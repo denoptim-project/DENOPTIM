@@ -1,0 +1,16 @@
+#
+# README file for test folder of DENOPTIM
+# 
+
+WARNING! The standard maximum valence (maxval) of TINKER has to be increased 
+         to be capable of running "t2" and other tests using DenoptimCG. 
+         Set "maxval=12" in the sizes.i of the TINKER source and recompile.
+
+WARNING! Generation of ring closing conformations with DenoptimCG requires
+         a modified version of TINKER implementing the Ring Closing Potential.
+         See J. Chem. Inf. Model. 2015, 55, 1844-1856.
+
+WARNING! There is no automated evaluation of the outcome of tests t1, t2, t3, 
+         and t4.
+         For now is up to the user to check the results.
+

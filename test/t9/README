@@ -1,0 +1,9 @@
+#
+# README file for test 't9' of DENOPTIM package
+#
+
+The binary files (i.e., serialized graphs) used in this test are created by 
+running 'p9'.
+Substrantial changed to the DENOPTIM's objects may require
+updating the binary files and re-running 'p9'.
+

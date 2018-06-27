@@ -1,0 +1,22 @@
+#
+# This is the parameter file for test t18
+#
+
+# Parameters for running the test
+TESTGENOPS-inpFileMale=OTF_WDIR/male.sdf
+TESTGENOPS-inpFileFemale=OTF_WDIR/female.sdf
+TESTGENOPS-outFileMale=male_xo.sdf
+TESTGENOPS-outFileFemale=female_xo.sdf
+TESTGENOPS-VERTEXMALE=5
+TESTGENOPS-VERTEXFEMALE=5
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+
+# Genetic Algorithm parameters
+GA-randomSeed=8572368003836
+#GA-XOverSelectionMode=TS
+

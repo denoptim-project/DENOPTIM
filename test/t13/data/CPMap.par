@@ -1,0 +1,24 @@
+# 
+# CompatibilityMatrix for Class Based Builders
+# 
+RCN cca:0 none
+RCN ccb:0 cca:0
+RCN co:0 coa:1
+RCN cob:1 cca:0
+RCN ch:0 F:0
+# CLASS-to-BondOrder conversion
+RBO cca 1
+RBO ccb 1
+RBO co 1
+RBO coa 1
+RBO cob 1
+RBO ch 1
+RBO hyd 1
+RBO F 1
+# Capping
+CAP cca:0 hyd:1
+CAP ccb:0 hyd:1
+CAP cob:1 hyd:1
+# Forbidden end
+DEL ch:0
+DEL co:0

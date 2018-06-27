@@ -1,0 +1,17 @@
+#
+# This is the parameter file for test t20
+#
+
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=OTF_WDIR/inGraphs.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=OTF_WDIR/editingTasks
+GRAPHEDIT-OUTPUTGRAPHS=outGraph.sdf
+GRAPHEDIT-OUTPUTGRAPHSFORMAT=SDF
+GRAPHEDIT-VERBOSITY=1
+GRAPHEDIT-ENFORCESYMMETRY=yes
+
+#Fragment space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par

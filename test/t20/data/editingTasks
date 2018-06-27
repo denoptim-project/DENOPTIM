@@ -1,0 +1,2 @@
+DENOPTIMGraphEdit [[Type=ReplaceChild] [FocusVertex=*_1_0_-1] [IncomingGraph=0 1_5_1_-1] [FocusEdge=*_*_1_0_1_cc:0_*]] 
+DENOPTIMGraphEdit [[Type=DeleteVertex] [FocusVertex=*_1_1_*]]

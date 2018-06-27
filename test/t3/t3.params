@@ -1,0 +1,110 @@
+#
+# This is the parameter file for DENOPTIM: test t3
+#
+
+# FragmentSpace parameters
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-maxHeavyAtom=100
+FS-maxRotatableBond=100
+FS-maxMW=1000
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds-1.2
+
+# RingClosureParameters
+RC-CLOSERINGS
+RC-RCCINDEX=OTF_WDIR/RCCONFS_ID_t3.txt
+RC-EVALUATIONCLOSABILITYMODE=0
+RC-CLOSABLERINGSMARTS=C1CCCC1
+RC-CLOSABLERINGSMARTS=C1CCCCC1
+RC-CLOSABLERINGSMARTS=C1CCCCCC1
+RC-VERBOSITY=2
+
+# File containing inchi keys. Useful when restarting the machinery. Provide a list
+# of all molecules encountered
+uidFile=OTF_WDIR/MOLUID.txt
+
+# print level
+printlevel=1
+
+# precision level
+precisionLevel=5
+
+
+# The seed value for random number generation
+seed=8572368003836
+
+# openbabel obabel executable
+toolOpenBabel=OTF_OBDIR/obabel
+
+# script for fitness evaluation
+fitnessEvalScript=OTF_WDIR/fitness_provider.sh
+
+# initial population file
+# should be supplied as multi-sd file or as a file containing list of sdf file paths
+# initPoplnFile=
+
+# number of processors to use
+# if the value is set to 0, the program will use the available Processors
+numOfProcessors=OTF_PROCS
+
+# max number of tries to build new graph
+MaxTriesPerPopulation = 1000
+
+################################################################################
+# Parameter settings for the GA
+################################################################################
+
+# the version of the GA to use
+# 1 = Parallelized version but based on a batch submission scheme. The next 
+# batch is submitted only on the completion of the previous batch
+# >1 = Parallelized version using a continuous submission scheme
+# (faster but extra jobs may be run)
+gaversion=2
+
+# population size of each generation
+populationSize=50
+
+# number of children to be produced during each generation
+numOfChildren=5
+
+# number of identical generations before convergence is reached
+numConvGen=10
+
+# strategy for selecting parents for the next generation
+# Choices: RWS/SUS/RANDOM/TS
+selectionStrategy=TS
+
+# The probability or rate at which crossover is performed
+crossoverProbability=0.750
+
+# The probability or rate at which mutation is performed
+mutationProbability=0.750
+
+# The probability or rate at which symmetric molecules are generated
+symmetricMoleculeProbability=0.0
+
+# number of generations the GA should run for
+numGen=100
+
+# Growth Probability scheme
+# 0:EXP_DIFF; 1:TANH; 2:MARCO_SCHEME; 3:UNRESTRICTED
+growthProbabilityScheme=2
+
+# Additional parameters for calculating growth probabilities
+# lamda values to be used with growth probability scheme 1 and 2
+lambda=0.25
+
+steepSigma=0.2
+middleSigma=2.0
+
+# sorting order of the fitness; default is to sort in the descending order
+sortOrderDesc=true
+
+# Strategy for population evolution
+# REPLACE_WORST = 1 (elitist scheme - survival of the fittest)
+# KEEP_GROWING = 2 (poor individuals are never removed thus population will continue to grow)
+replacementStrategy=1
+

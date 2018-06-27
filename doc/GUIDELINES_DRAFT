@@ -1,0 +1,55 @@
+Guidelines For Code Management (2 July 2014)
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+WARNING! This guidelines are only a draft based on Marco's 
+initial document and including modifications from Bjørn and Vish. 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+1. Types of source code
+1.1. Type A
+The fundamental library of DENOPTIM: data structure, basic functions, and general-purpose utilities (DENOPTIM.jar).
+1.2. Type B
+Denoptim main features. Code of this type depends on code of type A, which must be included as library when compiling code of type B. Modules like DenoptimGA (genetic algorithm) and DenoptimCG (3D builder) are examples of code of type B.
+1.3. Type C
+External features. Code of this type is independent from types A and B, and is used also for projects other than DENOPTIM. GM3DFragmenter (fragmentation tool) and the UIBKVANT library are type-C tools developed in Bergen. 
+
+2. Guidelines for code development
+
+2.1. Type-A and Type-B (from guidelines distributed ca. Jan 2013)
+2.1.1. SVN & Versioning: All source related to DENOPTIM must be checked into the SVN at regular intervals. The programmer must ensure that the entire program must be in a compilable state and that it does not significantly affect (discussed below) the general working of the software. While checking in add the necessary comments. A prescribed format is as follows: “Version: #.#.# Date: ##/###/#### Author: XYZ Comment:...”. The programmer should ensure that the version numbers are not conflicting. Additionally an update to the Wiki is also required to reflect these changes. The SVN also has its own versioning system but this is not the same as that followed by DENOPTIM. Version numbers allotted to DENOPTIM are currently on a conservative basis as the software is still in its infancy. For now, DENOPTIM internally maintains a general version number which will be updated once all members have agreed that the software (a stable version) is working for a pre-specified set of requirements. 
+2.1.2. Before making any changes to the source code, it is advisable to discuss the requirements with the lead programmer. A document such as the one distributed for the 3D builder is a good starting point. It is generally preferable that code not be deleted from the DENOPTIM library. This is particularly relevant when modifications to data structures are required.  At some pre-decided intervals (say every 6 months) the lead programmer can do some basic cleanup to remove redundant/obsolete code.  A set of test cases must be provided to ensure that the expected results are obtained. The programmer (the group member making the changes) is responsible for the software. A temporary version number may then be assigned to the software. To make the changes, the programmer must always start from a stable version downloaded from the SVN. 
+2.1.3. All contributing programmers are required to add their names to the author list in the files that they have edited. 
+2.1.4. Although programmers tend to have their own coding styles it is recommended that the Java coding conventions be followed (http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html)
+2.1.5. The guidelines do not specify coding conventions, testing policy, and distribution policy.
+
+2.2. Type-C
+2.2.1. The source code must be stored within the file system of the project repository and managed with a version manager tool, e.g., SVN or Git repository. When a SVN repository hosts a single project, SVN revision number should be used to unambiguously identify subversions under use and development, for example in­ communications, issue tracking, and also to specify the subversion used to produce results. Commits of tested code (see below) should be made as often as possible providing brief (1-2 sentences), yet informative commit messages, for example describing the main goal of a modification or the type of bug fixed.
+2.2.2. Coding conventions should be followed according to the programming language: for JAVA see Sun Java Conventions - revision 1999. 
+2.2.3. Whenever possible issue tracking systems bound to the subversion manager tool (e.g., Trac with SubVersion) should be used for reporting bugs, ask for new features, and plan further developments.
+2.2.4. The folder tree must contain documentation (e.g., doc folder), or scripts to generate documentation from source, including instructions on how to build and run the software on a specified platform. In alternative, scripts for building the executable files and running them must be placed in the root of the folder tree. 
+2.2.5. A test suite (e.g., test folder) must be provided to evaluate the functionality of the software. The test suite should contain all necessary input files and scripts to run each test without manual intervention and possibly evaluate the alphanumerical outcome returning a short digest or a “passed/not passed” log. 
+2.2.6. Collaborators who may wish to obtain preliminary version of the source code and eventually contribute to its development should operate exclusively via the SVN: obtain an account, check out (download) the latest version, and check in (upload) modifications as often as possible but only after proper testing. That is, run all existing tests making sure the modified version of the code returns results consistently with the nature of the modifications on the code, and maintains all the functionality of the previous version. If none of the existing tests makes use of the new features/modified code, new tests have to be generated and committed to the SVN together with the first version of the modified and tested code.
+2.2.7. All code shared via SVN repositories must be treated as confidential material. Thus code rewriting or smooth change of implementation of confidential material do not legitimate removal or alteration of the original authorship statements or licensing scheme, with the only exception of adding the name of the modifying author to the end of the existing list of authors (i.e., adding a tag @author after the existing ones in the header of the modified file) when significant improvements are introduced. Application of non-publicly distributed code must be discussed with the main author.
+2.2.8. Distribution of source code of type C outside the project is not bound to the distribution of code of types A and B. Licensing schemes are to be defined in compatibility with the regulation of the institution employing the main author.
+
+
+
+
+Some thoughts by BKA:
+
+If persons who are directly involved in this e-VITA project develops code which is relevant for DENOPTIM, then it should be accessible to the other members of this project. 
+
+If software developed in this project is also used in other projects, I don't see a problem with this as long as standard rules for scientific crediting are followed. 
+
+
+I think the main concerns we have about the source can be defined along the following main categories:
+
+1) Credit
+2) Control
+3) Access
+
+Credit: We should, and I do try to do this, follow standard practices for how to allocate scientific credit. The keywords I try to go by in this respect are fairness and generosity. If there is doubt whether someone should be on a paper, poster, code authorship etc. then I usually suggest we include a person rather than not. Credit is of critical importance to scientific work and if there are any complaints in this regard, we should bring it to the attention of the group (here it means all of us collaborating in the e-VITA project). Credit is here also related to authorship of source code, but I think most of the same principles as being used for scientific papers can also be used here. The issue about credit is “holy ground” so we have to step carefully. :-) My main message to everyone is: If you feel that you are not being credited for some of your work, please do not hesitate to tell me and I will do everything I can to address and hopefully solve the problem. 
+
+Control: I have a deep sympathy for the idea that the main contributor to a software should also be the one to take a lead on how to control its changes and development. When there is a disagreement on this, we should have a meeting (virtual or not) and discuss the problem.  The main developer might do something inefficient or wrong, and of course in those cases the rest of us must have an option to rectify this. The general rule should be that the main programmer has great influence over his own code, but in this project he cannot be a tyrant. 
+
+Access: We should all share and make available all code which is related to DENOPTIM whatever type it is. The main reason for this is redundancy, meaning that either research group should be able to proceed alone with the DENOPTIM research if necessary. If a nuclear bomb was dropped in Bergen or Trondheim tomorrow (heaven forbid!), the remaining group must be able to continue the DENOPTIM development. We should never be in a situation where one of us cannot run some code because it is being kept hidden by the other partner. Whenever one of us is considering using code developed by the other group, we should follow the main guidelines I've discussed under credit and control above. 

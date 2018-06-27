@@ -1,0 +1,11 @@
+#
+# README file for test 't10' of DENOPTIM package
+#
+
+The binary files (i.e., serialized graphs) used in this test have been created 
+with the SVN revision 8952.
+Substrantial changed to the DENOPTIM's objects may require
+updating the input and data files used by this test. The files under folder 'p9'
+in combination with the use of developers-only code (see 'PREPARECHKFORTEST'
+in class CombinatorialExplorerByLayer.java of the FragSpaceExplorer package) can
+be used to generate a new set of binaries for this test.
