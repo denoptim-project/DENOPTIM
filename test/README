@@ -14,3 +14,48 @@ WARNING! There is no automated evaluation of the outcome of tests t1, t2, t3,
          and t4.
          For now is up to the user to check the results.
 
+
+#
+# Description of the tests
+#
+
+t1: Test for DenoptimCG (requires Tinker-RC).
+
+t2: Application specific - test fitness provifed script (requires Tinker-RC).
+
+t3: Evolutionary experiment with ring-closures in 3D (requires Tinker-RC).
+
+t4: Exploration of fragment space with ring-closures in 3D (requires Tinker-RC).
+
+t5: Exploration of fragment space from given root graphs and ring-closures (no 3D).
+
+t6: Exploration of fragment space with enforced symmetry and ring-closures (no 3D).
+
+t7: Exploration of fragment space from a given set root graphs.
+
+t8: Exploration of fragment space.
+
+t9: Restart exploration of fragment space from checkpoint file.
+
+t10: Restart exploration of fragment space from checkpoint file.
+
+t11: Test "SerConverter", which parses a serialized graph. NB: this test need a serialized file generated with the same version of DENOPTIM.
+
+t12: Test "CheckpointReader", which reads a checkpoint file.
+
+t13: Exploration of fragment space with symmetry constraints.
+
+t14: Exploration of fragment space with enforced symmetry.
+
+t15: Evolution with enforced symmetry.
+
+t16: Evolution with symmetry constraints.
+
+t17: Preserve symmetri sets found in initial molecules throughout evolution.
+
+t18: Crossover operator with an acyclic graph.
+
+t19: Crossover opetator with a cyclic graph.
+
+t20: Test "GraphEditor", which takes an existing DENOPTINGraph, replaces a vertex with a new one, and deletesa nother vertex.
+
