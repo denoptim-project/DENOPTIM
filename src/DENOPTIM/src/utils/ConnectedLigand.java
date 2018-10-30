@@ -29,7 +29,7 @@ public class ConnectedLigand
         boolean isRCA = DENOPTIMConstants.RCATYPEMAP.keySet().contains(symbol);
         this.isDu = false;
         if (symbol.equals(DENOPTIMConstants.DUMMYATMSYMBOL) || isRCA ||
-                                DENOPTIMConstants.ALL_ELEMENTS.contains(symbol))
+                               !DENOPTIMConstants.ALL_ELEMENTS.contains(symbol))
         {
             this.isDu = true;
         }
@@ -55,6 +55,15 @@ public class ConnectedLigand
     {
         return this.seed;
     }
-    
+
+//------------------------------------------------------------------------------
+
+    public String toString()
+    {
+	StringBuilder sb = new StringBuilder();
+	sb.append(seed.getSymbol());
+	sb.append("(").append(connections).append("-conn.)");
+	return sb.toString();
+    }
 //------------------------------------------------------------------------------    
 }
