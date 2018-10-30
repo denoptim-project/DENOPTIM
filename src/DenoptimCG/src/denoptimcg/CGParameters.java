@@ -18,47 +18,146 @@ import logging.DENOPTIMLogger;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-
 /**
+ * Parameters for the conformer generator (3D builder).
  *
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 public class CGParameters
 {
+    /**
+     * Flag indicating that at least one parameter has been defined
+     */
+    private static boolean cgParamsInUse = false;
+
+    /**
+     * Verbosity level
+     */
     protected static int verbosity = 0;
+
+    /**
+     * Flag controlling debug verbosity
+     */
     protected static boolean debug = false;
+
+    /**
+     * Pathname to Tinker's pssrot executable
+     */
     protected static String toolPSSROT;
+
+    /**
+     * Pathname to Tinker's xyzint executable
+     */
     protected static String toolXYZINT;
+
+    /**
+     * Pathname to Tinker's intxyz executable
+     */
     protected static String toolINTXYZ;
-    protected static String paramFile;
-    protected static String pssrotFile;
-    protected static String rsPssrotFile;
-    protected static String keyFile;
-    protected static String rsKeyFile;
+
+    /**
+     * Pathname to OpenBabel executable
+     */
+    protected static String toolOpenBabel = "";
+
+    /**
+     * Flag controlling removal of dummy atoms from output geometry
+     */
     protected static boolean keepDummy = false;
+
+    /**
+     * Pathname to force field parameters file for Tinker
+     */
+    protected static String paramFile;
+
+    /**
+     * Pathname to parameters file for PSS part of Tinker's PSSROT
+     */
+    protected static String pssrotFile;
+
+    /**
+     * Pathname to parameters file for PSS part of Tinker's ring-closing PSSROT
+     */
+    protected static String rsPssrotFile;
+
+    /**
+     * Pathname to keywords file for Tinker's conformational search
+     */
+    protected static String keyFile;
+
+    /**
+     * Pathname to keywords file for Tinker's ring-closing conformational search
+     */
+    protected static String rsKeyFile;
+
+    /**
+     * Parameters for PSS part of Tinker's PSSROT step
+     */
     protected static ArrayList<String> pssrotParams_Init;
+
+    /**
+     * Parameters for linear search part of Tinker's PSSROT step
+     */
     protected static ArrayList<String> pssrotParams_Rest;
+
+    /**
+     * Keywords for Tinker's conformational search
+     */
     protected static ArrayList<String> keyFileParams;
+
+    /**
+     * Parameters for PSS part of Tinker's ring-closing PSSROT step
+     */
     protected static ArrayList<String> rsPssrotParams_Init;
+
+    /**
+     * Parameters for linear search part of Tinker's ring-closing PSSROT step
+     */
     protected static ArrayList<String> rsPssrotParams_Rest;
+
+    /**
+     * Keywords for Tinker's ring-closing conformational search
+     */
     protected static ArrayList<String> rsKeyFileParams;
+
+    /**
+     * Flag controlling the critetion used to reorder atom lists.
+     * 1: branch-oriented (completes a branch before moving to the next one).
+     * 2: layer-oriented )completes a layer bevore moving to the next one).
+     */
     protected static int atomOrderingScheme = 1;
-    // store atom types related to tinker
-    // these may be outside of what Tinker provides
+
+    /**
+     * Atom type map
+     */    
     protected static HashMap<String, Integer> TINKER_MAP;
 
-    // Log file to which all messages are written to
+    /**
+     * Log file //TODO: keep or get rid of it?
+     */
     protected static String logFile = "";
 
-    // read parameters from console
+    /**
+     * Unique task identifier
+     */
     protected static int taskID;
+
+    /**
+     * Pathname of input SDF file
+     */
     protected static String inpSDFFile;
+
+    /**
+     * Pathname of ouput SDF file
+     */
     protected static String outSDFFile;
+
+    /**
+     * Pathname to current working directory
+     */
     protected static String wrkDir;
     
-    // open babel conversion software
-    protected static String toolOpenBabel = "";
 
 //------------------------------------------------------------------------------
 
@@ -169,14 +268,14 @@ public class CGParameters
 
     public static int getVerbosity()
     {
-	return verbosity;
+        return verbosity;
     }
 
 //------------------------------------------------------------------------------
 
     public static boolean debug()
     {
-	return debug;
+        return debug;
     }
 
 //------------------------------------------------------------------------------
@@ -207,7 +306,8 @@ public class CGParameters
      * @param fname
      * @throws DENOPTIMException
      */
-    protected static void readParameterFile(String infile) throws DENOPTIMException
+    protected static void readParameterFile(String infile) 
+                                                        throws DENOPTIMException
     {
         String option, line;
         BufferedReader br = null;
@@ -239,129 +339,9 @@ public class CGParameters
                     continue;
                 }
 
-                if (line.toUpperCase().startsWith("TOOLOPENBABEL="))
+                if (line.toUpperCase().startsWith("CG-"))
                 {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        toolOpenBabel = option;
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("PSSROT="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    toolPSSROT = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("XYZINT"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    toolXYZINT = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("INTXYZ"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    toolINTXYZ = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("PARAM"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    paramFile = option;
-
-                    if (paramFile.length() > 0)
-                    {
-                        TINKER_MAP = TinkerUtils.readTinkerAtomTypes(paramFile);
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("KEYFILE"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    keyFile = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RCKEYFILE"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    rsKeyFile = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("VERBOSITY"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    verbosity = Integer.parseInt(option);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("DEBUG"))
-                {
-                    debug = true;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("PSSROTPARAMS"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    pssrotFile = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RSPSSROTPARAMS"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-		    rsPssrotFile = option;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("KEEPDUMMYATOMS"))
-                {
-                    keepDummy = true;
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("ATOMORDERINGSCHEME"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        atomOrderingScheme = Integer.parseInt(option);
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("INPSDF"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        inpSDFFile = option;
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("OUTSDF"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        outSDFFile = option;
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("WRKDIR="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                        wrkDir = option;
+                    CGParameters.interpretKeyword(line);
                     continue;
                 }
             }
@@ -386,17 +366,179 @@ public class CGParameters
         }
     }
 
+//-----------------------------------------------------------------------------
+
+    /**
+     * Processes a string looking for keyword and a possibly associated value.
+     * @param line the string to parse
+     * @throws DENOPTIMException
+     */
+
+    public static void interpretKeyword(String line) throws DENOPTIMException
+    {
+        String key = line.trim();
+        String value = "";
+        if (line.contains("="))
+        {
+            key = line.substring(0,line.indexOf("=") + 1).trim();
+            value = line.substring(line.indexOf("=") + 1).trim();
+        }
+        try
+        {
+            interpretKeyword(key,value);
+        }
+        catch (DENOPTIMException e)
+        {
+            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
+        }
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Processes a keyword/value pair and assign the related parameters.
+     * @param key the keyword as string
+     * @param value the value as a string
+     * @throws DENOPTIMException
+     */
+
+    public static void interpretKeyword(String key, String value)
+                                                      throws DENOPTIMException
+    {
+        cgParamsInUse = true;
+        String msg = "";
+        switch (key.toUpperCase())
+        {
+        case "CG-TOOLOPENBABEL=":
+            toolOpenBabel = value;
+            break;
+        case "CG-PSSROT=":            
+            toolPSSROT = value;
+            break;
+        case "CG-XYZINT=":
+            toolXYZINT = value;
+            break;
+        case "CG-INTXYZ=":
+            toolINTXYZ = value;
+            break;
+        case "CG-PARAM=":
+            paramFile = value;
+            break;
+        case "CG-KEYFILE=":
+            keyFile = value;
+            break;
+        case "CG-RCKEYFILE=":
+            rsKeyFile = value;
+            break;
+        case "CG-VERBOSITY=":
+            try
+            {
+                verbosity = Integer.parseInt(value);
+            }
+            catch (Throwable t)
+            {
+                msg = "Unable to understand value " + key + "'" + value + "'";
+                throw new DENOPTIMException(msg);
+            }
+            break;
+        case "CG-DEBUG=":
+            debug = true;
+            break;
+        case "CG-PSSROTPARAMS=":
+            pssrotFile = value;
+            break;
+        case "CG-RSPSSROTPARAMS=":
+            rsPssrotFile = value;
+            break;
+        case "CG-KEEPDUMMYATOMS=":
+            keepDummy = true;
+            break;
+        case "CG-ATOMORDERINGSCHEME=":
+            try
+            {
+                atomOrderingScheme = Integer.parseInt(value);
+            }
+            catch (Throwable t)
+            {
+                msg = "Unable to understand value " + key + "'" + value + "'";
+                throw new DENOPTIMException(msg);
+            }
+            break;
+        case "CG-INPSDF=":
+            inpSDFFile = value;
+            break;
+        case "CG-OUTSDF=":
+            outSDFFile = value;
+            break;
+        case "CG-WRKDIR=":
+            wrkDir = value;
+            break;
+/*
+        case "CG-=":
+            = value;
+            break;
+*/
+
+        default:
+             msg = "Keyword " + key + " is not a known DenoptimCG-"
+                                       + "related keyword. Check input files.";
+            throw new DENOPTIMException(msg);
+        }
+    }
+
 //------------------------------------------------------------------------------
 
-    public static boolean checkParameters() throws DENOPTIMException
+    /**
+     * Check all parameters.
+     */ 
+
+    public static void checkParameters() throws DENOPTIMException
     {
-        if (!(toolPSSROT != null && toolXYZINT != null && toolINTXYZ != null &&
-                keyFile != null && paramFile != null && pssrotFile != null &&
-                rsKeyFile != null && rsPssrotFile != null &&
-                atomOrderingScheme > 0 && atomOrderingScheme <= 2 &&
-                inpSDFFile != null && outSDFFile != null))
+        String msg = "ERROR: unacceptable value for parameter in DenoptimCG. ";
+        if (inpSDFFile == null)
         {
-            return false;
+           msg = msg + "inpSDFFile is '" + inpSDFFile + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (outSDFFile == null)
+        {
+           msg = msg + "outSDFFile is '" + outSDFFile + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (toolPSSROT == null)
+        {
+           msg = msg + "toolPSSROT is '" + toolPSSROT + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (toolXYZINT == null)
+        {
+           msg = msg + "toolXYZINT is '" + toolXYZINT + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (toolINTXYZ == null)
+        {
+           msg = msg + "toolINTXYZ is '" + toolINTXYZ + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (keyFile == null)
+        {
+           msg = msg + "keyFile is '" + keyFile + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (paramFile == null || paramFile.length() == 0)
+        {
+           msg = msg + "paramFile is '" + paramFile + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (pssrotFile == null)
+        {
+           msg = msg + "pssrotFile is '" + pssrotFile + "'";
+           throw new DENOPTIMException(msg);
+        }
+        if (atomOrderingScheme < 1 || atomOrderingScheme > 2)
+        {
+           msg = msg + "atomOrderingScheme is '" + atomOrderingScheme + "'";
+           throw new DENOPTIMException(msg);
         }
 
         if (FragmentSpaceParameters.fsParamsInUse())
@@ -407,9 +549,20 @@ public class CGParameters
         if (RingClosureParameters.rcParamsInUse())
         {
             RingClosureParameters.checkParameters();
+            if (RingClosureParameters.allowRingClosures())
+            {
+                if (rsPssrotFile == null)
+                {
+                   msg = msg + "rsPssrotFile is '" + rsPssrotFile + "'";
+                   throw new DENOPTIMException(msg);
+                }
+                if (rsKeyFile == null)
+                {
+                   msg = msg + "rsKeyFile is '" + rsKeyFile + "'";
+                   throw new DENOPTIMException(msg);
+                }
+            }
         }
-
-        return true;
     }
     
 //------------------------------------------------------------------------------
@@ -421,12 +574,13 @@ public class CGParameters
         keyFileParams = new ArrayList<>();
         rsPssrotParams_Init = new ArrayList<>();
         rsPssrotParams_Rest = new ArrayList<>();
-	rsKeyFileParams = new ArrayList<>();
+        rsKeyFileParams = new ArrayList<>();
         
-        // pssrot params
         CGUtils.readKeyFileParams(keyFile, keyFileParams);
         TinkerUtils.readPSSROTParams(pssrotFile, pssrotParams_Init, 
-							     pssrotParams_Rest);
+                                                             pssrotParams_Rest);
+        TINKER_MAP = TinkerUtils.readTinkerAtomTypes(paramFile);
+
         if (FragmentSpaceParameters.fsParamsInUse())
         {
             FragmentSpaceParameters.processParameters();
@@ -435,7 +589,7 @@ public class CGParameters
         if (RingClosureParameters.allowRingClosures())
         {
             TinkerUtils.readPSSROTParams(rsPssrotFile, rsPssrotParams_Init, 
-					                   rsPssrotParams_Rest);
+                                                           rsPssrotParams_Rest);
             CGUtils.readKeyFileParams(rsKeyFile, rsKeyFileParams);
             RingClosureParameters.processParameters();
         }
