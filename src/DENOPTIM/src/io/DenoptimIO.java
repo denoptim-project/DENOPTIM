@@ -230,6 +230,11 @@ public class DenoptimIO
 
         try
         {
+	    if (!checkExists(filename))
+	    {
+		System.out.println("ERROR! file '" + filename + "' not found!");
+		System.exit(-1);
+	    }
             mdlreader = new MDLV2000Reader(new FileReader(new File(filename)));
             ChemFile chemFile = (ChemFile) mdlreader.read((ChemObject) new ChemFile());
             lstContainers.addAll(
