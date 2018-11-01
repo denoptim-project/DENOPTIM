@@ -25,23 +25,19 @@ do
     echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> $tinkerparFile
     echo "FS-RotBondsDefFile=$DENOPTIMHomeDir/src/DenoptimCG/data/rotatableBonds-1.0" >> $tinkerparFile
 
-    echo "CG-toolOpenBabel=$obabelDENOPTIM/obabel" >> $tinkerparFile
     echo "CG-wrkDir=$wrkDir" >> $tinkerparFile
     # location of the TINKER tools
-    echo "CG-PSSROT=$tinkerPathDENOPTIM/pssrot" >> $tinkerparFile
-    echo "CG-XYZINT=$tinkerPathDENOPTIM/xyzint" >> $tinkerparFile
-    echo "CG-INTXYZ=$tinkerPathDENOPTIM/intxyz" >> $tinkerparFile
+    echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> $tinkerparFile
+    echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> $tinkerparFile
+    echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> $tinkerparFile
     # param file used by Tinker
-    echo "CG-PARAM=$DENOPTIMHomeDir/src/DenoptimCG/data/uff_vdw.prm" >> $tinkerparFile
+    echo "CG-ForceFieldFile=$DENOPTIMHomeDir/src/DenoptimCG/data/uff_vdw.prm" >> $tinkerparFile
     # key file to be used by tinker with PSSROT
     # this file is copied and edited for every molecule
     echo "CG-KEYFILE=$DENOPTIMHomeDir/src/DenoptimCG/data/build_uff.key" >> $tinkerparFile
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
     echo "CG-PSSROTPARAMS=$DENOPTIMHomeDir/src/DenoptimCG/data/submit_pssrot" >> $tinkerparFile
-    # Atom ordering scheme (1/2)
-    echo "CG-atomOrderingScheme=1" >> $tinkerparFile
-    echo "CG-KEEPDUMMYATOMS= any value" >> $tinkerparFile
 
 
     #run builder

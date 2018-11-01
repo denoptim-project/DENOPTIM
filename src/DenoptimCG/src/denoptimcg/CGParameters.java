@@ -57,11 +57,6 @@ public class CGParameters
     protected static String toolINTXYZ;
 
     /**
-     * Pathname to OpenBabel executable
-     */
-    protected static String toolOpenBabel = "";
-
-    /**
      * Flag controlling removal of dummy atoms from output geometry
      */
     protected static boolean keepDummy = false;
@@ -69,7 +64,7 @@ public class CGParameters
     /**
      * Pathname to force field parameters file for Tinker
      */
-    protected static String paramFile;
+    protected static String forceFieldFile;
 
     /**
      * Pathname to parameters file for PSS part of Tinker's PSSROT
@@ -182,13 +177,6 @@ public class CGParameters
 
 //------------------------------------------------------------------------------
 
-    public static String getOpenBabelTool()
-    {
-        return toolOpenBabel;
-    }
-
-//------------------------------------------------------------------------------
-
     public static String getPSSROTTool()
     {
         return toolPSSROT;
@@ -212,7 +200,7 @@ public class CGParameters
 
     public static String getParamFile()
     {
-        return paramFile;
+        return forceFieldFile;
     }
 
 //------------------------------------------------------------------------------
@@ -409,20 +397,17 @@ public class CGParameters
         String msg = "";
         switch (key.toUpperCase())
         {
-        case "CG-TOOLOPENBABEL=":
-            toolOpenBabel = value;
-            break;
-        case "CG-PSSROT=":            
+        case "CG-TOOLPSSROT=":            
             toolPSSROT = value;
             break;
-        case "CG-XYZINT=":
+        case "CG-TOOLXYZINT=":
             toolXYZINT = value;
             break;
-        case "CG-INTXYZ=":
+        case "CG-TOOLINTXYZ=":
             toolINTXYZ = value;
             break;
-        case "CG-PARAM=":
-            paramFile = value;
+        case "CG-FORCEFIELDFILE=":
+            forceFieldFile = value;
             break;
         case "CG-KEYFILE=":
             keyFile = value;
@@ -447,7 +432,7 @@ public class CGParameters
         case "CG-PSSROTPARAMS=":
             pssrotFile = value;
             break;
-        case "CG-RSPSSROTPARAMS=":
+        case "CG-RCPSSROTPARAMS=":
             rsPssrotFile = value;
             break;
         case "CG-KEEPDUMMYATOMS=":
@@ -489,56 +474,75 @@ public class CGParameters
 //------------------------------------------------------------------------------
 
     /**
+     * Ensures a pathname does lead to an existing file or stops with error
+     */
+
+    private static void checkFileExists(String pathname)
+    {
+	if (!DenoptimIO.checkExists(pathname))
+	{
+	    System.out.println("ERROR! File '" + pathname + "' not found!");
+	    System.exit(-1);
+	}
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Ensures that a parameter is not null or stops with error message.
+     */
+
+    private static void checkNotNull(String paramName, String param, String paramKey)
+    {
+        if (param == null)
+        {
+            System.out.println("ERROR! Parameter '" + paramName + "' is null! "
+				+ "Please, add '" + paramKey 
+				+ "' to the input parameters.");
+            System.exit(-1);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Check all parameters.
      */ 
 
     public static void checkParameters() throws DENOPTIMException
     {
-        String msg = "ERROR: unacceptable value for parameter in DenoptimCG. ";
-        if (inpSDFFile == null)
-        {
-           msg = msg + "inpSDFFile is '" + inpSDFFile + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (outSDFFile == null)
-        {
-           msg = msg + "outSDFFile is '" + outSDFFile + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (toolPSSROT == null)
-        {
-           msg = msg + "toolPSSROT is '" + toolPSSROT + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (toolXYZINT == null)
-        {
-           msg = msg + "toolXYZINT is '" + toolXYZINT + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (toolINTXYZ == null)
-        {
-           msg = msg + "toolINTXYZ is '" + toolINTXYZ + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (keyFile == null)
-        {
-           msg = msg + "keyFile is '" + keyFile + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (paramFile == null || paramFile.length() == 0)
-        {
-           msg = msg + "paramFile is '" + paramFile + "'";
-           throw new DENOPTIMException(msg);
-        }
-        if (pssrotFile == null)
-        {
-           msg = msg + "pssrotFile is '" + pssrotFile + "'";
-           throw new DENOPTIMException(msg);
-        }
+	checkNotNull("wrkDir",wrkDir,"CG-WRKDIR");
+	checkFileExists(wrkDir);
+
+        checkNotNull("inpSDFFile",inpSDFFile,"CG-INPSDF");
+        checkFileExists(inpSDFFile);
+
+        checkNotNull("outSDFFile",outSDFFile,"CG-OUTSDF");
+
+        checkNotNull("toolPSSROT",toolPSSROT,"CG-TOOLPSSROT");
+        checkFileExists(toolPSSROT);
+
+        checkNotNull("toolXYZINT",toolXYZINT,"CG-TOOLXYZINT");
+        checkFileExists(toolXYZINT);
+
+        checkNotNull("toolINTXYZ",toolINTXYZ,"CG-TOOLINTXYZ");
+        checkFileExists(toolINTXYZ);
+
+        checkNotNull("forceFieldFile",forceFieldFile,"CG-FORCEFIELDFILE");
+        checkFileExists(forceFieldFile);
+
+        checkNotNull("keyFile",keyFile,"CG-KEYFILE");
+        checkFileExists(keyFile);
+
+        checkNotNull("pssrotFile",pssrotFile,"CG-PSSROTPARAMS");
+        checkFileExists(pssrotFile);
+
+
         if (atomOrderingScheme < 1 || atomOrderingScheme > 2)
         {
-           msg = msg + "atomOrderingScheme is '" + atomOrderingScheme + "'";
-           throw new DENOPTIMException(msg);
+            System.out.println("ERROR! Parameter 'atomOrderingScheme' can only "
+				+ "be 1 or 2");
+            System.exit(-1);
         }
 
         if (FragmentSpaceParameters.fsParamsInUse())
@@ -551,16 +555,11 @@ public class CGParameters
             RingClosureParameters.checkParameters();
             if (RingClosureParameters.allowRingClosures())
             {
-                if (rsPssrotFile == null)
-                {
-                   msg = msg + "rsPssrotFile is '" + rsPssrotFile + "'";
-                   throw new DENOPTIMException(msg);
-                }
-                if (rsKeyFile == null)
-                {
-                   msg = msg + "rsKeyFile is '" + rsKeyFile + "'";
-                   throw new DENOPTIMException(msg);
-                }
+        	checkNotNull("rsPssrotFile",rsPssrotFile,"CG-RCPSSROTPARAMS");
+        	checkFileExists(rsPssrotFile);
+
+        	checkNotNull("rsKeyFile",rsKeyFile,"CG-RCKEYFILE");
+        	checkFileExists(rsKeyFile);
             }
         }
     }
@@ -579,7 +578,7 @@ public class CGParameters
         CGUtils.readKeyFileParams(keyFile, keyFileParams);
         TinkerUtils.readPSSROTParams(pssrotFile, pssrotParams_Init, 
                                                              pssrotParams_Rest);
-        TINKER_MAP = TinkerUtils.readTinkerAtomTypes(paramFile);
+        TINKER_MAP = TinkerUtils.readTinkerAtomTypes(forceFieldFile);
 
         if (FragmentSpaceParameters.fsParamsInUse())
         {
