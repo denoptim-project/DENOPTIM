@@ -21,7 +21,7 @@ WARNING! There is no automated evaluation of the outcome of tests t1, t2, t3,
 
 t1: Test for DenoptimCG (requires Tinker-RC).
 
-t2: Application specific - test fitness provifed script (requires Tinker-RC).
+t2: Application specific - test fitness provider script (requires Tinker-RC).
 
 t3: Evolutionary experiment with ring-closures in 3D (requires Tinker-RC).
 
@@ -51,11 +51,11 @@ t15: Evolution with enforced symmetry.
 
 t16: Evolution with symmetry constraints.
 
-t17: Preserve symmetri sets found in initial molecules throughout evolution.
+t17: Preserve symmetry sets found in initial molecules throughout evolution.
 
 t18: Crossover operator with an acyclic graph.
 
-t19: Crossover opetator with a cyclic graph.
+t19: Crossover operator with a cyclic graph.
 
-t20: Test "GraphEditor", which takes an existing DENOPTINGraph, replaces a vertex with a new one, and deletesa nother vertex.
+t20: Test "GraphEditor", which takes an existing DENOPTINGraph, replaces a vertex with a new one, and deletes another vertex.
 
