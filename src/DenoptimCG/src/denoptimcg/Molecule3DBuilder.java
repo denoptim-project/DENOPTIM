@@ -81,10 +81,15 @@ public class Molecule3DBuilder
     private Map<RingClosingAttractor,Integer> attToAtmID;
 
     /**
-     * List of combinations of Ring Closing Attractors (i.e., possible
+     * List of combinations of RingClosingAttractors (i.e., possible
      * set of rings to create)
      */
     private ArrayList<Set<ObjectPair>> allRCACombs;
+
+    /**
+     * Relation between pairs of RingClosingAttractors and DENOPTIMRings
+     */
+    private Map<ObjectPair,DENOPTIMRing> mapDRingsRCACombs;
 
     /**
      * List of rotatable bonds
@@ -132,6 +137,7 @@ public class Molecule3DBuilder
         this.attractors = new ArrayList<RingClosingAttractor>();
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
         this.allRCACombs = new ArrayList<Set<ObjectPair>>();
+        this.mapDRingsRCACombs = new HashMap<ObjectPair,DENOPTIMRing>();
         this.rotatableBnds = new ArrayList<ObjectPair>();
         this.newRingClosures = new ArrayList<RingClosure>();
         this.molName = "none";
@@ -169,11 +175,12 @@ public class Molecule3DBuilder
         this.attractors = attractors;
         this.attToAtmID = attToAtmID;
         this.allRCACombs = allRCACombs;
+        this.mapDRingsRCACombs = mapDRingsRCACombs;
         this.rotatableBnds = rotatableBnds;
         this.molName = molName;
         this.newRingClosures = ringClosures;
         this.overalRCScore = Double.NaN;
-	this.atmOveralScore = Double.NaN;
+        this.atmOveralScore = Double.NaN;
     }
 
 //------------------------------------------------------------------------------
@@ -205,17 +212,18 @@ public class Molecule3DBuilder
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
         findAttractors();
         this.allRCACombs = new ArrayList<Set<ObjectPair>>();
+        this.mapDRingsRCACombs = new HashMap<ObjectPair,DENOPTIMRing>();
         if (this.attractors.size() != 0)
         {
-	    if (molGraph.hasRings())
-	    {
-		// ring closures defined in the input
-		convertDENOPTIMRingIntoRcaCombinationns();
-	    }
+            if (molGraph.hasRings())
+            {
+                // ring closures defined in the input
+                convertDENOPTIMRingIntoRcaCombinationns();
+            }
         }
         this.newRingClosures = new ArrayList<RingClosure>();
         this.overalRCScore = Double.NaN;
-	this.atmOveralScore = Double.NaN;
+        this.atmOveralScore = Double.NaN;
     }
 
 //------------------------------------------------------------------------------    
@@ -255,33 +263,33 @@ public class Molecule3DBuilder
 
     private void convertDENOPTIMRingIntoRcaCombinationns()
     {
-	Set<ObjectPair> singleRCAcomb = new HashSet<ObjectPair>();
-	for (DENOPTIMRing dr : molGraph.getRings())
-	{
-	    DENOPTIMVertex headVtx = dr.getHeadVertex();
-	    DENOPTIMVertex tailVtx = dr.getTailVertex();
+        Set<ObjectPair> singleRCAcomb = new HashSet<ObjectPair>();
+        for (DENOPTIMRing dr : molGraph.getRings())
+        {
+            DENOPTIMVertex headVtx = dr.getHeadVertex();
+            DENOPTIMVertex tailVtx = dr.getTailVertex();
 
-	    int iH = -1;
-	    int iT = -1;
-	    for (int i=0; i<attractors.size(); i++)
-	    {
-		RingClosingAttractor rca = attractors.get(i);
-		int vid = (Integer) rca.getIAtom().getProperty(
-					    DENOPTIMConstants.ATMPROPVERTEXID);
-		
-		if (vid == headVtx.getVertexId())
-		{
-		    iH = i;
-		}
+            int iH = -1;
+            int iT = -1;
+            for (int i=0; i<attractors.size(); i++)
+            {
+                RingClosingAttractor rca = attractors.get(i);
+                int vid = (Integer) rca.getIAtom().getProperty(
+                                            DENOPTIMConstants.ATMPROPVERTEXID);
+                
+                if (vid == headVtx.getVertexId())
+                {
+                    iH = i;
+                }
                 if (vid == tailVtx.getVertexId())
                 {
                     iT = i;
                 }
-		if (iT > -1 && iH > -1)
-		{
-		    break;
-		}
-	    }
+                if (iT > -1 && iH > -1)
+                {
+                    break;
+                }
+            }
 
             ObjectPair op;
             if (iH > iT)
@@ -293,10 +301,13 @@ public class Molecule3DBuilder
                 op = new ObjectPair(iH,iT);
             }
 
-	    singleRCAcomb.add(op);
-	}
+            // Store this pair of RCAs
+            singleRCAcomb.add(op);
+            // and the relation between the pair and the associated DENOPTIMRing
+            mapDRingsRCACombs.put(op,dr);
+        }
 
-	allRCACombs.add(singleRCAcomb);
+        allRCACombs.add(singleRCAcomb);
     }
 
 //------------------------------------------------------------------------------
@@ -334,10 +345,10 @@ public class Molecule3DBuilder
             if (ia >  i || ib > i || ic > i)
             {
                 String msg = "ERROR! Cannot convert internal coordinates of "
-				   + "atom " + i + " " + tAtm + ". Reference "
-				   + "atoms have higher ID. The atoms list in "
-				   + "Molecule3DBuilder needs to be reordered.";
-		throw new DENOPTIMException(msg);
+                                   + "atom " + i + " " + tAtm + ". Reference "
+                                   + "atoms have higher ID. The atoms list in "
+                                   + "Molecule3DBuilder needs to be reordered.";
+                throw new DENOPTIMException(msg);
             }
             int angleFlag = tAtm.getAtomNeighbours()[3];
             double bond = tAtm.getDistAngle()[0];
@@ -351,7 +362,7 @@ public class Molecule3DBuilder
             double c2 = Math.cos(angle2);
             if (ia == 0)
             {
-		//first atom remains on the origin
+                //first atom remains on the origin
             }
             else if (ib == 0)
             {
@@ -360,32 +371,28 @@ public class Molecule3DBuilder
             else if (ic == 0)
             {
                 Vector3d nab = DENOPTIMMathUtils.normDist(
-				       newCoords.get(ia-1),newCoords.get(ib-1));
-		double rab = DENOPTIMMathUtils.distance(
+                                       newCoords.get(ia-1),newCoords.get(ib-1));
+                double rab = DENOPTIMMathUtils.distance(
                                        newCoords.get(ia-1),newCoords.get(ib-1));
                 newXYZ[0] = bond * s1;
                 newXYZ[2] = newCoords.get(ib-1).z + (rab - bond*c1)*nab.z;
-//TODO del
-if (Math.abs(nab.z) < (1.0 - smallDble))
-{
-    System.out.println("DIFF in A");
-    System.out.println(nab.x+" "+nab.y+" "+nab.z);
-    System.exit(1);
-}
             }
             else if (angleFlag == 0)
             {
                 Vector3d nab = DENOPTIMMathUtils.normDist(
-				       newCoords.get(ia-1),newCoords.get(ib-1));
+                                       newCoords.get(ia-1),newCoords.get(ib-1));
                 Vector3d nbc = DENOPTIMMathUtils.normDist(
-				       newCoords.get(ib-1),newCoords.get(ic-1));
+                                       newCoords.get(ib-1),newCoords.get(ic-1));
                 Vector3d t = new Vector3d();
                 t.cross(nbc,nab);
                 double c = nab.x*nbc.x + nab.y*nbc.y + nab.z*nbc.z;
                 if (Math.abs(c) > (1.0 - smallDble))
                 {
-                    String msg = "ERROR! Linearity does not allow to define "
-                        + "dihedral angle for atom " + i + " " + tAtm;
+                    String msg = "ERROR! Linearity does not allow definition "
+                        + "of the dihedral angle for atom " + i + " " + tAtm 
+                        + " (Value of c="+c+" too close to unity; threshold is "
+                        + (1.0 - smallDble) + "). "
+                        + "You better use dummy atoms to avoid linearities.";
                     throw new DENOPTIMException(msg);
                 }
                 t.scale(1/Math.sqrt(Math.max(1.00 - c*c, smallDble)));
@@ -401,17 +408,17 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
             else if (Math.abs(angleFlag) == 1)
             {
                 Vector3d nba = DENOPTIMMathUtils.normDist(
-				       newCoords.get(ib-1),newCoords.get(ia-1));
+                                       newCoords.get(ib-1),newCoords.get(ia-1));
                 Vector3d nac = DENOPTIMMathUtils.normDist(
-				       newCoords.get(ia-1),newCoords.get(ic-1));
+                                       newCoords.get(ia-1),newCoords.get(ic-1));
                 Vector3d t = new Vector3d();
                 t.cross(nac,nba);
                 double c = nba.x*nac.x + nba.y*nac.y + nba.z*nac.z;
                 if (Math.abs(c) > (1.0 - smallDble) && verbosity > 2)
                 {
-		    System.out.println("WARNING! close-to-linear system "
-			+ "in the definition of atom " + i + " " + tAtm + ". "
-			+ "You better use dummy atoms to avoid linearities.");
+                    System.out.println("WARNING! close-to-linear system "
+                        + "in the definition of atom " + i + " " + tAtm + ". "
+                        + "You better use dummy atoms to avoid linearities.");
                 }
                 double s = Math.max(1.00 - c*c, smallDble);
                 double a = (-c2 - c*c1) / s;
@@ -430,22 +437,22 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
                     b = b / ci;
                     ci = 0.0;
                     if (verbosity > 2)
-		    {
+                    {
                         System.out.println("WARNING! close-to-linear system "
                         + "in the definition of atom " + i + " " + tAtm + ". "
                         + "You better use dummy atoms to avoid linearities.");
-		    }
+                    }
                 }
                 else 
                 {
                    ci = 0.0;
                 }
                 newXYZ[0] = newCoords.get(ia-1).x 
-					    + bond*(a*nac.x + b*nba.x + ci*t.x);
+                                            + bond*(a*nac.x + b*nba.x + ci*t.x);
                 newXYZ[1] = newCoords.get(ia-1).y 
-					    + bond*(a*nac.y + b*nba.y + ci*t.y);
+                                            + bond*(a*nac.y + b*nba.y + ci*t.y);
                 newXYZ[2] = newCoords.get(ia-1).z 
-					    + bond*(a*nac.z + b*nba.z + ci*t.z);
+                                            + bond*(a*nac.z + b*nba.z + ci*t.z);
             }
             Point3d p3d = new Point3d(newXYZ[0],newXYZ[1],newXYZ[2]);
             newCoords.add(p3d);
@@ -558,6 +565,20 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
 //------------------------------------------------------------------------------
 
     /**
+     * Returns the DENOPTIMRing that corresponds to a given pair of
+     * RingClosingAttractors.
+     * @param pair the pair of RingClodingAttractors
+     * @return the correspondence bewteen RCAs and DENOPTIMRings
+     */
+
+    public DENOPTIMRing getDRingFromRCAPair(ObjectPair pairRCAs)
+    {
+        return mapDRingsRCACombs.get(pairRCAs);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Returns the list of rotatable bonds
      */
 
@@ -618,36 +639,36 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
 
     public double getAtomOverlapScore()
     {
-	if (Double.isNaN(atmOveralScore))
-	{
-	    double score = 0.0;
-	    for (IAtom atmA : fmol.atoms())
-	    {
-		String elA = atmA.getSymbol();
+        if (Double.isNaN(atmOveralScore))
+        {
+            double score = 0.0;
+            for (IAtom atmA : fmol.atoms())
+            {
+                String elA = atmA.getSymbol();
 
-		if (!DummyAtomHandler.isElement(elA))
-		    continue;
+                if (!DummyAtomHandler.isElement(elA))
+                    continue;
 
-		IAtom[] toExclude = PathTools.findClosestByBond(fmol,atmA,4);
-		for (IAtom atmB : fmol.atoms())
-		{
-		    if (atmA == atmB)
-			continue;
+                IAtom[] toExclude = PathTools.findClosestByBond(fmol,atmA,4);
+                for (IAtom atmB : fmol.atoms())
+                {
+                    if (atmA == atmB)
+                        continue;
 
-		    if (Arrays.asList(toExclude).contains(atmB))
-			continue;
+                    if (Arrays.asList(toExclude).contains(atmB))
+                        continue;
 
-		    String elB = atmB.getSymbol();
-		    if (!DummyAtomHandler.isElement(elB))
-			continue;
+                    String elB = atmB.getSymbol();
+                    if (!DummyAtomHandler.isElement(elB))
+                        continue;
 
-		    double dist = atmA.getPoint3d().distance(atmB.getPoint3d());
-		    score = score + dist;
-		}
-	    }
-	    atmOveralScore = score;
-	}
-	return atmOveralScore;
+                    double dist = atmA.getPoint3d().distance(atmB.getPoint3d());
+                    score = score + dist;
+                }
+            }
+            atmOveralScore = score;
+        }
+        return atmOveralScore;
     }
 
 //------------------------------------------------------------------------------
@@ -673,7 +694,7 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
      * atoms
      */
 
-    public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc)
+    public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc, int bondType)
     {
         this.newRingClosures.add(nRc);
         this.overalRCScore = Double.NaN;
@@ -684,8 +705,20 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
         if (verbosity > 2)
             System.out.println("ADDING BOND: "+iA+" "+iB);
 
-//TODO get bond order from DENOPTIM ring
-        this.fmol.addBond(iA, iB, IBond.Order.valueOf("SINGLE"));
+        String btStr = "SINGLE";        
+        switch (bondType)
+        {
+            case (2):
+                btStr = "DOUBLE";
+                break;
+            case (3):
+                btStr = "TRIPLE";
+                break;
+            default:
+                btStr = "SINGLE";
+                break;
+        }
+        this.fmol.addBond(iA, iB, IBond.Order.valueOf(btStr));
         if (iA < iB)
         {
             this.tmol.addBond(iA+1, iB+1);
@@ -706,7 +739,7 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
     public void purgeListRotatableBonds() throws DENOPTIMException
     {
         //Get all rings
-	SpanningTree st = new SpanningTree(fmol);
+        SpanningTree st = new SpanningTree(fmol);
         IRingSet allRings = new RingSet();
         try {
             allRings = st.getAllRings();
@@ -715,9 +748,9 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
         }
 
         //Identify bonds to remove (cyclic bonds)
-	ArrayList<ObjectPair> toRemove = new ArrayList<ObjectPair>();
-	for (ObjectPair op : rotatableBnds)
-	{
+        ArrayList<ObjectPair> toRemove = new ArrayList<ObjectPair>();
+        for (ObjectPair op : rotatableBnds)
+        {
             int i1 = ((Integer)op.getFirst()).intValue();
             int i2 = ((Integer)op.getSecond()).intValue();
 
@@ -738,8 +771,8 @@ if (Math.abs(nab.z) < (1.0 - smallDble))
         //Remove bonds
         for (ObjectPair op : toRemove)
         {
-	    rotatableBnds.remove(op);
-	}	
+            rotatableBnds.remove(op);
+        }        
     }
 
 //------------------------------------------------------------------------------
