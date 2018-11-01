@@ -12,8 +12,8 @@ wDir="/Users/mfo051/scratch"
 #      shorter than 80 characters.
 
 #DENOPTIM home
-export DENOPTIMHomeDir="/Users/mfo051/DENOPTIM"
-export DENOPTIM_HOME="/Users/mfo051/DENOPTIM"
+export DENOPTIMHomeDir="/Users/mfo051/tools/DENOPTIM"
+export DENOPTIM_HOME="/Users/mfo051/tools/DENOPTIM"
 
 #Setting for the execution of DENOPTIM tools
 export javaDENOPTIM="/usr/bin/java"
@@ -26,7 +26,7 @@ export obabelDENOPTIM="/usr/local/bin"
 export chemaxonDENOPTIM="/Applications/ChemAxon/MarvinBeans/bin"
 
 #TINKER
-export tinkerPathDENOPTIM="/Users/mfo051/tools/tinkerLFMM_RC/TinkerLFMM_RCP_2/bin"
+export tinkerPathDENOPTIM="/Users/mfo051/tools/tinker_with_extensions/TinkerLFMM_RCP_2/bin"
 
 #R
 export RscriptDENOPTIM="/usr/bin/Rscript"
