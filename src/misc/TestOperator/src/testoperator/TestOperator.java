@@ -12,7 +12,8 @@ import exception.DENOPTIMException;
 import denoptimga.DENOPTIMGraphOperations;
 
 /**
- * Tool to run crossober between to given molecules
+ * Tool to test genetic operators
+ *
  * @author Marco Foscato
  */
 
