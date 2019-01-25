@@ -122,6 +122,8 @@ public class ParallelEvolutionaryAlgorithm
             if (tsk.foundException())
             {
                 hasprobs = true;
+	        DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
+							      + tsk.toString());
 		DENOPTIMLogger.appLogger.log(Level.SEVERE,
 							 tsk.getErrorMessage());
                 break;

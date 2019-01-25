@@ -296,6 +296,7 @@ public class DENOPTIMGraphOperations
             System.err.println("---> Extending Graph " + grphId
                                + " on vertex " + curVrtId
                                + " which is in level " + lvl);
+	    System.err.println("     Grap: "+ molGraph);
         }
 
         MersenneTwister mtrand = RandomUtils.getRNG();
@@ -375,11 +376,19 @@ public class DENOPTIMGraphOperations
             if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
             {
                 symAPs = curVertex.getPartners(apId);
-                if (debug)
-                {
-                    System.err.println("Applying intra-fragment symmetric "
+		if (symAPs != null)
+		{
+                    if (debug)
+                    {
+                        System.err.println("Applying intra-fragment symmetric "
                                           + "substitution over APs: " + symAPs);
+		    }
                 }
+		else
+		{
+		    symAPs = new SymmetricSet();
+		    symAPs.add(apId);
+		}
             }
             else
             {

@@ -310,6 +310,9 @@ public class GraphEdParameters
         case "GRAPHEDIT-OUTPUTGRAPHSFORMAT=":
             outGraphsFormat = value.toUpperCase();
             break;
+	case "GRAPHEDIT-LOGFILE=":
+	    logFile = value;
+            break;
         case "GRAPHEDIT-VERBOSITY=":
             try
             {

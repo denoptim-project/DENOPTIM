@@ -51,7 +51,6 @@ public class GraphEditor
         
         try
         {
-            System.out.println("================ GraphEditor ================");
             GraphEdParameters.readParameterFile(configFile);
             GraphEdParameters.checkParameters();
             GraphEdParameters.processParameters();
@@ -117,7 +116,8 @@ public class GraphEditor
         }
 
         // normal completion
-        System.out.println("========= GraphEditor run completed =========");
+	DENOPTIMLogger.appLogger.log(Level.SEVERE, 
+			       "========= GraphEditor run completed =========");
         System.exit(0);
     }
     
