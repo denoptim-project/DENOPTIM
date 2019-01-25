@@ -60,7 +60,7 @@ then
     exit -1
 fi
 
-grep -q 'GraphEditor run completed' $wrkDir/t20.log
+grep -q 'GraphEditor run completed' $wrkDir/GraphEd.log
 if [[ $? != 0 ]]
 then
     echo " "
