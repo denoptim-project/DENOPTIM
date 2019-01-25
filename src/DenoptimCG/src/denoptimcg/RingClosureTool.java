@@ -567,7 +567,8 @@ public class RingClosureTool
         // Here we assume the file *.int with same basename exists
         // (was used it as input for PSSROT-RingSearch) and that file works as
         // template of the z-matrix
-        String orsIntfile = getNameLastCycleFile(molName + "_rs" + itn, rsOutFile);
+        String orsIntfile = getNameLastCycleFile(molName + "_rs" + itn, 
+								     rsOutFile);
         String orsID = "" + CGParameters.getTaskID();
         String orsCmd = CGParameters.getXYZINTTool() + " "
                         + orsIntfile + " "
@@ -637,14 +638,15 @@ public class RingClosureTool
      * in this attempt.
      */
 
-    public static void closeRings(Molecule3DBuilder mol, Set<ObjectPair> rcaCombination)
+    public static void closeRings(Molecule3DBuilder mol, 
+						 Set<ObjectPair> rcaCombination)
     {
         // Collect candidate RingClosures
         List<RingClosure> candidatesClosures = new ArrayList<RingClosure>();
         for (ObjectPair op : rcaCombination)
         {
 	    if (verbosity > 2)
-		System.out.println("closeRings: evaluating closure of pair: "+op);
+		System.out.println("closeRings: evaluating closure of "+op);
 
             int iRcaA = ((Integer) op.getFirst()).intValue();
             int iRcaB = ((Integer) op.getSecond()).intValue();
@@ -662,7 +664,8 @@ public class RingClosureTool
             double lenT = srcB.distance(atmB);
             double distTolerance = (lenH + lenT) / 2.0;
 //TODO may want to use different set criteria
-            distTolerance = distTolerance * RingClosureParameters.getRCDistTolerance();
+            distTolerance = distTolerance 
+				   * RingClosureParameters.getRCDistTolerance();
 //
             double minDistH1T2 = -1.0;
             double minDistH2T1 = -1.0;
@@ -688,7 +691,8 @@ public class RingClosureTool
                 maxDistH1T2 = lenH + distTolerance;
                 maxDistH2T1 = lenT + distTolerance;
 //TODO may want to use different set criteria
-                maxDistH2T2 = distTolerance * RingClosureParameters.getRCDistTolerance();
+                maxDistH2T2 = distTolerance 
+				   * RingClosureParameters.getRCDistTolerance();
             }
 
 	    boolean closeThisBnd = false;
@@ -708,7 +712,8 @@ public class RingClosureTool
 	    }
 	    if (closeThisBnd)
             {
-                mol.addBond(rcaA.getSrcAtom(),rcaB.getSrcAtom(),rc);
+		int bt = mol.getDRingFromRCAPair(op).getBondType();
+                mol.addBond(rcaA.getSrcAtom(),rcaB.getSrcAtom(),rc,bt);
                 rcaA.setUsed();
                 rcaB.setUsed();
             }

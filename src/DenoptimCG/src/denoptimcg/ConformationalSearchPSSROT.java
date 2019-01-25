@@ -101,16 +101,22 @@ public class ConformationalSearchPSSROT
 								   "MOL_ERROR");
 	    if (molErroProp == null)
 	    {
-		System.out.println("Field MOL_ERROR is null: proceeding with "
-				   + "conformational search");
+		if (verbosity > 1)
+		{
+		    System.out.println("Field MOL_ERROR is null: proceeding "
+				   + "with conformational search.");
+		}
                 Molecule3DBuilder csMol = performPSSROT(mols.get(i), i);
                 nMols.add(csMol);
 	    }
 	    else
 	    {
-		System.out.println("Field MOL_ERROR is NOT null: skiping "
+		if (verbosity > 1)
+		{
+		    System.out.println("Field MOL_ERROR is NOT null: skiping "
 				   + "conformational search. Reason: "
 				   + molErroProp);
+		}
                 nMols.add(mols.get(i).deepcopy());
 	    }
         }

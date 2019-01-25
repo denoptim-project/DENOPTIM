@@ -203,7 +203,7 @@ public class DENOPTIMMoleculeUtils
 		String s = "Unexpected inconsistency between used RCV list "
 			   + v + " in {" + usedRcvs + "}"
 			   + "and list of DENOPTIMRings "
-			   + "{" + rings + "}. Check Code.";
+			   + "{" + rings + "}. Check Code!";
 		throw new DENOPTIMException(s);
 	    }
 	    DENOPTIMVertex vH = rings.get(0).getHeadVertex();

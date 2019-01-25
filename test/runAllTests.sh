@@ -12,8 +12,8 @@ wDir="/Users/mfo051/scratch"
 #      shorter than 80 characters.
 
 #DENOPTIM home
-export DENOPTIMHomeDir="/Users/mfo051/DENOPTIM"
-export DENOPTIM_HOME="/Users/mfo051/DENOPTIM"
+export DENOPTIMHomeDir="/Users/mfo051/tools/DENOPTIM"
+export DENOPTIM_HOME="/Users/mfo051/tools/DENOPTIM"
 
 #Setting for the execution of DENOPTIM tools
 export javaDENOPTIM="/usr/bin/java"

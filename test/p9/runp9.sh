@@ -37,16 +37,7 @@ exec 2>&1
 "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/FragSpaceExplorer.jar" "$paramFile"
 exec 1>&6 6>&- 
 
-# NB: this is needed because of platform dependent sorting of file names.
-refMsgUNX="Stopped with converged checkpoint IDs: \[1, 0, 1\]"
-refMsgOS="Stopped with converged checkpoint IDs: \[0, 0, 0, 1, 0, 1\]"
-refMsg="$refMsgUNX"
-# TODO: implicit! Expects to be running on OS based on sed syntax. Cen be
-# better then this...
-if [ "$sedSyntax" == "BSD" ]
-    then
-    refMsg="$refMsgOS"
-fi
+refMsg="Stopped with converged checkpoint IDs:"
 if ! grep -q "$refMsg" "$logFile"
 then
     echo " "

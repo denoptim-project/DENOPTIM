@@ -17,30 +17,28 @@ do
     echo -ne ' progress: '$fname' / 1000\r'
 
     #Prepare parameters
-    echo "inpSDF=$inpSDF" > $tinkerparFile
-    echo "outSDF=$tmpOptSDFFile" >> $tinkerparFile
+    echo "CG-inpSDF=$inpSDF" > $tinkerparFile
+    echo "CG-outSDF=$tmpOptSDFFile" >> $tinkerparFile
     echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> $tinkerparFile
     echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> $tinkerparFile
     echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> $tinkerparFile
     echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> $tinkerparFile
     echo "FS-RotBondsDefFile=$DENOPTIMHomeDir/src/DenoptimCG/data/rotatableBonds-1.0" >> $tinkerparFile
 
-    echo "toolOpenBabel=$obabelDENOPTIM/obabel" >> $tinkerparFile
-    echo "wrkDir=$wrkDir" >> $tinkerparFile
+    echo "CG-wrkDir=$wrkDir" >> $tinkerparFile
     # location of the TINKER tools
-    echo "PSSROT=$tinkerPathDENOPTIM/pssrot" >> $tinkerparFile
-    echo "XYZINT=$tinkerPathDENOPTIM/xyzint" >> $tinkerparFile
-    echo "INTXYZ=$tinkerPathDENOPTIM/intxyz" >> $tinkerparFile
+    echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> $tinkerparFile
+    echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> $tinkerparFile
+    echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> $tinkerparFile
     # param file used by Tinker
-    echo "PARAM=$DENOPTIMHomeDir/src/DenoptimCG/data/uff_vdw.prm" >> $tinkerparFile
+    echo "CG-ForceFieldFile=$DENOPTIMHomeDir/src/DenoptimCG/data/uff_vdw.prm" >> $tinkerparFile
     # key file to be used by tinker with PSSROT
     # this file is copied and edited for every molecule
-    echo "KEYFILE=$DENOPTIMHomeDir/src/DenoptimCG/data/build_uff.key" >> $tinkerparFile
+    echo "CG-KEYFILE=$DENOPTIMHomeDir/src/DenoptimCG/data/build_uff.key" >> $tinkerparFile
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
-    echo "PSSROTPARAMS=$DENOPTIMHomeDir/src/DenoptimCG/data/submit_pssrot" >> $tinkerparFile
-    # Atom ordering scheme (1/2)
-    echo "atomOrderingScheme=1" >> $tinkerparFile
+    echo "CG-PSSROTPARAMS=$DENOPTIMHomeDir/src/DenoptimCG/data/submit_pssrot" >> $tinkerparFile
+
 
     #run builder
     $javaDENOPTIM -jar $DENOPTIMJarFiles/DenoptimCG.jar $tinkerparFile &> $logFile

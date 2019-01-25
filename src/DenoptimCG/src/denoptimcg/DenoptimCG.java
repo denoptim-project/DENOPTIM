@@ -34,6 +34,7 @@ public class DenoptimCG
         try
         {
             CGParameters.readParameterFile(paramFile);
+	    CGParameters.checkParameters();
             CGParameters.processParameters();
             CGParameters.printParameters();
             
