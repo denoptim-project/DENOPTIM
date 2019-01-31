@@ -213,7 +213,7 @@ public class GAParameters
     }
 
 //------------------------------------------------------------------------------
-//TODO move and update
+
     protected static String getVisitedGraphsFile()
     {
         return visitedGraphsFile;

@@ -12,6 +12,9 @@ src: The src directory contains the source code:
     DenoptimGA: The Genetic Algorithm engine that uses the DENOPTIM library  
                 for molecular design.
 
+    DenoptimRND: The Evolutionary Algorithms using only random selection of
+                new members.
+
     DenoptimCG: The 3D conformation generator. Requires standard or
                 RCP-capable (for DENOPTIM runs performing ring-closures) to
                 be installed.

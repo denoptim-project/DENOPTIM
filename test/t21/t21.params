@@ -1,0 +1,16 @@
+# Settings for the random evolution
+RND-PRECISIONLEVEL=5
+RND-RANDOMSEED=123123123
+RND-ALLGRAPHSFILE=OTF_WDIR/allGrafsWithFitness.sdf
+RND-NUMGENERATIONS=10
+RND-NUMCHILDREN=2
+RND-REPLACEMENTSTRATEGY=1
+RND-POPULATIONSIZE=10
+RND-NUMCONVGEN=10
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/TCFS-1_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/TCFS-1_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/TCFS-1_caps.sdf
+FS-compMatrixFile=OTF_WDIR/TCFS-1_CPMap.par
+FS-MaxMW=3000

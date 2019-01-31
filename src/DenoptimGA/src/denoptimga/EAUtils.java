@@ -633,7 +633,7 @@ class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Reconstruct the molecular population from the file
+     * Reconstruct the molecular population from the file.
      * @param filename
      * @param molPopulation
      * @param lstInchi

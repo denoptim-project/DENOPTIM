@@ -222,6 +222,11 @@ runTest "t19"
 #
 runTest "t20"
 
+#
+# t21: Evolution based on random seletion of known graphs
+#
+runTest "t21"
+
 
 echo "All done!"
 exit 0

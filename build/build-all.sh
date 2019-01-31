@@ -30,6 +30,19 @@ echo
 echo
 
 
+echo "build-denoptimrnd.sh"
+bash build-denoptimrnd.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-denoptimrnd.sh."
+    exit -1
+fi
+
+
+echo
+echo
+
+
 echo "build-denoptimcg.sh"
 bash build-denoptimcg.sh
 
