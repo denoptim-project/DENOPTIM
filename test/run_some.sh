@@ -108,7 +108,7 @@ fi
 
 cd $wDir
 
-runTest "t20"
+runTest "t21"
 
 echo "All done!"
 exit 0

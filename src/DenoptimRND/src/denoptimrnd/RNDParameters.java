@@ -18,7 +18,6 @@ import rings.RingClosureParameters;
 import fragspace.FragmentSpaceParameters;
 import org.apache.commons.io.FileUtils;
 import utils.RandomUtils;
-import utils.EvaluatedGraphsCollection;
 
 
 /**
@@ -492,11 +491,6 @@ public class RNDParameters
 	    RingClosureParameters.processParameters();
 	}
 
-	//Load collection of evaluated graphs
-	// WARNING: memory demanding operation!
-	EvaluatedGraphsCollection.addAll(
-		       RNDEAUtils.readGraphsWithFitnessFromFile(allGraphsFile));
-	
         System.err.println("Program log file: " + logFile);
         System.err.println("Output files associated with the current run are " +
                                 "located in " + dataDir);

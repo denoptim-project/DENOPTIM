@@ -7,13 +7,13 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.math3.random.MersenneTwister;
 
 import constants.DENOPTIMConstants;
 import io.DenoptimIO;
 import molecule.DENOPTIMGraph;
 import molecule.DENOPTIMMolecule;
 import utils.GenUtils;
-import utils.EvaluatedGraphsCollection;
 import utils.GraphUtils;
 import utils.TaskUtils;
 import fragspace.FragmentSpace;
@@ -35,6 +35,28 @@ public class DenoptimRND
 
     private static final String fsep = System.getProperty("file.separator");
 
+    /**
+     * Colection of DENOPTIM representations of
+     * graphs with fitness.
+     */
+    private static ArrayList<DENOPTIMMolecule> allEvaluatedGraphs =
+                                              new ArrayList<DENOPTIMMolecule>();
+
+    /**
+     * Comment used to flag previously used graphs
+     */
+    private static String usedFlag = "ALREADY_USED";
+
+    /**
+     * Number of used graphs
+     */
+    private static int numUsed = 0;
+
+    /**
+     * Number of available graphs
+     */
+    private static int numAvail = 0;
+
 //------------------------------------------------------------------------------
 
     public static void printUsage()
@@ -43,7 +65,7 @@ public class DenoptimRND
         System.exit(-1);
     }
 
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
     
     /**
      * Main program 
@@ -65,7 +87,13 @@ public class DenoptimRND
             RNDParameters.checkParameters();
             RNDParameters.processParameters();
             RNDParameters.printParameters();
+	
+	    // Load Known graphs
+	    // WARNING! This burns-up the memory
+	    addEvaluatedGraphs(RNDEAUtils.readGraphsWithFitnessFromFile(
+					     RNDParameters.getAllGraphsFile()));
 
+	    // Run evolution
             run();
         }
         catch (DENOPTIMException de)
@@ -224,7 +252,7 @@ public class DenoptimRND
 
         while (molPopulation.size() < n)
         {
-            DENOPTIMMolecule dm = EvaluatedGraphsCollection.getRandomEntry(1);
+            DENOPTIMMolecule dm = getRandomEntry();
             molPopulation.add(dm);
             if (molPopulation.size() == n)
             {
@@ -275,7 +303,7 @@ public class DenoptimRND
 
     /**
      * creates a population of molecules
-     * In creating the population of specified size (say n).
+     * of specified size.
      * If the desired population size is not achieved, the
      * program throws and exception.
      * @param molPopulation the population to be initialized
@@ -325,7 +353,7 @@ public class DenoptimRND
 	    t+=1;
 
             // Pick a graph from the list of known (and evaluated) graphs
-            DENOPTIMMolecule dm = EvaluatedGraphsCollection.getRandomEntry(1);
+            DENOPTIMMolecule dm = getRandomEntry();
             molPopulation.add(dm);
 
 	    // Stop appending to the population
@@ -357,6 +385,57 @@ public class DenoptimRND
         for (DENOPTIMMolecule mol:popln)
             mol.cleanup();
         popln.clear();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Append all entries to the collection
+     * @param dmols the entities to append
+     */
+
+    private static void addEvaluatedGraphs(ArrayList<DENOPTIMMolecule> dmols)
+    {
+	allEvaluatedGraphs.addAll(dmols);
+	numAvail = allEvaluatedGraphs.size();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Select an evaluated graph that was not selected before
+     */
+
+    private static DENOPTIMMolecule getRandomEntry() throws DENOPTIMException
+    {
+        DENOPTIMMolecule newOne = null;
+
+        if (numUsed == numAvail)
+        {
+            throw new DENOPTIMException("ERROR! Not enough graphs in the "
+                                           + "collection of evaluated graphs.");
+        }
+
+	MersenneTwister rng = RandomUtils.getRNG();
+	
+        while (numUsed < numAvail)
+        {
+            int rndNum = rng.nextInt(numAvail);
+            String str = allEvaluatedGraphs.get(rndNum).getComments();
+            if (str==null || (str!=null && !str.equals(usedFlag)))
+            {
+                newOne = allEvaluatedGraphs.get(rndNum);
+                allEvaluatedGraphs.get(rndNum).setComments(usedFlag);
+                numUsed+=1;
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("Selecting graph %d ",rndNum));
+                sb.append(newOne.getMoleculeUID());
+                sb.append(String.format(" (Usage %d/%d)",numUsed,numAvail));
+                DENOPTIMLogger.appLogger.log(Level.INFO,sb.toString());
+                break;
+            }
+        }
+        return newOne;
     }
     
 //------------------------------------------------------------------------------
