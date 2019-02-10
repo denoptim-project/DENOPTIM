@@ -142,11 +142,6 @@ public class PathSubGraph
         List<DENOPTIMEdge> seedToVAEdges = new ArrayList<DENOPTIMEdge>();
         seedToVA.add(vA);
         int currVert = vA.getVertexId();
-//TODO: there seems to be a bug in assigning the vertex levels
-// Maybe this is due to crossover. Anyway, the max level can be higher than the
-// number of verteces from vA to the seed +1, which causes the loop to run
-// from the seed to after vA and then NullPointerException as no parent can be
-// found for vA
         for (int i=-1; i<vA.getLevel(); i++)
         {
             DENOPTIMEdge edgeToParent = molGraph.getEdgeAtPosition(
@@ -167,11 +162,6 @@ public class PathSubGraph
         List<DENOPTIMEdge> seedToVBEdges = new ArrayList<DENOPTIMEdge>();
         seedToVB.add(vB);
         currVert = vB.getVertexId();
-//TODO: there seems to be a bug in assigning the vertex levels
-// Maybe this is due to crossover. Anyway, the max level can be higher than the
-// number of verteces from vA to the seed +1, which causes the loop to run
-// from the seed to after vA and then NullPointerException as no parent can be
-// found for vA
         for (int i=-1; i<vB.getLevel(); i++)
         {
             DENOPTIMEdge edgeToParent = molGraph.getEdgeAtPosition(
