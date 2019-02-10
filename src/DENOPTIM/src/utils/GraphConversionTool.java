@@ -214,10 +214,12 @@ public class GraphConversionTool
 
     /**
      * Given a formatted string-like representation of a DENOPTIM graph
-     * create the corresponding <code>DENOPTIMGraph</code> object.
+     * create the corresponding <code>DENOPTIMGraph</code> object. This method 
+     * assumes the correspondence between the graph and the loaded fragment 
+     * space.
      * @param strGraph the string representation in DENOPTIM format. NOTE: this
      * is not the serialized representation of a <code>DENOPTIMGraph</code>, but
-     * the string obtained by the 
+     * the string obtained by the
      * {@link molecule.DENOPTIMGraph#toString() toString} method the
      * <code>DENOPTIMGraph</code>.
      * @return the Graph representation that can be used by DENOPTIM
@@ -226,6 +228,30 @@ public class GraphConversionTool
 
     public static DENOPTIMGraph getGraphFromString(String strGraph)
                                                         throws DENOPTIMException
+    {
+	return getGraphFromString(strGraph,true);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Given a formatted string-like representation of a DENOPTIM graph
+     * create the corresponding <code>DENOPTIMGraph</code> object.
+     * @param strGraph the string representation in DENOPTIM format. NOTE: this
+     * is not the serialized representation of a <code>DENOPTIMGraph</code>, but
+     * the string obtained by the 
+     * {@link molecule.DENOPTIMGraph#toString() toString} method the
+     * <code>DENOPTIMGraph</code>.
+     * @param useMolInfo set to <code>true</code> when molecular infomarion on 
+     * is available for all fragments. That is, the libraries of fragments 
+     * provided to the FragmentSpace corrspond to the fragments implied in 
+     * the string-representation of the graph.
+     * @return the Graph representation that can be used by DENOPTIM
+     * @throws exception.DENOPTIMException
+     */
+
+    public static DENOPTIMGraph getGraphFromString(String strGraph, 
+				    boolean useMolInfo) throws DENOPTIMException
     {
 	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
         String s1[] = strGraph.split("\\s+");
@@ -273,20 +299,30 @@ public class GraphConversionTool
             // level
             int level = Integer.parseInt(s3[3]);
 
-            ArrayList<DENOPTIMAttachmentPoint> lstAP =
-                                FragmentUtils.getAPForFragment(molid, fragtype);
+            ArrayList<DENOPTIMAttachmentPoint> lstAP;
+	    if (useMolInfo)
+	    {
+                lstAP = FragmentUtils.getAPForFragment(molid, fragtype);
+	    }
+	    else
+	    {
+		// NB: empty list of APs will be updated later when we have 
+		// the edges.
+		lstAP = new ArrayList<DENOPTIMAttachmentPoint>();
+	    }
 
             DENOPTIMVertex dv = new DENOPTIMVertex(vid, molid, lstAP, fragtype);
             dv.setLevel(level);
 
-            IAtomContainer mol = FragmentSpace.getFragment(fragtype,molid);
-
-            ArrayList<SymmetricSet> simAP = 
+            if (useMolInfo)
+            {
+                IAtomContainer mol = FragmentSpace.getFragment(fragtype,molid);
+                ArrayList<SymmetricSet> simAP = 
                                         FragmentUtils.getMatchingAP(mol, lstAP);
-            dv.setSymmetricAP(simAP);
-
-            //System.err.println(dv.toString());
-            //GenUtils.pause();
+                dv.setSymmetricAP(simAP);
+	    }
+	    // NB: we cannot record which APs are symmetric from the string
+	    // representation of a graph without the library of fragments.
 
             vertices.add(dv);
         }
@@ -391,14 +427,42 @@ public class GraphConversionTool
             DENOPTIMVertex src = g.getVertexWithId(srcvid);
             DENOPTIMVertex trg = g.getVertexWithId(trgvid);
 
-            //System.err.println("src=" + src.toString());
-            //System.err.println("trg=" + trg.toString());
+	    // Here we fill the vertices with placeholders. This because
+	    // we want to be able to define a graph even without knowing
+	    // anything on the actual fragment contained in the vertex.
+	    // In particular, the list of APs is not knowable from the 
+	    // DENOPTIMGraph without the corresponding library of fragments.
+            if (!useMolInfo)
+            {
+		ArrayList<DENOPTIMAttachmentPoint> lstAPsrc = 
+						      src.getAttachmentPoints();
+		if (lstAPsrc.size() <= iA)
+		{
+		    while (lstAPsrc.size() <= (iA+1))
+		    {
+		        lstAPsrc.add(new DENOPTIMAttachmentPoint());
+		    }
+		}
+		src.setAttachmentPoints(lstAPsrc);
+                ArrayList<DENOPTIMAttachmentPoint> lstAPtrg =
+                                                      trg.getAttachmentPoints();
+                if (lstAPtrg.size() <= iB)
+                {
+                    while (lstAPtrg.size() <= (iB+1))
+                    {
+                        lstAPtrg.add(new DENOPTIMAttachmentPoint());
+                    }
+                }
+		trg.setAttachmentPoints(lstAPtrg);
+            }
 
             DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);
-
             DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
-            apA.updateAPConnections(-bndOrder);
-            apB.updateAPConnections(-bndOrder);
+	    if (useMolInfo)
+            {
+                apA.updateAPConnections(-bndOrder);
+                apB.updateAPConnections(-bndOrder);
+	    }
         }
 
         // update bond type of chords
