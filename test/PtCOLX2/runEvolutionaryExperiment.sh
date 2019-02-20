@@ -9,7 +9,7 @@ export SHELL="/bin/bash"
 
 # Run DENOPTIM	
 echo " "
-echo "Starting DenoptimGA (kill it with ctrl+c)"
+echo "Starting DenoptimGA (ctrl+c to kill)"
 echo " "
 java -jar ../../build/DenoptimGA.jar input_parameters
 
