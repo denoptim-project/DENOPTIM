@@ -18,7 +18,7 @@ fi
 
 
 find ../src/misc/RDKITFragmenter/src/ -name *.java > javafiles.txt
-javac -cp lib/cdk-1.4.19.jar @javafiles.txt -encoding utf-8 -d .
+javac -cp lib/cdk-1.4.19.jar:lib/DENOPTIM.jar @javafiles.txt -encoding utf-8 -d .
 
 if [ "$?" != "0" ]; then
     rm javafiles.txt
@@ -31,7 +31,7 @@ rm javafiles.txt
 
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Main-Class: setupbrics.SetupBRICS" >> manifest.mf
-echo "Class-Path: lib/cdk-1.4.19.jar" >> manifest.mf
+echo "Class-Path: lib/cdk-1.4.19.jar lib/DENOPTIM.jar" >> manifest.mf
 echo >> manifest.mf
 
 jar cvfm SetupBRICS.jar manifest.mf setupbrics 

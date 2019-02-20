@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Iterator;
 
+import constants.DENOPTIMConstants;
+
 
 public class SetupBRICS
 {

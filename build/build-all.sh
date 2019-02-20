@@ -55,64 +55,11 @@ echo
 echo
 
 
-
-echo "build-checkcatalystconstraints.sh"
-
-echo "WARNING! Skipping compilation of outdated code 'CheckCatalystConstraints'."
-#bash build-checkcatalystconstraints.sh
-
-if [ "$?" != "0" ]; then
-    echo "Execution failed for build-checkcatalystconstraints.sh."
-    exit -1
-fi
-
-echo
-echo
-
-
 echo "build-preparemopac.sh"
 bash build-preparemopac.sh
 
 if [ "$?" != "0" ]; then
     echo "Execution failed for build-preparemopac.sh."
-    exit -1
-fi
-
-echo
-echo
-
-
-echo "build-getmopaccoordinates.sh"
-echo "WARNING! Skipping compilation of outdated code 'GetMOPACCoordinates'."
-#bash build-getmopaccoordinates.sh
-
-if [ "$?" != "0" ]; then
-    echo "Execution failed for build-getmopaccoordinates.sh."
-    exit -1
-fi
-
-
-echo
-echo
-
-echo "build-EVA.sh"
-echo "WARNING! Skipping compilation of outdated code 'EVA'."
-#bash build-EVA.sh
-
-if [ "$?" != "0" ]; then
-    echo "Execution failed for build-EVA.sh."
-    exit -1
-fi
-
-
-echo
-echo
-
-echo "build-checkanchor.sh"
-bash build-checkanchor.sh
-
-if [ "$?" != "0" ]; then
-    echo "Execution failed for build-checkanchor.sh."
     exit -1
 fi
 
@@ -131,23 +78,12 @@ fi
 echo
 echo
 
-echo "build-fitnessevaluationrulcl2ch2.sh"
-echo "WARNING! Skipping compilation of outdated code 'FitnessEvaluationRuLCl2CH2/'."
-#bash build-fitnessevaluationrulcl2ch2.sh
+
+echo "build-brics.sh"
+bash build-brics.sh
 
 if [ "$?" != "0" ]; then
-    echo "Execution failed for build-fitnessevaluationrulcl2ch2.sh."
-    exit -1
-fi
-
-echo
-echo
-
-echo "build-fitnessruch2bndlng.sh"
-bash build-fitnessruch2bndlng.sh
-
-if [ "$?" != "0" ]; then
-    echo "Execution failed for build-fitnessruch2bndlng.sh."
+    echo "Execution failed for build-brics.sh."
     exit -1
 fi
 

@@ -26,11 +26,11 @@ echo "Manifest-Version: 1.0" > manifest.mf
 echo "Class-Path: lib/cdk-1.4.19.jar lib/commons-io-2.4.jar:lib commons-math3-3.6.1.jar" >> manifest.mf
 echo >> manifest.mf
 
-jar cvfm DENOPTIM.jar manifest.mf constants exception io logging molecule random task utils rings threedim fragspace tinker
+jar cvfm DENOPTIM.jar manifest.mf constants exception io logging molecule task utils rings threedim fragspace tinker
 
 if [ -f manifest.mf ]; then
     rm manifest.mf
-    rm -rf constants exception io logging molecule random task utils rings threedim fragspace tinker
+    rm -rf constants exception io logging molecule task utils rings threedim fragspace tinker
     
 fi
 
