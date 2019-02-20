@@ -1,0 +1,50 @@
+#
+# Parameters for de novo design of ligand set producing long CO bond
+#
+
+# Parameters for the genetic algorithm
+GA-fitnessEvalScript=data/fitness_provider_fromDB.sh
+GA-numParallelTasks=5
+GA-parallelization=2
+GA-populationSize=25
+GA-numChildren=5
+GA-numGenerations=30
+GA-numConvGen=5
+GA-replacementStrategy=1
+GA-XOverSelectionMode=TS
+GA-crossoverProbability=0.80
+GA-mutationProbability=0.80
+GA-symmetryProbability=0.0
+GA-growthProbScheme=2
+GA-GrowthSigmaSteepness=3.0
+GA-GrowthSigmaMiddle=2.5
+GA-ShowGraphics=false
+GA-PrecisionLevel=5
+
+# Definition of the Fragment Space 
+FS-scaffoldLibFile=data/TCFS-1_scaff.sdf
+FS-fragmentLibFile=data/TCFS-1_frags.sdf
+FS-cappingFragmentLibFile=data/TCFS-1_caps.sdf
+FS-compMatrixFile=data/TCFS-1_CPMap.par
+FS-CONSTRAINSYMMETRY=Xlig:0 1.0
+FS-CONSTRAINSYMMETRY=LBisAminoPhosphineN:0 1.0
+FS-CONSTRAINSYMMETRY=LTrisAminoPhosphineN:0 1.0
+FS-CONSTRAINSYMMETRY=LMonoAminoPhosphineSubR:0 1.0
+FS-CONSTRAINSYMMETRY=LCycloBisAminoPhosphineSubN:0 1.0
+FS-CONSTRAINSYMMETRY=LCycloBisAminoPhospholeSubN:0 1.0
+FS-CONSTRAINSYMMETRY=AminoPhosphineSubN:0 1.0
+FS-CONSTRAINSYMMETRY=L6HPyrimidinylideneSubN:0 1.0
+FS-CONSTRAINSYMMETRY=LPyrrolidinylideneSubCAlpha:0 1.0
+FS-CONSTRAINSYMMETRY=LIsoindolylideneSubCS:0 1.0
+FS-CONSTRAINSYMMETRY=LImidazolidinylideneSubNL:0 1.0
+FS-CONSTRAINSYMMETRY=LImidazolidinylideneSubCS:0 1.0
+FS-CONSTRAINSYMMETRY=LImidazolidinylideneSubCL:0 1.0
+FS-CONSTRAINSYMMETRY=LImidazolylideneSubNL:0 1.0
+FS-CONSTRAINSYMMETRY=LImidazolylideneSubCS:0 1.0
+FS-CONSTRAINSYMMETRY=LPhosphineSubMSym:0 1.0
+FS-CONSTRAINSYMMETRY=LPhosphiteSubO:0 1.0
+FS-CONSTRAINSYMMETRY=LPhosphoniteSubO:0 1.0
+FS-CONSTRAINSYMMETRY=LPhosphiniteSubR:0 1.0
+FS-CONSTRAINSYMMETRY=LPhospholeSubAlpha:0 1.0
+FS-CONSTRAINSYMMETRY=LPhospholeSubBeta:0 1.0
+FS-MaxMW=3000

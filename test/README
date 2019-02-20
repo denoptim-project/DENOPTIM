@@ -19,6 +19,8 @@ WARNING! There is no automated evaluation of the outcome of tests t1, t2, t3,
 # Description of the tests
 #
 
+PtCOLX2: publshed test case for evolutionary experiments.
+
 t1: Test for DenoptimCG (requires Tinker-RC).
 
 t2: Application specific - test fitness provider script (requires Tinker-RC).
