@@ -1,24 +1,25 @@
 package preparefitnessoutput;
 
 import exception.DENOPTIMException;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import io.DenoptimIO;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 
 /**
@@ -33,14 +34,9 @@ public class PrepareFitnessOutput
     Options opts = new Options();
 
     String inpSDFFile = "";
-    String fitFile = "";
-    String descFile = "";
-    double ADCutoff = -1;
-    int violationsCutoff = 0;
-    int ADViol = -1;
-    int category = -1;
-    double uncertaintyCutoff = -1;
-    double molSim = 0;
+    String property = "";
+    String value = "";
+    String propertyFile = "";
 
     /**
      * @param args the command line arguments
@@ -50,143 +46,32 @@ public class PrepareFitnessOutput
         PrepareFitnessOutput pfd = new PrepareFitnessOutput();
         pfd.setUp();
 
-
         try
         {
             pfd.parseCommandLine(args);
             pfd.checkOptions();
 
             IAtomContainer mol = DenoptimIO.readSingleSDFFile(pfd.inpSDFFile);
-
-
-            ArrayList<Double> fvals = new ArrayList<>();
-            pfd.readFitness(pfd.fitFile, fvals);
-
-            if (pfd.ADViol != 6)
-                mol.setProperty("FITNESS", fvals.get(0));
-            else
+            
+            if (pfd.property.length() > 0)
             {
-                mol.setProperty("MODEL_FITNESS", fvals.get(0));
-                mol.setProperty("FITNESS", pfd.molSim);
+                mol.setProperty(pfd.property, pfd.value);
             }
-
-            if (fvals.size() > 1)
-                mol.setProperty("LEVERAGE", String.format("%-10.4f", fvals.get(1)));
-
-            if (fvals.size() > 2)
+            
+            if (pfd.propertyFile.length() > 0)
             {
-                String s = String.format("%-10.4f", fvals.get(2));
-                mol.setProperty("UNCERTAINTY", s);
-            }
-
-            if (fvals.size() > 3)
-            {
-                StringBuilder sb = new StringBuilder();
-                for (int i=3; i<fvals.size(); i++)
-                    sb.append(fvals.get(i).intValue()).append(" ");
-                mol.setProperty("AD_VIOLATIONS", sb.toString());
-            }
-
-
-            if (pfd.descFile.length() > 0)
-            {
-                ArrayList<Double> descriptors = new ArrayList<>();
-                pfd.readDescriptors(pfd.descFile, descriptors);
-
-                StringBuilder sb = new StringBuilder();
-                for (int j=0; j<descriptors.size(); j++)
+                // read property file
+                HashMap<String, String> properties = new HashMap<>();
+                pfd.readProperties(pfd.propertyFile, properties);
+                Iterator<Map.Entry<String, String>> iterator = properties.entrySet().iterator();
+                while (iterator.hasNext())
                 {
-                    sb.append(String.format("%6.3f", descriptors.get(j))).append(" ");
-                }
-                mol.setProperty("Descriptors", sb.toString().trim());
-            }
-
-            if (pfd.ADViol == 1)
-            {
-                if (pfd.ADCutoff > 0)
-                {
-                    if (fvals.get(1) > pfd.ADCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
+                    Map.Entry<String, String> entry = iterator.next();
+                    mol.setProperty(entry.getKey(), entry.getValue());
                 }
             }
-
-            if (pfd.ADViol == 2)
-            {
-                if (pfd.violationsCutoff > 0)
-                {
-                    if (fvals.get(3) > pfd.violationsCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
-                }
-            }
-
-            if (pfd.ADViol == 3)
-            {
-                if (pfd.violationsCutoff > 0 && pfd.ADCutoff > 0)
-                {
-                    if (fvals.get(1) > pfd.ADCutoff || fvals.get(3) > pfd.violationsCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
-                }
-            }
-
-            if (pfd.ADViol == 4)
-            {
-                if (fvals.size() > 3)
-                {
-                    int[] ct = new int[7];
-                    for (int i=3; i<fvals.size(); i++)
-                        ct[i-3] = fvals.get(i).intValue();
-
-                    if (ct[pfd.category] == 1)
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                }
-            }
-
-            if (pfd.ADViol == 5)
-            {
-                if (pfd.uncertaintyCutoff > 0)
-                {
-                    if (fvals.get(2) > pfd.uncertaintyCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
-                }
-            }
-
-            if (pfd.ADViol == 6)
-            {
-                if (pfd.violationsCutoff > 0)
-                {
-                    if (fvals.get(3) > pfd.violationsCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
-                }
-                if (pfd.uncertaintyCutoff > 0)
-                {
-                    if (fvals.get(2) > pfd.uncertaintyCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
-                }
-                if (pfd.ADCutoff > 0)
-                {
-                    if (fvals.get(1) > pfd.ADCutoff)
-                    {
-                        mol.setProperty("MOL_ERROR", "#AD_ISSUE: Estimated fitness is outside AD.");
-                    }
-                }
-            }
-
-
-
+            
             DenoptimIO.writeMolecule(pfd.inpSDFFile, mol, false);
-
         }
         catch (DENOPTIMException ioe)
         {
@@ -199,53 +84,12 @@ public class PrepareFitnessOutput
 
 //------------------------------------------------------------------------------
 
-    private void readFitness(String filename, ArrayList<Double> fvals) throws DENOPTIMException
+    private void readProperties(String filename, 
+                    HashMap<String, String> properties) throws DENOPTIMException
     {
         BufferedReader br = null;
         String line;
-
-        try
-        {
-            br = new BufferedReader(new FileReader(filename));
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-                String[] vals = line.split("\\s+");
-                for (String val : vals)
-                {
-                    fvals.add(Double.parseDouble(val));
-                }
-            }
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    private void readDescriptors(String filename, ArrayList<Double> desc) throws DENOPTIMException
-    {
-        BufferedReader br = null;
-        String line;
+        String key, val;
 
         try
         {
@@ -260,11 +104,9 @@ public class PrepareFitnessOutput
                 {
                     continue;
                 }
-                String[] vals = line.split("\\s+");
-                for (String val : vals)
-                {
-                    desc.add(new Double(val));
-                }
+                val = line.substring(line.indexOf("=") + 1).trim();
+                key = line.substring(0, line.indexOf("="));
+                properties.put(key, val);
             }
         }
         catch (IOException ioe)
@@ -285,55 +127,16 @@ public class PrepareFitnessOutput
                 throw new DENOPTIMException(ioe);
             }
         }
+        
+        if (properties.isEmpty())
+        {
+            System.err.println("No data in " + filename);
+            System.exit(-1);
+        }
     }
 
-//------------------------------------------------------------------------------
-
-    private double readSimilarity(String filename) throws DENOPTIMException
-    {
-        BufferedReader br = null;
-        String line;
-        double val = 0;
-
-        try
-        {
-            br = new BufferedReader(new FileReader(filename));
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-                if (line.startsWith("#"))
-                {
-                    continue;
-                }
-                val = Double.parseDouble(line.trim());
-            }
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-        return val;
-    }
-
-//------------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------    
+    
     /**
      * Option setup for command line
      */
@@ -354,50 +157,24 @@ public class PrepareFitnessOutput
                     isRequired().
                     withLongOpt("input").
                     create('i'));
-
+            
             opts.addOption(
                 OptionBuilder.hasArg(true)
-                    .withDescription("File containing fitness value, "
-                    + "applicability domain estimate (if applicable)").
-                    isRequired().
-                    withLongOpt("fitness").
+                    .withDescription("File containing property values.").
+                    withLongOpt("pfile").
                     create('f'));
 
             opts.addOption(
                 OptionBuilder.hasArg(true)
-                    .withDescription("Applicability domain leverage based cutoff.").
-                    withLongOpt("cutoff").
-                    create('c'));
+                    .withDescription("Name of the tag to be added.").
+                    withLongOpt("property").
+                    create('p'));
 
             opts.addOption(
                 OptionBuilder.hasArg(true)
-                    .withDescription("Applicability domain category violations cutoff.").
-                    withLongOpt("violation").
+                    .withDescription("Value to be associated with property.").
+                    withLongOpt("value").
                     create('v'));
-
-            opts.addOption(
-                OptionBuilder.hasArg(true)
-                    .withDescription("File containing the descriptors.").
-                    withLongOpt("desc").
-                    create('d'));
-
-            opts.addOption(
-                OptionBuilder.hasArg(true)
-                    .withDescription("Uncertainty cutoff.").
-                    withLongOpt("uncertainty").
-                    create('u'));
-
-            opts.addOption(
-                OptionBuilder.hasArg(true)
-                    .withDescription("Use category #.").
-                    withLongOpt("category").
-                    create('g'));
-
-            opts.addOption(
-                OptionBuilder.hasArg(true)
-                    .withDescription("Use category #.").
-                    withLongOpt("similarity").
-                    create('s'));
         }
         catch (IllegalArgumentException e)
         {
@@ -405,13 +182,13 @@ public class PrepareFitnessOutput
             System.exit(-1);
         }
     }
-
+    
 //------------------------------------------------------------------------------
 
     private void printUsage()
     {
         HelpFormatter hf = new HelpFormatter();
-        hf.printHelp("java -jar PrepareFitnessOutput.jar <options>", opts);
+        hf.printHelp("java -jar SDFAddProperty.jar <options>", opts);
         System.exit(-1);
     }
 
@@ -424,45 +201,18 @@ public class PrepareFitnessOutput
             CommandLineParser parser = new PosixParser();
             CommandLine cmdLine = parser.parse(opts, args);
             inpSDFFile = cmdLine.getOptionValue("i").trim();
-            fitFile = cmdLine.getOptionValue("f").trim();
-            descFile = cmdLine.getOptionValue("d").trim();
-
-            if (cmdLine.hasOption("c"))
-            {
-                ADCutoff = Double.parseDouble(cmdLine.getOptionValue("c").trim());
-                ADViol = 1;
-            }
-
+            if (cmdLine.hasOption("property"))
+                property = cmdLine.getOptionValue("property").trim();
+            if (cmdLine.hasOption("p"))
+                property = cmdLine.getOptionValue("p").trim();
+            if (cmdLine.hasOption("pfile"))
+                propertyFile = cmdLine.getOptionValue("pfile").trim();
+            if (cmdLine.hasOption("f"))
+                propertyFile = cmdLine.getOptionValue("f").trim();
+            if (cmdLine.hasOption("value"))
+                value = cmdLine.getOptionValue("value").trim();
             if (cmdLine.hasOption("v"))
-            {
-                violationsCutoff = Integer.parseInt(cmdLine.getOptionValue("v").trim());
-                ADViol = 2;
-            }
-
-            if (cmdLine.hasOption("c") && cmdLine.hasOption("v"))
-            {
-                ADCutoff = Double.parseDouble(cmdLine.getOptionValue("c").trim());
-                violationsCutoff = Integer.parseInt(cmdLine.getOptionValue("v").trim());
-                ADViol = 3;
-            }
-
-            if (cmdLine.hasOption("g"))
-            {
-                category = Integer.parseInt(cmdLine.getOptionValue("g").trim());
-                ADViol = 4;
-            }
-
-            if (cmdLine.hasOption("u"))
-            {
-                uncertaintyCutoff = Double.parseDouble(cmdLine.getOptionValue("u").trim());
-                ADViol = 5;
-            }
-
-            if (cmdLine.hasOption("s"))
-            {
-                molSim = readSimilarity(cmdLine.getOptionValue("s").trim());
-                ADViol = 6;
-            }
+                value = cmdLine.getOptionValue("v").trim();
         }
         catch(ParseException | NumberFormatException poe)
         {
@@ -483,12 +233,33 @@ public class PrepareFitnessOutput
             LOGGER.log(Level.SEVERE, error);
             System.exit(-1);
         }
-
-        if (fitFile.length() == 0)
+        
+        int ctr = 0;
+        if (property.length() == 0)
         {
-            error = "File containing fitness values not specified.";
+            ctr++;
+        }
+        
+        if (propertyFile.length() == 0)
+        {
+            ctr++;
+        }
+
+        if (ctr == 0)
+        {
+            error = "Either a property or file containing properties must be specified.";
             LOGGER.log(Level.SEVERE, error);
             System.exit(-1);
+        }
+        
+        if (property.length() > 0)
+        {
+            if (value.length() == 0)
+            {
+                error = "No value supplied.";
+                LOGGER.log(Level.SEVERE, error);
+                System.exit(-1);
+            }
         }
 
     }
