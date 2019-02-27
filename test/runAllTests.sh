@@ -117,25 +117,6 @@ cd $wDir
 #TODO runTest "t1"
 
 #
-# t2: run fitness provider for Ru 14-el complexes (3D builder + fitness evaluation)
-#
-#TODO:update keywords
-#echo " "
-#echo " Skipping t2: scripts need to be updated!"
-#echo " "
-#runTest "t2"
-
-#
-# t3: build diamonds - from sp3 C and H
-#
-#TODO runTest "t3"
-
-#
-# t4: parallel combinatorial builder from frag. space definition (i.e., build starting from scaffold)
-#
-#TODO runTest "t4"
-
-#
 # t5: parallel combinatorial builder from given root (default format: STRING)
 #
 runTest "t5"
