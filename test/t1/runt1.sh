@@ -1,9 +1,54 @@
 #!/bin/bash
+#
+# WARNING!
+# To run these tests we depend on software Tinker.
+# Make sure the location of Tinker's executables is defined
+# in the environment as $tinkerPathDENOPTIM
+#
+
+echo here $tinkerPathDENOPTIM
+
+if [ ! -d "$tinkerPathDENOPTIM" ]
+then
+    echo " "
+    echo "WARNING! Cannot find Tinker executables in \$tinkerPathDENOPTIM"
+    echo "If Tinker is installed, please set valiable \$tinkerPathDENOPTIM "
+    echo "with the pathname of the bin folder containing all the executables"
+    echo "of Tinker."
+    echo "Skipping this test."
+    echo " "
+    exit 0
+else
+    if [ ! -f "$tinkerPathDENOPTIM/pssrot" ]
+    then
+        echo " "
+        echo "WARNING! Cannot find 'pssrot' in \$tinkerPathDENOPTIM "
+	echo "Skipping this test."
+        echo " "
+        exit 0
+    fi
+    if [ ! -f "$tinkerPathDENOPTIM/xyzint" ]
+    then
+        echo " "
+        echo "WARNING! Cannot find 'xyzint' in \$tinkerPathDENOPTIM "
+        echo "Skipping this test."
+        echo " "
+        exit 0
+    fi
+    if [ ! -f "$tinkerPathDENOPTIM/intxyz" ]
+    then
+        echo " "
+        echo "WARNING! Cannot find 'intxyz' in \$tinkerPathDENOPTIM "
+        echo "Skipping this test."
+        echo " "
+        exit 0
+    fi
+fi
 
 wrkDir=`pwd`
 
 files=$(ls input/*.sdf )
- 
+
 for f in $files
 do
     # Set file names

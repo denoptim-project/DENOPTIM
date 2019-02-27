@@ -112,9 +112,9 @@ cd $wDir
 # Run tests
 
 #
-# t1: use DenoptimCG to build 1000 molecules. Dummy atoms and various elements are included in the molecules.
+# t1: use DenoptimCG to build funny molecules.
 #
-#TODO runTest "t1"
+runTest "t1"
 
 #
 # t5: parallel combinatorial builder from given root (default format: STRING)
