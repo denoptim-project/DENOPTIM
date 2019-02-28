@@ -1,0 +1,19 @@
+#
+# This is the parameter file for test t5
+#
+
+# Parameters for FragmentSpaceExplorer
+FSE-WorkDir=OTF_WDIR
+FSE-UidFile=OTF_WDIR/MOLUID.txt
+FSE-NumOfProcessors=1
+FSE-MAXLEVEL=4
+FSE-EXTERNALTASK=OTF_WDIR/fitness_provider.sh
+#
+FSE-WAITSTEP=0
+
+# Definition of the Fragment Space 
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+

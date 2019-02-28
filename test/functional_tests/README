@@ -1,0 +1,56 @@
+#
+# README file for test folder of DENOPTIM
+# 
+
+WARNING! The standard maximum valence (maxval) of TINKER has to be increased 
+         to be capable of running "t2" and other tests using DenoptimCG. 
+         Set "maxval=12" in the sizes.i of the TINKER source and recompile.
+
+WARNING! Generation of ring closing conformations with DenoptimCG requires
+         a modified version of TINKER implementing the Ring Closing Potential.
+         See J. Chem. Inf. Model. 2015, 55, 1844-1856.
+
+WARNING! There is no automated evaluation of the outcome of tests t1, t2, t3, 
+         and t4.
+         For now is up to the user to check the results.
+
+
+#
+# Description of the tests
+#
+
+t1: Test for DenoptimCG (requires Tinker-RC).
+
+t2: Exploration of fragment space from given root graphs and ring-closures (no 3D).
+
+t3: Exploration of fragment space with enforced symmetry and ring-closures (no 3D).
+
+t4: Exploration of fragment space from a given set root graphs.
+
+t5: Exploration of fragment space.
+
+p6: preparation of files for t6 and t7
+t6: Restart exploration of fragment space from checkpoint file.
+
+t7: Test "SerConverter", which parses a serialized graph. NB: this test need a serialized file generated with the same version of DENOPTIM.
+
+t8: Test "CheckpointReader", which reads a checkpoint file.
+
+t9: Exploration of fragment space with symmetry constraints.
+
+t10: Exploration of fragment space with enforced symmetry.
+
+t11: Evolution with enforced symmetry.
+
+t12: Evolution with symmetry constraints.
+
+t13: Preserve symmetry sets found in initial molecules throughout evolution.
+
+t14: Crossover operator with an acyclic graph.
+
+t15: Crossover operator with a cyclic graph.
+
+t16: Test "GraphEditor", which takes an existing DENOPTINGraph, replaces a vertex with a new one, and deletes another vertex.
+
+t17: Test the random selection of candidates "DenoptimRND".
+

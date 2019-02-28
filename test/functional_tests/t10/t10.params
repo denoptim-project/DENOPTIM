@@ -1,0 +1,24 @@
+#
+# This is the parameter file for test t10
+#
+
+# Parameters for FragmentSpaceExplorer
+FSE-WorkDir=OTF_WDIR
+FSE-UidFile=OTF_WDIR/MOLUID.txt
+FSE-NumOfProcessors=OTF_PROCS
+FSE-MAXLEVEL=2
+FSE-EXTERNALTASK=OTF_WDIR/fitness_provider.sh
+FSE-WAITSTEP=1
+
+# Definition of the Fragment Space 
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-ENFORCESYMMETRY
+# NB: when exploring all the combination of fragments, symmetry can only be
+# fully imposed or fully ignored.
+# Any number (significantly) lower than 1.0d0 will lead to 100% asymmetry on the# attachment points of the given APClass. So 0.9, 0.4, and  0.0 lead to the same
+# result.
+FS-CONSTRAINSYMMETRY=co:0 0.9
+
