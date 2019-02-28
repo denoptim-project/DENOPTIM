@@ -13,7 +13,7 @@ then
     echo "If Tinker is installed, please set valiable \$tinkerPathDENOPTIM "
     echo "with the pathname of the bin folder containing all the executables"
     echo "of Tinker."
-    echo "Skipping this test."
+    echo "Skipping test 't1'."
     echo " "
     exit 0
 else
@@ -21,7 +21,7 @@ else
     then
         echo " "
         echo "WARNING! Cannot find 'pssrot' in \$tinkerPathDENOPTIM "
-	echo "Skipping this test."
+	echo "Skipping test 't1'."
         echo " "
         exit 0
     fi
@@ -29,7 +29,7 @@ else
     then
         echo " "
         echo "WARNING! Cannot find 'xyzint' in \$tinkerPathDENOPTIM "
-        echo "Skipping this test."
+        echo "Skipping test 't1'."
         echo " "
         exit 0
     fi
@@ -37,7 +37,7 @@ else
     then
         echo " "
         echo "WARNING! Cannot find 'intxyz' in \$tinkerPathDENOPTIM "
-        echo "Skipping this test."
+        echo "Skipping test 't1'."
         echo " "
         exit 0
     fi
