@@ -59,7 +59,7 @@ do
     logFile="$wrkDir/$fname.log"
 
     #report
-    echo -ne ' progress: '$fname' / 1000\r'
+    echo -ne ' progress: '$fname' / 5\r'
 
     #Prepare parameters
     echo "CG-inpSDF=$inpSDF" > $tinkerparFile

@@ -54,7 +54,7 @@ export DENOPTIMslaveCores=4
 
 function runTest() {
     testName=$1
-    echo "Running test '$testName'... (ctrl-z to kill all)"
+    echo "Running test '$testName'... (ctrl-z to stop all)"
 
     #generate the directory
     testDir=$wDir/$testName
