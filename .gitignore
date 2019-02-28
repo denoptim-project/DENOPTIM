@@ -1,5 +1,6 @@
 test/t9/data/prev_dbRoot/F*
 test/t9/data/oldCheckPoint.chk
+test/t11/data/dg_96.ser
 build/lib/
 build/*.jar
 lib/DENOPTIM.jar

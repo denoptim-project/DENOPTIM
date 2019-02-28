@@ -4,8 +4,8 @@
 
 # Parameters for SerConverter
 SerConv-WorkDir=OTF_WDIR
-SerConv-inpFile=OTF_WDIR/dg_319.ser
-SerConv-outFile=OTF_WDIR/dg_319.sdf
+SerConv-inpFile=OTF_WDIR/dg_96.ser
+SerConv-outFile=OTF_WDIR/dg_96.sdf
 SerConv-outFormat=SDF
 
 # Definition of the Fragment Space 

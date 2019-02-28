@@ -147,16 +147,9 @@ runTest "p9"
 runTest "t9"
 
 #
-# t10: restart FragSpaceExplorer from checkpoint file; end of level
-#
-echo "SKIPPING t10: work in progress..."
-#runTest "t10"
-
-#
 # t11: conversion of serialized DENOPTIMgraph to SDF
 #
-echo "SKIPPING t11: work in progress..."
-#runTest "t11"
+runTest "t11"
 
 #
 # t12: conversion of serialized checkpoint file to human readable string

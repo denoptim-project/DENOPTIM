@@ -38,7 +38,7 @@ $javaDENOPTIM -jar $DENOPTIMJarFiles/SerConverter.jar $paramFile
 exec 1>&6 6>&- 
 
 #Check outcome
-grep -q ' 16 15  0  0  .  0  0  0  0 ' $wrkDir/dg_319.sdf
+grep -q ' 16 15  0  0  .  0  0  0  0 ' $wrkDir/dg_96.sdf
 if [[ $? != 0 ]]
 then
     echo " "

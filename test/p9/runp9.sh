@@ -59,9 +59,17 @@ cp -r "$wrkDir"/FSE*/FSE-Level_1 "$wrkDir"/FSE*/FSE-Level_2 "$DENOPTIMHomeDir/te
 if [ $? != 0 ]
 then
     echo " "
-    echo "Error copying serialized graph's database for t9."
+    echo "Error copying base of serialized graphs for t9."
     exit -1
 fi
+cp -r "$wrkDir"/FSE*/FSE-Level_2/dg_96.ser "$DENOPTIMHomeDir/test/t11/data/dg_96.ser"
+if [ $? != 0 ]
+then
+    echo " "
+    echo "Error copying serialized graph for t11."
+    exit -1
+fi
+
 
 exit 0
 
