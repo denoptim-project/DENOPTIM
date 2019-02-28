@@ -18,7 +18,7 @@
 
 # Path to TINKER executables
 # Currently required only by t1 that will be skipped if the following is empty.
-export tinkerPathDENOPTIM="/Users/mfo051/tools/tinker_with_extensions/TinkerLFMM_RCP_2/bin/"
+export tinkerPathDENOPTIM=""
 
 # Directory created for running tests (must be shorter than 40 characters).
 wDir="/tmp/denoptim_test"
@@ -79,11 +79,11 @@ function runTest() {
 ############################################
 
 # Detect the version of SED
-if man sed | head -n 5 | grep -q "BSD"
+if man sed | grep -q "BSD"
 then
     export sedInPlace="-i ''"
 else
-    if man sed | head -n 5 | grep -q "GNU"
+    if man sed | grep -q "GNU"
     then
         export sedInPlace="-i"
     else
