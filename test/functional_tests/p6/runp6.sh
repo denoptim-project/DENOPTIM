@@ -11,23 +11,8 @@ rm -rf data
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    if [ "$sedSyntax" == "GNU" ]
-    then
-        sed -i "s|OTF_WDIR|$wrkDir|g" $f
-        sed -i "s|OTF_DENOPTIMJARS|$DENOPTIMJarFiles|g" $f
-        sed -i "s|OTF_JAVADIR|$javaDENOPTIM|g" $f
-        sed -i "s|OTF_OBDIR|$obabelDENOPTIM|g" $f
-        sed -i "s|OTF_PROCS|$DENOPTIMslaveCores|g" $f
-        sed -i "s|OTF_SEDSYNTAX|$sedSyntax|g" $f
-    elif [ "$sedSyntax" == "BSD" ]
-    then
-        sed -i '' "s|OTF_WDIR|$wrkDir|g" $f
-        sed -i '' "s|OTF_DENOPTIMJARS|$DENOPTIMJarFiles|g" $f
-        sed -i '' "s|OTF_JAVADIR|$javaDENOPTIM|g" $f
-        sed -i '' "s|OTF_OBDIR|$obabelDENOPTIM|g" $f
-        sed -i '' "s|OTF_PROCS|$DENOPTIMslaveCores|g" $f
-        sed -i '' "s|OTF_SEDSYNTAX|$sedSyntax|g" $f
-    fi
+    sed "$sedInPlace" "s|OTF_WDIR|$wrkDir|g" "$f"
+    sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
 #Run it
@@ -48,21 +33,21 @@ else
 fi
 
 # Move some of the generated files that are used by other tests
-cp "$wrkDir"/FSE*.chk "$DENOPTIMHomeDir/test/functional_tests/t6/data/oldCheckPoint.chk"
+cp "$wrkDir"/FSE*.chk "$DENOPTIM_HOME/test/functional_tests/t6/data/oldCheckPoint.chk"
 if [ $? != 0 ]
 then
     echo " "
     echo "Error copying checkpoint file for t6."
     exit -1
 fi
-cp -r "$wrkDir"/FSE*/FSE-Level_1 "$wrkDir"/FSE*/FSE-Level_2 "$DENOPTIMHomeDir/test/functional_tests/t6/data/prev_dbRoot"
+cp -r "$wrkDir"/FSE*/FSE-Level_1 "$wrkDir"/FSE*/FSE-Level_2 "$DENOPTIM_HOME/test/functional_tests/t6/data/prev_dbRoot"
 if [ $? != 0 ]
 then
     echo " "
     echo "Error copying base of serialized graphs for t6."
     exit -1
 fi
-cp -r "$wrkDir"/FSE*/FSE-Level_2/dg_96.ser "$DENOPTIMHomeDir/test/functional_tests/t7/data/dg_96.ser"
+cp -r "$wrkDir"/FSE*/FSE-Level_2/dg_96.ser "$DENOPTIM_HOME/test/functional_tests/t7/data/dg_96.ser"
 if [ $? != 0 ]
 then
     echo " "

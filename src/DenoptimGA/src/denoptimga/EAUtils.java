@@ -1,6 +1,5 @@
 package denoptimga;
 
-import constants.HTMLConstants;
 import constants.DENOPTIMConstants;
 import exception.DENOPTIMException;
 import io.DenoptimIO;
@@ -442,155 +441,6 @@ class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Output population details to HTML.
-     * @param popln Current population of molecules
-     * @param curGen Generation in the GA
-     * @param filename output file
-     * @throws DENOPTIMException
-     */
-
-    protected static void outputToHTML(ArrayList<DENOPTIMMolecule> popln,
-            int curGen, String filename) throws DENOPTIMException
-    {
-        StringBuilder sb = new StringBuilder(1024);
-        df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
-        int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
-
-        String fsep = System.getProperty("file.separator");
-
-        sb.append(HTMLConstants.DOCTYPE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.HTML_START_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.HEAD_START_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.META_TAG).append(System.getProperty("line.separator"));
-        
-
-        String htmlTitle = "";
-        if (curGen >= 0)
-            htmlTitle = HTMLConstants.TITLE_START_TAG +
-                        "DENOPTIM Output | Generation " + curGen +
-                        HTMLConstants.TITLE_CLOSE_TAG + System.getProperty("line.separator");
-        else
-            htmlTitle = HTMLConstants.TITLE_START_TAG +
-                        "DENOPTIM Output | Final " +
-                        HTMLConstants.TITLE_CLOSE_TAG + System.getProperty("line.separator");
-        sb.append(htmlTitle);
-
-        for (String CSS_TAG : HTMLConstants.CSS_TAG)
-        {
-            sb.append(CSS_TAG);
-        }
-
-        sb.append(HTMLConstants.HEAD_CLOSE_TAG).append(System.getProperty("line.separator"));
-
-        sb.append(HTMLConstants.BODY_START_TAG).append(System.getProperty("line.separator"));
-
-        sb.append(HTMLConstants.TABLE_START_TAG_HB).append(System.getProperty("line.separator"));
-
-        String tableCaption = "";
-
-        if (curGen >= 0)
-            tableCaption = HTMLConstants.CAPTION_START_TAG +
-                            "Generation " + curGen +
-                            HTMLConstants.CAPTION_CLOSE_TAG + System.getProperty("line.separator");
-        else
-            tableCaption = HTMLConstants.CAPTION_START_TAG +
-                            "Final Output " +
-                            HTMLConstants.CAPTION_CLOSE_TAG + System.getProperty("line.separator");
-
-        sb.append(tableCaption);
-        
-        sb.append(HTMLConstants.THEAD_START_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TR_START_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TH_SCOPE_START_TAG).append("Molecule");
-        sb.append(HTMLConstants.TH_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TH_SCOPE_START_TAG).append("InCHI");
-        sb.append(HTMLConstants.TH_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TH_SCOPE_START_TAG).append("2D Structure");
-        sb.append(HTMLConstants.TH_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TH_SCOPE_START_TAG).append("Fitness");
-        sb.append(HTMLConstants.TH_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TR_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.THEAD_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.TBODY_START_TAG).append(System.getProperty("line.separator"));
-
-
-        for (int i=0; i<GAParameters.getPopulationSize(); i++)
-        {
-            String showStr = "";
-            String imgFile = popln.get(i).getImageFile();
-
-            String relPath = "";
-
-            if (imgFile != null)
-            {
-                int pos = imgFile.indexOf("Gen");
-
-                
-                String gstr = "Gen" + GenUtils.getPaddedString(ndigits, curGen);
-
-                if (imgFile.contains(gstr))
-                {
-                    pos = imgFile.lastIndexOf("M");
-                    relPath = imgFile.substring(pos);
-                }
-                else
-                {
-                    relPath = ".." + fsep + imgFile.substring(pos);
-                }
-            }
-            
-
-            if (imgFile != null)
-            {
-                showStr = HTMLConstants.TD_START_TAG +
-                        popln.get(i).getMoleculeUID() +
-                        HTMLConstants.TD_CLOSE_TAG + System.getProperty("line.separator") +
-                        //HTMLConstants.TD_START_TAG + "<object data=\"" +
-                        //svgFile +
-                        //relPath +
-                //"\" type=\"image/svg+xml\" width=\"300\" height=\"300\"" +
-                //" alt=\"Star\"></object>" +
-                        HTMLConstants.TD_START_TAG + "<img src=\"" + relPath 
-                        + "\"/>" +
-                HTMLConstants.TD_CLOSE_TAG + System.getProperty("line.separator");
-            }
-            else
-            {
-                showStr = HTMLConstants.TD_START_TAG +
-                        popln.get(i).getMoleculeUID() +
-                        HTMLConstants.TD_CLOSE_TAG + System.getProperty("line.separator") +
-                        HTMLConstants.TD_START_TAG +
-                        " --- " +
-                        HTMLConstants.TD_CLOSE_TAG + System.getProperty("line.separator");
-            }
-
-            String mname = FilenameUtils.getBaseName(popln.get(i).getMoleculeFile());
-            
-            sb.append(HTMLConstants.TR_START_TAG).append(System.getProperty("line.separator"));
-            sb.append(HTMLConstants.TD_START_TAG).append(mname);
-            sb.append(HTMLConstants.TD_CLOSE_TAG).append(System.getProperty("line.separator"));
-            sb.append(showStr);
-            sb.append(HTMLConstants.TD_START_TAG);
-            sb.append(df.format(popln.get(i).getMoleculeFitness()));
-            sb.append(HTMLConstants.TD_CLOSE_TAG).append(System.getProperty("line.separator"));
-            sb.append(HTMLConstants.TR_CLOSE_TAG).append(System.getProperty("line.separator"));
-        }
-
-        sb.append(HTMLConstants.TBODY_CLOSE_TAG).append(System.getProperty("line.separator"));
-
-        sb.append(HTMLConstants.TABLE_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.BODY_CLOSE_TAG).append(System.getProperty("line.separator"));
-        sb.append(HTMLConstants.HTML_CLOSE_TAG).append(System.getProperty("line.separator"));
-
-        DenoptimIO.writeData(filename, sb.toString(), false);
-        sb.setLength(0);
-        sb = null;
-    }
-
-
-//------------------------------------------------------------------------------
-
-    /**
      * Simply copies the files from the previous directories into the specified
      * folder.
      * @param popln the final list of best molecules
@@ -603,8 +453,6 @@ class EAUtils
         String genOutfile = destDir + System.getProperty("file.separator") +
                                 "Final.txt";
 
-        String genHTMLfile = destDir + System.getProperty("file.separator") +
-                                "Final.html";
         File fileDir = new File(destDir);
 
         try
@@ -622,7 +470,6 @@ class EAUtils
                 }
             }
             outputPopulationDetails(popln, genOutfile);
-            outputToHTML(popln, -1, genHTMLfile);
         }
         catch (IOException ioe)
         {

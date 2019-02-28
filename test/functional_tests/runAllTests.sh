@@ -1,51 +1,40 @@
 #!/bin/bash
+################################################################################
+#                                                                              #
+#                                Run all tests                                 #
+#                                                                              #
+################################################################################
+#
+# Use this script to run all the tests.
 
-###############################################################
-#                                                             #
-#                        Run all tests                        #
-#                                                             #
-###############################################################
+# 
+# Usage:
+#
+# ./runAllTests.sh
 
-#Working directory for running tests
-wDir="/Users/mfo051/scratch"
-#NOTE: path $wDir/$testName/ must be short. Tinker needs paths
-#      shorter than 80 characters.
+#
+# Settings:
+#
 
-#DENOPTIM home
-export DENOPTIMHomeDir="/Users/mfo051/tools/DENOPTIM"
-export DENOPTIM_HOME="/Users/mfo051/tools/DENOPTIM"
+# Path to TINKER executables
+# Currently required only by t1 that will be skipped if the following is empty.
+export tinkerPathDENOPTIM="/Users/mfo051/tools/tinker_with_extensions/TinkerLFMM_RCP_2/bin/"
 
-#Setting for the execution of DENOPTIM tools
-export javaDENOPTIM="/usr/bin/java"
-export DENOPTIMJarFiles="$DENOPTIMHomeDir/build"
+# Directory created for running tests (must be shorter than 40 characters).
+wDir="/tmp/denoptim_test"
 
-#OPENBABEL
-export obabelDENOPTIM="/usr/local/bin"
-
-#ChemAxon tools
-export chemaxonDENOPTIM="/Applications/ChemAxon/MarvinBeans/bin"
-
-#TINKER
-export tinkerPathDENOPTIM="/Users/mfo051/tools/tinker_with_extensions/TinkerLFMM_RCP_2/bin"
-
-#R
-export RscriptDENOPTIM="/usr/bin/Rscript"
-
-# Version of 'sed' (either GNU or BSD)
-export sedSyntax="BSD"
-
-#shell
+# Environment
 export SHELL="/bin/bash"
+export DENOPTIM_HOME="$(cd ../.. ; pwd)"
+export javaDENOPTIM="java"
+export DENOPTIMJarFiles="$DENOPTIM_HOME/build"
 
-#Hardware specific params
-export DENOPTIMslaveCores=4
 
-
-############################################
-#                                          #
-# No need to change things below this line #
-#                                          #
-############################################
+################################################################################
+#                                                                              #
+#                    No need to change things below this line                  #
+#                                                                              #
+################################################################################
 
 
 ############################################ 
@@ -53,28 +42,28 @@ export DENOPTIMslaveCores=4
 ############################################ 
 
 function runTest() {
-    testName=$1
+    testName="$1"
     echo "Running test '$testName'... (ctrl-z to stop all)"
 
     #generate the directory
-    testDir=$wDir/$testName
-    mkdir $testDir
-    if [ ! -d $testDir ]
+    testDir="$wDir/$testName"
+    mkdir "$testDir"
+    if [ ! -d "$testDir" ]
     then
         echo " ERROR! Unabel to create directory $testDir"
         exit
     fi
 
     #prepare the files
-    cd $testDir
-    cp -r $DENOPTIMHomeDir/test/functional_tests/$testName/* .
+    cd "$testDir"
+    cp -r "$DENOPTIM_HOME/test/functional_tests/$testName/"* .
 
     #Run the test
-    ./run$testName.sh
+    ./"run$testName.sh"
 
     #get exit value and, in case of error, stop
     status=$?
-    if [ $status -ne 0 ]
+    if [ "$status" -ne 0 ]
     then
 	echo "ERROR running test $testName! Find relevant files in $testDir"
 	echo " "
@@ -82,12 +71,30 @@ function runTest() {
     fi
 
     #Back home
-    cd $wDir
+    cd "$wDir"
 }
 
 ############################################
 # Main
 ############################################
+
+# Detect the version of SED
+if man sed | head -n 5 | grep -q "BSD"
+then
+    export sedInPlace="-i ''"
+else
+    if man sed | head -n 5 | grep -q "GNU"
+    then
+        export sedInPlace="-i"
+    else
+        echo " ERROR! Could not detect 'sed' version."
+        echo " Expecting to find BSD or GNU."
+        exit 1
+    fi
+fi
+
+# Number of slave cores (NB: do not change)
+export DENOPTIMslaveCores=4
 
 # Make working directory
 if [ -d "$wDir" ]
@@ -106,7 +113,7 @@ then
     exit
 fi
 
-cd $wDir
+cd "$wDir"
 
 
 # Run tests

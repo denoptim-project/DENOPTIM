@@ -4,37 +4,22 @@ wrkDir=`pwd`
 logFile="t12.log"
 paramFile="t12.params"
 
-mv data/* $wrkDir
+mv data/* "$wrkDir"
 rm -rf data
 
 #Adjust path in scripts and parameter files
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    if [ "$sedSyntax" == "GNU" ]
-    then
-        sed -i "s|OTF_WDIR|$wrkDir|g" $f
-        sed -i "s|OTF_DENOPTIMJARS|$DENOPTIMJarFiles|g" $f
-        sed -i "s|OTF_JAVADIR|$javaDENOPTIM|g" $f
-        sed -i "s|OTF_OBDIR|$obabelDENOPTIM|g" $f
-        sed -i "s|OTF_PROCS|$DENOPTIMslaveCores|g" $f
-        sed -i "s|OTF_SEDSYNTAX|$sedSyntax|g" $f
-    elif [ "$sedSyntax" == "BSD" ]
-    then
-        sed -i '' "s|OTF_WDIR|$wrkDir|g" $f
-        sed -i '' "s|OTF_DENOPTIMJARS|$DENOPTIMJarFiles|g" $f
-        sed -i '' "s|OTF_JAVADIR|$javaDENOPTIM|g" $f
-        sed -i '' "s|OTF_OBDIR|$obabelDENOPTIM|g" $f
-        sed -i '' "s|OTF_PROCS|$DENOPTIMslaveCores|g" $f
-        sed -i '' "s|OTF_SEDSYNTAX|$sedSyntax|g" $f
-    fi
+    sed "$sedInPlace" "s|OTF_WDIR|$wrkDir|g" "$f"
+    sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
 #Run it
 exec 6>&1
-exec > $logFile
+exec > "$logFile"
 exec 2>&1
-$javaDENOPTIM -jar $DENOPTIMJarFiles/DenoptimGA.jar $paramFile
+"$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimGA.jar" "$paramFile"
 exec 1>&6 6>&- 
 
 #Check outcome
@@ -55,30 +40,30 @@ while IFS='' read -r uid || [[ -n "$uid" ]]; do
         echo "Test 't12' NOT PASSED (symptom: check unexpected UID '$uid'. If correct add it to the runt12.sh script)"
         exit 1
     fi
-done < $wrkDir/RUN*/MOLUID.txt
+done < "$wrkDir"/RUN*/MOLUID.txt
 
-uidA=$(grep -q 'SPEUIVXLLWOEMJ-UHFFFAOYNA-N' $wrkDir/RUN*/MOLUID.txt)
-uidA=$(grep -q 'UID with some text, numberts 1223 456, and symbols *@._-:,%&§' $wrkDir/RUN*/MOLUID.txt)
+uidA=$(grep -q 'SPEUIVXLLWOEMJ-UHFFFAOYNA-N' "$wrkDir"/RUN*/MOLUID.txt)
+uidA=$(grep -q 'UID with some text, numberts 1223 456, and symbols *@._-:,%&§' "$wrkDir"/RUN*/MOLUID.txt)
 prod=$((uidA * uidB))
-if [[ $prod != 0 ]]
+if [[ "$prod" != 0 ]]
 then
     echo " "
     echo "Test 't12' NOT PASSED (symptom: missing UID from initial popl. file)"
     exit 1
 fi
 
-uidA=$(grep -q 'MMMMMMMMMMMMMM-UHFFFAOYSA-N' $wrkDir/RUN*/MOLUID.txt)
-uidB=$(grep -q 'This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;' $wrkDir/RUN*/MOLUID.txt)
-uidC=$(grep -q 'PPPPPPPPPPPPPP-UHFFFAOYSA-N' $wrkDir/RUN*/MOLUID.txt)
+uidA=$(grep -q 'MMMMMMMMMMMMMM-UHFFFAOYSA-N' "$wrkDir"/RUN*/MOLUID.txt)
+uidB=$(grep -q 'This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;' "$wrkDir"/RUN*/MOLUID.txt)
+uidC=$(grep -q 'PPPPPPPPPPPPPP-UHFFFAOYSA-N' "$wrkDir"/RUN*/MOLUID.txt)
 prod=$((uidA * uidB * uidC))
-if [[ $prod != 0 ]]
+if [[ "$prod" != 0 ]]
 then
     echo " "
     echo "Test 't12' NOT PASSED (symptom: missing UID from UIDFileIn)"
     exit 1
 fi
 
-grep -q 'DENOPTIM EA run completed' $wrkDir/RUN*.log
+grep -q 'DENOPTIM EA run completed' "$wrkDir"/RUN*.log
 if [[ $? != 0 ]]
 then
     echo " "

@@ -98,11 +98,6 @@ public class EvolutionaryAlgorithm
         String genOutfile = sb.toString();
         sb.setLength(0);
         EAUtils.outputPopulationDetails(molPopulation, genOutfile);
-        sb.append(genDir).append(fsep).append("Gen")
-                    .append(GenUtils.getPaddedString(ndigits, 0)).append(".html");
-        String genHTMLfile = sb.toString();
-        sb.setLength(0);
-        EAUtils.outputToHTML(molPopulation, 0, genHTMLfile);
         
         
         double sdev = EAUtils.getPopulationSD(molPopulation);
@@ -161,12 +156,6 @@ public class EvolutionaryAlgorithm
 
             EAUtils.outputPopulationDetails(molPopulation, genOutfile);
             
-            sb.append(genDir).append(fsep).append("Gen")
-                .append(GenUtils.getPaddedString(ndigits, curGen)).append(".html");
-            genHTMLfile = sb.toString();
-            sb.setLength(0);
-            EAUtils.outputToHTML(molPopulation, curGen, genHTMLfile);
-
             DENOPTIMLogger.appLogger.log(Level.INFO,"Generation {0}" + " completed\n"
                 + "----------------------------------------"
                 + "----------------------------------------\n", curGen);

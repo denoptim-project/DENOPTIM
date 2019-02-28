@@ -10,9 +10,6 @@
 #
 ###############################################################################
 
-# Platform dependencies
-sedSyntax="OTF_SEDSYNTAX"
-
 # Parameters for molecular builder
 scaffoldLib="OTF_WDIR/lib_scaff.sdf"
 fragmentLib="OTF_WDIR/lib_frags.sdf"
@@ -20,25 +17,8 @@ cappingLib="OTF_WDIR/lib_cap.sdf"
 cpm="OTF_WDIR/CPMap.par"
 
 #Setting for the execution of DENOPTIM tools
-java="OTF_JAVADIR"
-pathToJarFiles="OTF_DENOPTIMJARS"
-
-#Openbabel
-obabel="OTF_OBDIR/obabel"
-obprop="OTF_OBDIR/obprop"
-
-#TINKER - PSSROT and TinkerLFMM
-pathToTinkerBin="OTF_TINKERDIR"
-tinkerForceField="OTF_WDIR/uff_vdw.prm"
-rotSpaceDef="OTF_WDIR/rotatableBonds-1.2"
-# Ring Search PSSROT
-tinkerRSKeyFile="OTF_WDIR/build_uff_RingClosing.key"
-tinkerRSSubmitFile="OTF_WDIR/submit_RingClosing"
-# Conformational Search PSSROT
-tinkerKeyFile="OTF_WDIR/build_uff_ConfSearch.key"
-tinkerSubmitFile="OTF_WDIR/submit_ConfSearch"
-
-
+java="$javaDENOPTIM"
+pathToJarFiles="$DENOPTIMJarFiles"
 
 #Exit code for uncomplete evaluation of fitness
 # -> set to 0 to return *FIT.sdf file with MOL_ERROR field
@@ -60,10 +40,10 @@ E_FATAL=1
 # Cleanup function: used to remove temporary files
 #
 function cleanup() {
-    FILE=$1
-    if [ -f $FILE ];
+    FILE="$1"
+    if [ -f "$FILE" ];
     then
-        rm $FILE
+        rm "$FILE"
     fi
 }
 
@@ -96,7 +76,7 @@ taskId=$4
 # Location of the UID file
 UIDFILE=$5
 
-locDir=$(pwd)
+locDir="$(pwd)"
 
 molName=`basename $inpSDF .sdf`
 molNum=`basename $inpSDF _inp.sdf`
@@ -105,33 +85,21 @@ molNum=`basename $inpSDF _inp.sdf`
 # Redirect log of this script
 #
 log=$wrkDir/$molName"_FProvider.log"
-exec > $log
+exec > "$log"
 exec 2>&1
 
 #
-# Create UID
+# Replace ATM/ATP with H
 #
-echo "Evaluation of UID..."
-molUniqueFile=$wrkDir/$molName".uid"
-molNoRCA=$wrkDir/$molName"_noRCA.sdf"
-cp $inpSDF $molNoRCA
-if [ "$sedSyntax" == "GNU" ]
-then
-    sed -i "s/ATP/H  /g" $molNoRCA
-    sed -i "s/ATM/H  /g" $molNoRCA
-elif [ "$sedSyntax" == "BSD" ]
-then
-    sed -i '' "s/ATP/H  /g" $molNoRCA
-    sed -i '' "s/ATM/H  /g" $molNoRCA
-fi
-$obabel -isdf $molNoRCA -oinchikey > $molUniqueFile
-uid=$(cat $molUniqueFile) 
-echo $uid >> $UIDFILE
+molNoRCA="$wrkDir/${molName}_noRCA.sdf"
+cp "$inpSDF" "$molNoRCA"
+sed "$sedInPlace" "s/ATP/H  /g" "$molNoRCA"
+sed "$sedInPlace" "s/ATM/H  /g" "$molNoRCA"
 
 #
 # Prepare final SDF file
 #
 echo "All done!"
-$obabel -isdf $molNoRCA -osdf -O $outSDF --property "UID" "$uid"
+mv "$molNoRCA" "$outSDF"
 
 exit 0
