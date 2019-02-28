@@ -6,8 +6,6 @@
 # in the environment as $tinkerPathDENOPTIM
 #
 
-echo here $tinkerPathDENOPTIM
-
 if [ ! -d "$tinkerPathDENOPTIM" ]
 then
     echo " "
