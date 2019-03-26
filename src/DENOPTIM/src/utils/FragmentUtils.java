@@ -446,10 +446,10 @@ public class FragmentUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Compare attachment points based on the reaction types
+     * Compare attachment points based on the AP class
      * @param A attachment point information
      * @param B attachment point information
-     * @return <code>true</code> if the points share a common reaction or more
+     * @return <code>true</code> if the points have the same class or
      * else <code>false</code>
      */
 
