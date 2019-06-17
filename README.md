@@ -3,15 +3,15 @@ De Novo OPTimization of organic and Inorganic Molecules (DENOPTIM) is a software
 
 ## Content of the source code folder tree
 
-* build: contains scripts for building the DENOPTIM package from source.
+* [build](./build): contains scripts for building the DENOPTIM package from source.
 
-* contrib: contains additional source and data that may be used in relation to DENOPTIM
+* [contrib](./contrib): contains additional source and data that may be used in relation to DENOPTIM
 
 * [doc](./doc): contains documentation and user manual
 
-* lib: The lib directory contains all third-party libraries used by DENOPTIM.
+* [lib](./lib): The lib directory contains all third-party libraries used by DENOPTIM.
 
-* src: contains the source code of DENOPTIM's core and modules:
+* [src](./src): contains the source code of DENOPTIM's core and modules:
 
   * DENOPTIM: Generic library of functions and data structures.
 
@@ -25,7 +25,7 @@ De Novo OPTimization of organic and Inorganic Molecules (DENOPTIM) is a software
 
   * misc: miscellaneous utilities that may be useful in DENOPTIM-based work.
 
-* test: contains some automated functionality tests and the published test case.
+* [test](./test): contains some automated functionality tests and the published test case.
 
 
 
@@ -60,8 +60,9 @@ Or, you can play with the optimization of organometallic ligands sets that weake
 
 ## User Manual
 
-The complete user manual is available at __
+The complete user manual is available [under the doc folder](./doc/DENOPTIM_MANUAL.odt)
 
 
 ## Cite DENOPTIM
-DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules, Vishwesh Venkatraman, Marco Foscato, and Vidar R. Jensen, J. Chem. Inf. Model <b>2019</b> (submitted)
+DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules, Vishwesh Venkatraman, Marco Foscato, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> (submitted)
+
