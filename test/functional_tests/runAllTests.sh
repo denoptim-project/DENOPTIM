@@ -28,6 +28,19 @@ export SHELL="/bin/bash"
 export DENOPTIM_HOME="$(cd ../.. ; pwd)"
 export javaDENOPTIM="java"
 export DENOPTIMJarFiles="$DENOPTIM_HOME/build"
+if [ ! -f "$DENOPTIMJarFiles/DenoptimGA.jar" ]
+then
+    echo "Cannot find  $DENOPTIMJarFiles/DenoptimGA.jar"
+    echo "Trying under dist folder"
+    if [ ! -f "$DENOPTIMJarFiles/dist/DenoptimGA.jar" ]
+    then
+       echo "ERROR! Cannot find  $DENOPTIMJarFiles/dist/DenoptimGA.jar"
+       exit -1
+    fi
+    export DENOPTIMJarFiles="$DENOPTIM_HOME/build/dist"
+fi
+echo "Using DENOPTIM from $DENOPTIMJarFiles"
+
 
 
 ################################################################################
@@ -100,7 +113,7 @@ export DENOPTIMslaveCores=4
 if [ -d "$wDir" ]
 then
     echo " "
-    echo "ERROR! $wDir exists already!"
+    echo "ERROR! Old $wDir exists already! Remove it to run new tests."
     echo " "
     exit
 fi

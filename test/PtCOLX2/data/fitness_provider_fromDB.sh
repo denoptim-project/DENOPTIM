@@ -25,10 +25,10 @@
 ###############################################################################
 
 #Java
-java="java"
+java="$javaDENOPTIM"
 
 #Denoptim home
-pathToDenoptimJars="../../build/"
+pathToDenoptimJars="$DENOPTIMJarFiles"
 
 # Map pf unique identifiers to fitness or rejection due to steric hindrance
 uidToAtomClash="data/UIDsToAtomClash"
