@@ -1,5 +1,5 @@
 # DENOPTIM
-De Novo OPTimization of organic and Inorganic Molecules (DENOPTIM) is a software for de novo design and optimization of functional compounds.
+DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software for de novo design and optimization of functional compounds. This project is licensed under the terms of the GNU Affero GPL version 3.0 license.
 
 ## Content of the source code folder tree
 
@@ -32,7 +32,7 @@ De Novo OPTimization of organic and Inorganic Molecules (DENOPTIM) is a software
 ## Quick start
 To get started you first have to compile DENOPTIM and its programs.
 
-1. Preparation. Make sure you have Java installed (1.7 or above). If the following does not results in a version statement or your version is too old, you can get and install Java, for instance, from www.oracle.com:
+1. Preparation. Make sure you have Java installed (1.6 or above). If the following does not results in a version statement or your version is too old, you can get and install Java, for instance, from www.oracle.com:
 
         java -version
         javac -version
