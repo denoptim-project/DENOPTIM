@@ -1,5 +1,5 @@
 # DENOPTIM
-DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software for de novo design and optimization of functional compounds. This project is licensed under the terms of the GNU Affero GPL version 3.0 license.
+DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software for de novo design and optimization of functional compounds.
 
 ## Content of the source code folder tree
 
@@ -58,6 +58,16 @@ Or, you can play with the optimization of organometallic ligands sets that weake
 ## User Manual
 
 The complete user manual is available [under the doc folder](./doc/DENOPTIM_MANUAL.odt)
+
+## License
+DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
+Instead, additional libraries used by DENOPTIM programs are licensed according to their respective licenses:
+* cdk: 
+* commons-cli: Apache License Version 2.0
+* commons-io: Apache License Version 2.0
+* commons-lang: Apache License Version 2.0
+* commons-math: Apache License Version 2.0
+* vecmath: GNU GPL Version 2
 
 
 ## Cite DENOPTIM
