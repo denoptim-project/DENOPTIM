@@ -34,7 +34,7 @@ import rings.RingClosingAttractor;
  * Toolbox for definition and managment of the rotational space, which is given
  * by the list of rotatable bonds.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class RotationalSpaceUtils  

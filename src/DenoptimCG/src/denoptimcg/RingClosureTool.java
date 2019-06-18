@@ -41,7 +41,7 @@ import org.openscience.cdk.PseudoAtom;
 /**
  * Toolkit to perform ring closure with 3D fragments
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class RingClosureTool

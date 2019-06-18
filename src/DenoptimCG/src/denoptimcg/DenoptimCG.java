@@ -11,7 +11,7 @@ import utils.GraphConversionTool;
 
 /**
  *
- * @author VISHWESH
+ * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 public class DenoptimCG 

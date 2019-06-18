@@ -15,7 +15,7 @@ import utils.GenUtils;
  * and PseudoAtom T2. keep in mind this scheme:<br>
  * H2--H1.....rest of chain.....T1--T2<br>
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class RingClosure

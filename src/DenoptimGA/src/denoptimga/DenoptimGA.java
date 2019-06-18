@@ -8,7 +8,7 @@ import utils.GenUtils;
 
 /**
  *
- * @author Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
+ * @author Vishwesh Venkatraman 
  */
 public class DenoptimGA
 {

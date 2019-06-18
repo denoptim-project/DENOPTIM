@@ -8,7 +8,7 @@ import java.io.Serializable;
  * molecule ID in the library of fragments, the type of fragment 
  * and the identify of the AP linking to the chain link before and after
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class ChainLink implements Cloneable, Serializable

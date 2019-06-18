@@ -34,7 +34,7 @@ import java.util.logging.Level;
 /**
  * Utilities for graphs.
  *
- * @author Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
+ * @author Vishwesh Venkatraman 
  * @author Marco Foscato
  */
 public class GraphUtils

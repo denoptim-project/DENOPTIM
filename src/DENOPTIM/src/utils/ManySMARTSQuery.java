@@ -13,7 +13,7 @@ import org.openscience.cdk.exception.CDKException;
 /**
  * Container of lists of atoms matching a list of SMARTS.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class ManySMARTSQuery

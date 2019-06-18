@@ -37,7 +37,7 @@ import org.openscience.cdk.PseudoAtom;
 /**
  * Toolkit to perform conformational search via Tinker PSSROT program
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class ConformationalSearchPSSROT

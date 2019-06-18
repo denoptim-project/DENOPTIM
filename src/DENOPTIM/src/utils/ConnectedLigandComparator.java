@@ -7,7 +7,7 @@ import java.util.Comparator;
  * the mass number. Dummy atoms are prioritized if they have only one connected
  * neighbour
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
 {

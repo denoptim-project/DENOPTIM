@@ -8,7 +8,7 @@ import constants.DENOPTIMConstants;
  * A ConnectedLigand is just an atom with an explicit field reporting the number
  * of connected atoms.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 public class ConnectedLigand
 {

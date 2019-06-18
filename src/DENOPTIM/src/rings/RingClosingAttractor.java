@@ -17,7 +17,7 @@ import constants.DENOPTIMConstants;
  * new bond with another RingClosingAttractor that belongs to
  * the same atom chain thus forming a ring.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class RingClosingAttractor

@@ -8,7 +8,7 @@ import molecule.DENOPTIMVertex;
  * ClosableChain represents a chain of fragments (chain links) that
  * is closable (or candidate closable).
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class ClosableChain implements Cloneable, Serializable

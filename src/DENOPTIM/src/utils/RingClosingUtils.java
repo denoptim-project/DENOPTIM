@@ -18,7 +18,7 @@ import molecule.DENOPTIMRing;
 /**
  * Toolbox useful when dealing with Ring Closing Attractors and ring closures.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class RingClosingUtils

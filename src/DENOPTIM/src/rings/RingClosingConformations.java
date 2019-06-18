@@ -20,7 +20,7 @@ import molecule.DENOPTIMVertex;
  * is performed in the parent object representing the chain. 
  * See {@link #rings.PathSubGraph  here}.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class RingClosingConformations implements Serializable

@@ -36,7 +36,7 @@ import org.openscience.cdk.graph.PathTools;
  * involving more than one <code>DENOPTIMVertex</code> and 
  * <code>DENOPTIMEdge</code>.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class PathSubGraph

@@ -35,7 +35,7 @@ import fragspace.FragmentSpace;
  * 3D fragments using the geometrical information contained in the fragment's
  * attachment points.
  *
- * @author Marco Foscato (University of Bergen)
+ * @author Marco Foscato 
  */
 
 public class TreeBuilder3D

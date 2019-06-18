@@ -11,7 +11,7 @@ import java.util.Properties;
  *  will be incremented for small bug fixes and changes that
  *  probably wouldn't be too noticeable .  
 
- * @author Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
+ * @author Vishwesh Venkatraman 
  */
 public class Version
 {
