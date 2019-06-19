@@ -62,7 +62,7 @@ The complete user manual is available [under the doc folder](./doc/DENOPTIM_MANU
 ## License
 DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
 Instead, additional libraries used by DENOPTIM programs are licensed according to their respective licenses:
-* cdk: 
+* cdk: GNU Lesser GPL Version 2.1
 * commons-cli: Apache License Version 2.0
 * commons-io: Apache License Version 2.0
 * commons-lang: Apache License Version 2.0
