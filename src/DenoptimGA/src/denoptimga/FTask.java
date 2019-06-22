@@ -1,6 +1,7 @@
 /*
  *   DENOPTIM
- *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
+ *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no> and
+ *   Marco Foscato <marco.foscato@uib.no>
  * 
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
@@ -23,26 +24,31 @@ import java.util.logging.Level;
 import java.util.concurrent.Callable;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.io.MDLV3000Reader;
+
+import org.apache.commons.io.FileUtils;
 
 import exception.DENOPTIMException;
 import io.DenoptimIO;
 import logging.DENOPTIMLogger;
 import molecule.DENOPTIMGraph;
 import molecule.DENOPTIMMolecule;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.io.MDLV3000Reader;
 import task.ProcessHandler;
 import utils.DENOPTIMMoleculeUtils;
 
 /**
  *
- * @author Vishwesh Venkatraman
+ * @author Vishwesh Venkatraman and Marco Foscato
  */
 public class FTask implements Callable
 {
@@ -166,12 +172,44 @@ public class FTask implements Callable
                 throw new DENOPTIMException(msg);
             }
 
-// MF: it is better to let the shell script decide whether to keep the input file
-//             DenoptimIO.deleteFile(molINITFile);
+            // read the molecular model returned by the fitness provider
+	    IAtomContainer mol3DFinal = new AtomContainer();
+	    boolean unreadable=false;
+	    try
+	    {
+                mol3DFinal = DenoptimIO.readSingleSDFFile(molFinalFile);
+		if (mol3DFinal.isEmpty())
+		{
+		    unreadable=true;
+		}
+	    }
+	    catch (Throwable t)
+	    {
+		unreadable=true;
+	    }
 
-            // read the conformation (lowest energy)
-            IAtomContainer mol3DFinal = DenoptimIO.readSingleSDFFile(molFinalFile);
-            //System.err.println("READING " + molFinalFile);
+	    if (unreadable)
+	    {
+                msg = "Unreadable FIT file for " + molName;
+		DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+		
+		// make a copy of theunreadable FIT file that will be replaced
+		String molFFileCp = workDir + fsep + molName 
+							  + "_UnreadbleFIT.sdf";
+		FileUtils.copyFile(new File(molFinalFile), 
+				   new File(molFFileCp));
+		FileUtils.deleteQuietly(new File(molFinalFile));
+
+		// make a readable FIT file with minimal data
+		mol3DFinal = new AtomContainer();
+		mol3DFinal.addAtom(new Atom("H"));
+		mol3DFinal.setProperty(CDKConstants.TITLE, molName);
+		mol3DFinal.setProperty("MOL_ERROR", 
+			   "#FTask: Unable to retrive dats. See " + molFFileCp);
+                mol3DFinal.setProperty("GCODE", molGraph.getGraphId());
+                mol3DFinal.setProperty("GraphENC", molGraph.toString());
+		DenoptimIO.writeMolecule(molFinalFile, mol3DFinal, false);
+	    }
 
             if (mol3DFinal.getProperty("MOL_ERROR") != null)
             {
