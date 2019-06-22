@@ -264,7 +264,7 @@ public class DenoptimIO
             lstContainers.addAll(
                     ChemFileManipulator.getAllAtomContainers(chemFile));
         }
-        catch (CDKException | IOException cdke)
+        catch (Throwable cdke)
         {
             throw new DENOPTIMException(cdke);
         }

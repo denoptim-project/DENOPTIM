@@ -34,21 +34,21 @@ import java.util.Properties;
 public class Version
 {
     public static final String NAME = "DENOPTIM";
-    public static final String COPYRIGHT = "2014";
+    public static final String COPYRIGHT = "2019";
     public static final String AUTHORS = "Vishwesh Venkatraman, Marco Foscato";
     public static final String CONTRIBUTORS = "";
-    public static final String CONTACT = "bjorn.k.alsberg@ntnu.no; vidar.jensen@kj.uib.no";
-    public static final String DATE = "Dec 31, 2014";
+    public static final String CONTACT = "see https://github.com/denoptim-project";
+    public static final String DATE = "Jun 22, 2019";
     public static final String MINIMUMJAVAVERSION = "1.5";
     
     /** The major version number. */
-    public static final int MAJOR = 0;
+    public static final int MAJOR = 1;
 
     /** The minor version number. */
-    public static final int MINOR = 5;
+    public static final int MINOR = 0;
 
     /** The update letter. */
-    public static final int UPDATE = 1;
+    public static final int UPDATE = 0;
 
 
     /** String for the current version. */
