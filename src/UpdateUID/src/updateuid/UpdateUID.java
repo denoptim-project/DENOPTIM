@@ -149,7 +149,7 @@ public class UpdateUID
             }
             else
             {
-                mol.setProperty("MOL_ERROR", "Already exists.");
+                mol.setProperty("MOL_ERROR", "#Duplicate: UID Already exists.");
             }
 
             mol.setProperty("UID", keyToVerify);
