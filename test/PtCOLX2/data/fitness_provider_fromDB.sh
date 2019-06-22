@@ -30,9 +30,12 @@ java="$javaDENOPTIM"
 #Denoptim home
 pathToDenoptimJars="$DENOPTIMJarFiles"
 
-# Map pf unique identifiers to fitness or rejection due to steric hindrance
+# Map of unique identifiers to fitness or rejection due to steric hindrance
 uidToAtomClash="data/UIDsToAtomClash"
 uidToFitness="data/UIDsToFitness"
+
+# List of all molecular models
+allMolsSDF="data/DB.sdf"
 
 #Flag controlling remotion of tmp files. 0:doit, 1:don't
 cleanup=0
@@ -150,7 +153,7 @@ then
     echo " "
     echo "Usage: `basename $0` required number of arguments not supplied"       
     echo "5 parameters must be supplied (in this order):"
-    echo " <input.sdf>  <output.sdf> <workingDirectory> <taskID> <UIDFile>"
+    echo " <input.sdf> <output.sdf> <workingDirectory> <taskID> <UIDFile>"
     echo " "
     exit 1
 fi
@@ -217,15 +220,34 @@ fi
 
 
 #
+# Recover molecular model (bahs-only extraction of one molecules from SDF)
+#
+echo "Retriving molecular model from DB..."
+nFile=$(wc -l "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
+nFirst=$(grep -n -m1 "\$\$\$\$" "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
+nUID=$(grep -n "$uid" "$allMolsSDF"  | awk '{gsub(":"," ",$0); print $1}')
+nToEnd=$(tail -n "$((nFile-nUID))" "$allMolsSDF" | grep -n "\$\$\$\$" | head -n 1 | awk '{gsub(":"," ",$0); print $1}')
+nEnd=$((nUID+nToEnd))
+if [ "$nFirst" -gt "$nUID" ]
+then
+    head -n "$nEnd" "$allMolsSDF" > "$preOutSDF"
+else
+    nBegin=$(head -n "$nUID" "$allMolsSDF" | grep -n "\$\$\$\$"  | tail -n 1 | awk '{gsub(":"," ",$0); print $1}')
+    nTot=$((nEnd-nBegin))
+    head -n "$nEnd" "$allMolsSDF" | tail -n "$nTot" > "$preOutSDF"
+fi
+awk -v molNum="$molNum" '{gsub("CandidateEntity",molNum,$0); print $0}' "$preOutSDF" > "$outSDF"
+
+
+#
 # Finally make the output
 #
-mv "$preOutSDF" "$outSDF"
+echo "All done. Returning $outSDF"
 
 
 #
-# Cleanup
+# Cleanup is done in finish function upon trappin the exit command
 #
-cleanUpTmpFiles
 
 
 #
