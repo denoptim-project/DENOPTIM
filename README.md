@@ -30,34 +30,34 @@ DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software
 
 
 ## Quick start
-To get started you first have to compile DENOPTIM and its programs.
+To get started you first have to compile DENOPTIM and its programs. We assume that <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned from the GitHub repository. 
 
-1. Preparation. Make sure you have Java installed (1.5 or above). If the following does not result in version statements or your versions are too old, you can get and install Java from www.oracle.com or http://openjdk.java.net/:
+1. Preparation. Make sure you have Java installed (1.5 or above). If the following does not result in version statements or the version is too old, you can get and install Java from www.oracle.com or http://openjdk.java.net/:
 
         java -version
         javac -version
 
 2. Compile DENOPTIM and all the accessories in the src folder.
 
-        cd build
+        cd $DENOPTIM_HOME/build
         bash build-all.sh
 
 3. Done!
 
 After compilation you can run the functionality tests (takes 2-3 minutes).
 
-    cd ../test/functional_tests
+    cd $DENOPTIM_HOME/test/functional_tests
     bash runAllTests.sh
 
-Or, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 5-10 minutes).
+Or, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 10-15 minutes).
 
-    cd test/PtCOLX2
+    cd $DENOPTIM_HOME/test/PtCOLX2
     bash runEvolutionaryExperiment.sh
 
 
 ## User Manual
 
-The complete user manual is available [under the doc folder](http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
+The complete user manual is available under the <code>doc</code> folder and is accessible [on line](http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
 
 ## License
 DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
