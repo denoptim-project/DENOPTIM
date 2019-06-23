@@ -46,7 +46,7 @@ To get started you first have to compile DENOPTIM and its programs.
 
 After compilation you can run the functionality tests (takes 2-3 minutes).
 
-    cd test/functional_tests
+    cd ../test/functional_tests
     bash runAllTests.sh
 
 Or, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 5-10 minutes).
