@@ -57,7 +57,7 @@ Or, you can play with the optimization of organometallic ligands sets that weake
 
 ## User Manual
 
-The complete user manual is available [under the doc folder](./doc/DENOPTIM_MANUAL.odt)
+The complete user manual is available [under the doc folder](./doc/user_manual.html)
 
 ## License
 DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
