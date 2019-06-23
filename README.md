@@ -32,7 +32,7 @@ DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software
 ## Quick start
 To get started you first have to compile DENOPTIM and its programs.
 
-1. Preparation. Make sure you have Java installed (1.6 or above). If the following do not result in version statements or your versions are too old, you can get and install a newer Java from www.oracle.com or http://openjdk.java.net/:
+1. Preparation. Make sure you have Java installed (1.5 or above). If the following do not result in version statements or your versions are too old, you can get and install a newer Java from www.oracle.com or http://openjdk.java.net/:
 
         java -version
         javac -version
