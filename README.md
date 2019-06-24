@@ -71,5 +71,9 @@ Instead, additional libraries used by DENOPTIM programs are licensed according t
 
 
 ## Cite DENOPTIM
-DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules, Vishwesh Venkatraman, Marco Foscato, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> (submitted)
+1) DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules, Vishwesh Venkatraman, Marco Foscato, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> (submitted)
+2) Foscato, M.; Occhipinti, G.; Venkatraman, V.; Alsberg, B. K.; Jensen, V. R.; Automated Design of Realistic Organometallic, Molecules from Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 767–780.
+3) Foscato, M.; Venkatraman, V.; Occhipinti, G.; Alsberg, B. K.; Jensen, V. R.; Automated Building of Organometallic Complexes from 3D Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 1919–1931.
+4) Foscato, M.; Houghton, B. J.; Occhipinti, G.; Deeth, R. J.; Jensen, V. R.; Ring Closure To Form Metal Chelates in 3D Fragment-Based de Novo Design. <i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 1844-1856.
+
 
