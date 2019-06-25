@@ -167,6 +167,11 @@ runTest "p6"
 runTest "t6"
 
 #
+# p7: exploration of fragment space that generates serialized graphs for t7
+#
+runTest "p7"
+
+#
 # t7: conversion of serialized DENOPTIMgraph to SDF
 #
 runTest "t7"
