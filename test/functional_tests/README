@@ -29,8 +29,11 @@ t4: Exploration of fragment space from a given set root graphs.
 
 t5: Exploration of fragment space.
 
-p6: preparation of files for t6 and t7
+p6: preparation of files for t6.
+
 t6: Restart exploration of fragment space from checkpoint file.
+
+p7: preparation of files for t7.
 
 t7: Test "SerConverter", which parses a serialized graph. NB: this test need a serialized file generated with the same version of DENOPTIM.
 
