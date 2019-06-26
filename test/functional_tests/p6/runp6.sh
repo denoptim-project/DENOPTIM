@@ -29,7 +29,7 @@ then
     echo "Unsuccesful generation of checkpoint files for tests."
     exit -1
 else
-    echo "Test 'p6' PASSED"
+    echo "Preparation 'p6' done."
 fi
 
 # Move some of the generated files that are used by other tests
