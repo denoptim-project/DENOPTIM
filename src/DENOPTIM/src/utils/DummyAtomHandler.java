@@ -85,7 +85,7 @@ public class DummyAtomHandler
 
     public IAtomContainer removeDummy(IAtomContainer mol) throws DENOPTIMException
     {
-	List<IAtom> dummiesList = new ArrayList<>();
+        List<IAtom> dummiesList = new ArrayList<>();
         List<Integer> dummiesIdxs = new ArrayList<>();
 
         //Identify the target atoms to be treated
@@ -139,7 +139,7 @@ public class DummyAtomHandler
 //------------------------------------------------------------------------------
     
     public IAtomContainer removeDummyInHapto(IAtomContainer mol) 
-						        throws DENOPTIMException
+                                                        throws DENOPTIMException
     {
         List<IAtom> dummiesList = new ArrayList<>();
         List<Integer> dummiesIdxs = new ArrayList<>();
@@ -167,16 +167,16 @@ public class DummyAtomHandler
         }
 
         if (debugLevel > 0)
-	    System.err.println("Found "+dummiesList.size()+" dummy atoms");
+            System.err.println("Found "+dummiesList.size()+" dummy atoms");
 
         if (debugLevel > 2)
-	{
+        {
             for (IAtom du : dummiesList)
-	    {
+            {
                 System.err.println("DU LIST: " + getSDFAtomNumber(mol,du) 
-				   + " size: " + dummiesList.size());
-	    }
-	}
+                                   + " size: " + dummiesList.size());
+            }
+        }
 
         //Delete dummy atoms and change connectivity
         for (IAtom du : dummiesList)
@@ -189,10 +189,10 @@ public class DummyAtomHandler
 
             //Identify atoms of ligand in mupltihapto system
             if (debugLevel > 2)
-	    {
+            {
                 System.err.println(" DU: " + getSDFAtomNumber(mol,du) 
-				   + " size: "+nbrOfDu.size());
-	    }
+                                   + " size: "+nbrOfDu.size());
+            }
 
             List<Boolean> found = getFlagsVector(numOfTerms);
             List<Set<IAtom>> goupsOfTerms = new ArrayList<>();
@@ -206,7 +206,7 @@ public class DummyAtomHandler
                 //Look for ligand starting from this term
                 IAtom nbrI = nbrOfDu.get(i);
                 Set<IAtom> ligOfNbrI = 
-				 exploreConnectedToAtom(nbrI,nbrOfDu,mol,found);
+                                 exploreConnectedToAtom(nbrI,nbrOfDu,mol,found);
                 if (!ligOfNbrI.isEmpty())
                 {
                     goupsOfTerms.add(ligOfNbrI);
@@ -234,7 +234,7 @@ public class DummyAtomHandler
                 //Idenfify the ligand corresponding to Du
                 int ligandID = -1;
                 boolean ligandFound = false;
-		List<Point3d> allCandidates = new ArrayList<Point3d>();
+                List<Point3d> allCandidates = new ArrayList<Point3d>();
                 for (int i=0; i<goupsOfTerms.size(); i++)
                 {
                     Set<IAtom> grp = goupsOfTerms.get(i);
@@ -258,7 +258,7 @@ public class DummyAtomHandler
                             candidateDuP3d.z = 0.0000; 
                         }
                     }
-		    allCandidates.add(candidateDuP3d);
+                    allCandidates.add(candidateDuP3d);
                     candidateDuP3d.x = candidateDuP3d.x / (double) hapticity.get(i);
                     candidateDuP3d.y = candidateDuP3d.y / (double) hapticity.get(i);
                     candidateDuP3d.z = candidateDuP3d.z / (double) hapticity.get(i);
@@ -280,15 +280,16 @@ public class DummyAtomHandler
                         dummyP3d.z = 0.0000;
                     }
 
-                    //Check if Du correspond to the center of this group of terms
-		    double dist = candidateDuP3d.distance(dummyP3d);
+                    //Check if Du correspond to the centroid of this group
+                    // WARNING! Hard-coded threshold.
+                    double dist = candidateDuP3d.distance(dummyP3d);
                     if (dist < 0.002)
                     {
                         if (ligandFound)
                         {
                             String msg = "More then one group of atoms may "
-					 + "correspond to the ligand. Not able "
-					 + "to identify the ligand!";
+                                         + "correspond to the ligand. Not able "
+                                         + "to identify the ligand!";
                             throw new DENOPTIMException(msg);
                         }
                         ligandID = i;
@@ -296,16 +297,16 @@ public class DummyAtomHandler
                     }
                 }
 
-		//In case of no mathcing return the error
-		if (!ligandFound)
+                //In case of no mathcing return the error
+                if (!ligandFound)
                 {
                     String msg = "Dummy atom does not seem to be placed at the "
-				 + "centroid of a multihapto ligand. "
-				 + "Du: " + du
-				 + "Candidates: " + allCandidates
-				 + "See current molecule in 'error.sdf'";
-		    DenoptimIO.writeMolecule("error.sdf",mol,false);
-		    throw new DENOPTIMException(msg);
+                                 + "centroid of a multihapto ligand. "
+                                 + "Du: " + du
+                                 + "Candidates: " + allCandidates
+                                 + "See current molecule in 'error.sdf'";
+                    DenoptimIO.writeMolecule("error.sdf",mol,false);
+                    throw new DENOPTIMException(msg);
                 }
                 
                 //Connect every atom from the multihapto ligand whith
