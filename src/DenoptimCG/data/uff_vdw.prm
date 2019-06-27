@@ -1,40 +1,24 @@
-
-      ##############################
-      ##                          ##
-      ##  Force Field Definition  ##
-      ##                          ##
-      ##############################
-
-
+#
+# Force field definition for Tinker
+# =================================
+#
+# Only Van der Waals term is includer in these parameters that are
+# taken from UFF force field. See:
+# Rappe', Casewit, Colwell, Goddard III, Skiff,
+# J. Am. Chem. Soc. 1992, 114, p. 10024
+#
 forcefield              UFF_VdW-only
-
 vdwtype                 LENNARD-JONES
 radiusrule              GEOMETRIC
 radiustype              SIGMA
 radiussize              DIAMETER
 epsilonrule             GEOMETRIC
-
-
-      #############################
-      ##                         ##
-      ##  Literature References  ##
-      ##                         ##
-      #############################
-
-
-Only Van der Waals term is includer in these parameters that are
-taken from UFF force field. See:
-
-Rappe', Casewit, Colwell, Goddard III, Skiff,
-J. Am. Chem. Soc. 1992, 114, p. 10024
-
-
-      #############################
-      ##                         ##
-      ##  Atom Type Definitions  ##
-      ##                         ##
-      #############################
-
+#
+#
+# Definition of atoms
+# ===================
+#
+#
 #key      class  symbol  label                          Z  a.weight  connectivity
 atom          1    H     "Hydrogen"                     1     1.008    9
 atom          2    He    "Helium"                       2     4.003    9
@@ -160,15 +144,12 @@ atom        120    Du    "Dummy atom"                   1     1.0      9
 #
 atom        121    ATP   "AttractorPLUS"                1     1.0      1
 atom        122    ATM   "AttractorMINUS"               1     1.0      1
-
-
-      ################################
-      ##                            ##
-      ##  Van der Waals Parameters  ##
-      ##                            ##
-      ################################
-
-
+#
+#
+#
+#  Van der Waals Parameters 
+#  ========================
+#
 vdw          1                2.8860     0.0440
 vdw          2                2.3620     0.0560
 vdw          3                2.4510     0.0250
