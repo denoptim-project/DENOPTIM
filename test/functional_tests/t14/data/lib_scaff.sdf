@@ -1,0 +1,19 @@
+Fragment
+  CDK     0627192255
+From GM3DFragmenter
+  1  0  0  0  0  0  0  0  0  0999 V2000
+   -0.0073    0.0049   -0.0016 C   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+Fragment
+
+> <cdk:Remark>
+From GM3DFragmenter
+
+> <CLASS>
+1#co:0:-0.4823%-1.3042%0.3501,ccb:0:-0.4706%0.3555%-1.3012,ccb:0:-0.4858%0.9618%0.9481,co:0:1.4181%0.0068%0.0059
+
+> <ATTACHMENT_POINT>
+1:4
+
+$$$$

@@ -1,0 +1,54 @@
+hydrogen
+  CDK     0627192255
+
+  1  0  0  0  0  0  0  0  0  0999 V2000
+    0.2029   -2.5007    1.1618 H   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+hydrogen
+
+> <CLASS>
+1#hyd:1:0.4734%-1.7380%0.3974
+
+> <ATTACHMENT_POINT>
+1:1
+
+$$$$
+AttractorPLUS
+  CDK     0627192255
+Built manually
+  1  0  0  0  0  0  0  0  0  0999 V2000
+   -0.0083    0.0094    0.0081 ATP 0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+AttractorPLUS
+
+> <cdk:Remark>
+Built manually
+
+> <CLASS>
+1#ATplus:0:0.0065%0.0058%-0.0060
+
+> <ATTACHMENT_POINT>
+1:1
+
+$$$$
+AttractorMINUS
+  CDK     0627192255
+Built manually
+  1  0  0  0  0  0  0  0  0  0999 V2000
+    0.0029   -0.0029    0.0019 ATM 0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+AttractorMINUS
+
+> <cdk:Remark>
+Built manually
+
+> <CLASS>
+1#ATminus:0:0.0008%-0.0033%-0.0028
+
+> <ATTACHMENT_POINT>
+1:1
+
+$$$$
