@@ -278,6 +278,32 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
+   /**
+    * Returns the bond order for the given APClass. 
+    * If the Fragment space is 
+    * not defined, that is, the bond order map is null, then it returns
+    * bond order 1.
+    * @param apclass the APclass to be converted into bond order
+    * @param the bond order
+    */
+    public static Integer getBondOrderForAPClass(String apclass)
+    {
+        if (FragmentSpace.getBondOrderMap() == null)
+        {
+            String msg = "Attemting to get bond order, but no "
+                       + "FragmentSpace defined (i.e., null BondOrderMap). "
+                       + "Assuming bond order one.";
+            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+	    return new Integer(1);
+        }
+        else
+        {
+            return FragmentSpace.getBondOrderMap().get(apclass);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
     public static HashMap<String, String> getCappingMap()
     {
         return cappingMap;

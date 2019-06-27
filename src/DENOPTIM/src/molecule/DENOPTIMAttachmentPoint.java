@@ -19,6 +19,7 @@
 package molecule;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 /**
  * Each attachment point is annotated by the number (position) of the atom
@@ -196,6 +197,34 @@ public class DENOPTIMAttachmentPoint implements Serializable
     public boolean isClassEnabled()
     {
         return apClass.length() > 0;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Prepare a string for writing this AP in a fragment SDF file.
+     * Only DENOPTIM's format is currently supported and we assume three 
+     * coordinates are used to define the direction vector.
+     * @returns a string with APClass nad coordinated of the AP direction vector
+     **/
+
+    public String getSingleAPStringSDF()
+    {
+	//TODO: move these two to constants
+	String APCLCOORDSEP = ":";
+	String APCOORDSEP = "%";
+
+	StringBuilder sb = new StringBuilder();
+	// We begin with APClass because atom number of handled elsewhere
+	sb.append(apClass);
+	// Append coordinates (assuming there are three!!!)
+        DecimalFormat digits = new DecimalFormat("###.####");
+        digits.setMinimumFractionDigits(4);
+	sb.append(APCLCOORDSEP);
+	sb.append(digits.format(dirVec[0])).append(APCOORDSEP);
+	sb.append(digits.format(dirVec[1])).append(APCOORDSEP);
+	sb.append(digits.format(dirVec[2]));
+	return sb.toString();
     }
 
 //------------------------------------------------------------------------------

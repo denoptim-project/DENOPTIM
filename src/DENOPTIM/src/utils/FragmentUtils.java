@@ -249,7 +249,7 @@ public class FragmentUtils
                         //System.err.println("RCN: " + rc);
                         //System.err.println("st: " + st3[0]);
                         Integer apobj = 
-				    FragmentSpace.getBondOrderMap().get(st3[0]);
+				   FragmentSpace.getBondOrderForAPClass(st3[0]);
                         if (apobj == null)
                         {
                             String msg = "No bond order data found for "
@@ -299,7 +299,8 @@ public class FragmentUtils
                     }
 
 
-                    Integer apobj = FragmentSpace.getBondOrderMap().get(st3[0]);
+                    Integer apobj = 
+				  FragmentSpace.getBondOrderForAPClass(st3[0]);
 
                     if (apobj == null)
                     {
@@ -337,7 +338,19 @@ public class FragmentUtils
             }
 	    try
 	    {
-                checkAPInfo(apMap, lstAP);
+		try
+		{
+                    checkAPInfo(apMap, lstAP);
+		}
+		catch (DENOPTIMException ide)
+		{
+		    String msg = "Check AP definitions: \n"
+			+ mol.getProperty(DENOPTIMConstants.APTAG).toString()
+		        + "\n"
+			+ mol.getProperty(DENOPTIMConstants.APCVTAG).toString();
+                    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                    throw new DENOPTIMException(msg);
+		}
 	    }
 	    catch (DENOPTIMException de)
 	    {
