@@ -49,11 +49,14 @@ After compilation you can run the functionality tests (takes 2-3 minutes).
     cd $DENOPTIM_HOME/test/functional_tests
     bash runAllTests.sh
 
-Or, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 10-15 minutes).
+The tests will use a temporary folder <code>/tmp/denoptim_test</code> where you can find all files related to these tests.
+
+In addition, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 10-15 minutes).
 
     cd $DENOPTIM_HOME/test/PtCOLX2
     bash runEvolutionaryExperiment.sh
 
+This will create a playground folder at <code>/tmp/denoptim_PtCO</code> where the evolutionary experiment will be run. Once the experiment is completed, you'll find also the results in the same folder.
 
 ## User Manual
 
