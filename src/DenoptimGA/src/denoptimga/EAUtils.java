@@ -67,11 +67,9 @@ class EAUtils
     protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
     
     protected static DecimalFormat df = new DecimalFormat();
-    
 
     // for each fragment store the reactions associated with it
     protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
-
 
     // flag for debugging
     private static final boolean DEBUG = false;
@@ -95,45 +93,27 @@ class EAUtils
         sb.append(String.format("%-20s", "#Name "));
         sb.append(String.format("%-20s", "GraphId "));
         sb.append(String.format("%-30s", "UID "));
-        sb.append(String.format("Fitness "));
+        sb.append(String.format("%-15s","Fitness "));
+	sb.append("Source ");
         sb.append(System.getProperty("line.separator"));
 
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
+        df.setMinimumFractionDigits(GAParameters.getPrecisionLevel());
 
-        int plev = GAParameters.getPrintLevel();
-        if (plev == 0)
+        for (int i=0; i<GAParameters.getPopulationSize(); i++)
         {
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
+            DENOPTIMMolecule mol = popln.get(i);
+            if (mol != null)
             {
-                DENOPTIMMolecule mol = popln.get(i);
-                if (mol != null)
-                {
-                    //sb.append(mol.toString()).append(System.getProperty("line.separator"));
-                    String mname = new File(mol.getMoleculeFile()).getName();
-                    if (mname != null)
-                        sb.append(String.format("%-20s", mname));
-                    sb.append(String.format("%-20s", mol.getMoleculeGraph().getGraphId()));
-                    sb.append(String.format("%-30s", mol.getMoleculeUID()));
-                    sb.append(df.format(mol.getMoleculeFitness()));
-                    sb.append(System.getProperty("line.separator"));
-                }
-            }
-        }
-        if (plev > 0)
-        {
-            for (int i=0; i<popln.size(); i++)
-            {
-                DENOPTIMMolecule mol = popln.get(i);
-                if (mol != null)
-                {
-                    String mname = new File(mol.getMoleculeFile()).getName();
-                    if (mname != null)
-                        sb.append(String.format("%-20s", mname));
-                    sb.append(String.format("%-20s", mol.getMoleculeGraph().getGraphId()));
-                    sb.append(String.format("%-30s", mol.getMoleculeUID()));
-                    sb.append(df.format(mol.getMoleculeFitness()));
-                    sb.append(System.getProperty("line.separator"));
-                }
+                String mname = new File(mol.getMoleculeFile()).getName();
+                if (mname != null)
+                    sb.append(String.format("%-20s", mname));
+                sb.append(String.format("%-20s", 
+					  mol.getMoleculeGraph().getGraphId()));
+                sb.append(String.format("%-30s", mol.getMoleculeUID()));
+                sb.append(df.format(mol.getMoleculeFitness()));
+		sb.append("    ").append(mol.getMoleculeFile());
+                sb.append(System.getProperty("line.separator"));
             }
         }
 
@@ -489,10 +469,12 @@ class EAUtils
                 String sdfile = popln.get(i).getMoleculeFile();
                 String imgfile = popln.get(i).getImageFile();
 
-                if (sdfile != null && imgfile != null)
+                if (sdfile != null)
                 {
                     FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-
+		}
+                if (imgfile != null)
+                {
                     FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
                 }
             }

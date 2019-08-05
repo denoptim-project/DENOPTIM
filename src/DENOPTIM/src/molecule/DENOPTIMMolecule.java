@@ -62,7 +62,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
      * Any comments on the molecule
      */
     private String commments;
-    
+
     
 //------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         molFitness = m_molFitness;
         molFile = m_molFile;
     }
-    
+
 //------------------------------------------------------------------------------
     
     public void setComments(String m_str)
