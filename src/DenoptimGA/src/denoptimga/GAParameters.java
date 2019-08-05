@@ -632,14 +632,22 @@ public class GAParameters
                 if (line.toUpperCase().startsWith("GA-GROWTHPROBSCHEME="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
+                    switch (option.toUpperCase())
                     {
-                        growthProbabilityScheme = Integer.parseInt(option);
-
-                        if (growthProbabilityScheme > 2 || growthProbabilityScheme < 0)
-                        {
+                        case "EXP_DIFF":
+			    growthProbabilityScheme = 0;
+                            break;
+                        case "TANH":
+                            growthProbabilityScheme = 1;
+                            break;
+                        case "SIGMA":
+                            growthProbabilityScheme = 2;
+                            break;
+			case "UNRESTRICTED":
+                            growthProbabilityScheme = 3;
+                            break;
+                        default:
                             throw new DENOPTIMException("Unknown growth probability scheme.");
-                        }
                     }
                 }
 

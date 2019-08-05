@@ -90,6 +90,14 @@ class EAUtils
                                                         throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
+
+	//Headers
+        sb.append(String.format("%-20s", "#Name "));
+        sb.append(String.format("%-20s", "GraphId "));
+        sb.append(String.format("%-30s", "UID "));
+        sb.append(String.format("Fitness "));
+        sb.append(System.getProperty("line.separator"));
+
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
 
         int plev = GAParameters.getPrintLevel();
@@ -1895,7 +1903,8 @@ MF: TO BE TESTED
         }
         else if (scheme == 1)
         {
-            prob = 1.0 - Math.tanh((double)level);
+            prob = 1.0 - Math.tanh(GAParameters.getGrowthMultiplier()
+				   * (double)level);
         }
         else if (scheme == 2)
         {
