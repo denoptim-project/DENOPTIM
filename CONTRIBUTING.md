@@ -35,3 +35,5 @@
 9. Create a pull request to your copy of `master`
 
     git push -u origin <name_of_branch>
+
+10. In the web page of the browser you'll find a `Compare & pull request` button that will allow you to compare the changes you have made and request the inclusion of those changes in the original `master` branch.
