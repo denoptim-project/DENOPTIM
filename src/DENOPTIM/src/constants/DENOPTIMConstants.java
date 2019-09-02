@@ -167,7 +167,7 @@ public final class DENOPTIMConstants
 		    ));
 
     /**
-     * Smallest difference for double/float comparison.
+     * Smallest difference for comparison of double and float numbers.
      */
     public static final double FLOATCOMPARISONTOLERANCE = 0.000000001;
 
