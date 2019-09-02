@@ -1,6 +1,7 @@
 # CONTRIBUTING to DENOPTIM
 
 ## Git work-flow
+Nice guidelines can be found in the internet. For instance, see (https://akrabat.com/the-beginners-guide-to-contributing-to-a-github-project/). Here is a summary of how to go with making changes to the source using the functionality provided by Git:
 
 1. Fork the `master` branch. The easiest is to use the `Fork` button on the top right to make your own copy. This will eventually open the GitHub page of our copy of `master` in your browser. 
 
