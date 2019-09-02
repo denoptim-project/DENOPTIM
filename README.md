@@ -1,5 +1,7 @@
 # DENOPTIM
-DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software for de novo design and optimization of functional compounds.
+
+## Introduction
+DENOPTIM (De Novo OPTimization of In/organic Molecules) is a software meant for <i>de novo</i> design and virtual screening of functional compounds. In practice, DENOPTIM is meant for building chemical entities by assembling building blocks (i.e., fragments), processing each chemical entity as to produce its figure of merit (i.e., fitness), and designing new entities based on the properties of entities generated before.
 
 ## Content of the source code folder tree
 
@@ -27,22 +29,20 @@ DENOPTIM (De Novo OPTimization of organic and Inorganic Molecules) is a software
 
 * [test](./test): contains some automated functionality tests and the published test case.
 
-
-
-## Quick start
-To get started you first have to compile DENOPTIM and its programs. We assume that <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned from the GitHub repository. 
-
-1. Preparation. Make sure you have Java installed (1.5 or above). If the following does not result in version statements or the version is too old, you can get and install Java from www.oracle.com or http://openjdk.java.net/:
+## Installation
+1. The prerequisite for installing DENOPTIM is having Java (1.5 or above). Make sure you have Java installed and its executables are in $PATH: If the following does not result in version statements or the version is too old, you can get and install Java from www.oracle.com or http://openjdk.java.net/:
 
         java -version
         javac -version
 
-2. Compile DENOPTIM and all the accessories in the src folder.
+2. Download/clone this GitHub repository (use the green "Clone or download" button). From now on, we assume that <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned from the GitHub repository. 
+
+3. Compile DENOPTIM and all the accessories in the src folder.
 
         cd $DENOPTIM_HOME/build
         bash build-all.sh
 
-3. Done!
+4. Done! 
 
 After compilation you can run the functionality tests (takes 2-3 minutes).
 
@@ -58,9 +58,19 @@ In addition, you can play with the optimization of organometallic ligands sets t
 
 This will create a playground folder at <code>/tmp/denoptim_PtCO</code> where the evolutionary experiment will be run. Once the experiment is completed, you'll find also the results in the same folder.
 
-## User Manual
+## Usage
+DENOPTIM programs are typically run using the following command
 
+    java -jar <program.jar> <input_parameters>
+
+where <code>&lt;program.jar&gt;</code> is the JAR file of the program you what to run, for instance <code>DenoptimGA.jar</code> for the the genetic algorithm, or <code>DenoptimCG.jar</code> for the 3D-structure builder, or <code>FragSpaceExplorer.jar</code> for the virtual screening tool, and <code>&lt;input_parameters&gt;</code> is a text file containing [keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
+A complete example of usage of the genetic algorithm can be found under the test folder at (./test/PtCOLX2).
+
+## User Manual
 The complete user manual is available under the <code>doc</code> folder and is accessible [on line](http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
+
+## Contributing
+Open an issue to point out any unreported and unexpected behaviors, bugs, or just to discuss changes to code or documentation. To make actual changes follow the [git workflow](https://guides.github.com/introduction/flow/) practices as indicated in the (./CONTRIBUTING.md).
 
 ## License
 DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
@@ -72,11 +82,11 @@ Instead, additional libraries used by DENOPTIM programs are licensed according t
 * commons-math: Apache License Version 2.0
 * vecmath: GNU GPL Version 2
 
-
 ## Cite DENOPTIM
 1) DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules; Marco Foscato, Vishwesh Venkatraman, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> (submitted)
 2) Foscato, M.; Occhipinti, G.; Venkatraman, V.; Alsberg, B. K.; Jensen, V. R.; Automated Design of Realistic Organometallic, Molecules from Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 767–780.
 3) Foscato, M.; Venkatraman, V.; Occhipinti, G.; Alsberg, B. K.; Jensen, V. R.; Automated Building of Organometallic Complexes from 3D Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 1919–1931.
 4) Foscato, M.; Houghton, B. J.; Occhipinti, G.; Deeth, R. J.; Jensen, V. R.; Ring Closure To Form Metal Chelates in 3D Fragment-Based de Novo Design. <i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 1844-1856.
 
-
+## Acknowledgments
+The Research Council of Norway (RCN) is acknowledged for financial support. 
