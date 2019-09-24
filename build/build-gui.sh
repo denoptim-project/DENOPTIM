@@ -36,7 +36,7 @@ echo >> manifest.mf
 jar cvfm GUI.jar manifest.mf gui images
 
 if [ "$?" = "0" ]; then
-    rm -rf manifest.mf gui
+    rm -rf manifest.mf gui images
 else
 	echo "Failed to create GUI.jar."
     exit -1
