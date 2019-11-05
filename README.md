@@ -24,6 +24,8 @@ DENOPTIM (De Novo OPTimization of In/organic Molecules) is a software meant for 
   * DenoptimRND: Dummy evolutionary algorithm using only random selection of new members (no genetic operators).
 
   * FragSpaceExplorer: Combinatorial algorithm for exploration of fragment spaces.
+  
+  * GUI: the user-friendly graphical interface.
 
   * misc: miscellaneous utilities that may be useful in DENOPTIM-based work.
 
@@ -42,7 +44,9 @@ DENOPTIM (De Novo OPTimization of In/organic Molecules) is a software meant for 
         cd $DENOPTIM_HOME/build
         bash build-all.sh
 
-4. Done! 
+4. Done! The DENOPTIM package is ready. Start the Graphical User Interface by double-clicking on the GUI.jar or by running
+
+        java -jar $DENOPTIM_HOME/build/GUI.jar
 
 After compilation you can run the functionality tests (takes 2-3 minutes).
 
@@ -83,7 +87,7 @@ Instead, additional libraries used by DENOPTIM programs are licensed according t
 * vecmath: GNU GPL Version 2
 
 ## Cite DENOPTIM
-1) DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules; Marco Foscato, Vishwesh Venkatraman, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> (submitted)
+1) DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules; Marco Foscato, Vishwesh Venkatraman, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> ASAP (<a href="https://doi.org/10.1021/acs.jcim.9b00516">https://doi.org/10.1021/acs.jcim.9b00516</a>)
 2) Foscato, M.; Occhipinti, G.; Venkatraman, V.; Alsberg, B. K.; Jensen, V. R.; Automated Design of Realistic Organometallic, Molecules from Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 767–780.
 3) Foscato, M.; Venkatraman, V.; Occhipinti, G.; Alsberg, B. K.; Jensen, V. R.; Automated Building of Organometallic Complexes from 3D Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 1919–1931.
 4) Foscato, M.; Houghton, B. J.; Occhipinti, G.; Deeth, R. J.; Jensen, V. R.; Ring Closure To Form Metal Chelates in 3D Fragment-Based de Novo Design. <i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 1844-1856.
