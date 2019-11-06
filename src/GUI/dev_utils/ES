@@ -1,0 +1,2 @@
+#!/bin/bash
+./addParamCode.sh Par10 B FS-EnforceSymmetry "Enforce symmetry:" 2 "Forces constitutional symmetry whenever possible. Corresponds to setting the symmetric substitution probability to 100%." FSParametersForm.java

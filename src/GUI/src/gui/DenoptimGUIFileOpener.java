@@ -4,21 +4,46 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.JTextField;
 
 public class DenoptimGUIFileOpener {
-	JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory()); 
 	 
-	public void pickFile() 
+	public static File pickFile(JTextField txtField) 
 	{
+		File file = pickFile();
+		txtField.setText(file.getAbsolutePath());
+	    return file;
+	}
+	
+	public static File pickFile() 
+	{
+		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory()); 
+		File file;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
-			File file = fileChooser.getSelectedFile();
-			System.out.println("TODO: read file "+file);
+			file = fileChooser.getSelectedFile();
 		}
 		else
 		{
-			//Nothing
-			//System.out.println("No file selected");
+			//TODO change to something sensible
+			return null;
 		}
+		return file;
+	}
+	
+	public static File saveFile() 
+	{
+		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		File file;
+		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+		{
+			file = fileChooser.getSelectedFile();
+		}
+		else
+		{
+			//TODO: insist
+			return null;
+		}
+		return file;
 	}
 }

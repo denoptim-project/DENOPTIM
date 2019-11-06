@@ -103,7 +103,7 @@ public class FragmentSpace
      * Clusters of fragments'AP based on AP classes
      */
     private static HashMap<String, ArrayList<ArrayList<Integer>>> 
-							     fragsApsPerApClass;
+							    fragsApsPerApClass;
 
     /**
      * APclass-specific constraints to constitutionsl symmetry

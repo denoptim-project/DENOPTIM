@@ -165,7 +165,7 @@ public class RingClosureParameters
             }
 	    if (maxRingSize>=7)
 	    {
-                // WARNING: if the default value of maxRingSize is change
+                // WARNING: if the default value of maxRingSize is changed
                 // also the default content of this array has to change
                 set(5,2);
                 set(6,4);
