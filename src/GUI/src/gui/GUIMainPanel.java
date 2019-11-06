@@ -12,6 +12,11 @@ import javax.swing.JPanel;
 public class GUIMainPanel extends JPanel 
 {
 	/**
+	 * Version
+	 */
+	private static final long serialVersionUID = 9090055883771428756L;
+	
+	/**
 	 * Reference to the tool bar of the GUI
 	 */
 	private ToolBar toolBar;
