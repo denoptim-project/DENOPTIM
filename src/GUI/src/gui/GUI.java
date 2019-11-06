@@ -7,6 +7,12 @@ import javax.swing.JPanel;
 import java.awt.CardLayout;
 import java.awt.EventQueue;
 
+/**
+ * Graphical User Interface for DENOPTIM package. 
+ * 
+ * @author Marco Foscato
+ */
+
 public class GUI {
 
 	private JFrame frame;     //GUI window frame
@@ -60,10 +66,10 @@ public class GUI {
 		framePane = (JPanel) frame.getContentPane();
 
 		//Menu bar
-		ToolBar menuBar = new ToolBar();
+		MainToolBar menuBar = new MainToolBar();
 		frame.setJMenuBar(menuBar);
 		
-		//Main panel is a deck of cards that contains all but the tools bar
+		//Main panel is a deck of cards that contains all but the tool bar
 		mainPanel = new GUIMainPanel(new CardLayout(), menuBar);
 		framePane.add(mainPanel);
 		menuBar.setRefToMainPanel(mainPanel);

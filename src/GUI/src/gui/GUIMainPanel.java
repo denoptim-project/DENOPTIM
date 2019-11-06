@@ -19,9 +19,9 @@ public class GUIMainPanel extends JPanel
 	/**
 	 * Reference to the tool bar of the GUI
 	 */
-	private ToolBar toolBar;
+	private MainToolBar toolBar;
 	
-	public GUIMainPanel(LayoutManager layout, ToolBar toolBar) 
+	public GUIMainPanel(LayoutManager layout, MainToolBar toolBar) 
 	{
 		super(layout);
 		this.toolBar = toolBar;

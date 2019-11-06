@@ -1,6 +1,5 @@
 package gui;
 
-
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -21,7 +20,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class ToolBar extends JMenuBar {
+/**
+ * Main tool bar of the DENOPTIM graphical user interface.
+ * 
+ * @author Marco Foscato
+ */
+
+public class MainToolBar extends JMenuBar {
 	
 	/**
 	 * Version
@@ -49,8 +54,9 @@ public class ToolBar extends JMenuBar {
 	/**
 	 * Create the application.
 	 */
-	public ToolBar() 
+	public MainToolBar() 
 	{
+		//TODO rel mainpanel
 		this.mainPanel = mainPanel;
 		initialize();
 	}
@@ -73,6 +79,7 @@ public class ToolBar extends JMenuBar {
 		
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
+			@SuppressWarnings("static-access")
 			public void actionPerformed(ActionEvent e) {
 				DenoptimGUIFileOpener openFileGui = new DenoptimGUIFileOpener();
 				openFileGui.pickFile();

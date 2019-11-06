@@ -19,6 +19,8 @@ import javax.swing.SwingConstants;
 /**
  * Form collecting input parameters for a defining the fragment space.
  * Includes settings to handle ring-closures.
+ * 
+ * @author Marco Foscato
  */
 
 public class FSParametersForm extends ParametersForm

@@ -2,6 +2,10 @@ package gui;
 
 import java.io.File;
 
+/**
+ * File opener for DENOPTIM GUI
+ */
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;

@@ -4,7 +4,10 @@ import javax.swing.JPanel;
 
 
 /**
- * Form containing all the input parameters for DenoptimGA.
+ * Master form containing all sub-forms that need to be filled to define the input parameters for DenoptimGA.
+ * 
+ * @author Marco Foscato
+ *
  */
 
 public class GUIPrepareGARun extends GUIPrepare

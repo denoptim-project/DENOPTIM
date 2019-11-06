@@ -9,8 +9,10 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 
-/*
- * Form collecting input parameters for a genetic algorithm experiment
+/**
+ * General structure of a form for collecting input parameters of various nature.
+ * 
+ * @author Marco Foscato
  */
 
 public class ParametersForm extends JPanel implements IParametersForm

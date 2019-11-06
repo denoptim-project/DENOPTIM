@@ -17,6 +17,8 @@ import javax.swing.UIManager;
 
 /**
  * Form containing all the input parameters for DenoptimGA.
+ * 
+ * @author Marco Foscato
  */
 
 public class GUIPrepare extends GUIWorkPanel

@@ -17,7 +17,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-/*
+/**
  * Form collecting input parameters for a genetic algorithm experiment
  */
 
