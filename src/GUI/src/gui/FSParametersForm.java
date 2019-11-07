@@ -14,6 +14,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -415,22 +416,103 @@ public class FSParametersForm extends ParametersForm
         tabModPar11 = new DefaultTableModel();
         tabModPar11.setColumnCount(2);
         tabPar11 = new JTable(tabModPar11);
+        tabPar11.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         btnPar11Insert = new JButton("Add Constraint");
         btnPar11Insert.setToolTipText("Click to choose an AP-Class from the current lists of scaffolds and fragments.");
         btnPar11Insert.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		//TODO
-        		
-        		//TODO del
-        		tabModPar11.addRow(new Object[]{"APClass:"+tabModPar11.getRowCount()+1, 0.56});
+        		//TODO: check if libraries of scaffolds and building blocks are there and load list of APClasses
+        		if (false)
+        		{
+	        		//TODO: make list taking apClasses from libraries
+	        		Object[] possibilities = {"ACham", "ACspam", "ACyam"};
+	        		
+	        		boolean done = false;
+	        		while (!done)
+	        		{
+		        		String apClass = (String)JOptionPane.showInputDialog(
+		        		                    null,
+		        		                    "Choose attachment point class:",
+		        		                    "apClass",
+		        		                    JOptionPane.PLAIN_MESSAGE,
+		        		                    null,
+		        		                    possibilities,
+		        		                    null);
+		
+		        		if ((apClass != null) && (apClass.length() > 0)) 
+		        		{  
+		        			boolean goodChoice = true;
+		        			if (tabPar11.getRowCount() > 0) 
+		        			{
+		        				for (int i=0; i<tabPar11.getRowCount(); i++)
+		        				{
+		        					if (apClass.equals(tabPar11.getValueAt(i, 0)))
+		        					{
+		        						JOptionPane.showMessageDialog(null, "<html>apClass already in the table.<br>Choose another class.", "Duplicate apClass", JOptionPane.ERROR_MESSAGE);
+		        						goodChoice = false;
+		        						break;
+		        					}
+		        				}
+		        			}
+		        			if (goodChoice)
+		        			{
+		        				tabModPar11.addRow(new Object[]{apClass, 1.00});
+		        				done = true;
+		        			}
+		        		}
+		        		if (apClass == null)
+		        		{
+		        			done =true;
+		        		}
+	        		}
+        		}
+        		else
+        		{
+        			boolean done = false;
+	        		while (!done)
+	        		{
+		        		String apClass = (String)JOptionPane.showInputDialog(
+			                    null,
+			                    "<html>No fragment library found.<br>Type an attachment point class:</html>",
+			                    "apClass",
+			                    JOptionPane.PLAIN_MESSAGE);
+	
+						if ((apClass != null) && (apClass.length() > 0)) 
+						{  
+							boolean goodChoice = true;
+							if (tabPar11.getRowCount() > 0) 
+							{
+								for (int i=0; i<tabPar11.getRowCount(); i++)
+								{
+									if (apClass.equals(tabPar11.getValueAt(i, 0)))
+									{
+										JOptionPane.showMessageDialog(null, "<html>apClass already in the table.<br>Choose another class.", "Duplicate apClass", JOptionPane.ERROR_MESSAGE);
+										goodChoice = false;
+										break;
+									}
+								}
+							}
+							if (goodChoice)
+							{
+								tabModPar11.addRow(new Object[]{apClass, 1.00});
+							}
+						}
+						if (apClass == null)
+		        		{
+		        			done =true;
+		        		}
+	        		}
+        		}
         	}
         });
         btnPar11Cleanup = new JButton("Remove Selected");
         btnPar11Cleanup.setToolTipText("Remove all selected entries from list.");
         btnPar11Cleanup.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		if (tabPar11.getRowCount() > 0) {
-        	        if (tabPar11.getSelectedRowCount() > 0) {
+        		if (tabPar11.getRowCount() > 0) 
+        		{
+        	        if (tabPar11.getSelectedRowCount() > 0) 
+        	        {
         	            int selectedRowIds[] = tabPar11.getSelectedRows();
         	            Arrays.sort(selectedRowIds);
         	            for (int i=(selectedRowIds.length-1); i>-1; i--) 
