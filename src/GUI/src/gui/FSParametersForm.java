@@ -3,18 +3,24 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collections;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Form collecting input parameters for a defining the fragment space.
@@ -90,8 +96,11 @@ public class FSParametersForm extends ParametersForm
 
     String keyPar11 = "FS-ConstrainSymmetry";
     JPanel linePar11;
+    JButton btnPar11Insert;
+    JButton btnPar11Cleanup;
     JLabel lblPar11;
-    JTextField txtPar11;
+    JTable tabPar11;
+    DefaultTableModel tabModPar11;
     
     String keyPar12 = "RC-CloseRings";
     JPanel linePar12;
@@ -397,17 +406,62 @@ public class FSParametersForm extends ParametersForm
         linePar10.add(rdbPar10);
         localBlock2.add(linePar10);
 
-        String toolTipPar11 = "<html>TODO(toTable): List of constraints in the symmetric substitution probability.<br>These constraints overwrite the any other settings only for the specific AP-classes.</html>";
-        linePar11 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        String toolTipPar11 = "<html>List of constraints in the symmetric substitution probability.<br>These constraints overwrite the any other settings only for the specific AP-classes.</html>";
+        linePar11 = new JPanel(new GridLayout(2, 2));
         lblPar11 = new JLabel("Symmetry constraints:", SwingConstants.LEFT);
         lblPar11.setPreferredSize(fileLabelSize);
-        lblPar11.setToolTipText(toolTipPar11);
-        txtPar11 = new JTextField();
-        txtPar11.setToolTipText(toolTipPar11);
-        txtPar11.setPreferredSize(strFieldSize);
-        linePar11.add(lblPar11);
-        linePar11.add(txtPar11);
-        localBlock2.add(linePar11);   
+        lblPar11.setToolTipText(toolTipPar11); 
+        tabModPar11 = new DefaultTableModel();
+        tabModPar11.setColumnCount(2);
+        tabPar11 = new JTable(tabModPar11);
+        btnPar11Insert = new JButton("Add Constraint");
+        btnPar11Insert.setToolTipText("Click to choose an AP-Class from the current lists of scaffolds and fragments.");
+        btnPar11Insert.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		//TODO
+        		
+        		//TODO del
+        		tabModPar11.addRow(new Object[]{"APClass:"+tabModPar11.getRowCount()+1, 0.56});
+        	}
+        });
+        btnPar11Cleanup = new JButton("Remove Selected");
+        btnPar11Cleanup.setToolTipText("Remove all selected entries from list.");
+        btnPar11Cleanup.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		if (tabPar11.getRowCount() > 0) {
+        	        if (tabPar11.getSelectedRowCount() > 0) {
+        	            int selectedRowIds[] = tabPar11.getSelectedRows();
+        	            Arrays.sort(selectedRowIds);
+        	            for (int i=(selectedRowIds.length-1); i>-1; i--) 
+        	            {
+        	            	tabModPar11.removeRow(selectedRowIds[i]);
+        	            }
+        	        }
+        	    }
+        	}
+        }); 
+        GroupLayout grpLyoPar11 = new GroupLayout(linePar11);
+        linePar11.setLayout(grpLyoPar11);
+        grpLyoPar11.setAutoCreateGaps(true);
+        grpLyoPar11.setAutoCreateContainerGaps(true);
+		grpLyoPar11.setHorizontalGroup(grpLyoPar11.createSequentialGroup()
+			.addComponent(lblPar11)
+			.addGroup(grpLyoPar11.createParallelGroup()
+				.addGroup(grpLyoPar11.createSequentialGroup()
+						.addComponent(btnPar11Insert)
+						.addComponent(btnPar11Cleanup))
+				.addComponent(tabPar11))
+		);
+		grpLyoPar11.setVerticalGroup(grpLyoPar11.createParallelGroup(GroupLayout.Alignment.LEADING)
+			.addComponent(lblPar11)
+			.addGroup(grpLyoPar11.createSequentialGroup()
+				.addGroup(grpLyoPar11.createParallelGroup()
+					.addComponent(btnPar11Insert)
+					.addComponent(btnPar11Cleanup))
+				.addComponent(tabPar11))
+		);
+        localBlock2.add(linePar11);
         
         JPanel localBlock3 = new JPanel();
         localBlock3.setVisible(false);
@@ -425,7 +479,7 @@ public class FSParametersForm extends ParametersForm
     				scrollablePane.validate();
     				scrollablePane.repaint();
     				scrollablePane.getVerticalScrollBar().setValue(
-    						scrollablePane.getVerticalScrollBar().getValue() + (int) preferredHeight*2/3);
+    					scrollablePane.getVerticalScrollBar().getValue() + (int) preferredHeight*2/3);
         		}
         		else
         		{
@@ -731,7 +785,7 @@ public class FSParametersForm extends ParametersForm
 	        sb.append(getStringIfNotEmpty(keyPar8,txtPar8));
 	        sb.append(getStringIfNotEmpty(keyPar9,txtPar9));
 	        sb.append(getStringIfSelected(keyPar10,rdbPar10));
-	        sb.append(getStringIfNotEmpty(keyPar11,txtPar11));
+	        sb.append(getStringFromTable(keyPar11,tabPar11, new int[]{0,1}));	        
 	        sb.append(getStringIfSelected(keyPar12,rdbPar12));
 	        sb.append(getStringIfNotEmpty(keyPar5,txtPar5));
 	        sb.append(getStringIfNotEmpty(keyPar15,txtPar15));

@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 
@@ -51,9 +52,20 @@ public class ParametersForm extends JPanel implements IParametersForm
         
     private final String NL = System.getProperty("line.separator");
     
+    /**
+     * Empty constructor
+     */
     public ParametersForm()
     {
     }
+    
+    /**
+     * Produced the KEY:VALUE string for a general text field. 
+     * The text can include numbers, characters, or both.
+     * @param key the keyword
+     * @param field the txt field
+     * @return the KEY:VALUE string including newline character at the end.
+     */
     
     protected String getStringIfNotEmpty(String key, JTextField field)
     {
@@ -65,6 +77,12 @@ public class ParametersForm extends JPanel implements IParametersForm
     	return sb.toString();
     }
     
+    /**
+     * Produced the KEY:VALUE string for a on/off button
+     * @param key the keyword
+     * @param btn the on/off button
+     * @return the KEY:VALUE string including newline character at the end.
+     */
     protected String getStringIfSelected(String key, JRadioButton btn)
     {
     	StringBuilder sb = new StringBuilder();
@@ -74,6 +92,60 @@ public class ParametersForm extends JPanel implements IParametersForm
     	}
     	return sb.toString();
     }
+    
+    /**
+     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * By default this method takes as VALUE only the first field of the table.
+     * @param key the keyword
+     * @param tab the table
+     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     */
+    protected String getStringFromTable(String key, JTable tab)
+    {
+    	return getStringFromTable(key, tab, new int[]{0});
+    }
+    
+    /**
+     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * @param key the keyword
+     * @param tab the table
+     * @param fields the id (0, n-1) of the fields to use as space-separated values
+     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     */
+    protected String getStringFromTable(String key, JTable tab, int[] fields)
+    {
+    	return getStringFromTable(key, tab, fields, " ");
+    }
+    
+    /**
+     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * @param key the keyword
+     * @param tab the table
+     * @param fields the indexes (0, n-1) of the fields to use as separated VALUEs
+     * @param sep string separator for fields of a single VALUE
+     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     */
+    protected String getStringFromTable(String key, JTable tab, int[] fields, String sep)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	for (int i=0; i<tab.getRowCount(); i++)
+    	{
+    		String val = "";
+    		for (int j=0; j<fields.length; j++)
+    		{
+    			if (j==0)
+    			{
+    				val = tab.getValueAt(i, fields[j]).toString();
+    			}    
+    			else
+    			{
+    				val = val + sep + tab.getValueAt(i, fields[j]).toString();
+    			}
+    		}
+    		sb.append(key).append("=").append(val).append(NL);
+    	}
+    	return sb.toString();
+    }  
 
 	@Override
 	public void putParametersToString(StringBuilder sb) {

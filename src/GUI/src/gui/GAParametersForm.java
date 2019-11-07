@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
@@ -151,8 +152,8 @@ public class GAParametersForm extends ParametersForm
     JComboBox<String> cmbPar25;
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
-        
-        
+
+    
     String NL = System.getProperty("line.separator");
     
     public GAParametersForm(Dimension d)
@@ -174,7 +175,7 @@ public class GAParametersForm extends ParametersForm
         linePar6.add(lblPar6);
         linePar6.add(txtPar6);
         block.add(linePar6);
-
+        
         String toolTipPar7 = "Specifies the number of children to be generated for each generation.";
         linePar7 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar7 = new JLabel("No. offsprings per generation:", SwingConstants.LEFT);
@@ -567,6 +568,6 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar22,txtPar22));
         sb.append(getStringIfNotEmpty(keyPar24,txtPar24));;
         sb.append(keyPar25).append("=").append(cmbPar25.getSelectedItem()).append(NL);
-        //HEREGOESPRINT this is only to facilitate automated insertion of code           
+        //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
 }
