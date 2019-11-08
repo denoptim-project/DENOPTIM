@@ -29,14 +29,14 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.util.logging.Level;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import logging.Version;
-import rings.RingClosureParameters;
-import fragspace.FragmentSpaceParameters;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.Version;
+import denoptim.rings.RingClosureParameters;
+import denoptim.fragspace.FragmentSpaceParameters;
 import org.apache.commons.io.FileUtils;
-import utils.RandomUtils;
+import denoptim.utils.RandomUtils;
 
 
 /**

@@ -28,12 +28,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import molecule.DENOPTIMGraph;
-import fragspace.FragmentSpaceParameters;
-import io.DenoptimIO;
-import io.SingletonFileAccess;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.io.SingletonFileAccess;
 
 
 /**

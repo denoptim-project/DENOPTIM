@@ -27,13 +27,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import utils.GenUtils;
-import tinker.TinkerUtils;
-import rings.RingClosureParameters;
-import fragspace.FragmentSpaceParameters;
-import logging.DENOPTIMLogger;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.utils.GenUtils;
+import denoptim.integration.tinker.TinkerUtils;
+import denoptim.rings.RingClosureParameters;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.logging.DENOPTIMLogger;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 

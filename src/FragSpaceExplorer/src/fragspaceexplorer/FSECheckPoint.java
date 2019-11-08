@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.io.Serializable;
 import java.io.File;
 
-import utils.GenUtils;
-import exception.DENOPTIMException;
+import denoptim.utils.GenUtils;
+import denoptim.exception.DENOPTIMException;
 
 
 /**

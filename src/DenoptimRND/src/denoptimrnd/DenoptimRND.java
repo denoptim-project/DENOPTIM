@@ -27,18 +27,18 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.random.MersenneTwister;
 
-import constants.DENOPTIMConstants;
-import io.DenoptimIO;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
-import utils.GenUtils;
-import utils.GraphUtils;
-import utils.TaskUtils;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
-import utils.RandomUtils;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.TaskUtils;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.utils.RandomUtils;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
 
 /**
  * Evolve a population using only random selection of new graphs.

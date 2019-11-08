@@ -38,13 +38,13 @@ import org.openscience.cdk.io.MDLV3000Reader;
 
 import org.apache.commons.io.FileUtils;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
-import task.ProcessHandler;
-import utils.DENOPTIMMoleculeUtils;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.task.ProcessHandler;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  *

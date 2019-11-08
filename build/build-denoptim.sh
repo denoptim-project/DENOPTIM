@@ -26,21 +26,15 @@ echo "Manifest-Version: 1.0" > manifest.mf
 echo "Class-Path: lib/cdk-1.4.19.jar lib/commons-io-2.4.jar:lib commons-math3-3.6.1.jar" >> manifest.mf
 echo >> manifest.mf
 
-jar cvfm DENOPTIM.jar manifest.mf constants exception io logging molecule task utils rings threedim fragspace tinker
-
-if [ -f manifest.mf ]; then
-    rm manifest.mf
-    rm -rf constants exception io logging molecule task utils rings threedim fragspace tinker
-    
-fi
+jar cvfm DENOPTIM.jar manifest.mf denoptim
 
 if [ "$?" = "0" ]; then
-    if [ -f DENOPTIM.jar ]; then
-        mv DENOPTIM.jar lib/
-	cp lib/DENOPTIM.jar ../lib
-    fi
+    rm manifest.mf
+    rm -rf denoptim 
+    mv DENOPTIM.jar lib/
+    cp lib/DENOPTIM.jar ../lib
 else
-	echo "Failed to create DENOPTIM.jar."
+    echo "Failed to create DENOPTIM.jar."
     exit -1
 fi
 

@@ -34,14 +34,14 @@ import org.apache.commons.io.FilenameUtils;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import molecule.DENOPTIMGraph;
-import utils.DENOPTIMGraphEdit;
-import utils.GraphConversionTool;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import io.DenoptimIO;
-import fragspace.FragmentSpaceParameters;
-import rings.RingClosureParameters;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.utils.DENOPTIMGraphEdit;
+import denoptim.utils.GraphConversionTool;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.io.DenoptimIO;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.rings.RingClosureParameters;
 
 
 /**

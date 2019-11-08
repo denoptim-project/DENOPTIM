@@ -26,28 +26,28 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import utils.ObjectPair;
-import molecule.DENOPTIMAttachmentPoint;
-import molecule.DENOPTIMEdge;
-import molecule.DENOPTIMVertex;
-import molecule.SymmetricSet;
-import utils.GraphUtils;
-import utils.FragmentUtils;
-import rings.ClosableChain;
-import rings.ChainLink;
-import rings.RingClosureParameters;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.utils.ObjectPair;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.FragmentUtils;
+import denoptim.rings.ClosableChain;
+import denoptim.rings.ChainLink;
+import denoptim.rings.RingClosureParameters;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import org.apache.commons.math3.random.MersenneTwister;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
-import utils.RandomUtils;
+import denoptim.utils.RandomUtils;
 
 /**
  *

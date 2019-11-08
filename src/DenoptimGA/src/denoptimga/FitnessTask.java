@@ -29,17 +29,17 @@ import java.util.ArrayList;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import io.DenoptimIO;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
+import denoptim.io.DenoptimIO;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.io.MDLV3000Reader;
-import task.DENOPTIMTask;
-import task.ProcessHandler;
-import utils.DENOPTIMMoleculeUtils;
+import denoptim.task.DENOPTIMTask;
+import denoptim.task.ProcessHandler;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 

@@ -18,8 +18,8 @@
 
 package denoptimrnd;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -34,11 +34,11 @@ import org.apache.commons.io.FileUtils;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import logging.DENOPTIMLogger;
-import molecule.*;
-import utils.*;
-import utils.GraphConversionTool;
-import fragspace.FragmentSpace;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.*;
+import denoptim.utils.*;
+import denoptim.utils.GraphConversionTool;
+import denoptim.fragspace.FragmentSpace;
 
 
 /**

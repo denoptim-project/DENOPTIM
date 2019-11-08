@@ -34,15 +34,15 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import exception.DENOPTIMException;
-import molecule.DENOPTIMAttachmentPoint;
-import molecule.DENOPTIMEdge;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMVertex;
-import molecule.DENOPTIMRing;
-import utils.GenUtils;
-import utils.DENOPTIMMathUtils;
-import fragspace.FragmentSpace;
+import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMRing;
+import denoptim.utils.GenUtils;
+import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.fragspace.FragmentSpace;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;

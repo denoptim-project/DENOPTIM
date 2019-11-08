@@ -20,9 +20,9 @@ package fragspaceexplorer;
 
 import java.util.logging.Level;
 
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import utils.GenUtils;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.GenUtils;
 
 
 /**

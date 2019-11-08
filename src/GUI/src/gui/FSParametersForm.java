@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -23,7 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
-import fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpace;
 
 /**
  * Form collecting input parameters for defining the fragment space.

@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import molecule.DENOPTIMGraph;
-import utils.GraphUtils;
-import utils.GraphConversionTool;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.GraphConversionTool;
 
 
 /**

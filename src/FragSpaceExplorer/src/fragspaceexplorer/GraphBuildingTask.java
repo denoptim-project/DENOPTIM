@@ -29,17 +29,17 @@ import java.util.concurrent.Callable;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import task.ProcessHandler;
-import molecule.*;
-import utils.*;
-import io.DenoptimIO;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragsCombination;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.ProcessHandler;
+import denoptim.molecule.*;
+import denoptim.utils.*;
+import denoptim.io.DenoptimIO;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.fragspace.FragsCombination;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 
 
 /**

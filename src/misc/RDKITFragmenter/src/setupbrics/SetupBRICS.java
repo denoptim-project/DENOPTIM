@@ -53,7 +53,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Iterator;
 
-import constants.DENOPTIMConstants;
+import denoptim.constants.DENOPTIMConstants;
 
 
 public class SetupBRICS

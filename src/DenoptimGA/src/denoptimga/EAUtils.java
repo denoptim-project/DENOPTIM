@@ -19,9 +19,9 @@
 
 package denoptimga;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import io.DenoptimIO;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -43,17 +43,17 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
-import logging.DENOPTIMLogger;
-import molecule.*;
-import utils.*;
-import rings.CyclicGraphHandler;
-import rings.RingClosureParameters;
-import rings.RingClosuresArchive;
-import utils.GraphConversionTool;
-import utils.FragmentUtils;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.*;
+import denoptim.utils.*;
+import denoptim.rings.CyclicGraphHandler;
+import denoptim.rings.RingClosureParameters;
+import denoptim.rings.RingClosuresArchive;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.FragmentUtils;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 
 
 /**
