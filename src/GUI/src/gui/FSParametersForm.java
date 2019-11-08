@@ -23,8 +23,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
+import fragspace.FragmentSpace;
+
 /**
- * Form collecting input parameters for a defining the fragment space.
+ * Form collecting input parameters for defining the fragment space.
  * Includes settings to handle ring-closures.
  * 
  * @author Marco Foscato
@@ -64,11 +66,11 @@ public class FSParametersForm extends ParametersForm
     JTextField txtPar3;
     JButton btnPar3;
 
-    String keyPar4 = "FS-CompMatrixFile";
-    JPanel linePar4;
-    JLabel lblPar4;
-    JTextField txtPar4;
-    JButton btnPar4;
+    String keyCPMat = "FS-CompMatrixFile";
+    JPanel lineCPMat;
+    JLabel lblCPMat;
+    JTextField txtCPMat;
+    JButton btnCPMat;
 
     String keyPar6 = "FS-RotBondsDefFile";
     JPanel linePar6;
@@ -326,24 +328,24 @@ public class FSParametersForm extends ParametersForm
         linePar3.add(btnPar3);
         localBlock2.add(linePar3);
 
-        String toolTipPar4 = "<html>Pathname of the compatibility matrix file.<br>Note that this file contains the compatibility matrix, map of AP-Class to bond order, the capping rules, and the list of forbidden ends.</html>";
-        linePar4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar4 = new JLabel("Compatibility matrix file:", SwingConstants.LEFT);
-        lblPar4.setPreferredSize(fileLabelSize);
-        lblPar4.setToolTipText(toolTipPar4);
-        txtPar4 = new JTextField();
-        txtPar4.setToolTipText(toolTipPar4);
-        txtPar4.setPreferredSize(fileFieldSize);
-        btnPar4 = new JButton("Browse");
-        btnPar4.addActionListener(new ActionListener() {
+        String toolTipCPMat = "<html>Pathname of the compatibility matrix file.<br>Note that this file contains the compatibility matrix, map of AP-Class to bond order, the capping rules, and the list of forbidden ends.</html>";
+        lineCPMat = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblCPMat = new JLabel("Compatibility matrix file:", SwingConstants.LEFT);
+        lblCPMat.setPreferredSize(fileLabelSize);
+        lblCPMat.setToolTipText(toolTipCPMat);
+        txtCPMat = new JTextField();
+        txtCPMat.setToolTipText(toolTipCPMat);
+        txtCPMat.setPreferredSize(fileFieldSize);
+        btnCPMat = new JButton("Browse");
+        btnCPMat.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar4);
+                DenoptimGUIFileOpener.pickFile(txtCPMat);
            }
         });
-        linePar4.add(lblPar4);
-        linePar4.add(txtPar4);
-        linePar4.add(btnPar4);
-        localBlock2.add(linePar4);
+        lineCPMat.add(lblCPMat);
+        lineCPMat.add(txtCPMat);
+        lineCPMat.add(btnCPMat);
+        localBlock2.add(lineCPMat);
 
         String toolTipPar6 = "<html>Pathname of the file containing the definition of the rotatable bonds.<br>Must be a list of SMARTS.</html>";
         linePar6 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -421,12 +423,32 @@ public class FSParametersForm extends ParametersForm
         btnPar11Insert.setToolTipText("Click to choose an AP-Class from the current lists of scaffolds and fragments.");
         btnPar11Insert.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		//TODO: check if libraries of scaffolds and building blocks are there and load list of APClasses
-        		if (false)
+        		
+        		// WARNING: here we use the compatibility matrix file to get all the APClasses
+        		// This assumes that the libraries of fragments (scaffolds, frags, and capping groups) 
+        		// are consistent with the compatibility matrix file.
+        		
+        		boolean apClassesFromCPMap = false;
+        		Object[] allAPClasses = new Object[]{};
+        		try
         		{
-	        		//TODO: make list taking apClasses from libraries
-	        		Object[] possibilities = {"ACham", "ACspam", "ACyam"};
-	        		
+        			FragmentSpace.importCompatibilityMatrixFromFile(txtCPMat.getText());
+        			allAPClasses = new Object[FragmentSpace.getAllAPClassesFromCPMap().size()];
+        			FragmentSpace.getAllAPClassesFromCPMap().toArray(allAPClasses);
+        			apClassesFromCPMap=true;
+        		}
+        		catch (Throwable t)
+        		{
+        			JOptionPane.showMessageDialog(null,
+        					"<html>The current parameters do not create a valid fragment space.<br>"
+        					+ "It looks like you want to manually insert APClasses.<br>"
+        					+ "If this is not true, you must adjust the parameters defining the fragment space.</html>",
+        					"No valid FragmentSpace",
+        					JOptionPane.WARNING_MESSAGE);
+        		}
+        		
+        		if (apClassesFromCPMap)
+        		{        		
 	        		boolean done = false;
 	        		while (!done)
 	        		{
@@ -436,7 +458,7 @@ public class FSParametersForm extends ParametersForm
 		        		                    "apClass",
 		        		                    JOptionPane.PLAIN_MESSAGE,
 		        		                    null,
-		        		                    possibilities,
+		        		                    allAPClasses,
 		        		                    null);
 		
 		        		if ((apClass != null) && (apClass.length() > 0)) 
@@ -861,7 +883,7 @@ public class FSParametersForm extends ParametersForm
 	        sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
 	        sb.append(getStringIfNotEmpty(keyPar2,txtPar2));
 	        sb.append(getStringIfNotEmpty(keyPar3,txtPar3));
-	        sb.append(getStringIfNotEmpty(keyPar4,txtPar4));
+	        sb.append(getStringIfNotEmpty(keyCPMat,txtCPMat));
 	        sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
 	        sb.append(getStringIfNotEmpty(keyPar7,txtPar7));
 	        sb.append(getStringIfNotEmpty(keyPar8,txtPar8));

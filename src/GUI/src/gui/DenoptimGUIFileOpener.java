@@ -15,8 +15,11 @@ public class DenoptimGUIFileOpener {
 	public static File pickFile(JTextField txtField) 
 	{
 		File file = pickFile();
-		txtField.setText(file.getAbsolutePath());
-	    return file;
+		if (file != null)
+		{
+		    txtField.setText(file.getAbsolutePath());
+		}
+		return file;
 	}
 	
 	public static File pickFile() 

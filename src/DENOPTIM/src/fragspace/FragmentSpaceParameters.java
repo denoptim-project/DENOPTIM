@@ -484,26 +484,14 @@ public class FragmentSpaceParameters
 	// compatibility matrix
         if (compMatrixFile.length() > 0)
         {
-            FragmentSpace.setCompatibilityMatrix(
-				       new HashMap<String,ArrayList<String>>());
-            FragmentSpace.setBondOrderMap(new HashMap<String,Integer>());
-            FragmentSpace.setCappingMap(new HashMap<String,String>());
-            FragmentSpace.setForbiddenEndList(new ArrayList<String>());
-            DenoptimIO.readCompatibilityMatrix(compMatrixFile, 
-                                        FragmentSpace.getCompatibilityMatrix(),
-                                        FragmentSpace.getBondOrderMap(),
-                                        FragmentSpace.getCappingMap(),
-                                        FragmentSpace.getForbiddenEndList());
+	    FragmentSpace.importCompatibilityMatrixFromFile(compMatrixFile);
             apClassBasedApproch = true;
         }
 
 	// compatibility matrix for ring closures
         if (rcCompMatrixFile != null && rcCompMatrixFile.length() > 0)
         {
-            FragmentSpace.setRCCompatibilityMatrix(
-				       new HashMap<String,ArrayList<String>>());
-            DenoptimIO.readRCCompatibilityMatrix(rcCompMatrixFile,
-                                    FragmentSpace.getRCCompatibilityMatrix());
+	    FragmentSpace.importRCCompatibilityMatrixFromFile(compMatrixFile);
         }
 
 	// constitutionsl symmetry constraints

@@ -19,6 +19,7 @@
 
 package fragspace;
 
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -27,6 +28,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import logging.DENOPTIMLogger;
 import exception.DENOPTIMException;
 import utils.FragmentUtils;
+import io.DenoptimIO;
 import constants.DENOPTIMConstants;
 
 
@@ -244,6 +246,47 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Load info from a compatibility matrix file.
+     * This method imports information such as the compatibility matrix,
+     * bond order map, and forbidden ends from
+     * a compatibility matrix file (i.e., a formatted text file using DENOPTIM
+     * keyword. This overrides any previous setting of such information in this
+     * FragmentSpace.
+     * @param inFile the pathname of the compatibility matrix file
+     */
+
+    public static void importCompatibilityMatrixFromFile(String inFile) 
+							throws DENOPTIMException
+    {
+            setCompatibilityMatrix(new HashMap<String,ArrayList<String>>());
+            setBondOrderMap(new HashMap<String,Integer>());
+            setCappingMap(new HashMap<String,String>());
+            setForbiddenEndList(new ArrayList<String>());
+            DenoptimIO.readCompatibilityMatrix(inFile,
+						compatMap,
+						bondOrderMap,
+						cappingMap,
+						forbiddenEndList);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Load info for ring closures compatibilities from a compatibility matrix 
+     * file.
+     * @param inFile the pathname of the RC-compatibility matrix file
+     */
+
+    public static void importRCCompatibilityMatrixFromFile(String inFile)
+                                                        throws DENOPTIMException
+    {
+            setRCCompatibilityMatrix(new HashMap<String,ArrayList<String>>());
+            DenoptimIO.readRCCompatibilityMatrix(inFile,rcCompatMap);
+    }
+
+//------------------------------------------------------------------------------
+
     public static HashMap<String, ArrayList<String>> getCompatibilityMatrix()
     {
         return compatMap;
@@ -327,6 +370,37 @@ public class FragmentSpace
     public static ArrayList<String> getForbiddenEndList()
     {
         return forbiddenEndList;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the set of APClasses that used in the compatibility matrix
+     * for the growing graph APs.
+     * Note these APClasses do include subclasses.
+     * For example, for AP with class <code>MyAPClass:0</code> the 
+     * <code>0</code> is the subclass.
+     * @return the lst of APClasses
+     */
+
+    public static Set<String> getAllAPClassesFromCPMap()
+    {
+        return FragmentSpace.getCompatibilityMatrix().keySet();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the set of APClasses that are defined in the bond order map.
+     * Note the APClasses in the bond order map fo not include the subclass.
+     * For example, for AP with class <code>MyAPClass:0</code> the map
+     * stores only <code>MyAPClass</code>.
+     * @return the lst of APClasses
+     */
+    
+    public static Set<String> getAllAPClassesFromBOMap()
+    {
+	return FragmentSpace.getBondOrderMap().keySet();
     }
 
 //------------------------------------------------------------------------------
