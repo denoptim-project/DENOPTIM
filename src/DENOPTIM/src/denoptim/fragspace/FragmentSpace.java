@@ -416,7 +416,7 @@ public class FragmentSpace
     /**
      * Returns the list of fragments with given number of APs
      * @param nAps the number of attachment points
-     * @return the list of fragments as indeces in the library of fragments.
+     * @return the list of fragments as indexes in the library of fragments.
      */
 
     public static ArrayList<Integer> getFragsWithNumAps(int nAps)
