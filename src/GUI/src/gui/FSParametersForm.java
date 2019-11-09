@@ -137,7 +137,10 @@ public class FSParametersForm extends ParametersForm
     String keyPar22 = "RC-RingSizeBias";
     JPanel linePar22;
     JLabel lblPar22;
-    JTextField txtPar22;
+    JButton btnPar22Insert;
+    JButton btnPar22Cleanup;
+    JTable tabPar22;
+    DefaultTableModel tabModPar22;
 
     String keyPar23 = "RC-MaxSizeNewRings";
     JPanel linePar23;
@@ -662,15 +665,102 @@ public class FSParametersForm extends ParametersForm
         localBlock3.add(linePar18);
 
         String toolTipPar22 = "TODO(toTable): Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.";
-        linePar22 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        linePar22 = new JPanel(new FlowLayout(FlowLayout.LEFT));      
         lblPar22 = new JLabel("Ring size preference biases:", SwingConstants.LEFT);
         lblPar22.setPreferredSize(fileLabelSize);
         lblPar22.setToolTipText(toolTipPar22);
-        txtPar22 = new JTextField();
-        txtPar22.setToolTipText(toolTipPar22);
-        txtPar22.setPreferredSize(strFieldSize);
-        linePar22.add(lblPar22);
-        linePar22.add(txtPar22);
+        tabModPar22 = new DefaultTableModel();
+        tabModPar22.setColumnCount(2);
+        tabPar22 = new JTable(tabModPar22);
+        tabPar22.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        btnPar22Insert = new JButton("Add Bias");
+        btnPar22Insert.setToolTipText("Click to set a new ring size bias.");
+        btnPar22Insert.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		boolean done = false;
+        		while (!done)
+        		{
+	        		String rsBias = (String)JOptionPane.showInputDialog(
+		                    null,
+		                    "Specify ring size:",
+		                    "Ring Size",
+		                    JOptionPane.PLAIN_MESSAGE);
+	
+					if ((rsBias != null) && (rsBias.length() > 0)) 
+					{  
+						boolean goodChoice = true;
+						if (tabPar22.getRowCount() > 0) 
+						{
+							for (int i=0; i<tabPar22.getRowCount(); i++)
+							{
+								if (rsBias.equals(tabPar22.getValueAt(i, 0)))
+								{
+									JOptionPane.showMessageDialog(null, "<html>Rins size already in the table.<br>Choose another size or modify the value of the bias in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
+									goodChoice = false;
+									break;
+								}
+							}
+						}
+						if (goodChoice)
+						{
+		        			if (tabPar22.getRowCount() == 0)
+		        			{
+		        				tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias</b></html>"});
+		        			}
+							tabModPar22.addRow(new Object[]{rsBias, 1.00});
+							done = true;
+						}
+					}
+				}       		
+        	}
+        });
+        btnPar22Cleanup = new JButton("Remove Selected");
+        btnPar22Cleanup.setToolTipText("Remove all selected entries from list.");
+        btnPar22Cleanup.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		if (tabPar22.getRowCount() > 1) 
+        		{
+        	        if (tabPar22.getSelectedRowCount() > 0) 
+        	        {
+        	            int selectedRowIds[] = tabPar22.getSelectedRows();
+        	            Arrays.sort(selectedRowIds);
+        	            for (int i=(selectedRowIds.length-1); i>-1; i--) 
+        	            {
+        	            	if (selectedRowIds[i] != 0)
+        	            	{
+        	            		tabModPar22.removeRow(selectedRowIds[i]);
+        	            	}
+        	            }
+        	            if (tabPar22.getRowCount() == 1)
+        	            {
+        	            	tabModPar22.removeRow(0);
+        	            }
+        	        }
+        	    }
+        	}
+        });
+        
+        GroupLayout grpLyoPar22 = new GroupLayout(linePar22);
+        linePar22.setLayout(grpLyoPar22);
+        grpLyoPar22.setAutoCreateGaps(true);
+        grpLyoPar22.setAutoCreateContainerGaps(true);
+		grpLyoPar22.setHorizontalGroup(grpLyoPar22.createSequentialGroup()
+			.addComponent(lblPar22)
+			.addGroup(grpLyoPar22.createParallelGroup()
+				.addGroup(grpLyoPar22.createSequentialGroup()
+						.addComponent(btnPar22Insert)
+						.addComponent(btnPar22Cleanup))
+				.addComponent(tabPar22))
+		);
+		grpLyoPar22.setVerticalGroup(grpLyoPar22.createParallelGroup(GroupLayout.Alignment.LEADING)
+			.addComponent(lblPar22)
+			.addGroup(grpLyoPar22.createSequentialGroup()
+				.addGroup(grpLyoPar22.createParallelGroup()
+					.addComponent(btnPar22Insert)
+					.addComponent(btnPar22Cleanup))
+				.addComponent(tabPar22))
+		);
+		
         localBlock3.add(linePar22);
 
         String toolTipPar23 = "Specifies the maximum number of ring members for rings created from scratch";
@@ -895,7 +985,7 @@ public class FSParametersForm extends ParametersForm
 	        sb.append(getStringIfNotEmpty(keyPar16,txtPar16));
 	        sb.append(getStringIfNotEmpty(keyPar17,txtPar17));
 	        sb.append(getStringIfNotEmpty(keyPar18,txtPar18));
-	        sb.append(getStringIfNotEmpty(keyPar22,txtPar22));
+	        sb.append(getStringFromTable(keyPar22,tabPar22, new int[]{0,1}));
 	        sb.append(getStringIfNotEmpty(keyPar23,txtPar23));
 	        sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem()).append(NL);
 	        sb.append(getStringIfNotEmpty(keyPar21,txtPar21));

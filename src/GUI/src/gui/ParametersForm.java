@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 
 /**
@@ -148,6 +149,7 @@ public class ParametersForm extends JPanel implements IParametersForm
     }  
 
 	@Override
-	public void putParametersToString(StringBuilder sb) {
+	public void putParametersToString(StringBuilder sb) 
+	{
 	}
 }
