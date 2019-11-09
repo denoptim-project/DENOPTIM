@@ -155,7 +155,10 @@ public class FSParametersForm extends ParametersForm
     String keyPar21 = "RC-ClosableRingSMARTS";
     JPanel linePar21;
     JLabel lblPar21;
-    JTextField txtPar21;
+    JButton btnPar21Insert;
+    JButton btnPar21Cleanup;
+    JTable tabPar21;
+    DefaultTableModel tabModPar21;
 
     String keyPar24 = "RC-CheckInterdependentChains";
     JPanel linePar24;
@@ -711,6 +714,10 @@ public class FSParametersForm extends ParametersForm
 							done = true;
 						}
 					}
+					if (rsBias == null)
+	        		{
+	        			done =true;
+	        		}
 				}       		
         	}
         });
@@ -788,7 +795,7 @@ public class FSParametersForm extends ParametersForm
         lblPar19 = new JLabel("Type of ring-closability conditions", SwingConstants.LEFT);
         lblPar19.setPreferredSize(fileLabelSize);
         lblPar19.setToolTipText(toolTipPar19);
-        cmbPar19 = new JComboBox<String>(new String[] {"Constitution", "Conformation(3D)", "Constitution and Conformation(3D)"});
+        cmbPar19 = new JComboBox<String>(new String[] {"Constitution", "3D-Conformation", "Constitution_and_3D-Conformation"});
         cmbPar19.setToolTipText(toolTipPar19);
         cmbPar19.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
@@ -799,12 +806,12 @@ public class FSParametersForm extends ParametersForm
             			localBlock5.setVisible(false);   
             			break;
             			
-        			case "Conformation(3D)":
+        			case "3D-Conformation":
         				localBlock4.setVisible(false);
             			localBlock5.setVisible(true); 
             			break;
             			
-        			case "Constitution and Conformation(3D)":
+        			case "Constitution_and_3D-Conformation":
         				localBlock4.setVisible(true);
             			localBlock5.setVisible(true);   
             			break;
@@ -817,16 +824,94 @@ public class FSParametersForm extends ParametersForm
         localBlock3.add(localBlock4);
         localBlock3.add(localBlock5);
 
-        String toolTipPar21 = "TODO(toTable): Specifies the constitutional ring closability conditions as SMARTS string.";
+        String toolTipPar21 = "Specifies the constitutional ring closability conditions by SMARTS string.";
         linePar21 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar21 = new JLabel("Constitutional ring-closability rules:", SwingConstants.LEFT);
         lblPar21.setPreferredSize(fileLabelSize);
         lblPar21.setToolTipText(toolTipPar21);
-        txtPar21 = new JTextField();
-        txtPar21.setToolTipText(toolTipPar21);
-        txtPar21.setPreferredSize(strFieldSize);
-        linePar21.add(lblPar21);
-        linePar21.add(txtPar21);
+        tabModPar21 = new DefaultTableModel();
+        tabModPar21.setColumnCount(1);
+        tabPar21 = new JTable(tabModPar21);
+        tabPar21.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        btnPar21Insert = new JButton("Add SMARTS");
+        btnPar21Insert.setToolTipText("Click to set a new ring size bias.");
+        btnPar21Insert.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		boolean done = false;
+        		while (!done)
+        		{
+	        		String rcRule = (String)JOptionPane.showInputDialog(
+		                    null,
+		                    "Specify ring-closability rules:",
+		                    "Add Constitutional Closability Rule",
+		                    JOptionPane.PLAIN_MESSAGE);
+	
+					if ((rcRule != null) && (rcRule.length() > 0)) 
+					{  
+						boolean goodChoice = true;
+						if (tabPar21.getRowCount() > 0) 
+						{
+							for (int i=0; i<tabPar21.getRowCount(); i++)
+							{
+								if (rcRule.equals(tabPar21.getValueAt(i, 0)))
+								{
+									JOptionPane.showMessageDialog(null, "<html>Rule already in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
+									goodChoice = false;
+									break;
+								}
+							}
+						}
+						if (goodChoice)
+						{
+							tabModPar21.addRow(new Object[]{rcRule});
+							done = true;
+						}
+					}
+					if (rcRule == null)
+	        		{
+	        			done =true;
+	        		}
+				}       		
+        	}
+        });
+        btnPar21Cleanup = new JButton("Remove Selected");
+        btnPar21Cleanup.setToolTipText("Remove all selected entries from list.");
+        btnPar21Cleanup.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		if (tabPar21.getRowCount() > 0) 
+        		{
+        	        if (tabPar21.getSelectedRowCount() > 0) 
+        	        {
+        	            int selectedRowIds[] = tabPar21.getSelectedRows();
+        	            Arrays.sort(selectedRowIds);
+        	            for (int i=(selectedRowIds.length-1); i>-1; i--) 
+        	            {
+        	            	tabModPar21.removeRow(selectedRowIds[i]);
+        	            }
+        	        }
+        	    }
+        	}
+        });
+        GroupLayout grpLyoPar21 = new GroupLayout(linePar21);
+        linePar21.setLayout(grpLyoPar21);
+        grpLyoPar21.setAutoCreateGaps(true);
+        grpLyoPar21.setAutoCreateContainerGaps(true);
+        grpLyoPar21.setHorizontalGroup(grpLyoPar21.createSequentialGroup()
+                .addComponent(lblPar21)
+                .addGroup(grpLyoPar21.createParallelGroup()
+                        .addGroup(grpLyoPar21.createSequentialGroup()
+                                        .addComponent(btnPar21Insert)
+                                        .addComponent(btnPar21Cleanup))
+                        .addComponent(tabPar21))
+        );
+        grpLyoPar21.setVerticalGroup(grpLyoPar21.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(lblPar21)
+                .addGroup(grpLyoPar21.createSequentialGroup()
+                        .addGroup(grpLyoPar21.createParallelGroup()
+                                .addComponent(btnPar21Insert)
+                                .addComponent(btnPar21Cleanup))
+                        .addComponent(tabPar21))
+        );
         localBlock4.add(linePar21);
 
         String toolTipPar25 = "Specifies the maximum number of rotatable bonds for which 3D chain closability is evaluated. Chains with a number of rotatable bonds higher than this value are assumed closable.";
@@ -988,7 +1073,7 @@ public class FSParametersForm extends ParametersForm
 	        sb.append(getStringFromTable(keyPar22,tabPar22, new int[]{0,1}));
 	        sb.append(getStringIfNotEmpty(keyPar23,txtPar23));
 	        sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem()).append(NL);
-	        sb.append(getStringIfNotEmpty(keyPar21,txtPar21));
+	        sb.append(getStringFromTable(keyPar21,tabPar21, new int[]{0}));
 	        sb.append(getStringIfSelected(keyPar24,rdbPar24));
 	        sb.append(getStringIfNotEmpty(keyPar25,txtPar25));
 	        sb.append(getStringIfNotEmpty(keyPar26,txtPar26));
