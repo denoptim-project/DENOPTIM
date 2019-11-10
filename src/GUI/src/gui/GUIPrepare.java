@@ -90,18 +90,21 @@ public class GUIPrepare extends GUIWorkPanel
 		});
 		commandsPane.add(btnSaveParams);
 		
-		/*
-		//TODO
-	    JButton btnCreateInp = new JButton("Validate Parameters",UIManager.getIcon("OptionPane.warningIcon"));
-		btnCreateInp.setToolTipText("Check the correctness of the parameters");
-		//TODO: add action
-		commandsPane.add(btnCreateInp);
-		*/
+	    JButton btnValidate = new JButton("Validate Parameters");
+	    btnValidate.setToolTipText("Check the correctness of the parameters");
+		btnValidate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//TODO
+				getNonImplementedError();
+			}
+		});
+		commandsPane.add(btnValidate);
 		
-		JButton btnClose = new JButton("?");
+		JButton btnClose = new JButton("Submit...");
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO
+				getNonImplementedError();
 			}
 		});
 		commandsPane.add(btnClose);
@@ -110,8 +113,8 @@ public class GUIPrepare extends GUIWorkPanel
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
-                        new JLabel("Hover over the fields to get a tip."),
-                        "About DENOPTIM",
+                        new JLabel("Hover over the parameter description fields to get a tip."),
+                        "Tips",
                         JOptionPane.PLAIN_MESSAGE);
 			}
 		});

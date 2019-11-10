@@ -181,9 +181,15 @@ public class FitnessParametersForm extends ParametersForm
     public void putParametersToString(StringBuilder sb) 
     {
         sb.append("# Fitness Provider - paramerers").append(NL);
-        sb.append(getStringIfNotEmpty(keyFitProviderSource,txtFitProviderSource));
-        sb.append(keyFitProviderInterpreter).append("=").append(cmbFitProviderInterpreter.getSelectedItem()).append(NL);
-        sb.append(getStringIfNotEmpty(keyEq,txtEq));;
+        if (rdbSrcOrNew.isSelected())
+        {
+	        sb.append(getStringIfNotEmpty(keyFitProviderSource,txtFitProviderSource));
+	        sb.append(keyFitProviderInterpreter).append("=").append(cmbFitProviderInterpreter.getSelectedItem()).append(NL);
+        }
+        else
+        {
+        	sb.append(getStringIfNotEmpty(keyEq,txtEq));
+        }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }
 }

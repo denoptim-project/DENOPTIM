@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
@@ -543,7 +542,7 @@ public class GAParametersForm extends ParametersForm
     @Override
     public void putParametersToString(StringBuilder sb) 
     {
-        sb.append("# GeneticAlgorithm-paramerers").append(NL);
+        sb.append("# Genetic Algorithm - paramerers").append(NL);
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));;
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));;
         sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem()).append(NL);

@@ -45,7 +45,7 @@ public class GUIWorkPanel extends JPanel
 	/**
 	 * Shows a dialog saying that the functionality is not ready yet. Use only during devel phase.
 	 */
-	protected void getNonImplementedError()
+	protected static void getNonImplementedError()
 	{
 		JOptionPane.showMessageDialog(null,
                 "Sorry! Function not implemented yet.",
