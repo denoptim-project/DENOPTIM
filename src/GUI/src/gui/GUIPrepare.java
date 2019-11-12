@@ -90,7 +90,7 @@ public class GUIPrepare extends GUIWorkPanel
 		});
 		commandsPane.add(btnSaveParams);
 		
-	    JButton btnValidate = new JButton("Validate Parameters");
+	    JButton btnValidate = new JButton("Validate Parameters",UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
 	    btnValidate.setToolTipText("Check the correctness of the parameters");
 		btnValidate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -100,7 +100,7 @@ public class GUIPrepare extends GUIWorkPanel
 		});
 		commandsPane.add(btnValidate);
 		
-		JButton btnClose = new JButton("Submit...");
+		JButton btnClose = new JButton("Submit...",UIManager.getIcon("Menu.arrowIcon"));
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO
