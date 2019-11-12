@@ -1155,10 +1155,10 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-SortOrder</code></p>
+		<td width="40%"><p><code>GA-SortByIncreasingFitness</code></p>
 		</td>
-		<td width="60%"><p>Specifies whether the candidates should be reported in descending
-			or ascending order of fitness.</p>
+		<td width="60%"><p>Requires to sort the candidates according 
+			to ascending rather than decending fitness.</p>
 		</td>
 	</tr>
 	<tr >
@@ -1274,8 +1274,8 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-ReplacementStrategy</code></p>
 		</td>
-		<td width="60%"><p>Specifies the population members replacement strategy: use <code>1</code>
-			for the elitist scheme (survival of the fittest), use <code>2</code>
+		<td width="60%"><p>Specifies the population members replacement strategy: <code>ELITIST</code>
+			for the elitist scheme (survival of the fittest), use <code>NONE</code>
 			for no replacement (all candidates become member of the
 			population, which keeps growing).</p>
 		</td>
@@ -1332,12 +1332,13 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-Parallelization</code></p>
 		</td>
-		<td width="60%"><p>Specifies the parallelization scheme: <code>1</code>
-			for synchronous (i.e., parallel tasks are submitted in
+		<td width="60%"><p>Specifies the parallelization scheme: 
+			<code>synchronous</code>
+			if parallel tasks are submitted in
 			batches, thus no new task is submitted until the last of the
-			previous tasks is completed), <code>2</code> for
-			asynchronous (i.e., a new parallel tasks is submitted as soon as
-			any of the previous task is completed). 
+			previous tasks is completed, or <code>asynchronous</code> 
+			if a new parallel tasks is submitted as soon as
+			any of the previous task is completed. 
 			</p>
 		</td>
 	</tr>

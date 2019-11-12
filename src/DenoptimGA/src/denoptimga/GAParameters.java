@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
@@ -89,11 +90,6 @@ public class GAParameters
      * Pathname to the file collecting the failed sdf molecules
      */
     static String failedSDF = "";
-
-    /**
-     * Pathname of the fitness evaluation script
-     */
-    protected static String fitnessEvalScript = "";
 
     /**
      * Pathname of log file (STDOUT)
@@ -180,7 +176,7 @@ public class GAParameters
      * Crossover parents selection strategy: string
      */
     protected static String strXoverSelectionMode =
-					        "STOCHASTIC UNIVERSAL SAMPLING";
+                                                "STOCHASTIC UNIVERSAL SAMPLING";
 
     /**
      * The seed value for random number generation
@@ -272,13 +268,6 @@ public class GAParameters
     protected static int getMaxTriesFactor()
     {
         return maxTriesPerPop;
-    }
-
-//------------------------------------------------------------------------------
-
-    protected static String getFitnessEvaluationScript()
-    {
-        return fitnessEvalScript;
     }
 
 //------------------------------------------------------------------------------
@@ -431,8 +420,8 @@ public class GAParameters
         DENOPTIMLogger.appLogger.info(sb.toString());
         sb.setLength(0);
 
-	FragmentSpaceParameters.printParameters();
-	RingClosureParameters.printParameters();
+        FragmentSpaceParameters.printParameters();
+        RingClosureParameters.printParameters();
     }
 
 //------------------------------------------------------------------------------
@@ -469,8 +458,14 @@ public class GAParameters
 
                 if (line.toUpperCase().startsWith("RC-"))
                 {
-		    RingClosureParameters.interpretKeyword(line);
-		    continue;
+                    RingClosureParameters.interpretKeyword(line);
+                    continue;
+                }
+                
+                if (line.toUpperCase().startsWith("FP-"))
+                {
+                    FitnessParameters.interpretKeyword(line);
+                    continue;
                 }
 
                 if (line.toUpperCase().startsWith("GA-NUMPARALLELTASKS="))
@@ -496,9 +491,16 @@ public class GAParameters
                 if (line.toUpperCase().startsWith("GA-PARALLELIZATION="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
+                    switch (option.toUpperCase())
                     {
-                        parallelizationScheme = Integer.parseInt(option);
+                        case "SYNCHRONOUS":
+                            parallelizationScheme = 1;
+                            break;
+                        case "ASYNCHRONOUS":
+                            parallelizationScheme = 2;
+                            break;
+                        default:
+                            throw new DENOPTIMException("Unknown parallelization scheme.");
                     }
                     continue;
                 }
@@ -561,16 +563,6 @@ public class GAParameters
                     continue;
                 }
 
-                if (line.toUpperCase().startsWith("GA-FITNESSEVALSCRIPT="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        fitnessEvalScript = option;
-                    }
-                    continue;
-                }
-
                 if (line.toUpperCase().startsWith("GA-PRINTLEVEL="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
@@ -581,24 +573,12 @@ public class GAParameters
                     continue;
                 }
 
-                if (line.toUpperCase().startsWith("GA-SORTORDER="))
+                if (line.toUpperCase().startsWith("GA-SORTBYINCREASINGFITNESS="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        switch (Integer.parseInt(option)) 
-                        {
-                        // descending order
-                            case 1:
-                                sortOrderDecreasing = true;
-                                break;
-                        // ascending order
-                            case 2:
-                                sortOrderDecreasing = false;
-                                break;
-                            default:
-                                throw new DENOPTIMException("Incorrect specification of sort order.");
-                        }
+                        sortOrderDecreasing = false;
                     }
                     continue;
                 }
@@ -636,7 +616,7 @@ public class GAParameters
                     switch (option.toUpperCase())
                     {
                         case "EXP_DIFF":
-			    growthProbabilityScheme = 0;
+                            growthProbabilityScheme = 0;
                             break;
                         case "TANH":
                             growthProbabilityScheme = 1;
@@ -644,7 +624,7 @@ public class GAParameters
                         case "SIGMA":
                             growthProbabilityScheme = 2;
                             break;
-			case "UNRESTRICTED":
+                        case "UNRESTRICTED":
                             growthProbabilityScheme = 3;
                             break;
                         default:
@@ -701,9 +681,16 @@ public class GAParameters
                 if (line.toUpperCase().startsWith("GA-REPLACEMENTSTRATEGY="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
+                    switch (option.toUpperCase())
                     {
-                        GAParameters.replacementStrategy = Integer.parseInt(option);
+                        case "NONE":
+                        	replacementStrategy = 2;
+                            break;
+                        case "ELITIST":
+                            replacementStrategy = 1;
+                            break;
+                        default:
+                            throw new DENOPTIMException("Unknown replacement strategy.");
                     }
                 }
 
@@ -821,10 +808,10 @@ public class GAParameters
 
         failedSDF = dataDir + "_FAILED.sdf";
 
-	if (uidFileOut.equals(""))
-	{
-	    uidFileOut = dataDir + fileSep + DEFUIDFILEOUTNAME;
-	}
+        if (uidFileOut.equals(""))
+        {
+            uidFileOut = dataDir + fileSep + DEFUIDFILEOUTNAME;
+        }
 
         try
         {
@@ -858,11 +845,11 @@ public class GAParameters
             FragmentSpaceParameters.processParameters();
         }
 
-	if (RingClosureParameters.allowRingClosures())
-	{
-	    RingClosureParameters.processParameters();
-	}
-	
+        if (RingClosureParameters.allowRingClosures())
+        {
+            RingClosureParameters.processParameters();
+        }
+        
         System.err.println("Program log file: " + logFile);
         System.err.println("Output files associated with the current run are " +
                                 "located in " + dataDir);
@@ -875,7 +862,7 @@ public class GAParameters
         String error = "";
         if (GAParameters.populationSize < 10)
         {
-	    String msg = "Small population size is allowed only for testing.";
+            String msg = "Small population size is allowed only for testing.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
         }
         if (GAParameters.numOfChildren <= 0)
@@ -927,28 +914,20 @@ public class GAParameters
             throw new DENOPTIMException(error);
         }
 
-        
-
-        if (fitnessEvalScript.length() == 0)
+        if (FitnessParameters.fitParamsInUse())
         {
-            error = "Script for fitness evaluation not specified.";
-            throw new DENOPTIMException(error);
-        }
-        if (!DenoptimIO.checkExists(fitnessEvalScript))
-        {
-            error = "Cannot find the script for fitness evaluation: " + fitnessEvalScript;
-            throw new DENOPTIMException(error);
-        }
+            FitnessParameters.checkParameters();
+        }        
 
         if (FragmentSpaceParameters.fsParamsInUse())
         {
             FragmentSpaceParameters.checkParameters();
         }
 
-	if (RingClosureParameters.rcParamsInUse())
-	{
-	    RingClosureParameters.checkParameters();
-	}
+        if (RingClosureParameters.rcParamsInUse())
+        {
+            RingClosureParameters.checkParameters();
+        }
     }
 
 //------------------------------------------------------------------------------

@@ -48,7 +48,7 @@ public class GAParametersForm extends ParametersForm
     JPanel linePar4;
     JRadioButton rdbPar4;
 
-    String keyPar5 = "GA-SortOrder";
+    String keyPar5 = "GA-SortByIncreasingFitness";
     JPanel linePar5;
     JRadioButton rdbPar5;
 

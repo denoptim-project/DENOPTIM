@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
@@ -82,11 +83,6 @@ public class FSEParameters
      * Flag: optionally perform an external task for each accepted graph
      */
     private static boolean externalTask = false;
-
-    /**
-     * External BASH script optionally submitted for each accepted graph
-     */
-    private static String externalScript = null;
 
     /**
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
@@ -197,23 +193,9 @@ public class FSEParameters
 
 //-----------------------------------------------------------------------------
 
-    public static String externalScriptName()
-    {
-	return externalScript;
-    }
-
-//-----------------------------------------------------------------------------
-
     public static String getDBRoot()
     {
 	return dbRootDir;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static String getPathnameExternalScript()
-    {
-	return externalScript;
     }
 
 //-----------------------------------------------------------------------------
@@ -337,6 +319,12 @@ public class FSEParameters
                     RingClosureParameters.interpretKeyword(line);
                     continue;
                 }
+                
+                if (line.toUpperCase().startsWith("FP-"))
+                {
+                    FitnessParameters.interpretKeyword(line);
+                    continue;
+                }
             }
         }
         catch (NumberFormatException | IOException nfe)
@@ -409,23 +397,23 @@ public class FSEParameters
         case "FSE-WORKDIR=":
             workDir = value;
             break;
-	case "FSE-ROOTGRAPHS=":
-	    rootGraphsFile = value;
-	    useGivenRoots = true;
-	    break;
+		case "FSE-ROOTGRAPHS=":
+		    rootGraphsFile = value;
+		    useGivenRoots = true;
+		    break;
         case "FSE-ROOTGRAPHSFORMAT=":
             rootGraphsFormat = value.toUpperCase();
             break;
         case "FSE-UIDFILE=":
             uidFile = value;
             break;
-	case "FSE-RESTARTFROMCHECKPOINT=":
-	    chkptFile = value;
-	    chkptRestart = true;
-	    break;
-	case "FSE-DEVEL-PREPAREFILESFORTESTS=":
-	    prepareChkAndSerForTests = true;
-	    break;
+		case "FSE-RESTARTFROMCHECKPOINT=":
+		    chkptFile = value;
+		    chkptRestart = true;
+		    break;
+		case "FSE-DEVEL-PREPAREFILESFORTESTS=":
+		    prepareChkAndSerForTests = true;
+		    break;
         case "FSE-CHECKPOINTSTEPLENGTH=":
             try
             {
@@ -437,13 +425,9 @@ public class FSEParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "FSE-EXTERNALTASK=":
-	    externalTask = true;
-            externalScript = value;
-            break;
-	case "FSE-DBROOTFOLDER=":
-	    dbRootDir = value;
-	    break;
+		case "FSE-DBROOTFOLDER=":
+		    dbRootDir = value;
+		    break;
         case "FSE-NUMOFPROCESSORS=":
             try
             {
@@ -571,13 +555,6 @@ public class FSEParameters
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 	}
 
-	if (externalTask && !DenoptimIO.checkExists(externalScript))
-	{
-            msg = "BASH script " + externalScript + " not found. "
-                  + "Please specify an existing BASH script. ";
-           throw new DENOPTIMException(msg);
-	} 
-
 	if (numCPU <= 0 )
 	{
 	    msg = "Number of processors (" + numCPU + ") is not valid. "
@@ -627,11 +604,11 @@ public class FSEParameters
     public static void processParameters() throws DENOPTIMException
     {
         boolean success = false;
-	String curDir = workDir;
-	if (curDir.equals("."))
-	{
-            curDir = System.getProperty("user.dir");
-	}
+		String curDir = workDir;
+		if (curDir.equals("."))
+		{
+	            curDir = System.getProperty("user.dir");
+		}
         String fileSep = System.getProperty("file.separator");
         while (!success)
         {
@@ -640,11 +617,11 @@ public class FSEParameters
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);
         }
-	if (dbRootDir.equals("."))
-	{
-	    dbRootDir = workDir;
-	}
-	logFile = workDir + ".log";
+		if (dbRootDir.equals("."))
+		{
+		    dbRootDir = workDir;
+		}
+		logFile = workDir + ".log";
 
         try
         {
@@ -665,29 +642,29 @@ public class FSEParameters
             RingClosureParameters.processParameters();
         }
 
-	if (useGivenRoots)
-	{
+		if (useGivenRoots)
+		{
             try
             {
-		if (rootGraphsFormat.equals(STRINGFORMATLABEL))
-		{
+				if (rootGraphsFormat.equals(STRINGFORMATLABEL))
+				{
                     rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
 								rootGraphsFile);
-		}
-		else if (rootGraphsFormat.equals(BYTEFORMATLABEL))
-		{
-		    rootGraphs = new ArrayList<DENOPTIMGraph>();
-		    //TODO get arraylist of graphs or accept multiple files
-		    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
-						      new File(rootGraphsFile));
-		    rootGraphs.add(g);
-		}
-		else
-		{
-		    String msg = "'" + rootGraphsFormat + "'"  
-			  + " is not a valid format for graphs.";
-		    throw new DENOPTIMException(msg);
-		}
+				}
+				else if (rootGraphsFormat.equals(BYTEFORMATLABEL))
+				{
+				    rootGraphs = new ArrayList<DENOPTIMGraph>();
+				    //TODO get arraylist of graphs or accept multiple files
+				    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
+								      new File(rootGraphsFile));
+				    rootGraphs.add(g);
+				}
+				else
+				{
+				    String msg = "'" + rootGraphsFormat + "'"  
+					  + " is not a valid format for graphs.";
+				    throw new DENOPTIMException(msg);
+				}
             }
             catch (Throwable t)
             {
@@ -695,12 +672,12 @@ public class FSEParameters
                 DENOPTIMLogger.appLogger.log(Level.INFO,msg);
                 throw new DENOPTIMException(msg,t);
             }
-	}
-
-	if (chkptRestart)
-	{
-	    chkpt = FSEUtils.deserializeCheckpoint(chkptFile);
-	}
+		}
+	
+		if (chkptRestart)
+		{
+		    chkpt = FSEUtils.deserializeCheckpoint(chkptFile);
+		}
         else
         {
 	    chkpt = new FSECheckPoint();
@@ -720,10 +697,10 @@ public class FSEParameters
 
     public static void printParameters()
     {
-	if (!fseParamsInUse)
-	{
-	    return;
-	}
+		if (!fseParamsInUse)
+		{
+		    return;
+		}
         String eol = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder(1024);
         sb.append(" FSEParameters ").append(eol);
@@ -745,6 +722,7 @@ public class FSEParameters
 
         FragmentSpaceParameters.printParameters();
         RingClosureParameters.printParameters();
+        FitnessParameters.printParameters();
     }
 
 //----------------------------------------------------------------------------

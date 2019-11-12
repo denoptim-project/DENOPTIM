@@ -29,6 +29,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
@@ -110,7 +111,7 @@ public class GraphBuildingTask implements Callable
     private int nSubTasks = 0;
 
     /**
-     * Executior for external bash script
+     * Executor for external bash script
      */
     private ProcessHandler ph_sc;
 
@@ -130,7 +131,7 @@ public class GraphBuildingTask implements Callable
  
     /**
      * @return <code>true</code> if an exception has been thrown within this 
-     * subtask, which also includes the senarion where the executed external
+     * subtask, which also includes the scenario where the executed external
      * script returned a non-zero exit status.
      */
   
@@ -557,10 +558,9 @@ public class GraphBuildingTask implements Callable
         DenoptimIO.writeMolecule(molInitFile, molInit, false);
 
         // build command
-        String shell = System.getenv("SHELL");
         StringBuilder cmdStr = new StringBuilder();
-        cmdStr.append(shell).append(" ")
-              .append(FSEParameters.getPathnameExternalScript())
+        cmdStr.append(FitnessParameters.getExternalFitnessProviderInterpreter().toString()).append(" ")
+              .append(FitnessParameters.getExternalFitnessProvider())
               .append(" ").append(molInitFile)
               .append(" ").append(molFinalFile)
               .append(" ").append(workDir)
@@ -580,9 +580,11 @@ public class GraphBuildingTask implements Callable
             ph_sc.runProcess();
             if (ph_sc.getExitCode() != 0)
             {
-                String msg = "Failed to execute shell script " 
-                             + FSEParameters.getPathnameExternalScript()
-                             + " on " + molInitFile;
+                String msg = "Failed to execute "
+                             + FitnessParameters.getExternalFitnessProviderInterpreter().toString()
+                             + " script '"
+                             + FitnessParameters.getExternalFitnessProvider()
+                             + "' on " + molInitFile;
                 DENOPTIMLogger.appLogger.severe(msg);
                 DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
                 throw new DENOPTIMException(msg);
