@@ -21,8 +21,9 @@ package denoptimga;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import denoptim.molecule.DENOPTIMMolecule;
 import org.apache.commons.math3.random.MersenneTwister;
+
+import denoptim.molecule.DENOPTIMMolecule;
 
 
 /**

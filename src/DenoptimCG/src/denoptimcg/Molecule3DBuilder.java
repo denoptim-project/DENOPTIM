@@ -18,46 +18,39 @@
 
 package denoptimcg;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
-import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.io.DenoptimIO;
-import denoptim.utils.GenUtils;
-import denoptim.utils.ObjectPair;
-import denoptim.utils.DummyAtomHandler;
-import denoptim.utils.RingClosingUtils;
-import denoptim.utils.GraphConversionTool;
-import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.integration.tinker.TinkerAtom;
-import denoptim.integration.tinker.TinkerUtils;
-import denoptim.exception.DENOPTIMException;
-import denoptim.rings.RingClosure;
-import denoptim.rings.RingClosingAttractor;
-import denoptim.rings.RingClosureParameters;
-
 import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.Atom;
+import org.openscience.cdk.graph.PathTools;
+import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.graph.PathTools;
-import org.openscience.cdk.graph.SpanningTree;
-import org.openscience.cdk.silent.RingSet;
 import org.openscience.cdk.interfaces.IRingSet;
+import org.openscience.cdk.silent.RingSet;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.integration.tinker.TinkerAtom;
+import denoptim.integration.tinker.TinkerMolecule;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.rings.RingClosingAttractor;
+import denoptim.rings.RingClosure;
+import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.DummyAtomHandler;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.ObjectPair;
 
 /**
  * Collector of molecular information, related to a single chemical object,

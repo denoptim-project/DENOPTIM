@@ -19,23 +19,19 @@
 
 package denoptimcg;
 
-import java.lang.reflect.Field;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-import denoptim.utils.GenUtils;
-import denoptim.integration.tinker.TinkerUtils;
-import denoptim.rings.RingClosureParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.integration.tinker.TinkerUtils;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-
-import org.openscience.cdk.interfaces.IAtomContainer;
+import denoptim.rings.RingClosureParameters;
 
 /**
  * Parameters for the conformer generator (3D builder).

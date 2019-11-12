@@ -19,7 +19,6 @@
 
 package denoptimga;
 
-import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -27,12 +26,14 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
+
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.utils.GraphUtils;
 import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
 
 
 /**

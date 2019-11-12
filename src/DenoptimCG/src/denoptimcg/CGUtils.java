@@ -19,34 +19,12 @@
 
 package denoptimcg;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.utils.GenUtils;
-import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.fragspace.FragmentSpace;
-
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 
 /**

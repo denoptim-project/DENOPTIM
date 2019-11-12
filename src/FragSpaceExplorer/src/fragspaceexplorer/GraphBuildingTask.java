@@ -18,28 +18,35 @@
 
 package fragspaceexplorer;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.logging.Level;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.task.ProcessHandler;
-import denoptim.molecule.*;
-import denoptim.utils.*;
-import denoptim.io.DenoptimIO;
-import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.FragsCombination;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.task.ProcessHandler;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
 
 
 /**

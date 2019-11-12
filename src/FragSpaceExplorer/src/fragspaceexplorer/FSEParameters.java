@@ -18,25 +18,22 @@
 
 package fragspaceexplorer;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 
-import org.apache.commons.io.FileUtils;
-
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.io.DenoptimIO;
-import denoptim.rings.RingClosureParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.rings.RingClosureParameters;
 
 
 /**

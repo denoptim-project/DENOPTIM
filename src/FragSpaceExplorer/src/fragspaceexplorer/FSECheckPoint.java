@@ -18,12 +18,9 @@
 
 package fragspaceexplorer;
 
-import java.util.ArrayList;
-import java.io.Serializable;
 import java.io.File;
-
-import denoptim.utils.GenUtils;
-import denoptim.exception.DENOPTIMException;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 
 /**

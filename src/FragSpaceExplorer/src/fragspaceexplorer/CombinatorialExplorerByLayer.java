@@ -19,45 +19,35 @@
 package fragspaceexplorer;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.logging.Level;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
+import java.util.logging.Level;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-import denoptim.utils.GenUtils;
-import denoptim.utils.FragmentUtils;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.GraphConversionTool;
-import denoptim.utils.TaskUtils;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.*;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
-
-import org.apache.commons.io.LineIterator;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.time.StopWatch;
-
-import org.openscience.cdk.interfaces.IAtomContainer;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.TaskUtils;
 
 
 /**

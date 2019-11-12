@@ -19,34 +19,30 @@
 
 package denoptimga;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.utils.ObjectPair;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.FragmentUtils;
-import denoptim.rings.ClosableChain;
-import denoptim.rings.ChainLink;
-import denoptim.rings.RingClosureParameters;
-import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import org.apache.commons.math3.random.MersenneTwister;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.rings.ChainLink;
+import denoptim.rings.ClosableChain;
+import denoptim.rings.RingClosureParameters;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
 
 /**

@@ -19,59 +19,37 @@
 
 package denoptimcg;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Collections;
-import java.util.List;
-import javax.vecmath.Point2d;
+
+import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.AxisAngle4d;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.integration.tinker.TinkerMolecule;
+import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
-import java.util.logging.Level;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.task.ProcessHandler;
-import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.rings.RingClosureParameters;
+import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.RotationalSpaceUtils;
-import denoptim.utils.RingClosingUtils;
 import denoptim.utils.OrganizeAtoms;
-import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.integration.tinker.TinkerAtom;
-import denoptim.integration.tinker.TinkerUtils;
-import denoptim.rings.RingClosingAttractor;
-import denoptim.rings.RingClosureParameters;
-import denoptim.threedim.TreeBuilder3D;
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
-
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.graph.PathTools;
-import org.openscience.cdk.graph.SpanningTree;
-import org.openscience.cdk.silent.RingSet;
-import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.PseudoAtom;
+import denoptim.utils.RotationalSpaceUtils;
 
 /**
  *

@@ -18,39 +18,16 @@
 
 package denoptimcg;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Comparator;
-import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.integration.tinker.TinkerAtom;
+import denoptim.integration.tinker.TinkerMolecule;
+import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
-import java.util.logging.Level;
 import denoptim.task.ProcessHandler;
-import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.integration.tinker.TinkerAtom;
-import denoptim.integration.tinker.TinkerUtils;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.graph.PathTools;
-import org.openscience.cdk.graph.SpanningTree;
-import org.openscience.cdk.silent.RingSet;
-import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.PseudoAtom;
 
 /**
  * Toolkit to perform conformational search via Tinker PSSROT program

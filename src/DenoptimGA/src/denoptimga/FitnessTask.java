@@ -18,25 +18,24 @@
 
 package denoptimga;
 
-import java.util.logging.Level;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-
+import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.MDLV3000Reader;
 
-import denoptim.io.DenoptimIO;
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.io.MDLV3000Reader;
 import denoptim.task.DENOPTIMTask;
 import denoptim.task.ProcessHandler;
 import denoptim.utils.DENOPTIMMoleculeUtils;
