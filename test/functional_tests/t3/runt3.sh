@@ -24,7 +24,8 @@ exec 1>&6 6>&-
 
 #Check outcome
 nGraphs=$(cat $wrkDir/*/FSE-Level_*/F*.txt | wc -l | tr -d '[[:space:]]')
-if [[ $nGraphs != 86 ]]
+#86
+if [[ $nGraphs != 80 ]]
 then
     echo " "
     echo "Test 't3' NOT PASSED (symptom: wrong number of graphs $nGraphs)"
