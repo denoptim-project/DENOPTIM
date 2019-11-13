@@ -11,7 +11,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;
 
 public class DenoptimGUIFileOpener {
-	 
+	
 	public static File pickFile(JTextField txtField) 
 	{
 		File file = pickFile();
@@ -25,6 +25,33 @@ public class DenoptimGUIFileOpener {
 	public static File pickFile() 
 	{
 		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory()); 
+		File file;
+		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		{
+			file = fileChooser.getSelectedFile();
+		}
+		else
+		{
+			//TODO change to something sensible
+			return null;
+		}
+		return file;
+	}
+	
+	public static File pickFolder(JTextField txtField) 
+	{
+		File file = pickFolder();
+		if (file != null)
+		{
+		    txtField.setText(file.getAbsolutePath());
+		}
+		return file;
+	}
+	
+	public static File pickFolder() 
+	{
+		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		File file;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{

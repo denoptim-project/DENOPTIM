@@ -69,9 +69,25 @@ public class GUIPrepare extends GUIWorkPanel
 				StringBuilder sb = new StringBuilder();
 				for (IParametersForm p : allParams)
 				{
-				    p.putParametersToString(sb);
+				    try 
+				    {
+						p.putParametersToString(sb);
+					} 
+				    catch (Exception e1) 
+				    {
+						JOptionPane.showMessageDialog(null,
+				                e1.getMessage(),
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+						return;
+					}
 				}
 				File outFile = DenoptimGUIFileOpener.saveFile();
+				if (outFile == null)
+				{
+					return;
+				}
 				try
 				{
 				    FileWriter fw = new FileWriter(outFile);
@@ -81,7 +97,7 @@ public class GUIPrepare extends GUIWorkPanel
 				catch (IOException io)
 				{
 					JOptionPane.showMessageDialog(null,
-			                "Could not same to '"+outFile+"'!.",
+			                "Could not write to '" + outFile + "'!.",
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));

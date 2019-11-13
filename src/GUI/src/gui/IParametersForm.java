@@ -7,5 +7,6 @@ package gui;
  * @author Marco Foscato
  */
 public interface IParametersForm {
-    public void putParametersToString(StringBuilder sb);
+	public void importSingleParameter(String key, String value) throws Exception;
+    public void putParametersToString(StringBuilder sb) throws Exception;
 }

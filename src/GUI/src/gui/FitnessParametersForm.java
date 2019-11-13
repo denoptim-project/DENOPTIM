@@ -123,10 +123,10 @@ public class FitnessParametersForm extends ParametersForm
         lineFitProviderInterpreter.add(cmbFitProviderInterpreter);
         localBlock1.add(lineFitProviderInterpreter);
 
-        String toolTipEq = "Define equation of integrated fitness provider.";
+        String toolTipEq = "Define integrated fitness provider equation.";
         lineEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblEq = new JLabel("Fitness = ", SwingConstants.LEFT);
-        lblEq.setPreferredSize(fileLabelSize);
+        lblEq = new JLabel("<html>Calculate fitness (F) with equation  <i>F=</i></html>", SwingConstants.LEFT);
+        //lblEq.setPreferredSize(fileLabelSize);
         lblEq.setToolTipText(toolTipEq);
         txtEq = new JTextField();
         txtEq.setToolTipText(toolTipEq);
@@ -178,7 +178,7 @@ public class FitnessParametersForm extends ParametersForm
     }
 
     @Override
-    public void putParametersToString(StringBuilder sb) 
+    public void putParametersToString(StringBuilder sb) throws Exception
     {
         sb.append("# Fitness Provider - paramerers").append(NL);
         if (rdbSrcOrNew.isSelected())
