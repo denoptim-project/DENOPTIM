@@ -11,8 +11,9 @@ FS-compMatrixFile=OTF_WDIR/CPMap.par
 # Genetic Algorithm parameters
 GA-InitPoplnFile=OTF_WDIR/initialPop.sdf
 GA-randomSeed=8572368003836
-GA-fitnessEvalScript=OTF_WDIR/fitness_provider.sh
-GA-parallelization=2
+FP-Source=OTF_WDIR/fitness_provider.sh
+FP-Interpreter=BASH
+GA-Parallelization=asynchronous
 GA-numParallelTasks=OTF_PROCS
 GA-populationSize=4
 GA-numChildren=4
@@ -25,4 +26,4 @@ GA-symmetryProbability=0.0
 GA-growthProbScheme=sigma
 GA-GrowthSigmaSteepness=1.0
 GA-GrowthSigmaMiddle=1.0
-GA-replacementStrategy=2
+GA-replacementStrategy=NONE

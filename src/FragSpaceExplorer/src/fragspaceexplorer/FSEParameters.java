@@ -641,7 +641,13 @@ public class FSEParameters
         {
             RingClosureParameters.processParameters();
         }
-
+        
+        if (FitnessParameters.fitParamsInUse())
+        {
+            FitnessParameters.processParameters();
+            externalTask = true;
+        }
+        
 		if (useGivenRoots)
 		{
             try

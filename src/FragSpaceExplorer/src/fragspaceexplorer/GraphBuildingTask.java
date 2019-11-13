@@ -557,9 +557,14 @@ public class GraphBuildingTask implements Callable
         // write current graph to file as molecular objects
         DenoptimIO.writeMolecule(molInitFile, molInit, false);
 
+        //TODO: deal with internal fitness and other kinds of fitness
+
+        //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
+
         // build command
         StringBuilder cmdStr = new StringBuilder();
-        cmdStr.append(FitnessParameters.getExternalFitnessProviderInterpreter().toString()).append(" ")
+        String shell = System.getenv("SHELL");
+        cmdStr.append(shell).append(" ")
               .append(FitnessParameters.getExternalFitnessProvider())
               .append(" ").append(molInitFile)
               .append(" ").append(molFinalFile)

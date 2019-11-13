@@ -131,6 +131,7 @@
 			<li><a href="#Toc40916_1191730726">DenoptimGA</a></li>
 			<li><a href="#Toc40918_1191730726">DenoptimCG</a></li>
 			<li><a href="#Toc13097_799972446">FragmentSpaceExplorer</a></li>
+			<li><a href="#Toc13097_123456789">Fitness provider</a></li>
 		</ul></li>
 		<li><a href="#Toc40920_1191730726">File Formats</a>
 		<ul>
@@ -397,8 +398,8 @@ figure of merit, is a typical way to quantify the extent
 a candidate entity is suitable to a specific function or use.</p>
 
 <p>To ensure general applicability, the calculation of the fitness is performed outside
-DENOPTIM and is controlled by an external BASH script, i.e., 
-the <b>fitness provider</b> script. This script is prepared by the user
+DENOPTIM and is controlled by an external tool, i.e., 
+the <b>fitness provider</b>, usually a BASH script. This script is prepared by the user
 according to the needs of the specific case. DENOPTIM programs can be asked to
 will then execute the fitness provider, wait for completion, and retrieve the 
 results that can contain either the fitness or an error message. Note that DENOPTIM programs do not
@@ -1313,12 +1314,6 @@ without providing that specific keyword in the input file.</p>
 		<td width="60%"><p>Specifies the pathname of the file, i.e., the UIDFileOut, collecting the list of unique individual identification strings(UID) encountered during an evolutionary experiment. If no pathname is given, a new UID file is generated under the work space of the experiment. UIDs from individuals found in an initial	population file, and those specified via the <code>GA-UIDFile</code>. In keyword are collected in the <code>UIDFileOut</code> file.</p>
 		</td>
 	</tr>
-	<tr valign="middle">
-		<td width="40%"><p><code>GA-FitnessEvalScript</code></p>
-		</td>
-		<td width="60%"><p>Specifies the pathname to the BASH script providing the fitness value for any given candidate system.  <font color="#ff3333"><b>[REQUIRED]</b></font></p>
-		</td>
-	</tr>
 	<tr >
 		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Parallelization</p>
 		</td>
@@ -1589,15 +1584,35 @@ without providing that specific keyword in the input file.</p>
 			FragSpaceExplorer restart from such file.</p>
 		</td>
 	</tr>
+</table>
+
+<br>
+<h3 class="western"><a name="Toc13097_123456789"></a>Fitness Provider</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+
+	<col width="154*"/>
+
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
 	<tr>
-		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>External task for acceptable graphs</p>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>External Fitness Provider</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>FSE-ExternalTask</code></p>
+		<td width="40%"><p><code>FP-Source</code></p>
 		</td>
-		<td width="60%"><p>Specifies the pathname of a shell script used to submit external
-			tasks for each acceptable graph generated.</p>
+		<td width="60%"><p>Specifies the pathname of executable to run to evaluate the fitness.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FP-Interpreter</code></p>
+		</td>
+		<td width="60%"><p>Specifies the kinf of interpretere to use when running the external fitness provider.</p>
 		</td>
 	</tr>
 </table>
