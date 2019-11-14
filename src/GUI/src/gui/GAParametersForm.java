@@ -5,17 +5,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Form collecting input parameters for a genetic algorithm experiment
@@ -28,6 +33,21 @@ public class GAParametersForm extends ParametersForm
 	 * Version
 	 */
 	private static final long serialVersionUID = 5067352357196631445L;
+	
+    /**
+     * Map connecting the parameter keyword and the field
+     * containing the parameter value. 
+     */
+	private Map<String,Object> mapKeyFieldToValueField;
+	
+	JPanel lineSrcOrNew;
+    JRadioButton rdbSrcOrNew;
+    
+    JPanel lineGASource;
+    JLabel lblGASource;
+    JTextField txtGASource;
+    JButton btnGASource;
+    JButton btnLoadGASource;
 	
 	String keyPar3 = "GA-RandomSeed";
     JPanel linePar3;
@@ -157,11 +177,134 @@ public class GAParametersForm extends ParametersForm
     
     public GAParametersForm(Dimension d)
     {
+    	mapKeyFieldToValueField = new HashMap<String,Object>();
+    	
         this.setLayout(new BorderLayout()); //Needed to allow dynamic resizing!
 
         JPanel block = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(block);
-        block.setLayout(new BoxLayout(block, SwingConstants.VERTICAL));        
+        block.setLayout(new BoxLayout(block, SwingConstants.VERTICAL));
+        
+        JPanel localBlock1 = new JPanel();
+        localBlock1.setVisible(false);
+        localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
+        
+        JPanel localBlock2 = new JPanel();
+        localBlock2.setVisible(true);
+        localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
+        
+        JPanel localBlock3 = new JPanel();
+        localBlock3.setVisible(true);
+        localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
+        
+        JPanel localBlock4 = new JPanel();
+        localBlock4.setVisible(false);
+        localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
+        
+        JPanel advOptsBlock = new JPanel();
+        advOptsBlock.setVisible(false);
+        advOptsBlock.setLayout(new BoxLayout(advOptsBlock, SwingConstants.VERTICAL));
+        
+        String toolTipSrcOrNew = "Tick here to use settings from file.";
+        lineSrcOrNew = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbSrcOrNew = new JRadioButton("Use parameters from existing file");
+        rdbSrcOrNew.setToolTipText(toolTipSrcOrNew);
+        rdbSrcOrNew.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		if (rdbSrcOrNew.isSelected())
+        		{
+    				localBlock1.setVisible(true);
+        			localBlock2.setVisible(false);
+        		}
+        		else
+        		{
+        			localBlock1.setVisible(false);
+        			localBlock2.setVisible(true);
+        		}
+        	}
+        });
+        lineSrcOrNew.add(rdbSrcOrNew);
+        block.add(lineSrcOrNew);
+        block.add(localBlock1);
+        block.add(localBlock2);
+        
+        String toolTipGASource = "<html>Pathname of a DENOPTIM's parameter file with GA settings.</html>";
+        lineGASource = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblGASource = new JLabel("Use parameters from file:", SwingConstants.LEFT);
+        lblGASource.setToolTipText(toolTipGASource);
+        txtGASource = new JTextField();
+        txtGASource.setToolTipText(toolTipGASource);
+        txtGASource.setPreferredSize(fileFieldSize);
+        btnGASource = new JButton("Browse");
+        btnGASource.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+                DenoptimGUIFileOpener.pickFile(txtGASource);
+           }
+        });
+        btnLoadGASource = new JButton("Load...");
+        txtGASource.setToolTipText("<html>Load the parameters in this form.<br>Allows to inspect and edit the parameters.</html>");
+        btnLoadGASource.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+	        	try 
+	        	{
+					importParametersFromDenoptimParamsFile(txtGASource.getText(),"GA-");
+				} 
+	        	catch (Exception e1) 
+	        	{
+	        		if (e1.getMessage().equals("") || e1.getMessage() == null)
+	        		{
+	        			e1.printStackTrace();
+						JOptionPane.showMessageDialog(null,
+								"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+	        		}
+	        		else
+	        		{
+						JOptionPane.showMessageDialog(null,
+								e1.getMessage(),
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+	        		}
+					return;
+				}
+	        	rdbSrcOrNew.setSelected(false);
+	        	localBlock1.setVisible(false);
+				localBlock2.setVisible(true);		
+        		switch (cmbPar11.getSelectedItem().toString())
+        		{
+        			case "EXP_DIFF":
+        				localBlock3.setVisible(true);
+            			localBlock4.setVisible(false);   
+            			break;
+            			
+        			case "TANH":
+        				localBlock3.setVisible(true);
+            			localBlock4.setVisible(false);   
+            			break;
+            			
+        			case "SIGMA":
+        				localBlock3.setVisible(false);
+            			localBlock4.setVisible(true);   
+            			break;
+            			
+        			default:
+        				localBlock3.setVisible(false);
+            			localBlock4.setVisible(false);   
+            			break;
+        		}
+        		advOptsBlock.setVisible(true);
+            }
+        });
+        lineGASource.add(lblGASource);
+        lineGASource.add(txtGASource);
+        lineGASource.add(btnGASource);
+        lineGASource.add(btnLoadGASource);
+        localBlock1.add(lineGASource);
+        
+        //HEREGOESIMPLEMENTATION this is only to facilitate automated insertion of code
 
         String toolTipPar6 = "Specifies the number of individuals in the initial population.";
         linePar6 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -171,9 +314,10 @@ public class GAParametersForm extends ParametersForm
         txtPar6 = new JTextField();
         txtPar6.setToolTipText(toolTipPar6);
         txtPar6.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar6,txtPar6);
         linePar6.add(lblPar6);
         linePar6.add(txtPar6);
-        block.add(linePar6);
+        localBlock2.add(linePar6);
         
         String toolTipPar7 = "Specifies the number of children to be generated for each generation.";
         linePar7 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -183,9 +327,10 @@ public class GAParametersForm extends ParametersForm
         txtPar7 = new JTextField();
         txtPar7.setToolTipText(toolTipPar7);
         txtPar7.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar7,txtPar7);
         linePar7.add(lblPar7);
         linePar7.add(txtPar7);
-        block.add(linePar7);
+        localBlock2.add(linePar7);
 
         String toolTipPar8 = "Specifies the maximum number of generation.";
         linePar8 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -195,9 +340,10 @@ public class GAParametersForm extends ParametersForm
         txtPar8 = new JTextField();
         txtPar8.setToolTipText(toolTipPar8);
         txtPar8.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar8,txtPar8);
         linePar8.add(lblPar8);
         linePar8.add(txtPar8);
-        block.add(linePar8);
+        localBlock2.add(linePar8);
 
         String toolTipPar9 = "Specifies the convergence criterion as number of subsequent identical generations.";
         linePar9 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -207,13 +353,10 @@ public class GAParametersForm extends ParametersForm
         txtPar9 = new JTextField();
         txtPar9.setToolTipText(toolTipPar9);
         txtPar9.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar9,txtPar9);
         linePar9.add(lblPar9);
         linePar9.add(txtPar9);
-        block.add(linePar9);
-        
-        JPanel localBlock2 = new JPanel();
-        localBlock2.setVisible(true);
-        localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
+        localBlock2.add(linePar9);
         
         String toolTipPar12 = "<html>Specifies the value of the factor used in growth probability schemes <code>EXP_DIFF TANH</code></html>";
         linePar12 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -223,13 +366,10 @@ public class GAParametersForm extends ParametersForm
         txtPar12 = new JTextField("1.0");
         txtPar12.setToolTipText(toolTipPar12);
         txtPar12.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar12,txtPar12);
         linePar12.add(lblPar12);
         linePar12.add(txtPar12);
-        localBlock2.add(linePar12);
-        
-        JPanel localBlock3 = new JPanel();
-        localBlock3.setVisible(false);
-        localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
+        localBlock3.add(linePar12);
         
         String toolTipPar13 = "<html>Specifies the value of parameter &sigma;<sub>1</sub> used in growth probability scheme <code>SIGMA</code></html>";
         linePar13 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -239,9 +379,10 @@ public class GAParametersForm extends ParametersForm
         txtPar13 = new JTextField();
         txtPar13.setToolTipText(toolTipPar13);
         txtPar13.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar13,txtPar13);
         linePar13.add(lblPar13);
         linePar13.add(txtPar13);
-        localBlock3.add(linePar13);
+        localBlock4.add(linePar13);
         
         String toolTipPar14 = "<html>Specifies the value of parameter &sigma;<sub>2</sub> used in growth probability scheme <code>SIGMA</code></html>";
         linePar14 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -251,9 +392,10 @@ public class GAParametersForm extends ParametersForm
         txtPar14 = new JTextField();
         txtPar14.setToolTipText(toolTipPar14);
         txtPar14.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar14,txtPar14);
         linePar14.add(lblPar14);
         linePar14.add(txtPar14);
-        localBlock3.add(linePar14);
+        localBlock4.add(linePar14);
 
         //TODO: add graph for visualizing the function
         
@@ -264,37 +406,38 @@ public class GAParametersForm extends ParametersForm
         lblPar11.setToolTipText(toolTipPar11);
         cmbPar11 = new JComboBox<String>(new String[] {"EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
         cmbPar11.setToolTipText(toolTipPar11);
+        mapKeyFieldToValueField.put(keyPar11,cmbPar11);
         cmbPar11.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
         		switch (cmbPar11.getSelectedItem().toString())
         		{
         			case "EXP_DIFF":
-        				localBlock2.setVisible(true);
-            			localBlock3.setVisible(false);   
+        				localBlock3.setVisible(true);
+            			localBlock4.setVisible(false);   
             			break;
             			
         			case "TANH":
-        				localBlock2.setVisible(true);
-            			localBlock3.setVisible(false);   
+        				localBlock3.setVisible(true);
+            			localBlock4.setVisible(false);   
             			break;
             			
         			case "SIGMA":
-        				localBlock2.setVisible(false);
-            			localBlock3.setVisible(true);   
+        				localBlock3.setVisible(false);
+            			localBlock4.setVisible(true);   
             			break;
             			
         			default:
-        				localBlock2.setVisible(false);
-            			localBlock3.setVisible(false);   
+        				localBlock3.setVisible(false);
+            			localBlock4.setVisible(false);   
             			break;
         		}
 	        }
 	    });
         linePar11.add(lblPar11);
         linePar11.add(cmbPar11);
-        block.add(linePar11);
-        block.add(localBlock2);
-        block.add(localBlock3);
+        localBlock2.add(linePar11);
+        localBlock2.add(localBlock3);
+        localBlock2.add(localBlock4);
 
         String toolTipPar15 = "<html>Specifies the strategy for selecting crossover partners.<ul>" 
         		+ "<li><code>RANDOM</code>: unbiased selection.</li>" 
@@ -308,9 +451,10 @@ public class GAParametersForm extends ParametersForm
         lblPar15.setToolTipText(toolTipPar15);
         cmbPar15 = new JComboBox<String>(new String[] {"RANDOM", "TS", "RW", "SUS"});
         cmbPar15.setToolTipText(toolTipPar15);
+        mapKeyFieldToValueField.put(keyPar15,cmbPar15);
         linePar15.add(lblPar15);
         linePar15.add(cmbPar15);
-        block.add(linePar15);
+        localBlock2.add(linePar15);
 
         String toolTipPar16 = "Specifies the probability (0.0-1.0) at which crossover is performed.";
         linePar16 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -320,9 +464,10 @@ public class GAParametersForm extends ParametersForm
         txtPar16 = new JTextField();
         txtPar16.setToolTipText(toolTipPar16);
         txtPar16.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar16,txtPar16);
         linePar16.add(lblPar16);
         linePar16.add(txtPar16);
-        block.add(linePar16);
+        localBlock2.add(linePar16);
 
         String toolTipPar17 = "Specifies the probability (0.0-1.0) at which mutation is performed.";
         linePar17 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -332,9 +477,10 @@ public class GAParametersForm extends ParametersForm
         txtPar17 = new JTextField();
         txtPar17.setToolTipText(toolTipPar17);
         txtPar17.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar17,txtPar17);
         linePar17.add(lblPar17);
         linePar17.add(txtPar17);
-        block.add(linePar17);
+        localBlock2.add(linePar17);
 
         String toolTipPar18 = "Specifies the probability (0.0-1.0) of symmetric operations.";
         linePar18 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -344,9 +490,10 @@ public class GAParametersForm extends ParametersForm
         txtPar18 = new JTextField();
         txtPar18.setToolTipText(toolTipPar18);
         txtPar18.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar18,txtPar18);
         linePar18.add(lblPar18);
         linePar18.add(txtPar18);
-        block.add(linePar18);
+        localBlock2.add(linePar18);
 
         String toolTipPar19 = "Specifies the population members replacement strategy.";
         linePar19 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -355,9 +502,10 @@ public class GAParametersForm extends ParametersForm
         lblPar19.setToolTipText(toolTipPar19);
         cmbPar19 = new JComboBox<String>(new String[] {"ELITIST", "NONE"});
         cmbPar19.setToolTipText(toolTipPar19);
+        mapKeyFieldToValueField.put(keyPar19,cmbPar19);
         linePar19.add(lblPar19);
         linePar19.add(cmbPar19);
-        block.add(linePar19);
+        localBlock2.add(linePar19);
 
         String toolTipPar24 = "Specifies the maximum number of parallel candidate evaluation tasks.";
         linePar24 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -367,9 +515,10 @@ public class GAParametersForm extends ParametersForm
         txtPar24 = new JTextField();
         txtPar24.setToolTipText(toolTipPar24);
         txtPar24.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar24,txtPar24);
         linePar24.add(lblPar24);
         linePar24.add(txtPar24);
-        block.add(linePar24);
+        localBlock2.add(linePar24);
 
         String toolTipPar25 = "<html>Specifies the parallelization scheme:<br><ul><li><code>synchronous</code>, i.e., parallel tasks are submitted in batches, thus no new task is submitted until the last of the previous tasks is completed.</li><li><code>asynchronous</code>, i.e., a new parallel tasks is submitted as soon as any of the previous task is completed.</li></ul></html>";
         linePar25 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -378,16 +527,12 @@ public class GAParametersForm extends ParametersForm
         lblPar25.setToolTipText(toolTipPar25);
         cmbPar25 = new JComboBox<String>(new String[] {"Synchronous", "Asynchronous"});
         cmbPar25.setToolTipText(toolTipPar25);
+        mapKeyFieldToValueField.put(keyPar25,cmbPar25);
         linePar25.add(lblPar25);
         linePar25.add(cmbPar25);
-        block.add(linePar25);
-
-        //HEREGOESIMPLEMENTATION this is only to facilitate automated insertion of code
+        localBlock2.add(linePar25);
 
         // From here it's all about advanced options
-        JPanel advOptsBlock = new JPanel();
-        advOptsBlock.setVisible(false);
-        advOptsBlock.setLayout(new BoxLayout(advOptsBlock, SwingConstants.VERTICAL));
 
         String toolTipPar3 = "Specifies the seed number used by the random number generator";
         linePar3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -396,7 +541,8 @@ public class GAParametersForm extends ParametersForm
         lblPar3.setToolTipText(toolTipPar3);
         txtPar3 = new JTextField();
         txtPar3.setToolTipText(toolTipPar3);
-        txtPar3.setPreferredSize(strFieldSize);
+        txtPar3.setPreferredSize(new Dimension(150,preferredHeight));
+        mapKeyFieldToValueField.put(keyPar3,txtPar3);
         linePar3.add(lblPar3);
         linePar3.add(txtPar3);
         advOptsBlock.add(linePar3);
@@ -409,6 +555,7 @@ public class GAParametersForm extends ParametersForm
         txtPar1 = new JTextField();
         txtPar1.setToolTipText(toolTipPar1);
         txtPar1.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar1,txtPar1);
         linePar1.add(lblPar1);
         linePar1.add(txtPar1);
         advOptsBlock.add(linePar1);
@@ -420,6 +567,7 @@ public class GAParametersForm extends ParametersForm
         lblPar2.setToolTipText(toolTipPar2);
         cmbPar2 = new JComboBox<String>(new String[] {"0", "1", "2", "3"});
         cmbPar2.setToolTipText(toolTipPar2);
+        mapKeyFieldToValueField.put(keyPar2,cmbPar2);
         linePar2.add(lblPar2);
         linePar2.add(cmbPar2);
         advOptsBlock.add(linePar2);
@@ -428,6 +576,7 @@ public class GAParametersForm extends ParametersForm
         linePar4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar4 = new JRadioButton("Prepare 2D graphs for candidates");
         rdbPar4.setToolTipText(toolTipPar4);
+        mapKeyFieldToValueField.put(keyPar4,rdbPar4);
         linePar4.add(rdbPar4);
         advOptsBlock.add(linePar4);
 
@@ -435,6 +584,7 @@ public class GAParametersForm extends ParametersForm
         linePar5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar5 = new JRadioButton("Sort by descending fitness");
         rdbPar5.setToolTipText(toolTipPar5);
+        mapKeyFieldToValueField.put(keyPar5,rdbPar5);
         linePar5.add(rdbPar5);
         advOptsBlock.add(linePar5);
 
@@ -446,6 +596,7 @@ public class GAParametersForm extends ParametersForm
         txtPar10 = new JTextField();
         txtPar10.setToolTipText(toolTipPar10);
         txtPar10.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar10,txtPar10);
         linePar10.add(lblPar10);
         linePar10.add(txtPar10);
         advOptsBlock.add(linePar10);
@@ -458,6 +609,7 @@ public class GAParametersForm extends ParametersForm
         txtPar20 = new JTextField();
         txtPar20.setToolTipText(toolTipPar20);
         txtPar20.setPreferredSize(fileFieldSize);
+        mapKeyFieldToValueField.put(keyPar20,txtPar20);
         btnPar20 = new JButton("Browse");
         btnPar20.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -477,6 +629,7 @@ public class GAParametersForm extends ParametersForm
         txtPar21 = new JTextField();
         txtPar21.setToolTipText(toolTipPar21);
         txtPar21.setPreferredSize(fileFieldSize);
+        mapKeyFieldToValueField.put(keyPar21,txtPar21);
         btnPar21 = new JButton("Browse");
         btnPar21.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -496,6 +649,7 @@ public class GAParametersForm extends ParametersForm
         txtPar22 = new JTextField();
         txtPar22.setToolTipText(toolTipPar22);
         txtPar22.setPreferredSize(fileFieldSize);
+        mapKeyFieldToValueField.put(keyPar22,txtPar22);
         btnPar22 = new JButton("Browse");
         btnPar22.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -508,7 +662,6 @@ public class GAParametersForm extends ParametersForm
         advOptsBlock.add(linePar22);
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
-        
         
         JButton advOptShow = new JButton("Advanced Settings");
         advOptShow.addActionListener(new ActionListener(){
@@ -532,17 +685,81 @@ public class GAParametersForm extends ParametersForm
         
         JPanel advOptsController = new JPanel();
         advOptsController.add(advOptShow);
-        block.add(new JSeparator());
-        block.add(advOptsController);
-        block.add(advOptsBlock);      
+        localBlock2.add(new JSeparator());
+        localBlock2.add(advOptsController);
+        localBlock2.add(advOptsBlock);      
         
         this.add(scrollablePane);
     }
 
+//-----------------------------------------------------------------------------
+    
+  	@SuppressWarnings("unchecked")
+	@Override
+	public void importSingleParameter(String key, String value) throws Exception 
+  	{
+  		Object valueField;
+  		String valueFieldClass;
+  		if (mapKeyFieldToValueField.containsKey(key))
+  		{
+  		    valueField = mapKeyFieldToValueField.get(key);
+  		    valueFieldClass = valueField.getClass().toString();
+  		}
+  		else
+  		{
+			JOptionPane.showMessageDialog(null,
+					"<html>Parameter '" + key + "' is not recognized<br> and will be ignored.</html>",
+	                "WARNING",
+	                JOptionPane.WARNING_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+  		}
+    
+ 		switch (valueFieldClass)
+ 		{				
+ 			case "class javax.swing.JTextField":
+ 				((JTextField) valueField).setText(value);
+ 				break;
+ 				
+ 			case "class javax.swing.JRadioButton":
+ 				((JRadioButton) valueField).setSelected(true);
+ 				break;
+ 				
+ 			case "class javax.swing.JComboBox":
+ 				((JComboBox<String>) valueField).setSelectedItem(value);
+ 				break;
+ 				
+ 			case "class javax.swing.table.DefaultTableModel":
+
+ 				//WARNING: there might be cases where we do not take all the records
+
+ 				((DefaultTableModel) valueField).addRow(value.split(" "));
+ 				break;
+ 				
+ 			default:
+ 				System.err.println("Filed for value of "+key+" is "+valueFieldClass);
+ 				throw new Exception("Unexpected type for parameter: " + key + " (" + valueFieldClass + ")");
+ 		}
+ 		
+	}
+  	
+//-----------------------------------------------------------------------------
+    
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
-        sb.append("# Genetic Algorithm - paramerers").append(NL);
+    	sb.append("# Genetic Algorithm - paramerers").append(NL);
+    	
+        if (rdbSrcOrNew.isSelected())
+        {
+        	if (txtGASource.getText().equals("") || txtGASource.getText() == null)
+        	{
+        		throw new Exception("<html>No source specified for GA parameters.<br>Please, specify the file name.</html>");
+        	}
+        	
+        	importParametersFromDenoptimParamsFile(txtGASource.getText(),"GA-");
+        }
+        
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));;
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));;
         sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem()).append(NL);

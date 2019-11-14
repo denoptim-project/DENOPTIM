@@ -212,9 +212,14 @@ public class ParametersForm extends JPanel implements IParametersForm
     protected void importParametersFromDenoptimParamsFile(String fileName, 
     		String keyRoot) throws Exception
     {  	
+    	if (keyRoot.equals("") || keyRoot == null)
+    	{
+    		throw new Exception("<html>Root of DENOPTIM keywords not defined.<br>Bugus use of method 'importParametersFromDenoptimParamsFile'!</html>");
+    	}
+    	String parType = keyRoot.replaceAll("-", "");
     	if (fileName.equals("") || !DenoptimIO.checkExists(fileName))
     	{
-    		throw new Exception("<html>Fragment space source file not found!<br>Please, specify another file name.");
+    		throw new Exception("<html>Source file for the " + parType + " parameters is not found!<br>Please, specify another file name.");
     	}
     	
         String line;

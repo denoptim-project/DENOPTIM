@@ -5,16 +5,21 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Form collecting input parameters for a setting-up the fitness provider.
@@ -28,8 +33,23 @@ public class FitnessParametersForm extends ParametersForm
 	 */
 	private static final long serialVersionUID = -282726238111247056L;
 	
+    /**
+     * Map connecting the parameter keyword and the field
+     * containing the parameter value. 
+     */
+	private Map<String,Object> mapKeyFieldToValueField;
+	
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
+    
+    JPanel lineFPSource;
+    JLabel lblFPSource;
+    JTextField txtFPSource;
+    JButton btnFPSource;
+    JButton btnLoadFPSource;
+	
+	JPanel lineIntOrExt;
+    JRadioButton rdbIntOrExt;
 
     String keyFitProviderSource = "FP-Source";
     JPanel lineFitProviderSource;
@@ -54,12 +74,14 @@ public class FitnessParametersForm extends ParametersForm
     
     public FitnessParametersForm(Dimension d)
     {
+    	mapKeyFieldToValueField = new HashMap<String,Object>();
+    	
         this.setLayout(new BorderLayout()); //Needed to allow dynamic resizing!
 
         JPanel block = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(block);
         block.setLayout(new BoxLayout(block, SwingConstants.VERTICAL));    
-        
+
         JPanel localBlock1 = new JPanel();
         localBlock1.setVisible(false);
         localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
@@ -67,10 +89,18 @@ public class FitnessParametersForm extends ParametersForm
         JPanel localBlock2 = new JPanel();
         localBlock2.setVisible(true);
         localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
-
-        String toolTipSrcOrNew = "<html>A fitness provider is an existing tool or script.<br> The fitness provider must produce an output SDF file with the <code>        //HEREGOESIMPLEMENTATIONlt;FITNESS        //HEREGOESIMPLEMENTATIONgt;</code> or <code>        //HEREGOESIMPLEMENTATIONlt;MOL_ERROR        //HEREGOESIMPLEMENTATIONgt;</code> tags.</html>";
+        
+        JPanel localBlock3 = new JPanel();
+        localBlock3.setVisible(false);
+        localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
+        
+        JPanel localBlock4 = new JPanel();
+        localBlock4.setVisible(true);
+        localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
+        
+        String toolTipSrcOrNew = "Tick here to use settings from file.";
         lineSrcOrNew = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        rdbSrcOrNew = new JRadioButton("Use external fitnes provider:");
+        rdbSrcOrNew = new JRadioButton("Use parameters from existing file");
         rdbSrcOrNew.setToolTipText(toolTipSrcOrNew);
         rdbSrcOrNew.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
@@ -90,6 +120,92 @@ public class FitnessParametersForm extends ParametersForm
         block.add(lineSrcOrNew);
         block.add(localBlock1);
         block.add(localBlock2);
+        
+        String toolTipFPSource = "<html>Pathname of a DENOPTIM's parameter file with fitness-provider settings.</html>";
+        lineFPSource = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblFPSource = new JLabel("Use parameters from file:", SwingConstants.LEFT);
+        lblFPSource.setToolTipText(toolTipFPSource);
+        txtFPSource = new JTextField();
+        txtFPSource.setToolTipText(toolTipFPSource);
+        txtFPSource.setPreferredSize(fileFieldSize);
+        btnFPSource = new JButton("Browse");
+        btnFPSource.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+                DenoptimGUIFileOpener.pickFile(txtFPSource);
+           }
+        });
+        btnLoadFPSource = new JButton("Load...");
+        txtFPSource.setToolTipText("<html>Load the parameters in this form.<br>Allows to inspect and edit the parameters.</html>");
+        btnLoadFPSource.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+	        	try 
+	        	{
+					importParametersFromDenoptimParamsFile(txtFPSource.getText(),"FP-");
+				} 
+	        	catch (Exception e1) 
+	        	{
+	        		if (e1.getMessage().equals("") || e1.getMessage() == null)
+	        		{
+	        			e1.printStackTrace();
+						JOptionPane.showMessageDialog(null,
+								"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+	        		}
+	        		else
+	        		{
+						JOptionPane.showMessageDialog(null,
+								e1.getMessage(),
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+	        		}
+					return;
+				}
+	        	rdbSrcOrNew.setSelected(false);
+	        	localBlock1.setVisible(false);
+				localBlock2.setVisible(true);		
+				if (rdbIntOrExt.isSelected())
+				{
+    				localBlock3.setVisible(true);
+        			localBlock4.setVisible(false);
+				}
+        		else
+        		{
+        			localBlock3.setVisible(false);
+        			localBlock4.setVisible(true);
+        		}
+            }
+        });
+        lineFPSource.add(lblFPSource);
+        lineFPSource.add(txtFPSource);
+        lineFPSource.add(btnFPSource);
+        lineFPSource.add(btnLoadFPSource);
+        localBlock1.add(lineFPSource);
+
+        String toolTipIntOrExt = "<html>A fitness provider is an existing tool or script.<br> The fitness provider must produce an output SDF file with the <code>        //HEREGOESIMPLEMENTATIONlt;FITNESS        //HEREGOESIMPLEMENTATIONgt;</code> or <code>        //HEREGOESIMPLEMENTATIONlt;MOL_ERROR        //HEREGOESIMPLEMENTATIONgt;</code> tags.</html>";
+        lineIntOrExt = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbIntOrExt = new JRadioButton("Use external fitnes provider:");
+        rdbIntOrExt.setToolTipText(toolTipIntOrExt);
+        rdbIntOrExt.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		if (rdbIntOrExt.isSelected())
+        		{
+    				localBlock3.setVisible(true);
+        			localBlock4.setVisible(false);
+        		}
+        		else
+        		{
+        			localBlock3.setVisible(false);
+        			localBlock4.setVisible(true);
+        		}
+        	}
+        });
+        lineIntOrExt.add(rdbIntOrExt);
+        localBlock2.add(lineIntOrExt);
+        localBlock2.add(localBlock3);
+        localBlock2.add(localBlock4);
 
         //HEREGOESIMPLEMENTATION this is only to facilitate automated insertion of code
 
@@ -101,6 +217,7 @@ public class FitnessParametersForm extends ParametersForm
         txtFitProviderSource = new JTextField();
         txtFitProviderSource.setToolTipText(toolTipFitProviderSource);
         txtFitProviderSource.setPreferredSize(fileFieldSize);
+        mapKeyFieldToValueField.put(keyFitProviderSource,txtFitProviderSource);
         btnFitProviderSource = new JButton("Browse");
         btnFitProviderSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -110,7 +227,7 @@ public class FitnessParametersForm extends ParametersForm
         lineFitProviderSource.add(lblFitProviderSource);
         lineFitProviderSource.add(txtFitProviderSource);
         lineFitProviderSource.add(btnFitProviderSource);
-        localBlock1.add(lineFitProviderSource);
+        localBlock3.add(lineFitProviderSource);
         
         String toolTipFitProviderInterpreter = "Interpreter to be used for the fitness provider executable";
         lineFitProviderInterpreter = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -119,9 +236,10 @@ public class FitnessParametersForm extends ParametersForm
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
         cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH", "Python", "JAVA"});
         cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
+        mapKeyFieldToValueField.put(keyFitProviderInterpreter,cmbFitProviderInterpreter);
         lineFitProviderInterpreter.add(lblFitProviderInterpreter);
         lineFitProviderInterpreter.add(cmbFitProviderInterpreter);
-        localBlock1.add(lineFitProviderInterpreter);
+        localBlock3.add(lineFitProviderInterpreter);
 
         String toolTipEq = "Define integrated fitness provider equation.";
         lineEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -131,9 +249,10 @@ public class FitnessParametersForm extends ParametersForm
         txtEq = new JTextField();
         txtEq.setToolTipText(toolTipEq);
         txtEq.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyEq,txtEq);
         lineEq.add(lblEq);
         lineEq.add(txtEq);
-        localBlock2.add(lineEq);
+        localBlock4.add(lineEq);
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
         
@@ -177,11 +296,68 @@ public class FitnessParametersForm extends ParametersForm
         this.add(scrollablePane);
     }
 
+//-----------------------------------------------------------------------------
+    
+  	@SuppressWarnings("unchecked")
+	@Override
+	public void importSingleParameter(String key, String value) throws Exception 
+  	{
+  		Object valueField;
+  		String valueFieldClass;
+  		if (mapKeyFieldToValueField.containsKey(key))
+  		{
+  		    valueField = mapKeyFieldToValueField.get(key);
+  		    valueFieldClass = valueField.getClass().toString();
+  		}
+  		else
+  		{
+			JOptionPane.showMessageDialog(null,
+					"<html>Parameter '" + key + "' is not recognized<br> and will be ignored.</html>",
+	                "WARNING",
+	                JOptionPane.WARNING_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+  		}
+    
+ 		switch (valueFieldClass)
+ 		{				
+ 			case "class javax.swing.JTextField":
+ 				((JTextField) valueField).setText(value);
+ 				
+ 				if (key.equals(keyFitProviderSource)) 
+    			{
+ 				    rdbIntOrExt.setSelected(true);
+    			}
+ 				break;
+ 				
+ 			case "class javax.swing.JRadioButton":
+ 				((JRadioButton) valueField).setSelected(true);
+ 				break;
+ 				
+ 			case "class javax.swing.JComboBox":
+ 				((JComboBox<String>) valueField).setSelectedItem(value);
+ 				break;
+ 				
+ 			case "class javax.swing.table.DefaultTableModel":
+
+ 				//WARNING: there might be cases where we do not take all the records
+
+ 				((DefaultTableModel) valueField).addRow(value.split(" "));
+ 				break;
+ 				
+ 			default:
+ 				System.err.println("Filed for value of "+key+" is "+valueFieldClass);
+ 				throw new Exception("Unexpected type for parameter: " + key + " (" + valueFieldClass + ")");
+ 		}
+	}
+  	
+//-----------------------------------------------------------------------------
+  	
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
         sb.append("# Fitness Provider - paramerers").append(NL);
-        if (rdbSrcOrNew.isSelected())
+        if (rdbIntOrExt.isSelected())
         {
 	        sb.append(getStringIfNotEmpty(keyFitProviderSource,txtFitProviderSource));
 	        sb.append(keyFitProviderInterpreter).append("=").append(cmbFitProviderInterpreter.getSelectedItem()).append(NL);
