@@ -40,6 +40,13 @@ public class GAParametersForm extends ParametersForm
      */
 	private Map<String,Object> mapKeyFieldToValueField;
 	
+    JPanel block;    
+    JPanel localBlock1;
+    JPanel localBlock2;
+    JPanel localBlock3;
+    JPanel localBlock4;
+    JPanel advOptsBlock;
+	
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
     
@@ -181,27 +188,27 @@ public class GAParametersForm extends ParametersForm
     	
         this.setLayout(new BorderLayout()); //Needed to allow dynamic resizing!
 
-        JPanel block = new JPanel();
+        block = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(block);
         block.setLayout(new BoxLayout(block, SwingConstants.VERTICAL));
         
-        JPanel localBlock1 = new JPanel();
+        localBlock1 = new JPanel();
         localBlock1.setVisible(false);
         localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
         
-        JPanel localBlock2 = new JPanel();
+        localBlock2 = new JPanel();
         localBlock2.setVisible(true);
         localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
         
-        JPanel localBlock3 = new JPanel();
+        localBlock3 = new JPanel();
         localBlock3.setVisible(true);
         localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
         
-        JPanel localBlock4 = new JPanel();
+        localBlock4 = new JPanel();
         localBlock4.setVisible(false);
         localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
         
-        JPanel advOptsBlock = new JPanel();
+        advOptsBlock = new JPanel();
         advOptsBlock.setVisible(false);
         advOptsBlock.setLayout(new BoxLayout(advOptsBlock, SwingConstants.VERTICAL));
         
@@ -247,7 +254,7 @@ public class GAParametersForm extends ParametersForm
         	public void actionPerformed(ActionEvent e) {
 	        	try 
 	        	{
-					importParametersFromDenoptimParamsFile(txtGASource.getText(),"GA-");
+					importParametersFromDenoptimParamsFile(txtGASource.getText());
 				} 
 	        	catch (Exception e1) 
 	        	{
@@ -270,6 +277,7 @@ public class GAParametersForm extends ParametersForm
 	        		}
 					return;
 				}
+	        	/*
 	        	rdbSrcOrNew.setSelected(false);
 	        	localBlock1.setVisible(false);
 				localBlock2.setVisible(true);		
@@ -296,6 +304,7 @@ public class GAParametersForm extends ParametersForm
             			break;
         		}
         		advOptsBlock.setVisible(true);
+        		*/
             }
         });
         lineGASource.add(lblGASource);
@@ -691,6 +700,50 @@ public class GAParametersForm extends ParametersForm
         
         this.add(scrollablePane);
     }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Imports parameters from a properly formatted parameters file.
+     * The file is a text file with lines containing KEY=VALUE pairs.
+     * The visibility of the blocks of content is set accordingly to the 
+     * parameters.
+     * @param fileName the pathname of the file to read
+     * @throws Exception
+     */
+    
+    @Override
+    public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
+    {
+    	importParametersFromDenoptimParamsFile(fileName,"GA-");
+    	
+    	rdbSrcOrNew.setSelected(false);
+    	localBlock1.setVisible(false);
+		localBlock2.setVisible(true);		
+		switch (cmbPar11.getSelectedItem().toString())
+		{
+			case "EXP_DIFF":
+				localBlock3.setVisible(true);
+    			localBlock4.setVisible(false);   
+    			break;
+    			
+			case "TANH":
+				localBlock3.setVisible(true);
+    			localBlock4.setVisible(false);   
+    			break;
+    			
+			case "SIGMA":
+				localBlock3.setVisible(false);
+    			localBlock4.setVisible(true);   
+    			break;
+    			
+			default:
+				localBlock3.setVisible(false);
+    			localBlock4.setVisible(false);   
+    			break;
+		}
+		advOptsBlock.setVisible(true);
+    }
 
 //-----------------------------------------------------------------------------
     
@@ -756,8 +809,7 @@ public class GAParametersForm extends ParametersForm
         	{
         		throw new Exception("<html>No source specified for GA parameters.<br>Please, specify the file name.</html>");
         	}
-        	
-        	importParametersFromDenoptimParamsFile(txtGASource.getText(),"GA-");
+        	importParametersFromDenoptimParamsFile(txtGASource.getText());
         }
         
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));;

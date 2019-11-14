@@ -32,7 +32,6 @@ public class DenoptimGUIFileOpener {
 		}
 		else
 		{
-			//TODO change to something sensible
 			return null;
 		}
 		return file;
@@ -59,7 +58,6 @@ public class DenoptimGUIFileOpener {
 		}
 		else
 		{
-			//TODO change to something sensible
 			return null;
 		}
 		return file;

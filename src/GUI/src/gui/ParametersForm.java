@@ -201,6 +201,12 @@ public class ParametersForm extends JPanel implements IParametersForm
     
 //-----------------------------------------------------------------------------
     
+    public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
+    {
+    }
+    
+//-----------------------------------------------------------------------------
+    
     /**
      * Reads in the parameters from a text file collecting  
      * DENOPTIM parameters in the form of KEY=VALUE lines.
@@ -211,7 +217,7 @@ public class ParametersForm extends JPanel implements IParametersForm
     
     protected void importParametersFromDenoptimParamsFile(String fileName, 
     		String keyRoot) throws Exception
-    {  	
+    {  	    	
     	if (keyRoot.equals("") || keyRoot == null)
     	{
     		throw new Exception("<html>Root of DENOPTIM keywords not defined.<br>Bugus use of method 'importParametersFromDenoptimParamsFile'!</html>");
@@ -288,54 +294,7 @@ public class ParametersForm extends JPanel implements IParametersForm
 	}
 
 //-----------------------------------------------------------------------------
-  	
-	/**
-	 * Looks into the fields of this class (typically a subclass of 
-	 * ParametersForm), and identifies the field that contains the value
-	 * associated with the given key.
-	 * @param key the keyword
-	 * @return the field containing the value associated with the keyword, 
-	 * or null if not found.
-	 */
-	/*
-	protected Object getFiledWithValueOf(String key) 
-	{   
-		//TODO del
-		System.out.println("HERE _"+key+"_ " +this.getClass().getName());
-		
-		// WARNING: Since this method is intended to be used
-		// by subclasses, remember the subtle meaning of 'this' (i.e., the subclass)
-		
-		Object valueField = null;	
-        for (Field f : this.getClass().getDeclaredFields()) 
-        {
-        	//TODO del
-        	System.out.println("   Trying _"+f.getName()+"_");
-        	try
-        	{
-        		if (!f.getName().startsWith("key"))
-        		{
-        			continue;
-        		}
-        		
-        		String candidateKey = (String) f.get(this);        			
-        		if (candidateKey.toUpperCase().equals(key.toUpperCase()))
-        		{
-        			valueField = mapKeyFieldToValueField.get(f.getName());
-        			break;
-        		}
-        	}
-        	catch (Throwable t)
-        	{
-        		t.printStackTrace();
-        	}
-        }
-		return null;
-	}
-	*/
-	
-//-----------------------------------------------------------------------------
-	
+
 	@Override
 	public void putParametersToString(StringBuilder sb) throws Exception
 	{

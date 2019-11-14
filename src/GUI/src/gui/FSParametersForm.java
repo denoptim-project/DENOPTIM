@@ -48,6 +48,13 @@ public class FSParametersForm extends ParametersForm
      */
 	private Map<String,Object> mapKeyFieldToValueField;
 	
+    JPanel block;    
+    JPanel localBlock1;
+    JPanel localBlock2;
+    JPanel localBlock3;
+    JPanel localBlock4;
+    JPanel localBlock5;
+	
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
 
@@ -234,23 +241,23 @@ public class FSParametersForm extends ParametersForm
         JScrollPane scrollablePane = new JScrollPane(block);
         block.setLayout(new BoxLayout(block, SwingConstants.VERTICAL));    
         
-        JPanel localBlock1 = new JPanel();
+        localBlock1 = new JPanel();
         localBlock1.setVisible(false);
         localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
         
-        JPanel localBlock2 = new JPanel();
+        localBlock2 = new JPanel();
         localBlock2.setVisible(true);
         localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
         
-        JPanel localBlock3 = new JPanel();
+        localBlock3 = new JPanel();
         localBlock3.setVisible(false);
         localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
         
-        JPanel localBlock4 = new JPanel();
+        localBlock4 = new JPanel();
         localBlock4.setVisible(true);
         localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
         
-        JPanel localBlock5 = new JPanel();
+        localBlock5 = new JPanel();
         localBlock5.setVisible(false);
         localBlock5.setLayout(new BoxLayout(localBlock5, SwingConstants.VERTICAL));
 
@@ -300,8 +307,7 @@ public class FSParametersForm extends ParametersForm
         public void actionPerformed(ActionEvent e) {
 	        	try 
 	        	{
-					importParametersFromDenoptimParamsFile(txtFSSource.getText(),"FS-");
-					importParametersFromDenoptimParamsFile(txtFSSource.getText(),"RC-");
+					importParametersFromDenoptimParamsFile(txtFSSource.getText());
 				} 
 	        	catch (Exception e1) 
 	        	{
@@ -324,30 +330,6 @@ public class FSParametersForm extends ParametersForm
 	        		}
 					return;
 				}
-	        	rdbSrcOrNew.setSelected(false);
-	        	localBlock1.setVisible(false);
-				localBlock2.setVisible(true);
-	    		if (rdbPar12.isSelected())
-	    		{
-					localBlock3.setVisible(true);
-	    		}
-        		switch (cmbPar19.getSelectedItem().toString())
-        		{
-        			case "Constitution":
-        				localBlock4.setVisible(true);
-            			localBlock5.setVisible(false);   
-            			break;
-            			
-        			case "3D-Conformation":
-        				localBlock4.setVisible(false);
-            			localBlock5.setVisible(true); 
-            			break;
-            			
-        			case "Constitution_and_3D-Conformation":
-        				localBlock4.setVisible(true);
-            			localBlock5.setVisible(true);   
-            			break;
-        		}
             }
         });
         lineFSSource.add(lblFSSource);
@@ -1139,6 +1121,47 @@ public class FSParametersForm extends ParametersForm
         
         this.add(scrollablePane);
     }
+   
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Imports parameters from a properly formatted parameters file.
+     * The file is a text file with lines containing KEY=VALUE pairs.
+     * @param fileName the pathname of the file to read
+     * @throws Exception
+     */
+    
+    @Override
+    public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
+    {
+    	importParametersFromDenoptimParamsFile(fileName,"FS-");
+		importParametersFromDenoptimParamsFile(fileName,"RC-");
+		
+    	rdbSrcOrNew.setSelected(false);
+    	localBlock1.setVisible(false);
+		localBlock2.setVisible(true);
+		if (rdbPar12.isSelected())
+		{
+			localBlock3.setVisible(true);
+		}
+		switch (cmbPar19.getSelectedItem().toString())
+		{
+			case "Constitution":
+				localBlock4.setVisible(true);
+    			localBlock5.setVisible(false);   
+    			break;
+    			
+			case "3D-Conformation":
+				localBlock4.setVisible(false);
+    			localBlock5.setVisible(true); 
+    			break;
+    			
+			case "Constitution_and_3D-Conformation":
+				localBlock4.setVisible(true);
+    			localBlock5.setVisible(true);   
+    			break;
+		}
+    }
     
 //-----------------------------------------------------------------------------
     
@@ -1208,9 +1231,7 @@ public class FSParametersForm extends ParametersForm
         	{
         		throw new Exception("<html>No source specified for fragment space.<br>Please, specify the file name.</html>");
         	}
-        	
-        	importParametersFromDenoptimParamsFile(txtFSSource.getText(),"FS-");
-        	importParametersFromDenoptimParamsFile(txtFSSource.getText(),"RC-");
+        	importParametersFromDenoptimParamsFile(txtFSSource.getText());
         }
 
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));

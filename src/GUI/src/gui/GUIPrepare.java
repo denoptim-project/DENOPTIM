@@ -63,7 +63,50 @@ public class GUIPrepare extends GUIWorkPanel
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
+		JButton btnLoadParams = new JButton("Load Parameters",UIManager.getIcon("FileView.directoryIcon"));
+		btnLoadParams.setToolTipText("<html>Reads a DENOPTIM parameter file, <br> and imports parameters into the form.</html>");
+		btnLoadParams.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				File inFile = DenoptimGUIFileOpener.pickFile();
+				if (inFile == null || inFile.getAbsolutePath().equals(""))
+				{
+					return;
+				}
+				for (IParametersForm p : allParams)
+				{
+				    try
+				    {
+						p.importParametersFromDenoptimParamsFile(inFile.getAbsolutePath());
+					}
+				    catch (Exception e1)
+				    {
+		        		if (e1.getMessage().equals("") || e1.getMessage() == null)
+		        		{
+		        			e1.printStackTrace();
+							JOptionPane.showMessageDialog(null,
+									"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
+					                "Error",
+					                JOptionPane.ERROR_MESSAGE,
+					                UIManager.getIcon("OptionPane.errorIcon"));
+		        		}
+		        		else
+		        		{
+							JOptionPane.showMessageDialog(null,
+									e1.getMessage(),
+					                "Error",
+					                JOptionPane.ERROR_MESSAGE,
+					                UIManager.getIcon("OptionPane.errorIcon"));
+		        		}
+					}
+				}
+
+			}
+		});
+		commandsPane.add(btnLoadParams);
+		
+		
 		JButton btnSaveParams = new JButton("Save Parameters",UIManager.getIcon("FileView.hardDriveIcon"));
+		btnSaveParams.setToolTipText("<html>Write all parameters to file.<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StringBuilder sb = new StringBuilder();
@@ -131,12 +174,13 @@ public class GUIPrepare extends GUIWorkPanel
 		*/
 		
 		JButton btnHelp = new JButton("?");
+		btnHelp.setToolTipText("Help");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
-                        new JLabel("Hover over the parameter description fields to get a tip."),
-                        "Tips",
-                        JOptionPane.PLAIN_MESSAGE);
+                    new JLabel("<html>Hover over the buttons and parameter fields to get a tip.</html>"),
+                    "Tips",
+                    JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 		commandsPane.add(btnHelp);

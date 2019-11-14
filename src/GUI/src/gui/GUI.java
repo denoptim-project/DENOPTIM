@@ -58,7 +58,7 @@ public class GUI {
 	 * Create and fill frame.
 	 */
 	private void initialize() {
-		frame = new JFrame("DENOPTIM GUI");
+		frame = new JFrame("DENOPTIM - GUI");
 		frame.setBounds(mainFrameInitX, mainFrameInitY, width, height);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

@@ -39,6 +39,12 @@ public class FitnessParametersForm extends ParametersForm
      */
 	private Map<String,Object> mapKeyFieldToValueField;
 	
+    JPanel block;    
+    JPanel localBlock1;
+    JPanel localBlock2;
+    JPanel localBlock3;
+    JPanel localBlock4;
+	
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
     
@@ -78,23 +84,23 @@ public class FitnessParametersForm extends ParametersForm
     	
         this.setLayout(new BorderLayout()); //Needed to allow dynamic resizing!
 
-        JPanel block = new JPanel();
+        block = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(block);
         block.setLayout(new BoxLayout(block, SwingConstants.VERTICAL));    
 
-        JPanel localBlock1 = new JPanel();
+        localBlock1 = new JPanel();
         localBlock1.setVisible(false);
         localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
         
-        JPanel localBlock2 = new JPanel();
+        localBlock2 = new JPanel();
         localBlock2.setVisible(true);
         localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
         
-        JPanel localBlock3 = new JPanel();
+        localBlock3 = new JPanel();
         localBlock3.setVisible(false);
         localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
         
-        JPanel localBlock4 = new JPanel();
+        localBlock4 = new JPanel();
         localBlock4.setVisible(true);
         localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
         
@@ -140,7 +146,7 @@ public class FitnessParametersForm extends ParametersForm
         	public void actionPerformed(ActionEvent e) {
 	        	try 
 	        	{
-					importParametersFromDenoptimParamsFile(txtFPSource.getText(),"FP-");
+					importParametersFromDenoptimParamsFile(txtFPSource.getText());
 				} 
 	        	catch (Exception e1) 
 	        	{
@@ -163,19 +169,6 @@ public class FitnessParametersForm extends ParametersForm
 	        		}
 					return;
 				}
-	        	rdbSrcOrNew.setSelected(false);
-	        	localBlock1.setVisible(false);
-				localBlock2.setVisible(true);		
-				if (rdbIntOrExt.isSelected())
-				{
-    				localBlock3.setVisible(true);
-        			localBlock4.setVisible(false);
-				}
-        		else
-        		{
-        			localBlock3.setVisible(false);
-        			localBlock4.setVisible(true);
-        		}
             }
         });
         lineFPSource.add(lblFPSource);
@@ -294,6 +287,35 @@ public class FitnessParametersForm extends ParametersForm
         */
         
         this.add(scrollablePane);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Imports parameters from a properly formatted parameters file.
+     * The file is a text file with lines containing KEY=VALUE pairs.
+     * @param fileName the pathname of the file to read
+     * @throws Exception
+     */
+    
+    @Override
+    public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
+    {
+    	importParametersFromDenoptimParamsFile(fileName,"FP-");
+    	
+    	rdbSrcOrNew.setSelected(false);
+    	localBlock1.setVisible(false);
+		localBlock2.setVisible(true);		
+		if (rdbIntOrExt.isSelected())
+		{
+			localBlock3.setVisible(true);
+			localBlock4.setVisible(false);
+		}
+		else
+		{
+			localBlock3.setVisible(false);
+			localBlock4.setVisible(true);
+		}
     }
 
 //-----------------------------------------------------------------------------
