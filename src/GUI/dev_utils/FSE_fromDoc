@@ -1,0 +1,13 @@
+#
+./addParamCode.sh Par2 S FSE-MaxLevel "Explore up to level numer:" 0 "<html>Specifies the maximum number of layers of fragments to consider.<br>Note that the root (i.e., scaffold or root graph) is assigned <code>level = -1</code>.<br>Therefore, if this parameter is 3, we'll try to append <br>up to 4 layers of fragments (levels = 0, 1, 2, and 3).</html>" FSEParametersForm.java
+./addParamCode.sh Par7 S FSE-NumOfProcessors "Mas. number parallel tasks:" 0 "Specifies the number of asynchronous processes that can be run in parallel. Usually this corresponds to the number of slave cores, if 1 such core corresponds to 1 external tas" FSEParametersForm.java
+./addParamCode.sh Par3 F FSE-UIDFile "File with known UIDs:" 0 "Specifies the pathname of the file with unique chemical entity ID." FSEParametersForm.java
+./addParamCode.sh Par9 F FSE-RootGraphs "Library of root graphs:" 0 "Specifies the pathname of a file containing the list of graphs that will be expanded." FSEParametersForm.java
+./addParamCode.sh Par10 P FSE-RootGraphsFormat "Format of root graphs: " 0 "<html>Specifies the format of the root graphs.<br><ul><li><code><b>STRING</b></code> for human readable graphs</li><li><code><b>'BYTE'</b></code> for serialized graphs (binary)</li></ul></html>" FSEParametersForm.java STRING BYTE
+./addParamCode.sh Par8 S FSE-Verbosity "Logging level:" 2 "Specifies the verbosity level." FSEParametersForm.java
+./addParamCode.sh Par1 F FSE-WorkDir "Work space:" 2 "Specifies the pathname of the directory where files will be created" FSEParametersForm.java
+./addParamCode.sh Par4 F FSE-DBRootFolder "Location of DENOPTIMGRaph database:" 2 "Specifies the pathname of the root of the folder tree of generate graphs." FSEParametersForm.java
+./addParamCode.sh Par5 S FSE-MaxWait "Max. time for fitness evaluation:" 2 "Specifies the wall time limit (in seconds) for completion of one or more tasks. Accepts only integer number" FSEParametersForm.java
+./addParamCode.sh Par6 S FSE-WaitStep "Time between checks for completion:" 2 "Specifies the sleeping time (or time step, in seconds) between checks for completion of one or more tasks. Accepts only integer number" FSEParametersForm.java
+./addParamCode.sh Par11 S FSE-CheckPointStepLength "Make checkpoint every # graphs:" 2 "<html>Specifies the distance between two subsequent updates of the<br> checkpoint information as a number of generated graphs.</html>" FSEParametersForm.java
+./addParamCode.sh Par12 F FSE-RestartFromCheckpoint "Restart from checkpoint file: " 2 "<html>Specifies the pathname of the checkpoint file, <br> and makes FragSpaceExplorer restart from such file.</html>" FSEParametersForm.java

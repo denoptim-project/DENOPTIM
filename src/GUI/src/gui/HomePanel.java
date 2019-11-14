@@ -70,11 +70,7 @@ public class HomePanel extends GUIWorkPanel
 		JButton btnNewGA = new JButton("New Evolutionary De Novo Design");
 		btnNewGA.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO del
-				//getNonImplementedError();
-				
 				addPanelToDeck(new GUIPrepareGARun(mainPanel,"GAParameters"));
-				
 			}
 		});
 		buttonsPanel.add(btnNewGA);
@@ -82,13 +78,7 @@ public class HomePanel extends GUIWorkPanel
 		JButton btnNewVirtualScreening = new JButton("New Virtual Screening");
 		btnNewVirtualScreening.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				getNonImplementedError();
-				
-				/*
-				JPanel newMainPanel = cleanUpMainPanel();
-				frame.setBounds(100, 100, 800, 400);
-				FSEForm gaForm = new FSEForm(newMainPanel);
-				*/
+				addPanelToDeck(new GUIPrepareFSERun(mainPanel,"FSEParameters"));
 			}
 		});
 		buttonsPanel.add(btnNewVirtualScreening);

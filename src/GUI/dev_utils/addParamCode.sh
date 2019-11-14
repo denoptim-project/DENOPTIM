@@ -19,9 +19,10 @@ then
     echo "        'S' for string, "
     echo "        'P' for pre-set choice"
     echo " <key>  sets the DENOPTIM keyword"
-    echo " <adv>  sets the destination of the parameter: "
-    echo "        0 for standard"
-    echo "        1 for advanced settings block"
+    echo " <label> the string to visualize in the GUI"
+    echo " <adv>  sets the destination of the parameter in the panels "
+    echo "        0 for standard, "
+    echo "        1 for advanced settings block, ... up to 5."
     echo " <help> if the help-tip message in between double quotes"
     echo " <file.java> is the name of the java cource code file to edit"
     exit 1
@@ -93,7 +94,7 @@ case "$typ" in
     'F')
         fields="    String key$name \= \"$key\";\n    JPanel line$name;\n    JLabel lbl$name;\n    JTextField txt$name;\n    JButton btn$name;\n\n    //HEREGOFIELDS"
 
-        code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        lbl$name = new JLabel(\"$label\", SwingConstants.LEFT);\n        lbl$name.setPreferredSize(fileLabelSize);\n        lbl$name.setToolTipText(toolTip$name);\n        txt$name = new JTextField();\n        txt$name.setToolTipText(toolTip$name);\n        txt$name.setPreferredSize(fileFieldSize);\n        btn$name = new JButton(\"Browse\");\n        btn$name.addActionListener(new ActionListener() {\n        public void actionPerformed(ActionEvent e) {\n                DenoptimGUIFileOpener.pickFile(txt$name);\n           }\n        });\n        line$name.add(lbl$name);\n        line$name.add(txt$name);\n        line$name.add(btn$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
+        code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        lbl$name = new JLabel(\"$label\", SwingConstants.LEFT);\n        lbl$name.setPreferredSize(fileLabelSize);\n        lbl$name.setToolTipText(toolTip$name);\n        txt$name = new JTextField();\n        txt$name.setToolTipText(toolTip$name);\n        txt$name.setPreferredSize(fileFieldSize);\n        mapKeyFieldToValueField.put(key$name,txt$name);\n        btn$name = new JButton(\"Browse\");\n        btn$name.addActionListener(new ActionListener() {\n        public void actionPerformed(ActionEvent e) {\n                DenoptimGUIFileOpener.pickFile(txt$name);\n           }\n        });\n        line$name.add(lbl$name);\n        line$name.add(txt$name);\n        line$name.add(btn$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
 
         outForm="        sb.append(getStringIfNotEmpty(key$name,txt$name));\n        //HEREGOESPRINT"
 	;;
@@ -101,7 +102,7 @@ case "$typ" in
     'B')
         fields="    String key$name \= \"$key\";\n    JPanel line$name;\n    JRadioButton rdb$name;\n\n    //HEREGOFIELDS"
 
-        code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        rdb$name = new JRadioButton(\"$label\");\n        rdb$name.setToolTipText(toolTip$name);\n        line$name.add(rdb$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
+        code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        rdb$name = new JRadioButton(\"$label\");\n        rdb$name.setToolTipText(toolTip$name);\n        mapKeyFieldToValueField.put(key$name,rdb$name);\n        line$name.add(rdb$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
 
         outForm="        sb.append(getStringIfSelected(key$name,rdb$name));\n        //HEREGOESPRINT"
         ;;
@@ -109,7 +110,7 @@ case "$typ" in
     'P')
 	fields="    String key$name \= \"$key\";\n    JPanel line$name;\n    JLabel lbl$name;\n    JComboBox<String> cmb$name;\n\n    //HEREGOFIELDS"
 
-	code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        lbl$name = new JLabel(\"$label\", SwingConstants.LEFT);\n        lbl$name.setPreferredSize(fileLabelSize);\n        lbl$name.setToolTipText(toolTip$name);\n        cmb$name = new JComboBox<String>(new String[] {$preSets});\n        cmb$name.setToolTipText(toolTip$name);\n        line$name.add(lbl$name);\n        line$name.add(cmb$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
+	code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        lbl$name = new JLabel(\"$label\", SwingConstants.LEFT);\n        lbl$name.setPreferredSize(fileLabelSize);\n        lbl$name.setToolTipText(toolTip$name);\n        cmb$name = new JComboBox<String>(new String[] {$preSets});\n        cmb$name.setToolTipText(toolTip$name);\n        mapKeyFieldToValueField.put(key$name,cmb$name);\n        line$name.add(lbl$name);\n        line$name.add(cmb$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
 
         outForm="        sb.append(key$name).append(\"=\").append(cmb$name.getSelectedItem()).append(NL);\n        //HEREGOESPRINT"
 	;;
@@ -117,7 +118,7 @@ case "$typ" in
     'S')
 	fields="    String key$name \= \"$key\";\n    JPanel line$name;\n    JLabel lbl$name;\n    JTextField txt$name;\n\n    //HEREGOFIELDS"
 
-	code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        lbl$name = new JLabel(\"$label\", SwingConstants.LEFT);\n        lbl$name.setPreferredSize(fileLabelSize);\n        lbl$name.setToolTipText(toolTip$name);\n        txt$name = new JTextField();\n        txt$name.setToolTipText(toolTip$name);\n        txt$name.setPreferredSize(strFieldSize);\n        line$name.add(lbl$name);\n        line$name.add(txt$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
+	code="        String toolTip$name = \"$helpMsg\";\n        line$name = new JPanel(new FlowLayout(FlowLayout.LEFT));\n        lbl$name = new JLabel(\"$label\", SwingConstants.LEFT);\n        lbl$name.setPreferredSize(fileLabelSize);\n        lbl$name.setToolTipText(toolTip$name);\n        txt$name = new JTextField();\n        txt$name.setToolTipText(toolTip$name);\n        txt$name.setPreferredSize(strFieldSize);\n        mapKeyFieldToValueField.put(key$name,txt$name);\n        line$name.add(lbl$name);\n        line$name.add(txt$name);\n        $targetPanel.add(line$name);\n\n$placeHolder"
 
 	outForm="        sb.append(getStringIfNotEmpty(key$name,txt$name));;\n        //HEREGOESPRINT"
 	;;

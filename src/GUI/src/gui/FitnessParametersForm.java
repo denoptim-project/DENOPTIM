@@ -210,7 +210,7 @@ public class FitnessParametersForm extends ParametersForm
         txtFitProviderSource = new JTextField();
         txtFitProviderSource.setToolTipText(toolTipFitProviderSource);
         txtFitProviderSource.setPreferredSize(fileFieldSize);
-        mapKeyFieldToValueField.put(keyFitProviderSource,txtFitProviderSource);
+        mapKeyFieldToValueField.put(keyFitProviderSource.toUpperCase(),txtFitProviderSource);
         btnFitProviderSource = new JButton("Browse");
         btnFitProviderSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -229,7 +229,7 @@ public class FitnessParametersForm extends ParametersForm
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
         cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH", "Python", "JAVA"});
         cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
-        mapKeyFieldToValueField.put(keyFitProviderInterpreter,cmbFitProviderInterpreter);
+        mapKeyFieldToValueField.put(keyFitProviderInterpreter.toUpperCase(),cmbFitProviderInterpreter);
         lineFitProviderInterpreter.add(lblFitProviderInterpreter);
         lineFitProviderInterpreter.add(cmbFitProviderInterpreter);
         localBlock3.add(lineFitProviderInterpreter);
@@ -242,7 +242,7 @@ public class FitnessParametersForm extends ParametersForm
         txtEq = new JTextField();
         txtEq.setToolTipText(toolTipEq);
         txtEq.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyEq,txtEq);
+        mapKeyFieldToValueField.put(keyEq.toUpperCase(),txtEq);
         lineEq.add(lblEq);
         lineEq.add(txtEq);
         localBlock4.add(lineEq);
@@ -326,9 +326,9 @@ public class FitnessParametersForm extends ParametersForm
   	{
   		Object valueField;
   		String valueFieldClass;
-  		if (mapKeyFieldToValueField.containsKey(key))
+  		if (mapKeyFieldToValueField.containsKey(key.toUpperCase()))
   		{
-  		    valueField = mapKeyFieldToValueField.get(key);
+  		    valueField = mapKeyFieldToValueField.get(key.toUpperCase());
   		    valueFieldClass = valueField.getClass().toString();
   		}
   		else

@@ -277,34 +277,6 @@ public class GAParametersForm extends ParametersForm
 	        		}
 					return;
 				}
-	        	/*
-	        	rdbSrcOrNew.setSelected(false);
-	        	localBlock1.setVisible(false);
-				localBlock2.setVisible(true);		
-        		switch (cmbPar11.getSelectedItem().toString())
-        		{
-        			case "EXP_DIFF":
-        				localBlock3.setVisible(true);
-            			localBlock4.setVisible(false);   
-            			break;
-            			
-        			case "TANH":
-        				localBlock3.setVisible(true);
-            			localBlock4.setVisible(false);   
-            			break;
-            			
-        			case "SIGMA":
-        				localBlock3.setVisible(false);
-            			localBlock4.setVisible(true);   
-            			break;
-            			
-        			default:
-        				localBlock3.setVisible(false);
-            			localBlock4.setVisible(false);   
-            			break;
-        		}
-        		advOptsBlock.setVisible(true);
-        		*/
             }
         });
         lineGASource.add(lblGASource);
@@ -323,7 +295,7 @@ public class GAParametersForm extends ParametersForm
         txtPar6 = new JTextField();
         txtPar6.setToolTipText(toolTipPar6);
         txtPar6.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar6,txtPar6);
+        mapKeyFieldToValueField.put(keyPar6.toUpperCase(),txtPar6);
         linePar6.add(lblPar6);
         linePar6.add(txtPar6);
         localBlock2.add(linePar6);
@@ -336,7 +308,7 @@ public class GAParametersForm extends ParametersForm
         txtPar7 = new JTextField();
         txtPar7.setToolTipText(toolTipPar7);
         txtPar7.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar7,txtPar7);
+        mapKeyFieldToValueField.put(keyPar7.toUpperCase(),txtPar7);
         linePar7.add(lblPar7);
         linePar7.add(txtPar7);
         localBlock2.add(linePar7);
@@ -349,7 +321,7 @@ public class GAParametersForm extends ParametersForm
         txtPar8 = new JTextField();
         txtPar8.setToolTipText(toolTipPar8);
         txtPar8.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar8,txtPar8);
+        mapKeyFieldToValueField.put(keyPar8.toUpperCase(),txtPar8);
         linePar8.add(lblPar8);
         linePar8.add(txtPar8);
         localBlock2.add(linePar8);
@@ -362,7 +334,7 @@ public class GAParametersForm extends ParametersForm
         txtPar9 = new JTextField();
         txtPar9.setToolTipText(toolTipPar9);
         txtPar9.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar9,txtPar9);
+        mapKeyFieldToValueField.put(keyPar9.toUpperCase(),txtPar9);
         linePar9.add(lblPar9);
         linePar9.add(txtPar9);
         localBlock2.add(linePar9);
@@ -375,7 +347,7 @@ public class GAParametersForm extends ParametersForm
         txtPar12 = new JTextField("1.0");
         txtPar12.setToolTipText(toolTipPar12);
         txtPar12.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar12,txtPar12);
+        mapKeyFieldToValueField.put(keyPar12.toUpperCase(),txtPar12);
         linePar12.add(lblPar12);
         linePar12.add(txtPar12);
         localBlock3.add(linePar12);
@@ -388,7 +360,7 @@ public class GAParametersForm extends ParametersForm
         txtPar13 = new JTextField();
         txtPar13.setToolTipText(toolTipPar13);
         txtPar13.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar13,txtPar13);
+        mapKeyFieldToValueField.put(keyPar13.toUpperCase(),txtPar13);
         linePar13.add(lblPar13);
         linePar13.add(txtPar13);
         localBlock4.add(linePar13);
@@ -401,7 +373,7 @@ public class GAParametersForm extends ParametersForm
         txtPar14 = new JTextField();
         txtPar14.setToolTipText(toolTipPar14);
         txtPar14.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar14,txtPar14);
+        mapKeyFieldToValueField.put(keyPar14.toUpperCase(),txtPar14);
         linePar14.add(lblPar14);
         linePar14.add(txtPar14);
         localBlock4.add(linePar14);
@@ -415,7 +387,7 @@ public class GAParametersForm extends ParametersForm
         lblPar11.setToolTipText(toolTipPar11);
         cmbPar11 = new JComboBox<String>(new String[] {"EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
         cmbPar11.setToolTipText(toolTipPar11);
-        mapKeyFieldToValueField.put(keyPar11,cmbPar11);
+        mapKeyFieldToValueField.put(keyPar11.toUpperCase(),cmbPar11);
         cmbPar11.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
         		switch (cmbPar11.getSelectedItem().toString())
@@ -460,7 +432,7 @@ public class GAParametersForm extends ParametersForm
         lblPar15.setToolTipText(toolTipPar15);
         cmbPar15 = new JComboBox<String>(new String[] {"RANDOM", "TS", "RW", "SUS"});
         cmbPar15.setToolTipText(toolTipPar15);
-        mapKeyFieldToValueField.put(keyPar15,cmbPar15);
+        mapKeyFieldToValueField.put(keyPar15.toUpperCase(),cmbPar15);
         linePar15.add(lblPar15);
         linePar15.add(cmbPar15);
         localBlock2.add(linePar15);
@@ -473,7 +445,7 @@ public class GAParametersForm extends ParametersForm
         txtPar16 = new JTextField();
         txtPar16.setToolTipText(toolTipPar16);
         txtPar16.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar16,txtPar16);
+        mapKeyFieldToValueField.put(keyPar16.toUpperCase(),txtPar16);
         linePar16.add(lblPar16);
         linePar16.add(txtPar16);
         localBlock2.add(linePar16);
@@ -486,7 +458,7 @@ public class GAParametersForm extends ParametersForm
         txtPar17 = new JTextField();
         txtPar17.setToolTipText(toolTipPar17);
         txtPar17.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar17,txtPar17);
+        mapKeyFieldToValueField.put(keyPar17.toUpperCase(),txtPar17);
         linePar17.add(lblPar17);
         linePar17.add(txtPar17);
         localBlock2.add(linePar17);
@@ -499,7 +471,7 @@ public class GAParametersForm extends ParametersForm
         txtPar18 = new JTextField();
         txtPar18.setToolTipText(toolTipPar18);
         txtPar18.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar18,txtPar18);
+        mapKeyFieldToValueField.put(keyPar18.toUpperCase(),txtPar18);
         linePar18.add(lblPar18);
         linePar18.add(txtPar18);
         localBlock2.add(linePar18);
@@ -511,7 +483,7 @@ public class GAParametersForm extends ParametersForm
         lblPar19.setToolTipText(toolTipPar19);
         cmbPar19 = new JComboBox<String>(new String[] {"ELITIST", "NONE"});
         cmbPar19.setToolTipText(toolTipPar19);
-        mapKeyFieldToValueField.put(keyPar19,cmbPar19);
+        mapKeyFieldToValueField.put(keyPar19.toUpperCase(),cmbPar19);
         linePar19.add(lblPar19);
         linePar19.add(cmbPar19);
         localBlock2.add(linePar19);
@@ -524,7 +496,7 @@ public class GAParametersForm extends ParametersForm
         txtPar24 = new JTextField();
         txtPar24.setToolTipText(toolTipPar24);
         txtPar24.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar24,txtPar24);
+        mapKeyFieldToValueField.put(keyPar24.toUpperCase(),txtPar24);
         linePar24.add(lblPar24);
         linePar24.add(txtPar24);
         localBlock2.add(linePar24);
@@ -536,7 +508,7 @@ public class GAParametersForm extends ParametersForm
         lblPar25.setToolTipText(toolTipPar25);
         cmbPar25 = new JComboBox<String>(new String[] {"Synchronous", "Asynchronous"});
         cmbPar25.setToolTipText(toolTipPar25);
-        mapKeyFieldToValueField.put(keyPar25,cmbPar25);
+        mapKeyFieldToValueField.put(keyPar25.toUpperCase(),cmbPar25);
         linePar25.add(lblPar25);
         linePar25.add(cmbPar25);
         localBlock2.add(linePar25);
@@ -551,7 +523,7 @@ public class GAParametersForm extends ParametersForm
         txtPar3 = new JTextField();
         txtPar3.setToolTipText(toolTipPar3);
         txtPar3.setPreferredSize(new Dimension(150,preferredHeight));
-        mapKeyFieldToValueField.put(keyPar3,txtPar3);
+        mapKeyFieldToValueField.put(keyPar3.toUpperCase(),txtPar3);
         linePar3.add(lblPar3);
         linePar3.add(txtPar3);
         advOptsBlock.add(linePar3);
@@ -564,7 +536,7 @@ public class GAParametersForm extends ParametersForm
         txtPar1 = new JTextField();
         txtPar1.setToolTipText(toolTipPar1);
         txtPar1.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar1,txtPar1);
+        mapKeyFieldToValueField.put(keyPar1.toUpperCase(),txtPar1);
         linePar1.add(lblPar1);
         linePar1.add(txtPar1);
         advOptsBlock.add(linePar1);
@@ -576,7 +548,7 @@ public class GAParametersForm extends ParametersForm
         lblPar2.setToolTipText(toolTipPar2);
         cmbPar2 = new JComboBox<String>(new String[] {"0", "1", "2", "3"});
         cmbPar2.setToolTipText(toolTipPar2);
-        mapKeyFieldToValueField.put(keyPar2,cmbPar2);
+        mapKeyFieldToValueField.put(keyPar2.toUpperCase(),cmbPar2);
         linePar2.add(lblPar2);
         linePar2.add(cmbPar2);
         advOptsBlock.add(linePar2);
@@ -585,7 +557,7 @@ public class GAParametersForm extends ParametersForm
         linePar4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar4 = new JRadioButton("Prepare 2D graphs for candidates");
         rdbPar4.setToolTipText(toolTipPar4);
-        mapKeyFieldToValueField.put(keyPar4,rdbPar4);
+        mapKeyFieldToValueField.put(keyPar4.toUpperCase(),rdbPar4);
         linePar4.add(rdbPar4);
         advOptsBlock.add(linePar4);
 
@@ -593,7 +565,7 @@ public class GAParametersForm extends ParametersForm
         linePar5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar5 = new JRadioButton("Sort by descending fitness");
         rdbPar5.setToolTipText(toolTipPar5);
-        mapKeyFieldToValueField.put(keyPar5,rdbPar5);
+        mapKeyFieldToValueField.put(keyPar5.toUpperCase(),rdbPar5);
         linePar5.add(rdbPar5);
         advOptsBlock.add(linePar5);
 
@@ -605,7 +577,7 @@ public class GAParametersForm extends ParametersForm
         txtPar10 = new JTextField();
         txtPar10.setToolTipText(toolTipPar10);
         txtPar10.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar10,txtPar10);
+        mapKeyFieldToValueField.put(keyPar10.toUpperCase(),txtPar10);
         linePar10.add(lblPar10);
         linePar10.add(txtPar10);
         advOptsBlock.add(linePar10);
@@ -618,7 +590,7 @@ public class GAParametersForm extends ParametersForm
         txtPar20 = new JTextField();
         txtPar20.setToolTipText(toolTipPar20);
         txtPar20.setPreferredSize(fileFieldSize);
-        mapKeyFieldToValueField.put(keyPar20,txtPar20);
+        mapKeyFieldToValueField.put(keyPar20.toUpperCase(),txtPar20);
         btnPar20 = new JButton("Browse");
         btnPar20.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -638,7 +610,7 @@ public class GAParametersForm extends ParametersForm
         txtPar21 = new JTextField();
         txtPar21.setToolTipText(toolTipPar21);
         txtPar21.setPreferredSize(fileFieldSize);
-        mapKeyFieldToValueField.put(keyPar21,txtPar21);
+        mapKeyFieldToValueField.put(keyPar21.toUpperCase(),txtPar21);
         btnPar21 = new JButton("Browse");
         btnPar21.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -658,7 +630,7 @@ public class GAParametersForm extends ParametersForm
         txtPar22 = new JTextField();
         txtPar22.setToolTipText(toolTipPar22);
         txtPar22.setPreferredSize(fileFieldSize);
-        mapKeyFieldToValueField.put(keyPar22,txtPar22);
+        mapKeyFieldToValueField.put(keyPar22.toUpperCase(),txtPar22);
         btnPar22 = new JButton("Browse");
         btnPar22.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -753,9 +725,9 @@ public class GAParametersForm extends ParametersForm
   	{
   		Object valueField;
   		String valueFieldClass;
-  		if (mapKeyFieldToValueField.containsKey(key))
+  		if (mapKeyFieldToValueField.containsKey(key.toUpperCase()))
   		{
-  		    valueField = mapKeyFieldToValueField.get(key);
+  		    valueField = mapKeyFieldToValueField.get(key.toUpperCase());
   		    valueFieldClass = valueField.getClass().toString();
   		}
   		else
