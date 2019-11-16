@@ -1,6 +1,6 @@
 package gui;
 
-import javax.swing.JPanel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -17,12 +17,17 @@ public class GUIPrepareFSERun extends GUIPrepare
 	 * Version UID
 	 */
 	private static final long serialVersionUID = 2579606720045728971L;
+	
+	/**
+	 * Unique identified for instances of this form
+	 */
+	public static AtomicInteger prepFSETabUID = new AtomicInteger(1);
 
 	/**
 	 * Constructor
 	 */
 	public GUIPrepareFSERun(GUIMainPanel mainPanel) {
-		super(mainPanel, "Prepare FSE experiment");
+		super(mainPanel, "Prepare FSE experiment #" + prepFSETabUID.getAndIncrement());
 		initialize();
 	}
 

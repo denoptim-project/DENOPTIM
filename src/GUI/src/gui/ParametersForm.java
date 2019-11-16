@@ -4,19 +4,13 @@ import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.TreeMap;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 
 import denoptim.io.DenoptimIO;
-import denoptim.utils.GenUtils;
 
 
 /**
@@ -57,12 +51,6 @@ public class ParametersForm extends JPanel implements IParametersForm
      * The newline character 
      */
     private final String NL = System.getProperty("line.separator");
-
-    /**
-     * Map connecting the parameter keyword and the field
-     * containing the parameter value. 
-     */
-	private Map<String,Object> mapKeyFieldToValueField;
     
 //-----------------------------------------------------------------------------
     

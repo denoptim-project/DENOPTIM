@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -33,6 +34,11 @@ public class GAParametersForm extends ParametersForm
 	 * Version
 	 */
 	private static final long serialVersionUID = 5067352357196631445L;
+	
+	/**
+	 * Unique identified for instances of this form
+	 */
+	public static AtomicInteger gaFormUID = new AtomicInteger(1);
 	
     /**
      * Map connecting the parameter keyword and the field

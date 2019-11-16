@@ -1,6 +1,6 @@
 package gui;
 
-import javax.swing.JPanel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -17,12 +17,17 @@ public class GUIPrepareGARun extends GUIPrepare
 	 * Version UID
 	 */
 	private static final long serialVersionUID = -2208699600683389219L;
+	
+	/**
+	 * Unique identified for instances of this form
+	 */
+	public static AtomicInteger prepGATabUID = new AtomicInteger(1);
 
 	/**
 	 * Constructor
 	 */
 	public GUIPrepareGARun(GUIMainPanel mainPanel) {
-		super(mainPanel, "Prepare GA experiment");
+		super(mainPanel, "Prepare GA experiment #" + prepGATabUID.getAndIncrement());
 		initialize();
 	}
 

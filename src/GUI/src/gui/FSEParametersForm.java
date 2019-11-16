@@ -127,8 +127,10 @@ public class FSEParametersForm extends ParametersForm
     
     public FSEParametersForm(Dimension d)
     {
+    	//Initialize this instance
     	mapKeyFieldToValueField = new HashMap<String,Object>();
     	
+    	//Build form
         this.setLayout(new BorderLayout()); //Needed to allow dynamic resizing!
 
         block = new JPanel();
