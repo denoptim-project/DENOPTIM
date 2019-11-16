@@ -7,6 +7,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import java.awt.CardLayout;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -19,6 +20,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Main tool bar of the DENOPTIM graphical user interface.
@@ -38,31 +41,33 @@ public class MainToolBar extends JMenuBar {
 	 */
 	private JMenu menuDenoptim;
 
-	/*
-	 NOT WORKING 
-	
-	 * The menu listing the active panels in the deck
-	 
-	private JMenu panelsMenu;
-*/
+	/**
+	 * The menu listing the active panels in the deck of cards
+	 */	 
+	private JMenu activeTabsMenu;
 	
 	/**
-	 * The main panel (cards deck)
+	 * List of the active panels in the deck of cards
+	 */	 
+	private Map<GUICardPanel,JMenuItem> activeTabsAndRefs;
+	
+	/**
+	 * Reference to the main panel (cards deck)
 	 */
 	protected JPanel mainPanel;
 
 	/**
-	 * Create the application.
+	 * Constructor that build the tool bar.
 	 */
 	public MainToolBar() 
 	{
-		//TODO rel mainpanel
-		this.mainPanel = mainPanel;
+		activeTabsAndRefs = new HashMap<GUICardPanel,JMenuItem>();
 		initialize();
 	}
 	
 	/**
-	 * Sets the main panel for creating functionality of menu items depending on main panel identity
+	 * Sets the main panel for creating functionality of menu items depending
+	 * on main panel identity
 	 */
 	public void setRefToMainPanel(JPanel mainPanel)
 	{
@@ -70,7 +75,7 @@ public class MainToolBar extends JMenuBar {
 	}
 
 	/**
-	 * Initialize the contents of the frame.
+	 * Initialize the contents of the tool bar
 	 */
 	private void initialize() {
 		menuDenoptim = new JMenu("DENOPTIM");
@@ -81,8 +86,8 @@ public class MainToolBar extends JMenuBar {
 		open.addActionListener(new ActionListener() {
 			@SuppressWarnings("static-access")
 			public void actionPerformed(ActionEvent e) {
-				DenoptimGUIFileOpener openFileGui = new DenoptimGUIFileOpener();
-				openFileGui.pickFile();
+				DenoptimGUIFileOpener opener = new DenoptimGUIFileOpener();
+				opener.pickFile();
 			}
 		});
 		menuDenoptim.add(open);
@@ -102,7 +107,8 @@ public class MainToolBar extends JMenuBar {
 		        JPanel abtPanel = new JPanel();
 		        abtPanel.setLayout(new GridLayout(3, 1, 3, 0));
 		        JPanel row1 = new JPanel();
-		        JLabel t1 = new JLabel("DENPTIM is open source software (Affero GPL-3.0).");
+		        JLabel t1 = new JLabel("DENPTIM is open source software "
+		        		+" (Affero GPL-3.0).");
 		        row1.add(t1);
 		        abtPanel.add(row1);
 		        
@@ -115,7 +121,8 @@ public class MainToolBar extends JMenuBar {
 				    @Override
 				    public void mouseClicked(MouseEvent e) {
 				    	try {
-		                    Desktop.getDesktop().browse(new URI("http://github.com/denoptim-project"));
+		                    Desktop.getDesktop().browse(new URI(
+		                    		"http://github.com/denoptim-project"));
 		                } catch (IOException | URISyntaxException e1) {
 		                    e1.printStackTrace();
 		                }
@@ -127,14 +134,17 @@ public class MainToolBar extends JMenuBar {
 				
 				JPanel row3 = new JPanel();
 		        JLabel t3 = new JLabel("Cite ");
-				JLabel h3 = new JLabel("http://doi.org/10.1021/acs.jcim.9b00516");
+				JLabel h3 = new JLabel("http://doi.org/10.1021/"
+						+ "acs.jcim.9b00516");
 				h3.setForeground(Color.BLUE.darker());
 				h3.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				h3.addMouseListener(new MouseAdapter() {
 				    @Override
 				    public void mouseClicked(MouseEvent e) {
 				    	try {
-		                    Desktop.getDesktop().browse(new URI("https://doi.org/10.1021/acs.jcim.9b00516"));
+				    		String url = "https://doi.org/10.1021/"
+				    				+" acs.jcim.9b00516";
+		                    Desktop.getDesktop().browse(new URI(url));
 		                } catch (IOException | URISyntaxException e1) {
 		                    e1.printStackTrace();
 		                }
@@ -159,22 +169,22 @@ public class MainToolBar extends JMenuBar {
 		});
 		menuDenoptim.add(exit);
 		
-		/*
-		 NOT WORKING: consider removing of fixing it
-		panelsMenu = new JMenu("Active Panels");
-		panelsMenu.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		super.add(panelsMenu);
-		*/
+		activeTabsMenu = new JMenu("Active Tabs");
+		activeTabsMenu.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		this.add(activeTabsMenu);
 		
 		JMenu menuHelp = new JMenu("Help");
 		menuHelp.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		super.add(menuHelp);
+		this.add(menuHelp);
 		
 		JMenuItem usrManual = new JMenuItem("DENOPTIM user manual");
 		usrManual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		    	try {
-                    Desktop.getDesktop().browse(new URI("http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html"));
+		    		String url = "http://htmlpreview.github.com/?https://"
+		    				+ "github.com/denoptim-project/DENOPTIM/blob/"
+		    				+ "master/doc/user_manual.html";
+                    Desktop.getDesktop().browse(new URI(url));
                 } catch (IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                     //TODO: use local version of user manual
@@ -184,27 +194,54 @@ public class MainToolBar extends JMenuBar {
 		menuHelp.add(usrManual);
 	}
 	
+//-----------------------------------------------------------------------------
+	
 	/**
-	 * Returns the main menu of the toolbar
-	 * @return the <b>DENOPTIM</b> menu of the toolbar
+	 * Returns the main menu of the tool bar
+	 * @return the <b>DENOPTIM</b> menu of the tool bar
 	 */
 	public JMenu getMainMenu()
 	{
 		return menuDenoptim;
 	}
 
-	/*
-	 * Add an entry to the list of active panels
-	 
-	 NOT WORKING!
-	 
-	public void addRefTo(JPanel panel)
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Add the reference to an active panel/tab in the menu listing active 
+	 * panel/tabs.
+	 * The panel is assumed to be included in the deck of cards (i.e., this 
+	 * method does not check if this assumption holds!).
+	 * @param panel the panel to reference
+	 */
+	public void addActiveTab(GUICardPanel panel)
 	{
-		JMenuItem ref = new JMenuItem(panel.getName());
-		ref.addActionListener((java.awt.event.ActionEvent evt) -> {
-            ((CardLayout) mainPanel.getLayout()).show(mainPanel,panel.getName());
+		JMenuItem refToPanel = new JMenuItem(panel.getName());
+		refToPanel.addActionListener((java.awt.event.ActionEvent evt) -> {
+            ((CardLayout) mainPanel.getLayout()).show(
+            		mainPanel,panel.getName());
         });
-		panelsMenu.add(ref);
+		activeTabsAndRefs.put(panel, refToPanel);
+		activeTabsMenu.add(refToPanel);
 	}
-	*/
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Remove the reference to an panel/tab in the menu listing active tabs.
+	 * If the panel is not listed among the active ones, this does nothing.
+	 * @param panel the panel referenced by the reference to remove from the 
+	 * list
+	 */
+	public void removeActiveTab(GUICardPanel panel)
+	{
+		if (activeTabsAndRefs.containsKey(panel))
+		{
+			JMenuItem refToDel = activeTabsAndRefs.get(panel);
+			activeTabsMenu.remove(refToDel);
+			activeTabsAndRefs.remove(panel);
+		}
+	}
+
+//-----------------------------------------------------------------------------
 }

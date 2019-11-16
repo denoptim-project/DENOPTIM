@@ -16,12 +16,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 /**
- * Form containing all the input parameters for DenoptimGA.
+ * Class representing the general structure of a form specifying a specific
+ * set of parameters.
  * 
  * @author Marco Foscato
  */
 
-public class GUIPrepare extends GUIWorkPanel
+public class GUIPrepare extends GUICardPanel
 {
 	
 	/**
@@ -42,7 +43,7 @@ public class GUIPrepare extends GUIWorkPanel
 	/**
 	 * Constructor
 	 */
-	public GUIPrepare(JPanel mainPanel, String newPanelName)
+	public GUIPrepare(GUIMainPanel mainPanel, String newPanelName)
 	{
 		super(mainPanel, newPanelName);
 		super.setLayout(new BorderLayout());
@@ -63,8 +64,10 @@ public class GUIPrepare extends GUIWorkPanel
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		JButton btnLoadParams = new JButton("Load Parameters",UIManager.getIcon("FileView.directoryIcon"));
-		btnLoadParams.setToolTipText("<html>Reads a DENOPTIM parameter file, <br> and imports parameters into the form.</html>");
+		JButton btnLoadParams = new JButton("Load Parameters",
+				UIManager.getIcon("FileView.directoryIcon"));
+		btnLoadParams.setToolTipText("<html>Reads a DENOPTIM parameter file,"
+				+ "<br>and imports parameters into the form.</html>");
 		btnLoadParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = DenoptimGUIFileOpener.pickFile();
@@ -76,15 +79,19 @@ public class GUIPrepare extends GUIWorkPanel
 				{
 				    try
 				    {
-						p.importParametersFromDenoptimParamsFile(inFile.getAbsolutePath());
+						p.importParametersFromDenoptimParamsFile(
+								inFile.getAbsolutePath());
 					}
 				    catch (Exception e1)
 				    {
-		        		if (e1.getMessage().equals("") || e1.getMessage() == null)
+		        		if (e1.getMessage().equals("") 
+		        				|| e1.getMessage() == null)
 		        		{
 		        			e1.printStackTrace();
 							JOptionPane.showMessageDialog(null,
-									"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
+									"<html>Exception occurred while importing"
+									+ "parameters.<br>Please, report this to "
+									+ "the DENOPTIM team.</html>",
 					                "Error",
 					                JOptionPane.ERROR_MESSAGE,
 					                UIManager.getIcon("OptionPane.errorIcon"));
@@ -104,9 +111,10 @@ public class GUIPrepare extends GUIWorkPanel
 		});
 		commandsPane.add(btnLoadParams);
 		
-		
-		JButton btnSaveParams = new JButton("Save Parameters",UIManager.getIcon("FileView.hardDriveIcon"));
-		btnSaveParams.setToolTipText("<html>Write all parameters to file.<br>This will produce a DENOPTIM parameter file.</html>");
+		JButton btnSaveParams = new JButton("Save Parameters",
+				UIManager.getIcon("FileView.hardDriveIcon"));
+		btnSaveParams.setToolTipText("<html>Write all parameters to file."
+				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StringBuilder sb = new StringBuilder();
@@ -151,7 +159,8 @@ public class GUIPrepare extends GUIWorkPanel
 		
 		/*
 		//TODO		
-	    JButton btnValidate = new JButton("Validate Parameters",UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
+	    JButton btnValidate = new JButton("Validate Parameters",
+	    UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
 	    btnValidate.setToolTipText("Check the correctness of the parameters");
 		btnValidate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -163,7 +172,8 @@ public class GUIPrepare extends GUIWorkPanel
 		*/
 		
 		/*
-		JButton btnSubmit = new JButton("Submit...",UIManager.getIcon("Menu.arrowIcon"));
+		JButton btnSubmit = new JButton("Submit...",
+		UIManager.getIcon("Menu.arrowIcon"));
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO
@@ -172,18 +182,52 @@ public class GUIPrepare extends GUIWorkPanel
 		});
 		commandsPane.add(btnSubmit);
 		*/
+
+		JButton btnCanc = new JButton("Cancel");
+		btnCanc.setToolTipText("Abandon form without saving.");
+		btnCanc.addActionListener(new removeCardActionListener(this));
+		commandsPane.add(btnCanc);
 		
 		JButton btnHelp = new JButton("?");
 		btnHelp.setToolTipText("Help");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
-                    new JLabel("<html>Hover over the buttons and parameter fields to get a tip.</html>"),
+                    new JLabel("<html>Hover over the buttons and parameter"
+                    		+ "fields to get a tip.</html>"),
                     "Tips",
                     JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 		commandsPane.add(btnHelp);
 
+	}
+	
+	private class removeCardActionListener implements ActionListener
+	{
+		private GUICardPanel parentPanel;
+		
+		public removeCardActionListener(GUICardPanel panel)
+		{
+			this.parentPanel = panel;
+		}
+		
+		public void actionPerformed(ActionEvent e) 
+		{
+			Object[] options = {"Yes","No"};
+			int res = JOptionPane.showOptionDialog(null,
+                "<html>Abandon without saving?"
+                + "<br>Press NO to go back.</html>",
+                "Abandon?",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                UIManager.getIcon("OptionPane.warningIcon"),
+                options,
+                options[1]);
+			if (res == 0)
+			{
+				mainPanel.removeCard(parentPanel);
+			}
+		}
 	}
 }

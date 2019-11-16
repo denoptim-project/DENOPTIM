@@ -21,8 +21,8 @@ public class GUIPrepareFSERun extends GUIPrepare
 	/**
 	 * Constructor
 	 */
-	public GUIPrepareFSERun(JPanel mainPanel, String newPanelName) {
-		super(mainPanel, newPanelName);
+	public GUIPrepareFSERun(GUIMainPanel mainPanel) {
+		super(mainPanel, "Prepare FSE experiment");
 		initialize();
 	}
 

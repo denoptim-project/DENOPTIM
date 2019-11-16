@@ -1,14 +1,17 @@
 package gui;
 
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import java.awt.CardLayout;
 import java.awt.EventQueue;
 
 /**
- * Graphical User Interface for DENOPTIM package. 
+ * Graphical User Interface of the DENOPTIM package.
+ * This GUI aims to facilitate:
+ * <ul>
+ * <li>creation of the various types of DENOPTIM input files</li>
+ * <li>reuse and modification of DENOPTIM input files</li>
+ * </ul>
  * 
  * @author Marco Foscato
  */
@@ -18,8 +21,8 @@ public class GUI {
 	private JFrame frame;     //GUI window frame
 	private int mainFrameInitX = 100;
 	private int mainFrameInitY = 100;
-	private JPanel framePane; //Panel including toolbar
-	private JPanel mainPanel; //Panel including all but toolbar
+	private JPanel framePane; //Panel including tool bar
+	private GUIMainPanel mainPanel; //Panel including all but tool bar
 
 	/**
 	 * Default width
@@ -70,17 +73,9 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 		
 		//Main panel is a deck of cards that contains all but the tool bar
-		mainPanel = new GUIMainPanel(new CardLayout(), menuBar);
+		mainPanel = new GUIMainPanel(menuBar);
 		framePane.add(mainPanel);
 		menuBar.setRefToMainPanel(mainPanel);
-		mainPanel.add(new HomePanel(mainPanel));
-		
-		//Menu item that takes the home panel on the top of the deck
-	    JMenuItem homeItem = new JMenuItem("Home view");
-	    homeItem.addActionListener((java.awt.event.ActionEvent evt) -> {
-            ((CardLayout) mainPanel.getLayout()).first(mainPanel);
-        });
-		menuBar.getMainMenu().add(homeItem,0);
-		
+		mainPanel.add(new HomePanel(mainPanel));		
 	}
 }

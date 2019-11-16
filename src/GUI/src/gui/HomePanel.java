@@ -27,7 +27,7 @@ import javax.swing.text.StyleConstants;
  * The home panel contains shortcuts buttons to perform the most common tasks.
  */
 
-public class HomePanel extends GUIWorkPanel
+public class HomePanel extends GUICardPanel
 {
 
 	/**
@@ -38,8 +38,8 @@ public class HomePanel extends GUIWorkPanel
 	/**
 	 * Constructor
 	 */
-	public HomePanel(JPanel mainPanel) {
-		super(mainPanel, "Home view");
+	public HomePanel(GUIMainPanel mainPanel) {
+		super(mainPanel, "Home");
 		initialize();
 	}
 
@@ -70,7 +70,7 @@ public class HomePanel extends GUIWorkPanel
 		JButton btnNewGA = new JButton("New Evolutionary De Novo Design");
 		btnNewGA.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPanelToDeck(new GUIPrepareGARun(mainPanel,"GAParameters"));
+				mainPanel.add(new GUIPrepareGARun(mainPanel));
 			}
 		});
 		buttonsPanel.add(btnNewGA);
@@ -78,7 +78,7 @@ public class HomePanel extends GUIWorkPanel
 		JButton btnNewVirtualScreening = new JButton("New Virtual Screening");
 		btnNewVirtualScreening.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPanelToDeck(new GUIPrepareFSERun(mainPanel,"FSEParameters"));
+				mainPanel.add(new GUIPrepareFSERun(mainPanel));
 			}
 		});
 		buttonsPanel.add(btnNewVirtualScreening);

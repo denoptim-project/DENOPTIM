@@ -21,8 +21,8 @@ public class GUIPrepareGARun extends GUIPrepare
 	/**
 	 * Constructor
 	 */
-	public GUIPrepareGARun(JPanel mainPanel, String newPanelName) {
-		super(mainPanel, newPanelName);
+	public GUIPrepareGARun(GUIMainPanel mainPanel) {
+		super(mainPanel, "Prepare GA experiment");
 		initialize();
 	}
 
