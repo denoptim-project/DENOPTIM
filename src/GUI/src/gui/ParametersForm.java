@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
@@ -78,6 +79,27 @@ public class ParametersForm extends JPanel implements IParametersForm
     	if (!field.getText().equals(""))
     	{
     		sb.append(key).append("=").append(field.getText()).append(NL);
+    	}
+    	return sb.toString();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Produced the KEY:VALUE string for a general spinner. 
+     * The text can include numbers, characters, or both.
+     * @param key the keyword
+     * @param field the txt field
+     * @return the KEY:VALUE string including newline character at the end.
+     */
+    
+    protected String getStringForKVLine(String key, JSpinner spinner)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	String value = spinner.getValue().toString();
+    	if (!value.equals(""))
+    	{
+    		sb.append(key).append("=").append(value).append(NL);
     	}
     	return sb.toString();
     }

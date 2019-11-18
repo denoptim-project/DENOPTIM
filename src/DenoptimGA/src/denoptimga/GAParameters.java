@@ -124,7 +124,7 @@ public class GAParameters
     protected static int maxTriesPerPop = 25;
 
     /**
-     * Replacemt strategy: 1) replace worst individuals with new ones that are
+     * Replacement strategy: 1) replace worst individuals with new ones that are
      * better than the worst, 2) no replacement (the population keeps growing)
      */
     protected static int replacementStrategy = 1;
@@ -613,23 +613,7 @@ public class GAParameters
                 if (line.toUpperCase().startsWith("GA-GROWTHPROBSCHEME="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    switch (option.toUpperCase())
-                    {
-                        case "EXP_DIFF":
-                            growthProbabilityScheme = 0;
-                            break;
-                        case "TANH":
-                            growthProbabilityScheme = 1;
-                            break;
-                        case "SIGMA":
-                            growthProbabilityScheme = 2;
-                            break;
-                        case "UNRESTRICTED":
-                            growthProbabilityScheme = 3;
-                            break;
-                        default:
-                            throw new DENOPTIMException("Unknown growth probability scheme.");
-                    }
+                    growthProbabilityScheme = convertGrowthProbabilityScheme(option);
                 }
 
                 if (line.toUpperCase().startsWith("GA-NUMGENERATIONS="))
@@ -770,7 +754,34 @@ public class GAParameters
     
 //------------------------------------------------------------------------------
     
-    /**
+    public static int convertGrowthProbabilityScheme(String option) 
+    		throws DENOPTIMException 
+    {
+        int res = 0;
+    	switch (option.toUpperCase())
+        {
+            case "EXP_DIFF":
+                res = 0;
+                break;
+            case "TANH":
+                res = 1;
+                break;
+            case "SIGMA":
+                res = 2;
+                break;
+            case "UNRESTRICTED":
+                res = 3;
+                break;
+            default:
+                throw new DENOPTIMException(
+                		"Unknown growth probability scheme.");
+        }
+		return res;
+	}
+    
+//-----------------------------------------------------------------------------
+
+	/**
      * Create the directory that will store the output of the GA run
      * @throws DENOPTIMException 
      */

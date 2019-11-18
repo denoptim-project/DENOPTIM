@@ -374,8 +374,10 @@ public class FitnessParametersForm extends ParametersForm
  				break;
  				
  			default:
- 				System.err.println("Filed for value of "+key+" is "+valueFieldClass);
- 				throw new Exception("Unexpected type for parameter: " + key + " (" + valueFieldClass + ")");
+ 				throw new Exception("<html>Unexpected type for parameter: "  
+ 						+ key + " (" + valueFieldClass 
+ 						+ ").<br>Please report this to"
+ 						+ "the DEMOPTIM team.</html>");
  		}
 	}
   	

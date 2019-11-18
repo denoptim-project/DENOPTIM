@@ -6,7 +6,10 @@ import java.io.File;
  * File opener for DENOPTIM GUI
  */
 
+
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;
 
@@ -73,7 +76,11 @@ public class DenoptimGUIFileOpener {
 		}
 		else
 		{
-			//TODO: insist
+			JOptionPane.showMessageDialog(null,
+					"Could not save. Try again.",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
 			return null;
 		}
 		return file;

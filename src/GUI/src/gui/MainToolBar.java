@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import java.awt.CardLayout;
 import java.awt.Font;
@@ -186,8 +187,12 @@ public class MainToolBar extends JMenuBar {
 		    				+ "master/doc/user_manual.html";
                     Desktop.getDesktop().browse(new URI(url));
                 } catch (IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                    //TODO: use local version of user manual
+					JOptionPane.showMessageDialog(null,
+							"Could not launch the browser to open online "
+							+ "version of the manual.",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
                 }
 		    }
 		});

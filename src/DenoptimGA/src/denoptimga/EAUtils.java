@@ -73,7 +73,7 @@ import denoptim.utils.RotationalSpaceUtils;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-class EAUtils
+public class EAUtils
 {
     // cluster the fragments based on their #APs
     protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
@@ -1889,7 +1889,7 @@ MF: TO BE TESTED
      * @return probability of adding a new fragment at this level.
      */
     
-    protected static double getGrowthProbabilityAtLevel(int level, int scheme, 
+    public static double getGrowthProbabilityAtLevel(int level, int scheme, 
     		double lambda, double sigmaOne, double sigmaTwo)
     {
         double prob = 0.0;
@@ -1923,7 +1923,7 @@ MF: TO BE TESTED
      * @param level level of the graph at which fragment is to be added
      * @return probability of adding a new fragment at this level.
      */
-    protected static double getGrowthProbabilityAtLevel(int level)
+    public static double getGrowthProbabilityAtLevel(int level)
     {
         int scheme = GAParameters.getGrowthProbabilityScheme();
         double lambda =GAParameters.getGrowthMultiplier();

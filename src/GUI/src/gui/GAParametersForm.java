@@ -1,15 +1,22 @@
 package gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -18,10 +25,28 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.XYDataset;
+
+import denoptimga.EAUtils;
+import denoptimga.GAParameters;
+
+
 
 /**
  * Form collecting input parameters for a genetic algorithm experiment
@@ -51,7 +76,16 @@ public class GAParametersForm extends ParametersForm
     JPanel localBlock2;
     JPanel localBlock3;
     JPanel localBlock4;
+    JPanel localBlockGraph;
     JPanel advOptsBlock;
+    
+    DefaultXYDataset subsProbData;
+    JFreeChart graphSubProbJFChart;
+	JPanel graphSubProbJFChartChartPanel;
+    JPanel graphSubProbJFChartCtrlPanel;
+    JPanel graphSpinnerPane;
+    Double minLevelProbPlot = 0.0;
+    Double maxLevelProbPlot = 4.0;
 	
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
@@ -118,17 +152,17 @@ public class GAParametersForm extends ParametersForm
     String keyPar12 = "GA-GrowthMultiplier";
     JPanel linePar12;
     JLabel lblPar12;
-    JTextField txtPar12;
+    JSpinner spnPar12;
 
     String keyPar13 = "GA-GrowthSigmaSteepness";
     JPanel linePar13;
     JLabel lblPar13;
-    JTextField txtPar13;
+    JSpinner spnPar13;
 
     String keyPar14 = "GA-GrowthSigmaMiddle";
     JPanel linePar14;
     JLabel lblPar14;
-    JTextField txtPar14;
+    JSpinner spnPar14;
 
     String keyPar15 = "GA-XOverSelectionMode";
     JPanel linePar15;
@@ -213,6 +247,9 @@ public class GAParametersForm extends ParametersForm
         localBlock4 = new JPanel();
         localBlock4.setVisible(false);
         localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
+        
+        localBlockGraph = new JPanel();
+        localBlockGraph.setVisible(true);
         
         advOptsBlock = new JPanel();
         advOptsBlock.setVisible(false);
@@ -345,46 +382,54 @@ public class GAParametersForm extends ParametersForm
         linePar9.add(txtPar9);
         localBlock2.add(linePar9);
         
-        String toolTipPar12 = "<html>Specifies the value of the factor used in growth probability schemes <code>EXP_DIFF TANH</code></html>";
+        String toolTipPar12 = "<html>Specifies the value of the factor used in"
+        		+ " growth probability schemes <code>EXP_DIFF</code> and "
+        		+ "<code>TANH</code></html>";
         linePar12 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar12 = new JLabel("<html>Graph extension - parameter <code>&lambda;</code><html>", SwingConstants.LEFT);
+        lblPar12 = new JLabel("<html>Graph extension - parameter "
+        		+ "<code>&lambda;</code><html>", SwingConstants.LEFT);
         lblPar12.setPreferredSize(fileLabelSize);
         lblPar12.setToolTipText(toolTipPar12);
-        txtPar12 = new JTextField("1.0");
-        txtPar12.setToolTipText(toolTipPar12);
-        txtPar12.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar12.toUpperCase(),txtPar12);
+        spnPar12 = new JSpinner(new SpinnerNumberModel(1.0, 0.0, null, 0.1));
+        spnPar12.setToolTipText(toolTipPar12);
+        spnPar12.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar12.toUpperCase(),spnPar12);
         linePar12.add(lblPar12);
-        linePar12.add(txtPar12);
+        linePar12.add(spnPar12);
         localBlock3.add(linePar12);
         
-        String toolTipPar13 = "<html>Specifies the value of parameter &sigma;<sub>1</sub> used in growth probability scheme <code>SIGMA</code></html>";
+        String toolTipPar13 = "<html>Specifies the value of parameter "
+        		+ "&sigma;<sub>1</sub> used for growth probability scheme"
+        		+ " <code>SIGMA</code>.<br>It corresponds to the steepness of"
+        		+ " the function where <i>P(level) = 50%</i></html>";
         linePar13 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar13 = new JLabel("<html>Graph extension - parameter <code>&sigma;</code><sub>1</sub>:</html>", SwingConstants.LEFT);
+        lblPar13 = new JLabel("<html>Graph extension - parameter "
+        		+ "<code>&sigma;</code><sub>1</sub>:</html>", SwingConstants.LEFT);
         lblPar13.setPreferredSize(fileLabelSize);
         lblPar13.setToolTipText(toolTipPar13);
-        txtPar13 = new JTextField();
-        txtPar13.setToolTipText(toolTipPar13);
-        txtPar13.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar13.toUpperCase(),txtPar13);
+        spnPar13 = new JSpinner(new SpinnerNumberModel(1.0, null, null, 0.1));
+        spnPar13.setToolTipText(toolTipPar13);
+        spnPar13.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar13.toUpperCase(),spnPar13);
         linePar13.add(lblPar13);
-        linePar13.add(txtPar13);
+        linePar13.add(spnPar13);
         localBlock4.add(linePar13);
         
-        String toolTipPar14 = "<html>Specifies the value of parameter &sigma;<sub>2</sub> used in growth probability scheme <code>SIGMA</code></html>";
+        String toolTipPar14 = "<html>Specifies the value of parameter "
+        		+ "&sigma;<sub>2</sub> used in growth probability scheme "
+        		+ "<code>SIGMA</code>.<br>It corresponds to the level "
+        		+ "where <i>P(level) = 50%</i></html>";
         linePar14 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar14 = new JLabel("<html>Graph extension - parameter <code>&sigma;</code><sub>2</sub>:<html>", SwingConstants.LEFT);
         lblPar14.setPreferredSize(fileLabelSize);
         lblPar14.setToolTipText(toolTipPar14);
-        txtPar14 = new JTextField();
-        txtPar14.setToolTipText(toolTipPar14);
-        txtPar14.setPreferredSize(strFieldSize);
-        mapKeyFieldToValueField.put(keyPar14.toUpperCase(),txtPar14);
+        spnPar14 = new JSpinner(new SpinnerNumberModel(3.5, null, null, 0.1));
+        spnPar14.setToolTipText(toolTipPar14);
+        spnPar14.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyPar14.toUpperCase(),spnPar14);
         linePar14.add(lblPar14);
-        linePar14.add(txtPar14);
+        linePar14.add(spnPar14);
         localBlock4.add(linePar14);
-
-        //TODO: add graph for visualizing the function
         
         String toolTipPar11 = "Specifies the growth probability scheme";
         linePar11 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -392,30 +437,100 @@ public class GAParametersForm extends ParametersForm
         lblPar11.setPreferredSize(fileLabelSize);
         lblPar11.setToolTipText(toolTipPar11);
         cmbPar11 = new JComboBox<String>(new String[] {"EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
+        cmbPar11.setSelectedIndex(0);
         cmbPar11.setToolTipText(toolTipPar11);
         mapKeyFieldToValueField.put(keyPar11.toUpperCase(),cmbPar11);
+        
+        // NB: we need to create the graph before setting the action listeners
+        //     that will eventually edit the data plotted.
+        createSubsProbGraph();
+        
+        graphSubProbJFChartCtrlPanel = new JPanel(new BorderLayout());
+        graphSubProbJFChartCtrlPanel.setMaximumSize(new Dimension(100,100));
+        graphSpinnerPane = new JPanel(new GridLayout(0,2));
+        final JSpinner spnMaxLev = new JSpinner(new SpinnerNumberModel(
+        		maxLevelProbPlot.intValue(), 1, null, 1));
+        spnMaxLev.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent event)
+            {
+                int maxLev = ((Integer) spnMaxLev.getValue()).intValue();                
+                ((XYPlot) graphSubProbJFChart.getPlot())
+                	.getDomainAxis().setRange(minLevelProbPlot, maxLev);
+            }
+        }); 
+        graphSpinnerPane.add(new JLabel("Max. level: "));
+        graphSpinnerPane.add(spnMaxLev);
+        graphSubProbJFChartCtrlPanel.add(graphSpinnerPane, BorderLayout.NORTH);
+        
+        GroupLayout grpLyoSubPrb = new GroupLayout(localBlockGraph);
+        localBlockGraph.setLayout(grpLyoSubPrb);
+        grpLyoSubPrb.setAutoCreateGaps(true);
+        grpLyoSubPrb.setAutoCreateContainerGaps(true);
+		grpLyoSubPrb.setHorizontalGroup(grpLyoSubPrb.createSequentialGroup()
+			.addComponent(graphSubProbJFChartChartPanel)
+			.addComponent(graphSubProbJFChartCtrlPanel));
+		grpLyoSubPrb.setVerticalGroup(grpLyoSubPrb.createParallelGroup(
+				GroupLayout.Alignment.CENTER)
+			.addComponent(graphSubProbJFChartChartPanel)
+			.addComponent(graphSubProbJFChartCtrlPanel));
+		
+		// NB: The listeners must be defined here because we first have to 
+		//     built all the pieces (plot + parameters) and then define how
+		//     things change upon change of the parameters/controllers.
+
+		spnPar12.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+            	updateSubsProbDataset();
+            }
+        });
+		spnPar13.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+            	updateSubsProbDataset();
+            }
+        });
+		spnPar14.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+            	updateSubsProbDataset();
+            }
+        });
+		
         cmbPar11.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
         		switch (cmbPar11.getSelectedItem().toString())
         		{
         			case "EXP_DIFF":
+        				updateSubsProbDataset();
         				localBlock3.setVisible(true);
-            			localBlock4.setVisible(false);   
+        				localBlock4.setVisible(false);
+        				localBlockGraph.setVisible(true);
             			break;
             			
         			case "TANH":
+        				updateSubsProbDataset();
         				localBlock3.setVisible(true);
-            			localBlock4.setVisible(false);   
+            			localBlock4.setVisible(false);  
+            			localBlockGraph.setVisible(true);
             			break;
             			
         			case "SIGMA":
+        				updateSubsProbDataset();
         				localBlock3.setVisible(false);
-            			localBlock4.setVisible(true);   
+            			localBlock4.setVisible(true);
+            			localBlockGraph.setVisible(true);
             			break;
             			
         			default:
         				localBlock3.setVisible(false);
-            			localBlock4.setVisible(false);   
+            			localBlock4.setVisible(false); 
+            			localBlockGraph.setVisible(false);
             			break;
         		}
 	        }
@@ -425,6 +540,7 @@ public class GAParametersForm extends ParametersForm
         localBlock2.add(linePar11);
         localBlock2.add(localBlock3);
         localBlock2.add(localBlock4);
+        localBlock2.add(localBlockGraph);
 
         String toolTipPar15 = "<html>Specifies the strategy for selecting crossover partners.<ul>" 
         		+ "<li><code>RANDOM</code>: unbiased selection.</li>" 
@@ -680,8 +796,106 @@ public class GAParametersForm extends ParametersForm
     }
     
 //-----------------------------------------------------------------------------
-    
-    /**
+
+	private void updateSubsProbDataset() 
+	{
+		createSubsProbDataset();
+		((XYPlot) graphSubProbJFChart.getPlot()).setDataset(subsProbData);	
+	}
+		
+//-----------------------------------------------------------------------------
+
+	private void createSubsProbDataset() 
+	{	
+        subsProbData = new DefaultXYDataset();
+        
+        ArrayList<Double> y = new ArrayList<Double>();
+		try
+		{
+			int scheme = GAParameters.convertGrowthProbabilityScheme(
+					cmbPar11.getSelectedItem().toString());
+			double l = (Double) spnPar12.getValue();
+			double s1 = (Double) spnPar13.getValue();
+			double s2 = (Double) spnPar14.getValue();
+			
+			for (int level=0; level<100; level++)
+			{
+				double prob = EAUtils.getGrowthProbabilityAtLevel(level, scheme, l, s1, s2);
+				y.add(prob);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+					"<html>Exception occurred while reading growth proability "
+					+ "scheme.<br>"
+					+ "Please, report this to the DENOPTIM team.</html>",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+		}
+
+        double[][] data = new double[2][y.size()];
+        for (int level=0; level<100; level++)
+        {
+        	data[0][level] = new Double(level);
+        	data[1][level] = y.get(level);
+        }
+        
+        subsProbData.addSeries("Growth Probability", data);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	private void createSubsProbGraph() {
+		createSubsProbDataset();
+    	createSubsProbChart();
+    	graphSubProbJFChartChartPanel = new ChartPanel(graphSubProbJFChart);
+    	graphSubProbJFChartChartPanel.setMaximumSize(new Dimension(400,200));
+	}
+	
+//-----------------------------------------------------------------------------
+	
+    private void createSubsProbChart()
+    {
+        graphSubProbJFChart = ChartFactory.createXYLineChart(
+            null,                         // plot title
+            "Level",                      // x axis label
+            "Probability",                // y axis label
+            subsProbData,                 // data
+            PlotOrientation.VERTICAL,  
+            false,                        // include legend
+            false,                        // tooltips
+            false                         // urls
+        );
+
+        XYPlot plot = (XYPlot) graphSubProbJFChart.getPlot();
+        
+        // axis ranges
+        plot.getDomainAxis().setRange(minLevelProbPlot, maxLevelProbPlot);
+        plot.getRangeAxis().setRange(0.0, 1.0);
+        
+        // axis ticks interval 
+        //NB: this if commented out because it blocks automated selection of tick units
+        // and therefore it allows ticks overlap when range is large
+        //((NumberAxis) plot.getDomainAxis()).setTickUnit(new NumberTickUnit(1.0));
+
+        // series line thickness
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0, Color.RED);
+        renderer.setSeriesStroke(0, new BasicStroke(2.0f));
+        plot.setRenderer(renderer);
+        
+        // font of axis label
+        Font font3 = new Font("Dialog", Font.PLAIN, 12); 
+        plot.getDomainAxis().setLabelFont(font3);
+        plot.getRangeAxis().setLabelFont(font3);
+    }
+	
+//-----------------------------------------------------------------------------
+
+	/**
      * Imports parameters from a properly formatted parameters file.
      * The file is a text file with lines containing KEY=VALUE pairs.
      * The visibility of the blocks of content is set accordingly to the 
@@ -767,9 +981,18 @@ public class GAParametersForm extends ParametersForm
  				((DefaultTableModel) valueField).addRow(value.split(" "));
  				break;
  				
+ 			case "class javax.swing.JSpinner":
+
+ 				//WARNING: assuming all JSpinners work on doubles
+ 				
+ 				((JSpinner) valueField).setValue(Double.parseDouble(value));
+ 				break;
+ 				
  			default:
- 				System.err.println("Filed for value of "+key+" is "+valueFieldClass);
- 				throw new Exception("Unexpected type for parameter: " + key + " (" + valueFieldClass + ")");
+ 				throw new Exception("<html>Unexpected type for parameter: "  
+ 						+ key + " (" + valueFieldClass 
+ 						+ ").<br>Please report this to"
+ 						+ "the DEMOPTIM team.</html>");
  		}
  		
 	}
@@ -790,29 +1013,29 @@ public class GAParametersForm extends ParametersForm
         	importParametersFromDenoptimParamsFile(txtGASource.getText());
         }
         
-        sb.append(getStringIfNotEmpty(keyPar3,txtPar3));;
-        sb.append(getStringIfNotEmpty(keyPar1,txtPar1));;
+        sb.append(getStringIfNotEmpty(keyPar3,txtPar3));
+        sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem()).append(NL);
         sb.append(getStringIfSelected(keyPar4,rdbPar4));
         sb.append(getStringIfSelected(keyPar5,rdbPar5));
-        sb.append(getStringIfNotEmpty(keyPar6,txtPar6));;
-        sb.append(getStringIfNotEmpty(keyPar7,txtPar7));;
-        sb.append(getStringIfNotEmpty(keyPar8,txtPar8));;
-        sb.append(getStringIfNotEmpty(keyPar9,txtPar9));;
-        sb.append(getStringIfNotEmpty(keyPar10,txtPar10));;
+        sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
+        sb.append(getStringIfNotEmpty(keyPar7,txtPar7));
+        sb.append(getStringIfNotEmpty(keyPar8,txtPar8));
+        sb.append(getStringIfNotEmpty(keyPar9,txtPar9));
+        sb.append(getStringIfNotEmpty(keyPar10,txtPar10));
         sb.append(keyPar11).append("=").append(cmbPar11.getSelectedItem()).append(NL);
-        sb.append(getStringIfNotEmpty(keyPar12,txtPar12));;
-        sb.append(getStringIfNotEmpty(keyPar13,txtPar13));;
-        sb.append(getStringIfNotEmpty(keyPar14,txtPar14));;
+        sb.append(getStringForKVLine(keyPar12,spnPar12));
+        sb.append(getStringForKVLine(keyPar13,spnPar13));
+        sb.append(getStringForKVLine(keyPar14,spnPar14));
         sb.append(keyPar15).append("=").append(cmbPar15.getSelectedItem()).append(NL);
-        sb.append(getStringIfNotEmpty(keyPar16,txtPar16));;
-        sb.append(getStringIfNotEmpty(keyPar17,txtPar17));;
-        sb.append(getStringIfNotEmpty(keyPar18,txtPar18));;
+        sb.append(getStringIfNotEmpty(keyPar16,txtPar16));
+        sb.append(getStringIfNotEmpty(keyPar17,txtPar17));
+        sb.append(getStringIfNotEmpty(keyPar18,txtPar18));
         sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem()).append(NL);
         sb.append(getStringIfNotEmpty(keyPar20,txtPar20));
         sb.append(getStringIfNotEmpty(keyPar21,txtPar21));
         sb.append(getStringIfNotEmpty(keyPar22,txtPar22));
-        sb.append(getStringIfNotEmpty(keyPar24,txtPar24));;
+        sb.append(getStringIfNotEmpty(keyPar24,txtPar24));
         sb.append(keyPar25).append("=").append(cmbPar25.getSelectedItem()).append(NL);
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
