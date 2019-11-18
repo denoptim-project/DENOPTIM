@@ -225,7 +225,7 @@ public class DENOPTIMGraphOperations
         // Need to remember symmetry because we are deleting the symm. vertices
         boolean symmetry = molGraph.hasSymmetryInvolvingVertex(vid);
 
-        // delete the vertex and its children and all its simmetryc partners
+        // delete the vertex and its children and all its symmetric partners
         deleteFragment(molGraph, curVertex);
 
         // extend the graph at this vertex but without recursion
@@ -341,7 +341,7 @@ public class DENOPTIMGraphOperations
             }
 
             // Do we want to extend the graph at this AP?
-            double growthProb = EAUtils.getLevelProbability(lvl+1);
+            double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl);
             boolean fgrow =  RandomUtils.nextBoolean(growthProb);
             if (debug)
             {

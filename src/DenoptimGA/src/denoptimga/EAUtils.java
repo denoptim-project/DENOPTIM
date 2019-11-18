@@ -1875,42 +1875,61 @@ MF: TO BE TESTED
         DenoptimIO.writeMolecule(rejectedFile, molecule, true);
     }
 */
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 
     /**
-     * Calculates the probability of adding a fragment at this level.
+     * Calculates the probability of adding a fragment to the given level level.
      * This will require a coin toss with the calculated probability. If a newly
      * drawn random number is less than this value, a new fragment may be added.
      * @param level level of the graph at which fragment is to be added
+     * @param scheme the chosen scheme
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
      * @return probability of adding a new fragment at this level.
      */
-    protected static double getLevelProbability(int level)
+    
+    protected static double getGrowthProbabilityAtLevel(int level, int scheme, 
+    		double lambda, double sigmaOne, double sigmaTwo)
     {
         double prob = 0.0;
-        int scheme = GAParameters.getGrowthProbabilityScheme();
-
+        
         if (scheme == 0)
         {
-            double f = Math.exp(-1.0 * level *
-                                    GAParameters.getGrowthMultiplier());
+            double f = Math.exp(-1.0 * (double)level * lambda);
             prob = 1 - ((1-f)/(1+f));
         }
         else if (scheme == 1)
         {
-            prob = 1.0 - Math.tanh(GAParameters.getGrowthMultiplier()
-				   * (double)level);
+            prob = 1.0 - Math.tanh(lambda * (double)level);
         }
         else if (scheme == 2)
         {
-            double a = GAParameters.getGrowthFactorSteepSigma();
-            double b = GAParameters.getGrowthFactorMiddleSigma();
-            prob = 1.0-1.0/(1.0 + Math.exp(-a * ((double) level - b)));
+            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * ((double) level - sigmaTwo)));
         }
         else if (scheme == 3)
         {
-            prob = 1;
+            prob = 1.0;
         }
+        
         return prob;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculates the probability of adding a fragment to the given level.
+     * Used the settings defined by the GAParameters class.
+     * @param level level of the graph at which fragment is to be added
+     * @return probability of adding a new fragment at this level.
+     */
+    protected static double getGrowthProbabilityAtLevel(int level)
+    {
+        int scheme = GAParameters.getGrowthProbabilityScheme();
+        double lambda =GAParameters.getGrowthMultiplier();
+        double sigmaOne = GAParameters.getGrowthFactorSteepSigma();
+        double sigmaTwo = GAParameters.getGrowthFactorMiddleSigma();
+        return getGrowthProbabilityAtLevel(level, scheme, lambda, sigmaOne, sigmaTwo);
     }
 
 
@@ -1918,7 +1937,7 @@ MF: TO BE TESTED
 
     /**
      * For the class associated with the AP identify a compatible fragment and
-     * a proper attachment point in it. Thid method searches only among 
+     * a proper attachment point in it. This method searches only among 
      * fragments (i.e., library of type 1).
      * @param curDap the attachment point for which we ask for a partner.
      * @return the vector of indeces defining the chosen fragment and the
