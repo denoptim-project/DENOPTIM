@@ -15,7 +15,8 @@ import denoptim.io.DenoptimIO;
 
 
 /**
- * General structure of a form for collecting input parameters of various nature.
+ * General structure of a form for collecting input parameters of various 
+ * nature.
  * 
  * @author Marco Foscato
  */
@@ -36,7 +37,8 @@ public class ParametersForm extends JPanel implements IParametersForm
     /**
      * Default text field height
      */
-    final int preferredHeight = (int) (new JTextField()).getPreferredSize().getHeight();
+    final int preferredHeight = 
+    		(int) (new JTextField()).getPreferredSize().getHeight();
         
     /**
      * Default sizes for file pathname fields
@@ -126,11 +128,13 @@ public class ParametersForm extends JPanel implements IParametersForm
 //-----------------------------------------------------------------------------
     
     /**
-     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * Produced an overall string including one or more KEY:VALUE strings taken
+     * from a table.
      * By default this method takes as VALUE only the first field of the table.
      * @param key the keyword
      * @param tab the table
-     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     * @return the overall string including one or more KEY:VALUE string, and 
+     * newline character at the end.
      */
     
     protected String getStringFromTable(String key, JTable tab)
@@ -141,15 +145,18 @@ public class ParametersForm extends JPanel implements IParametersForm
 //-----------------------------------------------------------------------------
     
     /**
-     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * Produced an overall string including one or more KEY:VALUE strings taken 
+     * from a table.
      * By default this method takes as VALUE only the first field of the table.
      * @param key the keyword
      * @param tab the table
      * @param skipHeader use <code>true</code> to ignore first row
-     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     * @return the overall string including one or more KEY:VALUE string, and 
+     * newline character at the end.
      */
     
-    protected String getStringFromTable(String key, JTable tab, boolean skipHeader)
+    protected String getStringFromTable(String key, JTable tab, 
+    		boolean skipHeader)
     {
     	return getStringFromTable(key, tab, new int[]{0}, skipHeader);
     }
@@ -157,15 +164,19 @@ public class ParametersForm extends JPanel implements IParametersForm
 //-----------------------------------------------------------------------------
     
     /**
-     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * Produced an overall string including one or more KEY:VALUE strings taken
+     *  from a table.
      * @param key the keyword
      * @param tab the table
-     * @param fields the id (0, n-1) of the fields to use as space-separated values
+     * @param fields the id (0, n-1) of the fields to use as space-separated 
+     * values
      * @param skipHeader use <code>true</code> to ignore first row
-     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     * @return the overall string including one or more KEY:VALUE string, and 
+     * newline character at the end.
      */
     
-    protected String getStringFromTable(String key, JTable tab, int[] fields, boolean skipHeader)
+    protected String getStringFromTable(String key, JTable tab, int[] fields, 
+    		boolean skipHeader)
     {
     	return getStringFromTable(key, tab, fields, " ", skipHeader);
     }
@@ -173,16 +184,20 @@ public class ParametersForm extends JPanel implements IParametersForm
 //-----------------------------------------------------------------------------
     
     /**
-     * Produced an overall string including one or more KEY:VALUE strings taken from a table.
+     * Produced an overall string including one or more KEY:VALUE strings taken
+     *  from a table.
      * @param key the keyword
      * @param tab the table
-     * @param fields the indexes (0, n-1) of the fields to use as separated VALUEs
+     * @param fields the indexes (0, n-1) of the fields to use as separated 
+     * VALUEs
      * @param sep string separator for fields of a single VALUE
      * @param skipHeader use <code>true</code> to ignore first row
-     * @return the overall string including one or more KEY:VALUE string, and newline character at the end.
+     * @return the overall string including one or more KEY:VALUE string, and 
+     * newline character at the end.
      */
     
-    protected String getStringFromTable(String key, JTable tab, int[] fields, String sep, boolean skipHeader)
+    protected String getStringFromTable(String key, JTable tab, int[] fields,
+    		String sep, boolean skipHeader)
     {
     	StringBuilder sb = new StringBuilder();
     	int firstRow = 0;
@@ -211,7 +226,8 @@ public class ParametersForm extends JPanel implements IParametersForm
     
 //-----------------------------------------------------------------------------
     
-    public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
+    public void importParametersFromDenoptimParamsFile(String fileName) 
+    		throws Exception
     {
     }
     
@@ -230,12 +246,16 @@ public class ParametersForm extends JPanel implements IParametersForm
     {  	    	
     	if (keyRoot.equals("") || keyRoot == null)
     	{
-    		throw new Exception("<html>Root of DENOPTIM keywords not defined.<br>Bugus use of method 'importParametersFromDenoptimParamsFile'!</html>");
+    		throw new Exception("<html>Root of DENOPTIM keywords not defined."
+    				+ "<br>Bugus use of method "
+    				+ "'importParametersFromDenoptimParamsFile'!</html>");
     	}
     	String parType = keyRoot.replaceAll("-", "");
     	if (fileName.equals("") || !DenoptimIO.checkExists(fileName))
     	{
-    		throw new Exception("<html>Source file for the " + parType + " parameters is not found!<br>Please, specify another file name.");
+    		throw new Exception("<html>Source file for the " + parType 
+    				+ " parameters is not found!<br>Please, specify another"
+    				+ " file name.");
     	}
     	
         String line;
@@ -277,7 +297,8 @@ public class ParametersForm extends JPanel implements IParametersForm
             }
             catch (IOException ioe)
             {
-            	throw new Exception("Unable to close file '" + fileName + "'", ioe);
+            	throw new Exception("Unable to close file '" + fileName + "'",
+            			ioe);
             }
         }
     }
@@ -299,7 +320,8 @@ public class ParametersForm extends JPanel implements IParametersForm
 //-----------------------------------------------------------------------------
   	
   	@Override
-	public void importSingleParameter(String key, String value) throws Exception 
+	public void importSingleParameter(String key, String value) 
+			throws Exception 
   	{	
 	}
 

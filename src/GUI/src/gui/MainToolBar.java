@@ -18,11 +18,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Main tool bar of the DENOPTIM graphical user interface.
@@ -41,6 +43,11 @@ public class MainToolBar extends JMenuBar {
 	 * Main DENOPTIM menu
 	 */
 	private JMenu menuDenoptim;
+	
+	/**
+	 * Main File menu
+	 */
+	private JMenu menuFile;
 
 	/**
 	 * The menu listing the active panels in the deck of cards
@@ -55,7 +62,7 @@ public class MainToolBar extends JMenuBar {
 	/**
 	 * Reference to the main panel (cards deck)
 	 */
-	protected JPanel mainPanel;
+	protected GUIMainPanel mainPanel;
 
 	/**
 	 * Constructor that build the tool bar.
@@ -70,7 +77,7 @@ public class MainToolBar extends JMenuBar {
 	 * Sets the main panel for creating functionality of menu items depending
 	 * on main panel identity
 	 */
-	public void setRefToMainPanel(JPanel mainPanel)
+	public void setRefToMainPanel(GUIMainPanel mainPanel)
 	{
 		this.mainPanel = mainPanel;
 	}
@@ -78,22 +85,11 @@ public class MainToolBar extends JMenuBar {
 	/**
 	 * Initialize the contents of the tool bar
 	 */
-	private void initialize() {
+	private void initialize() 
+	{		
 		menuDenoptim = new JMenu("DENOPTIM");
 		menuDenoptim.setFont(new Font("Lucida Grande", Font.BOLD, 12));
 		this.add(menuDenoptim);
-		
-		JMenuItem open = new JMenuItem("Open...");
-		open.addActionListener(new ActionListener() {
-			@SuppressWarnings("static-access")
-			public void actionPerformed(ActionEvent e) {
-				DenoptimGUIFileOpener opener = new DenoptimGUIFileOpener();
-				opener.pickFile();
-			}
-		});
-		menuDenoptim.add(open);
-	
-		menuDenoptim.addSeparator();
 		
 		JMenuItem about = new JMenuItem("About");
 		about.addActionListener(new ActionListener() {
@@ -170,12 +166,64 @@ public class MainToolBar extends JMenuBar {
 		});
 		menuDenoptim.add(exit);
 		
+		menuFile = new JMenu("File");
+		this.add(menuFile);
+		
+		JMenu newMenu = new JMenu("New");
+		
+		menuFile.add(newMenu);
+		JMenuItem newGA = new JMenuItem("New Evolutionary De Novo Design");
+		newGA.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.add(new GUIPrepareGARun(mainPanel));
+			}
+		});
+		newMenu.add(newGA);
+		JMenuItem newVS = new JMenuItem("New Virtual Screening");
+		newVS.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.add(new GUIPrepareFSERun(mainPanel));
+			}
+		});
+		newMenu.add(newVS);
+		
+		JMenuItem open = new JMenuItem("Open...");
+		open.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				File file = DenoptimGUIFileOpener.pickFile();
+				try {
+					openFile(file, DenoptimGUIFileOpener.detectFileFormat(file));
+				} catch (Exception e1) {
+					String[] options = {"Abandon", "GA-PARAMS","FSE-PARAMS"};
+					int res = JOptionPane.showOptionDialog(null,
+						"<html>Failed to detect file type automatically.<br>"
+						+ "Temptative reason: " + e1.getMessage() + "<br>"
+						+ "Please, specify how to interprete file <br>"
+						+ "'" + file.getAbsolutePath() + "'<br>"
+						+ "or 'Abandon' to give up.</html>",
+						"Specify File Type",
+		                JOptionPane.DEFAULT_OPTION,
+		                JOptionPane.QUESTION_MESSAGE,
+		                UIManager.getIcon("OptionPane.warningIcon"),
+		                options,
+		                options[0]);
+					if (res == 0)
+					{
+						return;
+					}
+					else
+					{
+						openFile(file,options[res]); 
+					}
+				}
+			}
+		});
+		menuFile.add(open);
+		
 		activeTabsMenu = new JMenu("Active Tabs");
-		activeTabsMenu.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		this.add(activeTabsMenu);
 		
 		JMenu menuHelp = new JMenu("Help");
-		menuHelp.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		this.add(menuHelp);
 		
 		JMenuItem usrManual = new JMenuItem("DENOPTIM user manual");
@@ -200,11 +248,57 @@ public class MainToolBar extends JMenuBar {
 	}
 	
 //-----------------------------------------------------------------------------
+
+	/**
+	 * Process a file that has a recognized file format and loads a suitable 
+	 * GUI card to visualize the file content.
+	 * @param file the file to open
+	 * @param fFormat the denoptim format of the file
+	 */
+	
+	private void openFile(File file, String fFormat) 
+	{
+		switch (fFormat)
+		{
+			case ("GA-PARAMS"):
+				GUIPrepareGARun gaParamsPanel = new GUIPrepareGARun(mainPanel);
+				mainPanel.add(gaParamsPanel);
+				gaParamsPanel.importParametersFromDenoptimParamsFile(file);
+				break;	
+				
+			case ("FSE-PARAMS"):
+				GUIPrepareFSERun fseParamsPanel = new GUIPrepareFSERun(mainPanel);
+				mainPanel.add(fseParamsPanel);
+				fseParamsPanel.importParametersFromDenoptimParamsFile(file);
+				break;
+				
+			/*
+			case ("FRAGMENT"):
+				//TODO
+				break;	
+				
+			case ("DENOPTIMGRAPH"):
+				//TODO
+				break;	
+			
+			 */
+			
+			default:
+				JOptionPane.showMessageDialog(null,
+						"File format '" + fFormat + "' not recognized.",
+		                "Error",
+		                JOptionPane.ERROR_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"));
+		}
+	}
+	
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Returns the main menu of the tool bar
 	 * @return the <b>DENOPTIM</b> menu of the tool bar
 	 */
+	
 	public JMenu getMainMenu()
 	{
 		return menuDenoptim;
@@ -219,6 +313,7 @@ public class MainToolBar extends JMenuBar {
 	 * method does not check if this assumption holds!).
 	 * @param panel the panel to reference
 	 */
+	
 	public void addActiveTab(GUICardPanel panel)
 	{
 		JMenuItem refToPanel = new JMenuItem(panel.getName());
@@ -238,6 +333,7 @@ public class MainToolBar extends JMenuBar {
 	 * @param panel the panel referenced by the reference to remove from the 
 	 * list
 	 */
+	
 	public void removeActiveTab(GUICardPanel panel)
 	{
 		if (activeTabsAndRefs.containsKey(panel))

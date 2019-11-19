@@ -75,38 +75,7 @@ public class GUIPrepare extends GUICardPanel
 				{
 					return;
 				}
-				for (IParametersForm p : allParams)
-				{
-				    try
-				    {
-						p.importParametersFromDenoptimParamsFile(
-								inFile.getAbsolutePath());
-					}
-				    catch (Exception e1)
-				    {
-		        		if (e1.getMessage().equals("") 
-		        				|| e1.getMessage() == null)
-		        		{
-		        			e1.printStackTrace();
-							JOptionPane.showMessageDialog(null,
-									"<html>Exception occurred while importing"
-									+ "parameters.<br>Please, report this to "
-									+ "the DENOPTIM team.</html>",
-					                "Error",
-					                JOptionPane.ERROR_MESSAGE,
-					                UIManager.getIcon("OptionPane.errorIcon"));
-		        		}
-		        		else
-		        		{
-							JOptionPane.showMessageDialog(null,
-									e1.getMessage(),
-					                "Error",
-					                JOptionPane.ERROR_MESSAGE,
-					                UIManager.getIcon("OptionPane.errorIcon"));
-		        		}
-					}
-				}
-
+				importParametersFromDenoptimParamsFile(inFile);
 			}
 		});
 		commandsPane.add(btnLoadParams);
@@ -227,6 +196,41 @@ public class GUIPrepare extends GUICardPanel
 			if (res == 0)
 			{
 				mainPanel.removeCard(parentPanel);
+			}
+		}
+	}
+	
+	public void importParametersFromDenoptimParamsFile(File file)
+	{
+		for (IParametersForm p : allParams)
+		{
+		    try
+		    {
+				p.importParametersFromDenoptimParamsFile(
+						file.getAbsolutePath());
+			}
+		    catch (Exception e1)
+		    {
+        		if (e1.getMessage().equals("") 
+        				|| e1.getMessage() == null)
+        		{
+        			e1.printStackTrace();
+					JOptionPane.showMessageDialog(null,
+							"<html>Exception occurred while importing"
+							+ "parameters.<br>Please, report this to "
+							+ "the DENOPTIM team.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+        		}
+        		else
+        		{
+					JOptionPane.showMessageDialog(null,
+							e1.getMessage(),
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+        		}
 			}
 		}
 	}
