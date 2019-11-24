@@ -1,5 +1,8 @@
 package gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -42,5 +45,41 @@ public class GUICardPanel extends JPanel
                 "Error",
                 JOptionPane.PLAIN_MESSAGE,
                 UIManager.getIcon("OptionPane.errorIcon"));
+	}
+	
+	/**
+	 * Remove the card from the deck of cards and takes care of removing
+	 * also the entry in the list of active tabs.
+	 * 
+	 * @author Marco Foscato
+	 *
+	 */
+	protected class removeCardActionListener implements ActionListener
+	{
+		private GUICardPanel parentPanel;
+		
+		public removeCardActionListener(GUICardPanel panel)
+		{
+			this.parentPanel = panel;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) 
+		{
+			Object[] options = {"Yes","No"};
+			int res = JOptionPane.showOptionDialog(null,
+                "<html>Abandon without saving?"
+                + "<br>Press NO to go back.</html>",
+                "Abandon?",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                UIManager.getIcon("OptionPane.warningIcon"),
+                options,
+                options[1]);
+			if (res == 0)
+			{
+				mainPanel.removeCard(parentPanel);
+			}
+		}
 	}
 }

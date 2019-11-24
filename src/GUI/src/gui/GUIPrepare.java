@@ -172,34 +172,6 @@ public class GUIPrepare extends GUICardPanel
 
 	}
 	
-	private class removeCardActionListener implements ActionListener
-	{
-		private GUICardPanel parentPanel;
-		
-		public removeCardActionListener(GUICardPanel panel)
-		{
-			this.parentPanel = panel;
-		}
-		
-		public void actionPerformed(ActionEvent e) 
-		{
-			Object[] options = {"Yes","No"};
-			int res = JOptionPane.showOptionDialog(null,
-                "<html>Abandon without saving?"
-                + "<br>Press NO to go back.</html>",
-                "Abandon?",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                UIManager.getIcon("OptionPane.warningIcon"),
-                options,
-                options[1]);
-			if (res == 0)
-			{
-				mainPanel.removeCard(parentPanel);
-			}
-		}
-	}
-	
 	public void importParametersFromDenoptimParamsFile(File file)
 	{
 		for (IParametersForm p : allParams)

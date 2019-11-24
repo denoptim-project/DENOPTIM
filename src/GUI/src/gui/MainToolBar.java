@@ -194,7 +194,7 @@ public class MainToolBar extends JMenuBar {
 				try {
 					openFile(file, DenoptimGUIFileOpener.detectFileFormat(file));
 				} catch (Exception e1) {
-					String[] options = {"Abandon", "GA-PARAMS","FSE-PARAMS"};
+					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS", "FRAGMETS"};
 					int res = JOptionPane.showOptionDialog(null,
 						"<html>Failed to detect file type automatically.<br>"
 						+ "Temptative reason: " + e1.getMessage() + "<br>"
@@ -211,7 +211,7 @@ public class MainToolBar extends JMenuBar {
 					{
 						return;
 					}
-					else
+					else if (res > -1)
 					{
 						openFile(file,options[res]); 
 					}
@@ -253,7 +253,7 @@ public class MainToolBar extends JMenuBar {
 	 * Process a file that has a recognized file format and loads a suitable 
 	 * GUI card to visualize the file content.
 	 * @param file the file to open
-	 * @param fFormat the denoptim format of the file
+	 * @param fFormat the DENOPTIM format of the file
 	 */
 	
 	private void openFile(File file, String fFormat) 
@@ -271,12 +271,19 @@ public class MainToolBar extends JMenuBar {
 				mainPanel.add(fseParamsPanel);
 				fseParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;
-				
-			/*
-			case ("FRAGMENT"):
-				//TODO
+		
+			case ("FRAGMENTS"):
+				GUIFragmentInspector fragPanel = new GUIFragmentInspector(mainPanel);
+				mainPanel.add(fragPanel);
+				fragPanel.importFragmentsFromFile(file);
 				break;	
 				
+/*
+			case ("DGRAPHS"):
+				//TODO
+				System.out.println("TODO DEL: opening DGRAPHs");
+				break;	
+
 			case ("DENOPTIMGRAPH"):
 				//TODO
 				break;	
@@ -285,7 +292,7 @@ public class MainToolBar extends JMenuBar {
 			
 			default:
 				JOptionPane.showMessageDialog(null,
-						"File format '" + fFormat + "' not recognized.",
+						"File format '" + fFormat + "' not yet recognized.",
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));

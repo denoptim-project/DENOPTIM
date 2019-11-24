@@ -113,7 +113,7 @@ public class DENOPTIMAttachmentPoint implements Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * @return the atom number position corresponding to the fragment
+     * @return the index of the source atom in the atom list of the fragment
      */
     public int getAtomPositionNumber()
     {

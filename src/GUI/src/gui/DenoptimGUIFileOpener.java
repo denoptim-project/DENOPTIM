@@ -2,6 +2,7 @@ package gui;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;
 
 import org.apache.commons.io.FilenameUtils;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 
 /**
  * File opener for DENOPTIM GUI
@@ -120,17 +122,25 @@ public class DenoptimGUIFileOpener
 		
 		//TODO: define class DenoptinFileType and subclasses for .par .sdf .ser etc...
 		//TODO: All this should probably be in a the DENOPTIM package under io (including this method)
+		//TODO Junit test
 		
 		switch (ext)
 		{
-		case "sdf":
-			//TODO: FRAGMENT or GRAPH
-			fType = "FRAGMET";
+		/*
+		case "txt":
+			//Human readable graph as text files are too a-specific
+			//TODO add something specific, like "GraphENC" at beginning of line.
 			fType = "DGRAPH";
+			break;
+		*/		
+			
+		case "sdf":
+			//Either graphs or
+			fType = detectKindOfSDFFile(inFile.getAbsolutePath());
 			break;
 		
 		case "ser":
-			//TODO serialized graph
+			//Serialized graph
 			fType = "SERDGRAPH";
 			break;
 		
@@ -147,18 +157,70 @@ public class DenoptimGUIFileOpener
 	}
 
 //-----------------------------------------------------------------------------
+
+	/**
+	 * Looks into a text file and tries to understand is the file is a 
+	 * collection of parameters for any specific DENOPTIM module.
+	 * 
+	 * @param fileName The pathname of the file to analyze
+	 * @return a string that defined the kind of parameters
+	 * @throws Exception
+	 */
+	public static String detectKindOfSDFFile(String fileName) 
+			throws Exception
+	{
+		//TODO: move this method to denoptim.io
+		
+		Map<String,String> determiningKeysMap = new HashMap<String,String>();
+		determiningKeysMap.put("^> *<ATTACHMENT_POINT>.*","FRAGMENTS");
+		determiningKeysMap.put("^> *<GraphENC>.*","DGRAPHS");
+
+		return detectKindFile(fileName, determiningKeysMap, "\\$\\$\\$\\$");
+	}
 	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Looks into a text file and tries to understand is the file is a 
+	 * collection of parameters for any specific DENOPTIM module.
+	 * 
+	 * @param fileName The pathname of the file to analyze
+	 * @return a string that defined the kind of parameters
+	 * @throws Exception
+	 */
 	public static String detectKindOfParameterFile(String fileName) 
+			throws Exception
+	{
+		//TODO: move this method to denoptim.io
+		
+		Map<String,String> determiningKeysMap = new HashMap<String,String>();
+		determiningKeysMap.put("^GA-.*","GA-PARAMS");
+		determiningKeysMap.put("^FSE-.*","FSE-PARAMS");
+		
+		return detectKindFile(fileName, determiningKeysMap, null);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Looks into a text file and tries to understand what it is given a
+	 * a patterns-to-file kind map.
+	 * 
+	 * @param fileName The pathname of the file to analyze
+	 * @param definingMap the map of regex (key) to file kind (values)
+	 * @param endOfSample a pattern identifying the end of the sampled text.
+	 * Use this to avoid reading long files that have no hope of matching any 
+	 * known kind-defining criteria.
+	 * @return a string that defined the kind of parameters, or null
+	 * @throws Exception when something goes wrong handling the file
+	 */
+	public static String detectKindFile(String fileName, 
+			Map<String,String> definingMap, String endOfSample) 
 			throws Exception
 	{
 		//TODO: move this method to denoptim.io
 	
 		String fType = null;
-		
-		Map<String,String> determiningKeysMap = new HashMap<String,String>();
-		determiningKeysMap.put("GA-","GA-PARAMS");
-		determiningKeysMap.put("FSE-","FSE-PARAMS");
-		
         String line;
         BufferedReader br = null;
         try
@@ -166,22 +228,22 @@ public class DenoptimGUIFileOpener
             br = new BufferedReader(new FileReader(fileName));
             lineReadingLoop:
 	            while ((line = br.readLine()) != null)
-	            {	
+	            {	            	
+	            	if (endOfSample != null && line.matches(endOfSample))
+	            	{
+	            		break lineReadingLoop;
+	            	}
+	            	
 	                if ((line.trim()).length() == 0)
 	                {
 	                    continue;
 	                }
-	
-	                if (line.startsWith("#"))
-	                {
-	                    continue;
-	                }
 	                
-	                for (String keyRoot : determiningKeysMap.keySet())
+	                for (String keyRoot : definingMap.keySet())
 	                {
-	                    if (line.toUpperCase().startsWith(keyRoot.toUpperCase()))
+	                    if (line.matches(keyRoot))
 	                    {
-	                    	fType = determiningKeysMap.get(keyRoot);
+	                    	fType = definingMap.get(keyRoot);
 	                    	break lineReadingLoop;
 	                    }
 	                }
@@ -210,7 +272,7 @@ public class DenoptimGUIFileOpener
 		
 		return fType;
 	}
-
+	
 //-----------------------------------------------------------------------------
 
 }
