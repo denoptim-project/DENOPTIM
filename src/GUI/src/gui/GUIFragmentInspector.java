@@ -292,31 +292,6 @@ public class GUIFragmentInspector extends GUICardPanel
 	                UIManager.getIcon("OptionPane.errorIcon"));
 		}
 	}
-	
-//-----------------------------------------------------------------------------
-	
-	private class JmolPanel extends JPanel {
-
-        /**
-		 * Version UID
-		 */
-		private static final long serialVersionUID = 1699908697703788097L;
-
-		JmolViewer viewer;
-
-        private final Dimension hostPanelSize = new Dimension();
-
-        public JmolPanel() {
-            viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
-            null, null, null, null, null);
-        }
-
-        @Override
-        public void paint(Graphics g) {
-            getSize(hostPanelSize);
-            viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
-        }
-    }
 
 //-----------------------------------------------------------------------------
 	
@@ -418,6 +393,31 @@ public class GUIFragmentInspector extends GUICardPanel
         }
         jmolPanel.viewer.evalString(sb.toString());
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class JmolPanel extends JPanel {
+
+        /**
+		 * Version UID
+		 */
+		private static final long serialVersionUID = 1699908697703788097L;
+
+		JmolViewer viewer;
+
+        private final Dimension hostPanelSize = new Dimension();
+
+        public JmolPanel() {
+            viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
+            null, null, null, null, null);
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            getSize(hostPanelSize);
+            viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
+        }
+    }
 	
 //-----------------------------------------------------------------------------
 	
