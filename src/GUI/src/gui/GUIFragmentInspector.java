@@ -27,17 +27,21 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Point3d;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.FragmentUtils;
 
 
@@ -81,16 +85,35 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private int currFrgIdx = 0;
 	
+	/**
+	 * Flag signaling that data about APs has been changed in the GUI
+	 */
+	private boolean alteredAPData = false;
+	
+	private JPanel centralPanel;
 	private JmolPanel jmolPanel;
-	
 	private JPanel fragCtrlPane;
-	
 	private JPanel fragNavigPanel;
+	
 	private JSpinner fragNavigSpinner;
 	private JLabel totalFragsLabel;
 	
 	private DefaultTableModel apTabModel;
 	private JTable apTable;
+	
+	private JPanel pnlOpenMol;
+	private JButton btnOpenMol;
+	
+	private JPanel pnlOpenSMILES;
+	private JButton btnOpenSMILES;
+	
+	private JPanel pnlAtmToAP;
+	private JButton btnAtmToAP;
+	
+	private JPanel pnlDelSel;
+	private JButton btnDelSel;
+	
+	private final String NL = System.getProperty("line.separator");
 	
 //-----------------------------------------------------------------------------
 	
@@ -122,7 +145,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The Jmol stuff goes all in here
-        JPanel centralPanel = new JPanel(new BorderLayout());
+        centralPanel = new JPanel(new BorderLayout());
         this.add(centralPanel,BorderLayout.CENTER);
         
         // Jmol viewer panel
@@ -134,34 +157,36 @@ public class GUIFragmentInspector extends GUICardPanel
 		apTabModel = new DefaultTableModel(){
 			@Override
 		    public boolean isCellEditable(int row, int column) {
-		       return false;
+				if (column == 0)
+				{
+					return false;
+				}
+				else
+			    {
+					return true;
+			    }
 		    }
 		};
 		apTabModel.setColumnCount(2);
 		apTable = new JTable(apTabModel);
+		apTable.putClientProperty("terminateEditOnFocusLost", true);
 		apTable.getColumnModel().getColumn(0).setMaxWidth(75);
-		TabRendenrer tabRenderer = new TabRendenrer();
-		apTable.setDefaultRenderer(Object.class, tabRenderer);
+		apTable.setGridColor(Color.BLACK);
+		apTabModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent tme) {
+                if (tme.getType() == TableModelEvent.UPDATE) {
+                    alteredAPData = true;
+                }
+            }
+        });
 		centralPanel.add(apTable,BorderLayout.SOUTH);
-
-        /*
-        // Jmol command line panel
-        JPanel jmolCmdPanel = new JPanel();
-        jmolCmdPanel.setLayout(new BorderLayout());
-        jmolCmdPanel.setPreferredSize(new Dimension(400, 100));
-        AppConsole jmolCmdLine = new AppConsole(jmolPanel.viewer, jmolCmdPanel,
-        		"Clear Undo Redo");
-        jmolPanel.viewer.setJmolCallbackListener(jmolCmdLine);
-        jmolCmdPanel.setToolTipText("<html>Jmol command line and shortcut "
-        		+ "buttons.<br>Use these to control the molecular viewer."
-        		+ "</html>");
-        centralPanel.add(jmolCmdPanel, BorderLayout.SOUTH);
-        */
 		
 		// General panel on the right: it containing all controls
         fragCtrlPane = new JPanel();
         fragCtrlPane.setVisible(true);
         fragCtrlPane.setLayout(new BoxLayout(fragCtrlPane, SwingConstants.VERTICAL));
+        fragCtrlPane.add(new JSeparator());
 		
         // NB: avoid GroupLayout because it interferes with Jmol viewer and causes exception
         
@@ -189,7 +214,75 @@ public class GUIFragmentInspector extends GUICardPanel
         fragNavigPanel.add(navigationLabel2);
         fragNavigPanel.add(totalFragsLabel);
 		fragCtrlPane.add(fragNavigPanel);
+		
 		fragCtrlPane.add(new JSeparator());
+		
+		/*
+		JPanel pnlTitleImport = new JPanel();
+		JLabel lblImport = new JLabel("Import a molecular model");
+		pnlTitleImport.add(lblImport);
+		fragCtrlPane.add(pnlTitleImport);
+		*/
+		
+		pnlOpenMol = new JPanel();
+		btnOpenMol = new JButton("Structure from File");
+		btnOpenMol.setToolTipText("Imports a chemical system"
+				+ "from file.");
+		btnOpenMol.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//TODO
+			}
+		});
+		pnlOpenMol.add(btnOpenMol);
+		fragCtrlPane.add(pnlOpenMol);
+		
+        pnlOpenSMILES = new JPanel();
+        btnOpenSMILES = new JButton("Structure from SMILES");
+        btnOpenSMILES.setToolTipText("Imports chemical system"
+                        + "from file.");
+        btnOpenSMILES.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                        //TODO
+                }
+        });
+        pnlOpenSMILES.add(btnOpenSMILES);
+        fragCtrlPane.add(pnlOpenSMILES);
+		
+		fragCtrlPane.add(new JSeparator());
+		
+		/*
+		JPanel pnlTitleEdit = new JPanel();
+		JLabel lblEdit = new JLabel("Edit fragment");
+		pnlTitleEdit.add(lblEdit);
+		fragCtrlPane.add(pnlTitleEdit);
+		*/
+		
+		pnlAtmToAP = new JPanel();
+		btnAtmToAP = new JButton("Atom to AP");
+		btnAtmToAP.setToolTipText("<html>Replaces the selected atom with an "
+				+ "attachment point.<br>APClass can be specified after clcking"
+				+ " here.<html>");
+		btnAtmToAP.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//TODO 
+			}
+		});
+		pnlAtmToAP.add(btnAtmToAP);
+		fragCtrlPane.add(pnlAtmToAP);
+		
+		pnlDelSel = new JPanel();
+		btnDelSel = new JButton("Remove Atoms");
+		btnDelSel.setToolTipText("<html>Removes all selected atoms from the "
+				+ "systhem.<br>This is not reversible, but takes care of "
+				+ "updating the attachment"
+				+ " points.<br>Use this instead of Jmol commands.</html>");
+		btnDelSel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//TODO 
+			}
+		});
+		pnlDelSel.add(btnDelSel);
+		fragCtrlPane.add(pnlDelSel);
 		
 		this.add(fragCtrlPane,BorderLayout.EAST);
 		
@@ -327,6 +420,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			System.out.println("Error writing TMP file");
 		}
 		jmolPanel.viewer.openFile(tmpSDFFile);
+		setJmolViewer();
 		
 		// Get attachment point data
         try
@@ -351,15 +445,15 @@ public class GUIFragmentInspector extends GUICardPanel
         {
         	apTabModel.removeRow(i);
         }
-        apTabModel.addRow(new Object[]{"<html><b>AtomID<b></html>",
+        apTabModel.addRow(new Object[]{"<html><b>AP<b></html>",
 		"<html><b>APClass<b></html>"});
         
         // Re-populate list of APs
+        int arrId = 0;  //NB: consistent with updateAPsInJmolViewer()
 	    for (DENOPTIMAttachmentPoint ap : lstAPs)
 	    {
-	    	//NB: display 1-based indexed according to Jmol practices
-	    	apTabModel.addRow(new Object[]{ap.getAtomPositionNumber()+1, 
-	    			ap.getAPClass()});
+	    	arrId++;
+	    	apTabModel.addRow(new Object[]{arrId, ap.getAPClass()});
 	    }
         
         // Display the APs as arrows
@@ -371,7 +465,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void updateAPsInJmolViewer()
 	{   
 		StringBuilder sb = new StringBuilder();
-		int arrId = -1;
+		int arrId = 0;
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
         	arrId++;
@@ -382,16 +476,47 @@ public class GUIFragmentInspector extends GUICardPanel
         			srcAtmPlace.y,
         			srcAtmPlace.z};
         	double[] endArrow = ap.getDirectionVector();
-        	sb.append("draw arrow").append(arrId).append(" arrow {");
-        	sb.append(startArrow[0]).append(" ");
-        	sb.append(startArrow[1]).append(" ");
-        	sb.append(startArrow[2]).append("} {");
-        	sb.append(endArrow[0]).append(" ");
-        	sb.append(endArrow[1]).append(" ");
-        	sb.append(endArrow[2]).append("} width 0.1");
-        	sb.append(System.getProperty("line.separator"));
+        	
+        	double[] offSet = DENOPTIMMathUtils.scale(DENOPTIMMathUtils.subtract(endArrow,startArrow), 0.2);
+        	double[] positionLabel = DENOPTIMMathUtils.add(endArrow,offSet); 
+        	sb.append("draw arrow").append(arrId).append(" arrow ");
+        	sb.append(getJmolPositionStr(startArrow));
+        	sb.append(getJmolPositionStr(endArrow));
+        	sb.append(" width 0.1");
+        	sb.append(NL);
+        	sb.append("set echo apLab").append(arrId);
+        	sb.append(getJmolPositionStr(positionLabel));
+        	sb.append("; echo ").append(arrId);
+        	sb.append("; color echo yellow");
+        	sb.append(NL);
         }
         jmolPanel.viewer.evalString(sb.toString());
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private String getJmolPositionStr(double[] position)
+	{
+		StringBuilder sb = new StringBuilder();
+    	sb.append(" {");
+    	sb.append(position[0]).append(" ");
+    	sb.append(position[1]).append(" ");
+    	sb.append(position[2]).append("} ");
+		return sb.toString();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void setJmolViewer()
+	{
+		StringBuilder sb = new StringBuilder();		
+		sb.append("select none").append(NL); 
+		sb.append("SelectionHalos ON").append(NL);
+		sb.append("set picking ATOMS").append(NL);
+		
+		// sb.append("").append(NL);
+		
+		jmolPanel.viewer.evalString(sb.toString());
 	}
 	
 //-----------------------------------------------------------------------------
@@ -418,26 +543,6 @@ public class GUIFragmentInspector extends GUICardPanel
             viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
         }
     }
-	
-//-----------------------------------------------------------------------------
-	
-	private class TabRendenrer extends DefaultTableCellRenderer {
-	    @Override
-	    public Component getTableCellRendererComponent(JTable table, 
-	    		Object value, boolean isSelected, boolean hasFocus, int row, 
-	    		int column) 
-	    {
-
-	        JComponent c = (JComponent) super.getTableCellRendererComponent(table,
-	                value, isSelected, hasFocus, row, column);
-	        
-            Border borderWithMargin = BorderFactory.createLineBorder(Color.BLACK);
-	        
-	        c.setBorder(borderWithMargin);
-	        
-			return c;
-	    }
-	}
 	
 //-----------------------------------------------------------------------------
 }

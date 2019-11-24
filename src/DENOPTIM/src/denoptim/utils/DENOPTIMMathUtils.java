@@ -88,6 +88,23 @@ public class DENOPTIMMathUtils
 	v.normalize();
 	return v;
     }
+
+//------------------------------------------------------------------------------
+    /**
+     * Scales a vector
+     *
+     * @param d A vector to be scaled
+     * @param a A scaler value
+     * @param ret The scaled vector
+     */
+    public static double[] scale(double[] d, double a)
+    {
+	double[] scaled = new double[3];
+        scaled[0] = d[0] * a;
+        scaled[1] = d[1] * a;
+        scaled[2] = d[2] * a;
+	return scaled;
+    }
     
 //------------------------------------------------------------------------------    
     /**
