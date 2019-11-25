@@ -170,5 +170,30 @@ public final class DENOPTIMConstants
      * Smallest difference for comparison of double and float numbers.
      */
     public static final double FLOATCOMPARISONTOLERANCE = 0.000000001;
+    
+    /**
+     * Separator between APs on different atoms in molecular property.
+     */
+    public static final String SEPARATORAPPROPATMS = " ";
+    
+    /**
+     * Separator between APs on same atom in molecular property.
+     */
+    public static final String SEPARATORAPPROPAPS = ",";
+    
+    /**
+     * Separator between atom index and APClass in molecular property.
+     */
+    public static final String SEPARATORAPPROPAAP = "#";
+    
+    /**
+     * Separator between APClass and APSubClass and coords
+     */
+    public static final String SEPARATORAPPROPSCL = ":";
+    
+    /**
+     * Separator between coordinates
+     */
+    public static final String SEPARATORAPPROPXYZ = "%";
 
 }
