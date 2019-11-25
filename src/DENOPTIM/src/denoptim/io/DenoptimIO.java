@@ -246,10 +246,11 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
     
     /**
-     * Reads a file containing multiple molecules (multiple SD format))
+     * Reads a file SDF file possible containing multiple molecules,
+     * and returns only the first one.
      *
      * @param fileName the file containing the molecules
-     * @return IAtomContainer[] an array of molecules
+     * @return the first molecular object in the file
      * @throws DENOPTIMException
      */
     public static IAtomContainer readSingleSDFFile(String fileName)
@@ -262,8 +263,8 @@ public class DenoptimIO
         {
 	    if (!checkExists(fileName))
 	    {
-		System.out.println("ERROR! file '" + fileName + "' not found!");
-		System.exit(-1);
+		String msg = "ERROR! file '" + fileName + "' not found!";
+		throw new DENOPTIMException(msg);
 	    }
             mdlreader = new MDLV2000Reader(new FileReader(new File(fileName)));
             ChemFile chemFile = (ChemFile) mdlreader.read((ChemObject) new ChemFile());
@@ -295,7 +296,6 @@ public class DenoptimIO
         }
 
         return lstContainers.get(0);
-        //return lstContainers.toArray(new IAtomContainer[lstContainers.size()]);
     }
 
 //------------------------------------------------------------------------------

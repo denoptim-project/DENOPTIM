@@ -8,8 +8,14 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javajs.util.BS;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -34,9 +40,16 @@ import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Point3d;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
+import org.jmol.api.JmolStatusListener;
 import org.jmol.api.JmolViewer;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.libio.jena.Convertor;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.jmol.app.jmolpanel.console.AppConsole;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -114,6 +127,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	private JButton btnDelSel;
 	
 	private final String NL = System.getProperty("line.separator");
+	
+	String tmpSDFFile = "/tmp/Denoptim_GUIFragInspector_loadedMol.sdf";
 	
 //-----------------------------------------------------------------------------
 	
@@ -230,7 +245,12 @@ public class GUIFragmentInspector extends GUICardPanel
 				+ "from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO
+				File inFile = DenoptimGUIFileOpener.pickFile();
+				if (inFile == null || inFile.getAbsolutePath().equals(""))
+				{
+					return;
+				}
+				importStructureFromFile(inFile);
 			}
 		});
 		pnlOpenMol.add(btnOpenMol);
@@ -242,7 +262,8 @@ public class GUIFragmentInspector extends GUICardPanel
                         + "from file.");
         btnOpenSMILES.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                        //TODO
+                	String smiles = JOptionPane.showInputDialog("Please input SMILES: ");
+                	importStructureFromSMILES(smiles);
                 }
         });
         pnlOpenSMILES.add(btnOpenSMILES);
@@ -349,6 +370,195 @@ public class GUIFragmentInspector extends GUICardPanel
 		});
 		commandsPane.add(btnHelp);
 	}
+
+//-----------------------------------------------------------------------------
+
+	public void importStructureFromFile(File file)
+	{
+		// Initialize array 
+		fragmentLibrary = new ArrayList<IAtomContainer>();
+		try {			
+			fragIAC = DenoptimIO.readSingleSDFFile(file.getAbsolutePath());
+
+			// the system is not a fragment but, this is done for consistency:
+			// when we have a molecule loaded the list is not empty
+			fragmentLibrary.add(fragIAC); 
+			
+			currFrgIdx = 0;
+			loadCurrentAsPlainStructure();
+			updateFragListSpinner();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+	                "<html>Could not read file '" + file.getAbsolutePath() 
+	                + "'!<br>Hint about reason: " + e.getCause() + "</html>",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+		}
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Imports the given SMILES into the viewer. As SMILES cannot hold 
+	 * attachment points (APs), no AP will be created and the resulting system 
+	 * is a plain molecule instead of a fragment.
+	 * @param smiles the SMILES string
+	 */
+	public void importStructureFromSMILES(String smiles)
+	{		
+		// Load the structure using CACTUS service via Jmol
+		jmolPanel.viewer.evalString("load $"+smiles);
+		waitForJmolViewer();
+
+		// NB: this is a workaround to the lack fo try/catch mechanism when
+		// executing Jmol commands.
+		// We want to catch errors that prevent loading the structure
+		// For example, offline mode and invalid SMILES
+		String data = jmolPanel.viewer.getData("*", "txt");				
+		if (data == null || data.equals(""))
+		{
+			System.out.println("DATA: "+data);
+			JOptionPane.showMessageDialog(null,
+	                "<html>Could not find a valid structure.<br>"
+	                + "Possible reasons are:"
+	                + "<ul>"
+	                + "<li>unreachable remote service (we are offline)</li>"
+	                + "<li>no available structure for SMILES string<br>'" 
+	                + smiles 
+	                + "'</li></ul><br>"
+	                + "Please create such structure and import it as SDF file."
+	                + "</html>",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+		
+		// Now we should have a structure loaded in the viewer, 
+		// so we take that one and put it in the IAtomContainer representation
+		try	{
+		    fragIAC = getStructureFromJmolViewer();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+	                "<html>Could not understand Jmol system.</html>",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+		
+		fragmentLibrary = new ArrayList<IAtomContainer>();
+		
+		// the system is not a fragment but, this is done for consistency:
+		// when we have a molecule loaded the list is not empty
+	    fragmentLibrary.add(fragIAC);
+	    
+		currFrgIdx = 0;
+		
+		// finalize GUI status
+		updateFragListSpinner();
+		setJmolViewer();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private IAtomContainer getStructureFromJmolViewer() throws DENOPTIMException
+	{
+		IAtomContainer mol = new AtomContainer();
+		
+		String strData = jmolPanel.viewer.getData("*", "txt");
+		strData = strData.replaceAll("[0-9] \\s+ 999 V2000", 
+				"0  0  0  0  0999 V2000");
+		String[] lines = strData.split("\\n");
+		if (lines.length < 5)
+		{
+			jmolPanel.viewer.evalString("zap");
+			throw new DENOPTIMException("Unexpected format in Jmol molecular "
+					+ "data: " + strData);
+		}
+		if (!lines[3].matches(".*999 V2000.*"))
+		{
+			jmolPanel.viewer.evalString("zap");
+			throw new DENOPTIMException("Unexpected format in Jmol molecular "
+					+ "data: " + strData);
+		}
+		String[] counters = lines[3].trim().split("\\s+");
+		int nAtms = Integer.parseInt(counters[0]);
+		int nBonds = Integer.parseInt(counters[1]);
+		
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("Structure in JmolViewer").append(NL);
+		sb.append("Jmol").append(NL).append(NL);
+		sb.append(lines[3]).append(NL);
+		for (int i=0; i<nAtms; i++)
+		{
+			sb.append(lines[3+i+1]).append("  0  0  0  0  0  0").append(NL);
+		}
+		for (int i=0; i<nBonds; i++)
+		{
+			sb.append(lines[3+nAtms+i+1]).append("  0").append(NL);
+		}
+		sb.append("M  END").append(NL).append("$$$$");
+		
+		DenoptimIO.writeData(tmpSDFFile, sb.toString(), false);
+		mol = DenoptimIO.readSingleSDFFile(tmpSDFFile);
+		return mol;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void waitForJmolViewer()
+	{
+		// We wait for 2 seconds
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Waiting cycles
+		Date date = new Date();
+		long startTime = date.getTime();
+		long wallTime = startTime + 5000;
+		while (jmolPanel.viewer.isScriptExecuting())
+		{
+				
+			Date newDate = new Date();
+			long now = newDate.getTime();
+			System.out.println("Waiting "+now);
+			if (now > wallTime)
+			{
+				String[] options = new String[]{"Yes","No"};
+				int res = JOptionPane.showOptionDialog(null,
+		                "<html>Slow response from Jmol.<br>Keep waiting?</html>",
+		                "Keep waiting?",
+		                JOptionPane.DEFAULT_OPTION,
+		                JOptionPane.QUESTION_MESSAGE,
+		                UIManager.getIcon("OptionPane.warningIcon"),
+		                options,
+		                options[1]);
+				if (res == 1)
+				{
+					break;
+				}
+				else
+				{
+					wallTime = date.getTime() + 5000;
+				}
+			}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
 //-----------------------------------------------------------------------------
 	
@@ -371,9 +581,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			loadCurrentFragIdxToViewer();
 			
 	        // Update the fragment spinner
-			fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-					fragmentLibrary.size(), 1));
-			totalFragsLabel.setText(Integer.toString(fragmentLibrary.size()));
+			updateFragListSpinner();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -384,6 +592,40 @@ public class GUIFragmentInspector extends GUICardPanel
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
 		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Puts currently loaded structure in the Jmol viewer.
+	 * This assumes that the structure is already added to the list of 
+	 * IAtomContainers and that the currFrgIdx filed is properly set.
+	 */
+	private void loadCurrentAsPlainStructure()
+	{
+		if (fragIAC == null)
+		{
+			JOptionPane.showMessageDialog(null,
+	                "<html>No structure loaded.<br>This is most likely a bug!"
+	                + "Please report it to the development team.</html>",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;			
+		}
+		
+		// NB: we use the nasty trick of a tmp file to by-pass the 
+		// fragile/discontinued CDK-to-Jmol support.
+		
+		try {
+			DenoptimIO.writeMolecule(tmpSDFFile, fragIAC, false);
+		} catch (DENOPTIMException e) {
+			// TODO change and look for other tmp file locations
+			e.printStackTrace();
+			System.out.println("Error writing TMP file");
+		}
+		jmolPanel.viewer.openFile(tmpSDFFile);
+		setJmolViewer();
 	}
 
 //-----------------------------------------------------------------------------
@@ -411,16 +653,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// NB: we use the nasty trick of a tmp file to by-pass the 
 		// fragile/discontinued CDK-to-Jmol support.
 		fragIAC = fragmentLibrary.get(currFrgIdx);
-		String tmpSDFFile = "/tmp/Denoptim_GUIFragInspector_loadedMol.sdf";
-		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, fragIAC, false);
-		} catch (DENOPTIMException e) {
-			// TODO change and look for other tmp file locations
-			e.printStackTrace();
-			System.out.println("Error writing TMP file");
-		}
-		jmolPanel.viewer.openFile(tmpSDFFile);
-		setJmolViewer();
+		loadCurrentAsPlainStructure();
 		
 		// Get attachment point data
         try
@@ -492,6 +725,15 @@ public class GUIFragmentInspector extends GUICardPanel
         }
         jmolPanel.viewer.evalString(sb.toString());
 	}
+
+//-----------------------------------------------------------------------------
+
+	private void updateFragListSpinner()
+	{
+		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
+				fragmentLibrary.size(), 1));
+		totalFragsLabel.setText(Integer.toString(fragmentLibrary.size()));
+	}
 	
 //-----------------------------------------------------------------------------
 	
@@ -534,7 +776,7 @@ public class GUIFragmentInspector extends GUICardPanel
 
         public JmolPanel() {
             viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
-            null, null, null, null, null);
+            null, null, null, null, null); //NB: can add listener here
         }
 
         @Override
