@@ -2,25 +2,17 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javajs.util.BS;
-
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,26 +22,17 @@ import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Point3d;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
-import org.jmol.api.JmolStatusListener;
 import org.jmol.api.JmolViewer;
 import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.exception.InvalidSmilesException;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.libio.jena.Convertor;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.jmol.app.jmolpanel.console.AppConsole;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -147,6 +130,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	/**
 	 * Initialize the panel and add buttons.
 	 */
+	@SuppressWarnings("serial")
 	private void initialize() {
 		
 		// BorderLayout is needed to allow dynamic resizing!
@@ -187,14 +171,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		apTable.putClientProperty("terminateEditOnFocusLost", true);
 		apTable.getColumnModel().getColumn(0).setMaxWidth(75);
 		apTable.setGridColor(Color.BLACK);
-		apTabModel.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent tme) {
-                if (tme.getType() == TableModelEvent.UPDATE) {
-                    alteredAPData = true;
-                }
-            }
-        });
+		apTabModel.addTableModelListener(new PausableTableModelListener());
 		centralPanel.add(apTable,BorderLayout.SOUTH);
 		
 		// General panel on the right: it containing all controls
@@ -219,9 +196,13 @@ public class GUIFragmentInspector extends GUICardPanel
             @Override
             public void stateChanged(ChangeEvent event)
             {
+            	activateTabEditsListener(false);
+            	saveUnsavedChanges();
+            	
             	//NB here we convert from 1-based index in GUI to o-based index
             	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
             	loadCurrentFragIdxToViewer();
+            	activateTabEditsListener(true);
             }
         });
         fragNavigPanel.add(navigationLabel1);
@@ -322,6 +303,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 				importFragmentsFromFile(inFile);
+				activateTabEditsListener(true);
 			}
 		});
 		commandsPane.add(btnOpenFrags);
@@ -338,7 +320,8 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				try
 				{
-				    //TODO write SDF
+				    DenoptimIO.writeMoleculeSet(outFile.getAbsolutePath(),
+				    		fragmentLibrary);
 				}
 				catch (Exception ex)
 				{
@@ -372,7 +355,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	}
 
 //-----------------------------------------------------------------------------
-
+	
 	public void importStructureFromFile(File file)
 	{
 		// Initialize array 
@@ -517,7 +500,6 @@ public class GUIFragmentInspector extends GUICardPanel
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -554,7 +536,6 @@ public class GUIFragmentInspector extends GUICardPanel
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -673,15 +654,13 @@ public class GUIFragmentInspector extends GUICardPanel
 			return;
         }
         
-        // Clear showed list of APs
+        // Load the attachment point information into the table
         for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
         {
         	apTabModel.removeRow(i);
         }
         apTabModel.addRow(new Object[]{"<html><b>AP<b></html>",
 		"<html><b>APClass<b></html>"});
-        
-        // Re-populate list of APs
         int arrId = 0;  //NB: consistent with updateAPsInJmolViewer()
 	    for (DENOPTIMAttachmentPoint ap : lstAPs)
 	    {
@@ -787,4 +766,69 @@ public class GUIFragmentInspector extends GUICardPanel
     }
 	
 //-----------------------------------------------------------------------------
+	
+	private class PausableTableModelListener implements TableModelListener
+	{	
+		private boolean isActive = false;
+		
+		public PausableTableModelListener() {};
+
+		@Override
+		public void tableChanged(TableModelEvent e) 
+		{
+            if (isActive && e.getType() == TableModelEvent.UPDATE)
+            {
+                alteredAPData = true;
+                //TODOdel
+                System.out.println("TABLE CHANGED! "+this);
+            }
+		}
+        
+		public void setActive(boolean var)
+		{
+			isActive = var;
+		}
+        
+	}
+	
+//-----------------------------------------------------------------------------
+
+    private void activateTabEditsListener(boolean var)
+    {
+		try
+		{
+			//System.out.println("#TMLISTENERS: "+apTabModel.getTableModelListeners());
+			PausableTableModelListener l = (PausableTableModelListener) apTabModel.getTableModelListeners()[0];
+			//System.out.println(l.getClass());
+    	    l.setActive(var);
+    	    
+    	    System.out.println("TabListener is active: "+l.isActive + " " + l);
+    	    
+		} catch (Throwable t) {
+			//t.printStackTrace();
+			System.out.println("Bad attempt to contro llistener: "+t.getMessage());
+			System.out.println(t.getCause());
+		}
+    }
+
+ //-----------------------------------------------------------------------------
+
+  	private void saveUnsavedChanges() 
+  	{
+  		if (alteredAPData)
+  		{
+  			/* 
+  			 * WARNNG: adding any JOptionPanel here
+  			 * triggers a loop of changes in the JSpinner
+  			 * which causes the scrolling of the entire list of fragments
+  	         */
+
+  			//TODO SAVE System.out.println("SAVING!");
+	        	
+  	        alteredAPData = false;
+  		}
+  	}
+  	
+//-----------------------------------------------------------------------------
+  	
 }
