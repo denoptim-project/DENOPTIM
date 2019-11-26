@@ -67,7 +67,8 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     
     public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
     {    	
-    	// WARNING: properties are not imported into this object
+    	// WARNING: atom container properties are not imported
+    	
         super(mol);
         
         Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
@@ -75,6 +76,28 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
         {
             projectPropertyToAP(prop.toString());
         }
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Add an attachment point to the specifies atom
+     * @param srcAtmId the index of the source atom in the atom list of this 
+     * chemical representation. Index must be 0-based.
+     * @param propAPClass the attachment point class, or null, if class should not 
+     * be defines.
+     * @param vector the coordinates of the 3D point representing the end of 
+     * the attachment point direction vector, or null. The coordinates must be
+     * consistent with the coordinates of the atoms.
+     * @throws DENOPTIMException 
+     */
+
+    public void addAP(int srcAtmId, String propAPClass, double[] vector) 
+    		throws DENOPTIMException
+    {
+        IAtom srcAtm = this.getAtom(srcAtmId);
+        Point3d p3d = new Point3d(vector[0], vector[1], vector[2]);
+        addAP(srcAtm, propAPClass, p3d);
     }
 
 //-----------------------------------------------------------------------------

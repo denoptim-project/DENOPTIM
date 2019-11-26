@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -30,6 +32,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Point3d;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
 import org.openscience.cdk.AtomContainer;
@@ -41,7 +44,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.FragmentUtils;
 
 
 /**
@@ -76,8 +78,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	/**
 	 * Temporary list of attachment points of the current fragment
 	 */
-	private ArrayList<DENOPTIMAttachmentPoint> lstAPs =
-            new ArrayList<DENOPTIMAttachmentPoint>();
+	private Map<Integer,DENOPTIMAttachmentPoint> mapAPs = null;
 	
 	/**
 	 * The index of the currently loaded fragment [0–(n-1)}
@@ -115,6 +116,9 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	private JPanel pnlDelSel;
 	private JButton btnDelSel;
+	
+	private JPanel pnlSaveEdits;
+	private JButton btnSaveEdits;
 	
 	private final String NL = System.getProperty("line.separator");
 	
@@ -163,7 +167,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		apTabModel = new DefaultTableModel(){
 			@Override
 		    public boolean isCellEditable(int row, int column) {
-				if (column == 0)
+				if (column == 0 || row == 0)
 				{
 					return false;
 				}
@@ -230,7 +234,8 @@ public class GUIFragmentInspector extends GUICardPanel
                         + "from file.");
         btnOpenSMILES.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                	String smiles = JOptionPane.showInputDialog("Please input SMILES: ");
+                	String smiles = JOptionPane.showInputDialog(
+                			"Please input SMILES: ");
                 	if (smiles != null && !smiles.trim().equals(""))
                 	{
                 	    importStructureFromSMILES(smiles);
@@ -241,13 +246,6 @@ public class GUIFragmentInspector extends GUICardPanel
         fragCtrlPane.add(pnlOpenSMILES);
 		
 		fragCtrlPane.add(new JSeparator());
-		
-		/*
-		JPanel pnlTitleEdit = new JPanel();
-		JLabel lblEdit = new JLabel("Edit fragment");
-		pnlTitleEdit.add(lblEdit);
-		fragCtrlPane.add(pnlTitleEdit);
-		*/
 		
 		pnlAtmToAP = new JPanel();
 		btnAtmToAP = new JButton("Atom to AP");
@@ -276,9 +274,27 @@ public class GUIFragmentInspector extends GUICardPanel
 		pnlDelSel.add(btnDelSel);
 		fragCtrlPane.add(pnlDelSel);
 		
+		fragCtrlPane.add(new JSeparator());
+		
+        pnlSaveEdits = new JPanel();
+        btnSaveEdits = new JButton("Save Changes");
+        btnSaveEdits.setForeground(Color.RED);
+        btnSaveEdits.setEnabled(false);
+        btnSaveEdits.setToolTipText("<html>Save the current fragment replacing"
+        		+ " <br>the original fragment in the loaded library.</html>");
+        btnSaveEdits.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                	saveUnsavedChanges();
+                }
+        });
+        pnlSaveEdits.add(btnSaveEdits);
+        fragCtrlPane.add(pnlSaveEdits);
+		
 		this.add(fragCtrlPane,BorderLayout.EAST);
 		
+		
 		// Panel with buttons to the bottom of the frame
+		
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
@@ -310,6 +326,10 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				try
 				{
+					for (DENOPTIMFragment f : fragmentLibrary)
+					{
+						f.projectAPsToProperties();
+					}
 				    DenoptimIO.writeFragmentSet(outFile.getAbsolutePath(),
 				    		fragmentLibrary);
 				}
@@ -336,8 +356,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
-                    new JLabel("<html>Hover over the buttons and fields "
-                    		+ "to get a tip.</html>"),
+                    "<html>Hover over the buttons and fields "
+                    + "to get a tip.</html>",
                     "Tips",
                     JOptionPane.PLAIN_MESSAGE);
 			}
@@ -560,23 +580,6 @@ public class GUIFragmentInspector extends GUICardPanel
 			    fragmentLibrary.add(new DENOPTIMFragment(iac));
 			}
 			
-			// Transfer APs from molecular property to atom
-			for (IAtomContainer frg : fragmentLibrary)
-			{
-				if (frg instanceof DENOPTIMFragment)
-				{
-					((DENOPTIMFragment) frg).projectPropertyToAP();
-					
-					frg.setProperty("Original"+DENOPTIMConstants.APTAG, 
-							frg.getProperty(DENOPTIMConstants.APTAG));
-					frg.removeProperty(DENOPTIMConstants.APTAG);
-					
-					frg.setProperty("Original"+DENOPTIMConstants.APCVTAG, 
-							frg.getProperty(DENOPTIMConstants.APCVTAG));
-					frg.removeProperty(DENOPTIMConstants.APCVTAG);
-				}
-			}
-			
 			// Display the first
 			currFrgIdx = 0;
 			loadCurrentFragIdxToViewer();
@@ -659,21 +662,23 @@ public class GUIFragmentInspector extends GUICardPanel
 		loadCurrentAsPlainStructure();
 		
 		// Get attachment point data in tmp storage, which we use for edits
-		lstAPs = fragment.getCurrentAPs();
+		ArrayList<DENOPTIMAttachmentPoint> lstAPs = fragment.getCurrentAPs();
         if (lstAPs.size() == 0)
         {
         	// WARNING: no dialog here because it fires event changes in JSpinner
 			return;
         }
         
-        // Load the attachment points information into the table
+        // Load the attachment points information into the table and map
         apTabModel.addRow(new Object[]{"<html><b>AP<b></html>",
 		"<html><b>APClass<b></html>"});
-        int arrId = 0;  //NB: consistent with updateAPsInJmolViewer()
+        mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
+        int arrId = 0;
 	    for (DENOPTIMAttachmentPoint ap : lstAPs)
 	    {
 	    	arrId++;
 	    	apTabModel.addRow(new Object[]{arrId, ap.getAPClass()});
+	    	mapAPs.put(arrId,ap);
 	    }
         
         // Display the APs as arrows
@@ -691,7 +696,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		jmolPanel.viewer.evalString("zap");
 		
 		// Remove tmp storage of APs
-		lstAPs = null;
+		mapAPs = null;
 		
 		// Remove table of APs
         for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
@@ -705,10 +710,9 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void updateAPsInJmolViewer()
 	{   
 		StringBuilder sb = new StringBuilder();
-		int arrId = 0;
-        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        for (int arrId : mapAPs.keySet())
         {
-        	arrId++;
+        	DENOPTIMAttachmentPoint ap = mapAPs.get(arrId);
         	int srcAtmId = ap.getAtomPositionNumber();
         	Point3d srcAtmPlace = fragment.getAtom(srcAtmId).getPoint3d();
         	double[] startArrow = new double[]{
@@ -844,9 +848,8 @@ public class GUIFragmentInspector extends GUICardPanel
         	{
         		return;
         	}
-        	
+      
         	activateTabEditsListener(false);
-        	saveUnsavedChanges();
         	
         	//NB here we convert from 1-based index in GUI to 0-based index
         	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
@@ -860,6 +863,7 @@ public class GUIFragmentInspector extends GUICardPanel
 
 	private void deprotectEditedSystem()
 	{
+		btnSaveEdits.setEnabled(false);
 		btnOpenFrags.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
@@ -878,6 +882,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	private void protectEditedSystem()
 	{
+		btnSaveEdits.setEnabled(true);
 		btnOpenFrags.setEnabled(false);
 		btnOpenSMILES.setEnabled(false); 
 		btnOpenMol.setEnabled(false);
@@ -913,23 +918,153 @@ public class GUIFragmentInspector extends GUICardPanel
 
   	private void saveUnsavedChanges() 
   	{
-  		if (alteredAPData)
+  		if (!alteredAPData)
   		{
-  			/* 
-  			 * WARNNG: adding any JOptionPanel here
-  			 * triggers a loop of changes in the JSpinner
-  			 * which causes the scrolling of the entire list of fragments
-  	         */
-
-  			// Maybe with the disable listener the problem of the dialog is not a proble anymore...
-  			
-  			//TODO SAVE 
-  			System.out.println("SAVING!");
-	        	
-  	        alteredAPData = false;
-  	        deprotectEditedSystem();
+  			return;
   		}
+
+  		/*
+  		String[] options = new String[]{"Overwrite","Cancel"};
+		int res = JOptionPane.showOptionDialog(null, 
+				"Are you sure you want to overwrite the loaded library?",
+				"Overwrite?",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                UIManager.getIcon("OptionPane.warningIcon"),
+                options,
+                options[1]);
+        */
+	    
+  		// Retrieve chemical object from Jmol
+		try	{
+		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer());
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+	                "<html>Could not understand Jmol system.</html>",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+  		
+  		// Deal with change of atom list
+  		//TODO?
+  		
+  		// Import changes from AP table into molecular representation
+        for (int i=1; i<apTabModel.getRowCount(); i++) 
+        {
+        	int apId = ((Integer) apTabModel.getValueAt(i, 0)).intValue();
+        	String currApClass = apTabModel.getValueAt(i, 1).toString();
+        	
+        	// Make sure the new class has a proper syntax
+        	while (!isGoodClass(currApClass))
+        	{
+        		currApClass = JOptionPane.showInputDialog("<html>APClass '"
+            			+ currApClass + "' is not valid!<br>"
+            			+ "The valid syntax is:<br><br><code>      rule" 
+            			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
+        				+ "subClass</code><br><br> where "
+        				+ "<ul><li><code>rule</code>"
+        				+ " is a string (no spaces)</li>"
+        				+ "<li><code>subClass</code> is an integer</li>"
+        				+ "</ul>Please, provide a valid "
+        				+ "APClass alternative: ");
+            	if (currApClass == null)
+            	{
+            		currApClass = "";
+            	}
+        	}
+        	
+        	if (mapAPs.containsKey(apId))
+        	{
+        		String origApClass = mapAPs.get(apId).getAPClass();
+        		if (!origApClass.equals(currApClass))
+        		{
+        			try {
+						mapAPs.get(apId).setAPClass(currApClass);
+					} catch (DENOPTIMException e) {
+						// We made sure the class is valid, so this
+						// should never happen, though one never knows
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(null,
+		    	                "<html>Could not save due to errors setting a "
+		    	                + "new APClass.<br>Please report this to the "
+		    	                + "DENOPTIM team.</html>",
+		    	                "Error",
+		    	                JOptionPane.PLAIN_MESSAGE,
+		    	                UIManager.getIcon("OptionPane.errorIcon"));
+		    			return;	
+					}
+        		}
+        	}
+        	else
+        	{
+    			JOptionPane.showMessageDialog(null,
+    	                "<html>Could not save due to mistmatch between AP "
+    	                + "table and map.<br>Please report this to the "
+    	                + "DENOPTIM team.</html>",
+    	                "Error",
+    	                JOptionPane.PLAIN_MESSAGE,
+    	                UIManager.getIcon("OptionPane.errorIcon"));
+    			return;	
+        	}
+        	
+        	// Add AP to molecular representation
+        	DENOPTIMAttachmentPoint ap = mapAPs.get(apId);
+        	try {
+				fragment.addAP(ap.getAtomPositionNumber(), currApClass,
+						ap.getDirectionVector());
+			} catch (DENOPTIMException e) {
+				e.printStackTrace();
+    			JOptionPane.showMessageDialog(null,
+    	                "<html>Could not add attachment points.<br>"
+    	                + "Please report this to the "
+    	                + "DENOPTIM team.</html>",
+    	                "Error",
+    	                JOptionPane.PLAIN_MESSAGE,
+    	                UIManager.getIcon("OptionPane.errorIcon"));
+    			return;	
+			}
+        }
+  		
+  		// Overwrite fragment in library
+  		fragmentLibrary.set(currFrgIdx, fragment);
+        
+        // Reload fragment from library to refresh table and viewer
+    	activateTabEditsListener(false);
+    	loadCurrentFragIdxToViewer();
+  		
+  		// Release constraints
+    	activateTabEditsListener(true);
+        alteredAPData = false;
+        deprotectEditedSystem();
   	}
+  	
+ //----------------------------------------------------------------------------
+
+  	//TODO: maybe move this functionality to general library
+  	
+	private boolean isGoodClass(String currApClass) {	
+		if (!currApClass.matches("^[a-z,A-Z,0-9].*"))
+			return false;
+		
+		if (!currApClass.matches(".*[0-9]$"))
+			return false;
+		
+		if (currApClass.contains("\\s"))
+			return false;
+		
+		if (!currApClass.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
+			return false;
+		
+		int numSep = StringUtils.countMatches(currApClass,
+				DENOPTIMConstants.SEPARATORAPPROPSCL);
+		if (1 != numSep)
+			return false;
+		
+		return true;
+	}
   	
 //-----------------------------------------------------------------------------
   	
