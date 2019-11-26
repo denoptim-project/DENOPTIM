@@ -135,6 +135,9 @@ public class FragmentUtils
     public static ArrayList<DENOPTIMAttachmentPoint> getAPForFragment(
                                     IAtomContainer mol) throws DENOPTIMException
     { 
+
+//TODO: need to update in relation with DENOPTIMFragment class methods
+
         String apProperty = mol.getProperty(DENOPTIMConstants.APTAG).toString();
         String[] tmpArr = apProperty.split("\\s+");
 

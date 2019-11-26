@@ -34,9 +34,11 @@ import org.jmol.api.JmolViewer;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.FragmentUtils;
 
@@ -63,15 +65,15 @@ public class GUIFragmentInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<IAtomContainer> fragmentLibrary;
+	private ArrayList<DENOPTIMFragment> fragmentLibrary;
 	
 	/**
 	 * The currently loaded fragment
 	 */
-	private IAtomContainer fragIAC;
+	private DENOPTIMFragment fragment;
 	
 	/**
-	 * The list of attachment points of the current fragment
+	 * Temporary list of attachment points of the current fragment
 	 */
 	private ArrayList<DENOPTIMAttachmentPoint> lstAPs =
             new ArrayList<DENOPTIMAttachmentPoint>();
@@ -320,7 +322,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				try
 				{
-				    DenoptimIO.writeMoleculeSet(outFile.getAbsolutePath(),
+				    DenoptimIO.writeFragmentSet(outFile.getAbsolutePath(),
 				    		fragmentLibrary);
 				}
 				catch (Exception ex)
@@ -359,13 +361,14 @@ public class GUIFragmentInspector extends GUICardPanel
 	public void importStructureFromFile(File file)
 	{
 		// Initialize array 
-		fragmentLibrary = new ArrayList<IAtomContainer>();
+		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
 		try {			
-			fragIAC = DenoptimIO.readSingleSDFFile(file.getAbsolutePath());
+			fragment = new DENOPTIMFragment(DenoptimIO.readSingleSDFFile(
+					file.getAbsolutePath()));
 
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
-			fragmentLibrary.add(fragIAC); 
+			fragmentLibrary.add(fragment); 
 			
 			currFrgIdx = 0;
 			loadCurrentAsPlainStructure();
@@ -422,7 +425,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Now we should have a structure loaded in the viewer, 
 		// so we take that one and put it in the IAtomContainer representation
 		try	{
-		    fragIAC = getStructureFromJmolViewer();
+		    fragment = getStructureFromJmolViewer();
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -437,7 +440,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		// the system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty
-	    fragmentLibrary.add(fragIAC);
+	    fragmentLibrary.add(fragment);
 	    
 		currFrgIdx = 0;
 		
@@ -557,6 +560,23 @@ public class GUIFragmentInspector extends GUICardPanel
 			fragmentLibrary = DenoptimIO.readMoleculeData(
 												file.getAbsolutePath());
 			
+			// Transfer APs from molecular property to atom
+			for (IAtomContainer frg : fragmentLibrary)
+			{
+				if (frg instanceof DENOPTIMFragment)
+				{
+					((DENOPTIMFragment) frg).projectPropertyToAP();
+					
+					frg.setProperty("Original"+DENOPTIMConstants.APTAG, 
+							frg.getProperty(DENOPTIMConstants.APTAG));
+					frg.removeProperty(DENOPTIMConstants.APTAG);
+					
+					frg.setProperty("Original"+DENOPTIMConstants.APCVTAG, 
+							frg.getProperty(DENOPTIMConstants.APCVTAG));
+					frg.removeProperty(DENOPTIMConstants.APCVTAG);
+				}
+			}
+			
 			// Display the first
 			currFrgIdx = 0;
 			loadCurrentFragIdxToViewer();
@@ -584,7 +604,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private void loadCurrentAsPlainStructure()
 	{
-		if (fragIAC == null)
+		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(null,
 	                "<html>No structure loaded.<br>This is most likely a bug!"
@@ -599,7 +619,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// fragile/discontinued CDK-to-Jmol support.
 		
 		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, fragIAC, false);
+			DenoptimIO.writeMolecule(tmpSDFFile, fragment, false);
 		} catch (DENOPTIMException e) {
 			// TODO change and look for other tmp file locations
 			e.printStackTrace();
@@ -633,28 +653,23 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Load the molecular data into Jmol
 		// NB: we use the nasty trick of a tmp file to by-pass the 
 		// fragile/discontinued CDK-to-Jmol support.
-		fragIAC = fragmentLibrary.get(currFrgIdx);
+		fragment = fragmentLibrary.get(currFrgIdx);
 		loadCurrentAsPlainStructure();
 		
-		// Get attachment point data
-        try
-        {
-            lstAPs = FragmentUtils.getAPForFragment(fragIAC);
-        }
-        catch (DENOPTIMException de)
+		// Get attachment point data in tmp storage, which we use for edits
+		lstAPs = fragment.getCurrentAPs();
+        if (lstAPs.size() == 0)
         {
 			JOptionPane.showMessageDialog(null,
-	                "<html>Fragment #" + (currFrgIdx + 1) 
-	                + " does not seem to be"
-	                + "properly formatted.<br> Hint: " 
-	                + de.getMessage() + "</html>",
-	                "Error",
+	                "Fragment #" + (currFrgIdx + 1) 
+	                + " does not have any attachment point.",
+	                "No Attachment Points",
 	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
+	                UIManager.getIcon("OptionPane.warningIcon"));
 			return;
         }
         
-        // Load the attachment point information into the table
+        // Load the attachment points information into the table
         for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
         {
         	apTabModel.removeRow(i);
@@ -682,7 +697,7 @@ public class GUIFragmentInspector extends GUICardPanel
         {
         	arrId++;
         	int srcAtmId = ap.getAtomPositionNumber();
-        	Point3d srcAtmPlace = fragIAC.getAtom(srcAtmId).getPoint3d();
+        	Point3d srcAtmPlace = fragment.getAtom(srcAtmId).getPoint3d();
         	double[] startArrow = new double[]{
         			srcAtmPlace.x,
         			srcAtmPlace.y,

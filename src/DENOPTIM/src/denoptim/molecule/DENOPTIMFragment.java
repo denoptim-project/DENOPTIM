@@ -18,34 +18,14 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
-import net.sf.jniinchi.INCHI_RET;
-
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.Bond;
 import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IBond.Order;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.smsd.Isomorphism;
-import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.cdk.smiles.SmilesGenerator;
-import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
-import org.openscience.cdk.inchi.InChIGeneratorFactory;
-import org.openscience.cdk.inchi.InChIGenerator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -244,8 +224,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 //-----------------------------------------------------------------------------
     
     /**
-     * Collects APs as molecular property. Use this to save the fragment in an
-     * SDF file.
+     * Collects APs currently defined as properties of the atoms.
      * Converts the internal notation defining APs (i.e., APs are stored in
      * as atom-specific properties) to the standard DENOPTIM formalism (i.e.,
      * APs are collected in a molecular property).

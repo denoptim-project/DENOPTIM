@@ -97,6 +97,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.rings.ClosableChain;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -296,6 +297,50 @@ public class DenoptimIO
         }
 
         return lstContainers.get(0);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the 2D/3D representation of the molecule to multi-SD file
+     *
+     * @param fileName The file to be written to
+     * @param mols The molecules to be written
+     * @throws DENOPTIMException
+     */
+    public static void writeFragmentSet(String fileName,
+            ArrayList<DENOPTIMFragment> mols)
+            throws DENOPTIMException
+    {
+        SDFWriter sdfWriter = null;
+        try
+        {
+            IAtomContainerSet molSet = new AtomContainerSet();
+            for (int idx = 0; idx < mols.size(); idx++)
+            {
+                molSet.addAtomContainer((IAtomContainer) mols.get(idx));
+            }
+            sdfWriter = new SDFWriter(new FileWriter(new File(fileName)));
+            sdfWriter.write(molSet);
+        }
+        catch (CDKException | IOException cdke)
+        {
+            throw new DENOPTIMException(cdke);
+        }
+        finally
+        {
+            try
+            {
+                if (sdfWriter != null)
+                {
+                    sdfWriter.close();
+                }
+            }
+            catch (IOException ioe)
+            {
+                throw new DENOPTIMException(ioe);
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
