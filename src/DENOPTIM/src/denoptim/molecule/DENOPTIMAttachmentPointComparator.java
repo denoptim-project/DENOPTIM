@@ -21,7 +21,8 @@ package denoptim.molecule;
 import java.util.Comparator;
 
 /**
- * Comparator for attachment points
+ * Comparator for DENOPTIMAttachmentPoint
+ * 
  * @author Marco Foscato
  */
 

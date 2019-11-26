@@ -45,13 +45,13 @@ fi
 
 echo "--------------------- Done building DENOPTIM.jar ---------------------"
 
-## Run all JUnit tests
-java -jar ../test/junit/junit-platform-console-standalone-1.5.1.jar -cp lib/DENOPTIM.jar --scan-classpath --details=tree
+## Run all JUnit tests (including CDK's)
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar --scan-classpath --details=tree
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.1.jar -cp lib/DENOPTIM.jar -c denoptim.molecule.DENOPTIMAttachmentPointTest
+java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar -p denoptim
 
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.1.jar -cp lib/DENOPTIM.jar -m denoptim.io.DenoptimIOTest#test
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar -m denoptim.io.DenoptimIOTest#test
 

@@ -20,12 +20,13 @@ package denoptim.molecule;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint
@@ -35,12 +36,101 @@ import denoptim.fragspace.FragmentSpace;
 
 public class DENOPTIMAttachmentPointTest
 {
-
+	private final int ATMID = 6;
+	private final int APCONN = 3;
+	private final String APRULE = "MyRule";
+	private final String APSUBRULE = "1";
+	private final String APCLASS = APRULE
+			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
+	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
+	
     @Test
-    public void testOne() throws Exception
+    public void testConstructorsAndSDFString() throws Exception
     {
-	//TODO
-    	assertEquals(true,1>0);
+
+    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
+    	ap.setAPClass(APCLASS);
+    	ap.setAPConnections(APCONN);
+    	ap.setAtomPositionNumber(ATMID);
+    	ap.setDirectionVector(DIRVEC);
+    	
+    	String str2 = ap.getSingleAPStringSDF(true);
+    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(str2,"SDF");
+    	
+    	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
+    			+ ap.getSingleAPStringSDF(false);
+    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(str3,"SDF");
+    	
+    	assertEquals(ap.getSingleAPStringSDF(true),
+    			ap2.getSingleAPStringSDF(true));
+    	assertEquals(ap2.toString(),ap3.toString());
+    }
+    
+    @Test
+    public void testConstructorsAndSDFStringNoDirVec() throws Exception
+    {
+
+    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
+    	ap.setAPClass(APCLASS);
+    	ap.setAPConnections(APCONN);
+    	ap.setAtomPositionNumber(ATMID);
+    	
+    	String str2 = ap.getSingleAPStringSDF(true);
+    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(str2,"SDF");
+    	
+    	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
+    			+ ap.getSingleAPStringSDF(false);
+    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(str3,"SDF");
+    	
+    	assertEquals(ap.getSingleAPStringSDF(true),
+    			ap2.getSingleAPStringSDF(true));
+    	assertEquals(ap2.toString(),ap3.toString());
+    }
+    
+    @Test
+    public void testSortAPs() throws Exception
+    {
+    	DENOPTIMAttachmentPoint ap1 = new DENOPTIMAttachmentPoint(0,2,1);
+    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(1,1,1);
+    	
+    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint();
+    	ap3.setAPClass("AA:0");
+    	ap3.setAtomPositionNumber(4);
+    	ap3.setDirectionVector(DIRVEC);
+    	
+    	DENOPTIMAttachmentPoint ap4 = new DENOPTIMAttachmentPoint();
+    	ap4.setAPClass("AA:1");
+    	ap4.setAtomPositionNumber(4);
+    	ap4.setDirectionVector(DIRVEC);
+    	
+    	DENOPTIMAttachmentPoint ap5 = new DENOPTIMAttachmentPoint();
+    	ap5.setAPClass(APCLASS);
+    	ap5.setAtomPositionNumber(5);
+    	ap5.setDirectionVector(new double[]{1.1, 2.2, 3.3});
+
+    	DENOPTIMAttachmentPoint ap6 = new DENOPTIMAttachmentPoint();
+    	ap6.setAPClass(APCLASS);
+    	ap6.setAtomPositionNumber(5);
+    	ap6.setDirectionVector(new double[]{2.2, 2.2, 3.3});
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> list = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	
+    	list.add(ap6);
+    	list.add(ap5);
+    	list.add(ap4);
+    	list.add(ap3);
+    	list.add(ap2);
+    	list.add(ap1);
+    	
+    	Collections.sort(list, new DENOPTIMAttachmentPointComparator());
+    	
+    	assertEquals(list.get(0),ap1);
+    	assertEquals(list.get(1),ap2);
+    	assertEquals(list.get(2),ap3);
+    	assertEquals(list.get(3),ap4);
+    	assertEquals(list.get(4),ap5);
+    	assertEquals(list.get(5),ap6);
     }
     
 //------------------------------------------------------------------------------
