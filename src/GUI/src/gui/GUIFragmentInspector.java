@@ -204,6 +204,7 @@ public class GUIFragmentInspector extends GUICardPanel
             	//NB here we convert from 1-based index in GUI to o-based index
             	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
             	loadCurrentFragIdxToViewer();
+            	
             	activateTabEditsListener(true);
             }
         });
@@ -425,7 +426,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Now we should have a structure loaded in the viewer, 
 		// so we take that one and put it in the IAtomContainer representation
 		try	{
-		    fragment = getStructureFromJmolViewer();
+		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer());
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -436,7 +437,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			return;
 		}
 		
-		fragmentLibrary = new ArrayList<IAtomContainer>();
+		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
 		
 		// the system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty
@@ -555,10 +556,15 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	public void importFragmentsFromFile(File file)
 	{	
-		try {
+		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
+		try 
+		{
 			// Import library of fragments
-			fragmentLibrary = DenoptimIO.readMoleculeData(
-												file.getAbsolutePath());
+			for (IAtomContainer iac : DenoptimIO.readMoleculeData(
+												file.getAbsolutePath()))
+			{
+			    fragmentLibrary.add(new DENOPTIMFragment(iac));
+			}
 			
 			// Transfer APs from molecular property to atom
 			for (IAtomContainer frg : fragmentLibrary)
@@ -812,6 +818,7 @@ public class GUIFragmentInspector extends GUICardPanel
     {
 		try
 		{
+			//TODO: fix!!!
 			//System.out.println("#TMLISTENERS: "+apTabModel.getTableModelListeners());
 			PausableTableModelListener l = (PausableTableModelListener) apTabModel.getTableModelListeners()[0];
 			//System.out.println(l.getClass());
@@ -838,7 +845,8 @@ public class GUIFragmentInspector extends GUICardPanel
   			 * which causes the scrolling of the entire list of fragments
   	         */
 
-  			//TODO SAVE System.out.println("SAVING!");
+  			//TODO SAVE 
+  			System.out.println("SAVING!");
 	        	
   	        alteredAPData = false;
   		}

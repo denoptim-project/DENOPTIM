@@ -59,7 +59,10 @@ public class HomePanel extends GUICardPanel
 		centralPanel.add(figurePanel);
 		
 		JLabel show_image = new JLabel("");
-		show_image.setIcon(new ImageIcon(new ImageIcon(this.getClass().getClass().getResource("/images/DENOPTIM_extended_logo.png")).getImage()));
+		
+		show_image.setIcon(new ImageIcon(new ImageIcon(
+				this.getClass().getClass().getResource(
+						"/DENOPTIM_extended_logo.png")).getImage()));
 		figurePanel.add(show_image);
 		
 		//Shortcuts panel
