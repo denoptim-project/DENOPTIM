@@ -247,7 +247,10 @@ public class GUIFragmentInspector extends GUICardPanel
         btnOpenSMILES.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                 	String smiles = JOptionPane.showInputDialog("Please input SMILES: ");
-                	importStructureFromSMILES(smiles);
+                	if (smiles != null && !smiles.trim().equals(""))
+                	{
+                	    importStructureFromSMILES(smiles);
+                	}
                 }
         });
         pnlOpenSMILES.add(btnOpenSMILES);
@@ -361,6 +364,9 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	public void importStructureFromFile(File file)
 	{
+		// Cleanup
+		clearCurrentSystem();
+		
 		// Initialize array 
 		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
 		try {			
@@ -394,7 +400,10 @@ public class GUIFragmentInspector extends GUICardPanel
 	 * @param smiles the SMILES string
 	 */
 	public void importStructureFromSMILES(String smiles)
-	{		
+	{	
+		// Cleanup
+		clearCurrentSystem();
+		
 		// Load the structure using CACTUS service via Jmol
 		jmolPanel.viewer.evalString("load $"+smiles);
 		waitForJmolViewer();
@@ -462,13 +471,13 @@ public class GUIFragmentInspector extends GUICardPanel
 		String[] lines = strData.split("\\n");
 		if (lines.length < 5)
 		{
-			jmolPanel.viewer.evalString("zap");
+			clearCurrentSystem();
 			throw new DENOPTIMException("Unexpected format in Jmol molecular "
 					+ "data: " + strData);
 		}
 		if (!lines[3].matches(".*999 V2000.*"))
 		{
-			jmolPanel.viewer.evalString("zap");
+			clearCurrentSystem();
 			throw new DENOPTIMException("Unexpected format in Jmol molecular "
 					+ "data: " + strData);
 		}
@@ -655,6 +664,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;
 		}
+		
+		clearCurrentSystem();
 			
 		// Load the molecular data into Jmol
 		// NB: we use the nasty trick of a tmp file to by-pass the 
@@ -666,20 +677,11 @@ public class GUIFragmentInspector extends GUICardPanel
 		lstAPs = fragment.getCurrentAPs();
         if (lstAPs.size() == 0)
         {
-			JOptionPane.showMessageDialog(null,
-	                "Fragment #" + (currFrgIdx + 1) 
-	                + " does not have any attachment point.",
-	                "No Attachment Points",
-	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.warningIcon"));
+        	// WARNING: no dialog here because it fires event changes in JSpinner
 			return;
         }
         
         // Load the attachment points information into the table
-        for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
-        {
-        	apTabModel.removeRow(i);
-        }
         apTabModel.addRow(new Object[]{"<html><b>AP<b></html>",
 		"<html><b>APClass<b></html>"});
         int arrId = 0;  //NB: consistent with updateAPsInJmolViewer()
@@ -691,6 +693,26 @@ public class GUIFragmentInspector extends GUICardPanel
         
         // Display the APs as arrows
         updateAPsInJmolViewer();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void clearCurrentSystem()
+	{
+		// Get rid of currently loaded mol
+		fragment = null;
+		
+		// Clear viewer
+		jmolPanel.viewer.evalString("zap");
+		
+		// Remove tmp storage of APs
+		lstAPs = null;
+		
+		// Remove table of APs
+        for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
+        {
+        	apTabModel.removeRow(i);
+        }
 	}
 
 //-----------------------------------------------------------------------------
