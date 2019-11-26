@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -93,8 +94,12 @@ public class GUIFragmentInspector extends GUICardPanel
 	private JPanel fragCtrlPane;
 	private JPanel fragNavigPanel;
 	
+	private JButton btnOpenFrags;
+	
 	private JSpinner fragNavigSpinner;
 	private JLabel totalFragsLabel;
+	private final FragSpinnerChangeEvent fragSpinnerListener = 
+			new FragSpinnerChangeEvent();
 	
 	private DefaultTableModel apTabModel;
 	private JTable apTable;
@@ -193,21 +198,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		fragNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
 		fragNavigSpinner.setToolTipText("Move to fragment number...");
 		fragNavigSpinner.setPreferredSize(new Dimension(75,20));
-		fragNavigSpinner.addChangeListener(new ChangeListener()
-        {
-            @Override
-            public void stateChanged(ChangeEvent event)
-            {
-            	activateTabEditsListener(false);
-            	saveUnsavedChanges();
-            	
-            	//NB here we convert from 1-based index in GUI to o-based index
-            	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
-            	loadCurrentFragIdxToViewer();
-            	
-            	activateTabEditsListener(true);
-            }
-        });
+		fragNavigSpinner.addChangeListener(fragSpinnerListener);
         fragNavigPanel.add(navigationLabel1);
 		fragNavigPanel.add(fragNavigSpinner);
         fragNavigPanel.add(navigationLabel2);
@@ -215,13 +206,6 @@ public class GUIFragmentInspector extends GUICardPanel
 		fragCtrlPane.add(fragNavigPanel);
 		
 		fragCtrlPane.add(new JSeparator());
-		
-		/*
-		JPanel pnlTitleImport = new JPanel();
-		JLabel lblImport = new JLabel("Import a molecular model");
-		pnlTitleImport.add(lblImport);
-		fragCtrlPane.add(pnlTitleImport);
-		*/
 		
 		pnlOpenMol = new JPanel();
 		btnOpenMol = new JButton("Structure from File");
@@ -298,7 +282,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		JButton btnOpenFrags = new JButton("Load",
+		btnOpenFrags = new JButton("Load",
 					UIManager.getIcon("FileView.directoryIcon"));
 		btnOpenFrags.setToolTipText("Reads fragments from file.");
 		btnOpenFrags.addActionListener(new ActionListener() {
@@ -337,6 +321,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			                JOptionPane.PLAIN_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
 				}
+				deprotectEditedSystem();
 			}
 		});
 		commandsPane.add(btnSaveFrags);
@@ -819,11 +804,11 @@ public class GUIFragmentInspector extends GUICardPanel
 		@Override
 		public void tableChanged(TableModelEvent e) 
 		{
-            if (isActive && e.getType() == TableModelEvent.UPDATE)
+            if (isActive && !alteredAPData 
+            		&& e.getType() == TableModelEvent.UPDATE)
             {
                 alteredAPData = true;
-                //TODOdel
-                System.out.println("TABLE CHANGED! "+this);
+                protectEditedSystem();
             }
 		}
         
@@ -831,7 +816,80 @@ public class GUIFragmentInspector extends GUICardPanel
 		{
 			isActive = var;
 		}
-        
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class FragSpinnerChangeEvent implements ChangeListener
+	{
+		private boolean inEnabled = true;
+		
+		public FragSpinnerChangeEvent()
+		{}
+		
+		/**
+		 * Enables/disable the listener
+		 * @param var <code>true</code> to activate listener, 
+		 * <code>false</code> to disable.
+		 */
+		public void setEnabled(boolean var)
+		{
+			this.inEnabled = var;
+		}
+		
+        @Override
+        public void stateChanged(ChangeEvent event)
+        {
+        	if (!inEnabled)
+        	{
+        		return;
+        	}
+        	
+        	activateTabEditsListener(false);
+        	saveUnsavedChanges();
+        	
+        	//NB here we convert from 1-based index in GUI to 0-based index
+        	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
+        	loadCurrentFragIdxToViewer();
+        	
+        	activateTabEditsListener(true);
+        }
+	}
+	
+//-----------------------------------------------------------------------------
+
+	private void deprotectEditedSystem()
+	{
+		btnOpenFrags.setEnabled(true);
+		btnOpenSMILES.setEnabled(true); 
+		btnOpenMol.setEnabled(true);
+		
+		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
+				fragmentLibrary.size(), 1));
+		((DefaultEditor) fragNavigSpinner.getEditor())
+			.getTextField().setEditable(true); 
+		((DefaultEditor) fragNavigSpinner.getEditor())
+			.getTextField().setForeground(Color.BLACK);
+		
+		fragSpinnerListener.setEnabled(true);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void protectEditedSystem()
+	{
+		btnOpenFrags.setEnabled(false);
+		btnOpenSMILES.setEnabled(false); 
+		btnOpenMol.setEnabled(false);
+		
+		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 
+				currFrgIdx+1, currFrgIdx+1, 1));
+		((DefaultEditor) fragNavigSpinner.getEditor())
+			.getTextField().setEditable(false); 
+		((DefaultEditor) fragNavigSpinner.getEditor())
+			.getTextField().setForeground(Color.GRAY);
+		
+		fragSpinnerListener.setEnabled(false);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -840,17 +898,13 @@ public class GUIFragmentInspector extends GUICardPanel
     {
 		try
 		{
-			//TODO: fix!!!
-			//System.out.println("#TMLISTENERS: "+apTabModel.getTableModelListeners());
-			PausableTableModelListener l = (PausableTableModelListener) apTabModel.getTableModelListeners()[0];
-			//System.out.println(l.getClass());
+			PausableTableModelListener l = (PausableTableModelListener) 
+					apTabModel.getTableModelListeners()[0];
     	    l.setActive(var);
-    	    
-    	    System.out.println("TabListener is active: "+l.isActive + " " + l);
-    	    
 		} catch (Throwable t) {
 			//t.printStackTrace();
-			System.out.println("Bad attempt to contro llistener: "+t.getMessage());
+			System.out.println("Bad attempt to contro llistener: " 
+					+ t.getMessage());
 			System.out.println(t.getCause());
 		}
     }
@@ -867,10 +921,13 @@ public class GUIFragmentInspector extends GUICardPanel
   			 * which causes the scrolling of the entire list of fragments
   	         */
 
+  			// Maybe with the disable listener the problem of the dialog is not a proble anymore...
+  			
   			//TODO SAVE 
   			System.out.println("SAVING!");
 	        	
   	        alteredAPData = false;
+  	        deprotectEditedSystem();
   		}
   	}
   	
