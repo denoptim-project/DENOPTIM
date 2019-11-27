@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javajs.util.BS;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -34,8 +36,12 @@ import javax.vecmath.Point3d;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
+import org.jmol.api.JmolSelectionListener;
 import org.jmol.api.JmolViewer;
+import org.jmol.util.BSUtil;
+import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -251,10 +257,68 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnAtmToAP = new JButton("Atom to AP");
 		btnAtmToAP.setToolTipText("<html>Replaces the selected atom with an "
 				+ "attachment point.<br>APClass can be specified after clcking"
-				+ " here.<html>");
+				+ " here.<br><b>WARNING:</b> this will change the currently"
+				+ " loaded structure. No undo.<html>");
 		btnAtmToAP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO 
+				ArrayList<IAtom> selectedAtms = getAtomsSelectedFromJMol();
+				
+				if (selectedAtms.size() == 0)
+				{
+					JOptionPane.showMessageDialog(null,
+			                "No atom selected! Click on atoms to select them",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
+				else
+				{
+					//TODO: deal with changes to the AP table first
+					
+					
+					//TODO: ask about hapticity:
+					// if multihapto, then use all the selected atoms for 1 AP
+					// and ask to select another set for other end of bond to 
+					// break.
+					
+					String apClass = ensureGoodAPClassString("");
+					
+					ArrayList<IAtom> failed = new ArrayList<IAtom>();
+					for (IAtom atm : selectedAtms)
+					{
+						if (!convertAtomToAP(atm, apClass))
+						{
+							failed.add(atm);
+						}
+					}
+					for (IAtom atm : failed)
+					{
+						selectedAtms.remove(atm);
+					}
+					if (selectedAtms.size() == 0)
+					{
+						return;
+					}
+					
+					removeAtoms(selectedAtms);
+					
+					// Use the APs stored in the atoms
+					fragment.updateAPs();
+					
+					// Load the "fragment" obj to the viewer
+					loadCurrentAsPlainStructure();
+					
+					// Update APs using info in atoms (overwrites map and table)
+					updateAPsMapAndTable();
+			        
+			        // Display the APs as arrows
+			        updateAPsInJmolViewer();
+					
+			        // Protect the temporary "fragment" obj
+			        alteredAPData = true;
+			        protectEditedSystem();
+				}
 			}
 		});
 		pnlAtmToAP.add(btnAtmToAP);
@@ -268,7 +332,39 @@ public class GUIFragmentInspector extends GUICardPanel
 				+ " points.<br>Use this instead of Jmol commands.</html>");
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO 
+				ArrayList<IAtom> selectedAtms = getAtomsSelectedFromJMol();
+				
+				if (selectedAtms.size() == 0)
+				{
+					JOptionPane.showMessageDialog(null,
+			                "No atom selected! Click on atoms to select them",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
+				else
+				{
+					//TODO: deal with changes to the AP table first
+					
+					removeAtoms(selectedAtms);
+					
+					// Use the APs stored in the atoms
+					fragment.updateAPs();
+					
+					// Load the "fragment" obj to the viewer
+					loadCurrentAsPlainStructure();
+					
+					// Update APs using info in atoms (overwrites map and table)
+					updateAPsMapAndTable();
+			        
+			        // Display the APs as arrows
+			        updateAPsInJmolViewer();
+					
+			        // Protect the temporary "fragment" obj
+			        alteredAPData = true;
+			        protectEditedSystem();
+				}
 			}
 		});
 		pnlDelSel.add(btnDelSel);
@@ -548,7 +644,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				else
 				{
-					wallTime = date.getTime() + 5000;
+					wallTime = newDate.getTime() + 5000;
 				}
 			}
 			try {
@@ -661,7 +757,21 @@ public class GUIFragmentInspector extends GUICardPanel
 		fragment = fragmentLibrary.get(currFrgIdx);
 		loadCurrentAsPlainStructure();
 		
-		// Get attachment point data in tmp storage, which we use for edits
+		// Update APs using info in atoms (overwrites map and table)
+		updateAPsMapAndTable();
+        
+        // Display the APs as arrows
+        updateAPsInJmolViewer();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Uses the AP of the {@link DENOPTIMFragment} to create a new map and 
+	 * table of APs.
+	 */
+	private void updateAPsMapAndTable()
+	{
 		ArrayList<DENOPTIMAttachmentPoint> lstAPs = fragment.getCurrentAPs();
         if (lstAPs.size() == 0)
         {
@@ -669,10 +779,13 @@ public class GUIFragmentInspector extends GUICardPanel
 			return;
         }
         
-        // Load the attachment points information into the table and map
-        apTabModel.addRow(new Object[]{"<html><b>AP<b></html>",
+		clearAPTable();
+        
+        apTabModel.addRow(new Object[]{"<html><b>AP#<b></html>",
 		"<html><b>APClass<b></html>"});
+        
         mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
+        
         int arrId = 0;
 	    for (DENOPTIMAttachmentPoint ap : lstAPs)
 	    {
@@ -680,9 +793,16 @@ public class GUIFragmentInspector extends GUICardPanel
 	    	apTabModel.addRow(new Object[]{arrId, ap.getAPClass()});
 	    	mapAPs.put(arrId,ap);
 	    }
-        
-        // Display the APs as arrows
-        updateAPsInJmolViewer();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void clearAPTable()
+	{
+        for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
+        {
+        	apTabModel.removeRow(i);
+        }
 	}
 	
 //-----------------------------------------------------------------------------
@@ -699,10 +819,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		mapAPs = null;
 		
 		// Remove table of APs
-        for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
-        {
-        	apTabModel.removeRow(i);
-        }
+		clearAPTable();
 	}
 
 //-----------------------------------------------------------------------------
@@ -774,7 +891,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private class JmolPanel extends JPanel {
+	private class JmolPanel extends JPanel 
+	{
 
         /**
 		 * Version UID
@@ -789,12 +907,136 @@ public class GUIFragmentInspector extends GUICardPanel
             viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
             null, null, null, null, null); //NB: can add listener here
         }
+        
+        //---------------------------------------------------------------------
 
         @Override
         public void paint(Graphics g) {
             getSize(hostPanelSize);
             viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
         }
+    }
+
+//-----------------------------------------------------------------------------
+    
+    private ArrayList<IAtom> getAtomsSelectedFromJMol()
+    {
+    	ArrayList<IAtom> selectedAtms = new ArrayList<IAtom>();
+    	
+    	if (fragment == null || fragment.getAtomCount()==0)
+    	{
+    		return selectedAtms;
+    	}
+    	
+		for (int i =0; i< fragment.getAtomCount(); i++)
+		{
+			if (((Viewer) jmolPanel.viewer).slm.isSelected(i))
+			{
+				selectedAtms.add(fragment.getAtom(i));
+			}
+		}
+    	
+		return selectedAtms;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Removes an atom and replaces it with an attachment point.
+     * @param apClass the attachment point class of the new fragment
+     * @param trgAtm
+     * @return <code>true</code> if the conversion was successful
+     */
+    private boolean convertAtomToAP(IAtom trgAtm, String apClass)
+    {
+    	// Accept ONLY if the atom has one and only one connected neighbor
+    	if (fragment.getConnectedAtomsCount(trgAtm) != 1)
+    	{
+			JOptionPane.showMessageDialog(null,
+	                "<html>Atom "+ trgAtm.getSymbol() 
+	                + (fragment.getAtomNumber(trgAtm)) 
+	                + " has more than one bond.<br>I can only transform atoms"
+	                + " that have one bond.</html>",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+    		return false;
+    	}
+    	
+    	IAtom srcAtm = fragment.getConnectedAtomsList(trgAtm).get(0);
+    	
+    	Point3d srcP3d = srcAtm.getPoint3d();
+    	Point3d trgP3d = trgAtm.getPoint3d();
+    	Point3d vector = new Point3d();
+    	vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
+    	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
+    	vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
+    	try {
+			fragment.addAP(srcAtm, apClass, vector);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+	                "<html>Could not make AP.<br>Possible cause: " 
+	                + e.getMessage() +"</html>",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+    		return false;
+		}   	
+    	return true;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Create a multihapto AP from centroids of set of atoms.
+     * @param srcAtms the set to be used to calculate centroid of the start of
+     * the formal bond to break, or the end atom if only one is present
+     * @param endAtm the set to be used to calculate centroid of the end of the
+     * formal bond to break, or the end atom if only one is present
+     * 
+     */
+    private void createAP(IAtom[] srcAtms, IAtom[] endAtms)
+    {
+    	//TODO
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Create a simple AP considering the bond from one atom to another.
+     * @param srcAtm the atom on the fragment, and that will hold the AP
+     * @param trgAtm the atom representing the next fragment, which does not 
+     * exist. This atom will be removed from the system.
+     */
+    private void createAP(IAtom srcAtm, IAtom trgAtm)
+    {  		
+    	//Ask about class
+    	//TODO
+    	
+    	//Make AP (use half-bond position for AP end)
+    	//TODO
+    	
+    	// Remove atom
+    	//TODO
+    	
+    	// Update APs
+    	//TODO
+    	
+    	//Update viewer
+    	//TODO
+    }
+    
+//----------------------------------------------------------------------------
+
+    private void removeAtoms(ArrayList<IAtom> selectedAtms)
+    {
+    	for (IAtom atm : selectedAtms)
+    	{
+    		fragment.removeAtom(atm);
+    	}
+    	
+    	
     }
 	
 //-----------------------------------------------------------------------------
@@ -943,13 +1185,10 @@ public class GUIFragmentInspector extends GUICardPanel
 			JOptionPane.showMessageDialog(null,
 	                "<html>Could not understand Jmol system.</html>",
 	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
+	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;
 		}
-  		
-  		// Deal with change of atom list
-  		//TODO?
   		
   		// Import changes from AP table into molecular representation
         for (int i=1; i<apTabModel.getRowCount(); i++) 
@@ -958,23 +1197,7 @@ public class GUIFragmentInspector extends GUICardPanel
         	String currApClass = apTabModel.getValueAt(i, 1).toString();
         	
         	// Make sure the new class has a proper syntax
-        	while (!isGoodClass(currApClass))
-        	{
-        		currApClass = JOptionPane.showInputDialog("<html>APClass '"
-            			+ currApClass + "' is not valid!<br>"
-            			+ "The valid syntax is:<br><br><code>      rule" 
-            			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
-        				+ "subClass</code><br><br> where "
-        				+ "<ul><li><code>rule</code>"
-        				+ " is a string (no spaces)</li>"
-        				+ "<li><code>subClass</code> is an integer</li>"
-        				+ "</ul>Please, provide a valid "
-        				+ "APClass alternative: ");
-            	if (currApClass == null)
-            	{
-            		currApClass = "";
-            	}
-        	}
+        	currApClass = ensureGoodAPClassString(currApClass);
         	
         	if (mapAPs.containsKey(apId))
         	{
@@ -1041,29 +1264,37 @@ public class GUIFragmentInspector extends GUICardPanel
         deprotectEditedSystem();
   	}
   	
- //----------------------------------------------------------------------------
-
-  	//TODO: maybe move this functionality to general library
-  	
-	private boolean isGoodClass(String currApClass) {	
-		if (!currApClass.matches("^[a-z,A-Z,0-9].*"))
-			return false;
-		
-		if (!currApClass.matches(".*[0-9]$"))
-			return false;
-		
-		if (currApClass.contains("\\s"))
-			return false;
-		
-		if (!currApClass.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
-			return false;
-		
-		int numSep = StringUtils.countMatches(currApClass,
-				DENOPTIMConstants.SEPARATORAPPROPSCL);
-		if (1 != numSep)
-			return false;
-		
-		return true;
+//----------------------------------------------------------------------------
+  	/**
+  	 * Forces the user to specify a properly formatted APClass.
+  	 * @param currApClass the current value of the APClass, or empty string
+  	 * @return 
+  	 */
+	private String ensureGoodAPClassString(String currApClass) 
+	{		
+		String preStr = "";
+		while (!DENOPTIMAttachmentPoint.isValidAPClassString(currApClass))
+    	{
+    		currApClass = JOptionPane.showInputDialog("<html>" + preStr 
+    				+ "</ul>Please, provide a valid "
+    				+ "APClass string: ");
+        	if (currApClass == null)
+        	{
+        		currApClass = "";
+        	}
+        	
+    		String syntax = "APClass '" + currApClass + "' is not valid!<br>"
+    				+ "The valid syntax for APClass is:<br><br><code>rule" 
+        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
+    				+ "subClass</code><br><br> where "
+    				+ "<ul><li><code>rule</code>"
+    				+ " is a string (no spaces)</li>"
+    				+ "<li><code>subClass</code> is an integer</li>";
+        	
+        	preStr = syntax;
+    	}
+    	
+    	return currApClass;
 	}
   	
 //-----------------------------------------------------------------------------

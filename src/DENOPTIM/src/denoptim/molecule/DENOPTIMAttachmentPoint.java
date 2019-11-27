@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -376,12 +378,42 @@ public class DENOPTIMAttachmentPoint implements Serializable
      */
     public void setAPClass(String m_class) throws DENOPTIMException
     {
-    	if (!m_class.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
+    	if (!isValidAPClassString(m_class))
     	{
-    		throw new DENOPTIMException("Attempt to use APClass that does not" 
-    					+ "contain main:subclass pair");
+    		throw new DENOPTIMException("Attempt to use APClass '" + m_class 
+    					+"' that does not respect main:subclass syntax.");
     	}
         apClass = m_class;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluate is a candidate string can be used as APClass. This method checks
+     * whether the string reflects the expected syntax of an APClass string
+     * 
+     */
+    
+    public static boolean isValidAPClassString(String temptAPClass)
+    {
+		if (!temptAPClass.matches("^[a-z,A-Z,0-9].*"))
+			return false;
+		
+		if (!temptAPClass.matches(".*[0-9]$"))
+			return false;
+		
+		if (temptAPClass.contains(" "))
+			return false;
+		
+		if (!temptAPClass.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
+			return false;
+		
+		int numSep = StringUtils.countMatches(temptAPClass,
+				DENOPTIMConstants.SEPARATORAPPROPSCL);
+		if (1 != numSep)
+			return false;
+		
+		return true;
     }
 
 //------------------------------------------------------------------------------
