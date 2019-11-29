@@ -186,15 +186,24 @@ public class MainToolBar extends JMenuBar {
 			}
 		});
 		newMenu.add(newVS);
+		JMenuItem newFr = new JMenuItem("New Fragments");
+		newFr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.add(new GUIFragmentInspector(mainPanel));
+			}
+		});
+		newMenu.add(newFr);
 		
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File file = DenoptimGUIFileOpener.pickFile();
 				try {
-					openFile(file, DenoptimGUIFileOpener.detectFileFormat(file));
+					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
+							file));
 				} catch (Exception e1) {
-					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS", "FRAGMETS"};
+					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
+							"FRAGMENTS"};
 					int res = JOptionPane.showOptionDialog(null,
 						"<html>Failed to detect file type automatically.<br>"
 						+ "Temptative reason: " + e1.getMessage() + "<br>"
@@ -275,7 +284,7 @@ public class MainToolBar extends JMenuBar {
 			case ("FRAGMENTS"):
 				GUIFragmentInspector fragPanel = new GUIFragmentInspector(mainPanel);
 				mainPanel.add(fragPanel);
-				fragPanel.importFragmentsFromFile(file);
+				fragPanel.importFragmentsFromFile(file,"SDF");
 				break;	
 				
 /*

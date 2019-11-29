@@ -229,7 +229,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnAddFrag.setToolTipText("Starts creation of a new fragment.");
 		btnAddFrag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] options = new String[]{"SMILES","File"};
+				String[] options = new String[]{"SMILES","File","Cancel"};
 				int res = JOptionPane.showOptionDialog(null,
 		                "<html>Importing structure for creation of a new "
 		                + "fragment<br>"
@@ -244,23 +244,27 @@ public class GUIFragmentInspector extends GUICardPanel
 		                UIManager.getIcon("OptionPane.warningIcon"),
 		                options,
 		                options[1]);
-				if (res == 0)
+				switch (res)
 				{
-					String smiles = JOptionPane.showInputDialog(
-                			"Please input SMILES: ");
-                	if (smiles != null && !smiles.trim().equals(""))
-                	{
-                	    importStructureFromSMILES(smiles);
-                	}
-				}
-				else
-				{
-					File inFile = DenoptimGUIFileOpener.pickFile();
-					if (inFile == null || inFile.getAbsolutePath().equals(""))
-					{
-						return;
-					}
-					importStructureFromFile(inFile);
+					case 0:
+						String smiles = JOptionPane.showInputDialog(
+	                			"Please input SMILES: ");
+	                	if (smiles != null && !smiles.trim().equals(""))
+	                	{
+	                	    importStructureFromSMILES(smiles);
+	                	}
+	                	break;
+	                	
+	                case 1:
+						File inFile = DenoptimGUIFileOpener.pickFile();
+						if (inFile == null || inFile.getAbsolutePath().equals(""))
+						{
+							return;
+						}
+						importStructureFromFile(inFile);
+						
+	                case 3:
+	                	return;
 				}
 			}
 		});
@@ -289,7 +293,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		pnlOpenMol = new JPanel();
 		btnOpenMol = new JButton("Structure from File");
 		btnOpenMol.setToolTipText("Imports a chemical system"
-				+ "from file.");
+				+ " from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = DenoptimGUIFileOpener.pickFile();
@@ -305,8 +309,10 @@ public class GUIFragmentInspector extends GUICardPanel
 		
         pnlOpenSMILES = new JPanel();
         btnOpenSMILES = new JButton("Structure from SMILES");
-        btnOpenSMILES.setToolTipText("Imports chemical system"
-                        + "from file.");
+        btnOpenSMILES.setToolTipText("<html>Imports chemical system"
+                        + " from SMILES string.<br>The conversion of SMILES "
+                        + "to 3D structure requires"
+                        + "<br> an internet connection.</html>");
         btnOpenSMILES.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                 	String smiles = JOptionPane.showInputDialog(
@@ -324,10 +330,10 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		pnlAtmToAP = new JPanel();
 		btnAtmToAP = new JButton("Atom to AP");
-		btnAtmToAP.setToolTipText("<html>Replaces the selected atom with an "
-				+ "attachment point.<br>APClass can be specified after clcking"
-				+ " here.<br><b>WARNING:</b> this will change the currently"
-				+ " loaded structure. No undo.<html>");
+		btnAtmToAP.setToolTipText("<html>Replaces the selected atoms with "
+				+ "attachment points.<br>Click on atoms to select"
+			    + " them. Click again to unselect.<br>"
+			    + "<br><b>WARNING:</b> this action cannot be undone!<html>");
 		btnAtmToAP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<IAtom> selectedAtms = getAtomsSelectedFromJMol();
@@ -335,7 +341,8 @@ public class GUIFragmentInspector extends GUICardPanel
 				if (selectedAtms.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
-			                "No atom selected! Click on atoms to select them",
+			                "<html>No atom selected! Click on atoms to select"
+			                + " them.<br>Click again to unselect.</html>",
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
@@ -385,6 +392,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			        updateAPsInJmolViewer();
 					
 			        // Protect the temporary "fragment" obj
+			        unsavedChanges = true;
 			        alteredAPData = true;
 			        protectEditedSystem();
 				}
@@ -396,9 +404,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		pnlDelSel = new JPanel();
 		btnDelSel = new JButton("Remove Atoms");
 		btnDelSel.setToolTipText("<html>Removes all selected atoms from the "
-				+ "systhem.<br>This is not reversible, but takes care of "
-				+ "updating the attachment"
-				+ " points.<br>Use this instead of Jmol commands.</html>");
+				+ "systhem.<br><br><b>WARNING:</b> this action cannot be "
+				+ "undone!");
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<IAtom> selectedAtms = getAtomsSelectedFromJMol();
@@ -406,7 +413,8 @@ public class GUIFragmentInspector extends GUICardPanel
 				if (selectedAtms.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
-			                "No atom selected! Click on atoms to select them",
+							"<html>No atom selected! Click on atoms to select"
+					        + " them.<br>Click again to unselect.</html>",
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
@@ -416,16 +424,10 @@ public class GUIFragmentInspector extends GUICardPanel
 				{
 					//TODO: deal with changes to the AP table first
 					
-					//TODO del
-					System.out.println("#APs: "+fragment.getAPCount());
-					
 					removeAtoms(selectedAtms);
 					
 					// Use the APs stored in the atoms
 					fragment.updateAPs();
-					
-					//TODO del
-					System.out.println("#APs: "+fragment.getAPCount());
 					
 					// Load the "fragment" obj to the viewer
 					loadCurrentAsPlainStructure();
@@ -437,6 +439,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			        updateAPsInJmolViewer();
 					
 			        // Protect the temporary "fragment" obj
+			        unsavedChanges = true;
 			        alteredAPData = true;
 			        protectEditedSystem();
 				}
@@ -498,9 +501,10 @@ public class GUIFragmentInspector extends GUICardPanel
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenFrags = new JButton("Load",
+		btnOpenFrags = new JButton("Load Library of Fragments",
 					UIManager.getIcon("FileView.directoryIcon"));
-		btnOpenFrags.setToolTipText("Reads fragments from file.");
+		btnOpenFrags.setToolTipText("Reads fragments or stractures from "
+				+ "file.");
 		btnOpenFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = DenoptimGUIFileOpener.pickFile();
@@ -509,14 +513,13 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 				importFragmentsFromFile(inFile);
-				activateTabEditsListener(true);
 			}
 		});
 		commandsPane.add(btnOpenFrags);
 		
-		JButton btnSaveFrags = new JButton("Save",
+		JButton btnSaveFrags = new JButton("Save Library of Fragment",
 				UIManager.getIcon("FileView.hardDriveIcon"));
-		btnSaveFrags.setToolTipText("Write all fragments to file.");
+		btnSaveFrags.setToolTipText("Write all fragments to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File outFile = DenoptimGUIFileOpener.saveFile();
@@ -540,19 +543,22 @@ public class GUIFragmentInspector extends GUICardPanel
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
 				}
 				deprotectEditedSystem();
+				unsavedChanges = false;
 			}
 		});
 		commandsPane.add(btnSaveFrags);
 
-		JButton btnCanc = new JButton("Cancel");
-		btnCanc.setToolTipText("Leave without saving.");
+		JButton btnCanc = new JButton("Close Tab");
+		btnCanc.setToolTipText("Closes this fragment inspector tab.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
 		commandsPane.add(btnCanc);
 		
 		JButton btnHelp = new JButton("?");
-		btnHelp.setToolTipText("Help");
+		btnHelp.setToolTipText("<html>Hover over the buttons and fields "
+                    + "to get a tip.</html>");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
@@ -590,6 +596,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			
 			loadCurrentAsPlainStructure();
 			updateFragListSpinner();
+			unsavedChanges = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -665,6 +672,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// finalize GUI status
 		updateFragListSpinner();
 		setJmolViewer();
+		unsavedChanges = true;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -764,7 +772,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	}
 	
 //-----------------------------------------------------------------------------
-	
+
 	/**
 	 * Imports fragments from a SDF file. This method expects to find fragments
 	 * with DENOPTIM's format, i.e., with the 
@@ -774,12 +782,27 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	public void importFragmentsFromFile(File file)
 	{	
+		importFragmentsFromFile(file,"SDF");
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Imports fragments from a SDF file. This method expects to find fragments
+	 * with DENOPTIM's format, i.e., with the 
+	 * <code>ATTACHMENT_POINT</code> and possibly the
+	 * <code>CLASS</code> tags.
+	 * @param file the file to open
+	 * @param format the format
+	 */
+	public void importFragmentsFromFile(File file, String format)
+	{	
 		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
 		try 
 		{
 			// Import library of fragments
 			for (IAtomContainer iac : DenoptimIO.readMoleculeData(
-												file.getAbsolutePath()))
+												file.getAbsolutePath(),format))
 			{
 			    fragmentLibrary.add(new DENOPTIMFragment(iac));
 			}
@@ -890,6 +913,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			return;
         }
         
+        activateTabEditsListener(false);
         apTabModel.addRow(new Object[]{"<html><b>AP#<b></html>",
 		"<html><b>APClass<b></html>"});
         
@@ -900,6 +924,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	    	apTabModel.addRow(new Object[]{arrId, ap.getAPClass()});
 	    	mapAPs.put(arrId,ap);
 	    }
+	    activateTabEditsListener(true);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1321,18 +1346,16 @@ public class GUIFragmentInspector extends GUICardPanel
 				return;
 			}
     	}
-    	
+
     	// Takes case of "fragment" and AP info in GUI components
     	clearCurrentSystem();
     	
     	// Actual removal from the library
-    	fragmentLibrary.remove(currFrgIdx);
-    	
-    	//Choose which other fragment to load, if any
-    	int libSize = fragmentLibrary.size();
-    	
-    	if (fragmentLibrary.size() > 0)
+    	if (fragmentLibrary.size()>0)
     	{
+    		fragmentLibrary.remove(currFrgIdx);
+    		int libSize = fragmentLibrary.size();
+    		
     		if (currFrgIdx>=0 && currFrgIdx<libSize)
     		{
     			//we keep currFrgIdx as it will correspond to the next item

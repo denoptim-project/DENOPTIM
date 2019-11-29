@@ -152,8 +152,8 @@ public class GUIPrepare extends GUICardPanel
 		commandsPane.add(btnSubmit);
 		*/
 
-		JButton btnCanc = new JButton("Cancel");
-		btnCanc.setToolTipText("Abandon form without saving.");
+		JButton btnCanc = new JButton("Close Tab");
+		btnCanc.setToolTipText("Closes this tab.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
 		commandsPane.add(btnCanc);
 		

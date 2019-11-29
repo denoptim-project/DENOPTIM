@@ -55,6 +55,11 @@ public class ParametersForm extends JPanel implements IParametersForm
      */
     private final String NL = System.getProperty("line.separator");
     
+	/**
+	 * Flag notifying that some data was not saved
+	 */
+	protected boolean unsavedChanges = false;
+    
 //-----------------------------------------------------------------------------
     
     /**

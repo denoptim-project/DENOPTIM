@@ -86,8 +86,6 @@ public class HomePanel extends GUICardPanel
 		});
 		buttonsPanel.add(btnNewVirtualScreening);
 		
-		//TODO: new fragmentation job with GM3DFragmenter
-		
 		JButton btnNewFragments = new JButton("New Fragments");
 		btnNewFragments.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -95,6 +93,8 @@ public class HomePanel extends GUICardPanel
 			}
 		});
 		buttonsPanel.add(btnNewFragments);
+		
+		//TODO: new fragmentation job with GM3DFragmenter "New Fragmentation"
 		
 		//Credits panel
 		JPanel creditsPanel = new JPanel();

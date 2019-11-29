@@ -21,6 +21,11 @@ public class GUICardPanel extends JPanel
 	private static final long serialVersionUID = -1640517890155875184L;
 	
 	/**
+	 * Flag notifying that some data was not saved
+	 */
+	protected boolean unsavedChanges = false;
+	
+	/**
 	 * The main panel (cards deck)
 	 */
 	protected GUIMainPanel mainPanel;
@@ -66,17 +71,24 @@ public class GUICardPanel extends JPanel
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
-			Object[] options = {"Yes","No"};
-			int res = JOptionPane.showOptionDialog(null,
-                "<html>Abandon without saving?"
-                + "<br>Press NO to go back.</html>",
-                "Abandon?",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                UIManager.getIcon("OptionPane.warningIcon"),
-                options,
-                options[1]);
-			if (res == 0)
+			if (unsavedChanges)
+			{
+				Object[] options = {"Yes","No"};
+				int res = JOptionPane.showOptionDialog(null,
+	                "<html>Abandon without saving?"
+	                + "<br>Press NO to go back.</html>",
+	                "Abandon?",
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[1]);
+				if (res == 0)
+				{
+					mainPanel.removeCard(parentPanel);
+				}
+			}
+			else
 			{
 				mainPanel.removeCard(parentPanel);
 			}

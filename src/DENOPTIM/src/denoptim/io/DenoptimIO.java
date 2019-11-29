@@ -1475,6 +1475,13 @@ public class DenoptimIO
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Reads the molecules in a file. Expects filenames with commonly accepted
+     * extensions (i.e., .txt and .sdf).
+     * @param fileName the pathname of the file to read.
+     * @return the list of molecules
+     * @throws DENOPTIMException
+     */
     public static ArrayList<IAtomContainer> readMoleculeData(String fileName)
                                                         throws DENOPTIMException
     {
@@ -1494,6 +1501,41 @@ public class DenoptimIO
         else
         {
             mols = DenoptimIO.readTxtFile(fileName);
+        }
+        return mols;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads the molecules in a file with specifies format. Acceptable formats 
+     * are TXT, SD, and SDF.
+     * @param fileName the pathname of the file to read.
+     * @param format a string defining how to interpret the file.
+     * @return the list of molecules
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<IAtomContainer> readMoleculeData(String fileName, 
+    		String format) throws DENOPTIMException
+    {
+        ArrayList<IAtomContainer> mols;
+        switch (format)
+        {
+        	case "SDF":
+        		mols = DenoptimIO.readSDFFile(fileName);
+        		break;
+        		
+        	case "SD":
+        		mols = DenoptimIO.readSDFFile(fileName);
+        		break;
+        		
+        	case "TXT":
+        		mols = DenoptimIO.readTxtFile(fileName);
+        		break;
+        		
+        	default:
+        		throw new DENOPTIMException("Molecular file format '" + format 
+        				+ "' is not recognized.");
         }
         return mols;
     }
