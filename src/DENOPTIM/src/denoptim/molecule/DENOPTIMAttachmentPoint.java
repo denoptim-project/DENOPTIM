@@ -408,8 +408,21 @@ public class DENOPTIMAttachmentPoint implements Serializable
 		if (!temptAPClass.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
 			return false;
 		
+		/*
+		//Avoiding StringUtils
 		int numSep = StringUtils.countMatches(temptAPClass,
 				DENOPTIMConstants.SEPARATORAPPROPSCL);
+		*/
+		
+		int numSep = 0;
+		for (int i=0; i<temptAPClass.length(); i++)
+		{
+			if (temptAPClass.charAt(i) == DENOPTIMConstants.SEPARATORAPPROPSCL.charAt(0))
+			{
+				numSep++;
+			}
+		}
+		
 		if (1 != numSep)
 			return false;
 		

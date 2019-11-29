@@ -457,7 +457,7 @@ public class GAParametersForm extends ParametersForm
                 	.getDomainAxis().setRange(minLevelProbPlot, maxLev);
             }
         }); 
-        graphSpinnerPane.add(new JLabel("Max. level: "));
+        graphSpinnerPane.add(new JLabel("X-axis max: "));
         graphSpinnerPane.add(spnMaxLev);
         graphSubProbJFChartCtrlPanel.add(graphSpinnerPane, BorderLayout.NORTH);
         

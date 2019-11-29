@@ -38,13 +38,10 @@ import denoptim.constants.DENOPTIMConstants;
 
 public class DENOPTIMFragmentTest
 {
-	private final int ATMID = 6;
-	private final int APCONN = 3;
 	private final String APRULE = "MyRule";
 	private final String APSUBRULE = "1";
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
 	
     @Test
     public void testHandingAPsAsObjOrProperty() throws Exception

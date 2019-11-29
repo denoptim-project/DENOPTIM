@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javajs.util.BS;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -34,15 +32,13 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Point3d;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
-import org.jmol.api.JmolSelectionListener;
 import org.jmol.api.JmolViewer;
-import org.jmol.util.BSUtil;
 import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -50,6 +46,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.FragmentUtils;
 
 
 /**
@@ -74,7 +71,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<DENOPTIMFragment> fragmentLibrary;
+	private ArrayList<DENOPTIMFragment> fragmentLibrary =
+			new ArrayList<DENOPTIMFragment>();
 	
 	/**
 	 * The currently loaded fragment
@@ -100,6 +98,11 @@ public class GUIFragmentInspector extends GUICardPanel
 	private JmolPanel jmolPanel;
 	private JPanel fragCtrlPane;
 	private JPanel fragNavigPanel;
+	private JPanel fragNavigPanel2;
+	private JPanel fragNavigPanel3;
+	
+	private JButton btnAddFrag;
+	private JButton btnDelFrag;
 	
 	private JButton btnOpenFrags;
 	
@@ -122,6 +125,9 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	private JPanel pnlDelSel;
 	private JButton btnDelSel;
+	
+	private JPanel pnlPrintMol; //for testing
+	private JButton btnPrintMol;//for testing
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
@@ -201,19 +207,82 @@ public class GUIFragmentInspector extends GUICardPanel
         
         // Controls to navigate the list of fragments
         fragNavigPanel = new JPanel();
-        JLabel navigationLabel1 = new JLabel("Fragment ");
-        JLabel navigationLabel2 = new JLabel(" of ");
-        totalFragsLabel = new JLabel("none");
+        fragNavigPanel2 = new JPanel();
+        fragNavigPanel3 = new JPanel();
+        JLabel navigationLabel1 = new JLabel("Fragment # ");
+        JLabel navigationLabel2 = new JLabel("Current library size: ");
+        totalFragsLabel = new JLabel("0");
         
 		fragNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
-		fragNavigSpinner.setToolTipText("Move to fragment number...");
+		fragNavigSpinner.setToolTipText("Move to fragment number # in the currently loaded library.");
 		fragNavigSpinner.setPreferredSize(new Dimension(75,20));
 		fragNavigSpinner.addChangeListener(fragSpinnerListener);
         fragNavigPanel.add(navigationLabel1);
 		fragNavigPanel.add(fragNavigSpinner);
-        fragNavigPanel.add(navigationLabel2);
-        fragNavigPanel.add(totalFragsLabel);
 		fragCtrlPane.add(fragNavigPanel);
+		
+        fragNavigPanel2.add(navigationLabel2);
+        fragNavigPanel2.add(totalFragsLabel);
+		fragCtrlPane.add(fragNavigPanel2);
+		
+		btnAddFrag = new JButton("Add");
+		btnAddFrag.setToolTipText("Starts creation of a new fragment.");
+		btnAddFrag.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String[] options = new String[]{"SMILES","File"};
+				int res = JOptionPane.showOptionDialog(null,
+		                "<html>Importing structure for creation of a new "
+		                + "fragment<br>"
+		                + "Please choose a source: <ul>"
+		                + "<li>SMILES (requires internet connection)</li>"
+		                + "<li>SD/SDF files (only the first "
+		                + "structure is imported).</li>"
+		                + "</ul></html>",
+		                "Specify source of moelcular structure",
+		                JOptionPane.DEFAULT_OPTION,
+		                JOptionPane.QUESTION_MESSAGE,
+		                UIManager.getIcon("OptionPane.warningIcon"),
+		                options,
+		                options[1]);
+				if (res == 0)
+				{
+					String smiles = JOptionPane.showInputDialog(
+                			"Please input SMILES: ");
+                	if (smiles != null && !smiles.trim().equals(""))
+                	{
+                	    importStructureFromSMILES(smiles);
+                	}
+				}
+				else
+				{
+					File inFile = DenoptimGUIFileOpener.pickFile();
+					if (inFile == null || inFile.getAbsolutePath().equals(""))
+					{
+						return;
+					}
+					importStructureFromFile(inFile);
+				}
+			}
+		});
+		btnDelFrag = new JButton("Remove");
+		btnDelFrag.setToolTipText("Remove the present fragment from the library.");
+		btnDelFrag.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					removeCurrentFragment();
+					if (fragmentLibrary.size()==0)
+					{
+						jmolPanel.viewer.evalString("zap");
+					}
+				} catch (DENOPTIMException e1) {
+					System.out.println("Esception while removing the current fragment:");
+					e1.printStackTrace();
+				}
+			}
+		});
+		fragNavigPanel3.add(btnAddFrag);
+		fragNavigPanel3.add(btnDelFrag);
+		fragCtrlPane.add(fragNavigPanel3);
 		
 		fragCtrlPane.add(new JSeparator());
 		
@@ -347,10 +416,16 @@ public class GUIFragmentInspector extends GUICardPanel
 				{
 					//TODO: deal with changes to the AP table first
 					
+					//TODO del
+					System.out.println("#APs: "+fragment.getAPCount());
+					
 					removeAtoms(selectedAtms);
 					
 					// Use the APs stored in the atoms
 					fragment.updateAPs();
+					
+					//TODO del
+					System.out.println("#APs: "+fragment.getAPCount());
 					
 					// Load the "fragment" obj to the viewer
 					loadCurrentAsPlainStructure();
@@ -369,6 +444,35 @@ public class GUIFragmentInspector extends GUICardPanel
 		});
 		pnlDelSel.add(btnDelSel);
 		fragCtrlPane.add(pnlDelSel);
+		
+		//TODO comment out button (only for testing)
+		/*
+        pnlPrintMol = new JPanel();
+        btnPrintMol = new JButton("TEST STUFF");
+        btnPrintMol.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {         	
+            	System.out.println("#Bonds: "+fragment.getBondCount());
+            	System.out.println("#Atoms: "+fragment.getAtomCount());
+            	for (IAtom atm : fragment.atoms())
+            	{
+                	System.out.println("    "+atm.getSymbol()+fragment.getAtomNumber(atm));
+            	}
+            	System.out.println("#APs:   "+fragment.getAPCount());
+            	for (DENOPTIMAttachmentPoint ap : fragment.getCurrentAPs())
+            	{
+            		System.out.println("    "+ap);
+            	}
+            	System.out.println("Library");
+            	for (IAtomContainer mol : fragmentLibrary)
+            	{
+            		System.out.println("Frag #atoms: "+mol.getAtomCount());
+            	}
+            	
+            }
+        });
+        pnlPrintMol.add(btnPrintMol);
+        fragCtrlPane.add(pnlPrintMol);
+		*/
 		
 		fragCtrlPane.add(new JSeparator());
 		
@@ -468,17 +572,22 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Cleanup
 		clearCurrentSystem();
 		
-		// Initialize array 
-		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
 		try {			
-			fragment = new DENOPTIMFragment(DenoptimIO.readSingleSDFFile(
-					file.getAbsolutePath()));
+			IAtomContainer mol = DenoptimIO.readSingleSDFFile(
+					file.getAbsolutePath());
+			
+			// We mean to import only the structure: get rid of AP
+			mol.setProperty(DENOPTIMConstants.APTAG,null);
+			mol.setProperty(DENOPTIMConstants.APCVTAG,null);
+			
+			fragment = new DENOPTIMFragment(mol);
 
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
+			// The currently viewed fragment (if any) is always part of the lib
 			fragmentLibrary.add(fragment); 
+			currFrgIdx = fragmentLibrary.size()-1;
 			
-			currFrgIdx = 0;
 			loadCurrentAsPlainStructure();
 			updateFragListSpinner();
 		} catch (Exception e) {
@@ -507,7 +616,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		// Load the structure using CACTUS service via Jmol
 		jmolPanel.viewer.evalString("load $"+smiles);
-		waitForJmolViewer();
+		waitForJmolViewer(1500);
 
 		// NB: this is a workaround to the lack fo try/catch mechanism when
 		// executing Jmol commands.
@@ -547,13 +656,11 @@ public class GUIFragmentInspector extends GUICardPanel
 			return;
 		}
 		
-		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
-		
 		// the system is not a fragment but, this is done for consistency:
-		// when we have a molecule loaded the list is not empty
+		// when we have a molecule loaded the list is not empty:
+		// The currently viewed fragment (if any) is always part of the library
 	    fragmentLibrary.add(fragment);
-	    
-		currFrgIdx = 0;
+		currFrgIdx = fragmentLibrary.size()-1;
 		
 		// finalize GUI status
 		updateFragListSpinner();
@@ -608,11 +715,11 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void waitForJmolViewer()
+	private void waitForJmolViewer(int milliSecFirst)
 	{
-		// We wait for 2 seconds
+		// We wait
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(milliSecFirst);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -620,7 +727,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Waiting cycles
 		Date date = new Date();
 		long startTime = date.getTime();
-		long wallTime = startTime + 5000;
+		long wallTime = startTime + 5000; // 5 seconds
 		while (jmolPanel.viewer.isScriptExecuting())
 		{
 				
@@ -632,7 +739,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				String[] options = new String[]{"Yes","No"};
 				int res = JOptionPane.showOptionDialog(null,
 		                "<html>Slow response from Jmol.<br>Keep waiting?</html>",
-		                "Keep waiting?",
+		                "Should we wait for another 5 seconds?",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
 		                UIManager.getIcon("OptionPane.warningIcon"),
@@ -644,7 +751,8 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				else
 				{
-					wallTime = newDate.getTime() + 5000;
+					newDate = new Date();
+					wallTime = newDate.getTime() + 5000; // 5 seconds
 				}
 			}
 			try {
@@ -772,19 +880,18 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private void updateAPsMapAndTable()
 	{
-		ArrayList<DENOPTIMAttachmentPoint> lstAPs = fragment.getCurrentAPs();
+		clearAPTable();
+		mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
+		
+		ArrayList<DENOPTIMAttachmentPoint> lstAPs = fragment.getCurrentAPs();		
         if (lstAPs.size() == 0)
         {
         	// WARNING: no dialog here because it fires event changes in JSpinner
 			return;
         }
         
-		clearAPTable();
-        
         apTabModel.addRow(new Object[]{"<html><b>AP#<b></html>",
 		"<html><b>APClass<b></html>"});
-        
-        mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
         
         int arrId = 0;
 	    for (DENOPTIMAttachmentPoint ap : lstAPs)
@@ -799,10 +906,12 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	private void clearAPTable()
 	{
+		activateTabEditsListener(false);
         for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
         {
         	apTabModel.removeRow(i);
         }
+        activateTabEditsListener(true);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -812,8 +921,10 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Get rid of currently loaded mol
 		fragment = null;
 		
-		// Clear viewer
-		jmolPanel.viewer.evalString("zap");
+		// Clear viewer?
+		// No, its clears upon loading of a new system.
+		// The exception (i.e., removal of the last fragment) is dealt with by
+		// submitting "zap" only in that occasion.
 		
 		// Remove tmp storage of APs
 		mapAPs = null;
@@ -826,12 +937,18 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	private void updateAPsInJmolViewer()
 	{   
+		if (mapAPs == null || mapAPs.isEmpty())
+		{
+			return;
+		}
+		
 		StringBuilder sb = new StringBuilder();
         for (int arrId : mapAPs.keySet())
         {
         	DENOPTIMAttachmentPoint ap = mapAPs.get(arrId);
         	int srcAtmId = ap.getAtomPositionNumber();
-        	Point3d srcAtmPlace = fragment.getAtom(srcAtmId).getPoint3d();
+        	Point3d srcAtmPlace = FragmentUtils.getPoint3d(
+        			fragment.getAtom(srcAtmId));
         	double[] startArrow = new double[]{
         			srcAtmPlace.x,
         			srcAtmPlace.y,
@@ -857,7 +974,7 @@ public class GUIFragmentInspector extends GUICardPanel
 //-----------------------------------------------------------------------------
 
 	private void updateFragListSpinner()
-	{
+	{		
 		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
 				fragmentLibrary.size(), 1));
 		totalFragsLabel.setText(Integer.toString(fragmentLibrary.size()));
@@ -879,14 +996,16 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	private void setJmolViewer()
 	{
+		//TODO del
+		System.out.println("In setJmolViewer");
 		StringBuilder sb = new StringBuilder();		
 		sb.append("select none").append(NL); 
 		sb.append("SelectionHalos ON").append(NL);
 		sb.append("set picking ATOMS").append(NL);
-		
-		// sb.append("").append(NL);
+		//sb.append("zoom 70").append(NL);
 		
 		jmolPanel.viewer.evalString(sb.toString());
+
 	}
 	
 //-----------------------------------------------------------------------------
@@ -910,7 +1029,7 @@ public class GUIFragmentInspector extends GUICardPanel
         
         //---------------------------------------------------------------------
 
-        @Override
+		@Override
         public void paint(Graphics g) {
             getSize(hostPanelSize);
             viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
@@ -952,11 +1071,20 @@ public class GUIFragmentInspector extends GUICardPanel
     	// Accept ONLY if the atom has one and only one connected neighbor
     	if (fragment.getConnectedAtomsCount(trgAtm) != 1)
     	{
+    		String str = "";
+    		for (IAtom atm : fragment.getConnectedAtomsList(trgAtm))
+    		{
+    			str = str + " " + atm.getSymbol() 
+    	                + (fragment.getAtomNumber(atm));
+    		}
+    		System.out.println("Connected atoms: "+str);
+    		
 			JOptionPane.showMessageDialog(null,
 	                "<html>Atom "+ trgAtm.getSymbol() 
 	                + (fragment.getAtomNumber(trgAtm)) 
-	                + " has more than one bond.<br>I can only transform atoms"
-	                + " that have one bond.</html>",
+	                + " has zero or more than one neighbour.<br>I can only "
+	                + "transform atoms"
+	                + " that have one and only one neighbour.</html>",
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -965,8 +1093,8 @@ public class GUIFragmentInspector extends GUICardPanel
     	
     	IAtom srcAtm = fragment.getConnectedAtomsList(trgAtm).get(0);
     	
-    	Point3d srcP3d = srcAtm.getPoint3d();
-    	Point3d trgP3d = trgAtm.getPoint3d();
+    	Point3d srcP3d = FragmentUtils.getPoint3d(srcAtm);
+    	Point3d trgP3d = FragmentUtils.getPoint3d(trgAtm);
     	Point3d vector = new Point3d();
     	vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
@@ -1029,11 +1157,26 @@ public class GUIFragmentInspector extends GUICardPanel
     
 //----------------------------------------------------------------------------
 
-    private void removeAtoms(ArrayList<IAtom> selectedAtms)
+    private void removeAtoms(ArrayList<IAtom> atmsToDels)
     {
-    	for (IAtom atm : selectedAtms)
+    	ArrayList<IBond> bnsToDel = new ArrayList<IBond>();
+    	for (IAtom atm : atmsToDels)
     	{
-    		fragment.removeAtom(atm);
+	    	for (IBond bnd : fragment.bonds())
+	    	{
+	    		if (bnd.contains(atm))
+	    		{
+	    			bnsToDel.add(bnd);
+	    		}
+	    	}
+    	}
+    	for (IBond bnd : bnsToDel)
+    	{
+    		fragment.removeBond(bnd);
+    	}
+    	for (IAtom atm : atmsToDels)
+    	{
+    		fragment.removeAtomAndConnectedElectronContainers(atm);
     	}
     	
     	
@@ -1106,6 +1249,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void deprotectEditedSystem()
 	{
 		btnSaveEdits.setEnabled(false);
+		btnAddFrag.setEnabled(true);
 		btnOpenFrags.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
@@ -1125,6 +1269,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void protectEditedSystem()
 	{
 		btnSaveEdits.setEnabled(true);
+		btnAddFrag.setEnabled(false);
 		btnOpenFrags.setEnabled(false);
 		btnOpenSMILES.setEnabled(false); 
 		btnOpenMol.setEnabled(false);
@@ -1155,8 +1300,60 @@ public class GUIFragmentInspector extends GUICardPanel
 			System.out.println(t.getCause());
 		}
     }
+    
+//-----------------------------------------------------------------------------
+    
+    private void removeCurrentFragment() throws DENOPTIMException
+    {
+    	if (alteredAPData)
+    	{
+			String[] options = new String[]{"Yes","No"};
+			int res = JOptionPane.showOptionDialog(null,
+	                "<html>Removing unsaved fragment?",
+	                "Warning",
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[1]);
+			if (res == 1)
+			{
+				return;
+			}
+    	}
+    	
+    	// Takes case of "fragment" and AP info in GUI components
+    	clearCurrentSystem();
+    	
+    	// Actual removal from the library
+    	fragmentLibrary.remove(currFrgIdx);
+    	
+    	//Choose which other fragment to load, if any
+    	int libSize = fragmentLibrary.size();
+    	
+    	if (fragmentLibrary.size() > 0)
+    	{
+    		if (currFrgIdx>=0 && currFrgIdx<libSize)
+    		{
+    			//we keep currFrgIdx as it will correspond to the next item
+    		}
+    		else
+    		{
+    			currFrgIdx = currFrgIdx-1;
+    		}
 
- //-----------------------------------------------------------------------------
+    		// We use the currFrgIdx to load another fragment
+	    	loadCurrentFragIdxToViewer();
+	    	updateFragListSpinner();
+	    	
+	  		// Release constraints
+	        alteredAPData = false;
+	        deprotectEditedSystem();
+	        
+    	}
+    }
+
+//-----------------------------------------------------------------------------
 
   	private void saveUnsavedChanges() 
   	{
@@ -1164,18 +1361,6 @@ public class GUIFragmentInspector extends GUICardPanel
   		{
   			return;
   		}
-
-  		/*
-  		String[] options = new String[]{"Overwrite","Cancel"};
-		int res = JOptionPane.showOptionDialog(null, 
-				"Are you sure you want to overwrite the loaded library?",
-				"Overwrite?",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                UIManager.getIcon("OptionPane.warningIcon"),
-                options,
-                options[1]);
-        */
 	    
   		// Retrieve chemical object from Jmol
 		try	{

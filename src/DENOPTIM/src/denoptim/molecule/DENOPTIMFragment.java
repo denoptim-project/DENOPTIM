@@ -299,7 +299,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     public void projectPropertyToAP() throws DENOPTIMException
     {
 
-	    String allAtomsProp = "";
+	    String allAtomsProp = "";    
 	    if (this.getProperty(DENOPTIMConstants.APCVTAG) == null)
 	    {
 	    	System.out.println("WARNING: no tag " 
@@ -307,13 +307,15 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 	    			+ " No AP created.");
 	    	return;
         }
+	    allAtomsProp = this.getProperty(DENOPTIMConstants.APCVTAG).toString();
 	    projectPropertyToAP(allAtomsProp);
     }
 	    
 //-----------------------------------------------------------------------------
     
     /**
-     * Uses the molecular property defining attachment points to create the 
+     * Uses a string formatted like the molecular property used for 
+     * defining attachment points to create the 
      * DENOPTIMAttachmentPoint objects in the Atom objects. Does not
      * overwrite existing APs in the atoms.
      * @param allAtomsProp the content of the molecular property.
@@ -326,7 +328,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     	{
     		return;
     	}
-    	
+
 	    // Temp storage for APs
 	    ArrayList<DENOPTIMAttachmentPoint> allAPs = 
 	    		new ArrayList<DENOPTIMAttachmentPoint>();

@@ -38,6 +38,9 @@ import denoptim.molecule.SymmetricSet;
 
 import java.util.logging.Level;
 
+import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
+
 
 /**
  *
@@ -601,6 +604,34 @@ public class FragmentUtils
         }
 
         return strFrg;
+    }
+    
+   //-----------------------------------------------------------------------------
+    
+    /**
+     * Return the 3D coordinates, if present.
+     * If only 2D coords exist, then it returns the 2D projected in 3D space.
+     * If neither 3D nor 2D are present returns [0, 0, 0].
+     * @param atm the atom to analyze.
+     * @return a not null.
+     */
+    public static Point3d getPoint3d(IAtom atm)
+    {
+    	Point3d p = atm.getPoint3d();
+    	
+    	if (p == null)
+    	{
+    		Point2d p2d = atm.getPoint2d();
+    		if (p2d == null)
+    		{
+    			p = new Point3d(0.0, 0.0, 0.0);
+    		}
+    		else
+    		{
+    			p = new Point3d(p2d.x, p2d.y, 0.0);
+    		}
+    	}
+    	return p;
     }
 
 //------------------------------------------------------------------------------
