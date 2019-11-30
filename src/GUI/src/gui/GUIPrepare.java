@@ -16,8 +16,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 /**
- * Class representing the general structure of a form specifying a specific
- * set of parameters.
+ * Class representing the general structure of a form including a specific
+ * set of parameter collections. Each parameter collection is a tab in a
+ * set of tabs (i.e., a tabbed pane).
  * 
  * @author Marco Foscato
  */
@@ -54,7 +55,8 @@ public class GUIPrepare extends GUICardPanel
 	/**
 	 * Initialize the panel with tabbedPane and buttons.
 	 */
-	private void initialize() {
+	private void initialize() 
+	{
 		
 		// Parameters for the various components are divided in TABs
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -75,7 +77,13 @@ public class GUIPrepare extends GUICardPanel
 				{
 					return;
 				}
+				
 				importParametersFromDenoptimParamsFile(inFile);
+				
+				for (IParametersForm p : allParams)
+			    {
+			    	p.setUnsavedChanges(false);
+			    }
 			}
 		});
 		commandsPane.add(btnLoadParams);
@@ -113,6 +121,11 @@ public class GUIPrepare extends GUICardPanel
 				    FileWriter fw = new FileWriter(outFile);
 				    fw.write(sb.toString());
 				    fw.close();
+				    
+				    for (IParametersForm p : allParams)
+				    {
+				    	p.setUnsavedChanges(false);
+				    }
 				}
 				catch (IOException io)
 				{
@@ -205,5 +218,29 @@ public class GUIPrepare extends GUICardPanel
         		}
 			}
 		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Check whether any of the parameter forms (i.e., a tab) in this list of
+	 * tabs has unsaved changes.
+	 * @return <code>true</code> if there are unsaved changes to the forms.
+	 */
+	
+	public boolean hasUnsavedChanges()
+	{
+		boolean res = false;
+		for (IParametersForm p : allParams)
+		{
+			if (p.hasUnsavedChanges())
+			{
+				//TODO del
+				System.out.println("Params "+p.getClass()+" has unsaved changes");
+				res = true;
+				break;
+			}
+		}
+		return res;
 	}
 }

@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,6 +12,12 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import denoptim.io.DenoptimIO;
 
@@ -59,6 +67,26 @@ public class ParametersForm extends JPanel implements IParametersForm
 	 * Flag notifying that some data was not saved
 	 */
 	protected boolean unsavedChanges = false;
+	
+	/**
+	 * Listener for changes in parameters of this form
+	 */
+	protected FieldListener fieldListener;
+	
+	/**
+	 * Listener for changes in radio button-bound parameters
+	 */
+	protected RdbFieldChange rdbFieldChange;
+	
+	/**
+	 * Listener for changes in table-bound parameters
+	 */
+	protected TabFieldChange tabFieldChange;
+	
+	/**
+	 * Listener for changes in combo box-bound parameters
+	 */
+	protected CmbFieldChange cmbFieldChange;
     
 //-----------------------------------------------------------------------------
     
@@ -68,6 +96,10 @@ public class ParametersForm extends JPanel implements IParametersForm
     
     public ParametersForm()
     {
+    	fieldListener = new FieldListener();
+    	rdbFieldChange = new RdbFieldChange();
+    	tabFieldChange = new TabFieldChange();
+    	cmbFieldChange = new CmbFieldChange();
     }
     
 //-----------------------------------------------------------------------------
@@ -338,4 +370,136 @@ public class ParametersForm extends JPanel implements IParametersForm
 	}
 	
 //-----------------------------------------------------------------------------
+	
+	/**
+	 * Returns the flag signaling unsaved changes.
+	 * @return the flag signaling unsaved changes
+	 */
+	
+	@Override
+	public boolean hasUnsavedChanges()
+	{
+		return unsavedChanges;
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Set the status of the flag signaling unsaved changes.
+	 * @param val the new status of the flag signaling unsaved changes
+	 */
+	
+	@Override
+	public void setUnsavedChanges(boolean val)
+	{
+		unsavedChanges = val;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class FieldListener implements DocumentListener
+	{
+		private boolean isActive = true;
+		
+		public void setActive(boolean active)
+		{
+			this.isActive = active;
+		}
+		
+		@Override
+		public void insertUpdate(DocumentEvent e) 
+		{
+			if (isActive)
+			{
+				unsavedChanges = true;
+			}
+		}
+	
+		@Override
+		public void removeUpdate(DocumentEvent e) 
+		{
+			if (isActive)
+			{
+				unsavedChanges = true;
+			}
+		}
+	
+		@Override
+		public void changedUpdate(DocumentEvent e) 
+		{
+			if (isActive)
+			{
+				unsavedChanges = true;
+			}
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class RdbFieldChange implements ChangeListener
+	{
+		private boolean isActive = true;
+		
+		public void setActive(boolean active)
+		{
+			this.isActive = active;
+		}
+		
+		@Override
+		public void stateChanged(ChangeEvent e) 
+		{
+			if (isActive)
+			{
+				unsavedChanges = true;
+				//TODO del
+				System.out.println("RdbField CHANGED e:"+e.getClass());
+			}
+		}	
+	}
+	
+//-----------------------------------------------------------------------------
+
+	private class TabFieldChange implements TableModelListener
+	{	
+		private boolean isActive = true;
+		
+		public void setActive(boolean active)
+		{
+			this.isActive = active;
+		}
+
+		@Override
+		public void tableChanged(TableModelEvent e) 
+		{
+			if (isActive)
+			{
+				unsavedChanges = true;
+			}
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class CmbFieldChange implements ActionListener
+	{
+		private boolean isActive = true;
+		
+		public void setActive(boolean active)
+		{
+			this.isActive = active;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) 
+		{
+			if (isActive)
+			{
+				unsavedChanges = true;
+			}
+		}
+		
+	}
+	
+//-----------------------------------------------------------------------------
+
 }

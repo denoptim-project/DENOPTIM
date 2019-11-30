@@ -10,4 +10,6 @@ public interface IParametersForm {
 	public void importParametersFromDenoptimParamsFile(String fileName) throws Exception;
 	public void importSingleParameter(String key, String value) throws Exception;
     public void putParametersToString(StringBuilder sb) throws Exception;
+    public boolean hasUnsavedChanges();
+    public void setUnsavedChanges(boolean val);
 }

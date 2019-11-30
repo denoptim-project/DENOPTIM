@@ -346,6 +346,7 @@ public class FSParametersForm extends ParametersForm
         txtPar1 = new JTextField();
         txtPar1.setToolTipText(toolTipPar1);
         txtPar1.setPreferredSize(fileFieldSize);
+        txtPar1.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar1.toUpperCase(),txtPar1);
         btnPar1 = new JButton("Browse");
         btnPar1.addActionListener(new ActionListener() {
@@ -366,6 +367,7 @@ public class FSParametersForm extends ParametersForm
         txtPar2 = new JTextField();
         txtPar2.setToolTipText(toolTipPar2);
         txtPar2.setPreferredSize(fileFieldSize);
+        txtPar2.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar2.toUpperCase(),txtPar2);
         btnPar2 = new JButton("Browse");
         btnPar2.addActionListener(new ActionListener() {
@@ -386,6 +388,7 @@ public class FSParametersForm extends ParametersForm
         txtPar3 = new JTextField();
         txtPar3.setToolTipText(toolTipPar3);
         txtPar3.setPreferredSize(fileFieldSize);
+        txtPar3.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar3.toUpperCase(),txtPar3);
         btnPar3 = new JButton("Browse");
         btnPar3.addActionListener(new ActionListener() {
@@ -406,6 +409,7 @@ public class FSParametersForm extends ParametersForm
         txtCPMat = new JTextField();
         txtCPMat.setToolTipText(toolTipCPMat);
         txtCPMat.setPreferredSize(fileFieldSize);
+        txtCPMat.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyCPMat.toUpperCase(),txtCPMat);
         btnCPMat = new JButton("Browse");
         btnCPMat.addActionListener(new ActionListener() {
@@ -426,6 +430,7 @@ public class FSParametersForm extends ParametersForm
         txtPar6 = new JTextField();
         txtPar6.setToolTipText(toolTipPar6);
         txtPar6.setPreferredSize(fileFieldSize);
+        txtPar6.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar6.toUpperCase(),txtPar6);
         btnPar6 = new JButton("Browse");
         btnPar6.addActionListener(new ActionListener() {
@@ -446,6 +451,7 @@ public class FSParametersForm extends ParametersForm
         txtPar7 = new JTextField();
         txtPar7.setToolTipText(toolTipPar7);
         txtPar7.setPreferredSize(strFieldSize);
+        txtPar7.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar7.toUpperCase(),txtPar7);
         linePar7.add(lblPar7);
         linePar7.add(txtPar7);
@@ -459,6 +465,7 @@ public class FSParametersForm extends ParametersForm
         txtPar8 = new JTextField();
         txtPar8.setToolTipText(toolTipPar8);
         txtPar8.setPreferredSize(strFieldSize);
+        txtPar8.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar8.toUpperCase(),txtPar8);
         linePar8.add(lblPar8);
         linePar8.add(txtPar8);
@@ -472,6 +479,7 @@ public class FSParametersForm extends ParametersForm
         txtPar9 = new JTextField();
         txtPar9.setToolTipText(toolTipPar9);
         txtPar9.setPreferredSize(strFieldSize);
+        txtPar9.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar9.toUpperCase(),txtPar9);
         linePar9.add(lblPar9);
         linePar9.add(txtPar9);
@@ -481,6 +489,7 @@ public class FSParametersForm extends ParametersForm
         linePar10 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar10 = new JRadioButton("Enforce symmetry:");
         rdbPar10.setToolTipText(toolTipPar10);
+        rdbPar10.addChangeListener(rdbFieldChange);
         mapKeyFieldToValueField.put(keyPar10.toUpperCase(),rdbPar10);
         linePar10.add(rdbPar10);
         localBlock2.add(linePar10);
@@ -492,6 +501,7 @@ public class FSParametersForm extends ParametersForm
         lblPar11.setToolTipText(toolTipPar11); 
         tabModPar11 = new DefaultTableModel();
         tabModPar11.setColumnCount(2);
+        tabModPar11.addTableModelListener(tabFieldChange);
         mapKeyFieldToValueField.put(keyPar11.toUpperCase(),tabModPar11);
         tabPar11 = new JTable(tabModPar11);
         tabPar11.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -647,6 +657,7 @@ public class FSParametersForm extends ParametersForm
         linePar12 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar12 = new JRadioButton("Enable cyclic graphs (create rings of fragments)");
         rdbPar12.setToolTipText(toolTipPar12);
+        rdbPar12.addChangeListener(rdbFieldChange);
         mapKeyFieldToValueField.put(keyPar12.toUpperCase(),rdbPar12);
         rdbPar12.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
@@ -676,6 +687,7 @@ public class FSParametersForm extends ParametersForm
         txtPar5 = new JTextField();
         txtPar5.setToolTipText(toolTipPar5);
         txtPar5.setPreferredSize(fileFieldSize);
+        txtPar5.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar5.toUpperCase(),txtPar5);
         btnPar5 = new JButton("Browse");
         btnPar5.addActionListener(new ActionListener() {
@@ -696,6 +708,7 @@ public class FSParametersForm extends ParametersForm
         txtPar15 = new JTextField();
         txtPar15.setToolTipText(toolTipPar15);
         txtPar15.setPreferredSize(strFieldSize);
+        txtPar15.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar15.toUpperCase(),txtPar15);
         linePar15.add(lblPar15);
         linePar15.add(txtPar15);
@@ -709,6 +722,7 @@ public class FSParametersForm extends ParametersForm
         txtPar16 = new JTextField();
         txtPar16.setToolTipText(toolTipPar16);
         txtPar16.setPreferredSize(strFieldSize);
+        txtPar16.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar16.toUpperCase(),txtPar16);
         linePar16.add(lblPar16);
         linePar16.add(txtPar16);
@@ -722,6 +736,7 @@ public class FSParametersForm extends ParametersForm
         txtPar17 = new JTextField();
         txtPar17.setToolTipText(toolTipPar17);
         txtPar17.setPreferredSize(strFieldSize);
+        txtPar17.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar17.toUpperCase(),txtPar17);
         linePar17.add(lblPar17);
         linePar17.add(txtPar17);
@@ -735,6 +750,7 @@ public class FSParametersForm extends ParametersForm
         txtPar18 = new JTextField();
         txtPar18.setToolTipText(toolTipPar18);
         txtPar18.setPreferredSize(strFieldSize);
+        txtPar18.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar18.toUpperCase(),txtPar18);
         linePar18.add(lblPar18);
         linePar18.add(txtPar18);
@@ -747,6 +763,7 @@ public class FSParametersForm extends ParametersForm
         lblPar22.setToolTipText(toolTipPar22);
         tabModPar22 = new DefaultTableModel();
         tabModPar22.setColumnCount(2);
+        tabModPar22.addTableModelListener(tabFieldChange);
         mapKeyFieldToValueField.put(keyPar22.toUpperCase(),tabModPar22);
         tabPar22 = new JTable(tabModPar22);
         tabPar22.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -852,6 +869,7 @@ public class FSParametersForm extends ParametersForm
         txtPar23 = new JTextField();
         txtPar23.setToolTipText(toolTipPar23);
         txtPar23.setPreferredSize(strFieldSize);
+        txtPar23.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar23.toUpperCase(),txtPar23);
         linePar23.add(lblPar23);
         linePar23.add(txtPar23);
@@ -864,6 +882,7 @@ public class FSParametersForm extends ParametersForm
         lblPar19.setToolTipText(toolTipPar19);
         cmbPar19 = new JComboBox<String>(new String[] {"Constitution", "3D-Conformation", "Constitution_and_3D-Conformation"});
         cmbPar19.setToolTipText(toolTipPar19);
+        cmbPar19.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyPar19.toUpperCase(),cmbPar19);
         cmbPar19.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
@@ -899,6 +918,7 @@ public class FSParametersForm extends ParametersForm
         lblPar21.setToolTipText(toolTipPar21);
         tabModPar21 = new DefaultTableModel();
         tabModPar21.setColumnCount(1);
+        tabModPar21.addTableModelListener(tabFieldChange);
         mapKeyFieldToValueField.put(keyPar21.toUpperCase(),tabModPar21);
         tabPar21 = new JTable(tabModPar21);
         tabPar21.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -991,6 +1011,7 @@ public class FSParametersForm extends ParametersForm
         txtPar25 = new JTextField();
         txtPar25.setToolTipText(toolTipPar25);
         txtPar25.setPreferredSize(strFieldSize);
+        txtPar25.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar25.toUpperCase(),txtPar25);
         linePar25.add(lblPar25);
         linePar25.add(txtPar25);
@@ -1004,6 +1025,7 @@ public class FSParametersForm extends ParametersForm
         txtPar26 = new JTextField();
         txtPar26.setToolTipText(toolTipPar26);
         txtPar26.setPreferredSize(strFieldSize);
+        txtPar26.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar26.toUpperCase(),txtPar26);
         linePar26.add(lblPar26);
         linePar26.add(txtPar26);
@@ -1017,6 +1039,7 @@ public class FSParametersForm extends ParametersForm
         txtPar27 = new JTextField();
         txtPar27.setToolTipText(toolTipPar27);
         txtPar27.setPreferredSize(strFieldSize);
+        txtPar27.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar27.toUpperCase(),txtPar27);
         linePar27.add(lblPar27);
         linePar27.add(txtPar27);
@@ -1026,6 +1049,7 @@ public class FSParametersForm extends ParametersForm
         linePar24 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar24 = new JRadioButton("Check interdependent chain closability.");
         rdbPar24.setToolTipText(toolTipPar24);
+        rdbPar24.addChangeListener(rdbFieldChange);
         mapKeyFieldToValueField.put(keyPar24.toUpperCase(),rdbPar24);
         linePar24.add(rdbPar24);
         localBlock5.add(linePar24);
@@ -1034,6 +1058,7 @@ public class FSParametersForm extends ParametersForm
         linePar28 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar28 = new JRadioButton("Extensive chain conformational search:");
         rdbPar28.setToolTipText(toolTipPar28);
+        rdbPar28.addChangeListener(rdbFieldChange);
         mapKeyFieldToValueField.put(keyPar28.toUpperCase(),rdbPar28);
         linePar28.add(rdbPar28);
         localBlock5.add(linePar28);
@@ -1046,6 +1071,7 @@ public class FSParametersForm extends ParametersForm
         txtPar30 = new JTextField();
         txtPar30.setToolTipText(toolTipPar30);
         txtPar30.setPreferredSize(fileFieldSize);
+        txtPar30.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar30.toUpperCase(),txtPar30);
         btnPar30 = new JButton("Browse");
         btnPar30.addActionListener(new ActionListener() {
@@ -1066,6 +1092,7 @@ public class FSParametersForm extends ParametersForm
         txtPar31 = new JTextField();
         txtPar31.setToolTipText(toolTipPar31);
         txtPar31.setPreferredSize(fileFieldSize);
+        txtPar31.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar31.toUpperCase(),txtPar31);
         btnPar31 = new JButton("Browse");
         btnPar31.addActionListener(new ActionListener() {
@@ -1086,6 +1113,7 @@ public class FSParametersForm extends ParametersForm
         txtPar32 = new JTextField();
         txtPar32.setToolTipText(toolTipPar32);
         txtPar32.setPreferredSize(strFieldSize);
+        txtPar32.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar32.toUpperCase(),txtPar32);
         linePar32.add(lblPar32);
         linePar32.add(txtPar32);
@@ -1099,6 +1127,7 @@ public class FSParametersForm extends ParametersForm
         txtPar33 = new JTextField();
         txtPar33.setToolTipText(toolTipPar33);
         txtPar33.setPreferredSize(strFieldSize);
+        txtPar33.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar33.toUpperCase(),txtPar33);
         linePar33.add(lblPar33);
         linePar33.add(txtPar33);
@@ -1112,6 +1141,7 @@ public class FSParametersForm extends ParametersForm
         txtPar34 = new JTextField();
         txtPar34.setToolTipText(toolTipPar34);
         txtPar34.setPreferredSize(strFieldSize);
+        txtPar34.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar34.toUpperCase(),txtPar34);
         linePar34.add(lblPar34);
         linePar34.add(txtPar34);

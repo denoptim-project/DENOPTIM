@@ -216,6 +216,7 @@ public class FitnessParametersForm extends ParametersForm
         txtFitProviderSource = new JTextField();
         txtFitProviderSource.setToolTipText(toolTipFitProviderSource);
         txtFitProviderSource.setPreferredSize(fileFieldSize);
+        txtFitProviderSource.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyFitProviderSource.toUpperCase(),txtFitProviderSource);
         btnFitProviderSource = new JButton("Browse");
         btnFitProviderSource.addActionListener(new ActionListener() {
@@ -248,6 +249,7 @@ public class FitnessParametersForm extends ParametersForm
         txtEq = new JTextField();
         txtEq.setToolTipText(toolTipEq);
         txtEq.setPreferredSize(strFieldSize);
+        txtEq.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyEq.toUpperCase(),txtEq);
         lineEq.add(lblEq);
         lineEq.add(txtEq);

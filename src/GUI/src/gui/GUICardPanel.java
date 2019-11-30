@@ -41,7 +41,8 @@ public class GUICardPanel extends JPanel
 	}
 	
 	/**
-	 * Shows a dialog saying that the functionality is not ready yet. Use only during devel phase.
+	 * Shows a dialog saying that the functionality is not ready yet. 
+	 * Use only during devel phase.
 	 */
 	protected void getNonImplementedError()
 	{
@@ -51,6 +52,8 @@ public class GUICardPanel extends JPanel
                 JOptionPane.PLAIN_MESSAGE,
                 UIManager.getIcon("OptionPane.errorIcon"));
 	}
+	
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Remove the card from the deck of cards and takes care of removing
@@ -71,12 +74,17 @@ public class GUICardPanel extends JPanel
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
+			if (parentPanel instanceof GUIPrepare)
+			{
+				unsavedChanges = ((GUIPrepare) parentPanel).hasUnsavedChanges();
+			}
+			
 			if (unsavedChanges)
 			{
 				Object[] options = {"Yes","No"};
 				int res = JOptionPane.showOptionDialog(null,
-	                "<html>Abandon without saving?"
-	                + "<br>Press NO to go back.</html>",
+	                "<html>Found unsaved edits.<br>"
+	                + "Abandon without saving?</html>",
 	                "Abandon?",
 	                JOptionPane.DEFAULT_OPTION,
 	                JOptionPane.QUESTION_MESSAGE,

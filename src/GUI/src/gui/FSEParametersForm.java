@@ -230,6 +230,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar2 = new JTextField();
         txtPar2.setToolTipText(toolTipPar2);
         txtPar2.setPreferredSize(strFieldSize);
+        txtPar2.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar2.toUpperCase(),txtPar2);
         linePar2.add(lblPar2);
         linePar2.add(txtPar2);
@@ -243,6 +244,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar7 = new JTextField();
         txtPar7.setToolTipText(toolTipPar7);
         txtPar7.setPreferredSize(strFieldSize);
+        txtPar7.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar7.toUpperCase(),txtPar7);
         linePar7.add(lblPar7);
         linePar7.add(txtPar7);
@@ -256,6 +258,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar3 = new JTextField();
         txtPar3.setToolTipText(toolTipPar3);
         txtPar3.setPreferredSize(fileFieldSize);
+        txtPar3.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar3.toUpperCase(),txtPar3);
         btnPar3 = new JButton("Browse");
         btnPar3.addActionListener(new ActionListener() {
@@ -276,6 +279,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar9 = new JTextField();
         txtPar9.setToolTipText(toolTipPar9);
         txtPar9.setPreferredSize(fileFieldSize);
+        txtPar9.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar9.toUpperCase(),txtPar9);
         btnPar9 = new JButton("Browse");
         btnPar9.addActionListener(new ActionListener() {
@@ -295,6 +299,7 @@ public class FSEParametersForm extends ParametersForm
         lblPar10.setToolTipText(toolTipPar10);
         cmbPar10 = new JComboBox<String>(new String[] {"STRING", "BYTE"});
         cmbPar10.setToolTipText(toolTipPar10);
+        cmbPar10.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyPar10.toUpperCase(),cmbPar10);
         linePar10.add(lblPar10);
         linePar10.add(cmbPar10);
@@ -313,6 +318,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar8 = new JTextField();
         txtPar8.setToolTipText(toolTipPar8);
         txtPar8.setPreferredSize(strFieldSize);
+        txtPar8.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar8.toUpperCase(),txtPar8);
         linePar8.add(lblPar8);
         linePar8.add(txtPar8);
@@ -326,6 +332,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar1 = new JTextField();
         txtPar1.setToolTipText(toolTipPar1);
         txtPar1.setPreferredSize(fileFieldSize);
+        txtPar1.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar1.toUpperCase(),txtPar1);
         btnPar1 = new JButton("Browse");
         btnPar1.addActionListener(new ActionListener() {
@@ -346,6 +353,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar4 = new JTextField();
         txtPar4.setToolTipText(toolTipPar4);
         txtPar4.setPreferredSize(fileFieldSize);
+        txtPar4.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar4.toUpperCase(),txtPar4);
         btnPar4 = new JButton("Browse");
         btnPar4.addActionListener(new ActionListener() {
@@ -366,6 +374,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar5 = new JTextField();
         txtPar5.setToolTipText(toolTipPar5);
         txtPar5.setPreferredSize(strFieldSize);
+        txtPar5.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar5.toUpperCase(),txtPar5);
         linePar5.add(lblPar5);
         linePar5.add(txtPar5);
@@ -379,6 +388,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar6 = new JTextField();
         txtPar6.setToolTipText(toolTipPar6);
         txtPar6.setPreferredSize(strFieldSize);
+        txtPar6.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar6.toUpperCase(),txtPar6);
         linePar6.add(lblPar6);
         linePar6.add(txtPar6);
@@ -392,6 +402,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar11 = new JTextField();
         txtPar11.setToolTipText(toolTipPar11);
         txtPar11.setPreferredSize(strFieldSize);
+        txtPar11.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar11.toUpperCase(),txtPar11);
         linePar11.add(lblPar11);
         linePar11.add(txtPar11);
@@ -405,6 +416,7 @@ public class FSEParametersForm extends ParametersForm
         txtPar12 = new JTextField();
         txtPar12.setToolTipText(toolTipPar12);
         txtPar12.setPreferredSize(fileFieldSize);
+        txtPar12.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyPar12.toUpperCase(),txtPar12);
         btnPar12 = new JButton("Browse");
         btnPar12.addActionListener(new ActionListener() {
