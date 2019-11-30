@@ -60,9 +60,16 @@ public class MainToolBar extends JMenuBar {
 	private Map<GUICardPanel,JMenuItem> activeTabsAndRefs;
 	
 	/**
+	 * Reference to the GUI window
+	 */
+	protected GUI gui;
+	
+	/**
 	 * Reference to the main panel (cards deck)
 	 */
 	protected GUIMainPanel mainPanel;
+	
+//-----------------------------------------------------------------------------
 
 	/**
 	 * Constructor that build the tool bar.
@@ -73,15 +80,29 @@ public class MainToolBar extends JMenuBar {
 		initialize();
 	}
 	
+//-----------------------------------------------------------------------------
+
 	/**
-	 * Sets the main panel for creating functionality of menu items depending
-	 * on main panel identity
+	 * Sets the reference to master GUI
+	 */
+	public void setRefToMasterGUI(GUI gui)
+	{
+		this.gui = gui;
+	}
+
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Sets the reference to main panel for creating functionality of menu 
+	 * items depending on main panel identity
 	 */
 	public void setRefToMainPanel(GUIMainPanel mainPanel)
 	{
 		this.mainPanel = mainPanel;
 	}
 
+//-----------------------------------------------------------------------------
+	
 	/**
 	 * Initialize the contents of the tool bar
 	 */
@@ -161,7 +182,7 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+				gui.closeIfAllSaved();
 			}
 		});
 		menuDenoptim.add(exit);
@@ -359,6 +380,6 @@ public class MainToolBar extends JMenuBar {
 			activeTabsAndRefs.remove(panel);
 		}
 	}
-
+	
 //-----------------------------------------------------------------------------
 }

@@ -77,4 +77,28 @@ public class GUIMainPanel extends JPanel
 	}
 	
 //-----------------------------------------------------------------------------
+	
+	/**
+	 * Checks is any card has unsaved changes
+	 * @return <code>true</code> if there is at least one card with unsaved 
+	 * changes
+	 */
+	public boolean hasUnsavedChanges()
+	{
+		boolean res = false;
+		for (Component c : this.getComponents())
+		{		
+			if (c instanceof GUICardPanel)
+			{
+				if (((GUICardPanel) c).hasUnsavedChanges())
+				{
+					res = true;
+					break;
+				}
+			}
+		}
+		return res;
+	}
+	
+//-----------------------------------------------------------------------------
 }

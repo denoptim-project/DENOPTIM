@@ -94,6 +94,11 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private boolean alteredAPData = false;
 	
+	/**
+	 * Flag signaling that loaded data has changes since last save
+	 */
+	private boolean unsavedChanges = false;
+	
 	private JPanel centralPanel;
 	private JmolPanel jmolPanel;
 	private JPanel fragCtrlPane;
@@ -1505,6 +1510,18 @@ public class GUIFragmentInspector extends GUICardPanel
     	return currApClass;
 	}
   	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Check whether there are unsaved changes.
+	 * @return <code>true</code> if there are unsaved changes.
+	 */
+	
+	public boolean hasUnsavedChanges()
+	{
+		return unsavedChanges;
+	}
+		
 //-----------------------------------------------------------------------------
   	
 }

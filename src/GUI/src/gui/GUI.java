@@ -1,6 +1,7 @@
 package gui;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import java.awt.EventQueue;
@@ -16,7 +17,8 @@ import java.awt.EventQueue;
  * @author Marco Foscato
  */
 
-public class GUI {
+public class GUI 
+{
 
 	private JFrame frame;     //GUI window frame
 	private int mainFrameInitX = 100;
@@ -50,6 +52,8 @@ public class GUI {
 		});
 	}
 
+//-----------------------------------------------------------------------------
+	
 	/**
 	 * Create the application.
 	 */
@@ -57,6 +61,8 @@ public class GUI {
 		initialize();
 	}
 
+//-----------------------------------------------------------------------------
+	
 	/**
 	 * Create and fill frame.
 	 */
@@ -64,6 +70,13 @@ public class GUI {
 		frame = new JFrame("DENOPTIM - GUI");
 		frame.setBounds(mainFrameInitX, mainFrameInitY, width, height);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    	closeIfAllSaved();
+		    }
+		});
 		
 		//Frame pane contains all (tools bar and the rest)
 		framePane = (JPanel) frame.getContentPane();
@@ -76,6 +89,37 @@ public class GUI {
 		mainPanel = new GUIMainPanel(menuBar);
 		framePane.add(mainPanel);
 		menuBar.setRefToMainPanel(mainPanel);
+		menuBar.setRefToMasterGUI(this);
+		
 		mainPanel.add(new HomePanel(mainPanel));		
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Close GUI is there are no unsaved changes to the open components
+	 */
+	protected void closeIfAllSaved()
+	{
+		if (mainPanel.hasUnsavedChanges())
+		{
+			int res = JOptionPane.showConfirmDialog(frame, 
+		            "<html>Found unsaved changes.<br>Are you sure you want to "
+		            + "close this window?<html>",
+		            "Close Window?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE);
+		    if (res == JOptionPane.YES_OPTION)
+		    {
+		        System.exit(0);
+		    }
+		}
+		else
+		{
+			System.exit(0);
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
 }

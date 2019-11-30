@@ -21,11 +21,6 @@ public class GUICardPanel extends JPanel
 	private static final long serialVersionUID = -1640517890155875184L;
 	
 	/**
-	 * Flag notifying that some data was not saved
-	 */
-	protected boolean unsavedChanges = false;
-	
-	/**
 	 * The main panel (cards deck)
 	 */
 	protected GUIMainPanel mainPanel;
@@ -39,6 +34,29 @@ public class GUICardPanel extends JPanel
 		this.mainPanel = mainPanel;
 		this.setName(newPanelName);
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Check for unsaved changes in the components included in this card.
+	 * @return <code>true</code> is there are unsaved changes.
+	 */
+	public boolean hasUnsavedChanges()
+	{		
+		boolean res = false;
+		if (this instanceof GUIPrepare)
+		{
+			res = ((GUIPrepare) this).hasUnsavedChanges();
+		}
+		else if (this instanceof GUIFragmentInspector)
+		{
+			res = ((GUIFragmentInspector) this).hasUnsavedChanges();
+		}
+		
+		return res;
+	}
+	
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Shows a dialog saying that the functionality is not ready yet. 
@@ -58,9 +76,6 @@ public class GUICardPanel extends JPanel
 	/**
 	 * Remove the card from the deck of cards and takes care of removing
 	 * also the entry in the list of active tabs.
-	 * 
-	 * @author Marco Foscato
-	 *
 	 */
 	protected class removeCardActionListener implements ActionListener
 	{
@@ -73,13 +88,8 @@ public class GUICardPanel extends JPanel
 		
 		@Override
 		public void actionPerformed(ActionEvent e) 
-		{
-			if (parentPanel instanceof GUIPrepare)
-			{
-				unsavedChanges = ((GUIPrepare) parentPanel).hasUnsavedChanges();
-			}
-			
-			if (unsavedChanges)
+		{		
+			if (hasUnsavedChanges())
 			{
 				Object[] options = {"Yes","No"};
 				int res = JOptionPane.showOptionDialog(null,

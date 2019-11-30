@@ -235,12 +235,13 @@ public class GUIPrepare extends GUICardPanel
 		{
 			if (p.hasUnsavedChanges())
 			{
-				//TODO del
-				System.out.println("Params "+p.getClass()+" has unsaved changes");
 				res = true;
 				break;
 			}
 		}
 		return res;
 	}
+	
+//-----------------------------------------------------------------------------
+	
 }
