@@ -50,7 +50,8 @@ import denoptim.utils.FragmentUtils;
 
 
 /**
- * A panel with a molecular viewer that understands DENOPTIM fragments.
+ * A panel with a molecular viewer that understands DENOPTIM fragments
+ * and allows to create and edit fragments.
  * The molecular viewer is provided by Jmol.
  * 
  * @author Marco Foscato
@@ -409,7 +410,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		pnlDelSel = new JPanel();
 		btnDelSel = new JButton("Remove Atoms");
 		btnDelSel.setToolTipText("<html>Removes all selected atoms from the "
-				+ "systhem.<br><br><b>WARNING:</b> this action cannot be "
+				+ "system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!");
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -508,7 +509,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		btnOpenFrags = new JButton("Load Library of Fragments",
 					UIManager.getIcon("FileView.directoryIcon"));
-		btnOpenFrags.setToolTipText("Reads fragments or stractures from "
+		btnOpenFrags.setToolTipText("Reads fragments or structures from "
 				+ "file.");
 		btnOpenFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -522,7 +523,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		});
 		commandsPane.add(btnOpenFrags);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Fragment",
+		JButton btnSaveFrags = new JButton("Save Library of Fragments",
 				UIManager.getIcon("FileView.hardDriveIcon"));
 		btnSaveFrags.setToolTipText("Write all fragments to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
@@ -1352,7 +1353,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			}
     	}
 
-    	// Takes case of "fragment" and AP info in GUI components
+    	// Takes care of "fragment" and AP info in GUI components
     	clearCurrentSystem();
     	
     	// Actual removal from the library

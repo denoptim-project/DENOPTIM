@@ -1109,8 +1109,8 @@ public class DenoptimIO
                 st = atom_symbols.get(i);
                 Point3d p3 = atom_coords.get(i);
 
-                line = st + "\t" + (p3.x < 0 ? "" : " ") + fsb.format(p3.x) + "\t"
-                        + (p3.y < 0 ? "" : " ") + fsb.format(p3.y) + "\t"
+                line = st + "        " + (p3.x < 0 ? "" : " ") + fsb.format(p3.x) + "        "
+                        + (p3.y < 0 ? "" : " ") + fsb.format(p3.y) + "        "
                         + (p3.z < 0 ? "" : " ") + fsb.format(p3.z);
                 fw.write(line + lsep);
                 fw.flush();
@@ -1827,6 +1827,72 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
+     * Reads a list of <code>DENOPTIMGraph</code>s from file
+     * @param fileName the pathname of the file to read
+     * @param format the file format to expect
+     * @param useFS set to <code>true</code> when there is a defined 
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential 
+     * mismatch between fragment space and graph representation.
+     * @return the list of graphs
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
+    		            String fileName, String format, boolean useFS) 
+    		            		throws DENOPTIMException
+    {
+		switch (format)
+		{
+			case "TXT":
+				return DenoptimIO.readDENOPTIMGraphsFromFile(fileName);
+				
+			case "SDF":
+				return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
+		}
+    	return new ArrayList<DENOPTIMGraph>();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of <code>DENOPTIMGraph</code>s from a SDF file
+     * @param fileName the pathname of the file to read
+     * @param useFS set to <code>true</code> when there is a defined 
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential 
+     * mismatch between fragment space and graph representation.
+     * @return the list of graphs
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
+								String fileName, boolean useFS)
+							throws DENOPTIMException
+    {
+    	ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
+    	ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
+    	int i=0;
+    	for (IAtomContainer mol : mols)
+    	{
+    		i++;
+    		Object prop = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
+    		if (prop == null)
+    		{
+    			throw new DENOPTIMException("Attempt to load graph form "
+    					+ "SDF that lack a '" + DENOPTIMConstants.GRAPHTAG 
+    					+ "' tag. Check molecule " + i);
+    		}
+    		DENOPTIMGraph g = GraphConversionTool.getGraphFromString(
+                                                  prop.toString().trim(),useFS);
+    		lstGraphs.add(g);
+    	}
+    	return lstGraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Reads a list of <code>DENOPTIMGraph</code>s from a text file
      * @param fileName the pathname of the file to read
      * @return the list of graphs
@@ -1836,7 +1902,7 @@ public class DenoptimIO
 								String fileName)
 							throws DENOPTIMException
     {
-	ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
+        ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
         String line = null;
         try
@@ -1854,26 +1920,26 @@ public class DenoptimIO
                     continue;
                 }
 
-		DENOPTIMGraph graph;
-		try
-		{
-		    graph = GraphConversionTool.getGraphFromString(line.trim());
+				DENOPTIMGraph g;
+				try
+				{
+				    g = GraphConversionTool.getGraphFromString(line.trim());
+				}
+				catch (Throwable t)
+				{
+				    String msg = "Cannot convert string to DENOPTIMGraph. "
+					         + "Check line '" + line.trim() + "'";
+				    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+		                    throw new DENOPTIMException(msg,t);
+				}
+				lstGraphs.add(g);
+		    }
 		}
-		catch (Throwable t)
-		{
-		    String msg = "Cannot convert string to DENOPTIMGraph. "
-			         + "Check line '" + line.trim() + "'";
-		    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                    throw new DENOPTIMException(msg,t);
-		}
-		lstGraphs.add(graph);
-	    }
-	}
         catch (IOException ioe)
         {
-	    String msg = "Cannot read file " + fileName;
-	    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            throw new DENOPTIMException(msg,ioe);
+		    String msg = "Cannot read file " + fileName;
+		    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+	            throw new DENOPTIMException(msg,ioe);
         }
         finally
         {
@@ -1889,7 +1955,7 @@ public class DenoptimIO
                 throw new DENOPTIMException(ioe);
             }
         }
-	return lstGraphs;
+		return lstGraphs;
     }
 
 //------------------------------------------------------------------------------

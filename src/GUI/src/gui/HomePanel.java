@@ -86,6 +86,8 @@ public class HomePanel extends GUICardPanel
 		});
 		buttonsPanel.add(btnNewVirtualScreening);
 		
+		//TODO: new fragmentation job with GM3DFragmenter "New Fragmentation"
+		
 		JButton btnNewFragments = new JButton("New Fragments");
 		btnNewFragments.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -94,7 +96,15 @@ public class HomePanel extends GUICardPanel
 		});
 		buttonsPanel.add(btnNewFragments);
 		
-		//TODO: new fragmentation job with GM3DFragmenter "New Fragmentation"
+		JButton btnNewGraph = new JButton("New DENOPTIM Graph");
+		btnNewGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.add(new GUIGraphHandler(mainPanel));
+			}
+		});
+		buttonsPanel.add(btnNewGraph);
+		
+		
 		
 		//Credits panel
 		JPanel creditsPanel = new JPanel();

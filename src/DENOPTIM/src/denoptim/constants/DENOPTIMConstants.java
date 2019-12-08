@@ -116,6 +116,23 @@ public final class DENOPTIMConstants
     
     
     public static final int MOLDIGITS = 8;
+    
+    //TODO: check all code for hard-coded SDF tags... there must be some #@%!
+
+    /**
+     * SDF tag containing graph ID
+     */
+    public static final String GCODETAG = "GCODE";
+    
+    /**
+     * SDF tag containing graph encoding
+     */
+    public static final String GRAPHTAG = "GraphENC";
+    
+    /**
+     * SDF tag containing metadata on graph
+     */
+    public static final String GMSGTAG = "GraphMsg";
 
     /**
      * SDF tag defining attachment points 

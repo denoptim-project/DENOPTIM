@@ -109,7 +109,7 @@ public class FragmentSpace
 							    fragsApsPerApClass;
 
     /**
-     * APclass-specific constraints to constitutionsl symmetry
+     * APclass-specific constraints to constitutional symmetry
      */
     private static HashMap<String, Double> symmConstraints;
 

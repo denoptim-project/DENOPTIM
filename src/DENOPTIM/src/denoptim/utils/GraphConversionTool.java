@@ -220,11 +220,11 @@ public class GraphConversionTool
         lstDVA.clear();
 
 	// Store graph as property
-        mol.setProperty("GCODE", g.getGraphId());
-        mol.setProperty("GraphENC", g.toString());
+        mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
+        mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
         if (g.getMsg() != null)
         {
-            mol.setProperty("GraphMsg", g.getMsg());
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getMsg());
         }
 
         return mol;
@@ -249,7 +249,7 @@ public class GraphConversionTool
     public static DENOPTIMGraph getGraphFromString(String strGraph)
                                                         throws DENOPTIMException
     {
-	return getGraphFromString(strGraph,true);
+    	return getGraphFromString(strGraph,true);
     }
 
 //------------------------------------------------------------------------------
@@ -262,9 +262,9 @@ public class GraphConversionTool
      * the string obtained by the 
      * {@link denoptim.molecule.DENOPTIMGraph#toString() toString} method the
      * <code>DENOPTIMGraph</code>.
-     * @param useMolInfo set to <code>true</code> when molecular infomarion on 
+     * @param useMolInfo set to <code>true</code> when molecular information 
      * is available for all fragments. That is, the libraries of fragments 
-     * provided to the FragmentSpace corrspond to the fragments implied in 
+     * provided to the FragmentSpace correspond to the fragments implied in 
      * the string-representation of the graph.
      * @return the Graph representation that can be used by DENOPTIM
      * @throws denoptim.exception.DENOPTIMException

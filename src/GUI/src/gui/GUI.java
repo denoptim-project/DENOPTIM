@@ -69,7 +69,6 @@ public class GUI
 	private void initialize() {
 		frame = new JFrame("DENOPTIM - GUI");
 		frame.setBounds(mainFrameInitX, mainFrameInitY, width, height);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
