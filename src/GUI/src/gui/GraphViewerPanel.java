@@ -1,7 +1,10 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 
 import javax.swing.JPanel;
 
@@ -10,11 +13,16 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.swingViewer.ViewPanel;
+import org.graphstream.ui.view.Camera;
 import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.ViewerPipe;
 import org.graphstream.ui.view.util.DefaultMouseManager;
+import org.graphstream.ui.view.util.MouseManager;
+import org.graphstream.ui.view.util.ShortcutManager;
 
 import signature.simple.SimpleGraph;
 
@@ -120,57 +128,20 @@ public class GraphViewerPanel extends JPanel
 	{
 		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 		this.setLayout(new BorderLayout());
-		
-		//TODO del
-		graph = new SingleGraph("Tutorial 1");
-		Node a = graph.addNode("A");
-		a.setAttribute("ui.class", "scaffold");
-		graph.addNode("rc1");
-		graph.getNode("rc1").setAttribute("ui.class", "rca");
-		graph.addNode("rc2");
-		graph.getNode("rc2").setAttribute("ui.class", "rca");
-		graph.addNode("B");
-		graph.getNode("B").setAttribute("ui.class", "fragment");
-		graph.addNode("C");
-		graph.getNode("C").setAttribute("ui.class", "fragment");
-		graph.addNode("D");
-		graph.getNode("D").setAttribute("ui.class", "fragment");
-		graph.addNode("E");
-		graph.getNode("E").setAttribute("ui.class", "fragment");
-		graph.addNode("F");
-		graph.getNode("F").setAttribute("ui.class", "fragment");
-		graph.addNode("GGGGGGG");
-		graph.getNode("GGGGGGG").setAttribute("ui.class", "fragment");
-		graph.addNode("H");
-		graph.getNode("H").setAttribute("ui.class", "cap");
-		graph.addNode("ap1");
-		graph.getNode("ap1").setAttribute("ui.class", "ap");
-		graph.addNode("ap2");
-		graph.getNode("ap2").setAttribute("ui.class", "ap");
-		Edge ap1 = graph.addEdge("Aap1","A","ap1");
-		ap1.setAttribute("ui.class", "ap");
-		Edge ap2 = graph.addEdge("Aap2","A","ap2");
-		ap2.setAttribute("ui.class", "ap");
-		graph.addEdge("Arc1", "A", "rc1",true);
-		graph.addEdge("rc1rc2", "rc1", "rc2",false);
-		graph.getEdge("rc1rc2").setAttribute("ui.class", "rc");
-		graph.addEdge("rc2B", "B", "rc2",true);
-		graph.addEdge("BC", "B", "C",true);
-		graph.addEdge("CA", "C", "A",true);
-		graph.addEdge("CD", "C", "D",true);
-		graph.addEdge("CE", "C", "E",true);
-		graph.addEdge("EG", "E", "GGGGGGG");
-		graph.addEdge("CF", "C", "F");
-		graph.addEdge("BF", "B", "F");
-		graph.addEdge("DG", "D", "GGGGGGG");
-		graph.addEdge("BH", "B", "H");
-
-	    for (Node node : graph) {
-	        node.addAttribute("ui.label", node.getId());
-	    }
-		
-		
-		loadGraphToViewer(graph);
+		this.setBackground(Color.decode("#D9D9D9"));
+		this.setToolTipText("No graph to visualize");
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	public void cleanup()
+	{
+		for (Component c : this.getComponents())
+		{
+			this.remove(c);
+		}
+		this.repaint();
+		this.revalidate();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -178,12 +149,17 @@ public class GraphViewerPanel extends JPanel
 	public void loadGraphToViewer(Graph g)
 	{
 		graph = g;
+		graph.addAttribute("ui.quality");
+		graph.addAttribute("ui.antialias");
+		graph.addAttribute("ui.stylesheet", cssStyle);
+		
 		viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
 		viewer.addDefaultView(false); 
 		viewer.enableAutoLayout();
 		
 		sman = new SpriteManager(graph);
 		//TODO process edges to get sprites
+		//TODO del tmp code
 		Sprite se = sman.addSprite("S_rc1rc2");
 		se.attachToEdge("rc1rc2");
 		se.setPosition(0.5);
@@ -192,10 +168,6 @@ public class GraphViewerPanel extends JPanel
 	    {
 	        s.addAttribute("ui.label", s.getId());
 	    }
-	    
-		graph.addAttribute("ui.quality");
-		graph.addAttribute("ui.antialias");
-		graph.addAttribute("ui.stylesheet", cssStyle);
 		
 		viewpanel = viewer.getDefaultView();
 		viewpanel.setMouseManager(new GraphMouseManager());
@@ -256,7 +228,7 @@ public class GraphViewerPanel extends JPanel
 				double relDeltaX = (altXstart - curX) / (viewpanel.getWidth());
 				double relDeltaY = (altYstart - curY) / (viewpanel.getHeight());
 				double newX = altXCamStart + altXCamStart*relDeltaX;
-				double newY = altYCamStart - altYCamStart*relDeltaY;
+				double newY = altYCamStart + altYCamStart*relDeltaY;
 				double z = view.getCamera().getViewCenter().z;
 				view.getCamera().setViewCenter(newX, newY, z);
 			}

@@ -23,9 +23,10 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -86,7 +87,6 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private JPanel centralPanel;
 	private GraphViewerPanel graphPanel;
-	//private GsTest graphPanel;
 	private JPanel graphCtrlPane;
 	private JPanel graphNavigPane;
 	private JPanel graphNavigPane2;
@@ -141,15 +141,7 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// The graph viewer goes all in here	
 		graphPanel = new GraphViewerPanel();
-		//graphPanel = new GsTest();
 		this.add(graphPanel,BorderLayout.CENTER);
-		
-        // Jmol viewer panel
-        /*
-        jmolPanel = new JmolPanel();
-        jmolPanel.setPreferredSize(new Dimension(400, 400));
-        centralPanel.add(jmolPanel,BorderLayout.CENTER);
-        */
        
 		// General panel on the right: it containing all controls
         graphCtrlPane = new JPanel();
@@ -158,6 +150,7 @@ public class GUIGraphHandler extends GUICardPanel
         graphCtrlPane.add(new JSeparator());
 
         // Controls to navigate the list of dnGraphs
+        // Silly enough we avoid GropupLayout: it messes with the rest of the layout
         graphNavigPane = new JPanel();
         graphNavigPane2 = new JPanel();
         graphNavigPane3 = new JPanel();
@@ -208,7 +201,7 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		pnlAddVrtx = new JPanel();
 		btnAddVrtx = new JButton("Add vertex");
-		btnAddVrtx.setToolTipText("<html>Append a vertex to the delected "
+		btnAddVrtx.setToolTipText("<html>Append a vertex to the selected "
 				+ "attachment point<html>");
 		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -371,6 +364,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	public void importGraphsFromFile(File file)
 	{	
+		//TODO: decide if this is really needed
 		importGraphsFromFile(file, "SDF");
 	}
 	
@@ -394,8 +388,9 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			loadCurrentGraphIdxToViewer();
 			updateGraphListSpinner();
-			
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
 	                "<html>Could not read file '" + file.getAbsolutePath() 
@@ -425,7 +420,7 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		clearCurrentSystem();
 		graph = convertDnGraphToGSGraph(dnGraphLibrary.get(currGrphIdx));
-		//graphPanel.loadGraphToViewer(graph);
+		graphPanel.loadGraphToViewer(graph);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -438,21 +433,64 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
 	{
-		Graph g = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
+		//Graph g = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
 		
-		//TODO: all 
-		g.addNode("A");
-		g.addNode("B");
-		g.addNode("C");
-		g.addNode("D");
-		g.addNode("E");
-		g.addEdge("AB","A","B");
-		g.addEdge("AC","A","C");
-		g.addEdge("AD","A","D");
-		g.addEdge("AE","A","E");
+		//TODO del
 		
+		graph = new SingleGraph("Tutorial 1");
+		Node a = graph.addNode("A");
+		a.setAttribute("ui.class", "scaffold");
+		graph.addNode("rc1");
+		graph.getNode("rc1").setAttribute("ui.class", "rca");
+		graph.addNode("rc2");
+		graph.getNode("rc2").setAttribute("ui.class", "rca");
+		graph.addNode("B");
+		graph.getNode("B").setAttribute("ui.class", "fragment");
+		graph.addNode("C");
+		graph.getNode("C").setAttribute("ui.class", "fragment");
+		graph.addNode("D");
+		graph.getNode("D").setAttribute("ui.class", "fragment");
+		if (currGrphIdx>2)
+		{
+			graph.addNode("E");
+			graph.getNode("E").setAttribute("ui.class", "fragment");
+			graph.addNode("F");
+			graph.getNode("F").setAttribute("ui.class", "fragment");
+			graph.addNode("GGGGGGG");
+			graph.getNode("GGGGGGG").setAttribute("ui.class", "fragment");
+			graph.addNode("H");
+			graph.getNode("H").setAttribute("ui.class", "cap");
+		}
+		graph.addNode("ap1");
+		graph.getNode("ap1").setAttribute("ui.class", "ap");
+		graph.addNode("ap2");
+		graph.getNode("ap2").setAttribute("ui.class", "ap");
+		Edge ap1 = graph.addEdge("Aap1","A","ap1");
+		ap1.setAttribute("ui.class", "ap");
+		Edge ap2 = graph.addEdge("Aap2","A","ap2");
+		ap2.setAttribute("ui.class", "ap");
+		graph.addEdge("Arc1", "A", "rc1",true);
+		graph.addEdge("rc1rc2", "rc1", "rc2",false);
+		graph.getEdge("rc1rc2").setAttribute("ui.class", "rc");
+		graph.addEdge("rc2B", "B", "rc2",true);
+		graph.addEdge("BC", "B", "C",true);
+		graph.addEdge("CA", "C", "A",true);
+		graph.addEdge("CD", "C", "D",true);
+		if (currGrphIdx>2)
+		{
+			graph.addEdge("CE", "C", "E",true);
+			graph.addEdge("EG", "E", "GGGGGGG");
+			graph.addEdge("CF", "C", "F");
+			graph.addEdge("BF", "B", "F");
+			graph.addEdge("DG", "D", "GGGGGGG");
+			graph.addEdge("BH", "B", "H");
+		}
+
+	    for (Node node : graph) {
+	        node.addAttribute("ui.label", node.getId());
+	    }		
 		
-		return g;
+		return graph;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -461,8 +499,7 @@ public class GUIGraphHandler extends GUICardPanel
 	{
 		// Get rid of currently loaded graph
 		dnGraph = null;
-		graph = null;
-		
+        graphPanel.cleanup();
 	}
 
 //-----------------------------------------------------------------------------
@@ -547,7 +584,7 @@ public class GUIGraphHandler extends GUICardPanel
     
     private void removeCurrentdnGraph() throws DENOPTIMException
     {
-    	// Takes care of "dnGraph" in GUI components
+    	// Takes care of "dnGraph" and GUI components
     	clearCurrentSystem();
     	
     	// Actual removal from the library
@@ -581,6 +618,7 @@ public class GUIGraphHandler extends GUICardPanel
   		// Overwrite dnGraph in library
   		dnGraphLibrary.set(currGrphIdx, dnGraph);
         
+  		//TODO: check. this might not be needed
         // Reload dnGraph from library to refresh viewer
     	loadCurrentGraphIdxToViewer();
   		
