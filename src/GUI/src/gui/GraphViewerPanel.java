@@ -61,7 +61,7 @@ public class GraphViewerPanel extends JPanel
 			+ "size: 20px, 20px; "
 			+ "fill-color: #57BC90; "
 			+ "} "
-			+ "node.rca {"
+			+ "node.rcv {"
 			+ "size: 20px, 20px; "
 			+ "fill-color: #F19F4D; "
 			+ "}"
@@ -101,6 +101,13 @@ public class GraphViewerPanel extends JPanel
 			+ "text-background-mode: rounded-box;"
 			+ "text-background-color: #D9D9D9;"
 			+ "text-padding: 1px;"
+			+ "} "
+			+ "sprite.apLabel {"
+			+ "shape: box; "
+			+ "size: 0px;" 
+			+ "text-mode: normal;"
+			+ "text-style: normal;"
+			+ "text-background-mode: none;"
 			+ "}";
 	
 	private ViewPanel viewpanel;
@@ -158,17 +165,27 @@ public class GraphViewerPanel extends JPanel
 		viewer.enableAutoLayout();
 		
 		sman = new SpriteManager(graph);
-		//TODO process edges to get sprites
-		//TODO del tmp code
-		Sprite se = sman.addSprite("S_rc1rc2");
-		se.attachToEdge("rc1rc2");
-		se.setPosition(0.5);
-		se.addAttribute("ui.class", "edgeLabel");
-	    for (Sprite s : sman) 
-	    {
-	        s.addAttribute("ui.label", s.getId());
-	    }
 		
+		// Display APClass on both ends of each edge and on root of of APs
+		for (Edge e : graph.getEdgeSet())
+		{
+			Sprite sSrc = sman.addSprite("srcApClass-"+e.getId());
+			sSrc.setAttribute("ui.class", "apLabel");
+			sSrc.addAttribute("ui.label", e.getAttribute("dnp.srcAPClass"));
+			sSrc.attachToEdge(e.getId());
+			sSrc.setPosition(0.3);
+
+			if (e.hasAttribute("dnp.trgAPClass"))
+			{
+				Sprite sTrg = sman.addSprite("trgApClass-"+e.getId());
+				sTrg.setAttribute("ui.class", "apLabel");
+				sTrg.addAttribute("ui.label", e.getAttribute("dnp.trgAPClass"));
+				sTrg.attachToEdge(e.getId());
+				sTrg.setPosition(0.7);
+			}
+		}
+		
+	    
 		viewpanel = viewer.getDefaultView();
 		viewpanel.setMouseManager(new GraphMouseManager());
 		this.add(viewpanel);
@@ -228,7 +245,7 @@ public class GraphViewerPanel extends JPanel
 				double relDeltaX = (altXstart - curX) / (viewpanel.getWidth());
 				double relDeltaY = (altYstart - curY) / (viewpanel.getHeight());
 				double newX = altXCamStart + altXCamStart*relDeltaX;
-				double newY = altYCamStart + altYCamStart*relDeltaY;
+				double newY = altYCamStart - altYCamStart*relDeltaY;
 				double z = view.getCamera().getViewCenter().z;
 				view.getCamera().setViewCenter(newX, newY, z);
 			}

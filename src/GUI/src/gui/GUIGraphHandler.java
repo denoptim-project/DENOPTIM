@@ -31,7 +31,9 @@ import org.graphstream.graph.implementations.SingleGraph;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 
 
@@ -171,22 +173,44 @@ public class GUIGraphHandler extends GUICardPanel
 		graphCtrlPane.add(graphNavigPane2);
 		
 		btnAddGraph = new JButton("Add");
-		btnAddGraph.setToolTipText("Starts creation of a new graph.");
+		btnAddGraph.setToolTipText("Append a graph to the currently loaded "
+				+ "list of graphs.");
 		btnAddGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO
+				String[] options = new String[]{"Build", "File", "Cancel"};
+				int res = JOptionPane.showOptionDialog(null,
+		                "<html>Please choose how wherther to start creations "
+		                + "of a new graph, or import graph from file.</html>",
+		                "Specify source of new graph",
+		                JOptionPane.DEFAULT_OPTION,
+		                JOptionPane.QUESTION_MESSAGE,
+		                UIManager.getIcon("OptionPane.warningIcon"),
+		                options,
+		                options[2]);
+				switch (res)
+				{
+					case 0:
+						
+						break;
+					
+					case 1:
+						File inFile = DenoptimGUIFileOpener.pickFile();
+						if (inFile == null || inFile.getAbsolutePath().equals(""))
+						{
+							return;
+						}
+						appendGraphsFromFile(inFile);
+						break;
+				}
 			}
 		});
 		btnGraphDel = new JButton("Remove");
 		btnGraphDel.setToolTipText("Remove the present graph from the library.");
 		btnGraphDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
+				try 
+				{
 					removeCurrentdnGraph();
-					if (dnGraphLibrary.size()==0)
-					{
-						//TODO jmolPanel.viewer.evalString("zap");
-					}
 				} catch (DENOPTIMException e1) {
 					System.out.println("Esception while removing the current graph:");
 					e1.printStackTrace();
@@ -362,32 +386,50 @@ public class GUIGraphHandler extends GUICardPanel
 	 * Imports graphs from file. 
 	 * @param file the file to open
 	 */
+
 	public void importGraphsFromFile(File file)
 	{	
-		//TODO: decide if this is really needed
-		importGraphsFromFile(file, "SDF");
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Imports graphs from file. 
-	 * @param file the file to open
-	 * @param format the format (acceptable values are TXT or SDF)
-	 */
-	public void importGraphsFromFile(File file, String format)
-	{	
-		dnGraphLibrary = new ArrayList<DENOPTIMGraph>();
-		try 
-		{
-			dnGraphLibrary = DenoptimIO.readDENOPTIMGraphsFromFile(
-					file.getAbsolutePath(), format, hasFragSpace);	
+		dnGraphLibrary = readGraphsFromFile(file);	
 			
-			// Display the first
-			currGrphIdx = 0;
+		// Display the first
+		currGrphIdx = 0;
+		
+		loadCurrentGraphIdxToViewer();
+		updateGraphListSpinner();
+	}
+
+//-----------------------------------------------------------------------------
+
+	private void appendGraphsFromFile(File file)
+	{
+		ArrayList<DENOPTIMGraph> graphs = readGraphsFromFile(file);
+		int oldSize = dnGraphLibrary.size();
+		if (graphs.size() > 0)
+		{
+			dnGraphLibrary.addAll(graphs);
+			
+			// Display the first of the imported ones
+			currGrphIdx = oldSize;
 			
 			loadCurrentGraphIdxToViewer();
 			updateGraphListSpinner();
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+
+	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
+	{
+		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+		
+		String format="SDF";
+		
+		//TODO: detect other formats or selection of format from GUI
+		
+		try 
+		{
+			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+					file.getAbsolutePath(), format, hasFragSpace);	
 		} 
 		catch (Exception e) 
 		{
@@ -399,8 +441,9 @@ public class GUIGraphHandler extends GUICardPanel
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
 		}
+		return graphs;
 	}
-
+	
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -433,62 +476,83 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
 	{
-		//Graph g = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
+		//TODO: test no edges/nodes
 		
-		//TODO del
+		graph = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
 		
-		graph = new SingleGraph("Tutorial 1");
-		Node a = graph.addNode("A");
-		a.setAttribute("ui.class", "scaffold");
-		graph.addNode("rc1");
-		graph.getNode("rc1").setAttribute("ui.class", "rca");
-		graph.addNode("rc2");
-		graph.getNode("rc2").setAttribute("ui.class", "rca");
-		graph.addNode("B");
-		graph.getNode("B").setAttribute("ui.class", "fragment");
-		graph.addNode("C");
-		graph.getNode("C").setAttribute("ui.class", "fragment");
-		graph.addNode("D");
-		graph.getNode("D").setAttribute("ui.class", "fragment");
-		if (currGrphIdx>2)
+		for (DENOPTIMVertex v : dnG.getVertexList())
 		{
-			graph.addNode("E");
-			graph.getNode("E").setAttribute("ui.class", "fragment");
-			graph.addNode("F");
-			graph.getNode("F").setAttribute("ui.class", "fragment");
-			graph.addNode("GGGGGGG");
-			graph.getNode("GGGGGGG").setAttribute("ui.class", "fragment");
-			graph.addNode("H");
-			graph.getNode("H").setAttribute("ui.class", "cap");
-		}
-		graph.addNode("ap1");
-		graph.getNode("ap1").setAttribute("ui.class", "ap");
-		graph.addNode("ap2");
-		graph.getNode("ap2").setAttribute("ui.class", "ap");
-		Edge ap1 = graph.addEdge("Aap1","A","ap1");
-		ap1.setAttribute("ui.class", "ap");
-		Edge ap2 = graph.addEdge("Aap2","A","ap2");
-		ap2.setAttribute("ui.class", "ap");
-		graph.addEdge("Arc1", "A", "rc1",true);
-		graph.addEdge("rc1rc2", "rc1", "rc2",false);
-		graph.getEdge("rc1rc2").setAttribute("ui.class", "rc");
-		graph.addEdge("rc2B", "B", "rc2",true);
-		graph.addEdge("BC", "B", "C",true);
-		graph.addEdge("CA", "C", "A",true);
-		graph.addEdge("CD", "C", "D",true);
-		if (currGrphIdx>2)
+			// Create representation of this vertex
+			
+			String vID = Integer.toString(v.getVertexId());
+			
+			Node n = graph.addNode(vID);
+			n.addAttribute("ui.label", vID);
+			n.setAttribute("dnp.molID", v.getMolId());
+			n.setAttribute("dnp.frgType", v.getFragmentType());
+			switch (v.getFragmentType())
+			{
+				case 0:
+					n.setAttribute("ui.class", "scaffold");
+					break;
+				case 1:
+					n.setAttribute("ui.class", "fragment");
+					break;
+				case 2:
+					n.setAttribute("ui.class", "cap");
+					break;
+			}
+			if (v.isRCV())
+			{
+				n.setAttribute("ui.class", "rcv");
+			}
+			n.setAttribute("dnp.level", v.getLevel());
+			n.setAttribute("dnp.", "");
+			
+			// Create representation of free APs
+			
+			for (int i=0; i<v.getNumberOfAP(); i++)
+			{
+				DENOPTIMAttachmentPoint ap = v.getAttachmentPoints().get(i);
+				if (ap.isAvailable())
+				{
+					String nApId = Integer.toString(i);
+					Node nAP = graph.addNode(nApId);
+					nAP.addAttribute("ui.label", nApId);
+					nAP.setAttribute("ui.class", "ap");
+					Edge eAP = graph.addEdge(vID+"-"+nApId,vID,nApId);
+					eAP.setAttribute("ui.class", "ap");
+					eAP.setAttribute("dnp.srcAPClass", ap.getAPClass());
+				}
+			}
+		} 
+		
+		for (DENOPTIMEdge dnE : dnG.getEdgeList())
 		{
-			graph.addEdge("CE", "C", "E",true);
-			graph.addEdge("EG", "E", "GGGGGGG");
-			graph.addEdge("CF", "C", "F");
-			graph.addEdge("BF", "B", "F");
-			graph.addEdge("DG", "D", "GGGGGGG");
-			graph.addEdge("BH", "B", "H");
+			String srcIdx = Integer.toString(dnE.getSourceVertex());
+			String trgIdx = Integer.toString(dnE.getTargetVertex());
+			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,true);
+			e.setAttribute("dnp.srcAPId", dnE.getSourceDAP());
+			e.setAttribute("dnp.trgAPId", dnE.getTargetDAP());
+			e.setAttribute("dnp.srcAPClass", dnE.getSourceReaction());
+			e.setAttribute("dnp.trgAPClass", dnE.getTargetReaction());
 		}
-
-	    for (Node node : graph) {
-	        node.addAttribute("ui.label", node.getId());
-	    }		
+		 
+		for (DENOPTIMRing r : dnG.getRings())
+		{
+			String srcIdx = Integer.toString(r.getHeadVertex().getVertexId());
+			String trgIdx = Integer.toString(r.getTailVertex().getVertexId());
+			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,false);
+			e.setAttribute("ui.class", "rc");
+			
+			//WARNING: graphs loaded without having a consistent definition of 
+			// the fragment space will not have all the AP data (which should be 
+			// taken from the fragment space). Therefore, they cannot be 
+			// recognized as RCV, but here we can fix at least part of this
+			
+			graph.getNode(srcIdx).setAttribute("ui.class", "rcv");
+			graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
+		}
 		
 		return graph;
 	}
@@ -552,7 +616,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddGraph.setEnabled(true);
 		btnOpenGraphs.setEnabled(true);
 		
-		graphNavigSpinner.setModel(new SpinnerNumberModel(currGrphIdx+1, 1, 
+		graphNavigSpinner.setModel(new SpinnerNumberModel(currGrphIdx+1, 0, 
 				dnGraphLibrary.size(), 1));
 		((DefaultEditor) graphNavigSpinner.getEditor())
 			.getTextField().setEditable(true); 
@@ -593,21 +657,29 @@ public class GUIGraphHandler extends GUICardPanel
     		dnGraphLibrary.remove(currGrphIdx);
     		int libSize = dnGraphLibrary.size();
     		
-    		if (currGrphIdx>=0 && currGrphIdx<libSize)
+    		if (libSize > 0)
     		{
-    			//we keep currGrphIdx as it will correspond to the next item
+	    		if (currGrphIdx>=0 && currGrphIdx<libSize)
+	    		{
+	    			//we keep currGrphIdx as it will correspond to the next item
+	    		}
+	    		else
+	    		{
+	    			currGrphIdx = currGrphIdx-1;
+	    		}
+	
+	    		// We use the currGrphIdx to load another dnGraph
+		    	loadCurrentGraphIdxToViewer();
+		    	updateGraphListSpinner();
+		    	System.out.println("HEREHERE");
     		}
     		else
     		{
-    			currGrphIdx = currGrphIdx-1;
+    			currGrphIdx = -1;
+    			//Spinner will be fixed by the deprotection routine
+    			totalGraphsLabel.setText(Integer.toString(dnGraphLibrary.size()));
     		}
-
-    		// We use the currGrphIdx to load another dnGraph
-	    	loadCurrentGraphIdxToViewer();
-	    	updateGraphListSpinner();
-	    	
-	  		// Release constraints
-	        deprotectEditedSystem();
+    		deprotectEditedSystem();
     	}
     }
 

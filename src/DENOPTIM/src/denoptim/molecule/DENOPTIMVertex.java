@@ -51,7 +51,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     private ArrayList<DENOPTIMAttachmentPoint> lstAP;
 
     /*
-     * 0-scaffold, 1-special fragment, 2-capping group
+     * 0:scaffold, 1:fragment, 2:capping group
      */
     private int fragmentType;
 
@@ -96,11 +96,11 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         fragmentType = m_fragmentType;
         lstSymmAP = new ArrayList<>();
         isRCV = false;
-	if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-	    lstAP.get(0).getAPClass()))
-	{
-	    isRCV = true;
-	}
+		if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
+		    lstAP.get(0).getAPClass()))
+		{
+		    isRCV = true;
+		}
     }
 
 //------------------------------------------------------------------------------

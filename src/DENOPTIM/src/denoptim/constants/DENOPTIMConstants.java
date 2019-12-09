@@ -29,8 +29,6 @@ import java.util.Arrays;
 
 /**
  * General set of constants used in DENOPTIM
- * @author Vishwesh Venkatraman
- * @author Marco Foscato
  */
 
 public final class DENOPTIMConstants 
