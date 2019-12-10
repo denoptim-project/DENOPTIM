@@ -1880,7 +1880,7 @@ public class DenoptimIO
     		if (prop == null)
     		{
     			throw new DENOPTIMException("Attempt to load graph form "
-    					+ "SDF that lack a '" + DENOPTIMConstants.GRAPHTAG 
+    					+ "SDF that lacks a '" + DENOPTIMConstants.GRAPHTAG 
     					+ "' tag. Check molecule " + i);
     		}
     		DENOPTIMGraph g = GraphConversionTool.getGraphFromString(

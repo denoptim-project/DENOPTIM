@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -87,12 +89,9 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private boolean hasFragSpace = false;
 	
-	private JPanel centralPanel;
 	private GraphViewerPanel graphPanel;
 	private JPanel graphCtrlPane;
 	private JPanel graphNavigPane;
-	private JPanel graphNavigPane2;
-	private JPanel graphNavigPane3;
 	
 	private JButton btnAddGraph;
 	private JButton btnGraphDel;
@@ -104,11 +103,14 @@ public class GUIGraphHandler extends GUICardPanel
 	private final GraphSpinnerChangeEvent graphSpinnerListener = 
 												new GraphSpinnerChangeEvent();
 	
-	private JPanel pnlAddVrtx;
+	private JPanel pnlEditVrtxBtns;
 	private JButton btnAddVrtx;
-	
-	private JPanel pnlDelSel;
 	private JButton btnDelSel;
+	
+	private JPanel pnlShowLabels;
+	private JButton btnAddLabel;
+	private JButton btnDelLabel;
+	private JComboBox<String> cmbLabel;
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
@@ -149,29 +151,18 @@ public class GUIGraphHandler extends GUICardPanel
         graphCtrlPane = new JPanel();
         graphCtrlPane.setVisible(true);
         graphCtrlPane.setLayout(new BoxLayout(graphCtrlPane, SwingConstants.VERTICAL));
-        graphCtrlPane.add(new JSeparator());
 
         // Controls to navigate the list of dnGraphs
-        // Silly enough we avoid GropupLayout: it messes with the rest of the layout
         graphNavigPane = new JPanel();
-        graphNavigPane2 = new JPanel();
-        graphNavigPane3 = new JPanel();
         JLabel navigationLabel1 = new JLabel("Graph # ");
         JLabel navigationLabel2 = new JLabel("Current library size: ");
         totalGraphsLabel = new JLabel("0");
         
 		graphNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
 		graphNavigSpinner.setToolTipText("Move to graph number # in the currently loaded library.");
-		graphNavigSpinner.setPreferredSize(new Dimension(75,20));
+		graphNavigSpinner.setMaximumSize(new Dimension(75,20));
 		graphNavigSpinner.addChangeListener(graphSpinnerListener);
-        graphNavigPane.add(navigationLabel1);
-		graphNavigPane.add(graphNavigSpinner);
-		graphCtrlPane.add(graphNavigPane);
-		
-        graphNavigPane2.add(navigationLabel2);
-        graphNavigPane2.add(totalGraphsLabel);
-		graphCtrlPane.add(graphNavigPane2);
-		
+        
 		btnAddGraph = new JButton("Add");
 		btnAddGraph.setToolTipText("Append a graph to the currently loaded "
 				+ "list of graphs.");
@@ -217,18 +208,46 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 			}
 		});
-		graphNavigPane3.add(btnAddGraph);
-		graphNavigPane3.add(btnGraphDel);
-		graphCtrlPane.add(graphNavigPane3);
+		
+        GroupLayout lyoAddDetGraphs = new GroupLayout(graphNavigPane);
+        graphNavigPane.setLayout(lyoAddDetGraphs);
+        lyoAddDetGraphs.setAutoCreateGaps(true);
+        lyoAddDetGraphs.setAutoCreateContainerGaps(true);
+        lyoAddDetGraphs.setHorizontalGroup(lyoAddDetGraphs.createParallelGroup(
+                        		GroupLayout.Alignment.CENTER)
+                        .addGroup(lyoAddDetGraphs.createSequentialGroup()
+                                        .addComponent(navigationLabel1)
+                                        .addComponent(graphNavigSpinner))
+                        .addGroup(lyoAddDetGraphs.createSequentialGroup()
+                                        .addComponent(navigationLabel2)
+                                        .addComponent(totalGraphsLabel))
+                        .addGroup(lyoAddDetGraphs.createSequentialGroup()
+                                        .addComponent(btnAddGraph)
+                                        .addComponent(btnGraphDel)));
+        lyoAddDetGraphs.setVerticalGroup(lyoAddDetGraphs.createSequentialGroup()
+                        .addGroup(lyoAddDetGraphs.createParallelGroup(
+                        		GroupLayout.Alignment.CENTER)
+                                        .addComponent(navigationLabel1)
+                                        .addComponent(graphNavigSpinner))
+                        .addGroup(lyoAddDetGraphs.createParallelGroup()
+                                        .addComponent(navigationLabel2)
+                                        .addComponent(totalGraphsLabel))
+                        .addGroup(lyoAddDetGraphs.createParallelGroup()
+                                        .addComponent(btnAddGraph)
+                                        .addComponent(btnGraphDel)));
+		graphCtrlPane.add(graphNavigPane);
 		
 		graphCtrlPane.add(new JSeparator());
 		
-		pnlAddVrtx = new JPanel();
-		btnAddVrtx = new JButton("Add vertex");
+		// Controls to alter the presently loaded graph (if any)
+		pnlEditVrtxBtns = new JPanel();
+		JLabel edtVertxsLab = new JLabel("Edit verteces:");
+		btnAddVrtx = new JButton("Add");
 		btnAddVrtx.setToolTipText("<html>Append a vertex to the selected "
 				+ "attachment point<html>");
 		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//TODO: disable when no graph loaded
 				//TODO: get selected
 				ArrayList<DENOPTIMAttachmentPoint> selectedAps = 
 						new ArrayList<DENOPTIMAttachmentPoint>();
@@ -253,17 +272,14 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 			}
 		});
-		pnlAddVrtx.add(btnAddVrtx);
-		graphCtrlPane.add(pnlAddVrtx);
 		
-		pnlDelSel = new JPanel();
-		btnDelSel = new JButton("Remove vertex");
+		btnDelSel = new JButton("Remove");
 		btnDelSel.setToolTipText("<html>Removes all selected vertexes from the "
 				+ "system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!");
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				//TODO disable when no graph loaded
 				//TODO: get selected
 				ArrayList<DENOPTIMVertex> selectedVrtx = 
 						new ArrayList<DENOPTIMVertex>();
@@ -289,11 +305,101 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 			}
 		});
-		pnlDelSel.add(btnDelSel);
-		graphCtrlPane.add(pnlDelSel);
+		
+		GroupLayout lyoEditVertxs = new GroupLayout(pnlEditVrtxBtns);
+		pnlEditVrtxBtns.setLayout(lyoEditVertxs);
+		lyoEditVertxs.setAutoCreateGaps(true);
+		lyoEditVertxs.setAutoCreateContainerGaps(true);
+		lyoEditVertxs.setHorizontalGroup(lyoEditVertxs.createParallelGroup(
+				GroupLayout.Alignment.CENTER)
+				.addComponent(edtVertxsLab)
+				.addGroup(lyoEditVertxs.createSequentialGroup()
+						.addComponent(btnAddVrtx)
+						.addComponent(btnDelSel)));
+		lyoEditVertxs.setVerticalGroup(lyoEditVertxs.createSequentialGroup()
+				.addComponent(edtVertxsLab)
+				.addGroup(lyoEditVertxs.createParallelGroup()
+						.addComponent(btnAddVrtx)
+						.addComponent(btnDelSel)));
+		graphCtrlPane.add(pnlEditVrtxBtns);
 		
 		graphCtrlPane.add(new JSeparator());
 		
+		// Controls of displayed attributes
+		pnlShowLabels = new JPanel();
+		JLabel lblShowHideLabels = new JLabel("Manage graph labels:");
+		cmbLabel = new JComboBox<String>(new String[] {graphPanel.SPRITE_APCLASS, 
+				graphPanel.SPRITE_BNDORD, graphPanel.SPRITE_FRGID});
+		cmbLabel.setToolTipText("<html>Select the kind of type of information"
+				+ "<br>to add or remove from the graph view.</html>");
+		//TODO: enable only if a graph is shown
+		btnAddLabel = new JButton("Show");
+		btnAddLabel.setToolTipText("<html>Shows the chosen label for the "
+				+ "<br>selected elements.</html>");
+		btnAddLabel.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (graphPanel.hasSelected())
+				{
+					graphPanel.appendSprites(cmbLabel.getSelectedItem().toString());
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,
+							"<html>No elements selected! Drag the "
+			                + "mouse to select elements."
+					        + "<br>Click on background to unselect.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+				}
+			}
+		});
+		btnDelLabel = new JButton("Hide");
+		btnDelLabel.setToolTipText("<html>Hides the chosen label for the "
+				+ "<br>selected elements.</html>");
+		btnDelLabel.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (graphPanel.hasSelected())
+				{
+					graphPanel.removeSprites(cmbLabel.getSelectedItem().toString());
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,
+							"<html>No elements selected! Drag the "
+			                + "mouse to select elements."
+					        + "<br>Click on background to unselect.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+				}
+			}
+		});
+		
+        GroupLayout lyoShowAttr = new GroupLayout(pnlShowLabels);
+        pnlShowLabels.setLayout(lyoShowAttr);
+        lyoShowAttr.setAutoCreateGaps(true);
+        lyoShowAttr.setAutoCreateContainerGaps(true);
+        lyoShowAttr.setHorizontalGroup(lyoShowAttr.createParallelGroup(
+                        GroupLayout.Alignment.CENTER)
+                        .addComponent(lblShowHideLabels)
+                        .addComponent(cmbLabel)
+                        .addGroup(lyoShowAttr.createSequentialGroup()
+	                        .addComponent(btnAddLabel)
+	                        .addComponent(btnDelLabel)));
+        lyoShowAttr.setVerticalGroup(lyoShowAttr.createSequentialGroup()
+		                .addComponent(lblShowHideLabels)
+		                .addComponent(cmbLabel)
+		                .addGroup(lyoShowAttr.createParallelGroup()
+		                        .addComponent(btnAddLabel)
+		                        .addComponent(btnDelLabel)));
+        graphCtrlPane.add(pnlShowLabels);
+        
+        graphCtrlPane.add(new JSeparator());
+		
+		// Control for unsaved changes
         pnlSaveEdits = new JPanel();
         btnSaveEdits = new JButton("Save Changes");
         btnSaveEdits.setForeground(Color.RED);
@@ -378,6 +484,9 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		commandsPane.add(btnHelp);
+		
+		//TODO del
+		//importGraphsFromFile(new File("/Users/mfo051/___/__GRAPH.sdf"));
 	}
 	
 //-----------------------------------------------------------------------------
@@ -434,9 +543,18 @@ public class GUIGraphHandler extends GUICardPanel
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
-	                "<html>Could not read file '" + file.getAbsolutePath() 
-	                + "'!<br>Hint of cause: " + e.getCause() + "</html>",
+			String msg = "<html>Could not read file '" + file.getAbsolutePath() 
+	                + "'!<br>Hint of cause: ";
+			if (e.getCause() != null)
+			{
+				msg = msg + e.getCause();
+			}
+			if (e.getMessage() != null)
+			{
+				msg = msg + " " + e.getMessage();
+			}
+			msg = msg + "</html>";
+			JOptionPane.showMessageDialog(null,msg,
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -536,6 +654,7 @@ public class GUIGraphHandler extends GUICardPanel
 			e.setAttribute("dnp.trgAPId", dnE.getTargetDAP());
 			e.setAttribute("dnp.srcAPClass", dnE.getSourceReaction());
 			e.setAttribute("dnp.trgAPClass", dnE.getTargetReaction());
+			e.setAttribute("dnp.bondType", dnE.getBondType());
 		}
 		 
 		for (DENOPTIMRing r : dnG.getRings())
@@ -548,7 +667,7 @@ public class GUIGraphHandler extends GUICardPanel
 			//WARNING: graphs loaded without having a consistent definition of 
 			// the fragment space will not have all the AP data (which should be 
 			// taken from the fragment space). Therefore, they cannot be 
-			// recognized as RCV, but here we can fix at least part of this
+			// recognized as RCV, but here we can fix at least part of the issue
 			
 			graph.getNode(srcIdx).setAttribute("ui.class", "rcv");
 			graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
@@ -671,7 +790,6 @@ public class GUIGraphHandler extends GUICardPanel
 	    		// We use the currGrphIdx to load another dnGraph
 		    	loadCurrentGraphIdxToViewer();
 		    	updateGraphListSpinner();
-		    	System.out.println("HEREHERE");
     		}
     		else
     		{
