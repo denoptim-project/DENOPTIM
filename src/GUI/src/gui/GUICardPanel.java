@@ -14,7 +14,6 @@ import javax.swing.UIManager;
 
 public class GUICardPanel extends JPanel
 {
-	
 	/**
 	 * Version
 	 */

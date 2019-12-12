@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import java.awt.EventQueue;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Graphical User Interface of the DENOPTIM package.
@@ -71,9 +73,9 @@ public class GUI
 		frame = new JFrame("DENOPTIM - GUI");
 		frame.setBounds(mainFrameInitX, mainFrameInitY, width, height);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		frame.addWindowListener(new WindowAdapter() {
 		    @Override
-		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    public void windowClosing(WindowEvent windowEvent) {
 		    	closeIfAllSaved();
 		    }
 		});

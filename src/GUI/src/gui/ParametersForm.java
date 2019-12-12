@@ -451,8 +451,6 @@ public class ParametersForm extends JPanel implements IParametersForm
 			if (isActive)
 			{
 				unsavedChanges = true;
-				//TODO del
-				System.out.println("RdbField CHANGED e:"+e.getClass());
 			}
 		}	
 	}

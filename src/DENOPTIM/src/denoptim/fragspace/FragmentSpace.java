@@ -112,7 +112,33 @@ public class FragmentSpace
      * APclass-specific constraints to constitutional symmetry
      */
     private static HashMap<String, Double> symmConstraints;
+    
+    /**
+     * Flag signaling that this fragment space was built and validated
+     */
+    private static boolean isValid = false;
+  
+//------------------------------------------------------------------------------
 
+    /**
+     * Sets the flag signaling valid definition of this fragment space
+     * @param val set to <code>true</code> to label this object as fully defined
+     */
+    public static void maskAsDefined(boolean val)
+    {
+    	isValid = val;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks for valid definition of this fragment space
+     * @return <code>true</code> if this fragment space has been defined
+     */
+    public static boolean isDefined()
+    {
+    	return isValid;
+    }
 
 //------------------------------------------------------------------------------
 

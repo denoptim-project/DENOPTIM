@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,12 +15,14 @@ import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -31,12 +35,15 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.rings.RingClosureParameters;
 
 
 /**
@@ -92,6 +99,17 @@ public class GUIGraphHandler extends GUICardPanel
 	private GraphViewerPanel graphPanel;
 	private JPanel graphCtrlPane;
 	private JPanel graphNavigPane;
+	
+	private JPanel pnlFragSpace;
+	private JTextField txtFragSpace;
+	private JButton btnFragSpace; 
+	private String loadFSToolTip = "<html>No fragment space loaded.<br>"
+			+ "Graphs can be inspected without loading a fragment space.<br>"
+			+ "However, loading a fragment space allows: <ul>"
+			+ "<li>visualize the molecular fragments linked to each node,</li>"
+			+ "<li>edit existing graphs,</li>"
+			+ "<li>build graphs manually.</li>"
+			+ "</ul></html>";
 	
 	private JButton btnAddGraph;
 	private JButton btnGraphDel;
@@ -170,7 +188,7 @@ public class GUIGraphHandler extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				String[] options = new String[]{"Build", "File", "Cancel"};
 				int res = JOptionPane.showOptionDialog(null,
-		                "<html>Please choose how wherther to start creations "
+		                "<html>Please choose wherther to start creations "
 		                + "of a new graph, or import graph from file.</html>",
 		                "Specify source of new graph",
 		                JOptionPane.DEFAULT_OPTION,
@@ -236,6 +254,61 @@ public class GUIGraphHandler extends GUICardPanel
                                         .addComponent(btnAddGraph)
                                         .addComponent(btnGraphDel)));
 		graphCtrlPane.add(graphNavigPane);
+		
+		graphCtrlPane.add(new JSeparator());
+		
+		// Fragment Space
+		if (FragmentSpace.isDefined())
+		{
+			hasFragSpace = true;
+		}
+		
+		txtFragSpace = new JTextField();
+		if (!hasFragSpace)
+		{
+			renderForLackOfFragSpace();
+		}
+		btnFragSpace = new JButton("Load Fragment Space");
+		btnFragSpace.setToolTipText(loadFSToolTip);
+		btnFragSpace.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (hasFragSpace)
+				{
+					String[] options = new String[]{"Yes", "No"};
+					int res = JOptionPane.showOptionDialog(null,
+			                "<html>A fragment space is already loaded!<br>"
+			                + "Loading a new fragment space may introduce <br>"
+			                + "mistmatched with the loaded graphs.<br>"
+			                + "Are you sure you want to change fragment space?"
+			                + "</html>",
+			                "Change frgment space?",
+			                JOptionPane.DEFAULT_OPTION,
+			                JOptionPane.WARNING_MESSAGE,
+			                UIManager.getIcon("OptionPane.warningIcon"),
+			                options,
+			                options[1]);
+					if (res == 1)
+					{
+						return;
+					}
+				}
+				loadFragmentSpace();
+			}
+		});
+		pnlFragSpace = new JPanel();
+        GroupLayout lyoFragSpace = new GroupLayout(pnlFragSpace);
+        pnlFragSpace.setLayout(lyoFragSpace);
+        lyoFragSpace.setAutoCreateGaps(true);
+        lyoFragSpace.setAutoCreateContainerGaps(true);
+        lyoFragSpace.setHorizontalGroup(lyoFragSpace.createParallelGroup(
+                                        GroupLayout.Alignment.CENTER)
+                        .addComponent(btnFragSpace)
+                        .addComponent(txtFragSpace));
+        lyoFragSpace.setVerticalGroup(lyoFragSpace.createSequentialGroup()
+		                .addComponent(btnFragSpace)
+		                .addComponent(txtFragSpace));
+        graphCtrlPane.add(pnlFragSpace);
 		
 		graphCtrlPane.add(new JSeparator());
 		
@@ -484,9 +557,28 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		commandsPane.add(btnHelp);
-		
-		//TODO del
-		//importGraphsFromFile(new File("/Users/mfo051/___/__GRAPH.sdf"));
+	}
+	
+//-----------------------------------------------------------------------------
+
+	protected void renderForLackOfFragSpace() 
+	{
+		txtFragSpace.setText("No fragment space");
+		txtFragSpace.setToolTipText(loadFSToolTip);
+		txtFragSpace.setBackground(Color.ORANGE);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	protected void renderForPresenceOfFragSpace() 
+	{
+		hasFragSpace = true;
+		txtFragSpace.setText("Fragment space loaded");
+		txtFragSpace.setToolTipText("<html>A fragment space has been loaded "
+				+ "previously<br>and is ready to use. You can change the "
+				+ "fragment space<br> by loading another one, but be aware "
+				+ "of any dependency from<br>currently loaded graphs.</html>");
+		txtFragSpace.setBackground(Color.GREEN);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -726,6 +818,174 @@ public class GUIGraphHandler extends GUICardPanel
         	loadCurrentGraphIdxToViewer();
         }
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void loadFragmentSpace()
+	{
+		// Define the fragment space via a a new dialog
+		FSParams fsParams = new FSParams(this);
+        fsParams.pack();
+        fsParams.setVisible(true);
+        
+	}
+//-----------------------------------------------------------------------------
+	
+	private class FSParams extends JDialog
+    {
+		/**
+		 * Version UID
+		 */
+		private static final long serialVersionUID = -3776622911267606154L;
+		
+		private FSParametersForm fsParsForm;
+		private JPanel pnlControls;
+		private JButton btnDone;
+		private JButton btnCanc;
+		
+		private GUIGraphHandler parent;
+		
+	//-------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 */
+		public FSParams(GUIGraphHandler parentPanel)
+		{
+			this.parent = parentPanel;
+			this.setModal(true);
+			this.setLayout(new BorderLayout());
+			this.setBounds(150, 150, 800, 450);
+			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			
+			fsParsForm = new FSParametersForm(this.getSize());
+			this.add(fsParsForm, BorderLayout.CENTER);
+			
+			btnDone = new JButton("Create Fragment Space");
+			btnDone.setToolTipText("<html>Uses the parameters defined above to"
+					+ "<br> build a fragment space and make it available to"
+					+ "<br>the graph handler.</html>");
+			btnDone.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						makeFragSpace();
+					} catch (Exception e1) {
+						String msg = "<html>The given parameters did not "
+								+ "allow to "
+								+ "build a fragment space.<br>"
+								+ "Hint to solve the problem: " 
+								+ "<br>";
+								
+						if (e1.getCause() != null)
+						{
+							msg = msg + e1.getCause();
+						}
+						if (e1.getMessage() != null)
+						{
+							msg = msg + " " + e1.getMessage();
+						}
+						msg = msg + "<br>Please alter the "
+								+ "settings and try again.</html>";
+								
+						JOptionPane.showMessageDialog(null, msg,
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+						
+						parent.renderForLackOfFragSpace();
+						return;
+					}
+					parent.renderForPresenceOfFragSpace();
+					close();
+				}
+			});
+			
+			btnCanc = new JButton("Cancel");
+			btnCanc.setToolTipText("Exit without creating a fragment space.");
+			btnCanc.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					close();
+				}
+			});
+			
+			pnlControls = new JPanel();
+			pnlControls.add(btnDone);
+			pnlControls.add(btnCanc);
+			this.add(pnlControls, BorderLayout.SOUTH);
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		private void resetFragSpace()
+		{
+			
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		/**
+		 * Reads all the parameters, calls the interpreters, and eventually
+		 * creates the static FragmentSpace object.
+		 * @throws Exception
+		 */
+		private void makeFragSpace() throws Exception
+		{
+			StringBuilder sbPars = new StringBuilder();
+			fsParsForm.putParametersToString(sbPars);
+			
+			String[] lines = sbPars.toString().split(
+					System.getProperty("line.separator"));
+			for (String line : lines)
+			{
+				if ((line.trim()).length() == 0)
+                {
+                    continue;
+                }
+				if (line.startsWith("#"))
+                {
+                    continue;
+                }
+				if (line.toUpperCase().startsWith("FS-"))
+                {
+                    FragmentSpaceParameters.interpretKeyword(line);
+                    continue;
+                }
+                if (line.toUpperCase().startsWith("RC-"))
+                {
+                    RingClosureParameters.interpretKeyword(line);
+                    continue;
+                }
+			}
+			
+			// This creates the static FragmentSpace object
+			if (FragmentSpaceParameters.fsParamsInUse())
+	        {
+	            FragmentSpaceParameters.checkParameters();
+	            FragmentSpaceParameters.processParameters();
+	        }
+	        if (RingClosureParameters.rcParamsInUse())
+	        {
+	            RingClosureParameters.checkParameters();
+	            RingClosureParameters.processParameters();
+	        }
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		/**
+		 * Closes the dialog window
+		 */
+		private void close()
+		{
+			FSParams.this.setVisible(false);
+			FSParams.this.dispatchEvent(new WindowEvent(
+					FSParams.this, WindowEvent.WINDOW_CLOSING));
+		}
+    }
 	
 //-----------------------------------------------------------------------------
 
