@@ -1,6 +1,6 @@
 package gui;
 
-import java.awt.BorderLayout;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -12,11 +12,14 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
@@ -25,7 +28,6 @@ import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -41,7 +43,7 @@ import denoptim.utils.FragmentUtils;
  * @author Marco Foscato
  */
 
-public class FragmentViewPanel extends JPanel
+public class FragmentViewPanel extends JSplitPane
 {
 	/**
 	 * Version UID
@@ -64,7 +66,7 @@ public class FragmentViewPanel extends JPanel
 	public boolean alteredAPData = false;
 
 	private JmolPanel jmolPanel;
-	
+	private JScrollPane tabPanel;
 	protected DefaultTableModel apTabModel;
 	protected JTable apTable;
 	
@@ -72,7 +74,7 @@ public class FragmentViewPanel extends JPanel
 	
 	private final String NL = System.getProperty("line.separator");
 	
-	private String tmpSDFFile = "/__tmp/Denoptim_GUIFragInspector_loadedMol.sdf";
+	private String tmpSDFFile;
 	
 //-----------------------------------------------------------------------------
 	
@@ -99,20 +101,22 @@ public class FragmentViewPanel extends JPanel
 	
 //-----------------------------------------------------------------------------
 
+	@SuppressWarnings("serial")
 	private void initialize()
-	{
-		// BorderLayout is needed to allow dynamic resizing!
-		this.setLayout(new BorderLayout()); 
+	{	
+		this.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		this.setOneTouchExpandable(true);
+		this.setDividerLocation(340);
         
         // Jmol viewer panel
         jmolPanel = new JmolPanel();
-        this.add(jmolPanel,BorderLayout.CENTER);
+        this.setTopComponent(jmolPanel);
         
 		// List of attachment points
-		apTabModel = new DefaultTableModel(){
+		apTabModel = new DefaultTableModel() {
 			@Override
 		    public boolean isCellEditable(int row, int column) {
-				if (column == 0 || row == 0)
+				if (column == 0)
 				{
 					return false;
 				}
@@ -123,12 +127,18 @@ public class FragmentViewPanel extends JPanel
 		    }
 		};
 		apTabModel.setColumnCount(2);
+		String column_names[]= {"<html><b>AP#</b></html>", "<html><b>APClass</b></html>"};
+		apTabModel.setColumnIdentifiers(column_names);
 		apTable = new JTable(apTabModel);
 		apTable.putClientProperty("terminateEditOnFocusLost", true);
 		apTable.getColumnModel().getColumn(0).setMaxWidth(75);
-		apTable.setGridColor(Color.BLACK);
+		apTable.setGridColor(Color.LIGHT_GRAY);
+		JTableHeader apTabHeader = apTable.getTableHeader();
+		apTabHeader.setPreferredSize(new Dimension(100, 20));
 		apTabModel.addTableModelListener(new PausableTableModelListener());
-		this.add(apTable,BorderLayout.SOUTH);
+		tabPanel = new JScrollPane(apTable);
+		tabPanel.setMinimumSize(new Dimension(100,30));
+		this.setBottomComponent(tabPanel);
 		
 		//Find a proper tmp disk space
 		ArrayList<String> tmpFolders = new ArrayList<String>();
@@ -453,9 +463,6 @@ public class FragmentViewPanel extends JPanel
         }
         
         activateTabEditsListener(false);
-        apTabModel.addRow(new Object[]{"<html><b>AP#<b></html>",
-		"<html><b>APClass<b></html>"});
-        
         int arrId = 0;
 	    for (DENOPTIMAttachmentPoint ap : lstAPs)
 	    {
@@ -474,9 +481,11 @@ public class FragmentViewPanel extends JPanel
 	public void clearAPTable()
 	{
 		activateTabEditsListener(false);
-        for (int i=(apTabModel.getRowCount()-1); i>-1; i--) 
+		int initRowCount = apTabModel.getRowCount();
+        for (int i=0; i<initRowCount; i++) 
         {
-        	apTabModel.removeRow(i);
+        	//Always remove the first to avoid dealing with changing row ids
+        	apTabModel.removeRow(0);
         }
         activateTabEditsListener(true);
 	}

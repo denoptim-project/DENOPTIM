@@ -3,6 +3,7 @@ package gui;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import java.awt.EventQueue;
 
@@ -102,13 +103,17 @@ public class GUI
 	{
 		if (mainPanel.hasUnsavedChanges())
 		{
-			int res = JOptionPane.showConfirmDialog(frame, 
-		            "<html>Found unsaved changes.<br>Are you sure you want to "
-		            + "close this window?<html>",
-		            "Close Window?", 
-		            JOptionPane.YES_NO_OPTION,
-		            JOptionPane.QUESTION_MESSAGE);
-		    if (res == JOptionPane.YES_OPTION)
+			String[] options = new String[]{"Yes","No"};
+			int res = JOptionPane.showOptionDialog(frame,
+					"<html>Found unsaved changes.<br>Are you sure you want to "
+				            + "close this window?<html>",
+				            "Close Window?", 
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[1]);
+		    if (res == 0)
 		    {
 		        System.exit(0);
 		    }

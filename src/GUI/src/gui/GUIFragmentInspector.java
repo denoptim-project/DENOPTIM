@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -96,10 +97,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	private final FragSpinnerChangeEvent fragSpinnerListener = 
 			new FragSpinnerChangeEvent();
 	
-	private JPanel pnlOpenMol;
+	private JPanel pnlImportStruct;
 	private JButton btnOpenMol;
-	
-	private JPanel pnlOpenSMILES;
 	private JButton btnOpenSMILES;
 	
 	private JPanel pnlAtmToAP;
@@ -243,8 +242,10 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		fragCtrlPane.add(new JSeparator());
 		
-		pnlOpenMol = new JPanel();
-		btnOpenMol = new JButton("Structure from File");
+		pnlImportStruct = new JPanel();
+		GroupLayout lyoImportStructure = new GroupLayout(pnlImportStruct);
+		JLabel lblImportStruct = new JLabel("Import a structure from");
+		btnOpenMol = new JButton("File");
 		btnOpenMol.setToolTipText("Imports a chemical system"
 				+ " from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
@@ -257,11 +258,8 @@ public class GUIFragmentInspector extends GUICardPanel
 				importStructureFromFile(inFile);
 			}
 		});
-		pnlOpenMol.add(btnOpenMol);
-		fragCtrlPane.add(pnlOpenMol);
 		
-        pnlOpenSMILES = new JPanel();
-        btnOpenSMILES = new JButton("Structure from SMILES");
+        btnOpenSMILES = new JButton("SMILES");
         btnOpenSMILES.setToolTipText("<html>Imports chemical system"
                         + " from SMILES string.<br>The conversion of SMILES "
                         + "to 3D structure requires"
@@ -276,9 +274,23 @@ public class GUIFragmentInspector extends GUICardPanel
                 	}
                 }
         });
-        pnlOpenSMILES.add(btnOpenSMILES);
-        fragCtrlPane.add(pnlOpenSMILES);
-		
+
+        pnlImportStruct.setLayout(lyoImportStructure);
+        lyoImportStructure.setAutoCreateGaps(true);
+        lyoImportStructure.setAutoCreateContainerGaps(true);
+        lyoImportStructure.setHorizontalGroup(lyoImportStructure.createParallelGroup(
+                                        GroupLayout.Alignment.CENTER)
+                        .addComponent(lblImportStruct)
+                        .addGroup(lyoImportStructure.createSequentialGroup()
+                                        .addComponent(btnOpenMol)
+                                        .addComponent(btnOpenSMILES)));
+        lyoImportStructure.setVerticalGroup(lyoImportStructure.createSequentialGroup()
+        				.addComponent(lblImportStruct)
+                        .addGroup(lyoImportStructure.createParallelGroup()
+	                                .addComponent(btnOpenMol)
+	                                .addComponent(btnOpenSMILES)));       
+        fragCtrlPane.add(pnlImportStruct);
+        
 		fragCtrlPane.add(new JSeparator());
 		
 		pnlAtmToAP = new JPanel();
@@ -911,7 +923,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	  		fragment = fragmentViewer.getLoadedStructure();
 	  		
 	  		// Import changes from AP table into molecular representation
-	        for (int i=1; i<fragmentViewer.apTabModel.getRowCount(); i++) 
+	        for (int i=0; i<fragmentViewer.apTabModel.getRowCount(); i++) 
 	        {	        	
 	        	int apId = ((Integer) fragmentViewer.apTabModel.getValueAt(i, 0))
 	        			.intValue();

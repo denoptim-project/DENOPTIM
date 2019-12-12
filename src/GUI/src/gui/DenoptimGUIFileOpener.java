@@ -2,7 +2,6 @@ package gui;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;
 
 import org.apache.commons.io.FilenameUtils;
-import org.openscience.cdk.DefaultChemObjectBuilder;
 
 /**
  * File opener for DENOPTIM GUI
@@ -135,7 +133,7 @@ public class DenoptimGUIFileOpener
 		*/		
 			
 		case "sdf":
-			//Either graphs or
+			//Either graphs or fragment
 			fType = detectKindOfSDFFile(inFile.getAbsolutePath());
 			break;
 		
