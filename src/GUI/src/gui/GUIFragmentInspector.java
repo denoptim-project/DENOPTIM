@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -478,6 +479,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	
 	public void importStructureFromFile(File file)
 	{
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
 		// Cleanup
 		clearCurrentSystem();
 		
@@ -501,6 +504,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			updateFragListSpinner();
 			unsavedChanges = true;
 		} catch (Exception e) {
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
 	                "<html>Could not read file '" + file.getAbsolutePath() 
@@ -509,6 +513,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
 		}
+		
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
 //-----------------------------------------------------------------------------
@@ -521,6 +527,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	public void importStructureFromSMILES(String smiles)
 	{	
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
 		// Cleanup
 		clearCurrentSystem();
 		
@@ -528,6 +536,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		try {
 			fragmentViewer.loadSMILESFromRemote(smiles);
 		} catch (Exception e) {
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			return;
 		}
 		
@@ -542,6 +551,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		// finalize GUI status
 		updateFragListSpinner();
 		unsavedChanges = true;
+		
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------
@@ -570,6 +581,8 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	public void importFragmentsFromFile(File file, String format)
 	{	
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
 		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
 		try 
 		{
@@ -589,6 +602,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			JOptionPane.showMessageDialog(null,
 	                "<html>Could not read file '" + file.getAbsolutePath() 
 	                + "'!<br>Hint of cause: " + e.getCause() + "</html>",
@@ -596,6 +610,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
 		}
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------
@@ -966,23 +981,33 @@ public class GUIFragmentInspector extends GUICardPanel
 		String preStr = "";
 		while (!DENOPTIMAttachmentPoint.isValidAPClassString(currApClass))
     	{
+			if (currApClass != "")
+			{
+	    		preStr = "APClass '" + currApClass + "' is not valid!<br>"
+	    				+ "The valid syntax for APClass is:<br><br><code>rule" 
+	        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
+	    				+ "subClass</code><br><br> where "
+	    				+ "<ul><li><code>rule</code>"
+	    				+ " is a string (no spaces)</li>"
+	    				+ "<li><code>subClass</code> is an integer</li>";
+			}
+			
     		currApClass = JOptionPane.showInputDialog("<html>" + preStr 
     				+ "</ul>Please, provide a valid "
     				+ "APClass string: ");
-        	if (currApClass == null)
+        	
+    		if (currApClass == null)
         	{
         		currApClass = "";
         	}
         	
-    		String syntax = "APClass '" + currApClass + "' is not valid!<br>"
+    		preStr = "APClass '" + currApClass + "' is not valid!<br>"
     				+ "The valid syntax for APClass is:<br><br><code>rule" 
         			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
     				+ "subClass</code><br><br> where "
     				+ "<ul><li><code>rule</code>"
     				+ " is a string (no spaces)</li>"
     				+ "<li><code>subClass</code> is an integer</li>";
-        	
-        	preStr = syntax;
     	}
     	
     	return currApClass;

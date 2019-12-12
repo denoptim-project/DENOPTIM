@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -70,7 +72,7 @@ public class FragmentViewPanel extends JPanel
 	
 	private final String NL = System.getProperty("line.separator");
 	
-	private String tmpSDFFile = "/tmp/Denoptim_GUIFragInspector_loadedMol.sdf";
+	private String tmpSDFFile = "/__tmp/Denoptim_GUIFragInspector_loadedMol.sdf";
 	
 //-----------------------------------------------------------------------------
 	
@@ -126,7 +128,54 @@ public class FragmentViewPanel extends JPanel
 		apTable.getColumnModel().getColumn(0).setMaxWidth(75);
 		apTable.setGridColor(Color.BLACK);
 		apTabModel.addTableModelListener(new PausableTableModelListener());
-		this.add(apTable,BorderLayout.SOUTH);		
+		this.add(apTable,BorderLayout.SOUTH);
+		
+		//Find a proper tmp disk space
+		ArrayList<String> tmpFolders = new ArrayList<String>();
+		tmpFolders.add(System.getProperty("file.separator")+"tmp");
+		tmpFolders.add(System.getProperty("file.separator")+"scratch");
+		
+		for (String tmpFolder : tmpFolders)
+		{
+			tmpSDFFile = tmpFolder + System.getProperty("file.separator") 
+					+ "Denoptim_GUIFragInspector_loadedMol.sdf";
+			if (tmpSpaceIsOK(tmpSDFFile))
+			{
+				break;
+			}
+		}
+		
+		String preStr = "Could not find a temprorary location on local disks";
+		while (!tmpSpaceIsOK(tmpSDFFile))
+		{
+			tmpSDFFile = JOptionPane.showInputDialog("<html>" + preStr
+				+ "<br>Please, "
+				+ "specify the absolute path of a folder I can use:");
+			
+			if (tmpSDFFile == null)
+			{
+				tmpSDFFile = "";
+			}
+			
+			preStr = "I tried, but I cannot use '" + tmpSDFFile + "'.";
+			
+			tmpSDFFile = tmpSDFFile + System.getProperty("file.separator") 
+					+ "Denoptim_GUIFragInspector_loadedMol.sdf";				
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private boolean tmpSpaceIsOK(String pathName)
+	{
+		boolean res = true;
+		try {
+			DenoptimIO.writeData(tmpSDFFile, "TEST", false);
+			DenoptimIO.readList(tmpSDFFile);
+		} catch (DENOPTIMException e) {
+			res = false;
+		}
+		return res;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -177,6 +226,8 @@ public class FragmentViewPanel extends JPanel
 			System.out.println("Waiting "+now);
 			if (now > wallTime)
 			{
+				this.setCursor(Cursor.getPredefinedCursor(
+						Cursor.DEFAULT_CURSOR));
 				String[] options = new String[]{"Yes","No"};
 				int res = JOptionPane.showOptionDialog(null,
 		                "<html>Slow response from Jmol.<br>Keep waiting?</html>",
@@ -192,6 +243,8 @@ public class FragmentViewPanel extends JPanel
 				}
 				else
 				{
+					this.setCursor(Cursor.getPredefinedCursor(
+							Cursor.WAIT_CURSOR));
 					newDate = new Date();
 					wallTime = newDate.getTime() + 5000; // 5 seconds
 				}
@@ -351,9 +404,9 @@ public class FragmentViewPanel extends JPanel
 		try {
 			DenoptimIO.writeMolecule(tmpSDFFile, fragment, false);
 		} catch (DENOPTIMException e) {
-			// TODO change and look for other tmp file locations
 			e.printStackTrace();
 			System.out.println("Error writing TMP file '" + tmpSDFFile + "'");
+			System.out.println("Please, report this to the DENOPTIM team.");
 		}
 		jmolPanel.viewer.openFile(tmpSDFFile);
 		setJmolViewer();

@@ -136,7 +136,7 @@ public class DenoptimIO
      * @return IAtomContainer[] an array of molecules
      * @throws DENOPTIMException
      */
-    public static ArrayList<IAtomContainer> readTxtFile(String fileName)
+    public static ArrayList<IAtomContainer> readLinksToMols(String fileName)
             throws DENOPTIMException
     {
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
@@ -1028,7 +1028,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Read list of data
+     * Read list of data as text
      *
      * @param fileName
      * @return list of data
@@ -1500,7 +1500,7 @@ public class DenoptimIO
         // process everything else as a text file with links to individual molecules
         else
         {
-            mols = DenoptimIO.readTxtFile(fileName);
+            mols = DenoptimIO.readLinksToMols(fileName);
         }
         return mols;
     }
@@ -1530,7 +1530,7 @@ public class DenoptimIO
         		break;
         		
         	case "TXT":
-        		mols = DenoptimIO.readTxtFile(fileName);
+        		mols = DenoptimIO.readLinksToMols(fileName);
         		break;
         		
         	default:

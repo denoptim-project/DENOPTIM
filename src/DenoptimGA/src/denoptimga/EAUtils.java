@@ -519,7 +519,7 @@ public class EAUtils
         // process everything else as a text file with links to individual molecules
         else
         {
-            mols = DenoptimIO.readTxtFile(filename);
+            mols = DenoptimIO.readLinksToMols(filename);
         }
 
         String fsep = System.getProperty("file.separator");

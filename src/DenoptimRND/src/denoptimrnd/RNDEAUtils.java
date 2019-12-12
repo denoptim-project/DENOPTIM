@@ -261,7 +261,7 @@ class RNDEAUtils
         // everything else as a text file with links to individual molecules
         else
         {
-            mols = DenoptimIO.readTxtFile(fileName);
+            mols = DenoptimIO.readLinksToMols(fileName);
         }
 
         String fsep = System.getProperty("file.separator");
