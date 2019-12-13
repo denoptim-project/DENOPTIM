@@ -264,6 +264,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		txtFragSpace = new JTextField();
+		txtFragSpace.setHorizontalAlignment(JTextField.CENTER);
 		if (!hasFragSpace)
 		{
 			renderForLackOfFragSpace();
@@ -273,15 +274,31 @@ public class GUIGraphHandler extends GUICardPanel
 		btnFragSpace.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				boolean showWarning = false;
+				String msg = "<html><b>WARNING</b>: you are introducing a "
+						+ "potential source of mistmatch between<br>"
+						+ "the fragments IDs used in graphs and the "
+						+ "fragment space.<br>In particular:<br>"
+						+ "<ul>";
+				
+				if (dnGraphLibrary.size() != 0)
+				{
+					msg = msg + "<li>One or more graphs are already loaded.</li>";
+					showWarning = true;
+				}
 				if (hasFragSpace)
 				{
+					msg = msg + "<li>A fragment space is alredy loaded.</li>";
+					showWarning = true;
+				}
+				if (showWarning)
+				{
+					msg = msg + "</ul>"
+							+ ""
+			                + "Are you sure you want to load a fragment "
+			                + "space?</html>";
 					String[] options = new String[]{"Yes", "No"};
-					int res = JOptionPane.showOptionDialog(null,
-			                "<html>A fragment space is already loaded!<br>"
-			                + "Loading a new fragment space may introduce <br>"
-			                + "mistmatched with the loaded graphs.<br>"
-			                + "Are you sure you want to change fragment space?"
-			                + "</html>",
+					int res = JOptionPane.showOptionDialog(null, msg,			            
 			                "Change frgment space?",
 			                JOptionPane.DEFAULT_OPTION,
 			                JOptionPane.WARNING_MESSAGE,
@@ -578,7 +595,7 @@ public class GUIGraphHandler extends GUICardPanel
 				+ "previously<br>and is ready to use. You can change the "
 				+ "fragment space<br> by loading another one, but be aware "
 				+ "of any dependency from<br>currently loaded graphs.</html>");
-		txtFragSpace.setBackground(Color.GREEN);
+		txtFragSpace.setBackground(Color.decode("#4cc253"));
 	}
 	
 //-----------------------------------------------------------------------------
@@ -635,8 +652,10 @@ public class GUIGraphHandler extends GUICardPanel
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			String msg = "<html>Could not read file '" + file.getAbsolutePath() 
+			String msg = "<html>Could not read graph from file <br> "
+					+ "'" + file.getAbsolutePath() 
 	                + "'!<br>Hint of cause: ";
+			msg = msg + e.getClass().getName()+ " (";
 			if (e.getCause() != null)
 			{
 				msg = msg + e.getCause();
@@ -644,6 +663,15 @@ public class GUIGraphHandler extends GUICardPanel
 			if (e.getMessage() != null)
 			{
 				msg = msg + " " + e.getMessage();
+			}
+			msg = msg + ")";
+			if (hasFragSpace)
+			{
+				msg = msg + "<br>This is likely due to a mistmatch between "
+						+ "the fragment IDs in the<br>"
+						+ "graph you are trying to load, "
+						+ "and the currently loaded fragment space.<br>"
+						+ "Aborting import of graphs.";
 			}
 			msg = msg + "</html>";
 			JOptionPane.showMessageDialog(null,msg,
@@ -823,11 +851,10 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private void loadFragmentSpace()
 	{
-		// Define the fragment space via a a new dialog
+		// Define the fragment space via a new dialog
 		FSParams fsParams = new FSParams(this);
         fsParams.pack();
         fsParams.setVisible(true);
-        
 	}
 //-----------------------------------------------------------------------------
 	
@@ -875,7 +902,7 @@ public class GUIGraphHandler extends GUICardPanel
 						String msg = "<html>The given parameters did not "
 								+ "allow to "
 								+ "build a fragment space.<br>"
-								+ "Hint to solve the problem: " 
+								+ "Possible cause of this problem: " 
 								+ "<br>";
 								
 						if (e1.getCause() != null)
@@ -920,13 +947,6 @@ public class GUIGraphHandler extends GUICardPanel
 		
 	//-------------------------------------------------------------------------
 		
-		private void resetFragSpace()
-		{
-			
-		}
-		
-	//-------------------------------------------------------------------------
-		
 		/**
 		 * Reads all the parameters, calls the interpreters, and eventually
 		 * creates the static FragmentSpace object.
@@ -934,6 +954,11 @@ public class GUIGraphHandler extends GUICardPanel
 		 */
 		private void makeFragSpace() throws Exception
 		{
+			if (fsParsForm.txtPar1.getText().trim().equals(""))
+			{
+				throw new DENOPTIMException("No library of fragments");
+			}
+			
 			StringBuilder sbPars = new StringBuilder();
 			fsParsForm.putParametersToString(sbPars);
 			
