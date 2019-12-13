@@ -33,17 +33,23 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
 import denoptim.rings.RingClosureParameters;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
 
 
 /**
@@ -72,12 +78,12 @@ public class GUIGraphHandler extends GUICardPanel
 			new ArrayList<DENOPTIMGraph>();
 	
 	/**
-	 * The currently loaded graph as DENOPTIM object
+	 * The unsaved version of the currently loaded graph
 	 */
 	private DENOPTIMGraph dnGraph;
 	
 	/**
-	 * The currently loaded graph as GRaphStream object
+	 * The currently loaded graph as GraphStream object
 	 */
 	private Graph graph;
 	
@@ -96,7 +102,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private boolean hasFragSpace = false;
 	
-	private GraphViewerPanel graphPanel;
+	private GraphViewerPanel graphViewer;
 	private JPanel graphCtrlPane;
 	private JPanel graphNavigPane;
 	
@@ -162,8 +168,8 @@ public class GUIGraphHandler extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The graph viewer goes all in here	
-		graphPanel = new GraphViewerPanel();
-		this.add(graphPanel,BorderLayout.CENTER);
+		graphViewer = new GraphViewerPanel();
+		this.add(graphViewer,BorderLayout.CENTER);
        
 		// General panel on the right: it containing all controls
         graphCtrlPane = new JPanel();
@@ -199,7 +205,19 @@ public class GUIGraphHandler extends GUICardPanel
 				switch (res)
 				{
 					case 0:
-						
+						if (!hasFragSpace)
+						{
+							JOptionPane.showMessageDialog(null,
+					                "<html>No fragment space is currently "
+					                + "loaded!<br>"
+					                + "You must load a fragment space to build"
+					                + " graphs.</html>",
+					                "Error",
+					                JOptionPane.ERROR_MESSAGE,
+					                UIManager.getIcon("OptionPane.errorIcon"));
+							return;
+						}
+						startGraphFromFragSpace();
 						break;
 					
 					case 1:
@@ -269,6 +287,7 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			renderForLackOfFragSpace();
 		}
+		txtFragSpace.setEditable(false);
 		btnFragSpace = new JButton("Load Fragment Space");
 		btnFragSpace.setToolTipText(loadFSToolTip);
 		btnFragSpace.addActionListener(new ActionListener() {
@@ -338,10 +357,15 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: disable when no graph loaded
-				//TODO: get selected
-				ArrayList<DENOPTIMAttachmentPoint> selectedAps = 
-						new ArrayList<DENOPTIMAttachmentPoint>();
-				if (selectedAps.size() == 0)
+								
+				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();
+				
+				//TODO del
+				System.out.println("=======> Selected aps");
+				for (IdFragmentAndAP id : selAps)
+					System.out.println("ID: "+id);
+				
+				if (selAps.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
 			                "<html>No attachment point selected!<br> Drag the "
@@ -354,9 +378,10 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				else
 				{
-					//TODO 
-					
-			        // Protect the temporary "dnGraph" obj
+					//TODO deal with more than one selected AP
+					int vId = selAps.get(0).getVertexId();
+					int apId = selAps.get(0).getApId();
+					extendGraphFromFragSpace(vId, apId);
 			        unsavedChanges = true;
 			        protectEditedSystem();
 				}
@@ -418,8 +443,8 @@ public class GUIGraphHandler extends GUICardPanel
 		// Controls of displayed attributes
 		pnlShowLabels = new JPanel();
 		JLabel lblShowHideLabels = new JLabel("Manage graph labels:");
-		cmbLabel = new JComboBox<String>(new String[] {graphPanel.SPRITE_APCLASS, 
-				graphPanel.SPRITE_BNDORD, graphPanel.SPRITE_FRGID});
+		cmbLabel = new JComboBox<String>(new String[] {graphViewer.SPRITE_APCLASS, 
+				graphViewer.SPRITE_BNDORD, graphViewer.SPRITE_FRGID});
 		cmbLabel.setToolTipText("<html>Select the kind of type of information"
 				+ "<br>to add or remove from the graph view.</html>");
 		//TODO: enable only if a graph is shown
@@ -429,9 +454,9 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddLabel.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (graphPanel.hasSelected())
+				if (graphViewer.hasSelected())
 				{
-					graphPanel.appendSprites(cmbLabel.getSelectedItem().toString());
+					graphViewer.appendSprites(cmbLabel.getSelectedItem().toString());
 				}
 				else
 				{
@@ -451,9 +476,9 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelLabel.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (graphPanel.hasSelected())
+				if (graphViewer.hasSelected())
 				{
-					graphPanel.removeSprites(cmbLabel.getSelectedItem().toString());
+					graphViewer.removeSprites(cmbLabel.getSelectedItem().toString());
 				}
 				else
 				{
@@ -574,12 +599,253 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		commandsPane.add(btnHelp);
+		
+		//TODO del
+		try {
+			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
+			for (String l : lines)
+			{
+			    FragmentSpaceParameters.interpretKeyword(l);
+			}
+			FragmentSpaceParameters.processParameters();
+			renderForPresenceOfFragSpace();
+		} catch (DENOPTIMException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Identifies which APs are selected in the graph viewer.
+	 * @return the list of identifiers
+	 */
+	private ArrayList<IdFragmentAndAP> getAPsSelectedInViewer()
+	{
+		ArrayList<IdFragmentAndAP> allIDs = new ArrayList<IdFragmentAndAP>();
+		for (Node n : graphViewer.getSelectedNodes())
+		{
+			if (!n.getAttribute("ui.class").equals("ap"))
+			{
+				continue;
+			}
+			int vId = n.getAttribute("dnp.srcVrtId");
+			int apId = n.getAttribute("dnp.srcVrtApId");
+			IdFragmentAndAP id = new IdFragmentAndAP(vId,-99,-99,apId,-99,-99);
+			allIDs.add(id);
+		}
+		return allIDs;
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Start the construction of a new graph from scratch
+	 */
+	protected void startGraphFromFragSpace()
+	{
+		extendGraphFromFragSpace(true, -1 ,-1);
+		unsavedChanges = true;
+        protectEditedSystem();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Extends the current graph by appending a node to a specific free AP on 
+	 * the growing graph. 
+	 * This method will prompt a question on which incoming fragment to append 
+	 * @param srcVertexId the vertex UID in the growing graph
+	 * @param srcApId the AP ID in the fragment of the growing graph
+	 */
+	protected void extendGraphFromFragSpace(int srcVertexId, int srcApId)
+	{
+		extendGraphFromFragSpace(false, srcVertexId, srcApId);
 	}
 	
 //-----------------------------------------------------------------------------
 
+	/**
+	 * General method to add nodes to a graph or create a new graph
+	 * @param startAnew
+	 * @param srcVertexId
+	 * @param srcApId
+	 */
+	private void extendGraphFromFragSpace(boolean startAnew, int srcVertexId,
+			int srcApId) 
+	{
+		int trgFrgType = -1;
+		
+		ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();
+		
+		if (startAnew)
+		{
+			fragLib = FragmentSpace.getScaffoldLibrary();
+			trgFrgType = 0;
+		}
+		else
+		{
+			// For extensions of existing graphs we need to know where to extend
+			if (srcVertexId==-1 || srcApId==-1)
+			{
+				JOptionPane.showMessageDialog(null,"No AP selected in the "
+						+ "growing graph",
+		                "Error",
+		                JOptionPane.PLAIN_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"));
+				return;
+			}
+			
+			String[] options = new String[]{"Fragment","Capping group"};
+			int res = JOptionPane.showOptionDialog(null,
+	                "<html>Select type of fragment to pick:</html>",
+	                "Choose fragment type",
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[0]);
+			switch (res)
+			{
+				case 0:
+					fragLib = FragmentSpace.getFragmentLibrary();
+					trgFrgType = 1;
+					break;
+				case 1:
+					fragLib = FragmentSpace.getCappingLibrary();
+					trgFrgType = 2;
+					break;
+			}
+		}
+
+		if (fragLib.size() == 0)
+		{
+			JOptionPane.showMessageDialog(null,"No fragments in the library",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+		
+		// Select the incoming fragment and its AP to use
+		GUIFragmentSelector fragSelector = new GUIFragmentSelector(fragLib);
+		if (!startAnew)
+		{
+			fragSelector.setRequireApSelection(true);
+		}
+		Object selected = fragSelector.showDialog();
+		if (selected == null)
+		{
+			return;
+		}
+		int trgFragId = ((Integer[]) selected)[0];
+		int trgApId = ((Integer[]) selected)[1];
+		
+		
+		//TODO del
+		System.out.println("Returned OBJ: "+trgFragId+" "+trgApId);
+		System.out.println("Graph is; "+graph);
+		System.out.println("dnGraph is; "+dnGraph);
+		
+		
+		// Take or make the graph to work with
+		if (startAnew)
+		{
+			currGrphIdx = dnGraphLibrary.size();
+			dnGraph = new DENOPTIMGraph();
+			dnGraphLibrary.add(dnGraph);
+			graph = null;
+			updateGraphListSpinner();
+		}
+		else
+		{
+			dnGraph = dnGraphLibrary.get(currGrphIdx);
+			graph = null;
+		}
+		
+		//TODO del
+		System.out.println("2Graph is; "+graph);
+		System.out.println("2dnGraph is; "+dnGraph);
+		
+		// Append the new node
+		ArrayList<DENOPTIMAttachmentPoint> trgAPs;
+		try {
+			trgAPs = FragmentUtils.getAPForFragment(trgFragId, trgFrgType);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,"Error defining APs",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+		int trgVrtId = 1;
+		if (!startAnew)
+		{
+			trgVrtId = dnGraph.getMaxVertexId()+1;
+		}
+		
+		DENOPTIMVertex trgVertex = new DENOPTIMVertex(trgVrtId, trgFragId, 
+				trgAPs,trgFrgType);
+		
+		//TODO del
+		System.out.println("TrgVertex "+trgVertex);
+
+		// Append the new edge
+		if (!startAnew)
+		{
+			// Identify the source vertex/node and its AP
+			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
+			
+			//TODO del
+			System.out.println("SrcVertex: "+srcVertexId+" "+srcVertex);
+			System.out.println(srcVertex.getAttachmentPoints());
+			
+			String sCls = srcVertex.getAttachmentPoints().get(srcApId)
+					.getAPClass();
+			String tCls = trgAPs.get(trgApId).getAPClass();
+			
+			trgVertex.setLevel(srcVertex.getLevel() + 1);
+			
+			//NB: we ignore symmetry here
+                
+            DENOPTIMEdge edge = GraphUtils.connectVertices(srcVertex, trgVertex,
+            		srcApId, trgApId, sCls, tCls);
+
+            if (edge == null)
+            {
+    			JOptionPane.showMessageDialog(null,"Unable to make new edge.",
+    	                "Error",
+    	                JOptionPane.PLAIN_MESSAGE,
+    	                UIManager.getIcon("OptionPane.errorIcon"));
+    			return;
+            }
+
+            dnGraph.addVertex(trgVertex);
+            dnGraph.addEdge(edge);	 
+		}
+		else
+		{
+			trgVertex.setLevel(-1); //NB: scaffold gets level -1
+			dnGraph.addVertex(trgVertex);
+		}
+		
+		//TODO del
+		System.out.println("4Graph is; "+graph);
+		System.out.println("4GnGraph is; "+dnGraph);
+		
+		// Update viewer
+		graph = convertDnGraphToGSGraph(dnGraph);
+		graphViewer.cleanup();
+		graphViewer.loadGraphToViewer(graph);
+	}
+
+//-----------------------------------------------------------------------------
+	
 	protected void renderForLackOfFragSpace() 
 	{
+		hasFragSpace = false;
 		txtFragSpace.setText("No fragment space");
 		txtFragSpace.setToolTipText(loadFSToolTip);
 		txtFragSpace.setBackground(Color.ORANGE);
@@ -701,7 +967,7 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		clearCurrentSystem();
 		graph = convertDnGraphToGSGraph(dnGraphLibrary.get(currGrphIdx));
-		graphPanel.loadGraphToViewer(graph);
+		graphViewer.loadGraphToViewer(graph);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -754,10 +1020,12 @@ public class GUIGraphHandler extends GUICardPanel
 				DENOPTIMAttachmentPoint ap = v.getAttachmentPoints().get(i);
 				if (ap.isAvailable())
 				{
-					String nApId = Integer.toString(i);
+					String nApId = "v"+vID+"ap"+Integer.toString(i);
 					Node nAP = graph.addNode(nApId);
 					nAP.addAttribute("ui.label", nApId);
 					nAP.setAttribute("ui.class", "ap");
+					nAP.addAttribute("dnp.srcVrtApId", i);
+					nAP.addAttribute("dnp.srcVrtId", v.getVertexId());
 					Edge eAP = graph.addEdge(vID+"-"+nApId,vID,nApId);
 					eAP.setAttribute("ui.class", "ap");
 					eAP.setAttribute("dnp.srcAPClass", ap.getAPClass());
@@ -802,7 +1070,7 @@ public class GUIGraphHandler extends GUICardPanel
 	{
 		// Get rid of currently loaded graph
 		dnGraph = null;
-        graphPanel.cleanup();
+        graphViewer.cleanup();
 	}
 
 //-----------------------------------------------------------------------------
@@ -856,19 +1124,12 @@ public class GUIGraphHandler extends GUICardPanel
         fsParams.pack();
         fsParams.setVisible(true);
 	}
+	
 //-----------------------------------------------------------------------------
 	
-	private class FSParams extends JDialog
+	private class FSParams extends GUIModalDialog
     {
-		/**
-		 * Version UID
-		 */
-		private static final long serialVersionUID = -3776622911267606154L;
-		
 		private FSParametersForm fsParsForm;
-		private JPanel pnlControls;
-		private JButton btnDone;
-		private JButton btnCanc;
 		
 		private GUIGraphHandler parent;
 		
@@ -879,20 +1140,18 @@ public class GUIGraphHandler extends GUICardPanel
 		 */
 		public FSParams(GUIGraphHandler parentPanel)
 		{
+			super();
 			this.parent = parentPanel;
-			this.setModal(true);
-			this.setLayout(new BorderLayout());
-			this.setBounds(150, 150, 800, 450);
-			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			
 			fsParsForm = new FSParametersForm(this.getSize());
-			this.add(fsParsForm, BorderLayout.CENTER);
+			addToCentralPane(fsParsForm);
 			
-			btnDone = new JButton("Create Fragment Space");
-			btnDone.setToolTipText("<html>Uses the parameters defined above to"
+			this.btnDone.setText("Create Fragment Space");
+			this.btnDone.setToolTipText("<html>Uses the parameters defined above to"
 					+ "<br> build a fragment space and make it available to"
 					+ "<br>the graph handler.</html>");
-			btnDone.addActionListener(new ActionListener() {
+			
+			this.btnDone.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -929,20 +1188,7 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 			});
 			
-			btnCanc = new JButton("Cancel");
-			btnCanc.setToolTipText("Exit without creating a fragment space.");
-			btnCanc.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					close();
-				}
-			});
-			
-			pnlControls = new JPanel();
-			pnlControls.add(btnDone);
-			pnlControls.add(btnCanc);
-			this.add(pnlControls, BorderLayout.SOUTH);
+			this.btnCanc.setToolTipText("Exit without creating a fragment space.");
 		}
 		
 	//-------------------------------------------------------------------------
@@ -1000,16 +1246,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 	//-------------------------------------------------------------------------
-		
-		/**
-		 * Closes the dialog window
-		 */
-		private void close()
-		{
-			FSParams.this.setVisible(false);
-			FSParams.this.dispatchEvent(new WindowEvent(
-					FSParams.this, WindowEvent.WINDOW_CLOSING));
-		}
+
     }
 	
 //-----------------------------------------------------------------------------

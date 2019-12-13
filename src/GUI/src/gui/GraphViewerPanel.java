@@ -58,7 +58,8 @@ public class GraphViewerPanel extends JPanel
 			+ "fill-color: #F19F4D; "
 			+ "}"
 			+ "node.ap {"
-			+ "size: 2px, 2px; "
+			+ "shape: circle;"
+			+ "size: 10px, 10px; "
 			+ "stroke-width: 1px; "
 			+ "text-mode: hidden;"
 			+ "fill-color: #FECE00; "
@@ -251,6 +252,10 @@ public class GraphViewerPanel extends JPanel
 			case SPRITE_FRGID:
 				for (Node n : getSelectedNodes())
 				{
+					if (n.getAttribute("ui.class").equals("ap"))
+					{
+						continue;
+					}
 					String sId = "molID-"+n.getId();
 					if (!hasSprite(sId))
 					{
@@ -259,7 +264,7 @@ public class GraphViewerPanel extends JPanel
 						s.addAttribute("ui.label",
 								"MolID: " + n.getAttribute("dnp.molID"));
 						s.attachToNode(n.getId());
-						s.setPosition(0.5, 0, 0);
+						s.setPosition(0.3, 0, 0);
 					}
 				}
 				break;

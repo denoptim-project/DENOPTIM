@@ -51,12 +51,12 @@ public class IdFragmentAndAP implements Serializable
     private int apId = -1;
 
     /**
-     * the index of the symmetryc set the vertex belongs to
+     * the index of the symmetric set the vertex belongs to
      */
     private int vSymSetId = -1;
 
     /**
-     * the index of the symmetryc set the AP belongs to
+     * the index of the symmetric set the AP belongs to
      */
     private int aSymSetId = -1;
 

@@ -522,14 +522,6 @@ public class DENOPTIMAttachmentPoint implements Serializable
         else if (res > 0)
             return AFTER;
         
-        int tBO = FragmentSpace.getBondOrderForAPClass(this.getAPClass());
-        int oBO = FragmentSpace.getBondOrderForAPClass(other.getAPClass());
-        if (tBO != oBO)
-        {
-        	System.out.println("WARNING: Unexpected difference in Bond Order "
-        			+ "while CLASS is equal!");
-        }
-        
         //Compare Direction Vector if AtomID is equal
         if (this.getDirectionVector() != null 
         		&& other.getDirectionVector() != null)

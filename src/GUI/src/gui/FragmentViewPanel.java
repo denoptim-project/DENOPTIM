@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.sql.RowId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -589,6 +590,40 @@ public class FragmentViewPanel extends JSplitPane
             viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
         }
     }
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Identifies which attachment points are selected in the visualized table
+	 * @return the list of attachment points
+	 */
+	public ArrayList<DENOPTIMAttachmentPoint> getSelectedAPs()
+	{
+		ArrayList<DENOPTIMAttachmentPoint> selected = 
+				new ArrayList<DENOPTIMAttachmentPoint>();
+		
+		for (int rowId : apTable.getSelectedRows())
+		{
+			selected.add(mapAPs.get(apTable.getValueAt(rowId, 0)));
+		}
+		return selected;
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Identifies which attachment points are selected in the visualized table
+	 * @return the list of attachment points indexes
+	 */
+	public ArrayList<Integer> getSelectedAPIDs()
+	{
+		ArrayList<Integer> selected = new ArrayList<Integer>();
+		for (int rowId : apTable.getSelectedRows())
+		{
+			selected.add(rowId);
+		}
+		return selected;
+	}
 
 //-----------------------------------------------------------------------------
     
