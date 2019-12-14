@@ -44,6 +44,8 @@ public class DENOPTIMFragmentTest
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	
+//------------------------------------------------------------------------------
+	
     @Test
     public void testHandlingAPsAsObjOrProperty() throws Exception
     {
@@ -81,6 +83,8 @@ public class DENOPTIMFragmentTest
     	assertEquals(frg1.getAPCount(),frg2.getAPCount());
     	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0));
     }
+    
+//------------------------------------------------------------------------------
     
     @Test
     public void testConversionToIAC() throws Exception

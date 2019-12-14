@@ -34,6 +34,9 @@ public class SymmetricSet implements Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Constructor for an empty set
+     */
     public SymmetricSet()
     {
         symVrtxIds = new ArrayList<Integer>();
@@ -41,6 +44,10 @@ public class SymmetricSet implements Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Constructor for a symmetric set with a list of vertexes IDs
+     * @param m_lst the list of vertexes IDs
+     */
     public SymmetricSet(ArrayList<Integer> m_lst)
     {
         symVrtxIds = new ArrayList<>(m_lst);
@@ -48,6 +55,10 @@ public class SymmetricSet implements Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Return the list of symmetric vertexes IDs
+     * @return the list of symmetric vertexes IDs 
+     */
     public ArrayList<Integer> getList()
     {
         return symVrtxIds;
@@ -55,6 +66,11 @@ public class SymmetricSet implements Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Return a specific vertex ID contained in this "set" (a list in reality)
+     * @param i the desired entry number
+     * @return a vertex ID
+     */
     public int get(int i)
     {
         return symVrtxIds.get(i);
@@ -62,6 +78,11 @@ public class SymmetricSet implements Serializable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Checks whether the given vertex ID is contained in this set
+     * @param m_val
+     * @return <code>true</code> if the vertex ID is contained in this set
+     */
     public boolean contains(Integer m_val)
     {
         return symVrtxIds.contains(m_val);
@@ -69,6 +90,10 @@ public class SymmetricSet implements Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Adds a vertex ID to this set
+     * @param id the vertex ID to add
+     */
     public void add(int id)
     {
 	if (!symVrtxIds.contains(id))
@@ -80,10 +105,9 @@ public class SymmetricSet implements Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Removed the given vertexID from the list
+     * Removes the given vertexID from the list
      * @param vid the vertexID to be removed
      */
-
     public void remove(Integer vid)
     {
 	symVrtxIds.remove((Integer) vid);
@@ -95,6 +119,10 @@ public class SymmetricSet implements Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Return the number of vertexes in this set
+     * @return the number of vertexes in this set
+     */
     public int size()
     {
 	return symVrtxIds.size();	

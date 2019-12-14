@@ -75,7 +75,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         gVertices = m_vertices;
         gEdges = m_edges;
         gRings = m_rings;
-	closableChains = new ArrayList<>();
+        closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
         localMsg = "";
     }
@@ -85,7 +85,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public DENOPTIMGraph(ArrayList<DENOPTIMVertex> m_vertices,
                             ArrayList<DENOPTIMEdge> m_edges,
                             ArrayList<DENOPTIMRing> m_rings,
-			    ArrayList<SymmetricSet> m_symVerts)
+                            ArrayList<SymmetricSet> m_symVerts)
     {
         gVertices = m_vertices;
         gEdges = m_edges;
@@ -100,8 +100,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public DENOPTIMGraph(ArrayList<DENOPTIMVertex> m_vertices,
                             ArrayList<DENOPTIMEdge> m_edges,
                             ArrayList<DENOPTIMRing> m_rings,
-			    ArrayList<ClosableChain> m_closableChains,
-			    ArrayList<SymmetricSet> m_symVerts)
+                            ArrayList<ClosableChain> m_closableChains,
+                            ArrayList<SymmetricSet> m_symVerts)
     {
         gVertices = m_vertices;
         gEdges = m_edges;
@@ -162,15 +162,26 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public boolean hasSymmetryInvolvingVertex(int vid)
     {
         boolean res = false;
-	for (SymmetricSet ss : symVertices)
-	{
-	    if (ss.contains(vid)) 
-	    {
-		res = true;
-		break;
-	    }
-	}
-	return res;
+        for (SymmetricSet ss : symVertices)
+        {
+            if (ss.contains(vid)) 
+            {
+                res = true;
+                break;
+            }
+        }
+        return res;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the number of symmetric sets of vertexes
+     * @return the number of symmetric sets of vertexes
+     */
+    public int getSymmetricSetCount()
+    {
+    	return symVertices.size();
     }
 
 //------------------------------------------------------------------------------
@@ -188,14 +199,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public SymmetricSet getSymSetForVertexID(int vid)
     {
-	for (SymmetricSet ss : symVertices)
-	{
-	    if (ss.contains(vid))
-	    {
-		return ss;
-	    }
-	}
-	return new SymmetricSet();
+        for (SymmetricSet ss : symVertices)
+        {
+            if (ss.contains(vid))
+            {
+                return ss;
+            }
+        }
+        return new SymmetricSet();
     }
 
 //------------------------------------------------------------------------------
@@ -209,20 +220,20 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     public void addSymmetricSetOfVertices(SymmetricSet m_ss) 
-						        throws DENOPTIMException
+                                                        throws DENOPTIMException
     {
-	for (SymmetricSet oldSS : symVertices)
-	{
-	    for (Integer vid : m_ss.getList())
-	    {
-	        if (oldSS.contains(vid))
-	        {
-		    throw new DENOPTIMException("Adding " + m_ss + " while "
-						+ "there is already " + oldSS 
-						+ " that contains " + vid);
-		}
-	    }
-	}
+        for (SymmetricSet oldSS : symVertices)
+        {
+            for (Integer vid : m_ss.getList())
+            {
+                if (oldSS.contains(vid))
+                {
+                    throw new DENOPTIMException("Adding " + m_ss + " while "
+                                                + "there is already " + oldSS 
+                                                + " that contains " + vid);
+                }
+            }
+        }
         symVertices.add(m_ss);
     }
 
@@ -264,14 +275,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public void setCandidateClosableChains(ArrayList<ClosableChain> m_closableChains)
     {
-	closableChains = m_closableChains;
+        closableChains = m_closableChains;
     }
 
 //------------------------------------------------------------------------------
 
     public ArrayList<ClosableChain> getClosableChains()
     {
-	return closableChains;
+        return closableChains;
     }
 
 //------------------------------------------------------------------------------
@@ -314,14 +325,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMRing> getRingsInvolvingVertexID(int vid)
     {
-	ArrayList<DENOPTIMRing> rings = new ArrayList<DENOPTIMRing>();
-	for (DENOPTIMRing r : gRings)
-	{
-	    if (r.containsID(vid))
-	    {
-		rings.add(r);
-	    }
-	}
+        ArrayList<DENOPTIMRing> rings = new ArrayList<DENOPTIMRing>();
+        for (DENOPTIMRing r : gRings)
+        {
+            if (r.containsID(vid))
+            {
+                rings.add(r);
+            }
+        }
         return rings;
     }
 
@@ -352,16 +363,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public boolean isVertexInRing(DENOPTIMVertex v)
     {
-	boolean result = false;
-	for (DENOPTIMRing  r : gRings)
-	{
-	    if (r.contains(v))
-	    {
-		result = true;
-		break;
-	    }
-	}
-	return result;
+        boolean result = false;
+        for (DENOPTIMRing  r : gRings)
+        {
+            if (r.contains(v))
+            {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
 //------------------------------------------------------------------------------
@@ -397,7 +408,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public ArrayList<DENOPTIMVertex> getFreeRCVertices()
     {
         ArrayList<DENOPTIMVertex> rcvLst = getRCVertices();
-	ArrayList<DENOPTIMVertex> free = new ArrayList<DENOPTIMVertex>();
+        ArrayList<DENOPTIMVertex> free = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : rcvLst)
         {
             if (!isVertexInRing(v))
@@ -419,9 +430,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMVertex> getUsedRCVertices()
     {
-	ArrayList<DENOPTIMVertex> used = new ArrayList<DENOPTIMVertex>();
-	used.addAll(getRCVertices());
-	used.removeAll(getFreeRCVertices());
+        ArrayList<DENOPTIMVertex> used = new ArrayList<DENOPTIMVertex>();
+        used.addAll(getRCVertices());
+        used.removeAll(getFreeRCVertices());
         return used;
     }
 
@@ -448,12 +459,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Remove a vertex from this graph. This method removes also edges and rings 
+     * that involve the removed vertex. Symmetric sets of vertexes are corrected
+     * accordingly: they are removed if there only one remaining vertex in the 
+     * set, of purged from the removed vertex.
+     * @param m_vertex the vertex to remove.
+     */
     public void removeVertex(DENOPTIMVertex m_vertex)
     {
-	int vid = m_vertex.getVertexId();
-        if (gVertices.contains(m_vertex))
-            gVertices.remove(m_vertex);
-
+        if (!gVertices.contains(m_vertex))
+        {
+        	return;
+        }
+        
+        int vid = m_vertex.getVertexId();
+            
         // delete also any ring involving the removed vertex
         if (isVertexInRing(m_vertex))
         {
@@ -463,26 +484,67 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 removeRing(r);
             }
         }
+        
+        // remove edges involving the removed vertex
+        ArrayList<DENOPTIMEdge> lstEdges = this.getEdgeList();
+        ArrayList<DENOPTIMEdge> eToDel = new ArrayList<>();
+        for (int i=0; i<lstEdges.size(); i++)
+        {
+            DENOPTIMEdge edge = lstEdges.get(i);
+            if (vid == edge.getTargetVertex())
+            {
+                eToDel.add(edge);
+            }
+            // NB: the following allows to break the spanning tree
+            if (vid == edge.getSourceVertex())
+            {
+                eToDel.add(edge);
+            }
+        }
+        for (int i=0; i<eToDel.size(); i++)
+        {        	
+            DENOPTIMEdge edge = eToDel.get(i);
+            int bndOrder = edge.getBondType();
+            
+            // update the connections of the parent(src) vertex
+            int iA = edge.getSourceDAP();
+            int srcvid = edge.getSourceVertex();
+            DENOPTIMVertex src = this.getVertexWithId(srcvid);
+            src.updateAttachmentPoint(iA, bndOrder);
+            
+            // update the connections of the child(trg) vertex
+            int iB = edge.getTargetDAP();
+            int trgvid = edge.getTargetVertex();
+            if (this.containsVertexId(trgvid))
+            {
+                DENOPTIMVertex trg = this.getVertexWithId(trgvid);
+                trg.updateAttachmentPoint(iB, bndOrder);
+            }
+            this.removeEdge(edge);
+        }
 
-	// delete the removed vertex from symmetric sets, but leave other vrtxs
-	ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
+        // delete the removed vertex from symmetric sets, but leave other vrtxs
+        ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : symVertices)
         {
             if (ss.contains(vid))
             {
-		if (ss.size() < 3)
-		{
-		    ssToRemove.add(ss);
-		}
-		else
-		{
-		    // NB: casting needed to remove the object Integer 'vid'
-		    // from the list instead of entry number 'vid'
-		    ss.remove((Integer) vid);
-		}
+                if (ss.size() < 3)
+                {
+                    ssToRemove.add(ss);
+                }
+                else
+                {
+                    // NB: casting needed to remove the object Integer 'vid'
+                    // from the list instead of entry number 'vid'
+                    ss.remove((Integer) vid);
+                }
             }
         }
-	symVertices.removeAll(ssToRemove);
+        symVertices.removeAll(ssToRemove);
+        
+        // remove the vertex from the graph
+        gVertices.remove(m_vertex);
     }
 
 //------------------------------------------------------------------------------
@@ -492,6 +554,27 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if ((m_pos >= gVertices.size()) || m_pos < 0)
             return null;
         return gVertices.get(m_pos);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check if any of the vertexes in this graph has the given ID
+     * @param vId the vertex ID to search for
+     * @return <code>true</code> if the vertex ID is found in this graph
+     */
+    public boolean containsVertexId(int vId)
+    {
+    	boolean res = false;
+    	for (DENOPTIMVertex v : gVertices)
+    	{
+    		if (vId == v.getVertexId())
+    		{
+    			res = true;
+    			break;
+    		}
+    	}
+    	return res;
     }
 
 //------------------------------------------------------------------------------
@@ -637,9 +720,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         for (int i=0; i<symVertices.size(); i++)
-	{
-	    sb.append(symVertices.get(i).toString()).append(" ");
-	}
+        {
+            sb.append(symVertices.get(i).toString()).append(" ");
+        }
         
         return sb.toString();
     }
@@ -679,7 +762,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMEdge> getIncidentEdges(DENOPTIMVertex v)
     {
-	return getIncidentEdges(v.getVertexId());
+        return getIncidentEdges(v.getVertexId());
     }
 
 //------------------------------------------------------------------------------
@@ -691,13 +774,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     public ArrayList<DENOPTIMEdge> getIncidentEdges(int vid)
-    { 	
+    {         
         ArrayList<DENOPTIMEdge> lst = new ArrayList<DENOPTIMEdge>();
         for (int i=0; i<gEdges.size(); i++)
         {
             DENOPTIMEdge edge = gEdges.get(i);
             if (edge.getTargetVertex() == vid ||
-		edge.getSourceVertex() == vid)
+                edge.getSourceVertex() == vid)
             {
                 lst.add(edge);
             }
@@ -943,14 +1026,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<Integer> getIndexOfEdgesWithChild(int m_vid)
     {
-	ArrayList<Integer> lstEdges = new ArrayList<>();
+        ArrayList<Integer> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
             DENOPTIMEdge edge = getEdgeAtPosition(j);
 
             if (edge.getSourceVertex() == m_vid)
             {
-		lstEdges.add(j);
+                lstEdges.add(j);
             }
         }
         return lstEdges;
@@ -966,7 +1049,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMEdge> getEdgesWithChild(int m_vid)
     {
-	ArrayList<DENOPTIMEdge> lstEdges = new ArrayList<>();
+        ArrayList<DENOPTIMEdge> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
             DENOPTIMEdge edge = getEdgeAtPosition(j);

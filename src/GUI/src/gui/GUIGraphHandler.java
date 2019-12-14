@@ -232,14 +232,16 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		btnGraphDel = new JButton("Remove");
-		btnGraphDel.setToolTipText("Remove the present graph from the library.");
+		btnGraphDel.setToolTipText("<html>Remove the present graph from the "
+				+ "library.<br><br><b>WARNING:</b> this action cannot be "
+				+ "undone!</html>");
 		btnGraphDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try 
-				{
+				try {
 					removeCurrentdnGraph();
 				} catch (DENOPTIMException e1) {
-					System.out.println("Esception while removing the current graph:");
+					System.out.println("Exception while removing the current "
+							+ "graph:");
 					e1.printStackTrace();
 				}
 			}
@@ -358,13 +360,7 @@ public class GUIGraphHandler extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				//TODO: disable when no graph loaded
 								
-				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();
-				
-				//TODO del
-				System.out.println("=======> Selected aps");
-				for (IdFragmentAndAP id : selAps)
-					System.out.println("ID: "+id);
-				
+				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
@@ -382,6 +378,13 @@ public class GUIGraphHandler extends GUICardPanel
 					int vId = selAps.get(0).getVertexId();
 					int apId = selAps.get(0).getApId();
 					extendGraphFromFragSpace(vId, apId);
+					
+					// Update viewer
+					graph = convertDnGraphToGSGraph(dnGraph);
+					graphViewer.cleanup();
+					graphViewer.loadGraphToViewer(graph);
+					
+					// Protect edited system
 			        unsavedChanges = true;
 			        protectEditedSystem();
 				}
@@ -389,17 +392,15 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		
 		btnDelSel = new JButton("Remove");
-		btnDelSel.setToolTipText("<html>Removes all selected vertexes from the "
-				+ "system.<br><br><b>WARNING:</b> this action cannot be "
-				+ "undone!");
+		btnDelSel.setToolTipText("<html>Removes all selected vertexes from "
+				+ "the system.<br><br><b>WARNING:</b> this action cannot be "
+				+ "undone!</html>");
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO disable when no graph loaded
-				//TODO: get selected
-				ArrayList<DENOPTIMVertex> selectedVrtx = 
-						new ArrayList<DENOPTIMVertex>();
 				
-				if (selectedVrtx.size() == 0)
+				ArrayList<DENOPTIMVertex> selVrtx = getSelectedNodesInViewer();
+				if (selVrtx.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
 							"<html>No vertex selected! Drag the "
@@ -411,8 +412,18 @@ public class GUIGraphHandler extends GUICardPanel
 					return;
 				}
 				else
-				{
-					//TODO
+				{				
+					for (DENOPTIMVertex v : selVrtx)
+					{
+						//TODO del
+						System.out.println("   Removing vertex "+v);
+						dnGraph.removeVertex(v);
+					}
+					
+					// Update viewer
+					graph = convertDnGraphToGSGraph(dnGraph);
+					graphViewer.cleanup();
+					graphViewer.loadGraphToViewer(graph);
 					
 			        // Protect the temporary "dnGraph" obj
 			        unsavedChanges = true;
@@ -564,7 +575,7 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				try
 				{
-					///TODO
+					//TODO
 				}
 				catch (Exception ex)
 				{
@@ -601,6 +612,7 @@ public class GUIGraphHandler extends GUICardPanel
 		commandsPane.add(btnHelp);
 		
 		//TODO del (only for devel phase)
+		/*
 		try {
 			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
 			for (String l : lines)
@@ -612,6 +624,7 @@ public class GUIGraphHandler extends GUICardPanel
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
+		*/
 	}
 	
 //-----------------------------------------------------------------------------
@@ -635,6 +648,23 @@ public class GUIGraphHandler extends GUICardPanel
 			allIDs.add(id);
 		}
 		return allIDs;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private ArrayList<DENOPTIMVertex> getSelectedNodesInViewer()
+	{
+		ArrayList<DENOPTIMVertex> selected = new ArrayList<DENOPTIMVertex>();
+		for (Node n : graphViewer.getSelectedNodes())
+		{
+			if (n.getAttribute("ui.class").equals("ap"))
+			{
+				continue;
+			}
+			int vId = Integer.parseInt(n.getAttribute("dnp.VrtId"));
+			selected.add(dnGraph.getVertexWithId(vId));
+		}	
+		return selected; 
 	}
 
 //-----------------------------------------------------------------------------
@@ -741,13 +771,6 @@ public class GUIGraphHandler extends GUICardPanel
 		int trgFragId = ((Integer[]) selected)[0];
 		int trgApId = ((Integer[]) selected)[1];
 		
-		
-		//TODO del
-		System.out.println("Returned OBJ: "+trgFragId+" "+trgApId);
-		System.out.println("Graph is; "+graph);
-		System.out.println("dnGraph is; "+dnGraph);
-		
-		
 		// Take or make the graph to work with
 		if (startAnew)
 		{
@@ -762,10 +785,6 @@ public class GUIGraphHandler extends GUICardPanel
 			dnGraph = dnGraphLibrary.get(currGrphIdx);
 			graph = null;
 		}
-		
-		//TODO del
-		System.out.println("2Graph is; "+graph);
-		System.out.println("2dnGraph is; "+dnGraph);
 		
 		// Append the new node
 		ArrayList<DENOPTIMAttachmentPoint> trgAPs;
@@ -787,19 +806,12 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		DENOPTIMVertex trgVertex = new DENOPTIMVertex(trgVrtId, trgFragId, 
 				trgAPs,trgFrgType);
-		
-		//TODO del
-		System.out.println("TrgVertex "+trgVertex);
 
 		// Append the new edge
 		if (!startAnew)
 		{
 			// Identify the source vertex/node and its AP
 			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
-			
-			//TODO del
-			System.out.println("SrcVertex: "+srcVertexId+" "+srcVertex);
-			System.out.println(srcVertex.getAttachmentPoints());
 			
 			String sCls = srcVertex.getAttachmentPoints().get(srcApId)
 					.getAPClass();
@@ -829,15 +841,6 @@ public class GUIGraphHandler extends GUICardPanel
 			trgVertex.setLevel(-1); //NB: scaffold gets level -1
 			dnGraph.addVertex(trgVertex);
 		}
-		
-		//TODO del
-		System.out.println("4Graph is; "+graph);
-		System.out.println("4GnGraph is; "+dnGraph);
-		
-		// Update viewer
-		graph = convertDnGraphToGSGraph(dnGraph);
-		graphViewer.cleanup();
-		graphViewer.loadGraphToViewer(graph);
 	}
 
 //-----------------------------------------------------------------------------
@@ -965,7 +968,8 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		clearCurrentSystem();
-		graph = convertDnGraphToGSGraph(dnGraphLibrary.get(currGrphIdx));
+		dnGraph = dnGraphLibrary.get(currGrphIdx);
+		graph = convertDnGraphToGSGraph(dnGraph);
 		graphViewer.loadGraphToViewer(graph);
 	}
 	
@@ -991,6 +995,7 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			Node n = graph.addNode(vID);
 			n.addAttribute("ui.label", vID);
+			n.addAttribute("dnp.VrtId", vID);
 			n.setAttribute("dnp.molID", v.getMolId());
 			n.setAttribute("dnp.frgType", v.getFragmentType());
 			switch (v.getFragmentType())

@@ -494,30 +494,6 @@ public class GraphUtils
             int vid = rvids.get(i);
             molGraph.removeVertex(molGraph.getVertexWithId(vid));
         }
-
-        // remove edges containing these vertex ids
-        ArrayList<DENOPTIMEdge> lstEdges = molGraph.getEdgeList();
-        ArrayList<DENOPTIMEdge> redges = new ArrayList<>();
-        for (int i=0; i<lstEdges.size(); i++)
-        {
-            DENOPTIMEdge edge = lstEdges.get(i);
-            if (rvids.contains(edge.getTargetVertex()))
-            {
-                redges.add(edge);
-            }
-        }
-
-        for (int i=0; i<redges.size(); i++)
-        {
-            DENOPTIMEdge edge = redges.get(i);
-            int bndOrder = edge.getBondType();
-            // for the parent update the connections
-            int iA = edge.getSourceDAP();
-            int srcvid = edge.getSourceVertex();
-            DENOPTIMVertex src = molGraph.getVertexWithId(srcvid);
-            src.updateAttachmentPoint(iA, bndOrder);
-            molGraph.removeEdge(edge);
-        }
     }
 
 //------------------------------------------------------------------------------
