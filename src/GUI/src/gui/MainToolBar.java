@@ -214,6 +214,13 @@ public class MainToolBar extends JMenuBar {
 			}
 		});
 		newMenu.add(newFr);
+		JMenuItem newGr = new JMenuItem("New DENOPTIMGraph");
+		newGr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.add(new GUIGraphHandler(mainPanel));
+			}
+		});
+		newMenu.add(newGr);
 		
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
@@ -224,7 +231,7 @@ public class MainToolBar extends JMenuBar {
 							file));
 				} catch (Exception e1) {
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS"};
+							"FRAGMENTS", "GRAPHS"};
 					int res = JOptionPane.showOptionDialog(null,
 						"<html>Failed to detect file type automatically.<br>"
 						+ "Temptative reason: " + e1.getMessage() + "<br>"
@@ -308,21 +315,15 @@ public class MainToolBar extends JMenuBar {
 				fragPanel.importFragmentsFromFile(file,"SDF");
 				break;	
 				
-/*
-			case ("DGRAPHS"):
-				//TODO
-				System.out.println("TODO DEL: opening DGRAPHs");
-				break;	
-
-			case ("DENOPTIMGRAPH"):
-				//TODO
-				break;	
-			
-			 */
+			case ("GRAPHS"):
+				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
+				mainPanel.add(graphPanel);
+				graphPanel.importGraphsFromFile(file);
+				break;
 			
 			default:
 				JOptionPane.showMessageDialog(null,
-						"File format '" + fFormat + "' not yet recognized.",
+						"File format '" + fFormat + "' not recognized.",
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));

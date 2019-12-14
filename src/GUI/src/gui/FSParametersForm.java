@@ -1252,20 +1252,29 @@ public class FSParametersForm extends ParametersForm
 	}
   	
 //-----------------------------------------------------------------------------
+  	
+  	public void possiblyReadParamsFromFSParFile() throws Exception
+  	{
+  		if (rdbSrcOrNew.isSelected())
+        {
+	    	if (txtFSSource.getText().equals("") 
+	    			|| txtFSSource.getText() == null)
+	    	{
+	    		throw new Exception("<html>No source specified for fragment "
+	    				+ "space.<br>Please, specify the file name.</html>");
+	    	}
+	    	importParametersFromDenoptimParamsFile(txtFSSource.getText());
+        }
+  	}
+  	
+//-----------------------------------------------------------------------------
 
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
+    	possiblyReadParamsFromFSParFile();
+    	
         sb.append("# Fragment Space - paramerers").append(NL);
-        if (rdbSrcOrNew.isSelected())
-        {
-        	if (txtFSSource.getText().equals("") || txtFSSource.getText() == null)
-        	{
-        		throw new Exception("<html>No source specified for fragment space.<br>Please, specify the file name.</html>");
-        	}
-        	importParametersFromDenoptimParamsFile(txtFSSource.getText());
-        }
-
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(getStringIfNotEmpty(keyPar2,txtPar2));
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));

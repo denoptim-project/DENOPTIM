@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,7 +13,6 @@ import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -29,6 +26,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.io.FilenameUtils;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -40,13 +38,12 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
@@ -356,10 +353,9 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddVrtx = new JButton("Add");
 		btnAddVrtx.setToolTipText("<html>Append a vertex to the selected "
 				+ "attachment point<html>");
+		btnAddVrtx.setEnabled(false);
 		btnAddVrtx.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				//TODO: disable when no graph loaded
-								
+			public void actionPerformed(ActionEvent e) {								
 				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
@@ -392,10 +388,9 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelSel.setToolTipText("<html>Removes all selected vertexes from "
 				+ "the system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!</html>");
+		btnDelSel.setEnabled(false);
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO disable when no graph loaded
-				
 				ArrayList<DENOPTIMVertex> selVrtx = getSelectedNodesInViewer();
 				if (selVrtx.size() == 0)
 				{
@@ -453,10 +448,11 @@ public class GUIGraphHandler extends GUICardPanel
 				graphViewer.SPRITE_BNDORD, graphViewer.SPRITE_FRGID});
 		cmbLabel.setToolTipText("<html>Select the kind of type of information"
 				+ "<br>to add or remove from the graph view.</html>");
-		//TODO: enable only if a graph is shown
+		cmbLabel.setEnabled(false);
 		btnAddLabel = new JButton("Show");
 		btnAddLabel.setToolTipText("<html>Shows the chosen label for the "
 				+ "<br>selected elements.</html>");
+		btnAddLabel.setEnabled(false);
 		btnAddLabel.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -479,6 +475,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelLabel = new JButton("Hide");
 		btnDelLabel.setToolTipText("<html>Hides the chosen label for the "
 				+ "<br>selected elements.</html>");
+		btnDelLabel.setEnabled(false);
 		btnDelLabel.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -534,16 +531,13 @@ public class GUIGraphHandler extends GUICardPanel
         });
         pnlSaveEdits.add(btnSaveEdits);
         graphCtrlPane.add(pnlSaveEdits);
-		
 		this.add(graphCtrlPane,BorderLayout.EAST);
 		
-		
 		// Panel with buttons to the bottom of the frame
-		
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenGraphs = new JButton("Load Library of graphs",
+		btnOpenGraphs = new JButton("Load Library of Graphs",
 					UIManager.getIcon("FileView.directoryIcon"));
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
@@ -558,7 +552,7 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnOpenGraphs);
 		
-		JButton btnSaveFrags = new JButton("Save Library of graphs",
+		JButton btnSaveFrags = new JButton("Save Library of Graphs",
 				UIManager.getIcon("FileView.hardDriveIcon"));
 		btnSaveFrags.setToolTipText("Write all graphs to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
@@ -570,7 +564,8 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				try
 				{
-					//TODO
+					DenoptimIO.writeGraphsToFile(outFile.getAbsolutePath(),
+							dnGraphLibrary, false);
 				}
 				catch (Exception ex)
 				{
@@ -607,6 +602,7 @@ public class GUIGraphHandler extends GUICardPanel
 		commandsPane.add(btnHelp);
 		
 		//TODO del (only for devel phase)
+		/*
 		try {
 			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
 			for (String l : lines)
@@ -618,7 +614,19 @@ public class GUIGraphHandler extends GUICardPanel
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
+		*/
 		
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void enableGraphDependentButtons(boolean enable)
+	{
+		btnAddVrtx.setEnabled(enable);
+		btnDelSel.setEnabled(enable);
+		cmbLabel.setEnabled(enable);
+		btnAddLabel.setEnabled(enable);
+		btnDelLabel.setEnabled(enable);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -721,6 +729,7 @@ public class GUIGraphHandler extends GUICardPanel
 		graph = convertDnGraphToGSGraph(dnGraph);
 		graphViewer.cleanup();
 		graphViewer.loadGraphToViewer(graph);
+		enableGraphDependentButtons(true);
 		unsavedChanges = true;
         protectEditedSystem();
 	}
@@ -910,12 +919,13 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
-		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
-		
 		String format="SDF";
+		if (!FilenameUtils.getExtension(file.getAbsolutePath()).equals("sdf"))
+		{
+			format="TXT";
+		}
 		
-		//TODO: detect other formats or selection of format from GUI
-		
+		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
 		try 
 		{
 			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
@@ -926,7 +936,7 @@ public class GUIGraphHandler extends GUICardPanel
 			e.printStackTrace();
 			String msg = "<html>Could not read graph from file <br> "
 					+ "'" + file.getAbsolutePath() 
-	                + "'!<br>Hint of cause: ";
+	                + "'<br>Hint on cause: ";
 			msg = msg + e.getClass().getName()+ " (";
 			if (e.getCause() != null)
 			{
@@ -975,6 +985,8 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
 		graph = convertDnGraphToGSGraph(dnGraph);
 		graphViewer.loadGraphToViewer(graph);
+		
+		enableGraphDependentButtons(true);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -987,14 +999,11 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
 	{
-		//TODO: test no edges/nodes
-		
 		graph = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
 		
 		for (DENOPTIMVertex v : dnG.getVertexList())
 		{
 			// Create representation of this vertex
-			
 			String vID = Integer.toString(v.getVertexId());
 			
 			Node n = graph.addNode(vID);
@@ -1163,8 +1172,9 @@ public class GUIGraphHandler extends GUICardPanel
 			this.btnDone.addActionListener(new ActionListener() {
 				
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e) {					
 					try {
+						fsParsForm.possiblyReadParamsFromFSParFile();
 						makeFragSpace();
 					} catch (Exception e1) {
 						String msg = "<html>The given parameters did not "
@@ -1266,8 +1276,15 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddGraph.setEnabled(true);
 		btnOpenGraphs.setEnabled(true);
 		
-		graphNavigSpinner.setModel(new SpinnerNumberModel(currGrphIdx+1, 0, 
-				dnGraphLibrary.size(), 1));
+		if (dnGraphLibrary.size()==0)
+		{
+			graphNavigSpinner.setModel(new SpinnerNumberModel(0,0,0,0));
+		}
+		else
+		{
+			graphNavigSpinner.setModel(new SpinnerNumberModel(currGrphIdx+1, 1, 
+					dnGraphLibrary.size(), 1));
+		}
 		((DefaultEditor) graphNavigSpinner.getEditor())
 			.getTextField().setEditable(true); 
 		((DefaultEditor) graphNavigSpinner.getEditor())
@@ -1327,6 +1344,7 @@ public class GUIGraphHandler extends GUICardPanel
     			currGrphIdx = -1;
     			//Spinner will be fixed by the deprotection routine
     			totalGraphsLabel.setText(Integer.toString(dnGraphLibrary.size()));
+    			enableGraphDependentButtons(false);
     		}
     		deprotectEditedSystem();
     	}

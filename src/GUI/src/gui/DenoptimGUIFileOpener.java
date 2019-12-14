@@ -128,7 +128,7 @@ public class DenoptimGUIFileOpener
 		case "txt":
 			//Human readable graph as text files are too a-specific
 			//TODO add something specific, like "GraphENC" at beginning of line.
-			fType = "DGRAPH";
+			fType = "GRAPHS";
 			break;
 		*/		
 			
@@ -139,7 +139,7 @@ public class DenoptimGUIFileOpener
 		
 		case "ser":
 			//Serialized graph
-			fType = "SERDGRAPH";
+			fType = "SERGRAPH";
 			break;
 		
 		case "par":
@@ -171,7 +171,7 @@ public class DenoptimGUIFileOpener
 		
 		Map<String,String> determiningKeysMap = new HashMap<String,String>();
 		determiningKeysMap.put("^> *<ATTACHMENT_POINT>.*","FRAGMENTS");
-		determiningKeysMap.put("^> *<GraphENC>.*","DGRAPHS");
+		determiningKeysMap.put("^> *<GraphENC>.*","GRAPHS");
 
 		return detectKindFile(fileName, determiningKeysMap, "\\$\\$\\$\\$");
 	}

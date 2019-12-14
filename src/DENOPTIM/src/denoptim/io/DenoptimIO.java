@@ -97,15 +97,11 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.rings.ClosableChain;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.ObjectPair;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtom;
@@ -118,7 +114,7 @@ import java.util.logging.Level;
 
 public class DenoptimIO
 {
-    private static final String lsep = System.getProperty("line.separator");
+    private static final String NL = System.getProperty("line.separator");
 
     // A list of properties used by CDK algorithms which must never be
     // serialized into the SD file format.
@@ -517,7 +513,7 @@ public class DenoptimIO
             fw = new FileWriter(new File(fileName), append);
             for (int i = 0; i < smiles.length; i++)
             {
-                fw.write(smiles[i] + lsep);
+                fw.write(smiles[i] + NL);
                 fw.flush();
             }
         }
@@ -559,7 +555,7 @@ public class DenoptimIO
         try
         {
             fw = new FileWriter(new File(fileName), append);
-            fw.write(smiles + lsep);
+            fw.write(smiles + NL);
             fw.flush();
         }
         catch (IOException ioe)
@@ -599,7 +595,7 @@ public class DenoptimIO
         try
         {
             fw = new FileWriter(new File(fileName), append);
-            fw.write(data + lsep);
+            fw.write(data + NL);
             fw.flush();
         }
         catch (IOException ioe)
@@ -1098,9 +1094,9 @@ public class DenoptimIO
             String molname = fileName.substring(0, fileName.length() - 4);
             fw = new FileWriter(new File(fileName));
             int numatoms = atom_symbols.size();
-            fw.write("" + numatoms + lsep);
+            fw.write("" + numatoms + NL);
             fw.flush();
-            fw.write(molname + lsep);
+            fw.write(molname + NL);
 
             String line = "", st = "";
 
@@ -1112,7 +1108,7 @@ public class DenoptimIO
                 line = st + "        " + (p3.x < 0 ? "" : " ") + fsb.format(p3.x) + "        "
                         + (p3.y < 0 ? "" : " ") + fsb.format(p3.y) + "        "
                         + (p3.z < 0 ? "" : " ") + fsb.format(p3.z);
-                fw.write(line + lsep);
+                fw.write(line + NL);
                 fw.flush();
             }
         }
@@ -1845,7 +1841,7 @@ public class DenoptimIO
 		switch (format)
 		{
 			case "TXT":
-				return DenoptimIO.readDENOPTIMGraphsFromFile(fileName);
+				return DenoptimIO.readDENOPTIMGraphsFromFile(fileName, useFS);
 				
 			case "SDF":
 				return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
@@ -1895,12 +1891,16 @@ public class DenoptimIO
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from a text file
      * @param fileName the pathname of the file to read
+     * @param useFS set to <code>true</code> when there is a defined 
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential 
+     * mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-								String fileName)
-							throws DENOPTIMException
+					String fileName, boolean useFS) throws DENOPTIMException
     {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
@@ -1923,7 +1923,8 @@ public class DenoptimIO
 				DENOPTIMGraph g;
 				try
 				{
-				    g = GraphConversionTool.getGraphFromString(line.trim());
+				    g = GraphConversionTool.getGraphFromString(
+				    		line.trim(),useFS);
 				}
 				catch (Throwable t)
 				{
@@ -1957,7 +1958,43 @@ public class DenoptimIO
         }
 		return lstGraphs;
     }
+  
+//------------------------------------------------------------------------------
 
+    /**
+     * Writes the string representation of the graphs to file.
+     * @param fileName the file where to print
+     * @param graphs the list of graphs to print
+     * @param append use <code>true</code> to append
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToFile(String fileName, 
+    		ArrayList<DENOPTIMGraph> graphs, boolean append) 
+    				throws DENOPTIMException
+    {
+    	StringBuilder sb = new StringBuilder();
+    	for(DENOPTIMGraph g : graphs)
+    	{
+    		sb.append(g.toString()).append(NL);
+    	}
+    	writeData(fileName, sb.toString(), append);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the string representation of a graph to file.
+     * @param fileName the file where to print
+     * @param graph the graph to print
+     * @param append use <code>true</code> to append
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphToFile(String fileName, DENOPTIMGraph graph, 
+    		boolean append) throws DENOPTIMException
+    {
+    	writeData(fileName, graph.toString(), append);
+    }
+    
 //------------------------------------------------------------------------------
 
 }
