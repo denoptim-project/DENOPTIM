@@ -95,7 +95,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 	public GUIFragmentSelector(ArrayList<IAtomContainer> fragLib)
 	{
 		super();
-		this.setBounds(150, 150, 400, 500);
+		this.setBounds(150, 150, 400, 550);
 		this.setTitle("Select fragment and AP");
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

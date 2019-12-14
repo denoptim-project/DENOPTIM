@@ -222,12 +222,12 @@ public class GraphViewerPanel extends JPanel
 							String sId = "trgApClass-"+e.getId();
 							if (!hasSprite(sId))
 							{
-								Sprite sSrc = sman.addSprite(sId);
-								sSrc.setAttribute("ui.class", "apLabel");
-								sSrc.addAttribute("ui.label", 
+								Sprite sTrg = sman.addSprite(sId);
+								sTrg.setAttribute("ui.class", "apLabel");
+								sTrg.addAttribute("ui.label", 
 										e.getAttribute("dnp.trgAPClass"));
-								sSrc.attachToEdge(e.getId());
-								sSrc.setPosition(0.7);
+								sTrg.attachToEdge(e.getId());
+								sTrg.setPosition(0.7);
 							}
 						}
 					}
@@ -478,7 +478,7 @@ public class GraphViewerPanel extends JPanel
 			for (GraphicElement g : elements)
 			{
 				System.out.println("Clicked on element: "+g);
-				//TODO: open dialog with details or tooltip
+				//TODO: open dialog with details
 			}
 		}
 		

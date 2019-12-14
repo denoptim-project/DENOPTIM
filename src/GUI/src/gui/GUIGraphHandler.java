@@ -374,10 +374,7 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				else
 				{
-					//TODO deal with more than one selected AP
-					int vId = selAps.get(0).getVertexId();
-					int apId = selAps.get(0).getApId();
-					extendGraphFromFragSpace(vId, apId);
+					extendGraphFromFragSpace(selAps);
 					
 					// Update viewer
 					graph = convertDnGraphToGSGraph(dnGraph);
@@ -415,8 +412,6 @@ public class GUIGraphHandler extends GUICardPanel
 				{				
 					for (DENOPTIMVertex v : selVrtx)
 					{
-						//TODO del
-						System.out.println("   Removing vertex "+v);
 						dnGraph.removeVertex(v);
 					}
 					
@@ -612,7 +607,6 @@ public class GUIGraphHandler extends GUICardPanel
 		commandsPane.add(btnHelp);
 		
 		//TODO del (only for devel phase)
-		/*
 		try {
 			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
 			for (String l : lines)
@@ -624,7 +618,7 @@ public class GUIGraphHandler extends GUICardPanel
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
-		*/
+		
 	}
 	
 //-----------------------------------------------------------------------------
@@ -672,9 +666,61 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Start the construction of a new graph from scratch
 	 */
-	protected void startGraphFromFragSpace()
+	private void startGraphFromFragSpace()
 	{
-		extendGraphFromFragSpace(true, -1 ,-1);
+		ArrayList<IAtomContainer> fragLib = FragmentSpace.getScaffoldLibrary();
+		if (fragLib.size() == 0)
+		{
+			JOptionPane.showMessageDialog(null,"No fragments in the library",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+		
+		// Select the scaffold
+		GUIFragmentSelector fragSelector = new GUIFragmentSelector(fragLib);
+		fragSelector.setRequireApSelection(false);
+		Object selected = fragSelector.showDialog();
+		if (selected == null)
+		{
+			return;
+		}
+		int scaffFragId = ((Integer[]) selected)[0];
+		
+		// Create the new graph
+		currGrphIdx = dnGraphLibrary.size();
+		dnGraph = new DENOPTIMGraph();
+		dnGraphLibrary.add(dnGraph);
+		graph = null;
+		updateGraphListSpinner();
+
+		
+		// Create the node
+		int scaffVrtId = 1;
+		ArrayList<DENOPTIMAttachmentPoint> scaffAPs;
+		try {
+			scaffAPs = FragmentUtils.getAPForFragment(scaffFragId, 0);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+					"Error defining APs for scaffold",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+
+		DENOPTIMVertex scaffVertex = new DENOPTIMVertex(scaffVrtId, 
+				scaffFragId, scaffAPs, 0); // 0 stands for scaffold
+
+		scaffVertex.setLevel(-1); //NB: scaffold gets level -1
+		dnGraph.addVertex(scaffVertex);
+		
+		// Put the graph to the viewer
+		graph = convertDnGraphToGSGraph(dnGraph);
+		graphViewer.cleanup();
+		graphViewer.loadGraphToViewer(graph);
 		unsavedChanges = true;
         protectEditedSystem();
 	}
@@ -688,64 +734,41 @@ public class GUIGraphHandler extends GUICardPanel
 	 * @param srcVertexId the vertex UID in the growing graph
 	 * @param srcApId the AP ID in the fragment of the growing graph
 	 */
-	protected void extendGraphFromFragSpace(int srcVertexId, int srcApId)
+	private void extendGraphFromFragSpace(ArrayList<IdFragmentAndAP> srcAPs)
 	{
-		extendGraphFromFragSpace(false, srcVertexId, srcApId);
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * General method to add nodes to a graph or create a new graph
-	 * @param startAnew
-	 * @param srcVertexId
-	 * @param srcApId
-	 */
-	private void extendGraphFromFragSpace(boolean startAnew, int srcVertexId,
-			int srcApId) 
-	{
+		// For extensions of existing graphs we need to know where to extend
+		if (srcAPs.size() == 0)
+		{
+			JOptionPane.showMessageDialog(null,"No AP selected in the "
+					+ "graph.",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
+		
 		int trgFrgType = -1;
 		
-		ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();
-		
-		if (startAnew)
+		ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();		
+		String[] options = new String[]{"Fragment","Capping group"};
+		int res = JOptionPane.showOptionDialog(null,
+                "<html>Select type of fragment to pick:</html>",
+                "Choose fragment type",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                UIManager.getIcon("OptionPane.warningIcon"),
+                options,
+                options[0]);
+		switch (res)
 		{
-			fragLib = FragmentSpace.getScaffoldLibrary();
-			trgFrgType = 0;
-		}
-		else
-		{
-			// For extensions of existing graphs we need to know where to extend
-			if (srcVertexId==-1 || srcApId==-1)
-			{
-				JOptionPane.showMessageDialog(null,"No AP selected in the "
-						+ "growing graph",
-		                "Error",
-		                JOptionPane.PLAIN_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
-				return;
-			}
-			
-			String[] options = new String[]{"Fragment","Capping group"};
-			int res = JOptionPane.showOptionDialog(null,
-	                "<html>Select type of fragment to pick:</html>",
-	                "Choose fragment type",
-	                JOptionPane.DEFAULT_OPTION,
-	                JOptionPane.QUESTION_MESSAGE,
-	                UIManager.getIcon("OptionPane.warningIcon"),
-	                options,
-	                options[0]);
-			switch (res)
-			{
-				case 0:
-					fragLib = FragmentSpace.getFragmentLibrary();
-					trgFrgType = 1;
-					break;
-				case 1:
-					fragLib = FragmentSpace.getCappingLibrary();
-					trgFrgType = 2;
-					break;
-			}
+			case 0:
+				fragLib = FragmentSpace.getFragmentLibrary();
+				trgFrgType = 1;
+				break;
+			case 1:
+				fragLib = FragmentSpace.getCappingLibrary();
+				trgFrgType = 2;
+				break;
 		}
 
 		if (fragLib.size() == 0)
@@ -759,10 +782,7 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Select the incoming fragment and its AP to use
 		GUIFragmentSelector fragSelector = new GUIFragmentSelector(fragLib);
-		if (!startAnew)
-		{
-			fragSelector.setRequireApSelection(true);
-		}
+		fragSelector.setRequireApSelection(true);
 		Object selected = fragSelector.showDialog();
 		if (selected == null)
 		{
@@ -771,75 +791,59 @@ public class GUIGraphHandler extends GUICardPanel
 		int trgFragId = ((Integer[]) selected)[0];
 		int trgApId = ((Integer[]) selected)[1];
 		
-		// Take or make the graph to work with
-		if (startAnew)
-		{
-			currGrphIdx = dnGraphLibrary.size();
-			dnGraph = new DENOPTIMGraph();
-			dnGraphLibrary.add(dnGraph);
-			graph = null;
-			updateGraphListSpinner();
-		}
-		else
-		{
-			dnGraph = dnGraphLibrary.get(currGrphIdx);
-			graph = null;
-		}
+		// Take the graph that will be extended
+		dnGraph = dnGraphLibrary.get(currGrphIdx);
+		graph = null;
 		
-		// Append the new node
-		ArrayList<DENOPTIMAttachmentPoint> trgAPs;
-		try {
-			trgAPs = FragmentUtils.getAPForFragment(trgFragId, trgFrgType);
-		} catch (DENOPTIMException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,"Error defining APs",
-	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
-			return;
-		}
-		int trgVrtId = 1;
-		if (!startAnew)
+		// Append the new nodes
+		for (int i=0; i<srcAPs.size(); i++)
 		{
-			trgVrtId = dnGraph.getMaxVertexId()+1;
-		}
-		
-		DENOPTIMVertex trgVertex = new DENOPTIMVertex(trgVrtId, trgFragId, 
-				trgAPs,trgFrgType);
-
-		// Append the new edge
-		if (!startAnew)
-		{
+			IdFragmentAndAP ids = srcAPs.get(i);
+			int srcVertexId = ids.getVertexId();
+			int srcApId = ids.getApId();
+			
+			ArrayList<DENOPTIMAttachmentPoint> trgAPs;
+			try {
+				trgAPs = FragmentUtils.getAPForFragment(trgFragId, trgFrgType);
+			} catch (DENOPTIMException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,"Error defining APs",
+		                "Error",
+		                JOptionPane.PLAIN_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"));
+				return;
+			}
+			
+			int trgVrtId = dnGraph.getMaxVertexId()+1;
+			
+			DENOPTIMVertex trgVertex = new DENOPTIMVertex(trgVrtId, trgFragId, 
+					trgAPs,trgFrgType);
+	
 			// Identify the source vertex/node and its AP
 			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
-			
+				
 			String sCls = srcVertex.getAttachmentPoints().get(srcApId)
-					.getAPClass();
+						.getAPClass();
 			String tCls = trgAPs.get(trgApId).getAPClass();
-			
+				
 			trgVertex.setLevel(srcVertex.getLevel() + 1);
-			
+				
 			//NB: we ignore symmetry here
-                
-            DENOPTIMEdge edge = GraphUtils.connectVertices(srcVertex, trgVertex,
-            		srcApId, trgApId, sCls, tCls);
-
-            if (edge == null)
-            {
-    			JOptionPane.showMessageDialog(null,"Unable to make new edge.",
-    	                "Error",
-    	                JOptionPane.PLAIN_MESSAGE,
-    	                UIManager.getIcon("OptionPane.errorIcon"));
-    			return;
-            }
-
-            dnGraph.addVertex(trgVertex);
-            dnGraph.addEdge(edge);	 
-		}
-		else
-		{
-			trgVertex.setLevel(-1); //NB: scaffold gets level -1
-			dnGraph.addVertex(trgVertex);
+	                
+	        DENOPTIMEdge edge = GraphUtils.connectVertices(srcVertex, trgVertex,
+	            		srcApId, trgApId, sCls, tCls);
+	
+	        if (edge == null)
+	        {
+	        	JOptionPane.showMessageDialog(null,"Unable to make new edge.",
+	    	                "Error",
+	    	                JOptionPane.PLAIN_MESSAGE,
+	    	                UIManager.getIcon("OptionPane.errorIcon"));
+	    		return;
+	        }
+	
+	        dnGraph.addVertex(trgVertex);
+	        dnGraph.addEdge(edge);
 		}
 	}
 
@@ -1060,6 +1064,7 @@ public class GUIGraphHandler extends GUICardPanel
 			// the fragment space will not have all the AP data (which should be 
 			// taken from the fragment space). Therefore, they cannot be 
 			// recognized as RCV, but here we can fix at least part of the issue
+			// by using the DENOPTIMRing to identify the RCVs
 			
 			graph.getNode(srcIdx).setAttribute("ui.class", "rcv");
 			graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
@@ -1333,10 +1338,6 @@ public class GUIGraphHandler extends GUICardPanel
   	{	      		
   		// Overwrite dnGraph in library
   		dnGraphLibrary.set(currGrphIdx, dnGraph);
-        
-  		//TODO: check. this might not be needed
-        // Reload dnGraph from library to refresh viewer
-    	loadCurrentGraphIdxToViewer();
   		
   		// Release constraints
         deprotectEditedSystem();
