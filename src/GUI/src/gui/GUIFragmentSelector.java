@@ -101,7 +101,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		// Define the list of frags among which we are selecting
 		for (IAtomContainer mol : fragLib)
-		{			
+		{				
 			try {
 				fragmentLibrary.add(new DENOPTIMFragment(mol));
 			} catch (DENOPTIMException e1) {
@@ -188,6 +188,11 @@ public class GUIFragmentSelector extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 
+	/**
+	 * Allows to control whether confirming the selection of a fragment without
+	 * having selected an attachment point is permitted or not.
+	 * @param enforced use <code>true</code> to enforce the selection of an AP.
+	 */
 	public void setRequireApSelection(boolean enforced)
 	{
 		this.enforceAPSelection = enforced;

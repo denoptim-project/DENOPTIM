@@ -328,6 +328,13 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     	{
     		return;
     	}
+    	
+    	// Cleanup current APs in atom objects
+    	for (int ii=0 ; ii<this.getAtomCount(); ii++)
+    	{
+    		IAtom atm = this.getAtom(ii);   		
+    		atm.removeProperty(DENOPTIMConstants.APTAG);
+    	}
 
 	    // Temp storage for APs
 	    ArrayList<DENOPTIMAttachmentPoint> allAPs = 

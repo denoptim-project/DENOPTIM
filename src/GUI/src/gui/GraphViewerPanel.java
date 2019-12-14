@@ -477,7 +477,7 @@ public class GraphViewerPanel extends JPanel
 					xb, yb);
 			for (GraphicElement g : elements)
 			{
-				System.out.println("Clocked on element: "+g);
+				System.out.println("Clicked on element: "+g);
 				//TODO: open dialog with details or tooltip
 			}
 		}

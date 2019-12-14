@@ -22,11 +22,12 @@ package denoptim.molecule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -44,7 +45,7 @@ public class DENOPTIMFragmentTest
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	
     @Test
-    public void testHandingAPsAsObjOrProperty() throws Exception
+    public void testHandlingAPsAsObjOrProperty() throws Exception
     {
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -79,6 +80,31 @@ public class DENOPTIMFragmentTest
     	
     	assertEquals(frg1.getAPCount(),frg2.getAPCount());
     	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0));
+    }
+    
+    @Test
+    public void testConversionToIAC() throws Exception
+    {
+    	DENOPTIMFragment frg1 = new DENOPTIMFragment();
+    	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+    	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+    	Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+    	frg1.addAtom(a1);
+    	frg1.addAtom(a2);
+    	frg1.addAtom(a3);
+    	frg1.addBond(new Bond(a1, a2));
+    	frg1.addBond(new Bond(a2, a3));
+    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+    	frg1.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+    	
+    	IAtomContainer iac = new AtomContainer(frg1);
+    	DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
+    	
+    	assertEquals(frg1.getAPCount(),frg2.getAPCount());
+    	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0));
+    	assertEquals(frg1.getAPCountOnAtom(2),frg2.getAPCountOnAtom(2));
     }
     
 //------------------------------------------------------------------------------

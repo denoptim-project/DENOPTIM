@@ -600,7 +600,7 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnHelp);
 		
-		//TODO del
+		//TODO del (only for devel phase)
 		try {
 			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
 			for (String l : lines)
@@ -610,7 +610,6 @@ public class GUIGraphHandler extends GUICardPanel
 			FragmentSpaceParameters.processParameters();
 			renderForPresenceOfFragSpace();
 		} catch (DENOPTIMException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
