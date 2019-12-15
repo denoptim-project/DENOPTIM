@@ -1020,7 +1020,10 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private void loadDnGraphToViewer()
 	{
-		fragViewer.clearAll();
+		if (fragViewer != null)
+		{
+			fragViewer.clearAll();
+		}
 		graph = convertDnGraphToGSGraph(dnGraph);
 		graphViewer.cleanup();
 		graphViewer.loadGraphToViewer(graph);

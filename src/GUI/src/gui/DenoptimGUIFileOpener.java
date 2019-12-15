@@ -21,6 +21,25 @@ import org.apache.commons.io.FilenameUtils;
 
 public class DenoptimGUIFileOpener 
 {
+	
+//-----------------------------------------------------------------------------
+	
+	public static File pickFileOrFolder()
+	{
+		JFileChooser fileChooser = new JFileChooser(
+				FileSystemView.getFileSystemView().getHomeDirectory()); 
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		File file;
+		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		{
+			file = fileChooser.getSelectedFile();
+		}
+		else
+		{
+			return null;
+		}
+		return file;
+	}
 
 //-----------------------------------------------------------------------------
 
@@ -122,6 +141,15 @@ public class DenoptimGUIFileOpener
 		//TODO: All this should probably be in a the DENOPTIM package under io (including this method)
 		//TODO Junit test
 		
+		// Folders are presumed to contain output kind of data
+		if (inFile.isDirectory())
+		{
+			//TODO: distinguish between kind of experiments (GA, FSE)
+			fType = "GA-RUN";
+			return fType;
+		}
+		
+		// Files are distinguished first by extension
 		switch (ext)
 		{
 		/*

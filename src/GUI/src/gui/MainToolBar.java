@@ -235,13 +235,13 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFile();
+				File file = DenoptimGUIFileOpener.pickFileOrFolder();
 				try {
 					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
 							file));
 				} catch (Exception e1) {
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS", "GRAPHS"};
+							"FRAGMENTS", "GRAPHS", "GA-RUN"};
 					int res = JOptionPane.showOptionDialog(null,
 						"<html>Failed to detect file type automatically.<br>"
 						+ "Temptative reason: " + e1.getMessage() + "<br>"
@@ -314,13 +314,15 @@ public class MainToolBar extends JMenuBar {
 				break;	
 				
 			case ("FSE-PARAMS"):
-				GUIPrepareFSERun fseParamsPanel = new GUIPrepareFSERun(mainPanel);
+				GUIPrepareFSERun fseParamsPanel = 
+					new GUIPrepareFSERun(mainPanel);
 				mainPanel.add(fseParamsPanel);
 				fseParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;
 		
 			case ("FRAGMENTS"):
-				GUIFragmentInspector fragPanel = new GUIFragmentInspector(mainPanel);
+				GUIFragmentInspector fragPanel = 
+					new GUIFragmentInspector(mainPanel);
 				mainPanel.add(fragPanel);
 				fragPanel.importFragmentsFromFile(file,"SDF");
 				break;	
@@ -329,6 +331,13 @@ public class MainToolBar extends JMenuBar {
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanel);
 				graphPanel.importGraphsFromFile(file);
+				break;
+				
+			case ("GA-RUN"):
+				GUIEvolutionInspector eiPanel = 
+					new GUIEvolutionInspector(mainPanel);
+				mainPanel.add(eiPanel);
+				eiPanel.importEvolutionRunData(file);
 				break;
 			
 			default:

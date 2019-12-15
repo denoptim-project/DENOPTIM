@@ -21,6 +21,8 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.io.File;
 
+import org.jmol.adapter.readers.molxyz.MolReader;
+
 
 /**
  *
@@ -28,40 +30,55 @@ import java.io.File;
  */
 public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializable
 {
-    /*
+    /**
      * molecule representation as a graph of vertices and edges
      */
     private DENOPTIMGraph molGraph;
     
-    /*
+    /**
      * INCHI representation of the generated molecule, we will stick to just the key
      */
     private String molUID;
 	
-    /*
+    /**
      * smiles representation
      */
     private String molSmiles;
     
-    /*
+    /**
      * fitness of the molecule
      */
     private double molFitness;
     
-    /*
+    /**
      * name of the optimized molecule filename
      */
     private String molFile;
 
-    /*
+    /**
      * File containing the graphical depiction of the molecule
      */
     private String imgFile;
     
-    /*
+    /**
      * Any comments on the molecule
      */
     private String commments;
+    
+    /**
+     * Error that prevented calculation of the fitness
+     */
+    private String molError;
+    
+    /**
+     * Flag signaling the presence of a fitness value associated
+     */
+    private boolean hasFitness;
+    
+    /**
+     * Generation this molecule belong to
+     */
+    private int generationId;
 
     
 //------------------------------------------------------------------------------
@@ -70,7 +87,8 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     {
         molUID = "UNDEFINED";
         molSmiles = "UNDEFINED";
-        molFitness = 0;
+        molFitness = 0; //This is stupid... only needed by compareTo. TODO: change!
+        hasFitness = false;
     }
     
 //------------------------------------------------------------------------------
@@ -82,6 +100,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         molUID = m_molUID;
         molSmiles = m_molSmiles;
         molFitness = m_molFitness;
+        hasFitness = true;
    }
 
 //------------------------------------------------------------------------------
@@ -95,6 +114,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         molSmiles = m_molSmiles;
         molFitness = m_molFitness;
         molFile = m_molFile;
+        hasFitness = true;
     }
 
 //------------------------------------------------------------------------------
@@ -151,8 +171,22 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     public void setMoleculeFitness(double m_fitness)
     {
         molFitness = m_fitness;
+        hasFitness = true;
     }
     
+//------------------------------------------------------------------------------
+
+    public void setError(String error)
+    {
+        molError = error;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public String getError()
+    {
+        return molError;
+    }
     
 //------------------------------------------------------------------------------
 
@@ -196,6 +230,27 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         return molFitness;
     }
     
+//------------------------------------------------------------------------------
+    
+    public boolean hasFitness()
+    {
+    	return hasFitness;
+    }
+
+//------------------------------------------------------------------------------
+    
+    public void setGeneration(int genId)
+    {
+	    generationId = genId;
+	}
+    
+//------------------------------------------------------------------------------
+    
+    public int getGeneration()
+    {
+	    return generationId;
+	}
+
 //------------------------------------------------------------------------------
 
     // The compareTo method compares the receiving object with the specified 

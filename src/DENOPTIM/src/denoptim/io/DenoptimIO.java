@@ -98,6 +98,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
@@ -1467,6 +1468,77 @@ public class DenoptimIO
             String err = "No reaction compatibility data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads SDF files that represent one or more tested candidates. Candidates 
+     * are provided with a graph representation, a unique identifier, and 
+     * either a fitness value or a mol_error defining why this candidate could
+     * not be evaluated.
+     * @param file the SDF file to read
+     * @param useFragSpace use <code>true</code> if a fragment space is defined
+     * and we can use it to interpret the graph finding a full meaning for the 
+     * nodes in the graph.
+     * @return the list of candidates
+     * @throws DENOPTIMException is something goes wrong while reading the file
+     * or interpreting its content
+     */
+    public static ArrayList<DENOPTIMMolecule> readDENOPTIMMolecules(File file, 
+    		boolean useFragSpace) throws DENOPTIMException
+    {
+    	String filename = file.getAbsolutePath();
+    	ArrayList<DENOPTIMMolecule> mols = new ArrayList<DENOPTIMMolecule>();
+    	ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
+    	for (IAtomContainer iac : iacs)
+    	{
+    		String molName = iac.getProperty(CDKConstants.TITLE).toString();
+    		
+    		DENOPTIMMolecule mol = new DENOPTIMMolecule();
+    		
+    		boolean fitnessOrError = false;
+            if (iac.getProperty("MOL_ERROR") != null)
+            {
+            	fitnessOrError = true;
+            	mol.setError(iac.getProperty("MOL_ERROR").toString());
+            }
+
+            if (iac.getProperty("FITNESS") != null)
+            {
+            	fitnessOrError = true;
+                String fitprp = iac.getProperty("FITNESS").toString();
+                double fitVal = Double.parseDouble(fitprp);
+                if (Double.isNaN(fitVal))
+                {
+                    String msg = "Fitness value is NaN for " + molName
+                    		+ " in file '" + filename+ "'";
+                    throw new DENOPTIMException(msg);
+                }
+                mol.setMoleculeFitness(fitVal);
+            }
+            
+            if (!fitnessOrError)
+            {
+            	String msg = "Neither fitness nor error found for " + molName
+            			+ " in file '" + filename+ "'";
+                throw new DENOPTIMException(msg);
+            }
+            
+            mol.setMoleculeFile(filename);
+            mol.setMoleculeSmiles(iac.getProperty("SMILES").toString());
+            mol.setMoleculeUID(iac.getProperty("UID").toString());
+            mol.setMoleculeGraph(GraphConversionTool.getGraphFromString(
+            		iac.getProperty("GraphENC").toString(), useFragSpace));
+            if (iac.getProperty("GraphMsg") != null)
+            {
+                mol.setComments(iac.getProperty("GraphMsg").toString());
+            }
+            
+            mols.add(mol);
+    	}
+    	
+    	return mols;
     }
 
 //------------------------------------------------------------------------------

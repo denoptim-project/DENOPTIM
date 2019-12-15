@@ -868,7 +868,8 @@ public class GAParametersForm extends ParametersForm
 	
 //-----------------------------------------------------------------------------
 
-	private void createSubsProbGraph() {
+	private void createSubsProbGraph() 
+	{
 		createSubsProbDataset();
     	createSubsProbChart();
     	graphSubProbJFChartChartPanel = new ChartPanel(graphSubProbJFChart);
