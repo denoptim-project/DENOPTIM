@@ -65,7 +65,7 @@ public class FragmentViewPanel extends JSplitPane
 	 * Flag signaling that data about APs has been changed in the GUI
 	 */
 	public boolean alteredAPData = false;
-
+	
 	private JmolPanel jmolPanel;
 	private JScrollPane tabPanel;
 	protected DefaultTableModel apTabModel;
@@ -84,7 +84,7 @@ public class FragmentViewPanel extends JSplitPane
 	 */
 	public FragmentViewPanel()
 	{
-		initialize();
+		initialize(340);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -97,17 +97,31 @@ public class FragmentViewPanel extends JSplitPane
 	public FragmentViewPanel(boolean editableTable)
 	{
 		editableAPTable = editableTable;
-		initialize();
+		initialize(340);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Constructor that allows to specify whether the AP table is editable or 
+	 * not.
+	 * @param editableTable use <code>true</code> to make the AP table editable
+	 * @param dividerPosition allows to set the initial position of the divide
+	 */
+	public FragmentViewPanel(boolean editableTable, int dividerPosition)
+	{
+		editableAPTable = editableTable;
+		initialize(dividerPosition);
 	}
 	
 //-----------------------------------------------------------------------------
 
 	@SuppressWarnings("serial")
-	private void initialize()
+	private void initialize(int dividerPosition)
 	{	
 		this.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		this.setOneTouchExpandable(true);
-		this.setDividerLocation(340);
+		this.setDividerLocation(dividerPosition);
         
         // Jmol viewer panel
         jmolPanel = new JmolPanel();
@@ -473,6 +487,17 @@ public class FragmentViewPanel extends JSplitPane
 	    }
 	    activateTabEditsListener(true);
 	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Removes the currently visualized molecule and AP table
+	 */
+	public void clearAll()
+	{
+		clearAPTable();
+		clearMolecularViewer();
+	}
 	
 //-----------------------------------------------------------------------------
 	
@@ -657,7 +682,8 @@ public class FragmentViewPanel extends JSplitPane
 	{	
 		private boolean isActive = false;
 		
-		public PausableTableModelListener() {};
+		public PausableTableModelListener() 
+		{};
 
 		@Override
 		public void tableChanged(TableModelEvent e) 

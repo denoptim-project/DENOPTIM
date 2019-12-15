@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeListenerProxy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -31,6 +35,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
@@ -99,6 +104,8 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private boolean hasFragSpace = false;
 	
+	private JSplitPane centralPane;
+	private FragmentViewPanel fragViewer;
 	private GraphViewerPanel graphViewer;
 	private JPanel graphCtrlPane;
 	private JPanel graphNavigPane;
@@ -160,18 +167,31 @@ public class GUIGraphHandler extends GUICardPanel
 		this.setLayout(new BorderLayout()); 
 		
 		// This card structure includes center, east and south panels:
-		// - (Center) graph viewer
+		// - (Center) splitPane with graph and fragment viewers
 		// - (East) graph controls
 		// - (South) general controls (load, save, close)
 		
-		// The graph viewer goes all in here	
+		// The graph and fragment viewers go in the central panel	
 		graphViewer = new GraphViewerPanel();
-		this.add(graphViewer,BorderLayout.CENTER);
+		//graphViewer.addPropertyChangeListener(nodeClickedListener);
+		graphViewer.addPropertyChangeListener(
+				new PropertyChangeListenerProxy(
+						"NODECLICKED", new NodeClickedListener()));
+		//TODO here of private listener??
+		fragViewer = new FragmentViewPanel(false, 300);
+		centralPane = new JSplitPane();
+		centralPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		centralPane.setOneTouchExpandable(true);
+		centralPane.setDividerLocation(200);
+		centralPane.setLeftComponent(fragViewer);
+		centralPane.setRightComponent(graphViewer);
+		this.add(centralPane,BorderLayout.CENTER);
        
 		// General panel on the right: it containing all controls
         graphCtrlPane = new JPanel();
         graphCtrlPane.setVisible(true);
-        graphCtrlPane.setLayout(new BoxLayout(graphCtrlPane, SwingConstants.VERTICAL));
+        graphCtrlPane.setLayout(new BoxLayout(graphCtrlPane, 
+        		SwingConstants.VERTICAL));
 
         // Controls to navigate the list of dnGraphs
         graphNavigPane = new JPanel();
@@ -180,7 +200,8 @@ public class GUIGraphHandler extends GUICardPanel
         totalGraphsLabel = new JLabel("0");
         
 		graphNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
-		graphNavigSpinner.setToolTipText("Move to graph number # in the currently loaded library.");
+		graphNavigSpinner.setToolTipText("Move to graph number # in the "
+				+ "currently loaded library.");
 		graphNavigSpinner.setMaximumSize(new Dimension(75,20));
 		graphNavigSpinner.addChangeListener(graphSpinnerListener);
         
@@ -219,7 +240,8 @@ public class GUIGraphHandler extends GUICardPanel
 					
 					case 1:
 						File inFile = DenoptimGUIFileOpener.pickFile();
-						if (inFile == null || inFile.getAbsolutePath().equals(""))
+						if (inFile == null 
+								|| inFile.getAbsolutePath().equals(""))
 						{
 							return;
 						}
@@ -301,7 +323,8 @@ public class GUIGraphHandler extends GUICardPanel
 				
 				if (dnGraphLibrary.size() != 0)
 				{
-					msg = msg + "<li>One or more graphs are already loaded.</li>";
+					msg = msg 
+							+ "<li>One or more graphs are already loaded.</li>";
 					showWarning = true;
 				}
 				if (hasFragSpace)
@@ -373,9 +396,7 @@ public class GUIGraphHandler extends GUICardPanel
 					extendGraphFromFragSpace(selAps);
 					
 					// Update viewer
-					graph = convertDnGraphToGSGraph(dnGraph);
-					graphViewer.cleanup();
-					graphViewer.loadGraphToViewer(graph);
+					loadDnGraphToViewer();
 					
 					// Protect edited system
 			        unsavedChanges = true;
@@ -411,9 +432,7 @@ public class GUIGraphHandler extends GUICardPanel
 					}
 					
 					// Update viewer
-					graph = convertDnGraphToGSGraph(dnGraph);
-					graphViewer.cleanup();
-					graphViewer.loadGraphToViewer(graph);
+					loadDnGraphToViewer();
 					
 			        // Protect the temporary "dnGraph" obj
 			        unsavedChanges = true;
@@ -444,7 +463,8 @@ public class GUIGraphHandler extends GUICardPanel
 		// Controls of displayed attributes
 		pnlShowLabels = new JPanel();
 		JLabel lblShowHideLabels = new JLabel("Manage graph labels:");
-		cmbLabel = new JComboBox<String>(new String[] {graphViewer.SPRITE_APCLASS, 
+		cmbLabel = new JComboBox<String>(
+				new String[] {graphViewer.SPRITE_APCLASS, 
 				graphViewer.SPRITE_BNDORD, graphViewer.SPRITE_FRGID});
 		cmbLabel.setToolTipText("<html>Select the kind of type of information"
 				+ "<br>to add or remove from the graph view.</html>");
@@ -458,7 +478,8 @@ public class GUIGraphHandler extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				if (graphViewer.hasSelected())
 				{
-					graphViewer.appendSprites(cmbLabel.getSelectedItem().toString());
+					graphViewer.appendSprites(
+							cmbLabel.getSelectedItem().toString());
 				}
 				else
 				{
@@ -481,7 +502,8 @@ public class GUIGraphHandler extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				if (graphViewer.hasSelected())
 				{
-					graphViewer.removeSprites(cmbLabel.getSelectedItem().toString());
+					graphViewer.removeSprites(
+							cmbLabel.getSelectedItem().toString());
 				}
 				else
 				{
@@ -726,9 +748,7 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraph.addVertex(scaffVertex);
 		
 		// Put the graph to the viewer
-		graph = convertDnGraphToGSGraph(dnGraph);
-		graphViewer.cleanup();
-		graphViewer.loadGraphToViewer(graph);
+		loadDnGraphToViewer();
 		enableGraphDependentButtons(true);
 		unsavedChanges = true;
         protectEditedSystem();
@@ -983,10 +1003,19 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		clearCurrentSystem();
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
-		graph = convertDnGraphToGSGraph(dnGraph);
-		graphViewer.loadGraphToViewer(graph);
+		loadDnGraphToViewer();
 		
 		enableGraphDependentButtons(true);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void loadDnGraphToViewer()
+	{
+		fragViewer.clearAll();
+		graph = convertDnGraphToGSGraph(dnGraph);
+		graphViewer.cleanup();
+		graphViewer.loadGraphToViewer(graph);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1099,6 +1128,49 @@ public class GUIGraphHandler extends GUICardPanel
 				dnGraphLibrary.size(), 1));
 		totalGraphsLabel.setText(Integer.toString(dnGraphLibrary.size()));
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Listener for identifying the node on which the user has clicked and 
+	 * load the corresponding fragment into the fragment viewer pane.
+	 */
+	private class NodeClickedListener implements PropertyChangeListener
+	{
+		
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) 
+		{
+			// null is used to trigger cleanup
+			if (evt.getNewValue() == null)
+			{
+				fragViewer.clearAll();
+			}
+			
+			// Otherwise try to load the fragment into the viewer
+			String nodeId = (String) evt.getNewValue();
+			Node n = graph.getNode(nodeId);
+			if (n == null || !hasFragSpace)
+			{
+				return;
+			}
+			
+			DENOPTIMVertex v = dnGraph.getVertexWithId(
+					Integer.parseInt(nodeId));
+			
+			DENOPTIMFragment frag;
+			try {
+				frag = new DENOPTIMFragment(
+						FragmentSpace.getFragment(
+								v.getFragmentType(), v.getMolId()));
+			} catch (DENOPTIMException e) {
+				e.printStackTrace();
+				return;
+			}
+			
+			fragViewer.loadFragImentToViewer(frag);
+		}
+	}
 
 //-----------------------------------------------------------------------------
 
@@ -1128,7 +1200,8 @@ public class GUIGraphHandler extends GUICardPanel
         	}
         	
         	//NB here we convert from 1-based index in GUI to 0-based index
-        	currGrphIdx = ((Integer) graphNavigSpinner.getValue()).intValue() - 1;
+        	currGrphIdx = ((Integer) graphNavigSpinner.getValue())
+        			.intValue() - 1;
         	loadCurrentGraphIdxToViewer();
         }
 	}
@@ -1165,7 +1238,8 @@ public class GUIGraphHandler extends GUICardPanel
 			addToCentralPane(fsParsForm);
 			
 			this.btnDone.setText("Create Fragment Space");
-			this.btnDone.setToolTipText("<html>Uses the parameters defined above to"
+			this.btnDone.setToolTipText("<html>Uses the parameters defined "
+					+ "above to"
 					+ "<br> build a fragment space and make it available to"
 					+ "<br>the graph handler.</html>");
 			
@@ -1207,7 +1281,8 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 			});
 			
-			this.btnCanc.setToolTipText("Exit without creating a fragment space.");
+			this.btnCanc.setToolTipText("Exit without creating a fragment "
+					+ "space.");
 		}
 		
 	//-------------------------------------------------------------------------
@@ -1343,7 +1418,8 @@ public class GUIGraphHandler extends GUICardPanel
     		{
     			currGrphIdx = -1;
     			//Spinner will be fixed by the deprotection routine
-    			totalGraphsLabel.setText(Integer.toString(dnGraphLibrary.size()));
+    			totalGraphsLabel.setText(Integer.toString(
+    					dnGraphLibrary.size()));
     			enableGraphDependentButtons(false);
     		}
     		deprotectEditedSystem();

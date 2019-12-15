@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -12,6 +14,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.swingViewer.ViewPanel;
@@ -27,7 +30,7 @@ public class GraphViewerPanel extends JPanel
 	private static final long serialVersionUID = 6492255171927069190L;
 	
 	/**
-	 * CSS string controlling the graphical style of the graph representation
+	 * CSS string controlling the graphical style of the visualized graph
 	 */
 	private static final String cssStyle = "graph {"
 			+ "fill-color: #D9D9D9; "
@@ -408,7 +411,7 @@ public class GraphViewerPanel extends JPanel
 	{
 		return mouseManager.hasSelected();
 	}
-	
+
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -425,6 +428,8 @@ public class GraphViewerPanel extends JPanel
 		
 		private double altXCamStart;
 		private double altYCamStart;
+		
+		private String oldElmId;
 		
 	//-------------------------------------------------------------------------
 		
@@ -475,10 +480,27 @@ public class GraphViewerPanel extends JPanel
 			double yb = e.getY() + t;
 			Iterable<GraphicElement> elements = view.allNodesOrSpritesIn(xa, ya,
 					xb, yb);
-			for (GraphicElement g : elements)
+			boolean clickedOnNode = false;
+			for (GraphicElement elmClicked : elements)
 			{
-				System.out.println("Clicked on element: "+g);
-				//TODO: open dialog with details
+				if (elmClicked.getSelectorType() != Selector.Type.NODE)
+				{
+					continue;
+				}
+				
+				String newElmId = elmClicked.getId();
+				
+				firePropertyChange("NODECLICKED", oldElmId, newElmId);
+				oldElmId = newElmId;
+				clickedOnNode = true;
+				
+				//WARNING: we take the first, but there could be more than one
+				break;
+			}
+			if (!clickedOnNode)
+			{
+				firePropertyChange("NODECLICKED", oldElmId, null);
+				oldElmId = null;
 			}
 		}
 		
