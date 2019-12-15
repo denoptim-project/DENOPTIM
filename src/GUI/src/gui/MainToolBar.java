@@ -112,6 +112,16 @@ public class MainToolBar extends JMenuBar {
 		menuDenoptim.setFont(new Font("Lucida Grande", Font.BOLD, 12));
 		this.add(menuDenoptim);
 		
+		JMenuItem prefs = new JMenuItem("Preferences");
+		prefs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				GUIPreferencesDialog prefDialog = new GUIPreferencesDialog();
+				prefDialog.pack();
+				prefDialog.setVisible(true);
+			}
+		});
+		menuDenoptim.add(prefs);
+		
 		JMenuItem about = new JMenuItem("About");
 		about.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

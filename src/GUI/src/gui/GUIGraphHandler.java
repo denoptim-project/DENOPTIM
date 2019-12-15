@@ -172,19 +172,27 @@ public class GUIGraphHandler extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The graph and fragment viewers go in the central panel	
-		graphViewer = new GraphViewerPanel();
-		//graphViewer.addPropertyChangeListener(nodeClickedListener);
-		graphViewer.addPropertyChangeListener(
-				new PropertyChangeListenerProxy(
-						"NODECLICKED", new NodeClickedListener()));
-		//TODO here of private listener??
-		fragViewer = new FragmentViewPanel(false, 300);
 		centralPane = new JSplitPane();
 		centralPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		centralPane.setOneTouchExpandable(true);
 		centralPane.setDividerLocation(200);
-		centralPane.setLeftComponent(fragViewer);
+		graphViewer = new GraphViewerPanel();
 		centralPane.setRightComponent(graphViewer);
+		graphViewer.addPropertyChangeListener(
+				new PropertyChangeListenerProxy(
+						"NODECLICKED", new NodeClickedListener()));
+		if (hasFragSpace)
+		{
+			fragViewer = new FragmentViewPanel(false, 300);
+			centralPane.setLeftComponent(fragViewer);
+		}
+		else
+		{
+			JPanel empty = new JPanel();
+			empty.add(new JLabel("<html>Load a fragment space <br>"
+					+ "to view fragments.</html>"));
+			centralPane.setLeftComponent(empty);
+		}
 		this.add(centralPane,BorderLayout.CENTER);
        
 		// General panel on the right: it containing all controls
@@ -623,7 +631,7 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnHelp);
 		
-		//TODO del (only for devel phase)
+		//TODO del (This is used only for devel phase of debug)
 		/*
 		try {
 			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
@@ -1214,6 +1222,10 @@ public class GUIGraphHandler extends GUICardPanel
 		FSParams fsParams = new FSParams(this);
         fsParams.pack();
         fsParams.setVisible(true);
+        
+        // Bring up the frag viewer
+		fragViewer = new FragmentViewPanel(false, 300);
+		centralPane.setLeftComponent(fragViewer);
 	}
 	
 //-----------------------------------------------------------------------------

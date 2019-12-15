@@ -32,89 +32,7 @@ public class GraphViewerPanel extends JPanel
 	/**
 	 * CSS string controlling the graphical style of the visualized graph
 	 */
-	private static final String cssStyle = "graph {"
-			+ "fill-color: #D9D9D9; "
-			+ "} "
-			+ "node {"
-			+ "shape: rounded-box; "
-			+ "size: 30px, 30px; "
-			+ "fill-mode: plain; "
-			+ "fill-color: grey; "
-			+ "stroke-color: #1D2731; "
-			+ "stroke-width: 2px; "
-			+ "stroke-mode: plain;"
-			+ "text-mode: normal;"
-			+ "text-style: normal;"
-			+ "} "
-			+ "node.fragment {"
-			+ "fill-color: #4484CE; "
-			+ "} "
-			+ "node.scaffold {"
-			+ "fill-color: #F53240; "
-			+ "} "
-			+ "node.cap {"
-			+ "size: 20px, 20px; "
-			+ "fill-color: #57BC90; "
-			+ "} "
-			+ "node.rcv {"
-			+ "size: 20px, 20px; "
-			+ "fill-color: #F19F4D; "
-			+ "}"
-			+ "node.ap {"
-			+ "shape: circle;"
-			+ "size: 10px, 10px; "
-			+ "stroke-width: 1px; "
-			+ "text-mode: hidden;"
-			+ "fill-color: #FECE00; "
-			+ "}"
-			+ "node:selected {"
-			+ "stroke-color: darkgreen;"
-			+ "fill-color: green;"
-			+ "}"
-			+ "edge {"
-			+ "shape: line; "
-			+ "size: 1.5px;"
-			+ "fill-color: #1D2731; "
-			+ "arrow-size: 7px, 5px; "
-			+ "}"
-			+ "edge.rc {"
-			+ "fill-color: #F19F4D; "
-			+ "}"
-			+ "edge.ap {"
-			+ "fill-color: #FECE00;"
-			+ "}"
-			+ "sprite.edgeLabel {"
-			+ "shape: box; "
-			+ "size: 0px;" 
-			+ "text-mode: normal;"
-			+ "text-style: normal;"
-			+ "text-background-mode: rounded-box;"
-			+ "text-background-color: #D9D9D9;"
-			+ "text-padding: 1px;"
-			+ "} "
-			+ "sprite.apLabel {"
-			+ "shape: box; "
-			+ "size: 0px;" 
-			+ "text-mode: normal;"
-			+ "text-style: normal;"
-			+ "text-background-mode: none;"
-			+ "}"
-			+ "sprite.molIdLabel {"
-			+ "shape: box; "
-			+ "size: 0px;" 
-			+ "text-mode: normal;"
-			+ "text-style: normal;"
-			+ "text-background-mode: none;"
-			+ "}"
-			+ "sprite.bndTypLabel {"
-			+ "shape: box; "
-			+ "size: 0px;" 
-			+ "text-mode: normal;"
-			+ "text-style: normal;"
-			+ "text-background-mode: rounded-box;"
-			+ "text-background-color: #D9D9D9;"
-			+ "text-padding: 1px;"
-			+ "}";
+	private String cssStyle = "";
 	
 	private ViewPanel viewpanel;
 	private Viewer viewer;
@@ -153,6 +71,103 @@ public class GraphViewerPanel extends JPanel
 	
 //-----------------------------------------------------------------------------
 	
+	private void updateGraphStyle()
+	{
+		cssStyle = "graph {"
+				+ "fill-color: #D9D9D9; "
+				+ "} "
+				+ "node {"
+				+ "shape: rounded-box; "
+				+ "size: " + GUIPreferences.graphNodeSize + "px, " 
+				+ GUIPreferences.graphNodeSize + "px; "
+				+ "fill-mode: plain; "
+				+ "fill-color: grey; "
+				+ "stroke-color: #1D2731; "
+				+ "stroke-width: 2px; "
+				+ "stroke-mode: plain; "
+				+ "text-mode: normal; "
+				+ "text-style: normal; "
+				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
+				+ "} "
+				+ "node.fragment {"
+				+ "fill-color: #4484CE; "
+				+ "} "
+				+ "node.scaffold {"
+				+ "fill-color: #F53240; "
+				+ "} "
+				+ "node.cap {"
+				+ "size: " + (GUIPreferences.graphNodeSize*2/3) + "px, " 
+				+ (GUIPreferences.graphNodeSize*2/3) + "px; "
+				+ "fill-color: #57BC90; "
+				+ "} "
+				+ "node.rcv {"
+				+ "size: " + (GUIPreferences.graphNodeSize*2/3) + "px, " 
+				+ (GUIPreferences.graphNodeSize*2/3) + "px; "
+				+ "fill-color: #F19F4D; "
+				+ "}"
+				+ "node.ap {"
+				+ "shape: circle;"
+				+ "size: " + (GUIPreferences.graphNodeSize*1/3) + "px, " 
+				+ (GUIPreferences.graphNodeSize*1/3) + "px; "
+				+ "stroke-width: 1px; "
+				+ "text-mode: hidden;"
+				+ "fill-color: #FECE00; "
+				+ "}"
+				+ "node:selected {"
+				+ "stroke-color: darkgreen;"
+				+ "fill-color: green;"
+				+ "}"
+				+ "edge {"
+				+ "shape: line; "
+				+ "size: 1.5px;"
+				+ "fill-color: #1D2731; "
+				+ "arrow-size: 7px, 5px; "
+				+ "}"
+				+ "edge.rc {"
+				+ "fill-color: #F19F4D; "
+				+ "}"
+				+ "edge.ap {"
+				+ "fill-color: #FECE00;"
+				+ "}"
+				+ "sprite.edgeLabel {"
+				+ "shape: box; "
+				+ "size: 0px;" 
+				+ "text-mode: normal;"
+				+ "text-style: normal;"
+				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
+				+ "text-background-mode: rounded-box;"
+				+ "text-background-color: #D9D9D9;"
+				+ "text-padding: 1px;"
+				+ "} "
+				+ "sprite.apLabel {"
+				+ "shape: box; "
+				+ "size: 0px;" 
+				+ "text-mode: normal;"
+				+ "text-style: normal;"
+				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
+				+ "text-background-mode: none;"
+				+ "}"
+				+ "sprite.molIdLabel {"
+				+ "shape: box; "
+				+ "size: 0px;" 
+				+ "text-mode: normal;"
+				+ "text-style: normal;"
+				+ "text-background-mode: none;"
+				+ "}"
+				+ "sprite.bndTypLabel {"
+				+ "shape: box; "
+				+ "size: 0px;" 
+				+ "text-mode: normal;"
+				+ "text-style: normal;"
+				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
+				+ "text-background-mode: rounded-box;"
+				+ "text-background-color: #D9D9D9;"
+				+ "text-padding: 1px;"
+				+ "}";
+	}
+	
+//-----------------------------------------------------------------------------
+	
 	/**
 	 * Removes the currently loaded graph viewer
 	 */
@@ -177,6 +192,9 @@ public class GraphViewerPanel extends JPanel
 		graph = g;
 		graph.addAttribute("ui.quality");
 		graph.addAttribute("ui.antialias");
+		
+		updateGraphStyle();
+		
 		graph.addAttribute("ui.stylesheet", cssStyle);
 		
 		viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
@@ -199,7 +217,7 @@ public class GraphViewerPanel extends JPanel
 	 * this GraphViewerPanel (fields beginning with <code>SPRITE_</code>).
 	 */
 	public void appendSprites(String sprType)
-	{
+	{		
 		switch (sprType)
 		{
 			case SPRITE_APCLASS:
