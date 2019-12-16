@@ -21,8 +21,6 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.io.File;
 
-import org.jmol.adapter.readers.molxyz.MolReader;
-
 
 /**
  *
@@ -79,6 +77,11 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
      * Generation this molecule belong to
      */
     private int generationId;
+    
+    /**
+     * Name (not guaranteed to be unique)
+     */
+    private String molName;
 
     
 //------------------------------------------------------------------------------
@@ -179,6 +182,20 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     public void setError(String error)
     {
         molError = error;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void setName(String name)
+    {
+        molName = name;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public String getName()
+    {
+        return molName;
     }
     
 //------------------------------------------------------------------------------

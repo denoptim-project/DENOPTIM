@@ -51,6 +51,11 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private JPanel pnlGraphNodeSize;
     private JLabel lblGraphNodeSize;
     private JTextField txtGraphNodeSize;
+    
+    private String namChartPointSize = "Size of points in evolution chart";
+    private JPanel pnlChartPointSize;
+    private JLabel lblChartPointSize;
+    private JTextField txtChartPointSize;
 	
 	
 	private boolean inputIsOK = true;
@@ -86,6 +91,15 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
         centralPanel.add(new JSeparator());
         
+        pnlChartPointSize = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblChartPointSize = new JLabel(namChartPointSize + ":");
+        txtChartPointSize = new JTextField();
+        txtChartPointSize.setPreferredSize(strFieldSize);
+        txtChartPointSize.setText(GUIPreferences.chartPointSize+"");
+        pnlChartPointSize.add(lblChartPointSize);
+        pnlChartPointSize.add(txtChartPointSize);
+        centralPanel.add(pnlChartPointSize);
+        
 		// Customize the buttons of the modal dialog
 		this.btnDone.setText("Save");
 		this.btnDone.setToolTipText("Save the values and close dialog");
@@ -113,6 +127,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 		inputIsOK = true; //resetting results from previous attempts
 		mustParseToInt(txtGraphTxtSize, namGraphTxtSize);
 		mustParseToInt(txtGraphNodeSize, namGraphNodeSize);
+		mustParseToInt(txtChartPointSize, namChartPointSize);
 	}
 
 //-----------------------------------------------------------------------------
@@ -140,5 +155,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 				Integer.parseInt(txtGraphTxtSize.getText());
 		GUIPreferences.graphNodeSize =
                 Integer.parseInt(txtGraphNodeSize.getText());
+        GUIPreferences.chartPointSize =
+                Integer.parseInt(txtChartPointSize.getText());
 	}
 }

@@ -163,7 +163,7 @@ public class FragmentViewPanel extends JSplitPane
 		for (String tmpFolder : tmpFolders)
 		{
 			tmpSDFFile = tmpFolder + System.getProperty("file.separator") 
-					+ "Denoptim_GUIFragInspector_loadedMol.sdf";
+					+ "Denoptim_FragViewer_loadedMol.sdf";
 			if (tmpSpaceIsOK(tmpSDFFile))
 			{
 				break;
@@ -185,7 +185,7 @@ public class FragmentViewPanel extends JSplitPane
 			preStr = "I tried, but I cannot use '" + tmpSDFFile + "'.";
 			
 			tmpSDFFile = tmpSDFFile + System.getProperty("file.separator") 
-					+ "Denoptim_GUIFragInspector_loadedMol.sdf";				
+					+ "Denoptim_FragViewer_loadedMol.sdf";				
 		}
 	}
 	

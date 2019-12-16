@@ -1025,6 +1025,51 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
+     * Read the min, max, mean, and median of a population from 
+     * "Gen.*\.txt" file
+     *
+     * @param fileName
+     * @return list of data
+     * @throws DENOPTIMException
+     */
+    public static double[] readPopulationProps(File file) 
+    		throws DENOPTIMException
+    {
+    	double[] vals = new double[4];
+    	ArrayList<String> txt = readList(file.getAbsolutePath());
+    	for (String line : txt)
+    	{
+    		if (line.trim().length() < 8)
+    		{
+    			continue;
+    		}
+    		
+    		String key = line.toUpperCase().trim().substring(0,8);
+    		switch (key)
+    		{
+    		case ("MIN:    "):
+    			vals[0] = Double.parseDouble(line.split("\\s+")[1]);
+    			break;
+    		
+    		case ("MAX:    "):
+    			vals[1] = Double.parseDouble(line.split("\\s+")[1]);
+    			break;
+    		
+    		case ("MEAN:   "):
+    			vals[2] = Double.parseDouble(line.split("\\s+")[1]);
+    			break;
+    		
+    		case ("MEDIAN: "):
+    			vals[3] = Double.parseDouble(line.split("\\s+")[1]);
+    			break;		
+    		}
+    	}
+    	return vals;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Read list of data as text
      *
      * @param fileName
@@ -1492,10 +1537,15 @@ public class DenoptimIO
     	ArrayList<DENOPTIMMolecule> mols = new ArrayList<DENOPTIMMolecule>();
     	ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
     	for (IAtomContainer iac : iacs)
-    	{
-    		String molName = iac.getProperty(CDKConstants.TITLE).toString();
-    		
+    	{   			
     		DENOPTIMMolecule mol = new DENOPTIMMolecule();
+    		
+    		String molName = "noname";
+    		if (iac.getProperty(CDKConstants.TITLE) != null)
+    		{
+    			molName = iac.getProperty(CDKConstants.TITLE).toString();
+    		}
+    		mol.setName(molName);
     		
     		boolean fitnessOrError = false;
             if (iac.getProperty("MOL_ERROR") != null)

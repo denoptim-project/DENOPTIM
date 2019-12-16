@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,6 +36,8 @@ public class HomePanel extends GUICardPanel
 	 */
 	private static final long serialVersionUID = 5512821342651489833L;
 
+//-----------------------------------------------------------------------------
+
 	/**
 	 * Constructor
 	 */
@@ -42,6 +45,8 @@ public class HomePanel extends GUICardPanel
 		super(mainPanel, "Home");
 		initialize();
 	}
+	
+//-----------------------------------------------------------------------------
 
 	/**
 	 * Initialize the panel with figure and shortcuts and credit panels
@@ -104,6 +109,20 @@ public class HomePanel extends GUICardPanel
 		});
 		buttonsPanel.add(btnNewGraph);
 		
+		JButton btnReadGAOutput = new JButton("Inspect Evolutionary run");
+		btnReadGAOutput.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				File file = DenoptimGUIFileOpener.pickFolder();
+				if (file == null)
+				{
+					return;
+				}
+				GUIEvolutionInspector i = new GUIEvolutionInspector(mainPanel);
+				mainPanel.add(i);
+				i.importEvolutionRunData(file);
+			}
+		});
+		buttonsPanel.add(btnReadGAOutput);
 		
 		
 		//Credits panel
@@ -138,6 +157,15 @@ public class HomePanel extends GUICardPanel
                 }
 		    }
 		});
-		creditsPanel.add(email);			
+		creditsPanel.add(email);		
+		
+
+		//TODO del: only for devel
+		/*
+		GUIEvolutionInspector eiPanel = 
+				new GUIEvolutionInspector(mainPanel);
+			mainPanel.add(eiPanel);
+			eiPanel.importEvolutionRunData(new java.io.File("/Users/mfo051/___/RUN13112019121926"));
+		*/
 	}
 }
