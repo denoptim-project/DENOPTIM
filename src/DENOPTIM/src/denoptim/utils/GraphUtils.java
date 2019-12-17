@@ -596,7 +596,6 @@ public class GraphUtils
         for (int i=0; i<children.size(); i++)
         {
             int k = children.get(i);
-            molGraph.getVertexWithId(k).getAttachmentPoints().clear();
             molGraph.removeVertex(k);
         }
 

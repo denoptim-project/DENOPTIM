@@ -470,18 +470,18 @@ public class GUIEvolutionInspector extends GUICardPanel
         plot.setRenderer(4, renderer4);
         renderer4.setSeriesPaint(0, Color.red);
         renderer4.setSeriesStroke(0, new BasicStroke(
-                1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
                 1.0f, new float[] {10.0f, 6.0f}, 0.0f));
         renderer4.setSeriesVisible(0, false);
         
         // median fitness in the population
         XYLineAndShapeRenderer renderer5 = 
         		new XYLineAndShapeRenderer(true, false);
-        plot.setDataset(5, datasetPopMean);
+        plot.setDataset(5, datasetPopMedian);
         plot.setRenderer(5, renderer5);
-        renderer5.setSeriesPaint(0, Color.green);   
+        renderer5.setSeriesPaint(0, Color.decode("#22BB22"));   
         renderer5.setSeriesStroke(0, new BasicStroke(
-                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
                     1.0f, new float[] {3.0f, 6.0f}, 0.0f));
         renderer5.setSeriesVisible(0, false);
         

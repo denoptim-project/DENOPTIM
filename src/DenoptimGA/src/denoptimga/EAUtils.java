@@ -146,6 +146,8 @@ public class EAUtils
         double sdev = DENOPTIMMathUtils.stddevp(fitness);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
+        
+        String floatForm = "%12." + GAParameters.getPrecisionLevel() + "f";
 
         if (sdev > 0.0001)
         {
@@ -156,22 +158,22 @@ public class EAUtils
             sb.append(System.getProperty("line.separator"));
             double f;
             f = DENOPTIMStatUtils.max(fitness);
-            sb.append(String.format("%-30s", "MAX:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MAX:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.min(fitness);
-            sb.append(String.format("%-30s", "MIN:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MIN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.mean(fitness);
-            sb.append(String.format("%-30s", "MEAN:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MEAN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.median(fitness);
-            sb.append(String.format("%-30s", "MEDIAN:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MEDIAN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.stddev(fitness, true);
-            sb.append(String.format("%-30s", "STDDEV:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "STDDEV:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.skewness(fitness, true);
-            sb.append(String.format("%-30s", "SKEW:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "SKEW:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
 
             int sz = FragmentSpace.getScaffoldLibrary().size();

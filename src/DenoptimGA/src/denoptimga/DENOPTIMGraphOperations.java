@@ -54,7 +54,7 @@ import denoptim.utils.RandomUtils;
 public class DENOPTIMGraphOperations
 {
 
-    // set tu true to debug
+    // set true to debug
     private static boolean debug = false;
 
 //------------------------------------------------------------------------------

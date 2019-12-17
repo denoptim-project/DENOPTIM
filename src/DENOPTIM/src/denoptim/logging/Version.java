@@ -69,7 +69,7 @@ public class Version
     
         return 
             "\n| " + NAME + 
-            "\n| DENovo OPTimization of Organic and Inorganic Molecules (" + VERSION + ")" +
+            "\n| DENovo OPTimization of In/organic Molecules (" + VERSION + ")" +
             "\n| By " + AUTHORS + 
             "\n| Contributors: " + CONTRIBUTORS +
             "\n| Contact: " + CONTACT + 

@@ -3,14 +3,15 @@
 #
 
 # Parameters for the genetic algorithm
-GA-fitnessEvalScript=data/fitness_provider_fromDB.sh
+FP-INTERPRETER=BASH
+FP-SOURCE=data/fitness_provider_fromDB.sh
 GA-numParallelTasks=5
-GA-parallelization=2
+GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25
 GA-numChildren=5
 GA-numGenerations=20
 GA-numConvGen=5
-GA-replacementStrategy=1
+GA-replacementStrategy=ELITIST
 GA-XOverSelectionMode=TS
 GA-crossoverProbability=0.20
 GA-mutationProbability=0.20

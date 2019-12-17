@@ -882,12 +882,14 @@ public class ParallelEvolutionaryAlgorithm
         {
             cleanup(tcons, futures, submitted);
             tcons.shutdown();
+            dex.printStackTrace();
             throw dex;
         }
         catch (Exception ex)
         {
             cleanup(tcons, futures, submitted);
             tcons.shutdown();
+            ex.printStackTrace();
             throw new DENOPTIMException(ex);
         }
 

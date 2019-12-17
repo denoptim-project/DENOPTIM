@@ -467,7 +467,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param m_vertex the vertex to remove.
      */
     public void removeVertex(DENOPTIMVertex m_vertex)
-    {
+    {   	
         if (!gVertices.contains(m_vertex))
         {
         	return;
