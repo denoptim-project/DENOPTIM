@@ -1025,9 +1025,9 @@ public class GraphUtils
 
     /**
      * Finalizes a candidate chemical entity by evaluating its
-     * <code>DENOPTIMGraph</code> and assigning prelominary molecular, 
+     * <code>DENOPTIMGraph</code> and assigning preliminary molecular, 
      * SMILES and INCHI representations. 
-     * The chemical entity is evaluated also gainst the
+     * The chemical entity is evaluated also against the
      * criteria defined by <code>FragmentSpaceParameters</code> and 
      * <code>RingClosureParameters</code>.
      * <b>WARNING</b> Although Cartesian coordinates are assigned to each atom

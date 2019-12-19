@@ -117,13 +117,27 @@ public class HomePanel extends GUICardPanel
 				{
 					return;
 				}
-				GUIEvolutionInspector i = new GUIEvolutionInspector(mainPanel);
-				mainPanel.add(i);
-				i.importEvolutionRunData(file);
+				GUIInspectGARun inspector = new GUIInspectGARun(mainPanel);
+				mainPanel.add(inspector);
+				inspector.importGARunData(file);
 			}
 		});
 		buttonsPanel.add(btnReadGAOutput);
 		
+        JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
+        btnReadFSEOutput.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                File file = DenoptimGUIFileOpener.pickFolder();
+                if (file == null)
+                {
+                        return;
+                }
+                GUIInspectFSERun inspector = new GUIInspectFSERun(mainPanel);
+                mainPanel.add(inspector);
+                inspector.importFSERunData(file);
+            }
+        });
+        buttonsPanel.add(btnReadFSEOutput);
 		
 		//Credits panel
 		JPanel creditsPanel = new JPanel();
@@ -162,10 +176,17 @@ public class HomePanel extends GUICardPanel
 
 		//TODO del: only for devel
 		/*
-		GUIEvolutionInspector eiPanel = 
-				new GUIEvolutionInspector(mainPanel);
+		GUIInspectGARun eiPanel = 
+				new GUIInspectGARun(mainPanel);
 			mainPanel.add(eiPanel);
 			eiPanel.importEvolutionRunData(new java.io.File("/Users/mfo051/___/RUN13112019121926"));
+		*/
+		
+		//TODO del: only for devel
+		/*
+		GUIInspectFSERun inspector = new GUIInspectFSERun(mainPanel);
+		mainPanel.add(inspector);
+		inspector.importFSERunData(new File("/tmp/denoptim_FSE/FSE19122019014853"));
 		*/
 	}
 }

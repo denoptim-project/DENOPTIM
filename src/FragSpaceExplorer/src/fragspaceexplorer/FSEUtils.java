@@ -55,7 +55,7 @@ public class FSEUtils
     {
         String dirName = FSEParameters.getDBRoot()
                           + DENOPTIMConstants.FSEP
-                          + FSEParameters.DIRNAMEROOT
+                          + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level;
         return dirName;
     }
@@ -70,14 +70,14 @@ public class FSEUtils
 							throws DENOPTIMException
     {
 	String msg ="";
-	if (fileName.contains(Pattern.quote(FSEParameters.FILENAMEROOT)) && 
+	if (fileName.contains(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT)) && 
             fileName.contains(Pattern.quote(".")))
 	{
 	     msg = "Failed attempt to extract a graphId from String '" 
 			 + fileName + "'";
 	    throw new DENOPTIMException(msg);
 	}
-	String[] p1 = fileName.split(Pattern.quote(FSEParameters.FILENAMEROOT));
+	String[] p1 = fileName.split(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT));
 	String[] p2 = p1[1].split(Pattern.quote("."));
 	int graphId = -1;
 	try
@@ -99,9 +99,9 @@ public class FSEUtils
    
     public static String getBaseNameOfStorageFile(int graphId)
     {
-	String baseName = FSEParameters.FILENAMEROOT
+	String baseName = DENOPTIMConstants.SERGFILENAMEROOT
                           + graphId + "."
-                          + FSEParameters.FILENAMEEXT;
+                          + DENOPTIMConstants.SERGFILENAMEEXT;
 	return baseName;
     }
 
@@ -115,7 +115,7 @@ public class FSEUtils
     {
         String fileName = FSEParameters.getDBRoot()
                           + DENOPTIMConstants.FSEP
-                          + FSEParameters.DIRNAMEROOT
+                          + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level
                           + DENOPTIMConstants.FSEP
 			  + getBaseNameOfStorageFile(graphId);
@@ -132,10 +132,10 @@ public class FSEUtils
     {
         String fileName = FSEParameters.getDBRoot()
                           + DENOPTIMConstants.FSEP
-                          + FSEParameters.DIRNAMEROOT
+                          + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level
                           + DENOPTIMConstants.FSEP
-                          + FSEParameters.DIRNAMEROOT
+                          + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level + ".txt";
         return fileName;
     }
@@ -159,7 +159,7 @@ public class FSEUtils
 	    //NOTE: the arraylist is supposed to hold the indeces used to 
 	    //      create the next combination of fragments, but this method
 	    //      is used only for graphs built with the base scaffolds or 
-	    //      the nacked root graphs. Therefore there is no set of indeces
+	    //      the naked root graphs. Therefore there is no set of indeces
 	    //      to store and we fed the method with an empty array.
 	    // NOTE2: the root Id is set to zero for the same reason.
             storeGraphOfLevel(g,level,0,new ArrayList());
@@ -244,7 +244,7 @@ public class FSEUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Convertes a binary file into the corresponding checkpoint object
+     * Converts a binary file into the corresponding checkpoint object
      * @param file the pathname of the file to convert
      */
 

@@ -1548,16 +1548,18 @@ public class DenoptimIO
     		mol.setName(molName);
     		
     		boolean fitnessOrError = false;
-            if (iac.getProperty("MOL_ERROR") != null)
+            if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
             {
             	fitnessOrError = true;
-            	mol.setError(iac.getProperty("MOL_ERROR").toString());
+            	mol.setError(iac.getProperty(
+            			DENOPTIMConstants.MOLERRORTAG).toString());
             }
 
-            if (iac.getProperty("FITNESS") != null)
+            if (iac.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
             {
             	fitnessOrError = true;
-                String fitprp = iac.getProperty("FITNESS").toString();
+                String fitprp = iac.getProperty(
+                		DENOPTIMConstants.FITNESSTAG).toString();
                 double fitVal = Double.parseDouble(fitprp);
                 if (Double.isNaN(fitVal))
                 {
@@ -1575,15 +1577,36 @@ public class DenoptimIO
                 throw new DENOPTIMException(msg);
             }
             
-            mol.setMoleculeFile(filename);
-            mol.setMoleculeSmiles(iac.getProperty("SMILES").toString());
-            mol.setMoleculeUID(iac.getProperty("UID").toString());
-            mol.setMoleculeGraph(GraphConversionTool.getGraphFromString(
-            		iac.getProperty("GraphENC").toString(), useFragSpace));
-            if (iac.getProperty("GraphMsg") != null)
+            if (iac.getProperty(DENOPTIMConstants.GRAPHLEVELTAG) != null)
             {
-                mol.setComments(iac.getProperty("GraphMsg").toString());
+            	mol.setLevel(Integer.parseInt(iac.getProperty(
+            			DENOPTIMConstants.GRAPHLEVELTAG).toString()));
             }
+            
+            if (iac.getProperty(DENOPTIMConstants.SMILESTAG) != null)
+            {
+            	mol.setMoleculeSmiles(iac.getProperty(
+            			DENOPTIMConstants.SMILESTAG).toString());
+            }
+            
+            try
+            {
+	            mol.setMoleculeUID(iac.getProperty(
+	            		DENOPTIMConstants.UNIQUEIDTAG).toString());
+	            mol.setMoleculeGraph(GraphConversionTool.getGraphFromString(
+	            		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
+	            		useFragSpace));
+            } catch (Exception e) {
+            	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
+            			+ " Could not read UID or GraphENC", e);
+            }
+            if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
+            {
+                mol.setComments(iac.getProperty(
+                		DENOPTIMConstants.GMSGTAG).toString());
+            }
+            
+            mol.setMoleculeFile(filename);
             
             mols.add(mol);
     	}
@@ -1608,14 +1631,16 @@ public class DenoptimIO
         if (GenUtils.getFileExtension(fileName).
                                     compareToIgnoreCase(".smi") == 0)
         {
-            throw new DENOPTIMException("Fragment files in SMILES format not supported.");
+            throw new DENOPTIMException("Fragment files in SMILES format not"
+            		+ " supported.");
         }
         else if (GenUtils.getFileExtension(fileName).
                                     compareToIgnoreCase(".sdf") == 0)
         {
             mols = DenoptimIO.readSDFFile(fileName);
         }
-        // process everything else as a text file with links to individual molecules
+        // process everything else as a text file with links to individual 
+        // molecules
         else
         {
             mols = DenoptimIO.readLinksToMols(fileName);

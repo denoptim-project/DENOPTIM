@@ -107,15 +107,52 @@ public final class DENOPTIMConstants
                     new HashSet<>(Arrays.asList(new String[] {".txt", 
 			".sdf", ".mol"}
                     ));
-
+    
+    /**
+     * Prefix for graph indexing files
+     */
+    public static final String FSEIDXNAMEROOT = "FSE-Level_";
+    
+    /**
+     * Prefix filenames  of serialized graphs
+     */
+    public static final String SERGFILENAMEROOT = "dg_";
+    
+    /**
+     * Extension filenames of serialized graphs
+     */
+    public static final String SERGFILENAMEEXT = "ser";
+    
+    /**
+     * Prefix of filenames for input/output files related to fitness
+     */
+    public static final String FITFILENAMEPREFIX = "M";
+    
+    /**
+     * Ending and extension of input file of external fitness provider
+     */
+    public static final String FITFILENAMEEXTIN = "_inp.sdf";
+    
+    /**
+     * Ending and extension of output file of external fitness provider
+     */
+    public static final String FITFILENAMEEXTOUT = "_out.sdf";
+    
+    /**
+     * Label used to point at text based graph format
+     */
+    public static final String GRAPHFORMATSTRING = "STRING";
+    
+    /**
+     * Label used to point at byte based graph format
+     */
+    public static final String GRAPHFORMATBYTE = "BYTE";
     
     
     public static final double INVPI = 1.0/Math.sqrt(Math.PI * 2);
     
     
     public static final int MOLDIGITS = 8;
-    
-    //TODO: check all code for hard-coded SDF tags... there must be some #@%!
 
     /**
      * SDF tag containing graph ID
@@ -141,6 +178,36 @@ public final class DENOPTIMConstants
      * SDF tag defining attachment points (APs) with AP class and AP vector
      */
     public static final String APCVTAG = "CLASS";
+    
+    /**
+     * SDF tag containing errors during execution of molecule specific tasks
+     */
+    public static final String MOLERRORTAG = "MOL_ERROR";
+    
+    /**
+     * SDF tag containing the fitness of a candidate
+     */
+    public static final String FITNESSTAG = "FITNESS";
+    
+    /**
+     * SDF tag containing the SMILES of a candidate
+     */
+    public static final String SMILESTAG = "SMILES";
+    
+    /**
+     * SDF tag containing the unique identifier of a candidate
+     */
+    public static final String UNIQUEIDTAG = "UID";
+    
+    /**
+     * SDF tag defining the ID of a parent graph (used in FSE)
+     */
+    public static final String PARENTGRAPHTAG = "ParentGraph";  
+    
+    /**
+     * SDF tag defining the graph generating level in an FSE run 
+     */
+    public static final String GRAPHLEVELTAG = "GraphLevel";
 
     /**
      * Symbol of dummy atom

@@ -241,7 +241,7 @@ public class MainToolBar extends JMenuBar {
 							file));
 				} catch (Exception e1) {
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS", "GRAPHS", "GA-RUN"};
+							"FRAGMENTS", "GRAPHS", "GA-RUN", "FSE-RUN"};
 					int res = JOptionPane.showOptionDialog(null,
 						"<html>Failed to detect file type automatically.<br>"
 						+ "Temptative reason: " + e1.getMessage() + "<br>"
@@ -334,10 +334,16 @@ public class MainToolBar extends JMenuBar {
 				break;
 				
 			case ("GA-RUN"):
-				GUIEvolutionInspector eiPanel = 
-					new GUIEvolutionInspector(mainPanel);
+				GUIInspectGARun eiPanel = 
+					new GUIInspectGARun(mainPanel);
 				mainPanel.add(eiPanel);
-				eiPanel.importEvolutionRunData(file);
+				eiPanel.importGARunData(file);
+				break;
+				
+			case ("FSE-RUN"):
+				GUIInspectFSERun fsei = new GUIInspectFSERun(mainPanel);
+				mainPanel.add(fsei);
+				fsei.importFSERunData(file);
 				break;
 			
 			default:
@@ -374,7 +380,7 @@ public class MainToolBar extends JMenuBar {
 	public void addActiveTab(GUICardPanel panel)
 	{
 		JMenuItem refToPanel = new JMenuItem(panel.getName());
-		refToPanel.addActionListener((java.awt.event.ActionEvent evt) -> {
+		refToPanel.addActionListener((ActionEvent evt) -> {
             ((CardLayout) mainPanel.getLayout()).show(
             		mainPanel,panel.getName());
         });

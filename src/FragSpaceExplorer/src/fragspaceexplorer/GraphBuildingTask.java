@@ -450,7 +450,9 @@ public class GraphBuildingTask implements Callable
                         }
 
                         // Prepare vector of results
-                        Object[] altRes = new Object[3];
+                        // NB: in FSE we ass also the ID of the root graph in 
+                        // this array
+                        Object[] altRes = new Object[5];
 
                         try 
                         {
@@ -458,6 +460,11 @@ public class GraphBuildingTask implements Callable
                             GraphConversionTool gct = new GraphConversionTool();
                             IAtomContainer mol = gct.convertGraphToMolecule(g,
                                                                           true);
+                            // Level that generated this graph
+                            altRes[4] = level;
+                            
+                            // Parent graph
+                            altRes[3] = rootId;
 
                             DENOPTIMMoleculeUtils.removeRCA(mol,g);
                             altRes[2] = mol;
@@ -479,7 +486,7 @@ public class GraphBuildingTask implements Callable
                                 pr.setFirst("UNDEFINED_INCHI");
                             }
                             altRes[0] = pr.getFirst(); 
-        
+                      
                             // Store graph
                             FSEUtils.storeGraphOfLevel(g,level,rootId,nextIds);
                             graphId = gId;
@@ -507,14 +514,20 @@ public class GraphBuildingTask implements Callable
                     // Optionally perform external task 
                     if (FSEParameters.submitExternalTask() && !needsCaps)
                     {
-                        executeExternalBASHScript(res, molGraph.getGraphId());
+                    	Object[] fseRes = new Object[5];
+                    	fseRes[0] = res [0];
+                    	fseRes[1] = res [1];
+                    	fseRes[2] = res [2];
+                    	fseRes[3] = rootId;
+                    	fseRes[4] = level;
+                        executeExternalBASHScript(fseRes, molGraph.getGraphId());
                     }
                 }
             }
         }
         catch (Throwable t)
         {
-            // This is a trick to trasnmit the exception to the parent thread
+            // This is a trick to transmit the exception to the parent thread
             // and store it as a property of the present task
             hasException = true;
             thrownExc = t;
@@ -541,16 +554,23 @@ public class GraphBuildingTask implements Callable
         String molinchi = res[0].toString().trim();
         String molsmiles = res[1].toString().trim();
         IAtomContainer molInit = (IAtomContainer) res[2];
+        String parentGraphId = res[3].toString().trim();
+        String level = res[4].toString().trim();
         molInit.setProperty("InChi", molinchi);
         molInit.setProperty("SMILES", molsmiles);
+        molInit.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
+        molInit.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
+        
 
-        String molName = "M" + GenUtils.getPaddedString(
-                                                    DENOPTIMConstants.MOLDIGITS,
+        String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
+        		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
         String workDir = FSEParameters.getWorkDirectory();
         String fsep = System.getProperty("file.separator");
-        String molInitFile = workDir + fsep + molName + "_inp.sdf";
-        String molFinalFile = workDir + fsep + molName + "_out.sdf";
+        String molInitFile = workDir + fsep + molName 
+        		+ DENOPTIMConstants.FITFILENAMEEXTIN;
+        String molFinalFile = workDir + fsep + molName 
+        		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
 
         molInit.setProperty(CDKConstants.TITLE, molName);
 

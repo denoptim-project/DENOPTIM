@@ -335,13 +335,13 @@ public class CombinatorialExplorerByLayer
                   + "of the previos run all graphs with ID higher than "
                   + chk.getLatestSafelyCompletedGraphId()
                   + ". You can find them in the "
-                  + "index file ('" + FSEParameters.DIRNAMEROOT + level
+                  + "index file ('" + DENOPTIMConstants.FSEIDXNAMEROOT + level
                   + ".txt'). ";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 
             Collection<File> lst = FileUtils.listFiles(
                                   new File(FSEUtils.getNameOfStorageDir(level)),
-                                       new String[] {FSEParameters.FILENAMEEXT},
+                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
 	    // Keep only safely completed serialized graphs
 	    serFromChkRestart = lst.size();
@@ -349,8 +349,8 @@ public class CombinatorialExplorerByLayer
 	    {
 		String fName = f.getName();
 		int serGrphID = Integer.parseInt(fName.substring(
-				            FSEParameters.FILENAMEROOT.length(),
-                          fName.length()-FSEParameters.FILENAMEEXT.length()-1));
+				            DENOPTIMConstants.SERGFILENAMEROOT.length(),
+                          fName.length()-DENOPTIMConstants.SERGFILENAMEEXT.length()-1));
 		if (serGrphID > chk.getLatestSafelyCompletedGraphId())
 		{
 		    msg = "Removing non-safely completed graph '" + fName + "'";
@@ -382,7 +382,7 @@ public class CombinatorialExplorerByLayer
                     {
                         Collection<File> lst = FileUtils.listFiles(
                                   new File(FSEUtils.getNameOfStorageDir(level)),
-                                       new String[] {FSEParameters.FILENAMEEXT},
+                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
                         int outCount = lst.size() - serFromChkRestart;
                         int totSubmSubTasks = countSubTasks();
@@ -467,7 +467,7 @@ public class CombinatorialExplorerByLayer
                 {
                     Collection<File> lstRootsForNextLev = FileUtils.listFiles(
                                 new File(FSEUtils.getNameOfStorageDir(level-1)),
-                                       new String[] {FSEParameters.FILENAMEEXT},
+                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
                     if (lstRootsForNextLev.size() == 0)
                     {
@@ -580,7 +580,7 @@ public class CombinatorialExplorerByLayer
             throw new DENOPTIMException(msg);
         }
         Collection<File> files = FileUtils.listFiles(new File(prevLevDirName),
-                               new String[] {FSEParameters.FILENAMEEXT}, false);
+                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT}, false);
         ArrayList<File> lstFiles = new ArrayList(files);
         Collections.sort(lstFiles);
         for (File file : lstFiles) 

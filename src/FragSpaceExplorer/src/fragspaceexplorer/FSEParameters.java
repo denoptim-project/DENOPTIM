@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -64,10 +65,11 @@ public class FSEParameters
      * File with user defined list of root graphs
      */
     private static String rootGraphsFile = null;
+    
     private static boolean useGivenRoots = false;
-    private static final String STRINGFORMATLABEL = "STRING";
-    private static final String BYTEFORMATLABEL = "BYTE";
-    private static String rootGraphsFormat = STRINGFORMATLABEL; //Default
+    
+    private static String rootGraphsFormat = 
+    		DENOPTIMConstants.GRAPHFORMATSTRING; //Default
 
     /**
      * User defined list of root graphs
@@ -88,10 +90,7 @@ public class FSEParameters
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
      * and reported as <code>String</code>s.
      */
-    private static String dbRootDir = ".";
-    protected static final String DIRNAMEROOT = "FSE-Level_";
-    protected static final String FILENAMEROOT = "dg_";
-    protected static final String FILENAMEEXT = "ser";
+    private static String dbRootDir = ".";  
 
     /**
      * Number of processors
@@ -528,30 +527,30 @@ public class FSEParameters
 	}
 
 	if (rootGraphsFormat != null 
-	    && !rootGraphsFormat.equals(STRINGFORMATLABEL)
-	    && !rootGraphsFormat.equals(BYTEFORMATLABEL))
+	    && !rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING)
+	    && !rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
         {
             msg = " The format for providing root graph must be either '" 
-		  + STRINGFORMATLABEL + "' (default) for human readable "
-		  + "strings, or '" + BYTEFORMATLABEL 
+		  + DENOPTIMConstants.GRAPHFORMATSTRING + "' (default) for human readable "
+		  + "strings, or '" + DENOPTIMConstants.GRAPHFORMATBYTE 
 		  + "' for serialized objects. "
 		  + "Unable to understand '" + rootGraphsFormat + "'.";
             throw new DENOPTIMException(msg);
         }
-	else if (rootGraphsFormat.equals(STRINGFORMATLABEL))
+	else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING))
 	{
-	    msg = "When root graphs are given as '"+ STRINGFORMATLABEL 
+	    msg = "When root graphs are given as '"+ DENOPTIMConstants.GRAPHFORMATSTRING 
 		  + "' existing symmetry relations between vertices belonging "
 		  + "to the root graphs are NOT perceived. Symmetry may only "
 		  + "be enforced starting from the first new layer of "
 		  + "vertices.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 	}
-	else if (rootGraphsFormat.equals(BYTEFORMATLABEL))
+	else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
 	{
 	    msg = "For now, only one serialized DENOPTIMGraph can by "
 		  + "given as user-defined root graph using format '" 
-		  + BYTEFORMATLABEL + "'.";
+		  + DENOPTIMConstants.GRAPHFORMATBYTE + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 	}
 
@@ -652,12 +651,12 @@ public class FSEParameters
 		{
             try
             {
-				if (rootGraphsFormat.equals(STRINGFORMATLABEL))
+				if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING))
 				{
                     rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
 								rootGraphsFile,true);
 				}
-				else if (rootGraphsFormat.equals(BYTEFORMATLABEL))
+				else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
 				{
 				    rootGraphs = new ArrayList<DENOPTIMGraph>();
 				    //TODO get arraylist of graphs or accept multiple files

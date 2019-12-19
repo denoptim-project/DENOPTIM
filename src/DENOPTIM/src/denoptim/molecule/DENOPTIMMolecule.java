@@ -23,8 +23,8 @@ import java.io.File;
 
 
 /**
- *
- * @author Vishwesh Venkatraman
+ * A molecular object with additional data and tags. Additional data includes
+ * the DENOPTIM graph representation, fitness/error, and possibly other stuff.
  */
 public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializable
 {
@@ -82,6 +82,11 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
      * Name (not guaranteed to be unique)
      */
     private String molName;
+    
+    /**
+     * Level that generated this graph in fragment space exploration
+     */
+    private int level;
 
     
 //------------------------------------------------------------------------------
@@ -266,6 +271,31 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     public int getGeneration()
     {
 	    return generationId;
+	}
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Sets level that generated this graph in a fragment space 
+     * exploration experiment.
+     * @param lev the level index
+     */
+    public void setLevel(int lev)
+    {
+    	level = lev;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the level that generated this graph in a fragment space 
+     * exploration experiment.
+     * @return the level that generated this graph in a fragment space 
+     * exploration experiment.
+     */
+	public int getLevel() 
+	{
+		return level;
 	}
 
 //------------------------------------------------------------------------------

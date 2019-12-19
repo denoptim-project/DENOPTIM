@@ -2,6 +2,7 @@ package gui;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;
 
 import org.apache.commons.io.FilenameUtils;
+
+import denoptim.constants.DENOPTIMConstants;
 
 /**
  * File opener for DENOPTIM GUI
@@ -144,39 +147,61 @@ public class DenoptimGUIFileOpener
 		// Folders are presumed to contain output kind of data
 		if (inFile.isDirectory())
 		{
-			//TODO: distinguish between kind of experiments (GA, FSE)
 			fType = "GA-RUN";
+			
+			// This is to distinguish GS from FSE runs
+			for(File folder : inFile.listFiles(new FileFilter() {
+				
+				@Override
+				public boolean accept(File pathname) {
+					if (pathname.isDirectory())
+					{
+						return true;
+					}
+					return false;
+				}
+			}))
+			{
+				if (folder.getName().startsWith(
+						DENOPTIMConstants.FSEIDXNAMEROOT))
+				{
+					fType = "FSE-RUN";
+					break;
+				}
+			}
 			return fType;
 		}
 		
 		// Files are distinguished first by extension
 		switch (ext)
 		{
-		/*
-		case "txt":
-			//Human readable graph as text files are too a-specific
-			//TODO add something specific, like "GraphENC" at beginning of line.
-			fType = "GRAPHS";
-			break;
-		*/		
+			/*
+			case "txt":
+				//Human readable graph as text files are too a-specific
+				//TODO add something specific, like "GraphENC" at beginning 
+				//of line.
+				fType = "GRAPHS";
+				break;
+			*/		
+				
+			case "sdf":
+				//Either graphs or fragment
+				fType = detectKindOfSDFFile(inFile.getAbsolutePath());
+				break;
 			
-		case "sdf":
-			//Either graphs or fragment
-			fType = detectKindOfSDFFile(inFile.getAbsolutePath());
-			break;
-		
-		case "ser":
-			//Serialized graph
-			fType = "SERGRAPH";
-			break;
-		
-		case "par":
-			//Parameters for any DENOPTIM module
-			fType = detectKindOfParameterFile(inFile.getAbsolutePath());
-		    break;
-		    
-		default:
-			throw new Exception("Unrecognized file extension '" + ext + "'.");
+			case "ser":
+				//Serialized graph
+				fType = "SERGRAPH";
+				break;
+			
+			case "par":
+				//Parameters for any DENOPTIM module
+				fType = detectKindOfParameterFile(inFile.getAbsolutePath());
+			    break;
+			    
+			default:
+				throw new Exception("Unrecognized file extension '" + ext 
+						+ "'.");
 		}
 		
 		return fType;

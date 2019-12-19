@@ -65,7 +65,7 @@ import denoptim.utils.GenUtils;
  * @author Marco Foscato
  */
 
-public class GUIEvolutionInspector extends GUICardPanel
+public class GUIInspectGARun extends GUICardPanel
 {
 	/**
 	 * Version UID
@@ -78,8 +78,6 @@ public class GUIEvolutionInspector extends GUICardPanel
 	public static AtomicInteger evolInspectorTabUID = new AtomicInteger(1);
 	
 	private JPanel ctrlPanel;
-	private JMenu expMenu;
-	private JMenu plotMenu;
 	private JSplitPane centralPanel;
 	private JPanel rightPanel;
 	private MoleculeViewPanel molViewer;
@@ -89,9 +87,9 @@ public class GUIEvolutionInspector extends GUICardPanel
 	private ArrayList<DENOPTIMMolecule> allIndividuals;
 	private int molsWithFitness = 0;
 	private Map<Integer,DENOPTIMMolecule> candsWithFitnessMap;
-	private Map<Integer,DENOPTIMMolecule> selectedMap;
 	
-	// WARNING: itemId in the data is "j" and is just a unique 
+	// WARNING: itemId in the map is "j" and is just a 
+	// locally generated unique 
 	// identifier that has NO RELATION to generation/molId/fitness
 	// The Map 'candsWithFitnessMap' serve specifically to convert
 	// the itemId 'j' into a DENOPTIMMolecule
@@ -111,9 +109,9 @@ public class GUIEvolutionInspector extends GUICardPanel
 	/**
 	 * Constructor
 	 */
-	public GUIEvolutionInspector(GUIMainPanel mainPanel)
+	public GUIInspectGARun(GUIMainPanel mainPanel)
 	{
-		super(mainPanel, "Evolution Inspector #" 
+		super(mainPanel, "GARun Inspector #" 
 					+ evolInspectorTabUID.getAndIncrement());
 		super.setLayout(new BorderLayout());
 		initialize();
@@ -201,7 +199,7 @@ public class GUIEvolutionInspector extends GUICardPanel
 		ctrlPanel.add(ctrlMax);
 		ctrlPanel.add(ctrlMean);
 		ctrlPanel.add(ctrlMedian);
-		JButton rstView = new JButton("Reser Chart View");
+		JButton rstView = new JButton("Reset Chart View");
 		rstView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				chart.getXYPlot().getDomainAxis().setAutoRange(true);
@@ -228,7 +226,7 @@ public class GUIEvolutionInspector extends GUICardPanel
 		JPanel commandsPane = new JPanel();
 		this.add(commandsPane, BorderLayout.SOUTH);
 		JButton btnCanc = new JButton("Close Tab");
-		btnCanc.setToolTipText("Closes this graph handler.");
+		btnCanc.setToolTipText("Closes this GARun Inspector.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
 		commandsPane.add(btnCanc);
 		
@@ -250,7 +248,7 @@ public class GUIEvolutionInspector extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 
-	public void importEvolutionRunData(File file) {
+	public void importGARunData(File file) {
 
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		srcFolder = file;
@@ -527,7 +525,6 @@ public class GUIEvolutionInspector extends GUICardPanel
 			@Override
 			public void chartMouseClicked(ChartMouseEvent e) 
 			{
-				System.out.println("entity: "+e.getEntity());
 				if (e.getEntity() instanceof XYItemEntity)
 				{
 					int serId = ((XYItemEntity)e.getEntity()).getSeriesIndex();
@@ -561,7 +558,6 @@ public class GUIEvolutionInspector extends GUICardPanel
 	{
 		// Update series of selected (chart is updated automatically)
         double[][] selectedCandsData = new double[2][1]; //NB: for now allow only one
-        selectedMap = new HashMap<Integer,DENOPTIMMolecule>();
         int j = -1;
         for (int i=0; i<1; i++) //NB: for now allow only one
         {	
