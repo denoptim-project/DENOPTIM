@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -20,11 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import org.jfree.chart.ChartFactory;
@@ -71,6 +75,8 @@ public class GUIInspectFSERun extends GUICardPanel
 	public static AtomicInteger fseInspectorTabUID = new AtomicInteger(1);
 	
 	private JPanel ctrlPanel;
+	private JPanel ctrlPanelLeft;
+	private JPanel ctrlPanelRight;
 	private JSplitPane centralPanel;
 	private JPanel rightPanel;
 	private MoleculeViewPanel molViewer;
@@ -82,6 +88,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	private int molsWithFitness = 0;
 	private int minLevel = 1;
 	private int maxLevel = -1;
+	private JLabel lblTotItems;
 	
 	private Map<Integer,DENOPTIMMolecule> mapCandsInByLevel;
 	private ArrayList<DENOPTIMMolecule> sorted;
@@ -133,14 +140,14 @@ public class GUIInspectFSERun extends GUICardPanel
 		//    |-> plot (RIGHT)
 		
 		// Creating local tool bar
-		ctrlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		ctrlPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton rstView = new JButton("Reset Chart View");
 		rstView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				resetView();
 			}
 		});
-		ctrlPanel.add(rstView);
+		ctrlPanelLeft.add(rstView);
 		
 		cmbPlotType = new JComboBox<String>(new String[] {
 				"Plot Sorted List of Candidates",
@@ -159,7 +166,24 @@ public class GUIInspectFSERun extends GUICardPanel
 				}
 			}
 		});
-		ctrlPanel.add(cmbPlotType);
+		ctrlPanelLeft.add(cmbPlotType);
+		
+		ctrlPanelRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		lblTotItems = new JLabel("No item loaded");
+		lblTotItems.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTotItems.setPreferredSize(new Dimension(300,28));
+		ctrlPanelRight.add(lblTotItems);
+		ctrlPanel = new JPanel();
+        GroupLayout lyoCtrlPanel = new GroupLayout(ctrlPanel);
+        ctrlPanel.setLayout(lyoCtrlPanel);
+        lyoCtrlPanel.setAutoCreateGaps(true);
+        lyoCtrlPanel.setAutoCreateContainerGaps(true);
+        lyoCtrlPanel.setHorizontalGroup(lyoCtrlPanel.createSequentialGroup()
+                    .addComponent(ctrlPanelLeft)
+                    .addComponent(ctrlPanelRight));
+        lyoCtrlPanel.setVerticalGroup(lyoCtrlPanel.createParallelGroup()
+			        .addComponent(ctrlPanelLeft)
+			        .addComponent(ctrlPanelRight));
 		this.add(ctrlPanel,BorderLayout.NORTH);
 		
 		// Setting structure of central panel	
@@ -291,6 +315,9 @@ public class GUIInspectFSERun extends GUICardPanel
 		}
 		
 		System.out.println("Imported "+allItems.size()+" individuals.");
+		
+		lblTotItems.setText("Found "+allItems.size()+" candidates ("
+				+molsWithFitness+" with fitness)");
 		
 		// Process data and organize them into series for the plot
         double[][] candsWithFitnessDataPerLevel = new double[2][molsWithFitness];

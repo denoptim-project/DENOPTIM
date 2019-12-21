@@ -2,9 +2,12 @@
 # Parameters for de novo design of ligand set producing long CO bond
 #
 
-# Parameters for the genetic algorithm
+# Fitness provider
 FP-INTERPRETER=BASH
 FP-SOURCE=data/fitness_provider_fromDB.sh
+
+# Parameters for the genetic algorithm
+#GA-InitPoplnFile=data/initPopulation.sdf
 GA-numParallelTasks=5
 GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25
@@ -13,8 +16,8 @@ GA-numGenerations=20
 GA-numConvGen=5
 GA-replacementStrategy=ELITIST
 GA-XOverSelectionMode=TS
-GA-crossoverProbability=0.20
-GA-mutationProbability=0.20
+GA-crossoverProbability=0.50
+GA-mutationProbability=0.50
 GA-symmetryProbability=0.0
 GA-growthProbScheme=sigma
 GA-GrowthSigmaSteepness=3.0
