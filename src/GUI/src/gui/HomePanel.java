@@ -179,7 +179,7 @@ public class HomePanel extends GUICardPanel
 		GUIInspectGARun eiPanel = 
 				new GUIInspectGARun(mainPanel);
 			mainPanel.add(eiPanel);
-			eiPanel.importEvolutionRunData(new java.io.File("/Users/mfo051/___/RUN13112019121926"));
+			eiPanel.importGARunData(new java.io.File("/tmp/denoptim_PtCO/RUN21122019104034"));
 		*/
 		
 		//TODO del: only for devel
