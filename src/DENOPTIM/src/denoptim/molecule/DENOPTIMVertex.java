@@ -182,7 +182,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * i.e. those with similar environments and class types.
      * TODO: one day change the name of this method!
      * @param m_dapidx
-     * @return the list of attahcment point IDs, which include 
+     * @return the list of attachment point IDs, which include 
      * <code>m_dapidx</code> or <code>null</code> if no partners present
      */
 
@@ -322,6 +322,28 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         }
     }
     
+//------------------------------------------------------------------------------
     
+    /**
+     * Compares this and another vertex ignoring vertex IDs.
+     * @param other
+     * @return
+     */
+    public boolean sameAs(DENOPTIMVertex other)
+    {
+    	if (this.getFragmentType() != other.getFragmentType())
+    	{
+    		return false;
+    	}
+    	if (this.getMolId() != other.getMolId())
+    	{
+    		return false;
+    	}
+    	if (this.getFreeAPCount() != other.getFreeAPCount())
+    	{
+    		return false;
+    	}
+    	return true;
+    }
 //------------------------------------------------------------------------------    
 }

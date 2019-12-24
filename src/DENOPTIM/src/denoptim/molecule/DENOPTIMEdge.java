@@ -184,6 +184,39 @@ public class DENOPTIMEdge implements Serializable
     {
         return bondType;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another edge ignoring edge and vertex IDs
+     * @param other
+     * @return <code>true</code> if the two edges represent the same connection
+     * even if the vertex IDs are different.
+     */
+    public boolean sameAs(DENOPTIMEdge other)
+    {
+    	if (this.getSourceDAP() != other.getSourceDAP())
+    	{
+    		return false;
+    	}
+    	if (this.getTargetDAP() != other.getTargetDAP())
+    	{
+    		return false;
+    	}
+    	if (this.getSourceReaction() != other.getSourceReaction())
+    	{
+    		return false;
+    	}
+    	if (this.getTargetReaction() != other.getTargetReaction())
+    	{
+    		return false;
+    	}
+    	if (this.getBondType() != other.getBondType())
+    	{
+    		return false;
+    	}
+    	return true;
+    }
 
 //------------------------------------------------------------------------------
 

@@ -20,20 +20,14 @@ package denoptim.molecule;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.vecmath.Point3d;
-
 import org.junit.jupiter.api.Test;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.silent.Bond;
 
-import denoptim.constants.DENOPTIMConstants;
 /**
  * Unit test for DENOPTIMGraph
  * 
@@ -174,6 +168,755 @@ public class DENOPTIMGraphTest
     	assertEquals(numSc,numSb);
     	assertEquals(numRc,numRb-1);
 
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_Equal() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 0, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 0, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(1, 2, 1, 0, 1));
+    	
+    	// Other graph, but is the same graph
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0B = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0B.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0B.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0B.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	DENOPTIMVertex v0B = new DENOPTIMVertex(90, 0, aps0, 0);
+    	graphB.addVertex(v0B);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1B = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1B.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1B.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1B = new DENOPTIMVertex(91, 0, aps1B, 1);
+    	graphB.addVertex(v1B);
+    	graphB.addEdge(new DENOPTIMEdge(90, 91, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2B = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2B.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2B.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2B = new DENOPTIMVertex(92, 0, aps2B, 1);
+    	graphB.addVertex(v2B);
+    	graphB.addEdge(new DENOPTIMEdge(91, 92, 1, 0, 1));
+    	
+    	/*
+    	System.out.println("Graphs");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	*/
+    	
+    	assertTrue (graphA.sameAs(graphB));	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_DiffVertex() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 0, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 0, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(1, 2, 1, 0, 1));
+    	
+    	// Other graph
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0B = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0B.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0B.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0B.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	DENOPTIMVertex v0B = new DENOPTIMVertex(90, 0, aps0, 0);
+    	graphB.addVertex(v0B);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1B = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1B.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1B.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1B = new DENOPTIMVertex(91, 3, aps1B, 1); //diff molId
+    	graphB.addVertex(v1B);
+    	graphB.addEdge(new DENOPTIMEdge(90, 91, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2B = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2B.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2B.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2B = new DENOPTIMVertex(92, 0, aps2B, 1);
+    	graphB.addVertex(v2B);
+    	graphB.addEdge(new DENOPTIMEdge(91, 92, 1, 0, 1));
+    	
+    	/*
+    	System.out.println("Graphs");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	*/
+    	
+    	assertFalse(graphA.sameAs(graphB));	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_SameSymmSet() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 0, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 0, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(0, 2, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3 = new DENOPTIMVertex(3, 0, aps3, 1);
+    	graphA.addVertex(v3);
+    	graphA.addEdge(new DENOPTIMEdge(0, 3, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4 = new DENOPTIMVertex(4, 0, aps4, 1);
+    	graphA.addVertex(v4);
+    	graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0, 1));
+    	
+    	SymmetricSet ssA = new SymmetricSet();
+    	ssA.add(1);
+    	ssA.add(2);
+    	graphA.addSymmetricSetOfVertices(ssA);
+    	SymmetricSet ssA2 = new SymmetricSet();
+    	ssA2.add(3);
+    	ssA2.add(4);
+    	graphA.addSymmetricSetOfVertices(ssA2);
+    	
+    	// Other
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0b = new DENOPTIMVertex(90, 0, aps0b, 0);
+    	graphB.addVertex(v0b);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1b = new DENOPTIMVertex(91, 0, aps1b, 1);
+    	graphB.addVertex(v1b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 91, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2b = new DENOPTIMVertex(92, 0, aps2b, 1);
+    	graphB.addVertex(v2b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 92, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3b = new DENOPTIMVertex(93, 0, aps3b, 1);
+    	graphB.addVertex(v3b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 93, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4b = new DENOPTIMVertex(94, 0, aps4b, 1);
+    	graphB.addVertex(v4b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 94, 3, 0, 1));
+    	
+    	SymmetricSet ssB2 = new SymmetricSet();
+    	ssB2.add(93);
+    	ssB2.add(94);
+    	graphB.addSymmetricSetOfVertices(ssB2);
+    	SymmetricSet ssB = new SymmetricSet();
+    	ssB.add(91);
+    	ssB.add(92);
+    	graphB.addSymmetricSetOfVertices(ssB);
+    	
+    	/*
+    	System.out.println("Graphs Same SS");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	*/
+    	
+    	assertTrue(graphA.sameAs(graphB));	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_DiffSymmSet() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 0, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 0, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(0, 2, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3 = new DENOPTIMVertex(3, 0, aps3, 1);
+    	graphA.addVertex(v3);
+    	graphA.addEdge(new DENOPTIMEdge(0, 3, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4 = new DENOPTIMVertex(4, 0, aps4, 1);
+    	graphA.addVertex(v4);
+    	graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0, 1));
+    	
+    	SymmetricSet ssA = new SymmetricSet();
+    	ssA.add(1);                            //difference
+    	ssA.add(2);                            //difference
+    	graphA.addSymmetricSetOfVertices(ssA);
+    	SymmetricSet ssA2 = new SymmetricSet();
+    	ssA2.add(3);                           //difference
+    	ssA2.add(4);                           //difference
+    	graphA.addSymmetricSetOfVertices(ssA2);
+    	
+    	// Other
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0b = new DENOPTIMVertex(0, 0, aps0b, 0);
+    	graphB.addVertex(v0b);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1b = new DENOPTIMVertex(1, 0, aps1b, 1);
+    	graphB.addVertex(v1b);
+    	graphB.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2b = new DENOPTIMVertex(2, 0, aps2b, 1);
+    	graphB.addVertex(v2b);
+    	graphB.addEdge(new DENOPTIMEdge(0, 2, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3b = new DENOPTIMVertex(3, 0, aps3b, 1);
+    	graphB.addVertex(v3b);
+    	graphB.addEdge(new DENOPTIMEdge(0, 3, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4b = new DENOPTIMVertex(4, 0, aps4b, 1);
+    	graphB.addVertex(v4b);
+    	graphB.addEdge(new DENOPTIMEdge(0, 4, 3, 0, 1));
+    	
+    	SymmetricSet ssB = new SymmetricSet();
+    	ssB.add(1);                           //difference
+    	ssB.add(3);                           //difference
+    	graphB.addSymmetricSetOfVertices(ssB);
+    	SymmetricSet ssB2 = new SymmetricSet();
+    	ssB2.add(2);                           //difference
+    	ssB2.add(4);                           //difference
+    	graphB.addSymmetricSetOfVertices(ssB2);
+    	
+    	/*
+    	System.out.println("Graphs DIFF SS");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	*/
+    	
+    	assertFalse(graphA.sameAs(graphB));	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_SameRings() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 0, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 0, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(0, 2, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3 = new DENOPTIMVertex(3, 0, aps3, 1);
+    	graphA.addVertex(v3);
+    	graphA.addEdge(new DENOPTIMEdge(0, 3, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4 = new DENOPTIMVertex(4, 0, aps4, 1);
+    	graphA.addVertex(v4);
+    	graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0, 1));
+    	
+    	ArrayList<DENOPTIMVertex> vrA = new ArrayList<DENOPTIMVertex>();
+    	vrA.add(v1);
+    	vrA.add(v0);
+    	vrA.add(v2);
+    	DENOPTIMRing rA = new DENOPTIMRing(vrA);
+    	graphA.addRing(rA);
+    	ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<DENOPTIMVertex>();
+    	vrA2.add(v3);
+    	vrA2.add(v0);
+    	vrA2.add(v4);
+    	DENOPTIMRing rA2 = new DENOPTIMRing(vrA2);
+    	graphA.addRing(rA2);
+    	
+    	
+    	// Other
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0b = new DENOPTIMVertex(90, 0, aps0b, 0);
+    	graphB.addVertex(v0b);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1b = new DENOPTIMVertex(91, 0, aps1b, 1);
+    	graphB.addVertex(v1b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 91, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2b = new DENOPTIMVertex(92, 0, aps2b, 1);
+    	graphB.addVertex(v2b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 92, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3b = new DENOPTIMVertex(93, 0, aps3b, 1);
+    	graphB.addVertex(v3b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 93, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4b = new DENOPTIMVertex(94, 0, aps4b, 1);
+    	graphB.addVertex(v4b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 94, 3, 0, 1));
+    	
+    	ArrayList<DENOPTIMVertex> vrB = new ArrayList<DENOPTIMVertex>();
+    	vrB.add(v1b);
+    	vrB.add(v0b);
+    	vrB.add(v2b);
+    	DENOPTIMRing rB = new DENOPTIMRing(vrB);
+    	graphB.addRing(rB);
+    	ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<DENOPTIMVertex>();
+    	vrB2.add(v3b);
+    	vrB2.add(v0b);
+    	vrB2.add(v4b);
+    	DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
+    	graphB.addRing(rB2);
+    	
+    	/*
+    	System.out.println("Graphs Same Rings");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	*/
+    	
+    	assertTrue(graphA.sameAs(graphB));	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_DisorderRings() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 1, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 2, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(0, 2, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3 = new DENOPTIMVertex(3, 3, aps3, 1);
+    	graphA.addVertex(v3);
+    	graphA.addEdge(new DENOPTIMEdge(0, 3, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4 = new DENOPTIMVertex(4, 4, aps4, 1);
+    	graphA.addVertex(v4);
+    	graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0, 1));
+    	
+    	ArrayList<DENOPTIMVertex> vrA = new ArrayList<DENOPTIMVertex>();
+    	vrA.add(v1);
+    	vrA.add(v0);
+    	vrA.add(v2);
+    	DENOPTIMRing rA = new DENOPTIMRing(vrA);
+    	graphA.addRing(rA);
+    	ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<DENOPTIMVertex>();
+    	vrA2.add(v3);
+    	vrA2.add(v0);
+    	vrA2.add(v4);
+    	DENOPTIMRing rA2 = new DENOPTIMRing(vrA2);
+    	graphA.addRing(rA2);
+    	
+    	
+    	// Other
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0b = new DENOPTIMVertex(90, 0, aps0b, 0);
+    	graphB.addVertex(v0b);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1b = new DENOPTIMVertex(91, 1, aps1b, 1);
+    	graphB.addVertex(v1b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 91, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2b = new DENOPTIMVertex(92, 2, aps2b, 1);
+    	graphB.addVertex(v2b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 92, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3b = new DENOPTIMVertex(93, 3, aps3b, 1);
+    	graphB.addVertex(v3b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 93, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4b = new DENOPTIMVertex(94, 4, aps4b, 1);
+    	graphB.addVertex(v4b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 94, 3, 0, 1));
+    	
+    	ArrayList<DENOPTIMVertex> vrB = new ArrayList<DENOPTIMVertex>();
+    	vrB.add(v1b);
+    	vrB.add(v0b);
+    	vrB.add(v2b);
+    	DENOPTIMRing rB = new DENOPTIMRing(vrB);
+    	graphB.addRing(rB);
+    	ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<DENOPTIMVertex>();
+    	vrB2.add(v4b);
+    	vrB2.add(v0b);
+    	vrB2.add(v3b);
+    	DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
+    	graphB.addRing(rB2);
+    	
+    	/*
+    	System.out.println("Graphs Disordered Rings");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	*/
+    	
+    	assertTrue(graphA.sameAs(graphB));	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSameAs_DiffRings() throws Exception
+    {
+    	DENOPTIMGraph graphA = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, 0, aps0, 0);
+    	graphA.addVertex(v0);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, 1, aps1, 1);
+    	graphA.addVertex(v1);
+    	graphA.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, 2, aps2, 1);
+    	graphA.addVertex(v2);
+    	graphA.addEdge(new DENOPTIMEdge(0, 2, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3 = new DENOPTIMVertex(3, 3, aps3, 1);
+    	graphA.addVertex(v3);
+    	graphA.addEdge(new DENOPTIMEdge(0, 3, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4 = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4 = new DENOPTIMVertex(4, 4, aps4, 1);
+    	graphA.addVertex(v4);
+    	graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0, 1));
+    	
+    	ArrayList<DENOPTIMVertex> vrA = new ArrayList<DENOPTIMVertex>();
+    	vrA.add(v1);
+    	vrA.add(v0);
+    	vrA.add(v2);
+    	DENOPTIMRing rA = new DENOPTIMRing(vrA);
+    	graphA.addRing(rA);
+    	ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<DENOPTIMVertex>();
+    	vrA2.add(v3);
+    	vrA2.add(v0);
+    	vrA2.add(v4);
+    	DENOPTIMRing rA2 = new DENOPTIMRing(vrA2);
+    	graphA.addRing(rA2);
+    	
+    	
+    	// Other
+    	
+    	DENOPTIMGraph graphB = new DENOPTIMGraph();
+    	ArrayList<DENOPTIMAttachmentPoint> aps0b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps0b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(2, 1, 1));
+    	aps0b.add(new DENOPTIMAttachmentPoint(3, 1, 1));
+    	DENOPTIMVertex v0b = new DENOPTIMVertex(90, 0, aps0b, 0);
+    	graphB.addVertex(v0b);
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps1b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps1b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps1b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v1b = new DENOPTIMVertex(91, 1, aps1b, 1);
+    	graphB.addVertex(v1b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 91, 0, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps2b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps2b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps2b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v2b = new DENOPTIMVertex(92, 2, aps2b, 1);
+    	graphB.addVertex(v2b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 92, 1, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps3b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps3b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps3b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v3b = new DENOPTIMVertex(93, 3, aps3b, 1);
+    	graphB.addVertex(v3b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 93, 2, 0, 1));
+    	
+    	ArrayList<DENOPTIMAttachmentPoint> aps4b = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	aps4b.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+    	aps4b.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+    	DENOPTIMVertex v4b = new DENOPTIMVertex(94, 4, aps4b, 1);
+    	graphB.addVertex(v4b);
+    	graphB.addEdge(new DENOPTIMEdge(90, 94, 3, 0, 1));
+    	
+    	ArrayList<DENOPTIMVertex> vrB = new ArrayList<DENOPTIMVertex>();
+    	vrB.add(v1b);
+    	vrB.add(v0b);
+    	vrB.add(v4b);
+    	DENOPTIMRing rB = new DENOPTIMRing(vrB);
+    	graphB.addRing(rB);
+    	ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<DENOPTIMVertex>();
+    	vrB2.add(v2b);
+    	vrB2.add(v0b);
+    	vrB2.add(v3b);
+    	DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
+    	graphB.addRing(rB2);
+    	
+    	
+    	System.out.println("Graphs DIFF Rings");
+    	System.out.println(graphA);
+    	System.out.println(graphB);
+    	
+    	
+    	assertFalse(graphA.sameAs(graphB));	
     }
     
 //------------------------------------------------------------------------------

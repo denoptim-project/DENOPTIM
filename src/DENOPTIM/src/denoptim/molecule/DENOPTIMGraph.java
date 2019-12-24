@@ -20,7 +20,11 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.io.Serializable;
 
 import denoptim.exception.DENOPTIMException;
@@ -304,6 +308,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public ArrayList<DENOPTIMRing> getRings()
     {
         return gRings;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public ArrayList<DENOPTIMEdge> getEdgesWithSrc(DENOPTIMVertex v)
+    {
+    	ArrayList<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();
+    	for (DENOPTIMEdge e : this.getEdgeList())
+    	{
+    		if (e.getSourceVertex() == v.getVertexId())
+    		{
+    			edges.add(e);
+    		}
+    	}
+    	return edges;
     }
 
 //------------------------------------------------------------------------------
@@ -1160,6 +1179,219 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             symVertices.clear();
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compare this and another graph ignoring the vertex IDs. This method looks
+     * into the structure of the graphs to determine if the two graphs have the
+     * same spanning tree, same symmetric sets, and same rings set, despite
+     * having different vertex IDs.
+     * @param other the other graph to be compared with this graph
+     * @return <code>true</code> if the two graphs represent the same system
+     */
+    public boolean sameAs(DENOPTIMGraph other)
+    {	
+    	if (this.getEdgeCount() != other.getEdgeCount())
+    	{
+    		return false;
+    	}
+    	
+    	if (this.getVertexCount() != other.getVertexCount())
+    	{
+    		return false;
+    	}
+    	
+    	if (this.getSymmetricSetCount() != other.getSymmetricSetCount())
+    	{
+    		return false;
+    	}
+    	
+    	if (this.getRingCount() != other.getRingCount())
+    	{
+    		return false;
+    	}
+    	
+    	//Pairwise correspondence of vertexes
+    	Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap = 
+    			new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
+    	
+    	vertexMap.put(this.getVertexAtPosition(0),other.getVertexAtPosition(0));
+    	
+    	//WARNING: assuming that vertex 0 is the root and there are no disconnections
+    	try {
+			if (!compareGraphNodes(this.getVertexAtPosition(0), this,
+											other.getVertexAtPosition(0), other,
+											vertexMap))
+			{
+				return false;
+			}
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
+			return false;
+		}
+    	
+    	//Check Symmetric sets
+    	Iterator<SymmetricSet> ssIter = this.getSymSetsIterator();
+    	while (ssIter.hasNext())
+    	{
+    		SymmetricSet ssT = ssIter.next();
+    		int vIdT = ssT.get(0);
+    		
+    		SymmetricSet ssO = other.getSymSetForVertexID(
+    				vertexMap.get(this.getVertexWithId(vIdT)).getVertexId());
+    		if (ssO.size() == 0)
+    		{
+    			// ssO is empty because no SymmetricSet was found that 
+    			// contains the given vertexID. This means the two graphs 
+    			// are different
+    			
+    			return false;
+    		}
+    		
+    		if (ssT.size() != ssO.size())
+    		{
+    			return false;
+    		}
+    		
+    		for (int it=0; it<ssT.size(); it++)
+    		{
+    			int svIdT = ssT.get(it);
+    			if (!ssO.contains(vertexMap.get(this.getVertexWithId(svIdT)).getVertexId()))
+    			{
+    				return false;
+    			}
+    		}
+    	}
+    	
+    	//Check Rings
+    	for (DENOPTIMRing rT : this.getRings())
+    	{
+    		DENOPTIMVertex vhT = rT.getHeadVertex();
+    		DENOPTIMVertex vtT = rT.getTailVertex();
+    		for (DENOPTIMRing rO : other.getRingsInvolvingVertex(vertexMap.get(vhT)))
+    		{
+				if (rT.getSize() != rO.getSize())
+				{
+					continue;
+				}
+				
+				boolean either = false;
+    			if (rO.getHeadVertex() == vertexMap.get(vhT)
+    					&& rO.getTailVertex() == vertexMap.get(vtT))
+    			{
+    				either = true;
+    				for (int i=1; i<rT.getSize(); i++)
+    				{
+    					if (vertexMap.get(rT.getVertexAtPosition(i)) 
+    							!= rO.getVertexAtPosition(i))
+    					{
+    						return false;
+    					}
+    				}
+    			}
+    			else if (rO.getHeadVertex() == vertexMap.get(vtT)
+    					&& rO.getTailVertex() == vertexMap.get(vhT))
+    			{
+    				either = true;       			
+    				for (int i=1; i<rT.getSize(); i++)
+    				{
+    					int j = rO.getSize()-i-1;
+    					if (vertexMap.get(rT.getVertexAtPosition(i)) 
+    							!= rO.getVertexAtPosition(j))
+    					{
+    						return false;
+    					}
+    				}
+    			}
+    			if (!either)
+    			{
+    				return false;
+    			}
+    		}
+    	}
+
+    	return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another graph by spanning vertexes staring from the
+     * given vertex and following the direction of edges.
+     * @param thisV
+     * @param otherV
+     * @return <code>true</code> if the graphs are same at this node
+     * @throws DENOPTIMException 
+     */
+    private static boolean compareGraphNodes(DENOPTIMVertex thisV, 
+    		DENOPTIMGraph thisG,
+    		DENOPTIMVertex otherV, 
+    		DENOPTIMGraph otherG, Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap) 
+    				throws DENOPTIMException
+    {    	
+    	if (!thisV.sameAs(otherV))
+    	{
+    		return false;
+    	}
+    	
+    	ArrayList<DENOPTIMEdge> edgesFromThis = thisG.getEdgesWithSrc(thisV);
+    	ArrayList<DENOPTIMEdge> edgesFromOther = otherG.getEdgesWithSrc(otherV);
+    	if (edgesFromThis.size() != edgesFromOther.size())
+    	{
+    		return false;
+    	}
+    	
+    	// pairwise correspondence between child vertexes
+    	ArrayList<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
+    	
+    	for (DENOPTIMEdge et : edgesFromThis)
+    	{
+    		boolean found = false;
+    		DENOPTIMEdge eo = null;
+    		for (DENOPTIMEdge e : edgesFromOther)
+    		{
+    			if (et.sameAs(e))
+    			{
+    				found = true;
+    				eo = e;
+    				break;
+    			}
+    		}
+    		if (!found)
+    		{
+    			return false;
+    		}
+    		
+    		//Check: this should never be true
+    		if (vertexMap.keySet().contains(
+    				thisG.getVertexWithId(et.getTargetVertex())))
+    		{
+    			throw new DENOPTIMException("More than one attempt to set vertex map.");
+    		}
+    		vertexMap.put(thisG.getVertexWithId(et.getTargetVertex()),
+    				otherG.getVertexWithId(eo.getTargetVertex()));
+    		
+    		DENOPTIMVertex[] pair = new DENOPTIMVertex[]{
+    				thisG.getVertexWithId(et.getTargetVertex()),
+    				otherG.getVertexWithId(eo.getTargetVertex())};
+    		pairs.add(pair);
+    	}
+    	
+    	//Recursion on child vertexes
+    	for (DENOPTIMVertex[] pair : pairs)
+    	{
+    		DENOPTIMVertex v = pair[0];
+    		DENOPTIMVertex o = pair[1];
+    		boolean localRes = compareGraphNodes(v, thisG, o, otherG,vertexMap);
+    		if (!localRes)
+    		{
+    			return false;
+    		}
+    	}
+    	
+    	return true;
     }
     
 //------------------------------------------------------------------------------        
