@@ -1191,25 +1191,34 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param other the other graph to be compared with this graph
      * @return <code>true</code> if the two graphs represent the same system
      */
-    public boolean sameAs(DENOPTIMGraph other)
+    public boolean sameAs(DENOPTIMGraph other, StringBuilder reason)
     {	
     	if (this.getEdgeCount() != other.getEdgeCount())
     	{
+    		reason.append("Different number of edges ("+this.getEdgeCount()+":"
+    					+other.getEdgeCount()+")");
     		return false;
     	}
     	
     	if (this.getVertexCount() != other.getVertexCount())
     	{
+    		reason.append("Different number of vertexes ("+this.getVertexCount()+":"
+    					+other.getVertexCount()+")");
     		return false;
     	}
     	
     	if (this.getSymmetricSetCount() != other.getSymmetricSetCount())
     	{
+    		reason.append("Different number of symmetric sets ("
+    					+ this.getSymmetricSetCount() + ":" 
+    					+ other.getSymmetricSetCount() + ")");
     		return false;
     	}
     	
     	if (this.getRingCount() != other.getRingCount())
     	{
+    		reason.append("Different number of Rings ("+this.getRingCount()+":"
+    					+other.getRingCount()+")");
     		return false;
     	}
     	
@@ -1223,12 +1232,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	try {
 			if (!compareGraphNodes(this.getVertexAtPosition(0), this,
 											other.getVertexAtPosition(0), other,
-											vertexMap))
+											vertexMap,reason))
 			{
 				return false;
 			}
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
+			reason.append("Exception");
 			return false;
 		}
     	
@@ -1246,20 +1256,25 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     			// ssO is empty because no SymmetricSet was found that 
     			// contains the given vertexID. This means the two graphs 
     			// are different
-    			
+    			reason.append("Symmetric set not found for vertex ("+vIdT+")");
     			return false;
     		}
     		
     		if (ssT.size() != ssO.size())
     		{
+    			reason.append("Different number of symmetric sets on verted " + vIdT
+    						+ "("+ssT.size()+":"+ssO.size()+")");
     			return false;
     		}
     		
     		for (int it=0; it<ssT.size(); it++)
     		{
     			int svIdT = ssT.get(it);
-    			if (!ssO.contains(vertexMap.get(this.getVertexWithId(svIdT)).getVertexId()))
+    			if (!ssO.contains(vertexMap.get(this.getVertexWithId(svIdT))
+    					.getVertexId()))
     			{
+    				reason.append("Difference in symmetric set ("+svIdT
+    							+" not in other)");
     				return false;
     			}
     		}
@@ -1270,10 +1285,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		DENOPTIMVertex vhT = rT.getHeadVertex();
     		DENOPTIMVertex vtT = rT.getTailVertex();
-    		for (DENOPTIMRing rO : other.getRingsInvolvingVertex(vertexMap.get(vhT)))
+    		for (DENOPTIMRing rO : 
+    			other.getRingsInvolvingVertex(vertexMap.get(vhT)))
     		{
 				if (rT.getSize() != rO.getSize())
 				{
+					reason.append("Different ring size ("+rT.getSize()+":"
+								+rO.getSize()+")");
 					continue;
 				}
 				
@@ -1287,6 +1305,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     					if (vertexMap.get(rT.getVertexAtPosition(i)) 
     							!= rO.getVertexAtPosition(i))
     					{
+    						reason.append("Rings differ (A) ("+rT+":"+rO+")");
     						return false;
     					}
     				}
@@ -1301,12 +1320,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     					if (vertexMap.get(rT.getVertexAtPosition(i)) 
     							!= rO.getVertexAtPosition(j))
     					{
+    						reason.append("Rings differ (B) ("+rT+":"+rO+")");
     						return false;
     					}
     				}
     			}
     			if (!either)
     			{
+    				reason.append("Rings differ (C) ("+rT+":"+rO+")");
     				return false;
     			}
     		}
@@ -1322,17 +1343,19 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * given vertex and following the direction of edges.
      * @param thisV
      * @param otherV
+     * @param reason a string recording the reason for returning false
      * @return <code>true</code> if the graphs are same at this node
      * @throws DENOPTIMException 
      */
     private static boolean compareGraphNodes(DENOPTIMVertex thisV, 
     		DENOPTIMGraph thisG,
     		DENOPTIMVertex otherV, 
-    		DENOPTIMGraph otherG, Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap) 
-    				throws DENOPTIMException
+    		DENOPTIMGraph otherG, Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap,
+    		StringBuilder reason) throws DENOPTIMException
     {    	
-    	if (!thisV.sameAs(otherV))
+    	if (!thisV.sameAs(otherV, reason))
     	{
+    		reason.append("Different vertex ("+thisV+":"+otherV+")");
     		return false;
     	}
     	
@@ -1340,6 +1363,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	ArrayList<DENOPTIMEdge> edgesFromOther = otherG.getEdgesWithSrc(otherV);
     	if (edgesFromThis.size() != edgesFromOther.size())
     	{
+    		reason.append("Different number of edged from vertex "+thisV+" ("
+    					+edgesFromThis.size()+":"
+    					+edgesFromOther.size()+")");
     		return false;
     	}
     	
@@ -1352,7 +1378,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		DENOPTIMEdge eo = null;
     		for (DENOPTIMEdge e : edgesFromOther)
     		{
-    			if (et.sameAs(e))
+    			if (et.sameAs(e,reason))
     			{
     				found = true;
     				eo = e;
@@ -1361,6 +1387,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		}
     		if (!found)
     		{
+    			reason.append ("Edge not found in other("+et+")");
     			return false;
     		}
     		
@@ -1384,7 +1411,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		DENOPTIMVertex v = pair[0];
     		DENOPTIMVertex o = pair[1];
-    		boolean localRes = compareGraphNodes(v, thisG, o, otherG,vertexMap);
+    		boolean localRes = compareGraphNodes(v, thisG, o, otherG,vertexMap,
+    				reason);
     		if (!localRes)
     		{
     			return false;

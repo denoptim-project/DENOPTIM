@@ -233,7 +233,8 @@ public class DENOPTIMGraphTest
     	System.out.println(graphB);
     	*/
     	
-    	assertTrue (graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertTrue (graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------
@@ -299,7 +300,8 @@ public class DENOPTIMGraphTest
     	System.out.println(graphB);
     	*/
     	
-    	assertFalse(graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertFalse(graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------
@@ -417,7 +419,8 @@ public class DENOPTIMGraphTest
     	System.out.println(graphB);
     	*/
     	
-    	assertTrue(graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertTrue(graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------
@@ -535,7 +538,8 @@ public class DENOPTIMGraphTest
     	System.out.println(graphB);
     	*/
     	
-    	assertFalse(graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertFalse(graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------
@@ -662,7 +666,8 @@ public class DENOPTIMGraphTest
     	System.out.println(graphB);
     	*/
     	
-    	assertTrue(graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertTrue(graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------
@@ -789,7 +794,8 @@ public class DENOPTIMGraphTest
     	System.out.println(graphB);
     	*/
     	
-    	assertTrue(graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertTrue(graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------
@@ -910,13 +916,14 @@ public class DENOPTIMGraphTest
     	DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
     	graphB.addRing(rB2);
     	
-    	
+    	/*
     	System.out.println("Graphs DIFF Rings");
     	System.out.println(graphA);
     	System.out.println(graphB);
+    	*/
     	
-    	
-    	assertFalse(graphA.sameAs(graphB));	
+    	StringBuilder reason = new StringBuilder();
+    	assertFalse(graphA.sameAs(graphB,reason));	
     }
     
 //------------------------------------------------------------------------------

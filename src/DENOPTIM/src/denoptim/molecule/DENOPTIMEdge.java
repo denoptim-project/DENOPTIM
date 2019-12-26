@@ -190,29 +190,43 @@ public class DENOPTIMEdge implements Serializable
     /**
      * Compares this and another edge ignoring edge and vertex IDs
      * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
      * @return <code>true</code> if the two edges represent the same connection
      * even if the vertex IDs are different.
      */
-    public boolean sameAs(DENOPTIMEdge other)
+    public boolean sameAs(DENOPTIMEdge other, StringBuilder reason)
     {
     	if (this.getSourceDAP() != other.getSourceDAP())
     	{
+    		reason.append("Different source atom ("+this.getSourceDAP()+":"
+    						+other.getSourceDAP()+"); ");
     		return false;
     	}
     	if (this.getTargetDAP() != other.getTargetDAP())
     	{
+    		reason.append("Different target atom ("+this.getTargetDAP()+":"
+					+other.getTargetDAP()+"); ");
     		return false;
     	}
-    	if (this.getSourceReaction() != other.getSourceReaction())
+    	if (!this.getSourceReaction().equals(other.getSourceReaction()))
     	{
+    		reason.append("Different source APClass ("
+    				+this.getSourceReaction()+":"
+					+other.getSourceReaction()+"); ");
     		return false;
     	}
-    	if (this.getTargetReaction() != other.getTargetReaction())
+    	if (!this.getTargetReaction().equals(other.getTargetReaction()))
     	{
+    		reason.append("Different target APClass ("
+    				+this.getTargetReaction()+":"
+					+other.getTargetReaction()+"); ");
     		return false;
     	}
-    	if (this.getBondType() != other.getBondType())
+    	if (this.getBondType() != (other.getBondType()))
     	{
+    		reason.append("Different bond type ("+this.getBondType()+":"
+					+other.getBondType()+"); ");
     		return false;
     	}
     	return true;

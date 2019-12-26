@@ -20,6 +20,8 @@ package denoptim.molecule;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +46,8 @@ public class DENOPTIMAttachmentPointTest
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
 	
+//-----------------------------------------------------------------------------
+	
     @Test
     public void testConstructorsAndSDFString() throws Exception
     {
@@ -66,6 +70,8 @@ public class DENOPTIMAttachmentPointTest
     	assertEquals(ap2.toString(),ap3.toString());
     }
     
+//-----------------------------------------------------------------------------
+    
     @Test
     public void testConstructorsAndSDFStringNoDirVec() throws Exception
     {
@@ -86,6 +92,8 @@ public class DENOPTIMAttachmentPointTest
     			ap2.getSingleAPStringSDF(true));
     	assertEquals(ap2.toString(),ap3.toString());
     }
+    
+//-----------------------------------------------------------------------------
     
     @Test
     public void testSortAPs() throws Exception
@@ -131,6 +139,55 @@ public class DENOPTIMAttachmentPointTest
     	assertEquals(list.get(3),ap4);
     	assertEquals(list.get(4),ap5);
     	assertEquals(list.get(5),ap6);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testEquals() throws Exception
+    {
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	
+    	assertEquals(apA.compareTo(apB),0);
+    	assertTrue(apA.equals(apB));
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testEquals_DiffArcAtm() throws Exception
+    {
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(2, 2, 1);
+    	
+    	assertFalse(apA.equals(apB));
+    }
+
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testEquals_SameAPClass() throws Exception
+    {
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	apA.setAPClass("classA:0");
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	apB.setAPClass("classA:0");
+    	
+    	assertTrue(apA.equals(apB));
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testEquals_DiffAPClass() throws Exception
+    {
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	apA.setAPClass("classA:0");
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	apB.setAPClass("classB:0");
+    	
+    	assertFalse(apA.equals(apB));
     }
     
 //------------------------------------------------------------------------------

@@ -327,23 +327,64 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * Compares this and another vertex ignoring vertex IDs.
      * @param other
-     * @return
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two vertexes represent the same graph
+     * node even if the vertex IDs are different.
      */
-    public boolean sameAs(DENOPTIMVertex other)
+    public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
     {
     	if (this.getFragmentType() != other.getFragmentType())
     	{
+    		reason.append("Different fragment type ("+this.getFragmentType()+":"
+					+other.getFragmentType()+"); ");
     		return false;
     	}
+    	
     	if (this.getMolId() != other.getMolId())
     	{
+    		reason.append("Different molID ("+this.getMolId()+":"
+					+other.getMolId()+"); ");
     		return false;
     	}
+    	
     	if (this.getFreeAPCount() != other.getFreeAPCount())
     	{
+    		reason.append("Different number of free APs ("
+    				+this.getFreeAPCount()+":"
+					+other.getFreeAPCount()+"); ");
     		return false;
     	}
+    	
+    	if (this.lstAP.size() != other.lstAP.size())
+    	{
+    		reason.append("Different number of APs ("
+    				+this.lstAP.size()+":"
+					+other.lstAP.size()+"); ");
+    		return false;
+    	}
+    	
+
+    	for (DENOPTIMAttachmentPoint apT : this.lstAP)
+    	{
+    		boolean found = false;
+    		for (DENOPTIMAttachmentPoint apO : other.lstAP)
+        	{
+		    	if (apT.equals(apO))
+		    	{
+		    		found = true;
+		    		break;
+		    	}
+        	}
+    		if (!found)
+    		{
+    			reason.append("No corresponding AP for "+apT);
+    			return false;
+    		}
+    	}
+    	
     	return true;
     }
+    
 //------------------------------------------------------------------------------    
 }

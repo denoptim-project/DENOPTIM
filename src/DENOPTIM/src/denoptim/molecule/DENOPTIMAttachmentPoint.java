@@ -439,6 +439,29 @@ public class DENOPTIMAttachmentPoint implements Serializable
     {
         return apClass;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the Attachment Point sub class.
+     * @return the APClass
+     */
+    public int getAPSubClass()
+    {
+        return apSubClass;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the main part of the APClass (i.e., the "rule").
+     * @return the APClass
+     */
+    public String getAPRule()
+    {
+        return apRule;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -512,6 +535,12 @@ public class DENOPTIMAttachmentPoint implements Serializable
 
         if (this == other)
             return EQUAL;
+        
+        //Compare source atom
+        if (this.getAtomPositionNumber() < other.getAtomPositionNumber())
+        	return BEFORE;
+        else if (this.getAtomPositionNumber() > other.getAtomPositionNumber())
+        	return AFTER;
 
         //Compare CLASS name
         String cl = this.getAPClass();
@@ -530,17 +559,24 @@ public class DENOPTIMAttachmentPoint implements Serializable
 	        double[] otherVec = other.getDirectionVector();
 	
 	        if (thisVec[0] < otherVec[0])
+	        {
 	            return BEFORE;
+	        }
 	        else if (thisVec[0] > otherVec[0])
 	            return AFTER;
 	
 	        if (thisVec[1] < otherVec[1])
+	        {
 	            return BEFORE;
+	            
+	        }
 	        else if (thisVec[1] > otherVec[1])
 	            return AFTER;
 	        
 	        if (thisVec[2] < otherVec[2])
+	        {
 	            return BEFORE;
+	        }
 	        else if (thisVec[2] > otherVec[2])
 	            return AFTER;
         }
@@ -552,7 +588,10 @@ public class DENOPTIMAttachmentPoint implements Serializable
         	}
         	else
         	{
-        		return BEFORE;
+        		if (other.getDirectionVector() != null)
+        		{
+                	return BEFORE;
+        		}
         	}
         }
         
@@ -561,6 +600,75 @@ public class DENOPTIMAttachmentPoint implements Serializable
         	"DENOPTIMAttachmentPoint.compareTo inconsistent with equals.";
         
         return EQUAL;
+    }
+    
+//------------------------------------------------------------------------------
+    
+
+    public boolean equals(DENOPTIMAttachmentPoint other)
+    {
+    	if (this.getAtomPositionNumber() != other.getAtomPositionNumber())
+    	{
+    		return false;
+    	}
+    	
+    	if (this.getAtmConnections() != other.getAtmConnections())
+    	{
+    		return false;
+    	}
+
+    	if (this.getAPConnections() != other.getAPConnections())
+    	{
+    		return false;
+    	}
+    	
+    	if (this.getAPClass()!=null && other.getAPClass()!=null)
+    	{
+	    	if (!this.getAPClass().equals(other.getAPClass()))
+	    	{
+	    		return false;
+	    	}
+    	}
+    	
+    	if (this.getAPRule()!=null && other.getAPRule()!=null)
+    	{
+	    	if (!this.getAPRule().equals(other.getAPRule()))
+	    	{
+	    		return false;
+	    	}
+    	}
+    	
+    	if (this.getAPSubClass() != other.getAPSubClass())
+    	{
+    		return false;
+    	}
+        
+    	if (this.getDirectionVector()!=null && other.getDirectionVector()!=null)
+    	{
+	    	double trslh = 0.001;
+	        if (Math.abs(this.getDirectionVector()[0]
+	        		-other.getDirectionVector()[0])
+	        		> trslh)
+	        {
+	        	return false;
+	        }
+	       
+	        if (Math.abs(this.getDirectionVector()[1]
+	        		-other.getDirectionVector()[1])
+	        		> trslh)
+	        {
+	        	return false;
+	        }
+	        
+	        if (Math.abs(this.getDirectionVector()[2]
+	        		-other.getDirectionVector()[2])
+	        		> trslh)
+	        {
+	        	return false;
+	        }
+    	}
+        
+    	return true;
     }
 
 //------------------------------------------------------------------------------
@@ -629,5 +737,5 @@ public class DENOPTIMAttachmentPoint implements Serializable
 		return pars.toString();
     }
     
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 }
