@@ -169,12 +169,13 @@ runTest "t6"
 #
 # p7: exploration of fragment space that generates serialized graphs for t7
 #
-runTest "p7"
+#runTest "p7" # Repaced by unit testing
+echo "t7 replaced by unit test"
 
 #
 # t7: conversion of serialized DENOPTIMgraph to SDF
 #
-runTest "t7"
+#runTest "t7" # Repaced by unit testing
 
 #
 # t8: conversion of serialized checkpoint file to human readable string

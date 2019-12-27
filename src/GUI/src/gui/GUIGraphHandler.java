@@ -947,10 +947,23 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
-		String format="SDF";
-		if (!FilenameUtils.getExtension(file.getAbsolutePath()).equals("sdf"))
+		//TODO change: this should be done elsewhere 
+		
+		String format="";
+		String ext = FilenameUtils.getExtension(file.getAbsolutePath());
+		switch (ext.toUpperCase())
 		{
-			format="TXT";
+			case ("SDF"):
+				format="SDF";
+				break;
+				
+			case ("TXT"):
+				format="TXT";
+				break;
+			
+			case ("SER"):
+				format="SER";
+				break;
 		}
 		
 		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();

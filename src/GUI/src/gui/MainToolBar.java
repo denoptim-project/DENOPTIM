@@ -241,7 +241,7 @@ public class MainToolBar extends JMenuBar {
 							file));
 				} catch (Exception e1) {
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS", "GRAPHS", "GA-RUN", "FSE-RUN"};
+							"FRAGMENTS", "GRAPHS", "GA-RUN", "FSE-RUN", "SERGRAPH"};
 					int res = JOptionPane.showOptionDialog(null,
 						"<html>Failed to detect file type automatically.<br>"
 						+ "Temptative reason: " + e1.getMessage() + "<br>"
@@ -331,6 +331,12 @@ public class MainToolBar extends JMenuBar {
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanel);
 				graphPanel.importGraphsFromFile(file);
+				break;
+				
+			case ("SERGRAPH"):
+				GUIGraphHandler graphPanelSer = new GUIGraphHandler(mainPanel);
+				mainPanel.add(graphPanelSer);
+				graphPanelSer.importGraphsFromFile(file); //NB: deals with SER/SDF/TXT
 				break;
 				
 			case ("GA-RUN"):

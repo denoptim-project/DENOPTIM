@@ -1992,8 +1992,30 @@ public class DenoptimIO
 				
 			case "SDF":
 				return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
+				
+			case "SER":
+				return DenoptimIO.readDENOPTIMGraphsFromSerFile(fileName);
 		}
     	return new ArrayList<DENOPTIMGraph>();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of <code>DENOPTIMGraph</code>s from a serialized graph.
+     * @param fileName the pathname of the file to read. 
+     * mismatch between fragment space and graph representation.
+     * @return 
+     * @return the list of graphs
+     * @throws DENOPTIMException
+     */
+    
+    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSerFile(
+    		String fileName) throws DENOPTIMException
+    {
+    	ArrayList<DENOPTIMGraph> list = new ArrayList<DENOPTIMGraph>();
+    	list.add(deserializeDENOPTIMGraph(new File(fileName)));
+    	return list;
     }
     
 //------------------------------------------------------------------------------
@@ -2140,6 +2162,51 @@ public class DenoptimIO
     		boolean append) throws DENOPTIMException
     {
     	writeData(fileName, graph.toString(), append);
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Looks for a writable location where to put temporary files and returns
+     * an absolute pathname to a tmp file.
+     * @return a  writable absolute path
+     */
+	public static String getTempFile() {
+		
+        ArrayList<String> tmpFolders = new ArrayList<String>();
+        tmpFolders.add(System.getProperty("file.separator")+"tmp");
+        tmpFolders.add(System.getProperty("file.separator")+"scratch");
+
+        String tmpPathName = "";
+        for (String tmpFolder : tmpFolders)
+        {
+        	tmpPathName = tmpFolder + System.getProperty("file.separator")
+        			+ "Denoptim_tmpFile";
+            if (DenoptimIO.canWriteAndReadTo(tmpPathName))
+            {
+                break;
+            }
+        }
+		return tmpPathName;
+	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Check whether we can write and read in a given pathname
+	 * @param pathName
+	 * @return <code>true</code> if we can write and read in that pathname
+	 */
+    public static boolean canWriteAndReadTo(String pathName)
+    {
+        boolean res = true;
+        try {
+            DenoptimIO.writeData(pathName, "TEST", false);
+            DenoptimIO.readList(pathName);
+        } catch (DENOPTIMException e) {
+            res = false;
+        }
+        return res;
     }
     
 //------------------------------------------------------------------------------
