@@ -491,10 +491,10 @@ public class FragmentSpaceParameters
 	// compatibility matrix for ring closures
         if (rcCompMatrixFile != null && rcCompMatrixFile.length() > 0)
         {
-	    FragmentSpace.importRCCompatibilityMatrixFromFile(compMatrixFile);
+	    FragmentSpace.importRCCompatibilityMatrixFromFile(rcCompMatrixFile);
         }
 
-	// constitutionsl symmetry constraints
+	// constitutional symmetry constraints
 	FragmentSpace.setSymmConstraints(symmConstraintsMap);
 	
 	// grouping of fragments

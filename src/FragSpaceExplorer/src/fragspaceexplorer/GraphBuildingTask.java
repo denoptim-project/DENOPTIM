@@ -428,9 +428,7 @@ public class GraphBuildingTask implements Callable
                     String lst = "[";
                     for (int ig = 0; ig<sz-1; ig++)
                     {
-    
                         lst = lst + altCyclicGraphs.get(ig).getGraphId()+", ";
-    
                     }
                     lst = lst + altCyclicGraphs.get(sz-1).getGraphId() + "]";
     
@@ -450,7 +448,7 @@ public class GraphBuildingTask implements Callable
                         }
 
                         // Prepare vector of results
-                        // NB: in FSE we ass also the ID of the root graph in 
+                        // NB: in FSE we add also the ID of the root graph in 
                         // this array
                         Object[] altRes = new Object[5];
 

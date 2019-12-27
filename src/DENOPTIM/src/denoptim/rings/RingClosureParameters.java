@@ -10,7 +10,7 @@
  *   This program is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Affero General Public License for more details.
+ *   GNU Affero General Public License for more details. 
  *
  *   You should have received a copy of the GNU Affero General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -447,6 +447,9 @@ public class RingClosureParameters
         case "RC-CLOSERINGS":
             closeRings = true;
             break;
+        case "RC-CLOSERINGS=":
+            closeRings = true;
+            break;
         case "RC-BUILDCHELATESMODE":
             buildChelatesMode = true;
             break;
@@ -465,15 +468,24 @@ public class RingClosureParameters
             }
             break;
         case "RC-EVALUATIONCLOSABILITYMODE=":
-	    try 
-	    {
-                rceMode = Integer.parseInt(value);
-	    }
-	    catch (Throwable t)
-	    {
-		msg = "Unable to understand value '" + value + "'";
-	        throw new DENOPTIMException(msg);
-	    }
+        	switch (value.toUpperCase())
+        	{
+        		case "CONSTITUTION":
+        			rceMode = 0;
+        			break;
+        			
+        		case "3D-CONFORMATION":
+        			rceMode = 1;
+        			break;
+        			
+        		case "CONSTITUTION_AND_3D-CONFORMATION":
+        			rceMode = 2;
+        			break;
+        			
+        		default:
+        			msg = "Unable to understand value '" + value + "'";
+        	        throw new DENOPTIMException(msg);
+        	}
             break;
         case "RC-MAXROTBONDS=":
             try
@@ -679,13 +691,6 @@ public class RingClosureParameters
 		  + "machinery (use RC-CLOSERINGS keyword).";
             throw new DENOPTIMException(msg);
 	}
-
-        if (rccIndex=="")
-        {
-            msg = "Name of RCC infex file not found. Please provide a "
-		  + "a value for keyword 'RC-RCCINDEX'";
-            throw new DENOPTIMException(msg);
-        }
 
         if (!DenoptimIO.checkExists(rccIndex))
         {

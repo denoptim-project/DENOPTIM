@@ -19,6 +19,9 @@
 
 package denoptim.fragspace;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +33,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
 
 
@@ -117,16 +121,72 @@ public class FragmentSpace
      * Flag signaling that this fragment space was built and validated
      */
     private static boolean isValid = false;
-  
+    
 //------------------------------------------------------------------------------
-
+    
     /**
-     * Sets the flag signaling valid definition of this fragment space
-     * @param val set to <code>true</code> to label this object as fully defined
+     * Creates the fragment space as defined in a formatted text file with the 
+     * parameters.
+     * @param paramFile text file with the parameters defining the fragment
+     * space.
+     * @throws Exception
      */
-    public static void maskAsDefined(boolean val)
+    public static void defineFragmentSpace(String paramFile) throws Exception
     {
-    	isValid = val;
+        String line;
+        BufferedReader br = null;
+        try
+        {
+            br = new BufferedReader(new FileReader(paramFile));
+            while ((line = br.readLine()) != null)
+            {
+                if ((line.trim()).length() == 0)
+                {
+                    continue;
+                }
+
+                if (line.startsWith("#"))
+                {
+                    continue;
+                }
+			
+				if (line.toUpperCase().startsWith("FS-"))
+	            {
+	                FragmentSpaceParameters.interpretKeyword(line);
+	                continue;
+	            }
+				
+	            if (line.toUpperCase().startsWith("RC-"))
+	            {
+	                RingClosureParameters.interpretKeyword(line);
+	                continue;
+	            }
+            }
+        }
+        catch (NumberFormatException | IOException nfe)
+        {
+            throw new DENOPTIMException(nfe);
+        }
+        finally
+        {
+            if (br != null)
+            {
+                br.close();
+                br = null;
+            }
+        }    
+		
+		// This creates the static FragmentSpace object
+		if (FragmentSpaceParameters.fsParamsInUse())
+        {
+            FragmentSpaceParameters.checkParameters();
+            FragmentSpaceParameters.processParameters();
+        }
+        if (RingClosureParameters.rcParamsInUse())
+        {
+            RingClosureParameters.checkParameters();
+            RingClosureParameters.processParameters();
+        }
     }
     
 //------------------------------------------------------------------------------

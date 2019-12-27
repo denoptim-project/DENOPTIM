@@ -1308,7 +1308,7 @@ public class GraphUtils
 
     /**
      * Evaluates the possibility of closing rings in a given graph and 
-     * generates all alternative graphs requlting by different combinations of
+     * generates all alternative graphs resulting by different combinations of
      * rings
      * @param molGraph the <code>DENOPTIMGraph</code> on which rings are to
      * be identified

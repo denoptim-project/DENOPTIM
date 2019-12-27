@@ -1300,6 +1300,7 @@ public class FSParametersForm extends ParametersForm
     		{
     			case "Constitution":
     				sb.append(getStringFromTable(keyPar21,tabPar21, new int[]{0},false));
+    				sb.append(getStringIfNotEmpty(keyPar30,txtPar30));
         			break;
         			
     			case "3D-Conformation":

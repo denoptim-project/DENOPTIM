@@ -242,7 +242,7 @@ public class CyclicGraphHandler
 //-----------------------------------------------------------------------------
 
     /**
-     * Identifyes all possibile ring closing paths and returns them as list of 
+     * Identifies all possible ring closing paths and returns them as list of 
      * DENOPTIMRings ready to be appended to a DENOPTIMGraph.
      * @param mol the molecule
      * @param molGraph the molecular graph
@@ -744,7 +744,7 @@ public class CyclicGraphHandler
                                 Map<IBond,Set<PathSubGraph>> interdepPaths,
                                 Map<ObjectPair,PathSubGraph> allGoodPaths)
     {
-        // Indentify the interdependent sets of paths
+        // Identify the interdependent sets of paths
         Set<ArrayList<ObjectPair>> listOfIntrDepPaths = 
                                           new HashSet<ArrayList<ObjectPair>>();
         for (IBond bnd : interdepPaths.keySet())
@@ -1338,7 +1338,7 @@ public class CyclicGraphHandler
      * @param vI first vertex
      * @param vJ second vertex
      * @param graph the graph representation
-     * @return <code>true</code> is the path satirfies the criteria
+     * @return <code>true</code> is the path satisfies the criteria
      */
 
     private boolean evaluateRCVPair(DENOPTIMVertex vI, DENOPTIMVertex vJ,
@@ -1414,10 +1414,10 @@ public class CyclicGraphHandler
             return false;
         }
 
-        // explude paths that do not connect APClass compatibile ends
+        // exclude paths that do not connect APClass compatible ends
         // NOTE that in ring closures the CPMap is symmetric, this
         // also implies that CPMap for ring closure may be different
-        // from standard CPMap
+        // from standard CPMap        
         if (!(compatClassesI.contains(parentAPClsJ) ||
               compatClassesJ.contains(parentAPClsI)))
         {
