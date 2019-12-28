@@ -947,7 +947,7 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
-		//TODO change: this should be done elsewhere 
+		//TODO change: this should be done elsewhere, maybe in DenoptimIO
 		
 		String format="";
 		String ext = FilenameUtils.getExtension(file.getAbsolutePath());
@@ -963,6 +963,39 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			case ("SER"):
 				format="SER";
+				break;
+				
+			default:
+				String[] options = {"Abandon", "TXT", "SDF", "SERIALIZED"};
+				int res = JOptionPane.showOptionDialog(null,
+					"<html>Failed to detect file type from file's "
+					+ "extension.<br>"
+					+ "Please, specify tell me to interpret file <br>"
+					+ "'" + file.getAbsolutePath() + "'<br>"
+					+ "or 'Abandon' to give up.</html>",
+					"Specify File Type",
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[0]);
+				switch (res)
+				{
+					case 0:
+						return new ArrayList<DENOPTIMGraph>();
+						
+					case 1:
+						format = "TXT";
+						break;
+						
+					case 2:
+						format="SDF";
+						break;
+						
+					case 3:
+						format="SER";
+						break;
+				}
 				break;
 		}
 		

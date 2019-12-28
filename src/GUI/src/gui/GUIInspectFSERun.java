@@ -289,8 +289,10 @@ public class GUIInspectFSERun extends GUICardPanel
 						molFile,false).get(0);
 			} catch (DENOPTIMException e1) {
 				e1.printStackTrace();
+				mainPanel.setCursor(Cursor.getPredefinedCursor(
+						Cursor.DEFAULT_CURSOR));
 				JOptionPane.showMessageDialog(null,
-		                "Could not read data from to '" + molFile + "'!.",
+		                "Could not read data from to '" + molFile + "'!",
 		                "Error",
 		                JOptionPane.PLAIN_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));
