@@ -42,10 +42,10 @@ public class Version
     public static final String MINIMUMJAVAVERSION = "1.5";
     
     /** The major version number. */
-    public static final int MAJOR = 1;
+    public static final int MAJOR = 2;
 
     /** The minor version number. */
-    public static final int MINOR = 1;
+    public static final int MINOR = 0;
 
     /** The update letter. */
     public static final int UPDATE = 0;
