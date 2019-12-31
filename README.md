@@ -44,11 +44,10 @@ DENOPTIM (De Novo OPTimization of In/organic Molecules) is a software meant for 
         cd $DENOPTIM_HOME/build
         bash build-all.sh
 
-4. Done! The DENOPTIM package is ready. Start the Graphical User Interface by double-clicking on the GUI.jar or by running
+4. Done! The DENOPTIM package is ready. 
 
-        java -jar $DENOPTIM_HOME/build/GUI.jar
-
-After compilation you can run the functionality tests (takes 2-3 minutes).
+## Testing
+After compilation you can run the functionality tests (takes ca. 5 minutes).
 
     cd $DENOPTIM_HOME/test/functional_tests
     bash runAllTests.sh
@@ -57,12 +56,23 @@ The tests will use a temporary folder <code>/tmp/denoptim_test</code> where you 
 
 In addition, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 10-15 minutes).
 
-    cd $DENOPTIM_HOME/test/PtCOLX2
+    cd $DENOPTIM_HOME/test/PtCOLX2_GA
     bash runEvolutionaryExperiment.sh
 
 This will create a playground folder at <code>/tmp/denoptim_PtCO</code> where the evolutionary experiment will be run. Once the experiment is completed, you'll find also the results in the same folder.
 
+An analogous test can be run with the fragment space explorer, i.e., a combinatorial, systematic exploration of the fragment space.
+
+    cd $DENOPTIM_HOME/test/PtCOLX2_FSE
+    bash runCombinatorialExperiment.sh
+
 ## Usage
+### Graphical User Interface
+The graphical user interface (GUI) of DENOPTIM facilitates the preparation and analysis of DENOPTIM experiments. After building the DENOPTIM package (see Installation), the GUI can be launched by double-click on the <code>$DENOPTIM_HOME/build/GUI.jar</code> file or using the following command
+
+    java -jar $DENOPTIM_HOME/build/GUI.jar
+
+### Command Line Programs
 DENOPTIM programs are typically run using the following command
 
     java -jar <program.jar> <input_parameters>
@@ -78,16 +88,22 @@ Open an issue to point out any unreported and unexpected behaviors, bugs, or jus
 
 ## License
 DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
-Instead, additional libraries used by DENOPTIM programs are licensed according to their respective licenses:
+Instead, libraries used by DENOPTIM programs are licensed according to their respective licenses:
 * cdk: GNU Lesser GPL Version 2.1
 * commons-cli: Apache License Version 2.0
 * commons-io: Apache License Version 2.0
-* commons-lang: Apache License Version 2.0
-* commons-math: Apache License Version 2.0
-* vecmath: GNU GPL Version 2
+* commons-lang3: Apache License Version 2.0
+* commons-math3: Apache License Version 2.0
+* vecmath: GNU General Public License Version 2
+* Jmol: GNU Lesser General Public License 2.0
+* apiguardian: Apache License Version 2.0
+* jfreechart: GNU Lesser General Public License 2.1
+* gs: GNU Lesser General Public License 3.0
+* junit: Eclipse Public License 2.0
+
 
 ## Cite DENOPTIM
-1) DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules; Marco Foscato, Vishwesh Venkatraman, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i> <b>2019</b> <b>ASAP</b> (<a href="https://doi.org/10.1021/acs.jcim.9b00516">https://doi.org/10.1021/acs.jcim.9b00516</a>)
+1) DENOPTIM: Software for Computational de Novo Design of Organic and Inorganic Molecules; Marco Foscato, Vishwesh Venkatraman, and Vidar R. Jensen, <i>J. Chem. Inf. Model</i>, <b>2019</b>, 59, 10, 4077-4082 (<a href="https://doi.org/10.1021/acs.jcim.9b00516">https://doi.org/10.1021/acs.jcim.9b00516</a>)
 2) Foscato, M.; Occhipinti, G.; Venkatraman, V.; Alsberg, B. K.; Jensen, V. R.; Automated Design of Realistic Organometallic, Molecules from Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 767–780.
 3) Foscato, M.; Venkatraman, V.; Occhipinti, G.; Alsberg, B. K.; Jensen, V. R.; Automated Building of Organometallic Complexes from 3D Fragments; <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 1919–1931.
 4) Foscato, M.; Houghton, B. J.; Occhipinti, G.; Deeth, R. J.; Jensen, V. R.; Ring Closure To Form Metal Chelates in 3D Fragment-Based de Novo Design. <i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 1844-1856.
