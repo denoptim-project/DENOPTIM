@@ -22,4 +22,9 @@ public class GUIPreferences {
 	 */
 	protected static int chartPointSize = 8;
 	
+	/**
+	 * Readable/writable space for tmp files
+	 */
+	protected static String tmpSpace = "/tmp";
+	
 }

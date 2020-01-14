@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import denoptim.io.DenoptimIO;
+
 public class GUIPreferencesDialog extends GUIModalDialog
 {
 
@@ -56,6 +58,11 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private JPanel pnlChartPointSize;
     private JLabel lblChartPointSize;
     private JTextField txtChartPointSize;
+    
+    private String namTmpSpace = "Folder for tmp files";
+    private JPanel pnlTmpSpace;
+    private JLabel lblTmpSpace;
+    private JTextField txtTmpSpace;
 	
 	
 	private boolean inputIsOK = true;
@@ -66,6 +73,21 @@ public class GUIPreferencesDialog extends GUIModalDialog
         JScrollPane scrollablePane = new JScrollPane(centralPanel);
         centralPanel.setLayout(new BoxLayout(
         		centralPanel, SwingConstants.VERTICAL)); 
+
+        JPanel titleGeneral = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titleGeneral.add(new JLabel("<html><b>General</b></html>"));
+        centralPanel.add(titleGeneral);
+
+        pnlTmpSpace = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblTmpSpace = new JLabel(namTmpSpace + ":");
+        txtTmpSpace = new JTextField();
+        txtTmpSpace.setPreferredSize(strFieldSize);
+        txtTmpSpace.setText(GUIPreferences.tmpSpace+"");
+        pnlTmpSpace.add(lblTmpSpace);
+        pnlTmpSpace.add(txtTmpSpace);
+        centralPanel.add(pnlTmpSpace);
+        
+        centralPanel.add(new JSeparator());
         
         JPanel titleGraphViewer = new JPanel(new FlowLayout(FlowLayout.LEFT));
         titleGraphViewer.add(new JLabel("<html><b>Graph viewer</b></html>"));
@@ -91,6 +113,10 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
         centralPanel.add(new JSeparator());
         
+        JPanel titleEvolutionPlots = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titleEvolutionPlots.add(new JLabel("<html><b>Evolution Run Plots</b></html>"));
+        centralPanel.add(titleEvolutionPlots);
+        
         pnlChartPointSize = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblChartPointSize = new JLabel(namChartPointSize + ":");
         txtChartPointSize = new JTextField();
@@ -114,7 +140,6 @@ public class GUIPreferencesDialog extends GUIModalDialog
 					close();
 				}
 			}
-			
 		});
 		
 		super.addToCentralPane(scrollablePane);
@@ -128,6 +153,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 		mustParseToInt(txtGraphTxtSize, namGraphTxtSize);
 		mustParseToInt(txtGraphNodeSize, namGraphNodeSize);
 		mustParseToInt(txtChartPointSize, namChartPointSize);
+		mustParseBeReadableWritable(txtTmpSpace, namTmpSpace);
 	}
 
 //-----------------------------------------------------------------------------
@@ -149,6 +175,24 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 	
+	private void mustParseBeReadableWritable(JTextField field, String name)
+	{
+		if (!DenoptimIO.canWriteAndReadTo(field.getText()
+				+ System.getProperty("file.separator") 
+				+ "test"))
+		{
+			inputIsOK = false;
+			JOptionPane.showMessageDialog(null,
+					"<html>Unacceptable value for '" + name + "'<br>"
+					+ "<br>The pathname should be readable and writable.</html>",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
 	private void storeValues()
 	{
 		GUIPreferences.graphLabelFontSize = 
@@ -157,5 +201,6 @@ public class GUIPreferencesDialog extends GUIModalDialog
                 Integer.parseInt(txtGraphNodeSize.getText());
         GUIPreferences.chartPointSize =
                 Integer.parseInt(txtChartPointSize.getText());
+        GUIPreferences.tmpSpace = txtTmpSpace.getText();
 	}
 }

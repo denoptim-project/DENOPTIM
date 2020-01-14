@@ -2176,6 +2176,7 @@ public class DenoptimIO
         ArrayList<String> tmpFolders = new ArrayList<String>();
         tmpFolders.add(System.getProperty("file.separator")+"tmp");
         tmpFolders.add(System.getProperty("file.separator")+"scratch");
+        tmpFolders.add(System.getProperty("java.io.tmpdir"));
 
         String tmpPathName = "";
         for (String tmpFolder : tmpFolders)
@@ -2193,7 +2194,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 	
 	/**
-	 * Check whether we can write and read in a given pathname
+	 * Check whether we can write and read to a given pathname
 	 * @param pathName
 	 * @return <code>true</code> if we can write and read in that pathname
 	 */
