@@ -5,7 +5,5 @@ build/lib/
 build/*.jar
 lib/DENOPTIM.jar
 /bin/
-.classpath
-.project
 src/misc/GraphListAnalysis/
 test/functional_tests/runT.sh
