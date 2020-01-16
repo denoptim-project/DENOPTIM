@@ -2168,10 +2168,10 @@ public class DenoptimIO
     
     /**
      * Looks for a writable location where to put temporary files and returns
-     * an absolute pathname to a tmp file.
+     * an absolute pathname to the folder where tmp files can be created.
      * @return a  writable absolute path
      */
-	public static String getTempFile() {
+	public static String getTempFolder() {
 		
         ArrayList<String> tmpFolders = new ArrayList<String>();
         tmpFolders.add(System.getProperty("file.separator")+"tmp");
@@ -2179,8 +2179,10 @@ public class DenoptimIO
         tmpFolders.add(System.getProperty("java.io.tmpdir"));
 
         String tmpPathName = "";
-        for (String tmpFolder : tmpFolders)
+        String tmpFolder = "";
+        for (String t : tmpFolders)
         {
+        	tmpFolder = t;
         	tmpPathName = tmpFolder + System.getProperty("file.separator")
         			+ "Denoptim_tmpFile";
             if (DenoptimIO.canWriteAndReadTo(tmpPathName))
@@ -2188,7 +2190,7 @@ public class DenoptimIO
                 break;
             }
         }
-		return tmpPathName;
+		return tmpFolder;
 	}
 	
 //------------------------------------------------------------------------------

@@ -125,7 +125,8 @@ public class DenoptimIOTest
     	graph.addSymmetricSetOfVertices(new SymmetricSet(
     			new ArrayList<Integer>(Arrays.asList(6,7))));
     	
-    	String tmpFile = DenoptimIO.getTempFile() + "_unit.ser";
+    	String tmpFile = DenoptimIO.getTempFolder() 
+    			+ System.getProperty("file.separator") + "_unit.ser";
     	DenoptimIO.serializeToFile(tmpFile, graph, false);
     	
     	DENOPTIMGraph graphA = DenoptimIO.deserializeDENOPTIMGraph(

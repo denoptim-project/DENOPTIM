@@ -108,36 +108,8 @@ public class MoleculeViewPanel extends JSplitPane
 		this.setBottomComponent(tabPanel);
 		
 		//Find a proper tmp disk space
-		tmpSDFFile = GUIPreferences.tmpSpace 
-				+ System.getProperty("file.separator") 
-				+ "Denoptim_MolViewer_loadedMol.sdf";
-		if (!DenoptimIO.canWriteAndReadTo(tmpSDFFile));
-		{
-			tmpSDFFile = DenoptimIO.getTempFile() + "_MolViewer_loadedMol.sdf";
-			if (!DenoptimIO.canWriteAndReadTo(tmpSDFFile))
-			{		
-				String preStr = "Could not find a temprorary location on local disks";
-				while (!DenoptimIO.canWriteAndReadTo(tmpSDFFile))
-				{
-					tmpSDFFile = JOptionPane.showInputDialog("<html>" + preStr
-						+ "<br>Please, "
-						+ "specify the absolute path of a folder I can use:");
-					
-					if (tmpSDFFile == null)
-					{
-						tmpSDFFile = "";
-					}
-					
-					tmpSDFFile = tmpSDFFile.replaceAll("\\\\","/"); 
-					//NB: '/' is properly interpreted by Jmol even in Windows.
-					
-					preStr = "I tried, but I cannot use '" + tmpSDFFile + "'.";
-					
-					tmpSDFFile = tmpSDFFile + System.getProperty("file.separator") 
-							+ "Denoptim_MolViewer_loadedMol.sdf";				
-				}
-			}
-		}
+		tmpSDFFile = Utils.getTempFile("Denoptim_MolViewer_loadedMol.sdf");
+
 	}
 	
 //-----------------------------------------------------------------------------
