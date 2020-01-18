@@ -127,7 +127,7 @@ public class HomePanel extends GUICardPanel
 		buttonsPanel.add(btnReadGAOutput);
 		
         JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
-		btnReadGAOutput.setToolTipText("Analyzes the output folder of an "
+        btnReadFSEOutput.setToolTipText("Analyzes the output folder of an "
 				+ "combinatorial experiment  (i.e., folder named FSE...)");
         btnReadFSEOutput.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
