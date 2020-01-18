@@ -17,7 +17,7 @@ if [ ! -f lib/DENOPTIM.jar ]; then
 fi
 
 find ../src/GUI/src/ -name *.java > javafiles.txt
-javac -cp lib/cdk-1.4.19.jar:lib/commons-io-2.4.jar:lib/commons-lang3-3.1.jar:lib/vecmath.jar:lib/commons-math3-3.6.1.jar:lib/jfreechart-1.5.0.jar:lib/Jmol-14.29.55.jar:lib/JmolLib-14.29.55.jar:lib/gs-core-1.3.jar:lib/gs-ui-1.3.jar:lib/DENOPTIM.jar:denoptimga.jar @javafiles.txt -encoding utf-8 -d .
+javac -cp lib/cdk-1.4.19.jar:lib/commons-io-2.4.jar:lib/commons-lang3-3.1.jar:lib/vecmath.jar:lib/commons-math3-3.6.1.jar:lib/jfreechart-1.5.0.jar:lib/Jmol-14.29.55.jar:lib/JmolLib-14.29.55.jar:lib/gs-core-1.3.jar:lib/gs-ui-1.3.jar:lib/DENOPTIM.jar:DenoptimGA.jar @javafiles.txt -encoding utf-8 -d .
 
 if [ "$?" != "0" ]; then
     rm javafiles.txt
@@ -30,7 +30,7 @@ rm javafiles.txt
 
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Main-Class: gui.GUI" >> manifest.mf
-echo "Class-Path: lib/cdk-1.4.19.jar lib/commons-io-2.4.jar lib/commons-lang3-3.1.jar lib/vecmath.jar lib/commons-math3-3.6.1.jar lib/jfreechart-1.5.0.jar lib/Jmol-14.29.55.jar lib/JmolLib-14.29.55.jar lib/gs-core-1.3.jar lib/gs-ui-1.3.jar lib/DENOPTIM.jar demoptimga.jar images" >> manifest.mf
+echo "Class-Path: lib/cdk-1.4.19.jar lib/commons-io-2.4.jar lib/commons-lang3-3.1.jar lib/vecmath.jar lib/commons-math3-3.6.1.jar lib/jfreechart-1.5.0.jar lib/Jmol-14.29.55.jar lib/JmolLib-14.29.55.jar lib/gs-core-1.3.jar lib/gs-ui-1.3.jar lib/DENOPTIM.jar DenoptimGA.jar images" >> manifest.mf
 echo >> manifest.mf
 
 jar cvfm GUI.jar manifest.mf gui images
