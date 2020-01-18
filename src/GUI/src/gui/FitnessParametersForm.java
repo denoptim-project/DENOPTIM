@@ -247,6 +247,10 @@ public class FitnessParametersForm extends ParametersForm
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
         cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH", "Python", "JAVA"});
         cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
+        
+        //TODO: remove when functionality is fully implemented
+        cmbFitProviderInterpreter.setEnabled(false);
+        
         mapKeyFieldToValueField.put(keyFitProviderInterpreter.toUpperCase(),cmbFitProviderInterpreter);
         lineFitProviderInterpreter.add(lblFitProviderInterpreter);
         lineFitProviderInterpreter.add(cmbFitProviderInterpreter);
