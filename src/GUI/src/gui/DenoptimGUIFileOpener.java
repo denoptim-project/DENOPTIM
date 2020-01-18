@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.FileDialog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -89,8 +90,10 @@ public class DenoptimGUIFileOpener
 	
 	public static File pickFolder() 
 	{
-		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		JFileChooser fileChooser = new JFileChooser(
+				FileSystemView.getFileSystemView().getHomeDirectory());
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fileChooser.setDialogTitle("Choose the folder to be loaded");
 		File file;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
@@ -107,7 +110,8 @@ public class DenoptimGUIFileOpener
 	
 	public static File saveFile() 
 	{
-		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		JFileChooser fileChooser = new JFileChooser(
+				FileSystemView.getFileSystemView().getHomeDirectory());
 		File file;
 		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
 		{

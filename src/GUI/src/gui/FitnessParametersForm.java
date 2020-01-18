@@ -187,8 +187,18 @@ public class FitnessParametersForm extends ParametersForm
         lineIntOrExt = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbIntOrExt = new JRadioButton("Use external fitnes provider:");
         rdbIntOrExt.setToolTipText(toolTipIntOrExt);
+        
+        //TODO: tmp code to restrict functionality
+        rdbIntOrExt.setSelected(true);
+		localBlock3.setVisible(true);
+		localBlock4.setVisible(false);
+        rdbIntOrExt.setEnabled(false);
+        
         rdbIntOrExt.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
+        		
+        		//TODO: activate when fully implemented
+        		/*
         		if (rdbIntOrExt.isSelected())
         		{
     				localBlock3.setVisible(true);
@@ -199,6 +209,7 @@ public class FitnessParametersForm extends ParametersForm
         			localBlock3.setVisible(false);
         			localBlock4.setVisible(true);
         		}
+        		*/
         	}
         });
         lineIntOrExt.add(rdbIntOrExt);

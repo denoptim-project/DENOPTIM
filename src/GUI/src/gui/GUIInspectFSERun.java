@@ -207,13 +207,33 @@ public class GUIInspectFSERun extends GUICardPanel
 		commandsPane.add(btnCanc);
 		
 		JButton btnHelp = new JButton("?");
-		btnHelp.setToolTipText("<html>Hover over the buttons and fields "
-                    + "to get a tip.</html>");
+		btnHelp.setToolTipText("<html>Hover over buttons and fields "
+                + "to get a tip.<br>"
+                + "Click the '?' button for further instructions.</html>");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,
-                    "<html>Hover over the buttons and fields "
-                    + "to get a tip.</html>",
+				String txt = "<html><body width='%1s'>"
+	                    + "<p>Selection of candidates:"
+	                    + "<ul>"
+	                    + "<li>Click on a dot in the chart to disply the "
+	                    + "corresponding molecular "
+	                    + "representation.</li>"
+	                    + "<li>Click away from any dot to reset the molecular "
+	                    + "viewer."
+	                    + "</li></ul></p>"
+	                    + "<p>Chart view:"
+	                    + "<ul>"
+	                    + "<li>zoom in: click-and-drag "
+	                    + "from the top-left to the bottom-right "
+	                    + "corners of the new region of the plot to focus on."
+	                    + "</li>"
+	                    + "<li>Use the <code>Reset Chart View</code> to reset "
+	                    + "the view.</li>"
+	                    + "<li>Right-click to get advanced controls and "
+	                    + "options</li>"
+	                    + "</ul></p>"
+	                    + "</body></html>";
+				JOptionPane.showMessageDialog(null, String.format(txt, 300),
                     "Tips",
                     JOptionPane.PLAIN_MESSAGE);
 			}

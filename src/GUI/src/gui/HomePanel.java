@@ -110,6 +110,8 @@ public class HomePanel extends GUICardPanel
 		buttonsPanel.add(btnNewGraph);
 		
 		JButton btnReadGAOutput = new JButton("Inspect Evolutionary run");
+		btnReadGAOutput.setToolTipText("Analyzes the output folder of an "
+				+ "evolutionary experiment  (i.e., folder named RUN...)");
 		btnReadGAOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File file = DenoptimGUIFileOpener.pickFolder();
@@ -125,6 +127,8 @@ public class HomePanel extends GUICardPanel
 		buttonsPanel.add(btnReadGAOutput);
 		
         JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
+		btnReadGAOutput.setToolTipText("Analyzes the output folder of an "
+				+ "combinatorial experiment  (i.e., folder named FSE...)");
         btnReadFSEOutput.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 File file = DenoptimGUIFileOpener.pickFolder();

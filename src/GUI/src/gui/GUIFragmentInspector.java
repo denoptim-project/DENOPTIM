@@ -477,11 +477,35 @@ public class GUIFragmentInspector extends GUICardPanel
                     + "to get a tip.</html>");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,
-                    "<html>Hover over the buttons and fields "
-                    + "to get a tip.</html>",
-                    "Tips",
-                    JOptionPane.PLAIN_MESSAGE);
+				String txt = "<html><body width='%1s'>"
+						+ "<p>This tab allows to create, inspect, and edit"
+						+ " three-dimensional molecular fragments.</p>"
+						+ "<p>New fragments can be created starting from any "
+						+ "chemical structure that can be loaded from file or "
+						+ "generated from SMILES (SMILES-to-3D conversion "
+						+ "requires an Internet connection).</p>"
+						+ "<p>Any terminal atom (i.e., atoms that have only "
+						+ "one connected neighbor) can be transformed into "
+						+ "on attachment point (AP). Click on the atom to "
+						+ "select it, and press <code><b>Atom to AP</b></code>."
+						+ "</p>"
+						+ "<p>Attachment points are depicted in the molecular "
+						+ "viewer as yellow arrows in the 3D space, and their "
+						+ "attachment point class (APClass) is specified in "
+						+ "the table below the viewer. Double-click on a "
+						+ "specific APClass field to change its value.</p>"
+						+ "<br>"
+						+ "<p>Hover over buttons get a tip.</p>"
+						+ "<br>"
+						+ "<p>Right-click on the Jmol viewer will open the "
+						+ "Jmol menu. However, Jmol cannot handle the "
+						+ "attachment points data. Therefore, Jmol "
+						+ "functionality should only be used on systems "
+						+ "that have no attachment points.</p></html>";
+				JOptionPane.showMessageDialog(null, 
+						String.format(txt, 400),
+	                    "Tips",
+	                    JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 		commandsPane.add(btnHelp);

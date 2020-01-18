@@ -622,11 +622,28 @@ public class GUIGraphHandler extends GUICardPanel
                     + "to get a tip.</html>");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,
-                    "<html>Hover over the buttons and fields "
-                    + "to get a tip.</html>",
-                    "Tips",
-                    JOptionPane.PLAIN_MESSAGE);
+				String txt = "<html><body width='%1s'>"
+						+ "<p>This tab allows to create, inspect, and edit "
+						+ "DENOPTIM's graph representation of chemical "
+						+ "objects (i.e., DENOPTIMGraph).</p>"
+						+ "<br>"
+						+ "<p>DENOPTIMGraphs can be visualized by opening the "
+						+ "corresponding files. However, a fully defined "
+						+ "fragment space must be loaded in order to inspect "
+						+ "the molecular fragments contained in any node of a "
+						+ "DENOPTIMGraph, and also to build new DENOPTIMGraphs "
+						+ "from scratch.</p>"
+						+ "<br>"
+						+ "<p>Hover over buttons get a tip.</p>"
+						+ "<br>"
+						+ "<p>Right-click on the Jmol viewer will open the "
+						+ "Jmol menu. However, any change on the molecular "
+						+ "object will not be saved in the library of "
+						+ "fragments.</p></html>";
+				JOptionPane.showMessageDialog(null, 
+						String.format(txt, 400),
+	                    "Tips",
+	                    JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 		commandsPane.add(btnHelp);

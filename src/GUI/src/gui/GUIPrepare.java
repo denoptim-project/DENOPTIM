@@ -174,11 +174,18 @@ public class GUIPrepare extends GUICardPanel
 		btnHelp.setToolTipText("Help");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,
-                    new JLabel("<html>Hover over the buttons and parameter"
-                    		+ "fields to get a tip.</html>"),
-                    "Tips",
-                    JOptionPane.PLAIN_MESSAGE);
+				String txt = "<html><body width='%1s'>"
+	                    + "<p>This tab allows to create, inspect, and edit "
+	                    + "parameter used as input for DENOPTIM experiments. "
+	                    + "These parameters are then collected into an input "
+	                    + "file for DENOPTIM.</p>"
+	                    + "<br>"
+	                    + "<p>Hover over buttons and parameter fields to get "
+	                    + "informations on a specific parameter.</p></html>";
+				JOptionPane.showMessageDialog(null, 
+						String.format(txt, 350),
+	                    "Tips",
+	                    JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 		commandsPane.add(btnHelp);
