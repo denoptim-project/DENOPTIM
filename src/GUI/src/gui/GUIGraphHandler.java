@@ -987,7 +987,7 @@ public class GUIGraphHandler extends GUICardPanel
 				int res = JOptionPane.showOptionDialog(null,
 					"<html>Failed to detect file type from file's "
 					+ "extension.<br>"
-					+ "Please, specify tell me to interpret file <br>"
+					+ "Please, tell me how to interpret file <br>"
 					+ "'" + file.getAbsolutePath() + "'<br>"
 					+ "or 'Abandon' to give up.</html>",
 					"Specify File Type",
