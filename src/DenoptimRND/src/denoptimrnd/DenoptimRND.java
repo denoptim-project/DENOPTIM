@@ -20,25 +20,17 @@ package denoptimrnd;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.logging.Level;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.random.MersenneTwister;
 
-import constants.DENOPTIMConstants;
-import io.DenoptimIO;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
-import utils.GenUtils;
-import utils.GraphUtils;
-import utils.TaskUtils;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
-import utils.RandomUtils;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.utils.GenUtils;
+import denoptim.utils.RandomUtils;
 
 /**
  * Evolve a population using only random selection of new graphs.
@@ -139,7 +131,7 @@ public class DenoptimRND
     private static void run() throws DENOPTIMException
     {
         StopWatch watch = new StopWatch();
-             watch.start();
+        watch.start();
         
         StringBuilder sb = new StringBuilder(32);
 

@@ -18,8 +18,8 @@
 
 package preparefitnessoutput;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

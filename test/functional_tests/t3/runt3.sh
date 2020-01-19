@@ -24,6 +24,7 @@ exec 1>&6 6>&-
 
 #Check outcome
 nGraphs=$(cat $wrkDir/*/FSE-Level_*/F*.txt | wc -l | tr -d '[[:space:]]')
+#86
 if [[ $nGraphs != 86 ]]
 then
     echo " "

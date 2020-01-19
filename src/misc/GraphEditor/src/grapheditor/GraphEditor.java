@@ -23,13 +23,13 @@ import java.util.ArrayList;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import utils.GenUtils;
-import utils.GraphUtils;
-import utils.GraphConversionTool;
-import molecule.DENOPTIMGraph;
-import io.DenoptimIO;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.io.DenoptimIO;
 
 
 /**

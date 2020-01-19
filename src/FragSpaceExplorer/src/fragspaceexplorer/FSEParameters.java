@@ -18,25 +18,24 @@
 
 package fragspaceexplorer;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 
-import org.apache.commons.io.FileUtils;
-
-import molecule.DENOPTIMGraph;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import io.DenoptimIO;
-import rings.RingClosureParameters;
-import fragspace.FragmentSpaceParameters;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.rings.RingClosureParameters;
 
 
 /**
@@ -66,10 +65,11 @@ public class FSEParameters
      * File with user defined list of root graphs
      */
     private static String rootGraphsFile = null;
+    
     private static boolean useGivenRoots = false;
-    private static final String STRINGFORMATLABEL = "STRING";
-    private static final String BYTEFORMATLABEL = "BYTE";
-    private static String rootGraphsFormat = STRINGFORMATLABEL; //Default
+    
+    private static String rootGraphsFormat = 
+    		DENOPTIMConstants.GRAPHFORMATSTRING; //Default
 
     /**
      * User defined list of root graphs
@@ -87,18 +87,10 @@ public class FSEParameters
     private static boolean externalTask = false;
 
     /**
-     * External BASH script optionally submitted for each accepted graph
-     */
-    private static String externalScript = null;
-
-    /**
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
      * and reported as <code>String</code>s.
      */
-    private static String dbRootDir = ".";
-    protected static final String DIRNAMEROOT = "FSE-Level_";
-    protected static final String FILENAMEROOT = "dg_";
-    protected static final String FILENAMEEXT = "ser";
+    private static String dbRootDir = ".";  
 
     /**
      * Number of processors
@@ -200,23 +192,9 @@ public class FSEParameters
 
 //-----------------------------------------------------------------------------
 
-    public static String externalScriptName()
-    {
-	return externalScript;
-    }
-
-//-----------------------------------------------------------------------------
-
     public static String getDBRoot()
     {
 	return dbRootDir;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static String getPathnameExternalScript()
-    {
-	return externalScript;
     }
 
 //-----------------------------------------------------------------------------
@@ -340,6 +318,12 @@ public class FSEParameters
                     RingClosureParameters.interpretKeyword(line);
                     continue;
                 }
+                
+                if (line.toUpperCase().startsWith("FP-"))
+                {
+                    FitnessParameters.interpretKeyword(line);
+                    continue;
+                }
             }
         }
         catch (NumberFormatException | IOException nfe)
@@ -412,23 +396,23 @@ public class FSEParameters
         case "FSE-WORKDIR=":
             workDir = value;
             break;
-	case "FSE-ROOTGRAPHS=":
-	    rootGraphsFile = value;
-	    useGivenRoots = true;
-	    break;
+		case "FSE-ROOTGRAPHS=":
+		    rootGraphsFile = value;
+		    useGivenRoots = true;
+		    break;
         case "FSE-ROOTGRAPHSFORMAT=":
             rootGraphsFormat = value.toUpperCase();
             break;
         case "FSE-UIDFILE=":
             uidFile = value;
             break;
-	case "FSE-RESTARTFROMCHECKPOINT=":
-	    chkptFile = value;
-	    chkptRestart = true;
-	    break;
-	case "FSE-DEVEL-PREPAREFILESFORTESTS=":
-	    prepareChkAndSerForTests = true;
-	    break;
+		case "FSE-RESTARTFROMCHECKPOINT=":
+		    chkptFile = value;
+		    chkptRestart = true;
+		    break;
+		case "FSE-DEVEL-PREPAREFILESFORTESTS=":
+		    prepareChkAndSerForTests = true;
+		    break;
         case "FSE-CHECKPOINTSTEPLENGTH=":
             try
             {
@@ -440,13 +424,9 @@ public class FSEParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "FSE-EXTERNALTASK=":
-	    externalTask = true;
-            externalScript = value;
-            break;
-	case "FSE-DBROOTFOLDER=":
-	    dbRootDir = value;
-	    break;
+		case "FSE-DBROOTFOLDER=":
+		    dbRootDir = value;
+		    break;
         case "FSE-NUMOFPROCESSORS=":
             try
             {
@@ -547,39 +527,32 @@ public class FSEParameters
 	}
 
 	if (rootGraphsFormat != null 
-	    && !rootGraphsFormat.equals(STRINGFORMATLABEL)
-	    && !rootGraphsFormat.equals(BYTEFORMATLABEL))
+	    && !rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING)
+	    && !rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
         {
             msg = " The format for providing root graph must be either '" 
-		  + STRINGFORMATLABEL + "' (default) for human readable "
-		  + "strings, or '" + BYTEFORMATLABEL 
+		  + DENOPTIMConstants.GRAPHFORMATSTRING + "' (default) for human readable "
+		  + "strings, or '" + DENOPTIMConstants.GRAPHFORMATBYTE 
 		  + "' for serialized objects. "
 		  + "Unable to understand '" + rootGraphsFormat + "'.";
             throw new DENOPTIMException(msg);
         }
-	else if (rootGraphsFormat.equals(STRINGFORMATLABEL))
+	else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING))
 	{
-	    msg = "When root graphs are given as '"+ STRINGFORMATLABEL 
+	    msg = "When root graphs are given as '"+ DENOPTIMConstants.GRAPHFORMATSTRING 
 		  + "' existing symmetry relations between vertices belonging "
 		  + "to the root graphs are NOT perceived. Symmetry may only "
 		  + "be enforced starting from the first new layer of "
 		  + "vertices.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 	}
-	else if (rootGraphsFormat.equals(BYTEFORMATLABEL))
+	else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
 	{
 	    msg = "For now, only one serialized DENOPTIMGraph can by "
 		  + "given as user-defined root graph using format '" 
-		  + BYTEFORMATLABEL + "'.";
+		  + DENOPTIMConstants.GRAPHFORMATBYTE + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 	}
-
-	if (externalTask && !DenoptimIO.checkExists(externalScript))
-	{
-            msg = "BASH script " + externalScript + " not found. "
-                  + "Please specify an existing BASH script. ";
-           throw new DENOPTIMException(msg);
-	} 
 
 	if (numCPU <= 0 )
 	{
@@ -630,11 +603,11 @@ public class FSEParameters
     public static void processParameters() throws DENOPTIMException
     {
         boolean success = false;
-	String curDir = workDir;
-	if (curDir.equals("."))
-	{
-            curDir = System.getProperty("user.dir");
-	}
+		String curDir = workDir;
+		if (curDir.equals("."))
+		{
+	            curDir = System.getProperty("user.dir");
+		}
         String fileSep = System.getProperty("file.separator");
         while (!success)
         {
@@ -643,11 +616,11 @@ public class FSEParameters
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);
         }
-	if (dbRootDir.equals("."))
-	{
-	    dbRootDir = workDir;
-	}
-	logFile = workDir + ".log";
+		if (dbRootDir.equals("."))
+		{
+		    dbRootDir = workDir;
+		}
+		logFile = workDir + ".log";
 
         try
         {
@@ -667,30 +640,36 @@ public class FSEParameters
         {
             RingClosureParameters.processParameters();
         }
-
-	if (useGivenRoots)
-	{
+        
+        if (FitnessParameters.fitParamsInUse())
+        {
+            FitnessParameters.processParameters();
+            externalTask = true;
+        }
+        
+		if (useGivenRoots)
+		{
             try
             {
-		if (rootGraphsFormat.equals(STRINGFORMATLABEL))
-		{
+				if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING))
+				{
                     rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-								rootGraphsFile);
-		}
-		else if (rootGraphsFormat.equals(BYTEFORMATLABEL))
-		{
-		    rootGraphs = new ArrayList<DENOPTIMGraph>();
-		    //TODO get arraylist of graphs or accept multiple files
-		    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
-						      new File(rootGraphsFile));
-		    rootGraphs.add(g);
-		}
-		else
-		{
-		    String msg = "'" + rootGraphsFormat + "'"  
-			  + " is not a valid format for graphs.";
-		    throw new DENOPTIMException(msg);
-		}
+								rootGraphsFile,true);
+				}
+				else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
+				{
+				    rootGraphs = new ArrayList<DENOPTIMGraph>();
+				    //TODO get arraylist of graphs or accept multiple files
+				    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
+								      new File(rootGraphsFile));
+				    rootGraphs.add(g);
+				}
+				else
+				{
+				    String msg = "'" + rootGraphsFormat + "'"  
+					  + " is not a valid format for graphs.";
+				    throw new DENOPTIMException(msg);
+				}
             }
             catch (Throwable t)
             {
@@ -698,12 +677,12 @@ public class FSEParameters
                 DENOPTIMLogger.appLogger.log(Level.INFO,msg);
                 throw new DENOPTIMException(msg,t);
             }
-	}
-
-	if (chkptRestart)
-	{
-	    chkpt = FSEUtils.deserializeCheckpoint(chkptFile);
-	}
+		}
+	
+		if (chkptRestart)
+		{
+		    chkpt = FSEUtils.deserializeCheckpoint(chkptFile);
+		}
         else
         {
 	    chkpt = new FSECheckPoint();
@@ -723,10 +702,10 @@ public class FSEParameters
 
     public static void printParameters()
     {
-	if (!fseParamsInUse)
-	{
-	    return;
-	}
+		if (!fseParamsInUse)
+		{
+		    return;
+		}
         String eol = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder(1024);
         sb.append(" FSEParameters ").append(eol);
@@ -748,6 +727,7 @@ public class FSEParameters
 
         FragmentSpaceParameters.printParameters();
         RingClosureParameters.printParameters();
+        FitnessParameters.printParameters();
     }
 
 //----------------------------------------------------------------------------

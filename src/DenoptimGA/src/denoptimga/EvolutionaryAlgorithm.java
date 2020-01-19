@@ -25,24 +25,22 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.StopWatch;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
-
-import task.DENOPTIMTask;
-import task.DENOPTIMTaskManager;
-import utils.GenUtils;
-import utils.GraphUtils;
-import utils.TaskUtils;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
-import utils.RandomUtils;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.task.DENOPTIMTask;
+import denoptim.task.DENOPTIMTaskManager;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.RandomUtils;
+import denoptim.utils.TaskUtils;
 
 
 

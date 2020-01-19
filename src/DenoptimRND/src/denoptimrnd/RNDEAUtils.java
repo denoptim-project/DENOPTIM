@@ -18,27 +18,32 @@
 
 package denoptimrnd;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import logging.DENOPTIMLogger;
-import molecule.*;
-import utils.*;
-import utils.GraphConversionTool;
-import fragspace.FragmentSpace;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMStatUtils;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
 
 
 /**
@@ -256,7 +261,7 @@ class RNDEAUtils
         // everything else as a text file with links to individual molecules
         else
         {
-            mols = DenoptimIO.readTxtFile(fileName);
+            mols = DenoptimIO.readLinksToMols(fileName);
         }
 
         String fsep = System.getProperty("file.separator");

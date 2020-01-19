@@ -21,12 +21,13 @@ package denoptimcg;
 
 import java.util.ArrayList;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import molecule.DENOPTIMGraph;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import utils.GenUtils;
-import utils.GraphConversionTool;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
 
 /**
  *

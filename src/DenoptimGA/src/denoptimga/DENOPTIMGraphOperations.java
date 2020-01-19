@@ -19,35 +19,31 @@
 
 package denoptimga;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import utils.ObjectPair;
-import molecule.DENOPTIMAttachmentPoint;
-import molecule.DENOPTIMEdge;
-import molecule.DENOPTIMVertex;
-import molecule.SymmetricSet;
-import utils.GraphUtils;
-import utils.FragmentUtils;
-import rings.ClosableChain;
-import rings.ChainLink;
-import rings.RingClosureParameters;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
 import org.apache.commons.math3.random.MersenneTwister;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
-import utils.RandomUtils;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.rings.ChainLink;
+import denoptim.rings.ClosableChain;
+import denoptim.rings.RingClosureParameters;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.RandomUtils;
 
 /**
  *
@@ -58,7 +54,7 @@ import utils.RandomUtils;
 public class DENOPTIMGraphOperations
 {
 
-    // set tu true to debug
+    // set true to debug
     private static boolean debug = false;
 
 //------------------------------------------------------------------------------
@@ -229,7 +225,7 @@ public class DENOPTIMGraphOperations
         // Need to remember symmetry because we are deleting the symm. vertices
         boolean symmetry = molGraph.hasSymmetryInvolvingVertex(vid);
 
-        // delete the vertex and its children and all its simmetryc partners
+        // delete the vertex and its children and all its symmetric partners
         deleteFragment(molGraph, curVertex);
 
         // extend the graph at this vertex but without recursion
@@ -345,7 +341,7 @@ public class DENOPTIMGraphOperations
             }
 
             // Do we want to extend the graph at this AP?
-            double growthProb = EAUtils.getLevelProbability(lvl+1);
+            double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl);
             boolean fgrow =  RandomUtils.nextBoolean(growthProb);
             if (debug)
             {

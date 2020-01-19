@@ -18,28 +18,28 @@
 
 package denoptimga;
 
-import java.util.logging.Level;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-
+import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import io.DenoptimIO;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.MDLV3000Reader;
-import task.DENOPTIMTask;
-import task.ProcessHandler;
-import utils.DENOPTIMMoleculeUtils;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.task.DENOPTIMTask;
+import denoptim.task.ProcessHandler;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 
@@ -115,10 +115,14 @@ public class FitnessTask extends DENOPTIMTask
         // write the 2D file
         DenoptimIO.writeMolecule(molInitFile, molInit, false);
 
-        StringBuilder cmdStr = new StringBuilder();
+        //TODO: deal with internal fitness and other kinds of fitness
+
+        //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
         
-        cmdStr.append(System.getenv("SHELL")).append(" ")
-            .append(GAParameters.fitnessEvalScript)
+        StringBuilder cmdStr = new StringBuilder();
+        String shell = System.getenv("SHELL");
+        cmdStr.append(shell).append(" ")
+            .append(FitnessParameters.getExternalFitnessProvider())
             .append(" ").append(molInitFile).append(" ").append(molFinalFile)
             .append(" ").append(workDir).append(" ").append(super.getId())
             .append(" ").append(fileUID);
@@ -135,8 +139,11 @@ public class FitnessTask extends DENOPTIMTask
 
             if (ph_sc.getExitCode() != 0)
             {
-                msg = "Failed to execute shell script " + GAParameters.fitnessEvalScript +
-                    " on " + molInitFile;
+                msg = "Failed to execute "
+                             + System.getenv("SHELL")
+                             + " script '"
+                             + FitnessParameters.getExternalFitnessProvider()
+                             + "' on " + molInitFile;
                 DENOPTIMLogger.appLogger.severe(msg);
                 DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
                 throw new DENOPTIMException(msg);

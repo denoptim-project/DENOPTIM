@@ -18,24 +18,25 @@
 
 package denoptimrnd;
 
-import java.lang.reflect.Field;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.text.DateFormat;
 import java.util.logging.Level;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import logging.Version;
-import rings.RingClosureParameters;
-import fragspace.FragmentSpaceParameters;
 import org.apache.commons.io.FileUtils;
-import utils.RandomUtils;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.Version;
+import denoptim.rings.RingClosureParameters;
+import denoptim.utils.RandomUtils;
 
 
 /**

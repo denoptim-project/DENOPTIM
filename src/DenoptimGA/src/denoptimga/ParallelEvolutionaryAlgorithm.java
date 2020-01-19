@@ -18,34 +18,33 @@
 
 package denoptimga;
 
-import constants.DENOPTIMConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.logging.Level;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
+import java.util.logging.Level;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import utils.GenUtils;
-import utils.TaskUtils;
-
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
 import org.apache.commons.io.FilenameUtils;
-import utils.GraphUtils;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
-
 import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import utils.RandomUtils;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.RandomUtils;
+import denoptim.utils.TaskUtils;
 
 /**
  *
@@ -883,12 +882,14 @@ public class ParallelEvolutionaryAlgorithm
         {
             cleanup(tcons, futures, submitted);
             tcons.shutdown();
+            dex.printStackTrace();
             throw dex;
         }
         catch (Exception ex)
         {
             cleanup(tcons, futures, submitted);
             tcons.shutdown();
+            ex.printStackTrace();
             throw new DENOPTIMException(ex);
         }
 

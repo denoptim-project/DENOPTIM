@@ -29,12 +29,12 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.util.logging.Level;
 
-import molecule.DENOPTIMGraph;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import io.DenoptimIO;
-import rings.RingClosureParameters;
-import fragspace.FragmentSpaceParameters;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.io.DenoptimIO;
+import denoptim.rings.RingClosureParameters;
+import denoptim.fragspace.FragmentSpaceParameters;
 
 
 /**

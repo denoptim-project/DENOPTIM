@@ -19,45 +19,35 @@
 package fragspaceexplorer;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.logging.Level;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
+import java.util.logging.Level;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import utils.GenUtils;
-import utils.FragmentUtils;
-import utils.GraphUtils;
-import utils.GraphConversionTool;
-import utils.TaskUtils;
-import logging.DENOPTIMLogger;
-import molecule.*;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragsCombination;
-import fragspace.FragsCombinationIterator;
-
-import org.apache.commons.io.LineIterator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragsCombination;
+import denoptim.fragspace.FragsCombinationIterator;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.TaskUtils;
 
 
 /**
@@ -345,13 +335,13 @@ public class CombinatorialExplorerByLayer
                   + "of the previos run all graphs with ID higher than "
                   + chk.getLatestSafelyCompletedGraphId()
                   + ". You can find them in the "
-                  + "index file ('" + FSEParameters.DIRNAMEROOT + level
+                  + "index file ('" + DENOPTIMConstants.FSEIDXNAMEROOT + level
                   + ".txt'). ";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 
             Collection<File> lst = FileUtils.listFiles(
                                   new File(FSEUtils.getNameOfStorageDir(level)),
-                                       new String[] {FSEParameters.FILENAMEEXT},
+                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
 	    // Keep only safely completed serialized graphs
 	    serFromChkRestart = lst.size();
@@ -359,8 +349,8 @@ public class CombinatorialExplorerByLayer
 	    {
 		String fName = f.getName();
 		int serGrphID = Integer.parseInt(fName.substring(
-				            FSEParameters.FILENAMEROOT.length(),
-                          fName.length()-FSEParameters.FILENAMEEXT.length()-1));
+				            DENOPTIMConstants.SERGFILENAMEROOT.length(),
+                          fName.length()-DENOPTIMConstants.SERGFILENAMEEXT.length()-1));
 		if (serGrphID > chk.getLatestSafelyCompletedGraphId())
 		{
 		    msg = "Removing non-safely completed graph '" + fName + "'";
@@ -392,7 +382,7 @@ public class CombinatorialExplorerByLayer
                     {
                         Collection<File> lst = FileUtils.listFiles(
                                   new File(FSEUtils.getNameOfStorageDir(level)),
-                                       new String[] {FSEParameters.FILENAMEEXT},
+                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
                         int outCount = lst.size() - serFromChkRestart;
                         int totSubmSubTasks = countSubTasks();
@@ -477,7 +467,7 @@ public class CombinatorialExplorerByLayer
                 {
                     Collection<File> lstRootsForNextLev = FileUtils.listFiles(
                                 new File(FSEUtils.getNameOfStorageDir(level-1)),
-                                       new String[] {FSEParameters.FILENAMEEXT},
+                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
                     if (lstRootsForNextLev.size() == 0)
                     {
@@ -590,7 +580,7 @@ public class CombinatorialExplorerByLayer
             throw new DENOPTIMException(msg);
         }
         Collection<File> files = FileUtils.listFiles(new File(prevLevDirName),
-                               new String[] {FSEParameters.FILENAMEEXT}, false);
+                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT}, false);
         ArrayList<File> lstFiles = new ArrayList(files);
         Collections.sort(lstFiles);
         for (File file : lstFiles) 

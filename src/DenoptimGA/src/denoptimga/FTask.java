@@ -19,36 +19,37 @@
 
 package denoptimga;
 
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.concurrent.Callable;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-
-import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.io.MDLV3000Reader;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.CDKConstants;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.MDLV3000Reader;
 
-import exception.DENOPTIMException;
-import io.DenoptimIO;
-import logging.DENOPTIMLogger;
-import molecule.DENOPTIMGraph;
-import molecule.DENOPTIMMolecule;
-import task.ProcessHandler;
-import utils.DENOPTIMMoleculeUtils;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.task.ProcessHandler;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  *
- * @author Vishwesh Venkatraman and Marco Foscato
+ * @author Vishwesh Venkatraman
+ * @author Marco Foscato
  */
 public class FTask implements Callable
 {
@@ -142,12 +143,14 @@ public class FTask implements Callable
             molInit.setProperty("GraphMsg", molGraph.getMsg());
         }
 
+        //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
         // write the 2D file
         DenoptimIO.writeMolecule(molINITFile, molInit, false);
 
         String shell = System.getenv("SHELL");
         StringBuilder cmdStr = new StringBuilder();
-        cmdStr.append(shell).append(" ").append(GAParameters.fitnessEvalScript)
+        cmdStr.append(shell).append(" ")
+        		.append(FitnessParameters.getExternalFitnessProvider())
                 .append(" ").append(molINITFile).append(" ").append(molFinalFile)
                 .append(" ").append(workDir).append(" ").append(id)
                 .append(" ").append(fileUID);
@@ -163,9 +166,11 @@ public class FTask implements Callable
             if (ph_sc.getExitCode() != 0)
             {
                 hasException = true;
-                msg = "Failed to execute shell script " 
-			+ GAParameters.fitnessEvalScript
-                        + " on " + molINITFile;
+                msg = "Failed to execute "
+                             + System.getenv("SHELL")
+                             + " script '"
+                             + FitnessParameters.getExternalFitnessProvider()
+                             + "' on " + molINITFile;
 		errMsg = msg;
                 DENOPTIMLogger.appLogger.severe(msg);
                 DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
@@ -193,7 +198,7 @@ public class FTask implements Callable
                 msg = "Unreadable FIT file for " + molName;
 		DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
 		
-		// make a copy of theunreadable FIT file that will be replaced
+		// make a copy of the unreadable FIT file that will be replaced
 		String molFFileCp = workDir + fsep + molName 
 							  + "_UnreadbleFIT.sdf";
 		FileUtils.copyFile(new File(molFinalFile), 
@@ -205,7 +210,7 @@ public class FTask implements Callable
 		mol3DFinal.addAtom(new Atom("H"));
 		mol3DFinal.setProperty(CDKConstants.TITLE, molName);
 		mol3DFinal.setProperty("MOL_ERROR", 
-			   "#FTask: Unable to retrive dats. See " + molFFileCp);
+			   "#FTask: Unable to retrive data. See " + molFFileCp);
                 mol3DFinal.setProperty("GCODE", molGraph.getGraphId());
                 mol3DFinal.setProperty("GraphENC", molGraph.toString());
 		DenoptimIO.writeMolecule(molFinalFile, mol3DFinal, false);
@@ -286,7 +291,6 @@ public class FTask implements Callable
                 {
                     numtry--;
                 }
-                
                 
                 // image creation
                 if (GAParameters.getGraphicsCreationStatus())

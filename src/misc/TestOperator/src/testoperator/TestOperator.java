@@ -21,12 +21,12 @@ package testoperator;
 import java.util.ArrayList;
 import java.io.File;
 
-import utils.GenUtils;
-import utils.GraphUtils;
-import utils.GraphConversionTool;
-import io.DenoptimIO; 
-import molecule.DENOPTIMGraph;
-import exception.DENOPTIMException;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.io.DenoptimIO; 
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.exception.DENOPTIMException;
 import denoptimga.DENOPTIMGraphOperations;
 
 /**

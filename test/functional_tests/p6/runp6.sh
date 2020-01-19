@@ -47,14 +47,6 @@ then
     echo "Error copying base of serialized graphs for t6."
     exit -1
 fi
-cp -r "$wrkDir"/FSE*/FSE-Level_2/dg_96.ser "$DENOPTIM_HOME/test/functional_tests/t7/data/dg_96.ser"
-if [ $? != 0 ]
-then
-    echo " "
-    echo "Error copying serialized graph for t7."
-    exit -1
-fi
-
 
 exit 0
 

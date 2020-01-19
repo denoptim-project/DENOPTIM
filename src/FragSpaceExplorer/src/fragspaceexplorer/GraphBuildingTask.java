@@ -18,28 +18,36 @@
 
 package fragspaceexplorer;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.logging.Level;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import logging.DENOPTIMLogger;
-import task.ProcessHandler;
-import molecule.*;
-import utils.*;
-import io.DenoptimIO;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragsCombination;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.FragsCombination;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.task.ProcessHandler;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
 
 
 /**
@@ -103,7 +111,7 @@ public class GraphBuildingTask implements Callable
     private int nSubTasks = 0;
 
     /**
-     * Executior for external bash script
+     * Executor for external bash script
      */
     private ProcessHandler ph_sc;
 
@@ -123,7 +131,7 @@ public class GraphBuildingTask implements Callable
  
     /**
      * @return <code>true</code> if an exception has been thrown within this 
-     * subtask, which also includes the senarion where the executed external
+     * subtask, which also includes the scenario where the executed external
      * script returned a non-zero exit status.
      */
   
@@ -420,9 +428,7 @@ public class GraphBuildingTask implements Callable
                     String lst = "[";
                     for (int ig = 0; ig<sz-1; ig++)
                     {
-    
                         lst = lst + altCyclicGraphs.get(ig).getGraphId()+", ";
-    
                     }
                     lst = lst + altCyclicGraphs.get(sz-1).getGraphId() + "]";
     
@@ -442,7 +448,9 @@ public class GraphBuildingTask implements Callable
                         }
 
                         // Prepare vector of results
-                        Object[] altRes = new Object[3];
+                        // NB: in FSE we add also the ID of the root graph in 
+                        // this array
+                        Object[] altRes = new Object[5];
 
                         try 
                         {
@@ -450,6 +458,11 @@ public class GraphBuildingTask implements Callable
                             GraphConversionTool gct = new GraphConversionTool();
                             IAtomContainer mol = gct.convertGraphToMolecule(g,
                                                                           true);
+                            // Level that generated this graph
+                            altRes[4] = level;
+                            
+                            // Parent graph
+                            altRes[3] = rootId;
 
                             DENOPTIMMoleculeUtils.removeRCA(mol,g);
                             altRes[2] = mol;
@@ -471,7 +484,7 @@ public class GraphBuildingTask implements Callable
                                 pr.setFirst("UNDEFINED_INCHI");
                             }
                             altRes[0] = pr.getFirst(); 
-        
+                      
                             // Store graph
                             FSEUtils.storeGraphOfLevel(g,level,rootId,nextIds);
                             graphId = gId;
@@ -499,14 +512,20 @@ public class GraphBuildingTask implements Callable
                     // Optionally perform external task 
                     if (FSEParameters.submitExternalTask() && !needsCaps)
                     {
-                        executeExternalBASHScript(res, molGraph.getGraphId());
+                    	Object[] fseRes = new Object[5];
+                    	fseRes[0] = res [0];
+                    	fseRes[1] = res [1];
+                    	fseRes[2] = res [2];
+                    	fseRes[3] = rootId;
+                    	fseRes[4] = level;
+                        executeExternalBASHScript(fseRes, molGraph.getGraphId());
                     }
                 }
             }
         }
         catch (Throwable t)
         {
-            // This is a trick to trasnmit the exception to the parent thread
+            // This is a trick to transmit the exception to the parent thread
             // and store it as a property of the present task
             hasException = true;
             thrownExc = t;
@@ -533,27 +552,38 @@ public class GraphBuildingTask implements Callable
         String molinchi = res[0].toString().trim();
         String molsmiles = res[1].toString().trim();
         IAtomContainer molInit = (IAtomContainer) res[2];
+        String parentGraphId = res[3].toString().trim();
+        String level = res[4].toString().trim();
         molInit.setProperty("InChi", molinchi);
         molInit.setProperty("SMILES", molsmiles);
+        molInit.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
+        molInit.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
+        
 
-        String molName = "M" + GenUtils.getPaddedString(
-                                                    DENOPTIMConstants.MOLDIGITS,
+        String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
+        		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
         String workDir = FSEParameters.getWorkDirectory();
         String fsep = System.getProperty("file.separator");
-        String molInitFile = workDir + fsep + molName + "_inp.sdf";
-        String molFinalFile = workDir + fsep + molName + "_out.sdf";
+        String molInitFile = workDir + fsep + molName 
+        		+ DENOPTIMConstants.FITFILENAMEEXTIN;
+        String molFinalFile = workDir + fsep + molName 
+        		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
 
         molInit.setProperty(CDKConstants.TITLE, molName);
 
         // write current graph to file as molecular objects
         DenoptimIO.writeMolecule(molInitFile, molInit, false);
 
+        //TODO: deal with internal fitness and other kinds of fitness
+
+        //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
+
         // build command
-        String shell = System.getenv("SHELL");
         StringBuilder cmdStr = new StringBuilder();
+        String shell = System.getenv("SHELL");
         cmdStr.append(shell).append(" ")
-              .append(FSEParameters.getPathnameExternalScript())
+              .append(FitnessParameters.getExternalFitnessProvider())
               .append(" ").append(molInitFile)
               .append(" ").append(molFinalFile)
               .append(" ").append(workDir)
@@ -573,9 +603,11 @@ public class GraphBuildingTask implements Callable
             ph_sc.runProcess();
             if (ph_sc.getExitCode() != 0)
             {
-                String msg = "Failed to execute shell script " 
-                             + FSEParameters.getPathnameExternalScript()
-                             + " on " + molInitFile;
+                String msg = "Failed to execute "
+                             + FitnessParameters.getExternalFitnessProviderInterpreter().toString()
+                             + " script '"
+                             + FitnessParameters.getExternalFitnessProvider()
+                             + "' on " + molInitFile;
                 DENOPTIMLogger.appLogger.severe(msg);
                 DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
                 throw new DENOPTIMException(msg);

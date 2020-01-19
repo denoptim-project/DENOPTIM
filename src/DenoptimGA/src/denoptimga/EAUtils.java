@@ -19,23 +19,19 @@
 
 package denoptimga;
 
-import constants.DENOPTIMConstants;
-import exception.DENOPTIMException;
-import io.DenoptimIO;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.graph.ConnectivityChecker;
@@ -43,17 +39,33 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
-import logging.DENOPTIMLogger;
-import molecule.*;
-import utils.*;
-import rings.CyclicGraphHandler;
-import rings.RingClosureParameters;
-import rings.RingClosuresArchive;
-import utils.GraphConversionTool;
-import utils.FragmentUtils;
-import fragspace.IdFragmentAndAP;
-import fragspace.FragmentSpace;
-import fragspace.FragmentSpaceParameters;
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.SymmetricSet;
+import denoptim.rings.CyclicGraphHandler;
+import denoptim.rings.RingClosureParameters;
+import denoptim.rings.RingClosuresArchive;
+import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMStatUtils;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
+import denoptim.utils.RandomUtils;
+import denoptim.utils.RotationalSpaceUtils;
 
 
 /**
@@ -61,7 +73,7 @@ import fragspace.FragmentSpaceParameters;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-class EAUtils
+public class EAUtils
 {
     // cluster the fragments based on their #APs
     protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
@@ -134,6 +146,8 @@ class EAUtils
         double sdev = DENOPTIMMathUtils.stddevp(fitness);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
+        
+        String floatForm = "%12." + GAParameters.getPrecisionLevel() + "f";
 
         if (sdev > 0.0001)
         {
@@ -144,22 +158,22 @@ class EAUtils
             sb.append(System.getProperty("line.separator"));
             double f;
             f = DENOPTIMStatUtils.max(fitness);
-            sb.append(String.format("%-30s", "MAX:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MAX:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.min(fitness);
-            sb.append(String.format("%-30s", "MIN:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MIN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.mean(fitness);
-            sb.append(String.format("%-30s", "MEAN:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MEAN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.median(fitness);
-            sb.append(String.format("%-30s", "MEDIAN:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "MEDIAN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.stddev(fitness, true);
-            sb.append(String.format("%-30s", "STDDEV:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "STDDEV:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
             f = DENOPTIMStatUtils.skewness(fitness, true);
-            sb.append(String.format("%-30s", "SKEW:")).append(String.format("%12.3f", f));
+            sb.append(String.format("%-30s", "SKEW:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
 
             int sz = FragmentSpace.getScaffoldLibrary().size();
@@ -507,7 +521,7 @@ class EAUtils
         // process everything else as a text file with links to individual molecules
         else
         {
-            mols = DenoptimIO.readTxtFile(filename);
+            mols = DenoptimIO.readLinksToMols(filename);
         }
 
         String fsep = System.getProperty("file.separator");
@@ -1863,42 +1877,61 @@ MF: TO BE TESTED
         DenoptimIO.writeMolecule(rejectedFile, molecule, true);
     }
 */
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 
     /**
-     * Calculates the probability of adding a fragment at this level.
+     * Calculates the probability of adding a fragment to the given level level.
      * This will require a coin toss with the calculated probability. If a newly
      * drawn random number is less than this value, a new fragment may be added.
      * @param level level of the graph at which fragment is to be added
+     * @param scheme the chosen scheme
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
      * @return probability of adding a new fragment at this level.
      */
-    protected static double getLevelProbability(int level)
+    
+    public static double getGrowthProbabilityAtLevel(int level, int scheme, 
+    		double lambda, double sigmaOne, double sigmaTwo)
     {
         double prob = 0.0;
-        int scheme = GAParameters.getGrowthProbabilityScheme();
-
+        
         if (scheme == 0)
         {
-            double f = Math.exp(-1.0 * level *
-                                    GAParameters.getGrowthMultiplier());
+            double f = Math.exp(-1.0 * (double)level * lambda);
             prob = 1 - ((1-f)/(1+f));
         }
         else if (scheme == 1)
         {
-            prob = 1.0 - Math.tanh(GAParameters.getGrowthMultiplier()
-				   * (double)level);
+            prob = 1.0 - Math.tanh(lambda * (double)level);
         }
         else if (scheme == 2)
         {
-            double a = GAParameters.getGrowthFactorSteepSigma();
-            double b = GAParameters.getGrowthFactorMiddleSigma();
-            prob = 1.0-1.0/(1.0 + Math.exp(-a * ((double) level - b)));
+            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * ((double) level - sigmaTwo)));
         }
         else if (scheme == 3)
         {
-            prob = 1;
+            prob = 1.0;
         }
+        
         return prob;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculates the probability of adding a fragment to the given level.
+     * Used the settings defined by the GAParameters class.
+     * @param level level of the graph at which fragment is to be added
+     * @return probability of adding a new fragment at this level.
+     */
+    public static double getGrowthProbabilityAtLevel(int level)
+    {
+        int scheme = GAParameters.getGrowthProbabilityScheme();
+        double lambda =GAParameters.getGrowthMultiplier();
+        double sigmaOne = GAParameters.getGrowthFactorSteepSigma();
+        double sigmaTwo = GAParameters.getGrowthFactorMiddleSigma();
+        return getGrowthProbabilityAtLevel(level, scheme, lambda, sigmaOne, sigmaTwo);
     }
 
 
@@ -1906,7 +1939,7 @@ MF: TO BE TESTED
 
     /**
      * For the class associated with the AP identify a compatible fragment and
-     * a proper attachment point in it. Thid method searches only among 
+     * a proper attachment point in it. This method searches only among 
      * fragments (i.e., library of type 1).
      * @param curDap the attachment point for which we ask for a partner.
      * @return the vector of indeces defining the chosen fragment and the

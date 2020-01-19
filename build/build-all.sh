@@ -155,6 +155,17 @@ if [ "$?" != "0" ]; then
     exit -1
 fi
 
+echo
+echo
+
+echo "build-gui.sh"
+bash build-gui.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-gui.sh."
+    exit -1
+fi
+
 
 if [ "$1" = "makedist" ]; then
     if [ -d "dist" ]; then
