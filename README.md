@@ -12,6 +12,8 @@ DENOPTIM is cross-platform, i.e., runs on Windows, Linux, and MacOS, and comes w
 The graphical user interface (GUI) of DENOPTIM facilitates the preparation and analysis of DENOPTIM experiments. After building the DENOPTIM package (see Installation), the GUI can be launched by double-click on the <code>$DENOPTIM_HOME/build/GUI.jar</code> (Win/Mac/Linux) file or using the following command (Mac/Linux):
 
     java -jar $DENOPTIM_HOME/build/GUI.jar
+    
+where <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned from the GitHub repository
 
 ### Command Line Programs (Mac/Linux)
 DENOPTIM programs are typically run using the following command
