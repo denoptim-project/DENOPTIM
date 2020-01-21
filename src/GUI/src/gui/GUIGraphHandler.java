@@ -645,6 +645,8 @@ public class GUIGraphHandler extends GUICardPanel
 						+ "DENOPTIM's graph representation of chemical "
 						+ "objects (i.e., DENOPTIMGraph).</p>"
 						+ "<br>"
+						+ "<p>Hover over buttons get a tip.</p>"
+						+ "<br>"
 						+ "<p>DENOPTIMGraphs can be visualized by opening the "
 						+ "corresponding files. However, a fully defined "
 						+ "fragment space must be loaded in order to inspect "
@@ -652,8 +654,13 @@ public class GUIGraphHandler extends GUICardPanel
 						+ "DENOPTIMGraph, and also to build new DENOPTIMGraphs "
 						+ "from scratch.</p>"
 						+ "<br>"
-						+ "<p>Hover over buttons get a tip.</p>"
+						+ "<p><b>Graph view</b></p>"
+						+ "<p>Move the mouse up/down while holding the "
+						+ "<code>ctrl</code> key to zoom in/out.</p>"
+						+ "<p>Move the mouse left/right while holding the "
+						+ "<code>Alt</code> key to pan the view.</p>"
 						+ "<br>"
+						+ "<p><b>Fragment view</b></p>"
 						+ "<p>Right-click on the Jmol viewer will open the "
 						+ "Jmol menu. However, any change on the molecular "
 						+ "object will not be saved in the library of "
@@ -1236,7 +1243,10 @@ public class GUIGraphHandler extends GUICardPanel
 			// null is used to trigger cleanup
 			if (evt.getNewValue() == null)
 			{
-				fragViewer.clearAll();
+				if (fragViewer != null)
+				{
+					fragViewer.clearAll();
+				}
 			}
 			
 			// Otherwise try to load the fragment into the viewer

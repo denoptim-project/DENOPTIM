@@ -250,7 +250,7 @@ public class GraphViewerPanel extends JPanel
 							{
 								Sprite sSrc = sman.addSprite(sId);
 								sSrc.setAttribute("ui.class", "apLabel");
-								sSrc.addAttribute("ui.label", 
+								sSrc.addAttribute("ui.label", (String)
 										e.getAttribute("dnp.srcAPClass"));
 								sSrc.attachToEdge(e.getId());
 								sSrc.setPosition(0.3);
@@ -263,7 +263,7 @@ public class GraphViewerPanel extends JPanel
 							{
 								Sprite sTrg = sman.addSprite(sId);
 								sTrg.setAttribute("ui.class", "apLabel");
-								sTrg.addAttribute("ui.label", 
+								sTrg.addAttribute("ui.label", (String)
 										e.getAttribute("dnp.trgAPClass"));
 								sTrg.attachToEdge(e.getId());
 								sTrg.setPosition(0.7);
@@ -281,7 +281,7 @@ public class GraphViewerPanel extends JPanel
 					{
 						Sprite s = sman.addSprite(sId);
 						s.setAttribute("ui.class", "bndTypLabel");
-						s.addAttribute("ui.label", e.getAttribute("dnp.bondType"));
+						s.addAttribute("ui.label", e.getAttribute("dnp.bondType").toString());
 						s.attachToEdge(e.getId());
 						s.setPosition(0.5);
 					}
