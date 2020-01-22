@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -42,20 +43,18 @@ public class GUI
 {
 
 	private JFrame frame;     //GUI window frame
-	private int mainFrameInitX = 100;
-	private int mainFrameInitY = 100;
 	private JPanel framePane; //Panel including tool bar
 	private GUIMainPanel mainPanel; //Panel including all but tool bar
 
 	/**
 	 * Default width
 	 */
-	private int width = 800;
+	private int width = 900;
 	
 	/**
 	 * Default height
 	 */
-	private int height = 500;
+	private int height = 600;
 	
 	/**
 	 * Launch the application.
@@ -65,6 +64,8 @@ public class GUI
 			public void run() {
 				try {
 					GUI window = new GUI();
+					window.frame.pack();
+					window.frame.setLocationRelativeTo(null);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -89,7 +90,7 @@ public class GUI
 	 */
 	private void initialize() {
 		frame = new JFrame("DENOPTIM - GUI");
-		frame.setBounds(mainFrameInitX, mainFrameInitY, width, height);
+		frame.setPreferredSize(new Dimension(width, height));
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 		    @Override

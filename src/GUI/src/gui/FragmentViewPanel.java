@@ -139,6 +139,7 @@ public class FragmentViewPanel extends JSplitPane
 		this.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		this.setOneTouchExpandable(true);
 		this.setDividerLocation(dividerPosition);
+		this.setResizeWeight(0.5);
         
         // Jmol viewer panel
         jmolPanel = new JmolPanel();

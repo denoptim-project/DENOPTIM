@@ -54,7 +54,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     private String molFile;
 
     /**
-     * File containing the graphical depiction of the molecule
+     * File containing the picture of the molecule
      */
     private String imgFile;
     
@@ -74,9 +74,9 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     private boolean hasFitness;
     
     /**
-     * Generation this molecule belong to
+     * ID of the generation this molecule belong to (or -1)
      */
-    private int generationId;
+    private int generationId = -1;
     
     /**
      * Name (not guaranteed to be unique)

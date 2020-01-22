@@ -37,6 +37,7 @@ import javax.swing.table.JTableHeader;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -60,6 +61,12 @@ public class MoleculeViewPanel extends JSplitPane
 	 * The currently loaded item
 	 */
 	private DENOPTIMMolecule item;
+	
+	/**
+	 * Flag controlling behavior in case of partial data 
+	 * (e.r., lack of fitness/error)
+	 */
+	private boolean toleratePartialData = false;
 	
 	private JmolPanel jmolPanel;
 	private JScrollPane tabPanel;
@@ -131,15 +138,45 @@ public class MoleculeViewPanel extends JSplitPane
 	}
 	
 //-----------------------------------------------------------------------------
+	
+	/**
+	 * Sets the behavior in case of request to visualize partial data. E.g.,
+	 * SDF files that have neither fitness nor error field.
+	 */
+	public void enablePartialData(boolean enable)
+	{
+		toleratePartialData = enable;
+	}
+	
+//-----------------------------------------------------------------------------
 
 	/**
 	 * Loads a structure in the Jmol viewer.
 	 * @param mol the structure to load
 	 */
-	public void loadMolecularFromFile(String pathName)
+	public void loadChemicalStructure(IAtomContainer mol)
+	{
+		try {
+			DenoptimIO.writeMolecule(tmpSDFFile, mol, false);
+		} catch (DENOPTIMException e) {
+			System.out.println("Could not write molecular representation to "
+					+ "tmp file. Thus, could not load it into Jmol viewer.");
+			return;
+		}
+		File file = new File(tmpSDFFile);
+		loadChemicalStructureFromFile(file);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Loads a structure in the Jmol viewer.
+	 * @param mol the structure to load
+	 */
+	public void loadChemicalStructureFromFile(String pathName)
 	{
 		File file = new File(pathName);
-		loadMolecularFromFile(file);
+		loadChemicalStructureFromFile(file);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -148,7 +185,7 @@ public class MoleculeViewPanel extends JSplitPane
 	 * Loads a structure in the Jmol viewer.
 	 * @param file the file to open
 	 */
-	public void loadMolecularFromFile(File file)
+	public void loadChemicalStructureFromFile(File file)
 	{
 		clearAll();
 		
@@ -156,13 +193,27 @@ public class MoleculeViewPanel extends JSplitPane
 		try {
 			item = DenoptimIO.readDENOPTIMMolecules(file, false).get(0);
 		} catch (DENOPTIMException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
-	                "<html>Could not load data from file <br>'" + file +"'.",
-	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
-			return;			
+			if (!toleratePartialData)
+			{
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,
+		                "<html>Could not load data from file <br>'" + file +"'.",
+		                "Error",
+		                JOptionPane.PLAIN_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"));
+				return;
+			}
+			else
+			{
+				try {
+					item = (DENOPTIMMolecule) DenoptimIO.readMoleculeData(
+							file.getAbsolutePath()).get(0);
+				} catch (DENOPTIMException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					return;
+				}
+			}
 		}
 
 		fillDataTable();
@@ -177,8 +228,15 @@ public class MoleculeViewPanel extends JSplitPane
 	
 	private void fillDataTable()
 	{
-		dataTabModel.addRow(new Object[]{"Name", item.getName()});
-		dataTabModel.addRow(new Object[]{"UID", item.getMoleculeUID()});
+		
+		if (item.getName() != null) 
+		{
+			dataTabModel.addRow(new Object[] { "Name", item.getName() });
+		}
+		if (item.getMoleculeUID() != null) 
+		{
+			dataTabModel.addRow(new Object[] { "UID", item.getMoleculeUID() });
+		}
 		if (item.hasFitness())
 		{
 			dataTabModel.addRow(new Object[]{"Fitness", 
@@ -186,10 +244,20 @@ public class MoleculeViewPanel extends JSplitPane
 		}
 		else
 		{
-			dataTabModel.addRow(new Object[]{"Error", item.getError()});
+			if (item.getError() != null) 
+			{
+				dataTabModel.addRow(new Object[] { "Error", item.getError() });
+			}
 		}
-		dataTabModel.addRow(new Object[]{"Generation", item.getGeneration()});
-		dataTabModel.addRow(new Object[]{"Source", item.getComments()});
+		if (item.getGeneration() > -1) 
+		{
+			dataTabModel.addRow(new Object[] { "Generation",
+					item.getGeneration() });
+		}
+		if (item.getComments() != null) 
+		{
+			dataTabModel.addRow(new Object[] { "Source", item.getComments() });
+		}
 	}
 
 //-----------------------------------------------------------------------------

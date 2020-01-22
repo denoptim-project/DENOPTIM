@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -75,7 +76,6 @@ public class HomePanel extends GUICardPanel
 		//Central panel (figure and shortcuts)
 		JPanel centralPanel = new JPanel();
 		this.add(centralPanel, BorderLayout.CENTER);
-		centralPanel.setLayout(new GridLayout(2, 1, 3, 0));
 		
 		//Figure panel
 		JPanel figurePanel = new JPanel();
@@ -105,7 +105,6 @@ public class HomePanel extends GUICardPanel
 				mainPanel.add(new GUIPrepareGARun(mainPanel));
 			}
 		});
-		buttonsPanel.add(btnNewGA);
 		
 		JButton btnNewVirtualScreening = new JButton("New Virtual Screening");
 		btnNewVirtualScreening.addActionListener(new ActionListener() {
@@ -113,7 +112,6 @@ public class HomePanel extends GUICardPanel
 				mainPanel.add(new GUIPrepareFSERun(mainPanel));
 			}
 		});
-		buttonsPanel.add(btnNewVirtualScreening);
 		
 		//TODO: new fragmentation job with GM3DFragmenter "New Fragmentation"
 		
@@ -123,7 +121,6 @@ public class HomePanel extends GUICardPanel
 				mainPanel.add(new GUIFragmentInspector(mainPanel));
 			}
 		});
-		buttonsPanel.add(btnNewFragments);
 		
 		JButton btnNewGraph = new JButton("New DENOPTIM Graph");
 		btnNewGraph.addActionListener(new ActionListener() {
@@ -131,7 +128,6 @@ public class HomePanel extends GUICardPanel
 				mainPanel.add(new GUIGraphHandler(mainPanel));
 			}
 		});
-		buttonsPanel.add(btnNewGraph);
 		
 		JButton btnReadGAOutput = new JButton("Inspect Evolutionary run");
 		btnReadGAOutput.setToolTipText("Analyzes the output folder of an "
@@ -148,7 +144,6 @@ public class HomePanel extends GUICardPanel
 				inspector.importGARunData(file);
 			}
 		});
-		buttonsPanel.add(btnReadGAOutput);
 		
         JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
         btnReadFSEOutput.setToolTipText("Analyzes the output folder of an "
@@ -165,7 +160,7 @@ public class HomePanel extends GUICardPanel
                 inspector.importFSERunData(file);
             }
         });
-        buttonsPanel.add(btnReadFSEOutput);
+ 
 		
 		//Credits panel
 		JPanel creditsPanel = new JPanel();
@@ -199,7 +194,44 @@ public class HomePanel extends GUICardPanel
                 }
 		    }
 		});
-		creditsPanel.add(email);		
+		creditsPanel.add(email);	
+		
+		JLabel labShortcuts = new JLabel("Shortcuts:");
+		
+		JLabel labEmpty = new JLabel("<html><br><br><br><br><br><br></html>");
+		
+        // Here we define the position of all the components of the central panel
+		GroupLayout lyoCentralPanel = new GroupLayout(centralPanel);
+		centralPanel.setLayout(lyoCentralPanel);
+		lyoCentralPanel.setAutoCreateGaps(true);
+		lyoCentralPanel.setAutoCreateContainerGaps(true);
+		lyoCentralPanel.setHorizontalGroup(lyoCentralPanel.createParallelGroup(
+        		GroupLayout.Alignment.CENTER)
+        		.addComponent(figurePanel)
+        		.addComponent(labShortcuts)
+        		.addGroup(lyoCentralPanel.createSequentialGroup()
+        				.addComponent(btnNewFragments)
+        				.addComponent(btnNewGraph))
+        		.addGroup(lyoCentralPanel.createSequentialGroup()
+        				.addComponent(btnNewGA)
+        				.addComponent(btnNewVirtualScreening))
+        		.addGroup(lyoCentralPanel.createSequentialGroup()
+        				.addComponent(btnReadGAOutput)
+        				.addComponent(btnReadFSEOutput))
+        		.addComponent(labEmpty));
+		lyoCentralPanel.setVerticalGroup(lyoCentralPanel.createSequentialGroup()
+				.addComponent(figurePanel)
+				.addComponent(labShortcuts)
+                .addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
+        				.addComponent(btnNewFragments)
+        				.addComponent(btnNewGraph))
+        		.addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
+        				.addComponent(btnNewGA)
+        				.addComponent(btnNewVirtualScreening))
+        		.addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
+        				.addComponent(btnReadGAOutput)
+        				.addComponent(btnReadFSEOutput))
+                .addComponent(labEmpty));
 		
 
 		//TODO del: only for devel

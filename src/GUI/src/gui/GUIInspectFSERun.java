@@ -632,7 +632,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		chartBySorted.getXYPlot().setDataset(1, datasetSelectedOrd);
 		
 		// Update the molecular viewer
-		molViewer.loadMolecularFromFile(mol.getMoleculeFile());
+		molViewer.loadChemicalStructureFromFile(mol.getMoleculeFile());
 	}
 	
 //-----------------------------------------------------------------------------

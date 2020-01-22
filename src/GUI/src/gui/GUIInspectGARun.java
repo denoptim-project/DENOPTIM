@@ -317,7 +317,7 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		System.out.println("Importing data from '" + srcFolder + "'...");
 		
-		Map<Integer,double[]> popPropertiess = new HashMap<Integer,double[]>();
+		Map<Integer,double[]> popProperties = new HashMap<Integer,double[]>();
 		allIndividuals = new ArrayList<DENOPTIMMolecule>();
 		for (File genFolder : file.listFiles(new FileFilter() {
 			
@@ -356,7 +356,7 @@ public class GUIInspectGARun extends GUICardPanel
 		                UIManager.getIcon("OptionPane.errorIcon"));
 			}
 			try {
-				popPropertiess.put(genId, DenoptimIO.readPopulationProps(
+				popProperties.put(genId, DenoptimIO.readPopulationProps(
 						genSummary));
 			} catch (DENOPTIMException e2) {
 				JOptionPane.showMessageDialog(null,
@@ -366,6 +366,8 @@ public class GUIInspectGARun extends GUICardPanel
 		                "Error",
 		                JOptionPane.PLAIN_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));
+				popProperties.put(genId, new double[] {
+						Double.NaN, Double.NaN, Double.NaN, Double.NaN});
 			}
 			
 			
@@ -433,14 +435,14 @@ public class GUIInspectGARun extends GUICardPanel
         }
 		datasetAllFit.addSeries("Candidates_with_fitness", candsWithFitnessData);
 		
-		int numGen = popPropertiess.keySet().size();
+		int numGen = popProperties.keySet().size();
 		double[][] popMin = new double[2][numGen];
 		double[][] popMax = new double[2][numGen];
 		double[][] popMean = new double[2][numGen];
 		double[][] popMedian = new double[2][numGen];
 		for (int i=0; i<numGen; i++)
 		{
-			double[] values = popPropertiess.get(i);			
+			double[] values = popProperties.get(i);
 			popMin[0][i] = i;
 			popMin[1][i] = values[0];
 			popMax[0][i] = i;
@@ -458,7 +460,7 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		
 		//TODO: somehow collect and display the candidates that hit a mol error
-		//      Could it be a histograpm (#failed x gen) below theevolution plot
+		//      Could it be a histogram (#failed x gen) below the evolution plot
 		
 		chart = ChartFactory.createScatterPlot(
 	            null,                         // plot title
@@ -637,7 +639,7 @@ public class GUIInspectGARun extends GUICardPanel
 		chart.getXYPlot().setDataset(1, datasetSelected);
 		
 		// Update the molecular viewer
-		molViewer.loadMolecularFromFile(mol.getMoleculeFile());
+		molViewer.loadChemicalStructureFromFile(mol.getMoleculeFile());
 	}
 	
 //-----------------------------------------------------------------------------
