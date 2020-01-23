@@ -9,19 +9,19 @@ DENOPTIM is cross-platform, i.e., runs on Windows, Linux, and MacOS, and comes w
 
 ## Usage
 ### Graphical User Interface
-The graphical user interface (GUI) of DENOPTIM facilitates the preparation and analysis of DENOPTIM experiments. After building the DENOPTIM package (see Installation), the GUI can be launched by double-click on the <code>$DENOPTIM_HOME/build/GUI.jar</code> (Win/Mac/Linux) file or using the following command (Mac/Linux):
+The graphical user interface (GUI) of DENOPTIM facilitates the preparation and analysis of DENOPTIM experiments. After building the DENOPTIM package (see [Installation](#installation)), the GUI can be launched by double-click on the <code>$DENOPTIM_HOME/build/GUI.jar</code> (Win/Mac/Linux) file or using the following command (Mac/Linux):
 
     java -jar $DENOPTIM_HOME/build/GUI.jar
     
-where <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned from the GitHub repository
+where <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned the DENOPTIM distribution.
 
 ### Command Line Programs (Mac/Linux)
 DENOPTIM programs are typically run using the following command
 
     java -jar <program.jar> <input_parameters>
 
-where <code>&lt;program.jar&gt;</code> is the JAR file of the program you what to run, for instance <code>DenoptimGA.jar</code> for the the genetic algorithm, or <code>DenoptimCG.jar</code> for the 3D-structure builder, or <code>FragSpaceExplorer.jar</code> for the virtual screening tool, and <code>&lt;input_parameters&gt;</code> is a text file containing [keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
-A complete example of usage of the genetic algorithm can be found under the test folder at (./test/PtCOLX2_GA).
+where <code>&lt;program.jar&gt;</code> is the JAR file of the program you what to run, for instance <code>DenoptimGA.jar</code> for the the genetic algorithm, or <code>DenoptimCG.jar</code> for the 3D-structure builder, or <code>FragSpaceExplorer.jar</code> for the virtual screening tool, and <code>&lt;input_parameters&gt;</code> is a text file containing [parameters and keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
+Complete examples of DENOPTIM experiments running the genetic algorithm or the virtual screening tool can be found under the test folder at [test/PtCOLX2_GA](./test/PtCOLX2_GA) and [test/PtCOLX2_FSE](./test/PtCOLX2_FSE) respectively.
 
 ## User Manual
 The complete user manual is available under the <code>doc</code> folder and is accessible [on line](http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
@@ -55,20 +55,20 @@ The complete user manual is available under the <code>doc</code> folder and is a
 * [test](./test): contains some automated functionality tests and the published test case.
 
 ## Installation 
-The prerequisite for installing DENOPTIM is having Java (1.5 or above). Make sure you have Java installed. You can get and install Java from www.oracle.com or http://openjdk.java.net/.
+PREREQUISITE: To install DENOPTIM you need Java (1.5 or above). You can get and install Java from www.oracle.com or http://openjdk.java.net/.
 
 ### Installation (Windows)
-Building DENOPTIM in Windows is currently supported only for the GUI and requires Eclipse IDE (https://www.eclipse.org/). Download or clone the DENOPTIM repository and import the DENOPTIM Java project. You can then run DENOPTIM's GUI as a Java application.
+Building DENOPTIM in Windows is currently supported only for the GUI and requires Eclipse IDE (https://www.eclipse.org/). Download the latest release and import the DENOPTIM Java project. You can then run DENOPTIM's GUI as a Java application.
 
 ### Installation (Linux/MacOS)
-1. Check the prerequisite. If the following does not result in version statements or the version is too old, you should get and install Java from www.oracle.com or http://openjdk.java.net/:
+1. Check the prerequisite. If the following does not result in version statements or the version is too old (i.e., < 1.5), you should get and install Java from www.oracle.com or http://openjdk.java.net/:
 
         java -version
         javac -version
 
-2. Download/clone this GitHub repository (use the green "Clone or download" button). From now on, we assume that <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned from the GitHub repository. 
+2. Download the released version that you want to use (from the [releases](https://github.com/denoptim-project/DENOPTIM/releases) tab) or download/clone this GitHub repository (use the green "Clone or download" button). From now on, we assume that <code>$DENOPTIM_HOME</code> is the uncompressed folder you have downloaded/cloned into your local computer. 
 
-3. Compile DENOPTIM and all the accessories in the src folder.
+3. Compile DENOPTIM and all its accessories with the following commands:  
 
         cd $DENOPTIM_HOME/build
         bash build-all.sh
@@ -96,7 +96,7 @@ An analogous test can be run with the fragment space explorer, i.e., a combinato
     bash runCombinatorialExperiment.sh
 
 ## Contributing
-Open an issue to point out any unreported and unexpected behaviors, bugs, or just to discuss changes to code or documentation. To make actual changes to the code follow the [git workflow](https://guides.github.com/introduction/flow/) practices as indicated in the (./CONTRIBUTING.md).
+Open an issue to point out any unreported and unexpected behaviors, bugs, or just to discuss changes to code or documentation. To make actual changes to the code follow the [git workflow](https://guides.github.com/introduction/flow/) practices as indicated in file  [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 DENOPTIM is licensed under the terms of the GNU Affero GPL version 3.0 license. 
