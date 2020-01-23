@@ -110,7 +110,7 @@ Instead, libraries used by DENOPTIM programs are licensed according to their res
 * Jmol: GNU Lesser General Public License 2.0
 * apiguardian: Apache License Version 2.0
 * jfreechart: GNU Lesser General Public License 2.1
-* gs: GNU Lesser General Public License 3.0
+* graphstream: GNU Lesser General Public License 3.0
 * junit: Eclipse Public License 2.0
 
 
