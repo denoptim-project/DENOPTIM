@@ -72,11 +72,12 @@ public class GUIModalDialog extends JDialog
 		btnDone.setToolTipText("Processes data and closes dialog");
 		
 		btnCanc = new JButton("Cancel");
-		btnCanc.setToolTipText("Exit without processing data.");
+		btnCanc.setToolTipText("Exit dialog.");
 		btnCanc.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				result = null;
 				close();
 			}
 		});

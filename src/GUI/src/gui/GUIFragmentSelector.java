@@ -106,11 +106,26 @@ public class GUIFragmentSelector extends GUIModalDialog
 	private boolean enforceAPSelection = false;
 	
 //-----------------------------------------------------------------------------
+
+	/**
+	 * Constructor
+	 * @param fragLib the library of fragment to load
+	 */
+	public GUIFragmentSelector(ArrayList<IAtomContainer> fragLib)
+	{
+		this(fragLib,0);
+	}
+	
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Constructor
+	 * @param fragLib the library of fragment to load
+	 * @param initialFragId the 0-based index of the fragment to open 
+	 * when displaying the dialog
 	 */
-	public GUIFragmentSelector(ArrayList<IAtomContainer> fragLib)
+	public GUIFragmentSelector(ArrayList<IAtomContainer> fragLib, 
+			int initialFragId)
 	{
 		super();
 		this.setBounds(150, 150, 400, 550);
@@ -167,7 +182,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		// Edit global dialog controls
 		this.btnDone.setText("Select current fragment");
 		this.btnDone.setToolTipText("<html>Process the currently displayed "
-				+ "fragment<br>and the currently slected AP, if any.</html>");
+				+ "fragment<br>and the currently selected AP, if any.</html>");
 		this.btnDone.addActionListener(new ActionListener() {
 			
 			@Override
@@ -199,7 +214,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		});
 		
 		// Load the first fragment
-		currFrgIdx = 0;
+		currFrgIdx = initialFragId;
 		loadCurrentFragIdxToViewer();
 		updateFragListSpinner();	
 	}

@@ -199,13 +199,51 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnAddFrag.setToolTipText("Append fragment taken from file.");
 		btnAddFrag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*
-				 
-				  
-				String[] options = new String[]{"Append All", 
-						"Select Fragments",
+				File inFile = DenoptimGUIFileOpener.pickFile();
+				if (inFile == null || inFile.getAbsolutePath().equals(""))
+				{
+					return;
+				}
+				
+				ArrayList<IAtomContainer> fragLib;
+				try {
+					fragLib = DenoptimIO.readMoleculeData(
+							inFile.getAbsolutePath());
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null,
+			                "<html>Could not read fragments from file"
+			                + "<br>'" + inFile + "'"
+			                + "<br>Hint on cause: " + e1.getMessage() 
+			                +"</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
+
+				if (fragLib.size() == 0)
+				{
+					JOptionPane.showMessageDialog(null,
+			                "<html>No fragments in file"
+			                + "<br>'" + inFile + "'</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
+				
+				if (fragLib.size() == 1)
+				{
+					importFragmentsFromFile(inFile);
+					return;
+				}
+				
+				String[] options = new String[]{"All", 
+						"Selected",
 						"Cancel"};
-				String txt = "<html><body width='%1s'>text"</html>";
+				String txt = "<html><body width='%1s'>Do you want to "
+						+ "append all fragments of only selected ones?"
+						+ "</html>";
 				int res = JOptionPane.showOptionDialog(null,
 		                String.format(txt,200),
 		                "Append Fragments",
@@ -214,21 +252,65 @@ public class GUIFragmentInspector extends GUICardPanel
 		                UIManager.getIcon("OptionPane.warningIcon"),
 		                options,
 		                options[0]);
+				
+				if (res == 2)
+				{
+					return;
+				}
+				
 				switch (res)
 				{
 					case 0:
+						importFragmentsFromFile(inFile);
+						break;
+						
+					case 1:						
+						ArrayList<IAtomContainer> selectedFrags = 
+								new ArrayList<IAtomContainer>();
+						int iFrg = -1;
+						while (true)
+						{
+							if (iFrg+1>=fragLib.size())
+							{
+								break;
+							}
+							GUIFragmentSelector fragSelector = 
+									new GUIFragmentSelector(fragLib,iFrg+1);
+							fragSelector.setRequireApSelection(false);
+							Object selected = fragSelector.showDialog();
+
+							if (selected != null)
+							{
+								iFrg = ((Integer[]) selected)[0];
+								selectedFrags.add(fragLib.get(iFrg));
+							}
+							else
+							{
+								break;
+							}
+						}
+						String tmpSDFFile = Utils.getTempFile(
+								"Denoptim_FragViewer_loadedMol.sdf");
+						try {
+							DenoptimIO.writeMoleculeSet(tmpSDFFile, selectedFrags);
+							importFragmentsFromFile(new File(tmpSDFFile));
+						} catch (DENOPTIMException e1) {
+							JOptionPane.showMessageDialog(null,
+					                "<html>Could not read import fragments.<br>"
+					                + "Error reading tmp file"
+					                + "<br>'" + inFile + "'"
+					                + "<br>Hint on cause: " + e1.getMessage() 
+					                +"</html>",
+					                "Error",
+					                JOptionPane.ERROR_MESSAGE,
+					                UIManager.getIcon("OptionPane.errorIcon"));
+							return;
+						}
 						break;
 					
 					default:
 						return;
 				}
-				*/
-				File inFile0 = DenoptimGUIFileOpener.pickFile();
-				if (inFile0 == null || inFile0.getAbsolutePath().equals(""))
-				{
-					return;
-				}
-				importFragmentsFromFile(inFile0);
 			}
 		});
 		btnDelFrag = new JButton("Remove");
@@ -237,10 +319,6 @@ public class GUIFragmentInspector extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				try {
 					removeCurrentFragment();
-					if (fragmentLibrary.size()==0)
-					{
-						fragmentViewer.clearMolecularViewer();
-					}
 				} catch (DENOPTIMException e1) {
 					System.out.println("Esception while removing the current fragment:");
 					e1.printStackTrace();
@@ -472,6 +550,8 @@ public class GUIFragmentInspector extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
+				fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
+						fragmentLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
 			}
@@ -879,8 +959,6 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnDelSel.setEnabled(true);
 		btnAtmToAP.setEnabled(true);
 		
-		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-				fragmentLibrary.size(), 1));
 		((DefaultEditor) fragNavigSpinner.getEditor())
 			.getTextField().setEditable(true); 
 		((DefaultEditor) fragNavigSpinner.getEditor())
@@ -957,14 +1035,24 @@ public class GUIFragmentInspector extends GUICardPanel
     		{
     			currFrgIdx = currFrgIdx-1;
     		}
-
-    		// We use the currFrgIdx to load another fragment
-	    	loadCurrentFragIdxToViewer();
-	    	updateFragListSpinner();
-	    	
-	  		// Release constraints
-	        deprotectEditedSystem();
-	        
+    		
+    		if (currFrgIdx==-1 || fragmentLibrary.size()==0)
+			{
+				fragmentViewer.clearMolecularViewer();
+				currFrgIdx = 0;
+				fragNavigSpinner.setModel(new SpinnerNumberModel(0,0,0,1));
+				totalFragsLabel.setText(Integer.toString(0));
+				deprotectEditedSystem();
+    		}
+    		else
+    		{
+	    		// We use the currFrgIdx to load another fragment
+		    	loadCurrentFragIdxToViewer();
+		    	updateFragListSpinner();
+		    	fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
+						fragmentLibrary.size(), 1));
+		        deprotectEditedSystem();
+    		}
     	}
     }
 
@@ -1034,6 +1122,8 @@ public class GUIFragmentInspector extends GUICardPanel
   		
   		// Release constraints
     	activateTabEditsListener(true);
+    	fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
+				fragmentLibrary.size(), 1));
         deprotectEditedSystem();
   	}
   	
