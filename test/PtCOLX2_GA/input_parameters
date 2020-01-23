@@ -7,7 +7,7 @@ FP-INTERPRETER=BASH
 FP-SOURCE=data/fitness_provider_fromDB.sh
 
 # Parameters for the genetic algorithm
-#GA-InitPoplnFile=data/initPopulation.sdf
+GA-InitPoplnFile=data/initPopulation.sdf
 GA-numParallelTasks=5
 GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25

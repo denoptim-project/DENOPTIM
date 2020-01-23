@@ -196,46 +196,39 @@ public class GUIFragmentInspector extends GUICardPanel
 		fragCtrlPane.add(fragNavigPanel2);
 		
 		btnAddFrag = new JButton("Add");
-		btnAddFrag.setToolTipText("Starts creation of a new fragment.");
+		btnAddFrag.setToolTipText("Append fragment taken from file.");
 		btnAddFrag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] options = new String[]{"SMILES","File","Cancel"};
+				/*
+				 
+				  
+				String[] options = new String[]{"Append All", 
+						"Select Fragments",
+						"Cancel"};
+				String txt = "<html><body width='%1s'>text"</html>";
 				int res = JOptionPane.showOptionDialog(null,
-		                "<html>Importing structure for creation of a new "
-		                + "fragment<br>"
-		                + "Please choose a source: <ul>"
-		                + "<li>SMILES (requires internet connection)</li>"
-		                + "<li>SD/SDF files (only the first "
-		                + "structure is imported).</li>"
-		                + "</ul></html>",
-		                "Specify source of moelcular structure",
+		                String.format(txt,200),
+		                "Append Fragments",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
 		                UIManager.getIcon("OptionPane.warningIcon"),
 		                options,
-		                options[1]);
+		                options[0]);
 				switch (res)
 				{
 					case 0:
-						String smiles = JOptionPane.showInputDialog(
-	                			"Please input SMILES: ");
-	                	if (smiles != null && !smiles.trim().equals(""))
-	                	{
-	                	    importStructureFromSMILES(smiles);
-	                	}
-	                	break;
-	                	
-	                case 1:
-						File inFile = DenoptimGUIFileOpener.pickFile();
-						if (inFile == null || inFile.getAbsolutePath().equals(""))
-						{
-							return;
-						}
-						importStructureFromFile(inFile);
-						
-	                case 3:
-	                	return;
+						break;
+					
+					default:
+						return;
 				}
+				*/
+				File inFile0 = DenoptimGUIFileOpener.pickFile();
+				if (inFile0 == null || inFile0.getAbsolutePath().equals(""))
+				{
+					return;
+				}
+				importFragmentsFromFile(inFile0);
 			}
 		});
 		btnDelFrag = new JButton("Remove");
@@ -637,18 +630,38 @@ public class GUIFragmentInspector extends GUICardPanel
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
-		fragmentLibrary = new ArrayList<DENOPTIMFragment>();
+		int firstOfNew = 0;
+		boolean libFromScrtch = false;
+		if (fragmentLibrary == null)
+		{
+			libFromScrtch = true;
+			fragmentLibrary = new ArrayList<DENOPTIMFragment>();
+		}
+		else
+		{
+			firstOfNew = fragmentLibrary.size();
+		}
+		
 		try 
 		{
 			// Import library of fragments
+			boolean addedOne = false;
 			for (IAtomContainer iac : DenoptimIO.readMoleculeData(
 												file.getAbsolutePath(),format))
 			{
 			    fragmentLibrary.add(new DENOPTIMFragment(iac));
+			    addedOne = true;
 			}
 			
 			// Display the first
-			currFrgIdx = 0;
+			if (libFromScrtch)
+			{
+				currFrgIdx = 0;
+			}
+			else if (addedOne)
+			{
+				currFrgIdx = firstOfNew;
+			}
 			loadCurrentFragIdxToViewer();
 			
 	        // Update the fragment spinner
