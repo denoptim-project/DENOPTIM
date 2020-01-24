@@ -204,7 +204,8 @@ public class FSEParametersForm extends ParametersForm
            }
         });
         btnLoadFSESource = new JButton("Load...");
-        txtFSESource.setToolTipText("<html>Load the parameters in this form.<br>Allows to inspect and edit the parameters.</html>");
+        txtFSESource.setToolTipText("<html>Specify the file containing the "
+        		+ "parameters to be loaded in this form.</html>");
         btnLoadFSESource.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
 	        	try 

@@ -320,7 +320,8 @@ public class FSParametersForm extends ParametersForm
            }
         });
         btnLoadFSSource = new JButton("Load...");
-        txtFSSource.setToolTipText("<html>Load the parameters in this form.<br>Allows to inspect and edit the parameters.</html>");
+        txtFSSource.setToolTipText("<html>Specify a file with parameters to "
+        		+ "be loaded in this form.</html>");
         btnLoadFSSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
 	        	try 

@@ -410,7 +410,13 @@ public class GUIFragmentInspector extends GUICardPanel
 					// and ask to select another set for other end of bond to 
 					// break.
 					
-					String apClass = ensureGoodAPClassString("");
+					String apClass;
+					try {
+						apClass = ensureGoodAPClassString("",false);
+					} catch (Exception e1) {
+						// We have pressed cancel or closed the dialog, so abandon
+						return;
+					}
 					
 					ArrayList<IAtom> failed = new ArrayList<IAtom>();
 					for (IAtom atm : selectedAtms)
@@ -1074,7 +1080,11 @@ public class GUIFragmentInspector extends GUICardPanel
 	        			.toString();
 	        	
 	        	// Make sure the new class has a proper syntax
-	        	currApClass = ensureGoodAPClassString(currApClass);
+	        	try {
+					currApClass = ensureGoodAPClassString(currApClass,true);
+				} catch (DENOPTIMException e1) {
+					currApClass = "dafaultAPClass:0";
+				}
 	        	
 	        	if (fragmentViewer.mapAPs.containsKey(apId))
 	        	{
@@ -1131,9 +1141,13 @@ public class GUIFragmentInspector extends GUICardPanel
   	/**
   	 * Forces the user to specify a properly formatted APClass.
   	 * @param currApClass the current value of the APClass, or empty string
+  	 * @param mustReply set to <code>true</code> to prevent escaping the wuestion
   	 * @return 
+  	 * @throws DENOPTIMException 
   	 */
-	private String ensureGoodAPClassString(String currApClass) 
+	private String ensureGoodAPClassString(String currApClass, 
+			boolean mustReply) 
+			throws DENOPTIMException 
 	{		
 		String preStr = "";
 		while (!DENOPTIMAttachmentPoint.isValidAPClassString(currApClass))
@@ -1156,6 +1170,10 @@ public class GUIFragmentInspector extends GUICardPanel
     		if (currApClass == null)
         	{
         		currApClass = "";
+        		if (!mustReply)
+        		{
+        			throw new DENOPTIMException();
+        		}
         	}
         	
     		preStr = "APClass '" + currApClass + "' is not valid!<br>"

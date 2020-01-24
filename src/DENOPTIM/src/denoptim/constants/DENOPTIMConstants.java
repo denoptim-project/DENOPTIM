@@ -107,6 +107,11 @@ public final class DENOPTIMConstants
                     new HashSet<>(Arrays.asList(new String[] {".txt", 
 			".sdf", ".mol"}
                     ));
+
+    /**
+     * Prefix for generation folders
+     */
+    public static final String GAGENDIRNAMEROOT = "Gen";
     
     /**
      * Prefix for graph indexing files

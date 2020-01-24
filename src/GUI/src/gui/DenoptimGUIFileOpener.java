@@ -169,7 +169,6 @@ public class DenoptimGUIFileOpener
 		// Folders are presumed to contain output kind of data
 		if (inFile.isDirectory())
 		{
-			fType = "GA-RUN";
 			
 			// This is to distinguish GS from FSE runs
 			for(File folder : inFile.listFiles(new FileFilter() {
@@ -188,10 +187,18 @@ public class DenoptimGUIFileOpener
 						DENOPTIMConstants.FSEIDXNAMEROOT))
 				{
 					fType = "FSE-RUN";
-					break;
+					return fType;
+				}
+				else if (folder.getName().startsWith(
+						DENOPTIMConstants.GAGENDIRNAMEROOT))
+				{
+					fType = "GA-RUN";
+					return fType;
 				}
 			}
-			return fType;
+	
+			throw new Exception("Could not recognized data in the folder '" 
+					+ ext + "'.");
 		}
 		
 		// Files are distinguished first by extension

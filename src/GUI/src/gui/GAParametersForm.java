@@ -309,7 +309,8 @@ public class GAParametersForm extends ParametersForm
            }
         });
         btnLoadGASource = new JButton("Load...");
-        txtGASource.setToolTipText("<html>Load the parameters in this form.<br>Allows to inspect and edit the parameters.</html>");
+        txtGASource.setToolTipText("<html>Specify the file containing the "
+        		+ "parameters to be loaded in this form.</html>");
         btnLoadGASource.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
 	        	try 

@@ -165,7 +165,8 @@ public class FitnessParametersForm extends ParametersForm
            }
         });
         btnLoadFPSource = new JButton("Load...");
-        txtFPSource.setToolTipText("<html>Load the parameters in this form.<br>Allows to inspect and edit the parameters.</html>");
+        txtFPSource.setToolTipText("<html>Specify the file containing the "
+        		+ "parameters to be loaded in this form.</html>");
         btnLoadFPSource.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
 	        	try 
@@ -201,7 +202,10 @@ public class FitnessParametersForm extends ParametersForm
         lineFPSource.add(btnLoadFPSource);
         localBlock1.add(lineFPSource);
 
-        String toolTipIntOrExt = "<html>A fitness provider is an existing tool or script.<br> The fitness provider must produce an output SDF file with the <code>        //HEREGOESIMPLEMENTATIONlt;FITNESS        //HEREGOESIMPLEMENTATIONgt;</code> or <code>        //HEREGOESIMPLEMENTATIONlt;MOL_ERROR        //HEREGOESIMPLEMENTATIONgt;</code> tags.</html>";
+        String toolTipIntOrExt = "<html>A fitness provider is an existing "
+        		+ "tool or script.<br> The fitness provider must produce an "
+        		+ "output SDF file with the <code>&lt;FITNESS&gt;</code> or "
+        		+ "<code>&lt;MOL_ERROR&gt;</code> tags.</html>";
         lineIntOrExt = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbIntOrExt = new JRadioButton("Use external fitnes provider:");
         rdbIntOrExt.setToolTipText(toolTipIntOrExt);
