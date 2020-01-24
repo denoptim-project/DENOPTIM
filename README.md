@@ -21,7 +21,7 @@ DENOPTIM programs are typically run using the following command
     java -jar <program.jar> <input_parameters>
 
 where <code>&lt;program.jar&gt;</code> is the JAR file of the program you what to run, for instance <code>DenoptimGA.jar</code> for the the genetic algorithm, or <code>DenoptimCG.jar</code> for the 3D-structure builder, or <code>FragSpaceExplorer.jar</code> for the virtual screening tool, and <code>&lt;input_parameters&gt;</code> is a text file containing [parameters and keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
-Complete examples of DENOPTIM experiments running the genetic algorithm or the virtual screening tool can be found under the test folder at [test/PtCOLX2_GA](./test/PtCOLX2_GA) and [test/PtCOLX2_FSE](./test/PtCOLX2_FSE) respectively.
+Complete examples of DENOPTIM experiments running the genetic algorithm or the virtual screening tool can be found under the test folder at [test/PtCOLX2](./test/PtCOLX2) and [test/PtCOLX2_FSE](./test/PtCOLX2_FSE) respectively.
 
 ## User Manual
 The complete user manual is available under the <code>doc</code> folder and is accessible [on line](http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
@@ -85,7 +85,7 @@ The tests will use a temporary folder <code>/tmp/denoptim_test</code> where you 
 
 In addition, you can play with the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (takes 10-15 minutes).
 
-    cd $DENOPTIM_HOME/test/PtCOLX2_GA
+    cd $DENOPTIM_HOME/test/PtCOLX2
     bash runEvolutionaryExperiment.sh
 
 This will create a playground folder at <code>/tmp/denoptim_PtCO</code> where the evolutionary experiment will be run. Once the experiment is completed, you'll find also the results in the same folder.
