@@ -575,7 +575,7 @@ public class FragmentSpace
      * of the action of symmetry-related keyword affecting the definition of
      * this FragmentSpace.
      * @param apClass the attachment point class
-     * @return <code>true<code> if symmetry has the applyed on APs of the
+     * @return <code>true<code> if symmetry has the applied on APs of the
      * given class
      */
 
@@ -604,10 +604,10 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Checks if there is a constraint on the constitutionsl 
+     * Checks if there is a constraint on the constitutional 
      * symmetry probability for the given AP class.
      * @param apClass the attachment point class
-     * @return <code>true<code> if there is a constraint on the constitutionsl
+     * @return <code>true<code> if there is a constraint on the constitutional
      * symmetry probability for the given AP class.
      */
 
