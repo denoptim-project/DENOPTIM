@@ -222,6 +222,18 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
         }
     	return num;
     }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns all APs currently defined.
+     * @return the list of APs
+     */
+    
+    public ArrayList<DENOPTIMAttachmentPoint> getAllAPs()
+    {
+    	return getCurrentAPs();
+    }
 
 //-----------------------------------------------------------------------------
     

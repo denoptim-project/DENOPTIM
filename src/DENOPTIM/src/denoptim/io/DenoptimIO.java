@@ -96,6 +96,7 @@ import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMMolecule;
@@ -1272,7 +1273,30 @@ public class DenoptimIO
             }
         }
     }
+    
+//------------------------------------------------------------------------------
 
+    public static Set<String> readAllAPClasses(File fragLib)
+    {
+    	Set<String> allCLasses = new HashSet<String>();
+    	try {
+			for (IAtomContainer mol : DenoptimIO.readMoleculeData(
+					fragLib.getAbsolutePath()))
+			{
+				DENOPTIMFragment frag = new DENOPTIMFragment(mol);
+				for (DENOPTIMAttachmentPoint ap : frag.getAllAPs())
+				{
+					allCLasses.add(ap.getAPClass());
+				}
+			}
+		} catch (DENOPTIMException e) {
+			System.out.println("Could not read data from '" + fragLib +"'. "
+					+ "Cause: " + e.getMessage());
+		}
+    	
+    	return allCLasses;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -1288,7 +1312,7 @@ public class DenoptimIO
     public static void readCompatibilityMatrix(String fileName,
             HashMap<String, ArrayList<String>> compReacMap,
             HashMap<String, Integer> reacBonds, HashMap<String, String> reacCap,
-            ArrayList<String> forbEnd)
+            Set<String> forbEnd)
             throws DENOPTIMException
     {
 

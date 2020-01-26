@@ -166,8 +166,9 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String txt = "<html><body width='%1s'>"
-						+ "<p>This tab allows to create, inspect, and edit "
-						+ "compatibility matrix data, which includes "
+						+ "<p>The Compatibility Matrix tab allows to create, "
+						+ "inspect, and edit "
+						+ "compatibility matrix data, which includes: "
 						+ "<ul>"
 						+ "<li>the actual compatibility matrix,</li>"
 						+ "<li>the APClass-to-bond order map,</li>"

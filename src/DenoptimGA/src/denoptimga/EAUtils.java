@@ -2070,7 +2070,7 @@ MF: TO BE TESTED
     protected static boolean foundForbiddenEnd(DENOPTIMGraph molGraph)
     {
         ArrayList<DENOPTIMVertex> vertices = molGraph.getVertexList();
-        ArrayList<String> classOfForbEnds = FragmentSpace.getForbiddenEndList();
+        Set<String> classOfForbEnds = FragmentSpace.getForbiddenEndList();
         boolean found = false;
         for (DENOPTIMVertex vtx : vertices)
         {

@@ -691,7 +691,7 @@ public class FragmentViewPanel extends JSplitPane
     	    l.setActive(var);
 		} catch (Throwable t) {
 			//t.printStackTrace();
-			System.out.println("Bad attempt to contro llistener: " 
+			System.out.println("Bad attempt to contro listener: " 
 					+ t.getMessage());
 			System.out.println(t.getCause());
 		}
