@@ -21,6 +21,13 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.io.File;
 
+import org.openscience.cdk.CDKConstants;
+import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.utils.GraphConversionTool;
+
 
 /**
  * A molecular object with additional data and tags. Additional data includes
@@ -123,6 +130,74 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         molFitness = m_molFitness;
         molFile = m_molFile;
         hasFitness = true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace) 
+    		throws DENOPTIMException
+    {
+    	// Initialize, then we try to take info from IAtomContainer
+        this.molUID = "UNDEFINED";
+        this.molSmiles = "UNDEFINED";
+        this.molFitness = 0; //This is stupid... only needed by compareTo. TODO: change!
+        this.hasFitness = false;
+		
+		this.molName = "noname";
+		if (iac.getProperty(CDKConstants.TITLE) != null)
+		{
+			this.molName = iac.getProperty(CDKConstants.TITLE).toString();
+		}
+		
+        if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
+        {
+        	this.molError = iac.getProperty(
+        			DENOPTIMConstants.MOLERRORTAG).toString();
+        }
+
+        if (iac.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
+        {
+            String fitprp = iac.getProperty(
+            		DENOPTIMConstants.FITNESSTAG).toString();
+            double fitVal = Double.parseDouble(fitprp);
+            if (Double.isNaN(fitVal))
+            {
+                String msg = "Cannot build DENOPTIMMolecule from "
+                		+ "IAtomContainer: Fitness value is NaN!";
+                throw new DENOPTIMException(msg);
+            }
+            this.molFitness = fitVal;
+            this.hasFitness = true;
+        }
+        
+        if (iac.getProperty(DENOPTIMConstants.GRAPHLEVELTAG) != null)
+        {
+        	this.level = Integer.parseInt(iac.getProperty(
+        			DENOPTIMConstants.GRAPHLEVELTAG).toString());
+        }
+        
+        if (iac.getProperty(DENOPTIMConstants.SMILESTAG) != null)
+        {
+        	this.molSmiles = iac.getProperty(
+        			DENOPTIMConstants.SMILESTAG).toString();
+        }
+        
+        try
+        {
+            this.molUID = (iac.getProperty(
+            		DENOPTIMConstants.UNIQUEIDTAG).toString());
+            this.molGraph = GraphConversionTool.getGraphFromString(
+            		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
+            		useFragSpace);
+        } catch (Exception e) {
+        	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
+        			+ " Could not read UID or Graph.", e);
+        }
+        if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
+        {
+            this.commments = iac.getProperty(
+            		DENOPTIMConstants.GMSGTAG).toString();
+        }
     }
 
 //------------------------------------------------------------------------------

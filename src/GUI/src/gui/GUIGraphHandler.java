@@ -1260,8 +1260,9 @@ public class GUIGraphHandler extends GUICardPanel
 				((CardLayout) molViewerCardHolder.getLayout()).show(
 						molViewerCardHolder, MOLVIEWERCARDNAME);
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("Could not read molecular data: "+
-						e.getCause());
+						e.getCause() + " " + e.getMessage());
 				((CardLayout) molViewerCardHolder.getLayout()).show(
 						molViewerCardHolder, EMPTYCARDNAME);
 			}
