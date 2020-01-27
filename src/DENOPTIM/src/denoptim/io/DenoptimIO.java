@@ -1562,73 +1562,7 @@ public class DenoptimIO
     	ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
     	for (IAtomContainer iac : iacs)
     	{   			
-    		DENOPTIMMolecule mol = new DENOPTIMMolecule();
-    		
-    		String molName = "noname";
-    		if (iac.getProperty(CDKConstants.TITLE) != null)
-    		{
-    			molName = iac.getProperty(CDKConstants.TITLE).toString();
-    		}
-    		mol.setName(molName);
-    		
-    		boolean fitnessOrError = false;
-            if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
-            {
-            	fitnessOrError = true;
-            	mol.setError(iac.getProperty(
-            			DENOPTIMConstants.MOLERRORTAG).toString());
-            }
-
-            if (iac.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
-            {
-            	fitnessOrError = true;
-                String fitprp = iac.getProperty(
-                		DENOPTIMConstants.FITNESSTAG).toString();
-                double fitVal = Double.parseDouble(fitprp);
-                if (Double.isNaN(fitVal))
-                {
-                    String msg = "Fitness value is NaN for " + molName
-                    		+ " in file '" + filename+ "'";
-                    throw new DENOPTIMException(msg);
-                }
-                mol.setMoleculeFitness(fitVal);
-            }
-            
-            if (!fitnessOrError)
-            {
-            	String msg = "Neither fitness nor error found for " + molName
-            			+ " in file '" + filename+ "'";
-                throw new DENOPTIMException(msg);
-            }
-            
-            if (iac.getProperty(DENOPTIMConstants.GRAPHLEVELTAG) != null)
-            {
-            	mol.setLevel(Integer.parseInt(iac.getProperty(
-            			DENOPTIMConstants.GRAPHLEVELTAG).toString()));
-            }
-            
-            if (iac.getProperty(DENOPTIMConstants.SMILESTAG) != null)
-            {
-            	mol.setMoleculeSmiles(iac.getProperty(
-            			DENOPTIMConstants.SMILESTAG).toString());
-            }
-            
-            try
-            {
-	            mol.setMoleculeUID(iac.getProperty(
-	            		DENOPTIMConstants.UNIQUEIDTAG).toString());
-	            mol.setMoleculeGraph(GraphConversionTool.getGraphFromString(
-	            		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
-	            		useFragSpace));
-            } catch (Exception e) {
-            	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
-            			+ " Could not read UID or GraphENC", e);
-            }
-            if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
-            {
-                mol.setComments(iac.getProperty(
-                		DENOPTIMConstants.GMSGTAG).toString());
-            }
+    		DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
             
             mol.setMoleculeFile(filename);
             
