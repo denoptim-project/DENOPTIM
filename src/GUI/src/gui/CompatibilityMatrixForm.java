@@ -24,10 +24,15 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeListenerProxy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +45,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -54,10 +60,13 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import com.sun.java.swing.plaf.motif.MotifBorders.BevelBorder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -68,6 +77,11 @@ public class CompatibilityMatrixForm extends JPanel {
 	 * Version UID
 	 */
 	private static final long serialVersionUID = -8042143358823563589L;
+
+	/**
+	 * Property used to trigger removal of a target APClass.
+	 */
+	protected static final String REMOVETRGAPC = "REMOVETRGAPC";
 	
 	/**
 	 * List of all APClasses.
@@ -1124,22 +1138,28 @@ public class CompatibilityMatrixForm extends JPanel {
 		private JPanel trgClassesPanel;
 		private JScrollPane trgClassesScroller;
 		private JButton btnAdd;
+		private TrgRemovalListener trgDelListener;
+		
+		private String srcAPClass;
 		
 		private boolean isSelected = false;
 		
 		private final Dimension minSrcAPClassName = new Dimension(200,26);
 		private final Dimension scrollerSize = new Dimension(300,50);
 		private final Color SELECTEDBACKGROUND = Color.BLUE;
-		private final Color DEFAULTBACKGROUND = Color.WHITE;
-		//UIManager.getLookAndFeelDefaults().getColor("Panel.background")
+		private final Color DEFAULTBACKGROUND = 
+			UIManager.getLookAndFeelDefaults().getColor("Panel.background");
 		
-	//------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 
-		public CompatibilityRuleLine(String srcAPClass)
+		public CompatibilityRuleLine(String apclass)
 		{
+			this.srcAPClass = apclass;
 			this.setName(srcAPClass);
 			this.setBackground(DEFAULTBACKGROUND);
 			this.setLayout(new BorderLayout());
+			
+			this.trgDelListener = new TrgRemovalListener(srcAPClass,this);
 			
 			srcClassName = new JLabel(srcAPClass);
 			srcClassName.setBackground(DEFAULTBACKGROUND);
@@ -1152,11 +1172,15 @@ public class CompatibilityMatrixForm extends JPanel {
 			trgClassesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			for (String trgAPClass : compatMap.get(srcAPClass))
 			{
-				trgClassesPanel.add(new JButton(trgAPClass));
+				TargetAPClassToken trg = new TargetAPClassToken(trgAPClass);
+				trg.addPropertyChangeListener(
+						new PropertyChangeListenerProxy(
+						CompatibilityMatrixForm.REMOVETRGAPC,trgDelListener));
+				trgClassesPanel.add(trg);
 			}
 			trgClassesScroller = new JScrollPane(trgClassesPanel,
 	        		JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-	        		JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+	        		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			trgClassesScroller.setPreferredSize(scrollerSize);
 	        this.add(trgClassesScroller, BorderLayout.CENTER);
 	        
@@ -1164,19 +1188,44 @@ public class CompatibilityMatrixForm extends JPanel {
 			btnAdd.setToolTipText(String.format("<html><body width='%1s'>"
 					+ "Add more compatible APClasses to source class <i>"
 					+ srcAPClass + "</i></html>",250));
+			btnAdd.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+	                DefaultListModel<String> trgAPCs =
+	                        new DefaultListModel<String>();
+	                JList<String> trgClsList = new JList<String>(trgAPCs);
+	                for (String apc : allAPClasses)
+	                {
+	                	trgAPCs.addElement(apc);
+	                }
+	                trgClsList.setSelectionMode(
+	                		ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+	                JScrollPane scrollTrg = new JScrollPane(trgClsList);
+	                
+	                JOptionPane.showMessageDialog(
+	                        null,
+	                        scrollTrg,
+	                        "Choose Compatible APClasses",
+	                        JOptionPane.PLAIN_MESSAGE);
+
+	                if (trgClsList.getSelectedIndices().length > 0)
+	                {
+		                ArrayList<String> trgCPClasses = new ArrayList<String>();
+		                for (Integer id : trgClsList.getSelectedIndices())
+		                {
+		                    trgCPClasses.add((String) trgAPCs.getElementAt(id));
+		                }
+		                compatMap.get(srcAPClass).addAll(trgCPClasses);
+		                updateAPClassCompatibilitiesList();
+	                }
+				}
+			});
 			this.add(btnAdd, BorderLayout.EAST);
 			
-			this.setBorder(BorderFactory.createEmptyBorder(5,0,5,5));
+			this.setBorder(BorderFactory.createRaisedSoftBevelBorder());
 			
 			addMouseListener(this);
 			setFocusable(true);
-		}
-		
-	//-------------------------------------------------------------------------
-		
-		public boolean isSelected()
-		{
-			return isSelected;
 		}
 		
 	//-------------------------------------------------------------------------
@@ -1198,7 +1247,8 @@ public class CompatibilityMatrixForm extends JPanel {
 	//-------------------------------------------------------------------------
 
 		@Override
-		public void mouseClicked(MouseEvent e) {
+		public void mouseClicked(MouseEvent e) 
+		{
 			if (isSelected)
 				isSelected = false;
 			else
@@ -1209,29 +1259,41 @@ public class CompatibilityMatrixForm extends JPanel {
 	//-------------------------------------------------------------------------
 	
 		@Override
-		public void mousePressed(MouseEvent e) {
-			//Nothing
-		}
-		
-	//-------------------------------------------------------------------------
+		public void mousePressed(MouseEvent e) {}
 	
 		@Override
-		public void mouseReleased(MouseEvent e) {
-			//Nothing
-		}
-		
-	//-------------------------------------------------------------------------
+		public void mouseReleased(MouseEvent e) {}
 	
 		@Override
-		public void mouseEntered(MouseEvent e) {
-			//Nothing
-		}
-		
-	//-------------------------------------------------------------------------
+		public void mouseEntered(MouseEvent e) {}
 	
 		@Override
-		public void mouseExited(MouseEvent e) {
-			//Nothing
+		public void mouseExited(MouseEvent e) {}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Listens for clicks that require removal of a compatible APClass 
+	 * (i.e., the target APClass)
+	 * from the existing rule of a source APClass.
+	 */
+	private class TrgRemovalListener implements PropertyChangeListener
+	{
+		private String srcAPClass;
+		private Component srcAPClassRulesPanel;
+		
+		public TrgRemovalListener(String srcAPClass, Component panel)
+		{
+			this.srcAPClass = srcAPClass;
+			this.srcAPClassRulesPanel = panel;
+		}
+
+		public void propertyChange(PropertyChangeEvent evt) 
+		{
+			String trgAPClass = (String) evt.getNewValue();
+			compatMap.get(srcAPClass).remove(trgAPClass);
+			updateAPClassCompatibilitiesList();
 		}
 	}
 	
@@ -1240,7 +1302,8 @@ public class CompatibilityMatrixForm extends JPanel {
 	private class CompatRulesHeader extends JPanel
 	{
 		private Dimension minSrcAPClassName = new Dimension(200,26);
-		public final Color DEFAULTBACKGROUND = Color.WHITE;
+		public final Color DEFAULTBACKGROUND = 
+				UIManager.getLookAndFeelDefaults().getColor("Panel.background");
 		
 		public CompatRulesHeader()
 		{
@@ -1258,7 +1321,7 @@ public class CompatibilityMatrixForm extends JPanel {
 			
 			JLabel trgClassTitle = new JLabel("<html>"
 					+ "<div style='text-align: center;'>"
-					+ "<b>Compatible target APClasses on incoming fragments:</b></div></html>");
+					+ "<b>Compatible APClasses of incoming fragments:</b></div></html>");
 			trgClassTitle.setBackground(DEFAULTBACKGROUND);
 			trgClassTitle.setPreferredSize(minSrcAPClassName);
 			trgClassTitle.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
@@ -1271,11 +1334,37 @@ public class CompatibilityMatrixForm extends JPanel {
     
 //-----------------------------------------------------------------------------
     
+    private class TargetAPClassToken extends JPanel
+    {
+    	private String trgAPClass;
+    	private JButton btnDel;
+    	
+    	public TargetAPClassToken(String apclass)
+    	{
+    		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    		this.trgAPClass = apclass;
+    		JLabel label = new JLabel(trgAPClass);
+    		this.add(label);
+    		btnDel = new JButton("X");
+    		btnDel.setMaximumSize(new Dimension(15,15));
+    		btnDel.setBackground(Color.decode("#f74019"));
+    		btnDel.setOpaque(true);
+    		btnDel.setBorderPainted(true);
+    		btnDel.setBorder(BorderFactory.createRaisedSoftBevelBorder());
+    		btnDel.setForeground(Color.BLACK);
+    		btnDel.addActionListener(new ActionListener() 
+    		{
+				public void actionPerformed(ActionEvent e) 
+				{
+					firePropertyChange(CompatibilityMatrixForm.REMOVETRGAPC,
+							"#", trgAPClass);
+				}
+			});
+    		this.add(btnDel);
+    		this.add(Box.createRigidArea(new Dimension(15,15)));
+    	}
+    }
     
-    
-//-----------------------------------------------------------------------------
-
-	
 //-----------------------------------------------------------------------------
 	
 }
