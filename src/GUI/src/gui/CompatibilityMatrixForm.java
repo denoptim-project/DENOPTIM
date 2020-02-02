@@ -22,19 +22,25 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -46,14 +52,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -78,6 +82,11 @@ public class CompatibilityMatrixForm extends JPanel {
 	 * the capping group library
 	 */
 	private SortedSet<String> allCapAPClasses = new TreeSet<String>();
+	
+	/**
+	 * Sorted list of APClasses in the map of compatibility rules
+	 */
+	private SortedSet<String> allAPClsInCPMap = new TreeSet<String>();
 	
     /**
      * Data structure that stored the true entries of the 
@@ -119,7 +128,13 @@ public class CompatibilityMatrixForm extends JPanel {
     private final int MAXBO = 4;
 	
 	private JTabbedPane tabbedPane;
-	private JPanel cpMapPanel;
+	private JPanel panelCPMap;
+	private JButton btnAddCompRul;
+	private JButton btnDelCompRul;
+	private JButton btnCopyCompRul;
+	private JButton btnHelpCPMap;
+	private JPanel panelCPRules;
+	private JScrollPane scrollPanelCPMap;
 	
 	private JPanel panelAPClsBO;
 	private DefaultTableModel tabModAPClsBO;
@@ -142,9 +157,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	private JButton btnDelFrbEnd;
 	private JButton btnSortFrbEnd;
 	private JButton btnHelpFrbEnd;
-
-
-
+	
 	
 //-----------------------------------------------------------------------------
 	
@@ -154,8 +167,234 @@ public class CompatibilityMatrixForm extends JPanel {
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		super.add(tabbedPane, BorderLayout.CENTER);
 		
-		cpMapPanel = new JPanel();
-		tabbedPane.addTab("APClass compatibility",null,cpMapPanel,null);
+		//
+		// APClass Compatibility rules (i.e., the actual compatibility matrix)
+		//
+		
+		panelCPMap = new JPanel(new BorderLayout());
+		tabbedPane.addTab("APClass compatibility",null,panelCPMap,null);
+
+        btnAddCompRul = new JButton("Add Rule");
+        btnAddCompRul.setToolTipText("Add compatibility rules for a new "
+        		+ "source APClass.");
+        btnAddCompRul.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                DefaultListModel<String> srcAPCs =
+                        new DefaultListModel<String>();
+                JList<String> srcClsList = new JList<String>(srcAPCs);
+                for (String apc : allAPClasses)
+                {
+                    if (!compatMap.keySet().contains(apc))
+                    {
+                    	srcAPCs.addElement(apc);
+                    }
+                }
+                srcClsList.setSelectionMode(
+                		ListSelectionModel.SINGLE_SELECTION);
+
+                DefaultListModel<String> trgAPCs =
+                        new DefaultListModel<String>();
+                JList<String> trgClsList = new JList<String>(trgAPCs);
+                for (String apc : allAPClasses)
+                {
+                	trgAPCs.addElement(apc);
+                }
+                trgClsList.setSelectionMode(
+                		ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+                JPanel twoListsPanel = new JPanel();
+                JLabel headSrc = new JLabel("APClass on the growing graph:");
+                JLabel headTrg = new JLabel("APClass on incoming fragment:");
+                JScrollPane scrollSrc = new JScrollPane(srcClsList);
+                JScrollPane scrollTrg = new JScrollPane(trgClsList);
+                GroupLayout lyoAddCapRule = new GroupLayout(twoListsPanel);
+                twoListsPanel.setLayout(lyoAddCapRule);
+                lyoAddCapRule.setAutoCreateGaps(true);
+                lyoAddCapRule.setAutoCreateContainerGaps(true);
+                lyoAddCapRule.setHorizontalGroup(lyoAddCapRule.createSequentialGroup()
+                	.addGroup(lyoAddCapRule.createParallelGroup()
+                			.addComponent(headSrc)
+                        	.addComponent(scrollSrc))
+                    .addGroup(lyoAddCapRule.createParallelGroup()
+                    	.addComponent(headTrg)
+                    	.addComponent(scrollTrg)));
+                lyoAddCapRule.setVerticalGroup(lyoAddCapRule.createSequentialGroup()
+                    .addGroup(lyoAddCapRule.createParallelGroup()
+                    	.addComponent(headSrc)
+                    	.addComponent(headTrg))
+                    .addGroup(lyoAddCapRule.createParallelGroup()
+                        .addComponent(scrollSrc)
+                    	.addComponent(scrollTrg)));
+
+                JOptionPane.showMessageDialog(
+                        null,
+                        twoListsPanel,
+                        "New APClass compatibility rule",
+                        JOptionPane.PLAIN_MESSAGE);
+
+                if (trgClsList.getSelectedIndices().length > 0
+                		&& srcClsList.getSelectedIndices().length > 0)
+                {
+	                //NB: we allow a single selection in the src APClass list
+	                String srcAPClass = (String) srcAPCs.getElementAt(
+	                		srcClsList.getSelectedIndices()[0]);
+
+	                ArrayList<String> trgCPClasses = new ArrayList<String>();
+	                for (Integer id : trgClsList.getSelectedIndices())
+	                {
+	                    trgCPClasses.add((String) trgAPCs.getElementAt(id));
+	                }
+	                
+	                if (compatMap.keySet().contains(srcAPClass))
+	                {
+	                	compatMap.get(srcAPClass).addAll(trgCPClasses);
+	                }
+	                else
+	                {
+	                	compatMap.put(srcAPClass,trgCPClasses);
+	                }
+	                allAPClsInCPMap.add(srcAPClass);
+	                
+	                updateAPClassCompatibilitiesList();
+                }
+            }
+        });
+        
+        btnCopyCompRul = new JButton("Copy Rule");
+        btnCopyCompRul.setToolTipText(String.format("<html><body width='%1s'>"
+        		+ "<p>Copy all the compatibility rules of a selected source "
+        		+ "APClass to a new, user-selected source APClass.</p></html>",
+        		300));
+        btnCopyCompRul.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	ArrayList<String> selected = new ArrayList<String>();
+            	for (Component lineComponent : panelCPRules.getComponents())
+            	{
+            		if (lineComponent instanceof CompatibilityRuleLine)
+            		{
+	            		if (((CompatibilityRuleLine) lineComponent).isSelected)
+	            		{
+	        				selected.add(lineComponent.getName());
+	            		}
+            		}
+            	}
+            	
+                if (selected.size() == 1)
+                {
+                	String srcOrig = selected.get(0);
+
+                    DefaultListModel<String> srcAPCs =
+                            new DefaultListModel<String>();
+                    JList<String> srcClsList = new JList<String>(srcAPCs);
+                    for (String apc : allAPClasses)
+                    {
+                        if (!compatMap.keySet().contains(apc))
+                        {
+                        	srcAPCs.addElement(apc);
+                        }
+                    }
+                    srcClsList.setSelectionMode(
+                    		ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                    
+                    JOptionPane.showMessageDialog(
+                            null,
+                            new JScrollPane(srcClsList),
+                            "Select source APClasses of new rules",
+                            JOptionPane.PLAIN_MESSAGE);
+
+                    List<String> selSrc = srcClsList.getSelectedValuesList();
+                    if (selSrc.size() > 0)
+                    {
+                    	for (String srcAPClass : selSrc)
+                    	{
+                    		ArrayList<String> newTrg = new ArrayList<String>();
+                    		newTrg.addAll(compatMap.get(srcOrig));
+	    	                compatMap.put(srcAPClass,newTrg);
+	    	                allAPClsInCPMap.add(srcAPClass);
+                    	}
+    	                updateAPClassCompatibilitiesList();
+                    }
+                }
+                else
+                {
+        			JOptionPane.showMessageDialog(null,
+        					"<html>Please, select one and only one source "
+        					+ "APCLasss.</html>",
+        	                "Error",
+        	                JOptionPane.WARNING_MESSAGE,
+        	                UIManager.getIcon("OptionPane.errorIcon"));
+        			return;
+                }
+            }
+        });
+
+        btnDelCompRul = new JButton("Remove Selected");
+        btnDelCompRul.setToolTipText(String.format("<html><body width='%1s'>"
+        		+ "<p>Remove all the compatibility rules of selected "
+        		+ "source APClasses. Click on the "
+        		+ "name of a source APClass to select all its compatibility"
+        		+ "rules. You can select multiple source APClasses.</p></html>",
+        		300));
+        btnDelCompRul.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	int i = 0;
+            	for (Component lineComponent : panelCPRules.getComponents())
+            	{
+            		if (lineComponent instanceof CompatibilityRuleLine)
+            		{
+	            		if (((CompatibilityRuleLine) lineComponent).isSelected)
+	            		{
+	            			compatMap.remove(lineComponent.getName());
+	            			allAPClsInCPMap.remove(lineComponent.getName());
+	            			panelCPRules.remove(lineComponent);
+	            			i++;
+	            		}
+            		}
+            	}
+            	
+                if (i > 0)
+                {
+                    updateAPClassCompatibilitiesList();
+                }
+                else
+                {
+                	JOptionPane.showMessageDialog(null,
+        					"<html>Please, click to select at least one source "
+        					+ "AP CLasss.</html>",
+        	                "Error",
+        	                JOptionPane.WARNING_MESSAGE,
+        	                UIManager.getIcon("OptionPane.errorIcon"));
+        			return;
+                }
+            }
+        });
+
+        btnHelpCPMap = new JButton("?");
+        btnHelpCPMap.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	//TODO
+                String txt = "<html><body width='%1s'><p>TODO</p></html>";
+                JOptionPane.showMessageDialog(null,
+                        String.format(txt, 400),
+                        "Tips",
+                        JOptionPane.PLAIN_MESSAGE);
+            }
+        });
+
+        JPanel panelBtnCPMap = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBtnCPMap.add(btnAddCompRul);
+        panelBtnCPMap.add(btnCopyCompRul);
+        panelBtnCPMap.add(btnDelCompRul);
+        panelBtnCPMap.add(btnHelpCPMap);
+        panelCPMap.add(panelBtnCPMap, BorderLayout.NORTH);
+        
+        panelCPRules = new JPanel();
+        scrollPanelCPMap = new JScrollPane(panelCPRules,
+        		JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        		JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        panelCPRules.setLayout(new BoxLayout(panelCPRules, 
+        		SwingConstants.VERTICAL));
+        panelCPMap.add(scrollPanelCPMap, BorderLayout.CENTER);
 		
 		//
 		// APClass to Bond Order
@@ -661,6 +900,7 @@ public class CompatibilityMatrixForm extends JPanel {
 						bondOrderMap,
 						cappingMap,
 						forbiddenEndList);
+			allAPClsInCPMap.addAll(compatMap.keySet());
 		} catch (DENOPTIMException e) {
 			JOptionPane.showMessageDialog(null,
 					"<html>Could not read compatibility matrix data from "
@@ -679,10 +919,32 @@ public class CompatibilityMatrixForm extends JPanel {
         importAllCappingGroupsAPClassesFromCPMatrix(true);
         
         //Place data into GUI
+        updateAPClassCompatibilitiesList();
         updateAPClassToBondOrderTable();
         updateCappingRulesTable();
         updateForbiddenEndsTable();
 
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void updateAPClassCompatibilitiesList()
+	{
+		// Cleanup previous content
+		panelCPRules.removeAll();
+		
+		// Fill with new content
+		CompatRulesHeader h = new CompatRulesHeader();
+		h.setAlignmentX(LEFT_ALIGNMENT);
+		panelCPRules.add(h);
+		for (String srcAPClass : allAPClsInCPMap)
+		{
+			CompatibilityRuleLine r = new CompatibilityRuleLine(srcAPClass);
+			r.setAlignmentX(LEFT_ALIGNMENT);
+			panelCPRules.add(r);
+		}
+		panelCPRules.repaint();
+		panelCPRules.revalidate();	
 	}
 	
 //-----------------------------------------------------------------------------
@@ -845,6 +1107,175 @@ public class CompatibilityMatrixForm extends JPanel {
 		//TODO
 	}
 
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Single line in the list of APClass compatibility rules
+	 */
+	
+	private class CompatibilityRuleLine extends JPanel implements MouseListener
+	{
+		/**
+		 * Version UID
+		 */
+		private static final long serialVersionUID = -5007017502551954331L;
+
+		private JLabel srcClassName;
+		private JPanel trgClassesPanel;
+		private JScrollPane trgClassesScroller;
+		private JButton btnAdd;
+		
+		private boolean isSelected = false;
+		
+		private final Dimension minSrcAPClassName = new Dimension(200,26);
+		private final Dimension scrollerSize = new Dimension(300,50);
+		private final Color SELECTEDBACKGROUND = Color.BLUE;
+		private final Color DEFAULTBACKGROUND = Color.WHITE;
+		//UIManager.getLookAndFeelDefaults().getColor("Panel.background")
+		
+	//------------------------------------------------------------------------
+
+		public CompatibilityRuleLine(String srcAPClass)
+		{
+			this.setName(srcAPClass);
+			this.setBackground(DEFAULTBACKGROUND);
+			this.setLayout(new BorderLayout());
+			
+			srcClassName = new JLabel(srcAPClass);
+			srcClassName.setBackground(DEFAULTBACKGROUND);
+			srcClassName.setPreferredSize(minSrcAPClassName);
+			srcClassName.setToolTipText(srcAPClass);
+			srcClassName.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+			srcClassName.addMouseListener(this);
+			this.add(srcClassName, BorderLayout.WEST);
+			
+			trgClassesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			for (String trgAPClass : compatMap.get(srcAPClass))
+			{
+				trgClassesPanel.add(new JButton(trgAPClass));
+			}
+			trgClassesScroller = new JScrollPane(trgClassesPanel,
+	        		JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+	        		JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+			trgClassesScroller.setPreferredSize(scrollerSize);
+	        this.add(trgClassesScroller, BorderLayout.CENTER);
+	        
+			btnAdd = new JButton("Add");
+			btnAdd.setToolTipText(String.format("<html><body width='%1s'>"
+					+ "Add more compatible APClasses to source class <i>"
+					+ srcAPClass + "</i></html>",250));
+			this.add(btnAdd, BorderLayout.EAST);
+			
+			this.setBorder(BorderFactory.createEmptyBorder(5,0,5,5));
+			
+			addMouseListener(this);
+			setFocusable(true);
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		public boolean isSelected()
+		{
+			return isSelected;
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		public void renderdAsSelected(boolean selected)
+		{
+			if (selected)
+			{
+				super.setBackground(SELECTEDBACKGROUND);
+				srcClassName.setForeground(Color.WHITE);
+			}
+			else
+			{
+				super.setBackground(DEFAULTBACKGROUND);
+				srcClassName.setForeground(Color.BLACK);
+			}
+		}
+		
+	//-------------------------------------------------------------------------
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (isSelected)
+				isSelected = false;
+			else
+				isSelected = true;
+			renderdAsSelected(isSelected);
+		}
+	
+	//-------------------------------------------------------------------------
+	
+		@Override
+		public void mousePressed(MouseEvent e) {
+			//Nothing
+		}
+		
+	//-------------------------------------------------------------------------
+	
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			//Nothing
+		}
+		
+	//-------------------------------------------------------------------------
+	
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			//Nothing
+		}
+		
+	//-------------------------------------------------------------------------
+	
+		@Override
+		public void mouseExited(MouseEvent e) {
+			//Nothing
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class CompatRulesHeader extends JPanel
+	{
+		private Dimension minSrcAPClassName = new Dimension(200,26);
+		public final Color DEFAULTBACKGROUND = Color.WHITE;
+		
+		public CompatRulesHeader()
+		{
+			this.setName("Header");
+			this.setBackground(DEFAULTBACKGROUND);
+			this.setLayout(new BorderLayout());
+			
+			JLabel srcClassTitle = new JLabel("<html>"
+					+ "<div style='text-align: center;'>"
+					+ "<b>Source APClass:</b></div></html>");
+			srcClassTitle.setBackground(DEFAULTBACKGROUND);
+			srcClassTitle.setPreferredSize(minSrcAPClassName);
+			srcClassTitle.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+			this.add(srcClassTitle, BorderLayout.WEST);
+			
+			JLabel trgClassTitle = new JLabel("<html>"
+					+ "<div style='text-align: center;'>"
+					+ "<b>Compatible target APClasses on incoming fragments:</b></div></html>");
+			trgClassTitle.setBackground(DEFAULTBACKGROUND);
+			trgClassTitle.setPreferredSize(minSrcAPClassName);
+			trgClassTitle.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+
+	        this.add(trgClassTitle, BorderLayout.CENTER);
+
+			this.setBorder(BorderFactory.createEmptyBorder(5,0,5,5));
+		}
+	}
+    
+//-----------------------------------------------------------------------------
+    
+    
+    
+//-----------------------------------------------------------------------------
+
+	
 //-----------------------------------------------------------------------------
 	
 }
