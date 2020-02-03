@@ -107,6 +107,37 @@ public final class DENOPTIMConstants
                     new HashSet<>(Arrays.asList(new String[] {".txt", 
 			".sdf", ".mol"}
                     ));
+    
+    /**
+     * Keyword identifying compatibility matrix file lines with 
+     * APClass compatibility rules
+     */
+    public static final String APCMAPCOMPRULE = "RCN";
+    
+    /**
+     * Keyword identifying compatibility matrix file lines with 
+     * APClass-to-Bond order map
+     */
+    public static final String APCMAPAP2BO = "RBO";
+    
+    /**
+     * Keyword identifying compatibility matrix file lines with
+     * forbidden ends
+     */
+    public static final String APCMAPFORBEND = "DEL";
+    
+    /**
+     * Keyword identifying compatibility matrix file lines with
+     * capping rules
+     */
+    public static final String APCMAPCAPPING = "CAP";
+    
+    /**
+     * Keyword identifying compatibility matrix file lines with
+     * comments
+     */
+    public static final String APCMAPIGNORE = "#";
+    
 
     /**
      * Prefix for generation folders

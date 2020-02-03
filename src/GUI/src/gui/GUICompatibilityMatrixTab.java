@@ -123,8 +123,12 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		
 		btnOpenFrags = new JButton("Load Compatibility Matrix",
 					UIManager.getIcon("FileView.directoryIcon"));
-		btnOpenFrags.setToolTipText("Reads compatibility matrix data from "
-				+ "file.");
+		btnOpenFrags.setToolTipText(String.format("<html><body width='%1s'>"
+				+ "Reads from file all compatibility matrix data including: "
+				+ "<ul><li>APClass compatibility rules</li>"
+				+ "<li>APClass-to-Bond order rules</li>"
+				+ "<li>Capping rules</li>"
+				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
 		btnOpenFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = DenoptimGUIFileOpener.pickFile();
@@ -139,24 +143,27 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		
 		JButton btnSaveFrags = new JButton("Save Compatibility Matrix",
 				UIManager.getIcon("FileView.hardDriveIcon"));
-		btnSaveFrags.setToolTipText("Write the compatibility matrix to file.");
+		btnSaveFrags.setToolTipText(String.format("<html><body width='%1s'>"
+				+ "Writes to file all compatibility matrix data including: "
+				+ "<ul><li>APClass compatibility rules</li>"
+				+ "<li>APClass-to-Bond order rules</li>"
+				+ "<li>Capping rules</li>"
+				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File outFile = DenoptimGUIFileOpener.saveFile();
-				if (outFile == null)
+				if (outFile == null || cpMapHandler == null)
 				{
 					return;
 				}
-				
-				//TODO
-				
+				cpMapHandler.writeCopatibilityMatrixFile(outFile);
 				unsavedChanges = false;
 			}
 		});
 		commandsPane.add(btnSaveFrags);
 
 		JButton btnCanc = new JButton("Close Tab");
-		btnCanc.setToolTipText("Closes this tab.");
+		btnCanc.setToolTipText("Closes this compatibility matrix editor.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
 		commandsPane.add(btnCanc);
 		
