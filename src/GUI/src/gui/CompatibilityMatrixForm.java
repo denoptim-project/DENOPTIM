@@ -1339,6 +1339,9 @@ public class CompatibilityMatrixForm extends JPanel {
     	private String trgAPClass;
     	private JButton btnDel;
     	
+    	private final Color BTNPRESS = Color.decode("#fbae9d");
+    	private final Color BTNDEF = Color.decode("#f74922");
+    	
     	public TargetAPClassToken(String apclass)
     	{
     		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -1347,18 +1350,37 @@ public class CompatibilityMatrixForm extends JPanel {
     		this.add(label);
     		btnDel = new JButton("X");
     		btnDel.setMaximumSize(new Dimension(15,15));
-    		btnDel.setBackground(Color.decode("#f74019"));
+    		btnDel.setBackground(BTNDEF);
     		btnDel.setOpaque(true);
     		btnDel.setBorderPainted(true);
     		btnDel.setBorder(BorderFactory.createRaisedSoftBevelBorder());
     		btnDel.setForeground(Color.BLACK);
-    		btnDel.addActionListener(new ActionListener() 
-    		{
-				public void actionPerformed(ActionEvent e) 
+    		btnDel.addMouseListener(new MouseListener() {
+				
+				@Override
+				public void mouseReleased(MouseEvent e) 
 				{
 					firePropertyChange(CompatibilityMatrixForm.REMOVETRGAPC,
 							"#", trgAPClass);
 				}
+				
+				@Override
+				public void mousePressed(MouseEvent e) 
+				{
+					btnDel.setBackground(BTNPRESS);	
+				}
+				
+				@Override
+				public void mouseExited(MouseEvent e) 
+				{
+					btnDel.setBackground(BTNDEF);
+				}
+				
+				@Override
+				public void mouseEntered(MouseEvent e) {}
+				
+				@Override
+				public void mouseClicked(MouseEvent e) {}
 			});
     		this.add(btnDel);
     		this.add(Box.createRigidArea(new Dimension(15,15)));
