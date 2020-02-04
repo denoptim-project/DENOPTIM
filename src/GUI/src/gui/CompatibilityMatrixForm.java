@@ -660,7 +660,7 @@ public class CompatibilityMatrixForm extends JPanel {
                         {
                             String apc = (String) tableAPClsBO.getValueAt(
                                     selectedRowIds[i], 0);
-                            cappingMap.remove(apc);
+                            bondOrderMap.remove(apc);
                             tabModAPClsBO.removeRow(selectedRowIds[i]);
                         }
                     }
