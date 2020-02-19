@@ -57,14 +57,20 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+
+import scala.collection.generic.Clearable;
 
 import com.sun.java.swing.plaf.motif.MotifBorders.BevelBorder;
 
@@ -149,6 +155,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	private JButton btnHelpCPMap;
 	private JPanel panelCPRules;
 	private JScrollPane scrollPanelCPMap;
+	private JTextField txtSearch;
 	
 	private JPanel panelAPClsBO;
 	private DefaultTableModel tabModAPClsBO;
@@ -173,7 +180,6 @@ public class CompatibilityMatrixForm extends JPanel {
 	private JButton btnDelFrbEnd;
 	private JButton btnSortFrbEnd;
 	private JButton btnHelpFrbEnd;
-	
 	
 //-----------------------------------------------------------------------------
 	
@@ -448,6 +454,42 @@ public class CompatibilityMatrixForm extends JPanel {
                 }
             }
         });
+        
+        JButton btnSearch = new JButton("Search");
+        btnSearch.setToolTipText(String.format("<html><body width='%1s'>Search "
+        		+ "for the given APClass. Matching compatibility rules are "
+        		+ "selected and highlighted accordingly.</html>",150));
+        btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				searchAPClass(txtSearch.getText());
+			}
+		});
+
+        txtSearch = new JTextField();
+        txtSearch.setToolTipText(String.format("<html><body width='%1s'>Type "
+        		+ "here the APClass name or part of it. The search supports "
+        		+ "regual expressions and initial and final '(.*)' are added "
+        		+ "to all queries.",250));
+        txtSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				searchAPClass(txtSearch.getText());
+			}
+		});
+        JScrollPane txtSearchPanel = new JScrollPane(txtSearch,
+        		JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+        		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        txtSearchPanel.getHorizontalScrollBar().setPreferredSize(new Dimension(0,2));
+        txtSearchPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+
+        JButton btnClearMatch = new JButton("Clear");
+        btnClearMatch.setToolTipText("Clear search matches");
+        btnClearMatch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				clearSearchMatches();
+				txtSearch.setText("");
+			}
+		});
+        
 
         btnHelpCPMap = new JButton("?");
         btnHelpCPMap.setToolTipText("Displays the help message.");
@@ -475,10 +517,16 @@ public class CompatibilityMatrixForm extends JPanel {
             }
         });
 
-        JPanel panelBtnCPMap = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        //JPanel panelBtnCPMap = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelBtnCPMap = new JPanel();
+        panelBtnCPMap.setLayout(new BoxLayout(panelBtnCPMap, BoxLayout.X_AXIS));
+        panelBtnCPMap.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         panelBtnCPMap.add(btnAddCompRul);
         panelBtnCPMap.add(btnCopyCompRul);
         panelBtnCPMap.add(btnDelCompRul);
+        panelBtnCPMap.add(btnSearch);
+        panelBtnCPMap.add(txtSearchPanel);
+        panelBtnCPMap.add(btnClearMatch);
         panelBtnCPMap.add(btnHelpCPMap);
         panelCPMap.add(panelBtnCPMap, BorderLayout.NORTH);
         
@@ -1102,6 +1150,41 @@ public class CompatibilityMatrixForm extends JPanel {
 	}
 	
 //-----------------------------------------------------------------------------
+
+	protected void clearSearchMatches() 
+	{
+		for (Component lineComponent : panelCPRules.getComponents())
+    	{
+    		if (lineComponent instanceof CompatibilityRuleLine)
+    		{    			
+    			((CompatibilityRuleLine) lineComponent).clearMatches();
+			}
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	protected void searchAPClass(String query) 
+	{
+		clearSearchMatches();
+		
+		if (query.equals(""))
+		{
+			return;
+		}
+		
+		for (Component lineComponent : panelCPRules.getComponents())
+    	{
+    		if (lineComponent instanceof CompatibilityRuleLine)
+    		{    			
+    			CompatibilityRuleLine line = 
+    					(CompatibilityRuleLine) lineComponent;
+        		line.renderIfMatches("(.*)" + query + "(.*)");
+			}
+		}
+	}
+
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Listener that is pausable and that, when active, projects edits in the 
@@ -1512,10 +1595,11 @@ public class CompatibilityMatrixForm extends JPanel {
 		private boolean isSelected = false;
 		
 		private final Dimension minSrcAPClassName = new Dimension(200,26);
-		private final Dimension scrollerSize = new Dimension(300,50);
+		private final Dimension scrollerSize = new Dimension(300,41);
 		private final Color SELECTEDBACKGROUND = Color.BLUE;
 		private final Color DEFAULTBACKGROUND = 
 			UIManager.getLookAndFeelDefaults().getColor("Panel.background");
+				
 		
 	//-------------------------------------------------------------------------
 
@@ -1548,6 +1632,8 @@ public class CompatibilityMatrixForm extends JPanel {
 			trgClassesScroller = new JScrollPane(trgClassesPanel,
 	        		JScrollPane.VERTICAL_SCROLLBAR_NEVER,
 	        		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			trgClassesScroller.getHorizontalScrollBar().setPreferredSize(
+					new Dimension(0,5));
 			trgClassesScroller.setPreferredSize(scrollerSize);
 	        this.add(trgClassesScroller, BorderLayout.CENTER);
 	        
@@ -1622,6 +1708,52 @@ public class CompatibilityMatrixForm extends JPanel {
 			
 			addMouseListener(this);
 			setFocusable(true);
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		public void clearMatches()
+		{
+			for (Component c : trgClassesPanel.getComponents())
+			{
+				if (c instanceof TargetAPClassToken)
+				{
+					((TargetAPClassToken) c).renderAsSelected(false);
+				}
+			}
+			isSelected = false;
+			renderdAsSelected(false);
+		}
+		
+	//-------------------------------------------------------------------------
+		
+		public void renderIfMatches(String regex)
+		{
+			boolean found = false;
+			
+			if (srcAPClass.matches(regex))
+			{
+				found = true;
+			}
+
+			for (Component c : trgClassesPanel.getComponents())
+			{
+				if (c instanceof TargetAPClassToken)
+				{
+					TargetAPClassToken tac = (TargetAPClassToken) c;
+					if (tac.matchesAPClass(regex))
+					{
+						found = true;
+						tac.renderAsSelected(true);
+					}
+				}
+			}
+			
+			if (found)
+			{
+				isSelected = true;
+				renderdAsSelected(true);
+			}
 		}
 		
 	//-------------------------------------------------------------------------
@@ -1733,17 +1865,22 @@ public class CompatibilityMatrixForm extends JPanel {
     private class TargetAPClassToken extends JPanel
     {
     	private String trgAPClass;
+    	private JLabel trgAPClLabel;
     	private JButton btnDel;
     	
     	private final Color BTNPRESS = Color.decode("#fbae9d");
     	private final Color BTNDEF = Color.decode("#f74922");
     	
+		private final Color SELECTEDBACKGROUND = Color.BLUE;
+		private final Color DEFAULTBACKGROUND = 
+				UIManager.getLookAndFeelDefaults().getColor("Panel.background");
+    	
     	public TargetAPClassToken(String apclass)
     	{
     		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     		this.trgAPClass = apclass;
-    		JLabel label = new JLabel(trgAPClass);
-    		this.add(label);
+    		trgAPClLabel = new JLabel(trgAPClass);
+    		this.add(trgAPClLabel);
     		btnDel = new JButton("X");
     		btnDel.setMaximumSize(new Dimension(15,15));
     		btnDel.setBackground(BTNDEF);
@@ -1783,6 +1920,32 @@ public class CompatibilityMatrixForm extends JPanel {
     		this.add(btnDel);
     		this.add(Box.createRigidArea(new Dimension(15,15)));
     	}
+    	
+    //-------------------------------------------------------------------------
+    	
+    	public boolean matchesAPClass(String regex)
+    	{
+    		return trgAPClass.matches(regex);
+    	}
+    	
+    //-------------------------------------------------------------------------
+    	
+    	public void renderAsSelected(boolean selected)
+    	{
+			if (selected)
+			{
+				super.setBackground(SELECTEDBACKGROUND);
+				trgAPClLabel.setForeground(Color.WHITE);
+			}
+			else
+			{
+				super.setBackground(DEFAULTBACKGROUND);
+				trgAPClLabel.setForeground(Color.BLACK);
+			}
+    	}
+    	
+    //-------------------------------------------------------------------------
+    	
     }
     
 //-----------------------------------------------------------------------------
