@@ -300,6 +300,15 @@ public class GUIInspectFSERun extends GUICardPanel
 
 	public void importFSERunData(File folder) {
 
+		if (!folder.isDirectory() || !folder.exists())
+		{
+			JOptionPane.showMessageDialog(null,
+	                "Could not read data from folder '" + folder+ "'!",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		System.out.println("Importing data from '" + folder + "'... ");
@@ -330,7 +339,7 @@ public class GUIInspectFSERun extends GUICardPanel
 				mainPanel.setCursor(Cursor.getPredefinedCursor(
 						Cursor.DEFAULT_CURSOR));
 				JOptionPane.showMessageDialog(null,
-		                "Could not read data from to '" + molFile + "'!",
+		                "Could not read data from '" + molFile + "'!",
 		                "Error",
 		                JOptionPane.PLAIN_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));

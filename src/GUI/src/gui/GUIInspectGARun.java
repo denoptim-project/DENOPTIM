@@ -310,7 +310,17 @@ public class GUIInspectGARun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 
-	public void importGARunData(File file) {
+	public void importGARunData(File file) 
+	{
+		if (!file.isDirectory() || !file.exists())
+		{
+			JOptionPane.showMessageDialog(null,
+	                "Could not read data from folder '" + file + "'!",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return;
+		}
 
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		srcFolder = file;

@@ -28,6 +28,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -81,7 +82,8 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 	 */
 	private boolean unsavedChanges = false;
 
-	private JButton btnOpenFrags;
+	private JButton btnLoadCPMap;
+	private JButton btnImportAPClasses;
 
 	private CompatibilityMatrixForm cpMapHandler;
 	
@@ -121,15 +123,16 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		JPanel commandsPane = new JPanel();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenFrags = new JButton("Load Compatibility Matrix",
+		
+		btnLoadCPMap = new JButton("Load Compatibility Matrix",
 					UIManager.getIcon("FileView.directoryIcon"));
-		btnOpenFrags.setToolTipText(String.format("<html><body width='%1s'>"
+		btnLoadCPMap.setToolTipText(String.format("<html><body width='%1s'>"
 				+ "Reads from file all compatibility matrix data including: "
 				+ "<ul><li>APClass compatibility rules</li>"
 				+ "<li>APClass-to-Bond order rules</li>"
 				+ "<li>Capping rules</li>"
 				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
-		btnOpenFrags.addActionListener(new ActionListener() {
+		btnLoadCPMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = DenoptimGUIFileOpener.pickFile();
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
@@ -139,7 +142,20 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				cpMapHandler.importCPMapFromFile(inFile);
 			}
 		});
-		commandsPane.add(btnOpenFrags);
+		commandsPane.add(btnLoadCPMap);
+		
+		btnImportAPClasses = new JButton("Import APClasses");
+		btnImportAPClasses.setToolTipText(String.format("<html>"
+				+ "<body width='%1s'>Appends all APClasses to the list of "
+				+ "all classes in the current tab.</html>",300));
+		btnImportAPClasses.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Set<File> files = DenoptimGUIFileOpener.pickManyFile();
+				cpMapHandler.importAllAPClassesFromFragmentLibs(files, false);
+			}
+		});
+		commandsPane.add(btnImportAPClasses);
+		
 		
 		JButton btnSaveFrags = new JButton("Save Compatibility Matrix",
 				UIManager.getIcon("FileView.hardDriveIcon"));

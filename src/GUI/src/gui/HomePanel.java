@@ -250,9 +250,11 @@ public class HomePanel extends GUICardPanel
 		*/
 		
 		//TODO del: only for devel
+		/*
 		GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
 		mainPanel.add(cpmap);
 		cpmap.importCPMapFromFile(new File("/tmp/CPMap.par"));
+		*/
 		
 	}
 }
