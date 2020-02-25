@@ -1,0 +1,39 @@
+#
+# Parameters for DENOPTIM
+#
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
+
+# Parameters controlling handling of cyclic graphs
+RC-CLOSERINGS=yes, we do!
+RC-EVALUATIONCLOSABILITYMODE=CONSTITUTION
+RC-CLOSABLERINGSMARTS=C1CCCC1
+RC-CLOSABLERINGSMARTS=C1CCCCC1
+RC-CLOSABLERINGSMARTS=C1CCCCCC1
+
+# Fitness provider
+FP-Source=OTF_WDIR/fitness_provider.sh
+FP-Interpreter=BASH
+
+# Genetic Algorithm parameters
+GA-Verbosity=2
+GA-randomSeed=8572368003836
+GA-Parallelization=asynchronous
+GA-numParallelTasks=OTF_PROCS
+GA-populationSize=10
+GA-numChildren=5
+GA-numGenerations=10
+GA-XOverSelectionMode=TS
+GA-crossoverProbability=0.8
+GA-mutationProbability=0.8
+GA-symmetryProbability=0.0
+GA-growthProbScheme=sigma
+GA-GrowthSigmaSteepness=2.0
+GA-GrowthSigmaMiddle=0.0
+GA-replacementStrategy=NONE
