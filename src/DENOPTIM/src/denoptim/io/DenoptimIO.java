@@ -29,8 +29,11 @@ package denoptim.io;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.io.FileNotFoundException;
 import java.io.InvalidClassException;
 import java.io.FileReader;
@@ -67,6 +70,7 @@ import javax.imageio.ImageIO;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.RenderingHints;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -96,6 +100,7 @@ import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMMolecule;
@@ -1272,23 +1277,127 @@ public class DenoptimIO
             }
         }
     }
+    
+//------------------------------------------------------------------------------
 
+    public static Set<String> readAllAPClasses(File fragLib)
+    {
+    	Set<String> allCLasses = new HashSet<String>();
+    	try {
+			for (IAtomContainer mol : DenoptimIO.readMoleculeData(
+					fragLib.getAbsolutePath()))
+			{
+				DENOPTIMFragment frag = new DENOPTIMFragment(mol);
+				for (DENOPTIMAttachmentPoint ap : frag.getAllAPs())
+				{
+					allCLasses.add(ap.getAPClass());
+				}
+			}
+		} catch (DENOPTIMException e) {
+			System.out.println("Could not read data from '" + fragLib +"'. "
+					+ "Cause: " + e.getMessage());
+		}
+    	
+    	return allCLasses;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
      * The class compatibility matrix
      *
-     * @param fileName
-     * @param compReacMap
-     * @param reacBonds
-     * @param reacCap
-     * @param forbEnd
+     * @param fileName the file to be read
+     * @param compReacMap container for the APClass compatibility rules
+     * @param reacBonds container for the APClass-to-bond order
+     * @param reacCap container for the capping rules
+     * @param forbEnd container for the definition of forbidden ends
+     */
+    public static void writeCompatibilityMatrix(String fileName,
+            HashMap<String, ArrayList<String>> compReacMap,
+            HashMap<String, Integer> reacBonds, HashMap<String, String> reacCap,
+            Set<String> forbEnd)
+            throws DENOPTIMException
+    {
+    	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+    	Date date = new Date();
+    	String dateStr = dateFormat.format(date);
+    	
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
+    	sb.append(" Compatibility matrix data").append(NL);
+    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
+    	sb.append(" Written by DENOPTIM-GUI on ").append(dateStr).append(NL);
+    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
+    	sb.append(" APCLass Compatibility rules").append(NL);
+    	SortedSet<String> keysCPMap = new TreeSet<String>();
+    	keysCPMap.addAll(compReacMap.keySet());
+    	for (String srcAPC : keysCPMap)
+    	{
+    		sb.append(DENOPTIMConstants.APCMAPCOMPRULE).append(" ");
+    		sb.append(srcAPC).append(" ");
+    		for (int i=0; i<compReacMap.get(srcAPC).size(); i++)
+    		{
+    			String trgAPC = compReacMap.get(srcAPC).get(i);
+    			sb.append(trgAPC);
+    			if (i != (compReacMap.get(srcAPC).size()-1))
+    			{
+    				sb.append(",");
+    			}
+    			else
+    			{
+    				sb.append(NL);
+    			}
+    		}
+    	}
+    	
+    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
+    	sb.append(" APClass-to-BondOrder").append(NL);
+    	SortedSet<String> keysBO = new TreeSet<String>();
+    	keysBO.addAll(reacBonds.keySet());
+    	for (String apc : keysBO)
+    	{
+    		sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
+    		sb.append(apc).append(" ").append(reacBonds.get(apc)).append(NL);
+    	}
+    	
+    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
+    	sb.append(" Capping rules").append(NL);
+    	SortedSet<String> keysCap = new TreeSet<String>();
+    	keysCap.addAll(reacCap.keySet());
+    	for (String apc : keysCap)
+    	{
+    		sb.append(DENOPTIMConstants.APCMAPCAPPING).append(" ");
+    		sb.append(apc).append(" ").append(reacCap.get(apc)).append(NL);
+    	}
+    	
+    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
+    	sb.append(" Forbidden ends").append(NL);
+    	SortedSet<String> sortedFE = new TreeSet<String>();
+    	sortedFE.addAll(forbEnd);
+    	for (String apc : sortedFE)
+    	{
+    		sb.append(DENOPTIMConstants.APCMAPFORBEND).append(" ");
+    		sb.append(apc).append(" ").append(NL);
+    	}
+    	
+    	DenoptimIO.writeData(fileName, sb.toString(), false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read the APclass compatibility matrix data from file.
+     * @param fileName the file to be read
+     * @param compReacMap container for the APClass compatibility rules
+     * @param reacBonds container for the APClass-to-bond order
+     * @param reacCap container for the capping rules
+     * @param forbEnd container for the definition of forbidden ends
      * @throws DENOPTIMException
      */
     public static void readCompatibilityMatrix(String fileName,
             HashMap<String, ArrayList<String>> compReacMap,
             HashMap<String, Integer> reacBonds, HashMap<String, String> reacCap,
-            ArrayList<String> forbEnd)
+            Set<String> forbEnd)
             throws DENOPTIMException
     {
 
@@ -1304,12 +1413,12 @@ public class DenoptimIO
                     continue;
                 }
 
-                if (line.startsWith("#"))
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
                 {
                     continue;
                 }
 
-                if (line.startsWith("RCN"))
+                if (line.startsWith(DENOPTIMConstants.APCMAPCOMPRULE))
                 {
                     String str[] = line.split("\\s+");
                     if (str.length < 3)
@@ -1329,7 +1438,7 @@ public class DenoptimIO
                 }
                 else
                 {
-                    if (line.startsWith("RBO"))
+                    if (line.startsWith(DENOPTIMConstants.APCMAPAP2BO))
                     {
                         String str[] = line.split("\\s+");
                         if (str.length != 3)
@@ -1341,7 +1450,7 @@ public class DenoptimIO
                     }
                     else
                     {
-                        if (line.startsWith("CAP"))
+                        if (line.startsWith(DENOPTIMConstants.APCMAPCAPPING))
                         {
                             String str[] = line.split("\\s+");
                             if (str.length != 3)
@@ -1353,7 +1462,7 @@ public class DenoptimIO
                         }
                         else
 			{
-			    if (line.startsWith("DEL"))
+			    if (line.startsWith(DENOPTIMConstants.APCMAPFORBEND))
 			    {
 				String str[] = line.split("\\s+");
 				if (str.length != 2)
@@ -1403,13 +1512,6 @@ public class DenoptimIO
             String err = "No bond data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);
         }
-
-//        System.err.println("RCN");
-//        System.err.println(compReacMap.toString());
-//
-//        System.err.println("RBO");
-//        System.err.println(reacBonds.toString());
-
     }
 
 //------------------------------------------------------------------------------
@@ -1444,12 +1546,12 @@ public class DenoptimIO
                     continue;
                 }
 
-                if (line.startsWith("#"))
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
                 {
                     continue;
                 }
 
-                if (line.startsWith("RCN"))
+                if (line.startsWith(DENOPTIMConstants.APCMAPCOMPRULE))
                 {
                     String str[] = line.split("\\s+");
                     if (str.length < 3)
@@ -1538,73 +1640,7 @@ public class DenoptimIO
     	ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
     	for (IAtomContainer iac : iacs)
     	{   			
-    		DENOPTIMMolecule mol = new DENOPTIMMolecule();
-    		
-    		String molName = "noname";
-    		if (iac.getProperty(CDKConstants.TITLE) != null)
-    		{
-    			molName = iac.getProperty(CDKConstants.TITLE).toString();
-    		}
-    		mol.setName(molName);
-    		
-    		boolean fitnessOrError = false;
-            if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
-            {
-            	fitnessOrError = true;
-            	mol.setError(iac.getProperty(
-            			DENOPTIMConstants.MOLERRORTAG).toString());
-            }
-
-            if (iac.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
-            {
-            	fitnessOrError = true;
-                String fitprp = iac.getProperty(
-                		DENOPTIMConstants.FITNESSTAG).toString();
-                double fitVal = Double.parseDouble(fitprp);
-                if (Double.isNaN(fitVal))
-                {
-                    String msg = "Fitness value is NaN for " + molName
-                    		+ " in file '" + filename+ "'";
-                    throw new DENOPTIMException(msg);
-                }
-                mol.setMoleculeFitness(fitVal);
-            }
-            
-            if (!fitnessOrError)
-            {
-            	String msg = "Neither fitness nor error found for " + molName
-            			+ " in file '" + filename+ "'";
-                throw new DENOPTIMException(msg);
-            }
-            
-            if (iac.getProperty(DENOPTIMConstants.GRAPHLEVELTAG) != null)
-            {
-            	mol.setLevel(Integer.parseInt(iac.getProperty(
-            			DENOPTIMConstants.GRAPHLEVELTAG).toString()));
-            }
-            
-            if (iac.getProperty(DENOPTIMConstants.SMILESTAG) != null)
-            {
-            	mol.setMoleculeSmiles(iac.getProperty(
-            			DENOPTIMConstants.SMILESTAG).toString());
-            }
-            
-            try
-            {
-	            mol.setMoleculeUID(iac.getProperty(
-	            		DENOPTIMConstants.UNIQUEIDTAG).toString());
-	            mol.setMoleculeGraph(GraphConversionTool.getGraphFromString(
-	            		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
-	            		useFragSpace));
-            } catch (Exception e) {
-            	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
-            			+ " Could not read UID or GraphENC", e);
-            }
-            if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
-            {
-                mol.setComments(iac.getProperty(
-                		DENOPTIMConstants.GMSGTAG).toString());
-            }
+    		DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
             
             mol.setMoleculeFile(filename);
             
@@ -1924,7 +1960,7 @@ public class DenoptimIO
                     continue;
                 }
 
-                if (line.startsWith("#"))
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
                 {
                     continue;
                 }
@@ -2084,7 +2120,7 @@ public class DenoptimIO
                     continue;
                 }
 
-                if (line.startsWith("#"))
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
                 {
                     continue;
                 }
