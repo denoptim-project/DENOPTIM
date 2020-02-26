@@ -1880,7 +1880,7 @@ MF: TO BE TESTED
   //------------------------------------------------------------------------------
 
     /**
-     * Calculates the probability of adding a fragment to the given level level.
+     * Calculates the probability of adding a fragment to the given level.
      * This will require a coin toss with the calculated probability. If a newly
      * drawn random number is less than this value, a new fragment may be added.
      * @param level level of the graph at which fragment is to be added
