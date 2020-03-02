@@ -1136,18 +1136,34 @@ public class GUIFragmentInspector extends GUICardPanel
 				fragmentLibrary.size(), 1));
         deprotectEditedSystem();
   	}
-  	
+
 //----------------------------------------------------------------------------
+  	
   	/**
   	 * Forces the user to specify a properly formatted APClass.
   	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the wuestion
+  	 * @param mustReply set to <code>true</code> to prevent escaping the question
   	 * @return 
   	 * @throws DENOPTIMException 
   	 */
 	private String ensureGoodAPClassString(String currApClass, 
 			boolean mustReply) 
 			throws DENOPTIMException 
+	{		
+		return ensureGoodAPClassString(currApClass,"Define APClass",mustReply);
+	}
+  	
+//-----------------------------------------------------------------------------
+  	
+  	/**
+  	 * Forces the user to specify a properly formatted APClass.
+  	 * @param currApClass the current value of the APClass, or empty string
+  	 * @param mustReply set to <code>true</code> to prevent escaping the question
+  	 * @return 
+  	 * @throws DENOPTIMException 
+  	 */
+	public static String ensureGoodAPClassString(String currApClass, 
+			String title, boolean mustReply) throws DENOPTIMException 
 	{		
 		String preStr = "";
 		while (!DENOPTIMAttachmentPoint.isValidAPClassString(currApClass))
@@ -1163,9 +1179,9 @@ public class GUIFragmentInspector extends GUICardPanel
 	    				+ "<li><code>subClass</code> is an integer</li>";
 			}
 			
-    		currApClass = JOptionPane.showInputDialog("<html>" + preStr 
-    				+ "</ul>Please, provide a valid "
-    				+ "APClass string: ");
+    		currApClass = JOptionPane.showInputDialog(null, 
+    				"<html>" + preStr + "</ul>Please, provide a valid "
+    				+ "APClass string: ", title, JOptionPane.PLAIN_MESSAGE);
         	
     		if (currApClass == null)
         	{

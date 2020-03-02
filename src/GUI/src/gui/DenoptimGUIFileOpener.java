@@ -25,7 +25,9 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -73,6 +75,29 @@ public class DenoptimGUIFileOpener
 		    txtField.setText(file.getAbsolutePath());
 		}
 		return file;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	public static Set<File> pickManyFile() 
+	{
+		JFileChooser filesChooser = new JFileChooser(
+				FileSystemView.getFileSystemView().getHomeDirectory()); 
+		filesChooser.setMultiSelectionEnabled(true);
+		Set<File> files = new HashSet<File>();
+		if (filesChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		{
+			File[] arr = filesChooser.getSelectedFiles();
+			for (int i=0; i<arr.length; i++)
+			{
+				files.add(arr[i]);
+			}
+		}
+		else
+		{
+			return null;
+		}
+		return files;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -276,6 +301,9 @@ public class DenoptimGUIFileOpener
 		Map<String,String> determiningKeysMap = new HashMap<String,String>();
 		determiningKeysMap.put("^GA-.*","GA-PARAMS");
 		determiningKeysMap.put("^FSE-.*","FSE-PARAMS");
+		determiningKeysMap.put("^RCN .*","CompatibilityMatrix");
+		determiningKeysMap.put("^RBO .*","CompatibilityMatrix");
+		determiningKeysMap.put("^CAP .*","CompatibilityMatrix");
 		
 		return detectKindFile(fileName, determiningKeysMap, null);
 	}

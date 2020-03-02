@@ -206,8 +206,13 @@ public class MoleculeViewPanel extends JSplitPane
 			else
 			{
 				try {
-					item = (DENOPTIMMolecule) DenoptimIO.readMoleculeData(
-							file.getAbsolutePath()).get(0);
+					
+					//WARNING: here we always ignore the fragment space because
+					// so far, there is no case where the fully defined graph 
+					// is needed. We only need its string representation.
+					
+					item = new DENOPTIMMolecule(DenoptimIO.readMoleculeData(
+							file.getAbsolutePath()).get(0),false);
 				} catch (DENOPTIMException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

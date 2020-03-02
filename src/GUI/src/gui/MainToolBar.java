@@ -18,6 +18,9 @@
 
 package gui;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -241,7 +244,14 @@ public class MainToolBar extends JMenuBar {
 				mainPanel.add(new GUIFragmentInspector(mainPanel));
 			}
 		});
-		newMenu.add(newFr);
+		newMenu.add(newFr);		
+		JMenuItem newCPM = new JMenuItem("New Compatibility Matrix");
+		newCPM.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.add(new GUICompatibilityMatrixTab(mainPanel));
+			}
+		});
+		newMenu.add(newCPM);
 		JMenuItem newGr = new JMenuItem("New DENOPTIMGraph");
 		newGr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -259,26 +269,33 @@ public class MainToolBar extends JMenuBar {
 							file));
 				} catch (Exception e1) {
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS", "GRAPHS", "GA-RUN", "FSE-RUN", "SERGRAPH"};
-					int res = JOptionPane.showOptionDialog(null,
-						"<html>Failed to detect file type automatically.<br>"
-						+ "Temptative reason: " + e1.getMessage() + "<br>"
-						+ "Please, specify how to interprete file <br>"
-						+ "'" + file.getAbsolutePath() + "'<br>"
-						+ "or 'Abandon' to give up.</html>",
-						"Specify File Type",
-		                JOptionPane.DEFAULT_OPTION,
-		                JOptionPane.QUESTION_MESSAGE,
-		                UIManager.getIcon("OptionPane.warningIcon"),
-		                options,
-		                options[0]);
-					if (res == 0)
+							"FRAGMENTS", "GRAPHS", "CompatibilityMatrix",  
+							"GA-RUN", "FSE-RUN", "SERGRAPH"};
+					JComboBox<String> cmbFiletype = 
+							new JComboBox<String>(options);
+					cmbFiletype.setSelectedIndex(0);
+					JLabel msgText = new JLabel(String.format(
+							"<html><body width="
+							+ "'%1s'>Failed to detect file type automatically."
+							+ "<br>Please, specify how to interpret file "
+							+ "'" + file.getAbsolutePath() + "'.",270));
+					int res = JOptionPane.showConfirmDialog(null, 
+							new Object[] {msgText,cmbFiletype}, 
+							"Select file type",
+							JOptionPane.OK_CANCEL_OPTION,
+		                     JOptionPane.ERROR_MESSAGE);
+
+					if (res != JOptionPane.YES_OPTION)
 					{
 						return;
 					}
-					else if (res > -1)
+					else
 					{
-						openFile(file,options[res]); 
+						if (cmbFiletype.getSelectedIndex() == 0)
+						{
+							return;
+						}
+						openFile(file,options[cmbFiletype.getSelectedIndex()]); 
 					}
 				}
 			}
@@ -349,6 +366,12 @@ public class MainToolBar extends JMenuBar {
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanel);
 				graphPanel.importGraphsFromFile(file);
+				break;
+				
+			case ("CompatibilityMatrix"):
+				GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
+				mainPanel.add(cpmap);
+				cpmap.importCPMapFromFile(file);
 				break;
 				
 			case ("SERGRAPH"):

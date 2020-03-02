@@ -22,6 +22,7 @@ package denoptim.fragspace;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +95,7 @@ public class FragmentSpace
     /**
      * Data structure that stores AP classes that cannot be held unused
      */
-    private static ArrayList<String> forbiddenEndList;
+    private static Set<String> forbiddenEndList;
 
     /**
      * Clusters of fragments based on the number of APs
@@ -349,7 +350,7 @@ public class FragmentSpace
             setCompatibilityMatrix(new HashMap<String,ArrayList<String>>());
             setBondOrderMap(new HashMap<String,Integer>());
             setCappingMap(new HashMap<String,String>());
-            setForbiddenEndList(new ArrayList<String>());
+            setForbiddenEndList(new HashSet<String>());
             DenoptimIO.readCompatibilityMatrix(inFile,
 						compatMap,
 						bondOrderMap,
@@ -454,7 +455,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getForbiddenEndList()
+    public static Set<String> getForbiddenEndList()
     {
         return forbiddenEndList;
     }
@@ -575,7 +576,7 @@ public class FragmentSpace
      * of the action of symmetry-related keyword affecting the definition of
      * this FragmentSpace.
      * @param apClass the attachment point class
-     * @return <code>true<code> if symmetry has the applyed on APs of the
+     * @return <code>true<code> if symmetry has the applied on APs of the
      * given class
      */
 
@@ -604,10 +605,10 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Checks if there is a constraint on the constitutionsl 
+     * Checks if there is a constraint on the constitutional 
      * symmetry probability for the given AP class.
      * @param apClass the attachment point class
-     * @return <code>true<code> if there is a constraint on the constitutionsl
+     * @return <code>true<code> if there is a constraint on the constitutional
      * symmetry probability for the given AP class.
      */
 
@@ -687,7 +688,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static void setForbiddenEndList(ArrayList<String> lst)
+    public static void setForbiddenEndList(Set<String> lst)
     {
         forbiddenEndList = lst;
     }
