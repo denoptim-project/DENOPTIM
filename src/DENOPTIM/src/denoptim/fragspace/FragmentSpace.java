@@ -665,25 +665,27 @@ public class FragmentSpace
 				continue;
 			}
 			
-			Iterator<IdFragmentAndAP> keptIter = compFrAps.iterator();
-			while (keptIter.hasNext())
+			ArrayList<IdFragmentAndAP> toKeep = new ArrayList<IdFragmentAndAP>();
+			for (IdFragmentAndAP candAp : compFrAps)
 			{
-				IdFragmentAndAP candAp = keptIter.next();
-				boolean found = false;
 				for (IdFragmentAndAP newId : compForOne)
 				{
 					if (newId.sameFragAndAp(candAp))
 					{
-						found = true;
+						toKeep.add(candAp);
 						break;
 					}
 				}
-				if (!found)
-				{
-					compFrAps.remove(candAp);
-				}
+			}
+			
+			compFrAps = toKeep;
+			
+			if (compFrAps.size()==0)
+			{
+				break;
 			}
 		}
+
 		return compFrAps;
     }
     

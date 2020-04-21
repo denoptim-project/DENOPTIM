@@ -60,7 +60,8 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 
     /**
      * Constructor from another atom container, which has APs only as 
-     * molecular properties.
+     * molecular properties. WARNING: properties of the atom container are not
+     * imported!
      * @param mol the molecular representation
      * @throws DENOPTIMException 
      */
@@ -374,11 +375,11 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 	    		new ArrayList<DENOPTIMAttachmentPoint>();
 	   
 	    // Collect all the APs an objects
-	    String[] atomsPRop = allAtomsProp.split(
+	    String[] atomsProp = allAtomsProp.split(
 	    		DENOPTIMConstants.SEPARATORAPPROPATMS);
-	    for (int i = 0; i< atomsPRop.length; i++)
+	    for (int i = 0; i< atomsProp.length; i++)
 	    {
-			String onThisAtm = atomsPRop[i];
+			String onThisAtm = atomsProp[i];
 			if (onThisAtm.contains(DENOPTIMConstants.SEPARATORAPPROPAPS))
 			{
 			    String[] moreAPonThisAtm = onThisAtm.split(

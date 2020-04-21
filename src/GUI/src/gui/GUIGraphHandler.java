@@ -1144,6 +1144,10 @@ public class GUIGraphHandler extends GUICardPanel
     	
     	// then keep unique fragment identifiers, and store unique
 		genToLocIDMap = new HashMap<Integer,Integer>();
+		
+		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		
 		for (IdFragmentAndAP frgApId : compatFragAps)
 		{
 			int fragId = frgApId.getVertexMolId();
@@ -1152,7 +1156,8 @@ public class GUIGraphHandler extends GUICardPanel
 			{
 				IAtomContainer frg = compatFrags.get(
 						genToLocIDMap.get(fragId));
-				//TODO add AP
+				String prop = frg.getProperty(PRESELPROP).toString();
+				frg.setProperty(PRESELPROP,prop+PRESELPROPSEP+apId);
 			}
 			else
 			{
@@ -1160,7 +1165,7 @@ public class GUIGraphHandler extends GUICardPanel
 				try
 				{
 					frg = FragmentSpace.getFragment(1,fragId).clone();
-					//TODO add AP
+					frg.setProperty(PRESELPROP,apId);
 				}
 				catch (Throwable t)
 				{

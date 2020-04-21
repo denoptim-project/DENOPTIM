@@ -105,6 +105,16 @@ public class GUIFragmentSelector extends GUIModalDialog
 	
 	private boolean enforceAPSelection = false;
 	
+	/**
+	 * Property used to pre-select APs.
+	 */
+	public static final String PRESELECTEDAPSFIELD = "pre-SelectedAPs";
+	
+	/**
+	 * Separator in property used to pre-select APs
+	 */
+	public static final String PRESELECTEDAPSFIELDSEP = "pre-SelectedAPs";
+	
 //-----------------------------------------------------------------------------
 
 	/**
@@ -136,7 +146,13 @@ public class GUIFragmentSelector extends GUIModalDialog
 		for (IAtomContainer mol : fragLib)
 		{				
 			try {
-				fragmentLibrary.add(new DENOPTIMFragment(mol));
+				DENOPTIMFragment frg = new DENOPTIMFragment(mol);
+				if (mol.getProperty(PRESELECTEDAPSFIELD) != null)
+				{
+				    frg.setProperty(PRESELECTEDAPSFIELD,
+				    		mol.getProperty(PRESELECTEDAPSFIELD));
+				}
+				fragmentLibrary.add(frg);
 			} catch (DENOPTIMException e1) {
 				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null,"<html>Error importing "

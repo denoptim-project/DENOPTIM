@@ -432,6 +432,8 @@ public class FragmentViewPanel extends JSplitPane
 		updateAPsMapAndTable();
         
         updateAPsInJmolViewer();
+        
+        preSelectAPs();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -460,6 +462,30 @@ public class FragmentViewPanel extends JSplitPane
 	    	mapAPs.put(arrId,ap);
 	    }
 	    activateTabEditsListener(true);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void preSelectAPs()
+	{
+		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		
+		if (fragment.getProperty(PRESELPROP) == null)
+		{
+			return;
+		}
+		
+		String prop = fragment.getProperty(PRESELPROP).toString();
+		String[] parts =prop.split(PRESELPROPSEP);
+		
+		activateTabEditsListener(false);
+		for (int i=0; i<parts.length; i++)
+		{
+			int apId = Integer.parseInt(parts[i]); //0-based
+			apTable.getSelectionModel().addSelectionInterval(apId, apId);
+		}
+		activateTabEditsListener(true);
 	}
 
 //-----------------------------------------------------------------------------
