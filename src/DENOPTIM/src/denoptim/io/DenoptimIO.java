@@ -77,6 +77,7 @@ import java.util.Map;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.io.SDFWriter;
@@ -1654,7 +1655,8 @@ public class DenoptimIO
 
     /**
      * Reads the molecules in a file. Expects filenames with commonly accepted
-     * extensions (i.e., .txt and .sdf).
+     * extensions (i.e., .smi and .sdf). Unrecognized extensions will be
+     * interpreted as links (i.e., pathnames) to SDF files.
      * @param fileName the pathname of the file to read.
      * @return the list of molecules
      * @throws DENOPTIMException

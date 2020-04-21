@@ -31,6 +31,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.io.DenoptimIO;
 /**
  * Unit test for DENOPTIMFragment
  * 
@@ -89,6 +90,9 @@ public class DENOPTIMFragmentTest
     @Test
     public void testConversionToIAC() throws Exception
     {
+    	// WARNING: the conversion does not project the atom properties into
+    	// molecular properties. So the APs do not appear in the mol properties.
+    	
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -106,9 +110,12 @@ public class DENOPTIMFragmentTest
     	IAtomContainer iac = new AtomContainer(frg1);
     	DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
     	
-    	assertEquals(frg1.getAPCount(),frg2.getAPCount());
-    	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0));
-    	assertEquals(frg1.getAPCountOnAtom(2),frg2.getAPCountOnAtom(2));
+    	assertEquals(4,frg1.getAPCount(),"Size if frg1");
+    	assertEquals(4,frg2.getAPCount(),"Size if frg2");
+    	assertEquals(1,frg1.getAPCountOnAtom(0),"Size if frg1 atm0");
+    	assertEquals(1,frg2.getAPCountOnAtom(0),"Size if frg2 atm0");
+    	assertEquals(3,frg1.getAPCountOnAtom(2),"Size if frg1 atm2");
+    	assertEquals(3,frg2.getAPCountOnAtom(2),"Size if frg2 atm2");
     }
     
 //------------------------------------------------------------------------------

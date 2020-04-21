@@ -130,6 +130,13 @@ public class FragmentSpaceParameters
     {
         return fsParamsInUse;
     }
+    
+//------------------------------------------------------------------------------
+
+    public static void setAPclassBasedApproach(boolean active)
+    {
+        apClassBasedApproch = active;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -498,20 +505,7 @@ public class FragmentSpaceParameters
 	FragmentSpace.setSymmConstraints(symmConstraintsMap);
 	
 	// grouping of fragments
-	FragmentSpace.setFragPoolPerNumAP(
-				     new HashMap<Integer,ArrayList<Integer>>());
-	if (apClassBasedApproch)
-	{
-	    FragmentSpace.setFragsApsPerApClass(
-			   new HashMap<String,ArrayList<ArrayList<Integer>>>());
-	    FragmentSpace.setAPClassesPerFrag(
-				      new HashMap<Integer,ArrayList<String>>());
-	}
-	for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
-	{
-	    IAtomContainer frag = FragmentSpace.getFragmentLibrary().get(j);
-	    FragmentSpaceUtils.classifyFragment(frag,1,j);
-	}
+	FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
 
 
     }

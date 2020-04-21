@@ -226,6 +226,27 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 //-----------------------------------------------------------------------------
 
     /**
+     * Returns the list of all APClasses on present on this fragment.
+     * @return the list of APClassess
+     */
+    
+    public ArrayList<String> getAllAPClassess()
+    {
+    	ArrayList<String> lst = new ArrayList<String>();
+    	for (DENOPTIMAttachmentPoint ap : getCurrentAPs())
+    	{
+    		String apCls = ap.getAPClass();
+    		if (!lst.contains(apCls))
+    		{
+    			lst.add(apCls);
+    		}
+    	}
+    	return lst;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
      * Returns all APs currently defined.
      * @return the list of APs
      */

@@ -31,17 +31,17 @@ import java.io.Serializable;
 public class IdFragmentAndAP implements Serializable
 {
     /**
-     * the ID of the vertex containing the fragment,
+     * the ID of the vertex containing the fragment.
      */
     private int vId = -1;
 
     /**
-     * the type of library containing the fragment, 
+     * the index of the fragment in that library. 
      */
     private int molId = -1;
 
     /**
-     * the index of the fragment in that library, 
+     * the type of library containing the fragment. 
      */
     private int molTyp = -1;
 
@@ -51,12 +51,12 @@ public class IdFragmentAndAP implements Serializable
     private int apId = -1;
 
     /**
-     * the index of the symmetric set the vertex belongs to
+     * the index of the symmetric set the vertex belongs to.
      */
     private int vSymSetId = -1;
 
     /**
-     * the index of the symmetric set the AP belongs to
+     * the index of the symmetric set the AP belongs to.
      */
     private int aSymSetId = -1;
 
@@ -125,6 +125,27 @@ public class IdFragmentAndAP implements Serializable
     public void setVrtSymSetId(int m_vSymSetId)
     {
 	vSymSetId = m_vSymSetId;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another identifier considering solely the fragment ID
+     * in the type-specific fragment library, and the attachment point ID in that
+     * fragment.
+     * @param other the other identified to be compared with this.
+     * @return <code>true</code> if this and the other identify the same fragment 
+     * and AP ID.
+     */
+    public boolean sameFragAndAp(IdFragmentAndAP other)
+    {
+    	if (this.getApId()==other.getApId() 
+    			&& this.getVertexMolId()==other.getVertexMolId()
+    			&& this.getVertexMolType()==other.getVertexMolType())
+    	{
+    		return true;
+    	}
+    	return false;
     }
 
 //------------------------------------------------------------------------------

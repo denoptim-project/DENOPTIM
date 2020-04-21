@@ -54,5 +54,5 @@ java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENO
 
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar -m denoptim.io.DenoptimIOTest#test
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar -c denoptim.fragspace.FragmentSpaceTest
 

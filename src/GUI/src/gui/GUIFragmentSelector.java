@@ -89,9 +89,9 @@ public class GUIFragmentSelector extends GUIModalDialog
 	private int currFrgIdx = 0;
 	
 	/**
-	 * The index of the selected AP
+	 * The index of the selected AP [0-(n-1)]
 	 */
-	private int currApIx = -1;
+	private int currApIdx = -1;
 	
 	private FragmentViewPanel fragmentViewer;
 	private JPanel fragCtrlPane;
@@ -190,11 +190,16 @@ public class GUIFragmentSelector extends GUIModalDialog
 				ArrayList<Integer> ids = fragmentViewer.getSelectedAPIDs();
 				if (ids.size() > 0)
 				{
-					currApIx = fragmentViewer.getSelectedAPIDs().get(0);
+					// WARNING: we take only the first, if many are selected.
+					currApIdx = ids.get(0);
 				}
 				else
 				{
-					if (enforceAPSelection)
+					if (fragment.getAPCount()==1)
+					{
+						currApIdx=0;
+					}
+					else if (enforceAPSelection)
 					{
 						JOptionPane.showMessageDialog(null,"<html>"
 								+ "No attachment point (AP) selected.<br>"
@@ -206,7 +211,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 						return;
 					}
 				}
-				result = new Integer[]{currFrgIdx, currApIx};
+				result = new Integer[]{currFrgIdx, currApIdx};
 				fragmentViewer.clearAPTable();
 				fragmentViewer.clearMolecularViewer();
 				close();
