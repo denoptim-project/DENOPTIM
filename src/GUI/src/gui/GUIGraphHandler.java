@@ -222,6 +222,12 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private ArrayList<IAtomContainer> compatFrags;
 	
+	/**
+	 * Map converting fragIDs in fragment library to fragIDs in subset
+	 * of compatible fragments
+	 */
+	private Map<Integer,Integer> genToLocIDMap;
+	
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -1046,6 +1052,21 @@ public class GUIGraphHandler extends GUICardPanel
 			return;
 		}
 		int trgFragId = ((Integer[]) selected)[0];
+		if (res==1)
+		{
+			// When we are selecting among a subset we need to convert the
+			// trgFragId into a value that corresponds to the fragId in
+			// the global fragment library
+			
+			for (int candFragId : genToLocIDMap.keySet())
+			{
+				if (genToLocIDMap.get(candFragId)==trgFragId)
+				{
+					trgFragId = candFragId;
+					break;
+				}
+			}
+		}
 		int trgApId = ((Integer[]) selected)[1];
 		
 		// Take the graph that will be extended
@@ -1122,7 +1143,7 @@ public class GUIGraphHandler extends GUICardPanel
 				FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
     	
     	// then keep unique fragment identifiers, and store unique
-		Map<Integer,Integer> genToLocIDMap = new HashMap<Integer,Integer>();
+		genToLocIDMap = new HashMap<Integer,Integer>();
 		for (IdFragmentAndAP frgApId : compatFragAps)
 		{
 			int fragId = frgApId.getVertexMolId();
