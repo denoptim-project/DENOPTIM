@@ -538,7 +538,7 @@ public class DENOPTIMGraphOperations
 
         // make new edge connecting the current vertex with the new one
         DENOPTIMEdge edge;
-        if (!FragmentSpaceParameters.useAPclassBasedApproach())
+        if (!FragmentSpace.useAPclassBasedApproach())
         {
             // connect a randomly selected AP of this fragment
             // to the current vertex
@@ -589,7 +589,7 @@ public class DENOPTIMGraphOperations
         DENOPTIMAttachmentPoint curDap = lstDaps.get(dapidx);
         
         IdFragmentAndAP res;
-        if (!FragmentSpaceParameters.useAPclassBasedApproach())
+        if (!FragmentSpace.useAPclassBasedApproach())
         {
             int fid = EAUtils.selectRandomFragment();
             res = new IdFragmentAndAP(-1,fid,1,-1,-1,-1);
@@ -1152,7 +1152,7 @@ if(debug)
 
         // select vertices for crossover
         int mvid, fvid;
-        if (FragmentSpaceParameters.useAPclassBasedApproach())
+        if (FragmentSpace.useAPclassBasedApproach())
         {
             // remove the capping groups
             GraphUtils.removeCappingGroups(male);
@@ -1235,10 +1235,10 @@ if(debug)
 	// instead of re-determinimg the symmetry from scratch
         ArrayList<Integer> symVrtIDs_M = 
                         GraphUtils.getSymmetricVertices(male, mvert,
-                             FragmentSpaceParameters.useAPclassBasedApproach());
+                             FragmentSpace.useAPclassBasedApproach());
         ArrayList<Integer> symVrtIDs_F =
                         GraphUtils.getSymmetricVertices(female, fvert,
-                            FragmentSpaceParameters.useAPclassBasedApproach());
+                            FragmentSpace.useAPclassBasedApproach());
 
         // MALE: Find all parent verteces and AP indeces where the incoming 
         // graph will have to be placed

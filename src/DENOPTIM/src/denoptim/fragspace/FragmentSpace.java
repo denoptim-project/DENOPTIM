@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,8 +35,10 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
 
 
 /**
@@ -119,9 +122,93 @@ public class FragmentSpace
     private static HashMap<String, Double> symmConstraints;
     
     /**
+     * FLag defining use of AP class-based approach
+     */
+    protected static boolean apClassBasedApproch = false;
+    
+    /**
      * Flag signaling that this fragment space was built and validated
      */
     private static boolean isValid = false;
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Define all components of a fragment space that implements the attachment
+     * point class-approach.
+     * @param scaffLib library of fragments used to start the construction of
+     * any new graph (i.e., seed or root fragments, a.k.a. scaffolds).
+     * @param fragLib library of fragments for general purpose.
+     * @param cappLib library of single-AP fragments used to cap free attachment 
+     * points (i.e., the capping groups).
+     * @param cpMap the APClass compatibility map. This data structure is a 
+     * map of the APClass-on-growing-graph (key) to list of permitted APClasses
+     * on incoming fragment (values).
+     * @param boMap the map of APClass into bond order. This data structure is a 
+     * map of APClass (keys) to bond order as integer (values).
+     * @param capMap the capping rules. This data structure is a map of  
+     * APClass-to-cap (keys) to APClass-of-capping-group (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot 
+     * be left unused neither capped. 
+     * @throws DENOPTIMException
+     */
+    public static void defineFragmentSpace(ArrayList<IAtomContainer> scaffLib,
+    		ArrayList<IAtomContainer> fragLib,
+    		ArrayList<IAtomContainer> cappLib) throws DENOPTIMException
+    {
+    	setScaffoldLibrary(scaffLib);
+    	setFragmentLibrary(fragLib);
+    	setCappingLibrary(cappLib);
+    	apClassBasedApproch = false;
+    	FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
+    	isValid = true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Define all components of a fragment space that implements the attachment
+     * point class-approach.
+     * @param scaffLib library of fragments used to start the construction of
+     * any new graph (i.e., seed or root fragments, a.k.a. scaffolds).
+     * @param fragLib library of fragments for general purpose.
+     * @param cappLib library of single-AP fragments used to cap free attachment 
+     * points (i.e., the capping groups).
+     * @param cpMap the APClass compatibility map. This data structure is a 
+     * map of the APClass-on-growing-graph (key) to list of permitted APClasses
+     * on incoming fragment (values).
+     * @param boMap the map of APClass into bond order. This data structure is a 
+     * map of APClass (keys) to bond order as integer (values).
+     * @param capMap the capping rules. This data structure is a map of  
+     * APClass-to-cap (keys) to APClass-of-capping-group (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot 
+     * be left unused neither capped. 
+     * @param rcCpMap the APClass compatibility matrix for ring closures.
+     * @throws DENOPTIMException
+     */
+    public static void defineFragmentSpace(ArrayList<IAtomContainer> scaffLib,
+    		ArrayList<IAtomContainer> fragLib,
+    		ArrayList<IAtomContainer> cappLib,
+    		HashMap<String,ArrayList<String>> cpMap,
+    		HashMap<String,Integer> boMap,
+    		HashMap<String,String> capMap,
+    		HashSet<String> forbEnds,
+    		HashMap<String,ArrayList<String>> rcCpMap) throws DENOPTIMException
+    {
+    	setScaffoldLibrary(scaffLib);
+    	setFragmentLibrary(fragLib);
+    	setCappingLibrary(cappLib);
+    	setCompatibilityMatrix(cpMap);
+    	apClassBasedApproch = true;
+    	setBondOrderMap(boMap);
+    	setCappingMap(capMap);
+    	setForbiddenEndList(forbEnds);
+    	setRCCompatibilityMatrix(rcCpMap);
+   
+    	FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
+    	
+    	isValid = true;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -188,6 +275,8 @@ public class FragmentSpace
             RingClosureParameters.checkParameters();
             RingClosureParameters.processParameters();
         }
+        
+        isValid = true;
     }
     
 //------------------------------------------------------------------------------
@@ -200,6 +289,44 @@ public class FragmentSpace
     {
     	return isValid;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check usage of APClass-based approach, i.e., uses attachment points with 
+     * annotated data (i.e., the APClass) to evaluate compatibilities between
+     * attachment points.
+     * @return <code>true</code> if this fragment space makes use of 
+     * APClass-based approach
+     */
+    public static boolean useAPclassBasedApproach()
+    {
+        return apClassBasedApproch;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Search for a specific AP on a specific fragment and finds out its class.
+     * @param the identified of a specific attachment point.
+     * @return the AP class or null
+     */
+    public static String getAPClassForFragment(IdFragmentAndAP apId)
+    {
+    	String cls = null;
+    	try
+    	{
+        	DENOPTIMFragment frg = new DENOPTIMFragment(FragmentSpace.getFragment(
+        			apId.getVertexMolType(), apId.getVertexMolId()));
+    		cls = frg.getCurrentAPs().get(apId.getApId()).getAPClass();
+    	}
+    	catch (Throwable t)
+    	{
+    		cls = null;
+    	}
+    			
+    	return cls;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -208,7 +335,7 @@ public class FragmentSpace
      * scaffold, fragment, capping).
      * @param frgTyp the type of fragment - selects the library from which the
      * fragment is taken
-     * @param molIdx the index (enumeration from 1 to n+1) of the fragment in
+     * @param molIdx the index (0-based) of the fragment in
      * the proper library, which is defied by the type of fragment
      * @return the molecular representation of the fragment
      * @throws DENOPTIMException
@@ -548,24 +675,153 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the list of attachment points with the given class. Multiple
-     * APs can be found for each fragment, thus this method returns pairs of
-     * integers identifying the fragment (first integer in the pair) and the
-     * AP (second index in the pair).
+     * Returns the list of attachment points with the given class. The returned
+     * identifiers have <code>vertex_id</code>=-1 
+     * because these APs are only on the individual 
+     * fragments held in the library and do not belong to any graph.
      * @param apclass 
-     * @return the list of pairs of indeces representing respectively the 
-     * fragment and its AP.
+     * @return the list of AP identifiers.
      */
 
-    public static ArrayList<ArrayList<Integer>> getFragsWithAPClass(
+    public static ArrayList<IdFragmentAndAP> getFragsWithAPClass(
 								 String apclass)
     {
-	ArrayList<ArrayList<Integer>> lst = new ArrayList<>();
-	if (fragsApsPerApClass.containsKey(apclass))
-	{
-	    lst = fragsApsPerApClass.get(apclass); 
-	}
+		ArrayList<IdFragmentAndAP> lst = new ArrayList<IdFragmentAndAP>();
+		
+		if (fragsApsPerApClass.containsKey(apclass))
+		{
+		    for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apclass))
+		    {
+		    	IdFragmentAndAP apId = new IdFragmentAndAP(-1, //vertexId
+		    											   idxs.get(0), //MolId,
+														   1, //FragType
+														   idxs.get(1), //ApId
+														   -1, //noVSym
+														   -1);//noAPSym
+		    	lst.add(apId);
+		    }
+		}
         return lst;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for all fragments that are compatible with the given list of APs.
+     * @param srcAPs the identifiers of APs meant to hold any of the desired
+     * fragments.
+     * @return a list of fragments.
+     */
+    public static ArrayList<IAtomContainer> getFragmentsCompatibleWithTheseAPs(
+    		ArrayList<IdFragmentAndAP> srcAPs)
+    {
+    	// First we get all possible APs on any fragment
+    	ArrayList<IdFragmentAndAP> compatFragAps = 
+				FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
+    	
+    	// then keep unique fragment identifiers, and store unique
+		Set<Integer> compatFragIds = new HashSet<Integer>();
+		for (IdFragmentAndAP apId : compatFragAps)
+		{
+			compatFragIds.add(apId.getVertexMolId());
+		}
+		
+		// Then we pack-up the selected list of fragments
+		ArrayList<IAtomContainer> compatFrags = new ArrayList<IAtomContainer>();
+		for (Integer fid : compatFragIds)
+		{
+			try {
+				compatFrags.add(FragmentSpace.getFragment(1, fid));
+			} catch (DENOPTIMException e) {
+				// skip
+			}
+		}
+		
+		return compatFrags;
+    }
+    
+//------------------------------------------------------------------------------
+   
+    /**
+     * Searches for all APs that are compatible with the given list of APs.
+     * @param srcAPs the identifiers of APs meant to hold any of the desired
+     * fragments.
+     * @return a list of identifiers for APs on fragments in the library.
+     */
+    public static ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithTheseAPs(
+    		ArrayList<IdFragmentAndAP> srcAPs)
+    {
+		ArrayList<IdFragmentAndAP> compFrAps = new ArrayList<IdFragmentAndAP>();
+		boolean first = true;
+		for (IdFragmentAndAP apId : srcAPs)
+		{
+			String srcApCls = getAPClassForFragment(apId);
+			ArrayList<IdFragmentAndAP> compForOne = 
+                                         getFragAPsCompatibleWithClass(srcApCls);
+			if (first)
+			{
+				compFrAps.addAll(compForOne);
+				first = false;
+				continue;
+			}
+			
+			ArrayList<IdFragmentAndAP> toKeep = new ArrayList<IdFragmentAndAP>();
+			for (IdFragmentAndAP candAp : compFrAps)
+			{
+				for (IdFragmentAndAP newId : compForOne)
+				{
+					if (newId.sameFragAndAp(candAp))
+					{
+						toKeep.add(candAp);
+						break;
+					}
+				}
+			}
+			
+			compFrAps = toKeep;
+			
+			if (compFrAps.size()==0)
+			{
+				break;
+			}
+		}
+
+		return compFrAps;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the list of attachment points found in the fragment 
+     * space and that are compatible with a given AP class. 
+     * Multiple APs can be found for each fragment, 
+     * thus this method returns pairs of
+     * integers identifying the fragment (first integer in the pair) and the
+     * AP (second index in the pair).
+     * @param srcApCls the AP class for which we want compatible APs
+     */
+    
+    public static ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithClass(
+    		String srcApCls)
+    {
+    	ArrayList<IdFragmentAndAP> compatFragAps = 
+    			new ArrayList<IdFragmentAndAP>();
+    	
+    	// Take the compatible AP classes
+		ArrayList<String> compatApClasses = 
+		     FragmentSpace.getCompatibleAPClasses(srcApCls);
+		
+		// Find all APs with any compatible class
+		if (compatApClasses != null)
+		{
+			for (String compClass : compatApClasses)
+			{
+			    compatFragAps.addAll(
+			    		FragmentSpace.getFragsWithAPClass(compClass));
+			}
+		}
+		
+		return compatFragAps;
     }
 
 //------------------------------------------------------------------------------
@@ -723,7 +979,30 @@ public class FragmentSpace
     {
 	symmConstraints = map;
     }
-
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Clears all settings of this fragment space. All fields changed to
+     * <code>null</code>.
+     */
+    public static void clearAll()
+    {	
+        scaffoldLib = null;
+        fragmentLib = null;
+        cappingLib = null;
+        compatMap = null;
+        rcCompatMap = null;
+        bondOrderMap= null;
+        cappingMap = null;
+        forbiddenEndList = null;
+        fragPoolPerNumAP = null;
+        apClassesPerFrag = null;
+        fragsApsPerApClass = null;
+        symmConstraints = null;
+		isValid = false;
+    }
+    
 //------------------------------------------------------------------------------
 
 }

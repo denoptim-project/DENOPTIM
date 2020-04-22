@@ -45,7 +45,7 @@ public class Version
     public static final int MAJOR = 2;
 
     /** The minor version number. */
-    public static final int MINOR = 0;
+    public static final int MINOR = 1;
 
     /** The update letter. */
     public static final int UPDATE = 0;

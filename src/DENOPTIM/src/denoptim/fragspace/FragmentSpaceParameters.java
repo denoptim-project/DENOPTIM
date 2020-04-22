@@ -21,6 +21,7 @@ package denoptim.fragspace;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -86,7 +87,7 @@ public class FragmentSpaceParameters
     /**
      * FLag defining use of AP class-based approach
      */
-    protected static boolean apClassBasedApproch = false;
+    private static boolean apClassBasedApproch = false;
 
     /**
      * Maximum number of heavy (non-hydrogen) atoms accepted
@@ -129,13 +130,6 @@ public class FragmentSpaceParameters
     public static boolean fsParamsInUse()
     {
         return fsParamsInUse;
-    }
-
-//------------------------------------------------------------------------------
-
-    public static boolean useAPclassBasedApproach()
-    {
-        return apClassBasedApproch;
     }
 
 //------------------------------------------------------------------------------
@@ -406,114 +400,57 @@ public class FragmentSpaceParameters
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Read the information collected in the parameters stored in this class
+     * and create the fragment space accordingly.
+     * @throws DENOPTIMException
+     */
     public static void processParameters() throws DENOPTIMException
     {
-        // library of scaffolds
-        FragmentSpace.setScaffoldLibrary(
-                                DenoptimIO.readMoleculeData(scaffoldLibFile));
-        Iterator<IAtomContainer> scafI = 
-                                 FragmentSpace.getScaffoldLibrary().iterator(); 
-        int i = 0;
-        while (scafI.hasNext())
-        {
-            IAtomContainer mol = scafI.next();
-            i++;
-            Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
-            if (ap == null)
-            {
-                DENOPTIMLogger.appLogger.log(Level.WARNING,
-                     "No attachment point information for scaffold {0}", (i));
-                scafI.remove();
-            }
-        }
-        if (FragmentSpace.getScaffoldLibrary().isEmpty())
-        {
-            throw new DENOPTIMException("Scaffold library has no entries.");
-        }
-
-        // library of fragments
-        FragmentSpace.setFragmentLibrary(
-                                DenoptimIO.readMoleculeData(fragmentLibFile));
-        Iterator<IAtomContainer> fragI = 
-                                 FragmentSpace.getFragmentLibrary().iterator();
-        i = 0;
-        while (fragI.hasNext())
-        {
-            IAtomContainer mol = fragI.next();
-            i++;
-            Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
-            if (ap == null)
-            {
-                DENOPTIMLogger.appLogger.log(Level.WARNING,
-                     "No attachment point information for fragment {0}", (i));
-                fragI.remove();
-            }
-        }
-        if (FragmentSpace.getFragmentLibrary().isEmpty())
-        {
-            throw new DENOPTIMException("Fragment library has no entries.");
-        }
-
-        // library of capping groups
+        ArrayList<IAtomContainer> scaffLib = 
+        		DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold");
+        ArrayList<IAtomContainer> fragLib = 
+        		DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment");
+        
+        ArrayList<IAtomContainer> cappLib = new ArrayList<IAtomContainer>();
+    	HashMap<String,ArrayList<String>> cpMap = 
+    			new HashMap<String,ArrayList<String>>();
+    	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
+    	HashMap<String,String> capMap = new HashMap<String,String>();
+    	HashSet<String> forbEnds = new HashSet<String>();
+    	HashMap<String,ArrayList<String>> rcCpMap = 
+    			new HashMap<String,ArrayList<String>>();
+        
         if (cappingLibFile.length() > 0)
         {
-            FragmentSpace.setCappingLibrary(
-                                DenoptimIO.readMoleculeData(cappingLibFile));
-            Iterator<IAtomContainer> cappI =
-                                 FragmentSpace.getCappingLibrary().iterator(); 
-            i = 0;
-            while (cappI.hasNext())
-            {
-                IAtomContainer mol = cappI.next();
-                i++;
-                Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
-                if (ap == null)
-                {
-                    DENOPTIMLogger.appLogger.log(Level.WARNING,
-                   "No attachment point information for capp. grp. {0}", (i));
-                    cappI.remove();
-                }
-            }
-            if (FragmentSpace.getCappingLibrary().isEmpty())
-            {
-                throw new DENOPTIMException("Capping library has no "
-                                                               + " entries.");
-            }
+            cappLib = DenoptimIO.readInLibraryOfFragments(cappingLibFile,
+            		"capping group");
         }
 
-	// compatibility matrix
         if (compMatrixFile.length() > 0)
         {
-	    FragmentSpace.importCompatibilityMatrixFromFile(compMatrixFile);
-            apClassBasedApproch = true;
+            DenoptimIO.readCompatibilityMatrix(compMatrixFile,
+						cpMap,
+						boMap,
+						capMap,
+						forbEnds);
         }
 
-	// compatibility matrix for ring closures
         if (rcCompMatrixFile != null && rcCompMatrixFile.length() > 0)
         {
-	    FragmentSpace.importRCCompatibilityMatrixFromFile(rcCompMatrixFile);
+        	DenoptimIO.readRCCompatibilityMatrix(rcCompMatrixFile,rcCpMap);
         }
 
-	// constitutional symmetry constraints
-	FragmentSpace.setSymmConstraints(symmConstraintsMap);
-	
-	// grouping of fragments
-	FragmentSpace.setFragPoolPerNumAP(
-				     new HashMap<Integer,ArrayList<Integer>>());
-	if (apClassBasedApproch)
-	{
-	    FragmentSpace.setFragsApsPerApClass(
-			   new HashMap<String,ArrayList<ArrayList<Integer>>>());
-	    FragmentSpace.setAPClassesPerFrag(
-				      new HashMap<Integer,ArrayList<String>>());
-	}
-	for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
-	{
-	    IAtomContainer frag = FragmentSpace.getFragmentLibrary().get(j);
-	    FragmentSpaceUtils.classifyFragment(frag,1,j);
-	}
-
-
+        if (compMatrixFile.length() > 0)
+        {
+		    FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib,cpMap,
+		    		boMap,capMap,forbEnds,rcCpMap);
+		    FragmentSpace.setSymmConstraints(symmConstraintsMap);
+        }
+        else
+        {
+        	FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib);
+        }
     }
 
 //------------------------------------------------------------------------------

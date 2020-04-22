@@ -1134,7 +1134,7 @@ public class GraphUtils
         mol.setProperty("ROT_BND", nrot);
         
         // 1D) unacceptable free APs
-        if (FragmentSpaceParameters.useAPclassBasedApproach())
+        if (FragmentSpace.useAPclassBasedApproach())
         {
             if (foundForbiddenEnd(molGraph))
             {
@@ -1225,7 +1225,7 @@ public class GraphUtils
 
     /**
      * Evaluates the possibility of closing rings in a given graph and if
-     * any ring can be closed, then it randomy choses one of the combinations
+     * any ring can be closed, then it randomly chooses one of the combinations
      * of ring closures
      * that involves the highest number of new rings.
      * @param res an object array containing the inchi code, the smiles string
@@ -1240,7 +1240,7 @@ public class GraphUtils
     public static boolean setupRings(Object[] res, DENOPTIMGraph molGraph)
                                                         throws DENOPTIMException
     {
-        boolean rcnEnabled = FragmentSpaceParameters.useAPclassBasedApproach();
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
         if (!rcnEnabled)
             return true;
 
@@ -1321,7 +1321,7 @@ public class GraphUtils
     {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<>();
 
-        boolean rcnEnabled = FragmentSpaceParameters.useAPclassBasedApproach();
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
         if (!rcnEnabled)
             return lstGraphs;
 
@@ -2319,7 +2319,7 @@ if(debug)
         DENOPTIMAttachmentPoint dap_Child =
                                   cvClone.getAttachmentPoints().get(childAPIdx);
         DENOPTIMEdge edge = null;
-        if (FragmentSpaceParameters.useAPclassBasedApproach())
+        if (FragmentSpace.useAPclassBasedApproach())
         {
             String rcnP = dap_Parent.getAPClass();
             String rcnC = dap_Child.getAPClass();

@@ -29,6 +29,11 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -125,9 +130,20 @@ public class GUIGraphHandler extends GUICardPanel
 	private DENOPTIMGraph dnGraph;
 	
 	/**
+	 * Unique identified for graphs built here
+	 */
+	public static AtomicInteger graphUID = new AtomicInteger(1);
+	
+	/**
 	 * The currently loaded graph as GraphStream object
 	 */
 	private Graph graph;
+	
+	/**
+	 * The snapshot of the old (removed) visualized GraphStrem system. 
+	 * Used only to remember stuff like sprites and node positions.
+	 */
+	private GSGraphSnapshot oldGSStatus;
 	
 	/**
 	 * The index of the currently loaded dnGraph [0–(n-1)}
@@ -197,6 +213,20 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
+	
+	/**
+	 * Subset of fragments for compatible fragment selecting GUI.
+	 * These fragments are clone of those in the fragment library,
+	 * and are annotate with fragmentID and AP pointers meant to 
+	 * facilitate a quick selection of compatible frag-frag connections.
+	 */
+	private ArrayList<IAtomContainer> compatFrags;
+	
+	/**
+	 * Map converting fragIDs in fragment library to fragIDs in subset
+	 * of compatible fragments
+	 */
+	private Map<Integer,Integer> genToLocIDMap;
 	
 //-----------------------------------------------------------------------------
 	
@@ -433,6 +463,10 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			renderForLackOfFragSpace();
 		}
+		else
+		{
+			renderForPresenceOfFragSpace();
+		}
 		txtFragSpace.setEditable(false);
 		
 		btnFragSpace = new JButton("Load Fragment Space");
@@ -441,8 +475,9 @@ public class GUIGraphHandler extends GUICardPanel
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean showWarning = false;
-				String msg = "<html><b>WARNING</b>: you are introducing a "
-						+ "potential source of mistmatch between<br>"
+				String msg = "<html><body width='%1s'>"
+						+ "<b>WARNING</b>: you are introducing a "
+						+ "potential source of mistmatch between "
 						+ "the fragments IDs used in graphs and the "
 						+ "fragment space.<br>In particular:<br>"
 						+ "<ul>";
@@ -463,9 +498,10 @@ public class GUIGraphHandler extends GUICardPanel
 					msg = msg + "</ul>"
 							+ ""
 			                + "Are you sure you want to load a fragment "
-			                + "space?</html>";
+			                + "space? </html>";
 					String[] options = new String[]{"Yes", "No"};
-					int res = JOptionPane.showOptionDialog(null, msg,			            
+					int res = JOptionPane.showOptionDialog(null,
+							String.format(msg,350),			            
 			                "Change frgment space?",
 			                JOptionPane.DEFAULT_OPTION,
 			                JOptionPane.WARNING_MESSAGE,
@@ -836,7 +872,21 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 			int vId = n.getAttribute("dnp.srcVrtId");
 			int apId = n.getAttribute("dnp.srcVrtApId");
-			IdFragmentAndAP id = new IdFragmentAndAP(vId,-99,-99,apId,-99,-99);
+			
+			IdFragmentAndAP id = null;
+			if (hasFragSpace)
+			{
+				DENOPTIMVertex v = dnGraph.getVertexWithId(vId);
+				id = new IdFragmentAndAP(vId,
+										 v.getMolId(),
+										 v.getFragmentType(),
+										 apId,-99,-99);
+			}
+			else
+			{
+				id = new IdFragmentAndAP(vId,-99,-99,apId,-99,-99);
+			}
+			
 			allIDs.add(id);
 		}
 		return allIDs;
@@ -889,6 +939,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create the new graph
 		currGrphIdx = dnGraphLibrary.size();
 		dnGraph = new DENOPTIMGraph();
+		dnGraph.setGraphId(graphUID.getAndIncrement());
 		graph = null;
 		
 		// Add new graph and corresponding mol representation
@@ -940,8 +991,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * Extends the current graph by appending a node to a specific free AP on 
 	 * the growing graph. 
 	 * This method will prompt a question on which incoming fragment to append 
-	 * @param srcVertexId the vertex UID in the growing graph
-	 * @param srcApId the AP ID in the fragment of the growing graph
+	 * @param srcAPs list of identifiers for APs on the growing graph.
 	 */
 	private void extendGraphFromFragSpace(ArrayList<IdFragmentAndAP> srcAPs)
 	{
@@ -956,13 +1006,17 @@ public class GUIGraphHandler extends GUICardPanel
 			return;
 		}
 		
-		int trgFrgType = -1;
+		// Create clones of fragments and put the into 'compatFrags'
+		collectFragAndAPsCompatibleWithSelectedAPs(srcAPs);
 		
+		int trgFrgType = -1;
 		ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();		
-		String[] options = new String[]{"Fragment","Capping group"};
+		String[] options = new String[]{"Any Fragment",
+				"Compatible Fragments ("+compatFrags.size()+")",
+				"Capping group"};
 		int res = JOptionPane.showOptionDialog(null,
-                "<html>Select type of fragment to pick:</html>",
-                "Choose fragment type",
+                "<html>Choose a subset of possible fragments:</html>",
+                "Choose fragment subset",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 UIManager.getIcon("OptionPane.warningIcon"),
@@ -975,9 +1029,15 @@ public class GUIGraphHandler extends GUICardPanel
 				trgFrgType = 1;
 				break;
 			case 1:
+				fragLib = compatFrags;
+				trgFrgType = 1;
+				break;
+			case 2:
 				fragLib = FragmentSpace.getCappingLibrary();
 				trgFrgType = 2;
 				break;
+			default:
+				return;
 		}
 
 		if (fragLib.size() == 0)
@@ -998,6 +1058,21 @@ public class GUIGraphHandler extends GUICardPanel
 			return;
 		}
 		int trgFragId = ((Integer[]) selected)[0];
+		if (res==1)
+		{
+			// When we are selecting among a subset we need to convert the
+			// trgFragId into a value that corresponds to the fragId in
+			// the global fragment library
+			
+			for (int candFragId : genToLocIDMap.keySet())
+			{
+				if (genToLocIDMap.get(candFragId)==trgFragId)
+				{
+					trgFragId = candFragId;
+					break;
+				}
+			}
+		}
 		int trgApId = ((Integer[]) selected)[1];
 		
 		// Take the graph that will be extended
@@ -1058,6 +1133,58 @@ public class GUIGraphHandler extends GUICardPanel
 
 //-----------------------------------------------------------------------------
 	
+	private void collectFragAndAPsCompatibleWithSelectedAPs(
+			ArrayList<IdFragmentAndAP> srcAPs) 
+	{
+		compatFrags = new ArrayList<IAtomContainer>();
+		
+		// WARNING: here I re-do most of what is already done in
+		// FragmentSpace.getFragmentsCompatibleWithTheseAPs.
+		// However, here we add additional data to (clones) of the 
+		// fragments, so that I can easily highlight the compatible APs in 
+		// the selection GUI.
+		
+    	// First we get all possible APs on any fragment
+    	ArrayList<IdFragmentAndAP> compatFragAps = 
+				FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
+    	
+    	// then keep unique fragment identifiers, and store unique
+		genToLocIDMap = new HashMap<Integer,Integer>();
+		
+		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		
+		for (IdFragmentAndAP frgApId : compatFragAps)
+		{
+			int fragId = frgApId.getVertexMolId();
+			int apId = frgApId.getApId();
+			if (genToLocIDMap.keySet().contains(fragId))
+			{
+				IAtomContainer frg = compatFrags.get(
+						genToLocIDMap.get(fragId));
+				String prop = frg.getProperty(PRESELPROP).toString();
+				frg.setProperty(PRESELPROP,prop+PRESELPROPSEP+apId);
+			}
+			else
+			{
+				IAtomContainer frg = null;
+				try
+				{
+					frg = FragmentSpace.getFragment(1,fragId).clone();
+					frg.setProperty(PRESELPROP,apId);
+				}
+				catch (Throwable t)
+				{
+					continue;
+				}
+				genToLocIDMap.put(fragId,compatFrags.size());
+				compatFrags.add(frg);
+			}
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+
 	protected void renderForLackOfFragSpace() 
 	{
 		hasFragSpace = false;
@@ -1217,7 +1344,7 @@ public class GUIGraphHandler extends GUICardPanel
 			msg = msg + ")";
 			if (hasFragSpace)
 			{
-				msg = msg + "<br>This is likely due to a mistmatch between "
+				msg = msg + "<br>This could be due to a mistmatch between "
 						+ "the fragment IDs in the<br>"
 						+ "graph you are trying to load, "
 						+ "and the currently loaded fragment space.<br>"
@@ -1249,7 +1376,10 @@ public class GUIGraphHandler extends GUICardPanel
 			return;
 		}
 		
-		clearCurrentSystem();
+		// Clears the "dnGraph" and GUI components, but keep memory of the 
+    	// status of the graph of an easy recovery, (see GSGraphSnapshot)
+    	clearCurrentSystem();
+    	
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
 		loadDnGraphToViewer();
 		
@@ -1287,8 +1417,12 @@ public class GUIGraphHandler extends GUICardPanel
 					fragViewerCardHolder, EMPTYCARDNAME);
 		}
 		graph = convertDnGraphToGSGraph(dnGraph);
+		
+		// Keep a snapshot of the old data visualized
+		oldGSStatus = graphViewer.getStatusSnapshot();
+		
 		graphViewer.cleanup();
-		graphViewer.loadGraphToViewer(graph);
+		graphViewer.loadGraphToViewer(graph,oldGSStatus);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1386,8 +1520,12 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
+	/**
+	 * Clears the current graph viewer but keeps track of the latest graph 
+	 * loaded. 
+	 */
 	private void clearCurrentSystem()
-	{
+	{	
 		// Get rid of currently loaded graph
 		dnGraph = null;
         graphViewer.cleanup();
@@ -1679,8 +1817,10 @@ public class GUIGraphHandler extends GUICardPanel
     
     private void removeCurrentdnGraph() throws DENOPTIMException
     {
-    	// Takes care of "dnGraph" and GUI components
-    	clearCurrentSystem();
+    	// Clears the "dnGraph" and GUI components, but keep memory of the 
+    	// status of the graph of an easy recovery, though since the old graph
+    	// is being removed, the recovered data is not needed anymore.
+        clearCurrentSystem();
     	
     	// Actual removal from the library
     	if (dnGraphLibrary.size()>0)
