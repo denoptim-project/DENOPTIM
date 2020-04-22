@@ -2251,5 +2251,42 @@ public class DenoptimIO
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * Reads a library of fragments from SDF file and checks that every fragment
+     * has the AP tag.
+     * @param fileName name of the SDF file
+     * @param kindStr the kind of fragment to be read. Used for logging.
+     * @return the list of fragments as atom containers.
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<IAtomContainer> readInLibraryOfFragments(
+    		String fileName, String kindStr) throws DENOPTIMException
+    {
+    	ArrayList<IAtomContainer> lib = new ArrayList<IAtomContainer>();
+        int i = 0;
+        for (IAtomContainer mol : readMoleculeData(fileName))
+        {
+            i++;
+            Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
+            if (ap == null)
+            {
+                DENOPTIMLogger.appLogger.log(Level.WARNING,
+                     "No attachment point information for " + kindStr + " " 
+                     + i + " in file '" + fileName + "'. I'm ignoring it!");
+            }
+            else
+            {
+            	lib.add(mol);
+            }
+        }
+        if (lib.isEmpty())
+        {
+            throw new DENOPTIMException("Scaffold library has no entries.");
+        }
+    	return lib;
+    }
+    
+//------------------------------------------------------------------------------
 
 }

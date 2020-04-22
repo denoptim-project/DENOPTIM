@@ -97,7 +97,7 @@ public class FragmentSpaceUtils
             }
 		}
 	
-		if (FragmentSpaceParameters.useAPclassBasedApproach())
+		if (FragmentSpace.useAPclassBasedApproach())
 		{
 		    // Collect classes per fragment
 		    ArrayList<String> lstAPC = frg.getAllAPClassess();

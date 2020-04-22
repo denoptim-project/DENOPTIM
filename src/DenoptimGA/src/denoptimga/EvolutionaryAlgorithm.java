@@ -70,7 +70,7 @@ public class EvolutionaryAlgorithm
         DenoptimIO.createDirectory(genDir);
 
         // create a fragment pool based on the number of attachment points
-        if (!FragmentSpaceParameters.useAPclassBasedApproach())
+        if (!FragmentSpace.useAPclassBasedApproach())
             EAUtils.poolFragments(FragmentSpace.getFragmentLibrary());
         else
         {

@@ -463,6 +463,10 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			renderForLackOfFragSpace();
 		}
+		else
+		{
+			renderForPresenceOfFragSpace();
+		}
 		txtFragSpace.setEditable(false);
 		
 		btnFragSpace = new JButton("Load Fragment Space");

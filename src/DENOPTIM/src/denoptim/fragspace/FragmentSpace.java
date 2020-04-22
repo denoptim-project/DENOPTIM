@@ -122,9 +122,93 @@ public class FragmentSpace
     private static HashMap<String, Double> symmConstraints;
     
     /**
+     * FLag defining use of AP class-based approach
+     */
+    protected static boolean apClassBasedApproch = false;
+    
+    /**
      * Flag signaling that this fragment space was built and validated
      */
     private static boolean isValid = false;
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Define all components of a fragment space that implements the attachment
+     * point class-approach.
+     * @param scaffLib library of fragments used to start the construction of
+     * any new graph (i.e., seed or root fragments, a.k.a. scaffolds).
+     * @param fragLib library of fragments for general purpose.
+     * @param cappLib library of single-AP fragments used to cap free attachment 
+     * points (i.e., the capping groups).
+     * @param cpMap the APClass compatibility map. This data structure is a 
+     * map of the APClass-on-growing-graph (key) to list of permitted APClasses
+     * on incoming fragment (values).
+     * @param boMap the map of APClass into bond order. This data structure is a 
+     * map of APClass (keys) to bond order as integer (values).
+     * @param capMap the capping rules. This data structure is a map of  
+     * APClass-to-cap (keys) to APClass-of-capping-group (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot 
+     * be left unused neither capped. 
+     * @throws DENOPTIMException
+     */
+    public static void defineFragmentSpace(ArrayList<IAtomContainer> scaffLib,
+    		ArrayList<IAtomContainer> fragLib,
+    		ArrayList<IAtomContainer> cappLib) throws DENOPTIMException
+    {
+    	setScaffoldLibrary(scaffLib);
+    	setFragmentLibrary(fragLib);
+    	setCappingLibrary(cappLib);
+    	apClassBasedApproch = false;
+    	FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
+    	isValid = true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Define all components of a fragment space that implements the attachment
+     * point class-approach.
+     * @param scaffLib library of fragments used to start the construction of
+     * any new graph (i.e., seed or root fragments, a.k.a. scaffolds).
+     * @param fragLib library of fragments for general purpose.
+     * @param cappLib library of single-AP fragments used to cap free attachment 
+     * points (i.e., the capping groups).
+     * @param cpMap the APClass compatibility map. This data structure is a 
+     * map of the APClass-on-growing-graph (key) to list of permitted APClasses
+     * on incoming fragment (values).
+     * @param boMap the map of APClass into bond order. This data structure is a 
+     * map of APClass (keys) to bond order as integer (values).
+     * @param capMap the capping rules. This data structure is a map of  
+     * APClass-to-cap (keys) to APClass-of-capping-group (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot 
+     * be left unused neither capped. 
+     * @param rcCpMap the APClass compatibility matrix for ring closures.
+     * @throws DENOPTIMException
+     */
+    public static void defineFragmentSpace(ArrayList<IAtomContainer> scaffLib,
+    		ArrayList<IAtomContainer> fragLib,
+    		ArrayList<IAtomContainer> cappLib,
+    		HashMap<String,ArrayList<String>> cpMap,
+    		HashMap<String,Integer> boMap,
+    		HashMap<String,String> capMap,
+    		HashSet<String> forbEnds,
+    		HashMap<String,ArrayList<String>> rcCpMap) throws DENOPTIMException
+    {
+    	setScaffoldLibrary(scaffLib);
+    	setFragmentLibrary(fragLib);
+    	setCappingLibrary(cappLib);
+    	setCompatibilityMatrix(cpMap);
+    	apClassBasedApproch = true;
+    	setBondOrderMap(boMap);
+    	setCappingMap(capMap);
+    	setForbiddenEndList(forbEnds);
+    	setRCCompatibilityMatrix(rcCpMap);
+   
+    	FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
+    	
+    	isValid = true;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -191,6 +275,8 @@ public class FragmentSpace
             RingClosureParameters.checkParameters();
             RingClosureParameters.processParameters();
         }
+        
+        isValid = true;
     }
     
 //------------------------------------------------------------------------------
@@ -202,6 +288,20 @@ public class FragmentSpace
     public static boolean isDefined()
     {
     	return isValid;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check usage of APClass-based approach, i.e., uses attachment points with 
+     * annotated data (i.e., the APClass) to evaluate compatibilities between
+     * attachment points.
+     * @return <code>true</code> if this fragment space makes use of 
+     * APClass-based approach
+     */
+    public static boolean useAPclassBasedApproach()
+    {
+        return apClassBasedApproch;
     }
     
 //------------------------------------------------------------------------------

@@ -258,7 +258,7 @@ public class EAUtils
         //MersenneTwister rng = GAParameters.getRNG();
         MersenneTwister rng = RandomUtils.getRNG();
 
-        if (!FragmentSpaceParameters.useAPclassBasedApproach())
+        if (!FragmentSpace.useAPclassBasedApproach())
         {
             switch (stype)
             {
@@ -381,7 +381,7 @@ public class EAUtils
         // This is done to maintain a unique vertex-id mapping
         GraphUtils.renumberGraphVertices(molGraph);
 
-        if (FragmentSpaceParameters.useAPclassBasedApproach())
+        if (FragmentSpace.useAPclassBasedApproach())
         {
             // remove the capping groups
             GraphUtils.removeCappingGroups(molGraph);
@@ -1195,7 +1195,7 @@ public class EAUtils
     protected static boolean setupRings(Object[] res, DENOPTIMGraph molGraph)
                                                     throws DENOPTIMException
     {
-        boolean rcnEnabled = FragmentSpaceParameters.useAPclassBasedApproach();
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
         if (!rcnEnabled)
             return true;
 
@@ -1340,7 +1340,7 @@ public class EAUtils
     protected static void addCappingGroup(DENOPTIMGraph molGraph)
                                                     throws DENOPTIMException
     {
-        boolean rcnEnabled = FragmentSpaceParameters.useAPclassBasedApproach();
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
         if (!rcnEnabled)
             return;
 
@@ -1502,7 +1502,7 @@ public class EAUtils
     protected static boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint A,
                                                     DENOPTIMAttachmentPoint B)
     {
-        boolean rcnEnabled = FragmentSpaceParameters.useAPclassBasedApproach();
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
         // if no reaction information is available return true
         if (!rcnEnabled)
         {
@@ -1757,7 +1757,7 @@ public class EAUtils
 
 
         //Detect free AP that are not permitted
-        if (FragmentSpaceParameters.useAPclassBasedApproach())
+        if (FragmentSpace.useAPclassBasedApproach())
         {
             if (foundForbiddenEnd(molGraph))
             {

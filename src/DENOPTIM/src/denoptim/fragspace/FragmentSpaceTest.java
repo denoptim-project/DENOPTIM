@@ -154,10 +154,6 @@ public class FragmentSpaceTest
         frg7.addAP(0, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
         IAtomContainer f7 = new AtomContainer(frg7);
         cappLib.add(f7);
-        
-    	FragmentSpace.setScaffoldLibrary(scaffLib);
-    	FragmentSpace.setFragmentLibrary(fragLib);
-    	FragmentSpace.setCappingLibrary(cappLib);
 
     	HashMap<String,ArrayList<String>> cpMap = new HashMap<String,ArrayList<String>>();
     	ArrayList<String> lst1 = new ArrayList<String>();
@@ -171,9 +167,6 @@ public class FragmentSpaceTest
     	lst3.add(APC2);
     	lst3.add(APC3);
     	cpMap.put(APC2, lst3);
-    	FragmentSpace.setCompatibilityMatrix(cpMap);
-
-    	FragmentSpaceParameters.setAPclassBasedApproach(true);
     	
     	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
     	boMap.put(APCS,1);
@@ -182,20 +175,20 @@ public class FragmentSpaceTest
     	boMap.put(APC3,1);
     	boMap.put(APCC1,1);
     	boMap.put(APCC1,1);
-    	FragmentSpace.setBondOrderMap(new HashMap<String,Integer>());
     	
     	HashMap<String,String> capMap = new HashMap<String,String>();
     	capMap.put(APCS, APCC2);
     	capMap.put(APC1, APCC1);
     	capMap.put(APC2, APCC1);
-    	FragmentSpace.setCappingMap(capMap);
 
     	HashSet<String> ends = new HashSet<String>();
     	ends.add(APC3);
-    	FragmentSpace.setForbiddenEndList(ends);
-   
-    	FragmentSpaceUtils.groupAndClassifyFragments(true);
     	
+    	HashMap<String,ArrayList<String>> rcCpMap = 
+    			new HashMap<String,ArrayList<String>>();
+
+    	FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib,cpMap,boMap,
+    			capMap,ends,rcCpMap);
 	}
 	
 //-----------------------------------------------------------------------------    	
