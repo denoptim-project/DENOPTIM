@@ -54,11 +54,13 @@ public class FragmentUtils
 
     /**
      * For the given molecule find the compatible list of classes (reactions)
-     * with respect to its attachment points
+     * with respect to its attachment points. 
+     * Deprecated: use DEOPTIMFragment.getAllAPClassess()
      * @param mol
      * @return list of classes (reactions)
      */
 
+	@Deprecated
     public static ArrayList<String> getClassesForFragment(IAtomContainer mol)
     {
         String apProperty = 
@@ -97,7 +99,7 @@ public class FragmentUtils
      * Parses the attachment point information associated with a molecule.
      * Where applicable, each AP must correspond to a class/reaction.
      * If multiple classes are involved, multiple attachments are created.
-     * @param idx the index of the fragment in the library
+     * @param idx the index of the fragment in the library (0-based).
      * @param ftype the type of fragment (scaffold, fragment, capping group)
      * as integer
      * @return a list of <code>DENOPTIMAttachmentPoint</code>
@@ -108,18 +110,17 @@ public class FragmentUtils
                                              int ftype) throws DENOPTIMException
     {
         IAtomContainer mol = FragmentSpace.getFragment(ftype,idx);
-        ArrayList<DENOPTIMAttachmentPoint> lstAP = 
-				       new ArrayList<>();
-	try
-	{
-	    lstAP = getAPForFragment(mol);
-	}
-	catch (DENOPTIMException de)
-	{
-	    String msg = de.getMessage() + " Check " + getFragmentType(ftype)
-                       + " MolID: " + (idx+1);
-	    throw new DENOPTIMException(msg);
-	}
+        ArrayList<DENOPTIMAttachmentPoint> lstAP = new ArrayList<>();
+		try
+		{
+		    lstAP = getAPForFragment(mol);
+		}
+		catch (DENOPTIMException de)
+		{
+		    String msg = de.getMessage() + " Check " + getFragmentType(ftype)
+	                       + " MolID: " + (idx+1);
+		    throw new DENOPTIMException(msg);
+		}
         return lstAP;
     }
 

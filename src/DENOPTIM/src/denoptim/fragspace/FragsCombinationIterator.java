@@ -207,7 +207,7 @@ public class FragsCombinationIterator
             }
         }
 
-        // Collect all possibilities (frags, caps, emtry) for each free AP
+        // Collect all possibilities (frags, caps, entry) for each free AP
         for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
             int fTyp = candSrcAp.getVertexMolType();
@@ -222,32 +222,23 @@ public class FragsCombinationIterator
                                                new ArrayList<IdFragmentAndAP>();
 
             // Get all compatible fragments
-            ArrayList<ArrayList<Integer>> compatFragAps = 
-                                            new ArrayList<ArrayList<Integer>>();
-            ArrayList<String> compatApClasses = 
-                                 FragmentSpace.getCompatibleAPClasses(srcApCls);
-            if (compatApClasses != null)
-            {
-                for (String compClass : compatApClasses)
-                {
-                    compatFragAps.addAll(FragmentSpace.getFragsWithAPClass(
-                                                                    compClass));
-                }
-            }
-            for (ArrayList<Integer> pair : compatFragAps)
+            ArrayList<IdFragmentAndAP> compatFragAps = 
+                           FragmentSpace.getFragAPsCompatibleWithClass(srcApCls);
+
+            for (IdFragmentAndAP compatApId : compatFragAps)
             {
                 int vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
-                                                       pair.get(0), //MolId,
-                                                                 1, //FragType
-                                                       pair.get(1), //ApId
+                		            compatApId.getVertexMolId(), //MolId,
+                                    1, //FragType
+                                    compatApId.getApId(), //ApId
 							        -1, //noVSym
 							        -1);//noAPSym
 
                 candsForThisSrc.add(trgFrgAp);
             }
 
-            // Get other possibile destinies for the free AP
+            // Get other possible destinies for the free AP
             // NOTE: in principle there should be only ONE capping group, but
             //       this is made to work also in case of more than one group.
             String capApCls = FragmentSpace.getCappingClass(srcApCls);

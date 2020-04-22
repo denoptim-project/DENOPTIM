@@ -77,6 +77,7 @@ import java.util.Map;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.io.SDFWriter;
@@ -1654,7 +1655,8 @@ public class DenoptimIO
 
     /**
      * Reads the molecules in a file. Expects filenames with commonly accepted
-     * extensions (i.e., .txt and .sdf).
+     * extensions (i.e., .smi and .sdf). Unrecognized extensions will be
+     * interpreted as links (i.e., pathnames) to SDF files.
      * @param fileName the pathname of the file to read.
      * @return the list of molecules
      * @throws DENOPTIMException
@@ -2246,6 +2248,43 @@ public class DenoptimIO
             res = false;
         }
         return res;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a library of fragments from SDF file and checks that every fragment
+     * has the AP tag.
+     * @param fileName name of the SDF file
+     * @param kindStr the kind of fragment to be read. Used for logging.
+     * @return the list of fragments as atom containers.
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<IAtomContainer> readInLibraryOfFragments(
+    		String fileName, String kindStr) throws DENOPTIMException
+    {
+    	ArrayList<IAtomContainer> lib = new ArrayList<IAtomContainer>();
+        int i = 0;
+        for (IAtomContainer mol : readMoleculeData(fileName))
+        {
+            i++;
+            Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
+            if (ap == null)
+            {
+                DENOPTIMLogger.appLogger.log(Level.WARNING,
+                     "No attachment point information for " + kindStr + " " 
+                     + i + " in file '" + fileName + "'. I'm ignoring it!");
+            }
+            else
+            {
+            	lib.add(mol);
+            }
+        }
+        if (lib.isEmpty())
+        {
+            throw new DENOPTIMException("Scaffold library has no entries.");
+        }
+    	return lib;
     }
     
 //------------------------------------------------------------------------------

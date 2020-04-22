@@ -91,9 +91,12 @@ public class GenUtils
 
     public static String getFileExtension(String fname)
     {
-        String ext;
-        int dotPos = fname.lastIndexOf(".");
-        ext = fname.substring(dotPos);
+        String ext = "";
+        if (fname.contains("."))
+        {
+	        int dotPos = fname.lastIndexOf(".");
+	        ext = fname.substring(dotPos);
+        }
         return ext;
     }
 

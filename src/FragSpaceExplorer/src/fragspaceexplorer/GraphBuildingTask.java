@@ -394,7 +394,7 @@ public class GraphBuildingTask implements Callable
                 // will be further grown, so no need to perceive rings or
                 // submit any external task.
                 boolean needsCaps = false;
-                if (FragmentSpaceParameters.useAPclassBasedApproach())
+                if (FragmentSpace.useAPclassBasedApproach())
                 {
                     needsCaps = GraphUtils.graphNeedsCappingGroups(molGraph);
                 }

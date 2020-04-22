@@ -22,22 +22,25 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JPanel;
 
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.ViewerPipe;
 import org.graphstream.ui.view.util.DefaultMouseManager;
+//import static org.graphstream.algorithm.Toolkit.nodePosition;
 
 public class GraphViewerPanel extends JPanel 
 {
@@ -61,6 +64,10 @@ public class GraphViewerPanel extends JPanel
 	public final String SPRITE_APCLASS = "sprite.apClass";
 	public final String SPRITE_BNDORD = "sprite.bndOrd";
 	public final String SPRITE_FRGID = "sprite.fragId";
+	public final String SPRITEATT_UICLASS_APCLASSSRC = "apLabelSRC";
+	public final String SPRITEATT_UICLASS_APCLASSTRG = "apLabelTRG";
+	public final String SPRITEATT_UICLASS_BNDORD = "bndTypLabel";
+	public final String SPRITEATT_UICLASS_FRGID = "molIdLabel";
 	
 
 //-----------------------------------------------------------------------------
@@ -81,7 +88,8 @@ public class GraphViewerPanel extends JPanel
 	 */
 	private void initialize()
 	{
-		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		System.setProperty("org.graphstream.ui.renderer", 
+				"org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 		this.setLayout(new BorderLayout());
 		this.setBackground(Color.decode("#D9D9D9"));
 		this.setToolTipText("No graph to visualize");
@@ -157,7 +165,7 @@ public class GraphViewerPanel extends JPanel
 				+ "text-background-color: #D9D9D9;"
 				+ "text-padding: 1px;"
 				+ "} "
-				+ "sprite.apLabel {"
+				+ "sprite."+SPRITEATT_UICLASS_APCLASSSRC+" {"
 				+ "shape: box; "
 				+ "size: 0px;" 
 				+ "text-mode: normal;"
@@ -165,14 +173,22 @@ public class GraphViewerPanel extends JPanel
 				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
 				+ "text-background-mode: none;"
 				+ "}"
-				+ "sprite.molIdLabel {"
+				+ "sprite."+SPRITEATT_UICLASS_APCLASSTRG+" {"
+				+ "shape: box; "
+				+ "size: 0px;" 
+				+ "text-mode: normal;"
+				+ "text-style: normal;"
+				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
+				+ "text-background-mode: none;"
+				+ "}"
+				+ "sprite."+SPRITEATT_UICLASS_FRGID+" {"
 				+ "shape: box; "
 				+ "size: 0px;" 
 				+ "text-mode: normal;"
 				+ "text-style: normal;"
 				+ "text-background-mode: none;"
 				+ "}"
-				+ "sprite.bndTypLabel {"
+				+ "sprite."+SPRITEATT_UICLASS_BNDORD+" {"
 				+ "shape: box; "
 				+ "size: 0px;" 
 				+ "text-mode: normal;"
@@ -200,12 +216,26 @@ public class GraphViewerPanel extends JPanel
 	}
 	
 //-----------------------------------------------------------------------------
-	
+
 	/**
 	 * Load the given graph to the graph viewer.
 	 * @param g the graph to load
 	 */
 	public void loadGraphToViewer(Graph g)
+	{
+		loadGraphToViewer(g,null);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Load the given graph to the graph viewer.
+	 * @param g the graph to load
+	 * @param prevStatus the snapshot of the previous status. We use this to 
+	 * remember previously chosen settings, such as the sprites to be 
+	 * displayed, or the position of nodes.
+	 */
+	public void loadGraphToViewer(Graph g, GSGraphSnapshot prevStatus)
 	{
 		graph = g;
 		graph.addAttribute("ui.quality");
@@ -220,11 +250,197 @@ public class GraphViewerPanel extends JPanel
 		viewer.enableAutoLayout();
 		
 		sman = new SpriteManager(graph);
+		appendSpritesFromSnapshot(prevStatus);
+		// Not working. See comment in the method.
+		//placeNodesAccordingToSnapshot(prevStatus);
 	    
 		viewpanel = viewer.getDefaultView();
 		mouseManager = new GraphMouseManager();
 		viewpanel.setMouseManager(mouseManager);
 		this.add(viewpanel);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Append sprites from snapshot.
+	 * @param snapshot
+	 */
+	private void appendSpritesFromSnapshot(GSGraphSnapshot snapshot)
+	{	
+		if (snapshot == null)
+		{
+			return;
+		}
+		
+		if (!snapshot.getGraphId().equals(graph.getId()))
+		{
+			return;
+		}
+		
+		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_APCLASSSRC))
+		{
+			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_APCLASSSRC))
+			{
+				if (el instanceof Edge)
+				{
+					Edge ed = graph.getEdge(el.getId());
+					if (ed != null)
+					{
+						addSrcApClassSprite(ed);
+					}
+				}
+			}
+		}
+		
+		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_APCLASSTRG))
+		{
+			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_APCLASSTRG))
+			{
+				if (el instanceof Edge)
+				{
+					Edge ed = graph.getEdge(el.getId());
+					if (ed != null)
+					{
+						addTrgApClassSprite(ed);
+					}
+				}
+			}
+		}
+		
+		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_BNDORD))
+		{
+			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_BNDORD))
+			{
+				if (el instanceof Edge)
+				{
+					Edge ed = graph.getEdge(el.getId());
+					if (ed != null)
+					{
+						addBondSprite(ed);
+					}
+				}
+			}
+		}
+		
+		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_FRGID))
+		{
+			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_FRGID))
+			{
+				if (el instanceof Node)
+				{
+					Node n = graph.getNode(el.getId());
+					if (n != null)
+					{
+						addFrgIdSprite(n);
+					}
+				}
+			}
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	// This was meant as a starting point for setting the initial layout of
+	// the nodes when updating the graphical representation of a graph.
+	// However, I never manager to get the autoLayour algorithms to use such an
+	// initial placement of the nodes.
+	// Yet, the snapshot does indeed include the coordinated of each node from the
+	// old graphical representation.
+	/*
+	private void placeNodesAccordingToSnapshot(GSGraphSnapshot snapshot)
+	{
+		if (snapshot == null)
+		{
+			return;
+		}
+		
+		if (!snapshot.getGraphId().equals(graph.getId()))
+		{
+			return;
+		}
+		
+		Iterator<Node> oldNodesIterator = snapshot.nodeIterator();
+		while (oldNodesIterator.hasNext())
+		{
+			Node oldNode = oldNodesIterator.next();
+			Node newNode = graph.getNode(oldNode.getId());
+			if (newNode == null)
+			{
+				continue;
+			}
+			newNode.setAttribute("xyz",oldNode.getAttribute("xyz"));
+		}
+		
+		
+	}
+	*/
+	
+//-----------------------------------------------------------------------------
+	
+	private void addSrcApClassSprite(Edge e)
+	{
+		String sId = "srcApClass-"+e.getId();
+		if (!hasSprite(sId))
+		{
+			Sprite sSrc = sman.addSprite(sId);
+			sSrc.setAttribute("ui.class", SPRITEATT_UICLASS_APCLASSSRC);
+			sSrc.addAttribute("ui.label", (String)
+					e.getAttribute("dnp.srcAPClass"));
+			sSrc.attachToEdge(e.getId());
+			sSrc.setPosition(0.3);
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+
+	private void addTrgApClassSprite(Edge e)
+	{
+		String sId = "trgApClass-"+e.getId();
+		if (!hasSprite(sId))
+		{
+			Sprite sTrg = sman.addSprite(sId);
+			sTrg.setAttribute("ui.class", SPRITEATT_UICLASS_APCLASSTRG);
+			sTrg.addAttribute("ui.label", (String)
+					e.getAttribute("dnp.trgAPClass"));
+			sTrg.attachToEdge(e.getId());
+			sTrg.setPosition(0.7);
+		}
+	}
+
+//-----------------------------------------------------------------------------
+
+	private void addBondSprite(Edge e)
+	{
+		String sId = "bndTyp-"+e.getId();
+		if (!hasSprite(sId))
+		{
+			Sprite s = sman.addSprite(sId);
+			s.setAttribute("ui.class", SPRITEATT_UICLASS_BNDORD);
+			s.addAttribute("ui.label", e.getAttribute("dnp.bondType").toString());
+			s.attachToEdge(e.getId());
+			s.setPosition(0.5);
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+
+	private void addFrgIdSprite(Node n)
+	{
+		if (n.getAttribute("ui.class").equals("ap"))
+		{
+			return;
+		}
+		String sId = "molID-"+n.getId();
+		if (!hasSprite(sId))
+		{
+			Sprite s = sman.addSprite(sId);
+			s.setAttribute("ui.class", SPRITEATT_UICLASS_FRGID);
+			s.addAttribute("ui.label",
+					"MolID: " + n.getAttribute("dnp.molID"));
+			s.attachToNode(n.getId());
+			s.setPosition(0.3, 0, 0);
+		}
 	}
 	
 //-----------------------------------------------------------------------------
@@ -245,29 +461,11 @@ public class GraphViewerPanel extends JPanel
 					{
 						if (e.getSourceNode() == n)
 						{
-							String sId = "srcApClass-"+e.getId();
-							if (!hasSprite(sId))
-							{
-								Sprite sSrc = sman.addSprite(sId);
-								sSrc.setAttribute("ui.class", "apLabel");
-								sSrc.addAttribute("ui.label", (String)
-										e.getAttribute("dnp.srcAPClass"));
-								sSrc.attachToEdge(e.getId());
-								sSrc.setPosition(0.3);
-							}
+							addSrcApClassSprite(e);
 						}
 						if (e.getTargetNode() == n)
 						{
-							String sId = "trgApClass-"+e.getId();
-							if (!hasSprite(sId))
-							{
-								Sprite sTrg = sman.addSprite(sId);
-								sTrg.setAttribute("ui.class", "apLabel");
-								sTrg.addAttribute("ui.label", (String)
-										e.getAttribute("dnp.trgAPClass"));
-								sTrg.attachToEdge(e.getId());
-								sTrg.setPosition(0.7);
-							}
+							addTrgApClassSprite(e);
 						}
 					}
 				}
@@ -276,35 +474,14 @@ public class GraphViewerPanel extends JPanel
 			case SPRITE_BNDORD:
 				for (Edge e : getSelectedEdges())
 				{
-					String sId = "bndTyp-"+e.getId();
-					if (!hasSprite(sId))
-					{
-						Sprite s = sman.addSprite(sId);
-						s.setAttribute("ui.class", "bndTypLabel");
-						s.addAttribute("ui.label", e.getAttribute("dnp.bondType").toString());
-						s.attachToEdge(e.getId());
-						s.setPosition(0.5);
-					}
+					addBondSprite(e);
 				}
 				break;
 				
 			case SPRITE_FRGID:
 				for (Node n : getSelectedNodes())
 				{
-					if (n.getAttribute("ui.class").equals("ap"))
-					{
-						continue;
-					}
-					String sId = "molID-"+n.getId();
-					if (!hasSprite(sId))
-					{
-						Sprite s = sman.addSprite(sId);
-						s.setAttribute("ui.class", "molIdLabel");
-						s.addAttribute("ui.label",
-								"MolID: " + n.getAttribute("dnp.molID"));
-						s.attachToNode(n.getId());
-						s.setPosition(0.3, 0, 0);
-					}
+					addFrgIdSprite(n);
 				}
 				break;
 		}		
@@ -446,6 +623,35 @@ public class GraphViewerPanel extends JPanel
 	public boolean hasSelected()
 	{
 		return mouseManager.hasSelected();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Returns a copy of the loaded graph
+	 */
+	
+	public GSGraphSnapshot getStatusSnapshot()
+	{	
+		GSGraphSnapshot snapshot = null;
+		if (graph !=null && sman != null)
+		{
+			/*
+			// Code collecting instantaneous position of the nodes from the viewer
+			GraphicGraph gg = viewer.getGraphicGraph();
+			Iterator<Node> ggNodeIt = gg.getNodeIterator();
+			while (ggNodeIt.hasNext())
+			{
+				Node ggNode = ggNodeIt.next();
+				double pos[] = nodePosition(ggNode);
+				graph.getNode(ggNode.getId()).setAttribute("xyz", pos);
+				//TODO del
+				System.out.println("NODE pos "+pos[0]+","+pos[1]+","+pos[2]);
+			}
+			*/
+			snapshot = new GSGraphSnapshot(graph,sman);
+		}
+		return snapshot;
 	}
 
 //-----------------------------------------------------------------------------
