@@ -475,8 +475,9 @@ public class GUIGraphHandler extends GUICardPanel
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean showWarning = false;
-				String msg = "<html><b>WARNING</b>: you are introducing a "
-						+ "potential source of mistmatch between<br>"
+				String msg = "<html><body width='%1s'>"
+						+ "<b>WARNING</b>: you are introducing a "
+						+ "potential source of mistmatch between "
 						+ "the fragments IDs used in graphs and the "
 						+ "fragment space.<br>In particular:<br>"
 						+ "<ul>";
@@ -497,9 +498,10 @@ public class GUIGraphHandler extends GUICardPanel
 					msg = msg + "</ul>"
 							+ ""
 			                + "Are you sure you want to load a fragment "
-			                + "space?</html>";
+			                + "space? </html>";
 					String[] options = new String[]{"Yes", "No"};
-					int res = JOptionPane.showOptionDialog(null, msg,			            
+					int res = JOptionPane.showOptionDialog(null,
+							String.format(msg,350),			            
 			                "Change frgment space?",
 			                JOptionPane.DEFAULT_OPTION,
 			                JOptionPane.WARNING_MESSAGE,
