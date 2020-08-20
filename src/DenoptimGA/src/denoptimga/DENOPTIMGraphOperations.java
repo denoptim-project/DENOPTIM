@@ -357,7 +357,7 @@ public class DENOPTIMGraphOperations
             }
 
             // Apply closability bias in selection of next fragment
-//TODO copy also DENOPTIMRing into growing graph or use DENOPTIMTemplate
+//TODO copy also DENOPTIMRing into growing graph or use denoptim.molecule.DENOPTIMTemplate
 // which is yet to be developed.
             if (RingClosureParameters.allowRingClosures() && 
                       RingClosureParameters.selectFragmentsFromClosableChains())

@@ -74,6 +74,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import denoptim.molecule.DENOPTIMTemplate;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -1676,6 +1677,7 @@ public class DenoptimIO
                                     compareToIgnoreCase(".sdf") == 0)
         {
             mols = DenoptimIO.readSDFFile(fileName);
+            mols.add(DENOPTIMTemplate.getTestTemplate());
         }
         // process everything else as a text file with links to individual 
         // molecules

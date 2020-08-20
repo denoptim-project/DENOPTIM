@@ -448,7 +448,6 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
      * the atoms in this container, and defines the string-based molecular
      * property used to print attachment points in SDF files.
      */
-    
     public void projectAPsToProperties()
     {
 
