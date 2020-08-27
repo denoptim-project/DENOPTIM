@@ -155,7 +155,7 @@ public class ParallelEvolutionaryAlgorithm
     public void runGA() throws DENOPTIMException
     {
         StopWatch watch = new StopWatch();
-             watch.start();
+        watch.start();
 
         // start the threads
         tcons.prestartAllCoreThreads();
@@ -172,8 +172,9 @@ public class ParallelEvolutionaryAlgorithm
         DenoptimIO.createDirectory(genDir);
 
         // create a fragment pool based on the number of attachment points
-        if (!FragmentSpace.useAPclassBasedApproach())
+        if (!FragmentSpace.useAPclassBasedApproach()) {
             EAUtils.poolFragments(FragmentSpace.getFragmentLibrary());
+        }
         else
         {
             // create a fragment pool based on the reactions each fragment

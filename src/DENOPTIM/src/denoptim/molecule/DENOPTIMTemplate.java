@@ -3,6 +3,7 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.List;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -16,11 +17,12 @@ import org.openscience.cdk.interfaces.IAtomContainer;
  * provided upon instantiation.
  */
 public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
+
     /**
      * interior graph of the template that can be constrained in various ways depending on the
      * <code>contractLevel</code>
      */
-    private DENOPTIMGraph interiorGraph;
+    private DENOPTIMGraph interiorGraph = new DENOPTIMGraph();
 
     /**
      * Denotes the constants in the template. It can take values from 0 to 2 and each level promises to uphold the
@@ -62,8 +64,18 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
     }
     */
 
+    public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs() {
+        return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
+    }
+
     public static DENOPTIMTemplate getTestTemplate() {
         DENOPTIMTemplate template = new DENOPTIMTemplate();
+        template.setProperty(DENOPTIMConstants.APTAG, "");
+        ArrayList apList = new ArrayList(1);
+        apList.add(new DENOPTIMAttachmentPoint(0, 1, 1));
+        template.interiorGraph.addVertex(new DENOPTIMVertex(-1, 1, apList, 1));
+	template.setProperty(DENOPTIMConstants.APCVTAG, "1#c0:0");
+        // Add attachment points as property
         return template;
     }
 
@@ -78,3 +90,4 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
         return isFrozen;
     }
 }
+

@@ -32,6 +32,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GenUtils;
+import denoptim.molecule.DENOPTIMTemplate;
 
 
 /**
@@ -411,6 +412,8 @@ public class FragmentSpaceParameters
         		DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold");
         ArrayList<IAtomContainer> fragLib = 
         		DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment");
+	fragLib.add(DENOPTIMTemplate.getTestTemplate());
+	System.err.println("Added test template to fragment library");
         
         ArrayList<IAtomContainer> cappLib = new ArrayList<IAtomContainer>();
     	HashMap<String,ArrayList<String>> cpMap = 

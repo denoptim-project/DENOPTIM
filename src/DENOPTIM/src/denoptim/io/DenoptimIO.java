@@ -1677,7 +1677,6 @@ public class DenoptimIO
                                     compareToIgnoreCase(".sdf") == 0)
         {
             mols = DenoptimIO.readSDFFile(fileName);
-            mols.add(DENOPTIMTemplate.getTestTemplate());
         }
         // process everything else as a text file with links to individual 
         // molecules
