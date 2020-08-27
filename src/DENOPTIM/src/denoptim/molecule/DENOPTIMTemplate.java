@@ -5,6 +5,7 @@ import java.util.List;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -69,12 +70,15 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
     }
 
     public static DENOPTIMTemplate getTestTemplate() {
-        DENOPTIMTemplate template = new DENOPTIMTemplate();
-        template.setProperty(DENOPTIMConstants.APTAG, "");
+	DENOPTIMTemplate template = new DENOPTIMTemplate();
+        Atom anAtom = new Atom("C");
+        // anAtom.setProperty(DENOPTIMConstants.APTAG, );
+        template.addAtom(anAtom);
+        template.setProperty(DENOPTIMConstants.APTAG, "1:1");
         ArrayList apList = new ArrayList(1);
         apList.add(new DENOPTIMAttachmentPoint(0, 1, 1));
         template.interiorGraph.addVertex(new DENOPTIMVertex(-1, 1, apList, 1));
-	template.setProperty(DENOPTIMConstants.APCVTAG, "1#c0:0");
+        template.setProperty(DENOPTIMConstants.APCVTAG, "1#c0:0:1.1%0.0%0.0");
         // Add attachment points as property
         return template;
     }
