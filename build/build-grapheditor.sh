@@ -1,14 +1,6 @@
 #!/bin/bash
 
 # Building GraphEditor
-if [ -d ../lib ]; then
-    if [ -d lib ]; then
-        cp -r ../lib/*.jar lib/
-    else
-        cp -r ../lib .        
-    fi 
-fi
-
 
 
 if [ ! -f lib/DENOPTIM.jar ]; then

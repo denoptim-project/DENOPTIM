@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# Building TestOperator
-if [ -d ../lib ]; then
-    if [ -d lib ]; then
-        cp -r ../lib/*.jar lib/
-    else
-        cp -r ../lib .        
-    fi 
-fi
-
-
 
 if [ ! -f lib/DENOPTIM.jar ]; then
 	echo "Failed to create TestOperator.jar. Cannot locate DENOPTIM.jar in lib"

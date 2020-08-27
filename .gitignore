@@ -2,8 +2,8 @@ test/functional_tests/t6/data/prev_dbRoot/F*
 test/functional_tests/t6/data/oldCheckPoint.chk
 test/functional_tests/t7/data/*.ser
 test/functional*
-build/lib/
 build/*.jar
+build/manifest.mf
 lib/DENOPTIM.jar
 /bin/
 src/misc/GraphListAnalysis/

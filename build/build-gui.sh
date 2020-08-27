@@ -1,13 +1,7 @@
 #!/bin/bash
 
 # Building GUI
-if [ -d ../lib ]; then
-    if [ -d lib ]; then
-        cp -r ../lib/*.jar lib/
-    else
-        cp -r ../lib .        
-    fi 
-fi
+
 cp -r ../src/GUI/images images
 
 

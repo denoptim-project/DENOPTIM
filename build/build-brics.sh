@@ -1,13 +1,6 @@
 #!/bin/bash
 
 # Building SetupBRICS
-if [ -d ../lib ]; then
-    if [ -d lib ]; then
-        cp -r ../lib/*.jar lib/
-    else
-        cp -r ../lib .        
-    fi 
-fi
 
 
 
