@@ -4,6 +4,6 @@ test/functional_tests/t7/data/*.ser
 build/lib/
 build/*.jar
 lib/DENOPTIM.jar
-/bin/
+bin/
 src/misc/GraphListAnalysis/
 test/functional_tests/runT.sh
