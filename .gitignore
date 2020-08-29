@@ -5,7 +5,7 @@ test/functional*
 build/*.jar
 build/manifest.mf
 lib/DENOPTIM.jar
-/bin/
+bin/
 src/misc/GraphListAnalysis/
 test/functional_tests/runT.sh
 .idea
