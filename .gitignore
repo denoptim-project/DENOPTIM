@@ -4,6 +4,9 @@ test/functional_tests/t7/data/*.ser
 test/functional*
 build/*.jar
 build/manifest.mf
+build/lib
+build/dist
+build/images
 lib/DENOPTIM.jar
 bin/
 src/misc/GraphListAnalysis/

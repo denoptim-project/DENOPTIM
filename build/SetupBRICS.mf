@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: setupbrics.SetupBRICS
+Class-Path: lib/cdk-1.4.19.jar lib/DENOPTIM.jar
+
