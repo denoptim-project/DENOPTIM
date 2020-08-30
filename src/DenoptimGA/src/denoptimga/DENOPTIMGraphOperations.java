@@ -37,6 +37,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
@@ -526,8 +527,12 @@ public class DENOPTIMGraphOperations
         // update the level of the vertex based on its parent
         int lvl = curVertex.getLevel();
         fragVertex.setLevel(lvl+1);
+        
+        //TODO: here again we would benefit from having the building block return the
+        // list of symmetry matching APs
+        
         // identify the symmetric APs if any for this fragment vertex
-        IAtomContainer mol = FragmentSpace.getFragmentLibrary().get(fid);
+        IGraphBuildingBlock mol = FragmentSpace.getFragmentLibrary().get(fid);
         ArrayList<SymmetricSet> simAP = FragmentUtils.getMatchingAP(mol,fragAP);
         fragVertex.setSymmetricAP(simAP);
 

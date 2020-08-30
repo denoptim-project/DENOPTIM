@@ -43,6 +43,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
@@ -756,7 +757,7 @@ public class GraphUtils
         //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint dap_A = vtxA.getAttachmentPoints().get(iA);
         DENOPTIMAttachmentPoint dap_B = vtxB.getAttachmentPoints().get(iB);
-
+        
         if (dap_A.isAvailable() && dap_B.isAvailable())
         {
             //System.err.println("Available APs");
@@ -2072,7 +2073,7 @@ if(debug)
         fragVertex.setLevel(lvl+1);
 
         // get molecular representation
-        IAtomContainer mol = FragmentSpace.getFragmentLibrary().get(fId);
+        IGraphBuildingBlock mol = FragmentSpace.getFragmentLibrary().get(fId);
 
         // identify the symmetric APs if any for this fragment vertex
         ArrayList<SymmetricSet> simAP = FragmentUtils.getMatchingAP(mol, fragAPs);
@@ -2280,15 +2281,15 @@ if(debug)
     /**
      * Append a subgraph (subGraph) to an existing graph (molGraph) specifying 
      * which vertex and attachment point to use for the connection.
-     * Does not project on symmetrically related verteces or
+     * Does not project on symmetrically related vertexes or
      * attachment points. No change in symmetric sets, apart from importing 
-     * those already defined in the subgraph.
+     * those sets that are already defined in the subgraph.
      * @param molGraph the receiving graph R, or parent
-     * @param parentVrtxs the vertex of R on which the a copy
+     * @param parentVrtxs the vertex of R on which a copy
      * of I is to be attached.
      * @param parentAPIdx the attachment point on R's vertex to be
      * used to attach I 
-     * @param subGraph the incoming graph I, or child
+     * @param subGraph the incoming graph I, or child graph.
      * @param childVrtx the vertex of I that is to be connected to R
      * @param childAPIdx the index of the attachment point on the vertex of I 
      * that is to be connected to R

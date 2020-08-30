@@ -43,13 +43,16 @@ import javax.vecmath.AxisAngle4d;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.RingClosureFinder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -100,7 +103,7 @@ public class CyclicGraphHandler
      * Verbosity level
      */
     private int verbosity = RingClosureParameters.getVerbosity();
-
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -110,6 +113,59 @@ public class CyclicGraphHandler
      * @param libCap the library of capping groups
      */
 
+    public CyclicGraphHandler(ArrayList<IGraphBuildingBlock> libScaff,
+                               ArrayList<IGraphBuildingBlock> libFrag,
+                               ArrayList<IGraphBuildingBlock> libCap,
+                               HashMap<String, ArrayList<String>> rcCPMap)
+    {
+    	//TODO change this is terrible, we need to work with a list of IBuildingblicks, 
+    	// but for now... this will do
+        this.libScaff = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : libScaff)
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		this.libScaff.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		this.libScaff.add(new AtomContainer());
+        	}
+        }
+        this.libFrag = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : libFrag)
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		this.libFrag.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		this.libFrag.add(new AtomContainer());
+        	}
+        }
+        this.libCap = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : libCap)
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		this.libCap.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		this.libCap.add(new AtomContainer());
+        	}
+        }
+    	
+        this.rcCPMap = rcCPMap;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Constructor from data structure. 
+     * @param libScaff the library of scaffolds
+     * @param libFrag the library of fragments
+     * @param libCap the library of capping groups
+     */
+/*
     public CyclicGraphHandler(ArrayList<IAtomContainer> libScaff,
                                             ArrayList<IAtomContainer> libFrag,
                                              ArrayList<IAtomContainer> libCap,
@@ -120,11 +176,12 @@ public class CyclicGraphHandler
         this.libCap = libCap;
         this.rcCPMap = rcCPMap;
     }
-
+*/
+    
 //-----------------------------------------------------------------------------
 
     /**
-     * Identifyes a random combination of ring closing paths and returns it as 
+     * Identifies a random combination of ring closing paths and returns it as 
      * list of DENOPTIMRings ready to be appended to a DENOPTIMGraph.
      * @param inMol the molecule
      * @param molGraph the molecular graph

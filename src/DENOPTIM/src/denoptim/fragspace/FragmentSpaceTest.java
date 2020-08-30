@@ -48,6 +48,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 
 /**
@@ -76,7 +77,7 @@ public class FragmentSpaceTest
 	
 	private void buildFragmentSpace() throws DENOPTIMException
 	{
-    	ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();
+    	ArrayList<IGraphBuildingBlock> fragLib = new ArrayList<IGraphBuildingBlock>();
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -90,8 +91,7 @@ public class FragmentSpaceTest
     	frg1.addAP(2, APC1, new Point3d(new double[]{0.0, 0.0, 3.3}));
     	frg1.addAP(2, APC2, new Point3d(new double[]{0.0, 0.0, 1.1}));
     	frg1.addAP(0, APC3, new Point3d(new double[]{3.0, 0.0, 3.3}));
-    	IAtomContainer f1 = new AtomContainer(frg1);
-    	fragLib.add(f1);
+    	fragLib.add(frg1);
     	
         DENOPTIMFragment frg2 = new DENOPTIMFragment();
         Atom a21 = new Atom("N", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -101,8 +101,7 @@ public class FragmentSpaceTest
         frg2.addBond(new Bond(a21, a22));
         frg2.addAP(1, APC2, new Point3d(new double[]{0.0, 2.2, 3.3}));
         frg2.addAP(1, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        IAtomContainer f2 = new AtomContainer(frg2);
-        fragLib.add(f2);
+        fragLib.add(frg2);
         
         DENOPTIMFragment frg3 = new DENOPTIMFragment();
         Atom a31 = new Atom("P", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -110,10 +109,9 @@ public class FragmentSpaceTest
         frg3.addAP(0, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
         frg3.addAP(0, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
         frg3.addAP(0, APC3, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        IAtomContainer f3 = new AtomContainer(frg3);
-        fragLib.add(f3);
+        fragLib.add(frg3);
         
-    	ArrayList<IAtomContainer> scaffLib = new ArrayList<IAtomContainer>();
+    	ArrayList<IGraphBuildingBlock> scaffLib = new ArrayList<IGraphBuildingBlock>();
         DENOPTIMFragment frg4 = new DENOPTIMFragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -128,8 +126,7 @@ public class FragmentSpaceTest
         frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
         frg4.addAP(0, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
         // NB: in the sorted list the last AP is first!
-        IAtomContainer f4 = new AtomContainer(frg4);
-        scaffLib.add(f4);
+        scaffLib.add(frg4);
         
         DENOPTIMFragment frg5 = new DENOPTIMFragment();
         Atom a51 = new Atom("Zn", new Point3d(new double[]{5.0, 1.1, 2.2}));
@@ -137,23 +134,20 @@ public class FragmentSpaceTest
         frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
         frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
         frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
-        IAtomContainer f5 = new AtomContainer(frg5);
-        scaffLib.add(f5);
+        scaffLib.add(frg5);
         
-        ArrayList<IAtomContainer> cappLib = new ArrayList<IAtomContainer>();
+        ArrayList<IGraphBuildingBlock> cappLib = new ArrayList<IGraphBuildingBlock>();
         DENOPTIMFragment frg6 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         frg6.addAtom(a61);
         frg6.addAP(0, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
-        IAtomContainer f6 = new AtomContainer(frg6);
-        cappLib.add(f6);
+        cappLib.add(frg6);
         
         DENOPTIMFragment frg7 = new DENOPTIMFragment();
         Atom a71 = new Atom("Cl", new Point3d(new double[]{10.0, 1.1, 2.2}));
         frg7.addAtom(a71);
         frg7.addAP(0, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
-        IAtomContainer f7 = new AtomContainer(frg7);
-        cappLib.add(f7);
+        cappLib.add(frg7);
 
     	HashMap<String,ArrayList<String>> cpMap = new HashMap<String,ArrayList<String>>();
     	ArrayList<String> lst1 = new ArrayList<String>();
@@ -329,7 +323,7 @@ public class FragmentSpaceTest
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
-    	ArrayList<IAtomContainer> lst = 
+    	ArrayList<IGraphBuildingBlock> lst = 
     			FragmentSpace.getFragmentsCompatibleWithTheseAPs(srcAPs);
     	
     	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");

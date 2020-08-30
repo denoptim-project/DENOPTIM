@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.GenUtils;
 
 /**
  * Each attachment point is annotated by the number (position) of the atom
@@ -42,7 +43,7 @@ import denoptim.fragspace.FragmentSpace;
  */
 
 
-public class DENOPTIMAttachmentPoint implements Serializable
+public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 {
 	/**
 	 * Version UID
@@ -135,7 +136,32 @@ public class DENOPTIMAttachmentPoint implements Serializable
         apClass = "";
         
         dirVec = new double[3];
-        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);        
+        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);
+    }
+    
+//------------------------------------------------------------------------------
+  
+    /**
+     * Constructor
+     * @param atomPosNum the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param dirVec the AP direction vector end (the beginning ate the 
+     * coords of the source atom). This must array have 3 entries.
+     */
+    public DENOPTIMAttachmentPoint(int atomPosNum, int atomConnections,
+    		int apConnections, String apRule, int apSubClass, String apClass, 
+    		double[] dirVec)
+    {
+        this.atomPostionNumber = atomPosNum;
+        this.atomConnections = atomConnections;
+        this.apConnections = apConnections;
+        this.apClass = apClass;
+        this.apRule = apRule;
+        this.apSubClass = apSubClass;
+        
+        this.dirVec = new double[3];
+        System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length); 
     }
     
 //------------------------------------------------------------------------------
@@ -281,6 +307,7 @@ public class DENOPTIMAttachmentPoint implements Serializable
 	            	this.dirVec[2] = Double.parseDouble(coord[2]);
 	            }
             }
+            this.apConnections = FragmentSpace.getBondOrderForAPClass(apRule);
 	    } catch (Throwable t) {
 			throw new DENOPTIMException("Cannot construct AP from string '" 
 						+ str + "'");
@@ -669,6 +696,22 @@ public class DENOPTIMAttachmentPoint implements Serializable
     	}
         
     	return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a deep clone of this attachment point
+     * @return a dep clone
+     */
+    
+    public DENOPTIMAttachmentPoint clone()
+    {
+    	DENOPTIMAttachmentPoint clAP = new DENOPTIMAttachmentPoint(
+    			atomPostionNumber, atomConnections, apConnections, apRule,
+    			apSubClass, apClass, dirVec);
+        
+        return clAP;
     }
 
 //------------------------------------------------------------------------------

@@ -32,7 +32,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GenUtils;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMTemplate;
+import denoptim.molecule.IGraphBuildingBlock;
 
 
 /**
@@ -398,7 +400,21 @@ public class FragmentSpaceParameters
             throw new DENOPTIMException(msg);
         }
     }
+    
+//------------------------------------------------------------------------------
 
+    // temp method to convert all IAtomContainers into Fragments that implement
+    // the IGraphBuildingBlock interface
+    
+    private static ArrayList<IGraphBuildingBlock> tempMEthod(ArrayList<IAtomContainer> iacs) throws DENOPTIMException
+    {
+    	ArrayList<IGraphBuildingBlock> list = new ArrayList<IGraphBuildingBlock>();
+    	for (IAtomContainer iac : iacs)
+    	{
+    		list.add(new DENOPTIMFragment(iac));
+    	}
+    	return list;
+    }
 //------------------------------------------------------------------------------
 
     /**
@@ -408,14 +424,21 @@ public class FragmentSpaceParameters
      */
     public static void processParameters() throws DENOPTIMException
     {
-        ArrayList<IAtomContainer> scaffLib = 
-        		DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold");
-        ArrayList<IAtomContainer> fragLib = 
-        		DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment");
-	fragLib.add(DENOPTIMTemplate.getTestTemplate());
-	System.err.println("Added test template to fragment library");
+        ArrayList<IGraphBuildingBlock> scaffLib = tempMEthod(
+                DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold"));
+        //TODO: the read method should deliver building blocks: todo when
+        // we'll know more about file format for templates and other building blocks
         
-        ArrayList<IAtomContainer> cappLib = new ArrayList<IAtomContainer>();
+        ArrayList<IGraphBuildingBlock> fragLib = tempMEthod(
+        DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
+        
+        //TODO: temp code
+        /*
+		fragLib.add(DENOPTIMTemplate.getTestTemplate());
+		System.err.println("Added test template to fragment library");
+	    */
+        
+        ArrayList<IGraphBuildingBlock> cappLib = new ArrayList<IGraphBuildingBlock>();
     	HashMap<String,ArrayList<String>> cpMap = 
     			new HashMap<String,ArrayList<String>>();
     	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
@@ -426,8 +449,8 @@ public class FragmentSpaceParameters
         
         if (cappingLibFile.length() > 0)
         {
-            cappLib = DenoptimIO.readInLibraryOfFragments(cappingLibFile,
-            		"capping group");
+            cappLib = tempMEthod(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
+            		"capping group"));
         }
 
         if (compMatrixFile.length() > 0)

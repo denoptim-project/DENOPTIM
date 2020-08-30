@@ -41,8 +41,10 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.GenUtils;
@@ -50,7 +52,7 @@ import denoptim.utils.GenUtils;
 
 /**
  * Tool to build three-dimensional (3D) tree-like molecular structures from 
- * 3D fragments using the geometrical information contained in the fragment's
+ * 3D fragments using the geometric information contained in the fragment's
  * attachment points.
  *
  * @author Marco Foscato 
@@ -66,7 +68,7 @@ public class TreeBuilder3D
     private ArrayList<IAtomContainer> libCap;
 
     /**
-     * The DENOPTIMGraph representation of the current systhem
+     * The DENOPTIMGraph representation of the current system
      */
     private DENOPTIMGraph graph = new DENOPTIMGraph();
 
@@ -119,9 +121,48 @@ public class TreeBuilder3D
 
     public TreeBuilder3D()
     {
-        this.libScaff = FragmentSpace.getScaffoldLibrary();
-        this.libFrag = FragmentSpace.getFragmentLibrary();
-        this.libCap = FragmentSpace.getCappingLibrary();
+    	//TODO: later we'll replace IAtomContainer with IGraphBuildingBlock
+    	
+    	//TODO change this is terrible, we need to work with a list of IBuildingblicks, 
+    	// but for now... this will do
+        this.libScaff = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : FragmentSpace.getScaffoldLibrary())
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		libScaff.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		//TODO deal with templates
+        		libScaff.add(new AtomContainer());
+        	}
+        }
+        this.libFrag = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : FragmentSpace.getFragmentLibrary())
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		libFrag.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		//TODO deal with templates
+        		libFrag.add(new AtomContainer());
+        	}
+        }
+        this.libCap = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : FragmentSpace.getCappingLibrary())
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		libCap.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		//TODO deal with templates, but templates do not fit within
+        		// the concept of capping group, so this should never happen for 
+        		// templates. Yet, other things than templates might need code here
+        		libCap.add(new AtomContainer());
+        	}
+        }
     }
 
 //------------------------------------------------------------------------------

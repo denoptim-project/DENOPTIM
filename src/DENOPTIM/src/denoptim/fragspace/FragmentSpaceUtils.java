@@ -26,6 +26,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.utils.FragmentUtils;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -61,9 +62,8 @@ public class FragmentSpaceUtils
 		}
 		for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
 		{
-		    IAtomContainer frag = FragmentSpace.getFragmentLibrary().get(j);
-		    DENOPTIMFragment dnFrag = new DENOPTIMFragment(frag);
-		    classifyFragment(dnFrag,1,j);
+			IGraphBuildingBlock frag = FragmentSpace.getFragmentLibrary().get(j);
+		    classifyFragment(frag,1,j);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class FragmentSpaceUtils
      * @throws DENOPTIMException
      */
 
-    private static void classifyFragment(DENOPTIMFragment frg, int type, 
+    private static void classifyFragment(IGraphBuildingBlock frg, int type, 
 					    int fragId) throws DENOPTIMException
     {
 		// Classify according to number of APs
@@ -104,7 +104,7 @@ public class FragmentSpaceUtils
 	        FragmentSpace.getMapAPClassesPerFragment().put(fragId,lstAPC);
 	
 		    // Classify according to AP-Classes
-	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = frg.getAllAPs();
+	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = frg.getAPs();
 	
 		    for (int j=0; j<lstAPs.size(); j++)
 		    {

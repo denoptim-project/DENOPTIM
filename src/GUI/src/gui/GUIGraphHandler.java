@@ -85,6 +85,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
@@ -916,7 +917,18 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private void startGraphFromFragSpace()
 	{
-		ArrayList<IAtomContainer> fragLib = FragmentSpace.getScaffoldLibrary();
+		ArrayList<IAtomContainer> fragLib = new  ArrayList<IAtomContainer>();
+        for (IGraphBuildingBlock bb : FragmentSpace.getScaffoldLibrary())
+        {
+        	if (bb instanceof DENOPTIMFragment)
+        	{
+        		fragLib.add((DENOPTIMFragment) bb);
+        	} else
+        	{
+        		//TODO deal with templates and other stuff
+        		fragLib.add(new AtomContainer());
+        	}
+        }
 		if (fragLib.size() == 0)
 		{
 			JOptionPane.showMessageDialog(null,"No fragments in the library",
@@ -1025,7 +1037,18 @@ public class GUIGraphHandler extends GUICardPanel
 		switch (res)
 		{
 			case 0:
-				fragLib = FragmentSpace.getFragmentLibrary();
+				fragLib = new  ArrayList<IAtomContainer>();
+		        for (IGraphBuildingBlock bb : FragmentSpace.getFragmentLibrary())
+		        {
+		        	if (bb instanceof DENOPTIMFragment)
+		        	{
+		        		fragLib.add((DENOPTIMFragment) bb);
+		        	} else
+		        	{
+		        		//TODO deal with templates and other stuff
+		        		fragLib.add(new AtomContainer());
+		        	}
+		        }
 				trgFrgType = 1;
 				break;
 			case 1:
@@ -1033,7 +1056,20 @@ public class GUIGraphHandler extends GUICardPanel
 				trgFrgType = 1;
 				break;
 			case 2:
-				fragLib = FragmentSpace.getCappingLibrary();
+				fragLib = new ArrayList<IAtomContainer>();
+		        for (IGraphBuildingBlock bb : FragmentSpace.getCappingLibrary())
+		        {
+		        	if (bb instanceof DENOPTIMFragment)
+		        	{
+		        		fragLib.add((DENOPTIMFragment) bb);
+		        	} else
+		        	{
+		        		//TODO deal with templates, but templates do not fit within
+		        		// the concept of capping group, so this should never happen for 
+		        		// templates. Yet, other things than templates might need code here
+		        		fragLib.add(new AtomContainer());
+		        	}
+		        }
 				trgFrgType = 2;
 				break;
 			default:
@@ -1170,7 +1206,14 @@ public class GUIGraphHandler extends GUICardPanel
 				IAtomContainer frg = null;
 				try
 				{
-					frg = FragmentSpace.getFragment(1,fragId).clone();
+					IGraphBuildingBlock bb = FragmentSpace.getFragment(1,fragId);
+					if (bb instanceof DENOPTIMFragment)
+					{
+						frg = (DENOPTIMFragment) bb;
+					} else {
+						//TODO deal with templates
+						frg = new AtomContainer();
+					}
 					frg.setProperty(PRESELPROP,apId);
 				}
 				catch (Throwable t)
@@ -1580,11 +1623,12 @@ public class GUIGraphHandler extends GUICardPanel
 				return;
 			}
 			
-			DENOPTIMFragment frag;
+			DENOPTIMFragment frag = null;
 			try {
-				frag = new DENOPTIMFragment(
-						FragmentSpace.getFragment(
-								v.getFragmentType(), v.getMolId()));
+				IGraphBuildingBlock bb = FragmentSpace.getFragment(
+						v.getFragmentType(), v.getMolId());
+				if (bb instanceof DENOPTIMFragment)
+					frag = (DENOPTIMFragment) bb;
 			} catch (DENOPTIMException e) {
 				//e.printStackTrace();
 				return;

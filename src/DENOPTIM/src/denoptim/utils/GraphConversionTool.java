@@ -71,8 +71,23 @@ public class GraphConversionTool
         {
             DENOPTIMVertex vertex = g.getVertexList().get(i);
             molidx = vertex.getMolId();
-            IAtomContainer iac = FragmentSpace.getFragment(
+            IGraphBuildingBlock igbb = FragmentSpace.getFragment(
                                               vertex.getFragmentType(), molidx);
+            IAtomContainer iac = null;
+            if (igbb instanceof DENOPTIMFragment)
+            {
+            	iac = (DENOPTIMFragment) igbb;
+            } else if (igbb instanceof DENOPTIMTemplate) 
+            {
+            	//TODO
+            	System.out.println("This is where some magic will occur... ");
+            	continue;
+            } else {
+            	//The verted does not point to anything that contains molecular fragments
+            	// so we will ignore it here
+            	continue;
+            }
+            
             for (IAtom atm : iac.atoms())
             {
                 atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,
@@ -273,7 +288,7 @@ public class GraphConversionTool
     public static DENOPTIMGraph getGraphFromString(String strGraph, 
 				    boolean useMolInfo) throws DENOPTIMException
     {
-	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
+    	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
         String s1[] = strGraph.split("\\s+");
         int gcode = Integer.parseInt(s1[0]);
         String vStr = s1[1];
@@ -289,16 +304,16 @@ public class GraphConversionTool
         }
         String rStr = "";
         String sStr = "";
-	int beginningOfSymSets = oStr.indexOf("SymmetricSet");
-	if (beginningOfSymSets == -1)
-	{
-	    rStr = oStr;
-	}
-	else
-	{
-            rStr = oStr.substring(0,beginningOfSymSets);
-            sStr = oStr.substring(beginningOfSymSets);
-	}
+		int beginningOfSymSets = oStr.indexOf("SymmetricSet");
+		if (beginningOfSymSets == -1)
+		{
+		    rStr = oStr;
+		}
+		else
+		{
+	            rStr = oStr.substring(0,beginningOfSymSets);
+	            sStr = oStr.substring(beginningOfSymSets);
+		}
 
         // split vertices on the comma
         String s2[] = vStr.split(",");
@@ -320,169 +335,169 @@ public class GraphConversionTool
             int level = Integer.parseInt(s3[3]);
 
             ArrayList<DENOPTIMAttachmentPoint> lstAP;
-	    if (useMolInfo)
-	    {
-                lstAP = FragmentUtils.getAPForFragment(molid, fragtype);
-	    }
-	    else
-	    {
-		// NB: empty list of APs will be updated later when we have 
-		// the edges.
-		lstAP = new ArrayList<DENOPTIMAttachmentPoint>();
-	    }
-
-            DENOPTIMVertex dv = new DENOPTIMVertex(vid, molid, lstAP, fragtype);
-            dv.setLevel(level);
-
-            if (useMolInfo)
-            {
-                IAtomContainer mol = FragmentSpace.getFragment(fragtype,molid);
-                ArrayList<SymmetricSet> simAP = 
-                                        FragmentUtils.getMatchingAP(mol, lstAP);
-                dv.setSymmetricAP(simAP);
-	    }
-	    // NB: we cannot record which APs are symmetric from the string
-	    // representation of a graph without the library of fragments.
-
-            vertices.add(dv);
-        }
-
-        ArrayList<DENOPTIMEdge> edges = new ArrayList<>();
-
-        // split edges on the comma
-        if (eStr.contains(","))
-        {
-            s2 = eStr.split(",");
-            for (int i=0; i<s2.length; i++)
-            {
-                String s4[] = s2[i].split("_");
-                int srcVertex = Integer.parseInt(s4[0]);
-    
-                int srcDAP = Integer.parseInt(s4[1]);
-    
-                int trgVertex = Integer.parseInt(s4[2]);
-    
-                int trgDAP = Integer.parseInt(s4[3]);
-    
-                int btype = Integer.parseInt(s4[4]);
-    
-                DENOPTIMEdge ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
-                                                        trgDAP, btype);
-    
-                //System.err.println("EDGE: " + ne.toString());
-    
-                if (s4.length > 5)
-                {
-                    ne.setSourceReaction(s4[5]);
-                    ne.setTargetReaction(s4[6]);
-                }
-                edges.add(ne);
-            }
-        }
-    
-        // collect Rings
-        ArrayList<DENOPTIMRing> rings = new ArrayList<>();
-        String[] sr2 = rStr.split("DENOPTIMRing ");
-        for (int i=1; i<sr2.length; i++)
-        {
-            String sr4 = sr2[i];
-            String sr5 = sr4.substring(sr4.indexOf("=") + 1).trim();
-            sr5 = sr5.substring(1,sr5.length()-2);
-            String[] sr6 = sr5.split(",\\s");
-            ArrayList<DENOPTIMVertex> lstVerteces = new ArrayList<>();
-            for (int j=0; j<sr6.length; j++)
-            {
-                String sr7[] = sr6[j].split("_");
-
-                // vertex id
-                int vid = Integer.parseInt(sr7[0]);
-
-                for (DENOPTIMVertex v : vertices)
-                {
-                    if (v.getVertexId() == vid)
-                    {
-                        lstVerteces.add(v);
-                        break;
-                    }
-                }
-            }
-
-            DENOPTIMRing r = new DENOPTIMRing(lstVerteces);
-            rings.add(r);
-        }
-
-	// collect map of symmetric vertices
-        ArrayList<SymmetricSet> symSets = new ArrayList<SymmetricSet>();
-        String[] ss8 = sStr.split("SymmetricSet ");
-        for (int i=1; i<ss8.length; i++)
-        {
-            String ss4 = ss8[i];
-            String ss5 = ss4.substring(ss4.indexOf("=") + 1).trim();
-            ss5 = ss5.substring(1,ss5.length()-2);
-            String[] ss6 = ss5.split(",\\s");
-            ArrayList<Integer> symVrtxIds = new ArrayList<Integer>();
-            for (int j=0; j<ss6.length; j++)
-            {
-		symVrtxIds.add(Integer.parseInt(ss6[j]));
-            }
-
-            SymmetricSet ss = new SymmetricSet(symVrtxIds);
-            symSets.add(ss);
-        }
-
-        DENOPTIMGraph g = new DENOPTIMGraph(vertices, edges, rings, symSets);
-
-        // update the attachment point info based on the edge info
-        for (int i=0; i<edges.size(); i++)
-        {
-            DENOPTIMEdge edge = edges.get(i);
-            int bndOrder = edge.getBondType();
-            int srcvid = edge.getSourceVertex();
-            int trgvid = edge.getTargetVertex();
-            int iA = edge.getSourceDAP();
-            int iB = edge.getTargetDAP();
-
-            //System.err.println("iA=" + iA + " " + "iB=" + iB);
-
-            DENOPTIMVertex src = g.getVertexWithId(srcvid);
-            DENOPTIMVertex trg = g.getVertexWithId(trgvid);
-
-	    // Here we fill the vertices with placeholders. This because
-	    // we want to be able to define a graph even without knowing
-	    // anything on the actual fragment contained in the vertex.
-	    // In particular, the list of APs is not knowable from the 
-	    // DENOPTIMGraph without the corresponding library of fragments.
-            if (!useMolInfo)
-            {
-		ArrayList<DENOPTIMAttachmentPoint> lstAPsrc = 
-						      src.getAttachmentPoints();
-		if (lstAPsrc.size() <= iA)
-		{
-		    while (lstAPsrc.size() <= (iA+1))
+		    if (useMolInfo)
 		    {
-		        lstAPsrc.add(new DENOPTIMAttachmentPoint());
+	                lstAP = FragmentUtils.getAPForFragment(molid, fragtype);
 		    }
-		}
-		src.setAttachmentPoints(lstAPsrc);
-                ArrayList<DENOPTIMAttachmentPoint> lstAPtrg =
-                                                      trg.getAttachmentPoints();
-                if (lstAPtrg.size() <= iB)
-                {
-                    while (lstAPtrg.size() <= (iB+1))
-                    {
-                        lstAPtrg.add(new DENOPTIMAttachmentPoint());
-                    }
-                }
-		trg.setAttachmentPoints(lstAPtrg);
-            }
-
-            DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);
-            DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
-	    if (useMolInfo)
-            {
-                apA.updateAPConnections(-bndOrder);
-                apB.updateAPConnections(-bndOrder);
-	    }
+		    else
+		    {
+				// NB: empty list of APs will be updated later when we have 
+				// the edges.
+				lstAP = new ArrayList<DENOPTIMAttachmentPoint>();
+		    }
+	
+	            DENOPTIMVertex dv = new DENOPTIMVertex(vid, molid, lstAP, fragtype);
+	            dv.setLevel(level);
+	
+	            if (useMolInfo)
+	            {
+	                IGraphBuildingBlock mol = FragmentSpace.getFragment(fragtype,molid);
+	                ArrayList<SymmetricSet> simAP = 
+	                                        FragmentUtils.getMatchingAP(mol, lstAP);
+	                dv.setSymmetricAP(simAP);
+			    }
+			    // NB: we cannot record which APs are symmetric from the string
+			    // representation of a graph without the library of fragments.
+	
+	            vertices.add(dv);
+	        }
+	
+	        ArrayList<DENOPTIMEdge> edges = new ArrayList<>();
+	
+	        // split edges on the comma
+	        if (eStr.contains(","))
+	        {
+	            s2 = eStr.split(",");
+	            for (int i=0; i<s2.length; i++)
+	            {
+	                String s4[] = s2[i].split("_");
+	                int srcVertex = Integer.parseInt(s4[0]);
+	    
+	                int srcDAP = Integer.parseInt(s4[1]);
+	    
+	                int trgVertex = Integer.parseInt(s4[2]);
+	    
+	                int trgDAP = Integer.parseInt(s4[3]);
+	    
+	                int btype = Integer.parseInt(s4[4]);
+	    
+	                DENOPTIMEdge ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
+	                                                        trgDAP, btype);
+	    
+	                //System.err.println("EDGE: " + ne.toString());
+	    
+	                if (s4.length > 5)
+	                {
+	                    ne.setSourceReaction(s4[5]);
+	                    ne.setTargetReaction(s4[6]);
+	                }
+	                edges.add(ne);
+	            }
+	        }
+	    
+	        // collect Rings
+	        ArrayList<DENOPTIMRing> rings = new ArrayList<>();
+	        String[] sr2 = rStr.split("DENOPTIMRing ");
+	        for (int i=1; i<sr2.length; i++)
+	        {
+	            String sr4 = sr2[i];
+	            String sr5 = sr4.substring(sr4.indexOf("=") + 1).trim();
+	            sr5 = sr5.substring(1,sr5.length()-2);
+	            String[] sr6 = sr5.split(",\\s");
+	            ArrayList<DENOPTIMVertex> lstVerteces = new ArrayList<>();
+	            for (int j=0; j<sr6.length; j++)
+	            {
+	                String sr7[] = sr6[j].split("_");
+	
+	                // vertex id
+	                int vid = Integer.parseInt(sr7[0]);
+	
+	                for (DENOPTIMVertex v : vertices)
+	                {
+	                    if (v.getVertexId() == vid)
+	                    {
+	                        lstVerteces.add(v);
+	                        break;
+	                    }
+	                }
+	            }
+	
+	            DENOPTIMRing r = new DENOPTIMRing(lstVerteces);
+	            rings.add(r);
+	        }
+	
+		// collect map of symmetric vertices
+	        ArrayList<SymmetricSet> symSets = new ArrayList<SymmetricSet>();
+	        String[] ss8 = sStr.split("SymmetricSet ");
+	        for (int i=1; i<ss8.length; i++)
+	        {
+	            String ss4 = ss8[i];
+	            String ss5 = ss4.substring(ss4.indexOf("=") + 1).trim();
+	            ss5 = ss5.substring(1,ss5.length()-2);
+	            String[] ss6 = ss5.split(",\\s");
+	            ArrayList<Integer> symVrtxIds = new ArrayList<Integer>();
+	            for (int j=0; j<ss6.length; j++)
+	            {
+			symVrtxIds.add(Integer.parseInt(ss6[j]));
+	            }
+	
+	            SymmetricSet ss = new SymmetricSet(symVrtxIds);
+	            symSets.add(ss);
+	        }
+	
+	        DENOPTIMGraph g = new DENOPTIMGraph(vertices, edges, rings, symSets);
+	
+	        // update the attachment point info based on the edge info
+	        for (int i=0; i<edges.size(); i++)
+	        {
+	            DENOPTIMEdge edge = edges.get(i);
+	            int bndOrder = edge.getBondType();
+	            int srcvid = edge.getSourceVertex();
+	            int trgvid = edge.getTargetVertex();
+	            int iA = edge.getSourceDAP();
+	            int iB = edge.getTargetDAP();
+	
+	            //System.err.println("iA=" + iA + " " + "iB=" + iB);
+	
+	            DENOPTIMVertex src = g.getVertexWithId(srcvid);
+	            DENOPTIMVertex trg = g.getVertexWithId(trgvid);
+	
+		    // Here we fill the vertices with placeholders. This because
+		    // we want to be able to define a graph even without knowing
+		    // anything on the actual fragment contained in the vertex.
+		    // In particular, the list of APs is not knowable from the 
+		    // DENOPTIMGraph without the corresponding library of fragments.
+	            if (!useMolInfo)
+	            {
+			ArrayList<DENOPTIMAttachmentPoint> lstAPsrc = 
+							      src.getAttachmentPoints();
+			if (lstAPsrc.size() <= iA)
+			{
+			    while (lstAPsrc.size() <= (iA+1))
+			    {
+			        lstAPsrc.add(new DENOPTIMAttachmentPoint());
+			    }
+			}
+			src.setAttachmentPoints(lstAPsrc);
+	                ArrayList<DENOPTIMAttachmentPoint> lstAPtrg =
+	                                                      trg.getAttachmentPoints();
+	                if (lstAPtrg.size() <= iB)
+	                {
+	                    while (lstAPtrg.size() <= (iB+1))
+	                    {
+	                        lstAPtrg.add(new DENOPTIMAttachmentPoint());
+	                    }
+	                }
+			trg.setAttachmentPoints(lstAPtrg);
+	            }
+	
+	            DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);
+	            DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
+		    if (useMolInfo)
+	            {
+	                apA.updateAPConnections(-bndOrder);
+	                apB.updateAPConnections(-bndOrder);
+		    }
         }
 
         // update bond type of chords

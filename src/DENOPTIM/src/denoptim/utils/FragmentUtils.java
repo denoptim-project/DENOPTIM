@@ -33,7 +33,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertexAtom;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 
 import java.util.logging.Level;
@@ -102,26 +104,22 @@ public class FragmentUtils
      * @param idx the index of the fragment in the library (0-based).
      * @param ftype the type of fragment (scaffold, fragment, capping group)
      * as integer
-     * @return a list of <code>DENOPTIMAttachmentPoint</code>
+     * @return a clone of the list of <code>DENOPTIMAttachmentPoint</code>
      * @throws DENOPTIMException
      */
 
     public static  ArrayList<DENOPTIMAttachmentPoint> getAPForFragment(int idx ,
                                              int ftype) throws DENOPTIMException
     {
-        IAtomContainer mol = FragmentSpace.getFragment(ftype,idx);
-        ArrayList<DENOPTIMAttachmentPoint> lstAP = new ArrayList<>();
-		try
-		{
-		    lstAP = getAPForFragment(mol);
-		}
-		catch (DENOPTIMException de)
-		{
-		    String msg = de.getMessage() + " Check " + getFragmentType(ftype)
-	                       + " MolID: " + (idx+1);
-		    throw new DENOPTIMException(msg);
-		}
-        return lstAP;
+    	IGraphBuildingBlock mol = FragmentSpace.getFragment(ftype,idx);
+    	ArrayList<DENOPTIMAttachmentPoint> origList = mol.getAPs();
+    	ArrayList<DENOPTIMAttachmentPoint> clList = 
+    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	for (int i=0; i<origList.size(); i++)
+    	{
+    		clList.add(origList.get(i).clone());
+    	}
+        return clList;
     }
 
 //------------------------------------------------------------------------------
@@ -137,10 +135,12 @@ public class FragmentUtils
      */
 
     public static ArrayList<DENOPTIMAttachmentPoint> getAPForFragment(
-                                    IAtomContainer mol) throws DENOPTIMException
+    		IAtomContainer mol) throws DENOPTIMException
     { 
 
 //TODO: need to update in relation with DENOPTIMFragment class methods
+// probably this is all superfluous and should be replaced by translator in DENOPTIMFragment
+// or we just keep this one
 
         String apProperty = mol.getProperty(DENOPTIMConstants.APTAG).toString();
         String[] tmpArr = apProperty.split("\\s+");
@@ -180,9 +180,8 @@ public class FragmentUtils
         }
         else
         {
-
             // if ap-class information is available 
-	    // we can ignore the ATTACHMENT_POINT info
+        	// we can ignore the ATTACHMENT_POINT info
             HashMap<Integer, Integer> apMap = new HashMap<>();
 
             for (int j=0; j<tmpArr.length; j++)
@@ -420,6 +419,21 @@ public class FragmentUtils
                 throw new DENOPTIMException(msg);
             }
         }        
+    }
+    
+//------------------------------------------------------------------------------
+    
+    //TODO: check if we really need this.
+    
+    public static ArrayList<SymmetricSet> getMatchingAP(IGraphBuildingBlock bb,
+            ArrayList<DENOPTIMAttachmentPoint> daps)
+    {
+    	if (bb instanceof DENOPTIMFragment)
+    	{
+    		IAtomContainer iac = (DENOPTIMFragment) bb;
+    		return getMatchingAP(iac, daps);
+    	}
+    	return null;
     }
 
 //------------------------------------------------------------------------------

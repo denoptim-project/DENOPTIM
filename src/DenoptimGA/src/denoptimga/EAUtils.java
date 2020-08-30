@@ -48,10 +48,12 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
@@ -689,20 +691,19 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    // pools fragments based on the number of attachment points
-    // done in order to make selection of fragments based on #APs easier
-    protected static void poolFragments(ArrayList<IAtomContainer> mols)
+    /**
+     * pools fragments based on the number of attachment points.
+     * This is done in order to make selection of fragments based on #APs easier
+     * @param bbs the list of building blocks to analyze
+     */
+    protected static void poolFragments(ArrayList<IGraphBuildingBlock> bbs)
     {
         fragmentPool = new HashMap<>();
 
-        for (int i=0; i<mols.size(); i++)
+        for (int i=0; i<bbs.size(); i++)
         {
-            IAtomContainer mol = mols.get(i);
-            String apProperty = 
-			    mol.getProperty(DENOPTIMConstants.APTAG).toString();
-            String[] tmpArr = apProperty.split("\\s+");
-
-            int len = tmpArr.length;
+            IGraphBuildingBlock bb = bbs.get(i);
+            int len = bb.getAPCount();
             if (len != 0)
                 updatePool(fragmentPool, len, i);
         }
@@ -711,19 +712,18 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * For each fragment, collect the reactions it is involved in
+     * For each building block collect the reactions it is involved in
      * @param mols
      */
 
-    protected static void poolAPClasses(ArrayList<IAtomContainer> mols)
+    protected static void poolAPClasses(ArrayList<IGraphBuildingBlock> bbs)
     {
         lstFragmentClass = new HashMap<>();
-        for (int i=0; i<mols.size(); i++)
+        for (int i=0; i<bbs.size(); i++)
         {
-            IAtomContainer mol = mols.get(i);
-            ArrayList<String> lstRcn = FragmentUtils.getClassesForFragment(mol);
+        	IGraphBuildingBlock bb = bbs.get(i);
+            ArrayList<String> lstRcn = bb.getAllAPClassess();
             lstFragmentClass.put(i, lstRcn);
-            //System.err.println(i + " " + lstRcn.toString());
         }
     }
 
@@ -774,13 +774,13 @@ public class EAUtils
     protected static int selectRandomReactionFragment(ArrayList<String> lstReac)
     {
         // find fragments with compatible reactions
-        ArrayList<IAtomContainer> mols = FragmentSpace.getFragmentLibrary();
+        ArrayList<IGraphBuildingBlock> mols = FragmentSpace.getFragmentLibrary();
         ArrayList<Integer> lstMols = new ArrayList<>();
 
         for (int i=0; i<mols.size(); i++)
         {
-            IAtomContainer mol = mols.get(i);
-            ArrayList<String> mReac = FragmentUtils.getClassesForFragment(mol);
+        	IGraphBuildingBlock mol = mols.get(i);
+            ArrayList<String> mReac = mol.getAllAPClassess();
             // check reaction compatibility
             for (int j=0; j<mReac.size(); j++)
             {
@@ -932,7 +932,11 @@ public class EAUtils
         new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(),scafIdx,scafAP, 0);
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
-        IAtomContainer mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
+        
+        //TODO: here again the issue of not having the symmetry set in the graph building blocks
+        // it would be best to just ass the symmetric set to the building blocks, maybe. Consider it
+        
+        IGraphBuildingBlock mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
         // identify the symmetric APs if any for this fragment vertex
         ArrayList<SymmetricSet> simAP = FragmentUtils.getMatchingAP(mol,scafAP);
         scafVertex.setSymmetricAP(simAP);
@@ -1017,8 +1021,8 @@ public class EAUtils
         ArrayList<Integer> lstFragIdx = new ArrayList<>();
         for (int i=0; i<FragmentSpace.getCappingLibrary().size(); i++)
         {
-            IAtomContainer mol = FragmentSpace.getCappingLibrary().get(i);
-            ArrayList<String> lstRcn = FragmentUtils.getClassesForFragment(mol);
+        	IGraphBuildingBlock mol = FragmentSpace.getCappingLibrary().get(i);
+            ArrayList<String> lstRcn = mol.getAllAPClassess();
             if (lstRcn.contains(cmpReac))
                 lstFragIdx.add(i);
         }
@@ -1451,16 +1455,18 @@ public class EAUtils
         {
             int id = vlst.get(i).getMolId();
             int ftype = vlst.get(i).getFragmentType();
-            //System.err.println("FTYPE: " + ftype);
-            if (ftype == 1)
-                n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
-                            FragmentSpace.getFragmentLibrary().get(id));
-            else if (ftype == 2)
-                n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
-                            FragmentSpace.getCappingLibrary().get(id));
-            else
-                n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
-                            FragmentSpace.getScaffoldLibrary().get(id));
+            IGraphBuildingBlock bb = null;
+			try {
+				bb = FragmentSpace.getFragment(ftype, id);
+				if (bb instanceof DENOPTIMFragment)
+	            {
+	            	n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
+	            			(DENOPTIMFragment) bb);
+	            }
+			} catch (DENOPTIMException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         return n;
     }
@@ -1479,8 +1485,20 @@ public class EAUtils
     protected static boolean isFragmentAdditionPossible(DENOPTIMGraph molGraph,
             int fragIdx, int nfrags)
     {
-        int n = nfrags * DENOPTIMMoleculeUtils.getHeavyAtomCount(
-                        FragmentSpace.getFragmentLibrary().get(fragIdx));
+    	int n = 0;
+    	IGraphBuildingBlock bb = null;
+		try {
+			//WARNING: assumption that the building block is a proper fragment
+			bb = FragmentSpace.getFragment(1, fragIdx);
+			if (bb instanceof DENOPTIMFragment)
+            {
+            	n = nfrags * DENOPTIMMoleculeUtils.getHeavyAtomCount(
+            			(DENOPTIMFragment) bb);
+            }
+		} catch (DENOPTIMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         int natom = getNumberOfAtoms(molGraph);
 

@@ -44,6 +44,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
@@ -51,7 +52,7 @@ import denoptim.utils.TaskUtils;
 
 
 /**
- * Generates all combinatons of fragments by means of asyncronous threads.
+ * Generates all combinators of fragments by means of asynchronous threads.
  * Combinations are produced by layer of fragments on root graphs, which can
  * be single fragments (i.e., scaffolds) or complex graphs.
  *
@@ -802,8 +803,11 @@ public class CombinatorialExplorerByLayer
         // as for DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);
 
+        //TODO and again here we would benefit from having the building block return
+        // the list of symmetry matching APs
+        
         // identify the symmetric APs if any for this fragment vertex
-        IAtomContainer mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
+        IGraphBuildingBlock mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
         ArrayList<SymmetricSet> symAPs = 
                                        FragmentUtils.getMatchingAP(mol,scafAPs);
         scafVertex.setSymmetricAP(symAPs);

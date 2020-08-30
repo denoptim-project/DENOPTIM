@@ -17,7 +17,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
  * The degree to which the interior graph can vary is dependent on the contract level of the Template, which can be
  * provided upon instantiation.
  */
-public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
+public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, IGraphBuildingBlock {
 
     /**
      * interior graph of the template that can be constrained in various ways depending on the
@@ -68,7 +68,7 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
     public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs() {
         return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
     }
-
+    
     public static DENOPTIMTemplate getTestTemplate() {
 	DENOPTIMTemplate template = new DENOPTIMTemplate();
         Atom anAtom = new Atom("C");
@@ -93,5 +93,39 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer {
         contractLevel = 2;
         return isFrozen;
     }
+
+    /**
+     * Returns the list of attachment points
+     * @return the list of APs
+     */
+    public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
+    {
+    	//TODO: probably this will change
+        return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
+    }
+    
+    /**
+     * Returns the list of attachment points
+     * @return the list of APs
+     */
+    public DENOPTIMTemplate clone()
+    {
+    	//TODO: implement deep cloning. Now it just returns the original ;-)
+    	return this;
+    }
+
+
+    //TODO
+	public ArrayList<String> getAllAPClassess() {
+		ArrayList<String> l = new ArrayList<String>();
+		l.add("templateAPClass");
+		return l;
+	}
+
+
+	//TODO
+	public int getAPCount() {
+		return 1;
+	}
 }
 

@@ -40,6 +40,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 import denoptim.task.ProcessHandler;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -339,7 +340,10 @@ public class GraphBuildingTask implements Callable
     
                 DENOPTIMVertex trgVrtx = new DENOPTIMVertex(tVId, tFId, tFAPs,
                                                                          tFTyp);
-                IAtomContainer mol = FragmentSpace.getFragment(tFTyp, tFId);
+                
+                //TODO: here again we would benefit from having the building block return tha list of
+                // symmetry matching aps
+                IGraphBuildingBlock mol = FragmentSpace.getFragment(tFTyp, tFId);
                 ArrayList<SymmetricSet> symAPs =
                                         FragmentUtils.getMatchingAP(mol, tFAPs);
                 trgVrtx.setSymmetricAP(symAPs);

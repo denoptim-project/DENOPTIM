@@ -21,11 +21,15 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -38,7 +42,7 @@ import denoptim.fragspace.FragmentSpace;
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
+public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, IGraphBuildingBlock
 { 	
     /**
 	 * Version UID
@@ -248,10 +252,24 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns all APs currently defined.
+     * Returns all attachment points currently defined on this fragment.
      * @return the list of APs
      */
     
+	public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
+	{
+		return getCurrentAPs();
+	}
+	
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns all APs currently defined.
+     * @return the list of APs
+     * @deprecated: use getAPs()
+     */
+    
+	@Deprecated
     public ArrayList<DENOPTIMAttachmentPoint> getAllAPs()
     {
     	return getCurrentAPs();
@@ -506,6 +524,26 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
         this.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
     }
 
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns a deep copy of this fragments.
+     * @throws CloneNotSupportedException 
+     */
+    public DENOPTIMFragment clone()
+    {
+    	DENOPTIMFragment frg = new DENOPTIMFragment();
+		try {
+			frg = new DENOPTIMFragment(super.clone());
+		} catch (Exception e) {
+			//TODO: by-pass by copying all atoms, bonds and el. containers,
+			// atom properties and atomcontainer properties (what else?)
+			String msg = "Failed to clone DENOPTIMFragment! " +frg;
+			System.err.println(msg);
+		}
+		return frg;
+    }
+    
 //-----------------------------------------------------------------------------
     
 }

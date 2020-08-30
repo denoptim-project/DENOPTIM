@@ -23,22 +23,18 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
-import denoptim.utils.GraphUtils;
 
 
 /**
@@ -52,15 +48,15 @@ public class FragmentSpace
     /**
      * Data structure containing the molecular representation of
      * building blocks: scaffolds section - fragments that can be used
-     * as seed to grow a new molecule.
+     * as seeds to grow a new molecule.
      */
-    private static ArrayList<IAtomContainer> scaffoldLib = null;
+    private static ArrayList<IGraphBuildingBlock> scaffoldLib = null;
 
     /**
      * Data structure containing the molecular representation of
      * building blocks: fragment section - fragments for general use
      */
-    private static ArrayList<IAtomContainer> fragmentLib = null;
+    private static ArrayList<IGraphBuildingBlock> fragmentLib = null;
 
     /**
      * Data structure containing the molecular representation of
@@ -68,7 +64,7 @@ public class FragmentSpace
      * one attachment point used to saturate unused attachment
      * points on a graph.
      */
-    private static ArrayList<IAtomContainer> cappingLib = null;
+    private static ArrayList<IGraphBuildingBlock> cappingLib = null;
 
     /**
      * Data structure that stored the true entries of the 
@@ -127,7 +123,7 @@ public class FragmentSpace
     protected static boolean apClassBasedApproch = false;
     
     /**
-     * Flag signaling that this fragment space was built and validated
+     * Flag signalling that this fragment space was built and validated
      */
     private static boolean isValid = false;
     
@@ -152,9 +148,10 @@ public class FragmentSpace
      * be left unused neither capped. 
      * @throws DENOPTIMException
      */
-    public static void defineFragmentSpace(ArrayList<IAtomContainer> scaffLib,
-    		ArrayList<IAtomContainer> fragLib,
-    		ArrayList<IAtomContainer> cappLib) throws DENOPTIMException
+    public static void defineFragmentSpace(
+    		ArrayList<IGraphBuildingBlock> scaffLib,
+    		ArrayList<IGraphBuildingBlock> fragLib,
+    		ArrayList<IGraphBuildingBlock> cappLib) throws DENOPTIMException
     {
     	setScaffoldLibrary(scaffLib);
     	setFragmentLibrary(fragLib);
@@ -186,9 +183,10 @@ public class FragmentSpace
      * @param rcCpMap the APClass compatibility matrix for ring closures.
      * @throws DENOPTIMException
      */
-    public static void defineFragmentSpace(ArrayList<IAtomContainer> scaffLib,
-    		ArrayList<IAtomContainer> fragLib,
-    		ArrayList<IAtomContainer> cappLib,
+    public static void defineFragmentSpace(
+    		ArrayList<IGraphBuildingBlock> scaffLib,
+    		ArrayList<IGraphBuildingBlock> fragLib,
+    		ArrayList<IGraphBuildingBlock> cappLib,
     		HashMap<String,ArrayList<String>> cpMap,
     		HashMap<String,Integer> boMap,
     		HashMap<String,String> capMap,
@@ -316,9 +314,9 @@ public class FragmentSpace
     	String cls = null;
     	try
     	{
-        	DENOPTIMFragment frg = new DENOPTIMFragment(FragmentSpace.getFragment(
-        			apId.getVertexMolType(), apId.getVertexMolId()));
-    		cls = frg.getCurrentAPs().get(apId.getApId()).getAPClass();
+    		IGraphBuildingBlock frg = FragmentSpace.getFragment(
+        			apId.getVertexMolType(), apId.getVertexMolId());
+    		cls = frg.getAPs().get(apId.getApId()).getAPClass();
     	}
     	catch (Throwable t)
     	{
@@ -331,102 +329,95 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Return the molecular representation of a fragment of any type (i.e., 
-     * scaffold, fragment, capping).
-     * @param frgTyp the type of fragment - selects the library from which the
-     * fragment is taken
+     * Return a clone of the requested building block  
+     * @param frgTyp the type of building block. This basically selects the 
+     * sub library from which the building block is taken: 0 for scaffold, 1 for
+     * standard fragment, 2 for capping group.
      * @param molIdx the index (0-based) of the fragment in
      * the proper library, which is defied by the type of fragment
      * @return the molecular representation of the fragment
      * @throws DENOPTIMException
      */
 
-    public static IAtomContainer getFragment(int frgTyp, int molIdx) 
+    public static IGraphBuildingBlock getFragment(int frgTyp, int molIdx) 
 						        throws DENOPTIMException
     {
-	String msg = "";
-	if (fragmentLib == null || scaffoldLib == null || cappingLib == null)
-	{
-	    msg = "Cannot retrieve fragments before defining the FragmentSpace";
-	    throw new DENOPTIMException(msg);
-	}
-        IAtomContainer iac = null, molClone = null;
-	switch (frgTyp)
-	{
-	case 0:
-	    if (molIdx < scaffoldLib.size())
-	    {
-		iac = scaffoldLib.get(molIdx);	
-	    }
-	    else
-	    {
-		msg = "Mismatch between scaffold molIdx and size of the library"
-		      + ". MolId: " + molIdx + " FragType: " + frgTyp;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-		throw new DENOPTIMException(msg);
-	    }
-	    break;
-	case 1:
-            if (molIdx < fragmentLib.size())
-            {
-                iac = fragmentLib.get(molIdx);
-            }
-            else
-            {
-                msg = "Mismatch between fragment molIdx and size of the library"
-                      + ". MolId: " + molIdx + " FragType: " + frgTyp;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
-            }
-	    break;
-        case 2:
-            if (molIdx < cappingLib.size())
-            {
-                iac = cappingLib.get(molIdx);
-            }
-            else
-            {
-                msg = "Mismatch between capping group molIdx and size of the "
-                      + "library. MolId: " + molIdx + " FragType: " + frgTyp;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
-            }
-            break;
-	default:
-	    msg = "Unknown type of fragment '" + frgTyp + "'.";
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-	    throw new DENOPTIMException(msg);
-	}
-	
-        try
-        {
-            molClone = (IAtomContainer) iac.clone();
-        }
-        catch (CloneNotSupportedException cnse)
-        {
-            throw new DENOPTIMException(cnse);
-        }
-
-        return molClone;
+		String msg = "";
+		if (fragmentLib == null || scaffoldLib == null || cappingLib == null)
+		{
+		    msg = "Cannot retrieve fragments before defining the FragmentSpace";
+		    throw new DENOPTIMException(msg);
+		}
+		IGraphBuildingBlock ibb = null, molClone = null;
+		switch (frgTyp)
+		{
+			case 0:
+			    if (molIdx < scaffoldLib.size())
+			    {
+			    	ibb = scaffoldLib.get(molIdx);	
+			    }
+			    else
+			    {
+				msg = "Mismatch between scaffold molIdx and size of the library"
+				      + ". MolId: " + molIdx + " FragType: " + frgTyp;
+		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+				throw new DENOPTIMException(msg);
+			    }
+			    break;
+			case 1:
+		            if (molIdx < fragmentLib.size())
+		            {
+		                ibb = fragmentLib.get(molIdx);
+		            }
+		            else
+		            {
+		                msg = "Mismatch between fragment molIdx and size of the "
+		                		+ "library" + ". MolId: " + molIdx 
+		                		+ " FragType: " + frgTyp;
+		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+		                throw new DENOPTIMException(msg);
+		            }
+			    break;
+			case 2:
+		            if (molIdx < cappingLib.size())
+		            {
+		                ibb = cappingLib.get(molIdx);
+		            }
+		            else
+		            {
+		                msg = "Mismatch between capping group molIdx and size "
+		                		+ "of the library. MolId: " + molIdx 
+		                		+ " FragType: " + frgTyp;
+		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+		                throw new DENOPTIMException(msg);
+		            }
+		            break;
+			default:
+			    msg = "Unknown type of fragment '" + frgTyp + "'.";
+		            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+			    throw new DENOPTIMException(msg);
+		}
+		
+        return ibb.clone();
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<IAtomContainer> getScaffoldLibrary()
+    public static ArrayList<IGraphBuildingBlock> getScaffoldLibrary()
     {
         return scaffoldLib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<IAtomContainer> getFragmentLibrary()
+    public static ArrayList<IGraphBuildingBlock> getFragmentLibrary()
     {
         return fragmentLib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<IAtomContainer> getCappingLibrary()
+    public static ArrayList<IGraphBuildingBlock> getCappingLibrary()
     {
         return cappingLib;
     }
@@ -707,12 +698,13 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
     
     /**
-     * Searches for all fragments that are compatible with the given list of APs.
+     * Searches for all building blocks that are compatible with the given 
+     * list of APs.
      * @param srcAPs the identifiers of APs meant to hold any of the desired
      * fragments.
      * @return a list of fragments.
      */
-    public static ArrayList<IAtomContainer> getFragmentsCompatibleWithTheseAPs(
+    public static ArrayList<IGraphBuildingBlock> getFragmentsCompatibleWithTheseAPs(
     		ArrayList<IdFragmentAndAP> srcAPs)
     {
     	// First we get all possible APs on any fragment
@@ -727,7 +719,8 @@ public class FragmentSpace
 		}
 		
 		// Then we pack-up the selected list of fragments
-		ArrayList<IAtomContainer> compatFrags = new ArrayList<IAtomContainer>();
+		ArrayList<IGraphBuildingBlock> compatFrags = 
+				new ArrayList<IGraphBuildingBlock>();
 		for (Integer fid : compatFragIds)
 		{
 			try {
@@ -882,7 +875,7 @@ public class FragmentSpace
      * a fixed probability that is not dependent on the distance from the
      * root of the DENOPTIMGraph (i.e. the level).
      * @param apClass the attachment point class
-     * @return the constrained value of the symmetric subtitution probability
+     * @return the constrained value of the symmetric substitution probability
      * (0.0 - 1.0).
      */
 
@@ -893,21 +886,21 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static void setScaffoldLibrary(ArrayList<IAtomContainer> lib)
+    public static void setScaffoldLibrary(ArrayList<IGraphBuildingBlock> lib)
     {
 	scaffoldLib = lib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static void setFragmentLibrary(ArrayList<IAtomContainer> lib)
+    public static void setFragmentLibrary(ArrayList<IGraphBuildingBlock> lib)
     {
 	fragmentLib = lib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static void setCappingLibrary(ArrayList<IAtomContainer> lib)
+    public static void setCappingLibrary(ArrayList<IGraphBuildingBlock> lib)
     {
 	cappingLib = lib;
     }

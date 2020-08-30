@@ -43,6 +43,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DummyAtomHandler;
@@ -451,18 +452,12 @@ public class DENOPTIM3DMoleculeBuilder
         // Get the incoming fragment
         DENOPTIMVertex inVtx = graph.getVertexWithId(edge.getTargetVertex());
         int idInVrx = inVtx.getVertexId();
-        IAtomContainer inFragOri = FragmentSpace.getFragment(
-						        inVtx.getFragmentType(),
-                                                              inVtx.getMolId());
-        IAtomContainer inFrag = new AtomContainer();
-        try
-        {
-            inFrag = (IAtomContainer) inFragOri.clone();
-        }
-        catch (Throwable t)
-        {
-            throw new DENOPTIMException(t);
-        }
+        IGraphBuildingBlock inFragOri = FragmentSpace.getFragment(
+						        inVtx.getFragmentType(), inVtx.getMolId());
+        
+        //TODO here we'll need to dig inside the DENOPTIMTemplate
+        
+        IAtomContainer inFrag = (IAtomContainer) inFragOri.clone();
 
 	if (debug)
 	{
