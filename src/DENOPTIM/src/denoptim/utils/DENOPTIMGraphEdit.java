@@ -76,7 +76,7 @@ public class DENOPTIMGraphEdit
     private final String GRPLAB = "IncomingGraph=";
 
     /**
-     * String identifying the task of replacing a chiled and all its branch
+     * String identifying the task of replacing a child and all its branch
      * with a given sub-graph
      */
     public static final String REPLACECHILD = "REPLACECHILD";
@@ -147,14 +147,14 @@ public class DENOPTIMGraphEdit
         {
             String str = line.substring(startOfVrt+VRTLAB.length());
             str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
-	    str = str.trim();
+            str = str.trim();
             String strPrts[] = str.split("_");
             // vertex id
-	    int vid = -1;
-	    if (!strPrts[0].equals("*"))
-	    {
-		vid = Integer.parseInt(strPrts[0]);
-	    }
+		    int vid = -1;
+		    if (!strPrts[0].equals("*"))
+		    {
+		    	vid = Integer.parseInt(strPrts[0]);
+		    }
             // molid
             int molid = -1;
             if (!strPrts[1].equals("*"))
@@ -216,17 +216,17 @@ public class DENOPTIMGraphEdit
             {
                 btype = Integer.parseInt(strPrts[4]);
             }
-	    this.focusEdge = new DENOPTIMEdge(srcVertex, trgVertex, srcAP,
-                                                                 trgAP, btype);
-	    if (strPrts.length > 5)
-	    {
-	        //source APClass
-	        String srcAPC = "*";
-	        if (!strPrts[5].equals("*"))
-	        {
-                    srcAPC = strPrts[5];
-                }
-		this.focusEdge.setSourceReaction(srcAPC);
+		    this.focusEdge = new DENOPTIMEdge(srcVertex, trgVertex, srcAP,
+		    		trgAP, btype);
+		    if (strPrts.length > 5)
+		    {
+		        //source APClass
+		        String srcAPC = "*";
+		        if (!strPrts[5].equals("*"))
+		        {
+		        	srcAPC = strPrts[5];
+		        }
+		        this.focusEdge.setSourceReaction(srcAPC);
 
                 //target APClass
                 String trgAPC = "*";
@@ -234,8 +234,8 @@ public class DENOPTIMGraphEdit
                 {
                     trgAPC = strPrts[6];
                 }
-		this.focusEdge.setTargetReaction(trgAPC);
-	    }
+			this.focusEdge.setTargetReaction(trgAPC);
+		    }
         }
 
         if (-1 != startOfAP)
@@ -262,19 +262,19 @@ public class DENOPTIMGraphEdit
             {
                 fconn = Integer.parseInt(strPrts[2]);
             }
-	    DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(apid,conn,
-								        fconn);
-	    if (strPrts.length > 3)
-	    {
+            DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(apid,
+            		conn,fconn);
+		    if (strPrts.length > 3)
+		    {
                 // AP class
                 String apClass = "*";
                 if (!strPrts[3].equals("*"))
                 {
                     apClass = strPrts[3];
                 }
-		ap.setAPClass(apClass);
-	    }
-	    this.focusAP = ap;
+                ap.setAPClass(apClass);
+		    }
+		    this.focusAP = ap;
         }
 
         if (-1 != startOfGraph)
@@ -283,7 +283,7 @@ public class DENOPTIMGraphEdit
             str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
             str = str.trim();
             this.incomingGraph = GraphConversionTool.getGraphFromString(str);
-	}
+        }
     }
 
 //------------------------------------------------------------------------------

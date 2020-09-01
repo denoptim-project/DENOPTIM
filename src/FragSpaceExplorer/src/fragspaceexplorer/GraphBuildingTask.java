@@ -31,7 +31,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
@@ -341,7 +340,7 @@ public class GraphBuildingTask implements Callable
                 DENOPTIMVertex trgVrtx = new DENOPTIMVertex(tVId, tFId, tFAPs,
                                                                          tFTyp);
                 
-                //TODO: here again we would benefit from having the building block return tha list of
+                //TODO: here again we would benefit from having the building block return the list of
                 // symmetry matching aps
                 IGraphBuildingBlock mol = FragmentSpace.getFragment(tFTyp, tFId);
                 ArrayList<SymmetricSet> symAPs =

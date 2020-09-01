@@ -940,6 +940,13 @@ public class EAUtils
         // identify the symmetric APs if any for this fragment vertex
         ArrayList<SymmetricSet> simAP = FragmentUtils.getMatchingAP(mol,scafAP);
         scafVertex.setSymmetricAP(simAP);
+        
+        
+        //TODO: did we pick a template? Then, we'll have to deal with it.
+        // as we can pick a template in other graph operations, the dealing of the template
+        // should be a public method or something that can be called from elsewhere
+        
+        
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
         molGraph.setMsg("NEW");

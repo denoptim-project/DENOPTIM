@@ -2797,19 +2797,19 @@ if(debug)
             ArrayList<DENOPTIMGraphEdit> edits, boolean symmetry, int verbosity)
                                                         throws DENOPTIMException
     {
-	//Make sure there is no clash with vertex IDs
-	int maxId = graph.getMaxVertexId();
-	if (vertexCounter.get() <= maxId)
-	{
-	    try
-	    {
-	        resetUniqueVertexCounter(maxId+1);
-	    }
-	    catch (Throwable t)
-	    {
-		maxId = vertexCounter.getAndIncrement();
-	    }
-	}
+		//Make sure there is no clash with vertex IDs
+		int maxId = graph.getMaxVertexId();
+		if (vertexCounter.get() <= maxId)
+		{
+		    try
+		    {
+		        resetUniqueVertexCounter(maxId+1);
+		    }
+		    catch (Throwable t)
+		    {
+			maxId = vertexCounter.getAndIncrement();
+		    }
+		}
 
         DENOPTIMGraph modGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(graph);
         for (DENOPTIMGraphEdit edit : edits)
@@ -2832,16 +2832,16 @@ if(debug)
                         int wantedApID = edit.getFocusEdge().getSourceDAP();
                         String wantedApCl = 
                                         edit.getFocusEdge().getSourceReaction();
-			ArrayList<Integer> symmUnqChilds = 
-                                                 modGraph.getChildVertices(pid);
-			if (symmetry)
-			{
-			    removeSymmetryRedundantIds(modGraph,symmUnqChilds);
-			}
+						ArrayList<Integer> symmUnqChilds = 
+								modGraph.getChildVertices(pid);
+						if (symmetry)
+						{
+						    removeSymmetryRedundantIds(modGraph,symmUnqChilds);
+						}
                         for (int cid : symmUnqChilds)
                         {
                             // Apply the query on the src AP on the focus vertex
-                            // -1 id the wildcar
+                            // -1 id the wildcard
                             int srcApId = modGraph.getEdgeWithParent(
                                                             cid).getSourceDAP();
                             if (wantedApID>-1 && wantedApID != srcApId)
