@@ -57,7 +57,7 @@ public class FragmentUtils
     /**
      * For the given molecule find the compatible list of classes (reactions)
      * with respect to its attachment points. 
-     * Deprecated: use DEOPTIMFragment.getAllAPClassess()
+     * @Deprecated: use DEOPTIMFragment.getAllAPClassess()
      * @param mol
      * @return list of classes (reactions)
      */
@@ -423,7 +423,7 @@ public class FragmentUtils
     
 //------------------------------------------------------------------------------
     
-    //TODO: check if we really need this.
+    //TODO: check if we really need this. Possibly get rid of it
     
     public static ArrayList<SymmetricSet> getMatchingAP(IGraphBuildingBlock bb,
             ArrayList<DENOPTIMAttachmentPoint> daps)

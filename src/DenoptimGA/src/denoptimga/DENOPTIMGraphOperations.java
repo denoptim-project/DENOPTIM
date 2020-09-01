@@ -508,7 +508,7 @@ public class DENOPTIMGraphOperations
      * @param molGraph
      * @param curVertex the vertex to which a fragment is to be attached
      * @param dapIdx index of the AP at which the fragment is to be attached
-     * @param chosenFrgAndAp indecex identifying the incoming fragment
+     * @param chosenFrgAndAp index identifying the incoming fragment
      * @return the id of the new vertex created
      * @throws DENOPTIMException
      */

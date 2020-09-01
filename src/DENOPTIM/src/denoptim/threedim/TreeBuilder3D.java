@@ -678,6 +678,9 @@ public class TreeBuilder3D
      * @return the <code>AtomContainer</code> representation
      * @throws DENOPTIMException
      */
+    
+    //TODO: this method is redundant and should be replaced by appropriate 
+    // functionality from the FragmentSpace
 
     public IAtomContainer getFragment(int ftype, int molidx)
                                                         throws DENOPTIMException
