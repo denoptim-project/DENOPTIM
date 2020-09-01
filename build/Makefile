@@ -1,4 +1,5 @@
 .PHONY: clean all lib
+SHELL := /bin/bash ## ubuntu uses dash by default
 
 JC := javac
 JFLAGS := -encoding utf-8 -d .
@@ -31,6 +32,7 @@ clean:
 SetupBRICS.jar: lib/cdk-1.4.19.jar
 CheckpointReader.jar: FragSpaceExplorer.jar
 UpdateUID.jar: lib/cdk-1.4.19.jar lib/commons-cli-1.3.1.jar
+GUI.jar: DenoptimGA.jar
 ##
 
 ALLDEPS := $(filter-out lib/DENOPTIM.jar,$(wildcard lib/*.jar))
