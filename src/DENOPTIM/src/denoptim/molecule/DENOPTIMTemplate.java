@@ -79,6 +79,9 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
         apList.add(new DENOPTIMAttachmentPoint(0, 1, 1));
         template.interiorGraph.addVertex(new DENOPTIMVertex(-1, 1, apList, 1));
         template.setProperty(DENOPTIMConstants.APCVTAG, "1#c0:0:1.1%0.0%0.0");
+        
+        //TODO fill with stuff
+        
         // Add attachment points as property
         return template;
     }
