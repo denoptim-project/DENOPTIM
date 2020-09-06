@@ -41,19 +41,17 @@ public interface IGraphBuildingBlock extends Cloneable
      * @return a deep copy.
      */
     public IGraphBuildingBlock clone();
+
     
-    //TODO: add a method that would return the list of APs that are related to the given list of APs
-    // by internal topological symmetry definition.
-    
-    //public ArrayList<SymmetricSet> getSymmetricAPSets(ArrayList<DENOPTIMAttachmentPoint> queryAPs);
-    
-    /*
-     The method would be meant to replace the following 2 lines that are currently found in a few places.
-     
-        IAtomContainer mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
-        ArrayList<SymmetricSet> symAPs = FragmentUtils.getMatchingAP(mol,scafAPs);
-    
+    /**
+     * Returns the list of attachment points that can be treated the same
+     * way (i.e., symmetry-related attachment points). 
+     * Note that symmetry, in this context, is
+     * a defined by the topological environment surrounding the attachment 
+     * point and has nothing to to with symmetry in three-dimensional space.  
+     * @return the list of symmetry-related attachment points.
      */
+    public ArrayList<SymmetricSet> getSymmetricAPsSets();
     
     //TODO: we might also need get/set Property like for the AtomContainer
     

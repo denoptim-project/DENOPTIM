@@ -433,10 +433,10 @@ public class FragmentSpaceParameters
         DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
         
         //TODO: temp code
-        
+        /*
 		fragLib.add(DENOPTIMTemplate.getTestTemplate());
 		System.err.println("Added test template to fragment library");
-	    
+	    */
         
         ArrayList<IGraphBuildingBlock> cappLib = new ArrayList<IGraphBuildingBlock>();
     	HashMap<String,ArrayList<String>> cpMap = 

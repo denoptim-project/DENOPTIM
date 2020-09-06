@@ -404,7 +404,7 @@ public class FragmentUtils
                 //System.err.println(dp.toString());
                 if (dp.getAtomPositionNumber() == atomidx)
                 {
-                    l += dp.getAPConnections();
+                    l += dp.getFreeConnections();
                 }
             }
 
@@ -458,19 +458,20 @@ public class FragmentUtils
             Integer i1 = i;
             lst.add(i1);
 
-	    boolean alreadyFound = false;
-	    for (SymmetricSet previousSS : lstCompatible)
-	    {
-		if (previousSS.contains(i1))
-		{
-		    alreadyFound = true;
-		    break;
-		}
-	    }
-	    if (alreadyFound)
-	    {
-		continue;
-	    }
+    	    boolean alreadyFound = false;
+    	    for (SymmetricSet previousSS : lstCompatible)
+    	    {
+        		if (previousSS.contains(i1))
+        		{
+        		    alreadyFound = true;
+        		    break;
+        		}
+    	    }
+    	    
+    	    if (alreadyFound)
+    	    {
+    	        continue;
+    	    }
 
             DENOPTIMAttachmentPoint d1 = daps.get(i);
             for (int j=i+1; j<daps.size(); j++)
@@ -489,9 +490,9 @@ public class FragmentUtils
             }
 
             if (lst.size() > 1)
-	    {
+    	    {
                 lstCompatible.add(new SymmetricSet(lst));
-	    }
+    	    }
         }
 
         return lstCompatible;

@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,11 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	 * Version UID
 	 */
 	private static final long serialVersionUID = -3680248393705286640L;
+	
+	/**
+	 * Index used to keep the order in a list of attachment points
+	 */
+	private int id;
 
 	/**
 	 * The index of the source atom in the atom list of the fragment (0-based)
@@ -58,12 +64,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     /**
      * the original number of connections of this atom
      */
-    private int atomConnections; 
+    private int totalConnections; 
 
     /**
      * the current free connections
      */
-    private int apConnections; 
+    private int freeConnections; 
     
     /**
      * The cutting rule that generated this AP (the main APClass)
@@ -95,9 +101,10 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     public DENOPTIMAttachmentPoint()
     {
         atomPostionNumber = 0;
-        atomConnections = 0;
-        apConnections = 0;
+        totalConnections = 0;
+        freeConnections = 0;
         apClass = "";
+        id = FragmentSpace.apID.getAndIncrement();
     }
 
 //------------------------------------------------------------------------------
@@ -112,9 +119,10 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
                                                             int m_apConnections)
     {
         atomPostionNumber = m_AtomPosNum;
-        atomConnections = m_atomConnections;
-        apConnections = m_apConnections;
+        totalConnections = m_atomConnections;
+        freeConnections = m_apConnections;
         apClass = "";
+        id = FragmentSpace.apID.getAndIncrement();
     }
     
 //------------------------------------------------------------------------------
@@ -131,12 +139,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
                                         int m_apConnections, double[] m_dirVec)
     {
         atomPostionNumber = m_AtomPosNum;
-        atomConnections = m_atomConnections;
-        apConnections = m_apConnections;
+        totalConnections = m_atomConnections;
+        freeConnections = m_apConnections;
         apClass = "";
-        
         dirVec = new double[3];
         System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);
+        id = FragmentSpace.apID.getAndIncrement();
     }
     
 //------------------------------------------------------------------------------
@@ -154,14 +162,14 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     		double[] dirVec)
     {
         this.atomPostionNumber = atomPosNum;
-        this.atomConnections = atomConnections;
-        this.apConnections = apConnections;
+        this.totalConnections = atomConnections;
+        this.freeConnections = apConnections;
         this.apClass = apClass;
         this.apRule = apRule;
         this.apSubClass = apSubClass;
-        
         this.dirVec = new double[3];
         System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length); 
+        id = FragmentSpace.apID.getAndIncrement();
     }
     
 //------------------------------------------------------------------------------
@@ -193,6 +201,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     			throw new DENOPTIMException("Unknown format for string "
     					+ "representation of DENOPTIMAttachmentPoint");
     	}
+    	id = FragmentSpace.apID.getAndIncrement();
     }
 //-----------------------------------------------------------------------------
 	
@@ -221,12 +230,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     				this.atomPostionNumber = Integer.parseInt(parts[1]);
     				break;
     				
-    			case "atomConnections":
-					this.atomConnections = Integer.parseInt(parts[1]);
+    			case "totalConnections":
+					this.totalConnections = Integer.parseInt(parts[1]);
 					break;
 				
-    			case "apConnections":
-    				this.apConnections = Integer.parseInt(parts[1]);
+    			case "freeConnections":
+    				this.freeConnections = Integer.parseInt(parts[1]);
 					break;
 				
     			case "apRule":
@@ -307,7 +316,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	            	this.dirVec[2] = Double.parseDouble(coord[2]);
 	            }
             }
-            this.apConnections = FragmentSpace.getBondOrderForAPClass(apRule);
+            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule);
 	    } catch (Throwable t) {
 			throw new DENOPTIMException("Cannot construct AP from string '" 
 						+ str + "'");
@@ -317,15 +326,26 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
+     * Returns a unique integer that is used to sort list of attachment points.
+     * This index follows the order in which attachment points were generated.
+     */
+    public int getID()
+    {
+        return id;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Return the total number of connections that can be generated by this AP.
      * This practically corresponds to the max valence this AP can occupy.
      * This is useful for attachment points that do not follow
      * the APClass-based formalism.
      * @return the max number of connections
      */
-    public int getAtmConnections()
+    public int getTotalConnections()
     {
-    	return atomConnections;
+    	return totalConnections;
     }    
 
 //------------------------------------------------------------------------------
@@ -337,9 +357,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * the APClass-based formalism.
      * @return the current free connections associated with the atom
      */
-    public int getAPConnections()
+    public int getFreeConnections()
     {
-        return apConnections;
+        return freeConnections;
     }
 
 //------------------------------------------------------------------------------
@@ -375,9 +395,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * the APClass-based formalism.
      * @param m_apConnections
      */
-    public void setAPConnections(int m_apConnections)
+    public void setFreeConnections(int m_freeConnections)
     {
-        apConnections = m_apConnections;
+        freeConnections = m_freeConnections;
     }
     
 //------------------------------------------------------------------------------
@@ -507,9 +527,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * Resets the connections of this AP. Makes all connections free.
      */
 
-    public void resetAPConnections()
+    public void resetFreeConnections()
     {
-        setAPConnections(atomConnections);
+        setFreeConnections(totalConnections);
     }
 
 //------------------------------------------------------------------------------
@@ -518,9 +538,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * Change the number of free connections by the given delta.
      * @param delta the amount of change.
      */
-    public void updateAPConnections(int delta)
+    public void updateFreeConnections(int delta)
     {
-        apConnections = apConnections + delta;
+        freeConnections = freeConnections + delta;
     }
 
 //------------------------------------------------------------------------------
@@ -532,7 +552,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 
     public boolean isAvailable()
     {
-        return apConnections > 0;
+        return freeConnections > 0;
     }
 
 //------------------------------------------------------------------------------
@@ -547,14 +567,34 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     * Compares this and another attachment points based on their unique 
+     * identifier. This is done to retail the order of attachment points when
+     * regenerating AP lists multiple times.
+     * @param other the attachment point to compare this with.
+     * @return an integer that can be used by a comparator
+     */
+    public int compareTo(DENOPTIMAttachmentPoint other)
+    {
+        if (this.getID() > other.getID()) {
+            return +1;
+        } else if (this.getID() < other.getID()) {
+            return -1;
+        } else {
+            return 0;
+        }   
+    }
+    
+//------------------------------------------------------------------------------
     
     /**
-     * Compare this and given attachment point. This method defines how
+     * Compares this and given attachment point. This method defines how
      * DENOPTIMAttachmentPoint are sorted.
      * @param other
      * @return an integer that can be used by a comparator.
      */
-    public int compareTo(DENOPTIMAttachmentPoint other)
+    public int comparePropertiesTo(DENOPTIMAttachmentPoint other)
     {
         final int BEFORE = -1;
         final int EQUAL = 0;
@@ -639,12 +679,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     		return false;
     	}
     	
-    	if (this.getAtmConnections() != other.getAtmConnections())
+    	if (this.getTotalConnections() != other.getTotalConnections())
     	{
     		return false;
     	}
 
-    	if (this.getAPConnections() != other.getAPConnections())
+    	if (this.getFreeConnections() != other.getFreeConnections())
     	{
     		return false;
     	}
@@ -708,7 +748,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     public DENOPTIMAttachmentPoint clone()
     {
     	DENOPTIMAttachmentPoint clAP = new DENOPTIMAttachmentPoint(
-    			atomPostionNumber, atomConnections, apConnections, apRule,
+    			atomPostionNumber, totalConnections, freeConnections, apRule,
     			apSubClass, apClass, dirVec);
         
         return clAP;
@@ -762,8 +802,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     {
     	Map<String,Object> pars = new HashMap<String,Object>();
     	pars.put("atomPostionNumber",atomPostionNumber);
-    	pars.put("atomConnections",atomConnections);
-    	pars.put("apConnections",apConnections);
+    	pars.put("totalConnections",totalConnections);
+    	pars.put("freeConnections",freeConnections);
     	if (apClass != null)
     	{
         	pars.put("apRule",apRule);

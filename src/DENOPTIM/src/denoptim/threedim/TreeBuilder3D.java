@@ -225,8 +225,8 @@ public class TreeBuilder3D
             DENOPTIMAttachmentPoint ap = rootVrtx.getAttachmentPoints().get(i);
             // For first vertex the atomPositionNumber remains the same
             int atmPos = ap.getAtomPositionNumber();
-            int connNum = ap.getAtmConnections();
-            int apConn = ap.getAPConnections();
+            int connNum = ap.getTotalConnections();
+            int apConn = ap.getFreeConnections();
             String apCls = ap.getAPClass();
             double[] pt = ap.getDirectionVector();
 
@@ -599,8 +599,8 @@ public class TreeBuilder3D
             DENOPTIMAttachmentPoint oriAP = inVtx.getAttachmentPoints().get(i);
             // For vertices other than the first AtomPositionNumber in mol
             int atmPos = oriAP.getAtomPositionNumber() + preNumAtms;
-            int connNum = oriAP.getAtmConnections();
-            int apConn = oriAP.getAPConnections();
+            int connNum = oriAP.getTotalConnections();
+            int apConn = oriAP.getFreeConnections();
             String apCls = oriAP.getAPClass();
             Point3d pt = allApsAsPt3D.get(i);
 

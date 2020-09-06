@@ -130,5 +130,14 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
 	public int getAPCount() {
 		return 1;
 	}
+
+
+    @Override
+    public ArrayList<SymmetricSet> getSymmetricAPsSets()
+    {
+        // TODO Now this returns an empty list, but it will have to detect
+        // the symmetric sets in the underlying graph
+        return new ArrayList<SymmetricSet>();
+    }
 }
 

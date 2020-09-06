@@ -51,11 +51,6 @@ public class ChainLink implements Cloneable, Serializable
      */
     private int apRight;
 
-    /**
-     * Total number of APs on this link
-     */
-    private int numAPs;
-
 
 //-----------------------------------------------------------------------------
 
@@ -130,14 +125,26 @@ public class ChainLink implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
+     * Returns a deep-clone
+     * @return a deep-clone
+     */
+    public ChainLink clone()
+    {
+        ChainLink c = new ChainLink(molID, ftype, apLeft, apRight);
+        return c;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
      * @return the string representation of this ChainLink
      */
 
     public String toString()
     {
-	String str = " ChainLink[molID: " + molID + ", ftype: " + ftype
+        String str = " ChainLink[molID: " + molID + ", ftype: " + ftype
 		      + ", apLeft: " + apLeft + ", apRight: " + apRight + "]";
-	return str;
+        return str;
     }
 
 //-----------------------------------------------------------------------------

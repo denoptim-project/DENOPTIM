@@ -34,6 +34,7 @@ import org.openscience.cdk.interfaces.IBond;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.FragmentUtils;
 
 /**
  * Class representing a continuously connected portion of molecular object
@@ -48,6 +49,17 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
 	 * Version UID
 	 */
 	private static final long serialVersionUID = 4415462924969433010L;
+	
+	/**
+	 * List of Attachment points
+	 */
+	private ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+	        new ArrayList<DENOPTIMAttachmentPoint> ();
+	
+	/**
+	 * Flag notifying the need to update the list of APs
+	 */
+	private boolean apListNeddsToBeUpdated = false;
 
 //-----------------------------------------------------------------------------
 
@@ -162,6 +174,8 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     	}
         
         srcAtm.setProperty(DENOPTIMConstants.APTAG, apList);
+
+        apListNeddsToBeUpdated = true;
     }
 
 //-----------------------------------------------------------------------------
@@ -542,6 +556,23 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
 			System.err.println(msg);
 		}
 		return frg;
+    }
+    
+//-----------------------------------------------------------------------------
+   
+    /**
+     * Returns the list of attachment points that can be treated the same
+     * way (i.e., symmetry-related attachment points). 
+     * Note that symmetry, in this context, is
+     * a defined by the topological environment surrounding the attachment 
+     * point and has nothing to to with symmetry in three-dimensional space.  
+     * @return the list of symmetry-related attachment points.
+     */
+    public ArrayList<SymmetricSet> getSymmetricAPsSets()
+    {
+        ArrayList<SymmetricSet> symAPs = FragmentUtils.getMatchingAP(
+                (IAtomContainer) this, this.getCurrentAPs());
+        return symAPs;
     }
     
 //-----------------------------------------------------------------------------

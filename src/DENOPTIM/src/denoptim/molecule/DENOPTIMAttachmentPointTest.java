@@ -54,7 +54,7 @@ public class DENOPTIMAttachmentPointTest
 
     	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
     	ap.setAPClass(APCLASS);
-    	ap.setAPConnections(APCONN);
+    	ap.setFreeConnections(APCONN);
     	ap.setAtomPositionNumber(ATMID);
     	ap.setDirectionVector(DIRVEC);
     	
@@ -78,7 +78,7 @@ public class DENOPTIMAttachmentPointTest
 
     	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
     	ap.setAPClass(APCLASS);
-    	ap.setAPConnections(APCONN);
+    	ap.setFreeConnections(APCONN);
     	ap.setAtomPositionNumber(ATMID);
     	
     	String str2 = ap.getSingleAPStringSDF(true);

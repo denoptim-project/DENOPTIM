@@ -25,6 +25,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import com.hp.hpl.jena.graph.GraphUtil;
+
 import java.io.Serializable;
 
 import denoptim.exception.DENOPTIMException;
@@ -122,6 +125,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         gVertices = new ArrayList<>();
         gEdges = new ArrayList<>();
         gRings = new ArrayList<>();
+        closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
         localMsg = "";
     }
@@ -942,12 +946,76 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-//TODO: define whether this is a shallow or deep copy... might return a shallow
-// copy. Have a look at DenoptimIO.deepCopy method
+    /**
+     * Returns a deep-copy of this graph. The IDs are not changed, so you might
+     * want to renumber the graph with {@link GraphUtil.renumberVerticesGetMap}.
+     */
     @Override
-    public Object clone() throws CloneNotSupportedException
+    public DENOPTIMGraph clone()
     {
-        return super.clone();
+        // When cloning the VertedID remains the same so we'll have two 
+        // deep-copies of the same vertex having the same VertexID
+        ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex vOrig : gVertices)
+        {
+            DENOPTIMVertex vClone = vOrig.clone();
+            for (int i=0; i<vOrig.getAttachmentPoints().size(); i++)
+            {
+                DENOPTIMAttachmentPoint origAp = 
+                        vOrig.getAttachmentPoints().get(i);
+                DENOPTIMAttachmentPoint cloneAp = 
+                        vClone.getAttachmentPoints().get(i);
+                cloneAp.setFreeConnections(origAp.getFreeConnections());
+            }
+            vClone.setLevel(vOrig.getLevel());
+            cListVrtx.add(vClone);
+        }
+        
+        // Only primitives inside the edges, so it's just fine
+        ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<DENOPTIMEdge>();
+        for (DENOPTIMEdge e : gEdges)
+        {
+            cListEdges.add(e.clone());
+        }
+        
+        DENOPTIMGraph clone = new DENOPTIMGraph(cListVrtx, cListEdges);
+        
+        // Copy the list but using the references to the cloned vertexes
+        ArrayList<DENOPTIMRing> cListRings = new ArrayList<DENOPTIMRing>();
+        for (DENOPTIMRing ring : gRings)
+        {
+            DENOPTIMRing cRing = new DENOPTIMRing();
+            for (int iv=0; iv<ring.getSize(); iv++)
+            {
+                DENOPTIMVertex origVrtx = ring.getVertexAtPosition(iv);
+                cRing.addVertex(
+                        clone.getVertexWithId(origVrtx.getVertexId()));
+            }
+            cListRings.add(cRing);
+        }
+        clone.setRings(cListRings);
+        
+        // The cheinLinks are made of primitives, so it's just fine
+        ArrayList<ClosableChain> cListClosableChains = 
+                new ArrayList<ClosableChain>();
+        for (ClosableChain cc : closableChains)
+        {
+            cListClosableChains.add(cc.clone());
+        }
+        clone.setCandidateClosableChains(cListClosableChains);
+        
+        // Each "set" is a list of Integer, but SymmetricSet.clone takes care
+        ArrayList<SymmetricSet> cSymVertices = new  ArrayList<SymmetricSet>();
+        for (SymmetricSet ss : symVertices)
+        {
+            cSymVertices.add(ss.clone());
+        }
+        clone.setSymMap(cSymVertices);
+        
+        clone.setGraphId(graphId);
+        clone.setMsg(localMsg);
+        
+        return clone;
     }
 
 //------------------------------------------------------------------------------

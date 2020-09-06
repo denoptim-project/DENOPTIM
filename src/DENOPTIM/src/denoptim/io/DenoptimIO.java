@@ -74,7 +74,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
-import denoptim.molecule.DENOPTIMTemplate;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -988,6 +987,7 @@ public class DenoptimIO
      * @return a deep copy of an object
      * @throws DENOPTIMException
      */
+    
     public static Object deepCopy(Object oldObj) throws DENOPTIMException
     {
         ObjectOutputStream oos = null;

@@ -20,9 +20,14 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.io.Serializable;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.FragmentUtils;
 
 
 /**
@@ -43,7 +48,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     /*
      * store the integer id associated with the scaffold/fragment/capping
      */
-    private int molId;
+    private int buildingBlockId;
 
     /*
      * attachment points for this Mol
@@ -53,7 +58,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     /*
      * 0:scaffold, 1:fragment, 2:capping group
      */
-    private int fragmentType;
+    private int buildingBlockType;
 
     /*
      * While growing the graph, we associate a level with each vertex where the
@@ -62,8 +67,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     int recursiveLevel;
 
     /*
-     * list of APs that behave in a similar manner when fragments are attached
-     * i.e. mirror the operation performed on symmetric set of APs
+     * list of APs that behave in a similar manner when fragments are attached,
+     * i.e., mirror the operation performed on symmetric set of APs.
      */
     private ArrayList<SymmetricSet> lstSymmAP;
 
@@ -77,23 +82,60 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public DENOPTIMVertex()
     {
-        molId = 0;
+        buildingBlockId = 0;
         lstAP = new ArrayList<>();
         vertexId = 0;
-        fragmentType = 0;
+        buildingBlockType = 0;
         lstSymmAP = new ArrayList<>();
         isRCV = false;
     }
+    
+//------------------------------------------------------------------------------
+
+    public DENOPTIMVertex(int vertexId, int bbId, int bbType)
+    {
+        this.vertexId = vertexId;
+        this.buildingBlockId = bbId;
+        this.buildingBlockType = bbType;
+        IGraphBuildingBlock bb = null;
+        try
+        {
+            bb = FragmentSpace.getFragment(bbType,bbId).clone();
+        } catch (DENOPTIMException e)
+        {
+            e.printStackTrace();
+            String msg = "Fatal error! Cannot continue. " + e.getMessage();
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            System.exit(0);
+        }
+        this.lstAP = new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : bb.getAPs())
+        {
+            this.lstAP.add(ap.clone());
+        }
+        this.lstSymmAP = new ArrayList<SymmetricSet>();
+        for (SymmetricSet ss : bb.getSymmetricAPsSets())
+        {
+            this.lstSymmAP.add(ss.clone());
+        }
+        isRCV = false;
+        if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
+            lstAP.get(0).getAPClass()))
+        {
+            isRCV = true;
+        }
+    }    
 
 //------------------------------------------------------------------------------
 
+    @Deprecated
     public DENOPTIMVertex(int m_vid, int m_molId,
             ArrayList<DENOPTIMAttachmentPoint> m_lstAP, int m_fragmentType)
     {
-        molId = m_molId;
+        buildingBlockId = m_molId;
         lstAP = m_lstAP;
         vertexId = m_vid;
-        fragmentType = m_fragmentType;
+        buildingBlockType = m_fragmentType;
         lstSymmAP = new ArrayList<>();
         isRCV = false;
 		if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
@@ -112,7 +154,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public int getFragmentType()
     {
-        return fragmentType;
+        return buildingBlockType;
     }
 
 //------------------------------------------------------------------------------
@@ -123,14 +165,14 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      */
     public int getMolId()
     {
-        return molId;
+        return buildingBlockId;
     }
 
 //------------------------------------------------------------------------------
 
     public void setMolId(int m_molId)
     {
-        molId = m_molId;
+        buildingBlockId = m_molId;
     }
 
 //------------------------------------------------------------------------------
@@ -180,13 +222,13 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * For the given attachment point index locate the symmetric partners
      * i.e. those with similar environments and class types.
-     * TODO: one day change the name of this method!
-     * @param m_dapidx
+     * @param m_dapidx inded of the attachment point which we want to get
+     * the symmetrically related partners of.
      * @return the list of attachment point IDs, which include 
      * <code>m_dapidx</code> or <code>null</code> if no partners present
      */
 
-    public SymmetricSet getPartners(int m_dapidx)
+    public SymmetricSet getSymmetricAPs(int m_dapidx)
     {
         for (int i=0; i<lstSymmAP.size(); i++)
         {
@@ -254,7 +296,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public void updateAttachmentPoint(int idx, int delta)
     {
-        lstAP.get(idx).updateAPConnections(delta);
+        lstAP.get(idx).updateFreeConnections(delta);
     }
 
 //------------------------------------------------------------------------------
@@ -303,8 +345,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public String toString()
     {
         StringBuilder sb = new StringBuilder(64);
-        sb.append(vertexId).append("_").append((molId+1)).append("_").
-                    append(fragmentType).append("_").append(recursiveLevel);
+        sb.append(vertexId).append("_").append((buildingBlockId+1)).append("_").
+                    append(buildingBlockType).append("_").append(recursiveLevel);
         return sb.toString();
     }
 
@@ -320,6 +362,19 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         {
             lstAP.clear();
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a deep-copy of this vertex
+     * @return a deep-copy
+     */
+    public DENOPTIMVertex clone()
+    {
+        DENOPTIMVertex c = new DENOPTIMVertex(vertexId, buildingBlockId, 
+                buildingBlockType);
+        return c;
     }
     
 //------------------------------------------------------------------------------

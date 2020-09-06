@@ -411,14 +411,14 @@ public class GraphUtils
                 // update the attachment point of the source vertex
                 int iA = edge.getSourceDAP();
                 DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);
-                apA.updateAPConnections(bndOrder);
+                apA.updateFreeConnections(bndOrder);
 
 
                 // update the attachment point of the target vertex
                 DENOPTIMVertex trg = g.getVertexWithId(cvid);
                 int iB = edge.getTargetDAP();
                 DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
-                apB.updateAPConnections(bndOrder);
+                apB.updateFreeConnections(bndOrder);
 
                 pvid = vid;
                 eid = j;
@@ -774,8 +774,8 @@ public class GraphUtils
             edge.setTargetReaction(trgRcn);
 
             // update the attachment point info
-            dap_A.updateAPConnections(-bndOrder); // decrement the connections
-            dap_B.updateAPConnections(-bndOrder); // decrement the connections
+            dap_A.updateFreeConnections(-bndOrder); // decrement the connections
+            dap_B.updateFreeConnections(-bndOrder); // decrement the connections
 
             return edge;
         }
@@ -1474,86 +1474,6 @@ public class GraphUtils
             }
         }
 
-
-/*
-TODO del if not useful
-        //TODO this code is taken mostry from UpdateUID class. need a toolbox
-        //somewhere in DENOPTIM to do the task of accessing a file with lock
-
-        // Later a synchronized method has been introduced: evaluate whether
-        // to use the lock or the synchronized approach.
-
-        File file1 = new File(rccIndexFile);
-        RandomAccessFile rafile1 = null;
-        FileChannel channel1 = null;
-        FileLock lock1 = null;
-        try
-        {
-            rafile1 = new RandomAccessFile(file1, "rw");
-            channel1 = rafile1.getChannel();
-
-            int nTry = 0;
-            while (true)
-            {
-                try
-                {
-                    lock1 = channel1.tryLock();
-                    if (lock1 != null)
-                        break;
-//TODO: maybe something missing here: check
-                }
-                catch (OverlappingFileLockException e)
-                {
-                    nTry++;
-                }
-            }
-
-            // read file
-            for (String line; (line = rafile1.readLine()) != null;)
-            {
-                if (line.trim().length() == 0)
-                    continue;
-
-                String[] parts = line.trim().split("\\s+");
-                String cID = parts[0];
-                int rccID = Integer.parseInt(parts[1]);
-                String closability = parts[2];
-                if (closability.equals("T"))
-                {
-                    ClosableChain cc = new ClosableChain(line);
-                    int pos = cc.involvesVertex(scaf);
-                    if (pos != -1)
-                    {
-                        clbChains.add(cc);
-                    }
-                }
-            }
-        }
-        catch (Throwable t)
-        {
-             throw new DENOPTIMException(t);
-        }
-        finally
-        {
-            try
-            {
-                if (channel1 != null)
-                    channel1.close();
-                if (lock1 != null && lock1.isValid())
-                    lock1.release();
-            }
-            catch (Throwable t)
-            {
-                t.printStackTrace();
-                throw new DENOPTIMException("GraphUtils is unable to "
-                        + " unlock file '" + rccIndexFile + "'. " + t);
-            }
-        }
-*/
-
-//TODO del
-System.out.println("DB: Found " + clbChains.size() + " for vertex " + scaf); 
-
         return clbChains;
     }
 
@@ -1585,23 +1505,10 @@ System.out.println("DB: Found " + clbChains.size() + " for vertex " + scaf);
             return false;
         }
 
-//TODO del
-System.out.println("Comparing these two graphs: ");
-System.out.println(gA);
-System.out.println(" ");
-System.out.println(gB);
-GenUtils.pause();
-
         ArrayList<Integer> visitedA = new ArrayList<Integer>();
         ArrayList<Integer> visitedB = new ArrayList<Integer>();
         result = exploreGraphs(gA, gB, 0, 0, -1, -1, visitedA, visitedB, 
                                                                 false, false);
-
-//TODO del
-System.out.println("End og equivalentGraphs: "+result);
-System.out.println("VisitedA: "+visitedA);
-System.out.println("VisitedB: "+visitedB);
-GenUtils.pause();
 
         return result;
      }
@@ -1643,18 +1550,8 @@ GenUtils.pause();
     {
         boolean areEqual = false;
 
-//TODO del
-System.out.println("Beginning of 'exploreGraphs'------------------------");
-
         DENOPTIMVertex vA = gA.getVertexAtPosition(cvA);
         DENOPTIMVertex vB = gB.getVertexAtPosition(cvB);
-
-//TODO del
-System.out.println("VA: "+vA+" vB: "+vB);
-System.out.println("VisitedA: "+visitedA);
-System.out.println("VisitedB: "+visitedB);
-System.out.println("backwardA: "+backwardA);
-System.out.println("backwardB: "+backwardB);
 
         ArrayList<Integer> addedToVisitedA = new ArrayList<Integer>();
         ArrayList<Integer> addedToVisitedB = new ArrayList<Integer>();
@@ -1696,8 +1593,6 @@ System.out.println("backwardB: "+backwardB);
         if (ringsOnVA.size() == 1)
         {
             DENOPTIMRing r = ringsOnVA.get(0);
-//TODO del
-System.out.println("vA is head/tail of ring "+vA+" "+r);
             if (vA == r.getHeadVertex())
             {
                 visitedA.add(vA.getVertexId());
@@ -1720,12 +1615,6 @@ System.out.println("vA is head/tail of ring "+vA+" "+r);
                 apVAToBack = gA.getEdgeAtPosition(ceA).getSourceDAP();
             }
             nextDirOnA = true;
-//TODO del
-System.out.println("vA: "+vA);
-System.out.println("edge used: "+gA.getEdgeAtPosition(ceA));
-System.out.println("nextDirOnA: "+nextDirOnA);
-System.out.println("apVAToBack: "+apVAToBack);
-
         }
         else
         {
@@ -1747,8 +1636,6 @@ System.out.println("apVAToBack: "+apVAToBack);
         if (ringsOnVB.size() == 1)
         {
             DENOPTIMRing r = ringsOnVB.get(0);
-//TODO del
-System.out.println("vB is head/tail of ring "+vB+" "+r);
             if (vB == r.getHeadVertex())
             {
                 visitedB.add(vB.getVertexId());
@@ -1771,11 +1658,6 @@ System.out.println("vB is head/tail of ring "+vB+" "+r);
                 apVBToBack = gB.getEdgeAtPosition(ceB).getSourceDAP();
             }
             nextDirOnB = true;
-//TODO del
-System.out.println("vB: "+vB);
-System.out.println("edge used: "+gB.getEdgeAtPosition(ceB));
-System.out.println("nextDirOnB: "+nextDirOnB);
-System.out.println("apVBToBack: "+apVBToBack);
         }
         else
         {
@@ -1796,8 +1678,6 @@ System.out.println("apVBToBack: "+apVBToBack);
         if (visitedA.contains(vA.getVertexId()) && 
             visitedB.contains(vB.getVertexId()))
         {
-//TODO del
-System.out.println("returning true-1: "+visitedA.contains(vA.getVertexId())+" "+visitedB.contains(vB.getVertexId()));
             return true;
         }
         else if ((visitedA.contains(vA.getVertexId()) &&
@@ -1805,8 +1685,6 @@ System.out.println("returning true-1: "+visitedA.contains(vA.getVertexId())+" "+
                  (!visitedA.contains(vA.getVertexId()) &&
                    visitedB.contains(vB.getVertexId())))
         {
-//TODO del
-System.out.println("returning false-1: "+visitedA.contains(vA.getVertexId())+" "+visitedB.contains(vB.getVertexId()));
             return false;
         }
 
@@ -1817,10 +1695,6 @@ System.out.println("returning false-1: "+visitedA.contains(vA.getVertexId())+" "
         addedToVisitedB.add(vB.getVertexId());
 
         // Compare the current fragments
-//TODO del
-System.out.println("Comparing type:  "+vA.getFragmentType()+" "+vB.getFragmentType());
-System.out.println("Comparing molID: "+vA.getMolId()+" "+vB.getMolId());
-System.out.println("Comparing apID:  "+apVAToBack+" "+apVBToBack);
         boolean sameFragTyp = (vA.getFragmentType() == vB.getFragmentType());
         boolean sameGrafID = (vA.getMolId() == vB.getMolId());
         boolean sameAPtoHere = false;
@@ -1836,8 +1710,6 @@ System.out.println("Comparing apID:  "+apVAToBack+" "+apVBToBack);
 
         if (sameFragTyp && sameGrafID && sameAPtoHere)
         {
-//TODO del
-System.out.println("SAME");
             // move to next level
             boolean inner = true;
             for (int nextAp=0; nextAp<vA.getAttachmentPoints().size(); nextAp++)
@@ -1868,10 +1740,7 @@ System.out.println("SAME");
                     else
                     {
                         branchAIsOver = false;
-//TODO del
-System.out.println("Edge-A1: "+e);
                     }
-
                 }
                 if (!nextDirOnA)
                 {
@@ -1884,8 +1753,6 @@ System.out.println("Edge-A1: "+e);
                             nextEdgeAID = ie;
                             nextVrtxAID =  gA.getIndexOfVertex(
                                                         e.getTargetVertex());
-//TODO del
-System.out.println("Edge-A2: "+e);
                             branchAIsOver = false;
                             break;
                         }
@@ -1905,8 +1772,6 @@ System.out.println("Edge-A2: "+e);
                     else
                     {
                         branchBIsOver = false;
-//TODO del
-System.out.println("Edge-B1: "+e);
                     }
                 }
                 if (!nextDirOnB)
@@ -1920,8 +1785,6 @@ System.out.println("Edge-B1: "+e);
                             nextEdgeBID = ie;
                             nextVrtxBID = gB.getIndexOfVertex(
                                                         e.getTargetVertex());
-//TODO del
-System.out.println("Edge-B2: "+e);
                             branchBIsOver = false;
                             break;
                         }
@@ -1930,23 +1793,14 @@ System.out.println("Edge-B2: "+e);
 
                 if (branchAIsOver && branchBIsOver)
                 {
-//TODO del
-System.out.println("Branches are over");
                     return true;
                 }
                 else if ((branchAIsOver && !branchBIsOver) ||
                          (!branchAIsOver && branchBIsOver))
                 {
-//TODO del
-System.out.println("Only one branch is over");
                     return false;
                 }
-
-//TODO del
-System.out.println("Next AP: "+nextAp+" of vertx. "+vA);
-System.out.println("nextVrtxAID: "+nextVrtxAID+" "+nextEdgeAID);
-System.out.println("nextVrtxBID: "+nextVrtxBID+" "+nextEdgeBID);
-
+                
                 inner = exploreGraphs(gA, gB, 
                                       nextVrtxAID, nextVrtxBID,
                                       nextEdgeAID, nextEdgeBID,
@@ -1963,11 +1817,6 @@ System.out.println("nextVrtxBID: "+nextVrtxBID+" "+nextEdgeBID);
                 areEqual = true;
             }
         }
-        else
-        {
-//TODO del
-System.out.println("DIFFERENT");
-        }
 
         if (!areEqual)
         {
@@ -1976,11 +1825,6 @@ System.out.println("DIFFERENT");
             visitedB.removeAll(addedToVisitedB);
         }
 
-
-//TODO del
-System.out.println("End of 'exploreGraphs': "+areEqual+"----------------------------");
-
-        
         return areEqual;
     }
 
@@ -2022,8 +1866,8 @@ System.out.println("End of 'exploreGraphs': "+areEqual+"------------------------
                                                      iA, iB, bndOrder);
 
         // update the attachment point info
-        dap_A.updateAPConnections(-bndOrder); // decrement the connections
-        dap_B.updateAPConnections(-bndOrder); // decrement the connections
+        dap_A.updateFreeConnections(-bndOrder); // decrement the connections
+        dap_B.updateFreeConnections(-bndOrder); // decrement the connections
 
         return edge;
     }
@@ -2051,21 +1895,11 @@ System.out.println("End of 'exploreGraphs': "+areEqual+"------------------------
                                                       int trgAPIdx) 
                                                       throws DENOPTIMException
     {
-//TODO del
-if(debug)
-{
-    System.out.println("Attempt to attach: molID:"+fId+" fTyp:"+fTyp+" apId:"+trgAPIdx);
-    System.out.println("On src AP: "+srcAPIdx+" of vertex "+curVertex);
-}
         // create the new DENOPTIMVertex
         int lvl = curVertex.getLevel();
         int nvid = GraphUtils.getUniqueVertexIndex();
         ArrayList<DENOPTIMAttachmentPoint> fragAPs =
                                  FragmentUtils.getAPForFragment(fId, fTyp);
-
-//TODO del
-if(debug)
-    System.out.println("fragAPs: "+fragAPs);
 
         DENOPTIMVertex fragVertex = new DENOPTIMVertex(nvid,fId,fragAPs,fTyp);
 
@@ -2084,17 +1918,10 @@ if(debug)
                                                 curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint srcAP = curAPs.get(srcAPIdx);
         String srcAPCls = srcAP.getAPClass();
-
-//TODO
-if(debug)
-    System.out.println("trgAPIdx: "+trgAPIdx);
-
+        
         // identify the target AP (on the appended verex)
         DENOPTIMAttachmentPoint trgAP = fragAPs.get(trgAPIdx);
 
-//TODO del
-if(debug)
-    System.out.println("trgAP: "+trgAP);
         String trgAPCls = trgAP.getAPClass();
 
         // create the new DENOPTIMEdge
@@ -2120,8 +1947,8 @@ if(debug)
      * Append a graph (incoming=I) onto another graph (receiving=R).
      * This method ignores symmetry.
      * @param molGraph the receiving graph R, or parent
-     * @param parentVrtx the source vertix of R on which I will be attached
-     * @param parentAPIdx the attachment point on R's verticx to be
+     * @param parentVrtx the source vertex of R on which I will be attached
+     * @param parentAPIdx the attachment point on R's vertex to be
      * used to attach I
      * @param subGraph the incoming graph I, or child
      * @param childVrtx the vertex of I that is to be connected to R
@@ -2254,7 +2081,7 @@ if(debug)
                                      boolean onAllSymmAPs)
                                                         throws DENOPTIMException
     {
-        SymmetricSet symAPs = parentVrtx.getPartners(parentAPIdx);
+        SymmetricSet symAPs = parentVrtx.getSymmetricAPs(parentAPIdx);
         if (symAPs != null && onAllSymmAPs)
         {
             ArrayList<Integer> apLst = symAPs.getList();
@@ -2309,16 +2136,20 @@ if(debug)
                                                     throws DENOPTIMException
     {
         // Clone and renumber the subgraph to ensure uniqueness
-        DENOPTIMGraph sgClone = (DENOPTIMGraph) DenoptimIO.deepCopy(subGraph);
+        DENOPTIMGraph sgClone = subGraph.clone();
+        
+        //DENOPTIMGraph sgClone = (DENOPTIMGraph) DenoptimIO.deepCopy(subGraph);
         GraphUtils.renumberGraphVertices(sgClone);
-
+               
         // Make the connection between molGraph and subGraph
         DENOPTIMVertex cvClone = sgClone.getVertexAtPosition(
                             subGraph.getIndexOfVertex(childVrtx.getVertexId()));
+
         DENOPTIMAttachmentPoint dap_Parent =
                               parentVrtx.getAttachmentPoints().get(parentAPIdx);
         DENOPTIMAttachmentPoint dap_Child =
                                   cvClone.getAttachmentPoints().get(childAPIdx);
+        
         DENOPTIMEdge edge = null;
         if (FragmentSpace.useAPclassBasedApproach())
         {
@@ -2332,8 +2163,8 @@ if(debug)
             edge = new DENOPTIMEdge(parentVrtx.getVertexId(), 
                        cvClone.getVertexId(), parentAPIdx, childAPIdx, bndType);
             // decrement the num. of available connections
-            dap_Parent.updateAPConnections(-bndType); 
-            dap_Child.updateAPConnections(-bndType); 
+            dap_Parent.updateFreeConnections(-bndType); 
+            dap_Child.updateFreeConnections(-bndType); 
         }
         if (edge == null)
         {
@@ -2343,7 +2174,7 @@ if(debug)
         }
         molGraph.addEdge(edge);
 
-        // Import all vertices from cloned subgraph
+        // Import all vertices from cloned subgraph, i.e., sgClone
         for (int i=0; i<sgClone.getVertexList().size(); i++)
         {
             DENOPTIMVertex clonV = sgClone.getVertexList().get(i);
@@ -2351,7 +2182,8 @@ if(debug)
 
             molGraph.addVertex(sgClone.getVertexList().get(i));
 
-            // also need to tmp store pointers to symmetriic verteces
+            // also need to tmp store pointers to symmetric vertexes
+            // TODO: check. Why is this working on subGraph and not on sgClone?
             if (subGraph.hasSymmetryInvolvingVertex(origV.getVertexId()))
             {
                 if (newSymSets.containsKey(origV.getVertexId()))

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/DENOPTIM/src"/>
+	<classpathentry kind="src" path="src/misc/TestOperator/src"/>
 	<classpathentry excluding="src/" including="images/*.png" kind="src" path="src/GUI"/>
 	<classpathentry kind="src" path="src/DenoptimCG/src"/>
 	<classpathentry kind="src" path="src/DenoptimGA/src"/>

@@ -391,7 +391,7 @@ public class DENOPTIMGraphOperations
             SymmetricSet symAPs = new SymmetricSet();
             if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
             {
-                symAPs = curVertex.getPartners(apId);
+                symAPs = curVertex.getSymmetricAPs(apId);
 				if (symAPs != null)
 				{
                     if (debug)

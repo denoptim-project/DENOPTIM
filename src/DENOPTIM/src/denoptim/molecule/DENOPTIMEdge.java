@@ -24,9 +24,8 @@ import java.io.Serializable;
  * This class represents the edge between 2 fragments (vertices)
  * @author Vishwesh Venkatraman
  */
-public class DENOPTIMEdge implements Serializable 
+public class DENOPTIMEdge implements Serializable,Cloneable
 {
-
     /**
      * The vertex id of the source fragment
      */
@@ -84,6 +83,30 @@ public class DENOPTIMEdge implements Serializable
         bondType = m_btype;  
         trgRcn = "";
         srcRcn = "";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor for an edge from all parameters
+     * @param m_src verted ID of the source vertex
+     * @param m_trg vertex ID of the target vertex
+     * @param m_srcDAP index of the AP on the source vertex
+     * @param m_trgDAP index of the AP on the target vertex
+     * @param m_btype the bond type
+     * @param m_srcAPClass the AP class on the source attachment point
+     * @param m_trgAPClass the AP class on the target attachment point
+     */
+    public DENOPTIMEdge(int m_src, int m_trg, int m_srcDAP, int m_trgDAP,
+            int m_btype, String m_srcAPClass, String m_trgAPClass)
+    {
+        srcVertex = m_src;
+        trgVertex = m_trg;
+        srcDAP = m_srcDAP;
+        trgDAP = m_trgDAP;
+        bondType = m_btype;  
+        srcRcn = m_srcAPClass;
+        trgRcn = m_trgAPClass;
     }
     
 //------------------------------------------------------------------------------
@@ -183,6 +206,19 @@ public class DENOPTIMEdge implements Serializable
     public int getBondType()
     {
         return bondType;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Return a deep-copy
+     * @return a deep copy
+     */
+    public DENOPTIMEdge clone()
+    {
+        DENOPTIMEdge c = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP, trgDAP, 
+                bondType, srcRcn, trgRcn);
+        return c;
     }
     
 //------------------------------------------------------------------------------

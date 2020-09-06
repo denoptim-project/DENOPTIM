@@ -798,7 +798,7 @@ public class CombinatorialExplorerByLayer
                                                                         scafAPs,
                                                                              0);
 
-        // as for DenoptimGA, though level=-1 is a bit misleading
+        // as in DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);
 
         //TODO and again here we would benefit from having the building block return

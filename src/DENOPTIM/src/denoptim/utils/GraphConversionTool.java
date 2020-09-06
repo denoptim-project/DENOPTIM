@@ -495,8 +495,8 @@ public class GraphConversionTool
             DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
 		    if (useMolInfo)
 	        {
-                apA.updateAPConnections(-bndOrder);
-                apB.updateAPConnections(-bndOrder);
+                apA.updateFreeConnections(-bndOrder);
+                apB.updateFreeConnections(-bndOrder);
 		    }
         }
 
