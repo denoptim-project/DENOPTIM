@@ -195,7 +195,7 @@ public class FragmentSpaceTest
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
     	
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,3,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
@@ -236,7 +236,7 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,3,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
@@ -277,12 +277,23 @@ public class FragmentSpaceTest
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
+    	/*
+    	System.out.println("SRC1 "+FragmentSpace.getAPClassForFragment(src1)+" => "
+    	+FragmentSpace.getCompatibleAPClasses(FragmentSpace.getAPClassForFragment(src1)));
+    	System.out.println("SRC2 "+FragmentSpace.getAPClassForFragment(src2)+" => "
+    	+FragmentSpace.getCompatibleAPClasses(FragmentSpace.getAPClassForFragment(src2)));
+    	System.out.println("Frags with SRC1: "+FragmentSpace.getFragAPsCompatibleWithClass(
+    	        FragmentSpace.getAPClassForFragment(src1)));
+        System.out.println("Frags with SRC2: "+FragmentSpace.getFragAPsCompatibleWithClass(
+                FragmentSpace.getAPClassForFragment(src2)));
+    	*/
+    	
     	ArrayList<IdFragmentAndAP> lst = 
     			FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,3,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
@@ -293,6 +304,9 @@ public class FragmentSpaceTest
     	boolean found4 = false;
     	for (IdFragmentAndAP id : lst)
     	{
+    	    //TODO del
+            System.out.println("IdFragmentAndAP: "+id);
+            
     		if (id.sameFragAndAp(ref1))
     			found1 = true;
     		if (id.sameFragAndAp(ref2))

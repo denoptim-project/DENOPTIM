@@ -149,8 +149,10 @@ public class DENOPTIMAttachmentPointTest
     	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
     	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
     	
-    	assertEquals(apA.compareTo(apB),0);
-    	assertTrue(apA.equals(apB));
+    	assertEquals(-1,apA.compareTo(apB),"Comparison driven by ID.");
+    	assertTrue(apA.equals(apB),"Equals ignores ID.");
+    	assertEquals(0,apA.comparePropertiesTo(apB),
+    	        "Property-based comparison.");
     }
     
 //-----------------------------------------------------------------------------

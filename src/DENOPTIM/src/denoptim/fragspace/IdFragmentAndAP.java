@@ -68,14 +68,15 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public IdFragmentAndAP(int m_vId, int m_molId, int m_molTyp, int m_apId, int m_vSymSetId, int m_aSymSetId)
+    public IdFragmentAndAP(int m_vId, int m_molId, int m_molTyp, int m_apId, 
+            int m_vSymSetId, int m_aSymSetId)
     {
         vId = m_vId;
         molId = m_molId;
         molTyp = m_molTyp;
         apId = m_apId;
-	vSymSetId = m_vSymSetId;
-	aSymSetId = m_aSymSetId;
+    	vSymSetId = m_vSymSetId;
+    	aSymSetId = m_aSymSetId;
     }
 
 //------------------------------------------------------------------------------
@@ -124,7 +125,7 @@ public class IdFragmentAndAP implements Serializable
 
     public void setVrtSymSetId(int m_vSymSetId)
     {
-	vSymSetId = m_vSymSetId;
+        vSymSetId = m_vSymSetId;
     }
     
 //------------------------------------------------------------------------------
@@ -155,10 +156,12 @@ public class IdFragmentAndAP implements Serializable
     {
         StringBuilder sb = new StringBuilder();
         sb.append("IdFragmentAndAP [vId=").append(vId);
-	sb.append(", molId=").append(molId);
-	sb.append(", molTyp=").append(molTyp);
-	sb.append(", apId=").append(apId).append("]");
-	return sb.toString();
+    	sb.append(", molId=").append(molId);
+    	sb.append(", molTyp=").append(molTyp);
+    	sb.append(", apId=").append(apId);
+    	sb.append(", vSymSetId=").append(vSymSetId);
+    	sb.append(", aSymSetId=").append(aSymSetId).append("]");
+    	return sb.toString();
     }
 
 //------------------------------------------------------------------------------
