@@ -46,17 +46,17 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     private int vertexId;
 
     /*
-     * store the integer id associated with the scaffold/fragment/capping
+     * store the integer id associated with the building block
      */
     private int buildingBlockId;
 
     /*
      * attachment points for this Mol
      */
-    private ArrayList<DENOPTIMAttachmentPoint> lstAP;
+    private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
 
     /*
-     * 0:scaffold, 1:fragment, 2:capping group
+     * Type of building block: 0:scaffold, 1:fragment, 2:capping group
      */
     private int buildingBlockType;
 
@@ -83,7 +83,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public DENOPTIMVertex()
     {
         buildingBlockId = 0;
-        lstAP = new ArrayList<>();
+        lstAPs = new ArrayList<>();
         vertexId = 0;
         buildingBlockType = 0;
         lstSymmAP = new ArrayList<>();
@@ -108,10 +108,10 @@ public class DENOPTIMVertex implements Cloneable, Serializable
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             System.exit(0);
         }
-        this.lstAP = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         for (DENOPTIMAttachmentPoint ap : bb.getAPs())
         {
-            this.lstAP.add(ap.clone());
+            this.lstAPs.add(ap.clone());
         }
         this.lstSymmAP = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : bb.getSymmetricAPsSets())
@@ -119,8 +119,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
             this.lstSymmAP.add(ss.clone());
         }
         isRCV = false;
-        if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-            lstAP.get(0).getAPClass()))
+        if (lstAPs.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
+            lstAPs.get(0).getAPClass()))
         {
             isRCV = true;
         }
@@ -133,13 +133,13 @@ public class DENOPTIMVertex implements Cloneable, Serializable
             ArrayList<DENOPTIMAttachmentPoint> m_lstAP, int m_fragmentType)
     {
         buildingBlockId = m_molId;
-        lstAP = m_lstAP;
+        lstAPs = m_lstAP;
         vertexId = m_vid;
         buildingBlockType = m_fragmentType;
         lstSymmAP = new ArrayList<>();
         isRCV = false;
-		if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-		    lstAP.get(0).getAPClass()))
+		if (lstAPs.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
+		    lstAPs.get(0).getAPClass()))
 		{
 		    isRCV = true;
 		}
@@ -179,14 +179,14 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        return lstAP;
+        return lstAPs;
     }
 
 //------------------------------------------------------------------------------
 
     public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
     {
-        lstAP = m_lstAP;
+        lstAPs = m_lstAP;
     }
 
 //------------------------------------------------------------------------------
@@ -245,7 +245,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public int getNumberOfAP()
     {
-        return lstAP.size();
+        return lstAPs.size();
     }
 
 //------------------------------------------------------------------------------
@@ -258,9 +258,9 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public ArrayList<Integer> getFreeAPList()
     {
         ArrayList<Integer> lstAvailableAP = new ArrayList<>();
-        for (int i=0; i<lstAP.size(); i++)
+        for (int i=0; i<lstAPs.size(); i++)
         {
-            if (lstAP.get(i).isAvailable())
+            if (lstAPs.get(i).isAvailable())
                 lstAvailableAP.add(new Integer(i));
         }
         return lstAvailableAP;
@@ -271,9 +271,9 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public int getFreeAPCount()
     {
         int n = 0;
-        for (int i=0; i<lstAP.size(); i++)
+        for (int i=0; i<lstAPs.size(); i++)
         {
-            if (lstAP.get(i).isAvailable())
+            if (lstAPs.get(i).isAvailable())
                 n++;
         }
         return n;
@@ -284,9 +284,9 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public boolean hasFreeAP()
     {
-        for (int i=0; i<lstAP.size(); i++)
+        for (int i=0; i<lstAPs.size(); i++)
         {
-            if (lstAP.get(i).isAvailable())
+            if (lstAPs.get(i).isAvailable())
                 return true;
         }
         return false;
@@ -296,7 +296,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public void updateAttachmentPoint(int idx, int delta)
     {
-        lstAP.get(idx).updateFreeConnections(delta);
+        lstAPs.get(idx).updateFreeConnections(delta);
     }
 
 //------------------------------------------------------------------------------
@@ -358,9 +358,9 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         {
             lstSymmAP.clear();
         }
-        if (lstAP != null)
+        if (lstAPs != null)
         {
-            lstAP.clear();
+            lstAPs.clear();
         }
     }
     
@@ -411,19 +411,19 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     		return false;
     	}
     	
-    	if (this.lstAP.size() != other.lstAP.size())
+    	if (this.lstAPs.size() != other.lstAPs.size())
     	{
     		reason.append("Different number of APs ("
-    				+this.lstAP.size()+":"
-					+other.lstAP.size()+"); ");
+    				+this.lstAPs.size()+":"
+					+other.lstAPs.size()+"); ");
     		return false;
     	}
     	
 
-    	for (DENOPTIMAttachmentPoint apT : this.lstAP)
+    	for (DENOPTIMAttachmentPoint apT : this.lstAPs)
     	{
     		boolean found = false;
-    		for (DENOPTIMAttachmentPoint apO : other.lstAP)
+    		for (DENOPTIMAttachmentPoint apO : other.lstAPs)
         	{
 		    	if (apT.equals(apO))
 		    	{
