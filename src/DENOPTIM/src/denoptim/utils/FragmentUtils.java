@@ -34,7 +34,6 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMVertexAtom;
 import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 
@@ -525,32 +524,7 @@ public class FragmentUtils
 
         return false;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the atom number corresponding to the attachment point index
-     * @param lstDVA
-     * @param vertexId
-     * @param dap_anum
-     * @return the atom number corresponding to the attachment point index
-     */
-
-    public static int getCorrespondingAtomNumber(
-	       ArrayList<DENOPTIMVertexAtom> lstDVA, int vertexId, int dap_anum)
-    {
-        int mnum = -1;
-        for (DENOPTIMVertexAtom dva : lstDVA)
-        {
-            if (dva.getVertexId() == vertexId)
-            {
-                mnum = dva.lookupMatchingAtomNumber(dap_anum);
-                break;
-            }
-        }
-        return mnum;
-    }
-
+    
 //------------------------------------------------------------------------------
 
     /**

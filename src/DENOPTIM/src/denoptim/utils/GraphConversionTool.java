@@ -21,6 +21,7 @@ package denoptim.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -141,10 +142,8 @@ public class GraphConversionTool
                             getAtomPositionNumber();
 
             // get the new atom indices for the dap's
-            int atom1 = FragmentUtils.getCorrespondingAtomNumber(lstDVA, v1_id,
-                                                                     dap1_anum);
-            int atom2 = FragmentUtils.getCorrespondingAtomNumber(lstDVA, v2_id,
-                                                                     dap2_anum);
+            int atom1 = getCorrespondingAtomNumber(lstDVA, v1_id, dap1_anum);
+            int atom2 = getCorrespondingAtomNumber(lstDVA, v2_id, dap2_anum);
 
             //System.err.println(atom1 + " " + v1_id + " " + dap_idx_v1 + " " + dap1_anum);
             //System.err.println(atom2 + " " + v2_id + " " + dap_idx_v2 + " " + dap2_anum);
@@ -191,10 +190,8 @@ public class GraphConversionTool
                 // ASSUMPTION: Ring closing vertex contains only one atom
                 // that is the RingClosingAttractor (RCA)
 
-                int idH = FragmentUtils.getCorrespondingAtomNumber(lstDVA, 
-                                                                      vH_id, 0);
-                int idT = FragmentUtils.getCorrespondingAtomNumber(lstDVA, 
-                                                                      vT_id, 0);
+                int idH = getCorrespondingAtomNumber(lstDVA, vH_id, 0);
+                int idT = getCorrespondingAtomNumber(lstDVA, vT_id, 0);
 
                 List<IAtom> cH = mol.getConnectedAtomsList(mol.getAtom(idH)); 
                 List<IAtom> cT = mol.getConnectedAtomsList(mol.getAtom(idT));
@@ -519,6 +516,70 @@ public class GraphConversionTool
 
         return g;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Just a utility class that is used to convert the atom index in the
+     * molecular representation of a specific vertex (i.e., vertexId) in the
+     * atom index in the whole molecular representation of the graph.
+     */
+    
+    private static class DENOPTIMVertexAtom
+    {
+        private int vertexId;
+        private final HashMap<Integer, Integer> anum_map;
+
+        public DENOPTIMVertexAtom(int m_vertexId,
+                                            HashMap<Integer, Integer> m_anum_map)
+        {
+            vertexId = m_vertexId;
+            anum_map = m_anum_map;
+        }
+        
+        public int lookupMatchingAtomNumber(int anum)
+        {
+            for (Map.Entry<Integer, Integer> entry : anum_map.entrySet())
+            {
+                if (entry.getKey() == anum)
+                {
+                    return entry.getValue();
+                }
+            }
+            return -1;
+        }
+        
+        public int getVertexId()
+        {
+            return vertexId;
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+      /**
+       * Return the atom number corresponding to the attachment point index
+       * @param lstDVA
+       * @param vertexId
+       * @param dap_anum
+       * @return the atom number corresponding to the attachment point index
+       */
+
+      public static int getCorrespondingAtomNumber(
+             ArrayList<DENOPTIMVertexAtom> lstDVA, int vertexId, int dap_anum)
+      {
+          int mnum = -1;
+          for (DENOPTIMVertexAtom dva : lstDVA)
+          {
+              if (dva.getVertexId() == vertexId)
+              {
+                  mnum = dva.lookupMatchingAtomNumber(dap_anum);
+                  break;
+              }
+          }
+          return mnum;
+      }
+
 
 //------------------------------------------------------------------------------
 

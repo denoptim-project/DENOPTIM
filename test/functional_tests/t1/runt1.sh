@@ -12,7 +12,8 @@ then
     echo "WARNING! Cannot find Tinker executables in \$tinkerPathDENOPTIM"
     echo "If Tinker is installed, please set valiable \$tinkerPathDENOPTIM "
     echo "with the pathname of the bin folder containing all the executables"
-    echo "of Tinker."
+    echo "of Tinker. The installation of Tinker must be configured with "
+    echo "'maxval' >= 12 (see sizes.i in Tinker's source code)."
     echo "Skipping test 't1'."
     echo " "
     exit 0
