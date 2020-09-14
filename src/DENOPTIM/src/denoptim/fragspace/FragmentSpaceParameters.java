@@ -88,7 +88,7 @@ public class FragmentSpaceParameters
     protected static String rotBndsFile = "";
 
     /**
-     * FLag defining use of AP class-based approach
+     * Flag defining use of AP class-based approach
      */
     private static boolean apClassBasedApproch = false;
 
@@ -122,6 +122,11 @@ public class FragmentSpaceParameters
      */
     protected static HashMap<String, Double> symmConstraintsMap = 
 						  new HashMap<String, Double>();
+    
+    /**
+     * Flag signalling the use of graph templates
+     */
+    protected static boolean useTemplates = false;
 
     /**
      * Verbosity level
@@ -160,7 +165,7 @@ public class FragmentSpaceParameters
     
     public static boolean enforceSymmetry()
     {
-	return enforceSymmetry;
+        return enforceSymmetry;
     }
 
 //------------------------------------------------------------------------------
@@ -174,7 +179,7 @@ public class FragmentSpaceParameters
 
     public static int getVerbosity()
     {
-	return verbosity;
+        return verbosity;
     }
 
 //------------------------------------------------------------------------------
@@ -182,6 +187,13 @@ public class FragmentSpaceParameters
     public static String getRotSpaceDefFile()
     {
         return rotBndsFile;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static boolean hasTemplates()
+    {
+        return useTemplates;
     }
 
 //------------------------------------------------------------------------------
@@ -268,65 +280,72 @@ public class FragmentSpaceParameters
                 throw new DENOPTIMException(msg);
             }
             break;
+            
+        //NB: this is supposed to be without "=" sign because it's a parameter without value
         case "FS-ENFORCESYMMETRY":
-	    enforceSymmetry = true;
-	    break;
-	case "FS-CONSTRAINSYMMETRY=":
-	    symmetryConstraints = true;
-	    try
-	    {
+    	    enforceSymmetry = true;
+    	    break;
+    	    
+        case "FS-USETEMPLATES=":
+            useTemplates = true;
+            break;
+    	case "FS-CONSTRAINSYMMETRY=":
+    	    symmetryConstraints = true;
+    	    try
+    	    {
                 if (value.length() > 0)
-		{
-		    String[] words = value.trim().split("\\s+");
-		    if (words.length != 2)
-		    {
+        		{
+        		    String[] words = value.trim().split("\\s+");
+        		    if (words.length != 2)
+        		    {
                         msg = "Keyword " + key + " requires two arguments: " 
                               + "[APClass (String)] [probability (Double)].";
                         throw new DENOPTIMException(msg);
-		    }
-		    String apClass = words[0];
-		    double prob = 0.0;
-		    try
-		    {
-			prob = Double.parseDouble(words[1]);
-		    }
-		    catch (Throwable t2)
-		    {
-			msg = "Unable to convert '" + words[1] + "' into a "
-			      + "double.";
-                        throw new DENOPTIMException(msg);
-		    }
+        		    }
+        		    String apClass = words[0];
+        		    double prob = 0.0;
+        		    try
+        		    {
+        		        prob = Double.parseDouble(words[1]);
+        		    }
+        		    catch (Throwable t2)
+        		    {
+        		        msg = "Unable to convert '" + words[1] + "' into a "
+        			      + "double.";
+                                throw new DENOPTIMException(msg);
+        		    }
                     symmConstraintsMap.put(apClass,prob);
-		}
-		else
-		{
-		    msg = "Keyword '" + key + "' requires two arguments: " 
-			         + "[APClass (String)] [probability (Double)].";
+        		}
+        		else
+        		{
+        		    msg = "Keyword '" + key + "' requires two arguments: " 
+        			         + "[APClass (String)] [probability (Double)].";
+                            throw new DENOPTIMException(msg);
+        		}
+    	    }
+    	    catch (Throwable t)
+    	    {
+        		if (msg.equals(""))
+        		{
+        		    msg = "Unable to understand value '" + value + "'";
+        		}
+                throw new DENOPTIMException(msg);
+    	    }
+    	    break;
+    	case "FS-VERBOSITY=":
+    	    try
+    	    {
+    	        verbosity = Integer.parseInt(value);
+    	    }
+    	    catch (Throwable t)
+    	    {
+    	        msg = "Unable to understand value '" + value + "'";
                     throw new DENOPTIMException(msg);
-		}
-	    }
-	    catch (Throwable t)
-	    {
-		if (msg.equals(""))
-		{
-		    msg = "Unable to understand value '" + value + "'";
-		}
-                throw new DENOPTIMException(msg);
-	    }
-	    break;
-	case "FS-VERBOSITY=":
-	    try
-	    {
-	        verbosity = Integer.parseInt(value);
-	    }
-	    catch (Throwable t)
-	    {
-		msg = "Unable to understand value '" + value + "'";
-                throw new DENOPTIMException(msg);
-	    }
+    	    }
+    	    break;
         default:
              msg = "Keyword " + key + " is not a known fragment space-"
-                                          + "related keyword. Check input files.";
+                     + "related keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }
@@ -432,11 +451,12 @@ public class FragmentSpaceParameters
         ArrayList<IGraphBuildingBlock> fragLib = tempMEthod(
         DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
         
-        //TODO: temp code
-        /*
-		fragLib.add(DENOPTIMTemplate.getTestTemplate());
-		System.err.println("Added test template to fragment library");
-	    */
+        if (useTemplates)
+        {
+            //TODO: temp code
+    		fragLib.add(DENOPTIMTemplate.getTestTemplate());
+    		System.err.println("Added test template to fragment library");
+        }
         
         ArrayList<IGraphBuildingBlock> cappLib = new ArrayList<IGraphBuildingBlock>();
     	HashMap<String,ArrayList<String>> cpMap = 

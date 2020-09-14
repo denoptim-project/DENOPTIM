@@ -354,7 +354,7 @@ public class FragmentSpace
 		    msg = "Cannot retrieve fragments before defining the FragmentSpace";
 		    throw new DENOPTIMException(msg);
 		}
-		IGraphBuildingBlock ibb = null, molClone = null;
+		IGraphBuildingBlock ibb = null;
 		switch (frgTyp)
 		{
 			case 0:
@@ -549,7 +549,7 @@ public class FragmentSpace
                        + "FragmentSpace defined (i.e., null BondOrderMap). "
                        + "Assuming bond order one.";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-	    return new Integer(1);
+            return 1;
         }
         else
         {
