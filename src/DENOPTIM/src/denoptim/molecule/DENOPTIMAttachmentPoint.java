@@ -577,13 +577,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      */
     public int compareTo(DENOPTIMAttachmentPoint other)
     {
-        if (this.getID() > other.getID()) {
-            return +1;
-        } else if (this.getID() < other.getID()) {
-            return -1;
-        } else {
-            return 0;
-        }   
+	return Integer.compare(this.getID(), other.getID());
     }
     
 //------------------------------------------------------------------------------
