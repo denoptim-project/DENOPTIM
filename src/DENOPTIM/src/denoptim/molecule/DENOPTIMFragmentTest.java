@@ -107,7 +107,7 @@ public class DENOPTIMFragmentTest
     	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
     	frg1.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
     	
-    	IAtomContainer iac = new AtomContainer(frg1);
+    	IAtomContainer iac = new AtomContainer(frg1.getAtomContainer());
     	DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
     	
     	assertEquals(4,frg1.getAPCount(),"Size if frg1");

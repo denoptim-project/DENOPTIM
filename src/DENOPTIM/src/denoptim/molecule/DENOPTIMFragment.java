@@ -20,6 +20,8 @@ package denoptim.molecule;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
@@ -30,6 +32,15 @@ import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IBond.Order;
+import org.openscience.cdk.interfaces.IBond.Stereo;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IChemObjectChangeEvent;
+import org.openscience.cdk.interfaces.IChemObjectListener;
+import org.openscience.cdk.interfaces.IElectronContainer;
+import org.openscience.cdk.interfaces.ILonePair;
+import org.openscience.cdk.interfaces.ISingleElectron;
+import org.openscience.cdk.interfaces.IStereoElement;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -43,12 +54,17 @@ import denoptim.utils.FragmentUtils;
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, IGraphBuildingBlock
+public class DENOPTIMFragment implements IGraphBuildingBlock
 { 	
     /**
 	 * Version UID
 	 */
 	private static final long serialVersionUID = 4415462924969433010L;
+	
+	/**
+	 * Molecular representation of this fragment
+	 */
+	private IAtomContainer mol;
 	
 	/**
 	 * List of Attachment points
@@ -69,7 +85,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     
     public DENOPTIMFragment()
     {
-        super();
+        this.mol = new AtomContainer();
     }
     
 //-----------------------------------------------------------------------------
@@ -85,8 +101,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
     {    	
     	// WARNING: atom container properties are not imported
-    	
-        super(mol);
+        this.mol = new AtomContainer(mol);
         
         Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
         if (prop != null)
@@ -112,7 +127,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     public void addAP(int srcAtmId, String propAPClass, double[] vector) 
     		throws DENOPTIMException
     {
-        IAtom srcAtm = this.getAtom(srcAtmId);
+        IAtom srcAtm = mol.getAtom(srcAtmId);
         Point3d p3d = new Point3d(vector[0], vector[1], vector[2]);
         addAP(srcAtm, propAPClass, p3d);
     }
@@ -134,7 +149,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     public void addAP(int srcAtmId, String propAPClass, Point3d vector) 
     		throws DENOPTIMException
     {
-        IAtom srcAtm = this.getAtom(srcAtmId);
+        IAtom srcAtm = mol.getAtom(srcAtmId);
         addAP(srcAtm, propAPClass, vector);
     }
     
@@ -155,7 +170,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     public void addAP(IAtom srcAtm, String propAPClass, Point3d vector) 
     		throws DENOPTIMException
     {
-    	int atmId = this.getAtomNumber(srcAtm);
+    	int atmId = mol.getAtomNumber(srcAtm);
     	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
     	ap.setAtomPositionNumber(atmId);
     	ap.setAPClass(propAPClass);
@@ -200,7 +215,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     
     public int getAPCountOnAtom(int srcAtmId)
     {
-        IAtom srcAtm = this.getAtom(srcAtmId);
+        IAtom srcAtm = mol.getAtom(srcAtmId);
         return getAPCountOnAtom(srcAtm);
     }
 
@@ -235,7 +250,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     public int getAPCount()
     {
     	int num = 0;
-        for (int atmId = 0; atmId<this.getAtomCount(); atmId++)
+        for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
         {
             num = num + getAPCountOnAtom(atmId);
         }
@@ -300,9 +315,9 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     
     public void updateAPs()
     {
-        for (int atmId = 0; atmId<this.getAtomCount(); atmId++)
+        for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
         {
-            IAtom srcAtm = this.getAtom(atmId);
+            IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
             {
             	ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
@@ -334,7 +349,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     	ArrayList<DENOPTIMAttachmentPoint> allAPs = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	
-        for (IAtom srcAtm : this.atoms())
+        for (IAtom srcAtm : mol.atoms())
         {
         	if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
             {
@@ -366,14 +381,14 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     {
 
 	    String allAtomsProp = "";    
-	    if (this.getProperty(DENOPTIMConstants.APCVTAG) == null)
+	    if (mol.getProperty(DENOPTIMConstants.APCVTAG) == null)
 	    {
 	    	System.out.println("WARNING: no tag " 
 	    			+ DENOPTIMConstants.APCVTAG + "found in fragment."
 	    			+ " No AP created.");
 	    	return;
         }
-	    allAtomsProp = this.getProperty(DENOPTIMConstants.APCVTAG).toString();
+	    allAtomsProp = mol.getProperty(DENOPTIMConstants.APCVTAG).toString();
 	    projectPropertyToAP(allAtomsProp);
     }
 	    
@@ -396,9 +411,9 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     	}
     	
     	// Cleanup current APs in atom objects
-    	for (int ii=0 ; ii<this.getAtomCount(); ii++)
+    	for (int ii=0 ; ii<mol.getAtomCount(); ii++)
     	{
-    		IAtom atm = this.getAtom(ii);   		
+    		IAtom atm = mol.getAtom(ii);   		
     		atm.removeProperty(DENOPTIMConstants.APTAG);
     	}
 
@@ -448,13 +463,13 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
             DENOPTIMAttachmentPoint ap = allAPs.get(i);
             int atmID = ap.getAtomPositionNumber();
             
-            if (atmID > this.getAtomCount())
+            if (atmID > mol.getAtomCount())
             {
             	throw new DENOPTIMException("Fragment property defines AP "
             			+ "with out-of-borders atom index (" + atmID + ").");
             }
             
-            IAtom atm = this.getAtom(atmID);
+            IAtom atm = mol.getAtom(atmID);
             if (atm.getProperty(DENOPTIMConstants.APTAG) != null)
             {
 				ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
@@ -487,10 +502,10 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
 
     	String propAPClass = "";
         String propAttchPnt = "";
-        for (IAtom atm : this.atoms())
+        for (IAtom atm : mol.atoms())
         {
         	//WARNING: here is the 1-based criterion implemented
-        	int atmID = this.getAtomNumber(atm)+1;
+        	int atmID = mol.getAtomNumber(atm)+1;
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
@@ -534,8 +549,8 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
 	        propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
 	    }
 
-        this.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
-        this.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+        mol.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
+        mol.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
     }
 
 //-----------------------------------------------------------------------------
@@ -548,7 +563,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
     {
     	DENOPTIMFragment frg = new DENOPTIMFragment();
 		try {
-			frg = new DENOPTIMFragment(super.clone());
+			frg = new DENOPTIMFragment(mol.clone());
 		} catch (Exception e) {
 			//TODO: by-pass by copying all atoms, bonds and el. containers,
 			// atom properties and atomcontainer properties (what else?)
@@ -570,10 +585,139 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer, I
      */
     public ArrayList<SymmetricSet> getSymmetricAPsSets()
     {
-        ArrayList<SymmetricSet> symAPs = FragmentUtils.getMatchingAP(
-                (IAtomContainer) this, this.getCurrentAPs());
+        ArrayList<SymmetricSet> symAPs = FragmentUtils.getMatchingAP(mol,
+                this.getCurrentAPs());
         return symAPs;
     }
+    
+//-----------------------------------------------------------------------------
+
+    public IAtomContainer getAtomContainer()
+    {
+        return mol;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public Iterable<IAtom> atoms()
+    {
+        return mol.atoms();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public Iterable<IBond> bonds()
+    {
+        return mol.bonds();
+    }
+
+//-----------------------------------------------------------------------------
+
+    public void addAtom(IAtom atom)
+    {
+        mol.addAtom(atom);
+    }   
+    
+//-----------------------------------------------------------------------------
+
+    public IAtom getAtom(int number)
+    {
+        return mol.getAtom(number);
+    }
+
+//-----------------------------------------------------------------------------
+
+    public int getAtomNumber(IAtom atom)
+    {
+        return mol.getAtomNumber(atom);
+    }
+
+//-----------------------------------------------------------------------------
+
+    public int getAtomCount()
+    {
+        return mol.getAtomCount();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public void addBond(IBond bond)
+    {
+        mol.addBond(bond);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public IBond removeBond(int position)
+    {
+        return mol.removeBond(position);
+    }
+
+//-----------------------------------------------------------------------------
+   
+    public IBond removeBond(IAtom atom1, IAtom atom2)
+    {
+       return mol.removeBond(atom1, atom2);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeBond(IBond bond)
+    {
+        mol.removeBond(bond);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeAtomAndConnectedElectronContainers(IAtom atom)
+    {
+        mol.removeAtomAndConnectedElectronContainers(atom);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public List<IAtom> getConnectedAtomsList(IAtom atom)
+    {
+        return mol.getConnectedAtomsList(atom);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public int getConnectedAtomsCount(IAtom atom)
+    {
+        return mol.getConnectedAtomsCount(atom);
+    }
+ 
+//-----------------------------------------------------------------------------
+
+    public Object getProperty(Object description)
+    {
+        return mol.getProperty(description);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperty(Object description, Object property)
+    {
+        mol.setProperty(description, property);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperties(Map<Object, Object> properties)
+    {
+        mol.setProperties(properties);
+    }
+    
+    /*
+//-----------------------------------------------------------------------------
+
+    public
+    {
+        
+    }
+    
+    */
     
 //-----------------------------------------------------------------------------
     

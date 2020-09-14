@@ -429,7 +429,7 @@ public class FragmentUtils
     {
     	if (bb instanceof DENOPTIMFragment)
     	{
-    		IAtomContainer iac = (DENOPTIMFragment) bb;
+    		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
     		return getMatchingAP(iac, daps);
     	}
     	return null;

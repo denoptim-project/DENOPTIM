@@ -77,7 +77,7 @@ public class GraphConversionTool
             IAtomContainer iac = null;
             if (igbb instanceof DENOPTIMFragment)
             {
-            	iac = (DENOPTIMFragment) igbb;
+            	iac = ((DENOPTIMFragment) igbb).getAtomContainer();
             } else if (igbb instanceof DENOPTIMTemplate) 
             {
             	//TODO

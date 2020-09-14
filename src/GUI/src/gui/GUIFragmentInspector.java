@@ -775,7 +775,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private void loadCurrentAsPlainStructure()
 	{
-		fragmentViewer.loadPlainStructure(fragment);
+		fragmentViewer.loadPlainStructure(fragment.getAtomContainer());
 	}
 
 //-----------------------------------------------------------------------------
@@ -843,7 +843,7 @@ public class GUIFragmentInspector extends GUICardPanel
      */
     private boolean convertAtomToAP(IAtom trgAtm, String apClass)
     {
-    	// Accept ONLY if the atom has one and only one connected neighbor
+    	// Accept ONLY if the atom has one and only one connected neighbour
     	if (fragment.getConnectedAtomsCount(trgAtm) != 1)
     	{
     		String str = "";

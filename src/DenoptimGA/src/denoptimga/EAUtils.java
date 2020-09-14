@@ -1468,7 +1468,7 @@ public class EAUtils
 				if (bb instanceof DENOPTIMFragment)
 	            {
 	            	n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
-	            			(DENOPTIMFragment) bb);
+	            			((DENOPTIMFragment) bb).getAtomContainer());
 	            }
 			} catch (DENOPTIMException e) {
 				// TODO Auto-generated catch block
@@ -1500,7 +1500,7 @@ public class EAUtils
 			if (bb instanceof DENOPTIMFragment)
             {
             	n = nfrags * DENOPTIMMoleculeUtils.getHeavyAtomCount(
-            			(DENOPTIMFragment) bb);
+            			((DENOPTIMFragment) bb).getAtomContainer());
             }
 		} catch (DENOPTIMException e) {
 			// TODO Auto-generated catch block

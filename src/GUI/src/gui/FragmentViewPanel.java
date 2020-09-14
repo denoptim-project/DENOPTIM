@@ -79,7 +79,7 @@ public class FragmentViewPanel extends JSplitPane
 	protected Map<Integer,DENOPTIMAttachmentPoint> mapAPs = null;
 	
 	/**
-	 * Flag signaling that data about APs has been changed in the GUI
+	 * Flag signalling that data about APs has been changed in the GUI
 	 */
 	public boolean alteredAPData = false;
 	
@@ -401,7 +401,8 @@ public class FragmentViewPanel extends JSplitPane
 		// fragile/discontinued CDK-to-Jmol support.
 		
 		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, fragment, false);
+			DenoptimIO.writeMolecule(tmpSDFFile, fragment.getAtomContainer(), 
+			        false);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			System.out.println("Error writing TMP file '" + tmpSDFFile + "'");
@@ -427,7 +428,7 @@ public class FragmentViewPanel extends JSplitPane
 		
 		this.fragment = frag;
 			
-		loadPlainStructure(fragment);
+		loadPlainStructure(fragment.getAtomContainer());
 		
 		updateAPsMapAndTable();
         

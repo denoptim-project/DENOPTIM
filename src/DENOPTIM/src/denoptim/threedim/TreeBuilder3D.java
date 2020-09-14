@@ -130,7 +130,8 @@ public class TreeBuilder3D
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		libScaff.add((DENOPTIMFragment) bb);
+        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
+        		libScaff.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		//TODO deal with templates
@@ -142,7 +143,8 @@ public class TreeBuilder3D
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		libFrag.add((DENOPTIMFragment) bb);
+        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
+        		libFrag.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		//TODO deal with templates
@@ -154,7 +156,8 @@ public class TreeBuilder3D
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		libCap.add((DENOPTIMFragment) bb);
+        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
+        		libCap.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		//TODO deal with templates, but templates do not fit within

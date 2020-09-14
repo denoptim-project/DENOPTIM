@@ -322,7 +322,7 @@ public class DenoptimIO
             IAtomContainerSet molSet = new AtomContainerSet();
             for (int idx = 0; idx < mols.size(); idx++)
             {
-                molSet.addAtomContainer((IAtomContainer) mols.get(idx));
+                molSet.addAtomContainer(mols.get(idx).getAtomContainer());
             }
             sdfWriter = new SDFWriter(new FileWriter(new File(fileName)));
             sdfWriter.write(molSet);

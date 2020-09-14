@@ -922,7 +922,7 @@ public class GUIGraphHandler extends GUICardPanel
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		fragLib.add((DENOPTIMFragment) bb);
+        		fragLib.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		//TODO deal with templates and other stuff
@@ -1042,7 +1042,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add((DENOPTIMFragment) bb);
+		        		fragLib.add(((DENOPTIMFragment) bb).getAtomContainer());
 		        	} else
 		        	{
 		        		//TODO deal with templates and other stuff
@@ -1061,7 +1061,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add((DENOPTIMFragment) bb);
+		        		fragLib.add(((DENOPTIMFragment) bb).getAtomContainer());
 		        	} else
 		        	{
 		        		//TODO deal with templates, but templates do not fit within
@@ -1209,7 +1209,7 @@ public class GUIGraphHandler extends GUICardPanel
 					IGraphBuildingBlock bb = FragmentSpace.getFragment(1,fragId);
 					if (bb instanceof DENOPTIMFragment)
 					{
-						frg = (DENOPTIMFragment) bb;
+						frg = ((DENOPTIMFragment) bb).getAtomContainer();
 					} else {
 						//TODO deal with templates
 						frg = new AtomContainer();

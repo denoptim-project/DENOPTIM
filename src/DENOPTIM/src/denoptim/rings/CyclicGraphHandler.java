@@ -84,6 +84,8 @@ public class CyclicGraphHandler
     /**
      * Reference to libraries of fragments
      */
+    
+    //TODO: move to IGraphBuildingBlock
     private ArrayList<IAtomContainer> libScaff;
     private ArrayList<IAtomContainer> libFrag;
     private ArrayList<IAtomContainer> libCap;
@@ -125,7 +127,8 @@ public class CyclicGraphHandler
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		this.libScaff.add((DENOPTIMFragment) bb);
+        	    //TODO should not be neede when libScaff = <IGraphBuildingBlock>
+        		this.libScaff.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		this.libScaff.add(new AtomContainer());
@@ -136,7 +139,8 @@ public class CyclicGraphHandler
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		this.libFrag.add((DENOPTIMFragment) bb);
+        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
+        		this.libFrag.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		this.libFrag.add(new AtomContainer());
@@ -147,7 +151,8 @@ public class CyclicGraphHandler
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		this.libCap.add((DENOPTIMFragment) bb);
+        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
+        		this.libCap.add(((DENOPTIMFragment) bb).getAtomContainer());
         	} else
         	{
         		this.libCap.add(new AtomContainer());
