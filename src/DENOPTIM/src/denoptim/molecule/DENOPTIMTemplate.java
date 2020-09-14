@@ -4,21 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.GraphUtils;
+
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
- * Templates are a variation on fragments that has a number of attachment points and an interior graph. The attachment
- * points are constant and always available (i.e. uncapped), but the interior graph can vary.
- * The constant attachment points makes it easy to control the chemical environment in which the Template is embedded
- * while the interior graph provides the flexibility to change the content between these attachment points.
- * The degree to which the interior graph can vary is dependent on the contract level of the Template, which can be
- * provided upon instantiation.
+ * A template is a contract that defines subgraph features that can go from 
+ * a list of attachment points, via a partially defined subgraph structure, to
+ * a fully defined subgraph (i.e., graph structure + identify of each vertex).
  */
-public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, IGraphBuildingBlock {
 
+// TODO: remove, later. 
+//  Template are variation on fragments that has a number of attachment points and an interior graph. The attachment
+//  points are constant and always available (i.e. uncapped), but the interior graph can vary.
+//  The constant attachment points makes it easy to control the chemical environment in which the Template is embedded
+//  while the interior graph provides the flexibility to change the content between these attachment points.
+//  The degree to which the interior graph can vary is dependent on the contract level of the Template, which can be
+//  provided upon instantiation.
+//
+
+public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBlock 
+{
     /**
      * interior graph of the template that can be constrained in various ways depending on the
      * <code>contractLevel</code>
@@ -32,20 +42,26 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
      */
     private int contractLevel = 0;
 
-    private DENOPTIMTemplate() {
+//------------------------------------------------------------------------------
+
+    private DENOPTIMTemplate() 
+    {
         super();
     }
 
+//------------------------------------------------------------------------------
 
     /**
      * @param exteriorAPs Attachment points that are always present and vacant.
      * @return Template with an (initially empty) unconstrained interior graph.
      */
-    private static DENOPTIMTemplate getEmptyTemplate(List<DENOPTIMAttachmentPoint> exteriorAPs) {
+    private static DENOPTIMTemplate getEmptyTemplate(List<DENOPTIMAttachmentPoint> exteriorAPs) 
+    {
         DENOPTIMTemplate template = new DENOPTIMTemplate();
         return template;
     }
 
+//------------------------------------------------------------------------------
 
     /**
      * @return Template with a random, unconstrained interior graph. The interior graph consists of one fragment.
@@ -65,26 +81,47 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
     }
     */
 
-    public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs() {
+    public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs() 
+    {
         return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
     }
-    
-    public static DENOPTIMTemplate getTestTemplate() {
-	DENOPTIMTemplate template = new DENOPTIMTemplate();
-        Atom anAtom = new Atom("C");
-        // anAtom.setProperty(DENOPTIMConstants.APTAG, );
-        template.addAtom(anAtom);
-        template.setProperty(DENOPTIMConstants.APTAG, "1:1");
-        ArrayList apList = new ArrayList(1);
-        apList.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-        template.interiorGraph.addVertex(new DENOPTIMVertex(-1, 1, apList, 1));
-        template.setProperty(DENOPTIMConstants.APCVTAG, "1#c0:0:1.1%0.0%0.0");
+
+//------------------------------------------------------------------------------
+
+    /*
+     * Method meant for devel phase only. 
+     */
+    //TODO: Remove.
+
+    public static DENOPTIMTemplate getTestTemplate() 
+    {
+        DENOPTIMTemplate template = new DENOPTIMTemplate();
+
         
-        //TODO fill with stuff
+        // Adding fully defined vertexes (they point to an actual fragment
+        DENOPTIMVertex vA = new DENOPTIMVertex(
+                GraphUtils.getUniqueVertexIndex(), 0, 1);
+        DENOPTIMVertex vB = new DENOPTIMVertex(
+                GraphUtils.getUniqueVertexIndex(), 1, 1);
+        template.interiorGraph.addVertex(vA);
+        template.interiorGraph.addVertex(vB);
         
-        // Add attachment points as property
+        // Make and add a fully defined edge that connects the two vertexes
+        DENOPTIMAttachmentPoint apOnA = vA.getAttachmentPoints().get(0);
+        DENOPTIMAttachmentPoint apOnB = vB.getAttachmentPoints().get(1);
+        String srcAPClass = apOnA.getAPClass();
+        String trgAPClass = apOnA.getAPClass();
+        DENOPTIMEdge eAB = new DENOPTIMEdge(vA.getVertexId(), vB.getVertexId(), 
+                0, 1, FragmentSpace.getBondOrderForAPClass(apOnA.getAPRule()), 
+                srcAPClass, trgAPClass);
+        template.interiorGraph.addEdge(eAB);
+        
+        System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
+        
         return template;
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Promotes the contract level of this template to the highest value, i.e. makes the template unable to change after
@@ -97,6 +134,8 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
         return isFrozen;
     }
 
+//------------------------------------------------------------------------------
+
     /**
      * Returns the list of attachment points
      * @return the list of APs
@@ -106,6 +145,8 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
     	//TODO: probably this will change
         return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
     }
+
+//------------------------------------------------------------------------------
     
     /**
      * Returns the list of attachment points
@@ -117,7 +158,8 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
     	return this;
     }
 
-
+//------------------------------------------------------------------------------
+    
     //TODO
 	public ArrayList<String> getAllAPClassess() {
 		ArrayList<String> l = new ArrayList<String>();
@@ -125,12 +167,14 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
 		return l;
 	}
 
+//------------------------------------------------------------------------------
 
 	//TODO
 	public int getAPCount() {
 		return 1;
 	}
 
+//------------------------------------------------------------------------------
 
     @Override
     public ArrayList<SymmetricSet> getSymmetricAPsSets()
@@ -139,5 +183,15 @@ public class DENOPTIMTemplate extends AtomContainer implements IAtomContainer, I
         // the symmetric sets in the underlying graph
         return new ArrayList<SymmetricSet>();
     }
+    
+//-----------------------------------------------------------------------------
+    
+    //TODO: this will probably change, not it is useful for debugging
+    public DENOPTIMGraph getEmbeddeGraph()
+    {
+        return interiorGraph;
+    }
+    
+//-----------------------------------------------------------------------------
 }
 

@@ -451,12 +451,12 @@ public class FragmentSpaceParameters
         ArrayList<IGraphBuildingBlock> fragLib = tempMEthod(
         DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
         
-        if (useTemplates)
-        {
+
+        /* Moved to FragmentSpace.defineFragmentSpace
             //TODO: temp code
     		fragLib.add(DENOPTIMTemplate.getTestTemplate());
     		System.err.println("Added test template to fragment library");
-        }
+        */
         
         ArrayList<IGraphBuildingBlock> cappLib = new ArrayList<IGraphBuildingBlock>();
     	HashMap<String,ArrayList<String>> cpMap = 
@@ -496,7 +496,7 @@ public class FragmentSpaceParameters
         else
         {
         	FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib);
-        }
+        }        
     }
 
 //------------------------------------------------------------------------------

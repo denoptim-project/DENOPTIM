@@ -33,6 +33,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
@@ -212,6 +213,13 @@ public class FragmentSpace
     	FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
     	
     	isValid = true;
+    	
+    	//TODO: remove: tmp code just for devel phase
+        if (FragmentSpaceParameters.useTemplates)
+        {
+            fragmentLib.add(DENOPTIMTemplate.getTestTemplate());
+            System.err.println("Added test template to fragment library");
+        }
     }
     
 //------------------------------------------------------------------------------
