@@ -92,6 +92,12 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * 
+     * @param vertexId unique identified of the vertex
+     * @param bbId 0-based index of building block in the library
+     * @param bbType choose the type of building block 0:scaffold, 1:fragment, 2:capping group
+     */
     public DENOPTIMVertex(int vertexId, int bbId, int bbType)
     {
         this.vertexId = vertexId;
