@@ -1020,7 +1020,7 @@ public class ParallelEvolutionaryAlgorithm
 
                 // generate a random graph
                 DENOPTIMGraph molGraph = EAUtils.buildGraph();
-                //System.err.println(molGraph.toString());
+//                System.err.println("My graph: " + molGraph.toString());
 
                 if (molGraph == null)
                 {

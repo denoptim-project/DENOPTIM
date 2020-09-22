@@ -19,14 +19,19 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.GraphUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Unit test for DENOPTIMTemplate
@@ -36,6 +41,12 @@ import org.junit.jupiter.api.Test;
 
 public class DENOPTIMTemplateTest
 {
+    private static DENOPTIMAttachmentPoint testAP = null;
+
+    @BeforeAll
+    public static void SetUpClass() {
+        testAP = new DENOPTIMAttachmentPoint(0, 1, 1);
+    }
 	
 //------------------------------------------------------------------------------
 
@@ -48,4 +59,17 @@ public class DENOPTIMTemplateTest
 */
     
 //------------------------------------------------------------------------------
+
+
+    @Test
+    public void testIfInteriorGraphDoesNotHaveVacantAPsEqualToExteriorAPsThrowIAE() {
+        DENOPTIMTemplate template = new DENOPTIMTemplate();
+        List<DENOPTIMAttachmentPoint> exteriorAPs = new ArrayList<>();
+        exteriorAPs.add(testAP);
+        template.setExteriorAPs(exteriorAPs);
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        assertThrows(IllegalArgumentException.class,
+                () -> template.setInteriorGraph(g)
+        );
+    }
 }

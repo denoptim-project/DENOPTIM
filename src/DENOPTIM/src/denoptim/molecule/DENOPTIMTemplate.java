@@ -41,10 +41,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
      * constant, and 2 means the vertices are constant.
      */
     private int contractLevel = 0;
+    private List<DENOPTIMAttachmentPoint> exteriorAPs;
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMTemplate() 
+    public DENOPTIMTemplate()
     {
         super();
     }
@@ -97,7 +98,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate();
 
-        
         // Adding fully defined vertexes (they point to an actual fragment
         DENOPTIMVertex vA = new DENOPTIMVertex(
                 GraphUtils.getUniqueVertexIndex(), 0, 1);
@@ -111,12 +111,19 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
         DENOPTIMAttachmentPoint apOnB = vB.getAttachmentPoints().get(1);
         String srcAPClass = apOnA.getAPClass();
         String trgAPClass = apOnA.getAPClass();
-        DENOPTIMEdge eAB = new DENOPTIMEdge(vA.getVertexId(), vB.getVertexId(), 
-                0, 1, FragmentSpace.getBondOrderForAPClass(apOnA.getAPRule()), 
-                srcAPClass, trgAPClass);
+        DENOPTIMEdge eAB = new DENOPTIMEdge(
+                vA.getVertexId(),
+                vB.getVertexId(),
+                0,
+                1,
+                FragmentSpace.getBondOrderForAPClass(apOnA.getAPRule()),
+                srcAPClass,
+                trgAPClass
+        );
+
         template.interiorGraph.addEdge(eAB);
-        
-        System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
+
+//        System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
         
         return template;
     }
@@ -155,7 +162,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
     public DENOPTIMTemplate clone()
     {
     	//TODO: implement deep cloning. Now it just returns the original ;-)
-    	return this;
+    	return getTestTemplate();
     }
 
 //------------------------------------------------------------------------------
@@ -187,11 +194,23 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
 //-----------------------------------------------------------------------------
     
     //TODO: this will probably change, not it is useful for debugging
-    public DENOPTIMGraph getEmbeddeGraph()
+    public DENOPTIMGraph getEmbeddedGraph()
     {
         return interiorGraph;
     }
-    
+
+    public void setInteriorGraph(DENOPTIMGraph graph) {
+        if (!graph.getAvailableAPs().containsAll(exteriorAPs)) {
+            throw new IllegalArgumentException("Graph must have vacant APs " +
+                    "same as exteriorAPs");
+        }
+
+    }
+
+    public void setExteriorAPs(List<DENOPTIMAttachmentPoint> exteriorAPs) {
+        this.exteriorAPs = exteriorAPs;
+    }
+
 //-----------------------------------------------------------------------------
 }
 

@@ -70,7 +70,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * list of APs that behave in a similar manner when fragments are attached,
      * i.e., mirror the operation performed on symmetric set of APs.
      */
-    private ArrayList<SymmetricSet> lstSymmAP;
+    protected ArrayList<SymmetricSet> lstSymmAP;
 
     /*
      * Flag indicating this as a ring closing vertex

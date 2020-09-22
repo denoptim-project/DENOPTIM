@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import denoptim.molecule.*;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 
@@ -32,10 +33,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.IGraphBuildingBlock;
-import denoptim.molecule.SymmetricSet;
 
 import java.util.logging.Level;
 
@@ -431,7 +428,10 @@ public class FragmentUtils
     	{
     		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
     		return getMatchingAP(iac, daps);
-    	}
+    	} else if (bb instanceof DENOPTIMTemplate) {
+    	    return new ArrayList<>();
+        }
+    	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
     	return null;
     }
 

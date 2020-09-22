@@ -34,9 +34,11 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMTemplate;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
 
 
 /**
@@ -217,8 +219,14 @@ public class FragmentSpace
     	//TODO: remove: tmp code just for devel phase
         if (FragmentSpaceParameters.useTemplates)
         {
-            fragmentLib.add(DENOPTIMTemplate.getTestTemplate());
-            System.err.println("Added test template to fragment library");
+//            fragmentLib.add(DENOPTIMTemplate.getTestTemplate());
+//            System.err.println("Added test template to fragment library");
+            scaffoldLib = new ArrayList<>();
+            scaffoldLib.add(DENOPTIMTemplate.getTestTemplate());
+            DENOPTIMVertex vertex = new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(), 0, 0);
+            System.err.println(vertex);
+            System.err.println(vertex.hasSymmetricAP());
+            System.err.println("Replaced scaffold lib with single test template");
         }
     }
     
