@@ -54,8 +54,7 @@ import denoptim.utils.FragmentUtils;
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragment extends DENOPTIMVertex 
-        implements IGraphBuildingBlock
+public class DENOPTIMFragment implements IGraphBuildingBlock
 { 	
     /**
 	 * Version UID
@@ -66,6 +65,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	 * Molecular representation of this fragment
 	 */
 	private IAtomContainer mol;
+	
+	/**
+	 * List of Attachment points
+	 */
+	private ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+	        new ArrayList<DENOPTIMAttachmentPoint> ();
 	
 	/**
 	 * Flag notifying the need to update the list of APs
@@ -80,7 +85,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
     public DENOPTIMFragment()
     {
-        super();
         this.mol = new AtomContainer();
     }
     
@@ -95,9 +99,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     
     public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
-    {
-        super();
-        
+    {    	
     	// WARNING: atom container properties are not imported
         this.mol = new AtomContainer(mol);
         
@@ -340,15 +342,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * in the atom list!
      */
     
-    //TODO: use the content of this method to update the list of APs that
-    // is found in the super class
-    
     public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs()
     {
-    	if (apListNeddsToBeUpdated)
-    	{
-    	    updateAPs();
-    	}
+    	updateAPs();
     	
     	ArrayList<DENOPTIMAttachmentPoint> allAPs = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -712,6 +708,16 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         mol.setProperties(properties);
     }
+    
+    /*
+//-----------------------------------------------------------------------------
+
+    public
+    {
+        
+    }
+    
+    */
     
 //-----------------------------------------------------------------------------
     
