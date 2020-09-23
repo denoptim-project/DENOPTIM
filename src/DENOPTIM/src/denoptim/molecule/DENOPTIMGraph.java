@@ -31,7 +31,9 @@ import com.hp.hpl.jena.graph.GraphUtil;
 import java.io.Serializable;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.rings.ClosableChain;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 /**
@@ -1492,5 +1494,58 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     
 //------------------------------------------------------------------------------        
 
+    /**
+     * Parses the attachment point information associated with a molecule.
+     * Where applicable, each AP must correspond to a class/reaction.
+     * If multiple classes are involved, multiple attachments are created.
+     * @param idx the index of the fragment in the library (0-based).
+     * @param ftype the type of fragment (scaffold, fragment, capping group)
+     * as integer
+     * @return a clone of the list of <code>DENOPTIMAttachmentPoint</code>
+     * @throws DENOPTIMException
+     */
+
+    public static  ArrayList<DENOPTIMAttachmentPoint> getAPForFragment(
+            int idx ,
+            int ftype
+    ) throws DENOPTIMException {
+        IGraphBuildingBlock mol = FragmentSpace.getFragment(ftype,idx);
+        ArrayList<DENOPTIMAttachmentPoint> origList = mol.getAPs();
+        ArrayList<DENOPTIMAttachmentPoint> clList =
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (int i=0; i<origList.size(); i++)
+        {
+            clList.add(origList.get(i).clone());
+        }
+        return clList;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * calculate the number of atoms from the graph representation
+     * @return number of heavy atoms in the molecule
+     */
+    public int getNumberOfAtoms()
+    {
+        int n = 0;
+        ArrayList<DENOPTIMVertex> vlst = getVertexList();
+
+        for (DENOPTIMVertex denoptimVertex : vlst) {
+            int id = denoptimVertex.getMolId();
+            int ftype = denoptimVertex.getFragmentType();
+            IGraphBuildingBlock bb;
+            try {
+                bb = FragmentSpace.getFragment(ftype, id);
+                if (bb instanceof DENOPTIMFragment) {
+                    n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
+                            ((DENOPTIMFragment) bb).getAtomContainer());
+                }
+            } catch (DENOPTIMException e) {
+                e.printStackTrace();
+            }
+        }
+        return n;
+    }
 }
 

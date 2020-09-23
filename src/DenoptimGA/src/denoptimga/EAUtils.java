@@ -1480,40 +1480,6 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    /**
-     *
-     * @param molGraph
-     * @param fragIdx
-     * @param nfrags
-     * @return <code>true</code> if addition of a fragment does not violate
-     * any rules (max number of atoms)
-     */
-
-    protected static boolean isFragmentAdditionPossible(DENOPTIMGraph molGraph,
-            int fragIdx, int nfrags)
-    {
-    	int n = 0;
-    	IGraphBuildingBlock bb = null;
-		try {
-			//WARNING: assumption that the building block is a proper fragment
-			bb = FragmentSpace.getFragment(1, fragIdx);
-			if (bb instanceof DENOPTIMFragment)
-            {
-            	n = nfrags * DENOPTIMMoleculeUtils.getHeavyAtomCount(
-            			((DENOPTIMFragment) bb).getAtomContainer());
-            }
-		} catch (DENOPTIMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-        int natom = getNumberOfAtoms(molGraph);
-
-        if (n + natom > FragmentSpaceParameters.getMaxHeavyAtom())
-            return false;
-        return true;
-    }
-
 //------------------------------------------------------------------------------
 
     /**
