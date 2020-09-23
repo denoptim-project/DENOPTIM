@@ -19,12 +19,7 @@
 
 package denoptim.molecule;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.hp.hpl.jena.graph.GraphUtil;
 
@@ -1491,7 +1486,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	
     	return true;
     }
-    
+
+    public List<DENOPTIMAttachmentPoint> getAvailableAPs() {
+        return null;
+    }
+
 //------------------------------------------------------------------------------        
 
     /**

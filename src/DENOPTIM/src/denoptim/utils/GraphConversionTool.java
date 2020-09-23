@@ -81,7 +81,7 @@ public class GraphConversionTool
             } else if (igbb instanceof DENOPTIMTemplate) 
             {
             	//TODO
-            	System.out.println("This is where some magic will occur... ");
+            	System.out.println("This is where some Template magic will occur... ");
             	continue;
             } else {
             	//The vertex does not point to anything that contains molecular fragments

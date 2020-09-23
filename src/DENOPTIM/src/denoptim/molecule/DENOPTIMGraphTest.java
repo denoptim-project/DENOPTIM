@@ -927,4 +927,26 @@ public class DENOPTIMGraphTest
     }
     
 //------------------------------------------------------------------------------
+
+	@Test
+	public void testGetAvailableAPs_returnsListOfAvailableAPs() {
+    	DENOPTIMAttachmentPoint ap0 = new DENOPTIMAttachmentPoint(0, 1, 1);
+    	DENOPTIMAttachmentPoint ap1 = new DENOPTIMAttachmentPoint(0, 1, 1);
+
+    	DENOPTIMVertex vertex0 = new DENOPTIMVertex();
+    	vertex0.setVertexId(0);
+    	vertex0.setAttachmentPoints(new ArrayList<>(Arrays.asList(ap0, ap1)));
+
+    	DENOPTIMVertex vertex1 = new DENOPTIMVertex();
+    	vertex1.setVertexId(1);
+    	vertex1.setAttachmentPoints(new ArrayList<>(Arrays.asList(ap0)));
+
+    	DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getVertexId(),
+				vertex1.getVertexId(), 0, 0, 1);
+
+		DENOPTIMGraph graph = new DENOPTIMGraph();
+		graph.addVertex(vertex0);
+		graph.addVertex(vertex1);
+		graph.addEdge(edge0);
+	}
 }

@@ -70,7 +70,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * list of APs that behave in a similar manner when fragments are attached,
      * i.e., mirror the operation performed on symmetric set of APs.
      */
-    private ArrayList<SymmetricSet> lstSymmAP;
+    protected ArrayList<SymmetricSet> lstSymmAP;
 
     /*
      * Flag indicating this as a ring closing vertex
@@ -92,6 +92,12 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * 
+     * @param vertexId unique identified of the vertex
+     * @param bbId 0-based index of building block in the library
+     * @param bbType choose the type of building block 0:scaffold, 1:fragment, 2:capping group
+     */
     public DENOPTIMVertex(int vertexId, int bbId, int bbType)
     {
         this.vertexId = vertexId;
