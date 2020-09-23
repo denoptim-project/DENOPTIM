@@ -1450,39 +1450,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * calculate the number of atoms from the graph representation
-     * @return number of heavy atoms in the molecule
-     */
-    protected static int getNumberOfAtoms(DENOPTIMGraph molGraph)
-    {
-        int n = 0;
-        ArrayList<DENOPTIMVertex> vlst = molGraph.getVertexList();
-
-        for (int i=0; i<vlst.size(); i++)
-        {
-            int id = vlst.get(i).getMolId();
-            int ftype = vlst.get(i).getFragmentType();
-            IGraphBuildingBlock bb = null;
-			try {
-				bb = FragmentSpace.getFragment(ftype, id);
-				if (bb instanceof DENOPTIMFragment)
-	            {
-	            	n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
-	            			((DENOPTIMFragment) bb).getAtomContainer());
-	            }
-			} catch (DENOPTIMException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-        return n;
-    }
-
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-    /**
      * Compare attachment points based on the reaction types
      * @param A attachment point information
      * @param B attachment point information
