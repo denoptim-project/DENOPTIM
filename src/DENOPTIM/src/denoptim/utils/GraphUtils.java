@@ -1899,7 +1899,7 @@ public class GraphUtils
         int lvl = curVertex.getLevel();
         int nvid = GraphUtils.getUniqueVertexIndex();
         ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                                 FragmentUtils.getAPForFragment(fId, fTyp);
+                FragmentSpace.getFragment(fTyp, fId).getAPs();
 
         DENOPTIMVertex fragVertex = new DENOPTIMVertex(nvid,fId,fragAPs,fTyp);
 

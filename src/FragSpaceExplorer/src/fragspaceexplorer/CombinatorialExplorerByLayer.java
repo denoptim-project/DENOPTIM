@@ -790,7 +790,7 @@ public class CombinatorialExplorerByLayer
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
         ArrayList<DENOPTIMAttachmentPoint> scafAPs =
-                                      FragmentUtils.getAPForFragment(scafIdx,0);
+                FragmentSpace.getFragment(0, scafIdx).getAPs();
 
         DENOPTIMVertex scafVertex = new DENOPTIMVertex(
                                               GraphUtils.getUniqueVertexIndex(),

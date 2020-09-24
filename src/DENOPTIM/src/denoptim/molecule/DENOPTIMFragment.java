@@ -287,7 +287,13 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
     
 	public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
 	{
-		return getCurrentAPs();
+		ArrayList<DENOPTIMAttachmentPoint> original = getCurrentAPs();
+		ArrayList<DENOPTIMAttachmentPoint> copy =
+                new ArrayList<>(original.size());
+		for (DENOPTIMAttachmentPoint ap : original) {
+		    copy.add(ap.clone());
+        }
+		return copy;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -346,8 +352,8 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
     {
     	updateAPs();
     	
-    	ArrayList<DENOPTIMAttachmentPoint> allAPs = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	ArrayList<DENOPTIMAttachmentPoint> allAPs =
+                new ArrayList<>();
     	
         for (IAtom srcAtm : mol.atoms())
         {
@@ -355,15 +361,12 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
             {
         		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
         				getAPListFromAtom(srcAtm);
-		        for (int i = 0; i<apsOnAtm.size(); i++)
-		        {
-		            allAPs.add(apsOnAtm.get(i));
-		        }
+                allAPs.addAll(apsOnAtm);
             }
         }
 
         //Reorder according to DENOPTIMAttachmentPoint priority
-        Collections.sort(allAPs, new DENOPTIMAttachmentPointComparator());
+        allAPs.sort(new DENOPTIMAttachmentPointComparator());
         
         return allAPs;
     }

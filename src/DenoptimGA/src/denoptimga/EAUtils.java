@@ -48,7 +48,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
@@ -925,8 +924,8 @@ public class EAUtils
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold();
 
-        ArrayList<DENOPTIMAttachmentPoint> scafAP = 
-				      FragmentUtils.getAPForFragment(scafIdx,0);
+        ArrayList<DENOPTIMAttachmentPoint> scafAP =
+                FragmentSpace.getFragment(0, scafIdx).getAPs();
 
         DENOPTIMVertex scafVertex = 
         new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(),scafIdx,scafAP, 0);
@@ -1067,8 +1066,8 @@ public class EAUtils
             if (fid != -1)
             {
                 // for the current capping fragment get the list of APs
-                ArrayList<DENOPTIMAttachmentPoint> fragAP = 
-					 FragmentUtils.getAPForFragment(fid, 2);
+                ArrayList<DENOPTIMAttachmentPoint> fragAP =
+                        FragmentSpace.getFragment(2, fid).getAPs();
 
                 DENOPTIMVertex fragVertex =
                            new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(),
@@ -1954,8 +1953,8 @@ MF: TO BE TESTED
                 }
 
 		// choose one of the compatible APs on the chosen fragment
-        	ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                                         FragmentUtils.getAPForFragment(fid, 1);
+                ArrayList<DENOPTIMAttachmentPoint> fragAPs =
+                        FragmentSpace.getFragment(1, fid).getAPs();
 		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
 		for (int i=0; i<fragAPs.size(); i++)
 		{

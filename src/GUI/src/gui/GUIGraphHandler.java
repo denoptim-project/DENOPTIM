@@ -30,10 +30,7 @@ import java.beans.PropertyChangeListenerProxy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -59,20 +56,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IChemObjectChangeEvent;
-import org.openscience.cdk.interfaces.IChemObjectListener;
-import org.openscience.cdk.interfaces.IElectronContainer;
-import org.openscience.cdk.interfaces.ILonePair;
-import org.openscience.cdk.interfaces.ISingleElectron;
-import org.openscience.cdk.interfaces.IStereoElement;
-import org.openscience.cdk.interfaces.IBond.Order;
-import org.openscience.cdk.interfaces.IBond.Stereo;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -87,7 +72,6 @@ import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
 
 
@@ -973,7 +957,7 @@ public class GUIGraphHandler extends GUICardPanel
 		int scaffVrtId = 1;
 		ArrayList<DENOPTIMAttachmentPoint> scaffAPs;
 		try {
-			scaffAPs = FragmentUtils.getAPForFragment(scaffFragId, 0);
+			scaffAPs = FragmentSpace.getFragment(0, scaffFragId).getAPs();
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -1124,7 +1108,7 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			ArrayList<DENOPTIMAttachmentPoint> trgAPs;
 			try {
-				trgAPs = FragmentUtils.getAPForFragment(trgFragId, trgFrgType);
+				trgAPs = FragmentSpace.getFragment(trgFrgType, trgFragId).getAPs();
 			} catch (DENOPTIMException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null,"Error defining APs",

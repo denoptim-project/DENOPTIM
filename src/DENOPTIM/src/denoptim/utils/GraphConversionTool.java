@@ -334,7 +334,7 @@ public class GraphConversionTool
             ArrayList<DENOPTIMAttachmentPoint> lstAP;
 		    if (useMolInfo)
 		    {
-	            lstAP = FragmentUtils.getAPForFragment(molid, fragtype);
+                lstAP = FragmentSpace.getFragment(fragtype, molid).getAPs();
 		    }
 		    else
 		    {

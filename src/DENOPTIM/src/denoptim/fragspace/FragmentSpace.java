@@ -37,7 +37,6 @@ import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
 
 
@@ -458,7 +457,7 @@ public class FragmentSpace
 	    String apc = "";
 	    try 
 	    {
-		apc = FragmentUtils.getAPForFragment(i,2).get(0).getAPClass();
+            apc = getFragment(2, i).getAPs().get(0).getAPClass();
 		if (apc.equals(query))
 		{
 		    selected.add(i);

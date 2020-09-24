@@ -334,7 +334,7 @@ public class GraphBuildingTask implements Callable
                     newSymSets.put(tSymSetID,ss);
                 }
                 ArrayList<DENOPTIMAttachmentPoint> tFAPs =
-                                    FragmentUtils.getAPForFragment(tFId, tFTyp);
+                        FragmentSpace.getFragment(tFTyp, tFId).getAPs();
                 String tCls = tFAPs.get(tApId).getAPClass();
     
                 DENOPTIMVertex trgVrtx = new DENOPTIMVertex(tVId, tFId, tFAPs,

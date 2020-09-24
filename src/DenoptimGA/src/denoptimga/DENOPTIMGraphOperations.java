@@ -25,12 +25,10 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.apache.commons.math3.random.MersenneTwister;
-import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -521,7 +519,7 @@ public class DENOPTIMGraphOperations
         // Define the new vertex
         int fid = chosenFrgAndAp.getVertexMolId();
         ArrayList<DENOPTIMAttachmentPoint> fragAP =
-                                         FragmentUtils.getAPForFragment(fid, 1);
+                FragmentSpace.getFragment(1, fid).getAPs();
         int nvid = GraphUtils.getUniqueVertexIndex();
         DENOPTIMVertex fragVertex = new DENOPTIMVertex(nvid, fid, fragAP, 1);
         // update the level of the vertex based on its parent
