@@ -77,7 +77,6 @@ import java.util.Map;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.io.SDFWriter;
@@ -1290,7 +1289,7 @@ public class DenoptimIO
 					fragLib.getAbsolutePath()))
 			{
 				DENOPTIMFragment frag = new DENOPTIMFragment(mol);
-				for (DENOPTIMAttachmentPoint ap : frag.getAllAPs())
+                for (DENOPTIMAttachmentPoint ap : frag.getAPs())
 				{
 					allCLasses.add(ap.getAPClass());
 				}

@@ -188,7 +188,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
     {
         // TODO Now this returns an empty list, but it will have to detect
         // the symmetric sets in the underlying graph
-        return new ArrayList<SymmetricSet>();
+        return new ArrayList<>();
     }
     
 //-----------------------------------------------------------------------------

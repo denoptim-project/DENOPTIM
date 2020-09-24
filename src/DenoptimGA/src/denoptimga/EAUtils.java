@@ -60,7 +60,6 @@ import denoptim.rings.RingClosuresArchive;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -937,7 +936,62 @@ public class EAUtils
         
         IGraphBuildingBlock mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
         // identify the symmetric APs if any for this fragment vertex
-        ArrayList<SymmetricSet> simAP = FragmentUtils.getMatchingAP(mol,scafAP);
+        /*
+    	if (bb instanceof DENOPTIMFragment)
+    	{
+    		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
+            ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
+            for (int i = 0; i< daps.size()-1; i++)
+            {
+                ArrayList<Integer> lst = new ArrayList<>();
+                Integer i1 = i;
+                lst.add(i1);
+
+                boolean alreadyFound = false;
+                for (SymmetricSet previousSS : lstCompatible)
+                {
+                    if (previousSS.contains(i1))
+                    {
+                        alreadyFound = true;
+                        break;
+                    }
+                }
+
+                if (alreadyFound)
+                {
+                    continue;
+                }
+
+                DENOPTIMAttachmentPoint d1 = daps.get(i);
+                for (int j = i+1; j< daps.size(); j++)
+                {
+                    DENOPTIMAttachmentPoint d2 = daps.get(j);
+                    if (isCompatible(iac, d1.getAtomPositionNumber(),
+                                                    d2.getAtomPositionNumber()))
+                    {
+                        // check if reactions are compatible
+                        if (isFragmentClassCompatible(d1, d2))
+                        {
+                            Integer i2 = j;
+                            lst.add(i2);
+                        }
+                    }
+                }
+
+                if (lst.size() > 1)
+                {
+                    lstCompatible.add(new SymmetricSet(lst));
+                }
+            }
+
+            return lstCompatible;
+        } else if (bb instanceof DENOPTIMTemplate) {
+    	    return new ArrayList<>();
+        }
+    	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
+    	return null;
+    	*/
+        ArrayList<SymmetricSet> simAP = mol.getSymmetricAPsSets();
         scafVertex.setSymmetricAP(simAP);
         
         

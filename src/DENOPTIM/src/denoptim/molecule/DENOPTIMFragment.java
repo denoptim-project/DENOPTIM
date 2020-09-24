@@ -19,28 +19,17 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
-import org.openscience.cdk.Atom;
+import denoptim.logging.DENOPTIMLogger;
 import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IBond.Order;
-import org.openscience.cdk.interfaces.IBond.Stereo;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IChemObjectChangeEvent;
-import org.openscience.cdk.interfaces.IChemObjectListener;
-import org.openscience.cdk.interfaces.IElectronContainer;
-import org.openscience.cdk.interfaces.ILonePair;
-import org.openscience.cdk.interfaces.ISingleElectron;
-import org.openscience.cdk.interfaces.IStereoElement;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -64,12 +53,12 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 	/**
 	 * Molecular representation of this fragment
 	 */
-	private IAtomContainer mol;
+	private final IAtomContainer mol;
 	
 	/**
 	 * List of Attachment points
 	 */
-	private ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+	private final ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
 	        new ArrayList<DENOPTIMAttachmentPoint> ();
 	
 	/**
@@ -284,7 +273,7 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
      * Returns all attachment points currently defined on this fragment.
      * @return the list of APs
      */
-    
+
 	public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
 	{
 		ArrayList<DENOPTIMAttachmentPoint> original = getCurrentAPs();
@@ -296,20 +285,6 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 		return copy;
 	}
 	
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns all APs currently defined.
-     * @return the list of APs
-     * @deprecated: use getAPs()
-     */
-    
-	@Deprecated
-    public ArrayList<DENOPTIMAttachmentPoint> getAllAPs()
-    {
-    	return getCurrentAPs();
-    }
-
 //-----------------------------------------------------------------------------
     
     /**
@@ -542,10 +517,10 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 			    int BndOrd = FragmentSpace.getBondOrderForAPClass(
 			    		ap.getAPClass());
 			    String sBO = Integer.toString(BndOrd);
-			    String stBnd = " " + Integer.toString(atmID)+":"+sBO;
+			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
 			    {
-	                stBnd = stBnd.substring(1,stBnd.length());
+	                stBnd = stBnd.substring(1);
 			    }
 			    propAttchPnt = propAttchPnt + stBnd;
 			}
@@ -586,11 +561,46 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
      * point and has nothing to to with symmetry in three-dimensional space.  
      * @return the list of symmetry-related attachment points.
      */
-    public ArrayList<SymmetricSet> getSymmetricAPsSets()
-    {
-        ArrayList<SymmetricSet> symAPs = FragmentUtils.getMatchingAP(mol,
-                this.getCurrentAPs());
-        return symAPs;
+    public ArrayList<SymmetricSet> getSymmetricAPsSets() {
+        ArrayList<DENOPTIMAttachmentPoint> aps = getAPs();
+        IAtomContainer iac = this.getAtomContainer();
+        ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
+        for (int i = 0; i < aps.size() - 1; i++) {
+            ArrayList<Integer> lst = new ArrayList<>();
+            Integer i1 = i;
+            lst.add(i1);
+
+            boolean alreadyFound = false;
+            for (SymmetricSet previousSS : lstCompatible) {
+                if (previousSS.contains(i1)) {
+                    alreadyFound = true;
+                    break;
+                }
+            }
+
+            if (alreadyFound) {
+                continue;
+            }
+
+            DENOPTIMAttachmentPoint d1 = aps.get(i);
+            for (int j = i + 1; j < aps.size(); j++) {
+                DENOPTIMAttachmentPoint d2 = aps.get(j);
+                if (FragmentUtils.isCompatible(iac, d1.getAtomPositionNumber(),
+                        d2.getAtomPositionNumber())) {
+                    // check if reactions are compatible
+                    if (FragmentUtils.isFragmentClassCompatible(d1, d2)) {
+                        Integer i2 = j;
+                        lst.add(i2);
+                    }
+                }
+            }
+
+            if (lst.size() > 1) {
+                lstCompatible.add(new SymmetricSet(lst));
+            }
+        }
+
+        return lstCompatible;
     }
     
 //-----------------------------------------------------------------------------

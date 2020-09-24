@@ -27,7 +27,6 @@ import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 
 import java.util.logging.Level;
@@ -141,86 +140,6 @@ public class FragmentUtils
     }
     
 //------------------------------------------------------------------------------
-    
-    //TODO: check if we really need this. Possibly get rid of it
-    
-    public static ArrayList<SymmetricSet> getMatchingAP(IGraphBuildingBlock bb,
-            ArrayList<DENOPTIMAttachmentPoint> daps)
-    {
-    	if (bb instanceof DENOPTIMFragment)
-    	{
-    		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
-    		return getMatchingAP(iac, daps);
-    	} else if (bb instanceof DENOPTIMTemplate) {
-    	    return new ArrayList<>();
-        }
-    	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
-    	return null;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * In the given molecule, the method identifies similar atom environments
-     * which also have similar attachment point attributes (bond/reaction
-     * types)
-     * @param mol the scaffold molecule, for which similar atom environments 
-     * at the attachment points are to be identified
-     * @param daps the list of APs for the scaffold
-     * @return a list of indices of the APs that match
-     */
-
-    public static ArrayList<SymmetricSet> getMatchingAP(IAtomContainer mol,
-                                        ArrayList<DENOPTIMAttachmentPoint> daps)
-    {
-        ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
-        for (int i=0; i<daps.size()-1; i++)
-        {
-            ArrayList<Integer> lst = new ArrayList<>();
-            Integer i1 = i;
-            lst.add(i1);
-
-    	    boolean alreadyFound = false;
-    	    for (SymmetricSet previousSS : lstCompatible)
-    	    {
-        		if (previousSS.contains(i1))
-        		{
-        		    alreadyFound = true;
-        		    break;
-        		}
-    	    }
-    	    
-    	    if (alreadyFound)
-    	    {
-    	        continue;
-    	    }
-
-            DENOPTIMAttachmentPoint d1 = daps.get(i);
-            for (int j=i+1; j<daps.size(); j++)
-            {
-                DENOPTIMAttachmentPoint d2 = daps.get(j);
-                if (isCompatible(mol, d1.getAtomPositionNumber(),
-                                                d2.getAtomPositionNumber()))
-                {
-                    // check if reactions are compatible
-                    if (isFragmentClassCompatible(d1, d2))
-                    {
-                        Integer i2 = j;
-                        lst.add(i2);
-                    }
-                }
-            }
-
-            if (lst.size() > 1)
-    	    {
-                lstCompatible.add(new SymmetricSet(lst));
-    	    }
-        }
-
-        return lstCompatible;
-    }
-
-//------------------------------------------------------------------------------
 
     /**
      * Compare attachment points based on the AP class
@@ -230,7 +149,7 @@ public class FragmentUtils
      * else <code>false</code>
      */
 
-    private static boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint A,
+    public static boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint A,
                                                       DENOPTIMAttachmentPoint B)
     {
         String strA = A.getAPClass();
@@ -259,7 +178,7 @@ public class FragmentUtils
      * @return <code>true</code> if atoms have similar environments
      */
 
-    private static boolean isCompatible(IAtomContainer mol, int a1, int a2)
+    public static boolean isCompatible(IAtomContainer mol, int a1, int a2)
     {
         // check atom types
         IAtom atm1 = mol.getAtom(a1);
