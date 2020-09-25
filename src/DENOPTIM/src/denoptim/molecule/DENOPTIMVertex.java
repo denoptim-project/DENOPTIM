@@ -114,22 +114,18 @@ public class DENOPTIMVertex implements Cloneable, Serializable
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             System.exit(0);
         }
-        this.lstAP = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstAP = new ArrayList<>();
         for (DENOPTIMAttachmentPoint ap : bb.getAPs())
         {
             this.lstAP.add(ap.clone());
         }
-        this.lstSymmAP = new ArrayList<SymmetricSet>();
+        this.lstSymmAP = new ArrayList<>();
         for (SymmetricSet ss : bb.getSymmetricAPsSets())
         {
             this.lstSymmAP.add(ss.clone());
         }
-        isRCV = false;
-        if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-            lstAP.get(0).getAPClass()))
-        {
-            isRCV = true;
-        }
+        isRCV = lstAP.size() == 1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
+                lstAP.get(0).getAPClass());
     }    
 
 //------------------------------------------------------------------------------
@@ -143,12 +139,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         vertexId = m_vid;
         buildingBlockType = m_fragmentType;
         lstSymmAP = new ArrayList<>();
-        isRCV = false;
-		if (lstAP.size()==1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-		    lstAP.get(0).getAPClass()))
-		{
-		    isRCV = true;
-		}
+        isRCV = lstAP.size() == 1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
+                lstAP.get(0).getAPClass());
     }
 
 //------------------------------------------------------------------------------
@@ -236,12 +228,9 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public SymmetricSet getSymmetricAPs(int m_dapidx)
     {
-        for (int i=0; i<lstSymmAP.size(); i++)
-        {
-            ArrayList<Integer> lst = lstSymmAP.get(i).getList();
-            if (lstSymmAP.get(i).contains(Integer.valueOf(m_dapidx)))
-            {
-                return lstSymmAP.get(i);
+        for (SymmetricSet symmetricSet : lstSymmAP) {
+            if (symmetricSet.contains(m_dapidx)) {
+                return symmetricSet;
             }
         }
         return null;
@@ -267,7 +256,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         for (int i=0; i<lstAP.size(); i++)
         {
             if (lstAP.get(i).isAvailable())
-                lstAvailableAP.add(new Integer(i));
+                lstAvailableAP.add(i);
         }
         return lstAvailableAP;
     }
@@ -277,9 +266,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public int getFreeAPCount()
     {
         int n = 0;
-        for (int i=0; i<lstAP.size(); i++)
-        {
-            if (lstAP.get(i).isAvailable())
+        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAP) {
+            if (denoptimAttachmentPoint.isAvailable())
                 n++;
         }
         return n;
@@ -290,9 +278,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public boolean hasFreeAP()
     {
-        for (int i=0; i<lstAP.size(); i++)
-        {
-            if (lstAP.get(i).isAvailable())
+        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAP) {
+            if (denoptimAttachmentPoint.isAvailable())
                 return true;
         }
         return false;
@@ -340,9 +327,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public boolean hasSymmetricAP()
     {
-        if (lstSymmAP.isEmpty())
-            return false;
-        return true;
+        return !lstSymmAP.isEmpty();
     }
 
 //------------------------------------------------------------------------------
@@ -350,10 +335,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append(vertexId).append("_").append((buildingBlockId+1)).append("_").
-                    append(buildingBlockType).append("_").append(recursiveLevel);
-        return sb.toString();
+        return vertexId + "_" + (buildingBlockId + 1) + "_" +
+                buildingBlockType + "_" + recursiveLevel;
     }
 
 //------------------------------------------------------------------------------
@@ -378,9 +361,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      */
     public DENOPTIMVertex clone()
     {
-        DENOPTIMVertex c = new DENOPTIMVertex(vertexId, buildingBlockId, 
+        return new DENOPTIMVertex(vertexId, buildingBlockId,
                 buildingBlockType);
-        return c;
     }
     
 //------------------------------------------------------------------------------
