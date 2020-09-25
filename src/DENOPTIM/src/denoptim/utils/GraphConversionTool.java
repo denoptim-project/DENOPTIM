@@ -594,14 +594,7 @@ public class GraphConversionTool
         
         public int lookupMatchingAtomNumber(int anum)
         {
-            for (Map.Entry<Integer, Integer> entry : anum_map.entrySet())
-            {
-                if (entry.getKey() == anum)
-                {
-                    return entry.getValue();
-                }
-            }
-            return -1;
+            return anum_map.getOrDefault(anum, -1);
         }
         
         public int getVertexId()
@@ -634,7 +627,6 @@ public class GraphConversionTool
           }
           return mnum;
       }
-
 
 //------------------------------------------------------------------------------
 
