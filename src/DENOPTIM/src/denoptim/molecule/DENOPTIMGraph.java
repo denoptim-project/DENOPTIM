@@ -571,9 +571,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public DENOPTIMVertex getVertexAtPosition(int m_pos)
     {
-        if ((m_pos >= gVertices.size()) || m_pos < 0)
-            return null;
-        return gVertices.get(m_pos);
+        return ((m_pos >= gVertices.size()) || m_pos < 0) ? null :
+                gVertices.get(m_pos);
     }
     
 //------------------------------------------------------------------------------
@@ -952,7 +951,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         // When cloning the VertedID remains the same so we'll have two 
         // deep-copies of the same vertex having the same VertexID
-        ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<DENOPTIMVertex>();
+        ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
         for (DENOPTIMVertex vOrig : gVertices)
         {
             DENOPTIMVertex vClone = vOrig.clone();
@@ -969,7 +968,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         // Only primitives inside the edges, so it's just fine
-        ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<DENOPTIMEdge>();
+        ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<>();
         for (DENOPTIMEdge e : gEdges)
         {
             cListEdges.add(e.clone());
@@ -978,7 +977,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         DENOPTIMGraph clone = new DENOPTIMGraph(cListVrtx, cListEdges);
         
         // Copy the list but using the references to the cloned vertexes
-        ArrayList<DENOPTIMRing> cListRings = new ArrayList<DENOPTIMRing>();
+        ArrayList<DENOPTIMRing> cListRings = new ArrayList<>();
         for (DENOPTIMRing ring : gRings)
         {
             DENOPTIMRing cRing = new DENOPTIMRing();
@@ -993,8 +992,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         clone.setRings(cListRings);
         
         // The cheinLinks are made of primitives, so it's just fine
-        ArrayList<ClosableChain> cListClosableChains = 
-                new ArrayList<ClosableChain>();
+        ArrayList<ClosableChain> cListClosableChains =
+                new ArrayList<>();
         for (ClosableChain cc : closableChains)
         {
             cListClosableChains.add(cc.clone());
@@ -1002,7 +1001,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         clone.setCandidateClosableChains(cListClosableChains);
         
         // Each "set" is a list of Integer, but SymmetricSet.clone takes care
-        ArrayList<SymmetricSet> cSymVertices = new  ArrayList<SymmetricSet>();
+        ArrayList<SymmetricSet> cSymVertices = new ArrayList<>();
         for (SymmetricSet ss : symVertices)
         {
             cSymVertices.add(ss.clone());
@@ -1025,9 +1024,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public ArrayList<Integer> getVerticesWithMolId(int m_molId)
     {
         ArrayList<Integer> lst = new ArrayList<>();
-        for (int i=0; i<gVertices.size(); i++)
-        {
-            DENOPTIMVertex v = gVertices.get(i);
+        for (DENOPTIMVertex v : gVertices) {
             if (v.getMolId() == m_molId)
                 lst.add(v.getVertexId());
         }
@@ -1151,9 +1148,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public int getMaxLevel()
     {
         int mval = -1;
-        for (int i=0; i<gVertices.size(); i++)
-        {
-            DENOPTIMVertex vtx = gVertices.get(i);
+        for (DENOPTIMVertex vtx : gVertices) {
             mval = Math.max(mval, vtx.getLevel());
         }
         return mval;
@@ -1164,9 +1159,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public int getMaxVertexId()
     {
         int mval = Integer.MIN_VALUE;
-        for (int i=0; i<gVertices.size(); i++)
-        {
-            DENOPTIMVertex v = gVertices.get(i);
+        for (DENOPTIMVertex v : gVertices) {
             mval = Math.max(mval, v.getVertexId());
         }
         return mval;
@@ -1181,8 +1174,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             DENOPTIMEdge edge = getEdgeAtPosition(idx);
             int src = edge.getSourceVertex();
-            DENOPTIMVertex vtx = getVertexWithId(src);
-            return vtx;
+            return getVertexWithId(src);
         }
         return null;
     }
@@ -1195,8 +1187,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (idx != -1)
         {
             DENOPTIMEdge edge = getEdgeAtPosition(idx);
-            int srcdap = edge.getSourceDAP();
-            return srcdap;
+            return edge.getSourceDAP();
         }
         return -1;
     }
@@ -1206,9 +1197,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public ArrayList<Integer> getFragments(int ftype)
     {
         ArrayList<Integer> lstFrags = new ArrayList<>();
-        for (int i=0; i<gVertices.size(); i++)
-        {
-            DENOPTIMVertex vtx = gVertices.get(i);
+        for (DENOPTIMVertex vtx : gVertices) {
             if (vtx.getFragmentType() == ftype)
                 lstFrags.add(vtx.getMolId());
         }
@@ -1223,9 +1212,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             if (!gVertices.isEmpty())
             {
-                for (int i=0; i<gVertices.size(); i++)
-                {
-                    DENOPTIMVertex vtx = gVertices.get(i);
+                for (DENOPTIMVertex vtx : gVertices) {
                     if (vtx != null)
                         vtx.cleanup();
                 }
@@ -1491,34 +1478,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return null;
     }
 
-//------------------------------------------------------------------------------        
-
-    /**
-     * Parses the attachment point information associated with a molecule.
-     * Where applicable, each AP must correspond to a class/reaction.
-     * If multiple classes are involved, multiple attachments are created.
-     * @param idx the index of the fragment in the library (0-based).
-     * @param ftype the type of fragment (scaffold, fragment, capping group)
-     * as integer
-     * @return a clone of the list of <code>DENOPTIMAttachmentPoint</code>
-     * @throws DENOPTIMException
-     */
-
-    public static  ArrayList<DENOPTIMAttachmentPoint> getAPForFragment(
-            int idx ,
-            int ftype
-    ) throws DENOPTIMException {
-        IGraphBuildingBlock mol = FragmentSpace.getFragment(ftype,idx);
-        ArrayList<DENOPTIMAttachmentPoint> origList = mol.getAPs();
-        ArrayList<DENOPTIMAttachmentPoint> clList =
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (int i=0; i<origList.size(); i++)
-        {
-            clList.add(origList.get(i).clone());
-        }
-        return clList;
-    }
-
 //------------------------------------------------------------------------------
 
     /**
@@ -1545,6 +1504,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         return n;
+    }
+
+    public int getCorrespondingAtomNumber(int vertexId, int apAtomNumber) {
+
     }
 }
 
