@@ -1467,38 +1467,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Compare attachment points based on the reaction types
-     * @param A attachment point information
-     * @param B attachment point information
-     * @return <code>true</code> if the points share a common reaction or more
-     * else <code>false</code>
-     */
-
-    protected static boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint A,
-                                                    DENOPTIMAttachmentPoint B)
-    {
-        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
-        // if no reaction information is available return true
-        if (!rcnEnabled)
-        {
-            //System.err.println("No reactions defined. Always TRUE");
-            return true;
-        }
-
-        // if both have reaction info
-        String strA = A.getAPClass();
-        String strB = B.getAPClass();
-        if (strA != null && strB != null)
-        {
-            if (strA.compareToIgnoreCase(strB) == 0)
-                    return true;
-        }
-        return false;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Checks if the atoms at the given positions have similar environments
      * i.e. are similar in atom types etc.
      * @param mol

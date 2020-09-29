@@ -741,11 +741,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     
     public DENOPTIMAttachmentPoint clone()
     {
-    	DENOPTIMAttachmentPoint clAP = new DENOPTIMAttachmentPoint(
-    			atomPostionNumber, totalConnections, freeConnections, apRule,
-    			apSubClass, apClass, dirVec);
-        
-        return clAP;
+        return new DENOPTIMAttachmentPoint(
+                atomPostionNumber, totalConnections, freeConnections, apRule,
+                apSubClass, apClass, dirVec);
     }
 
 //------------------------------------------------------------------------------
@@ -815,4 +813,24 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     }
     
 //-----------------------------------------------------------------------------
+
+    /**
+     * Compare attachment points based on the reaction types
+     * @param other to compare against
+     * @return <code>true</code> if the points share a common reaction or more
+     */
+    public boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint other) {
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
+        // if no reaction information is available return true
+        if (!rcnEnabled) {
+            return true;
+        }
+
+        // if both have reaction info
+        String strA = getAPClass();
+        String strB = other.getAPClass();
+        return strA != null
+                && strB != null
+                && strA.compareToIgnoreCase(strB) == 0;
+    }
 }
