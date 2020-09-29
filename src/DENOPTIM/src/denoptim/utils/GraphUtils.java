@@ -105,39 +105,6 @@ public class GraphUtils
     }
 
 //------------------------------------------------------------------------------
-
-    /**
-     * Check if all the APs are satisfied.
-     *
-     * @param molGraph the Graph representation of the molecule
-     * @return <code>true</code> if all APs have been satisfied
-     */
-    public static boolean areAllAPSatisfied(DENOPTIMGraph molGraph)
-    {
-        ArrayList<DENOPTIMVertex> vertices = molGraph.getVertexList();
-        boolean found = true;
-        for (DENOPTIMVertex vtx : vertices)
-        {
-            ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();
-            for (DENOPTIMAttachmentPoint dp : daps)
-            {
-                if (dp.isAvailable())
-                {
-                    String msg = "Free APs available for Vertex: "
-                            + vtx.getVertexId()
-                            + " MolId: " + vtx.getMolId()
-                            + " Ftype: " + vtx.getFragmentType();
-                    DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-                    found = false;
-                    break;
-                }
-            }
-        }
-
-        return found;
-    }
-
-//------------------------------------------------------------------------------
     
     /**
      * Extracts the subgraph of a graph G starting from a given vertex in G.
