@@ -428,6 +428,34 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     	
     	return true;
     }
-    
-//------------------------------------------------------------------------------    
+
+//------------------------------------------------------------------------------
+
+    /**
+     *
+     * @param cmpReac list of reactions of the source vertex attachment point
+     * @return list of indices of the attachment points in vertex that has
+     * the corresponding reaction
+     */
+
+    public ArrayList<Integer> getCompatibleClassAPIndex(
+            String cmpReac
+    ) {
+        ArrayList<DENOPTIMAttachmentPoint> apLst = getAttachmentPoints();
+        ArrayList<Integer> apIdx = new ArrayList<>();
+        for (int i = 0; i < apLst.size(); i++)
+        {
+            DENOPTIMAttachmentPoint dap = apLst.get(i);
+            if (dap.isAvailable())
+            {
+                // check if this AP has the compatible reactions
+                String dapReac = dap.getAPClass();
+                if (dapReac.compareToIgnoreCase(cmpReac) == 0)
+                {
+                    apIdx.add(i);
+                }
+            }
+        }
+        return apIdx;
+    }
 }

@@ -206,7 +206,7 @@ public class EAUtils
 
     /**
      * Selects a single parent  using the scheme specified.
-     * @param molPopulation
+     * @param popln
      * @return the index of the parent
      */
 
@@ -294,8 +294,6 @@ public class EAUtils
     /**
      * perform fitness based class compatible selection of parents
      * @param molPopulation list of molecules
-     * @param sz size of the pool
-     * @param stype
      * @return indices of the parents that have at least 1 compatible Xover point
      */
 
@@ -711,7 +709,7 @@ public class EAUtils
 
     /**
      * For each building block collect the reactions it is involved in
-     * @param mols
+     * @param bbs
      */
 
     protected static void poolAPClasses(ArrayList<IGraphBuildingBlock> bbs)
@@ -1132,7 +1130,7 @@ public class EAUtils
                 //Get the index of the AP of the capping group to use
                 //(always the first and only AP)
                 ArrayList<Integer> apIdx =
-                        getCompatibleClassAPIndex(rcnCap, fragVertex);
+                        fragVertex.getCompatibleClassAPIndex(rcnCap);
                 int dap = apIdx.get(0);
 
                 DENOPTIMEdge edge = GraphUtils.connectVertices(
@@ -1439,40 +1437,6 @@ public class EAUtils
                 }
             }
         }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @param cmpReac list of reactions of the source vertex attachment point
-     * @param molVertex target vertex containing compatible reaction APs
-     * @return list of indices of the attachment points in molVertex that has
-     * the corresponding reaction
-     */
-
-    protected static ArrayList<Integer> getCompatibleClassAPIndex
-                                    (String cmpReac, DENOPTIMVertex molVertex)
-    {
-        ArrayList<DENOPTIMAttachmentPoint> apLst = molVertex.getAttachmentPoints();
-
-        ArrayList<Integer> apIdx = new ArrayList<>();
-
-        for (int i=0; i<apLst.size(); i++)
-        {
-            DENOPTIMAttachmentPoint dap = apLst.get(i);
-            if (dap.isAvailable())
-            {
-                // check if this AP has the compatible reactions
-                String dapReac = dap.getAPClass();
-                if (dapReac.compareToIgnoreCase(cmpReac) == 0)
-                {
-                    apIdx.add(i);
-                }
-            }
-        }
-
-        return apIdx;
     }
 
 //------------------------------------------------------------------------------
@@ -2049,7 +2013,7 @@ MF: TO BE TESTED
     {
         // get the list of indices of the compatible reaction AP
         ArrayList<Integer> apIdx =
-                            getCompatibleClassAPIndex(cmpReac, fragVertex);
+                fragVertex.getCompatibleClassAPIndex(cmpReac);
 
         MersenneTwister rng = RandomUtils.getRNG();
         int fapidx = -1;
