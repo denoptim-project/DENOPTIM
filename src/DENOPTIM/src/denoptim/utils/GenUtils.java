@@ -37,23 +37,20 @@ public class GenUtils
 //------------------------------------------------------------------------------
     
     // this is the javaboutique version
-    public static void printExceptionChain(Throwable thr)
-    {
+    public static void printExceptionChain(Throwable thr) {
         
-        StackTraceElement elements[] = thr.getStackTrace();
-        for (int i = 0, n = elements.length; i < n; i++) 
-        {
-            System.err.println(elements[i].getFileName() +  ":" 
-                            + elements[i].getLineNumber() + ">> " 
-                            + elements[i].getMethodName() + "()"
-                            );
+        StackTraceElement[] elements = thr.getStackTrace();
+        for (StackTraceElement element : elements) {
+            System.err.println(element.getFileName() + ":"
+                    + element.getLineNumber() + ">> "
+                    + element.getMethodName() + "()"
+            );
         }
     
     
         StackTraceElement[] steArr;
         Throwable cause = thr;
-        while (cause != null) 
-        {
+        while (cause != null) {
             System.err.println("-------------------------------");
             steArr = cause.getStackTrace();
             StackTraceElement s0 = steArr[0];
@@ -74,8 +71,7 @@ public class GenUtils
      * C++ equivalent of a getchar()
      */
      
-    public static void pause()
-    {
+    public static void pause() {
         System.err.println("Press a key to continue");
         try 
         {
@@ -133,35 +129,13 @@ public class GenUtils
         
         System.out.println(sb.toString());
     }
-        
-//------------------------------------------------------------------------------
 
-    public static double roundValue(double d, int n)
-    {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(n, BigDecimal.ROUND_HALF_UP);
-        return bd.doubleValue();
-    }
-
-//------------------------------------------------------------------------------  
-
-    /**
-     * match a number with optional '-' and decimal.
-     * @param str
-     * @return <code>true<true> if the string is a number
-     */
-
-    public static boolean isNumeric(String str)
-    {
-        return str.matches("-?\\d+(\\.\\d+)?");
-    }
-    
 //------------------------------------------------------------------------------
 
     /**
      * Return the index of the closing parenthesis. 
      * Ignores nested parenthesis
-     * @param id identified of the paranthesis 
+     * @param id identified of the parenthesis
      * (use 1 for round, 2 for square, and three for curly brackets)
      * @param s the string to analyze
      * @return the index of the closing parenthesis
