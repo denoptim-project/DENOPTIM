@@ -34,7 +34,6 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
     public int compare(ConnectedLigand a, ConnectedLigand b)
     {
         final int FIRST = 1;
-        final int EQUAL = 0;
         final int LAST = -1;
 
 	// Get the connection number
@@ -71,21 +70,7 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
         //Decide on priority
         if (cnnA == cnnB)
         {
-            if (massA == massB)
-            {
-                return EQUAL;
-            }
-            else
-            {
-                if (massA < massB)
-                {
-                    return FIRST;
-                }
-                else
-                {
-                    return LAST;
-                }
-            }
+            return Integer.compare(massB, massA);
         }
         else
         {

@@ -31,11 +31,11 @@ import denoptim.constants.DENOPTIMConstants;
 public class ConnectedLigand
 {
     //Root of the Ligand
-    private IAtom seed;
+    private final IAtom seed;
     //Connections
-    private int connections;
+    private final int connections;
     //is dummy atom
-    private boolean isDu;
+    private final boolean isDu;
 
 //------------------------------------------------------------------------------
     
@@ -44,13 +44,9 @@ public class ConnectedLigand
         this.seed = seed;
         this.connections = connections;
         String symbol = seed.getSymbol();
-        boolean isRCA = DENOPTIMConstants.RCATYPEMAP.keySet().contains(symbol);
-        this.isDu = false;
-        if (symbol.equals(DENOPTIMConstants.DUMMYATMSYMBOL) || isRCA ||
-                               !DENOPTIMConstants.ALL_ELEMENTS.contains(symbol))
-        {
-            this.isDu = true;
-        }
+        boolean isRCA = DENOPTIMConstants.RCATYPEMAP.containsKey(symbol);
+        this.isDu = symbol.equals(DENOPTIMConstants.DUMMYATMSYMBOL) || isRCA ||
+                !DENOPTIMConstants.ALL_ELEMENTS.contains(symbol);
     }
 
 //------------------------------------------------------------------------------
@@ -78,10 +74,7 @@ public class ConnectedLigand
 
     public String toString()
     {
-	StringBuilder sb = new StringBuilder();
-	sb.append(seed.getSymbol());
-	sb.append("(").append(connections).append("-conn.)");
-	return sb.toString();
+        return seed.getSymbol() + "(" + connections + "-conn.)";
     }
 //------------------------------------------------------------------------------    
 }

@@ -1505,9 +1505,5 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return n;
     }
-
-    public int getCorrespondingAtomNumber(int vertexId, int apAtomNumber) {
-
-    }
 }
 
