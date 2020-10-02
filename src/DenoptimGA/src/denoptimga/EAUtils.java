@@ -57,7 +57,6 @@ import denoptim.molecule.SymmetricSet;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
-import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -143,7 +142,7 @@ public class EAUtils
     private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> popln)
     {
         double[] fitness = getFitnesses(popln);
-        double sdev = DENOPTIMStatUtils.stddev(fitness, true);
+        double sdev = DENOPTIMStatUtils.stddev(fitness);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
         
@@ -169,10 +168,10 @@ public class EAUtils
             f = DENOPTIMStatUtils.median(fitness);
             sb.append(String.format("%-30s", "MEDIAN:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.stddev(fitness, true);
+            f = DENOPTIMStatUtils.stddev(fitness);
             sb.append(String.format("%-30s", "STDDEV:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.skewness(fitness, true);
+            f = DENOPTIMStatUtils.skewness(fitness);
             sb.append(String.format("%-30s", "SKEW:")).append(String.format(floatForm, f));
             sb.append(System.getProperty("line.separator"));
 
@@ -1546,7 +1545,7 @@ public class EAUtils
     protected static double getPopulationSD(ArrayList<DENOPTIMMolecule> molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
-        return DENOPTIMStatUtils.stddev(fitvals, true);
+        return DENOPTIMStatUtils.stddev(fitvals);
     }
     
 

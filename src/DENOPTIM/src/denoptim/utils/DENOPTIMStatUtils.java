@@ -99,11 +99,9 @@ public final class DENOPTIMStatUtils
      * numbers list is empty.
      *
      * @param numbers the numbers to calculate the standard deviation.
-     * @param biasCorrected true if variance is calculated by dividing by n - 1.
-     *                      False if by n.
      * @return the standard deviation
      */
-    public static double stddev(double[] numbers, boolean biasCorrected)
+    public static double stddev(double[] numbers)
     {
         double stddev = Double.NaN;
         int n = numbers.length;
@@ -111,7 +109,7 @@ public final class DENOPTIMStatUtils
         {
             if (n > 1)
             {
-                stddev = Math.sqrt(var(numbers, biasCorrected));
+                stddev = Math.sqrt(var(numbers));
             }
             else
             {
@@ -124,24 +122,14 @@ public final class DENOPTIMStatUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Computes the variance of the available values. By default, the unbiased
-     * "sample variance" definitional formula is
-     * used: variance = sum((x_i - mean)^2) / (n - 1)
-     * <p/>
-     * The "population variance"  ( sum((x_i - mean)^2) / n ) can also be
-     * computed using this statistic.  The
-     * <code>biasCorrected</code> property determines whether the "population"
-     * or "sample" value is returned by the
-     * <code>evaluate</code> and <code>getResult</code> methods. To compute
-     * population variances, set this property to
-     * <code>false</code>.
+     * Computes the variance of the available values. The unbiased
+     * "sample variance" definitional formula is used: variance =
+     * sum((x_i - mean)^2) / (n - 1).
      *
-     * @param numbers       the numbers to calculate the variance.
-     * @param biasCorrected true if variance is calculated by dividing by n - 1.
-     *                      False if by n.
+     * @param numbers the numbers to calculate the variance.
      * @return the variance of the numbers.
      */
-    public static double var(double[] numbers, boolean biasCorrected)
+    public static double var(double[] numbers)
     {
         int n = numbers.length;
         if (n == 0)
@@ -157,15 +145,21 @@ public final class DENOPTIMStatUtils
             squares[i] = Math.pow(XminMean, 2);
         }
         double sum = sum(squares);
-        return sum / (biasCorrected ? (n - 1) : n);
+        return sum / (n - 1);
     }
 
 //------------------------------------------------------------------------------
-    //   Precondition: Array must be sorted
+
+    /**
+     * Calculates median value of a <i>sorted</i> list.
+     *
+     * @param m
+     * @return median value of m
+     */
     public static double median(double[] m)
     {
-        int middle = m.length/2;  // subscript of middle element
-        if (m.length%2 == 1)
+        int middle = m.length / 2;  // subscript of middle element
+        if (m.length % 2 == 1)
         {
             // Odd number of elements -- return the middle one.
             return m[middle];
@@ -179,98 +173,27 @@ public final class DENOPTIMStatUtils
     }
 
 //------------------------------------------------------------------------------
-
     /**
-    * Computes the Kurtosis of the available values.
-    * <p>
-    * We use the following (unbiased) formula to define kurtosis:</p>
-    *  <p>
-    *  kurtosis = { [n(n+1) / (n -1)(n - 2)(n-3)] sum[(x_i - mean)^4] / std^4 } - [3(n-1)^2 / (n-2)(n-3)]
-    *  </p><p>
-    *  where n is the number of values, mean is the {@link Mean} and std is the
-    * {@link StandardDeviation}</p>
-    * <p>
-    *  Note that this statistic is undefined for n < 4.  <code>Double.Nan</code>
-    *  is returned when there is not sufficient data to compute the statistic.</p>
-    *
-    */
-
-    public static double kurtosis(double[] m, boolean biasCorrected)
+     * Computes the skewness using the adjusted Fisher-Pearson skewness
+     * coefficient.
+     * @param m sample
+     * @return skewness of sample or NaN if sample size is strictly less than 4.
+     */
+    public static double skewness(double[] m)
     {
-        double value = Double.NaN;
-        int N = m.length;
-        if (N > 3)
-        {
-            double variance = var(m, biasCorrected);
-            if (N <= 3 || variance < 10E-20)
-            {
-                value = 0.0;
-            }
-            else
-            {
-                double n = N;
-                double f1 = (n*(n+1)) /((n -1) * (n - 2) * (n - 3));
-                double avg = mean(m);
-                double f2 = 0, f3 = 0;
-                for (int i=0; i<N; i++)
-                {
-                    f2 += Math.pow((m[i] - avg), 4);
-                    f3 += Math.pow((m[i] - avg), 2);
-                }
-
-                double f4 = (3 * (n-1) * (n -1)) / ((n-2)*(n-3));
-
-                value = (f1 * (Math.pow(f2, 4)/Math.pow(f3, 2))) - f4;
-            }
+        double n = m.length;
+        if (n <= 3) {
+            return Double.NaN;
         }
-        return value;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-    * Computes the skewness of the available values.
-    * <p>
-    * We use the following (unbiased) formula to define skewness:</p>
-    * <p>
-    * skewness = [n / (n -1) (n - 2)] sum[(x_i - mean)^3] / std^3 </p>
-    * <p>
-    * where n is the number of values, mean is the {@link Mean} and std is the
-    * StandardDeviation </p>
-    *
-    */
-
-    public static double skewness(double[] m, boolean biasCorrected)
-    {
-        double value = Double.NaN;
-        int N = m.length;
-
-        if (N > 3)
-        {
-            double variance = var(m, biasCorrected);
-            if (variance < 10E-20)
-                value = 0.0;
-            else
-            {
-                double n = N;
-                double f1 = 0;
-                double f2 = 0;
-                double avg = mean(m);
-
-                for (int i=0; i<N; i++)
-                {
-                    f1 += Math.pow((m[i] - avg), 3);
-                    f2 += Math.pow((m[i] - avg), 2);
-                }
-
-                f1 /= n;
-                f2 /= n;
-                f2 = Math.pow(f2, 1.5);
-
-                value = f1/f2;
-            }
+        double sampleSizeCorrectionTerm = Math.sqrt(n * (n - 1)) / (n - 2);
+        double biasedStandardDeviation = Math.sqrt(n / (n - 1)) * stddev(m);
+        double accDeviationFromMean = 0.0;
+        double mean = mean(m);
+        for (double v : m) {
+            accDeviationFromMean += v - mean;
         }
-        return value;
+        return sampleSizeCorrectionTerm
+                * (accDeviationFromMean / (n * biasedStandardDeviation));
     }
 
 //------------------------------------------------------------------------------

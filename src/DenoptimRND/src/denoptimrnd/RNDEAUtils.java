@@ -126,11 +126,11 @@ class RNDEAUtils
         sb.append(String.format("%-30s", "MEDIAN:"));
 	sb.append(String.format("%12.3f", f));
         sb.append(System.getProperty("line.separator"));
-        f = DENOPTIMStatUtils.stddev(fitness, true);
+        f = DENOPTIMStatUtils.stddev(fitness);
         sb.append(String.format("%-30s", "STDDEV:"));
 	sb.append(String.format("%12.3f", f));
         sb.append(System.getProperty("line.separator"));
-        f = DENOPTIMStatUtils.skewness(fitness, true);
+        f = DENOPTIMStatUtils.skewness(fitness);
         sb.append(String.format("%-30s", "SKEW:"));
 	sb.append(String.format("%12.3f", f));
         sb.append(System.getProperty("line.separator"));
