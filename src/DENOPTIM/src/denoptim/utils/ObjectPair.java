@@ -19,6 +19,7 @@
 package denoptim.utils;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * This class is the equivalent of the Pair data structure used in C++
@@ -51,7 +52,7 @@ public class ObjectPair implements Serializable
  
     public boolean isSame(Object o1, Object o2) 
     {
-        return o1 == null ? o2 == null : o1.equals(o2);
+        return Objects.equals(o1, o2);
     }
 
 //------------------------------------------------------------------------------
@@ -102,8 +103,8 @@ public class ObjectPair implements Serializable
     @Override
     public int hashCode() 
     { 
-        return ((o1 == null ? 0 : o1.hashCode()) ^ 
-                                            (o2 == null ? 0 : o2.hashCode()));
+        return ((o1 == null ? 0 : o1.hashCode()) ^
+                (o2 == null ? 0 : o2.hashCode()));
     }
 
 //------------------------------------------------------------------------------
