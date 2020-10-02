@@ -143,7 +143,7 @@ public class EAUtils
     private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> popln)
     {
         double[] fitness = getFitnesses(popln);
-        double sdev = DENOPTIMMathUtils.stddevp(fitness);
+        double sdev = DENOPTIMMathUtils.stddev(fitness);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
         
@@ -1546,7 +1546,7 @@ public class EAUtils
     protected static double getPopulationSD(ArrayList<DENOPTIMMolecule> molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
-        double sdev = DENOPTIMMathUtils.stddevp(fitvals);
+        double sdev = DENOPTIMMathUtils.stddev(fitvals);
         fitvals = null;
         return sdev;
     }
