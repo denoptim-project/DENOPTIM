@@ -398,38 +398,6 @@ public class DENOPTIMMathUtils
         return sum / a.length;
     }
     
-//------------------------------------------------------------------------------        
-    
-    /**
-     * Calculate corrected sample standard deviation.
-     * @param a Array to calculate variance of.
-     * @return Corrected sample standard deviation. NaN if a is empty.
-     */
-    public static double stddev(double[] a)
-    {
-        return Math.sqrt(var(a));
-    }    
-    
-//------------------------------------------------------------------------------        
-    
-    /**
-     * Calculate corrected variance.
-     * @param a Array to calculate variance of.
-     * @return Corrected variance. NaN if a is empty.
-     */
-    public static double var(double[] a)
-    {
-        if (a.length == 0) {
-            return Double.NaN;
-        }
-        double avg = mean(a);
-        double sum = 0.0;
-        for (double v : a) {
-            sum += (v - avg) * (v - avg);
-        }
-        return sum / (a.length - 1);
-    }
-    
 //------------------------------------------------------------------------------    
 
     /**

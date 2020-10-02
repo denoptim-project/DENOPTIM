@@ -36,9 +36,8 @@ public final class DENOPTIMStatUtils
     public static double sum(double[] numbers)
     {
         double sum = 0;
-        for (int i=0; i<numbers.length; i++)
-        {
-            sum += numbers[i];
+        for (double number : numbers) {
+            sum += number;
         }
         return sum;
     }
@@ -68,10 +67,9 @@ public final class DENOPTIMStatUtils
     public static double min(double[] numbers)
     {
         double min = Integer.MAX_VALUE;
-        for (int i=0; i<numbers.length; i++)
-        {
-            if (numbers[i] < min)
-                min = numbers[i];
+        for (double number : numbers) {
+            if (number < min)
+                min = number;
         }
         return min;
     }
@@ -87,10 +85,9 @@ public final class DENOPTIMStatUtils
     public static double max(double[] numbers)
     {
         double max = Integer.MIN_VALUE;
-        for (int i=0; i<numbers.length; i++)
-        {
-            if (numbers[i] > max)
-                max = numbers[i];
+        for (double number : numbers) {
+            if (number > max)
+                max = number;
         }
         return max;
     }
@@ -98,13 +95,12 @@ public final class DENOPTIMStatUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the standard deviation of the numbers.
+     * Returns the standard deviation of the numbers. NaN is returned if the
+     * numbers list is empty.
      *
-     * Double.NaN is returned if the numbers list is empty.
-     *
-     * @param numbers       the numbers to calculate the standard deviation.
+     * @param numbers the numbers to calculate the standard deviation.
      * @param biasCorrected true if variance is calculated by dividing by n - 1.
-     *        False if by n. stddev is a sqrt of the variance.
+     *                      False if by n.
      * @return the standard deviation
      */
     public static double stddev(double[] numbers, boolean biasCorrected)
