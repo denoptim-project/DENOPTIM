@@ -101,8 +101,7 @@ public class GenUtils
     // returns a padded string with zeroes for the count,
     public static String getPaddedString(int count, int number)
     {
-        String formatted = String.format("%0" + count + "d", number);
-        return formatted;
+        return String.format("%0" + count + "d", number);
     }
 
 //------------------------------------------------------------------------------
@@ -175,8 +174,7 @@ public class GenUtils
                 }
                 else
                 {
-                    nOpen = nOpen - 1;
-                    continue;
+                    nOpen -= 1;
                 }
             }
             else if (ss.startsWith(openingSing))
