@@ -1288,15 +1288,21 @@ if(debug)
 
         // Identify all verteces symmetric to the ones chosen for xover
         // Xover is to be projected on each of these
-	// TODO: evaluate whether to use the symmetricSets already in the graph
-	// instead of re-determinimg the symmetry from scratch
+        
+        //TODO-V3 del
+        /*
         ArrayList<Integer> symVrtIDs_M = 
                         GraphUtils.getSymmetricVertices(male, mvert,
                              FragmentSpace.useAPclassBasedApproach());
         ArrayList<Integer> symVrtIDs_F =
                         GraphUtils.getSymmetricVertices(female, fvert,
                             FragmentSpace.useAPclassBasedApproach());
-
+                            */
+        ArrayList<Integer> symVrtIDs_M = 
+                male.getSymSetForVertexID(mvert.getVertexId()).getList();
+        ArrayList<Integer> symVrtIDs_F = 
+                female.getSymSetForVertexID(fvert.getVertexId()).getList();
+        
         // MALE: Find all parent verteces and AP indeces where the incoming 
         // graph will have to be placed
         ArrayList<DENOPTIMVertex> symParVertM = new ArrayList<DENOPTIMVertex>();

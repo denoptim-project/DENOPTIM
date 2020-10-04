@@ -21,6 +21,7 @@ package denoptim.rings;
 import java.util.ArrayList;
 import java.io.Serializable;
 
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**
@@ -185,16 +186,19 @@ public class ClosableChain implements Cloneable, Serializable
     public int involvesVertex(DENOPTIMVertex vert)
     {
         int result = -1;
-        int vertMolID = vert.getMolId();
-        int vertFrgTyp = vert.getFragmentType();
-        for (int i=0; i<links.size(); i++)
+        if (vert instanceof DENOPTIMFragment)
         {
-            ChainLink cl = links.get(i);
-            if (cl.getMolID() == vertMolID &&
-                cl.getFragType() == vertFrgTyp)
+            int vertMolID = ((DENOPTIMFragment)vert).getMolId();
+            int vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
+            for (int i=0; i<links.size(); i++)
             {
-                result = i;
-                break;
+                ChainLink cl = links.get(i);
+                if (cl.getMolID() == vertMolID &&
+                    cl.getFragType() == vertFrgTyp)
+                {
+                    result = i;
+                    break;
+                }
             }
         }
         return result;
@@ -217,20 +221,23 @@ public class ClosableChain implements Cloneable, Serializable
     public int involvesVertexAndAP(DENOPTIMVertex vert, int apIDA, int apIDB)
     {
     	int result = -1;
-    	int vertMolID = vert.getMolId();
-    	int vertFrgTyp = vert.getFragmentType();
-    	for (int i=0; i<links.size(); i++)
-    	{
-    	    ChainLink cl = links.get(i);
-    	    if (cl.getMolID() == vertMolID && 
-    		cl.getFragType() == vertFrgTyp &&
-    		((cl.getApIdToLeft()==apIDA && cl.getApIdToRight()==apIDB) || 
-    		 (cl.getApIdToLeft()==apIDB && cl.getApIdToRight()==apIDA)))
-    	    {
-    		result = i;
-    		break;
-    	    }
-    	}
+        if (vert instanceof DENOPTIMFragment)
+        {
+            int vertMolID = ((DENOPTIMFragment)vert).getMolId();
+            int vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
+        	for (int i=0; i<links.size(); i++)
+        	{
+        	    ChainLink cl = links.get(i);
+        	    if (cl.getMolID() == vertMolID && 
+        		cl.getFragType() == vertFrgTyp &&
+        		((cl.getApIdToLeft()==apIDA && cl.getApIdToRight()==apIDB) || 
+        		 (cl.getApIdToLeft()==apIDB && cl.getApIdToRight()==apIDA)))
+        	    {
+        		result = i;
+        		break;
+        	    }
+        	}
+        }
         return result;
     }
 

@@ -36,14 +36,14 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit test for DENOPTIMTemplate
  * 
- * @author Marco Foscato
  */
 
 public class DENOPTIMTemplateTest
 {
     private static DENOPTIMAttachmentPoint testAP = null;
 
-    @BeforeAll
+    //TODO-V3
+    //@BeforeAll
     public static void SetUpClass() {
         testAP = new DENOPTIMAttachmentPoint(0, 1, 1);
     }
@@ -61,7 +61,8 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
 
-    @Test
+    //TODO-V3
+    //@Test
     public void testIfInteriorGraphDoesNotHaveVacantAPsEqualToExteriorAPsThrowIAE() {
         DENOPTIMTemplate template = new DENOPTIMTemplate();
         List<DENOPTIMAttachmentPoint> exteriorAPs = new ArrayList<>();

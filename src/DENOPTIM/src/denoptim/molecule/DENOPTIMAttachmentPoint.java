@@ -316,10 +316,11 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	            	this.dirVec[2] = Double.parseDouble(coord[2]);
 	            }
             }
-            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule);
+            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule);           
 	    } catch (Throwable t) {
+	        t.printStackTrace();
 			throw new DENOPTIMException("Cannot construct AP from string '" 
-						+ str + "'");
+						+ str + "'",t);
 	    }
     }
 

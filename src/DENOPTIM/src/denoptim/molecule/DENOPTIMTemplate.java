@@ -99,9 +99,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
         DENOPTIMTemplate template = new DENOPTIMTemplate();
 
         // Adding fully defined vertexes (they point to an actual fragment
-        DENOPTIMVertex vA = new DENOPTIMVertex(
+        DENOPTIMVertex vA = DENOPTIMVertex.newFragVertex(
                 GraphUtils.getUniqueVertexIndex(), 0, 1);
-        DENOPTIMVertex vB = new DENOPTIMVertex(
+        DENOPTIMVertex vB = DENOPTIMVertex.newFragVertex(
                 GraphUtils.getUniqueVertexIndex(), 1, 1);
         template.interiorGraph.addVertex(vA);
         template.interiorGraph.addVertex(vB);

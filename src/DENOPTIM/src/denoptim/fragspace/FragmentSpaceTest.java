@@ -48,7 +48,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
 
 /**
@@ -60,24 +60,32 @@ import denoptim.molecule.SymmetricSet;
 public class FragmentSpaceTest
 {
 	private final String APSUBRULE = "0";
-	private final String APCS = "apc-S"
+
+    private final String RULAPCS = "apc-S";
+    private final String RULAPC1 = "apc-1";
+    private final String RULAPC2 = "apc-2";
+    private final String RULAPC3 = "apc-3";
+    private final String RULAPCC1 = "cap-1";
+    private final String RULAPCC2 = "cap-1";
+    
+	private final String APCS = RULAPCS
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APC1 = "apc-1"
+	private final String APC1 = RULAPC1
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APC2 = "apc-2"
+	private final String APC2 = RULAPC2
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APC3 = "apc-3"
+	private final String APC3 = RULAPC3
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APCC1 = "cap-1"
+	private final String APCC1 = RULAPCC1
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APCC2 = "cap-1"
+	private final String APCC2 = RULAPCC2
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	
 //------------------------------------------------------------------------------
 	
 	private void buildFragmentSpace() throws DENOPTIMException
 	{
-    	ArrayList<IGraphBuildingBlock> fragLib = new ArrayList<IGraphBuildingBlock>();
+    	ArrayList<DENOPTIMVertex> fragLib = new ArrayList<DENOPTIMVertex>();
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -111,7 +119,7 @@ public class FragmentSpaceTest
         frg3.addAP(0, APC3, new Point3d(new double[]{0.0, 0.0, 1.1}));
         fragLib.add(frg3);
         
-    	ArrayList<IGraphBuildingBlock> scaffLib = new ArrayList<IGraphBuildingBlock>();
+    	ArrayList<DENOPTIMVertex> scaffLib = new ArrayList<DENOPTIMVertex>();
         DENOPTIMFragment frg4 = new DENOPTIMFragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -136,7 +144,7 @@ public class FragmentSpaceTest
         frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
         scaffLib.add(frg5);
         
-        ArrayList<IGraphBuildingBlock> cappLib = new ArrayList<IGraphBuildingBlock>();
+        ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
         DENOPTIMFragment frg6 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         frg6.addAtom(a61);
@@ -163,12 +171,12 @@ public class FragmentSpaceTest
     	cpMap.put(APC2, lst3);
     	
     	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
-    	boMap.put(APCS,1);
-    	boMap.put(APC1,1);
-    	boMap.put(APC2,1);
-    	boMap.put(APC3,1);
-    	boMap.put(APCC1,1);
-    	boMap.put(APCC1,1);
+    	boMap.put(RULAPCS,1);
+    	boMap.put(RULAPC1,1);
+    	boMap.put(RULAPC2,1);
+    	boMap.put(RULAPC3,1);
+    	boMap.put(RULAPCC1,1);
+    	boMap.put(RULAPCC2,1);
     	
     	HashMap<String,String> capMap = new HashMap<String,String>();
     	capMap.put(APCS, APCC2);
@@ -303,10 +311,7 @@ public class FragmentSpaceTest
     	boolean found3 = false;
     	boolean found4 = false;
     	for (IdFragmentAndAP id : lst)
-    	{
-    	    //TODO del
-            System.out.println("IdFragmentAndAP: "+id);
-            
+    	{            
     		if (id.sameFragAndAp(ref1))
     			found1 = true;
     		if (id.sameFragAndAp(ref2))
@@ -337,7 +342,7 @@ public class FragmentSpaceTest
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
-    	ArrayList<IGraphBuildingBlock> lst = 
+    	ArrayList<DENOPTIMVertex> lst = 
     			FragmentSpace.getFragmentsCompatibleWithTheseAPs(srcAPs);
     	
     	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");

@@ -34,6 +34,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureFinder;
@@ -223,7 +224,7 @@ public class PathSubGraph
 
         // Build the DENOPTIMGraph and string representations of this sub graph
         chainID = "";
-	revChainID = "";
+        revChainID = "";
         DENOPTIMVertex vertBack = new DENOPTIMVertex();
         DENOPTIMVertex vertHere = new DENOPTIMVertex();
         DENOPTIMVertex vertFrnt = new DENOPTIMVertex();
@@ -243,10 +244,26 @@ public class PathSubGraph
             // and this will make the chainID be different for otherwise equal
             // chains. Thus first and last vertex are not seen in the chainID
             
-            chainID = chainID + vertHere.getMolId() + "/"
-                              + vertHere.getFragmentType() + "/" + "ap";
-	    String leftRevChainID = vertHere.getMolId() + "/"
-                                  + vertHere.getFragmentType() + "/" + "ap";
+            
+            //TODO-V3 chainID uses molId and fragType from DENOPTIMFragment
+            // Therefore, vertexes that are not instances of DENOPTIMFragment
+            // cannot yet be used.
+            if (vertHere instanceof DENOPTIMFragment == false)
+            {
+                Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
+                e.printStackTrace();
+                System.err.println("ERROR! Current managment of chains cannot "
+                        + "handle vertexes that are NOT intances of "
+                        + "DENOPTIMFragment.");
+                System.exit(-1);
+            }
+            
+            DENOPTIMFragment vertFrgHere = (DENOPTIMFragment) vertHere;
+            
+            chainID = chainID + vertFrgHere.getMolId() + "/"
+                              + vertFrgHere.getFragmentType() + "/" + "ap";
+	    String leftRevChainID = vertFrgHere.getMolId() + "/"
+                                  + vertFrgHere.getFragmentType() + "/" + "ap";
 
             int apIdBack2Here = -1;
             int apIdHere2Back = -1;
@@ -306,31 +323,31 @@ public class PathSubGraph
  
         this.graph = new DENOPTIMGraph(gVertices,gEdges);
 
-	// prepare alternative chain IDs
-	String[] pA = chainID.split("_");
-	String[] pB = revChainID.split("_");
-	allPossibleChainIDs.add(chainID);
-	allPossibleChainIDs.add(revChainID);
-	for (int i=1; i<pA.length; i++)
-	{
-	    String altrnA = "";
-	    String altrnB = "";
-	    for (int j=0; j<pA.length; j++)
-	    {
-		if ((i+j) < pA.length)
-		{
-                   altrnA = altrnA + pA[i+j] + "_";
-                   altrnB = altrnB + pB[i+j] + "_";
-		}
-		else
-		{
-		   altrnA = altrnA + pA[i+j-pA.length] + "_";
-                   altrnB = altrnB + pB[i+j-pA.length] + "_";
-		}
-	    }
-	    allPossibleChainIDs.add(altrnA);
-	    allPossibleChainIDs.add(altrnB);
-	}
+    	// prepare alternative chain IDs
+    	String[] pA = chainID.split("_");
+    	String[] pB = revChainID.split("_");
+    	allPossibleChainIDs.add(chainID);
+    	allPossibleChainIDs.add(revChainID);
+    	for (int i=1; i<pA.length; i++)
+    	{
+    	    String altrnA = "";
+    	    String altrnB = "";
+    	    for (int j=0; j<pA.length; j++)
+    	    {
+    		if ((i+j) < pA.length)
+    		{
+                       altrnA = altrnA + pA[i+j] + "_";
+                       altrnB = altrnB + pB[i+j] + "_";
+    		}
+    		else
+    		{
+    		   altrnA = altrnA + pA[i+j-pA.length] + "_";
+                       altrnB = altrnB + pB[i+j-pA.length] + "_";
+    		}
+    	    }
+    	    allPossibleChainIDs.add(altrnA);
+    	    allPossibleChainIDs.add(altrnB);
+    	}
     }
 //-----------------------------------------------------------------------------
 
@@ -348,9 +365,9 @@ public class PathSubGraph
      */
 
     public void makeMolecularRepresentation(IAtomContainer mol,
-                                            ArrayList<IAtomContainer> libScaff,
-                                            ArrayList<IAtomContainer> libFrag,
-                                            ArrayList<IAtomContainer> libCap,
+                                            ArrayList<DENOPTIMVertex> libScaff,
+                                            ArrayList<DENOPTIMVertex> libFrag,
+                                            ArrayList<DENOPTIMVertex> libCap,
                                             boolean make3D)
                                                        throws DENOPTIMException
     {
@@ -441,7 +458,7 @@ public class PathSubGraph
         }
 
         // Identify the path of bonds between head and tail
-        // This is taken from the fully defined mol to inheredit rotatability
+        // This is taken from the fully defined mol to inherit rotatability
         bondsPathVAVB = new ArrayList<IBond>();
         for (int i=0; i < pathInFullMol.size()-1; i++)
         {

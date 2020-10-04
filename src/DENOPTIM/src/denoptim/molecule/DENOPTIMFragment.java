@@ -43,28 +43,28 @@ import denoptim.utils.FragmentUtils;
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragment implements IGraphBuildingBlock
+public class DENOPTIMFragment extends DENOPTIMVertex
 { 	
     /**
 	 * Version UID
 	 */
 	private static final long serialVersionUID = 4415462924969433010L;
 	
+    /**
+     * Index of the graph building block contained in the vertex
+     */
+    private int buildingBlockId;
+    
+    //TODO-V3 to enum
+    /*
+     * 0:scaffold, 1:fragment, 2:capping group
+     */
+    private int buildingBlockType;
+    
 	/**
 	 * Molecular representation of this fragment
 	 */
 	private final IAtomContainer mol;
-	
-	/**
-	 * List of Attachment points
-	 */
-	private final ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
-	        new ArrayList<DENOPTIMAttachmentPoint> ();
-	
-	/**
-	 * Flag notifying the need to update the list of APs
-	 */
-	private boolean apListNeddsToBeUpdated = false;
 
 //-----------------------------------------------------------------------------
 
@@ -74,7 +74,50 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
     
     public DENOPTIMFragment()
     {
+        super();
         this.mol = new AtomContainer();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor for a molecular fragment kind of vertex.
+     * @param vertexId unique identified of the vertex
+     * @param bbId 0-based index of building block in the library
+     * @param bbType the type of building block 0:scaffold, 1:fragment, 2:capping group
+     */
+    @Deprecated
+    public DENOPTIMFragment(int vertexId, int bbId, int bbType)
+    {
+        super(vertexId);
+       
+        //TODO-V3 : get rid of this constructor
+        // FragmentSpace.getFragment(bbType,bbId) already return a clone of the original
+        
+
+      //TODO-V3 delete. only until FRagSpace will not return mol
+        this.mol = new AtomContainer();
+        
+        //TODO-V3 get rid of interface
+        DENOPTIMVertex bb = null;
+        try
+        {
+            bb = FragmentSpace.getFragment(bbType,bbId).clone();
+            
+            //TODO-V3 get IAC from library
+        } catch (DENOPTIMException e)
+        {
+            e.printStackTrace();
+            String msg = "Fatal error! Cannot continue. " + e.getMessage();
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            System.exit(0);
+        }
+        
+        this.setAttachmentPoints(bb.getAttachmentPoints());
+        this.setSymmetricAP(bb.getSymmetricAP());
+        this.setAsRCV(getAPCount() == 1 
+                && DENOPTIMConstants.RCAAPCLASSSET.contains(
+                        this.getAttachmentPoints().get(0).getAPClass()));
     }
     
 //-----------------------------------------------------------------------------
@@ -99,6 +142,36 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
         }
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     *
+     * @return <code>true</code> if vertex is a fragment
+     */
+
+    public int getFragmentType()
+    {
+        return buildingBlockType;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     *
+     * @return the id of the molecule
+     */
+    public int getMolId()
+    {
+        return buildingBlockId;
+    }
+
+//------------------------------------------------------------------------------
+
+    public void setMolId(int m_molId)
+    {
+        buildingBlockId = m_molId;
+    }
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -106,7 +179,7 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
      * @param srcAtmId the index of the source atom in the atom list of this 
      * chemical representation. Index must be 0-based.
      * @param propAPClass the attachment point class, or null, if class should not 
-     * be defines.
+     * be defined.
      * @param vector the coordinates of the 3D point representing the end of 
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
@@ -165,6 +238,9 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
     	ap.setAPClass(propAPClass);
     	ap.setDirectionVector(new double[]{vector.x, vector.y, vector.z});
     	
+    	//This adds the AP to the list of the superclass
+    	addAttachmentPoint(ap);
+    	
     	ArrayList<DENOPTIMAttachmentPoint> apList;
         if (getAPCountOnAtom(srcAtm) > 0)
         {
@@ -178,8 +254,6 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
     	}
         
         srcAtm.setProperty(DENOPTIMConstants.APTAG, apList);
-
-        apListNeddsToBeUpdated = true;
     }
 
 //-----------------------------------------------------------------------------
@@ -253,6 +327,9 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
      * @return the list of APClassess
      */
     
+    //TODO-V3 remove, moved to DENOPTIMVertex
+    
+    @Deprecated
     public ArrayList<String> getAllAPClassess()
     {
     	ArrayList<String> lst = new ArrayList<String>();
@@ -270,12 +347,15 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns all attachment points currently defined on this fragment.
-     * @return the list of APs
+     * Returns clones of all attachment points currently defined on this 
+     * fragment.
+     * @return the list of AP clones
      */
 
 	public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
 	{
+	    //TODO-V3 use or overwrite the method from vertex
+	    //TODO-V3 clarify if and when we return copy/original
 		ArrayList<DENOPTIMAttachmentPoint> original = getCurrentAPs();
 		ArrayList<DENOPTIMAttachmentPoint> copy =
                 new ArrayList<>(original.size());
@@ -310,6 +390,8 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 	            }
             }
         }
+        
+        //TODO-V3 make sure the update affects also the reference hosted in vertex.lstAPs
     }
 
 //-----------------------------------------------------------------------------
@@ -342,6 +424,9 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 
         //Reorder according to DENOPTIMAttachmentPoint priority
         allAPs.sort(new DENOPTIMAttachmentPointComparator());
+        
+        //Sync the list of APs stored in superclass
+        setAttachmentPoints(allAPs);
         
         return allAPs;
     }
@@ -399,7 +484,7 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 	    ArrayList<DENOPTIMAttachmentPoint> allAPs = 
 	    		new ArrayList<DENOPTIMAttachmentPoint>();
 	   
-	    // Collect all the APs an objects
+	    // Collect all the APs as objects
 	    String[] atomsProp = allAtomsProp.split(
 	    		DENOPTIMConstants.SEPARATORAPPROPATMS);
 	    for (int i = 0; i< atomsProp.length; i++)
@@ -463,7 +548,10 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
                 
                 atm.setProperty(DENOPTIMConstants.APTAG,aps);
             }
-        } 
+        }
+
+        //Overwrite the list of APs of the superclass
+        setAttachmentPoints(allAPs);
     }
 
 //-----------------------------------------------------------------------------
@@ -487,7 +575,7 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
-        		System.out.println("No property "+DENOPTIMConstants.APTAG);
+        		//System.out.println("No property "+DENOPTIMConstants.APTAG);
         		continue;
             }
         	
@@ -514,8 +602,21 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
 			    propAPClass = propAPClass + stingAPP;
 	
 			    //Build SDF property "ATTACHMENT_POINT"
-			    int BndOrd = FragmentSpace.getBondOrderForAPClass(
-			    		ap.getAPClass());
+			    //TODO-V3 del
+			    
+			    int BndOrd = 1;
+                try
+                {
+                    BndOrd = FragmentSpace.getBondOrderForAPClass(
+                    		ap.getAPClass());
+                } catch (Exception e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    System.out.println("HERE HERE: "+ap);
+                    System.out.println("BO-MAP: "+FragmentSpace.getBondOrderMap());
+                    
+                }
 			    String sBO = Integer.toString(BndOrd);
 			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
@@ -538,16 +639,19 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
      * @throws CloneNotSupportedException 
      */
     public DENOPTIMFragment clone()
-    {
+    {   
     	DENOPTIMFragment frg = new DENOPTIMFragment();
 		try {
-			frg = new DENOPTIMFragment(mol.clone());
+		    this.projectAPsToProperties();
+			frg = new DENOPTIMFragment(mol);
 		} catch (Exception e) {
 			//TODO: by-pass by copying all atoms, bonds and el. containers,
 			// atom properties and atomcontainer properties (what else?)
 			String msg = "Failed to clone DENOPTIMFragment! " +frg;
 			System.err.println(msg);
 		}
+		
+		//TODO-V3: check consistency with content of vertex.lstAPs
 		return frg;
     }
     
@@ -563,7 +667,7 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
      */
     public ArrayList<SymmetricSet> getSymmetricAPsSets() {
         ArrayList<DENOPTIMAttachmentPoint> aps = getAPs();
-        IAtomContainer iac = this.getAtomContainer();
+        IAtomContainer iac = this.getIAtomContainer();
         ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
         for (int i = 0; i < aps.size() - 1; i++) {
             ArrayList<Integer> lst = new ArrayList<>();
@@ -605,7 +709,8 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
     
 //-----------------------------------------------------------------------------
 
-    public IAtomContainer getAtomContainer()
+    @Override
+    public IAtomContainer getIAtomContainer()
     {
         return mol;
     }
@@ -722,15 +827,52 @@ public class DENOPTIMFragment implements IGraphBuildingBlock
         mol.setProperties(properties);
     }
     
-    /*
-//-----------------------------------------------------------------------------
-
-    public
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another fragment ignoring vertex IDs.
+     * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two vertexes represent the same graph
+     * node even if the vertex IDs are different.
+     */
+    public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
     {
-        
+        if (other instanceof DENOPTIMFragment)
+            return sameAs((DENOPTIMFragment) other, reason);
+        else
+            return false;
     }
     
-    */
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another fragment ignoring vertex IDs.
+     * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two vertexes represent the same graph
+     * node even if the vertex IDs are different.
+     */
+    public boolean sameAs(DENOPTIMFragment other, StringBuilder reason)
+    {
+        if (this.getFragmentType() != other.getFragmentType())
+        {
+            reason.append("Different fragment type ("+this.getFragmentType()+":"
+                    +other.getFragmentType()+"); ");
+            return false;
+        }
+        
+        if (this.getMolId() != other.getMolId())
+        {
+            reason.append("Different molID ("+this.getMolId()+":"
+                    +other.getMolId()+"); ");
+            return false;
+        }
+        
+        return ((DENOPTIMVertex) this).sameAs(((DENOPTIMVertex)other), reason);
+    }
     
 //-----------------------------------------------------------------------------
     

@@ -14,6 +14,8 @@ import denoptim.utils.FragmentUtils;
  * contract.
  */
 
+//TODO-V3 delete class
+
 public interface IGraphBuildingBlock extends Cloneable
 {
 	

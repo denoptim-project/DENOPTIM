@@ -63,9 +63,9 @@ public class TreeBuilder3D
     /**
      * Reference to libraries of fragments
      */
-    private ArrayList<IAtomContainer> libScaff;
-    private ArrayList<IAtomContainer> libFrag;
-    private ArrayList<IAtomContainer> libCap;
+    private ArrayList<DENOPTIMVertex> libScaff;
+    private ArrayList<DENOPTIMVertex> libFrag;
+    private ArrayList<DENOPTIMVertex> libCap;
 
     /**
      * The DENOPTIMGraph representation of the current system
@@ -121,51 +121,9 @@ public class TreeBuilder3D
 
     public TreeBuilder3D()
     {
-    	//TODO: later we'll replace IAtomContainer with IGraphBuildingBlock
-    	
-    	//TODO change this is terrible, we need to work with a list of IBuildingblicks, 
-    	// but for now... this will do
-        this.libScaff = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : FragmentSpace.getScaffoldLibrary())
-        {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
-        		libScaff.add(((DENOPTIMFragment) bb).getAtomContainer());
-        	} else
-        	{
-        		//TODO deal with templates
-        		libScaff.add(new AtomContainer());
-        	}
-        }
-        this.libFrag = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : FragmentSpace.getFragmentLibrary())
-        {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
-        		libFrag.add(((DENOPTIMFragment) bb).getAtomContainer());
-        	} else
-        	{
-        		//TODO deal with templates
-        		libFrag.add(new AtomContainer());
-        	}
-        }
-        this.libCap = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : FragmentSpace.getCappingLibrary())
-        {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
-        		libCap.add(((DENOPTIMFragment) bb).getAtomContainer());
-        	} else
-        	{
-        		//TODO deal with templates, but templates do not fit within
-        		// the concept of capping group, so this should never happen for 
-        		// templates. Yet, other things than templates might need code here
-        		libCap.add(new AtomContainer());
-        	}
-        }
+        this.libScaff =  FragmentSpace.getScaffoldLibrary();
+        this.libFrag =  FragmentSpace.getFragmentLibrary();
+        this.libCap =  FragmentSpace.getCappingLibrary();
     }
 
 //------------------------------------------------------------------------------
@@ -174,9 +132,9 @@ public class TreeBuilder3D
      * Constructs a new TreeBuilder3D providing libraries of building blocks
      */
 
-    public TreeBuilder3D(ArrayList<IAtomContainer> libScaff,
-                         ArrayList<IAtomContainer> libFrag,
-                         ArrayList<IAtomContainer> libCap)
+    public TreeBuilder3D(ArrayList<DENOPTIMVertex> libScaff,
+                         ArrayList<DENOPTIMVertex> libFrag,
+                         ArrayList<DENOPTIMVertex> libCap)
     {
         this.libScaff = libScaff;
         this.libFrag = libFrag;
@@ -212,8 +170,31 @@ public class TreeBuilder3D
         // Add the first vertex in the graph (i.e., the root of the tree)
         DENOPTIMVertex rootVrtx = graph.getVertexList().get(0);
         int idRootVrtx = rootVrtx.getVertexId();
-        IAtomContainer iacRootVrtx = getFragment(rootVrtx.getFragmentType(),
-                                            rootVrtx.getMolId());
+        
+        //TODO-V3 assumption that scaffold is a Fragment, which cannot hold true 
+        // in general, so this will have to change 
+        if (rootVrtx instanceof DENOPTIMFragment == false)
+        {
+            Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
+            e.printStackTrace();
+            System.err.println("ERROR! TreeBuilder3D not ready to deal with "
+                    + "anything else than DENOPTIMFragments!!!");
+            System.exit(-1);
+        }
+        
+        //TODO-V3: any possibility that scaffold does not have an IAtomContainer?
+        IAtomContainer iacRootVrtx = rootVrtx.getIAtomContainer();
+        
+        //TODO-V3: this should never happen, so remove once we are sure it does nto happen
+        if (iacRootVrtx == null)
+        {
+            Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
+            e.printStackTrace();
+            System.err.println("ERROR! TreeBuilder3D not ready to deal with "
+                    + "anything else than DENOPTIMFragments!!!");
+            System.exit(-1);
+        }
+        
         for (IAtom atm : iacRootVrtx.atoms())
         {
             atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,idRootVrtx);
@@ -367,7 +348,7 @@ public class TreeBuilder3D
      * @param trgApA the point in space corresponding to the end of the
      * attachment point vector on the growing molecule
      * @param edge the <code>DENOPTIMEdge</code> corresponding to the
-     * connection this method is encharged to make between 3D molecular
+     * connection this method is charged to make between 3D molecular
      * fragments
      * @throws DENOPTIMException
      */
@@ -383,8 +364,37 @@ public class TreeBuilder3D
         // Get the incoming fragment
         DENOPTIMVertex inVtx = graph.getVertexWithId(edge.getTargetVertex());
         int idInVrx = inVtx.getVertexId();
-        IAtomContainer inFragOri = getFragment(inVtx.getFragmentType(),
-                                                              inVtx.getMolId());
+        
+        //TODO-V3
+        if (inVtx.containsAtoms())
+        {
+            return;
+        }
+        
+        //TODO-V3 assumption that scaffold is a Fragment, which cannot hold true 
+        // in general, so this will have to change 
+        if (inVtx instanceof DENOPTIMFragment == false)
+        {
+            Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
+            e.printStackTrace();
+            System.err.println("ERROR! TreeBuilder3D not ready to deal with "
+                    + "anything else than DENOPTIMFragments!!!");
+            System.exit(-1);
+        }
+        
+        //TODO-V3: any possibility that scaffold does not have an IAtomContainer?
+        IAtomContainer inFragOri = inVtx.getIAtomContainer();
+        
+        //TODO-V3: this should never happen, so remove once we are sure it does nto happen
+        if (inFragOri == null)
+        {
+            Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
+            e.printStackTrace();
+            System.err.println("ERROR! TreeBuilder3D not ready to deal with "
+                    + "anything else than DENOPTIMFragments!!!");
+            System.exit(-1);
+        }
+        
         IAtomContainer inFrag = new AtomContainer();
         try
         {
@@ -638,7 +648,7 @@ public class TreeBuilder3D
         }
         apsPerEdge.get(edge).add(apsOnThisFrag.get(idApB));
 
-        // Remenber also relation between APs and bonds in the IAtomContainer
+        // Remember also relation between APs and bonds in the IAtomContainer
         IBond b = mol.getBond(mol.getAtom(idSrcAtmA),mol.getAtom(newIdSrcAtmB));
         apsPerBond.put(b,apsPerEdge.get(edge));
 
@@ -682,7 +692,7 @@ public class TreeBuilder3D
      * @throws DENOPTIMException
      */
     
-    //TODO: this method is redundant and should be replaced by appropriate 
+    //TODO-V3: this method is redundant and should be replaced by appropriate 
     // functionality from the FragmentSpace
 
     public IAtomContainer getFragment(int ftype, int molidx)
@@ -699,7 +709,7 @@ public class TreeBuilder3D
                              + "and that provided to TreeBuilder3D.";
                 throw new DENOPTIMException(str);
             }
-            iac = libScaff.get(molidx);
+            iac = libScaff.get(molidx).getIAtomContainer();
             break;
         case 1:
             if (molidx >= libFrag.size())
@@ -709,7 +719,7 @@ public class TreeBuilder3D
                              + "and that provided to TreeBuilder3D.";
                 throw new DENOPTIMException(str);
             }
-            iac = libFrag.get(molidx);
+            iac = libFrag.get(molidx).getIAtomContainer();
             break;
         case 2:
             if (molidx >= libCap.size())
@@ -719,7 +729,7 @@ public class TreeBuilder3D
                              + "and that provided to TreeBuilder3D.";
                 throw new DENOPTIMException(str);
             }
-            iac = libCap.get(molidx);
+            iac = libCap.get(molidx).getIAtomContainer();
             break;
         default:
             String str = "ERROR! Unrecognized type of fragment.";

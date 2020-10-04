@@ -775,7 +775,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private void loadCurrentAsPlainStructure()
 	{
-		fragmentViewer.loadPlainStructure(fragment.getAtomContainer());
+		fragmentViewer.loadPlainStructure(fragment.getIAtomContainer());
 	}
 
 //-----------------------------------------------------------------------------

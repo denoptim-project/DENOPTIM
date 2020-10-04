@@ -1017,45 +1017,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * return a list of vertex ids whose molecule id are the same as m_molId
-     * @param m_molId
-     * @return the list of vertices representing the fragment corresponding to m_molId
-     */
-    public ArrayList<Integer> getVerticesWithMolId(int m_molId)
-    {
-        ArrayList<Integer> lst = new ArrayList<>();
-        for (DENOPTIMVertex v : gVertices) {
-            if (v.getMolId() == m_molId)
-                lst.add(v.getVertexId());
-        }
-        return lst;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * returns a list of vertex ids whose molecule id are the same as
-     * m_molId and occur at the given level
-     * @param m_molId
-     * @param m_lvl
-     * @return the list of vertices representing the fragment corresponding to m_molId 
-     * at the specified level
-     */
-    public ArrayList<Integer> getVerticesWithMolId(int m_molId, int m_lvl)
-    {
-        ArrayList<Integer> lst = new ArrayList<>();
-        for (int i=0; i<gVertices.size(); i++)
-        {
-            DENOPTIMVertex v = gVertices.get(i);
-            if (v.getMolId() == m_molId && v.getLevel() == m_lvl)
-                lst.add(v.getVertexId());
-        }
-        return lst;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      *
      * @param m_vid
      * @return the index of edge whose target vertex is same as m_vid
@@ -1190,19 +1151,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return edge.getSourceDAP();
         }
         return -1;
-    }
-
-//------------------------------------------------------------------------------
-    
-    public ArrayList<Integer> getFragments(int ftype)
-    {
-        ArrayList<Integer> lstFrags = new ArrayList<>();
-        for (DENOPTIMVertex vtx : gVertices) {
-            if (vtx.getFragmentType() == ftype)
-                lstFrags.add(vtx.getMolId());
-        }
-        return lstFrags;
-    }    
+    }  
     
 //------------------------------------------------------------------------------    
     
@@ -1484,30 +1433,19 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * calculate the number of atoms from the graph representation
      * @return number of heavy atoms in the molecule
      */
-    public int getNumberOfAtoms()
+    public int getHeavyAtomsCount()
     {
         int n = 0;
         ArrayList<DENOPTIMVertex> vlst = getVertexList();
 
-        for (DENOPTIMVertex denoptimVertex : vlst) {
-            int id = denoptimVertex.getMolId();
-            int ftype = denoptimVertex.getFragmentType();
-            IGraphBuildingBlock bb;
-            try {
-                bb = FragmentSpace.getFragment(ftype, id);
-                if (bb instanceof DENOPTIMFragment) {
-                    n += DENOPTIMMoleculeUtils.getHeavyAtomCount(
-                            ((DENOPTIMFragment) bb).getAtomContainer());
-                }
-            } catch (DENOPTIMException e) {
-                e.printStackTrace();
-            }
+        for (DENOPTIMVertex denoptimVertex : vlst) 
+        {
+            n += denoptimVertex.getHeavyAtomsCount();
         }
         return n;
     }
 
-    public int getCorrespondingAtomNumber(int vertexId, int apAtomNumber) {
-
-    }
+//------------------------------------------------------------------------------
+    
 }
 

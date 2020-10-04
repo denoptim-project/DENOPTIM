@@ -52,7 +52,6 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.RingClosureFinder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -85,10 +84,10 @@ public class CyclicGraphHandler
      * Reference to libraries of fragments
      */
     
-    //TODO: move to IGraphBuildingBlock
-    private ArrayList<IAtomContainer> libScaff;
-    private ArrayList<IAtomContainer> libFrag;
-    private ArrayList<IAtomContainer> libCap;
+    //TODO: move to DENOPTIMVertex
+    private ArrayList<DENOPTIMVertex> libScaff;
+    private ArrayList<DENOPTIMVertex> libFrag;
+    private ArrayList<DENOPTIMVertex> libCap;
 
     /**
      * AP-class compatibility matrix for ring closures
@@ -115,73 +114,16 @@ public class CyclicGraphHandler
      * @param libCap the library of capping groups
      */
 
-    public CyclicGraphHandler(ArrayList<IGraphBuildingBlock> libScaff,
-                               ArrayList<IGraphBuildingBlock> libFrag,
-                               ArrayList<IGraphBuildingBlock> libCap,
+    public CyclicGraphHandler(ArrayList<DENOPTIMVertex> libScaff,
+                               ArrayList<DENOPTIMVertex> libFrag,
+                               ArrayList<DENOPTIMVertex> libCap,
                                HashMap<String, ArrayList<String>> rcCPMap)
-    {
-    	//TODO change this is terrible, we need to work with a list of IBuildingblicks, 
-    	// but for now... this will do
-        this.libScaff = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : libScaff)
-        {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	    //TODO should not be neede when libScaff = <IGraphBuildingBlock>
-        		this.libScaff.add(((DENOPTIMFragment) bb).getAtomContainer());
-        	} else
-        	{
-        		this.libScaff.add(new AtomContainer());
-        	}
-        }
-        this.libFrag = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : libFrag)
-        {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
-        		this.libFrag.add(((DENOPTIMFragment) bb).getAtomContainer());
-        	} else
-        	{
-        		this.libFrag.add(new AtomContainer());
-        	}
-        }
-        this.libCap = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : libCap)
-        {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	  //TODO should not be neede when libScaff = <IGraphBuildingBlock>
-        		this.libCap.add(((DENOPTIMFragment) bb).getAtomContainer());
-        	} else
-        	{
-        		this.libCap.add(new AtomContainer());
-        	}
-        }
-    	
-        this.rcCPMap = rcCPMap;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Constructor from data structure. 
-     * @param libScaff the library of scaffolds
-     * @param libFrag the library of fragments
-     * @param libCap the library of capping groups
-     */
-/*
-    public CyclicGraphHandler(ArrayList<IAtomContainer> libScaff,
-                                            ArrayList<IAtomContainer> libFrag,
-                                             ArrayList<IAtomContainer> libCap,
-                                   HashMap<String, ArrayList<String>> rcCPMap)
     {
         this.libScaff = libScaff;
         this.libFrag = libFrag;
         this.libCap = libCap;
         this.rcCPMap = rcCPMap;
     }
-*/
     
 //-----------------------------------------------------------------------------
 
@@ -1869,10 +1811,15 @@ public class CyclicGraphHandler
         for (DENOPTIMVertex vert : molGraph.getVertexList())
         {
             int vId = vert.getVertexId();
+            
+            DENOPTIMFragment vertFrag = null;
+            if (vert instanceof DENOPTIMFragment)
+                vertFrag = (DENOPTIMFragment) vert;
+                
 
             // check for orphan coordinating atoms:
             // they have RCAs but none of them is included in a rings
-            if (vert.getLevel() == 0 && vert.getFragmentType() == 1)
+            if (vert.getLevel() == 0 && vertFrag.getFragmentType() == 1)
             {
 
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeAtPosition(

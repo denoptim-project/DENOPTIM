@@ -40,6 +40,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
@@ -416,10 +417,6 @@ public class GraphUtils
     {
         for (DENOPTIMVertex v : molGraph.getVertexList())
         {
-            if (v.getFragmentType() == 2)
-            {
-                continue;
-            }
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (ap.isAvailable())
@@ -449,8 +446,13 @@ public class GraphUtils
         for (int i=0; i<lstVerts.size(); i++)
         {
             DENOPTIMVertex vtx = lstVerts.get(i);
+            if (vtx instanceof DENOPTIMFragment == false)
+            {
+                continue;
+            }
             // capping groups have fragment type 2
-            if (vtx.getFragmentType() == 2 && !molGraph.isVertexInRing(vtx))
+            if (((DENOPTIMFragment) vtx).getFragmentType() == 2 
+                    && !molGraph.isVertexInRing(vtx))
             {
                 rvids.add(vtx.getVertexId());
             }
@@ -601,6 +603,7 @@ public class GraphUtils
      * @param molGraph
      */
 
+    @Deprecated
     public static void changeSignToVertexID(DENOPTIMGraph molGraph)
     {
         HashMap<Integer, Integer> nmap = new HashMap<>();
@@ -784,109 +787,8 @@ public class GraphUtils
         return vid;
     }
 
-//------------------------------------------------------------------------------    
-    /**
-     * Returns the list of vertices that are related by constitutional symmetry
-     * to the given one. This method searches for symmetry independently on the
-     * {@link SymmetricSet}s that can be stored in the {@link DENOPTIGraph}.
-     * The vertices selected are those that satisfy simultaneously all the
-     * following criteria:
-     * <ul>
-     * <li>vertices belonging to the same level (i.e. distance from the 
-     * core/scaffold),</li>
-     * <li>vertices containing the same fragment (i.e., same molID),</li>
-     * <li>vertices bound to parents containing the same fragment (i.e., parents
-     * with same molID),</li> 
-     * <li>vertices binding their parents with APs having the same APclass.</li>
-     * </ul>
-     * TODO: consider comparing the two chains of edges that link 
-     * i) the curVertes to the core/scaffold vertex, and 
-     * ii) the candidate symmetric vertex to the core/Scaffold vertex.
-     * @param molGraph molecular graph containing the vertex
-     * @param curVertex the vertex at which a new fragment will be added
-     * @param rcnstatus set to <code>true</code> when using class-based approach
-     * @return the list of vertices related to <code>curVertex</code> according
-     * to DENOPTIM's perception of symmetry.
-     * The list does NOT include <code>curVertex</code>
-     */
-
-    public static ArrayList<Integer> getSymmetricVertices(
-            DENOPTIMGraph molGraph, DENOPTIMVertex curVertex, boolean rcnstatus)
-    {
-        ArrayList<Integer> copylst = new ArrayList<>();
-
-        // Identify the current Vertex
-        int molid = curVertex.getMolId();
-        int lvl = curVertex.getLevel();
-        int cvid = curVertex.getVertexId();
-
-        // Find the parent, if any
-        DENOPTIMVertex parent = molGraph.getParent(cvid);
-
-        if (parent == null)
-        {
-            //no other vertex in the graph: nothing to do
-            return copylst;
-        }
-
-        // Identify the parent and the APclass used in by curVertex to bind
-        // its parent
-        int parent_molid = parent.getMolId();
-        int eidx = molGraph.getIndexOfEdgeWithParent(cvid);
-        DENOPTIMEdge edge = molGraph.getEdgeAtPosition(eidx);
-        String rcn = edge.getTargetReaction();
-
-        // Identify vertices at the same level that have the same molid
-        ArrayList<Integer> lstv_symmolid =
-                                      molGraph.getVerticesWithMolId(molid, lvl);
-
-        // Analyse the list and apply further selection criteria (see below)
-        for (int i=0; i<lstv_symmolid.size(); i++)
-        {
-            int vid = lstv_symmolid.get(i);
-
-            // Exclute the curVertex from the analysis
-            if (vid == cvid)
-                continue;
-
-            // for this vertex, get the parent
-            DENOPTIMVertex parent_vid = molGraph.getParent(vid);
-
-            // This should never happen, unless at some point multi-seed graphs
-            // are used, which is not allowed currently
-            if (parent_vid == null)
-                continue;
-
-            // get the molid of the parent
-            int locParent_molid = parent_vid.getMolId();
-            if (parent_molid != locParent_molid)
-                continue;
-
-            if (!rcnstatus)
-            {
-                // Without class-based approach, no other condition
-                copylst.add(vid);
-                continue;
-            }
-            else
-            {
-                // With class-based approach, compare also APClass of the AP
-                // used by this candidate vertex to bind its parent vertex
-                int idx = molGraph.getIndexOfEdgeWithParent(vid);
-                DENOPTIMEdge e = molGraph.getEdgeAtPosition(idx);
-                String rcn2 = e.getTargetReaction();
-                if (rcn.equalsIgnoreCase(rcn2))
-                {
-                    // add the vertex to the symmetry copy list
-                    copylst.add(vid);
-                }
-            }
-        }
-
-        return copylst;
-    }
-
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
+    
     /**
      * @Deprecated
      */
@@ -1386,9 +1288,8 @@ public class GraphUtils
                     {
                         found = true;
                         String msg = "Forbidden free AP for Vertex: "
-                            + vtx.getVertexId()
-                            + " MolId: " + (vtx.getMolId() + 1)
-                            + " Ftype: " + vtx.getFragmentType()
+                            + vtx.getVertexId() + " "
+                            + vtx.toString()
                             + "\n"+ molGraph+" \n "
                             + " AP class: " + apClass;
                         DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
@@ -1662,8 +1563,6 @@ public class GraphUtils
         addedToVisitedB.add(vB.getVertexId());
 
         // Compare the current fragments
-        boolean sameFragTyp = (vA.getFragmentType() == vB.getFragmentType());
-        boolean sameGrafID = (vA.getMolId() == vB.getMolId());
         boolean sameAPtoHere = false;
         if (apVAToBack<0 && apVBToBack<0)
         {
@@ -1675,7 +1574,7 @@ public class GraphUtils
             sameAPtoHere = (apVAToBack == apVBToBack);
         }
 
-        if (sameFragTyp && sameGrafID && sameAPtoHere)
+        if (vA.sameAs(vB, new StringBuilder()) && sameAPtoHere)
         {
             // move to next level
             boolean inner = true;
@@ -1853,7 +1752,7 @@ public class GraphUtils
      * @return the id of the new vertex created
      * @throws DENOPTIMException
      */
-
+    
     public static int attachNewFragmentAtAPWithAP (DENOPTIMGraph molGraph, 
                                                       DENOPTIMVertex curVertex,
                                                       int srcAPIdx, 
@@ -1862,19 +1761,16 @@ public class GraphUtils
                                                       int trgAPIdx) 
                                                       throws DENOPTIMException
     {
-        // create the new DENOPTIMVertex
+        DENOPTIMVertex incomingVertex = DENOPTIMVertex.newFragVertex(fId, fTyp);
+
         int lvl = curVertex.getLevel();
-        int nvid = GraphUtils.getUniqueVertexIndex();
-        ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                FragmentSpace.getFragment(fTyp, fId).getAPs();
-
-        DENOPTIMVertex fragVertex = new DENOPTIMVertex(nvid,fId,fragAPs,fTyp);
-
-        // update the level of the vertex based on its parent
-        fragVertex.setLevel(lvl+1);
-
-        // get molecular representation
-        IGraphBuildingBlock mol = FragmentSpace.getFragmentLibrary().get(fId);
+        incomingVertex.setLevel(lvl+1);
+        
+        
+        //TODO-V3: check it this is really not needed anymore
+        
+        // get molecular representation of incoming fragment
+        //IGraphBuildingBlock mol = FragmentSpace.getFragmentLibrary().get(fId);
 
         // identify the symmetric APs if any for this fragment vertex
         /*
@@ -1932,32 +1828,37 @@ public class GraphUtils
     	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
     	return null;
     	*/
+        
+        //TODO-V3: this should not be needed anymore: symmetry should come from the vertex
+        /*
         ArrayList<SymmetricSet> simAP = mol.getSymmetricAPsSets();
         fragVertex.setSymmetricAP(simAP);
-
+        */
+        
         // identify the src AP (on the current vertex)
         ArrayList<DENOPTIMAttachmentPoint> curAPs =
                                                 curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint srcAP = curAPs.get(srcAPIdx);
         String srcAPCls = srcAP.getAPClass();
         
-        // identify the target AP (on the appended verex)
-        DENOPTIMAttachmentPoint trgAP = fragAPs.get(trgAPIdx);
+        // identify the target AP (on the appended vertex)
+        DENOPTIMAttachmentPoint trgAP = incomingVertex.getAttachmentPoints()
+                .get(trgAPIdx);
 
         String trgAPCls = trgAP.getAPClass();
 
         // create the new DENOPTIMEdge
         DENOPTIMEdge edge;
-        edge = connectVertices(curVertex, fragVertex, srcAPIdx, trgAPIdx, 
+        edge = connectVertices(curVertex, incomingVertex, srcAPIdx, trgAPIdx, 
                                                             srcAPCls, trgAPCls);
 
         if (edge != null)
         {
             // update graph
-            molGraph.addVertex(fragVertex);
+            molGraph.addVertex(incomingVertex);
             molGraph.addEdge(edge);
 
-            return fragVertex.getVertexId();
+            return incomingVertex.getVertexId();
         }
 
         return -1;
@@ -1974,7 +1875,7 @@ public class GraphUtils
      * used to attach I
      * @param subGraph the incoming graph I, or child
      * @param childVrtx the vertex of I that is to be connected to R
-     * @param childAPIdx the index of the atachment point on the vertex of I
+     * @param childAPIdx the index of the attachment point on the vertex of I
      * that is to be connected to R
      * @param bndType the bond type between R and I
      */
@@ -2325,7 +2226,7 @@ public class GraphUtils
      * @param onlyOneSymm if <code>true</code> then only one match will be 
      * collected for each symmetric set of partners.
      * @param verbosity the verbosity level
-     * @return the list of mathced vertices
+     * @return the list of matched vertices
      */
 
     public static ArrayList<DENOPTIMVertex> findVertices(DENOPTIMGraph graph,
@@ -2364,43 +2265,54 @@ public class GraphUtils
         }
 
         //Check condition fragment ID
-        query = vQuery.getMolId();
-        if (query > -1) //-1 would be the wildcard
+        if (vQuery instanceof DENOPTIMFragment)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
+            query = ((DENOPTIMFragment) vQuery).getMolId();
+            if (query > -1) //-1 would be the wildcard
             {
-                if (v.getMolId() == query)
+                ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
+                for (DENOPTIMVertex v : matches)
                 {
-                    newLst.add(v);
+                    if (v instanceof DENOPTIMFragment == false)
+                    {
+                        continue;
+                    }
+                    if (((DENOPTIMFragment) v).getMolId() == query)
+                    {
+                        newLst.add(v);
+                    }
                 }
+                matches = newLst;
             }
-            matches = newLst;
-        }
 
-        if (verbosity > 2)
-        {
-            System.out.println("After MolID-based rule: " + matches);
-        }
-
-        //Check condition fragment type
-        query = vQuery.getFragmentType();
-        if (query > -1) //-1 would be the wildcard
-        {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
+            if (verbosity > 2)
             {
-                if (v.getFragmentType() == query)
-                {
-                    newLst.add(v);
-                }
+                System.out.println("After MolID-based rule: " + matches);
             }
-            matches = newLst;
-        }
-
-        if (verbosity > 2)
-        {
-            System.out.println("After Frag-type rule: " + matches);
+    
+            //Check condition fragment type
+            query = ((DENOPTIMFragment) vQuery).getFragmentType();
+            if (query > -1) //-1 would be the wildcard
+            {
+                ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
+                for (DENOPTIMVertex v : matches)
+                {
+                    if (v instanceof DENOPTIMFragment == false)
+                    {
+                        continue;
+                    }
+                    if (((DENOPTIMFragment) v).getFragmentType() == query)
+                    {
+                        newLst.add(v);
+                    }
+                }
+                matches = newLst;
+            }
+    
+            if (verbosity > 2)
+            {
+                System.out.println("After Frag-type rule: " + matches);
+            }
         }
 
         //Check condition level of vertex

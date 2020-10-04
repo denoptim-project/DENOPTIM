@@ -32,7 +32,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
@@ -127,6 +127,7 @@ public class FragsCombinationIterator
         for (DENOPTIMVertex v : this.rootGraph.getVertexList())
         {
             int vIdx = v.getVertexId();
+            //TODO-V3 need to use something else
             int vMolId = v.getMolId();
             int vMolTyp = v.getFragmentType();
            
@@ -214,8 +215,8 @@ public class FragsCombinationIterator
             int fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
-            IGraphBuildingBlock frag = FragmentSpace.getFragment(fTyp, fIdx); 
-            String srcApCls = frag.getAPs().get(apId).getAPClass();
+            DENOPTIMVertex frag = FragmentSpace.getFragment(fTyp, fIdx); 
+            String srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 
             ArrayList<IdFragmentAndAP> candsForThisSrc = 

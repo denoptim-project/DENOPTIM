@@ -401,7 +401,7 @@ public class FragmentViewPanel extends JSplitPane
 		// fragile/discontinued CDK-to-Jmol support.
 		
 		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, fragment.getAtomContainer(), 
+			DenoptimIO.writeMolecule(tmpSDFFile, fragment.getIAtomContainer(), 
 			        false);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
@@ -428,7 +428,7 @@ public class FragmentViewPanel extends JSplitPane
 		
 		this.fragment = frag;
 			
-		loadPlainStructure(fragment.getAtomContainer());
+		loadPlainStructure(fragment.getIAtomContainer());
 		
 		updateAPsMapAndTable();
         

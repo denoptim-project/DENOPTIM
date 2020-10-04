@@ -33,9 +33,9 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GraphUtils;
 
@@ -53,13 +53,13 @@ public class FragmentSpace
      * building blocks: scaffolds section - fragments that can be used
      * as seeds to grow a new molecule.
      */
-    private static ArrayList<IGraphBuildingBlock> scaffoldLib = null;
+    private static ArrayList<DENOPTIMVertex> scaffoldLib = null;
 
     /**
      * Data structure containing the molecular representation of
      * building blocks: fragment section - fragments for general use
      */
-    private static ArrayList<IGraphBuildingBlock> fragmentLib = null;
+    private static ArrayList<DENOPTIMVertex> fragmentLib = null;
 
     /**
      * Data structure containing the molecular representation of
@@ -67,7 +67,7 @@ public class FragmentSpace
      * one attachment point used to saturate unused attachment
      * points on a graph.
      */
-    private static ArrayList<IGraphBuildingBlock> cappingLib = null;
+    private static ArrayList<DENOPTIMVertex> cappingLib = null;
 
     /**
      * Data structure that stored the true entries of the 
@@ -157,9 +157,9 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     public static void defineFragmentSpace(
-    		ArrayList<IGraphBuildingBlock> scaffLib,
-    		ArrayList<IGraphBuildingBlock> fragLib,
-    		ArrayList<IGraphBuildingBlock> cappLib) throws DENOPTIMException
+    		ArrayList<DENOPTIMVertex> scaffLib,
+    		ArrayList<DENOPTIMVertex> fragLib,
+    		ArrayList<DENOPTIMVertex> cappLib) throws DENOPTIMException
     {
     	setScaffoldLibrary(scaffLib);
     	setFragmentLibrary(fragLib);
@@ -192,9 +192,9 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     public static void defineFragmentSpace(
-    		ArrayList<IGraphBuildingBlock> scaffLib,
-    		ArrayList<IGraphBuildingBlock> fragLib,
-    		ArrayList<IGraphBuildingBlock> cappLib,
+    		ArrayList<DENOPTIMVertex> scaffLib,
+    		ArrayList<DENOPTIMVertex> fragLib,
+    		ArrayList<DENOPTIMVertex> cappLib,
     		HashMap<String,ArrayList<String>> cpMap,
     		HashMap<String,Integer> boMap,
     		HashMap<String,String> capMap,
@@ -215,16 +215,13 @@ public class FragmentSpace
     	
     	isValid = true;
     	
-    	//TODO: remove: tmp code just for devel phase
+    	//TODO-V3: remove: tmp code just for devel phase
         if (FragmentSpaceParameters.useTemplates)
         {
 //            fragmentLib.add(DENOPTIMTemplate.getTestTemplate());
 //            System.err.println("Added test template to fragment library");
             scaffoldLib = new ArrayList<>();
             scaffoldLib.add(DENOPTIMTemplate.getTestTemplate());
-            DENOPTIMVertex vertex = new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(), 0, 0);
-            System.err.println(vertex);
-            System.err.println(vertex.hasSymmetricAP());
             System.err.println("Replaced scaffold lib with single test template");
         }
     }
@@ -335,9 +332,9 @@ public class FragmentSpace
     	String cls = null;
     	try
     	{
-    		IGraphBuildingBlock frg = FragmentSpace.getFragment(
+    		DENOPTIMVertex frg = FragmentSpace.getFragment(
         			apId.getVertexMolType(), apId.getVertexMolId());
-    		cls = frg.getAPs().get(apId.getApId()).getAPClass();
+    		cls = frg.getAttachmentPoints().get(apId.getApId()).getAPClass();
     	}
     	catch (Throwable t)
     	{
@@ -360,7 +357,7 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
 
-    public static IGraphBuildingBlock getFragment(int frgTyp, int molIdx) 
+    public static DENOPTIMVertex getFragment(int frgTyp, int molIdx) 
 						        throws DENOPTIMException
     {
 		String msg = "";
@@ -369,13 +366,13 @@ public class FragmentSpace
 		    msg = "Cannot retrieve fragments before defining the FragmentSpace";
 		    throw new DENOPTIMException(msg);
 		}
-		IGraphBuildingBlock ibb = null;
+		DENOPTIMVertex originalVrtx = null;
 		switch (frgTyp)
 		{
 			case 0:
 			    if (molIdx < scaffoldLib.size())
 			    {
-			    	ibb = scaffoldLib.get(molIdx);	
+			    	originalVrtx = scaffoldLib.get(molIdx);	
 			    }
 			    else
 			    {
@@ -388,7 +385,7 @@ public class FragmentSpace
 			case 1:
 		            if (molIdx < fragmentLib.size())
 		            {
-		                ibb = fragmentLib.get(molIdx);
+		                originalVrtx = fragmentLib.get(molIdx);
 		            }
 		            else
 		            {
@@ -402,7 +399,7 @@ public class FragmentSpace
 			case 2:
 		            if (molIdx < cappingLib.size())
 		            {
-		                ibb = cappingLib.get(molIdx);
+		                originalVrtx = cappingLib.get(molIdx);
 		            }
 		            else
 		            {
@@ -419,26 +416,26 @@ public class FragmentSpace
 			    throw new DENOPTIMException(msg);
 		}
 		
-        return ibb.clone();
+        return originalVrtx.clone();
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<IGraphBuildingBlock> getScaffoldLibrary()
+    public static ArrayList<DENOPTIMVertex> getScaffoldLibrary()
     {
         return scaffoldLib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<IGraphBuildingBlock> getFragmentLibrary()
+    public static ArrayList<DENOPTIMVertex> getFragmentLibrary()
     {
         return fragmentLib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<IGraphBuildingBlock> getCappingLibrary()
+    public static ArrayList<DENOPTIMVertex> getCappingLibrary()
     {
         return cappingLib;
     }
@@ -457,7 +454,7 @@ public class FragmentSpace
 	    String apc = "";
 	    try 
 	    {
-            apc = getFragment(2, i).getAPs().get(0).getAPClass();
+            apc = getFragment(2, i).getAttachmentPoints().get(0).getAPClass();
 		if (apc.equals(query))
 		{
 		    selected.add(i);
@@ -549,16 +546,16 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
    /**
-    * Returns the bond order for the given APClass. 
-    * If the Fragment space is 
-    * not defined, that is, the bond order map is null, then it returns
-    * bond order 1.
+    * Returns the bond order for the given APClass, if defined.
     * @param apclass the APclass to be converted into bond order
-    * @param the bond order
+    * @param the bond order as an integer, or 1 if either the 
+    * Fragment space is not defined, that is, the bond order map is 
+    * <code>null</code>, or a fully defined map does not include any mapping 
+    * for the given APClass.
     */
     public static Integer getBondOrderForAPClass(String apclass)
     {
-        if (FragmentSpace.getBondOrderMap() == null)
+        if (!isValid || bondOrderMap == null)
         {
             String msg = "Attemting to get bond order, but no "
                        + "FragmentSpace defined (i.e., null BondOrderMap). "
@@ -566,9 +563,13 @@ public class FragmentSpace
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
             return 1;
         }
+        else if (!bondOrderMap.keySet().contains(apclass))
+        {
+            return 1;
+        }
         else
         {
-            return FragmentSpace.getBondOrderMap().get(apclass);
+            return bondOrderMap.get(apclass);
         }
     }
 
@@ -681,7 +682,7 @@ public class FragmentSpace
     public static HashMap<String,ArrayList<ArrayList<Integer>>> 
 						      getMapFragsAPsPerAPClass()
     {
-	return fragsApsPerApClass;
+        return fragsApsPerApClass;
     }
 
 //------------------------------------------------------------------------------
@@ -725,7 +726,7 @@ public class FragmentSpace
      * fragments.
      * @return a list of fragments.
      */
-    public static ArrayList<IGraphBuildingBlock> getFragmentsCompatibleWithTheseAPs(
+    public static ArrayList<DENOPTIMVertex> getFragmentsCompatibleWithTheseAPs(
     		ArrayList<IdFragmentAndAP> srcAPs)
     {
     	// First we get all possible APs on any fragment
@@ -740,14 +741,15 @@ public class FragmentSpace
 		}
 		
 		// Then we pack-up the selected list of fragments
-		ArrayList<IGraphBuildingBlock> compatFrags = 
-				new ArrayList<IGraphBuildingBlock>();
+		ArrayList<DENOPTIMVertex> compatFrags = 
+				new ArrayList<DENOPTIMVertex>();
 		for (Integer fid : compatFragIds)
 		{
 			try {
 				compatFrags.add(FragmentSpace.getFragment(1, fid));
 			} catch (DENOPTIMException e) {
-				// skip
+		        System.err.println("Exception while trying to get fragment '"+fid+"'!");
+		        e.printStackTrace();
 			}
 		}
 		
@@ -772,6 +774,7 @@ public class FragmentSpace
 			String srcApCls = getAPClassForFragment(apId);
 			ArrayList<IdFragmentAndAP> compForOne = 
                                          getFragAPsCompatibleWithClass(srcApCls);
+            
 			if (first)
 			{
 				compFrAps.addAll(compForOne);
@@ -907,21 +910,21 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static void setScaffoldLibrary(ArrayList<IGraphBuildingBlock> lib)
+    public static void setScaffoldLibrary(ArrayList<DENOPTIMVertex> lib)
     {
 	scaffoldLib = lib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static void setFragmentLibrary(ArrayList<IGraphBuildingBlock> lib)
+    public static void setFragmentLibrary(ArrayList<DENOPTIMVertex> lib)
     {
 	fragmentLib = lib;
     }
 
 //------------------------------------------------------------------------------
 
-    public static void setCappingLibrary(ArrayList<IGraphBuildingBlock> lib)
+    public static void setCappingLibrary(ArrayList<DENOPTIMVertex> lib)
     {
 	cappingLib = lib;
     }
@@ -968,7 +971,7 @@ public class FragmentSpace
     public static void setFragPoolPerNumAP(HashMap<Integer,ArrayList<Integer>>
 									    map)
     {
-	fragPoolPerNumAP = map;
+        fragPoolPerNumAP = map;
     }
 
 //------------------------------------------------------------------------------
@@ -984,14 +987,14 @@ public class FragmentSpace
     public static void setAPClassesPerFrag(HashMap<Integer,ArrayList<String>> 
 									    map)
     {
-	apClassesPerFrag = map;
+        apClassesPerFrag = map;
     }
 
 //------------------------------------------------------------------------------
 
     public static void setSymmConstraints(HashMap<String,Double> map)
     {
-	symmConstraints = map;
+        symmConstraints = map;
     }
     
 //------------------------------------------------------------------------------

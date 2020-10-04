@@ -1,0 +1,12 @@
+* compare vertexes
+
+* get 3D molecular representation of vertex, if any, or skip if none is available. 
+
+* should not allow setVertexId
+
+* MolId and fragmen-type are used to point to a specific fragment in the library without pointing to a specific vertex (so, cannot use vertex ID). This happens in:
+** PathSubGraph (need to collect all possible chain IDs in allPossibleChainIDs, and the chain ID needs to be independent from the actual vertex ID, while it should point to a specific fragment in the library.)
+** DENOPTIMGraphEdit has a similar need: point to an undefined verted that contains a specific fragment from the fragment space.
+** GraphUtils.findVertices too has the need to detect vertexes that CAN be fragments and CAN have a specific molID+fragTyp pair
+** FragsCombinationIterator
+** see IdFragmentAndAP 

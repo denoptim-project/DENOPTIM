@@ -31,6 +31,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 /**
  * Unit test for DENOPTIMFragment
@@ -81,8 +82,16 @@ public class DENOPTIMFragmentTest
     	frg2.setProperty(DENOPTIMConstants.APCVTAG, clsStr);
     	frg2.projectPropertyToAP();
     	
-    	assertEquals(frg1.getAPCount(),frg2.getAPCount());
-    	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0));
+        //TODO del
+    	/*
+        System.out.println("FRAGSPACE: "+FragmentSpace.isDefined());
+        System.out.println("FRAGSPACE: "+FragmentSpace.getBondOrderMap());
+        */
+    	
+    	assertEquals(frg1.getAPCount(),frg2.getAPCount(),"Equality of #AP");
+    	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0),
+    	        "Equality of #AP-on-atom");
+    	
     }
     
 //------------------------------------------------------------------------------
@@ -107,7 +116,7 @@ public class DENOPTIMFragmentTest
     	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
     	frg1.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
     	
-    	IAtomContainer iac = new AtomContainer(frg1.getAtomContainer());
+    	IAtomContainer iac = new AtomContainer(frg1.getIAtomContainer());
     	DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
     	
     	assertEquals(4,frg1.getAPCount(),"Size if frg1");

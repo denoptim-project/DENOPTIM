@@ -28,6 +28,7 @@ import java.io.Serializable;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.ClosableChain;
@@ -173,8 +174,10 @@ public class DENOPTIMGraphEdit
             {
                 level = Integer.parseInt(strPrts[3]);
             }
-            DENOPTIMVertex dv = new DENOPTIMVertex(vid, molid, 
-			   new ArrayList<DENOPTIMAttachmentPoint>(), fragtype);
+            
+            //TODO-V3: use whatever way to identify a fragment without giving a vertex ID
+            DENOPTIMVertex dv = new DENOPTIMFragment(vid, molid, fragtype);
+            
             dv.setLevel(level);
 
             this.focusVrtx = dv;

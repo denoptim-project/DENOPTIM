@@ -26,7 +26,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.FragmentUtils;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -62,7 +62,7 @@ public class FragmentSpaceUtils
 		}
 		for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
 		{
-			IGraphBuildingBlock frag = FragmentSpace.getFragmentLibrary().get(j);
+			DENOPTIMVertex frag = FragmentSpace.getFragmentLibrary().get(j);
 		    classifyFragment(frag,1,j);
 		}
 	}
@@ -78,11 +78,11 @@ public class FragmentSpaceUtils
      * @throws DENOPTIMException
      */
 
-    private static void classifyFragment(IGraphBuildingBlock frg, int type, 
+    private static void classifyFragment(DENOPTIMVertex frg, int type, 
 					    int fragId) throws DENOPTIMException
-    {
+    {   
 		// Classify according to number of APs
-        int nAps = frg.getAPCount();
+        int nAps = frg.getNumberOfAP();
 		if (nAps != 0)
 		{
             if (FragmentSpace.getMapOfFragsPerNumAps().containsKey(nAps))
@@ -100,12 +100,19 @@ public class FragmentSpaceUtils
 		if (FragmentSpace.useAPclassBasedApproach())
 		{
 		    // Collect classes per fragment
-		    ArrayList<String> lstAPC = frg.getAllAPClassess();
+		    ArrayList<String> lstAPC = frg.getAllAPClasses();
 	        FragmentSpace.getMapAPClassesPerFragment().put(fragId,lstAPC);
 	
+	        
+	        //TODO-TU: the AP list on the vertex is empty because we have created the 
+	        // fragments from the constructor of the DENOPTIMFragment class, and added 
+	        // SPa with the DENOPTIMFragment.addAP, but we never copyed the list of 
+	        // APs in the verted. So the vertex returns an empty list!
+	        
 		    // Classify according to AP-Classes
-	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = frg.getAPs();
-	
+	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+	                frg.getAttachmentPoints();
+	        
 		    for (int j=0; j<lstAPs.size(); j++)
 		    {
 				ArrayList<Integer> apId = new ArrayList<Integer>();

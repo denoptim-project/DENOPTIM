@@ -20,178 +20,174 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
+
+import org.openscience.cdk.interfaces.IAtomContainer;
+
 import java.io.Serializable;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.FragmentUtils;
+import denoptim.utils.GraphUtils;
 
 
 /**
- * Data structure of a single vertex that contains information as to the
- * list of attachment points, type of this vertex and the index of the
- * molecular representation in a library of fragments of a given type
- * (scaffold, fragment, capping groups).
+ * A vertex is a data structure that has an identity and holds a 
+ * list of attachment points. The attachment points can be related by
+ * an here-undefined relation.
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 public class DENOPTIMVertex implements Cloneable, Serializable
 {
-    /*
-     * unique id associated with the vertex
+    /**
+     * Version UID
+     */
+    private static final long serialVersionUID = -6093013990421027436L;
+
+    /**
+     * Unique identifier associated with the vertex instance
      */
     private int vertexId;
-
+    
     /*
-     * store the integer id associated with the scaffold/fragment/capping
+     * attachment points on this vertex
      */
-    private int buildingBlockId;
+    private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
 
-    /*
-     * attachment points for this Mol
+    /**
+     * List of AP sets that are related to each other, so that we 
+     * call them "symmetric" (though symmetry is a fuzzy concept here). 
      */
-    private ArrayList<DENOPTIMAttachmentPoint> lstAP;
+    private ArrayList<SymmetricSet> lstSymAPs;
 
     /*
-     * 0:scaffold, 1:fragment, 2:capping group
-     */
-    private int buildingBlockType;
-
-    /*
-     * While growing the graph, we associate a level with each vertex where the
-     * scaffold has a level -1, while each layer adds 1
-     */
-    int recursiveLevel;
-
-    /*
-     * list of APs that behave in a similar manner when fragments are attached,
-     * i.e., mirror the operation performed on symmetric set of APs.
-     */
-    protected ArrayList<SymmetricSet> lstSymmAP;
-
-    /*
-     * Flag indicating this as a ring closing vertex
+     * Flag indicating that this as a ring closing vertex
      */
     private boolean isRCV;
+    
+    //TODO-V3 remove: get it from the graph
+    /*
+     * if the level at which this vertex is in a graph
+     */
+    private int recursiveLevel;
 
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Constructor for an empty vertex.
+     */
     public DENOPTIMVertex()
     {
-        buildingBlockId = 0;
-        lstAP = new ArrayList<>();
-        vertexId = 0;
-        buildingBlockType = 0;
-        lstSymmAP = new ArrayList<>();
+        vertexId = -1;
+        lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        lstSymAPs = new ArrayList<SymmetricSet>();
         isRCV = false;
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * 
+     * Constructor for an identified vertex without attachment points.
+     */
+    public DENOPTIMVertex(int id)
+    {
+        vertexId = id;
+        lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        lstSymAPs = new ArrayList<SymmetricSet>();
+        isRCV = false;
+    }
+    
+  //------------------------------------------------------------------------------
+
+    /**
+     * Constructor for an identified vertex with attachment points.
+     */
+    public DENOPTIMVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs)
+    {
+        this.vertexId = id;
+        this.lstAPs = lstAPs;
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        this.isRCV = false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor for an identified vertex.
+     */
+    public DENOPTIMVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs,
+            ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)
+    {
+        this.vertexId = id;
+        this.lstAPs = lstAPs;
+        this.lstSymAPs = lstSymAPs;
+        this.isRCV = isRCV;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds a new molecular fragment kind of vertex.
+     * @param bbId 0-based index of building block in the library
+     * @param bbType the type of building block 0:scaffold, 1:fragment, 
+     * 2:capping group
+     */
+    public static DENOPTIMVertex newFragVertex(int bbId, int bbType)
+    {
+        return newFragVertex(GraphUtils.getUniqueVertexIndex(), bbId, bbType);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds a new molecular fragment kind of vertex.
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
-     * @param bbType choose the type of building block 0:scaffold, 1:fragment, 2:capping group
+     * @param bbType the type of building block 0:scaffold, 1:fragment, 2:capping group
      */
-    public DENOPTIMVertex(int vertexId, int bbId, int bbType)
+    public static DENOPTIMVertex newFragVertex(int vertexId, int bbId, int bbType)
     {
-        this.vertexId = vertexId;
-        this.buildingBlockId = bbId;
-        this.buildingBlockType = bbType;
-        IGraphBuildingBlock bb = null;
-        try
-        {
-            bb = FragmentSpace.getFragment(bbType,bbId).clone();
-        } catch (DENOPTIMException e)
-        {
-            e.printStackTrace();
-            String msg = "Fatal error! Cannot continue. " + e.getMessage();
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            System.exit(0);
-        }
-        this.lstAP = new ArrayList<>();
-        for (DENOPTIMAttachmentPoint ap : bb.getAPs())
-        {
-            this.lstAP.add(ap.clone());
-        }
-        this.lstSymmAP = new ArrayList<>();
-        for (SymmetricSet ss : bb.getSymmetricAPsSets())
-        {
-            this.lstSymmAP.add(ss.clone());
-        }
-        isRCV = lstAP.size() == 1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-                lstAP.get(0).getAPClass());
-    }    
-
-//------------------------------------------------------------------------------
-
-    @Deprecated
-    public DENOPTIMVertex(int m_vid, int m_molId,
-            ArrayList<DENOPTIMAttachmentPoint> m_lstAP, int m_fragmentType)
-    {
-        buildingBlockId = m_molId;
-        lstAP = m_lstAP;
-        vertexId = m_vid;
-        buildingBlockType = m_fragmentType;
-        lstSymmAP = new ArrayList<>();
-        isRCV = lstAP.size() == 1 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-                lstAP.get(0).getAPClass());
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @return <code>true</code> if vertex is a fragment
-     */
-
-    public int getFragmentType()
-    {
-        return buildingBlockType;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @return the id of the molecule
-     */
-    public int getMolId()
-    {
-        return buildingBlockId;
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setMolId(int m_molId)
-    {
-        buildingBlockId = m_molId;
+        return new DENOPTIMFragment(vertexId,bbId,bbType);
     }
 
 //------------------------------------------------------------------------------
 
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        return lstAP;
+        return lstAPs;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
+    /**
+     * Append and attachment point to the list of attachment points on this 
+     * vertex.
+     * @param ap the attachment point to add
+     */
+    protected void addAttachmentPoint(DENOPTIMAttachmentPoint ap)
     {
-        lstAP = m_lstAP;
+        lstAPs.add(ap);
     }
-
+    
 //------------------------------------------------------------------------------
 
-    public void setVertexId(int m_vid)
+    protected void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
     {
-        vertexId = m_vid;
+        lstAPs = m_lstAP;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected void setAsRCV(boolean isRCV)
+    {
+        this.isRCV = isRCV;
+    }
+    
+//------------------------------------------------------------------------------
+    //TODO-V3 get rid of this
+    @Deprecated
+    public void setVertexId(int id)
+    {
+        this.vertexId = id;
     }
 
 //------------------------------------------------------------------------------
@@ -203,16 +199,16 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void setSymmetricAP(ArrayList<SymmetricSet> m_Sap)
+    protected void setSymmetricAP(ArrayList<SymmetricSet> m_Sap)
     {
-        lstSymmAP = m_Sap;
+        lstSymAPs = m_Sap;
     }
 
 //------------------------------------------------------------------------------
 
     public ArrayList<SymmetricSet> getSymmetricAP()
     {
-        return lstSymmAP;
+        return lstSymAPs;
     }
 
 //------------------------------------------------------------------------------
@@ -228,8 +224,10 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public SymmetricSet getSymmetricAPs(int m_dapidx)
     {
-        for (SymmetricSet symmetricSet : lstSymmAP) {
-            if (symmetricSet.contains(m_dapidx)) {
+        for (SymmetricSet symmetricSet : lstSymAPs) 
+        {
+            if (symmetricSet.contains(m_dapidx)) 
+            {
                 return symmetricSet;
             }
         }
@@ -240,7 +238,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public int getNumberOfAP()
     {
-        return lstAP.size();
+        return lstAPs.size();
     }
 
 //------------------------------------------------------------------------------
@@ -253,9 +251,9 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public ArrayList<Integer> getFreeAPList()
     {
         ArrayList<Integer> lstAvailableAP = new ArrayList<>();
-        for (int i=0; i<lstAP.size(); i++)
+        for (int i=0; i<lstAPs.size(); i++)
         {
-            if (lstAP.get(i).isAvailable())
+            if (lstAPs.get(i).isAvailable())
                 lstAvailableAP.add(i);
         }
         return lstAvailableAP;
@@ -266,7 +264,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     public int getFreeAPCount()
     {
         int n = 0;
-        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAP) {
+        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAPs) {
             if (denoptimAttachmentPoint.isAvailable())
                 n++;
         }
@@ -278,7 +276,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public boolean hasFreeAP()
     {
-        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAP) {
+        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAPs) {
             if (denoptimAttachmentPoint.isAvailable())
                 return true;
         }
@@ -289,7 +287,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public void updateAttachmentPoint(int idx, int delta)
     {
-        lstAP.get(idx).updateFreeConnections(delta);
+        lstAPs.get(idx).updateFreeConnections(delta);
     }
 
 //------------------------------------------------------------------------------
@@ -327,7 +325,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
     public boolean hasSymmetricAP()
     {
-        return !lstSymmAP.isEmpty();
+        return !lstSymAPs.isEmpty();
     }
 
 //------------------------------------------------------------------------------
@@ -335,21 +333,22 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     @Override
     public String toString()
     {
-        return vertexId + "_" + (buildingBlockId + 1) + "_" +
-                buildingBlockType + "_" + recursiveLevel;
+        return vertexId + "_DUMMY_STRING";
+        //return vertexId + "_" + (buildingBlockId + 1) + "_" +
+        //        buildingBlockType + "_" + recursiveLevel;
     }
 
 //------------------------------------------------------------------------------
     
     public void cleanup()
     {
-        if (lstSymmAP != null)
+        if (lstSymAPs != null)
         {
-            lstSymmAP.clear();
+            lstSymAPs.clear();
         }
-        if (lstAP != null)
+        if (lstAPs != null)
         {
-            lstAP.clear();
+            lstAPs.clear();
         }
     }
     
@@ -361,8 +360,24 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      */
     public DENOPTIMVertex clone()
     {
-        return new DENOPTIMVertex(vertexId, buildingBlockId,
-                buildingBlockType);
+        //TODO-TU2
+        System.out.println("-----CLONE OF VERTEX----");
+        
+        ArrayList<DENOPTIMAttachmentPoint> cLstAPs = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        {
+            cLstAPs.add(ap.clone());
+        }
+        
+        ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
+        for (SymmetricSet ss : lstSymAPs)
+        {
+            cLstSymAPs.add(ss.clone());
+        }
+        
+        //TODO-V3: must return proper subclass
+        return new DENOPTIMVertex(vertexId,cLstAPs,cLstSymAPs,isRCV);
     }
     
 //------------------------------------------------------------------------------
@@ -376,21 +391,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * node even if the vertex IDs are different.
      */
     public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
-    {
-    	if (this.getFragmentType() != other.getFragmentType())
-    	{
-    		reason.append("Different fragment type ("+this.getFragmentType()+":"
-					+other.getFragmentType()+"); ");
-    		return false;
-    	}
-    	
-    	if (this.getMolId() != other.getMolId())
-    	{
-    		reason.append("Different molID ("+this.getMolId()+":"
-					+other.getMolId()+"); ");
-    		return false;
-    	}
-    	
+    {	
     	if (this.getFreeAPCount() != other.getFreeAPCount())
     	{
     		reason.append("Different number of free APs ("
@@ -399,19 +400,19 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     		return false;
     	}
     	
-    	if (this.lstAP.size() != other.lstAP.size())
+    	if (this.lstAPs.size() != other.lstAPs.size())
     	{
     		reason.append("Different number of APs ("
-    				+this.lstAP.size()+":"
-					+other.lstAP.size()+"); ");
+    				+this.lstAPs.size()+":"
+					+other.lstAPs.size()+"); ");
     		return false;
     	}
     	
 
-    	for (DENOPTIMAttachmentPoint apT : this.lstAP)
+    	for (DENOPTIMAttachmentPoint apT : this.lstAPs)
     	{
     		boolean found = false;
-    		for (DENOPTIMAttachmentPoint apO : other.lstAP)
+    		for (DENOPTIMAttachmentPoint apO : other.lstAPs)
         	{
 		    	if (apT.equals(apO))
 		    	{
@@ -458,4 +459,77 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         }
         return apIdx;
     }
+    
+//------------------------------------------------------------------------------
+
+
+    //TODO-V3 remove this tmp stuff
+
+    @Deprecated
+    public int getFragmentType()
+    {
+        System.err.println("ERROR! Attempt to get fragType from vertex");
+        return -999;
+    }
+
+//------------------------------------------------------------------------------
+
+    //TODO-V3 remove this tmp stuff
+    
+    @Deprecated
+    public int getMolId()
+    {
+        System.err.println("ERROR! Attempt to get molId from vertex");
+        return -999;
+    }
+
+//------------------------------------------------------------------------------
+
+    //TODO-V3 overload this in subclasses
+    public int getHeavyAtomsCount()
+    {
+        return 0;
+    }
+
+//------------------------------------------------------------------------------
+
+    //TODO-V3 overload this in subclasses
+    public boolean containsAtoms()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    //TODO-V3 overload this in subclasses
+    public IAtomContainer getIAtomContainer()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns the list of all APClasses on present on this fragment.
+     * @return the list of APClassess
+     */
+    
+    public ArrayList<String> getAllAPClasses()
+    {
+        ArrayList<String> lst = new ArrayList<String>();
+        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        {
+            String apCls = ap.getAPClass();
+            if (!lst.contains(apCls))
+            {
+                lst.add(apCls);
+            }
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
 }
