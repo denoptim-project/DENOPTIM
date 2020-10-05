@@ -52,7 +52,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
@@ -692,14 +692,14 @@ public class EAUtils
      * This is done in order to make selection of fragments based on #APs easier
      * @param bbs the list of building blocks to analyze
      */
-    protected static void poolFragments(ArrayList<IGraphBuildingBlock> bbs)
+    protected static void poolFragments(ArrayList<DENOPTIMVertex> bbs)
     {
         fragmentPool = new HashMap<>();
 
         for (int i=0; i<bbs.size(); i++)
         {
-            IGraphBuildingBlock bb = bbs.get(i);
-            int len = bb.getAPCount();
+            DENOPTIMVertex bb = bbs.get(i);
+            int len = bb.getNumberOfAP();
             if (len != 0)
                 updatePool(fragmentPool, len, i);
         }
@@ -712,13 +712,13 @@ public class EAUtils
      * @param bbs
      */
 
-    protected static void poolAPClasses(ArrayList<IGraphBuildingBlock> bbs)
+    protected static void poolAPClasses(ArrayList<DENOPTIMVertex> bbs)
     {
         lstFragmentClass = new HashMap<>();
         for (int i=0; i<bbs.size(); i++)
         {
-        	IGraphBuildingBlock bb = bbs.get(i);
-            ArrayList<String> lstRcn = bb.getAllAPClassess();
+        	DENOPTIMVertex bb = bbs.get(i);
+            ArrayList<String> lstRcn = bb.getAllAPClasses();
             lstFragmentClass.put(i, lstRcn);
         }
     }
@@ -770,13 +770,13 @@ public class EAUtils
     protected static int selectRandomReactionFragment(ArrayList<String> lstReac)
     {
         // find fragments with compatible reactions
-        ArrayList<IGraphBuildingBlock> mols = FragmentSpace.getFragmentLibrary();
+        ArrayList<DENOPTIMVertex> mols = FragmentSpace.getFragmentLibrary();
         ArrayList<Integer> lstMols = new ArrayList<>();
 
         for (int i=0; i<mols.size(); i++)
         {
-        	IGraphBuildingBlock mol = mols.get(i);
-            ArrayList<String> mReac = mol.getAllAPClassess();
+        	DENOPTIMVertex mol = mols.get(i);
+            ArrayList<String> mReac = mol.getAllAPClasses();
             // check reaction compatibility
             for (int j=0; j<mReac.size(); j++)
             {
@@ -921,77 +921,20 @@ public class EAUtils
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold();
 
-        ArrayList<DENOPTIMAttachmentPoint> scafAP =
-                FragmentSpace.getFragment(0, scafIdx).getAPs();
-
-        DENOPTIMVertex scafVertex = 
-        new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(),scafIdx,scafAP, 0);
+        //TODO-V3: use a type-agnostic w.r.t vertex constructor
+        DENOPTIMVertex scafVertex = DENOPTIMVertex.newFragVertex(
+                GraphUtils.getUniqueVertexIndex(), scafIdx, 0);
+        
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
         
-        //TODO: here again the issue of not having the symmetry set in the graph building blocks
-        // it would be best to just ass the symmetric set to the building blocks, maybe. Consider it
+        //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
         
-        IGraphBuildingBlock mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
-        // identify the symmetric APs if any for this fragment vertex
         /*
-    	if (bb instanceof DENOPTIMFragment)
-    	{
-    		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
-            ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
-            for (int i = 0; i< daps.size()-1; i++)
-            {
-                ArrayList<Integer> lst = new ArrayList<>();
-                Integer i1 = i;
-                lst.add(i1);
-
-                boolean alreadyFound = false;
-                for (SymmetricSet previousSS : lstCompatible)
-                {
-                    if (previousSS.contains(i1))
-                    {
-                        alreadyFound = true;
-                        break;
-                    }
-                }
-
-                if (alreadyFound)
-                {
-                    continue;
-                }
-
-                DENOPTIMAttachmentPoint d1 = daps.get(i);
-                for (int j = i+1; j< daps.size(); j++)
-                {
-                    DENOPTIMAttachmentPoint d2 = daps.get(j);
-                    if (isCompatible(iac, d1.getAtomPositionNumber(),
-                                                    d2.getAtomPositionNumber()))
-                    {
-                        // check if reactions are compatible
-                        if (isFragmentClassCompatible(d1, d2))
-                        {
-                            Integer i2 = j;
-                            lst.add(i2);
-                        }
-                    }
-                }
-
-                if (lst.size() > 1)
-                {
-                    lstCompatible.add(new SymmetricSet(lst));
-                }
-            }
-
-            return lstCompatible;
-        } else if (bb instanceof DENOPTIMTemplate) {
-    	    return new ArrayList<>();
-        }
-    	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
-    	return null;
-    	*/
+        DENOPTIMVertex mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
         ArrayList<SymmetricSet> simAP = mol.getSymmetricAPsSets();
         scafVertex.setSymmetricAP(simAP);
-        
+        */
         
         //TODO: did we pick a template? Then, we'll have to deal with it.
         // as we can pick a template in other graph operations, the dealing of the template
@@ -1079,8 +1022,8 @@ public class EAUtils
         ArrayList<Integer> lstFragIdx = new ArrayList<>();
         for (int i=0; i<FragmentSpace.getCappingLibrary().size(); i++)
         {
-        	IGraphBuildingBlock mol = FragmentSpace.getCappingLibrary().get(i);
-            ArrayList<String> lstRcn = mol.getAllAPClassess();
+        	DENOPTIMVertex mol = FragmentSpace.getCappingLibrary().get(i);
+            ArrayList<String> lstRcn = mol.getAllAPClasses();
             if (lstRcn.contains(cmpReac))
                 lstFragIdx.add(i);
         }
@@ -1117,14 +1060,9 @@ public class EAUtils
 
             if (fid != -1)
             {
-                // for the current capping fragment get the list of APs
-                ArrayList<DENOPTIMAttachmentPoint> fragAP =
-                        FragmentSpace.getFragment(2, fid).getAPs();
-
-                DENOPTIMVertex fragVertex =
-                           new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(),
-                                                                fid, fragAP, 2);
-                // level 0 attachment
+                DENOPTIMVertex fragVertex = DENOPTIMVertex.newFragVertex(
+                        GraphUtils.getUniqueVertexIndex(), fid, 2);
+                
                 fragVertex.setLevel(lvl+1);
 
                 //Get the index of the AP of the capping group to use
@@ -1900,7 +1838,7 @@ MF: TO BE TESTED
 
         MersenneTwister rng = RandomUtils.getRNG();
 
-        // loop thru the reactions for the current AP
+        // loop through the reactions for the current AP
         // check if this reaction bond is already satisfied
         if (curDap.isAvailable())
         {
@@ -1929,26 +1867,26 @@ MF: TO BE TESTED
             {
                 // choose a random fragment if there are more than 1
                 if (reacFrags.size() == 1)
-		{
+                {
                     fid = reacFrags.get(0);
-		}
+                }
                 else
                 {
                     rnd = rng.nextInt(reacFrags.size());
                     fid = reacFrags.get(rnd);
                 }
 
-		// choose one of the compatible APs on the chosen fragment
+                // choose one of the compatible APs on the chosen fragment
                 ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                        FragmentSpace.getFragment(1, fid).getAPs();
-		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
-		for (int i=0; i<fragAPs.size(); i++)
-		{
-		    if (fragAPs.get(i).getAPClass().equals(cmpReac))
-		    {
-			compatApIds.add(i);
-		    }
-		}
+                        FragmentSpace.getFragment(1, fid).getAttachmentPoints();
+        		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
+        		for (int i=0; i<fragAPs.size(); i++)
+        		{
+        		    if (fragAPs.get(i).getAPClass().equals(cmpReac))
+        		    {
+        			compatApIds.add(i);
+        		    }
+        		}
                 if (compatApIds.size() == 1)
                 {
                     apid = compatApIds.get(0);

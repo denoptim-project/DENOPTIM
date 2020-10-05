@@ -332,76 +332,20 @@ public class GraphBuildingTask implements Callable
                     ss.add(tVId);
                     newSymSets.put(tSymSetID,ss);
                 }
-                ArrayList<DENOPTIMAttachmentPoint> tFAPs =
-                        FragmentSpace.getFragment(tFTyp, tFId).getAPs();
-                String tCls = tFAPs.get(tApId).getAPClass();
     
-                DENOPTIMVertex trgVrtx = new DENOPTIMVertex(tVId, tFId, tFAPs,
-                                                                         tFTyp);
+                //TODO-V3: use a type-agnostic w.r.t vertex constructor
+                DENOPTIMVertex trgVrtx = DENOPTIMVertex.newFragVertex(tVId, tFId, tFTyp);
                 
-                //TODO: here again we would benefit from having the building block return the list of
-                // symmetry matching aps
-                IGraphBuildingBlock mol = FragmentSpace.getFragment(tFTyp, tFId);
+                //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
                 /*
-                if (bb instanceof DENOPTIMFragment)
-                {
-                    IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
-                    ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
-                    for (int i = 0; i< daps.size()-1; i++)
-                    {
-                        ArrayList<Integer> lst = new ArrayList<>();
-                        Integer i1 = i;
-                        lst.add(i1);
-
-                        boolean alreadyFound = false;
-                        for (SymmetricSet previousSS : lstCompatible)
-                        {
-                            if (previousSS.contains(i1))
-                            {
-                                alreadyFound = true;
-                                break;
-                            }
-                        }
-
-                        if (alreadyFound)
-                        {
-                            continue;
-                        }
-
-                        DENOPTIMAttachmentPoint d1 = daps.get(i);
-                        for (int j = i+1; j< daps.size(); j++)
-                        {
-                            DENOPTIMAttachmentPoint d2 = daps.get(j);
-                            if (isCompatible(iac, d1.getAtomPositionNumber(),
-                                                            d2.getAtomPositionNumber()))
-                            {
-                                // check if reactions are compatible
-                                if (isFragmentClassCompatible(d1, d2))
-                                {
-                                    Integer i2 = j;
-                                    lst.add(i2);
-                                }
-                            }
-                        }
-
-                        if (lst.size() > 1)
-                        {
-                            lstCompatible.add(new SymmetricSet(lst));
-                        }
-                    }
-
-                    return lstCompatible;
-                } else if (bb instanceof DENOPTIMTemplate) {
-                    return new ArrayList<>();
-                }
-                DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
-                return null;
-                */
                 ArrayList<SymmetricSet> symAPs =
                         mol.getSymmetricAPsSets();
                 trgVrtx.setSymmetricAP(symAPs);
+                */
 
                 trgVrtx.setLevel(srcVrtx.getLevel() + 1);
+                
+                String tCls = trgVrtx.getAttachmentPoints().get(tApId).getAPClass();
                 
                 DENOPTIMEdge edge = GraphUtils.connectVertices(srcVrtx, trgVrtx,
                                                                    sApId, tApId,

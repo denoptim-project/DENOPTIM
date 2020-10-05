@@ -70,7 +70,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GraphUtils;
 
@@ -902,7 +902,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private void startGraphFromFragSpace()
 	{
 		ArrayList<IAtomContainer> fragLib = new  ArrayList<IAtomContainer>();
-        for (IGraphBuildingBlock bb : FragmentSpace.getScaffoldLibrary())
+        for (DENOPTIMVertex bb : FragmentSpace.getScaffoldLibrary())
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
@@ -955,21 +955,8 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Create the node
 		int scaffVrtId = 1;
-		ArrayList<DENOPTIMAttachmentPoint> scaffAPs;
-		try {
-			scaffAPs = FragmentSpace.getFragment(0, scaffFragId).getAPs();
-		} catch (DENOPTIMException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
-					"Error defining APs for scaffold",
-	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
-			return;
-		}
-
-		DENOPTIMVertex scaffVertex = new DENOPTIMVertex(scaffVrtId, 
-				scaffFragId, scaffAPs, 0); // 0 stands for scaffold
+		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newFragVertex(scaffVrtId, 
+				scaffFragId, 0); // 0 stands for scaffold
 
 		scaffVertex.setLevel(-1); //NB: scaffold gets level -1
 		dnGraph.addVertex(scaffVertex);
@@ -1022,7 +1009,7 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			case 0:
 				fragLib = new  ArrayList<IAtomContainer>();
-		        for (IGraphBuildingBlock bb : FragmentSpace.getFragmentLibrary())
+		        for (DENOPTIMVertex bb : FragmentSpace.getFragmentLibrary())
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
@@ -1041,7 +1028,7 @@ public class GUIGraphHandler extends GUICardPanel
 				break;
 			case 2:
 				fragLib = new ArrayList<IAtomContainer>();
-		        for (IGraphBuildingBlock bb : FragmentSpace.getCappingLibrary())
+		        for (DENOPTIMVertex bb : FragmentSpace.getCappingLibrary())
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
@@ -1106,29 +1093,17 @@ public class GUIGraphHandler extends GUICardPanel
 			int srcVertexId = ids.getVertexId();
 			int srcApId = ids.getApId();
 			
-			ArrayList<DENOPTIMAttachmentPoint> trgAPs;
-			try {
-				trgAPs = FragmentSpace.getFragment(trgFrgType, trgFragId).getAPs();
-			} catch (DENOPTIMException e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(null,"Error defining APs",
-		                "Error",
-		                JOptionPane.PLAIN_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
-				return;
-			}
-			
 			int trgVrtId = dnGraph.getMaxVertexId()+1;
 			
-			DENOPTIMVertex trgVertex = new DENOPTIMVertex(trgVrtId, trgFragId, 
-					trgAPs,trgFrgType);
+			DENOPTIMVertex trgVertex = DENOPTIMVertex.newFragVertex(trgVrtId, 
+			        trgFragId, trgFrgType);
 	
 			// Identify the source vertex/node and its AP
 			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
 				
 			String sCls = srcVertex.getAttachmentPoints().get(srcApId)
 						.getAPClass();
-			String tCls = trgAPs.get(trgApId).getAPClass();
+			String tCls = trgVertex.getAttachmentPoints().get(trgApId).getAPClass();
 				
 			trgVertex.setLevel(srcVertex.getLevel() + 1);
 				
@@ -1190,7 +1165,7 @@ public class GUIGraphHandler extends GUICardPanel
 				IAtomContainer frg = null;
 				try
 				{
-					IGraphBuildingBlock bb = FragmentSpace.getFragment(1,fragId);
+					DENOPTIMVertex bb = FragmentSpace.getFragment(1,fragId);
 					if (bb instanceof DENOPTIMFragment)
 					{
 						frg = ((DENOPTIMFragment) bb).getIAtomContainer();
@@ -1609,7 +1584,7 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			DENOPTIMFragment frag = null;
 			try {
-				IGraphBuildingBlock bb = FragmentSpace.getFragment(
+				DENOPTIMVertex bb = FragmentSpace.getFragment(
 						v.getFragmentType(), v.getMolId());
 				if (bb instanceof DENOPTIMFragment)
 					frag = (DENOPTIMFragment) bb;

@@ -35,7 +35,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
@@ -517,77 +517,20 @@ public class DENOPTIMGraphOperations
     {
         // Define the new vertex
         int fid = chosenFrgAndAp.getVertexMolId();
-        ArrayList<DENOPTIMAttachmentPoint> fragAP =
-                FragmentSpace.getFragment(1, fid).getAPs();
         int nvid = GraphUtils.getUniqueVertexIndex();
-        DENOPTIMVertex fragVertex = new DENOPTIMVertex(nvid, fid, fragAP, 1);
+        DENOPTIMVertex fragVertex = DENOPTIMVertex.newFragVertex(nvid, fid, 1);
         // update the level of the vertex based on its parent
         int lvl = curVertex.getLevel();
         fragVertex.setLevel(lvl+1);
         
-        //TODO: here again we would benefit from having the building block return the
-        // list of symmetry matching APs
+        //TODO-V3: check that symmetry is indeed defined in the vertex upon creation
         
-        // identify the symmetric APs if any for this fragment vertex
-        IGraphBuildingBlock mol = FragmentSpace.getFragmentLibrary().get(fid);
         /*
-    	if (bb instanceof DENOPTIMFragment)
-    	{
-    		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
-            ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
-            for (int i = 0; i< daps.size()-1; i++)
-            {
-                ArrayList<Integer> lst = new ArrayList<>();
-                Integer i1 = i;
-                lst.add(i1);
-
-                boolean alreadyFound = false;
-                for (SymmetricSet previousSS : lstCompatible)
-                {
-                    if (previousSS.contains(i1))
-                    {
-                        alreadyFound = true;
-                        break;
-                    }
-                }
-
-                if (alreadyFound)
-                {
-                    continue;
-                }
-
-                DENOPTIMAttachmentPoint d1 = daps.get(i);
-                for (int j = i+1; j< daps.size(); j++)
-                {
-                    DENOPTIMAttachmentPoint d2 = daps.get(j);
-                    if (isCompatible(iac, d1.getAtomPositionNumber(),
-                                                    d2.getAtomPositionNumber()))
-                    {
-                        // check if reactions are compatible
-                        if (isFragmentClassCompatible(d1, d2))
-                        {
-                            Integer i2 = j;
-                            lst.add(i2);
-                        }
-                    }
-                }
-
-                if (lst.size() > 1)
-                {
-                    lstCompatible.add(new SymmetricSet(lst));
-                }
-            }
-
-            return lstCompatible;
-        } else if (bb instanceof DENOPTIMTemplate) {
-    	    return new ArrayList<>();
-        }
-    	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
-    	return null;
-    	*/
+        DENOPTIMVertex mol = FragmentSpace.getFragmentLibrary().get(fid);
         ArrayList<SymmetricSet> simAP = mol.getSymmetricAPsSets();
         fragVertex.setSymmetricAP(simAP);
-
+        */
+        
         // get source: where the new fragment is going to be attached
         ArrayList<DENOPTIMAttachmentPoint> lstDaps =
                                                 curVertex.getAttachmentPoints();
@@ -605,7 +548,7 @@ public class DENOPTIMGraphOperations
         {
             int fapidx = chosenFrgAndAp.getApId();
             String rcn = curDap.getAPClass(); //on the src
-            String cmpReac = fragAP.get(fapidx).getAPClass();
+            String cmpReac = fragVertex.getAttachmentPoints().get(fapidx).getAPClass();
 
             edge = GraphUtils.connectVertices(curVertex, fragVertex, dapIdx, 
                                                           fapidx, rcn, cmpReac);

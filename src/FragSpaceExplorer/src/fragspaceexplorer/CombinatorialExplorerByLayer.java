@@ -788,81 +788,20 @@ public class CombinatorialExplorerByLayer
         DENOPTIMGraph molGraph = new DENOPTIMGraph();
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
-        ArrayList<DENOPTIMAttachmentPoint> scafAPs =
-                FragmentSpace.getFragment(0, scafIdx).getAPs();
-
-        DENOPTIMVertex scafVertex = new DENOPTIMVertex(
-                                              GraphUtils.getUniqueVertexIndex(),
-                                                                        scafIdx,
-                                                                        scafAPs,
-                                                                             0);
+        //TODO-V3: use a vertex constructor that is type-agnostic
+        DENOPTIMVertex scafVertex = DENOPTIMVertex.newFragVertex(
+                GraphUtils.getUniqueVertexIndex(),scafIdx,0);
 
         // as in DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);
 
-        //TODO and again here we would benefit from having the building block return
-        // the list of symmetry matching APs
+        //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
         
-        // identify the symmetric APs if any for this fragment vertex
-        IGraphBuildingBlock mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
         /*
-    	if (bb instanceof DENOPTIMFragment)
-    	{
-    		IAtomContainer iac = ((DENOPTIMFragment) bb).getAtomContainer();
-            ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
-            for (int i = 0; i< daps.size()-1; i++)
-            {
-                ArrayList<Integer> lst = new ArrayList<>();
-                Integer i1 = i;
-                lst.add(i1);
-
-                boolean alreadyFound = false;
-                for (SymmetricSet previousSS : lstCompatible)
-                {
-                    if (previousSS.contains(i1))
-                    {
-                        alreadyFound = true;
-                        break;
-                    }
-                }
-
-                if (alreadyFound)
-                {
-                    continue;
-                }
-
-                DENOPTIMAttachmentPoint d1 = daps.get(i);
-                for (int j = i+1; j< daps.size(); j++)
-                {
-                    DENOPTIMAttachmentPoint d2 = daps.get(j);
-                    if (isCompatible(iac, d1.getAtomPositionNumber(),
-                                                    d2.getAtomPositionNumber()))
-                    {
-                        // check if reactions are compatible
-                        if (isFragmentClassCompatible(d1, d2))
-                        {
-                            Integer i2 = j;
-                            lst.add(i2);
-                        }
-                    }
-                }
-
-                if (lst.size() > 1)
-                {
-                    lstCompatible.add(new SymmetricSet(lst));
-                }
-            }
-
-            return lstCompatible;
-        } else if (bb instanceof DENOPTIMTemplate) {
-    	    return new ArrayList<>();
-        }
-    	DENOPTIMLogger.appLogger.log(Level.WARNING, "getMatchingAP returns null, but should not");
-    	return null;
-    	*/
         ArrayList<SymmetricSet> symAPs =
                 mol.getSymmetricAPsSets();
         scafVertex.setSymmetricAP(symAPs);
+        */
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
