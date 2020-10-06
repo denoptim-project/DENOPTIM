@@ -19,44 +19,16 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.vecmath.Point3d;
-
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.utils.FragmentUtils;
 
 
 /**

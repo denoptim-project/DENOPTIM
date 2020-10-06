@@ -22,19 +22,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.NoSuchElementException;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
 
 

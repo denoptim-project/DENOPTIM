@@ -22,19 +22,10 @@ package denoptimcg;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.vecmath.AxisAngle4d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
-
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
@@ -42,14 +33,12 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.OrganizeAtoms;
+import denoptim.utils.AtomOrganizer;
 import denoptim.utils.RotationalSpaceUtils;
 
 /**
@@ -353,7 +342,7 @@ public class DENOPTIM3DMoleculeBuilder
         }
 
         // Reorder atoms
-        OrganizeAtoms oa = new OrganizeAtoms();
+        AtomOrganizer oa = new AtomOrganizer();
         oa.setScheme(CGParameters.getAtomOrderingScheme());
         int seedAtm = 0;
         IAtomContainer reorderedMol = oa.reorderStartingFrom(seedAtm, initMol);
@@ -408,12 +397,13 @@ public class DENOPTIM3DMoleculeBuilder
         TinkerUtils.setTinkerTypes(tmol,CGParameters.getTinkerMap());
 
         // Generate combined molecular representations (both XYZ and INT)
-        Molecule3DBuilder m3DB = new Molecule3DBuilder(molGraph,
-                                                       reorderedMol,
-                                                       tmol,
-                                                       molName,
-                                                       rotBonds);
-        return m3DB;
+        return new Molecule3DBuilder(
+                molGraph,
+                reorderedMol,
+                tmol,
+                molName,
+                rotBonds
+        );
     }
 
 //------------------------------------------------------------------------------

@@ -87,10 +87,7 @@ public class DENOPTIMGraphEdit
      */
     public static final String DELETEVERTEX = "DELETEVERTEX";
     public static final Set<String> EDIT_TASKS =
-                    new HashSet<>(Arrays.asList(new String[] {
-                                  REPLACECHILD,
-                                  DELETEVERTEX}
-                    ));
+                    new HashSet<>(Arrays.asList(REPLACECHILD, DELETEVERTEX));
 
 //------------------------------------------------------------------------------
 
@@ -188,7 +185,7 @@ public class DENOPTIMGraphEdit
             String str = line.substring(startOfEdg+EDGLAB.length());
             str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
             str = str.trim();
-            String strPrts[] = str.split("_");
+            String[] strPrts = str.split("_");
             // source vertex
             int srcVertex = -1;
             if (!strPrts[0].equals("*"))
@@ -246,7 +243,7 @@ public class DENOPTIMGraphEdit
             String str = line.substring(startOfAP+APLAB.length());
             str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
             str = str.trim();
-            String strPrts[] = str.split("\\|");
+            String[] strPrts = str.split("\\|");
             // AP index
             int apid = -1;
             if (!strPrts[0].equals("*"))
@@ -336,17 +333,13 @@ public class DENOPTIMGraphEdit
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder(512);
-        
-        sb.append("DENOPTIMGraphEdit [[");
-        sb.append(TYPLAB).append("=").append(taskType).append("] ");
-        sb.append(VRTLAB).append("=").append(focusVrtx.toString()).append("] ");
-        sb.append(EDGLAB).append("=").append(focusEdge.toString()).append("] ");
-        sb.append(APLAB).append("=").append(focusAP.toString()).append("] ");
-        sb.append(GRPLAB).append("=").append(incomingGraph.toString());
-        sb.append("]] ");
-
-        return sb.toString();
+        return "DENOPTIMGraphEdit [[" +
+                TYPLAB + "=" + taskType + "] " +
+                VRTLAB + "=" + focusVrtx.toString() + "] " +
+                EDGLAB + "=" + focusEdge.toString() + "] " +
+                APLAB + "=" + focusAP.toString() + "] " +
+                GRPLAB + "=" + incomingGraph.toString() +
+                "]] ";
     }
 
 //------------------------------------------------------------------------------

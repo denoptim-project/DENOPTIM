@@ -1458,6 +1458,5 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     }
 
 //------------------------------------------------------------------------------
-    
+  
 }
-

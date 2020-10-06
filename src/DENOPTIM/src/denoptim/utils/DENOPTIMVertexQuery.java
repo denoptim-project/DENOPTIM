@@ -32,17 +32,17 @@ public class DENOPTIMVertexQuery
     /**
      * Query on the vertex properties
      */
-    private DENOPTIMVertex vQuery;
+    private final DENOPTIMVertex vQuery;
    
     /**
      * Query on the vertex' incoming connections (i.e., vertex id the target)
      */
-    private DENOPTIMEdge eInQuery;
+    private final DENOPTIMEdge eInQuery;
 
     /**
      * Query on the vertex' outcoming connections (i.e., vertex id the cource)
      */
-    private DENOPTIMEdge eOutQuery;
+    private final DENOPTIMEdge eOutQuery;
 
 //------------------------------------------------------------------------------
 

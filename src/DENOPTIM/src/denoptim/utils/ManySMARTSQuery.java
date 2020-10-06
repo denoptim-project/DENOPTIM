@@ -56,60 +56,51 @@ public class ManySMARTSQuery
 
 //------------------------------------------------------------------------------
 
-    public ManySMARTSQuery(IAtomContainer mol, Map<String, String> smarts)
-    {
+    public ManySMARTSQuery(IAtomContainer mol, Map<String, String> smarts) {
         super();
-	String blankSmarts = "[*]";
-	String err="";
-	try {
-                SMARTSQueryTool query = new SMARTSQueryTool(blankSmarts);
-		for (String smartsRef : smarts.keySet())
-		{
-		    //get the new query
-                    String oneSmarts = smarts.get(smartsRef);
-		    err = smartsRef;
+        String blankSmarts = "[*]";
+        String err = "";
+        try {
+            SMARTSQueryTool query = new SMARTSQueryTool(blankSmarts);
+            for (String smartsRef : smarts.keySet()) {
+                //get the new query
+                String oneSmarts = smarts.get(smartsRef);
+                err = smartsRef;
 
-                    //Update the query tool
-		    query.setSmarts(oneSmarts);
-		    
-		    if (query.matches(mol))
-		    {
-			//Store matches
-			List<List<Integer>> listOfIds = new ArrayList<List<Integer>>();
-			listOfIds = query.getUniqueMatchingAtoms();
-			allMatches.put(smartsRef,listOfIds);
-			//Store number
-			int num = listOfIds.size();
-			numMatches.put(smartsRef,num);
- 		    }
-		}
-        } catch (CDKException cdkEx) 
-        {
+                //Update the query tool
+                query.setSmarts(oneSmarts);
+
+                if (query.matches(mol)) {
+                    //Store matches
+                    List<List<Integer>> listOfIds = new ArrayList<List<Integer>>();
+                    listOfIds = query.getUniqueMatchingAtoms();
+                    allMatches.put(smartsRef, listOfIds);
+                    //Store number
+                    int num = listOfIds.size();
+                    numMatches.put(smartsRef, num);
+                }
+            }
+        } catch (CDKException cdkEx) {
             String cause = cdkEx.getCause().getMessage();
             err = "\nWARNING! For query " + err + " => " + cause;
             problems = true;
             message = err;
-	} 
-        catch (Throwable t) 
-        {
-		java.lang.StackTraceElement[] stes = t.getStackTrace();
-		String cause = "";
-		int s = stes.length;
-		if (s >= 1)
-		{
-		    java.lang.StackTraceElement ste = stes[0];
-		    cause = ste.getClassName();
-		} 
-                else 
-                {
-		    cause = "'unknown' (try to process this molecule alone to "
-							    + "get more infos)";
-		}
-                err = "\nWARNING! For query " + err + " => Exception returned "
-								  + "by "+cause;
-                problems = true;
-                message = err;
-	}
+        } catch (Throwable t) {
+            java.lang.StackTraceElement[] stes = t.getStackTrace();
+            String cause = "";
+            int s = stes.length;
+            if (s >= 1) {
+                java.lang.StackTraceElement ste = stes[0];
+                cause = ste.getClassName();
+            } else {
+                cause = "'unknown' (try to process this molecule alone to "
+                        + "get more infos)";
+            }
+            err = "\nWARNING! For query " + err + " => Exception returned "
+                    + "by " + cause;
+            problems = true;
+            message = err;
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -130,10 +121,7 @@ public class ManySMARTSQuery
 
     public int getNumMatchesOfQuery(String query)
     {
-	if (numMatches.keySet().contains(query))
-	    return numMatches.get(query);
-	else
-	    return 0;
+        return numMatches.getOrDefault(query, 0);
     }
 
 //------------------------------------------------------------------------------

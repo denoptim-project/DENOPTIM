@@ -103,14 +103,14 @@ public class RotationalSpaceUtils
         }
 
         // We'll use SMARTS so get rid of pseudoatoms that can create problems
-	// We'll use this modified IAtomContainer only when dealing with SMARTS
+	    // We'll use this modified IAtomContainer only when dealing with SMARTS
         IAtomContainer locMol = new AtomContainer();
         try {
             locMol = mol.clone();
         } catch (Throwable t) {
             throw new DENOPTIMException(t);
         }
-	DENOPTIMMoleculeUtils.removeRCA(locMol);
+	    DENOPTIMMoleculeUtils.removeRCA(locMol);
 
         // Get definition of rotational space as list of SMARTS queries
         Map<String,String> listQueries = getRotationalSpaceDefinition(

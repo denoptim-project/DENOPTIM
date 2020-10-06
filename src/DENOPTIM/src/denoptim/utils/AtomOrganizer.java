@@ -41,25 +41,21 @@ import org.openscience.cdk.interfaces.IAtomContainer;
  *
  * @author Marco Foscato
  */
-public class OrganizeAtoms
+public class AtomOrganizer
 {
 //------------------------------------------------------------------------------    
     
 //indexes of atoms bearing  AP
 
-    private ArrayList<Integer> allAPs;
     //Flags per atoms
     private ArrayList<ArrayList<Boolean>> flags;
-    //Recursion flag for reporting infos
+    //Recursion flag for reporting info
     private int recNum;
     //Alternative atom order
     private Map<Integer, ArrayList<Integer>> atomOrders;
     private Map<Integer, ArrayList<Integer>> oldToNewOrder;
-    private int thisNum;
     //layers
     private Map<Integer, Map<Integer, Set<Integer>>> layers;
-    //pointer to layer
-    private ArrayList<Integer> layerOfAtom;
     //layer index
     private int lidx;
     //Type of reordering scheme:
@@ -68,17 +64,14 @@ public class OrganizeAtoms
     private int scheme = 1;
 
 //------------------------------------------------------------------------------
-    public OrganizeAtoms()
+    public AtomOrganizer()
     {
-        allAPs = new ArrayList<>();
         flags = new ArrayList<>();
         atomOrders = new HashMap<>();
         oldToNewOrder = new HashMap<>();
         recNum = 1;
-        thisNum = 0;
         lidx = 0;
         layers = new HashMap<>();
-        layerOfAtom = new ArrayList<>();
     }
 
 //------------------------------------------------------------------------------
@@ -105,73 +98,55 @@ public class OrganizeAtoms
      * <code>IAtomContainer<code/> with the new order of atoms
      */
     public IAtomContainer reorderStartingFrom(int seed, IAtomContainer mol)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         AtomContainer newMol = new AtomContainer();
         int flag = getFreeAtomsFlag(mol);
 
         //find new order of atoms using starting from 'seed'
-        if (!atomOrders.keySet().contains(seed))
-        {
+        if (!atomOrders.containsKey(seed)) {
             //create all empty vectors of proper size
             ArrayList<Integer> reorderedAtms = new ArrayList<>(mol.getAtomCount());
             atomOrders.put(seed, reorderedAtms);
             ArrayList<Integer> pointer = new ArrayList<>(mol.getAtomCount());
             oldToNewOrder.put(seed, pointer);
-            for (int i = 0; i < mol.getAtomCount(); i++)
-            {
+            for (int i = 0; i < mol.getAtomCount(); i++) {
                 oldToNewOrder.get(seed).add(i, -1);
             }
             recNum = 1;
 
             //add atoms to new other
-	    switch (scheme)
-	    {
-	    case 1:
-	        branchOrienterReordering(seed, flag, mol);
-                break;
-	    case 2:
-		layerOrientedReordering(seed, flag, mol);
-		break;
-	    default:
-		String str = "ERROR! Atom ordering: scheme not recognized";
-		throw new DENOPTIMException(str);	
-            } 
+            switch (scheme) {
+                case 1:
+                    branchOrienterReordering(seed, flag, mol);
+                    break;
+                case 2:
+                    layerOrientedReordering(seed, flag, mol);
+                    break;
+                default:
+                    String str = "ERROR! Atom ordering: scheme not recognized";
+                    throw new DENOPTIMException(str);
+            }
 
             //delete temp vector of flags
             deleteAtomsFlag(flag);
         }
 
-        //Print pointers
-        //System.err.println("\nPointers using atom number " + (seed+1) + " as SEED:");
-        //for (int i=0; i< mol.getAtomCount(); i++)
-        //    System.err.println("   New atom num. "+(i+1)+" is "+(atomOrders.get(seed).get(i)+1)+
-        //                "   \t and Old atom num. "+(i+1)+" is "+oldToNewOrder.get(seed).get(i));
-
-        //Now build the reordered system: rigenerate atoms and bonds
+        //Now build the reordered system: regenerate atoms and bonds
         //Regenerate Atoms
-        for (int i = 0; i < mol.getAtomCount(); i++)
-        {
-            try
-            {
+        for (int i = 0; i < mol.getAtomCount(); i++) {
+            try {
                 IAtom atm = (IAtom) mol.getAtom(atomOrders.get(seed).get(i)).clone();
                 newMol.addAtom(atm);
-            }
-            catch (CloneNotSupportedException cnse)
-            {
-                //System.err.println("\nERROR in cloning ATOM. " + cnse.getMessage());
+            } catch (CloneNotSupportedException cnse) {
                 throw new DENOPTIMException(cnse);
             }
         }
 
         //Regenerate Bonds
-        for (int i = 0; i < mol.getBondCount(); i++)
-        {
-            try
-            {
+        for (int i = 0; i < mol.getBondCount(); i++) {
+            try {
                 IBond oldBnd = mol.getBond(i);
-                if (oldBnd.getAtomCount() != 2)
-                {
+                if (oldBnd.getAtomCount() != 2) {
                     System.err.println("\nMulticenter bond!!!");
                     String msg = "Multicenter bond not supported yet.";
                     throw new DENOPTIMException(msg);
@@ -186,9 +161,7 @@ public class OrganizeAtoms
                 IBond.Stereo stereo = oldBnd.getStereo();
                 IBond bnd = new Bond(newMol.getAtom(newatm1), newMol.getAtom(newatm2), order, stereo);
                 newMol.addBond(bnd);
-            }
-            catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 String msg = "ERROR in making new BOND";
                 throw new DENOPTIMException(msg);
             }
@@ -226,17 +199,10 @@ public class OrganizeAtoms
      */
     private void exploreMolecule(int seed, int flag, IAtomContainer mol, int ap)
     {
-        // Set string for reporting and debugging
-        String recFlag = "";
-        for (int ri = 0; ri < recNum; ri++)
-        {
-            recFlag = recFlag + "-";
-        }
-
         // Get the list of neighbours (connected atoms)
         List<IAtom> neighbourAtoms = mol.getConnectedAtomsList(mol.getAtom(seed));
 
-        // Through away atoms already done
+        // Throw away atoms already done
         List<IAtom> purgedList = new ArrayList<>();
         for (IAtom connectedAtom : neighbourAtoms)
         {
@@ -247,7 +213,7 @@ public class OrganizeAtoms
             }
         }
 
-        // In case nothing alse to do
+        // In case nothing else to do
         if (purgedList.isEmpty())
         {
             return;
@@ -260,15 +226,12 @@ public class OrganizeAtoms
         }
 
         // Add all the atoms connected
-        for (int j = 0; j < purgedList.size(); j++)
-        {
+        for (IAtom connectedAtom : purgedList) {
             // Identify atom
-            IAtom connectedAtom = purgedList.get(j);
             int atmidx = mol.getAtomNumber(connectedAtom);
 
             // Use flag to avoid giving a bite on your own tail!
-            if (flags.get(flag).get(atmidx))
-            {
+            if (flags.get(flag).get(atmidx)) {
                 continue;
             }
 
@@ -277,23 +240,15 @@ public class OrganizeAtoms
         }
 
         // Move to the next level
-        for (int j = 0; j < purgedList.size(); j++)
-        {
+        for (IAtom connectedAtom : purgedList) {
             //get atom
-            IAtom connectedAtom = purgedList.get(j);
-
             //identify atom
             int atmidx = mol.getAtomNumber(connectedAtom);
 
-            //System.err.println(recFlag+"> connected atom: "+ atmidx+" is "+connectedAtom.getSymbol()+" - Branches: "+mol.getConnectedAtomsCount(connectedAtom)+" Flag: "+connectedAtom.getFlag(flag));
-
             // move to the next shell of atoms
-            if (mol.getConnectedAtomsCount(connectedAtom) > 1)
-            {
+            if (mol.getConnectedAtomsCount(connectedAtom) > 1) {
                 recNum++;
-                //System.err.println(recFlag+"> recursion on atom "+atmidx+" which is "+connectedAtom.getSymbol());
                 exploreMolecule(atmidx, flag, mol, ap);
-                //System.err.println(recFlag+"> recursion ALL DONE!");
                 recNum--;
             }
         }
@@ -331,18 +286,14 @@ public class OrganizeAtoms
             // Get atoms in this layer
             Set<Integer> atmInLyr = layersOfAP.get(lidx);
 
-            //System.err.println("Atoms already in layer "+lidx+" -> "+atmInLyr);
-
             // get connected atoms for all atoms in this layer checking flag
             for (int atmIdx : atmInLyr)
             {
                 List<IAtom> neighbourAtoms = mol.getConnectedAtomsList(mol.getAtom(atmIdx));
-                //System.err.println(" - Connected atoms of "+atmIdx);
                 // Set layer lidx+1 to all connected atoms
                 for (IAtom ngbAtm : neighbourAtoms)
                 {
                     int ngbAtmIdx = mol.getAtomNumber(ngbAtm);
-                    //System.err.println(" - - "+ngbAtmIdx);
                     if (!flags.get(lyflg).get(ngbAtmIdx))
                     {
                         int layerOfNgbAtm = lidx + 1;
@@ -352,10 +303,7 @@ public class OrganizeAtoms
             }
 
             // Update goon-condition
-            if (!layersOfAP.keySet().contains(lidx + 1))
-            {
-                goon = false;
-            }
+            goon = layersOfAP.containsKey(lidx + 1);
 
             // Update layer identifier
             lidx++;
@@ -363,35 +311,22 @@ public class OrganizeAtoms
 
         // Explore layers and reorder atoms
         int numberOfLayers = layersOfAP.keySet().size();
-        //System.err.println("tot layers: "+numberOfLayers);
         for (int i = 0; i < numberOfLayers; i++)
         {
             // Get atoms in this layer
-            //System.err.println("get layer "+i+" - "+layersOfAP.get(i));
             Set<Integer> idxInLyr = layersOfAP.get(i);
-            List<IAtom> atmInLyr = new ArrayList<IAtom>();
+            List<IAtom> atmInLyr = new ArrayList<>();
             for (Integer idx : idxInLyr)
             {
-                //System.err.println("   Converting atom index "+idx+" to atom");
                 atmInLyr.add(mol.getAtom(idx));
             }
 
             // Get prioritized list of layer's members
             atmInLyr = prioritizeAtomList(atmInLyr, mol);
-            //System.err.print(" Prioritized list is: ");
-            //for (int j = 0; j < atmInLyr.size(); j++)
-            //{
-            //    IAtom orderedAtm = atmInLyr.get(j);
-                ///int atmidx = mol.getAtomNumber(orderedAtm);
-                //System.err.print(" "+atmidx);
-            //}
-            //System.err.println(" ");
 
             // Report atoms to ordered list
-            for (int j = 0; j < atmInLyr.size(); j++)
-            {
+            for (IAtom orderedAtm : atmInLyr) {
                 // Identify atom
-                IAtom orderedAtm = atmInLyr.get(j);
                 int atmidx = mol.getAtomNumber(orderedAtm);
 
                 // Add to ordered lists
@@ -417,21 +352,20 @@ public class OrganizeAtoms
     private void addAtomToLayer(int atmidx, int ap, int layer, int doneFlag)
     {
         // Check existence of AP-related layers
-        if (!layers.keySet().contains(ap))
+        if (!layers.containsKey(ap))
         {
             Map<Integer, Set<Integer>> layersForAP = new HashMap<>();
             layers.put(ap, layersForAP);
         }
 
         // check existence of this layer in the list of layers
-        if (!layers.get(ap).keySet().contains(layer))
+        if (!layers.get(ap).containsKey(layer))
         {
             Set<Integer> atmInLayer = new HashSet<>();
             layers.get(ap).put(layer, atmInLayer);
         }
 
         // Add atom to layer
-        //System.err.println("Setting layer "+layer+" to atom "+(atmidx+1));
         layers.get(ap).get(layer).add(atmidx);
 
         //Set the doneFlag to true ( = 'DONE')
@@ -457,8 +391,6 @@ public class OrganizeAtoms
 
         //get new index of this atom
         int newIdx = atomOrders.get(ap).size();
-
-        //System.err.println("Adding atom "+atmidx+" ("+(atmidx+1)+") to order. Position: "+newIdx);
 
         //Add NEW atom index to the OLD ORDER pointer
         oldToNewOrder.get(ap).set(atmidx, newIdx);
@@ -487,11 +419,10 @@ public class OrganizeAtoms
             ligList.add(lig);
         }
 
-        Collections.sort(ligList, new ConnectedLigandComparator());
+        ligList.sort(new ConnectedLigandComparator());
 
-        for (int i = 0; i < ligList.size(); i++)
-        {
-            IAtom a = ligList.get(i).getAtom();
+        for (ConnectedLigand connectedLigand : ligList) {
+            IAtom a = connectedLigand.getAtom();
             outList.add(a);
         }
         return outList;
@@ -505,14 +436,14 @@ public class OrganizeAtoms
      *
      * @param mol molecular object for which the vector of flags has to be
      * generated.
-     * @return an integer index referring to the vecot of flags.
+     * @return an integer index referring to the vector of flags.
      */
     private int getFreeAtomsFlag(IAtomContainer mol)
     {
         int freeFlag = -1;
         //create a vector with false entries
         int atoms = mol.getAtomCount();
-        ArrayList<Boolean> flg = new ArrayList<Boolean>();
+        ArrayList<Boolean> flg = new ArrayList<>();
         for (int i = 0; i < atoms; i++)
         {
             flg.add(false);
@@ -536,40 +467,5 @@ public class OrganizeAtoms
         flags.remove(flagID);
     }
 
-//------------------------------------------------------------------------------
-    /**
-     * Reads the attachment points from the DENOPTIMConstants.APCVTAG property.
-     * DENOPTIM's format is expected.
-     *
-     * @param mol chemical object to be red.
-     */
-    public void movePropertyToAP(IAtomContainer mol) throws DENOPTIMException
-    {
-        String allAtomsProp = "";
-        try
-        {
-            allAtomsProp =mol.getProperty(DENOPTIMConstants.APCVTAG).toString();
-        }
-        catch (Exception ex)
-        {
-            String msg = "ERROR! " + DENOPTIMConstants.APCVTAG 
-			+ " field not found!";
-            throw new DENOPTIMException(msg);
-        }
-
-        String[] atomsPRop = allAtomsProp.split(" ");
-        for (int i = 0; i < atomsPRop.length; i++)
-        {
-            String onThisAtm = atomsPRop[i];
-            String[] moreAPonThisAtm = onThisAtm.split(",");
-            String ap = moreAPonThisAtm[0];
-            String[] parts = ap.split("#");
-            int apAtm = Integer.parseInt(parts[0]);
-
-            //DENOPTIM's format used [1 to n+1] instead of [0 to n]
-            allAPs.add(apAtm - 1);
-        }
-    }
-    
 //------------------------------------------------------------------------------
 }

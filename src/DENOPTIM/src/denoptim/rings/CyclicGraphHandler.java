@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Collections;
 
 import org.apache.commons.math3.random.MersenneTwister;
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
@@ -37,14 +36,9 @@ import org.openscience.cdk.graph.PathTools;
 import org.openscience.cdk.graph.matrix.TopologicalMatrix;
 
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.AxisAngle4d;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
@@ -52,11 +46,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.rings.ClosableChain;
-import denoptim.rings.RingClosureFinder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
@@ -265,7 +255,7 @@ public class CyclicGraphHandler
         ArrayList<DENOPTIMVertex> rcaVertLst = molGraph.getFreeRCVertices();
 
         Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId = 
-                     DENOPTIMMoleculeUtils.getVertexToAtmIdMap(rcaVertLst,mol);
+                     DENOPTIMMoleculeUtils.getVertexToAtomIdMap(rcaVertLst,mol);
 
         // Get manager of ring size problems
         RingSizeManager rsm = new RingSizeManager();
@@ -979,7 +969,7 @@ public class CyclicGraphHandler
             sz = lstVert.size();
 
             // Define link between list of vertices and list of atoms
-            vIdToAtmId = DENOPTIMMoleculeUtils.getVertexToAtmIdMap(lstVert,mol);
+            vIdToAtmId = DENOPTIMMoleculeUtils.getVertexToAtomIdMap(lstVert,mol);
 
             // Build topological matrix
             fillTopologicalMatrix(); 
@@ -1494,7 +1484,7 @@ public class CyclicGraphHandler
         {
             System.out.println(" ");
             System.out.println("Evaluating constitutional closability of "
-                               + "path: "+subGraph.getVertecesPath());
+                               + "path: " + subGraph.getVertecesPath());
         }
 
         // Get a working copy of the molecular container
@@ -1502,17 +1492,17 @@ public class CyclicGraphHandler
         try
         {
             mol = inMol.clone();
-            DENOPTIMMoleculeUtils.removeRCA(mol);
         }
-        catch (Throwable t)
+        catch (CloneNotSupportedException e)
         {
-            throw new DENOPTIMException(t); 
+            throw new DENOPTIMException(e);
         }
+        DENOPTIMMoleculeUtils.removeRCA(mol);
         
         // Identify atoms of molecular representation that correspond to
         // this path of vertices
         Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
-                                  DENOPTIMMoleculeUtils.getVertexToAtmIdMap(
+                                  DENOPTIMMoleculeUtils.getVertexToAtomIdMap(
                                   (ArrayList) subGraph.getVertecesPath(),mol);
         Set<Integer> atmIdsInVrtxPath = new HashSet<Integer>();
         for (DENOPTIMVertex v : subGraph.getVertecesPath())

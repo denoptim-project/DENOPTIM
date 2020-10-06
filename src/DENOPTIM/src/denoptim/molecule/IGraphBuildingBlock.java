@@ -2,11 +2,6 @@ package denoptim.molecule;
 
 import java.util.ArrayList;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.fragspace.FragmentSpace;
-import denoptim.utils.FragmentUtils;
-
 /**
  * Interface for any sort of graph building block. {@link DENOPTIMGraph}s are
  * made of {@link DENOPTIMEdge}s connecting {@link DENOPTIMVertex}ex, and the 

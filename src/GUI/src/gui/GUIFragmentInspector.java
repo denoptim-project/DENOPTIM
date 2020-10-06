@@ -46,6 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.vecmath.Point3d;
 
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -55,7 +56,6 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.utils.FragmentUtils;
 
 
 /**
@@ -868,8 +868,8 @@ public class GUIFragmentInspector extends GUICardPanel
     	
     	IAtom srcAtm = fragment.getConnectedAtomsList(trgAtm).get(0);
     	
-    	Point3d srcP3d = FragmentUtils.getPoint3d(srcAtm);
-    	Point3d trgP3d = FragmentUtils.getPoint3d(trgAtm);
+    	Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
+    	Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
     	Point3d vector = new Point3d();
     	vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);

@@ -21,11 +21,9 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.vecmath.Point3d;
 
-import denoptim.logging.DENOPTIMLogger;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
@@ -36,9 +34,6 @@ import org.openscience.cdk.interfaces.IPseudoAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.FragmentUtils;
 
 /**
  * Class representing a continuously connected portion of molecular object
@@ -810,7 +805,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     public ArrayList<SymmetricSet> getSymmetricAPsSets() {
         ArrayList<DENOPTIMAttachmentPoint> aps = getAPs();
-        IAtomContainer iac = this.getIAtomContainer();
         ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
         for (int i = 0; i < aps.size() - 1; i++) {
             ArrayList<Integer> lst = new ArrayList<>();
@@ -832,10 +826,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             DENOPTIMAttachmentPoint d1 = aps.get(i);
             for (int j = i + 1; j < aps.size(); j++) {
                 DENOPTIMAttachmentPoint d2 = aps.get(j);
-                if (FragmentUtils.isCompatible(iac, d1.getAtomPositionNumber(),
-                        d2.getAtomPositionNumber())) {
+                if (isCompatible(
+                        d1.getAtomPositionNumber(),
+                        d2.getAtomPositionNumber()
+                )) {
                     // check if reactions are compatible
-                    if (FragmentUtils.isFragmentClassCompatible(d1, d2)) {
+                    if (d1.isFragmentClassCompatible(d2)) {
                         Integer i2 = j;
                         lst.add(i2);
                     }
@@ -849,7 +845,53 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
         return lstCompatible;
     }
-    
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Checks if the atoms at the given positions have similar environments
+     * i.e. are similar in atom types etc.
+     * @param a1 atom position
+     * @param a2 atom position
+     * @return <code>true</code> if atoms have similar environments
+     */
+
+    private boolean isCompatible(int a1, int a2)
+    {
+        IAtomContainer mol = this.getAtomContainer();
+
+        // check atom types
+        IAtom atm1 = mol.getAtom(a1);
+        IAtom atm2 = mol.getAtom(a2);
+
+        if (atm1.getSymbol().compareTo(atm2.getSymbol()) != 0)
+            return false;
+
+        // check connected bonds
+        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
+            return false;
+
+
+        // check connected atoms
+        if (mol.getConnectedAtomsCount(atm1)!=mol.getConnectedAtomsCount(atm2))
+            return false;
+
+        List<IAtom> la1 = mol.getConnectedAtomsList(atm2);
+        List<IAtom> la2 = mol.getConnectedAtomsList(atm2);
+
+        int k = 0;
+        for (IAtom b1 : la1) {
+            for (IAtom b2 : la2) {
+                if (b1.getSymbol().compareTo(b2.getSymbol()) == 0) {
+                    k++;
+                    break;
+                }
+            }
+        }
+
+        return k == la1.size();
+    }
+
 //-----------------------------------------------------------------------------
 
     @Override
@@ -969,6 +1011,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         mol.setProperties(properties);
     }
+
     
 //------------------------------------------------------------------------------
     
@@ -1044,5 +1087,4 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     }
     
 //-----------------------------------------------------------------------------
-    
 }

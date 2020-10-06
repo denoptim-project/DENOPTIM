@@ -94,8 +94,7 @@ public class DENOPTIMMathUtils
      * Scales a vector
      *
      * @param d A vector to be scaled
-     * @param a A scaler value
-     * @param ret The scaled vector
+     * @param a A scaling value
      */
     public static double[] scale(double[] d, double a)
     {
@@ -111,7 +110,7 @@ public class DENOPTIMMathUtils
      * Scales a vector
      *
      * @param d A vector to be scaled
-     * @param a A scaler value
+     * @param a A scaling value
      * @param ret The scaled vector
      */
     public static void scalar(double[] d, double a, double[] ret) 
@@ -131,8 +130,7 @@ public class DENOPTIMMathUtils
      */
     public static double length (double[] v)
     {
-        double len = Math.sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-        return len;
+        return Math.sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
     }
 
 //------------------------------------------------------------------------------
@@ -140,14 +138,13 @@ public class DENOPTIMMathUtils
     /**
      * Compute the dot product (a scalar) between two vectors.
      *
-     * @param v0   Vectors to compute dot product between.
-     * @param v1
-     * @return        Dot product of given vectors.
+     * @param v0 First vector
+     * @param v1 Second vector
+     * @return Dot product of given vectors.
      */
     public static double computeDotProduct (double[] v0, double[] v1)
     {
-        double d = v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
-        return d;
+        return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
     }
 
 //------------------------------------------------------------------------------
@@ -155,13 +152,13 @@ public class DENOPTIMMathUtils
     /**
      * Compute the cross product of two vectors. Result is a vector
      *
-     * @param v0        Vectors to compute cross product between.
-     * @param v1        Vectors to compute cross product between.
+     * @param v0 First vector
+     * @param v1 Second vector
      * @return crossProduct  Cross product of vectors [x,y,z].
      */
     public static double[] computeCrossProduct (double[] v0, double[] v1)
     {
-        double crossProduct[] = new double[3];
+        double[] crossProduct = new double[3];
         crossProduct[0] = v0[1] * v1[2] - v0[2] * v1[1];
         crossProduct[1] = v0[2] * v1[0] - v0[0] * v1[2];
         crossProduct[2] = v0[0] * v1[1] - v0[1] * v1[0];
@@ -170,9 +167,16 @@ public class DENOPTIMMathUtils
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Perform vector subtraction.
+     *
+     * @param v0 Vector to subtract from
+     * @param v1 Vector to subtract
+     * @return v0 - v1
+     */
     public static double[] subtract (double[] v0, double[] v1)
     {
-        double res[] = new double[3];
+        double[] res = new double[3];
         res[0] = v0[0] - v1[0];
         res[1] = v0[1] - v1[1];
         res[2] = v0[2] - v1[2];
@@ -181,9 +185,16 @@ public class DENOPTIMMathUtils
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Perform vector addition
+     *
+     * @param v0 First vector
+     * @param v1 Second vector
+     * @return v0 + v1
+     */
     public static double[] add (double[] v0, double[] v1)
     {
-        double res[] = new double[3];
+        double[] res = new double[3];
         res[0] = v0[0] + v1[0];
         res[1] = v0[1] + v1[1];
         res[2] = v0[2] + v1[2];
@@ -260,23 +271,6 @@ public class DENOPTIMMathUtils
 
 //------------------------------------------------------------------------------
 
-    // 1 kcal mol-1  =	4.184 J mol-1
-    // 1 Electron volt = 23.06035 kcal mol-1
-    public static double convertEVToKCalPerMol(double energy)
-    {
-        return (energy * 23.06035);
-    }
-
-//------------------------------------------------------------------------------
-
-    // 1AU to nm-1
-    public static double convertEVToReciprocalNM(double energy)
-    {
-        return (energy * 1239.8424121); // in nm-1
-    }
-
-//------------------------------------------------------------------------------
-
     /** 
      * Calculate the angle between the 3 points.
      * @param a
@@ -315,24 +309,13 @@ public class DENOPTIMMathUtils
     
 //------------------------------------------------------------------------------
     
-    public static void diff(double[] a, double[] b, double[] ab)
-    {
-        for (int i=0; i<a.length; i++)
-        {
-            ab[i] = a[i] - b[i];
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
     /**
-     * Call the three points A = (x1,y1,z1), B = (x2,y2,z2), and 
-     * C = (x3,y3,z3). Assuming you want angle ABC, the angle between vector 
-     * BA and vector BC i.e. centered at B
-     * @param A 
-     * @param B
-     * @param C
-     * @return the angle
+     * Calculates angle (in degrees) between vectors BA and BC
+     *
+     * @param A Point
+     * @param B Point
+     * @param C Point
+     * @return Angle (degrees)
      */
     
     public static double getAngle(double[] A, double[] B, double[] C)
@@ -346,6 +329,13 @@ public class DENOPTIMMathUtils
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Calculates distance between point a and point b
+     *
+     * @param a Point
+     * @param b Point
+     * @return Distance between a and b
+     */
     public static double distance(Point3d a, Point3d b)
     {
         double dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
@@ -354,32 +344,18 @@ public class DENOPTIMMathUtils
 
 //------------------------------------------------------------------------------
 
-    /** 
-     * Static distance squared method.
-     * @param a
-     * @param b
-     * @return  squared distance
-     */
-    public static double distanceSquared(Point3d a, Point3d b)
-    {
-        double dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
-        return dx*dx + dy*dy + dz*dz;
-    }
-
-//------------------------------------------------------------------------------
-
-    private static double[] tp1 = new double[3];
-    private static double[] tp2 = new double[3];
-    private static double[] tp3 = new double[3];
-    private static double[] tp4 = new double[3];
+    private static final double[] tp1 = new double[3];
+    private static final double[] tp2 = new double[3];
+    private static final double[] tp3 = new double[3];
+    private static final double[] tp4 = new double[3];
 
     /** 
      * Calculate the torsion angle between the 4 points.
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @return  torsion
+     * @param p1 Point
+     * @param p2 Point
+     * @param p3 Point
+     * @param p4 Point
+     * @return Torsion between arguments
      */
     public static double torsion(Point3d p1, Point3d p2, Point3d p3, Point3d p4)
     {
@@ -390,51 +366,19 @@ public class DENOPTIMMathUtils
 
 	return computeDihedralAngle(tp1, tp2, tp3, tp4);
     }
-
-//------------------------------------------------------------------------------
-    
-    public static double[][] makeMatrix(double[] X, double[] Y)  
-    {  
-        double [][] M = new double[3][3];
-        for (int i=0; i<3; i++)
-            M[i] = new double[3];
-        double[] nX = new double[3];
-        double[] nY = new double[3];
-        double[] nZ = new double[3];
-
-        norm(X, nX); //M.X = normalise( X );
-        norm(computeCrossProduct(X, Y), nZ); // M.Z = normalise( cross_product(X,Y) );
-        norm(computeCrossProduct(nZ, X), nY); // M.Y = //normalise( cross_product(M.Z,X) );  
-
-        M[0][0] = nX[0];
-        M[0][1] = nX[1];
-        M[0][2] = nX[2];
-
-        M[1][0] = nY[0];
-        M[1][1] = nY[1];
-        M[1][2] = nY[2];
-
-        M[2][0] = nZ[0];
-        M[2][1] = nZ[1];
-        M[2][2] = nZ[2]; 
-    
-    
-        return M;
-    }
     
 //------------------------------------------------------------------------------    
     
     /**
      * Return sum of all values in array.
-     * @param a
-     * @return array sum
+     * @param a Array to sum elements of.
+     * @return array sum.
      */
-    public static double sum(double[] a) 
+    public static double sum(double[] a)
     {
         double sum = 0.0;
-        for (int i = 0; i < a.length; i++) 
-        {
-            sum += a[i];
+        for (double v : a) {
+            sum += v;
         }
         return sum;
     }
@@ -442,9 +386,9 @@ public class DENOPTIMMathUtils
 //------------------------------------------------------------------------------        
     
     /**
-     * Return average value in array, NaN if no such value.
-     * @param a
-     * @return 
+     * Calculate mean value.
+     * @param a Array to calculate mean from.
+     * @return mean value of array, NaN if empty array.
      */
     public static double mean(double[] a) 
     {
@@ -452,69 +396,6 @@ public class DENOPTIMMathUtils
             return Double.NaN;
         double sum = sum(a);
         return sum / a.length;
-    }
-    
-//------------------------------------------------------------------------------    
-    
-    /**
-     * Return sample standard deviation of array, NaN if no such value.
-     * @param a
-     * @return 
-     */
-    public static double stddev(double[] a) 
-    {
-        return Math.sqrt(var(a));
-    }
-    
-//------------------------------------------------------------------------------        
-    
-    /**
-     * Return population standard deviation of array, NaN if no such value.
-     * @param a
-     * @return 
-     */
-    public static double stddevp(double[] a) 
-    {
-        return Math.sqrt(varp(a));
-    }    
-    
-//------------------------------------------------------------------------------        
-    
-    /**
-     * Return population variance of array, NaN if no such value.
-     * @param a
-     * @return 
-     */
-    public static double varp(double[] a) 
-    {
-        if (a.length == 0) 
-            return Double.NaN;
-        double avg = mean(a);
-        double sum = 0.0;
-        for (int i = 0; i < a.length; i++) 
-        {
-            sum += (a[i] - avg) * (a[i] - avg);
-        }
-        return sum / a.length;
-    }        
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Return sample variance of array, NaN if no such value.
-     * @param a
-     * @return 
-     */
-    public static double var(double[] a) 
-    {
-        if (a.length == 0) return Double.NaN;
-        double avg = mean(a);
-        double sum = 0.0;
-        for (int i = 0; i < a.length; i++) 
-        {
-            sum += (a[i] - avg) * (a[i] - avg);
-        }
-        return sum / (a.length - 1);
     }
     
 //------------------------------------------------------------------------------    
@@ -543,15 +424,13 @@ public class DENOPTIMMathUtils
 				    1.0/Math.sqrt(2.0), 
 				    1.0/Math.sqrt(2.0)));
 
-        for (int i=0; i<candidates.size(); i++)
-        {
-            double res = vecA.dot(candidates.get(i));
-	    if (Math.abs(res) > 0.1 && Math.abs(res) < 0.9)
-	    {
-		normalDir.cross(vecA,candidates.get(i));
-		break;
-	    }
-	}
+        for (Vector3d candidate : candidates) {
+            double res = vecA.dot(candidate);
+            if (Math.abs(res) > 0.1 && Math.abs(res) < 0.9) {
+                normalDir.cross(vecA, candidate);
+                break;
+            }
+        }
 	normalDir.normalize();
 
         return normalDir;

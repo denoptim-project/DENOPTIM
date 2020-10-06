@@ -839,7 +839,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
         if (!rcnEnabled) {
             return true;
         }
-
         // if both have reaction info
         String strA = getAPClass();
         String strB = other.getAPClass();

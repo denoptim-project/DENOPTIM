@@ -19,18 +19,10 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.utils.FragmentUtils;
-
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
 
 
 /**
