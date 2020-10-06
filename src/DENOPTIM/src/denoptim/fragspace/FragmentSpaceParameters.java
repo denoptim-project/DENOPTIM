@@ -417,10 +417,17 @@ public class FragmentSpaceParameters
     
 //------------------------------------------------------------------------------
 
-    // temp method to convert all IAtomContainers into Fragments that implement
-    // the DENOPTIMVertex interface
+    /**
+     * Processes atom containers and builds fragments
+     * @param iacs
+     * @return a collection of DENOPTIMFragments
+     * @throws DENOPTIMException
+     */
     
-    private static ArrayList<DENOPTIMVertex> tempMEthod(ArrayList<IAtomContainer> iacs) throws DENOPTIMException
+    //TODO-V3: we should do something similar also for templates.
+    
+    private static ArrayList<DENOPTIMVertex> convertsIACsToFrags(
+            ArrayList<IAtomContainer> iacs) throws DENOPTIMException
     {
     	ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
     	for (IAtomContainer iac : iacs)
@@ -438,21 +445,12 @@ public class FragmentSpaceParameters
      */
     public static void processParameters() throws DENOPTIMException
     {
-        ArrayList<DENOPTIMVertex> scaffLib = tempMEthod(
+        ArrayList<DENOPTIMVertex> scaffLib = convertsIACsToFrags(
                 DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold"));
-        //TODO: the read method should deliver building blocks: todo when
-        // we'll know more about file format for templates and other building blocks
         
-        ArrayList<DENOPTIMVertex> fragLib = tempMEthod(
+        ArrayList<DENOPTIMVertex> fragLib = convertsIACsToFrags(
         DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
-        
 
-        /* Moved to FragmentSpace.defineFragmentSpace
-            //TODO: temp code
-    		fragLib.add(DENOPTIMTemplate.getTestTemplate());
-    		System.err.println("Added test template to fragment library");
-        */
-        
         ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
     	HashMap<String,ArrayList<String>> cpMap = 
     			new HashMap<String,ArrayList<String>>();
@@ -464,7 +462,7 @@ public class FragmentSpaceParameters
         
         if (cappingLibFile.length() > 0)
         {
-            cappLib = tempMEthod(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
+            cappLib = convertsIACsToFrags(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
             		"capping group"));
         }
 

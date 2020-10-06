@@ -20,11 +20,17 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import java.io.Serializable;
 
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GraphUtils;
 
 
@@ -145,8 +151,25 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * @param bbType the type of building block 0:scaffold, 1:fragment, 2:capping group
      */
     public static DENOPTIMVertex newFragVertex(int vertexId, int bbId, int bbType)
-    {
-        return new DENOPTIMFragment(vertexId,bbId,bbType);
+    {   
+        DENOPTIMVertex v = new DENOPTIMVertex();
+        try
+        {
+            v = FragmentSpace.getFragment(bbType,bbId).clone();
+        } catch (DENOPTIMException e)
+        {
+            e.printStackTrace();
+            String msg = "Fatal error! Cannot continue. " + e.getMessage();
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            System.exit(0);
+        }
+        v.setVertexId(vertexId);
+        
+        v.setAsRCV(v.getNumberOfAP() == 1 
+                && DENOPTIMConstants.RCAAPCLASSSET.contains(
+                        v.getAttachmentPoints().get(0).getAPClass()));
+        
+        return v;
     }
 
 //------------------------------------------------------------------------------
@@ -170,7 +193,12 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    protected void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
+    //TODO-V3: should be protected? Now it's public to allow refilling of AP list
+    // as done in GraphConversionTool.getGraphFromString to recover at least
+    // some of the entire list of APs of a vertex read-in from a string
+    // representation of a graph. Tha's obviously not ideal, so eventually
+    // we must get rid of it and move this back to protected.
+    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
     {
         lstAPs = m_lstAP;
     }
@@ -359,10 +387,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * @return a deep-copy
      */
     public DENOPTIMVertex clone()
-    {
-        //TODO-TU2
-        System.out.println("-----CLONE OF VERTEX----");
-        
+    {        
         ArrayList<DENOPTIMAttachmentPoint> cLstAPs = 
                 new ArrayList<DENOPTIMAttachmentPoint>();
         for (DENOPTIMAttachmentPoint ap : lstAPs)
@@ -376,7 +401,6 @@ public class DENOPTIMVertex implements Cloneable, Serializable
             cLstSymAPs.add(ss.clone());
         }
         
-        //TODO-V3: must return proper subclass
         return new DENOPTIMVertex(vertexId,cLstAPs,cLstSymAPs,isRCV);
     }
     

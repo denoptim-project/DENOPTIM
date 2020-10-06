@@ -132,8 +132,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * @param m_AtomPosNum the index of the source atom (0-based)
      * @param m_atomConnections the total number of connections
      * @param m_apConnections the number of free connections
-     * @param m_dirVec the AP direction vector end (the beginning ate the 
-     * coords of the source atom). This must array have 3 entries.
+     * @param m_dirVec the AP direction vector end (the beginning are the 
+     * coords of the source atom). This array must have 3 entries.
      */
     public DENOPTIMAttachmentPoint(int m_AtomPosNum, int m_atomConnections,
                                         int m_apConnections, double[] m_dirVec)
@@ -737,14 +737,27 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     
     /**
      * Returns a deep clone of this attachment point
-     * @return a dep clone
+     * @return a deep clone
      */
     
     public DENOPTIMAttachmentPoint clone()
-    {
-        return new DENOPTIMAttachmentPoint(
-                atomPostionNumber, totalConnections, freeConnections, apRule,
-                apSubClass, apClass, dirVec);
+    {   
+        if (apClass.equals(""))
+        {
+            if (dirVec == null)
+            {
+                return new DENOPTIMAttachmentPoint(
+                    atomPostionNumber, totalConnections, freeConnections);
+            } else {
+                return new DENOPTIMAttachmentPoint(
+                        atomPostionNumber, totalConnections, freeConnections, 
+                        dirVec);
+            }
+        } else {
+            return new DENOPTIMAttachmentPoint(
+                    atomPostionNumber, totalConnections, freeConnections,
+                    apRule, apSubClass, apClass, dirVec);
+        }
     }
 
 //------------------------------------------------------------------------------

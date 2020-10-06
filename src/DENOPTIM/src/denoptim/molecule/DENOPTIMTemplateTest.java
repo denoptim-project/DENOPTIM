@@ -42,7 +42,7 @@ public class DENOPTIMTemplateTest
 {
     private static DENOPTIMAttachmentPoint testAP = null;
 
-    //TODO-V3
+    //TODO-V3: reactivate
     //@BeforeAll
     public static void SetUpClass() {
         testAP = new DENOPTIMAttachmentPoint(0, 1, 1);
@@ -61,7 +61,7 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
 
-    //TODO-V3
+    //TODO-V3: complete and reactivate
     //@Test
     public void testIfInteriorGraphDoesNotHaveVacantAPsEqualToExteriorAPsThrowIAE() {
         DENOPTIMTemplate template = new DENOPTIMTemplate();

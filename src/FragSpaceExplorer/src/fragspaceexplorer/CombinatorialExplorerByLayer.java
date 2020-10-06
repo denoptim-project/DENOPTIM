@@ -636,7 +636,7 @@ public class CombinatorialExplorerByLayer
                     FragsCombination fragsToAdd = fcf.next();
 
                     GraphBuildingTask task = new GraphBuildingTask(tId,
-                                                                      rootGraph,
+                                                              rootGraph.clone(),
                                                                      fragsToAdd,
                                                                          level);
 
@@ -666,14 +666,15 @@ public class CombinatorialExplorerByLayer
 						    (total+fcf.getNumGeneratedCombs()>=maxI))
 			            {
 						    String key = "NONE";
-			                            System.out.println("Execution stopped: now waiting "
+			                System.out.println("Execution stopped: now waiting "
 							 + " for checkpoint file to mature");
 						    int iWait=0;
 						    int nEqual = 0;
 						    ArrayList<Integer> oldIds =new ArrayList<Integer>();
 						    ArrayList<Integer> nowIds =new ArrayList<Integer>();
 			                            makeCheckPoint();
-						    oldIds.addAll(FSEParameters.getCheckPoint().getNextIds());
+						    oldIds.addAll(
+						            FSEParameters.getCheckPoint().getNextIds());
 		                    while (true)
 		                    {
 								iWait++;
@@ -686,7 +687,7 @@ public class CombinatorialExplorerByLayer
 				                                makeCheckPoint();
 								nowIds.clear();
 								nowIds.addAll(
-								    FSEParameters.getCheckPoint().getNextIds());
+								FSEParameters.getCheckPoint().getNextIds());
 								System.out.println(oldIds + " " + nowIds 
 										   + " nEqualChecks:" + nEqual);
 								boolean converged = true;

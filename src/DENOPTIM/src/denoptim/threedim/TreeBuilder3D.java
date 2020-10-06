@@ -365,8 +365,7 @@ public class TreeBuilder3D
         DENOPTIMVertex inVtx = graph.getVertexWithId(edge.getTargetVertex());
         int idInVrx = inVtx.getVertexId();
         
-        //TODO-V3
-        if (inVtx.containsAtoms())
+        if (!inVtx.containsAtoms())
         {
             return;
         }

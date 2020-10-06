@@ -943,18 +943,30 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns a deep-copy of this graph. The IDs are not changed, so you might
-     * want to renumber the graph with {@link GraphUtil.renumberVerticesGetMap}.
+     * Returns a deep-copy of this graph. The vertex IDs are not changed, so you
+     * might want to renumber the graph with 
+     * {@link GraphUtil.renumberVerticesGetMap}.
      */
     @Override
     public DENOPTIMGraph clone()
     {
+        //TODO-V3: should this be replaced by DenoptimIO.deepCopy?
+        
+        /*
+        return (DENOPTIMGraph) DenoptimIO.deepCopy(this);
+        */
+        
         // When cloning the VertedID remains the same so we'll have two 
         // deep-copies of the same vertex having the same VertexID
         ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
         for (DENOPTIMVertex vOrig : gVertices)
         {
             DENOPTIMVertex vClone = vOrig.clone();
+            
+            //TODO-TU3
+            //System.out.println(vOrig.getVertexId()+"-"+vClone.getVertexId()+" #AP orig : "+vOrig.getAttachmentPoints());
+            //System.out.println(vOrig.getVertexId()+"-"+vClone.getVertexId()+" #AP clone: "+vClone.getAttachmentPoints());
+            
             for (int i=0; i<vOrig.getAttachmentPoints().size(); i++)
             {
                 DENOPTIMAttachmentPoint origAp = 
@@ -991,7 +1003,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         clone.setRings(cListRings);
         
-        // The cheinLinks are made of primitives, so it's just fine
+        // The chainLinks are made of primitives, so it's just fine
         ArrayList<ClosableChain> cListClosableChains =
                 new ArrayList<>();
         for (ClosableChain cc : closableChains)

@@ -248,20 +248,10 @@ public class GraphBuildingTask implements Callable
                                                         throws DENOPTIMException
     {
         id = "" + m_Id;
-        try
-        {
-            molGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph);
-            molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-            rootId = m_molGraph.getGraphId();
-            graphId = molGraph.getGraphId();
-        }
-        catch (DENOPTIMException de)
-        {
-            hasException = true;
-            thrownExc = de;
-            String msg = "Unable to copy root graph";
-            throw new DENOPTIMException(msg,de);
-        }
+        molGraph = m_molGraph.clone();
+        molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+        rootId = m_molGraph.getGraphId();
+        graphId = molGraph.getGraphId();
         fragsToAdd = m_fragsToAdd;
         level = m_level;      
     }
@@ -279,6 +269,7 @@ public class GraphBuildingTask implements Callable
         {
             String msg = "Call GraphBuildingTask " + id 
                          + " (Lev:" + level + ", comb:" + nextIds + ")";
+            
             if (verbosity > 1)
             {
                 msg = msg + DENOPTIMConstants.EOL + " - Fragsments to add: ";
@@ -305,6 +296,7 @@ public class GraphBuildingTask implements Callable
                 int sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
                 DENOPTIMVertex srcVrtx = molGraph.getVertexWithId(sVId);
+                
                 String sCls = 
                           srcVrtx.getAttachmentPoints().get(sApId).getAPClass();
     
@@ -384,7 +376,7 @@ public class GraphBuildingTask implements Callable
                 nSubTasks = 1;
 
                 // Store graph
-                FSEUtils.storeGraphOfLevel(molGraph,level,rootId,nextIds);
+                FSEUtils.storeGraphOfLevel(molGraph.clone(),level,rootId,nextIds);
             }
             else
             {
@@ -487,7 +479,7 @@ public class GraphBuildingTask implements Callable
                             altRes[0] = pr.getFirst(); 
                       
                             // Store graph
-                            FSEUtils.storeGraphOfLevel(g,level,rootId,nextIds);
+                            FSEUtils.storeGraphOfLevel(g.clone(),level,rootId,nextIds);
                             graphId = gId;
     
                             // Optionally perform external task
@@ -508,7 +500,7 @@ public class GraphBuildingTask implements Callable
                     nSubTasks = 1;
 
                     // Store graph
-                    FSEUtils.storeGraphOfLevel(molGraph,level,rootId,nextIds);
+                    FSEUtils.storeGraphOfLevel(molGraph.clone(),level,rootId,nextIds);
                    
                     // Optionally perform external task 
                     if (FSEParameters.submitExternalTask() && !needsCaps)

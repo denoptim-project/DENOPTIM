@@ -22,6 +22,9 @@ package denoptim.molecule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -125,6 +128,56 @@ public class DENOPTIMFragmentTest
     	assertEquals(1,frg2.getAPCountOnAtom(0),"Size if frg2 atm0");
     	assertEquals(3,frg1.getAPCountOnAtom(2),"Size if frg1 atm2");
     	assertEquals(3,frg2.getAPCountOnAtom(2),"Size if frg2 atm2");
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testClone() throws Exception
+    {
+        DENOPTIMFragment orig = new DENOPTIMFragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        orig.addAtom(a1);
+        orig.addAtom(a2);
+        orig.addAtom(a3);
+        orig.addBond(new Bond(a1, a2));
+        orig.addBond(new Bond(a2, a3));
+        orig.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        orig.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        orig.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        orig.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        
+        ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
+        ssaps.add(new SymmetricSet(new ArrayList(Arrays.asList(0,1,2))));
+        orig.setSymmetricAP(ssaps);
+        
+        DENOPTIMVertex c = orig.clone();
+        
+        assertEquals(4,((DENOPTIMFragment) c).getAPCount(),"Number of APs");
+        assertEquals(1,((DENOPTIMFragment) c).getAPCountOnAtom(0),
+                "Size APs on atm0");
+        assertEquals(3,((DENOPTIMFragment) c).getAPCountOnAtom(2),
+                "Size APs on atm2");
+        assertEquals(4,c.getAttachmentPoints().size(),"Number of APs (B)");
+        assertEquals(1,c.getSymmetricAP().size(), "Number of symmetric sets");
+        assertEquals(3,c.getSymmetricAP().get(0).size(), 
+                "Number of symmetric APs in set");
+        
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testContructorFromIAC() throws Exception
+    {
+        IAtomContainer iac = new AtomContainer();
+        
+        //TODO-TU3
+        
+        
+        
     }
     
 //------------------------------------------------------------------------------

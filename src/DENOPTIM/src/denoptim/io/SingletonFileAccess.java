@@ -52,7 +52,7 @@ public class SingletonFileAccess
 								 boolean append)
 							throws DENOPTIMException
     {
-	DenoptimIO.writeData(fileName, data, append);
+        DenoptimIO.writeData(fileName, data, append);
     }
 
 //------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ public class SingletonFileAccess
                                                                  boolean append)
                                                         throws DENOPTIMException
     {
-	DenoptimIO.serializeToFile(fileName, obj, append);
+        DenoptimIO.serializeToFile(fileName, obj, append);
     }
 //------------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ public class SingletonFileAccess
 
     public static SingletonFileAccess getInstance() 
     {
-	return sfa;
+        return sfa;
     }
 
 //------------------------------------------------------------------------------

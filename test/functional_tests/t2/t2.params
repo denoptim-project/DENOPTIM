@@ -5,8 +5,10 @@
 # Parameters for FragmentSpaceExplorer
 FSE-WorkDir=OTF_WDIR
 FSE-UidFile=OTF_WDIR/MOLUID.txt
+FSE-NumOfProcessors=1
+#TODO-TU3: back to normal
 FSE-NumOfProcessors=OTF_PROCS
-FSE-MAXLEVEL=1
+#FSE-MAXLEVEL=1
 FSE-ROOTGRAPHS=OTF_WDIR/roots.txt
 FP-Source=OTF_WDIR/fitness_provider.sh
 FP-Interpreter=BASH

@@ -748,8 +748,15 @@ public class GraphUtils
             dap_B.updateFreeConnections(-bndOrder); // decrement the connections
 
             return edge;
+        } else {
+            System.err.println("ERROR! Attempt to make edge using unavailable AP!"
+                    + System.getProperty("line.separator")
+                    + "Vertex: "+vtxA.getVertexId()
+                    +" AP-A(available:"+dap_A.isAvailable()+"): "+dap_A
+                    + System.getProperty("line.separator")
+                    + "Vertex: "+vtxB.getVertexId()
+                    +" AP-B(available:"+dap_B.isAvailable()+"): "+dap_B);
         }
-        //System.err.println("PROBLEM getting null");
         return null;
     }
 

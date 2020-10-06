@@ -27,13 +27,17 @@ import javax.vecmath.Point3d;
 
 import denoptim.logging.DENOPTIMLogger;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IPseudoAtom;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.FragmentUtils;
 
 /**
@@ -64,7 +68,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	/**
 	 * Molecular representation of this fragment
 	 */
-	private final IAtomContainer mol;
+	private IAtomContainer mol;
 
 //-----------------------------------------------------------------------------
 
@@ -86,38 +90,40 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param bbId 0-based index of building block in the library
      * @param bbType the type of building block 0:scaffold, 1:fragment, 2:capping group
      */
-    @Deprecated
-    public DENOPTIMFragment(int vertexId, int bbId, int bbType)
+
+    public DENOPTIMFragment(int vertexId)
     {
         super(vertexId);
-       
-        //TODO-V3 : get rid of this constructor
-        // FragmentSpace.getFragment(bbType,bbId) already return a clone of the original
-        
-
-      //TODO-V3 delete. only until FRagSpace will not return mol
         this.mol = new AtomContainer();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Constructor from another atom container, which has APs only as 
+     * molecular properties. WARNING: other properties of the atom container
+     * are not imported!
+     * @param vetexId the identifier of the vertex to construct
+     * @param mol the molecular representation
+     * @throws DENOPTIMException 
+     */
+    
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol) 
+            throws DENOPTIMException
+    {     
+        super (vertexId);
         
-        //TODO-V3 get rid of interface
-        DENOPTIMVertex bb = null;
-        try
+        this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
+        
+        Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
+        if (prop != null)
         {
-            bb = FragmentSpace.getFragment(bbType,bbId).clone();
-            
-            //TODO-V3 get IAC from library
-        } catch (DENOPTIMException e)
-        {
-            e.printStackTrace();
-            String msg = "Fatal error! Cannot continue. " + e.getMessage();
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            System.exit(0);
+            projectPropertyToAP(prop.toString());
         }
         
-        this.setAttachmentPoints(bb.getAttachmentPoints());
-        this.setSymmetricAP(bb.getSymmetricAP());
-        this.setAsRCV(getAPCount() == 1 
-                && DENOPTIMConstants.RCAAPCLASSSET.contains(
-                        this.getAttachmentPoints().get(0).getAPClass()));
+        ArrayList<SymmetricSet> simAP = getMatchingAP(this.mol, 
+                getAttachmentPoints());
+        setSymmetricAP(simAP);
     }
     
 //-----------------------------------------------------------------------------
@@ -132,14 +138,136 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
     public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
     {    	
-    	// WARNING: atom container properties are not imported
-        this.mol = new AtomContainer(mol);
-        
-        Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
-        if (prop != null)
+    	this(-1,mol);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static ArrayList<SymmetricSet> getMatchingAP(IAtomContainer mol,
+            ArrayList<DENOPTIMAttachmentPoint> daps)
+    {
+        ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
+        for (int i=0; i<daps.size()-1; i++)
         {
-            projectPropertyToAP(prop.toString());
+            ArrayList<Integer> lst = new ArrayList<>();
+            Integer i1 = i;
+            lst.add(i1);
+            
+            boolean alreadyFound = false;
+            for (SymmetricSet previousSS : lstCompatible)
+            {
+                if (previousSS.contains(i1))
+                {
+                    alreadyFound = true;
+                    break;
+                }
+            }
+            if (alreadyFound)
+            {
+                continue;
+            }
+        
+            DENOPTIMAttachmentPoint d1 = daps.get(i);
+            for (int j=i+1; j<daps.size(); j++)
+            {
+                DENOPTIMAttachmentPoint d2 = daps.get(j);
+                if (isCompatible(mol, d1.getAtomPositionNumber(),
+                                    d2.getAtomPositionNumber()))
+                {
+                    // check if reactions are compatible
+                    if (isFragmentClassCompatible(d1, d2))
+                    {
+                        Integer i2 = j;
+                        lst.add(i2);
+                    }
+                }
+            }
+            
+            if (lst.size() > 1)
+            {
+                lstCompatible.add(new SymmetricSet(lst));
+            }
         }
+        
+        return lstCompatible;
+    }
+ 
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if the atoms at the given positions have similar environments
+     * i.e. are similar in atom types etc.
+     * @param mol
+     * @param a1 atom position
+     * @param a2 atom position
+     * @return <code>true</code> if atoms have similar environments
+     */
+
+    private static boolean isCompatible(IAtomContainer mol, int a1, int a2)
+    {
+        // check atom types
+        IAtom atm1 = mol.getAtom(a1);
+        IAtom atm2 = mol.getAtom(a2);
+
+        if (atm1.getSymbol().compareTo(atm2.getSymbol()) != 0)
+            return false;
+
+        // check connected bonds
+        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
+            return false;
+
+
+        // check connected atoms
+        if (mol.getConnectedAtomsCount(atm1)!=mol.getConnectedAtomsCount(atm2))
+            return false;
+
+        List<IAtom> la1 = mol.getConnectedAtomsList(atm2);
+        List<IAtom> la2 = mol.getConnectedAtomsList(atm2);
+
+        int k = 0;
+        for (int i=0; i<la1.size(); i++)
+        {
+            IAtom b1 = la1.get(i);
+            for (int j=0; j<la2.size(); j++)
+            {
+                IAtom b2 = la2.get(j);
+                if (b1.getSymbol().compareTo(b2.getSymbol()) == 0)
+                {
+                    k++;
+                    break;
+                }
+            }
+        }
+
+        return k == la1.size();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Compare attachment points based on the AP class
+     * @param A attachment point information
+     * @param B attachment point information
+     * @return <code>true</code> if the points have the same class or
+     * else <code>false</code>
+     */
+
+    private static boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint A,
+                                                      DENOPTIMAttachmentPoint B)
+    {
+        String strA = A.getAPClass();
+        String strB = B.getAPClass();
+        if (strA != null && strB != null)
+        {
+            if (strA.compareToIgnoreCase(strB) == 0)
+                    return true;
+        }
+        else
+        {        
+            return true;
+        }
+
+        return false;
     }
     
 //------------------------------------------------------------------------------
@@ -152,6 +280,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public int getFragmentType()
     {
         return buildingBlockType;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void setFragmentType(int fType)
+    {
+        buildingBlockType = fType;
     }
 
 //------------------------------------------------------------------------------
@@ -643,15 +778,23 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	DENOPTIMFragment frg = new DENOPTIMFragment();
 		try {
 		    this.projectAPsToProperties();
-			frg = new DENOPTIMFragment(mol);
+		    //deep copy of mol is created in the DENOPTIMFragment constructor
+			frg = new DENOPTIMFragment(getVertexId(),mol);
 		} catch (Exception e) {
-			//TODO: by-pass by copying all atoms, bonds and el. containers,
-			// atom properties and atomcontainer properties (what else?)
+		    e.printStackTrace();
 			String msg = "Failed to clone DENOPTIMFragment! " +frg;
 			System.err.println(msg);
 		}
+		frg.setMolId(this.getMolId());
+		frg.setFragmentType(this.getFragmentType());
 		
-		//TODO-V3: check consistency with content of vertex.lstAPs
+		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
+        for (SymmetricSet ss : this.getSymmetricAP())
+        {
+            cLstSymAPs.add(ss.clone());
+        }
+        frg.setSymmetricAP(cLstSymAPs);
+        
 		return frg;
     }
     
@@ -872,6 +1015,32 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         }
         
         return ((DENOPTIMVertex) this).sameAs(((DENOPTIMVertex)other), reason);
+    }
+  
+//------------------------------------------------------------------------------
+
+    public int getHeavyAtomsCount()
+    {
+        return DENOPTIMMoleculeUtils.getHeavyAtomCount(mol);
+    }
+
+//------------------------------------------------------------------------------
+
+    public boolean containsAtoms()
+    {
+        if (mol.getAtomCount() > 0)
+            return true;
+        else
+            return false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public String toString()
+    {
+        return getVertexId()+ "_" + (buildingBlockId + 1) + "_" +
+                buildingBlockType + "_" + getLevel();
     }
     
 //-----------------------------------------------------------------------------

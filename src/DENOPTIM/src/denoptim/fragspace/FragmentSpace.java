@@ -138,8 +138,8 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
     
     /**
-     * Define all components of a fragment space that implements the attachment
-     * point class-approach.
+     * Define all components of a fragment space that does NOT 
+     * implement the attachment point class-approach.
      * @param scaffLib library of fragments used to start the construction of
      * any new graph (i.e., seed or root fragments, a.k.a. scaffolds).
      * @param fragLib library of fragments for general purpose.

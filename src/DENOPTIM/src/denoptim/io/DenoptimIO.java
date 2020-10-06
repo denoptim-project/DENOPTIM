@@ -638,31 +638,32 @@ public class DenoptimIO
 								 boolean append)
 							throws DENOPTIMException
     {
-	FileOutputStream fos = null;
-	ObjectOutputStream oos = null;
+    	FileOutputStream fos = null;
+    	ObjectOutputStream oos = null;
         try
         {
             fos = new FileOutputStream(fileName, append);
-	    oos = new ObjectOutputStream(fos);
+            oos = new ObjectOutputStream(fos);
             oos.writeObject(obj);
             oos.close();
         }
         catch (Throwable t)
         {
+            t.printStackTrace();
             throw new DENOPTIMException("Cannot serialize object.", t);
         }
         finally
         {
-	    try
-	    {
-	        fos.flush();
+    	    try
+    	    {
+    	        fos.flush();
                 fos.close();
                 fos = null;
-	    } 
-	    catch (Throwable t)
-	    {
-		throw new DENOPTIMException("cannot close FileOutputStream",t);
-	    }
+    	    } 
+    	    catch (Throwable t)
+    	    {
+    	        throw new DENOPTIMException("Cannot close FileOutputStream",t);
+    	    }
         }
     }
 

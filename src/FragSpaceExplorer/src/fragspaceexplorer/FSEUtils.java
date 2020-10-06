@@ -143,7 +143,7 @@ public class FSEUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Serilize all <code>DENOPTIMGraph</code>s to file.
+     * Serialize all <code>DENOPTIMGraph</code>s to file.
      * The pathname of the output file is given by the value of 
      * <code>level</code> and the parameters from <code>FSEParameters</code>.
      * @param lstGraphs
@@ -162,7 +162,7 @@ public class FSEUtils
 	    //      the naked root graphs. Therefore there is no set of indeces
 	    //      to store and we fed the method with an empty array.
 	    // NOTE2: the root Id is set to zero for the same reason.
-            storeGraphOfLevel(g,level,0,new ArrayList());
+            storeGraphOfLevel(g.clone(),level,0,new ArrayList());
         }
     }
 
@@ -183,26 +183,26 @@ public class FSEUtils
                             int rootId, ArrayList<Integer> nextIds) 
 							throws DENOPTIMException
     {
-	String outDir = getNameOfStorageDir(level);
-	if (!DenoptimIO.checkExists(outDir))
-	{
-	    try
-	    {
-		FileUtils.forceMkdir(new File(outDir));
-	    }
-	    catch (Throwable t)
-	    {
-		String msg = "Cannot create folder " + outDir;
-		throw new DENOPTIMException(msg,t);
-	    }
-	}
-
+    	String outDir = getNameOfStorageDir(level);
+    	if (!DenoptimIO.checkExists(outDir))
+    	{
+    	    try
+    	    {
+    	        FileUtils.forceMkdir(new File(outDir));
+    	    }
+    	    catch (Throwable t)
+    	    {
+    	        String msg = "Cannot create folder " + outDir;
+    	        throw new DENOPTIMException(msg,t);
+    	    }
+    	}
+    
         String fileSer = getNameOfStorageFile(level,graph.getGraphId());
-	String indexFile = getNameOfStorageIndexFile(level);
-	String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
-			   + rootId + " " + nextIds;
-	SingletonFileAccess.getInstance().serializeToFile(fileSer,graph,true);
-	SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
+    	String indexFile = getNameOfStorageIndexFile(level);
+    	String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
+    			   + rootId + " " + nextIds;
+    	SingletonFileAccess.getInstance().serializeToFile(fileSer,graph,true);
+    	SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
     }
 
 //------------------------------------------------------------------------------
