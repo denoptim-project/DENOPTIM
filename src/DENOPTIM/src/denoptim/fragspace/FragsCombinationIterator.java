@@ -167,7 +167,7 @@ public class FragsCombinationIterator
                 {
                     keepThisAP = false;
                     boolean isInSymSet = false;
-                    for (SymmetricSet ss : v.getSymmetricAP())
+                    for (SymmetricSet ss : v.getSymmetricAPSets())
                     {
                         if (ss.contains(apIdx))
                         {
@@ -550,7 +550,7 @@ public class FragsCombinationIterator
                 {
                     continue;
                 }
-                for (SymmetricSet ss : v.getSymmetricAP())
+                for (SymmetricSet ss : v.getSymmetricAPSets())
                 {
                     if (ss.contains(srcApId))
                     {

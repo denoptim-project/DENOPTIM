@@ -226,14 +226,14 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    protected void setSymmetricAP(ArrayList<SymmetricSet> m_Sap)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap)
     {
         lstSymAPs = m_Sap;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<SymmetricSet> getSymmetricAP()
+    public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
         return lstSymAPs;
     }
