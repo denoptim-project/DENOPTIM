@@ -34,6 +34,8 @@ import org.openscience.cdk.interfaces.IPseudoAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * Class representing a continuously connected portion of molecular object
@@ -858,7 +860,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     private boolean isCompatible(int a1, int a2)
     {
-        IAtomContainer mol = this.getAtomContainer();
+        IAtomContainer mol = this.getIAtomContainer();
 
         // check atom types
         IAtom atm1 = mol.getAtom(a1);

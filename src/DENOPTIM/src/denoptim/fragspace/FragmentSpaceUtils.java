@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMVertex;
 
 
 /**

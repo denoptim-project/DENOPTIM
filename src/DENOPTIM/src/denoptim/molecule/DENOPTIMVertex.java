@@ -31,6 +31,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.GraphUtils;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
