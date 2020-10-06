@@ -27,7 +27,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.FragmentUtils;
 
 
 /**

@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
 import org.jmol.viewer.Viewer;
@@ -52,7 +53,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.FragmentUtils;
 
 
 /**
@@ -541,7 +541,7 @@ public class FragmentViewPanel extends JSplitPane
         {
         	DENOPTIMAttachmentPoint ap = mapAPs.get(arrId);
         	int srcAtmId = ap.getAtomPositionNumber();
-        	Point3d srcAtmPlace = FragmentUtils.getPoint3d(
+        	Point3d srcAtmPlace = DENOPTIMMoleculeUtils.getPoint3d(
         			fragment.getAtom(srcAtmId));
         	double[] startArrow = new double[]{
         			srcAtmPlace.x,

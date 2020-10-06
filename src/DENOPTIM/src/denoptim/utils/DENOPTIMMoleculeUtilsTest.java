@@ -19,6 +19,7 @@ package denoptim.utils;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static denoptim.utils.DENOPTIMMoleculeUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,12 +32,12 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
 /**
- * Unit test for FragmentUtils
+ * Unit test for DENOPTIMMoleculeUtils
  * 
  * @author Marco Foscato
  */
 
-public class FragmentUtilsTest
+public class DENOPTIMMoleculeUtilsTest
 {
 	
     @Test
@@ -44,31 +45,27 @@ public class FragmentUtilsTest
     {
     	
     	IAtom a = new Atom();
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).x,0.0));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).y,0.0));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).z,0.0));
+    	assertTrue(areCloseEnough(getPoint3d(a).x,0.0));
+    	assertTrue(areCloseEnough(getPoint3d(a).y,0.0));
+    	assertTrue(areCloseEnough(getPoint3d(a).z,0.0));
     	
     	a.setPoint2d(new Point2d(2.6, -4.2));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).x,2.6));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).y,-4.2));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).z,0.0));
+    	assertTrue(areCloseEnough(getPoint3d(a).x,2.6));
+    	assertTrue(areCloseEnough(getPoint3d(a).y,-4.2));
+    	assertTrue(areCloseEnough(getPoint3d(a).z,0.0));
     	
     	a.setPoint3d(new Point3d(2.6, -4.2, 6.4));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).x,2.6));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).y,-4.2));
-    	assertTrue(areCloseEnough(FragmentUtils.getPoint3d(a).z,6.4));
+    	assertTrue(areCloseEnough(getPoint3d(a).x,2.6));
+    	assertTrue(areCloseEnough(getPoint3d(a).y,-4.2));
+    	assertTrue(areCloseEnough(getPoint3d(a).z,6.4));
     	
     	assertFalse(areCloseEnough(1.00001, 1.00002));
     }
     
     private boolean areCloseEnough(double a, double b)
     {
-    	double t = 0.0000001;
-    	if (Math.abs(a-b) > t)
-    	{
-    		return false;
-    	}
-    	return true;
+    	double delta = 0.0000001;
+    	return Math.abs(a-b) <= delta;
     }
     
 //------------------------------------------------------------------------------
