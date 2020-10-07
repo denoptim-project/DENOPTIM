@@ -158,6 +158,17 @@ fi
 echo
 echo
 
+echo "build-graphlisthandler.sh"
+bash build-graphlisthandler.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-graphlisthandler.sh."
+    exit -1
+fi
+
+echo
+echo
+
 echo "build-gui.sh"
 bash build-gui.sh
 
