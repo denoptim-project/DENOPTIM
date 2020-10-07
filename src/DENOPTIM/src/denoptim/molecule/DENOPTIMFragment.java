@@ -54,13 +54,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     /**
      * Index of the graph building block contained in the vertex
      */
-    private int buildingBlockId;
+    private int buildingBlockId = -99; //Initialised to meaningless value
     
     //TODO-V3 to enum
     /*
      * 0:scaffold, 1:fragment, 2:capping group
      */
-    private int buildingBlockType;
+    private int buildingBlockType = -99; //Initialised to meaningless value
     
 	/**
 	 * Molecular representation of this fragment

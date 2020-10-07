@@ -209,7 +209,7 @@ public class FragsCombinationIterator
             int fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
-            DENOPTIMVertex frag = FragmentSpace.getFragment(fTyp, fIdx); 
+            DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
             String srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 

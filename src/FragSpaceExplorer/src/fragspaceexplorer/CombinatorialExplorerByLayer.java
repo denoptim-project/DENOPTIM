@@ -557,7 +557,7 @@ public class CombinatorialExplorerByLayer
                     scafLevel.add(startNewGraphFromScaffold(i));
                 }
             }
-
+            
             // Store them
             FSEUtils.storeAllGraphsOfLevel(scafLevel,level);
 

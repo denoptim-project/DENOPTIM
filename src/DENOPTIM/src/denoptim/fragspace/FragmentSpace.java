@@ -51,13 +51,21 @@ public class FragmentSpace
     /**
      * Data structure containing the molecular representation of
      * building blocks: scaffolds section - fragments that can be used
-     * as seeds to grow a new molecule.
+     * as seeds to grow a new molecule. 
+     * WARNING! The objects stores in the library do not have a 
+     * meaningful value for the two indexes representing the type
+     * of building block and the position of the list of all building blocks
+     * of that type.
      */
     private static ArrayList<DENOPTIMVertex> scaffoldLib = null;
 
     /**
      * Data structure containing the molecular representation of
-     * building blocks: fragment section - fragments for general use
+     * building blocks: fragment section - fragments for general use.
+     * WARNING! The objects stores in the library do not have a 
+     * meaningful value for the two indexes representing the type
+     * of building block and the position of the list of all building blocks
+     * of that type.
      */
     private static ArrayList<DENOPTIMVertex> fragmentLib = null;
 
@@ -65,7 +73,11 @@ public class FragmentSpace
      * Data structure containing the molecular representation of
      * building blocks: capping group section - fragments with only
      * one attachment point used to saturate unused attachment
-     * points on a graph.
+     * points on a graph. 
+     * WARNING! The objects stores in the library do not have a 
+     * meaningful value for the two indexes representing the type
+     * of building block and the position of the list of all building blocks
+     * of that type.
      */
     private static ArrayList<DENOPTIMVertex> cappingLib = null;
 
@@ -332,7 +344,7 @@ public class FragmentSpace
     	String cls = null;
     	try
     	{
-    		DENOPTIMVertex frg = FragmentSpace.getFragment(
+    		DENOPTIMVertex frg = FragmentSpace.getVertexFromLibrary(
         			apId.getVertexMolType(), apId.getVertexMolId());
     		cls = frg.getAttachmentPoints().get(apId.getApId()).getAPClass();
     	}
@@ -347,19 +359,29 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Return a clone of the requested building block  
-     * @param frgTyp the type of building block. This basically selects the 
+     * Returns a clone of the requested building block.
+     * 
+     * @param bbTyp the type of building block. This basically selects the 
      * sub library from which the building block is taken: 0 for scaffold, 1 for
      * standard fragment, 2 for capping group.
-     * @param molIdx the index (0-based) of the fragment in
-     * the proper library, which is defied by the type of fragment
-     * @return the molecular representation of the fragment
+     * @param bbIdx the index (0-based) of the building block in
+     * the corresponding library, which is defied by the type of building 
+     * block 'bbType'
+     * @return the chosen vertex, possibly including its molecular 
+     * representation.
      * @throws DENOPTIMException
      */
 
-    public static DENOPTIMVertex getFragment(int frgTyp, int molIdx) 
+    public static DENOPTIMVertex getVertexFromLibrary(int bbTyp, int bbIdx) 
 						        throws DENOPTIMException
     {
+        // WARNING! This is were we first assign the bbTyp and bbIdx to
+        // a vertex 'taken' from the library. Note that 'taken' means that we 
+        // get a slightly modified copy of the vertex. In particular, the
+        // objects stores in the library do not have a meaningful value for the
+        // two indexes, so after we make a deep copy of them we assign the 
+        // indexes according to bbTyp and bbIdx.
+        
 		String msg = "";
 		if (fragmentLib == null || scaffoldLib == null || cappingLib == null)
 		{
@@ -367,56 +389,70 @@ public class FragmentSpace
 		    throw new DENOPTIMException(msg);
 		}
 		DENOPTIMVertex originalVrtx = null;
-		switch (frgTyp)
+		switch (bbTyp)
 		{
 			case 0:
-			    if (molIdx < scaffoldLib.size())
+			    if (bbIdx < scaffoldLib.size())
 			    {
-			    	originalVrtx = scaffoldLib.get(molIdx);	
+			    	originalVrtx = scaffoldLib.get(bbIdx);	
 			    }
 			    else
 			    {
-				msg = "Mismatch between scaffold molIdx and size of the library"
-				      + ". MolId: " + molIdx + " FragType: " + frgTyp;
+				msg = "Mismatch between scaffold bbIdx and size of the library"
+				      + ". MolId: " + bbIdx + " FragType: " + bbTyp;
 		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 				throw new DENOPTIMException(msg);
 			    }
 			    break;
 			case 1:
-		            if (molIdx < fragmentLib.size())
+		            if (bbIdx < fragmentLib.size())
 		            {
-		                originalVrtx = fragmentLib.get(molIdx);
+		                originalVrtx = fragmentLib.get(bbIdx);
 		            }
 		            else
 		            {
-		                msg = "Mismatch between fragment molIdx and size of the "
-		                		+ "library" + ". MolId: " + molIdx 
-		                		+ " FragType: " + frgTyp;
+		                msg = "Mismatch between fragment bbIdx and size of the "
+		                		+ "library" + ". MolId: " + bbIdx 
+		                		+ " FragType: " + bbTyp;
 		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 		                throw new DENOPTIMException(msg);
 		            }
 			    break;
 			case 2:
-		            if (molIdx < cappingLib.size())
+		            if (bbIdx < cappingLib.size())
 		            {
-		                originalVrtx = cappingLib.get(molIdx);
+		                originalVrtx = cappingLib.get(bbIdx);
 		            }
 		            else
 		            {
-		                msg = "Mismatch between capping group molIdx and size "
-		                		+ "of the library. MolId: " + molIdx 
-		                		+ " FragType: " + frgTyp;
+		                msg = "Mismatch between capping group bbIdx and size "
+		                		+ "of the library. MolId: " + bbIdx 
+		                		+ " FragType: " + bbTyp;
 		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 		                throw new DENOPTIMException(msg);
 		            }
 		            break;
 			default:
-			    msg = "Unknown type of fragment '" + frgTyp + "'.";
+			    msg = "Unknown type of fragment '" + bbTyp + "'.";
 		            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 			    throw new DENOPTIMException(msg);
 		}
 		
-        return originalVrtx.clone();
+		DENOPTIMVertex clone = originalVrtx.clone();
+		
+		//TODO-V3: is there a better way to do this in a type-agnostic way?
+		if (clone instanceof DENOPTIMFragment)
+		{
+    		((DENOPTIMFragment) clone).setMolId(bbIdx);
+    		((DENOPTIMFragment) clone).setFragmentType(bbTyp);
+		} 
+		else 
+		{
+		    System.err.println("WARNING! Recovering a vertex that is not an"
+		            + " instance of fragment.");
+		}
+		
+        return clone;
     }
 
 //------------------------------------------------------------------------------
@@ -454,7 +490,7 @@ public class FragmentSpace
 	    String apc = "";
 	    try 
 	    {
-            apc = getFragment(2, i).getAttachmentPoints().get(0).getAPClass();
+            apc = getVertexFromLibrary(2, i).getAttachmentPoints().get(0).getAPClass();
 		if (apc.equals(query))
 		{
 		    selected.add(i);
@@ -746,7 +782,7 @@ public class FragmentSpace
 		for (Integer fid : compatFragIds)
 		{
 			try {
-				compatFrags.add(FragmentSpace.getFragment(1, fid));
+				compatFrags.add(FragmentSpace.getVertexFromLibrary(1, fid));
 			} catch (DENOPTIMException e) {
 		        System.err.println("Exception while trying to get fragment '"+fid+"'!");
 		        e.printStackTrace();
@@ -905,28 +941,28 @@ public class FragmentSpace
 
     public static double getSymmetryConstrain(String apClass)
     {
-	return symmConstraints.get(apClass);
+        return symmConstraints.get(apClass);
     }
 
 //------------------------------------------------------------------------------
 
     public static void setScaffoldLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-	scaffoldLib = lib;
+        scaffoldLib = lib;
     }
 
 //------------------------------------------------------------------------------
 
     public static void setFragmentLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-	fragmentLib = lib;
+        fragmentLib = lib;
     }
 
 //------------------------------------------------------------------------------
 
     public static void setCappingLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-	cappingLib = lib;
+        cappingLib = lib;
     }
 
 //------------------------------------------------------------------------------

@@ -72,7 +72,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     /*
      * if the level at which this vertex is in a graph
      */
-    private int recursiveLevel;
+    private int recursiveLevel = -99; //Initialised to meaningless value
 
 
 //------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         DENOPTIMVertex v = new DENOPTIMVertex();
         try
         {
-            v = FragmentSpace.getFragment(bbType,bbId).clone();
+            v = FragmentSpace.getVertexFromLibrary(bbType,bbId).clone();
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -210,8 +210,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     }
     
 //------------------------------------------------------------------------------
-    //TODO-V3 get rid of this
-    @Deprecated
+
     public void setVertexId(int id)
     {
         this.vertexId = id;
@@ -508,7 +507,6 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 overload this in subclasses
     public int getHeavyAtomsCount()
     {
         return 0;
@@ -516,10 +514,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 overload this in subclasses
     public boolean containsAtoms()
     {
-        // TODO Auto-generated method stub
         return false;
     }
     
