@@ -1875,7 +1875,7 @@ MF: TO BE TESTED
 
                 // choose one of the compatible APs on the chosen fragment
                 ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                        FragmentSpace.getFragment(1, fid).getAttachmentPoints();
+                        FragmentSpace.getVertexFromLibrary(1, fid).getAttachmentPoints();
         		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
         		for (int i=0; i<fragAPs.size(); i++)
         		{

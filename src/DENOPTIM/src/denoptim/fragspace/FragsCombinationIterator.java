@@ -167,7 +167,7 @@ public class FragsCombinationIterator
                 {
                     keepThisAP = false;
                     boolean isInSymSet = false;
-                    for (SymmetricSet ss : v.getSymmetricAP())
+                    for (SymmetricSet ss : v.getSymmetricAPSets())
                     {
                         if (ss.contains(apIdx))
                         {
@@ -209,7 +209,7 @@ public class FragsCombinationIterator
             int fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
-            DENOPTIMVertex frag = FragmentSpace.getFragment(fTyp, fIdx); 
+            DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
             String srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 
@@ -550,7 +550,7 @@ public class FragsCombinationIterator
                 {
                     continue;
                 }
-                for (SymmetricSet ss : v.getSymmetricAP())
+                for (SymmetricSet ss : v.getSymmetricAPSets())
                 {
                     if (ss.contains(srcApId))
                     {

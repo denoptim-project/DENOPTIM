@@ -78,7 +78,7 @@ public class FragSpaceExplorer
 
         String configFile = args[0];
         
-	CombinatorialExplorerByLayer pCombExp = null;
+        CombinatorialExplorerByLayer pCombExp = null;
         try
         {
             FSEParameters.readParameterFile(configFile);
@@ -91,10 +91,10 @@ public class FragSpaceExplorer
         }
         catch (DENOPTIMException de)
         {
-	    if (pCombExp != null)
-	    {
-                pCombExp.stopRun();
-	    }
+    	    if (pCombExp != null)
+    	    {
+                    pCombExp.stopRun();
+    	    }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
             System.exit(-1);
         }

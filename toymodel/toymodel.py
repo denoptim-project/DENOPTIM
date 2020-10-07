@@ -45,20 +45,43 @@ def main():
     
     
 
+class Edge:
+    def __init__(self, a, b):
+        self._left = None # AP
+        self._right = None # AP
+        self.join(a, b)
+        
+    def join(self, a, b):
+        self._left = a
+        a._edge = self
+        self._right = b
+        b._edge = self
+        
+    class UnknownEndpoint(Exception):
+        pass
+        
+    def follow_from(self, x):
+        if x is self._left:
+            return self._right
+        
+        if x is self._right:
+            return self._left
+        
+        raise UnknownEndpoint
+        
+    
+# Vertex - AP - Edge - AP - Vertex
 
-
-
-
-class AP():
+class AP:
     def __init__(self,name):
         self._name = name
         self._owner = None # a Vertex, gets set by e.g. Fragment constructor
-        self._other = None # another AP
+        self._edge = None # an Edge
     
     def __str__(self):
         """Show AP as a human-readable string"""
         #owner = self._owner if self._owner is None else id(self._owner)%10000
-        other = self._other if self._other is None else id(self._other)%10000
+        other = None if self.other() is None else id(self.other())%10000
         return f'AP {self._name} {id(self)%10000}<->{other}'
     
     def matches(self,other):
@@ -71,20 +94,23 @@ class AP():
     
     def join(self,other):
         """Link this AP to another"""
-        self._other = other
-        other._other = self
+        Edge(self,other)
     
     def is_free(self):
         """Return True if this AP is free"""
-        return self._other is None
+        return self._edge is None
         
-        
+    def other(self):
+        if self._edge is not None:
+            return self._edge.follow_from(self)
+        else:
+            return None
         
         
         
         
     
-class Vertex():
+class Vertex:
     def __init__(self):
         pass
         
@@ -165,10 +191,10 @@ def depth_traverse(start, tab='', ignore=None):
             #print('ignore', ap)
             continue
         print(tab, ap, sep='')
-        if ap._other is not None:
-            ignore.append(ap._other)
+        if not ap.is_free():
+            ignore.append(ap.other())
             tab += TAB
-            depth_traverse(ap._other._owner, tab, ignore)
+            depth_traverse(ap.other()._owner, tab, ignore)
             tab = tab[:-TAB_LEN]
     tab = tab[:-TAB_LEN]
 

@@ -96,14 +96,7 @@ public class GraphConversionTool
                         vertex.getVertexId());
             }
 
-            try
-            {
-                mol.add(iac.clone());
-            } catch (CloneNotSupportedException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            mol.add(iac);
 
             HashMap<Integer, Integer> anum_map = new HashMap<>();
 
@@ -333,7 +326,7 @@ public class GraphConversionTool
             int fragtype = Integer.parseInt(s3[2]);
             // level
             int level = Integer.parseInt(s3[3]);
-	
+	            
             //TODO-V3: this is where a type-agnostic constructor should be used
             DENOPTIMVertex dv = DENOPTIMVertex.newFragVertex(vid, molid,fragtype);
             dv.setLevel(level);

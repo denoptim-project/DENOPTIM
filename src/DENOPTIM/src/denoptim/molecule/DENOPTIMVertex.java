@@ -31,6 +31,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.GraphUtils;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
@@ -71,7 +72,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     /*
      * if the level at which this vertex is in a graph
      */
-    private int recursiveLevel;
+    private int recursiveLevel = -99; //Initialised to meaningless value
 
 
 //------------------------------------------------------------------------------
@@ -153,7 +154,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         DENOPTIMVertex v = new DENOPTIMVertex();
         try
         {
-            v = FragmentSpace.getFragment(bbType,bbId).clone();
+            v = FragmentSpace.getVertexFromLibrary(bbType,bbId).clone();
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -209,8 +210,7 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     }
     
 //------------------------------------------------------------------------------
-    //TODO-V3 get rid of this
-    @Deprecated
+
     public void setVertexId(int id)
     {
         this.vertexId = id;
@@ -225,14 +225,14 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    protected void setSymmetricAP(ArrayList<SymmetricSet> m_Sap)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap)
     {
         lstSymAPs = m_Sap;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<SymmetricSet> getSymmetricAP()
+    public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
         return lstSymAPs;
     }
@@ -507,7 +507,6 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 overload this in subclasses
     public int getHeavyAtomsCount()
     {
         return 0;
@@ -515,10 +514,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 overload this in subclasses
     public boolean containsAtoms()
     {
-        // TODO Auto-generated method stub
         return false;
     }
     

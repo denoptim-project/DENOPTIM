@@ -20,7 +20,7 @@ package denoptim.molecule;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,13 +29,11 @@ import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
+
 /**
  * Unit test for DENOPTIMFragment
  * 
@@ -48,7 +46,8 @@ public class DENOPTIMFragmentTest
 	private final String APSUBRULE = "1";
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	
+    private final String APCSEP = DENOPTIMConstants.SEPARATORAPPROPSCL;
+    
 //------------------------------------------------------------------------------
 	
     @Test
@@ -85,16 +84,9 @@ public class DENOPTIMFragmentTest
     	frg2.setProperty(DENOPTIMConstants.APCVTAG, clsStr);
     	frg2.projectPropertyToAP();
     	
-        //TODO del
-    	/*
-        System.out.println("FRAGSPACE: "+FragmentSpace.isDefined());
-        System.out.println("FRAGSPACE: "+FragmentSpace.getBondOrderMap());
-        */
-    	
-    	assertEquals(frg1.getAPCount(),frg2.getAPCount(),"Equality of #AP");
+    	assertEquals(frg1.getNumberOfAP(),frg2.getNumberOfAP(),"Equality of #AP");
     	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0),
     	        "Equality of #AP-on-atom");
-    	
     }
     
 //------------------------------------------------------------------------------
@@ -103,31 +95,45 @@ public class DENOPTIMFragmentTest
     public void testConversionToIAC() throws Exception
     {
     	// WARNING: the conversion does not project the atom properties into
-    	// molecular properties. So the APs do not appear in the mol properties.
+    	// molecular properties. So the APs do not appear in the mol properties
+        // unless we project the APs to properties (see projectAPsToProperties)
     	
-    	DENOPTIMFragment frg1 = new DENOPTIMFragment();
-    	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
-    	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
-    	Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
-    	frg1.addAtom(a1);
-    	frg1.addAtom(a2);
-    	frg1.addAtom(a3);
-    	frg1.addBond(new Bond(a1, a2));
-    	frg1.addBond(new Bond(a2, a3));
-    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-    	frg1.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
-    	
-    	IAtomContainer iac = new AtomContainer(frg1.getIAtomContainer());
-    	DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
-    	
-    	assertEquals(4,frg1.getAPCount(),"Size if frg1");
-    	assertEquals(4,frg2.getAPCount(),"Size if frg2");
-    	assertEquals(1,frg1.getAPCountOnAtom(0),"Size if frg1 atm0");
-    	assertEquals(1,frg2.getAPCountOnAtom(0),"Size if frg2 atm0");
-    	assertEquals(3,frg1.getAPCountOnAtom(2),"Size if frg1 atm2");
-    	assertEquals(3,frg2.getAPCountOnAtom(2),"Size if frg2 atm2");
+        DENOPTIMFragment frg1 = new DENOPTIMFragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("O", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        frg1.addAtom(a1);
+        frg1.addAtom(a2);
+        frg1.addAtom(a3);
+        frg1.addBond(new Bond(a1, a2));
+        frg1.addBond(new Bond(a2, a3));
+        frg1.addAP(0, APCLASS, new Point3d(new double[]{1.0, 2.5, 3.3}));
+        frg1.addAP(0, APRULE+APCSEP+"2", new Point3d(new double[]{2.0, -2.5, 3.3}));
+        frg1.addAP(0, APRULE+APCSEP+"3", new Point3d(new double[]{-2.0, -2.5, 3.3}));
+        frg1.addAP(1, APCLASS, new Point3d(new double[]{2.5, 2.5, 3.3}));
+        frg1.addAP(2, APCLASS, new Point3d(new double[]{3.0, 2.5, 3.3}));
+        frg1.addAP(2, APRULE+APCSEP+"2", new Point3d(new double[]{4.0, -2.5, 3.3}));
+        frg1.addAP(2, APRULE+APCSEP+"4", new Point3d(new double[]{-4.0, -2.5, 3.3}));
+        frg1.projectAPsToProperties();
+
+        //System.out.println("Initial Symm set: "+orig.getSymmetricAPSets());
+        
+        IAtomContainer iac = frg1.getIAtomContainer();
+        
+        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
+        
+        assertEquals(7,frg1.getNumberOfAP(),"#APs in frg1");
+        assertEquals(7,frg2.getNumberOfAP(),"#APs in frg2");
+        assertEquals(3,frg1.getAPCountOnAtom(0),"#APs in frg1 atm0");
+        assertEquals(3,frg2.getAPCountOnAtom(0),"#APs in frg2 atm0");
+        assertEquals(3,frg1.getAPCountOnAtom(2),"#APs in frg1 atm2");
+        assertEquals(3,frg2.getAPCountOnAtom(2),"#APs in frg2 atm2");
+        assertEquals(2,frg1.getSymmetricAPSets().size(),"#SymmAPSets in frg1");
+        assertEquals(2,frg2.getSymmetricAPSets().size(),"#SymmAPSets in frg2");
+        assertTrue(frg1.getSymmetricAPs(0).contains(4),"SymmSet [0,4] in frg1");
+        assertTrue(frg2.getSymmetricAPs(0).contains(4),"SymmSet [0,4] in frg2");
+        assertTrue(frg1.getSymmetricAPs(1).contains(5),"SymmSet [1,5] in frg1");
+        assertTrue(frg2.getSymmetricAPs(1).contains(5),"SymmSet [1,5] in frg2");
     }
 
 //------------------------------------------------------------------------------
@@ -150,33 +156,21 @@ public class DENOPTIMFragmentTest
         orig.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
         
         ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
-        ssaps.add(new SymmetricSet(new ArrayList(Arrays.asList(0,1,2))));
-        orig.setSymmetricAP(ssaps);
+        ssaps.add(new SymmetricSet(new ArrayList<Integer>(
+                Arrays.asList(0,1,2))));
+        orig.setSymmetricAPSets(ssaps);
         
         DENOPTIMVertex c = orig.clone();
         
-        assertEquals(4,((DENOPTIMFragment) c).getAPCount(),"Number of APs");
+        assertEquals(4,((DENOPTIMFragment) c).getNumberOfAP(),"Number of APs");
         assertEquals(1,((DENOPTIMFragment) c).getAPCountOnAtom(0),
                 "Size APs on atm0");
         assertEquals(3,((DENOPTIMFragment) c).getAPCountOnAtom(2),
                 "Size APs on atm2");
         assertEquals(4,c.getAttachmentPoints().size(),"Number of APs (B)");
-        assertEquals(1,c.getSymmetricAP().size(), "Number of symmetric sets");
-        assertEquals(3,c.getSymmetricAP().get(0).size(), 
+        assertEquals(1,c.getSymmetricAPSets().size(), "Number of symmetric sets");
+        assertEquals(3,c.getSymmetricAPSets().get(0).size(), 
                 "Number of symmetric APs in set");
-        
-    }
-    
-//------------------------------------------------------------------------------
-
-    @Test
-    public void testContructorFromIAC() throws Exception
-    {
-        IAtomContainer iac = new AtomContainer();
-        
-        //TODO-TU3
-        
-        
         
     }
     

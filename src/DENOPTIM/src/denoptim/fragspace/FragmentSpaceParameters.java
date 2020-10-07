@@ -418,15 +418,15 @@ public class FragmentSpaceParameters
 //------------------------------------------------------------------------------
 
     /**
-     * Processes atom containers and builds fragments
-     * @param iacs
-     * @return a collection of DENOPTIMFragments
+     * Processes a list of atom containers and builds a list of vertexes.
+     * @param iacs the list of atom containers.
+     * @return the list of vertexes.
      * @throws DENOPTIMException
      */
     
-    //TODO-V3: we should do something similar also for templates.
+    //TODO-V3: adapt to templates.
     
-    private static ArrayList<DENOPTIMVertex> convertsIACsToFrags(
+    private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
             ArrayList<IAtomContainer> iacs) throws DENOPTIMException
     {
     	ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
@@ -445,10 +445,10 @@ public class FragmentSpaceParameters
      */
     public static void processParameters() throws DENOPTIMException
     {
-        ArrayList<DENOPTIMVertex> scaffLib = convertsIACsToFrags(
+        ArrayList<DENOPTIMVertex> scaffLib = convertsIACsToVertexes(
                 DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold"));
         
-        ArrayList<DENOPTIMVertex> fragLib = convertsIACsToFrags(
+        ArrayList<DENOPTIMVertex> fragLib = convertsIACsToVertexes(
         DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
 
         ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
@@ -462,7 +462,7 @@ public class FragmentSpaceParameters
         
         if (cappingLibFile.length() > 0)
         {
-            cappLib = convertsIACsToFrags(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
+            cappLib = convertsIACsToVertexes(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
             		"capping group"));
         }
 

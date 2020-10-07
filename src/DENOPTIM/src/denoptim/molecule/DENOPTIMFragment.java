@@ -34,6 +34,8 @@ import org.openscience.cdk.interfaces.IPseudoAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * Class representing a continuously connected portion of molecular object
@@ -52,13 +54,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     /**
      * Index of the graph building block contained in the vertex
      */
-    private int buildingBlockId;
+    private int buildingBlockId = -99; //Initialised to meaningless value
     
     //TODO-V3 to enum
     /*
      * 0:scaffold, 1:fragment, 2:capping group
      */
-    private int buildingBlockType;
+    private int buildingBlockType = -99; //Initialised to meaningless value
     
 	/**
 	 * Molecular representation of this fragment
@@ -116,9 +118,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             projectPropertyToAP(prop.toString());
         }
         
-        ArrayList<SymmetricSet> simAP = getMatchingAP(this.mol, 
+        ArrayList<SymmetricSet> simAP = identifySymmetryRelatedAPSets(this.mol, 
                 getAttachmentPoints());
-        setSymmetricAP(simAP);
+        setSymmetricAPSets(simAP);
     }
     
 //-----------------------------------------------------------------------------
@@ -138,7 +140,16 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //------------------------------------------------------------------------------
     
-    private static ArrayList<SymmetricSet> getMatchingAP(IAtomContainer mol,
+    private void updateSymmetryRelations()
+    {
+        setSymmetricAPSets(identifySymmetryRelatedAPSets(mol, 
+                getAttachmentPoints()));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
+            IAtomContainer mol,
             ArrayList<DENOPTIMAttachmentPoint> daps)
     {
         ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
@@ -166,7 +177,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             for (int j=i+1; j<daps.size(); j++)
             {
                 DENOPTIMAttachmentPoint d2 = daps.get(j);
-                if (isCompatible(mol, d1.getAtomPositionNumber(),
+                if (atomsAreCompatible(mol, d1.getAtomPositionNumber(),
                                     d2.getAtomPositionNumber()))
                 {
                     // check if reactions are compatible
@@ -198,7 +209,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return <code>true</code> if atoms have similar environments
      */
 
-    private static boolean isCompatible(IAtomContainer mol, int a1, int a2)
+    private static boolean atomsAreCompatible(IAtomContainer mol, int a1, int a2)
     {
         // check atom types
         IAtom atm1 = mol.getAtom(a1);
@@ -384,6 +395,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	}
         
         srcAtm.setProperty(DENOPTIMConstants.APTAG, apList);
+        
+        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -440,6 +453,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return the number of APs
      */
     
+    @Deprecated
     public int getAPCount()
     {
     	int num = 0;
@@ -482,6 +496,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return the list of AP clones
      */
 
+    @Deprecated
 	public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
 	{
 	    //TODO-V3 use or overwrite the method from vertex
@@ -521,7 +536,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             }
         }
         
-        //TODO-V3 make sure the update affects also the reference hosted in vertex.lstAPs
+        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -682,6 +697,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
         //Overwrite the list of APs of the superclass
         setAttachmentPoints(allAPs);
+        
+        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -732,21 +749,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    propAPClass = propAPClass + stingAPP;
 	
 			    //Build SDF property "ATTACHMENT_POINT"
-			    //TODO-V3 del
-			    
-			    int BndOrd = 1;
-                try
-                {
-                    BndOrd = FragmentSpace.getBondOrderForAPClass(
+			    int BndOrd = FragmentSpace.getBondOrderForAPClass(
                     		ap.getAPClass());
-                } catch (Exception e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    System.out.println("HERE HERE: "+ap);
-                    System.out.println("BO-MAP: "+FragmentSpace.getBondOrderMap());
-                    
-                }
+
 			    String sBO = Integer.toString(BndOrd);
 			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
@@ -784,112 +789,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 		frg.setFragmentType(this.getFragmentType());
 		
 		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
-        for (SymmetricSet ss : this.getSymmetricAP())
+        for (SymmetricSet ss : this.getSymmetricAPSets())
         {
             cLstSymAPs.add(ss.clone());
         }
-        frg.setSymmetricAP(cLstSymAPs);
+        frg.setSymmetricAPSets(cLstSymAPs);
         
 		return frg;
-    }
-    
-//-----------------------------------------------------------------------------
-   
-    /**
-     * Returns the list of attachment points that can be treated the same
-     * way (i.e., symmetry-related attachment points). 
-     * Note that symmetry, in this context, is
-     * a defined by the topological environment surrounding the attachment 
-     * point and has nothing to to with symmetry in three-dimensional space.  
-     * @return the list of symmetry-related attachment points.
-     */
-    public ArrayList<SymmetricSet> getSymmetricAPsSets() {
-        ArrayList<DENOPTIMAttachmentPoint> aps = getAPs();
-        ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
-        for (int i = 0; i < aps.size() - 1; i++) {
-            ArrayList<Integer> lst = new ArrayList<>();
-            Integer i1 = i;
-            lst.add(i1);
-
-            boolean alreadyFound = false;
-            for (SymmetricSet previousSS : lstCompatible) {
-                if (previousSS.contains(i1)) {
-                    alreadyFound = true;
-                    break;
-                }
-            }
-
-            if (alreadyFound) {
-                continue;
-            }
-
-            DENOPTIMAttachmentPoint d1 = aps.get(i);
-            for (int j = i + 1; j < aps.size(); j++) {
-                DENOPTIMAttachmentPoint d2 = aps.get(j);
-                if (isCompatible(
-                        d1.getAtomPositionNumber(),
-                        d2.getAtomPositionNumber()
-                )) {
-                    // check if reactions are compatible
-                    if (d1.isFragmentClassCompatible(d2)) {
-                        Integer i2 = j;
-                        lst.add(i2);
-                    }
-                }
-            }
-
-            if (lst.size() > 1) {
-                lstCompatible.add(new SymmetricSet(lst));
-            }
-        }
-
-        return lstCompatible;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Checks if the atoms at the given positions have similar environments
-     * i.e. are similar in atom types etc.
-     * @param a1 atom position
-     * @param a2 atom position
-     * @return <code>true</code> if atoms have similar environments
-     */
-
-    private boolean isCompatible(int a1, int a2)
-    {
-        IAtomContainer mol = this.getAtomContainer();
-
-        // check atom types
-        IAtom atm1 = mol.getAtom(a1);
-        IAtom atm2 = mol.getAtom(a2);
-
-        if (atm1.getSymbol().compareTo(atm2.getSymbol()) != 0)
-            return false;
-
-        // check connected bonds
-        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
-            return false;
-
-
-        // check connected atoms
-        if (mol.getConnectedAtomsCount(atm1)!=mol.getConnectedAtomsCount(atm2))
-            return false;
-
-        List<IAtom> la1 = mol.getConnectedAtomsList(atm2);
-        List<IAtom> la2 = mol.getConnectedAtomsList(atm2);
-
-        int k = 0;
-        for (IAtom b1 : la1) {
-            for (IAtom b2 : la2) {
-                if (b1.getSymbol().compareTo(b2.getSymbol()) == 0) {
-                    k++;
-                    break;
-                }
-            }
-        }
-
-        return k == la1.size();
     }
 
 //-----------------------------------------------------------------------------

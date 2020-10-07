@@ -1165,7 +1165,7 @@ public class GUIGraphHandler extends GUICardPanel
 				IAtomContainer frg = null;
 				try
 				{
-					DENOPTIMVertex bb = FragmentSpace.getFragment(1,fragId);
+					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(1,fragId);
 					if (bb instanceof DENOPTIMFragment)
 					{
 						frg = ((DENOPTIMFragment) bb).getIAtomContainer();
@@ -1584,7 +1584,7 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			DENOPTIMFragment frag = null;
 			try {
-				DENOPTIMVertex bb = FragmentSpace.getFragment(
+				DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
 						v.getFragmentType(), v.getMolId());
 				if (bb instanceof DENOPTIMFragment)
 					frag = (DENOPTIMFragment) bb;
