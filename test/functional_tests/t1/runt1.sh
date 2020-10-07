@@ -1,5 +1,8 @@
 #!/bin/bash
 #
+# This script is meant to be executed by runAllTests.sh.
+# Usually, you should not run this script yourself.
+#
 # WARNING!
 # To run these tests we depend on software Tinker.
 # Make sure the location of Tinker's executables is defined
@@ -11,8 +14,11 @@ then
     echo " "
     echo "WARNING! Cannot find Tinker executables in \$tinkerPathDENOPTIM"
     echo "If Tinker is installed, please set valiable \$tinkerPathDENOPTIM "
-    echo "with the pathname of the bin folder containing all the executables"
-    echo "of Tinker."
+    echo "in runAllTests.sh and run it again."
+    echo "The value should be set to be the pathname of "
+    echo "the bin folder containing all the executables of Tinker."
+    echo "The installation of Tinker must be configured with "
+    echo "'maxval' >= 12 (see sizes.i in Tinker's source code)."
     echo "Skipping test 't1'."
     echo " "
     exit 0
