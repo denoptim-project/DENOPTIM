@@ -1458,5 +1458,45 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     }
 
 //------------------------------------------------------------------------------
-  
+
+    /**
+     * Checks the graph for unused APs that need to be capped
+     * @return <code>true</code> if the graph has at least one AP that needs
+     * to be capped
+     */
+
+    public boolean graphNeedsCappingGroups()
+    {
+        for (DENOPTIMVertex v : getVertexList()) {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
+                if (ap.isAvailable()
+                        && FragmentSpace.getCappingClass(ap.getAPClass()) !=null
+                ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * For the given graph remove all capping groups if any
+     */
+
+    public void removeCappingGroups() {
+        ArrayList<DENOPTIMVertex> lstVerts = getVertexList();
+        for (DENOPTIMVertex vtx : lstVerts) {
+            if (vtx instanceof DENOPTIMFragment) {
+                DENOPTIMFragment frag = (DENOPTIMFragment) vtx;
+                if (frag.getFragmentType() == 2 && !isVertexInRing(vtx)) {
+                    removeVertex(vtx);
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
 }

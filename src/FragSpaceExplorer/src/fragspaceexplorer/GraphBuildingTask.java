@@ -389,7 +389,7 @@ public class GraphBuildingTask implements Callable
                 boolean needsCaps = false;
                 if (FragmentSpace.useAPclassBasedApproach())
                 {
-                    needsCaps = GraphUtils.graphNeedsCappingGroups(molGraph);
+                    needsCaps = molGraph.graphNeedsCappingGroups();
                 }
 
                 ArrayList<DENOPTIMGraph> altCyclicGraphs =

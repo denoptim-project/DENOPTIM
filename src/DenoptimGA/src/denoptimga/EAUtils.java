@@ -381,7 +381,7 @@ public class EAUtils
         if (FragmentSpace.useAPclassBasedApproach())
         {
             // remove the capping groups
-            GraphUtils.removeCappingGroups(molGraph);
+            molGraph.removeCappingGroups();
         }
 
         boolean status;

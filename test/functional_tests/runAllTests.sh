@@ -7,7 +7,7 @@
 #
 # Use this script to run all the tests.
 
-# 
+#
 # Usage:
 #
 # ./runAllTests.sh
@@ -50,9 +50,9 @@ echo "Using DENOPTIM from $DENOPTIMJarFiles"
 ################################################################################
 
 
-############################################ 
+############################################
 # Function for running a Test
-############################################ 
+############################################
 
 function runTest() {
     testName="$1"
@@ -139,7 +139,7 @@ runTest "t1"
 #
 # t2: parallel combinatorial builder from given root (default format: STRING)
 #
-runTest "t2"
+# runTest "t2"
 
 #
 # t3: parallel combinatorial builder with enforced symmetry
@@ -149,7 +149,7 @@ runTest "t3"
 #
 # t4: parallel combinatorial builder from STRING-like user-provided root graph and enforced symmetry
 #
-runTest "t4"
+# runTest "t4"
 
 #
 # t5: parallel combinatorial building til exhaustion of space
@@ -218,7 +218,7 @@ runTest "t14"
 runTest "t15"
 
 #
-# t16: GraphEditor 
+# t16: GraphEditor
 #
 runTest "t16"
 

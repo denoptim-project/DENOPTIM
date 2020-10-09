@@ -1155,8 +1155,8 @@ if(debug)
         if (FragmentSpace.useAPclassBasedApproach())
         {
             // remove the capping groups
-            GraphUtils.removeCappingGroups(male);
-            GraphUtils.removeCappingGroups(female);
+            male.removeCappingGroups();
+            female.removeCappingGroups();
             
             // select vertices with compatible parent class
             RMap rp = locateCompatibleXOverPoints(male, female);
