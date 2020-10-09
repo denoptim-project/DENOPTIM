@@ -1894,6 +1894,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return nmap;
     }
 
+//------------------------------------------------------------------------------
 
+    /**
+     * Update the level at which the new vertices have been added. This
+     * is generally applicable for a crossover or for a substitution operation
+     * @param lvl
+     */
+
+    public void updateLevels(int lvl)
+    {
+        List<DENOPTIMVertex> lstVert = getVertexList();
+        int levRoot = lstVert.get(0).getLevel();
+        int correction = lvl - levRoot;
+        for (DENOPTIMVertex denoptimVertex : lstVert) {
+            denoptimVertex.setLevel(denoptimVertex.getLevel() + correction);
+        }
+    }
 
 }

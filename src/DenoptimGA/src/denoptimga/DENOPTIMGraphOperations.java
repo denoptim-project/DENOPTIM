@@ -1322,8 +1322,8 @@ if(debug)
         }
 
         // set the level of each branch according to the destination graph
-        GraphUtils.updateLevels(subG_M.getVertexList(), lvl_female);
-        GraphUtils.updateLevels(subG_F.getVertexList(), lvl_male);
+        subG_M.updateLevels(lvl_female);
+        subG_F.updateLevels(lvl_male);
 
         // attach the subgraph from M/F onto F/M in all symmetry related APs
         GraphUtils.appendGraphOnGraph(male, symParVertM, symmParAPidxM, 

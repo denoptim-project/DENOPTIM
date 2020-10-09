@@ -114,24 +114,6 @@ public class GraphUtils
     {
         vertexCounter.set(num);
     }
-    
-//------------------------------------------------------------------------------        
-
-    /**
-     * Update the level at which the new vertices have been added. This 
-     * is generally applicable for a crossover or for a substitution operation
-     * @param lstVert
-     * @param lvl 
-     */
-
-    public static void updateLevels(ArrayList<DENOPTIMVertex> lstVert, int lvl)
-    {
-        int levRoot = lstVert.get(0).getLevel();
-        int correction = lvl - levRoot;
-        for (DENOPTIMVertex denoptimVertex : lstVert) {
-            denoptimVertex.setLevel(denoptimVertex.getLevel() + correction);
-        }
-    }
 
 //------------------------------------------------------------------------------
 
@@ -150,7 +132,7 @@ public class GraphUtils
     {
         if (graphCounter.get() >= val)
         {
-            String msg = "Attempt to reser the unique graph ID using "
+            String msg = "Attempt to reset the unique graph ID using "
                          + val + " while the current value is "
                          + graphCounter.get();
             throw new DENOPTIMException(msg);
