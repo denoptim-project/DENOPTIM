@@ -90,17 +90,15 @@ public class VisitedGraphsHandler
      * @param candGraph the candidate new graph
      * @return <code>true</code> if the graph is appended to the list.
      */
-    public boolean appendGraph(DENOPTIMGraph candGraph)
-    {
+    public boolean appendGraph(DENOPTIMGraph candGraph) {
         boolean appended = false;
-        
+
         RandomAccessFile rafile = null; // The file we'll lock
         FileChannel channel = null; // The channel to the file
         FileLock lock = null; // The lock object we hold
         File lockfile = null;
-        
-        try
-        {
+
+        try {
             lockfile = new File(graphLibFile);
             // Creates a random access file stream to read from, and 
             // optionally to write to
@@ -110,87 +108,74 @@ public class VisitedGraphsHandler
             // This will create the file if it doesn't exit. We'll arrange
             // for it to be deleted below, if we succeed in locking it.
             rafile = new RandomAccessFile(lockfile, "rw");
-            
+
             channel = rafile.getChannel();
-            
+
             // Try to get an exclusive lock on the file.
             // This method will return a lock or null, but will not block.
             // See also FileChannel.lock() for a blocking variant.
-            
-            while (true)
-            {
+
+            while (true) {
                 // Attempts to acquire an exclusive lock on this channel's file
                 // (returns null or throws
                 // an exception if the file is already locked.
-                try 
-                {
+                try {
                     lock = channel.tryLock();
                     if (lock != null)
                         break;
-                }
-                catch (OverlappingFileLockException e) 
-                {
+                } catch (OverlappingFileLockException e) {
                     // thrown when an attempt is made to acquire a lock on a a
                     // file that overlaps
                     // a region already locked by the same JVM or when another
                     // thread is already
                     // waiting to lock an overlapping region of the same file
-                    System.err.println("Overlapping File Lock Error: " 
-                                                            + e.getMessage());
+                    System.err.println("Overlapping File Lock Error: "
+                            + e.getMessage());
                 }
             }
-            
-	    boolean found = false;
-            for ( String line; (line = rafile.readLine()) != null; )
-            {
+
+            boolean found = false;
+            for (String line; (line = rafile.readLine()) != null; ) {
                 if (line.trim().length() == 0)
                     continue;
 
-                DENOPTIMGraph graphInLib = 
-				   GraphConversionTool.getGraphFromString(line);
+                DENOPTIMGraph graphInLib =
+                        GraphConversionTool.getGraphFromString(line);
 
-                if (GraphUtils.equivalentGraphs(candGraph,graphInLib))
-                {
-                    found = true;;
+                if (candGraph.sameAs(graphInLib, new StringBuilder())) {
+                    found = true;
+                    ;
                     break;
                 }
             }
-            
+
             // do all the checks and update the keyfile as required
             // move the cursor to the end of the file
-            if (!found)
-            {
+            if (!found) {
                 rafile.seek(channel.position());
                 rafile.writeBytes(candGraph.toString() + "\n");
                 channel.force(true);
-		appended = true;
+                appended = true;
             }
-        }
-        catch (Exception de)
-        {
-            LOGGER.log(Level.SEVERE, null, de); 
+        } catch (Exception de) {
+            LOGGER.log(Level.SEVERE, null, de);
             System.exit(-1);
-        }
-        finally
-        {
-            try 
-            {
+        } finally {
+            try {
                 // close the channel
                 if (channel != null)
                     channel.close();
-                if (rafile!= null)
+                if (rafile != null)
                     rafile.close();
                 // release the lock
                 if (lock != null && lock.isValid())
                     lock.release();
-            }
-            catch (IOException e) 
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    
-        return appended;    
+
+        return appended;
     }
     
 //------------------------------------------------------------------------------
