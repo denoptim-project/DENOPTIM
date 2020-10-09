@@ -50,7 +50,7 @@ public class DENOPTIMVertexTest
     	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new DENOPTIMVertex(0, apsA);
+    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
     	
     	ArrayList<DENOPTIMAttachmentPoint> apsB = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -59,7 +59,7 @@ public class DENOPTIMVertexTest
     	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsB.add(new DENOPTIMAttachmentPoint(3, 1, 1));
     	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new DENOPTIMVertex(90, apsB);
+    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
 
     	assertTrue(vA.sameAs(vB, reason));	
     }
@@ -75,7 +75,7 @@ public class DENOPTIMVertexTest
     	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new DENOPTIMVertex(0, apsA);
+    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
     	
     	ArrayList<DENOPTIMAttachmentPoint> apsB = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -84,7 +84,7 @@ public class DENOPTIMVertexTest
     	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsB.add(new DENOPTIMAttachmentPoint(3, 1, 2)); //diff
     	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new DENOPTIMVertex(90, apsB);
+    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
@@ -100,7 +100,7 @@ public class DENOPTIMVertexTest
     	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new DENOPTIMVertex(0, apsA);
+    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
     	
     	ArrayList<DENOPTIMAttachmentPoint> apsB = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -108,7 +108,7 @@ public class DENOPTIMVertexTest
     	apsB.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new DENOPTIMVertex(90, apsB);
+    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
@@ -123,7 +123,7 @@ public class DENOPTIMVertexTest
         apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
         apsA.add(new DENOPTIMAttachmentPoint(2, 2, 1));
         apsA.add(new DENOPTIMAttachmentPoint(3, 2, 1));
-        DENOPTIMVertex v = new DENOPTIMVertex(0, apsA);
+        DENOPTIMVertex v = new EmptyVertex(0, apsA);
         v.setLevel(26);
         
         DENOPTIMVertex c = v.clone();

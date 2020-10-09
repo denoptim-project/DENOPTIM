@@ -37,6 +37,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.rings.RingClosureFinder;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.GenUtils;
@@ -200,7 +201,7 @@ public class PathSubGraph
         // find xor plus junction vertex
         vertPathVAVB = new ArrayList<DENOPTIMVertex>();
         edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
-        turningPointVert = new DENOPTIMVertex();
+        turningPointVert = null;
         for (int i=0; i<seedToVA.size(); i++)
         {
             if (seedToVB.contains(seedToVA.get(i)))
@@ -225,9 +226,9 @@ public class PathSubGraph
         // Build the DENOPTIMGraph and string representations of this sub graph
         chainID = "";
         revChainID = "";
-        DENOPTIMVertex vertBack = new DENOPTIMVertex();
-        DENOPTIMVertex vertHere = new DENOPTIMVertex();
-        DENOPTIMVertex vertFrnt = new DENOPTIMVertex();
+        DENOPTIMVertex vertBack;
+        DENOPTIMVertex vertHere;
+        DENOPTIMVertex vertFrnt;
         boolean insideOut = false;
         ArrayList<DENOPTIMVertex> gVertices = new ArrayList<DENOPTIMVertex>();
         ArrayList<DENOPTIMEdge> gEdges = new ArrayList<DENOPTIMEdge>();

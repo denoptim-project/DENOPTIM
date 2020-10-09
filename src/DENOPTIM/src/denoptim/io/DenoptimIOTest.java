@@ -40,6 +40,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
 
 /**
@@ -63,14 +64,14 @@ public class DenoptimIOTest
     	aps0.add(new DENOPTIMAttachmentPoint(0, 1, 1));
     	aps0.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	aps0.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	DENOPTIMVertex v0 = new DENOPTIMVertex(0, aps0);
+    	DENOPTIMVertex v0 = new EmptyVertex(0, aps0);
     	graph.addVertex(v0);
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps1 = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	aps1.add(new DENOPTIMAttachmentPoint(0, 1, 1));
     	aps1.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	DENOPTIMVertex v1 = new DENOPTIMVertex(1, aps1);
+    	DENOPTIMVertex v1 = new EmptyVertex(1, aps1);
     	graph.addVertex(v1);
     	graph.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
     	
@@ -78,14 +79,14 @@ public class DenoptimIOTest
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	aps2.add(new DENOPTIMAttachmentPoint(0, 1, 1));
     	aps2.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	DENOPTIMVertex v2 = new DENOPTIMVertex(2, aps2);
+    	DENOPTIMVertex v2 = new EmptyVertex(2, aps2);
     	graph.addVertex(v2);
     	graph.addEdge(new DENOPTIMEdge(1, 2, 1, 0, 1));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps3 = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	aps3.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	DENOPTIMVertex v3 = new DENOPTIMVertex(3, aps3);
+    	DENOPTIMVertex v3 = new EmptyVertex(3, aps3);
     	graph.addVertex(v3);
     	graph.addEdge(new DENOPTIMEdge(2, 3, 1, 0, 1));
     	
@@ -94,28 +95,28 @@ public class DenoptimIOTest
     	aps4.add(new DENOPTIMAttachmentPoint(0, 1, 1));
     	aps4.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	aps4.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	DENOPTIMVertex v4 = new DENOPTIMVertex(4, aps4);
+    	DENOPTIMVertex v4 = new EmptyVertex(4, aps4);
     	graph.addVertex(v4);
     	graph.addEdge(new DENOPTIMEdge(0, 4, 1, 0, 1));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps5 = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	aps5.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	DENOPTIMVertex v5 = new DENOPTIMVertex(5, aps5);
+    	DENOPTIMVertex v5 = new EmptyVertex(5, aps5);
     	graph.addVertex(v5);
     	graph.addEdge(new DENOPTIMEdge(4, 5, 1, 0, 1));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps6 = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	aps6.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	DENOPTIMVertex v6 = new DENOPTIMVertex(6, aps6);
+    	DENOPTIMVertex v6 = new EmptyVertex(6, aps6);
     	graph.addVertex(v6);
     	graph.addEdge(new DENOPTIMEdge(0, 6, 2, 0, 1));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps7 = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
     	aps7.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	DENOPTIMVertex v7 = new DENOPTIMVertex(7, aps7);
+    	DENOPTIMVertex v7 = new EmptyVertex(7, aps7);
     	graph.addVertex(v7);
     	graph.addEdge(new DENOPTIMEdge(4, 7, 2, 0, 1));
     	
