@@ -1696,4 +1696,100 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         return pvid;
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Deletes the branch, i.e., the specified vertex and its children
+     * @param vid
+     * @param symmetry use <code>true</code> to enforce deletion of all
+     * symmetric verices
+     * @return <code>true</code> if operation is successful
+     * @throws DENOPTIMException
+     */
+
+    public boolean deleteVertex(int vid,boolean symmetry)
+            throws DENOPTIMException
+    {
+        boolean res = true;
+        if (hasSymmetryInvolvingVertex(vid) && symmetry)
+        {
+            ArrayList<Integer> toRemove = new ArrayList<>();
+            for (int i=0; i<getSymSetForVertexID(vid).size(); i++)
+            {
+                int svid = getSymSetForVertexID(vid).getList().get(i);
+                toRemove.add(svid);
+            }
+            for (Integer svid : toRemove)
+            {
+                boolean res2 = deleteVertex(svid);
+                if (!res2)
+                {
+                    res = res2;
+                }
+            }
+        }
+        else
+        {
+            res = deleteVertex(vid);
+        }
+
+        return res;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Deletes the branch, i.e., the specified vertex and its children.
+     * No handling of symmetry.
+     * @param vid
+     * @return <code>true</code> if operation is successful
+     * @throws DENOPTIMException
+     */
+
+    public boolean deleteVertex(int vid)
+            throws DENOPTIMException
+    {
+        // first delete the edge with the parent vertex
+        int pvid = removeEdgeWithParent(vid);
+        if (pvid == -1)
+        {
+            String msg = "Program Bug detected trying to  delete vertex "
+                    + vid + " from graph '" + this + "'. "
+                    + "Unable to locate parent edge.";
+            throw new DENOPTIMException(msg);
+        }
+
+        // now get the vertices attached to vid i.e. return vertex ids
+        ArrayList<Integer> children = new ArrayList<>();
+        getChildren(vid, children);
+
+        // delete the children vertices
+        for (int k : children) {
+            removeVertex(k);
+        }
+
+        // now delete the edges containing the children
+        ArrayList<DENOPTIMEdge> edges = getEdgeList();
+        Iterator<DENOPTIMEdge> iter = edges.iterator();
+        while (iter.hasNext())
+        {
+            DENOPTIMEdge edge = iter.next();
+            for (int k : children) {
+                if (edge.getSourceVertex() == k || edge.getTargetVertex() == k) {
+                    // remove edge
+                    iter.remove();
+                    break;
+                }
+            }
+        }
+
+        // finally delete the vertex
+        removeVertex(vid);
+
+        return getVertexWithId(vid) == null;
+    }
+
+//------------------------------------------------------------------------------
+
 }

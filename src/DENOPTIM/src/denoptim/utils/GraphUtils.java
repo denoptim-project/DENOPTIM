@@ -108,108 +108,6 @@ public class GraphUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Deletes the branch, i.e., the specified vertex and its children
-     * @param molGraph
-     * @param vid
-     * @param symmetry use <code>true</code> to enforce deletion of all 
-     * symmetric verices
-     * @return <code>true</code> if operation is successful
-     * @throws DENOPTIMException
-     */
-
-    public static boolean deleteVertex(DENOPTIMGraph molGraph, int vid, 
-				      boolean symmetry) throws DENOPTIMException
-    {
-	boolean res = true;
-        if (molGraph.hasSymmetryInvolvingVertex(vid) && symmetry)
-        {
-            ArrayList<Integer> toRemove = new ArrayList<Integer>();
-            for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
-            {
-                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i);
-                toRemove.add(svid);
-            }
-            for (Integer svid : toRemove)
-            {
-                boolean res2 = GraphUtils.deleteVertex(molGraph, svid);
-	        if (!res2)
-		{
-		    res = res2;
-		}
-            }
-        }
-	else
-        {
-            res = GraphUtils.deleteVertex(molGraph, vid);
-        }
-
-	return res;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Deletes the branch, i.e., the specified vertex and its children.
-     * No handling of symmetry.
-     * @param molGraph
-     * @param vid
-     * @return <code>true</code> if operation is successful
-     * @throws DENOPTIMException
-     */
-
-    public static boolean deleteVertex(DENOPTIMGraph molGraph, int vid)
-                                                        throws DENOPTIMException
-    {
-        // first delete the edge with the parent vertex
-        int pvid = molGraph.removeEdgeWithParent(vid);
-        if (pvid == -1)
-        {
-            String msg = "Program Bug detected trying to  delete vertex "
-                          + vid + " from graph '" + molGraph + "'. "
-			  + "Unable to locate parent edge.";
-            throw new DENOPTIMException(msg);
-        }
-
-        // now get the vertices attached to vid i.e. return vertex ids
-        ArrayList<Integer> children = new ArrayList<>();
-        molGraph.getChildren(vid, children);
-
-        // delete the children vertices
-        for (int i=0; i<children.size(); i++)
-        {
-            int k = children.get(i);
-            molGraph.removeVertex(k);
-        }
-
-        // now delete the edges containing the children
-        ArrayList<DENOPTIMEdge> edges = molGraph.getEdgeList();
-        Iterator<DENOPTIMEdge> iter = edges.iterator();
-        while (iter.hasNext())
-        {
-            DENOPTIMEdge edge = iter.next();
-            for (int i=0; i<children.size(); i++)
-            {
-                int k = children.get(i);
-                if (edge.getSourceVertex() == k || edge.getTargetVertex() == k)
-                {
-                    // remove edge
-                    iter.remove();
-                    break;
-                }
-            }
-        }
-
-        // finally delete the vertex
-        molGraph.removeVertex(vid);
-
-        if (molGraph.getVertexWithId(vid) == null)
-            return true;
-        return false;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Change all vertex IDs to the corresponding negative value. For instance
      * if the vertex ID is 12 this method changes it into -12.
      * @param molGraph
@@ -2242,7 +2140,7 @@ public class GraphUtils
                             {
                                 continue;
                             }
-                            GraphUtils.deleteVertex(modGraph,cid,symmetry);
+                            modGraph.deleteVertex(cid,symmetry);
                             int wantedTrgApId = e.getTargetDAP();
                             int trgApLstSize = inGraph.getVertexWithId(
                                            e.getTargetVertex()).getNumberOfAP();
@@ -2274,7 +2172,7 @@ public class GraphUtils
                                              modGraph,query,symmetry,verbosity);
                     for (int vid : matches)
                     {
-                        GraphUtils.deleteVertex(modGraph,vid,symmetry);
+                        modGraph.deleteVertex(vid,symmetry);
                     }
                     break;
                 }

@@ -257,12 +257,12 @@ public class DENOPTIMGraphOperations
             }
             for (Integer svid : toRemove)
             {
-                GraphUtils.deleteVertex(molGraph, svid);
+                molGraph.deleteVertex(svid);
             }
         }
         else
         {
-            GraphUtils.deleteVertex(molGraph, vid);
+            molGraph.deleteVertex(vid);
         }
 
         if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
@@ -1259,7 +1259,7 @@ if(debug)
             symParVertM.add(spv);
             symmParAPidxM.add(se.getSourceDAP());
             //Delete the symmetric vertex 
-            GraphUtils.deleteVertex(male, svid);
+            male.deleteVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
@@ -1278,7 +1278,7 @@ if(debug)
             symParVertF.add(spv);
             symmParAPidxF.add(se.getSourceDAP());
             //Delete the symmetric vertex
-            GraphUtils.deleteVertex(female, svid);
+            female.deleteVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        
