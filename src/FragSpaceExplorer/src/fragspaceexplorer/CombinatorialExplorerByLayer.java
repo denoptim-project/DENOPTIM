@@ -155,7 +155,7 @@ public class CombinatorialExplorerByLayer
         {
             @Override
             public void rejectedExecution(Runnable r, 
-                                                    ThreadPoolExecutor executor)
+                    ThreadPoolExecutor executor)
             {
                 try
                 {
@@ -592,7 +592,7 @@ public class CombinatorialExplorerByLayer
             }
 
             DENOPTIMGraph rootGraph = DenoptimIO.deserializeDENOPTIMGraph(file);
-
+            
             // Get combination factory
             FragsCombinationIterator fcf = new FragsCombinationIterator(
                                                                      rootGraph);

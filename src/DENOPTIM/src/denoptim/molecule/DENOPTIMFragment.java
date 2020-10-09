@@ -110,6 +110,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {     
         super (vertexId);
         
+        //TODO-V3 get rid of serialization-based deep copying
         this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
         
         Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
@@ -773,29 +774,34 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Returns a deep copy of this fragments.
      * @throws CloneNotSupportedException 
      */
+    
+    @Override
     public DENOPTIMFragment clone()
     {   
-    	DENOPTIMFragment frg = new DENOPTIMFragment();
+    	DENOPTIMFragment clone = new DENOPTIMFragment();
 		try {
 		    this.projectAPsToProperties();
 		    //deep copy of mol is created in the DENOPTIMFragment constructor
-			frg = new DENOPTIMFragment(getVertexId(),mol);
+			clone = new DENOPTIMFragment(getVertexId(),mol);
 		} catch (Exception e) {
 		    e.printStackTrace();
-			String msg = "Failed to clone DENOPTIMFragment! " +frg;
+			String msg = "Failed to clone DENOPTIMFragment! " +clone;
 			System.err.println(msg);
 		}
-		frg.setMolId(this.getMolId());
-		frg.setFragmentType(this.getFragmentType());
+		clone.setMolId(this.getMolId());
+		clone.setFragmentType(this.getFragmentType());
 		
 		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : this.getSymmetricAPSets())
         {
             cLstSymAPs.add(ss.clone());
         }
-        frg.setSymmetricAPSets(cLstSymAPs);
+        clone.setSymmetricAPSets(cLstSymAPs);
         
-		return frg;
+        clone.setAsRCV(this.isRCV());
+        clone.setLevel(this.getLevel());
+        
+		return clone;
     }
 
 //-----------------------------------------------------------------------------
@@ -929,6 +935,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return <code>true</code> if the two vertexes represent the same graph
      * node even if the vertex IDs are different.
      */
+    @Override
     public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
     {
         if (other instanceof DENOPTIMFragment)
@@ -963,7 +970,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             return false;
         }
         
-        return ((DENOPTIMVertex) this).sameAs(((DENOPTIMVertex)other), reason);
+        return super.sameAs(((DENOPTIMVertex)other), reason);
     }
   
 //------------------------------------------------------------------------------

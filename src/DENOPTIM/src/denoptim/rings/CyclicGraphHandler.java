@@ -74,7 +74,6 @@ public class CyclicGraphHandler
      * Reference to libraries of fragments
      */
     
-    //TODO: move to DENOPTIMVertex
     private ArrayList<DENOPTIMVertex> libScaff;
     private ArrayList<DENOPTIMVertex> libFrag;
     private ArrayList<DENOPTIMVertex> libCap;
@@ -253,7 +252,7 @@ public class CyclicGraphHandler
                                         new HashMap<ObjectPair,PathSubGraph>();
 
         ArrayList<DENOPTIMVertex> rcaVertLst = molGraph.getFreeRCVertices();
-
+        
         Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId = 
                      DENOPTIMMoleculeUtils.getVertexToAtomIdMap(rcaVertLst,mol);
 
@@ -456,7 +455,6 @@ public class CyclicGraphHandler
                        ArrayList<Set<DENOPTIMRing>> allCombsOfRings)
                                                       throws DENOPTIMException
     {
-        //TODO del
         int objId = this.hashCode();
         String recLab = new String(new char[recCount]).replace("\0", "-");
         boolean debug = false;
@@ -482,7 +480,6 @@ public class CyclicGraphHandler
             DENOPTIMVertex vi = sortedKeys.get(ii);
             int vIdI = vi.getVertexId();
 
-            //TODO del
             if (debug)
                 System.out.println(objId+"-"+recLab+"> vIdI= "+vIdI);
 
@@ -495,7 +492,6 @@ public class CyclicGraphHandler
             {
                 int vIdJ = vj.getVertexId();
 
-                //TODO
                 if (debug)
                     System.out.println(objId+"-"+recLab+"> vIdJ= "+vIdJ);
 
@@ -532,14 +528,11 @@ public class CyclicGraphHandler
                                         allCombsOfRings);
                 recCount--;
 
-                //TODO del
                 if (debug)
                     System.out.println(objId+"-"+recLab+"> lstPairs.size() & maxLng= "+lstPairs.size() +" " +maxLng); 
 
                 if (!inFound && lstPairs.size() == maxLng)
                 {
-
-                    //TODO del
                     if (debug)
                         System.out.println(objId+"-"+recLab+"> in A");
 
@@ -554,8 +547,6 @@ public class CyclicGraphHandler
                     }
                     if (closable)
                     {
-
-                        //TODO del
                         if (debug)
                             System.out.println(objId+"-"+recLab+"> in B");
 
@@ -587,7 +578,6 @@ public class CyclicGraphHandler
 
                             ringsComb.add(ring);
 
-                            //TODO del
                             if (debug)
                                 System.out.println(objId+"-"+recLab+"> added ringComb: "+ring);
                         }
@@ -595,8 +585,6 @@ public class CyclicGraphHandler
                         boolean notNewCmb = false;
                         for(Set<DENOPTIMRing> oldCmb : allCombsOfRings)
                         {
-
-                            //TODO del
                             if (debug)
                             {
                                 System.out.println(objId+"-"+recLab+"> Comparing ring sets: ");
@@ -606,7 +594,7 @@ public class CyclicGraphHandler
 
                             notNewCmb = RingClosingUtils.areSameRingsSet(oldCmb,
                                                                      ringsComb);
-                            //TODO del
+                            
                             if (debug)
                                 System.out.println("o> result: "+notNewCmb);
 
@@ -618,7 +606,6 @@ public class CyclicGraphHandler
 
                         if (!notNewCmb)
                         {
-                            //TODO del
                             if (debug)
                                 System.out.println(objId+"-"+recLab+"> addinf to all combs of ring.");
 
@@ -629,8 +616,6 @@ public class CyclicGraphHandler
                 }
                 if (!inFound)
                 {
-
-                    //TODO del
                     if (debug)
                         System.out.println(objId+"-"+recLab+"> in C");
 
@@ -648,7 +633,6 @@ public class CyclicGraphHandler
                     }
                     lstPairs.removeAll(toDel);
 
-                    //TODO del
                     if (debug)
                     {
                         System.out.println(objId+"-"+recLab+"> in C: after removal usedId: "+usedId);
@@ -658,8 +642,6 @@ public class CyclicGraphHandler
 
                 if (lstPairs.contains(op))
                 {
-
-                    //TODO del
                     if (debug)
                         System.out.println(objId+"-"+recLab+"> in D");
 
@@ -667,7 +649,6 @@ public class CyclicGraphHandler
                     usedId.remove(usedId.indexOf(vIdI));
                     usedId.remove(usedId.indexOf(vIdJ));
 
-                    //TODO del
                     if (debug)
                     {
                         System.out.println(objId+"-"+recLab+"> in D: after removal usedId: "+usedId);
@@ -677,7 +658,6 @@ public class CyclicGraphHandler
             }
         }
         
-        //TODO del
         if (debug)
             System.out.println(objId+"-"+recLab+"> returning= "+addedNew);
 
@@ -1815,7 +1795,7 @@ public class CyclicGraphHandler
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeAtPosition(
                                        molGraph.getIndexOfEdgeWithParent(vId));
                 String apClassToScaffold = edgeToParnt.getTargetReaction();
-//TODO: change. hard coded class of ligand
+//TODO-V3: change. hard coded class of ligand
                 if (!apClassToScaffold.equals("MAmine:1"))
                 {
                     continue;

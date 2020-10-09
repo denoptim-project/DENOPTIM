@@ -22,6 +22,7 @@ package denoptim.molecule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,7 +112,30 @@ public class DENOPTIMVertexTest
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
- 
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testClone() throws Exception
+    {
+        ArrayList<DENOPTIMAttachmentPoint> apsA = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(2, 2, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(3, 2, 1));
+        DENOPTIMVertex v = new DENOPTIMVertex(0, apsA);
+        v.setLevel(26);
+        
+        DENOPTIMVertex c = v.clone();
+        
+        assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
+        assertEquals(v.getNumberOfAP(), c.getNumberOfAP(), "Number of APS");
+        assertEquals(v.getSymmetricAPSets().size(), 
+                c.getSymmetricAPSets().size(), "Number of SymAPs sets");
+        assertEquals(v.getLevel(), c.getLevel(), "Level");
+        assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
+        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");       
+    }
     
 //------------------------------------------------------------------------------
 }

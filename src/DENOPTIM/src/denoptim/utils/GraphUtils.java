@@ -1208,7 +1208,7 @@ public class GraphUtils
 
         // get a atoms/bonds molecular representation (no 3D needed)
         IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(molGraph,false);
-
+        
         // Set rotatability property as property of IBond
         ArrayList<ObjectPair> rotBonds =
                                   RotationalSpaceUtils.defineRotatableBonds(mol,
@@ -1223,7 +1223,7 @@ public class GraphUtils
                                       FragmentSpace.getRCCompatibilityMatrix());
          ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
                                cgh.getPossibleCombinationOfRings(mol, molGraph);
-
+         
         // Keep closable chains that are relevant for chelate formation
         if (RingClosureParameters.buildChelatesMode())
         {
@@ -1242,6 +1242,7 @@ public class GraphUtils
         for (Set<DENOPTIMRing> ringSet : allCombsOfRings)
         {
             // clone root graph
+          //TODO-V3 get rid of serialization-based deep copying
             DENOPTIMGraph newGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(
                                                                       molGraph);
             HashMap<Integer,Integer> vRenum = renumberVerticesGetMap(newGraph);
@@ -2584,7 +2585,9 @@ public class GraphUtils
 		    }
 		}
 
+		//TODO-V3 get rid of serialization-based deep copying
         DENOPTIMGraph modGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(graph);
+        
         for (DENOPTIMGraphEdit edit : edits)
         {
             String task = edit.getType();

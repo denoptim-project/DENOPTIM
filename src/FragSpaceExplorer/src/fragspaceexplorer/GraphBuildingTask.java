@@ -380,10 +380,10 @@ public class GraphBuildingTask implements Callable
             }
             else
             {
-                // We don't add capping groups are they are among the candidate
+                // We don't add capping groups as they are among the candidate
                 // fragments to be put in each AP.
                 // If a graph still holds unused APs that should be capped,
-                // then such graph is an unfinished molecular candidate that
+                // then such graph is an unfinished molecular entity that
                 // will be further grown, so no need to perceive rings or
                 // submit any external task.
                 boolean needsCaps = false;
@@ -400,6 +400,7 @@ public class GraphBuildingTask implements Callable
                         GraphUtils.makeAllGraphsWithDifferentRingSets(molGraph);
                 }
                 int sz = altCyclicGraphs.size();
+                
                 if (sz>0 && !needsCaps)
                 {
                     nSubTasks = sz;
