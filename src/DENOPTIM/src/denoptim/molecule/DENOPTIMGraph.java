@@ -30,13 +30,12 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.ClosableChain;
+import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.GraphConversionTool;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.ObjectPair;
+import denoptim.utils.*;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -2114,4 +2113,87 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return res;
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Evaluates the possibility of closing rings in this graph and
+     * generates all alternative graphs resulting by different combinations of
+     * rings
+     * @return <code>true</code> unless no ring can be set up even if required
+     * @throws denoptim.exception.DENOPTIMException
+     */
+    public ArrayList<DENOPTIMGraph> makeAllGraphsWithDifferentRingSets()
+            throws DENOPTIMException {
+        ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<>();
+
+        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
+        if (!rcnEnabled)
+            return lstGraphs;
+
+        boolean evaluateRings = RingClosureParameters.allowRingClosures();
+        if (!evaluateRings)
+            return lstGraphs;
+
+        // get a atoms/bonds molecular representation (no 3D needed)
+        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(this,
+                false);
+
+        // Set rotatable property as property of IBond
+        ArrayList<ObjectPair> rotBonds =
+                RotationalSpaceUtils.defineRotatableBonds(mol,
+                        FragmentSpaceParameters.getRotSpaceDefFile(),
+                        true, true);
+
+        // get the set of possible RCA combinations = ring closures
+        CyclicGraphHandler cgh = new CyclicGraphHandler(
+                FragmentSpace.getScaffoldLibrary(),
+                FragmentSpace.getFragmentLibrary(),
+                FragmentSpace.getCappingLibrary(),
+                FragmentSpace.getRCCompatibilityMatrix());
+        ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
+                cgh.getPossibleCombinationOfRings(mol, this);
+
+        // Keep closable chains that are relevant for chelate formation
+        if (RingClosureParameters.buildChelatesMode())
+        {
+            ArrayList<Set<DENOPTIMRing>> toRemove = new ArrayList<>();
+            for (Set<DENOPTIMRing> setRings : allCombsOfRings)
+            {
+                if (!cgh.checkChelatesGraph(this,setRings))
+                {
+                    toRemove.add(setRings);
+                }
+            }
+            allCombsOfRings.removeAll(toRemove);
+        }
+
+        // prepare output graphs
+        for (Set<DENOPTIMRing> ringSet : allCombsOfRings)
+        {
+            // clone root graph
+            //TODO-V3 get rid of serialization-based deep copying
+            DENOPTIMGraph newGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(this);
+            HashMap<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
+            newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+
+            // add rings
+            for (DENOPTIMRing oldRing : ringSet)
+            {
+                DENOPTIMRing newRing = new DENOPTIMRing();
+                for (int i=0; i<oldRing.getSize(); i++)
+                {
+                    int oldVId = oldRing.getVertexAtPosition(i).getVertexId();
+                    int newVId = vRenum.get(oldVId);
+                    newRing.addVertex(newGraph.getVertexWithId(newVId));
+                }
+                newRing.setBondType(oldRing.getBondType());
+                newGraph.addRing(newRing);
+            }
+
+            // store
+            lstGraphs.add(newGraph);
+        }
+
+        return lstGraphs;
+    }
 }

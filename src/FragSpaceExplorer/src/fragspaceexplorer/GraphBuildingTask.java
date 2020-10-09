@@ -396,8 +396,8 @@ public class GraphBuildingTask implements Callable
                                                 new ArrayList<DENOPTIMGraph>();
                 if (!needsCaps)
                 {
-                    altCyclicGraphs = 
-                        GraphUtils.makeAllGraphsWithDifferentRingSets(molGraph);
+                    altCyclicGraphs =
+                            molGraph.makeAllGraphsWithDifferentRingSets();
                 }
                 int sz = altCyclicGraphs.size();
                 
