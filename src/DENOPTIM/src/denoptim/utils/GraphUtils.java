@@ -108,93 +108,6 @@ public class GraphUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Connects 2 vertices by an edge based on reaction type
-     * @param vtxA source vertex
-     * @param vtxB target vertex
-     * @param iA index of Attachment point in first vertex
-     * @param iB index of Attachment point in second vertex
-     * @param srcRcn the reaction scheme at the source
-     * @param trgRcn the reaction scheme at the target
-     * @return DENOPTIMEdge 
-     */
-
-    public static DENOPTIMEdge connectVertices(DENOPTIMVertex vtxA,
-                                DENOPTIMVertex vtxB, int iA, int iB, 
-                                String srcRcn, String trgRcn)
-    {
-        //System.err.println("Connecting vertices RCN");
-        DENOPTIMAttachmentPoint dap_A = vtxA.getAttachmentPoints().get(iA);
-        DENOPTIMAttachmentPoint dap_B = vtxB.getAttachmentPoints().get(iB);
-        
-        if (dap_A.isAvailable() && dap_B.isAvailable())
-        {
-            //System.err.println("Available APs");
-            String rname = trgRcn.substring(0, trgRcn.indexOf(':'));
-
-            // look up the reaction bond order table
-            int bndOrder = FragmentSpace.getBondOrderMap().get(rname);
-            //System.err.println("Bond: " + bndOrder + " " + srcRcn + " " + trgRcn);
-
-            // create a new edge
-            DENOPTIMEdge edge = new DENOPTIMEdge(vtxA.getVertexId(), vtxB.getVertexId(),
-                                                     iA, iB, bndOrder);
-            edge.setSourceReaction(srcRcn);
-            edge.setTargetReaction(trgRcn);
-
-            // update the attachment point info
-            dap_A.updateFreeConnections(-bndOrder); // decrement the connections
-            dap_B.updateFreeConnections(-bndOrder); // decrement the connections
-
-            return edge;
-        } else {
-            System.err.println("ERROR! Attempt to make edge using unavailable AP!"
-                    + System.getProperty("line.separator")
-                    + "Vertex: "+vtxA.getVertexId()
-                    +" AP-A(available:"+dap_A.isAvailable()+"): "+dap_A
-                    + System.getProperty("line.separator")
-                    + "Vertex: "+vtxB.getVertexId()
-                    +" AP-B(available:"+dap_B.isAvailable()+"): "+dap_B);
-        }
-        return null;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Get the id of the vertex attached at the specified attachment point
-     * index of the given vertex
-     * @param molGraph
-     * @param curVertex
-     * @param dapIdx
-     * @return id of the vertex
-     */
-
-    public static int getVertexForAP(DENOPTIMGraph molGraph,
-                                        DENOPTIMVertex curVertex, int dapIdx)
-    {
-        // loop thru the edges with the children and identify the vertex
-        // associated
-        int vid = -1;
-        ArrayList<DENOPTIMEdge> edges = molGraph.getEdgeList();
-        for (int i=0; i<edges.size(); i++)
-        {
-            DENOPTIMEdge edge = edges.get(i);
-            if (edge.getSourceVertex() == curVertex.getVertexId())
-            {
-                if (edge.getSourceDAP() == dapIdx)
-                {
-                    vid = edge.getTargetVertex();
-                    break;
-                }
-            }
-        }
-
-        return vid;
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
      * @Deprecated
      */
     public static void updateVertexCounter(int num)
@@ -215,9 +128,8 @@ public class GraphUtils
     {
         int levRoot = lstVert.get(0).getLevel();
         int correction = lvl - levRoot;
-        for (int i=0; i<lstVert.size(); i++)
-        {
-            lstVert.get(i).setLevel(lstVert.get(i).getLevel() + correction);
+        for (DENOPTIMVertex denoptimVertex : lstVert) {
+            denoptimVertex.setLevel(denoptimVertex.getLevel() + correction);
         }
     }
 
@@ -1109,8 +1021,7 @@ public class GraphUtils
      * @return edge connecting the vertices
      */
 
-    public static DENOPTIMEdge connectVertices(DENOPTIMVertex a,
-                                                    DENOPTIMVertex b)
+    public static DENOPTIMEdge connectVertices(DENOPTIMVertex a, DENOPTIMVertex b)
     {
         ArrayList<Integer> apA = a.getFreeAPList();
         ArrayList<Integer> apB = b.getFreeAPList();
@@ -1255,8 +1166,13 @@ public class GraphUtils
 
         // create the new DENOPTIMEdge
         DENOPTIMEdge edge;
-        edge = connectVertices(curVertex, incomingVertex, srcAPIdx, trgAPIdx, 
-                                                            srcAPCls, trgAPCls);
+        edge = curVertex.connectVertices(
+                incomingVertex,
+                srcAPIdx,
+                trgAPIdx,
+                srcAPCls,
+                trgAPCls
+        );
 
         if (edge != null)
         {
@@ -1485,8 +1401,13 @@ public class GraphUtils
         {
             String rcnP = dap_Parent.getAPClass();
             String rcnC = dap_Child.getAPClass();
-            edge = connectVertices(parentVrtx, cvClone, parentAPIdx, childAPIdx,
-                                                                    rcnP, rcnC);
+            edge = parentVrtx.connectVertices(
+                    cvClone,
+                    parentAPIdx,
+                    childAPIdx,
+                    rcnP,
+                    rcnC
+            );
         }
         else
         {

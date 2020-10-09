@@ -339,9 +339,9 @@ public class GraphBuildingTask implements Callable
                 
                 String tCls = trgVrtx.getAttachmentPoints().get(tApId).getAPClass();
                 
-                DENOPTIMEdge edge = GraphUtils.connectVertices(srcVrtx, trgVrtx,
-                                                                   sApId, tApId,
-                                                                    sCls, tCls);
+                DENOPTIMEdge edge = srcVrtx.connectVertices(
+                        trgVrtx, sApId, tApId, sCls, tCls
+                );
                 if (edge == null)
                 {
                     msg = "Unable to make new edge.";

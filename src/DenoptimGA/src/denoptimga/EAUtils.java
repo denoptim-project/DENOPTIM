@@ -1070,8 +1070,9 @@ public class EAUtils
                         fragVertex.getCompatibleClassAPIndex(rcnCap);
                 int dap = apIdx.get(0);
 
-                DENOPTIMEdge edge = GraphUtils.connectVertices(
-			       curVertex, fragVertex, dapIdx, dap, rcn, rcnCap);
+                DENOPTIMEdge edge = curVertex.connectVertices(
+                        fragVertex, dapIdx, dap, rcn, rcnCap
+                );
                 if (edge != null)
                 {
                     // add the fragment as a vertex

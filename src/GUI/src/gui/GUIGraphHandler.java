@@ -1109,8 +1109,9 @@ public class GUIGraphHandler extends GUICardPanel
 				
 			//NB: we ignore symmetry here
 	                
-	        DENOPTIMEdge edge = GraphUtils.connectVertices(srcVertex, trgVertex,
-	            		srcApId, trgApId, sCls, tCls);
+	        DENOPTIMEdge edge = srcVertex.connectVertices(
+	        		trgVertex, srcApId, trgApId, sCls, tCls
+			);
 	
 	        if (edge == null)
 	        {

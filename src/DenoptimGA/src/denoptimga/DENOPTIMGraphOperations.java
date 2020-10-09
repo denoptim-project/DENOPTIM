@@ -550,8 +550,13 @@ public class DENOPTIMGraphOperations
             String rcn = curDap.getAPClass(); //on the src
             String cmpReac = fragVertex.getAttachmentPoints().get(fapidx).getAPClass();
 
-            edge = GraphUtils.connectVertices(curVertex, fragVertex, dapIdx, 
-                                                          fapidx, rcn, cmpReac);
+            edge = curVertex.connectVertices(
+                    fragVertex,
+                    dapIdx,
+                    fapidx,
+                    rcn,
+                    cmpReac
+            );
         }
 
         if (edge != null)

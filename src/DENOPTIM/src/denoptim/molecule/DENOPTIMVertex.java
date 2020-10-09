@@ -555,4 +555,61 @@ public class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Connects this vertex to target by an edge based on reaction type.
+     * @param target target vertex
+     * @param sourceAPIndex index of Attachment point in source vertex
+     * @param targetAPIndex index of Attachment point in target vertex
+     * @param srcRcn the reaction scheme at the source
+     * @param trgRcn the reaction scheme at the target
+     * @return DENOPTIMEdge
+     */
+
+    public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
+                                        int sourceAPIndex,
+                                        int targetAPIndex,
+                                        String srcRcn,
+                                        String trgRcn
+    ) {
+        //System.err.println("Connecting vertices RCN");
+        DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
+                .get(sourceAPIndex);
+        DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
+                .get(targetAPIndex);
+
+        if (sourceAP.isAvailable() && targetAP.isAvailable())
+        {
+            //System.err.println("Available APs");
+            String rname = trgRcn.substring(0, trgRcn.indexOf(':'));
+
+            // look up the reaction bond order table
+            int bndOrder = FragmentSpace.getBondOrderMap().get(rname);
+            //System.err.println("Bond: " + bndOrder + " " + srcRcn + " " + trgRcn);
+
+            // create a new edge
+            DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
+                    target.getVertexId(),
+                    sourceAPIndex,
+                    targetAPIndex,
+                    bndOrder
+            );
+            edge.setSourceReaction(srcRcn);
+            edge.setTargetReaction(trgRcn);
+
+            // update the attachment point info
+            sourceAP.updateFreeConnections(-bndOrder); // decrement the connections
+            targetAP.updateFreeConnections(-bndOrder); // decrement the connections
+
+            return edge;
+        } else {
+            System.err.println("ERROR! Attempt to make edge using unavailable AP!"
+                    + System.getProperty("line.separator")
+                    + "Vertex: "+getVertexId()
+                    +" AP-A(available:"+sourceAP.isAvailable()+"): "+sourceAP
+                    + System.getProperty("line.separator")
+                    + "Vertex: "+target.getVertexId()
+                    +" AP-B(available:"+targetAP.isAvailable()+"): "+targetAP);
+        }
+        return null;
+    }
 }
