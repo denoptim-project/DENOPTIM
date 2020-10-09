@@ -154,17 +154,17 @@ runTest "t3"
 #
 # t5: parallel combinatorial building til exhaustion of space
 #
-runTest "t5"
+# runTest "t5"
 
 #
 # p6: partial exploration of fragment space that generates checkpoint and serialized graphs for other tests.
 #
-runTest "p6"
+# runTest "p6"
 
 #
 # t6: restart FragSpaceExplorer from checkpoint file; non-first, non-last iteration
 #
-runTest "t6"
+# runTest "t6"
 
 #
 # p7: exploration of fragment space that generates serialized graphs for t7

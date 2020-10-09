@@ -86,7 +86,7 @@ public class GraphUtils
         if (vertexCounter.get() >= val)
         {
             String msg = "Attempt to reser the unique vertex ID using "
-                         + val + " while the current value is " 
+                         + val + " while the current value is "
                          + vertexCounter.get();
             throw new DENOPTIMException(msg);
         }
@@ -103,213 +103,6 @@ public class GraphUtils
     public static synchronized int getUniqueVertexIndex()
     {
         return vertexCounter.getAndIncrement();
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Extracts the subgraph of a graph G starting from a given vertex in G.
-     * Only the given vertex V and all child vertexes are considered part of 
-     * the subgraph, which encodes also rings and symmetric sets. Potential
-     * rings that include vertices not belonging to the subgraph are lost.
-     * @param molGraph the graph G
-     * @param vid the vertex id from which the extraction has to start
-     * @return the subgraph 
-     */
-
-    public static DENOPTIMGraph extractSubgraph(DENOPTIMGraph molGraph, int vid)
- throws DENOPTIMException
-    {
-        DENOPTIMGraph subGraph = new DENOPTIMGraph();
-
-        // Identify vertices belonging to subgraph (i.e., vid + children)
-        ArrayList<Integer> subGrpVrtIDs = new ArrayList<>();
-        subGrpVrtIDs.add(vid);
-        GraphUtils.getChildren(molGraph, vid, subGrpVrtIDs);
-        // Copy vertices to subgraph
-        for (Integer i : subGrpVrtIDs)
-        {
-            subGraph.addVertex(molGraph.getVertexWithId(i));
-            // vertices are removed later (see below) otherwise also
-            // rings and sym.sets are removed
-        }
-
-        // Remove the edge joining graph and gubgraph
-        removeEdgeWithParent(molGraph, vid);
-
-        // Identify edges belonging to subgraph
-        Iterator<DENOPTIMEdge> iter1 = molGraph.getEdgeList().iterator();
-        while (iter1.hasNext())
-        {
-            DENOPTIMEdge edge = iter1.next();
-            for (Integer k : subGrpVrtIDs)
-            {
-                if (edge.getSourceVertex() == k || edge.getTargetVertex() == k)
-                {
-                    // Copy edge to subgraph...
-                    subGraph.addEdge(edge);
-                    // ...and remove it from molGraph
-                    iter1.remove();
-                    break;
-                }
-            }
-        }
-
-        // Identify and move rings
-        Iterator<DENOPTIMRing> iter2 = molGraph.getRings().iterator();
-        while (iter2.hasNext())
-        {
-            DENOPTIMRing ring = iter2.next();
-            boolean rSpanAnySGVrtx = false;
-            boolean rWithinSubGrph = true;
-            for (int i=0; i<ring.getSize(); i++)
-            {
-                int idVrtInRing = ring.getVertexAtPosition(i).getVertexId();
-                if (subGrpVrtIDs.contains(idVrtInRing))
-                {
-                    rSpanAnySGVrtx = true;
-                }
-                else
-                {
-                    rWithinSubGrph = false;
-                }
-            }
-            if (rSpanAnySGVrtx && rWithinSubGrph)
-            {
-                //copy ring to subgraph
-                subGraph.addRing(ring);
-                //remove ring from molGraph
-                iter2.remove();
-            }
-            //else if (!rSpanAnySGVrtx && rWithinSubGrph) imposible!
-            else if (!rSpanAnySGVrtx && !rWithinSubGrph)
-            {
-                //ignore ring
-                continue;
-            }
-            else if (rSpanAnySGVrtx && !rWithinSubGrph)
-            {
-                // only remove ring from molGraph
-                iter2.remove();
-            }
-        }
-                
-        // Identify and move symmetiric sets
-        Iterator<SymmetricSet> iter3 = molGraph.getSymSetsIterator();
-        while (iter3.hasNext())
-        {
-            SymmetricSet ss = iter3.next();
-            boolean ssSpanAnySGVrtx = false;
-            boolean ssWithinSubGrph = true;
-            SymmetricSet partOfSSInSubGraph = new SymmetricSet();
-            for (Integer idVrtInSS : ss.getList())
-            {
-                if (subGrpVrtIDs.contains(idVrtInSS))
-                {
-                    partOfSSInSubGraph.add(idVrtInSS);
-                    ssSpanAnySGVrtx = true;
-                }
-                else
-                {
-                    ssWithinSubGrph = false;
-                }
-            }
-            if (ssSpanAnySGVrtx && ssWithinSubGrph)
-            {
-                //copy symm.set to subgraph
-                subGraph.addSymmetricSetOfVertices(ss);
-                //remove symm.set from molGraph
-                iter3.remove();
-            }
-            //else if (!ssSpanAnySGVrtx && ssWithinSubGrph) imposible!
-            else if (!ssSpanAnySGVrtx && !ssWithinSubGrph)
-            {
-                //ignore sym.set
-                continue;
-            }
-            else if (ssSpanAnySGVrtx && !ssWithinSubGrph)
-            {
-                //copy only portion of sym.set
-                subGraph.addSymmetricSetOfVertices(partOfSSInSubGraph);
-                //remove sym.set from molGraph
-                iter3.remove();
-            }
-        }
-
-        // Remove vertices from molGraph
-        for (Integer i : subGrpVrtIDs)
-        {
-            molGraph.removeVertex(i);
-        }
-
-        return subGraph;
-    }
-
-//------------------------------------------------------------------------------
-    
-   /**
-    * updates the valence of the parent and child vertex after the edge
-    * has been removed
-    * @param g the molecular graph representation
-    * @param vid the id of the vertex whose edge with its parent will be removed
-    * @return the id of the parent vertex
-    */
-
-    public static int removeEdgeWithParent(DENOPTIMGraph g, int vid)
-    {
-        int pvid = -1;
-        int eid = g.getIndexOfEdgeWithParent(vid);
-
-        if (eid != -1)
-        {
-            DENOPTIMEdge edge = g.getEdgeList().get(eid);
-
-            int bndOrder = edge.getBondType();
-
-            DENOPTIMVertex src = g.getVertexWithId(edge.getSourceVertex());
-            // update the attachment point of the source vertex
-            int iA = edge.getSourceDAP();
-            src.updateAttachmentPoint(iA, bndOrder);
-            pvid = src.getVertexId();
-
-
-            // update the attachment point of the target vertex
-            DENOPTIMVertex trg = g.getVertexWithId(edge.getTargetVertex());
-            int iB = edge.getTargetDAP();
-            trg.updateAttachmentPoint(iB, bndOrder);
-
-            // remove associated edge
-            g.removeEdge(g.getEdgeList().get(eid));
-        }
-
-        return pvid;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Gets all the children of the current vertex
-     * @param g the molecular graph representation
-     * @param vid the vertex whose children are to be located
-     * @param children list containing the vertex ids of the children
-     */
-    public static void getChildren(DENOPTIMGraph g, int vid,
-                                                ArrayList<Integer> children)
-    {
-        // get the child vertices of vid
-        ArrayList<Integer> lst = g.getChildVertices(vid);
-
-        if (lst.isEmpty())
-            return;
-
-        for (int i=0; i<lst.size(); i++)
-        {
-            if (!children.contains(lst.get(i)))
-            {
-                children.add(lst.get(i));
-                getChildren(g, lst.get(i), children);
-            }
-        }
     }
 
 //------------------------------------------------------------------------------
@@ -368,7 +161,7 @@ public class GraphUtils
                                                         throws DENOPTIMException
     {
         // first delete the edge with the parent vertex
-        int pvid = removeEdgeWithParent(molGraph, vid);
+        int pvid = molGraph.removeEdgeWithParent(vid);
         if (pvid == -1)
         {
             String msg = "Program Bug detected trying to  delete vertex "
@@ -379,7 +172,7 @@ public class GraphUtils
 
         // now get the vertices attached to vid i.e. return vertex ids
         ArrayList<Integer> children = new ArrayList<>();
-        getChildren(molGraph, vid, children);
+        molGraph.getChildren(vid, children);
 
         // delete the children vertices
         for (int i=0; i<children.size(); i++)
@@ -1803,7 +1596,7 @@ public class GraphUtils
     /**
      * Append a graph (incoming=I) onto another graph (receiving=R). 
      * @param molGraph the receiving graph R, or parent
-     * @param parentVrtxs the vertex of R on which the a copy
+     * @param parentVrtx the vertex of R on which the a copy
      * of I is to be attached.
      * @param parentAPIdx the attachment point on R's vertex to be
      * used to attach I 
@@ -1861,7 +1654,7 @@ public class GraphUtils
      * attachment points. No change in symmetric sets, apart from importing 
      * those sets that are already defined in the subgraph.
      * @param molGraph the receiving graph R, or parent
-     * @param parentVrtxs the vertex of R on which a copy
+     * @param parentVrtx the vertex of R on which a copy
      * of I is to be attached.
      * @param parentAPIdx the attachment point on R's vertex to be
      * used to attach I 
@@ -1870,11 +1663,12 @@ public class GraphUtils
      * @param childAPIdx the index of the attachment point on the vertex of I 
      * that is to be connected to R
      * @param bndType the bond type between R and I
-     * @param map of symmetric sets. This parameter is only used to keep track
+     * @param newSymSets of symmetric sets. This parameter is only used to keep
+     *               track
      * of the symmetric copies of I. Simply provide an empty data structure.
      */
 
-    public static void appendGraphOnAP(DENOPTIMGraph molGraph, 
+    public static void appendGraphOnAP(DENOPTIMGraph molGraph,
                                         DENOPTIMVertex parentVrtx, 
                                         int parentAPIdx, 
                                         DENOPTIMGraph subGraph, 

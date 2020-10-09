@@ -1306,8 +1306,8 @@ if(debug)
             System.out.println("DBUG: MALE before extraction: "+male);
             System.out.println("DBUG: FEMALE before extraction: "+female);
         }
-        DENOPTIMGraph subG_M =  GraphUtils.extractSubgraph(male,mvid);
-        DENOPTIMGraph subG_F =  GraphUtils.extractSubgraph(female,fvid);
+        DENOPTIMGraph subG_M =  male.extractSubgraph(mvid);
+        DENOPTIMGraph subG_F =  female.extractSubgraph(fvid);
         if (debug)
         {
             System.out.println("DBUG: subGraph from male: "+subG_M);
