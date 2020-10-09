@@ -1,0 +1,27 @@
+#
+# This is the parameter file for test 't18'
+#
+
+# Parameters for handling the graph lists
+GRAPHLISTS-WORKDIR=OTF_WDIR
+GRAPHLISTS-INPUTGRAPHSFORMAT=STRING
+GRAPHLISTS-INPUTGRAPHS-A=OTF_WDIR/listA.txt
+GRAPHLISTS-INPUTGRAPHS-B=OTF_WDIR/listB.txt
+#GRAPHLISTS-INPUTGRAPHS-A=OTF_WDIR/listA2.txt
+#GRAPHLISTS-INPUTGRAPHS-B=OTF_WDIR/listB2.txt
+
+# Definition of the Fragment Space 
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds-1.2
+
+# RingClosureParameters
+RC-CLOSERINGS
+RC-RCCINDEX=OTF_WDIR/RCCONFS_ID_t2.txt
+RC-EVALUATIONCLOSABILITYMODE=CONSTITUTION
+RC-CLOSABLERINGSMARTS=C1[C,O]CC[C,O]1
+RC-CLOSABLERINGSMARTS=C1[C,O]CCC[C,O]1
+RC-CLOSABLERINGSMARTS=C1[C,O]CCCC[C,O]1

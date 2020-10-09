@@ -1,0 +1,76 @@
+AttractorPLUS
+  CDK     0627192254
+Built manually
+  1  0  0  0  0  0  0  0  0  0999 V2000
+    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+AttractorPLUS
+
+> <cdk:Remark>
+Built manually
+
+> <CLASS>
+1#ATplus:0:-0.0087%-0.0070%-0.0079
+
+> <ATTACHMENT_POINT>
+1:1
+
+$$$$
+AttractorMINUS
+  CDK     0627192254
+Built manually
+  1  0  0  0  0  0  0  0  0  0999 V2000
+   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+AttractorMINUS
+
+> <cdk:Remark>
+Built manually
+
+> <CLASS>
+1#ATminus:0:0.0109%-0.0071%0.0026
+
+> <ATTACHMENT_POINT>
+1:1
+
+$$$$
+C_sp3_2H
+  CDK     0627192254
+From GM3DFragmenter
+  1  0  0  0  0  0  0  0  0  0999 V2000
+   -0.0017   -0.0071   -0.0076 C   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+C_sp3_2H
+
+> <cdk:Remark>
+From GM3DFragmenter
+
+> <CLASS>
+1#cca:0:-0.4835%-1.3073%0.3488,ccb:0:-0.4813%0.3391%-1.3070,ch:0:-0.4848%0.9557%0.9479,ch:0:1.4370%-0.0077%-0.0066
+
+> <ATTACHMENT_POINT>
+1:4
+
+$$$$
+Fragment
+  CDK     0627192254
+From GM3DFragmenter
+  1  0  0  0  0  0  0  0  0  0999 V2000
+    0.0026    0.0050   -0.0086 O   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <cdk:Title>
+Fragment
+
+> <cdk:Remark>
+From GM3DFragmenter
+
+> <CLASS>
+1#coa:1:-0.4745%-1.3069%0.3390,cob:1:-0.4817%0.3533%-1.3070
+
+> <ATTACHMENT_POINT>
+1:2
+
+$$$$
