@@ -542,7 +542,7 @@ public class DENOPTIMGraphOperations
         {
             // connect a randomly selected AP of this fragment
             // to the current vertex
-            edge = GraphUtils.connectVertices(curVertex, fragVertex);
+            edge = curVertex.connectVertices(fragVertex);
         }
         else
         {

@@ -36,6 +36,7 @@ import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.*;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -2239,5 +2240,48 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         return found;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * connects 2 vertices based on their free AP connections
+     * @param a vertex
+     * @param b vertex
+     * @return edge connecting the vertices
+     */
+
+    public static DENOPTIMEdge connectVertices(DENOPTIMVertex a, DENOPTIMVertex b)
+    {
+        ArrayList<Integer> apA = a.getFreeAPList();
+        ArrayList<Integer> apB = b.getFreeAPList();
+
+        if (apA.isEmpty() || apB.isEmpty())
+            return null;
+
+        // select random APs - these are the indices in the list
+        MersenneTwister rng = RandomUtils.getRNG();
+
+
+        //int iA = apA.get(GAParameters.getRNG().nextInt(apA.size()));
+        //int iB = apB.get(GAParameters.getRNG().nextInt(apB.size()));
+        int iA = apA.get(rng.nextInt(apA.size()));
+        int iB = apB.get(rng.nextInt(apB.size()));
+
+        DENOPTIMAttachmentPoint dap_A = a.getAttachmentPoints().get(iA);
+        DENOPTIMAttachmentPoint dap_B = b.getAttachmentPoints().get(iB);
+
+        // if no reaction/class specific info available set to single bond
+        int bndOrder = 1;
+
+        // create a new edge
+        DENOPTIMEdge edge = new DENOPTIMEdge(a.getVertexId(), b.getVertexId(),
+                iA, iB, bndOrder);
+
+        // update the attachment point info
+        dap_A.updateFreeConnections(-bndOrder); // decrement the connections
+        dap_B.updateFreeConnections(-bndOrder); // decrement the connections
+
+        return edge;
     }
 }
