@@ -27,7 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.vecmath.Point3d;
+
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.silent.Bond;
 
 /**
  * Unit test for DENOPTIMVertex
@@ -50,7 +54,7 @@ public class DENOPTIMVertexTest
     	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new DENOPTIMVertex(0, apsA);
+    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
     	
     	ArrayList<DENOPTIMAttachmentPoint> apsB = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -59,7 +63,7 @@ public class DENOPTIMVertexTest
     	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsB.add(new DENOPTIMAttachmentPoint(3, 1, 1));
     	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new DENOPTIMVertex(90, apsB);
+    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
 
     	assertTrue(vA.sameAs(vB, reason));	
     }
@@ -75,7 +79,7 @@ public class DENOPTIMVertexTest
     	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new DENOPTIMVertex(0, apsA);
+    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
     	
     	ArrayList<DENOPTIMAttachmentPoint> apsB = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -84,7 +88,7 @@ public class DENOPTIMVertexTest
     	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsB.add(new DENOPTIMAttachmentPoint(3, 1, 2)); //diff
     	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new DENOPTIMVertex(90, apsB);
+    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
@@ -100,7 +104,7 @@ public class DENOPTIMVertexTest
     	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new DENOPTIMVertex(0, apsA);
+    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
     	
     	ArrayList<DENOPTIMAttachmentPoint> apsB = 
     			new ArrayList<DENOPTIMAttachmentPoint>();
@@ -108,7 +112,7 @@ public class DENOPTIMVertexTest
     	apsB.add(new DENOPTIMAttachmentPoint(1, 1, 1));
     	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
     	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new DENOPTIMVertex(90, apsB);
+    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
@@ -123,7 +127,7 @@ public class DENOPTIMVertexTest
         apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
         apsA.add(new DENOPTIMAttachmentPoint(2, 2, 1));
         apsA.add(new DENOPTIMAttachmentPoint(3, 2, 1));
-        DENOPTIMVertex v = new DENOPTIMVertex(0, apsA);
+        DENOPTIMVertex v = new EmptyVertex(0, apsA);
         v.setLevel(26);
         
         DENOPTIMVertex c = v.clone();
@@ -134,7 +138,34 @@ public class DENOPTIMVertexTest
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
         assertEquals(v.getLevel(), c.getLevel(), "Level");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
-        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");       
+        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code"); 
+        
+        
+        v = new DENOPTIMFragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        ((DENOPTIMFragment) v).addAtom(a1);
+        ((DENOPTIMFragment) v).addAtom(a2);
+        ((DENOPTIMFragment) v).addAtom(a3);
+        ((DENOPTIMFragment) v).addBond(new Bond(a1, a2));
+        ((DENOPTIMFragment) v).addBond(new Bond(a2, a3));
+        String APCLASS = "apc:0";
+        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        ((DENOPTIMFragment) v).addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        v.setLevel(62);
+        
+        c = v.clone();
+        
+        assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
+        assertEquals(v.getNumberOfAP(), c.getNumberOfAP(), "Number of APS");
+        assertEquals(v.getSymmetricAPSets().size(), 
+                c.getSymmetricAPSets().size(), "Number of SymAPs sets");
+        assertEquals(v.getLevel(), c.getLevel(), "Level");
+        assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
+        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code"); 
     }
     
 //------------------------------------------------------------------------------

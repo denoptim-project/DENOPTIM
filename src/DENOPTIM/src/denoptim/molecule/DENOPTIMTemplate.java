@@ -30,6 +30,11 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBlock 
 {
     /**
+     * Version UID
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * interior graph of the template that can be constrained in various ways depending on the
      * <code>contractLevel</code>
      */
@@ -209,6 +214,55 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
 
     public void setExteriorAPs(List<DENOPTIMAttachmentPoint> exteriorAPs) {
         this.exteriorAPs = exteriorAPs;
+    }
+
+    @Override
+    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public ArrayList<SymmetricSet> getSymmetricAPSets()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int getHeavyAtomsCount()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public boolean containsAtoms()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public IAtomContainer getIAtomContainer()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 //-----------------------------------------------------------------------------

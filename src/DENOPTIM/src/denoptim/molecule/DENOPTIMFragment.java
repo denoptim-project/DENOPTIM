@@ -64,6 +64,17 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     private int buildingBlockType = -99; //Initialised to meaningless value
     
+    /*
+     * attachment points on this vertex
+     */
+    private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
+
+    /**
+     * List of AP sets that are related to each other, so that we
+     * call them "symmetric" (though symmetry is a fuzzy concept here).
+     */
+    private ArrayList<SymmetricSet> lstSymAPs;
+    
 	/**
 	 * Molecular representation of this fragment
 	 */
@@ -78,6 +89,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public DENOPTIMFragment()
     {
         super();
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
         this.mol = new AtomContainer();
     }
     
@@ -93,6 +106,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public DENOPTIMFragment(int vertexId)
     {
         super(vertexId);
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
         this.mol = new AtomContainer();
     }
     
@@ -111,6 +126,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             throws DENOPTIMException
     {     
         super (vertexId);
+        
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
         
         //TODO-V3 get rid of serialization-based deep copying
         
@@ -149,6 +167,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         
         ArrayList<SymmetricSet> simAP = identifySymmetryRelatedAPSets(this.mol, 
                 getAttachmentPoints());
+        
         setSymmetricAPSets(simAP);
     }
     
@@ -474,70 +493,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	}
     	return num;
     }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns the number of APs currently defined.
-     * @return the number of APs
-     */
-    
-    @Deprecated
-    public int getAPCount()
-    {
-    	int num = 0;
-        for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
-        {
-            num = num + getAPCountOnAtom(atmId);
-        }
-    	return num;
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns the list of all APClasses on present on this fragment.
-     * @return the list of APClassess
-     */
-    
-    //TODO-V3 remove, moved to DENOPTIMVertex
-    
-    @Deprecated
-    public ArrayList<String> getAllAPClassess()
-    {
-    	ArrayList<String> lst = new ArrayList<String>();
-    	for (DENOPTIMAttachmentPoint ap : getCurrentAPs())
-    	{
-    		String apCls = ap.getAPClass();
-    		if (!lst.contains(apCls))
-    		{
-    			lst.add(apCls);
-    		}
-    	}
-    	return lst;
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns clones of all attachment points currently defined on this 
-     * fragment.
-     * @return the list of AP clones
-     */
-
-    @Deprecated
-	public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
-	{
-	    //TODO-V3 use or overwrite the method from vertex
-	    //TODO-V3 clarify if and when we return copy/original
-		ArrayList<DENOPTIMAttachmentPoint> original = getCurrentAPs();
-		ArrayList<DENOPTIMAttachmentPoint> copy =
-                new ArrayList<>(original.size());
-		for (DENOPTIMAttachmentPoint ap : original) {
-		    copy.add(ap.clone());
-        }
-		return copy;
-	}
 	
 //-----------------------------------------------------------------------------
     
@@ -1025,6 +980,38 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         return getVertexId()+ "_" + (buildingBlockId + 1) + "_" +
                 buildingBlockType + "_" + getLevel();
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    {
+        return lstAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAPs)
+    {
+        this.lstAPs = lstAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> lstSymAPs)
+    {
+        this.lstSymAPs = lstSymAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public ArrayList<SymmetricSet> getSymmetricAPSets()
+    {
+        return lstSymAPs;
     }
     
 //-----------------------------------------------------------------------------
