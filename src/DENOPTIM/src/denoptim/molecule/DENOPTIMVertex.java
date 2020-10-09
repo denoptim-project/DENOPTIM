@@ -384,6 +384,8 @@ public class DENOPTIMVertex implements Cloneable, Serializable
      * Returns a deep-copy of this vertex
      * @return a deep-copy
      */
+    
+    @Override
     public DENOPTIMVertex clone()
     {        
         ArrayList<DENOPTIMAttachmentPoint> cLstAPs = 
@@ -398,8 +400,10 @@ public class DENOPTIMVertex implements Cloneable, Serializable
         {
             cLstSymAPs.add(ss.clone());
         }
+        DENOPTIMVertex clone = new DENOPTIMVertex(vertexId,cLstAPs,cLstSymAPs,isRCV);
+        clone.setLevel(this.getLevel());
         
-        return new DENOPTIMVertex(vertexId,cLstAPs,cLstSymAPs,isRCV);
+        return clone;
     }
     
 //------------------------------------------------------------------------------

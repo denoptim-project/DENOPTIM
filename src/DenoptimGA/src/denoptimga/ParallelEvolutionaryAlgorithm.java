@@ -365,6 +365,7 @@ public class ParallelEvolutionaryAlgorithm
 
         synchronized (molPopulation)
         {
+            //TODO-V3 get rid of serialization-based deep copying
             clone_popln =
                 (ArrayList<DENOPTIMMolecule>) DenoptimIO.deepCopy(molPopulation);
         }

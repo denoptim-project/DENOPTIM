@@ -24,7 +24,9 @@ import java.util.Map;
 
 import javax.vecmath.Point3d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.Bond;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -110,7 +112,34 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {     
         super (vertexId);
         
-        this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
+        //TODO-V3 get rid of serialization-based deep copying
+        
+        //this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
+        
+        this.mol = new AtomContainer();
+        for (IAtom oAtm : mol.atoms())
+        {
+            IAtom nAtm = new Atom(oAtm.getSymbol());
+            if (oAtm.getPoint3d() != null)
+            {
+                Point3d p3d = oAtm.getPoint3d();
+                nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
+            }
+            //TODO-V3 we might need to get more...
+            this.mol.addAtom(nAtm);
+        }
+        
+        for (IBond oBnd : mol.bonds())
+        {
+            if (oBnd.getAtomCount() != 2)
+            {
+                throw new DENOPTIMException("Unable to deal with bonds "
+                        + "involving more than two atoms.");
+            }
+            int ia = mol.getAtomNumber(oBnd.getAtom(0));
+            int ib = mol.getAtomNumber(oBnd.getAtom(1));
+            this.mol.addBond(ia,ib,oBnd.getOrder());
+        }
         
         Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
         if (prop != null)
@@ -773,29 +802,34 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Returns a deep copy of this fragments.
      * @throws CloneNotSupportedException 
      */
+    
+    @Override
     public DENOPTIMFragment clone()
     {   
-    	DENOPTIMFragment frg = new DENOPTIMFragment();
+    	DENOPTIMFragment clone = new DENOPTIMFragment();
 		try {
 		    this.projectAPsToProperties();
 		    //deep copy of mol is created in the DENOPTIMFragment constructor
-			frg = new DENOPTIMFragment(getVertexId(),mol);
+			clone = new DENOPTIMFragment(getVertexId(),mol);
 		} catch (Exception e) {
 		    e.printStackTrace();
-			String msg = "Failed to clone DENOPTIMFragment! " +frg;
+			String msg = "Failed to clone DENOPTIMFragment! " +clone;
 			System.err.println(msg);
 		}
-		frg.setMolId(this.getMolId());
-		frg.setFragmentType(this.getFragmentType());
+		clone.setMolId(this.getMolId());
+		clone.setFragmentType(this.getFragmentType());
 		
 		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : this.getSymmetricAPSets())
         {
             cLstSymAPs.add(ss.clone());
         }
-        frg.setSymmetricAPSets(cLstSymAPs);
+        clone.setSymmetricAPSets(cLstSymAPs);
         
-		return frg;
+        clone.setAsRCV(this.isRCV());
+        clone.setLevel(this.getLevel());
+        
+		return clone;
     }
 
 //-----------------------------------------------------------------------------
@@ -929,6 +963,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return <code>true</code> if the two vertexes represent the same graph
      * node even if the vertex IDs are different.
      */
+    @Override
     public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
     {
         if (other instanceof DENOPTIMFragment)
@@ -963,7 +998,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             return false;
         }
         
-        return ((DENOPTIMVertex) this).sameAs(((DENOPTIMVertex)other), reason);
+        return super.sameAs(((DENOPTIMVertex)other), reason);
     }
   
 //------------------------------------------------------------------------------

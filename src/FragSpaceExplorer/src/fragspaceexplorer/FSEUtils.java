@@ -162,7 +162,10 @@ public class FSEUtils
 	    //      the naked root graphs. Therefore there is no set of indeces
 	    //      to store and we fed the method with an empty array.
 	    // NOTE2: the root Id is set to zero for the same reason.
-            storeGraphOfLevel(g.clone(),level,0,new ArrayList());
+            
+            DENOPTIMGraph c = g.clone();
+            
+            storeGraphOfLevel(c,level,0,new ArrayList());
         }
     }
 

@@ -963,11 +963,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex vOrig : gVertices)
         {
             DENOPTIMVertex vClone = vOrig.clone();
-            
-            //TODO-TU3
-            //System.out.println(vOrig.getVertexId()+"-"+vClone.getVertexId()+" #AP orig : "+vOrig.getAttachmentPoints());
-            //System.out.println(vOrig.getVertexId()+"-"+vClone.getVertexId()+" #AP clone: "+vClone.getAttachmentPoints());
-            
+
             for (int i=0; i<vOrig.getAttachmentPoints().size(); i++)
             {
                 DENOPTIMAttachmentPoint origAp = 

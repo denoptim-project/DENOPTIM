@@ -20,6 +20,7 @@ package denoptim.molecule;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -141,26 +142,29 @@ public class DENOPTIMFragmentTest
     @Test
     public void testClone() throws Exception
     {
-        DENOPTIMFragment orig = new DENOPTIMFragment();
+        DENOPTIMFragment v = new DENOPTIMFragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
-        orig.addAtom(a1);
-        orig.addAtom(a2);
-        orig.addAtom(a3);
-        orig.addBond(new Bond(a1, a2));
-        orig.addBond(new Bond(a2, a3));
-        orig.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        orig.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        orig.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        orig.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        v.addAtom(a1);
+        v.addAtom(a2);
+        v.addAtom(a3);
+        v.addBond(new Bond(a1, a2));
+        v.addBond(new Bond(a2, a3));
+        v.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
         
         ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
         ssaps.add(new SymmetricSet(new ArrayList<Integer>(
                 Arrays.asList(0,1,2))));
-        orig.setSymmetricAPSets(ssaps);
+        v.setSymmetricAPSets(ssaps);
+        v.setVertexId(18);
+        v.setLevel(26);
+        v.setAsRCV(true);
         
-        DENOPTIMVertex c = orig.clone();
+        DENOPTIMVertex c = v.clone();
         
         assertEquals(4,((DENOPTIMFragment) c).getNumberOfAP(),"Number of APs");
         assertEquals(1,((DENOPTIMFragment) c).getAPCountOnAtom(0),
@@ -171,7 +175,13 @@ public class DENOPTIMFragmentTest
         assertEquals(1,c.getSymmetricAPSets().size(), "Number of symmetric sets");
         assertEquals(3,c.getSymmetricAPSets().get(0).size(), 
                 "Number of symmetric APs in set");
-        
+        assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
+        assertEquals(v.getNumberOfAP(), c.getNumberOfAP(), "Number of APS");
+        assertEquals(v.getSymmetricAPSets().size(), 
+                c.getSymmetricAPSets().size(), "Number of SymAPs sets");
+        assertEquals(v.getLevel(), c.getLevel(), "Level");
+        assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
+        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");  
     }
     
 //------------------------------------------------------------------------------

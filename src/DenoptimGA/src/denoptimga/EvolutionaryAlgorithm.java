@@ -227,7 +227,8 @@ public class EvolutionaryAlgorithm
         
 
         // keep a clone of the current population for the parents to be
-        // chosen from
+        // chosen from.
+      //TODO-V3 get rid of serialization-based deep copying
         ArrayList<DENOPTIMMolecule> clone_popln =
                 (ArrayList<DENOPTIMMolecule>) DenoptimIO.deepCopy(molPopulation);
 

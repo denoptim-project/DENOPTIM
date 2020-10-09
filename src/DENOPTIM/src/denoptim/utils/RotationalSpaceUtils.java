@@ -73,12 +73,12 @@ public class RotationalSpaceUtils
      * SMARTS queries and can consider all fragment-fragment bonds 
      * (i.e., interfragment connections) while excluding cyclic bonds.
      * The propety <code>DENOPTIMConstants.BONDPROPROTATABLE</code> is used 
-     * to store the rotatanility in the <code>Bond</code>s.
+     * to store the rotatability in the <code>Bond</code>s.
      * 
      * @param mol the molecular structure
      * @param defRotBndsFile name of a text file with a list of SMARTS queries
      * that defines which bonds are considered rotatable bonds
-     * @param addIterfragBonds if <code>true</code> includes all interfragment 
+     * @param addIterfragBonds if <code>true</code> includes all inter-fragment 
      * connections
      * @param excludeRings if <code>true</code> cyclic bonds will be excluded
      * @throws DENOPTIMException
@@ -90,11 +90,11 @@ public class RotationalSpaceUtils
     {
         ArrayList<ObjectPair> rotatableBonds = new ArrayList<ObjectPair>();
 
-	// Set all bond flags
-	for (IBond b : mol.bonds())
-	{
-             b.setProperty(DENOPTIMConstants.BONDPROPROTATABLE,"false");
-	}
+    	// Set all bond flags
+    	for (IBond b : mol.bonds())
+    	{
+                 b.setProperty(DENOPTIMConstants.BONDPROPROTATABLE,"false");
+    	}
 
         // Deal with interfragment bonds
         if (addIterfragBonds)
@@ -219,8 +219,8 @@ public class RotationalSpaceUtils
             bnd.setProperty(DENOPTIMConstants.BONDPROPROTATABLE, "true");
         }
 
-	if (excludeRings)
-	{
+    	if (excludeRings)
+    	{
             for (ObjectPair op : toRemove)
             {
                 rotatableBonds.remove(op);

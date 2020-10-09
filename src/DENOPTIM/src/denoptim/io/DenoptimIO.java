@@ -664,6 +664,15 @@ public class DenoptimIO
     	    {
     	        throw new DENOPTIMException("Cannot close FileOutputStream",t);
     	    }
+            try
+            {
+                oos.close();
+                oos = null;
+            } 
+            catch (Throwable t)
+            {
+                throw new DENOPTIMException("Cannot close ObjectOutputStream",t);
+            }
         }
     }
 
@@ -990,6 +999,7 @@ public class DenoptimIO
     
     public static Object deepCopy(Object oldObj) throws DENOPTIMException
     {
+        Object newObj = null;
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try
@@ -1002,8 +1012,11 @@ public class DenoptimIO
             ByteArrayInputStream bin =
                     new ByteArrayInputStream(bos.toByteArray());
             ois = new ObjectInputStream(bin);
-            // return the new object
-            return ois.readObject();
+            
+            oos.close();
+            
+            newObj = ois.readObject();
+            ois.close();
         }
         catch (IOException | ClassNotFoundException ioe)
         {
@@ -1027,6 +1040,7 @@ public class DenoptimIO
                 throw new DENOPTIMException(ioe);
             }
         }
+        return newObj;
     }
 
 //------------------------------------------------------------------------------

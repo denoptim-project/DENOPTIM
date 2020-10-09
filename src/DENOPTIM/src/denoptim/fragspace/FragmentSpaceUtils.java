@@ -95,12 +95,6 @@ public class FragmentSpaceUtils
 		    // Collect classes per fragment
 		    ArrayList<String> lstAPC = frg.getAllAPClasses();
 	        FragmentSpace.getMapAPClassesPerFragment().put(fragId,lstAPC);
-	
-	        
-	        //TODO-TU: the AP list on the vertex is empty because we have created the 
-	        // fragments from the constructor of the DENOPTIMFragment class, and added 
-	        // SPa with the DENOPTIMFragment.addAP, but we never copyed the list of 
-	        // APs in the verted. So the vertex returns an empty list!
 	        
 		    // Classify according to AP-Classes
 	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
