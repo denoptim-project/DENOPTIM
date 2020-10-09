@@ -1139,8 +1139,8 @@ if(debug)
     {
 
         // This is done to maintain a unique vertex-id mapping
-        GraphUtils.renumberGraphVertices(male);
-        GraphUtils.renumberGraphVertices(female);
+        male.renumberGraphVertices();
+        female.renumberGraphVertices();
 
         if(debug)
         {

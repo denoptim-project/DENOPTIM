@@ -108,118 +108,6 @@ public class GraphUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Change all vertex IDs to the corresponding negative value. For instance
-     * if the vertex ID is 12 this method changes it into -12.
-     * @param molGraph
-     */
-
-    @Deprecated
-    public static void changeSignToVertexID(DENOPTIMGraph molGraph)
-    {
-        HashMap<Integer, Integer> nmap = new HashMap<>();
-        for (int i=0; i<molGraph.getVertexCount(); i++)
-        {
-            int vid = molGraph.getVertexList().get(i).getVertexId();
-            int nvid = -vid;
-            nmap.put(vid, nvid);
-
-            molGraph.getVertexList().get(i).setVertexId(nvid);
-
-            for (int j=0; j<molGraph.getEdgeCount(); j++)
-            {
-                if (molGraph.getEdgeList().get(j).getSourceVertex() == vid)
-                        molGraph.getEdgeList().get(j).setSourceVertex(nvid);
-                if (molGraph.getEdgeList().get(j).getTargetVertex() == vid)
-                        molGraph.getEdgeList().get(j).setTargetVertex(nvid);
-            }
-        }
-        Iterator<SymmetricSet> iter = molGraph.getSymSetsIterator();
-        while (iter.hasNext())
-        {
-            SymmetricSet ss = iter.next();
-            for (int i=0; i<ss.getList().size(); i++)
-            {
-                ss.getList().set(i,nmap.get(ss.getList().get(i)));
-            }
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Reassign vertex IDs to a graph. 
-     * Before any operation is performed on the graph, its vertices are
-     * renumbered so as to differentiate them from their progenitors
-     * @param molGraph
-     *
-     */
-
-    public static void renumberGraphVertices(DENOPTIMGraph molGraph)
-    {
-        HashMap<Integer, Integer> nmap = renumberVerticesGetMap(molGraph);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Reassign vertex IDs to a graph. 
-     * Before any operation is performed on the graph, its vertices are 
-     * renumbered so as to differentiate them from their progenitors
-     * @param molGraph 
-     * @return the key to convert old IDs into new ones
-     */
-
-    public static HashMap<Integer,Integer> renumberVerticesGetMap(
-                                                         DENOPTIMGraph molGraph)
-    {
-        HashMap<Integer, Integer> nmap = new HashMap<>();
-
-        // for the vertices in the graph, get new vertex ids
-        Set<DENOPTIMEdge> doneSrc = new HashSet<DENOPTIMEdge>();
-        Set<DENOPTIMEdge> doneTrg = new HashSet<DENOPTIMEdge>();
-        for (int i=0; i<molGraph.getVertexCount(); i++)
-        {
-            int vid = molGraph.getVertexList().get(i).getVertexId();
-
-            int nvid = getUniqueVertexIndex();
-
-            nmap.put(vid, nvid);
-
-            molGraph.getVertexList().get(i).setVertexId(nvid);
-
-            // update all edges with vid
-            for (int j=0; j<molGraph.getEdgeCount(); j++)
-            {
-                DENOPTIMEdge e = molGraph.getEdgeList().get(j);
-                if (e.getSourceVertex() == vid && !doneSrc.contains(e))
-                {
-                    e.setSourceVertex(nvid);
-                    doneSrc.add(e);
-                }
-                if (e.getTargetVertex() == vid && !doneTrg.contains(e))
-                {
-                    e.setTargetVertex(nvid);
-                    doneTrg.add(e);
-                }
-            }
-        }
-        // Update the sets of symmetrix vertex IDs
-        Iterator<SymmetricSet> iter = molGraph.getSymSetsIterator();
-        while (iter.hasNext())
-        {
-            SymmetricSet ss = iter.next();
-            for (int i=0; i<ss.getList().size(); i++)
-            {
-                ss.getList().set(i,nmap.get(ss.getList().get(i)));
-            }
-        }
-    
-        return nmap;    
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Connects 2 vertices by an edge based on reaction type
      * @param vtxA source vertex
      * @param vtxB target vertex
@@ -755,7 +643,7 @@ public class GraphUtils
           //TODO-V3 get rid of serialization-based deep copying
             DENOPTIMGraph newGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(
                                                                       molGraph);
-            HashMap<Integer,Integer> vRenum = renumberVerticesGetMap(newGraph);
+            HashMap<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(getUniqueGraphIndex());
 
             // add rings
@@ -1581,7 +1469,7 @@ public class GraphUtils
         DENOPTIMGraph sgClone = subGraph.clone();
         
         //DENOPTIMGraph sgClone = (DENOPTIMGraph) DenoptimIO.deepCopy(subGraph);
-        GraphUtils.renumberGraphVertices(sgClone);
+        sgClone.renumberGraphVertices();
                
         // Make the connection between molGraph and subGraph
         DENOPTIMVertex cvClone = sgClone.getVertexAtPosition(

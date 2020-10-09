@@ -376,7 +376,7 @@ public class EAUtils
         //System.err.println("performMutation " + molGraph.getGraphId());
 
         // This is done to maintain a unique vertex-id mapping
-        GraphUtils.renumberGraphVertices(molGraph);
+        molGraph.renumberGraphVertices();
 
         if (FragmentSpace.useAPclassBasedApproach())
         {

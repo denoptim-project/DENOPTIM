@@ -81,8 +81,8 @@ public class TestOperator
             int ivfemale = female.getIndexOfVertex(TestOperatorParameters.fvid);
 
             // Ensure uniqeness on vertexID
-            GraphUtils.renumberGraphVertices(male);
-            GraphUtils.renumberGraphVertices(female);
+            male.renumberGraphVertices();
+            male.renumberGraphVertices();
 
             // Get new vid of chosen frags
             int newmvid = male.getVertexAtPosition(ivmale).getVertexId();

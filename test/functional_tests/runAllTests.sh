@@ -139,7 +139,7 @@ runTest "t1"
 #
 # t2: parallel combinatorial builder from given root (default format: STRING)
 #
-# runTest "t2"
+ runTest "t2"
 
 #
 # t3: parallel combinatorial builder with enforced symmetry
@@ -190,7 +190,7 @@ runTest "t9"
 #
 # t10: FragSpaceExplorer with symmetry constraints and enforced symmetry
 #
-runTest "t10"
+# runTest "t10"
 
 #
 # t11: Genetic algorithm running with enforced symmetry.

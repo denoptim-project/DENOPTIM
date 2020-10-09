@@ -1788,4 +1788,110 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Change all vertex IDs to the corresponding negative value. For instance
+     * if the vertex ID is 12 this method changes it into -12.
+     */
+
+    @Deprecated
+    public void changeSignToVertexID()
+    {
+        HashMap<Integer, Integer> nmap = new HashMap<>();
+        for (int i=0; i<getVertexCount(); i++)
+        {
+            int vid = getVertexList().get(i).getVertexId();
+            int nvid = -vid;
+            nmap.put(vid, nvid);
+
+            getVertexList().get(i).setVertexId(nvid);
+
+            for (int j=0; j<getEdgeCount(); j++)
+            {
+                if (getEdgeList().get(j).getSourceVertex() == vid) {
+                    getEdgeList().get(j).setSourceVertex(nvid);
+                }
+                if (getEdgeList().get(j).getTargetVertex() == vid) {
+                    getEdgeList().get(j).setTargetVertex(nvid);
+                }
+            }
+        }
+        Iterator<SymmetricSet> iter = getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricSet ss = iter.next();
+            for (int i=0; i<ss.getList().size(); i++)
+            {
+                ss.getList().set(i,nmap.get(ss.getList().get(i)));
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Reassign vertex IDs to a graph.
+     * Before any operation is performed on the graph, its vertices are
+     * renumbered so as to differentiate them from their progenitors
+     *
+     */
+
+    public void renumberGraphVertices()
+    {
+        renumberVerticesGetMap();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Reassign vertex IDs to a graph.
+     * Before any operation is performed on the graph, its vertices are
+     * renumbered so as to differentiate them from their progenitors
+     * @return the key to convert old IDs into new ones
+     */
+
+    public HashMap<Integer,Integer> renumberVerticesGetMap() {
+        HashMap<Integer, Integer> nmap = new HashMap<>();
+
+        // for the vertices in the graph, get new vertex ids
+        Set<DENOPTIMEdge> doneSrc = new HashSet<>();
+        Set<DENOPTIMEdge> doneTrg = new HashSet<>();
+        for (int i=0; i<getVertexCount(); i++)
+        {
+            int vid = getVertexList().get(i).getVertexId();
+            int nvid = GraphUtils.getUniqueVertexIndex();
+
+            nmap.put(vid, nvid);
+
+            getVertexList().get(i).setVertexId(nvid);
+
+            // update all edges with vid
+            for (int j=0; j<getEdgeCount(); j++)
+            {
+                DENOPTIMEdge e = getEdgeList().get(j);
+                if (e.getSourceVertex() == vid && !doneSrc.contains(e))
+                {
+                    e.setSourceVertex(nvid);
+                    doneSrc.add(e);
+                }
+                if (e.getTargetVertex() == vid && !doneTrg.contains(e))
+                {
+                    e.setTargetVertex(nvid);
+                    doneTrg.add(e);
+                }
+            }
+        }
+        // Update the sets of symmetrix vertex IDs
+        Iterator<SymmetricSet> iter = getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricSet ss = iter.next();
+            for (int i=0; i<ss.getList().size(); i++)
+            {
+                ss.getList().set(i,nmap.get(ss.getList().get(i)));
+            }
+        }
+
+        return nmap;
+    }
+
 }

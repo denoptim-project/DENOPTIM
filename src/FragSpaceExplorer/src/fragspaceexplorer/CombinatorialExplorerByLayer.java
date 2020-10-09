@@ -542,9 +542,9 @@ public class CombinatorialExplorerByLayer
                     // Vertex ID in root can be whatever and we ignore them
                     // when setting new vertex IDs. To do this, we change sign
                     // to the old IDs to avoid them clashing with the new ones,
-                    GraphUtils.changeSignToVertexID(rootGraph);
+                    rootGraph.changeSignToVertexID();
                     // ...and renumber starting from vertex ID = 1.
-                    GraphUtils.renumberGraphVertices(rootGraph);
+                    rootGraph.renumberGraphVertices();
                     rootGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
                     scafLevel.add(rootGraph);
                 }
