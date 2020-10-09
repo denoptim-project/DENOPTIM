@@ -392,8 +392,7 @@ public class GraphBuildingTask implements Callable
                     needsCaps = molGraph.graphNeedsCappingGroups();
                 }
 
-                ArrayList<DENOPTIMGraph> altCyclicGraphs =
-                                                new ArrayList<DENOPTIMGraph>();
+                ArrayList<DENOPTIMGraph> altCyclicGraphs = new ArrayList<DENOPTIMGraph>();
                 if (!needsCaps)
                 {
                     altCyclicGraphs =

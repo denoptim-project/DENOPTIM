@@ -2028,7 +2028,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         // 1D) unacceptable free APs
         if (FragmentSpace.useAPclassBasedApproach())
         {
-            if (GraphUtils.foundForbiddenEnd(this))
+            if (hasForbiddenEnd())
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
                 DENOPTIMLogger.appLogger.log(Level.INFO, msg);
@@ -2195,5 +2195,49 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         return lstGraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Check if there are forbidden ends: free attachment points that are not
+     * suitable for capping and not allowed to stay unused.
+     *
+     * @return <code>true</code> if a forbidden end is found
+     */
+
+    public boolean hasForbiddenEnd()
+    {
+        ArrayList<DENOPTIMVertex> vertices = getVertexList();
+        Set<String> classOfForbEnds = FragmentSpace.getForbiddenEndList();
+        boolean found = false;
+        for (DENOPTIMVertex vtx : vertices)
+        {
+            ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();
+            for (DENOPTIMAttachmentPoint dp : daps)
+            {
+                if (dp.isAvailable())
+                {
+                    String apClass = dp.getAPClass();
+                    if (classOfForbEnds.contains(apClass))
+                    {
+                        found = true;
+                        String msg = "Forbidden free AP for Vertex: "
+                                + vtx.getVertexId() + " "
+                                + vtx.toString()
+                                + "\n"+ this +" \n "
+                                + " AP class: " + apClass;
+                        DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                        break;
+                    }
+                }
+            }
+            if (found)
+            {
+                break;
+            }
+        }
+
+        return found;
     }
 }
