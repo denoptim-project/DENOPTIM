@@ -49,10 +49,10 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
             {
                 cnnA = 100;
             }
-	}
-	else
-	{
-            massA = a.getAtom().getMassNumber();
+    	}
+    	else
+    	{
+            massA = a.getAtom().getAtomicNumber();
         }
 
         if (b.isDummy())
@@ -64,7 +64,7 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
         }
         else
         {
-            massB = b.getAtom().getMassNumber();
+            massB = b.getAtom().getAtomicNumber();
         }
 
         //Decide on priority
