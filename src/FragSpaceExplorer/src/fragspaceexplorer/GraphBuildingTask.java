@@ -364,7 +364,7 @@ public class GraphBuildingTask implements Callable
             }
 
             // Evaluate graph
-            Object[] res = GraphUtils.evaluateGraph(molGraph);
+            Object[] res = molGraph.evaluateGraph();
             if (res == null) // null is used to indicate an unacceptable graph
             {
                 if (verbosity > 1)

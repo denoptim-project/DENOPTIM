@@ -24,12 +24,22 @@ import java.util.*;
 import com.hp.hpl.jena.graph.GraphUtil;
 
 import java.io.Serializable;
+import java.util.logging.Level;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.ClosableChain;
+import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
+import org.openscience.cdk.graph.ConnectivityChecker;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 
 /**
@@ -1910,6 +1920,198 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex denoptimVertex : lstVert) {
             denoptimVertex.setLevel(denoptimVertex.getLevel() + correction);
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Finalizes a candidate chemical entity by evaluating its
+     * <code>DENOPTIMGraph</code> and assigning preliminary molecular,
+     * SMILES and INCHI representations.
+     * The chemical entity is evaluated also against the
+     * criteria defined by <code>FragmentSpaceParameters</code> and
+     * <code>RingClosureParameters</code>.
+     * <b>WARNING</b> Although Cartesian coordinates are assigned to each atom
+     * and pseudo-atom in the molecular representation ,
+     * such coordinates do <b>NOT</b> represent a valid 3D model.
+     * As a consequence stereochemical descriptors in the INCHI representation
+     * are not consistent with the actual arrangement of fragments.
+     * @return an object array containing the inchi code, the SMILES string
+     *         and the 2D representation of the molecule.
+     *         <code>null</code> is returned if any check or conversion fails.
+     * @throws DENOPTIMException
+     */
+
+    public Object[] evaluateGraph()
+            throws DENOPTIMException
+    {
+        // calculate the molecule representation
+        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(this,
+                true);
+        if (mol == null)
+        {
+            String msg ="Evaluation of graph: graph-to-mol returned null!"
+                    + toString();
+            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            return null;
+        }
+
+        // check if the molecule is connected
+        boolean isConnected = ConnectivityChecker.isConnected(mol);
+        if (!isConnected)
+        {
+            String msg = "Evaluation of graph: Not all connected"
+                    + toString();
+            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            return null;
+        }
+
+        // SMILES
+        String smiles = null;
+        smiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
+        if (smiles == null)
+        {
+            String msg = "Evaluation of graph: SMILES is null! "
+                    + toString();
+            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            smiles = "FAIL: NO SMILES GENERATED";
+        }
+        // if by chance the smiles indicates a disconnected molecule
+        if (smiles.contains("."))
+        {
+            String msg = "Evaluation of graph: SMILES contains \".\"" + smiles;
+            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            return null;
+        }
+
+        // criteria from definition of Fragment space
+        // 1A) number of heavy atoms
+        if (FragmentSpaceParameters.getMaxHeavyAtom() > 0)
+        {
+            if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
+                    FragmentSpaceParameters.getMaxHeavyAtom())
+            {
+                String msg = "Evaluation of graph: Max atoms constraint "
+                        + " violated: " + smiles;
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                return null;
+            }
+        }
+
+        // 1B) molecular weight
+        double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
+        if (FragmentSpaceParameters.getMaxMW() > 0)
+        {
+            if (mw > FragmentSpaceParameters.getMaxMW())
+            {
+                String msg = "Evaluation of graph: Molecular weight "
+                        + "constraint violated: " + smiles + " | MW: " + mw;
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                return null;
+            }
+        }
+        mol.setProperty("MOL_WT", mw);
+
+        // 1C) number of rotatable bonds
+        int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
+        if (FragmentSpaceParameters.getMaxRotatableBond() > 0)
+        {
+            if (nrot > FragmentSpaceParameters.getMaxRotatableBond())
+            {
+                String msg = "Evaluation of graph: Max rotatable bonds "
+                        + "constraint violated: "+ smiles;
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                return null;
+            }
+        }
+        mol.setProperty("ROT_BND", nrot);
+
+        // 1D) unacceptable free APs
+        if (FragmentSpace.useAPclassBasedApproach())
+        {
+            if (GraphUtils.foundForbiddenEnd(this))
+            {
+                String msg = "Evaluation of graph: forbidden end in graph!";
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                return null;
+            }
+        }
+
+        // criteria from settings of ring closures
+        if (RingClosureParameters.allowRingClosures())
+        {
+            // Count rings and RCAs
+            int nPossRings = 0;
+            Set<String> doneType = new HashSet<>();
+            Map<String,String> rcaTypes = DENOPTIMConstants.RCATYPEMAP;
+            for (String rcaTyp : rcaTypes.keySet())
+            {
+                if (doneType.contains(rcaTyp))
+                {
+                    continue;
+                }
+
+                int nThisType = 0;
+                int nCompType = 0;
+                for (IAtom atm : mol.atoms())
+                {
+                    if (atm.getSymbol().equals(rcaTyp))
+                    {
+                        nThisType++;
+                    }
+                    else if (atm.getSymbol().equals(rcaTypes.get(rcaTyp)))
+                    {
+                        nCompType++;
+                    }
+                }
+
+                // check number of rca per type
+                if (nThisType > RingClosureParameters.getMaxRcaPerType() ||
+                        nCompType > RingClosureParameters.getMaxRcaPerType())
+                {
+                    String msg = "Evaluation of graph: too many RCAs! "
+                            + rcaTyp + ":" + nThisType + " "
+                            + rcaTypes.get(rcaTyp) + ":" + nCompType;
+                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    return null;
+                }
+                if (nThisType < RingClosureParameters.getMinRcaPerType() ||
+                        nCompType < RingClosureParameters.getMinRcaPerType())
+                {
+                    String msg = "Evaluation of graph: too few RCAs! "
+                            + rcaTyp + ":" + nThisType + " "
+                            + rcaTypes.get(rcaTyp) + ":" + nCompType;
+                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    return null;
+                }
+
+                nPossRings = nPossRings + Math.min(nThisType, nCompType);
+                doneType.add(rcaTyp);
+                doneType.add(rcaTypes.get(rcaTyp));
+            }
+            if (nPossRings < RingClosureParameters.getMinRingClosures())
+            {
+                String msg = "Evaluation of graph: too few ring candidates";
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                return null;
+            }
+        }
+
+        // get the smiles/Inchi representation
+        ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
+        if (pr.getFirst() == null)
+        {
+            String msg = "Evaluation of graph: INCHI is null!";
+            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            pr.setFirst("UNDEFINED_INCHI");
+        }
+
+        Object[] res = new Object[3];
+        res[0] = pr.getFirst(); // inchi
+        res[1] = smiles; // smiles
+        res[2] = mol;
+
+        return res;
     }
 
 }
