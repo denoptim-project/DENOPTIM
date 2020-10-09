@@ -24,7 +24,9 @@ import java.util.Map;
 
 import javax.vecmath.Point3d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.Bond;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -111,7 +113,33 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         super (vertexId);
         
         //TODO-V3 get rid of serialization-based deep copying
-        this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
+        
+        //this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
+        
+        this.mol = new AtomContainer();
+        for (IAtom oAtm : mol.atoms())
+        {
+            IAtom nAtm = new Atom(oAtm.getSymbol());
+            if (oAtm.getPoint3d() != null)
+            {
+                Point3d p3d = oAtm.getPoint3d();
+                nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
+            }
+            //TODO-V3 we might need to get more...
+            this.mol.addAtom(nAtm);
+        }
+        
+        for (IBond oBnd : mol.bonds())
+        {
+            if (oBnd.getAtomCount() != 2)
+            {
+                throw new DENOPTIMException("Unable to deal with bonds "
+                        + "involving more than two atoms.");
+            }
+            int ia = mol.getAtomNumber(oBnd.getAtom(0));
+            int ib = mol.getAtomNumber(oBnd.getAtom(1));
+            this.mol.addBond(ia,ib,oBnd.getOrder());
+        }
         
         Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
         if (prop != null)
