@@ -120,9 +120,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param bbType the type of building block 0:scaffold, 1:fragment, 
      * 2:capping group
      */
-    public static DENOPTIMVertex newFragVertex(int bbId, int bbType)
+    public static DENOPTIMVertex newVertexFromLibrary(int bbId, int bbType)
     {
-        return newFragVertex(GraphUtils.getUniqueVertexIndex(), bbId, bbType);
+        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(), bbId, bbType);
     }
     
 //------------------------------------------------------------------------------
@@ -131,14 +131,20 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Builds a new molecular fragment kind of vertex.
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
-     * @param bbType the type of building block 0:scaffold, 1:fragment, 2:capping group
+     * @param bbType the type of building block 0:scaffold, 1:fragment, 
+     * 2:capping group
      */
-    public static DENOPTIMVertex newFragVertex(int vertexId, int bbId, int bbType)
+    public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
+            int bbType)
     {   
+        // This is just to initialise the vertex. The actual type of vertex
+        // returned by this method depends on the what we get from the
+        // FragmentSpace.getVertexFromLibrary call
         DENOPTIMVertex v = new EmptyVertex();
         try
         {
-            v = FragmentSpace.getVertexFromLibrary(bbType,bbId).clone();
+            //NB: this returns a clone of the vertex stored in the library
+            v = FragmentSpace.getVertexFromLibrary(bbType,bbId);
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -148,10 +154,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         v.setVertexId(vertexId);
         
-        v.setAsRCV(v.getNumberOfAP() == 1 
+        if (v instanceof DENOPTIMFragment)
+        {
+            v.setAsRCV(v.getNumberOfAP() == 1 
                 && DENOPTIMConstants.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
-        
+        }
         return v;
     }
 

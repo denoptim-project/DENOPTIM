@@ -790,7 +790,7 @@ public class CombinatorialExplorerByLayer
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
         //TODO-V3: use a vertex constructor that is type-agnostic
-        DENOPTIMVertex scafVertex = DENOPTIMVertex.newFragVertex(
+        DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(),scafIdx,0);
 
         // as in DenoptimGA, though level=-1 is a bit misleading

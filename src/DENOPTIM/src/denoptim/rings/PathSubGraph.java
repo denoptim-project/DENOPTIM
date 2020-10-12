@@ -198,7 +198,7 @@ public class PathSubGraph
             }
         }
 
-        // find xor plus junction vertex
+        // find XOR plus junction vertex
         vertPathVAVB = new ArrayList<DENOPTIMVertex>();
         edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
         turningPointVert = null;
@@ -249,9 +249,12 @@ public class PathSubGraph
             //TODO-V3 chainID uses molId and fragType from DENOPTIMFragment
             // Therefore, vertexes that are not instances of DENOPTIMFragment
             // cannot yet be used.
+            // When we'll have APs with owner we'll be able to build the path
+            // following AP ownership and, thus, we should be able to get the
+            // path from the Template's graph (recursion?).
             if (vertHere instanceof DENOPTIMFragment == false)
             {
-                Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
+                Exception e = new Exception("TODO: Upgrade code to include handling of Templates!!!");
                 e.printStackTrace();
                 System.err.println("ERROR! Current managment of chains cannot "
                         + "handle vertexes that are NOT intances of "
@@ -263,7 +266,7 @@ public class PathSubGraph
             
             chainID = chainID + vertFrgHere.getMolId() + "/"
                               + vertFrgHere.getFragmentType() + "/" + "ap";
-	    String leftRevChainID = vertFrgHere.getMolId() + "/"
+            String leftRevChainID = vertFrgHere.getMolId() + "/"
                                   + vertFrgHere.getFragmentType() + "/" + "ap";
 
             int apIdBack2Here = -1;
@@ -297,7 +300,7 @@ public class PathSubGraph
             }
 
             chainID = chainID + apIdHere2Back + "ap" + apIdHere2Frnt + "_";
-	    revChainID = leftRevChainID + apIdHere2Frnt + "ap"
+            revChainID = leftRevChainID + apIdHere2Frnt + "ap"
 			     + apIdHere2Back + "_" + revChainID; 
 
             // Build the DENOPTIMGraph with edges directed from VA to VB
@@ -321,7 +324,8 @@ public class PathSubGraph
                                             edgeToFrnt.getBondType()));
             }
         }
- 
+
+        // Build the DENOPTIMGraph with edges directed from VA to VB
         this.graph = new DENOPTIMGraph(gVertices,gEdges);
 
     	// prepare alternative chain IDs
@@ -350,6 +354,7 @@ public class PathSubGraph
     	    allPossibleChainIDs.add(altrnB);
     	}
     }
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -600,20 +605,10 @@ public class PathSubGraph
         hasMolRepr = true;
     }
 
-//----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-
-    /**
-     * Returns all the possible IDs for this chain. The alternatived differ in
-     * the position of the chord.
-     */
-
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the string representation of the path
+     * Returns the string representation of the path
      */
 
     public String getChainID()
@@ -624,7 +619,8 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the string representation of the path
+     * Returns all the possible IDs for this chain. The alternatives differ in
+     * the position of the chord.
      */
 
     public ArrayList<String> getAllAlternativeChainIDs()
@@ -635,7 +631,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the vertex representing the head of the chain
+     * Returns the vertex representing the head of the chain
      */
 
     public DENOPTIMVertex getHeadVertex()
@@ -646,7 +642,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the vertex representing the tail of the chain
+     * Returns the vertex representing the tail of the chain
      */
 
     public DENOPTIMVertex getTailVertex()
@@ -657,7 +653,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the list of verteces involved
+     * Returns the list of verteces involved
      */
 
     public List<DENOPTIMVertex> getVertecesPath()
@@ -668,7 +664,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the list of edges involved
+     * Returns the list of edges involved
      */
 
     public List<DENOPTIMEdge> getEdgesPath()
@@ -690,7 +686,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns the  molecular representation 
+     * Returns the molecular representation 
      */
     public IAtomContainer getMolecularRepresentation()
     {
@@ -700,7 +696,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the list of atoms in the path between the head and the tail
+     * Returns the list of atoms in the path between the head and the tail
      */
 
     public List<IAtom> getAtomPath()
@@ -711,7 +707,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the string with atom symbols and number for an easy
+     * Returns the string with atom symbols and number for an easy
      * identification of the path in a molecular structure
      */
 
@@ -723,7 +719,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the list of bonds in the path between the head and the tail.
+     * Returns the list of bonds in the path between the head and the tail.
      * Note that the <code>IBond</code>s are those of the entire molecule
      * not of the <code>IAtomContainer</code> representing only this path.
      */
@@ -749,7 +745,7 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Retruns the ring closing conformations
+     * Returns the ring closing conformations
      */
 
     public RingClosingConformations getRCC()

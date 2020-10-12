@@ -234,7 +234,7 @@ public class FragmentSpace
 //            System.err.println("Added test template to fragment library");
             scaffoldLib = new ArrayList<>();
             scaffoldLib.add(DENOPTIMTemplate.getTestTemplate());
-            System.err.println("Replaced scaffold lib with single test template");
+            System.err.println("WARNING! Running TEMP CODE: Replaced scaffold lib with single test template");
         }
     }
     
@@ -359,17 +359,22 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Returns a clone of the requested building block.
+     * Returns a clone of the requested building block. The type of vertex
+     * returned depends on the type stored in the library.
      * 
      * @param bbTyp the type of building block. This basically selects the 
-     * sub library from which the building block is taken: 0 for scaffold, 1 for
-     * standard fragment, 2 for capping group.
+     * sub library from which the building block is taken: 0 for scaffold (i.e.,
+     * building blocks that can be used to start a new graph), 1 for
+     * standard building blocks (i.e., can be used freely to grow or modify an 
+     * existing graph), or 2 for capping group (i.e., can be used only to 
+     * saturate attachment points that cannot remain unused in a finished
+     * graph).
      * @param bbIdx the index (0-based) of the building block in
-     * the corresponding library, which is defied by the type of building 
+     * the corresponding library defied by the type of building 
      * block 'bbType'
-     * @return the chosen vertex, possibly including its molecular 
-     * representation.
-     * @throws DENOPTIMException
+     * @return a clone of the chosen building block.
+     * @throws DENOPTIMException when the given indexes cannot be used, for
+     * example, any of the indexes is out of range.  
      */
 
     public static DENOPTIMVertex getVertexFromLibrary(int bbTyp, int bbIdx) 
@@ -405,33 +410,33 @@ public class FragmentSpace
 			    }
 			    break;
 			case 1:
-		            if (bbIdx < fragmentLib.size())
-		            {
-		                originalVrtx = fragmentLib.get(bbIdx);
-		            }
-		            else
-		            {
-		                msg = "Mismatch between fragment bbIdx and size of the "
-		                		+ "library" + ". MolId: " + bbIdx 
-		                		+ " FragType: " + bbTyp;
-		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-		                throw new DENOPTIMException(msg);
-		            }
+	            if (bbIdx < fragmentLib.size())
+	            {
+	                originalVrtx = fragmentLib.get(bbIdx);
+	            }
+	            else
+	            {
+	                msg = "Mismatch between fragment bbIdx and size of the "
+	                		+ "library" + ". MolId: " + bbIdx 
+	                		+ " FragType: " + bbTyp;
+	                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+	                throw new DENOPTIMException(msg);
+	            }
 			    break;
 			case 2:
-		            if (bbIdx < cappingLib.size())
-		            {
-		                originalVrtx = cappingLib.get(bbIdx);
-		            }
-		            else
-		            {
-		                msg = "Mismatch between capping group bbIdx and size "
-		                		+ "of the library. MolId: " + bbIdx 
-		                		+ " FragType: " + bbTyp;
-		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-		                throw new DENOPTIMException(msg);
-		            }
-		            break;
+	            if (bbIdx < cappingLib.size())
+	            {
+	                originalVrtx = cappingLib.get(bbIdx);
+	            }
+	            else
+	            {
+	                msg = "Mismatch between capping group bbIdx and size "
+	                		+ "of the library. MolId: " + bbIdx 
+	                		+ " FragType: " + bbTyp;
+	                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+	                throw new DENOPTIMException(msg);
+	            }
+	            break;
 			default:
 			    msg = "Unknown type of fragment '" + bbTyp + "'.";
 		            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
@@ -445,11 +450,17 @@ public class FragmentSpace
 		{
     		((DENOPTIMFragment) clone).setMolId(bbIdx);
     		((DENOPTIMFragment) clone).setFragmentType(bbTyp);
-		} 
-		else 
+		}
+		//TODO-V3 keep it or trash it
+		else if (clone instanceof DENOPTIMTemplate)
+        {
+            ((DENOPTIMTemplate) clone).setMolId(bbIdx);
+            ((DENOPTIMTemplate) clone).setFragmentType(bbTyp);
+        }
+        else 
 		{
 		    System.err.println("WARNING! Recovering a vertex that is not an"
-		            + " instance of fragment.");
+		            + " instance of fragment. Not setting bbType and bbIdx.");
 		}
 		
         return clone;

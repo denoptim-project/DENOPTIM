@@ -1769,7 +1769,7 @@ public class GraphUtils
                                                       int trgAPIdx) 
                                                       throws DENOPTIMException
     {
-        DENOPTIMVertex incomingVertex = DENOPTIMVertex.newFragVertex(fId, fTyp);
+        DENOPTIMVertex incomingVertex = DENOPTIMVertex.newVertexFromLibrary(fId, fTyp);
 
         int lvl = curVertex.getLevel();
         incomingVertex.setLevel(lvl+1);

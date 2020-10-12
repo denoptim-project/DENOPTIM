@@ -326,7 +326,7 @@ public class GraphBuildingTask implements Callable
                 }
     
                 //TODO-V3: use a type-agnostic w.r.t vertex constructor
-                DENOPTIMVertex trgVrtx = DENOPTIMVertex.newFragVertex(tVId, tFId, tFTyp);
+                DENOPTIMVertex trgVrtx = DENOPTIMVertex.newVertexFromLibrary(tVId, tFId, tFTyp);
                 
                 //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
                 /*

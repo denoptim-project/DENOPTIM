@@ -6,8 +6,10 @@ import java.util.List;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
+import org.apache.commons.math3.util.OpenIntToDoubleHashMap.Iterator;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -27,12 +29,23 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 //  provided upon instantiation.
 //
 
-public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBlock 
+public class DENOPTIMTemplate extends DENOPTIMVertex
 {
     /**
      * Version UID
      */
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * Index of the graph building block contained in the vertex
+     */
+    private int buildingBlockId = -99; //Initialised to meaningless value
+    
+    //TODO-V3 to enum
+    /*
+     * 0:scaffold, 1:fragment, 2:capping group
+     */
+    private int buildingBlockType = -99; //Initialised to meaningless value
 
     /**
      * interior graph of the template that can be constrained in various ways depending on the
@@ -66,6 +79,42 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
         DENOPTIMTemplate template = new DENOPTIMTemplate();
         return template;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *
+     * @return the id of the molecule
+     */
+    public int getMolId()
+    {
+        return buildingBlockId;
+    }
+
+//------------------------------------------------------------------------------
+
+    public void setMolId(int m_molId)
+    {
+        buildingBlockId = m_molId;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     *
+     * @return <code>true</code> if vertex is a fragment
+     */
+    public int getFragmentType()
+    {
+        return buildingBlockType;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void setFragmentType(int fType)
+    {
+        buildingBlockType = fType;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -73,6 +122,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
      * @return Template with a random, unconstrained interior graph. The interior graph consists of one fragment.
      * The exterior attachment points are those of the initial fragment.
      */
+    
     /*
     public static DENOPTIMTemplate getRandomTemplate() {
         // TODO: Implement method
@@ -87,26 +137,23 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
     }
     */
 
-    public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs() 
-    {
-        return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
-    }
-
 //------------------------------------------------------------------------------
 
-    /*
+    /**
      * Method meant for devel phase only. 
      */
-    //TODO: Remove.
+    //TODO-V3 Remove.
 
     public static DENOPTIMTemplate getTestTemplate() 
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate();
+        
+        
 
         // Adding fully defined vertexes (they point to an actual fragment
-        DENOPTIMVertex vA = DENOPTIMVertex.newFragVertex(
+        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, 1);
-        DENOPTIMVertex vB = DENOPTIMVertex.newFragVertex(
+        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 1, 1);
         template.interiorGraph.addVertex(vA);
         template.interiorGraph.addVertex(vB);
@@ -115,20 +162,18 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
         DENOPTIMAttachmentPoint apOnA = vA.getAttachmentPoints().get(0);
         DENOPTIMAttachmentPoint apOnB = vB.getAttachmentPoints().get(1);
         String srcAPClass = apOnA.getAPClass();
-        String trgAPClass = apOnA.getAPClass();
-        DENOPTIMEdge eAB = new DENOPTIMEdge(
-                vA.getVertexId(),
-                vB.getVertexId(),
-                0,
-                1,
-                FragmentSpace.getBondOrderForAPClass(apOnA.getAPRule()),
-                srcAPClass,
-                trgAPClass
-        );
+        String trgAPClass = apOnB.getAPClass();
+        DENOPTIMEdge eAB = GraphUtils.connectVertices(vA,vB,0,1,srcAPClass,trgAPClass);
 
         template.interiorGraph.addEdge(eAB);
+        
 
-//        System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
+        //TODO del
+        System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
+        System.out.println("TEMPLATE's APs: ");
+        for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints())
+            System.out.println("  "+ap+" free="+ap.isAvailable());
+        
         
         return template;
     }
@@ -154,114 +199,126 @@ public class DENOPTIMTemplate extends DENOPTIMVertex implements IGraphBuildingBl
      */
     public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
     {
-    	//TODO: probably this will change
-        return interiorGraph.getVertexAtPosition(0).getAttachmentPoints();
+        return interiorGraph.getAvailableAPs();
     }
 
 //------------------------------------------------------------------------------
     
     /**
-     * Returns the list of attachment points
-     * @return the list of APs
+     * Returns a deep copy of this template
+     * @return the deep copy
      */
     public DENOPTIMTemplate clone()
     {
-    	//TODO: implement deep cloning. Now it just returns the original ;-)
+    	//TODO-V3: implement deep cloning. Now it just building a new test template
     	return getTestTemplate();
-    }
-
-//------------------------------------------------------------------------------
-    
-    //TODO
-	public ArrayList<String> getAllAPClassess() {
-		ArrayList<String> l = new ArrayList<String>();
-		l.add("templateAPClass");
-		return l;
-	}
-
-//------------------------------------------------------------------------------
-
-	//TODO
-	public int getAPCount() {
-		return 1;
-	}
-
-//------------------------------------------------------------------------------
-
-    @Override
-    public ArrayList<SymmetricSet> getSymmetricAPsSets()
-    {
-        // TODO Now this returns an empty list, but it will have to detect
-        // the symmetric sets in the underlying graph
-        return new ArrayList<>();
     }
     
 //-----------------------------------------------------------------------------
     
-    //TODO: this will probably change, not it is useful for debugging
+    //TODO: this will probably change, now it is useful for debugging
     public DENOPTIMGraph getEmbeddedGraph()
     {
         return interiorGraph;
     }
-
-    public void setInteriorGraph(DENOPTIMGraph graph) {
-        if (!graph.getAvailableAPs().containsAll(exteriorAPs)) {
+    
+//-----------------------------------------------------------------------------
+    
+    protected void setInteriorGraph(DENOPTIMGraph graph) 
+    {
+        //TODO-V3 is this condition really sensible?
+        if (!graph.getAvailableAPs().containsAll(exteriorAPs)) 
+        {
             throw new IllegalArgumentException("Graph must have vacant APs " +
                     "same as exteriorAPs");
         }
-
     }
+    
+//-----------------------------------------------------------------------------
 
-    public void setExteriorAPs(List<DENOPTIMAttachmentPoint> exteriorAPs) {
+    protected void setExteriorAPs(List<DENOPTIMAttachmentPoint> exteriorAPs) {
         this.exteriorAPs = exteriorAPs;
     }
 
+//-----------------------------------------------------------------------------
+    
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return interiorGraph.getAttachmentPoints();
     }
-
+    
+//-----------------------------------------------------------------------------
+    
+    // NB: since the list of APs of a template depends on the embedded graph,
+    // setting a list of APs on a template should not be needed/useful. 
+    // However, we need a way to set the constrained (i.e., required) APs that
+    // a template must guarantee.
+    // What we want to do on a template is to define a the constrains w.r.t.
+    // the list of APs, rather than set the sets of list of APs itself.
     @Override
-    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP)
+    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP)
     {
         // TODO Auto-generated method stub
-        
     }
 
+//-----------------------------------------------------------------------------
+    
+    //NB: since the symmetry depends on the embedded graph, what we want to do 
+    // on a template is define a symmetry constrain rather than set the sets of 
+    // symmetric vertices
     @Override
     protected void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap)
     {
         // TODO Auto-generated method stub
         
     }
-
+    
+//-----------------------------------------------------------------------------
+    
     @Override
     public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
-        // TODO Auto-generated method stub
-        return null;
+        //TODO-V3: this cannot yet be done on a template because the 
+        // SymmetricSet class holds only one set of integer identifiers that 
+        // can be used to identify symmetric things like vertexes in a graph,
+        // or APs belonging to the SAME vertex. However, the symmetric APs on 
+        // a template can belong to different vertexes, meaning that 
+        // identifying these APs with indexes requires at least two sets of
+        // indexes (one for the vertex, one for the AP).
+        // For the moment, we cannot return a sensible ArrayList<SymmetricSet>
+        // thus we return an empty one.
+        return new ArrayList<SymmetricSet>();
     }
 
+//-----------------------------------------------------------------------------
+       
     @Override
     public int getHeavyAtomsCount()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return interiorGraph.getHeavyAtomsCount();
     }
 
+//-----------------------------------------------------------------------------
+    
     @Override
     public boolean containsAtoms()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return interiorGraph.containsAtoms();
     }
 
+//-----------------------------------------------------------------------------
+    
     @Override
     public IAtomContainer getIAtomContainer()
     {
-        // TODO Auto-generated method stub
+        try
+        {
+            return GraphConversionTool.convertGraphToMolecule(interiorGraph, true);
+        } catch (DENOPTIMException e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
