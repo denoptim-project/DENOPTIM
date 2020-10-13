@@ -90,7 +90,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     /**
      * The direction vector representing the bond direction
      */
-    private double[] dirVec; 
+    private double[] dirVec;
+
+    /**
+     * The vertex to which this AP is attached to.
+     */
+    private DENOPTIMVertex owner;
 
 
 //------------------------------------------------------------------------------
@@ -394,7 +399,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * to the number of unsaturated valences that can still be used on this 
      * attachment point. This is useful for attachment points that do not follow
      * the APClass-based formalism.
-     * @param m_apConnections
+     * @param m_freeConnections
      */
     public void setFreeConnections(int m_freeConnections)
     {
@@ -470,11 +475,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 				numSep++;
 			}
 		}
-		
-		if (1 != numSep)
-			return false;
-		
-		return true;
+
+        return 1 == numSep;
     }
 
 //------------------------------------------------------------------------------
@@ -721,7 +723,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	        {
 	        	return false;
 	        }
-	        
+
 	        if (Math.abs(this.getDirectionVector()[2]
 	        		-other.getDirectionVector()[2])
 	        		> trslh)
@@ -846,4 +848,41 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
                 && strB != null
                 && strA.compareToIgnoreCase(strB) == 0;
     }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Joins this AP and other through a DENOPTIMEdge
+     * @param other
+     * @return DENOPTIMEdge with this and other as endpoints
+     */
+
+    public DENOPTIMEdge join(DENOPTIMAttachmentPoint other) {
+        DENOPTIMEdge edge = new DENOPTIMEdge(getOwner().getVertexId(),
+                other.getOwner().getVertexId(),
+                getID(),
+                other.getID(),
+                other.getBondOrder()
+        );
+        if (FragmentSpace.useAPclassBasedApproach()) {
+            edge.setSourceReaction(getAPClass());
+            edge.setSourceReaction(other.getAPClass());
+        }
+        return edge;
+    }
+
+//-----------------------------------------------------------------------------
+
+    private int getBondOrder() {
+        return FragmentSpace.getBondOrderForAPClass(this.getAPClass());
+    }
+
+//-----------------------------------------------------------------------------
+
+    public DENOPTIMVertex getOwner() {
+        return owner;
+    }
+
+//-----------------------------------------------------------------------------
+
 }

@@ -1208,9 +1208,14 @@ if(debug)
     public static boolean performCrossover(DENOPTIMGraph male, int mvid,
                         DENOPTIMGraph female, int fvid) throws DENOPTIMException
     {
+        //TODO-V3 massive use of pointers (i.e., integers pointing to a position 
+        // in a list of things) should be replaced with use of references
+        
         if(debug)
         {
             System.err.println("Crossover on vertices " + mvid + " " + fvid);
+            System.err.println("Male graph:   "+male);
+            System.err.println("Female graph: "+female);
         }
 
         // get details about crosover points
@@ -1228,72 +1233,106 @@ if(debug)
 
         if(debug)
         {
-            int fragid_M = mvert.getMolId();
-            int fragid_F = fvert.getMolId();
-            System.err.println("Male XOVER frag   molID: " + fragid_M);
-            System.err.println("Female XOVER frag molID: " + fragid_F);
+            System.err.println("Male XOVER vertex: " + mvert);
+            System.err.println("Female XOVER vertex: " + fvert);
         }
 
         // Identify all verteces symmetric to the ones chosen for xover
         // Xover is to be projected on each of these
         
-        //TODO-V3 del
-        /*
-        ArrayList<Integer> symVrtIDs_M = 
-                        GraphUtils.getSymmetricVertices(male, mvert,
-                             FragmentSpace.useAPclassBasedApproach());
-        ArrayList<Integer> symVrtIDs_F =
-                        GraphUtils.getSymmetricVertices(female, fvert,
-                            FragmentSpace.useAPclassBasedApproach());
-                            */
         ArrayList<Integer> symVrtIDs_M = 
                 male.getSymSetForVertexID(mvert.getVertexId()).getList();
         ArrayList<Integer> symVrtIDs_F = 
                 female.getSymSetForVertexID(fvert.getVertexId()).getList();
         
+        if (debug)
+        {
+            System.out.println("DBUG: MALE sym sites: "+symVrtIDs_M);
+
+            System.out.println("DBUG: FEMALE sym sites: "+symVrtIDs_F);
+        }
+        
         // MALE: Find all parent verteces and AP indeces where the incoming 
         // graph will have to be placed
         ArrayList<DENOPTIMVertex> symParVertM = new ArrayList<DENOPTIMVertex>();
         ArrayList<Integer> symmParAPidxM = new ArrayList<Integer>();
+        ArrayList<Integer> toRemoveFromM = new ArrayList<Integer>();
         for (int i=0; i<symVrtIDs_M.size(); i++)
         {
             int svid = symVrtIDs_M.get(i);
+            if (svid == mvid)
+            {
+                // We keep only the branch of the vertex identified for crossover
+                continue;
+            }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = male.getEdgeWithParent(svid);
             DENOPTIMVertex spv = male.getParent(svid);
             symParVertM.add(spv);
             symmParAPidxM.add(se.getSourceDAP());
+<<<<<<< HEAD
             //Delete the symmetric vertex 
             male.deleteVertex(svid);
+=======
+            toRemoveFromM.add(svid);
+        }
+        for (Integer svid : toRemoveFromM)
+        {
+            GraphUtils.deleteVertex(male, svid);
+>>>>>>> 664f8d7ba007d7022eca53fcf02e3075879578d0
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
         symmParAPidxM.add(apidxMP);
+        if (debug)
+        {
+            System.out.println("DEBUG: MALE After removal of symm:");
+            System.out.println("DEBUG: "+male);
+        }
 
         // FEMALE Find all parent verteces and AP indeces where the incoming
         // graph will have to be placed
         ArrayList<DENOPTIMVertex> symParVertF = new ArrayList<DENOPTIMVertex>();
         ArrayList<Integer> symmParAPidxF = new ArrayList<Integer>();
+        ArrayList<Integer> toRemoveFromF = new ArrayList<Integer>();
         for (int i=0; i<symVrtIDs_F.size(); i++)
         {
             int svid = symVrtIDs_F.get(i);
+            if (svid == fvid)
+            {
+                // We keep only the branch of the vertex identified for crossover
+                continue;
+            }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = female.getEdgeWithParent(svid);
             DENOPTIMVertex spv = female.getParent(svid);
             symParVertF.add(spv);
             symmParAPidxF.add(se.getSourceDAP());
+<<<<<<< HEAD
             //Delete the symmetric vertex
             female.deleteVertex(svid);
+=======
+            toRemoveFromF.add(svid);
+        }
+        for (Integer svid : toRemoveFromF)
+        {
+            GraphUtils.deleteVertex(female, svid);
+>>>>>>> 664f8d7ba007d7022eca53fcf02e3075879578d0
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        
         symmParAPidxF.add(apidxFP);
+        if (debug)
+        {
+            System.out.println("DEBUG: FEMALE After removal of symm:");
+            System.out.println("DEBUG: "+female);
+        }
 
         // record levels: we'll need to set them in the incoming subgraphs
-        int lvl_male = male.getVertexWithId(mvid).getLevel();
-        int lvl_female = female.getVertexWithId(fvid).getLevel();
+        int lvl_male = mvert.getLevel();
+        int lvl_female = fvert.getLevel();
 
-        // extract subgraphs (i.e., branched of graphs that will be exchanged)
+        // extract subgraphs (i.e., branches of graphs that will be exchanged)
         if (debug)
         {
             System.out.println("DBUG: MALE sites for FEMALE subGraph:");

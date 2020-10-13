@@ -366,36 +366,6 @@ public class GraphUtils
      * Append a graph (incoming=I) onto another graph (receiving=R).
      * This method ignores symmetry.
      * @param molGraph the receiving graph R, or parent
-     * @param parentVrtx the source vertex of R on which I will be attached
-     * @param parentAPIdx the attachment point on R's vertex to be
-     * used to attach I
-     * @param subGraph the incoming graph I, or child
-     * @param childVrtx the vertex of I that is to be connected to R
-     * @param childAPIdx the index of the attachment point on the vertex of I
-     * that is to be connected to R
-     * @param bndType the bond type between R and I
-     */
-
-    public static void appendGraphOnGraph(DENOPTIMGraph molGraph,
-                                     DENOPTIMVertex parentVrtx,
-                                     int parentAPIdx,
-                                     DENOPTIMGraph subGraph,
-                                     DENOPTIMVertex childVrtx,
-                                     int childAPIdx,
-                                     int bndType)
-                                                        throws DENOPTIMException
-    {
-        appendGraphOnGraph(molGraph, parentVrtx, parentAPIdx,
-                                       subGraph, childVrtx, childAPIdx, bndType,
-                                    new HashMap<Integer,SymmetricSet>(), false);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Append a graph (incoming=I) onto another graph (receiving=R).
-     * This method ignores symmetry.
-     * @param molGraph the receiving graph R, or parent
      * @param parentVrtx the source vertix of R on which I will be attached
      * @param parentAPIdx the attachment point on R's verticx to be
      * used to attach I

@@ -62,12 +62,12 @@ public class DENOPTIMEdge implements Serializable,Cloneable
      * The class associated with the target AP
      */
     private String trgRcn;
-    
+
 //------------------------------------------------------------------------------
     
     /**
      * Constructor for an edge from all parameters
-     * @param m_src verted ID of the source vertex
+     * @param m_src vertex ID of the source vertex
      * @param m_trg vertex ID of the target vertex
      * @param m_srcDAP index of the AP on the source vertex
      * @param m_trgDAP index of the AP on the target vertex
@@ -89,7 +89,7 @@ public class DENOPTIMEdge implements Serializable,Cloneable
     
     /**
      * Constructor for an edge from all parameters
-     * @param m_src verted ID of the source vertex
+     * @param m_src vertex ID of the source vertex
      * @param m_trg vertex ID of the target vertex
      * @param m_srcDAP index of the AP on the source vertex
      * @param m_trgDAP index of the AP on the target vertex

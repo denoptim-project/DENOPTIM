@@ -72,10 +72,10 @@ class Edge:
 # Vertex - AP - Edge - AP - Vertex
 
 class AP:
-    def __init__(self,name):
+    def __init__(self, name):
         self._name = name
-        self._owner = None # a Vertex, gets set by e.g. Fragment constructor
-        self._edge = None # an Edge
+        self._owner = None  # a Vertex, gets set by e.g. Fragment constructor
+        self._edge = None  # an Edge
 
     def __str__(self):
         """Show AP as a human-readable string"""
