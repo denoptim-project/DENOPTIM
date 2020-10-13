@@ -173,7 +173,7 @@ public class DENOPTIMGraphEdit
             }
             
             //TODO-V3: use whatever way to identify a fragment without giving a vertex ID
-            DENOPTIMVertex dv = DENOPTIMVertex.newFragVertex(vid, molid, fragtype);
+            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, fragtype);
             
             dv.setLevel(level);
 

@@ -518,7 +518,7 @@ public class DENOPTIMGraphOperations
         // Define the new vertex
         int fid = chosenFrgAndAp.getVertexMolId();
         int nvid = GraphUtils.getUniqueVertexIndex();
-        DENOPTIMVertex fragVertex = DENOPTIMVertex.newFragVertex(nvid, fid, 1);
+        DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(nvid, fid, 1);
         // update the level of the vertex based on its parent
         int lvl = curVertex.getLevel();
         fragVertex.setLevel(lvl+1);

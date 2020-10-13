@@ -192,7 +192,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 				}
 				else
 				{
-					if (fragment.getAPCount()==1)
+					if (fragment.getNumberOfAP()==1)
 					{
 						currApIdx=0;
 					}

@@ -72,8 +72,6 @@ public class GraphConversionTool
         for (int i=0; i<n; i++)
         {
             DENOPTIMVertex vertex = g.getVertexList().get(i);
-
-            DENOPTIMFragment frg = (DENOPTIMFragment) vertex;
             
             Integer id = vertex.getVertexId();
             if (!vertex.containsAtoms())
@@ -328,7 +326,7 @@ public class GraphConversionTool
             int level = Integer.parseInt(s3[3]);
 	            
             //TODO-V3: this is where a type-agnostic constructor should be used
-            DENOPTIMVertex dv = DENOPTIMVertex.newFragVertex(vid, molid,fragtype);
+            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
             dv.setLevel(level);
 
             //TODO-V3:check the symmetry on the vertex is properly imported

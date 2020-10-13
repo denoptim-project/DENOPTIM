@@ -227,7 +227,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setSymMap(ArrayList<SymmetricSet> m_mp)
+    public void setSymmetricVertexSets(ArrayList<SymmetricSet> m_mp)
     {
         symVertices.clear();
         symVertices.addAll(m_mp);
@@ -251,19 +251,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         symVertices.add(m_ss);
-    }
-
-//------------------------------------------------------------------------------
-
-    // when a property of the vertex changes, we need to update the vertex
-    // in the arraylist
-    public void updateVertex(DENOPTIMVertex m_vertex)
-    {
-        int idx = getIndexOfVertex(m_vertex.getVertexId());
-        if (idx != -1)
-        {
-            gVertices.set(idx, m_vertex);
-        }
     }
 
 //------------------------------------------------------------------------------
@@ -1025,7 +1012,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             cSymVertices.add(ss.clone());
         }
-        clone.setSymMap(cSymVertices);
+        clone.setSymmetricVertexSets(cSymVertices);
         
         clone.setGraphId(graphId);
         clone.setMsg(localMsg);
@@ -1441,27 +1428,80 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	
     	return true;
     }
+    
+//------------------------------------------------------------------------------
 
-    public List<DENOPTIMAttachmentPoint> getAvailableAPs() {
-        return null;
+    /**
+     * Returns <code>true</code> if this graph has any vertex that contains 
+     * atoms.
+     * @return <code>true</code> if this graph has any vertex that contains 
+     * atoms.
+     */
+    public boolean containsAtoms()
+    {
+        for (DENOPTIMVertex v : getVertexList()) 
+        {
+            if (v.containsAtoms())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * calculate the number of atoms from the graph representation
+     * Calculate the number of atoms from the graph representation
      * @return number of heavy atoms in the molecule
      */
     public int getHeavyAtomsCount()
     {
         int n = 0;
-        ArrayList<DENOPTIMVertex> vlst = getVertexList();
-
-        for (DENOPTIMVertex denoptimVertex : vlst) 
+        for (DENOPTIMVertex v : getVertexList()) 
         {
-            n += denoptimVertex.getHeavyAtomsCount();
+            n += v.getHeavyAtomsCount();
         }
         return n;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of all attachment points contained in this graph
+     * @return list of attachment points.
+     */
+
+    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    {
+        ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex v : gVertices)
+        {
+            lstAPs.addAll(v.getAttachmentPoints());
+        }
+        return lstAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of all attachment points contained in this graph
+     * @return list of attachment points.
+     */
+
+    public ArrayList<DENOPTIMAttachmentPoint> getAvailableAPs()
+    {
+        ArrayList<DENOPTIMAttachmentPoint> lstFreeAPs = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.isAvailable())
+            {
+                lstFreeAPs.add(ap);
+            }
+        }
+        return lstFreeAPs;
     }
 
 //------------------------------------------------------------------------------

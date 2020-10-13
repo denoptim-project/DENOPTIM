@@ -955,7 +955,7 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Create the node
 		int scaffVrtId = 1;
-		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newFragVertex(scaffVrtId, 
+		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newVertexFromLibrary(scaffVrtId, 
 				scaffFragId, 0); // 0 stands for scaffold
 
 		scaffVertex.setLevel(-1); //NB: scaffold gets level -1
@@ -1095,7 +1095,7 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			int trgVrtId = dnGraph.getMaxVertexId()+1;
 			
-			DENOPTIMVertex trgVertex = DENOPTIMVertex.newFragVertex(trgVrtId, 
+			DENOPTIMVertex trgVertex = DENOPTIMVertex.newVertexFromLibrary(trgVrtId, 
 			        trgFragId, trgFrgType);
 	
 			// Identify the source vertex/node and its AP

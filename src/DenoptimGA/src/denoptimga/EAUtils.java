@@ -921,7 +921,7 @@ public class EAUtils
         int scafIdx = selectRandomScaffold();
 
         //TODO-V3: use a type-agnostic w.r.t vertex constructor
-        DENOPTIMVertex scafVertex = DENOPTIMVertex.newFragVertex(
+        DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, 0);
         
         // we set the level to -1, as the base
@@ -1059,7 +1059,7 @@ public class EAUtils
 
             if (fid != -1)
             {
-                DENOPTIMVertex fragVertex = DENOPTIMVertex.newFragVertex(
+                DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(
                         GraphUtils.getUniqueVertexIndex(), fid, 2);
                 
                 fragVertex.setLevel(lvl+1);

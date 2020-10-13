@@ -1304,7 +1304,7 @@ public class DenoptimIO
 					fragLib.getAbsolutePath()))
 			{
 				DENOPTIMFragment frag = new DENOPTIMFragment(mol);
-                for (DENOPTIMAttachmentPoint ap : frag.getAPs())
+                for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints())
 				{
 					allCLasses.add(ap.getAPClass());
 				}
