@@ -349,361 +349,6 @@ public class GraphUtils
         return -1;
     }
 
-//-----------------------------------------------------------------------------
-
-    /**
-     * Search a graph for vertices that match the criteria defined in a query
-     * vertex.
-     * @param graph the graph to be searched
-     * @param query the query
-     * @param onlyOneSymm if <code>true</code> then only one match will be 
-     * collected for each symmetric set of partners.
-     * @param verbosity the verbosity level
-     * @return the list of matches
-     */
-    public static ArrayList<Integer> findVerticesIds(DENOPTIMGraph graph, 
-                  DENOPTIMVertexQuery query, boolean onlyOneSymm, int verbosity)
-    {
-        ArrayList<Integer> matches = new ArrayList<>();
-        for (DENOPTIMVertex v : findVertices(graph,query,onlyOneSymm,verbosity))
-        {
-            matches.add(v.getVertexId());
-        }
-        return matches;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Filters a list of vertices according to a query.
-     * vertex.
-     * @param graph the graph to be searched
-     * @param dnQuery the query
-     * @param onlyOneSymm if <code>true</code> then only one match will be 
-     * collected for each symmetric set of partners.
-     * @param verbosity the verbosity level
-     * @return the list of matched vertices
-     */
-
-    public static ArrayList<DENOPTIMVertex> findVertices(DENOPTIMGraph graph,
-                DENOPTIMVertexQuery dnQuery, boolean onlyOneSymm, int verbosity)
-    {
-        DENOPTIMVertex vQuery = dnQuery.getVrtxQuery();
-        DENOPTIMEdge eInQuery = dnQuery.getInEdgeQuery();
-        DENOPTIMEdge eOutQuery = dnQuery.getOutEdgeQuery();
-        
-        ArrayList<DENOPTIMVertex> matches = new ArrayList<DENOPTIMVertex>();
-        matches.addAll(graph.getVertexList());
-
-        if (verbosity > 1)
-        {
-            System.out.println("Searching vertices - candidates: " + matches);
-        }
-
-        //Check condition vertex ID
-        int query = vQuery.getVertexId();
-        if (query > -1) //-1 would be the wildcard
-        {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
-            {
-                if (v.getVertexId() == query)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-        }
-
-        if (verbosity > 2)
-        {
-            System.out.println("After ID-based rule: " + matches);
-        }
-
-        //Check condition fragment ID
-        if (vQuery instanceof DENOPTIMFragment)
-        {
-            query = ((DENOPTIMFragment) vQuery).getMolId();
-            if (query > -1) //-1 would be the wildcard
-            {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    if (v instanceof DENOPTIMFragment == false)
-                    {
-                        continue;
-                    }
-                    if (((DENOPTIMFragment) v).getMolId() == query)
-                    {
-                        newLst.add(v);
-                    }
-                }
-                matches = newLst;
-            }
-
-            if (verbosity > 2)
-            {
-                System.out.println("After MolID-based rule: " + matches);
-            }
-    
-            //Check condition fragment type
-            query = ((DENOPTIMFragment) vQuery).getFragmentType();
-            if (query > -1) //-1 would be the wildcard
-            {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    if (v instanceof DENOPTIMFragment == false)
-                    {
-                        continue;
-                    }
-                    if (((DENOPTIMFragment) v).getFragmentType() == query)
-                    {
-                        newLst.add(v);
-                    }
-                }
-                matches = newLst;
-            }
-    
-            if (verbosity > 2)
-            {
-                System.out.println("After Frag-type rule: " + matches);
-            }
-        }
-
-        //Check condition level of vertex
-        query = vQuery.getLevel();
-        if (query > -2) //-2 would be the wildcard
-        {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
-            {
-                if (v.getLevel() == query)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-        }
-
-        if (verbosity > 1)
-        {
-            System.out.println("After Vertex-based rules: " + matches);
-        }
-
-        //Incoming connections (candidate vertex is the target)
-        if (eInQuery != null)
-        {
-            //Check condition target AP
-            query = eInQuery.getTargetDAP();
-            if (query > -1)
-            {
-                ArrayList<DENOPTIMVertex> newLst = 
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-		    if (graph.getIndexOfEdgeWithParent(v.getVertexId()) < 0)
-		    {
-			continue;
-		    }
-                    DENOPTIMEdge e = graph.getEdgeWithParent(v.getVertexId());
-                    if (e!=null && e.getTargetDAP() == query)
-                    {
-                        newLst.add(v);
-                    }
-                }
-                matches = newLst;
-            }
-
-            if (verbosity > 2)
-            {
-                System.out.println("After OutEdge-srcAP rule: "+matches);
-            }
-    
-            //Check condition bond type
-            query = eInQuery.getBondType();
-            if (query > -1)
-            {
-                ArrayList<DENOPTIMVertex> newLst = 
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    if (graph.getIndexOfEdgeWithParent(v.getVertexId()) < 0)
-                    {
-                        continue;
-                    }
-                    DENOPTIMEdge e = graph.getEdgeWithParent(v.getVertexId());
-                    if (e!=null && e.getBondType() == query)
-                    {
-                        newLst.add(v);
-                    }
-                }
-                matches = newLst;
-            }
-
-            if (verbosity > 2)
-            {
-                System.out.println("After InEdge-bond rule: "+matches);
-            }
-    
-            //Check condition AP class
-            String squery = eInQuery.getTargetReaction();
-            if (!squery.equals("*"))
-            {
-                ArrayList<DENOPTIMVertex> newLst = 
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    if (graph.getIndexOfEdgeWithParent(v.getVertexId()) < 0)
-                    {
-                        continue;
-                    }
-                    DENOPTIMEdge e = graph.getEdgeWithParent(v.getVertexId());
-                    if (e!=null && e.getTargetReaction().equals(squery))
-                    {
-                        newLst.add(v);
-                    }
-                }
-                matches = newLst;
-            }
-            squery = eInQuery.getSourceReaction();
-            if (!squery.equals("*"))
-            {
-                ArrayList<DENOPTIMVertex> newLst =
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    if (graph.getIndexOfEdgeWithParent(v.getVertexId()) < 0)
-                    {
-                        continue;
-                    }
-                    DENOPTIMEdge e = graph.getEdgeWithParent(v.getVertexId());
-                    if (e!=null && e.getSourceReaction().equals(squery))
-                    {
-                        newLst.add(v);
-                    }
-                }
-                matches = newLst;
-            }
-        }
-
-        if (verbosity > 1)
-        {
-            System.out.println("After InEdge-based rules: " + matches);
-        }
-
-        //Outcoming connections (candidate vertex is the source)
-        if (eOutQuery != null)
-        {
-            //Check condition target AP
-            query = eOutQuery.getSourceDAP();
-            if (query > -1)
-            {
-                ArrayList<DENOPTIMVertex> newLst = 
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    for (DENOPTIMEdge e : graph.getEdgesWithChild(
-                                                              v.getVertexId()))
-                    {
-                        if (e.getSourceDAP() == query)
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-            }
-
-            if (verbosity > 2)
-            {
-                System.out.println("After OutEdge-srcAP rule: "+matches);
-            }
-
-            //Check condition bond type
-            query = eOutQuery.getBondType();
-            if (query > -1)
-            {
-                ArrayList<DENOPTIMVertex> newLst = 
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    for (DENOPTIMEdge e : graph.getEdgesWithChild(
-                                                              v.getVertexId()))
-                    {
-                        if (e.getBondType() == query)
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-            }
-
-            if (verbosity > 2)
-            {
-                System.out.println("After OutEdge-bond rule: "+matches);
-            }
-
-            //Check condition AP class
-            String squery = eOutQuery.getTargetReaction();
-            if (!squery.equals("*"))
-            {
-                ArrayList<DENOPTIMVertex> newLst =
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    for (DENOPTIMEdge e : graph.getEdgesWithChild(
-                                                              v.getVertexId()))
-                    {
-                        if (e.getTargetReaction().equals(squery))
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-            }
-            squery = eOutQuery.getSourceReaction();
-            if (!squery.equals("*"))
-            {
-                ArrayList<DENOPTIMVertex> newLst = 
-                                               new ArrayList<DENOPTIMVertex>();
-                for (DENOPTIMVertex v : matches)
-                {
-                    for (DENOPTIMEdge e : graph.getEdgesWithChild(
-                                                              v.getVertexId()))
-                    {
-                        if (e.getSourceReaction().equals(squery))
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-            }
-        }
-
-        if (verbosity > 1)
-        {
-            System.out.println("After OutEdge-based rule: " + matches);
-        }
-
-        // Identify symmetiric sets and keep only one member
-	removeSymmetryRedundance(graph,matches);
-
-        if (verbosity > 1)
-        {
-            System.out.println("Final Matches (after symmetry): " + matches);
-        }
-
-        return matches;
-    }
-
 //------------------------------------------------------------------------------
 
     /**
@@ -715,7 +360,7 @@ public class GraphUtils
      * @return the modified graph
      */
 
-    public static DENOPTIMGraph editGraph(DENOPTIMGraph graph, 
+    public static DENOPTIMGraph editGraph(DENOPTIMGraph graph,
             ArrayList<DENOPTIMGraphEdit> edits, boolean symmetry, int verbosity)
                                                         throws DENOPTIMException
     {
@@ -735,7 +380,7 @@ public class GraphUtils
 
 		//TODO-V3 get rid of serialization-based deep copying
         DENOPTIMGraph modGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(graph);
-        
+
         for (DENOPTIMGraphEdit edit : edits)
         {
             String task = edit.getType();
@@ -749,18 +394,18 @@ public class GraphUtils
                                                          edit.getFocusVertex(),
                                                                           null,
                                                            edit.getFocusEdge());
-                    ArrayList<Integer> matches = GraphUtils.findVerticesIds(
-                                             modGraph,query,symmetry,verbosity);
+                    ArrayList<Integer> matches = modGraph.findVerticesIds(
+                            query,verbosity);
                     for (int pid : matches)
                     {
                         int wantedApID = edit.getFocusEdge().getSourceDAP();
-                        String wantedApCl = 
+                        String wantedApCl =
                                         edit.getFocusEdge().getSourceReaction();
-						ArrayList<Integer> symmUnqChilds = 
+						ArrayList<Integer> symmUnqChilds =
 								modGraph.getChildVertices(pid);
 						if (symmetry)
 						{
-						    removeSymmetryRedundantIds(modGraph,symmUnqChilds);
+						    modGraph.removeSymmetryRedundantIds(symmUnqChilds);
 						}
                         for (int cid : symmUnqChilds)
                         {
@@ -772,10 +417,10 @@ public class GraphUtils
                             {
                                 continue;
                             }
-                            // Apply the query on the AP Class 
+                            // Apply the query on the AP Class
                             String srcApCl = modGraph.getEdgeWithParent(
                                                        cid).getSourceReaction();
-                            if (!wantedApCl.equals("*") 
+                            if (!wantedApCl.equals("*")
                                 && !wantedApCl.equals(srcApCl))
                             {
                                 continue;
@@ -786,7 +431,7 @@ public class GraphUtils
                                            e.getTargetVertex()).getNumberOfAP();
                             if (wantedTrgApId >= trgApLstSize)
                             {
-                                String msg = "Request to use AP number " 
+                                String msg = "Request to use AP number "
                                 + wantedTrgApId + " but only " + trgApLstSize
                                 + " are found in the designated vertex.";
                                 throw new DENOPTIMException(msg);
@@ -810,8 +455,8 @@ public class GraphUtils
                     DENOPTIMVertexQuery query =
                                  new DENOPTIMVertexQuery(edit.getFocusVertex(),
 							   edit.getFocusEdge());
-                    ArrayList<Integer> matches = GraphUtils.findVerticesIds(
-                                             modGraph,query,symmetry,verbosity);
+                    ArrayList<Integer> matches = modGraph.findVerticesIds(
+                            query, verbosity);
                     for (int vid : matches)
                     {
                         modGraph.deleteVertex(vid,symmetry);
@@ -824,70 +469,4 @@ public class GraphUtils
     }
 
 //-----------------------------------------------------------------------------
-
-    /**
-     * Remove all but one of the symmetry-related partners in a list.
-     * @param graph the graph to which the vertices IDs belong
-     * @param list the list of vertex IDs to be purged
-     */
-
-    public static void removeSymmetryRedundantIds(DENOPTIMGraph graph,
-                                                        ArrayList<Integer> list)
-    {
-	ArrayList<DENOPTIMVertex> vList = new ArrayList<DENOPTIMVertex>();
-	for (int vid : list)
-	{
-	    vList.add(graph.getVertexWithId(vid));
-	}
-	removeSymmetryRedundance(graph,vList);
-	list.clear();
-	for (DENOPTIMVertex v : vList)
-	{
-	    list.add(v.getVertexId());
-	}
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Remove all but one of the symmetry-related partners in a list
-     * @param graph the graph to which the vertices belong
-     * @param vList the list of vertices to be purged
-     */
-
-    public static void removeSymmetryRedundance(
-			    DENOPTIMGraph graph, ArrayList<DENOPTIMVertex> list)
-    {
-        ArrayList<DENOPTIMVertex> symRedundnt = new ArrayList<DENOPTIMVertex>();
-        Iterator<SymmetricSet> itSymm = graph.getSymSetsIterator();
-        while (itSymm.hasNext())
-        {
-            SymmetricSet ss = itSymm.next();
-            for (DENOPTIMVertex v : list)
-            {
-                int vid = v.getVertexId();
-                if (symRedundnt.contains(v))
-                {
-                    continue;
-                }
-                if (ss.contains(vid))
-                {
-                    for (Integer idVrtInSS : ss.getList())
-                    {
-                        if (idVrtInSS != vid)
-                        {
-                            symRedundnt.add(graph.getVertexWithId(idVrtInSS));
-                        }
-                    }
-                }
-            }
-        }
-        for (DENOPTIMVertex v : symRedundnt)
-        {
-            list.remove(v);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
 }
