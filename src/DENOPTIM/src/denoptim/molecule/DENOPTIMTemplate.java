@@ -163,7 +163,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMAttachmentPoint apOnB = vB.getAttachmentPoints().get(1);
         String srcAPClass = apOnA.getAPClass();
         String trgAPClass = apOnB.getAPClass();
-        DENOPTIMEdge eAB = GraphUtils.connectVertices(vA,vB,0,1,srcAPClass,trgAPClass);
+        DENOPTIMEdge eAB = vA.connectVertices(vB,0,1,srcAPClass,trgAPClass);
 
         template.interiorGraph.addEdge(eAB);
         

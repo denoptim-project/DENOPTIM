@@ -27,28 +27,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.openscience.cdk.graph.ConnectivityChecker;
-import org.apache.commons.math3.random.MersenneTwister;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
-
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ClosableChain;
-import denoptim.rings.CyclicGraphHandler;
-import denoptim.rings.RingClosureParameters;
 
 import java.util.logging.Level;
 
@@ -360,311 +349,6 @@ public class GraphUtils
         return -1;
     }
 
-//------------------------------------------------------------------------------
-
-    /**
-     * Append a graph (incoming=I) onto another graph (receiving=R).
-     * This method ignores symmetry.
-     * @param molGraph the receiving graph R, or parent
-     * @param parentVrtx the source vertix of R on which I will be attached
-     * @param parentAPIdx the attachment point on R's verticx to be
-     * used to attach I
-     * @param subGraph the incoming graph I, or child
-     * @param childVrtx the vertex of I that is to be connected to R
-     * @param childAPIdx the index of the atachment point on the vertex of I
-     * that is to be connected to R
-     * @param bndType the bond type between R and I
-     * @param symmetry use <code>true</code> to reproduce the same operation
-     * onto symmetric parters and generate the relative symmetric sets.
-     */
-
-    public static void appendGraphOnGraph(DENOPTIMGraph molGraph,
-                                     DENOPTIMVertex parentVrtx,
-                                     int parentAPIdx,
-                                     DENOPTIMGraph subGraph,
-                                     DENOPTIMVertex childVrtx,
-                                     int childAPIdx,
-                                     int bndType,
-                                     boolean symmetry)
-                                                        throws DENOPTIMException
-    {
-        appendGraphOnGraph(molGraph, parentVrtx, parentAPIdx,
-                                       subGraph, childVrtx, childAPIdx, bndType,
-                                 new HashMap<Integer,SymmetricSet>(), symmetry);
-    }
- 
-//------------------------------------------------------------------------------
-
-    /**
-     * Append a graph (incoming=I) onto another graph (receiving=R). 
-     * Can append one or more copyes of the same graph. The corresponding
-     * vertex and attachment point ID for each connection are given in
-     * separated arrays.
-     * @param molGraph the receiving graph R, or parent
-     * @param parentVrtxs the list of source vertices of R on which a copy
-     * of I is to be attached.
-     * @param parentAPIdx the list of attachment points on R's vertices to be
-     * used to attach I 
-     * @param subGraph the incoming graph I, or child
-     * @param childVrtx the vertex of I that is to be connected to R
-     * @param childAPIdx the index of the atachment point on the vertex of I 
-     * that is to be connected to R
-     * @param bndType the bond type between R and I
-     * @param onAllSymmAPs set to <code>true</code> to require the same graph I
-     * to be attached on all available and symmetric APs on the same vertex of 
-     * the AP indicated in the list.
-     */
-    
-    public static void appendGraphOnGraph(DENOPTIMGraph molGraph,
-                                     ArrayList<DENOPTIMVertex> parentVrtxs,
-                                     ArrayList<Integer> parentAPIdx,
-                                     DENOPTIMGraph subGraph,
-                                     DENOPTIMVertex childVrtx,
-                                     int childAPIdx,
-                                     int bndType,
-                                     boolean onAllSymmAPs)
-                                                        throws DENOPTIMException
-    {
-        // Collector for symmetries created by appending copyes of subGraph
-        Map<Integer,SymmetricSet> newSymSets = 
-                                            new HashMap<Integer,SymmetricSet>();
-
-        // Repeat append for each parent vertex while collecting symmetries
-        for (int i=0; i<parentVrtxs.size(); i++)
-        {
-            appendGraphOnGraph(molGraph, parentVrtxs.get(i), parentAPIdx.get(i),
-                                       subGraph, childVrtx, childAPIdx, bndType,
-                                                     newSymSets, onAllSymmAPs);
-        }
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Append a graph (incoming=I) onto another graph (receiving=R). 
-     * @param molGraph the receiving graph R, or parent
-     * @param parentVrtx the vertex of R on which the a copy
-     * of I is to be attached.
-     * @param parentAPIdx the attachment point on R's vertex to be
-     * used to attach I 
-     * @param subGraph the incoming graph I, or child
-     * @param childVrtx the vertex of I that is to be connected to R
-     * @param childAPIdx the index of the attachment point on the vertex of I 
-     * that is to be connected to R
-     * @param bndType the bond type between R and I
-     * @param newSymSets this parameter is only used to keep track
-     * of the symmetric copies of I. Simply provide an empty data structure.
-     * @param onAllSymmAPs set to <code>true</code> to require the same graph I
-     * to be attached on all available and symmetric APs on the same vertex of 
-     * the AP indicated in the list.
-     */
-    
-    public static void appendGraphOnGraph(DENOPTIMGraph molGraph,
-                                     DENOPTIMVertex parentVrtx,
-                                     int parentAPIdx,
-                                     DENOPTIMGraph subGraph,
-                                     DENOPTIMVertex childVrtx,
-                                     int childAPIdx,
-                                     int bndType,
-                                     Map<Integer,SymmetricSet> newSymSets,
-                                     boolean onAllSymmAPs)
-                                                        throws DENOPTIMException
-    {
-        SymmetricSet symAPs = parentVrtx.getSymmetricAPs(parentAPIdx);
-        if (symAPs != null && onAllSymmAPs)
-        {
-            ArrayList<Integer> apLst = symAPs.getList();
-            for (int i=0; i<apLst.size(); i++)
-            {
-                int idx = apLst.get(i);
-                if (!parentVrtx.getAttachmentPoints().get(idx).isAvailable())
-                {
-                    continue;
-                }
-                appendGraphOnAP(molGraph, parentVrtx, idx,
-                         subGraph, childVrtx, childAPIdx, bndType, newSymSets);
-            }
-        }
-        else
-        {
-            appendGraphOnAP(molGraph, parentVrtx, parentAPIdx,
-                         subGraph, childVrtx, childAPIdx, bndType, newSymSets);
-        }
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Append a subgraph (subGraph) to an existing graph (molGraph) specifying 
-     * which vertex and attachment point to use for the connection.
-     * Does not project on symmetrically related vertexes or
-     * attachment points. No change in symmetric sets, apart from importing 
-     * those sets that are already defined in the subgraph.
-     * @param molGraph the receiving graph R, or parent
-     * @param parentVrtx the vertex of R on which a copy
-     * of I is to be attached.
-     * @param parentAPIdx the attachment point on R's vertex to be
-     * used to attach I 
-     * @param subGraph the incoming graph I, or child graph.
-     * @param childVrtx the vertex of I that is to be connected to R
-     * @param childAPIdx the index of the attachment point on the vertex of I 
-     * that is to be connected to R
-     * @param bndType the bond type between R and I
-     * @param newSymSets of symmetric sets. This parameter is only used to keep
-     *               track
-     * of the symmetric copies of I. Simply provide an empty data structure.
-     */
-
-    public static void appendGraphOnAP(DENOPTIMGraph molGraph,
-                                        DENOPTIMVertex parentVrtx, 
-                                        int parentAPIdx, 
-                                        DENOPTIMGraph subGraph, 
-                                        DENOPTIMVertex childVrtx, 
-                                        int childAPIdx, 
-                                        int bndType, 
-                                        Map<Integer,SymmetricSet> newSymSets)
-                                                    throws DENOPTIMException
-    {
-        // Clone and renumber the subgraph to ensure uniqueness
-        DENOPTIMGraph sgClone = subGraph.clone();
-        
-        //DENOPTIMGraph sgClone = (DENOPTIMGraph) DenoptimIO.deepCopy(subGraph);
-        sgClone.renumberGraphVertices();
-               
-        // Make the connection between molGraph and subGraph
-        DENOPTIMVertex cvClone = sgClone.getVertexAtPosition(
-                            subGraph.getIndexOfVertex(childVrtx.getVertexId()));
-
-        DENOPTIMAttachmentPoint dap_Parent =
-                              parentVrtx.getAttachmentPoints().get(parentAPIdx);
-        DENOPTIMAttachmentPoint dap_Child =
-                                  cvClone.getAttachmentPoints().get(childAPIdx);
-        
-        DENOPTIMEdge edge = null;
-        if (FragmentSpace.useAPclassBasedApproach())
-        {
-            String rcnP = dap_Parent.getAPClass();
-            String rcnC = dap_Child.getAPClass();
-            edge = parentVrtx.connectVertices(
-                    cvClone,
-                    parentAPIdx,
-                    childAPIdx,
-                    rcnP,
-                    rcnC
-            );
-        }
-        else
-        {
-            edge = new DENOPTIMEdge(parentVrtx.getVertexId(), 
-                       cvClone.getVertexId(), parentAPIdx, childAPIdx, bndType);
-            // decrement the num. of available connections
-            dap_Parent.updateFreeConnections(-bndType); 
-            dap_Child.updateFreeConnections(-bndType); 
-        }
-        if (edge == null)
-        {
-            String msg = "Program Bug in appendGraphOnAP: No edge created.";
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            throw new DENOPTIMException(msg);
-        }
-        molGraph.addEdge(edge);
-
-        // Import all vertices from cloned subgraph, i.e., sgClone
-        for (int i=0; i<sgClone.getVertexList().size(); i++)
-        {
-            DENOPTIMVertex clonV = sgClone.getVertexList().get(i);
-            DENOPTIMVertex origV = subGraph.getVertexList().get(i);
-
-            molGraph.addVertex(sgClone.getVertexList().get(i));
-
-            // also need to tmp store pointers to symmetric vertexes
-            // TODO: check. Why is this working on subGraph and not on sgClone?
-            if (subGraph.hasSymmetryInvolvingVertex(origV.getVertexId()))
-            {
-                if (newSymSets.containsKey(origV.getVertexId()))
-                {
-                    newSymSets.get(origV.getVertexId()).add(
-                                                           clonV.getVertexId());
-                }
-                else
-                {
-                    newSymSets.put(origV.getVertexId(),
-                               sgClone.getSymSetForVertexID(
-                                 sgClone.getVertexList().get(i).getVertexId()));
-                }
-            }
-            else
-            {
-                if (newSymSets.containsKey(origV.getVertexId()))
-                {
-                    newSymSets.get(origV.getVertexId()).add(
-                                                           clonV.getVertexId());
-                }
-                else
-                {
-                    SymmetricSet ss = new SymmetricSet();
-                    ss.add(clonV.getVertexId());
-                    newSymSets.put(origV.getVertexId(),ss);
-                }
-            }
-        }
-        // Import all edges from cloned subgraph
-        for (int i=0; i<sgClone.getEdgeList().size(); i++)
-        {
-            molGraph.addEdge(sgClone.getEdgeList().get(i));
-        }
-        // Import all rings from cloned subgraph
-        for (int i=0; i<sgClone.getRings().size(); i++)
-        {
-            molGraph.addRing(sgClone.getRings().get(i));
-        }
-
-        // project tmp symmetric set into final symmetric sets
-        Set<SymmetricSet> doneTmpSymSets = new HashSet<SymmetricSet>();
-        for (Map.Entry<Integer,SymmetricSet> e : newSymSets.entrySet())
-        {
-            SymmetricSet tmpSS = e.getValue();
-            if (doneTmpSymSets.contains(tmpSS))
-            {
-                continue;
-            }
-            doneTmpSymSets.add(tmpSS);
-            boolean done = false;
-            // NB: no need to check all entries of tmpSS: the first is enough
-            SymmetricSet oldSS;
-            Iterator<SymmetricSet> iter = molGraph.getSymSetsIterator();
-            while (iter.hasNext())
-            {
-                oldSS = iter.next();
-                if (oldSS.contains(tmpSS.getList().get(0)))
-                {
-                    done = true;
-                    for (Integer symVrtID : tmpSS.getList())
-                    {
-                        // NB this adds only if not already contained
-                        oldSS.add(symVrtID); 
-                    }
-                    break;
-                }
-            }
-            if (!done)
-            {
-                if (tmpSS.size() <= 1)
-                {
-                    // tmpSS has always at leas one entry: the initial vrtId
-                    continue;
-                }
-                //Move tmpSS into a new SS on molGraph
-                SymmetricSet newSS = new SymmetricSet();
-                for (Integer symVrtID : tmpSS.getList())
-                {
-                    newSS.add(symVrtID);
-                }
-                molGraph.addSymmetricSetOfVertices(newSS);
-            }
-        }
-    }
-
 //-----------------------------------------------------------------------------
 
     /**
@@ -680,7 +364,7 @@ public class GraphUtils
     public static ArrayList<Integer> findVerticesIds(DENOPTIMGraph graph, 
                   DENOPTIMVertexQuery query, boolean onlyOneSymm, int verbosity)
     {
-        ArrayList<Integer> matches = new ArrayList<Integer>();
+        ArrayList<Integer> matches = new ArrayList<>();
         for (DENOPTIMVertex v : findVertices(graph,query,onlyOneSymm,verbosity))
         {
             matches.add(v.getVertexId());
@@ -1107,14 +791,16 @@ public class GraphUtils
                                 + " are found in the designated vertex.";
                                 throw new DENOPTIMException(msg);
                             }
-                            GraphUtils.appendGraphOnGraph(modGraph,
-                                                 modGraph.getVertexWithId(pid),
-                                                                       srcApId,
-                                                                       inGraph,
-                                  inGraph.getVertexWithId(e.getTargetVertex()),
-                                                                 wantedTrgApId,
-                                                               e.getBondType(),
-                                                                      symmetry);
+                            modGraph.appendGraphOnGraph(
+                                    modGraph.getVertexWithId(pid),
+                                    srcApId,
+                                    inGraph,
+                                    inGraph.getVertexWithId(e.getTargetVertex()),
+                                    wantedTrgApId,
+                                    e.getBondType(),
+                                    new HashMap<>(),
+                                    symmetry
+                            );
                         }
                     }
                     break;

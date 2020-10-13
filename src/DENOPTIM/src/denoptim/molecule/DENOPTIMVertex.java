@@ -20,6 +20,8 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 import denoptim.utils.RandomUtils;
@@ -616,4 +618,28 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
         return edge;
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Connects this vertex to other based on their free AP connections
+     * @param other vertex
+     */
+    public void join(DENOPTIMVertex other) {
+        List<DENOPTIMAttachmentPoint> apsA = getAttachmentPoints();
+        List<DENOPTIMAttachmentPoint> apsB = other.getAttachmentPoints();
+        if (apsA.isEmpty() || apsB.isEmpty()) {
+            throw new IllegalArgumentException("Vertex has no attachment " +
+                    "points");
+        }
+        Random random = new Random();
+        DENOPTIMAttachmentPoint apA = apsA.get(random.nextInt(apsA.size()));
+        DENOPTIMAttachmentPoint apB = apsB.get(random.nextInt(apsB.size()));
+
+        int bondOrder = 1;
+//        if (FragmentSpace.useAPclassBasedApproach()) {
+//            bondOrder =
+//        }
+    }
+
 }

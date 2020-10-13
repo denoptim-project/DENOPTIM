@@ -1199,7 +1199,7 @@ if(debug)
      * @param male the first Graph
      * @param female the second Graph
      * @param mvid vertexID of the root vertex of the branch of male to echange
-     * @param mfvid vertexID of the root vertex of the branch of female to 
+     * @param fvid vertexID of the root vertex of the branch of female to
      * echange
      * @return <code>true</code> if a new graph has been successfully produced
      * @throws DENOPTIMException
@@ -1270,16 +1270,11 @@ if(debug)
             DENOPTIMVertex spv = male.getParent(svid);
             symParVertM.add(spv);
             symmParAPidxM.add(se.getSourceDAP());
-<<<<<<< HEAD
-            //Delete the symmetric vertex 
-            male.deleteVertex(svid);
-=======
             toRemoveFromM.add(svid);
         }
         for (Integer svid : toRemoveFromM)
         {
-            GraphUtils.deleteVertex(male, svid);
->>>>>>> 664f8d7ba007d7022eca53fcf02e3075879578d0
+            male.deleteVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
@@ -1308,16 +1303,11 @@ if(debug)
             DENOPTIMVertex spv = female.getParent(svid);
             symParVertF.add(spv);
             symmParAPidxF.add(se.getSourceDAP());
-<<<<<<< HEAD
-            //Delete the symmetric vertex
-            female.deleteVertex(svid);
-=======
             toRemoveFromF.add(svid);
         }
         for (Integer svid : toRemoveFromF)
         {
-            GraphUtils.deleteVertex(female, svid);
->>>>>>> 664f8d7ba007d7022eca53fcf02e3075879578d0
+            female.deleteVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        
@@ -1365,10 +1355,10 @@ if(debug)
         subG_F.updateLevels(lvl_male);
 
         // attach the subgraph from M/F onto F/M in all symmetry related APs
-        GraphUtils.appendGraphOnGraph(male, symParVertM, symmParAPidxM, 
-                subG_F, subG_F.getVertexAtPosition(0), apidxFC, bndOrder, true);
-        GraphUtils.appendGraphOnGraph(female, symParVertF, symmParAPidxF, 
-                subG_M, subG_M.getVertexAtPosition(0), apidxMC, bndOrder, true);
+        male.appendGraphOnGraph(symParVertM, symmParAPidxM, subG_F,
+                subG_F.getVertexAtPosition(0), apidxFC, bndOrder, true);
+        female.appendGraphOnGraph(symParVertF, symmParAPidxF, subG_M,
+                subG_M.getVertexAtPosition(0), apidxMC, bndOrder, true);
 
         return true;
     }

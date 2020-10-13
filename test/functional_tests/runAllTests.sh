@@ -170,12 +170,12 @@ runTest "t3"
 # p7: exploration of fragment space that generates serialized graphs for t7
 #
 #runTest "p7" # Repaced by unit testing
-echo "t7 replaced by unit test"
+#echo "t7 replaced by unit test"
 
 #
 # t7: conversion of serialized DENOPTIMgraph to SDF
 #
-#runTest "t7" # Repaced by unit testing
+#runTest "t7" # Replaced by unit testing
 
 #
 # t8: conversion of serialized checkpoint file to human readable string
@@ -190,7 +190,7 @@ runTest "t9"
 #
 # t10: FragSpaceExplorer with symmetry constraints and enforced symmetry
 #
-# runTest "t10"
+ runTest "t10"
 
 #
 # t11: Genetic algorithm running with enforced symmetry.
