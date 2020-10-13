@@ -1270,16 +1270,11 @@ if(debug)
             DENOPTIMVertex spv = male.getParent(svid);
             symParVertM.add(spv);
             symmParAPidxM.add(se.getSourceDAP());
-<<<<<<< HEAD
-            //Delete the symmetric vertex 
-            male.deleteVertex(svid);
-=======
             toRemoveFromM.add(svid);
         }
         for (Integer svid : toRemoveFromM)
         {
-            GraphUtils.deleteVertex(male, svid);
->>>>>>> 664f8d7ba007d7022eca53fcf02e3075879578d0
+            male.removeVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
@@ -1308,16 +1303,11 @@ if(debug)
             DENOPTIMVertex spv = female.getParent(svid);
             symParVertF.add(spv);
             symmParAPidxF.add(se.getSourceDAP());
-<<<<<<< HEAD
-            //Delete the symmetric vertex
-            female.deleteVertex(svid);
-=======
             toRemoveFromF.add(svid);
         }
         for (Integer svid : toRemoveFromF)
         {
-            GraphUtils.deleteVertex(female, svid);
->>>>>>> 664f8d7ba007d7022eca53fcf02e3075879578d0
+            female.removeVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        
