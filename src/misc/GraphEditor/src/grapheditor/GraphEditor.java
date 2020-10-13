@@ -78,10 +78,11 @@ public class GraphEditor
             for (DENOPTIMGraph graph : GraphEdParameters.getInputGraphs())
             {
                 i++;
-                DENOPTIMGraph modGraph = GraphUtils.editGraph(graph,
+                DENOPTIMGraph modGraph = graph.editGraph(
                                          GraphEdParameters.getGraphEditTasks(),
                                               GraphEdParameters.symmetryFlag(),
-                                             GraphEdParameters.getVerbosity());
+                                             GraphEdParameters.getVerbosity()
+                );
                
                 if (GraphEdParameters.getVerbosity() > 0)
                 {

@@ -943,7 +943,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Returns a deep-copy of this graph. The vertex IDs are not changed, so you
      * might want to renumber the graph with 
-     * {@link GraphUtil.renumberVerticesGetMap}.
      */
     @Override
     public DENOPTIMGraph clone()
@@ -2985,5 +2984,123 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex v : vList) {
             list.add(v.getVertexId());
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Edit a graph according to a given list of edit tasks.
+     * @param edits the list of edit tasks
+     * @param symmetry if <code>true</code> the symmetry is enforced
+     * @param verbosity the verbosity level
+     * @return the modified graph
+     */
+
+    public DENOPTIMGraph editGraph(ArrayList<DENOPTIMGraphEdit> edits,
+                                   boolean symmetry, int verbosity
+    ) throws DENOPTIMException {
+
+        //Make sure there is no clash with vertex IDs
+        int maxId = getMaxVertexId();
+        if (GraphUtils.vertexCounter.get() <= maxId)
+        {
+            try
+            {
+                GraphUtils.resetUniqueVertexCounter(maxId+1);
+            }
+            catch (Throwable t)
+            {
+                maxId = GraphUtils.vertexCounter.getAndIncrement();
+            }
+        }
+
+        //TODO-V3 get rid of serialization-based deep copying
+        DENOPTIMGraph modGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(this);
+
+        for (DENOPTIMGraphEdit edit : edits)
+        {
+            String task = edit.getType();
+            switch (task.toUpperCase())
+            {
+                case (DENOPTIMGraphEdit.REPLACECHILD):
+                {
+                    DENOPTIMEdge e =  edit.getFocusEdge();
+                    DENOPTIMGraph inGraph = edit.getIncomingGraph();
+                    DENOPTIMVertexQuery query = new DENOPTIMVertexQuery(
+                            edit.getFocusVertex(),
+                            null,
+                            edit.getFocusEdge());
+                    ArrayList<Integer> matches = modGraph.findVerticesIds(
+                            query,verbosity);
+                    for (int pid : matches)
+                    {
+                        int wantedApID = edit.getFocusEdge().getSourceDAP();
+                        String wantedApCl =
+                                edit.getFocusEdge().getSourceReaction();
+                        ArrayList<Integer> symmUnqChilds =
+                                modGraph.getChildVertices(pid);
+                        if (symmetry)
+                        {
+                            modGraph.removeSymmetryRedundantIds(symmUnqChilds);
+                        }
+                        for (int cid : symmUnqChilds)
+                        {
+                            // Apply the query on the src AP on the focus vertex
+                            // -1 id the wildcard
+                            int srcApId = modGraph.getEdgeWithParent(
+                                    cid).getSourceDAP();
+                            if (wantedApID>-1 && wantedApID != srcApId)
+                            {
+                                continue;
+                            }
+                            // Apply the query on the AP Class
+                            String srcApCl = modGraph.getEdgeWithParent(
+                                    cid).getSourceReaction();
+                            if (!wantedApCl.equals("*")
+                                    && !wantedApCl.equals(srcApCl))
+                            {
+                                continue;
+                            }
+                            modGraph.deleteVertex(cid,symmetry);
+                            int wantedTrgApId = e.getTargetDAP();
+                            int trgApLstSize = inGraph.getVertexWithId(
+                                    e.getTargetVertex()).getNumberOfAP();
+                            if (wantedTrgApId >= trgApLstSize)
+                            {
+                                String msg = "Request to use AP number "
+                                        + wantedTrgApId + " but only " + trgApLstSize
+                                        + " are found in the designated vertex.";
+                                throw new DENOPTIMException(msg);
+                            }
+                            modGraph.appendGraphOnGraph(
+                                    modGraph.getVertexWithId(pid),
+                                    srcApId,
+                                    inGraph,
+                                    inGraph.getVertexWithId(e.getTargetVertex()),
+                                    wantedTrgApId,
+                                    e.getBondType(),
+                                    new HashMap<>(),
+                                    symmetry
+                            );
+                        }
+                    }
+                    break;
+                }
+                case (DENOPTIMGraphEdit.DELETEVERTEX):
+                {
+                    DENOPTIMVertexQuery query =
+                            new DENOPTIMVertexQuery(edit.getFocusVertex(),
+                                    edit.getFocusEdge());
+                    ArrayList<Integer> matches = modGraph.findVerticesIds(
+                            query, verbosity);
+                    for (int vid : matches)
+                    {
+                        modGraph.deleteVertex(vid,symmetry);
+                    }
+                    break;
+                }
+            }
+        }
+        return modGraph;
     }
 }
