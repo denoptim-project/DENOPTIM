@@ -33,6 +33,7 @@ import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
@@ -1229,7 +1230,7 @@ if(debug)
         int apidxMC = eM.getTargetDAP(); // ap index of the male
         int apidxFC = eF.getTargetDAP(); // ap index of the female
         int apidxFP = eF.getSourceDAP(); // ap index of the female parent
-        int bndOrder = eM.getBondType();
+        BondType bndOrder = eM.getBondType();
 
         if(debug)
         {

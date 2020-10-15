@@ -27,10 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openscience.cdk.tools.diff.tree.BondOrderDifference;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.utils.GenUtils;
 
 /**
@@ -866,15 +868,17 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
         );
         if (FragmentSpace.useAPclassBasedApproach()) {
             edge.setSourceReaction(getAPClass());
-            edge.setSourceReaction(other.getAPClass());
+            edge.setTargetReaction(other.getAPClass());
         }
         return edge;
     }
 
 //-----------------------------------------------------------------------------
 
-    private int getBondOrder() {
-        return FragmentSpace.getBondOrderForAPClass(this.getAPClass());
+    private BondType getBondOrder() {
+        //TODO-V3 make the BOMap use the BondType enum
+        return BondType.parseInt(FragmentSpace.getBondOrderForAPClass(
+                this.getAPClass()).toString());
     }
 
 //-----------------------------------------------------------------------------

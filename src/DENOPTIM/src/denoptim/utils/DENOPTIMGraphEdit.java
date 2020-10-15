@@ -28,6 +28,7 @@ import java.io.Serializable;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
@@ -217,7 +218,7 @@ public class DENOPTIMGraphEdit
                 btype = Integer.parseInt(strPrts[4]);
             }
 		    this.focusEdge = new DENOPTIMEdge(srcVertex, trgVertex, srcAP,
-		    		trgAP, btype);
+		    		trgAP, BondType.parseInt(btype + ""));
 		    if (strPrts.length > 5)
 		    {
 		        //source APClass

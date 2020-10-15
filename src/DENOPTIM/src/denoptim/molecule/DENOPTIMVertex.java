@@ -35,6 +35,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -547,8 +548,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             String rname = trgRcn.substring(0, trgRcn.indexOf(':'));
 
             // look up the reaction bond order table
-            int bndOrder = FragmentSpace.getBondOrderMap().get(rname);
-            //System.err.println("Bond: " + bndOrder + " " + srcRcn + " " + trgRcn);
+            //TODO-V3 use BondOrder in BOMap
+            BondType bndOrder = BondType.parseInt(
+                    FragmentSpace.getBondOrderMap().get(rname).toString());
 
             // create a new edge
             DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
@@ -561,12 +563,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             edge.setTargetReaction(trgRcn);
 
             // update the attachment point info
-            sourceAP.updateFreeConnections(-bndOrder); // decrement the connections
-            targetAP.updateFreeConnections(-bndOrder); // decrement the connections
+            sourceAP.updateFreeConnections(-bndOrder.getValence());
+            targetAP.updateFreeConnections(-bndOrder.getValence());
 
             return edge;
         } else {
-            System.err.println("ERROR! Attempt to make edge using unavailable AP!"
+            System.err.println("ERROR! Attempt to make edge using unavailable "
+                    + "APs!"
                     + System.getProperty("line.separator")
                     + "Vertex: "+getVertexId()
                     +" AP-A(available:"+sourceAP.isAvailable()+"): "+sourceAP
@@ -605,17 +608,24 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         DENOPTIMAttachmentPoint dap_A = getAttachmentPoints().get(iA);
         DENOPTIMAttachmentPoint dap_B = other.getAttachmentPoints().get(iB);
 
-        // if no reaction/class specific info available set to single bond
-        int bndOrder = 1;
-
+        //TODO-V3 test this if block
+        
+        int chosenBO = 1;
+        if (dap_A.getFreeConnections()>1 && dap_B.getFreeConnections()>1)
+        {
+            int maxBO = Math.max(dap_A.getFreeConnections(), 
+                    dap_B.getFreeConnections());
+            chosenBO = rng.nextInt(maxBO-1) + 1;
+        }
+        
         // create a new edge
         DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(), other.getVertexId(),
-                iA, iB, bndOrder);
+                iA, iB, BondType.parseInt(chosenBO + ""));
 
         // update the attachment point info
-        dap_A.updateFreeConnections(-bndOrder); // decrement the connections
-        dap_B.updateFreeConnections(-bndOrder); // decrement the connections
-
+        dap_A.updateFreeConnections(-chosenBO); // decrement the connections
+        dap_B.updateFreeConnections(-chosenBO); // decrement the connections
+        
         return edge;
     }
 

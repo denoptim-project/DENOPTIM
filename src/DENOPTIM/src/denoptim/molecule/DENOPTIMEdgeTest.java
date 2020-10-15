@@ -28,6 +28,8 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
+import denoptim.molecule.DENOPTIMEdge.BondType;
+
 /**
  * Unit test for DENOPTIMEdge
  * 
@@ -43,8 +45,8 @@ public class DENOPTIMEdgeTest
     @Test
     public void testSameAs_Equal() throws Exception
     {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, 1);
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, 1);
+    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
+    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
 
     	assertTrue(eA.sameAs(eB, reason));	
     }
@@ -54,9 +56,9 @@ public class DENOPTIMEdgeTest
     @Test
     public void testSameAs_DiffAtm() throws Exception
     {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, 1);
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 1, 0, 1);
-    	DENOPTIMEdge eC = new DENOPTIMEdge(0, 1, 0, 1, 1);
+    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
+    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 1, 0, BondType.UNDEFINED);
+    	DENOPTIMEdge eC = new DENOPTIMEdge(0, 1, 0, 1, BondType.UNDEFINED);
 
     	assertFalse(eA.sameAs(eB, reason));	
     	assertFalse(eA.sameAs(eC, reason));	
@@ -67,8 +69,8 @@ public class DENOPTIMEdgeTest
     @Test
     public void testSameAs_DiffBndTyp() throws Exception
     {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, 1);
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, 2);
+    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.SINGLE);
+    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.DOUBLE);
     	
     	assertFalse(eA.sameAs(eB, reason));	
     }
@@ -78,9 +80,9 @@ public class DENOPTIMEdgeTest
     @Test
     public void testSameAs_SameAPClass() throws Exception
     {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, 1);
+    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
     	eA.setSourceReaction("classA");
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, 1);
+    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
     	eB.setSourceReaction("classA");
     	
     	assertTrue(eA.sameAs(eB, reason));	
@@ -91,9 +93,9 @@ public class DENOPTIMEdgeTest
     @Test
     public void testSameAs_DiffAPClass() throws Exception
     {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, 1);
+    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
     	eA.setSourceReaction("classA");
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, 1);
+    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
     	eB.setSourceReaction("classB");
     	
     	assertFalse(eA.sameAs(eB, reason));	

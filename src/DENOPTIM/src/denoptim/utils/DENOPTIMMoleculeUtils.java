@@ -83,6 +83,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 //TODO del if writing of failing molecule is not made systematic
 
@@ -194,17 +195,16 @@ public class DENOPTIMMoleculeUtils
             atmsToRemove.add(atomHead);
             atmsToRemove.add(atomTail);
 
-            switch (rings.get(0).getBondType()) {
-                case (2):
-                    mol.addBond(iSrcH, iSrcT, IBond.Order.DOUBLE);
-                    break;
-                case (3):
-                    mol.addBond(iSrcH, iSrcT, IBond.Order.TRIPLE);
-                    break;
-                default:
-                    mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-                    break;
+            BondType bndTyp = rings.get(0).getBondType();
+            if (bndTyp.hasCDKAnalogue())
+            {
+                mol.addBond(iSrcH, iSrcT, bndTyp.getCDKOrder());
+            } else {
+                System.out.println("WARNING! Attempt to add ring closing bond "
+                        + "did not add any actual chemical bond because the "
+                        + "bond type of the chord is '" + bndTyp +"'.");
             }
+
             doneVertices.set(usedRcvs.indexOf(vHead),true);
             doneVertices.set(usedRcvs.indexOf(vTail),true);
 	    }

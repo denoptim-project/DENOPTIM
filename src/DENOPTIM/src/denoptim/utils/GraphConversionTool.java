@@ -36,6 +36,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.*;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 
 /**
@@ -142,17 +143,9 @@ public class GraphConversionTool
 
             if (atom1 >= 0 && atom2 >= 0)
             {
-                switch (edge.getBondType())
+                if (edge.getBondType().hasCDKAnalogue())
                 {
-                case 1:
-                    mol.addBond(atom1, atom2, IBond.Order.SINGLE);
-                    break;
-                case 2:
-                    mol.addBond(atom1, atom2, IBond.Order.DOUBLE);
-                    break;
-                case 3:
-                    mol.addBond(atom1, atom2, IBond.Order.TRIPLE);
-                    break;
+                    mol.addBond(atom1, atom2, edge.getBondType().getCDKOrder());
                 }
             }
             else
@@ -202,21 +195,9 @@ public class GraphConversionTool
                 int idSrcH = mol.getAtomNumber(cH.get(0));
                 int idSrcT = mol.getAtomNumber(cT.get(0));
 
-                int bndOrder = r.getBondType(); 
-                switch (bndOrder)
+                if (r.getBondType().hasCDKAnalogue())
                 {
-                case 1:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
-                    break;
-                case 2:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.DOUBLE);
-                    break;
-                case 3:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.TRIPLE);
-                    break;
-                default:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
-                    break;
+                    mol.addBond(idSrcH, idSrcT, r.getBondType().getCDKOrder());
                 }
             }
         }
@@ -360,7 +341,7 @@ public class GraphConversionTool
     
                 int trgDAP = Integer.parseInt(s4[3]);
     
-                int btype = Integer.parseInt(s4[4]);
+                BondType btype = BondType.parseInt(s4[4]);
     
                 DENOPTIMEdge ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
                                                         trgDAP, btype);
@@ -430,7 +411,7 @@ public class GraphConversionTool
         for (int i=0; i<edges.size(); i++)
         {
             DENOPTIMEdge edge = edges.get(i);
-            int bndOrder = edge.getBondType();
+            BondType bndTyp = edge.getBondType();
             int srcvid = edge.getSourceVertex();
             int trgvid = edge.getTargetVertex();
             int iA = edge.getSourceDAP();
@@ -474,8 +455,8 @@ public class GraphConversionTool
             DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
 		    if (useMolInfo)
 	        {
-                apA.updateFreeConnections(-bndOrder);
-                apB.updateFreeConnections(-bndOrder);
+                apA.updateFreeConnections(-bndTyp.getValence());
+                apB.updateFreeConnections(-bndTyp.getValence());
 		    }
         }
 
@@ -487,8 +468,7 @@ public class GraphConversionTool
             {
                 if (e.getTargetVertex() == vid || e.getSourceVertex() == vid)
                 {
-                    int bt = e.getBondType();
-                    r.setBondType(bt);
+                    r.setBondType(e.getBondType());
                     break;
                 }
             }
