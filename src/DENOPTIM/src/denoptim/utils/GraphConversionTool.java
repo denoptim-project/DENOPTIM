@@ -326,9 +326,16 @@ public class GraphConversionTool
             int level = Integer.parseInt(s3[3]);
 	            
             //TODO-V3: this is where a type-agnostic constructor should be used
-            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
+            DENOPTIMVertex dv;
+            if (FragmentSpace.isDefined())
+            {
+                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
+            } else {
+                dv =  new EmptyVertex(vid);
+            }
             dv.setLevel(level);
 
+            
             //TODO-V3:check the symmetry on the vertex is properly imported
             // NB: now, we cannot record which APs are symmetric from the string
 		    // representation of a graph without the library of fragments.

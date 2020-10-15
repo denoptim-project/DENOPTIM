@@ -190,6 +190,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
             		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
             		useFragSpace);
         } catch (Exception e) {
+            e.printStackTrace();
         	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
         			+ " Could not read UID or Graph.", e);
         }
