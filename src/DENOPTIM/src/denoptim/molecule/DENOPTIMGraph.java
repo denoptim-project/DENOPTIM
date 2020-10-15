@@ -480,12 +480,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Remove a vertex from this graph. This method removes also edges and rings 
      * that involve the removed vertex. Symmetric sets of vertexes are corrected
-     * accordingly: they are removed if there only one remaining vertex in the 
-     * set, of purged from the removed vertex.
+     * accordingly: they are removed if there is only one remaining vertex in  
+     * the set, of purged from the removed vertex.
      * @param m_vertex the vertex to remove.
      */
     public void removeVertex(DENOPTIMVertex m_vertex)
-    {   	
+    {   
         if (!gVertices.contains(m_vertex))
         {
         	return;
@@ -540,7 +540,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
             this.removeEdge(edge);
         }
-
+        
         // delete the removed vertex from symmetric sets, but leave other vrtxs
         ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : symVertices)
@@ -1760,15 +1760,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Deletes the branch, i.e., the specified vertex and its children
-     * @param vid
+     * Deletes the branch, i.e., the specified vertex and its children.
+     * @param vid the vertexID of the root of the branch. We'll remove also
+     * this vertex.
      * @param symmetry use <code>true</code> to enforce deletion of all
-     * symmetric verices
-     * @return <code>true</code> if operation is successful
+     * symmetric vertexes.
+     * @return <code>true</code> if operation is successful.
      * @throws DENOPTIMException
      */
 
-    public boolean deleteVertex(int vid,boolean symmetry)
+    public boolean removeBranchStartingAt(int vid,boolean symmetry)
             throws DENOPTIMException
     {
         boolean res = true;
@@ -1782,7 +1783,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
             for (Integer svid : toRemove)
             {
-                boolean res2 = deleteVertex(svid);
+                boolean res2 = removeBranchStartingAt(svid);
                 if (!res2)
                 {
                     res = res2;
@@ -1791,7 +1792,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         else
         {
-            res = deleteVertex(vid);
+            res = removeBranchStartingAt(vid);
         }
 
         return res;
@@ -1802,12 +1803,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Deletes the branch, i.e., the specified vertex and its children.
      * No handling of symmetry.
-     * @param vid
+     * @param vid the vertexID of the root of the branch. We'll remove also
+     * this vertex.
      * @return <code>true</code> if operation is successful
      * @throws DENOPTIMException
      */
 
-    public boolean deleteVertex(int vid)
+    public boolean removeBranchStartingAt(int vid)
             throws DENOPTIMException
     {
         // first delete the edge with the parent vertex
@@ -3076,7 +3078,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             {
                                 continue;
                             }
-                            modGraph.deleteVertex(cid,symmetry);
+                            modGraph.removeBranchStartingAt(cid,symmetry);
                             int wantedTrgApId = e.getTargetDAP();
                             int trgApLstSize = inGraph.getVertexWithId(
                                     e.getTargetVertex()).getNumberOfAP();
@@ -3110,7 +3112,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             query, verbosity);
                     for (int vid : matches)
                     {
-                        modGraph.deleteVertex(vid,symmetry);
+                        modGraph.removeBranchStartingAt(vid,symmetry);
                     }
                     break;
                 }

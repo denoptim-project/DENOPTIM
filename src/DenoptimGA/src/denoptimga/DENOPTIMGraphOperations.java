@@ -257,12 +257,12 @@ public class DENOPTIMGraphOperations
             }
             for (Integer svid : toRemove)
             {
-                molGraph.deleteVertex(svid);
+                molGraph.removeBranchStartingAt(svid);
             }
         }
         else
         {
-            molGraph.deleteVertex(vid);
+            molGraph.removeBranchStartingAt(vid);
         }
 
         if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
@@ -1198,9 +1198,9 @@ if(debug)
      * Performs crossover between two graphs on a given pair of vertexIDs
      * @param male the first Graph
      * @param female the second Graph
-     * @param mvid vertexID of the root vertex of the branch of male to echange
+     * @param mvid vertexID of the root vertex of the branch of male to exchange
      * @param fvid vertexID of the root vertex of the branch of female to
-     * echange
+     * exchange
      * @return <code>true</code> if a new graph has been successfully produced
      * @throws DENOPTIMException
      */
@@ -1218,7 +1218,7 @@ if(debug)
             System.err.println("Female graph: "+female);
         }
 
-        // get details about crosover points
+        // get details about crossover points
         DENOPTIMVertex mvert = male.getVertexWithId(mvid);
         DENOPTIMVertex fvert = female.getVertexWithId(fvid);
         int eidxM = male.getIndexOfEdgeWithParent(mvid);
@@ -1274,7 +1274,7 @@ if(debug)
         }
         for (Integer svid : toRemoveFromM)
         {
-            male.removeVertex(svid);
+            male.removeBranchStartingAt(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
@@ -1307,7 +1307,7 @@ if(debug)
         }
         for (Integer svid : toRemoveFromF)
         {
-            female.removeVertex(svid);
+            female.removeBranchStartingAt(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        

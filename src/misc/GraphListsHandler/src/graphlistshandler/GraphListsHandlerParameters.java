@@ -56,6 +56,7 @@ public class GraphListsHandlerParameters
     private static String inGraphsFileB = null;
     protected static final String STRINGFORMATLABEL = "STRING";
     protected static final String SERFORMATLABEL = "SER";
+    protected static final String SDFFORMATLABEL = "SDF";
     private static String inGraphsFormat = STRINGFORMATLABEL; //Default
 
     /**
@@ -284,7 +285,7 @@ public class GraphListsHandlerParameters
         }
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Evaluate consistency of input parameters.
@@ -311,12 +312,14 @@ public class GraphListsHandlerParameters
             msg = "Input file with graphs to edit not define. Check you input.";
             throw new DENOPTIMException(msg);
         }
-        else if (inGraphsFileA != null && !DenoptimIO.checkExists(inGraphsFileA))
+        else if (inGraphsFileA != null 
+                && !DenoptimIO.checkExists(inGraphsFileA))
         {
             msg = "File with input graphs not found. Check " + inGraphsFileA;
             throw new DENOPTIMException(msg);
         }
-        else if (inGraphsFileB != null && !DenoptimIO.checkExists(inGraphsFileB))
+        else if (inGraphsFileB != null 
+                && !DenoptimIO.checkExists(inGraphsFileB))
         {
             msg = "File with input graphs not found. Check " + inGraphsFileB;
             throw new DENOPTIMException(msg);
@@ -329,10 +332,12 @@ public class GraphListsHandlerParameters
         }
 
         if (inGraphsFormat != null
-            && !inGraphsFormat.equals(STRINGFORMATLABEL))
+            && !inGraphsFormat.equals(STRINGFORMATLABEL)
+            && !inGraphsFormat.equals(SDFFORMATLABEL))
         {
             msg = " The format for providing input graph must be either '"
-                  + STRINGFORMATLABEL + "' (default)."
+                  + STRINGFORMATLABEL + "' (default), or '"
+                  + SDFFORMATLABEL +"'."
                   + "Unable to understand '" + inGraphsFormat + "'.";
             throw new DENOPTIMException(msg);
         }
@@ -377,7 +382,7 @@ public class GraphListsHandlerParameters
         }
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Processes all parameters and initialize related objects.
@@ -411,12 +416,24 @@ public class GraphListsHandlerParameters
         {
             switch (inGraphsFormat)
             {
-            case (STRINGFORMATLABEL):
+                case (STRINGFORMATLABEL):
                 {
-                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromFile(inGraphsFileA,true);
-                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromFile(inGraphsFileB,true);
+                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromFile(
+                            inGraphsFileA,true);
+                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromFile(
+                            inGraphsFileB,true);
                     break;
                 }
+
+                case (SDFFORMATLABEL):
+                {
+                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                            inGraphsFileA,true);
+                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                            inGraphsFileB,true);
+                    break;
+                }
+
                 default:
                 {
                     String msg = "'" + inGraphsFormat + "'"
@@ -427,7 +444,8 @@ public class GraphListsHandlerParameters
         }
         catch (Throwable t)
         {
-            String msg = "Cannot read in graphs from " + inGraphsFileA +" or " + inGraphsFileB;
+            String msg = "Cannot read in graphs from " + inGraphsFileA +" or " 
+                    + inGraphsFileB;
             DENOPTIMLogger.appLogger.log(Level.INFO,msg);
             throw new DENOPTIMException(msg,t);
         }
@@ -443,7 +461,7 @@ public class GraphListsHandlerParameters
 
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Print all parameters.
@@ -463,12 +481,12 @@ public class GraphListsHandlerParameters
             try
             {
                 sb.append(f.getName()).append(" = ").append(
-                            f.get(GraphListsHandlerParameters.class)).append(eol);
+                        f.get(GraphListsHandlerParameters.class)).append(eol);
             }
             catch (Throwable t)
             {
-                sb.append("ERROR! Unable to print GraphListsHandlerParameters. "+
-                                                                "Cause: " + t);
+                sb.append("ERROR! Unable to print "
+                        + "GraphListsHandlerParameters. Cause: " + t);
                 break;
             }
         }
@@ -479,6 +497,6 @@ public class GraphListsHandlerParameters
         RingClosureParameters.printParameters();
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 }

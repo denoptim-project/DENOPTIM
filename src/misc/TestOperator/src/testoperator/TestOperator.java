@@ -67,7 +67,7 @@ public class TestOperator
 
 // TODO: adapt for general operations
 
-            System.out.println("Testing crossover between: ");
+            System.out.println("Initial graphs: ");
             System.out.println(" ");
             System.out.println("v:"+TestOperatorParameters.mvid
                                +" of MALE: "+male);
@@ -80,7 +80,7 @@ public class TestOperator
             int ivmale = male.getIndexOfVertex(TestOperatorParameters.mvid);
             int ivfemale = female.getIndexOfVertex(TestOperatorParameters.fvid);
 
-            // Ensure uniqeness on vertexID
+            // Ensure uniqueness on vertexID
             male.renumberGraphVertices();
             male.renumberGraphVertices();
 
@@ -89,7 +89,7 @@ public class TestOperator
             int newfvid = female.getVertexAtPosition(ivfemale).getVertexId();
 
             // do crossover
-            System.out.println("Testing crossover between: ");
+            System.out.println("Initial graphs now with unique vertexID: ");
             System.out.println(" ");
             System.out.println("v:"+TestOperatorParameters.mvid+" (now:"+newmvid
                                +") of MALE: "+male);
