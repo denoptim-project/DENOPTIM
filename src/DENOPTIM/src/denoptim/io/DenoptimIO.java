@@ -1331,7 +1331,7 @@ public class DenoptimIO
      */
     public static void writeCompatibilityMatrix(String fileName,
             HashMap<String, ArrayList<String>> compReacMap,
-            HashMap<String, Integer> boMap, HashMap<String, String> reacCap,
+            HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
             Set<String> forbEnd)
             throws DENOPTIMException
     {
@@ -1374,7 +1374,8 @@ public class DenoptimIO
     	for (String apc : keysBO)
     	{
     		sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
-    		sb.append(apc).append(" ").append(boMap.get(apc)).append(NL);
+    		sb.append(apc).append(" ").append(
+    		        boMap.get(apc).toOldString()).append(NL);
     	}
     	
     	sb.append(DENOPTIMConstants.APCMAPIGNORE);

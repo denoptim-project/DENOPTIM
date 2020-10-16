@@ -116,10 +116,10 @@ public class CompatibilityMatrixForm extends JPanel {
     			new HashMap<String, ArrayList<String>>();
 
     /**
-     * Data structure that stores the correspondence between bond order
+     * Data structure that stores the correspondence between bond type
      * and attachment point class.
      */
-    private HashMap<String, BondType> bondOrderMap =
+    private HashMap<String, BondType> bondTypeMap =
     			new HashMap<String, BondType>();
 
     /**
@@ -132,11 +132,6 @@ public class CompatibilityMatrixForm extends JPanel {
      * Data structure that stores AP classes that cannot be held unused
      */
     private Set<String> forbiddenEndList = new HashSet<String>();
-    
-    /**
-     * Maximum bond order accepted in APClass-to-BO map
-     */
-    private final int MAXBO = 4;
 	
 	private JTabbedPane tabbedPane;
 	
@@ -540,14 +535,14 @@ public class CompatibilityMatrixForm extends JPanel {
         panelCPMap.add(scrollPanelCPMap, BorderLayout.CENTER);
 		
 		//
-		// APClass to Bond Order
+		// APClass to bond type
 		//
         panelAPClsBO = new JPanel(new BorderLayout());
 		tabbedPane.addTab("APClass-to-Bond",null,panelAPClsBO,null);
 
         String toolTipAPClsBO = String.format("<html><body width='%1s'>This "
-        		+ "table contains the APClass-to-Bond Order map that defines "
-        		+ "the bond order of bonds that are generated as a result of "
+        		+ "table contains the APClass-to-bond type map that defines "
+        		+ "the bond type of bonds that are generated as a result of "
         		+ "a fragment-fragment connection, i.e., an edge in the "
         		+ "DENOPTIMGraph.</html>",300);
 
@@ -588,7 +583,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 JList<String> srcClsList = new JList<String>(srcAPCs);
                 for (String apc : allAPClasses)
                 {
-                    if (!bondOrderMap.keySet().contains(apc))
+                    if (!bondTypeMap.keySet().contains(apc))
                     {
                     	srcAPCs.addElement(apc);
                     }
@@ -633,7 +628,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 JOptionPane.showMessageDialog(
                         null,
                         twoListsPanel,
-                        "New APClass-to-Bond Order Rule",
+                        "New APClass-to-Bond Type Rule",
                         JOptionPane.PLAIN_MESSAGE);
 
                 if (boList.getSelectedIndices().length > 0
@@ -677,10 +672,10 @@ public class CompatibilityMatrixForm extends JPanel {
 	                
 	                for (String apc : srcAPClasses)
 	                {
-	                	bondOrderMap.put(apc, bo);
+	                	bondTypeMap.put(apc, bo);
 	                }
 	                
-	                updateAPClassToBondOrderTable();
+	                updateAPClassToBondTypeTable();
                 }
 			}
 		});
@@ -690,7 +685,7 @@ public class CompatibilityMatrixForm extends JPanel {
         		+ "recent list of APClasses");
         btnUpdateAPClsBO.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	updateAPClassToBondOrderTable();
+            	updateAPClassToBondTypeTable();
             }
         });
         
@@ -714,7 +709,7 @@ public class CompatibilityMatrixForm extends JPanel {
                         {
                             String apc = (String) tableAPClsBO.getValueAt(
                                     selectedRowIds[i], 0);
-                            bondOrderMap.remove(apc);
+                            bondTypeMap.remove(apc);
                             tabModAPClsBO.removeRow(selectedRowIds[i]);
                         }
                     }
@@ -727,18 +722,12 @@ public class CompatibilityMatrixForm extends JPanel {
         btnHelpAPClsBO.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String txt = "<html><body width='%1s'><p>This table contains "
-                		+ "the APClass-to-Bond Order mapping. Use the "
+                		+ "the APClass-to-Bond Type mapping. Use the "
                 		+ "<code>Refresh</code> button to update a the table "
                 		+ "when APClasses have been added in other tabs. The "
                 		+ "<code>Refresh</code> allows also to recover the "
-                		+ "last available and valid value provided for any "
-                		+ "bond order.</p>"
-                		+ "<br>"
-                		+ "<p>Missing of invalid values (non-integer, "
-                		+ "value&lt;1 or value&gt;" + MAXBO 
-                		+ ") are highlighted in red, "
-                		+ "and must be changed to acceptable values in order "
-                		+ "to define a fragment space.</p></html>";
+                		+ "last available and valid bond type value provided "
+                		+ "for any APClass.</p></html>";
                 JOptionPane.showMessageDialog(null,
                         String.format(txt, 400),
                         "Tips",
@@ -1249,9 +1238,9 @@ public class CompatibilityMatrixForm extends JPanel {
                     Integer idBo = boList.getSelectedIndices()[0];
                     String apc = table.getValueAt(table.getSelectedRow(),
                             0).toString();
-                    bondOrderMap.put(apc, availBO.getElementAt(idBo));
+                    bondTypeMap.put(apc, availBO.getElementAt(idBo));
                     
-                    updateAPClassToBondOrderTable();
+                    updateAPClassToBondTypeTable();
                 }
             }
             
@@ -1355,7 +1344,6 @@ public class CompatibilityMatrixForm extends JPanel {
 
             if(column == 1)
             {
-                //TODO-V3 render BondType
             	if (value instanceof Integer)
             	{
             		if (((Integer) value) < 1)
@@ -1364,17 +1352,10 @@ public class CompatibilityMatrixForm extends JPanel {
 					}
             		else
             		{
-            			if (((Integer) value) > MAXBO)
-            			{
-    						cellComponent.setBackground(Color.RED);
-    					}
-                		else
-                		{
-	            			if (isSelected)
-	                    		cellComponent.setBackground(Color.BLUE);
-	                    	else
-	                    		cellComponent.setBackground(Color.WHITE);
-                		}
+            		    if (isSelected)
+                    		cellComponent.setBackground(Color.BLUE);
+                    	else
+                    		cellComponent.setBackground(Color.WHITE);
             		}
             	}
             	else if (value instanceof String)
@@ -1388,17 +1369,11 @@ public class CompatibilityMatrixForm extends JPanel {
 						}
 						else
 						{
-							if (val > MAXBO)
-							{
-								cellComponent.setBackground(Color.RED);
-							}
-							else
-							{
-								if (isSelected)
-				            		cellComponent.setBackground(Color.BLUE);
-				            	else
-				            		cellComponent.setBackground(Color.WHITE);
-							}
+							if (isSelected)
+			            		cellComponent.setBackground(Color.BLUE);
+			            	else
+			            		cellComponent.setBackground(Color.WHITE);
+							
 						}
 					} catch (NumberFormatException e) {
 						cellComponent.setBackground(Color.RED);
@@ -1422,13 +1397,13 @@ public class CompatibilityMatrixForm extends JPanel {
 	{	
 		//Read data from file
         compatMap = new HashMap<String,ArrayList<String>>();
-        bondOrderMap = new HashMap<String,BondType>();
+        bondTypeMap = new HashMap<String,BondType>();
         cappingMap = new HashMap<String,String>();
         forbiddenEndList = new HashSet<String>();
         try {
 			DenoptimIO.readCompatibilityMatrix(inFile.getAbsolutePath(),
 						compatMap,
-						bondOrderMap,
+						bondTypeMap,
 						cappingMap,
 						forbiddenEndList);
 			allAPClsInCPMap.addAll(compatMap.keySet());
@@ -1451,7 +1426,7 @@ public class CompatibilityMatrixForm extends JPanel {
         
         //Place data into GUI
         updateAPClassCompatibilitiesList();
-        updateAPClassToBondOrderTable();
+        updateAPClassToBondTypeTable();
         updateCappingRulesTable();
         updateForbiddenEndsTable();
 	}
@@ -1461,22 +1436,15 @@ public class CompatibilityMatrixForm extends JPanel {
 	/**
 	 * Writes all the compatibility matrix data to the given file. 
 	 * this methods writes all data, that is, compatibility rules, APClass-to-
-	 * bond order, capping rules, and definition of forbidden ends.
+	 * bond type, capping rules, and definition of forbidden ends.
 	 * @param outFile where to write
 	 */
 	public void writeCopatibilityMatrixFile(File outFile)
 	{
 		try {
-		    //TODO fixme
-		    /*
 			DenoptimIO.writeCompatibilityMatrix(outFile.getAbsolutePath(), 
-					compatMap, bondOrderMap, 
+					compatMap, bondTypeMap, 
 					cappingMap, forbiddenEndList);
-					*/
-		    //TODO del this bypassing
-		    DenoptimIO.writeCompatibilityMatrix(outFile.getAbsolutePath(), 
-                    compatMap, new HashMap<>(), 
-                    cappingMap, forbiddenEndList);
 		} catch (DENOPTIMException e) {
 			JOptionPane.showMessageDialog(null,
 					"<html>Could not write compatibility matrix data to "
@@ -1511,7 +1479,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	
 //-----------------------------------------------------------------------------
 	
-	private void updateAPClassToBondOrderTable()
+	private void updateAPClassToBondTypeTable()
 	{
 		activateTabEditsListener(false); 
 		
@@ -1525,13 +1493,13 @@ public class CompatibilityMatrixForm extends JPanel {
         
         // Get sorted list of table rows
 		ArrayList<String> sortedAPClsToBO = new ArrayList<String>();
-		sortedAPClsToBO.addAll(bondOrderMap.keySet());
+		sortedAPClsToBO.addAll(bondTypeMap.keySet());
 	    Collections.sort(sortedAPClsToBO);
 	    
 	    // Re-build table
 	    for (String apc : sortedAPClsToBO)
 	    {
-	    	tabModAPClsBO.addRow(new Object[]{apc, bondOrderMap.get(apc)});
+	    	tabModAPClsBO.addRow(new Object[]{apc, bondTypeMap.get(apc)});
 	    }
 	    
 	    activateTabEditsListener(true);
