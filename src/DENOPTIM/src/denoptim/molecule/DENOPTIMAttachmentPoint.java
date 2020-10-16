@@ -323,7 +323,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	            	this.dirVec[2] = Double.parseDouble(coord[2]);
 	            }
             }
-            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule);           
+            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule)
+                    .getValence();           
 	    } catch (Throwable t) {
 	        t.printStackTrace();
 			throw new DENOPTIMException("Cannot construct AP from string '" 
@@ -864,7 +865,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
                 other.getOwner().getVertexId(),
                 getID(),
                 other.getID(),
-                other.getBondOrder()
+                other.getBondType()
         );
         if (FragmentSpace.useAPclassBasedApproach()) {
             edge.setSourceReaction(getAPClass());
@@ -875,10 +876,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 
 //-----------------------------------------------------------------------------
 
-    private BondType getBondOrder() {
-        //TODO-V3 make the BOMap use the BondType enum
-        return BondType.parseInt(FragmentSpace.getBondOrderForAPClass(
-                this.getAPClass()).toString());
+    private BondType getBondType() {
+        return FragmentSpace.getBondOrderForAPClass(this.getAPClass());
     }
 
 //-----------------------------------------------------------------------------

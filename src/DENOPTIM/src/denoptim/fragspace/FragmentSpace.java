@@ -33,6 +33,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
@@ -98,7 +99,7 @@ public class FragmentSpace
      * Data structure that stores the correspondence between bond order
      * and attachment point class.
      */
-    private static HashMap<String, Integer> bondOrderMap;
+    private static HashMap<String, BondType> bondOrderMap;
 
     /**
      * Data structure that stores the AP-classes to be used to cap unused
@@ -157,15 +158,6 @@ public class FragmentSpace
      * @param fragLib library of fragments for general purpose.
      * @param cappLib library of single-AP fragments used to cap free attachment 
      * points (i.e., the capping groups).
-     * @param cpMap the APClass compatibility map. This data structure is a 
-     * map of the APClass-on-growing-graph (key) to list of permitted APClasses
-     * on incoming fragment (values).
-     * @param boMap the map of APClass into bond order. This data structure is a 
-     * map of APClass (keys) to bond order as integer (values).
-     * @param capMap the capping rules. This data structure is a map of  
-     * APClass-to-cap (keys) to APClass-of-capping-group (values).
-     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot 
-     * be left unused neither capped. 
      * @throws DENOPTIMException
      */
     public static void defineFragmentSpace(
@@ -208,7 +200,7 @@ public class FragmentSpace
     		ArrayList<DENOPTIMVertex> fragLib,
     		ArrayList<DENOPTIMVertex> cappLib,
     		HashMap<String,ArrayList<String>> cpMap,
-    		HashMap<String,Integer> boMap,
+    		HashMap<String,BondType> boMap,
     		HashMap<String,String> capMap,
     		HashSet<String> forbEnds,
     		HashMap<String,ArrayList<String>> rcCpMap) throws DENOPTIMException
@@ -531,7 +523,7 @@ public class FragmentSpace
 							throws DENOPTIMException
     {
             setCompatibilityMatrix(new HashMap<String,ArrayList<String>>());
-            setBondOrderMap(new HashMap<String,Integer>());
+            setBondOrderMap(new HashMap<String,BondType>());
             setCappingMap(new HashMap<String,String>());
             setForbiddenEndList(new HashSet<String>());
             DenoptimIO.readCompatibilityMatrix(inFile,
@@ -585,7 +577,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static HashMap<String, Integer> getBondOrderMap()
+    public static HashMap<String, BondType> getBondOrderMap()
     {
         return bondOrderMap;
     }
@@ -600,7 +592,7 @@ public class FragmentSpace
     * <code>null</code>, or a fully defined map does not include any mapping 
     * for the given APClass.
     */
-    public static Integer getBondOrderForAPClass(String apclass)
+    public static BondType getBondOrderForAPClass(String apclass)
     {
         if (!isValid || bondOrderMap == null)
         {
@@ -608,9 +600,9 @@ public class FragmentSpace
                        + "FragmentSpace defined (i.e., null BondOrderMap). "
                        + "Assuming bond order one.";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-            return 1;
+            return BondType.UNDEFINED;
         }
-        else return bondOrderMap.getOrDefault(apclass, 1);
+        else return bondOrderMap.getOrDefault(apclass, BondType.UNDEFINED);
     }
 
 //------------------------------------------------------------------------------
@@ -987,7 +979,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static void setBondOrderMap(HashMap<String, Integer> map)
+    public static void setBondOrderMap(HashMap<String, BondType> map)
     {
         bondOrderMap = map;
     }

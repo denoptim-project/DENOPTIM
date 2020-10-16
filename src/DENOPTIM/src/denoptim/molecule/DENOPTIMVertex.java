@@ -548,23 +548,21 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             String rname = trgRcn.substring(0, trgRcn.indexOf(':'));
 
             // look up the reaction bond order table
-            //TODO-V3 use BondOrder in BOMap
-            BondType bndOrder = BondType.parseInt(
-                    FragmentSpace.getBondOrderMap().get(rname).toString());
+            BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
 
             // create a new edge
             DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
                     target.getVertexId(),
                     sourceAPIndex,
                     targetAPIndex,
-                    bndOrder
+                    bndTyp
             );
             edge.setSourceReaction(srcRcn);
             edge.setTargetReaction(trgRcn);
 
             // update the attachment point info
-            sourceAP.updateFreeConnections(-bndOrder.getValence());
-            targetAP.updateFreeConnections(-bndOrder.getValence());
+            sourceAP.updateFreeConnections(-bndTyp.getValence());
+            targetAP.updateFreeConnections(-bndTyp.getValence());
 
             return edge;
         } else {
@@ -620,7 +618,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         
         // create a new edge
         DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(), other.getVertexId(),
-                iA, iB, BondType.parseInt(chosenBO + ""));
+                iA, iB, BondType.parseInt(chosenBO));
 
         // update the attachment point info
         dap_A.updateFreeConnections(-chosenBO); // decrement the connections

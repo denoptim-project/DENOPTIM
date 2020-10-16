@@ -28,6 +28,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
 
@@ -276,7 +277,8 @@ public class FragmentSpaceParameters
             }
             break;
             
-        //NB: this is supposed to be without "=" sign because it's a parameter without value
+        //NB: this is supposed to be without "=" sign because it's a parameter
+        // without value
         case "FS-ENFORCESYMMETRY":
     	    enforceSymmetry = true;
     	    break;
@@ -446,7 +448,8 @@ public class FragmentSpaceParameters
     public static void processParameters() throws DENOPTIMException
     {
         ArrayList<DENOPTIMVertex> scaffLib = convertsIACsToVertexes(
-                DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold"));
+                DenoptimIO.readInLibraryOfFragments(
+                        scaffoldLibFile,"scaffold"));
         
         ArrayList<DENOPTIMVertex> fragLib = convertsIACsToVertexes(
         DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
@@ -454,7 +457,7 @@ public class FragmentSpaceParameters
         ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
     	HashMap<String,ArrayList<String>> cpMap = 
     			new HashMap<String,ArrayList<String>>();
-    	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
+    	HashMap<String,BondType> boMap = new HashMap<String,BondType>();
     	HashMap<String,String> capMap = new HashMap<String,String>();
     	HashSet<String> forbEnds = new HashSet<String>();
     	HashMap<String,ArrayList<String>> rcCpMap = 
@@ -462,7 +465,8 @@ public class FragmentSpaceParameters
         
         if (cappingLibFile.length() > 0)
         {
-            cappLib = convertsIACsToVertexes(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
+            cappLib = convertsIACsToVertexes(
+                    DenoptimIO.readInLibraryOfFragments(cappingLibFile,
             		"capping group"));
         }
 

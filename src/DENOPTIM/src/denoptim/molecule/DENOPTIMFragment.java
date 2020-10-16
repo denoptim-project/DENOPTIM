@@ -733,10 +733,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    propAPClass = propAPClass + stingAPP;
 	
 			    //Build SDF property "ATTACHMENT_POINT"
-			    int BndOrd = FragmentSpace.getBondOrderForAPClass(
-                    		ap.getAPClass());
-
-			    String sBO = Integer.toString(BndOrd);
+			    String sBO = FragmentSpace.getBondOrderForAPClass(
+                        ap.getAPClass()).toOldString();
 			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
 			    {

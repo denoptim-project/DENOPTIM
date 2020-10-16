@@ -33,6 +33,7 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
 
@@ -155,13 +156,13 @@ public class FragmentSpaceTest
     	lst3.add(APC3);
     	cpMap.put(APC2, lst3);
     	
-    	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
-    	boMap.put(RULAPCS,1);
-    	boMap.put(RULAPC1,1);
-    	boMap.put(RULAPC2,1);
-    	boMap.put(RULAPC3,1);
-    	boMap.put(RULAPCC1,1);
-    	boMap.put(RULAPCC2,1);
+    	HashMap<String,BondType> boMap = new HashMap<String,BondType>();
+    	boMap.put(RULAPCS,BondType.SINGLE);
+    	boMap.put(RULAPC1,BondType.SINGLE);
+    	boMap.put(RULAPC2,BondType.SINGLE);
+    	boMap.put(RULAPC3,BondType.SINGLE);
+    	boMap.put(RULAPCC1,BondType.SINGLE);
+    	boMap.put(RULAPCC2,BondType.SINGLE);
     	
     	HashMap<String,String> capMap = new HashMap<String,String>();
     	capMap.put(APCS, APCC2);

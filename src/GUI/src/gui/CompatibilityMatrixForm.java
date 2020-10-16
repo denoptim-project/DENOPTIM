@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -66,6 +67,7 @@ import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 public class CompatibilityMatrixForm extends JPanel {
 
@@ -117,8 +119,8 @@ public class CompatibilityMatrixForm extends JPanel {
      * Data structure that stores the correspondence between bond order
      * and attachment point class.
      */
-    private HashMap<String, Integer> bondOrderMap =
-    			new HashMap<String, Integer>();
+    private HashMap<String, BondType> bondOrderMap =
+    			new HashMap<String, BondType>();
 
     /**
      * Data structure that stores the AP-classes to be used to cap unused
@@ -552,26 +554,33 @@ public class CompatibilityMatrixForm extends JPanel {
         tabModAPClsBO = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-            	if (column == 0)
-            		return false;
-            	else
-            		return true;
+                // NB: editing is done via a dialog that pops-up when double
+                // clicking on the second column. So the table itself is not
+                // editable
+                return false;
             }
         };
         tabModAPClsBO.setColumnCount(2);
         String column_name_bo[]= {"<html><b>APClass</b></html>",
-                "<html><b>Bond Order</b></html>"};
+                "<html><b>Bond Type</b></html>"};
         tabModAPClsBO.setColumnIdentifiers(column_name_bo);
-        tabModAPClsBO.addTableModelListener(new PausableAPC2BOTabModListener());
+        
+        // Old, but we keep it here to remember how it once was
+        // tabModAPClsBO.addTableModelListener(
+        //      new PausableAPC2BOTabModListener());
+        // The TableModelListener is now replaced with the MouseListener 
+        // appended to tableAPClsBO (see below)
+        
         tableAPClsBO = new JTable(tabModAPClsBO);
         tableAPClsBO.getColumnModel().getColumn(1).setCellRenderer(
         		new AP2BOCellRenderer());
         tableAPClsBO.setToolTipText(toolTipAPClsBO);
+        tableAPClsBO.addMouseListener(new APC2BOMouseListener());
         tableAPClsBO.putClientProperty("terminateEditOnFocusLost", true);
-        
+
         btnAddAPClsBO = new JButton("Add Rule");
-        btnAddAPClsBO.setToolTipText("Add one or more new APClass-to-Bond "
-        		+ "Rules");
+        btnAddAPClsBO.setToolTipText("Add one or more new APClass-to-BondType "
+        		+ "Rule");
         btnAddAPClsBO.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                 DefaultListModel<String> srcAPCs =
@@ -587,19 +596,19 @@ public class CompatibilityMatrixForm extends JPanel {
                 srcAPCs.addElement("<html><b><i>Define a new APClass...<i>"
                 		+ "</b></html>");
 
-                DefaultListModel<Integer> availBO =
-                        new DefaultListModel<Integer>();
-                JList<Integer> boList = new JList<Integer>(availBO);
-                for (int i=1; i<(MAXBO+1); i++)
+                DefaultListModel<BondType> availBO =
+                        new DefaultListModel<BondType>();
+                for (BondType b : BondType.values())
                 {
-                	availBO.addElement(i);
+                    availBO.addElement(b);
                 }
-                boList.setSelectionMode(
-                		ListSelectionModel.SINGLE_SELECTION);
+                JList<BondType> boList = new JList<BondType>(availBO);
+                boList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                boList.setSelectedValue(BondType.SINGLE, true);
 
                 JPanel twoListsPanel = new JPanel();
                 JLabel headSrc = new JLabel("APClass:");
-                JLabel headBo = new JLabel("Bond Order:");
+                JLabel headBo = new JLabel("Chemical Bond:");
                 JScrollPane scrollSrc = new JScrollPane(srcClsList);
                 JScrollPane scrollBo = new JScrollPane(boList);
                 GroupLayout lyoAddBO = new GroupLayout(twoListsPanel);
@@ -632,7 +641,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 {
                 	//NB: we allow a single selection in the boList
                 	Integer idBo = boList.getSelectedIndices()[0];
-                	int bo = ((Integer) availBO.getElementAt(idBo)).intValue();
+                	BondType bo = availBO.getElementAt(idBo);
                 	
                 	ArrayList<String> srcAPClasses = new ArrayList<String>();
 	                for (Integer id : srcClsList.getSelectedIndices())
@@ -1192,12 +1201,81 @@ public class CompatibilityMatrixForm extends JPanel {
 				matchCounter.setText(" "+n+" matches");
 		}
 	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Listener that waits for double click in the bond type column, and
+	 * opens the dialog for editing the content of the cell by allowing
+	 * a selection of a new value.
+	 */
+	private class APC2BOMouseListener implements MouseListener
+	{
+
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+            JTable table =(JTable) e.getSource();
+            Point point = e.getPoint();
+            
+            //Consider only double clicks on the bond type column
+            if (e.getClickCount() == 2
+                    && table.getSelectedRow() != -1
+                    && table.getSelectedColumn() == 1)
+            {
+                DefaultListModel<BondType> availBO =
+                        new DefaultListModel<BondType>();
+                for (BondType b : BondType.values())
+                {
+                    availBO.addElement(b);
+                }
+                JList<BondType> boList = new JList<BondType>(availBO);
+                boList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                boList.setSelectedValue(BondType.SINGLE, true);
+
+                JPanel oneListsPanel = new JPanel();
+                JScrollPane scrollBo = new JScrollPane(boList);
+                oneListsPanel.add(scrollBo);
+
+                JOptionPane.showMessageDialog(
+                        null,
+                        oneListsPanel,
+                        "Change Chemical Bond Equivalen",
+                        JOptionPane.PLAIN_MESSAGE);
+
+                if (boList.getSelectedIndices().length > 0)
+                {
+                    //NB: we allow a single selection in the boList
+                    Integer idBo = boList.getSelectedIndices()[0];
+                    String apc = table.getValueAt(table.getSelectedRow(),
+                            0).toString();
+                    bondOrderMap.put(apc, availBO.getElementAt(idBo));
+                    
+                    updateAPClassToBondOrderTable();
+                }
+            }
+            
+        }
+    
+        @Override
+        public void mousePressed(MouseEvent e){}
+    
+        @Override
+        public void mouseReleased(MouseEvent e){}
+    
+        @Override
+        public void mouseEntered(MouseEvent e){}
+    
+        @Override
+        public void mouseExited(MouseEvent e){}
+	    
+	}
 
 //-----------------------------------------------------------------------------
 	
 	/**
 	 * Listener that is pausable and that, when active, projects edits in the 
-	 * table of APClass-to-BO rules into the corresponding map.
+	 * table of APClass-to-BondType rules into the corresponding map.
 	 */
 	private class PausableAPC2BOTabModListener implements TableModelListener
 	{	
@@ -1205,10 +1283,12 @@ public class CompatibilityMatrixForm extends JPanel {
 		
 		public PausableAPC2BOTabModListener() 
 		{};
-
+      
 		@Override
 		public void tableChanged(TableModelEvent e) 
 		{
+		    
+		    /*
             if (isActive && e.getType() == TableModelEvent.UPDATE)
             {
             	int row = e.getFirstRow();
@@ -1230,6 +1310,7 @@ public class CompatibilityMatrixForm extends JPanel {
 					// value is so invalid we ignore it
 				}
             }
+            */
 		}
         
 		public void setActive(boolean var)
@@ -1274,6 +1355,7 @@ public class CompatibilityMatrixForm extends JPanel {
 
             if(column == 1)
             {
+                //TODO-V3 render BondType
             	if (value instanceof Integer)
             	{
             		if (((Integer) value) < 1)
@@ -1340,7 +1422,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	{	
 		//Read data from file
         compatMap = new HashMap<String,ArrayList<String>>();
-        bondOrderMap = new HashMap<String,Integer>();
+        bondOrderMap = new HashMap<String,BondType>();
         cappingMap = new HashMap<String,String>();
         forbiddenEndList = new HashSet<String>();
         try {
@@ -1385,9 +1467,16 @@ public class CompatibilityMatrixForm extends JPanel {
 	public void writeCopatibilityMatrixFile(File outFile)
 	{
 		try {
+		    //TODO fixme
+		    /*
 			DenoptimIO.writeCompatibilityMatrix(outFile.getAbsolutePath(), 
 					compatMap, bondOrderMap, 
 					cappingMap, forbiddenEndList);
+					*/
+		    //TODO del this bypassing
+		    DenoptimIO.writeCompatibilityMatrix(outFile.getAbsolutePath(), 
+                    compatMap, new HashMap<>(), 
+                    cappingMap, forbiddenEndList);
 		} catch (DENOPTIMException e) {
 			JOptionPane.showMessageDialog(null,
 					"<html>Could not write compatibility matrix data to "

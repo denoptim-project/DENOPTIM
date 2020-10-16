@@ -341,7 +341,7 @@ public class GraphConversionTool
     
                 int trgDAP = Integer.parseInt(s4[3]);
     
-                BondType btype = BondType.parseInt(s4[4]);
+                BondType btype = BondType.parseStr(s4[4]);
     
                 DENOPTIMEdge ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
                                                         trgDAP, btype);

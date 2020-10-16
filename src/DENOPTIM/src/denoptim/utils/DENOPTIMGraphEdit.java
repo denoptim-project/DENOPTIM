@@ -218,7 +218,7 @@ public class DENOPTIMGraphEdit
                 btype = Integer.parseInt(strPrts[4]);
             }
 		    this.focusEdge = new DENOPTIMEdge(srcVertex, trgVertex, srcAP,
-		    		trgAP, BondType.parseInt(btype + ""));
+		    		trgAP, BondType.parseInt(btype));
 		    if (strPrts.length > 5)
 		    {
 		        //source APClass

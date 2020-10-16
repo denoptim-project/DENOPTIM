@@ -26,13 +26,14 @@ import org.openscience.cdk.interfaces.IBond.Order;
 /**
  * This class represents the edge between 2 fragments (vertices)
  * @author Vishwesh Venkatraman
+ * @author Marco Foscato
  */
 public class DENOPTIMEdge implements Serializable,Cloneable
 {
     /**
      * The vertex id of the source fragment
      */
-    private int srcVertex; 
+    private int srcVertex;
     
     /**
      * the vertex id of the destination fragment
@@ -60,19 +61,29 @@ public class DENOPTIMEdge implements Serializable,Cloneable
       
         //TODO-V3: this is to be consistent with old "int-based" internal 
         // convention. Eventually, we'll not need this anymore.
-        private String s = "1";
+        private String oldString = "1";
+        
+        private int valenceUsed = -1;
         
         private IBond.Order bo = null;
         
         static {
+            ANY.bo = IBond.Order.SINGLE;
             SINGLE.bo = IBond.Order.SINGLE;
             DOUBLE.bo = IBond.Order.DOUBLE;
             TRIPLE.bo = IBond.Order.TRIPLE;
             QUADRUPLE.bo = IBond.Order.QUADRUPLE;
             
-            DOUBLE.s = "2";
-            TRIPLE.s = "3";
-            QUADRUPLE.s = "4";
+            SINGLE.valenceUsed = 1;
+            DOUBLE.valenceUsed = 2;
+            TRIPLE.valenceUsed = 3;
+            QUADRUPLE.valenceUsed = 4;
+            
+            //TODO del
+            SINGLE.oldString = "1";
+            DOUBLE.oldString = "2";
+            TRIPLE.oldString = "3";
+            QUADRUPLE.oldString = "4";
         }
         
         /**
@@ -91,18 +102,45 @@ public class DENOPTIMEdge implements Serializable,Cloneable
         }
         
         /**
-         * @return a string representation
+         * This method exists only to retain compatibility with old int-based
+         * notation.
+         * @return a string representation of the bond type
          */
-        @Override
-        public String toString() {
-            return s;
+        @Deprecated
+        public String toOldString() {
+            return oldString;
         }
 
         /**
          * @param string to be parsed
          * @return the corresponding bond type, if known, or UNDEFINED.
          */
-        public static BondType parseInt(String string)
+        public static BondType parseInt(int i)
+        {
+            switch (i)
+            {
+                case -1:
+                    return NONE;
+                case 1:
+                    return SINGLE;
+                case 2: 
+                    return DOUBLE;
+                case 3:
+                    return TRIPLE;
+                case 4:
+                    return QUADRUPLE;
+                case 8:
+                    return ANY;
+                default:
+                    return UNDEFINED;
+            }
+        }
+        
+        /**
+         * @param string to be parsed
+         * @return the corresponding bond type, if known, or UNDEFINED.
+         */
+        public static BondType parseStr(String string)
         {
             switch (string.trim())
             {
@@ -114,6 +152,8 @@ public class DENOPTIMEdge implements Serializable,Cloneable
                     return TRIPLE;
                 case "4":
                     return QUADRUPLE;
+                case "8":
+                    return ANY;
                 default:
                     return UNDEFINED;
             }
@@ -124,7 +164,7 @@ public class DENOPTIMEdge implements Serializable,Cloneable
          */
         public int getValence()
         {
-            return Integer.parseInt(s);
+            return valenceUsed;
         }
     }
     
@@ -358,7 +398,7 @@ public class DENOPTIMEdge implements Serializable,Cloneable
         StringBuilder sb = new StringBuilder(64);
         sb.append(srcVertex).append("_").append(srcDAP).append("_").
                 append(trgVertex).append("_").append(trgDAP).append("_").
-                append(bndTyp.toString());
+                append(bndTyp.toOldString());
         if (srcRcn.length() > 0 && trgRcn.length() > 0)
             sb.append("_").append(srcRcn).append("_").append(trgRcn);
 
