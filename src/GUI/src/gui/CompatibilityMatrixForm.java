@@ -65,8 +65,10 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
 public class CompatibilityMatrixForm extends JPanel {
@@ -87,6 +89,12 @@ public class CompatibilityMatrixForm extends JPanel {
 	 * fragment libraries
 	 */
 	private SortedSet<String> allAPClasses = new TreeSet<String>();
+	
+	/**
+     * List of all APRules. This list can be edited by creating/removing an 
+     * APRule or by creating/removing an APClass.
+     */
+    private SortedSet<String> allAPRules = new TreeSet<String>();
 	
 	/**
 	 * List of APClasses of capping groups.
@@ -271,6 +279,8 @@ public class CompatibilityMatrixForm extends JPanel {
     		        			return;
                 			}
 							allAPClasses.add(srcAPClass);
+							allAPRules.add(
+							        DENOPTIMAttachmentPoint.getAPRule(srcAPClass));
 						} catch (DENOPTIMException e1) {
 		        			JOptionPane.showMessageDialog(null,
 		        					"<html>Error definging anew APClass.<br>"
@@ -308,6 +318,9 @@ public class CompatibilityMatrixForm extends JPanel {
 	                			}
 								trgCPClasses.add(newAPC);
 								allAPClasses.add(newAPC);
+								allAPRules.add(
+								        DENOPTIMAttachmentPoint.getAPRule(
+								                newAPC));
 							} catch (DENOPTIMException e1) {
 								continue;
 							} 
@@ -538,13 +551,22 @@ public class CompatibilityMatrixForm extends JPanel {
 		// APClass to bond type
 		//
         panelAPClsBO = new JPanel(new BorderLayout());
-		tabbedPane.addTab("APClass-to-Bond",null,panelAPClsBO,null);
+		tabbedPane.addTab("APRule-to-Bond",null,panelAPClsBO,null);
 
-        String toolTipAPClsBO = String.format("<html><body width='%1s'>This "
-        		+ "table contains the APClass-to-bond type map that defines "
+        String toolTipAPClsBO = String.format("<html><body width='%1s'>"
+                + "</p>This "
+        		+ "table contains the APRule-to-bond type map that defines "
         		+ "the bond type of bonds that are generated as a result of "
-        		+ "a fragment-fragment connection, i.e., an edge in the "
-        		+ "DENOPTIMGraph.</html>",300);
+        		+ "a fragment-fragment connection between attachment points "
+        		+ "(APs), i.e., an edge in the "
+        		+ "DENOPTIMGraph.</p>"
+        		+ "<p>The APRule is the first component of an APClass, can be "
+        		+ "convinently seen as the property shared by both ends of "
+        		+ "any bond that is cut during fragmentation to yield two "
+        		+ "attachment points (APs). These two APs share the same "
+        		+ "APRule, but are usually distinguishable by the second "
+        		+ "component of the APClass: the so-called <i>subclass</i>"
+        		+ "</p></html>",300);
 
         tabModAPClsBO = new DefaultTableModel() {
             @Override
@@ -556,7 +578,7 @@ public class CompatibilityMatrixForm extends JPanel {
             }
         };
         tabModAPClsBO.setColumnCount(2);
-        String column_name_bo[]= {"<html><b>APClass</b></html>",
+        String column_name_bo[]= {"<html><b>APRule</b></html>",
                 "<html><b>Bond Type</b></html>"};
         tabModAPClsBO.setColumnIdentifiers(column_name_bo);
         
@@ -574,21 +596,22 @@ public class CompatibilityMatrixForm extends JPanel {
         tableAPClsBO.putClientProperty("terminateEditOnFocusLost", true);
 
         btnAddAPClsBO = new JButton("Add Rule");
-        btnAddAPClsBO.setToolTipText("Add one or more new APClass-to-BondType "
+        btnAddAPClsBO.setToolTipText("Add one or more new APRule-to-BondType "
         		+ "Rule");
         btnAddAPClsBO.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                DefaultListModel<String> srcAPCs =
+                DefaultListModel<String> srcAPRs =
                         new DefaultListModel<String>();
-                JList<String> srcClsList = new JList<String>(srcAPCs);
+                JList<String> apRulesList = new JList<String>(srcAPRs);
                 for (String apc : allAPClasses)
                 {
-                    if (!bondTypeMap.keySet().contains(apc))
+                    String apr = DENOPTIMAttachmentPoint.getAPRule(apc);
+                    if (!bondTypeMap.keySet().contains(apr))
                     {
-                    	srcAPCs.addElement(apc);
+                    	srcAPRs.addElement(apr);
                     }
                 }
-                srcAPCs.addElement("<html><b><i>Define a new APClass...<i>"
+                srcAPRs.addElement("<html><b><i>Define a new APRule...<i>"
                 		+ "</b></html>");
 
                 DefaultListModel<BondType> availBO =
@@ -602,9 +625,9 @@ public class CompatibilityMatrixForm extends JPanel {
                 boList.setSelectedValue(BondType.SINGLE, true);
 
                 JPanel twoListsPanel = new JPanel();
-                JLabel headSrc = new JLabel("APClass:");
+                JLabel headApr = new JLabel("APClass:");
                 JLabel headBo = new JLabel("Chemical Bond:");
-                JScrollPane scrollSrc = new JScrollPane(srcClsList);
+                JScrollPane scrollApr = new JScrollPane(apRulesList);
                 JScrollPane scrollBo = new JScrollPane(boList);
                 GroupLayout lyoAddBO = new GroupLayout(twoListsPanel);
                 twoListsPanel.setLayout(lyoAddBO);
@@ -612,45 +635,44 @@ public class CompatibilityMatrixForm extends JPanel {
                 lyoAddBO.setAutoCreateContainerGaps(true);
                 lyoAddBO.setHorizontalGroup(lyoAddBO.createSequentialGroup()
                 	.addGroup(lyoAddBO.createParallelGroup()
-                			.addComponent(headSrc)
-                        	.addComponent(scrollSrc))
+                			.addComponent(headApr)
+                        	.addComponent(scrollApr))
                     .addGroup(lyoAddBO.createParallelGroup()
                     	.addComponent(headBo)
                     	.addComponent(scrollBo)));
                 lyoAddBO.setVerticalGroup(lyoAddBO.createSequentialGroup()
                     .addGroup(lyoAddBO.createParallelGroup()
-                    	.addComponent(headSrc)
+                    	.addComponent(headApr)
                     	.addComponent(headBo))
                     .addGroup(lyoAddBO.createParallelGroup()
-                        .addComponent(scrollSrc)
+                        .addComponent(scrollApr)
                     	.addComponent(scrollBo)));
 
                 JOptionPane.showMessageDialog(
                         null,
                         twoListsPanel,
-                        "New APClass-to-Bond Type Rule",
+                        "New APRule-to-Bond Type Rule",
                         JOptionPane.PLAIN_MESSAGE);
 
                 if (boList.getSelectedIndices().length > 0
-                		&& srcClsList.getSelectedIndices().length > 0)
+                		&& apRulesList.getSelectedIndices().length > 0)
                 {
                 	//NB: we allow a single selection in the boList
                 	Integer idBo = boList.getSelectedIndices()[0];
                 	BondType bo = availBO.getElementAt(idBo);
                 	
-                	ArrayList<String> srcAPClasses = new ArrayList<String>();
-	                for (Integer id : srcClsList.getSelectedIndices())
+                	ArrayList<String> apRules = new ArrayList<String>();
+	                for (Integer id : apRulesList.getSelectedIndices())
 	                {
-	                	if (id.intValue() == (srcAPCs.size()-1))
+	                	if (id.intValue() == (srcAPRs.size()-1))
 	                	{
 	                		try {
-								String newAPC = GUIFragmentInspector
-										.ensureGoodAPClassString("",
-										"Define APClass", false);
-	                			if (allAPClasses.contains(newAPC))
+								String newAPR = ensureGoodAPRuleString("",
+										"Define APRule", false);
+	                			if (allAPRules.contains(newAPR))
 	                			{
 	                				JOptionPane.showMessageDialog(null,
-	    		        					"<html>Class '<code>" + newAPC
+	    		        					"<html>APRule '<code>" + newAPR
 	    		        					+"</code>' is not new!</html>",
 	    		        	                "Error",
 	    		        	                JOptionPane.WARNING_MESSAGE,
@@ -658,34 +680,34 @@ public class CompatibilityMatrixForm extends JPanel {
 	    		        	                		"OptionPane.errorIcon"));
 	    		        			return;
 	                			}
-	                			srcAPClasses.add(newAPC);
-								allAPClasses.add(newAPC);
+	                			apRules.add(newAPR);
+	                			allAPRules.add(newAPR);
 							} catch (DENOPTIMException e1) {
 								continue;
 							}
 	                	}
 	                	else
 	                	{
-	                		srcAPClasses.add((String) srcAPCs.getElementAt(id));
+	                		apRules.add((String) srcAPRs.getElementAt(id));
 	                	}
 	                }
 	                
-	                for (String apc : srcAPClasses)
+	                for (String apr : apRules)
 	                {
-	                	bondTypeMap.put(apc, bo);
+	                	bondTypeMap.put(apr, bo);
 	                }
 	                
-	                updateAPClassToBondTypeTable();
+	                updateAPRuleToBondTypeTable();
                 }
 			}
 		});
 
         btnUpdateAPClsBO = new JButton("Refresh");
         btnUpdateAPClsBO.setToolTipText("Updates the table with the most "
-        		+ "recent list of APClasses");
+        		+ "recent list of APRules");
         btnUpdateAPClsBO.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	updateAPClassToBondTypeTable();
+            	updateAPRuleToBondTypeTable();
             }
         });
         
@@ -721,8 +743,31 @@ public class CompatibilityMatrixForm extends JPanel {
         btnHelpAPClsBO.setToolTipText("Displays the help message.");
         btnHelpAPClsBO.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String txt = "<html><body width='%1s'><p>This table contains "
-                		+ "the APClass-to-Bond Type mapping. Use the "
+                String txt = "<html><body width='%1s'>"
+                        + "<p>This "
+                        + "table contains the APRule-to-bond type map that "
+                        + "defines "
+                        + "the bond type of bonds that are generated as a "
+                        + "result of "
+                        + "a fragment-fragment connection between attachment "
+                        + "points "
+                        + "(APs), i.e., an edge in the "
+                        + "DENOPTIMGraph.</p>"
+                        + "<br>"
+                        + "<p>The APRule is the first component of an APClass, "
+                        + "and can be "
+                        + "convinently seen as the property shared by both "
+                        + "ends of "
+                        + "any bond that is cut during fragmentation to "
+                        + "yield two "
+                        + "attachment points (APs). These two APs share "
+                        + "the same "
+                        + "APRule, but are usually distinguishable by the "
+                        + "second "
+                        + "component of the APClass: the so-called "
+                        + "<i>subclass</i>.</p>"
+                        + "<br>"
+                        + "<p>Use the "
                 		+ "<code>Refresh</code> button to update a the table "
                 		+ "when APClasses have been added in other tabs. The "
                 		+ "<code>Refresh</code> allows also to recover the "
@@ -852,6 +897,8 @@ public class CompatibilityMatrixForm extends JPanel {
     		        			return;
                 			}
 							allAPClasses.add(cappingAPClass);
+							allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(
+							        cappingAPClass));
 						} catch (DENOPTIMException e1) {
 		        			JOptionPane.showMessageDialog(null,
 		        					"<html>Error definging a new APClass.<br>"
@@ -890,6 +937,9 @@ public class CompatibilityMatrixForm extends JPanel {
 			                    		cappingAPClass});
 			                    cappingMap.put(newAPC,cappingAPClass);
 								allAPClasses.add(newAPC);
+								allAPRules.add(
+								        DENOPTIMAttachmentPoint.getAPRule(
+								                newAPC));
 							} catch (DENOPTIMException e1) {
 								continue;
 							} 
@@ -1058,6 +1108,8 @@ public class CompatibilityMatrixForm extends JPanel {
                 			tabModFrbEnd.addRow(new Object[]{newAPC});
     	    				forbiddenEndList.add(newAPC);
 							allAPClasses.add(newAPC);
+							allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(
+							        newAPC));
 						} catch (DENOPTIMException e1) {
 							continue;
 						} 
@@ -1143,6 +1195,61 @@ public class CompatibilityMatrixForm extends JPanel {
         panelFrbEnd.add(panelFrbEndTable, BorderLayout.CENTER);
 		
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Forces the user to specify a properly formatted APRule, i.e., the first
+     * component of an APClass. If the APClass is "myRule:1", the APRule is 
+     * "myRule".
+     * @param currApRule the current value of the APClass, or empty string
+     * @param mustReply set to <code>true</code> to prevent escaping the question
+     * @return 
+     * @throws DENOPTIMException 
+     */
+    public static String ensureGoodAPRuleString(String currApRule, 
+            String title, boolean mustReply) throws DENOPTIMException 
+    {       
+        String preStr = "";
+        while (!DENOPTIMAttachmentPoint.isValidAPRuleString(currApRule))
+        {
+            if (currApRule != "")
+            {
+                preStr = "APRule '" + currApRule + "' is not valid!<br>"
+                        + "The valid syntax for APClass is:<br><br><code>APRule" 
+                        + DENOPTIMConstants.SEPARATORAPPROPSCL 
+                        + "subClass</code><br><br> where "
+                        + "<ul><li><code>APrule</code>"
+                        + " is the wtring you should provide now, and is"
+                        + "typically any string with no spaces,</li>"
+                        + "<li><code>subClass</code> is an integer.</li>";
+            }
+            
+            currApRule = JOptionPane.showInputDialog(null, 
+                    "<html>" + preStr + "</ul>Please, provide a valid "
+                    + "APClass string: ", title, JOptionPane.PLAIN_MESSAGE);
+            
+            if (currApRule == null)
+            {
+                currApRule = "";
+                if (!mustReply)
+                {
+                    throw new DENOPTIMException();
+                }
+            }
+            
+            preStr = "APRule '" + currApRule + "' is not valid!<br>"
+                    + "The valid syntax for APClass is:<br><br><code>APRule" 
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL 
+                    + "subClass</code><br><br> where "
+                    + "<ul><li><code>APrule</code>"
+                    + " is the wtring you should provide now, and is"
+                    + "typically any string with no spaces,</li>"
+                    + "<li><code>subClass</code> is an integer.</li>";
+        }
+        
+        return currApRule;
+    }
 	
 //-----------------------------------------------------------------------------
 
@@ -1240,7 +1347,7 @@ public class CompatibilityMatrixForm extends JPanel {
                             0).toString();
                     bondTypeMap.put(apc, availBO.getElementAt(idBo));
                     
-                    updateAPClassToBondTypeTable();
+                    updateAPRuleToBondTypeTable();
                 }
             }
             
@@ -1426,7 +1533,7 @@ public class CompatibilityMatrixForm extends JPanel {
         
         //Place data into GUI
         updateAPClassCompatibilitiesList();
-        updateAPClassToBondTypeTable();
+        updateAPRuleToBondTypeTable();
         updateCappingRulesTable();
         updateForbiddenEndsTable();
 	}
@@ -1479,7 +1586,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	
 //-----------------------------------------------------------------------------
 	
-	private void updateAPClassToBondTypeTable()
+	private void updateAPRuleToBondTypeTable()
 	{
 		activateTabEditsListener(false); 
 		
@@ -1575,6 +1682,11 @@ public class CompatibilityMatrixForm extends JPanel {
 		{
 			allAPClasses.addAll(apcs);
 		}
+		
+		for (String apc : allAPClasses)
+		{
+		    allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(apc));
+		}
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1593,6 +1705,11 @@ public class CompatibilityMatrixForm extends JPanel {
 			allCapAPClasses = new TreeSet<String>();
 		}
 		allCapAPClasses.addAll(cappingMap.values());
+		allAPClasses.addAll(allCapAPClasses);
+		for (String apc : allAPClasses)
+        {
+            allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(apc));
+        }
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1612,12 +1729,18 @@ public class CompatibilityMatrixForm extends JPanel {
 		if (cleanup)
 		{
 			allAPClasses = new TreeSet<String>();
+			allAPRules = new TreeSet<String>();
 		}
 		
 		for (File fragLib : fragLibs)
 		{
 			allAPClasses.addAll(DenoptimIO.readAllAPClasses(fragLib));
 		}
+		
+		for (String apc : allAPClasses)
+        {
+            allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(apc));
+        }
 		
 		this.setCursor(Cursor.getPredefinedCursor(
 				Cursor.DEFAULT_CURSOR));
@@ -1752,6 +1875,9 @@ public class CompatibilityMatrixForm extends JPanel {
 		                			}
 									trgCPClasses.add(newAPC);
 									allAPClasses.add(newAPC);
+									allAPRules.add(
+									        DENOPTIMAttachmentPoint.getAPRule(
+									                newAPC));
 								} catch (DENOPTIMException e1) {
 									continue;
 								} 

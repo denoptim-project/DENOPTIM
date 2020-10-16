@@ -1158,8 +1158,9 @@ public class GUIFragmentInspector extends GUICardPanel
   	/**
   	 * Forces the user to specify a properly formatted APClass.
   	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the question
-  	 * @return 
+  	 * @param mustReply set to <code>true</code> to prevent escaping the 
+  	 * question
+  	 * @return the APClass
   	 * @throws DENOPTIMException 
   	 */
 	public static String ensureGoodAPClassString(String currApClass, 
