@@ -30,6 +30,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
 
 
@@ -429,12 +430,12 @@ public class FragmentSpaceParameters
     //TODO-V3: adapt to templates.
     
     private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
-            ArrayList<IAtomContainer> iacs) throws DENOPTIMException
+            ArrayList<IAtomContainer> iacs, BBType bbt) throws DENOPTIMException
     {
     	ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
     	for (IAtomContainer iac : iacs)
     	{
-    		list.add(new DENOPTIMFragment(iac));
+    		list.add(new DENOPTIMFragment(iac,bbt));
     	}
     	return list;
     }
@@ -449,10 +450,11 @@ public class FragmentSpaceParameters
     {
         ArrayList<DENOPTIMVertex> scaffLib = convertsIACsToVertexes(
                 DenoptimIO.readInLibraryOfFragments(
-                        scaffoldLibFile,"scaffold"));
+                        scaffoldLibFile,"scaffold"),BBType.SCAFFOLD);
         
         ArrayList<DENOPTIMVertex> fragLib = convertsIACsToVertexes(
-        DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
+        DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"),
+        BBType.FRAGMENT);
 
         ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
     	HashMap<String,ArrayList<String>> cpMap = 
@@ -467,7 +469,7 @@ public class FragmentSpaceParameters
         {
             cappLib = convertsIACsToVertexes(
                     DenoptimIO.readInLibraryOfFragments(cappingLibFile,
-            		"capping group"));
+            		"capping group"),BBType.CAP);
         }
 
         if (compMatrixFile.length() > 0)

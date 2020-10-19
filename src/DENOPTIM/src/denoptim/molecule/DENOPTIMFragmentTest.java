@@ -34,6 +34,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 /**
  * Unit test for DENOPTIMFragment
@@ -121,7 +122,7 @@ public class DENOPTIMFragmentTest
         
         IAtomContainer iac = frg1.getIAtomContainer();
         
-        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac);
+        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac,BBType.UNDEFINED);
         
         assertEquals(7,frg1.getNumberOfAP(),"#APs in frg1");
         assertEquals(7,frg2.getNumberOfAP(),"#APs in frg2");

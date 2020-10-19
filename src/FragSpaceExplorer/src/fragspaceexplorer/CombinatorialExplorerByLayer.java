@@ -41,6 +41,7 @@ import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
@@ -791,7 +792,7 @@ public class CombinatorialExplorerByLayer
 
         //TODO-V3: use a vertex constructor that is type-agnostic
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(),scafIdx,0);
+                GraphUtils.getUniqueVertexIndex(),scafIdx,BBType.SCAFFOLD);
 
         // as in DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);

@@ -20,6 +20,8 @@ package denoptim.rings;
 
 import java.io.Serializable;
 
+import denoptim.molecule.DENOPTIMFragment.BBType;
+
 /**
  * ChainLink represents a vertex in a closable chain.
  * This data structure stores information as to the corrersponding
@@ -39,7 +41,7 @@ public class ChainLink implements Cloneable, Serializable
     /**
      * Fragment type
      */
-    private int ftype;
+    private BBType ftype;
 
     /**
      * Index of AP towards left
@@ -68,7 +70,7 @@ public class ChainLink implements Cloneable, Serializable
      *  Constructs a ChainLink from the involved points
      */
 
-    public ChainLink(int molID, int ftype, int apLeft, int apRight)
+    public ChainLink(int molID, BBType ftype, int apLeft, int apRight)
     {
         this.molID = molID;
         this.ftype = ftype;
@@ -93,7 +95,7 @@ public class ChainLink implements Cloneable, Serializable
      * @return the type of fragment library
      */
 
-    public int getFragType()
+    public BBType getFragType()
     {
         return ftype;
     }
@@ -101,7 +103,7 @@ public class ChainLink implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
-     * @return the index of the attachment point derected to the left side
+     * @return the index of the attachment point directed to the left side
      * of the chain from this link
      */
     
@@ -113,7 +115,7 @@ public class ChainLink implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
-     * @return the index of the attachment point derected to the right side
+     * @return the index of the attachment point directed to the right side
      * of the chain from this link
      */
 

@@ -20,6 +20,8 @@ package denoptim.fragspace;
 
 import java.io.Serializable;
 
+import denoptim.molecule.DENOPTIMFragment.BBType;
+
 
 /**
  * Data structure containing information that identifies a single AP of 
@@ -30,6 +32,11 @@ import java.io.Serializable;
 
 public class IdFragmentAndAP implements Serializable
 {
+    /**
+     * Vedrsion UID
+     */
+    private static final long serialVersionUID = -863201756763649026L;
+
     /**
      * the ID of the vertex containing the fragment.
      */
@@ -43,7 +50,7 @@ public class IdFragmentAndAP implements Serializable
     /**
      * the type of library containing the fragment. 
      */
-    private int molTyp = -1;
+    private BBType molTyp = BBType.UNDEFINED;
 
     /**
      * the index of a specific attachment point.
@@ -68,12 +75,12 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public IdFragmentAndAP(int m_vId, int m_molId, int m_molTyp, int m_apId, 
+    public IdFragmentAndAP(int m_vId, int m_molId, BBType vMolTyp, int m_apId, 
             int m_vSymSetId, int m_aSymSetId)
     {
         vId = m_vId;
         molId = m_molId;
-        molTyp = m_molTyp;
+        molTyp = vMolTyp;
         apId = m_apId;
     	vSymSetId = m_vSymSetId;
     	aSymSetId = m_aSymSetId;
@@ -95,7 +102,7 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public int getVertexMolType()
+    public BBType getVertexMolType()
     {
         return molTyp;
     }

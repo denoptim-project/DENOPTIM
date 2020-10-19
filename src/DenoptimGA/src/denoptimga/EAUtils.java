@@ -54,6 +54,7 @@ import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
@@ -922,7 +923,7 @@ public class EAUtils
 
         //TODO-V3: use a type-agnostic w.r.t vertex constructor
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, 0);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD);
         
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
@@ -1060,7 +1061,7 @@ public class EAUtils
             if (fid != -1)
             {
                 DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), fid, 2);
+                        GraphUtils.getUniqueVertexIndex(), fid, BBType.CAP);
                 
                 fragVertex.setLevel(lvl+1);
 
@@ -1353,7 +1354,7 @@ public class EAUtils
 
             // no capping of a capping group
 
-            if (curVertex.getFragmentType() == 2)
+            if (curVertex.getFragmentType() == BBType.CAP)
             {
                 //String msg = "Attempting to cap a capping group. Check your data.";
                 //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
@@ -1876,7 +1877,8 @@ MF: TO BE TESTED
 
                 // choose one of the compatible APs on the chosen fragment
                 ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                        FragmentSpace.getVertexFromLibrary(1, fid).getAttachmentPoints();
+                        FragmentSpace.getVertexFromLibrary(BBType.FRAGMENT, 
+                                fid).getAttachmentPoints();
         		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
         		for (int i=0; i<fragAPs.size(); i++)
         		{
@@ -1897,7 +1899,8 @@ MF: TO BE TESTED
             }
         }
 
-	IdFragmentAndAP res = new IdFragmentAndAP(-1,fid,1,apid,-1,-1);
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, fid, BBType.FRAGMENT, 
+                apid, -1, -1);
 
         return res;
     }

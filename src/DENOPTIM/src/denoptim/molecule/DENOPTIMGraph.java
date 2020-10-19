@@ -33,12 +33,14 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.graph.ConnectivityChecker;
+import org.openscience.cdk.graph.MoleculeGraphs;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -1510,7 +1512,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getFragmentType() == 2
+            if (((DENOPTIMFragment) vtx).getFragmentType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 rvids.add(vtx.getVertexId());
@@ -1688,10 +1690,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * updates the valence of the parent and child vertex after the edge
-     * has been removed
-     * @param vid the id of the vertex whose edge with its parent will be removed
-     * @return the id of the parent vertex
+     * Removes the edge an updates the valence of the parent and child vertex 
+     * after the edge has been removed.
+     * @param vid the id of the vertex whose edge with its parent will be 
+     * removed.
+     * @return the id of the parent vertex.
      */
 
     public int removeEdgeWithParent(int vid)
@@ -1708,7 +1711,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             int iA = edge.getSourceDAP();
             src.updateAttachmentPoint(iA, edge.getBondType().getValence());
             pvid = src.getVertexId();
-
 
             // update the attachment point of the target vertex
             DENOPTIMVertex trg = getVertexWithId(edge.getTargetVertex());
@@ -1734,7 +1736,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
 
-    public boolean removeBranchStartingAt(int vid,boolean symmetry)
+    public boolean removeBranchStartingAt(int vid, boolean symmetry)
             throws DENOPTIMException
     {
         boolean res = true;
@@ -1781,7 +1783,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         int pvid = removeEdgeWithParent(vid);
         if (pvid == -1)
         {
-            String msg = "Program Bug detected trying to  delete vertex "
+            String msg = "Program Bug detected trying to delete vertex "
                     + vid + " from graph '" + this + "'. "
                     + "Unable to locate parent edge.";
             throw new DENOPTIMException(msg);
@@ -2547,14 +2549,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     public ArrayList<Integer> findVerticesIds(
             DENOPTIMVertexQuery query,
-            int verbosity
-    ) {
+            int verbosity) 
+    {
         ArrayList<Integer> matches = new ArrayList<>();
         for (DENOPTIMVertex v : findVertices(query, verbosity)) {
             matches.add(v.getVertexId());
         }
         return matches;
     }
+    
+//-----------------------------------------------------------------------------
 
     /**
      * Filters a list of vertices according to a query.
@@ -2566,8 +2570,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMVertex> findVertices(
             DENOPTIMVertexQuery dnQuery,
-            int verbosity
-    ) {
+            int verbosity) 
+    {
         DENOPTIMVertex vQuery = dnQuery.getVrtxQuery();
         DENOPTIMEdge eInQuery = dnQuery.getInEdgeQuery();
         DENOPTIMEdge eOutQuery = dnQuery.getOutEdgeQuery();
@@ -2576,12 +2580,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         if (verbosity > 1)
         {
-            System.out.println("Searching vertices - candidates: " + matches);
+            System.out.println("Candidates: " + matches);
         }
 
         //Check condition vertex ID
         if (vQuery.getVertexId() > -1) //-1 would be the wildcard
         {
+            if (verbosity > 2)
+            { 
+                System.out.println("Keeping vertex ID: "+vQuery.getVertexId());
+            }
             ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
             for (DENOPTIMVertex v : matches)
             {
@@ -2593,7 +2601,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             matches = newLst;
         }
 
-        if (verbosity > 2)
+        if (verbosity > 1)
         {
             System.out.println("After ID-based rule: " + matches);
         }
@@ -2605,6 +2613,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             if (queryMolID > -1) //-1 would be the wildcard
             {
                 ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
+                if (verbosity > 2)
+                { 
+                    System.out.println("Keeping MolID: "+queryMolID);
+                }
                 for (DENOPTIMVertex v : matches)
                 {
                     if (!(v instanceof DENOPTIMFragment))
@@ -2625,9 +2637,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition fragment type
-            int queryFrgTyp = ((DENOPTIMFragment) vQuery).getFragmentType();
-            if (queryFrgTyp > -1) //-1 would be the wildcard
+            BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getFragmentType();
+            if (queryFrgTyp != BBType.UNDEFINED)
             {
+                if (verbosity > 2)
+                { 
+                    System.out.println("Keeping FragType: "+queryFrgTyp);
+                }
                 ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
                 for (DENOPTIMVertex v : matches)
                 {
@@ -2945,8 +2961,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     public DENOPTIMGraph editGraph(ArrayList<DENOPTIMGraphEdit> edits,
-                                   boolean symmetry, int verbosity
-    ) throws DENOPTIMException {
+                                   boolean symmetry, int verbosity) 
+                                           throws DENOPTIMException 
+    {
 
         //Make sure there is no clash with vertex IDs
         int maxId = getMaxVertexId();
@@ -2968,6 +2985,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMGraphEdit edit : edits)
         {
             String task = edit.getType();
+            
+            if (verbosity > 1)
+            {
+                System.out.println(" ");
+                System.out.println("Graph edit task: "+task);
+                System.out.println("Graph to be edited: "+modGraph);
+            }
+            
             switch (task.toUpperCase())
             {
                 case (DENOPTIMGraphEdit.REPLACECHILD):
@@ -3043,7 +3068,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             query, verbosity);
                     for (int vid : matches)
                     {
-                        modGraph.removeBranchStartingAt(vid,symmetry);
+                        modGraph.removeBranchStartingAt(vid, symmetry);
                     }
                     break;
                 }

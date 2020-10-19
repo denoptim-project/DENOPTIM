@@ -34,6 +34,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
@@ -237,11 +238,12 @@ public class GraphUtils
                                                       DENOPTIMVertex curVertex,
                                                       int srcAPIdx, 
                                                       int fId, 
-                                                      int fTyp,
+                                                      BBType fTyp,
                                                       int trgAPIdx) 
                                                       throws DENOPTIMException
     {
-        DENOPTIMVertex incomingVertex = DENOPTIMVertex.newVertexFromLibrary(fId, fTyp);
+        DENOPTIMVertex incomingVertex = DENOPTIMVertex.newVertexFromLibrary(fId,
+                fTyp);
 
         int lvl = curVertex.getLevel();
         incomingVertex.setLevel(lvl+1);

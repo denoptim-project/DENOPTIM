@@ -67,6 +67,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
@@ -869,7 +870,7 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 			else
 			{
-				id = new IdFragmentAndAP(vId,-99,-99,apId,-99,-99);
+				id = new IdFragmentAndAP(vId,-99,BBType.UNDEFINED,apId,-99,-99);
 			}
 			
 			allIDs.add(id);
@@ -955,8 +956,8 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Create the node
 		int scaffVrtId = 1;
-		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newVertexFromLibrary(scaffVrtId, 
-				scaffFragId, 0); // 0 stands for scaffold
+		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newVertexFromLibrary(
+		        scaffVrtId, scaffFragId, BBType.SCAFFOLD);
 
 		scaffVertex.setLevel(-1); //NB: scaffold gets level -1
 		dnGraph.addVertex(scaffVertex);
@@ -992,7 +993,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(srcAPs);
 		
-		int trgFrgType = -1;
+		BBType trgFrgType = BBType.UNDEFINED;
 		ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();		
 		String[] options = new String[]{"Any Fragment",
 				"Compatible Fragments ("+compatFrags.size()+")",
@@ -1005,6 +1006,13 @@ public class GUIGraphHandler extends GUICardPanel
                 UIManager.getIcon("OptionPane.warningIcon"),
                 options,
                 options[0]);
+
+        //TODO-V3 deal with non-fragment vertexes
+        // Templates do not fit 
+        // within the concept of capping group, so this should 
+        // never happen for templates. Yet, other things than 
+        // templates might need code here
+		
 		switch (res)
 		{
 			case 0:
@@ -1020,11 +1028,11 @@ public class GUIGraphHandler extends GUICardPanel
 		        		fragLib.add(new AtomContainer());
 		        	}
 		        }
-				trgFrgType = 1;
+				trgFrgType = BBType.FRAGMENT;
 				break;
 			case 1:
 				fragLib = compatFrags;
-				trgFrgType = 1;
+				trgFrgType = BBType.FRAGMENT;
 				break;
 			case 2:
 				fragLib = new ArrayList<IAtomContainer>();
@@ -1032,16 +1040,13 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add(((DENOPTIMFragment) bb).getIAtomContainer());
+		        		fragLib.add(((DENOPTIMFragment)bb).getIAtomContainer());
 		        	} else
 		        	{
-		        		//TODO deal with templates, but templates do not fit within
-		        		// the concept of capping group, so this should never happen for 
-		        		// templates. Yet, other things than templates might need code here
 		        		fragLib.add(new AtomContainer());
 		        	}
 		        }
-				trgFrgType = 2;
+				trgFrgType = BBType.CAP;
 				break;
 			default:
 				return;
@@ -1095,8 +1100,8 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			int trgVrtId = dnGraph.getMaxVertexId()+1;
 			
-			DENOPTIMVertex trgVertex = DENOPTIMVertex.newVertexFromLibrary(trgVrtId, 
-			        trgFragId, trgFrgType);
+			DENOPTIMVertex trgVertex = DENOPTIMVertex.newVertexFromLibrary(
+			       trgVrtId, trgFragId, trgFrgType);
 	
 			// Identify the source vertex/node and its AP
 			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
@@ -1166,7 +1171,8 @@ public class GUIGraphHandler extends GUICardPanel
 				IAtomContainer frg = null;
 				try
 				{
-					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(1,fragId);
+					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
+					        BBType.FRAGMENT,fragId);
 					if (bb instanceof DENOPTIMFragment)
 					{
 						frg = ((DENOPTIMFragment) bb).getIAtomContainer();
@@ -1452,13 +1458,13 @@ public class GUIGraphHandler extends GUICardPanel
 			n.setAttribute("dnp.frgType", v.getFragmentType());
 			switch (v.getFragmentType())
 			{
-				case 0:
+				case SCAFFOLD:
 					n.setAttribute("ui.class", "scaffold");
 					break;
-				case 1:
+				case FRAGMENT:
 					n.setAttribute("ui.class", "fragment");
 					break;
-				case 2:
+				case CAP:
 					n.setAttribute("ui.class", "cap");
 					break;
 			}

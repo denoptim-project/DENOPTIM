@@ -35,6 +35,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
@@ -354,7 +355,7 @@ public class FragmentSpace
      * Returns a clone of the requested building block. The type of vertex
      * returned depends on the type stored in the library.
      * 
-     * @param bbTyp the type of building block. This basically selects the 
+     * @param fTyp the type of building block. This basically selects the 
      * sub library from which the building block is taken: 0 for scaffold (i.e.,
      * building blocks that can be used to start a new graph), 1 for
      * standard building blocks (i.e., can be used freely to grow or modify an 
@@ -369,7 +370,7 @@ public class FragmentSpace
      * example, any of the indexes is out of range.  
      */
 
-    public static DENOPTIMVertex getVertexFromLibrary(int bbTyp, int bbIdx) 
+    public static DENOPTIMVertex getVertexFromLibrary(BBType fTyp, int bbIdx) 
 						        throws DENOPTIMException
     {
         // WARNING! This is were we first assign the bbTyp and bbIdx to
@@ -386,9 +387,9 @@ public class FragmentSpace
 		    throw new DENOPTIMException(msg);
 		}
 		DENOPTIMVertex originalVrtx = null;
-		switch (bbTyp)
+		switch (fTyp)
 		{
-			case 0:
+			case SCAFFOLD:
 			    if (bbIdx < scaffoldLib.size())
 			    {
 			    	originalVrtx = scaffoldLib.get(bbIdx);	
@@ -396,12 +397,12 @@ public class FragmentSpace
 			    else
 			    {
 				msg = "Mismatch between scaffold bbIdx and size of the library"
-				      + ". MolId: " + bbIdx + " FragType: " + bbTyp;
+				      + ". MolId: " + bbIdx + " FragType: " + fTyp;
 		                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 				throw new DENOPTIMException(msg);
 			    }
 			    break;
-			case 1:
+			case FRAGMENT:
 	            if (bbIdx < fragmentLib.size())
 	            {
 	                originalVrtx = fragmentLib.get(bbIdx);
@@ -410,12 +411,12 @@ public class FragmentSpace
 	            {
 	                msg = "Mismatch between fragment bbIdx and size of the "
 	                		+ "library" + ". MolId: " + bbIdx 
-	                		+ " FragType: " + bbTyp;
+	                		+ " FragType: " + fTyp;
 	                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 	                throw new DENOPTIMException(msg);
 	            }
 			    break;
-			case 2:
+			case CAP:
 	            if (bbIdx < cappingLib.size())
 	            {
 	                originalVrtx = cappingLib.get(bbIdx);
@@ -424,13 +425,13 @@ public class FragmentSpace
 	            {
 	                msg = "Mismatch between capping group bbIdx and size "
 	                		+ "of the library. MolId: " + bbIdx 
-	                		+ " FragType: " + bbTyp;
+	                		+ " FragType: " + fTyp;
 	                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 	                throw new DENOPTIMException(msg);
 	            }
 	            break;
 			default:
-			    msg = "Unknown type of fragment '" + bbTyp + "'.";
+			    msg = "Unknown type of fragment '" + fTyp + "'.";
 		            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
 			    throw new DENOPTIMException(msg);
 		}
@@ -441,13 +442,11 @@ public class FragmentSpace
 		if (clone instanceof DENOPTIMFragment)
 		{
     		((DENOPTIMFragment) clone).setMolId(bbIdx);
-    		((DENOPTIMFragment) clone).setFragmentType(bbTyp);
 		}
-		//TODO-V3 keep it or trash it
+		//TODO-V3 keep it or trash it?
 		else if (clone instanceof DENOPTIMTemplate)
         {
             ((DENOPTIMTemplate) clone).setMolId(bbIdx);
-            ((DENOPTIMTemplate) clone).setFragmentType(bbTyp);
         }
         else 
 		{
@@ -493,7 +492,8 @@ public class FragmentSpace
 	    String apc = "";
 	    try 
 	    {
-            apc = getVertexFromLibrary(2, i).getAttachmentPoints().get(0).getAPClass();
+            apc = getVertexFromLibrary(BBType.CAP, i)
+                    .getAttachmentPoints().get(0).getAPClass();
 		if (apc.equals(query))
 		{
 		    selected.add(i);
@@ -739,7 +739,7 @@ public class FragmentSpace
 		    {
 		    	IdFragmentAndAP apId = new IdFragmentAndAP(-1, //vertexId
 		    											   idxs.get(0), //MolId,
-														   1, //FragType
+														   BBType.FRAGMENT,
 														   idxs.get(1), //ApId
 														   -1, //noVSym
 														   -1);//noAPSym
@@ -778,7 +778,8 @@ public class FragmentSpace
 		for (Integer fid : compatFragIds)
 		{
 			try {
-				compatFrags.add(FragmentSpace.getVertexFromLibrary(1, fid));
+				compatFrags.add(FragmentSpace.getVertexFromLibrary(
+				        BBType.FRAGMENT, fid));
 			} catch (DENOPTIMException e) {
 		        System.err.println("Exception while trying to get fragment '"+fid+"'!");
 		        e.printStackTrace();

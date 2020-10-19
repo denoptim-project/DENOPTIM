@@ -104,6 +104,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -1304,7 +1305,8 @@ public class DenoptimIO
 			for (IAtomContainer mol : DenoptimIO.readMoleculeData(
 					fragLib.getAbsolutePath()))
 			{
-				DENOPTIMFragment frag = new DENOPTIMFragment(mol);
+				DENOPTIMFragment frag = new DENOPTIMFragment(mol,
+				        BBType.UNDEFINED);
                 for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints())
 				{
 					allCLasses.add(ap.getAPClass());

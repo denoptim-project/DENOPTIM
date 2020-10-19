@@ -57,12 +57,65 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Index of the graph building block contained in the vertex
      */
     private int buildingBlockId = -99; //Initialised to meaningless value
-    
-    //TODO-V3 to enum
-    /*
-     * 0:scaffold, 1:fragment, 2:capping group
+
+    /**
+     * The type of building block. This is used to easily distinguish among
+     * building blocks that can be used to start new graphs (i.e., the so-called
+     * scaffolds), those that can be use anywhere (i.e., fragments), and 
+     * building blocks that can be used to saturate open valences (i.e., the 
+     * capping groups).
      */
-    private int buildingBlockType = -99; //Initialised to meaningless value
+    
+    public enum BBType {
+        UNDEFINED, SCAFFOLD, FRAGMENT, CAP, NONE;
+        
+        private int i = -99;
+        
+        static {
+            NONE.i = -1;
+            SCAFFOLD.i = 0;
+            FRAGMENT.i = 1;
+            CAP.i = 2;
+        }
+        
+        /**
+         * Translates the integer into the enum
+         * @param 0:scaffold, 1:fragment, 2:capping group
+         * @return the corresponding enum
+         */
+        public static BBType parseInt(int i) {
+            BBType bbt;
+            switch (i)
+            {
+                case 0:
+                    bbt = SCAFFOLD;
+                    break;
+                case 1:
+                    bbt = FRAGMENT;
+                    break;
+                case 2:
+                    bbt = CAP;
+                    break;
+                default:
+                    bbt = UNDEFINED;
+                    break;
+            }
+            return bbt;
+        }
+        
+        /**
+         * @return 0:scaffold, 1:fragment, 2:capping group
+         */
+        public int toOldInt()
+        {
+            return i;
+        }
+    }
+    
+    /**
+     * Type of this building block
+     */
+    private BBType buildingBlockType = BBType.UNDEFINED;
     
     /*
      * attachment points on this vertex
@@ -122,10 +175,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(int vertexId, IAtomContainer mol) 
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
         super (vertexId);
+        
+        this.setFragmentType(bbt);
         
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
@@ -181,9 +236,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
+    public DENOPTIMFragment(IAtomContainer mol, BBType bbt) 
+            throws DENOPTIMException
     {    	
-    	this(-1,mol);
+    	this(-1,mol,bbt);
     }
     
 //------------------------------------------------------------------------------
@@ -328,17 +384,18 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     /**
      *
-     * @return <code>true</code> if vertex is a fragment
+     * @return the
      */
 
-    public int getFragmentType()
+    @Override
+    public BBType getFragmentType()
     {
         return buildingBlockType;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setFragmentType(int fType)
+    private void setFragmentType(BBType fType)
     {
         buildingBlockType = fType;
     }
@@ -346,8 +403,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @return the id of the molecule
+     * Returns the ID of this fragment. The ID is the index in the list of
+     * all building blocks of the same type.
+     * @return the numerical ID of this fragment.
      */
     public int getMolId()
     {
@@ -763,7 +821,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 		try {
 		    this.projectAPsToProperties();
 		    //deep copy of mol is created in the DENOPTIMFragment constructor
-			clone = new DENOPTIMFragment(getVertexId(),mol);
+			clone = new DENOPTIMFragment(getVertexId(),mol,buildingBlockType);
 		} catch (Exception e) {
 		    e.printStackTrace();
 			String msg = "Failed to clone DENOPTIMFragment! " +clone;
@@ -977,7 +1035,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public String toString()
     {
         return getVertexId()+ "_" + (buildingBlockId + 1) + "_" +
-                buildingBlockType + "_" + getLevel();
+                buildingBlockType.toOldInt() + "_" + getLevel();
     }
     
 //------------------------------------------------------------------------------

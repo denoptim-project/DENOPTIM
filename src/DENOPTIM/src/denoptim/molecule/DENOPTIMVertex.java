@@ -36,6 +36,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -122,12 +123,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * Builds a new molecular fragment kind of vertex.
      * @param bbId 0-based index of building block in the library
-     * @param bbType the type of building block 0:scaffold, 1:fragment, 
+     * @param bbt the type of building block 0:scaffold, 1:fragment, 
      * 2:capping group
      */
-    public static DENOPTIMVertex newVertexFromLibrary(int bbId, int bbType)
+    public static DENOPTIMVertex newVertexFromLibrary(int bbId, BBType bbt)
     {
-        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(), bbId, bbType);
+        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(),bbId,bbt);
     }
     
 //------------------------------------------------------------------------------
@@ -140,7 +141,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * 2:capping group
      */
     public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
-            int bbType)
+            BBType bbt)
     {   
         // This is just to initialise the vertex. The actual type of vertex
         // returned by this method depends on the what we get from the
@@ -149,7 +150,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         try
         {
             //NB: this returns a clone of the vertex stored in the library
-            v = FragmentSpace.getVertexFromLibrary(bbType,bbId);
+            v = FragmentSpace.getVertexFromLibrary(bbt,bbId);
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -467,16 +468,18 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     //TODO-V3 remove this tmp stuff
 
-    @Deprecated
-    public int getFragmentType()
+    public BBType getFragmentType()
     {
-        System.err.println("ERROR! Attempt to get fragType from vertex");
-        return -999;
+        //TODO-V3: delete
+        System.err.println("WARNING! Attempt to get fragType from vertex");
+        return BBType.UNDEFINED;
     }
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 remove this tmp stuff
+    //TODO-V3 remove this tmp stuff? this is marked "deprecated" to discourage
+    // its use, but there is currently no better alternative than using 
+    // this pointer.
     
     @Deprecated
     public int getMolId()

@@ -37,6 +37,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.*;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
 /**
@@ -302,7 +303,7 @@ public class GraphConversionTool
             // molid
             int molid = Integer.parseInt(s3[1]) - 1;
             // fragment/scaffold
-            int fragtype = Integer.parseInt(s3[2]);
+            BBType fragtype = BBType.parseInt(Integer.parseInt(s3[2]));
             // level
             int level = Integer.parseInt(s3[3]);
 	            

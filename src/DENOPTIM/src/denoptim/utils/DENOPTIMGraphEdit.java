@@ -30,6 +30,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.ClosableChain;
@@ -161,10 +162,10 @@ public class DENOPTIMGraphEdit
                 molid = Integer.parseInt(strPrts[1]) - 1;
             }
             // type scaffold/fragment/capping group
-            int fragtype = -1;
+            BBType fragtype = BBType.UNDEFINED;
             if (!strPrts[2].equals("*"))
             {
-                fragtype = Integer.parseInt(strPrts[2]);
+                fragtype = BBType.parseInt(Integer.parseInt(strPrts[2]));
             }
             // level
             int level = -2;
@@ -173,8 +174,10 @@ public class DENOPTIMGraphEdit
                 level = Integer.parseInt(strPrts[3]);
             }
             
-            //TODO-V3: use whatever way to identify a fragment without giving a vertex ID
-            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, fragtype);
+            //TODO-V3: use whatever way to identify a fragment without giving a 
+            // vertex ID
+            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, 
+                    fragtype);
             
             dv.setLevel(level);
 

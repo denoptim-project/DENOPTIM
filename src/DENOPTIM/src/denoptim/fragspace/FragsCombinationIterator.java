@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
@@ -123,7 +124,7 @@ public class FragsCombinationIterator
             int vIdx = v.getVertexId();
             //TODO-V3 need to use something else
             int vMolId = v.getMolId();
-            int vMolTyp = v.getFragmentType();
+            BBType vMolTyp = v.getFragmentType();
            
             // deal with symmetric sets of vertices
             boolean keepThisVertex = true;
@@ -206,7 +207,7 @@ public class FragsCombinationIterator
         // Collect all possibilities (frags, caps, entry) for each free AP
         for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
-            int fTyp = candSrcAp.getVertexMolType();
+            BBType fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
             DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
@@ -225,7 +226,7 @@ public class FragsCombinationIterator
                 int vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
                 		            compatApId.getVertexMolId(), //MolId,
-                                    1, //FragType
+                                    BBType.FRAGMENT,
                                     compatApId.getApId(), //ApId
 							        -1, //noVSym
 							        -1);//noAPSym
@@ -250,10 +251,10 @@ public class FragsCombinationIterator
                     int vid = GraphUtils.getUniqueVertexIndex();
                     IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid,//vertxId
                                                                     i,//MolId,
-                                                                    2,//FrgType
+                                                                    BBType.CAP,
                                                                     0,//ApId
-								   -1,//noVSym
-								   -1);//noAPSym
+                                								   -1,//noVSym
+                                								   -1);//noAPSym
                     candsForThisSrc.add(trgFrgAp);
                 }
             }

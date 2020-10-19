@@ -6,6 +6,7 @@ import java.util.List;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
@@ -41,11 +42,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     private int buildingBlockId = -99; //Initialised to meaningless value
     
-    //TODO-V3 to enum
     /*
-     * 0:scaffold, 1:fragment, 2:capping group
+     * Building block type distinguished among scaffolds, fragments, and capping
+     * groups, if defined.
      */
-    private int buildingBlockType = -99; //Initialised to meaningless value
+    private BBType buildingBlockType = BBType.UNDEFINED;
 
     /**
      * interior graph of the template that can be constrained in various ways depending on the
@@ -104,16 +105,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      *
      * @return <code>true</code> if vertex is a fragment
      */
-    public int getFragmentType()
+    public BBType getFragmentType()
     {
         return buildingBlockType;
-    }
-    
-//------------------------------------------------------------------------------
-
-    public void setFragmentType(int fType)
-    {
-        buildingBlockType = fType;
     }
 
 //------------------------------------------------------------------------------
@@ -148,13 +142,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate();
         
-        
-
         // Adding fully defined vertexes (they point to an actual fragment
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, 1);
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 1, 1);
+                GraphUtils.getUniqueVertexIndex(), 1, BBType.FRAGMENT);
         template.interiorGraph.addVertex(vA);
         template.interiorGraph.addVertex(vB);
         

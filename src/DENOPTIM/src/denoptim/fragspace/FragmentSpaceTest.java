@@ -35,6 +35,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**
@@ -53,6 +54,8 @@ public class FragmentSpaceTest
     private final String RULAPC3 = "apc-3";
     private final String RULAPCC1 = "cap-1";
     private final String RULAPCC2 = "cap-1";
+    
+    private final BBType BBTFRAG = BBType.FRAGMENT;
     
 	private final String APCS = RULAPCS
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
@@ -189,10 +192,10 @@ public class FragmentSpaceTest
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
     	
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,2,-1,-1);
+    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
+    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	
     	boolean found1 = false;
     	boolean found2 = false;
@@ -230,10 +233,10 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,2,-1,-1);
+    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
+    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	
     	boolean found1 = false;
     	boolean found2 = false;
@@ -265,8 +268,8 @@ public class FragmentSpaceTest
     public void testGetFragAPsCompatibleWithTheseAPs() throws Exception
     {
     	buildFragmentSpace();
-    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,1,0,-1,-1);
-    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
@@ -287,10 +290,10 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,2,-1,-1);
+    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
+    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	
     	boolean found1 = false;
     	boolean found2 = false;
@@ -322,8 +325,8 @@ public class FragmentSpaceTest
     public void testGetFragmentsCompatibleWithTheseAPs() throws Exception
     {
     	buildFragmentSpace();
-    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,1,0,-1,-1);
-    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);

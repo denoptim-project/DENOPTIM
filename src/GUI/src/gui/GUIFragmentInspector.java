@@ -56,6 +56,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
 /**
@@ -625,7 +626,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			mol.setProperty(DENOPTIMConstants.APTAG,null);
 			mol.setProperty(DENOPTIMConstants.APCVTAG,null);
 			
-			fragment = new DENOPTIMFragment(mol);
+			fragment = new DENOPTIMFragment(mol,BBType.UNDEFINED);
 
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
@@ -735,7 +736,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			for (IAtomContainer iac : DenoptimIO.readMoleculeData(
 												file.getAbsolutePath(),format))
 			{
-			    fragmentLibrary.add(new DENOPTIMFragment(iac));
+			    fragmentLibrary.add(new DENOPTIMFragment(iac,BBType.UNDEFINED));
 			    addedOne = true;
 			}
 			

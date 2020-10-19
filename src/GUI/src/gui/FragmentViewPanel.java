@@ -52,6 +52,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.DENOPTIMMathUtils;
 
 
@@ -303,8 +304,15 @@ public class FragmentViewPanel extends JSplitPane
 		
 		// Now we should have a structure loaded in the viewer, 
 		// so we take that one and put it in the IAtomContainer representation
-		try	{
-		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer());
+		try	{ 
+		    // WARNING! Here we assume we are always making undefined building
+		    // blocks. Namely, neither a scaffold, nor a Fragment, nor a 
+		    // capping group. This because when we make frags 
+		    // from the GUI we are only saving an SDF file. The latter is later
+		    // imported as part of the library of scaffolds/fragments/capping
+		    // groups, and in that moment the BBType is re-assigned.
+		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer(),
+		            BBType.FRAGMENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
