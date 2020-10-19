@@ -26,6 +26,7 @@ import java.util.List;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ public class DENOPTIMTemplateTest
     //TODO-V3: complete and reactivate
     //@Test
     public void testIfInteriorGraphDoesNotHaveVacantAPsEqualToExteriorAPsThrowIAE() {
-        DENOPTIMTemplate template = new DENOPTIMTemplate();
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
         List<DENOPTIMAttachmentPoint> exteriorAPs = new ArrayList<>();
         exteriorAPs.add(testAP);
         template.setExteriorAPs(exteriorAPs);

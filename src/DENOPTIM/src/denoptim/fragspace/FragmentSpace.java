@@ -226,7 +226,7 @@ public class FragmentSpace
 //            fragmentLib.add(DENOPTIMTemplate.getTestTemplate());
 //            System.err.println("Added test template to fragment library");
             scaffoldLib = new ArrayList<>();
-            scaffoldLib.add(DENOPTIMTemplate.getTestTemplate());
+            scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
             System.err.println("WARNING! Running TEMP CODE: Replaced scaffold lib with single test template");
         }
     }

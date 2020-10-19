@@ -180,7 +180,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {     
         super (vertexId);
         
-        this.setFragmentType(bbt);
+        this.setBuildingBlockType(bbt);
         
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
@@ -395,7 +395,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //------------------------------------------------------------------------------
 
-    private void setFragmentType(BBType fType)
+    private void setBuildingBlockType(BBType fType)
     {
         buildingBlockType = fType;
     }
@@ -828,7 +828,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			System.err.println(msg);
 		}
 		clone.setMolId(this.getMolId());
-		clone.setFragmentType(this.getFragmentType());
+		clone.setBuildingBlockType(this.getFragmentType());
 		
 		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : this.getSymmetricAPSets())

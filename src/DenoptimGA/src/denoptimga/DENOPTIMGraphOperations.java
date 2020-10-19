@@ -80,7 +80,8 @@ public class DENOPTIMGraphOperations
             int mvid = male.getVertexAtPosition(i).getVertexId();
             int mfragid = male.getVertexAtPosition(i).getMolId();
 
-            //System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
+            //TODO del
+            System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
 
             // if the fragment is a capping group or the scaffold itself ignore
             if (mtype == BBType.SCAFFOLD || mtype == BBType.CAP)
@@ -150,12 +151,14 @@ public class DENOPTIMGraphOperations
      */
     private static boolean isCrossoverPossible(DENOPTIMEdge eA, DENOPTIMEdge eB)
     {
+        //TODO del
+        System.out.println("Checking XOVER: \n"+eA+"\n"+eB);
+        
         String apClassSrcA = eA.getSourceReaction();
         String apClassTrgA = eA.getTargetReaction();
         String apClassSrcB = eB.getSourceReaction();
         String apClassTrgB = eB.getTargetReaction();
         
-
         if (isCompatible(apClassSrcA, apClassTrgB))
         {
             if (isCompatible(apClassSrcB, apClassTrgA))

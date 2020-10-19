@@ -64,9 +64,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMTemplate()
+    public DENOPTIMTemplate(BBType bbType)
     {
         super();
+        setBuildingBlockType(bbType);
     }
 
 //------------------------------------------------------------------------------
@@ -77,7 +78,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     private static DENOPTIMTemplate getEmptyTemplate(List<DENOPTIMAttachmentPoint> exteriorAPs) 
     {
-        DENOPTIMTemplate template = new DENOPTIMTemplate();
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
         return template;
     }
     
@@ -109,6 +110,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         return buildingBlockType;
     }
+    
+//------------------------------------------------------------------------------
+
+    private void setBuildingBlockType(BBType fType)
+    {
+        buildingBlockType = fType;
+    }
+
 
 //------------------------------------------------------------------------------
 
@@ -138,9 +147,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     //TODO-V3 Remove.
 
-    public static DENOPTIMTemplate getTestTemplate() 
+    
+    // WARNING! This is only meant to return a "scaffold" type of template
+    
+    public static DENOPTIMTemplate getTestScaffoldTemplate() 
     {
-        DENOPTIMTemplate template = new DENOPTIMTemplate();
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.SCAFFOLD);
         
         // Adding fully defined vertexes (they point to an actual fragment
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
@@ -204,7 +216,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public DENOPTIMTemplate clone()
     {
     	//TODO-V3: implement deep cloning. Now it just building a new test template
-    	return getTestTemplate();
+    	return getTestScaffoldTemplate();
     }
     
 //-----------------------------------------------------------------------------
