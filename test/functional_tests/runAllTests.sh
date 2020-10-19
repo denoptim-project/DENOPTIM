@@ -227,6 +227,10 @@ runTest "t16"
 #
 runTest "t17"
 
+#
+# t18: comparison of graph lists
+#
+runTest "t18"
 
 echo "All done!"
 exit 0
