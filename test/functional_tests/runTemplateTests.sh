@@ -19,7 +19,7 @@
 export tinkerPathDENOPTIM=""
 
 # Directory created for running tests (must be shorter than 40 characters).
-wDir="/tmp/denoptim_t99"
+wDir="/tmp/dnTestTemplate"
 
 # Environment
 export SHELL="/bin/bash"
@@ -127,13 +127,15 @@ fi
 cd "$wDir"
 
 
-# Run Only this one
+#
+# t98: under development - crossover involving templates
+#
+runTest "t98"
 
 #
-# t99: under development - Meant for testing of the graph template stuff
+# t99: under development - Meant for testing of the graph template stuff in GA run
 #
 runTest "t99"
-
 
 echo "All done!"
 exit 0

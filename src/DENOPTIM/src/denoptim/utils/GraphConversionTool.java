@@ -129,14 +129,43 @@ public class GraphConversionTool
             int dap_idx_v1 = edge.getSourceDAP();
             int dap_idx_v2 = edge.getTargetDAP();
 
-            int dap1_anum = v1.
-                            getAttachmentPoints().
-                            get(dap_idx_v1).
-                            getAtomPositionNumber();
-            int dap2_anum = v2.
-                            getAttachmentPoints().
-                            get(dap_idx_v2).
-                            getAtomPositionNumber();
+            int dap1_anum = -1;
+            try
+            {
+                dap1_anum = v1.getAttachmentPoints().get(dap_idx_v1).
+                                getAtomPositionNumber();
+            } catch (Exception e)
+            {
+                System.out.println(" ");
+                System.out.println("Exception when trying to get source atom "
+                        + "ID.");
+                System.out.println("GraphMSG: "+g.getMsg());
+                System.out.println("Graph: "+g);
+                System.out.println("Edge: "+edge);
+                System.out.println("Vertex: "+v1);
+                System.out.println("AP id: "+dap_idx_v1);
+                System.out.println("AP: "+v1.getAttachmentPoints().get(dap_idx_v1));
+                throw e;
+            }
+            
+            int dap2_anum = -1;
+            try
+            {
+                dap2_anum = v2.getAttachmentPoints().get(dap_idx_v2).
+                                getAtomPositionNumber();
+            } catch (Exception e)
+            {
+                System.out.println(" ");
+                System.out.println("Exception when trying to get source atom "
+                        + "ID.");
+                System.out.println("GraphMSG: "+g.getMsg());
+                System.out.println("Graph: "+g);
+                System.out.println("Edge: "+edge);
+                System.out.println("Vertex: "+v2);
+                System.out.println("AP id: "+dap_idx_v2);
+                System.out.println("AP: "+v2.getAttachmentPoints().get(dap_idx_v2));
+                throw e;
+            }
 
             // get the new atom indices for the dap's
             int atom1 = getCorrespondingAtomNumber(lstDVA, v1_id, dap1_anum);

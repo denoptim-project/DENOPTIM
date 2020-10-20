@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.vecmath.Point3d;
 
@@ -34,6 +35,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 
 /**
@@ -55,6 +58,12 @@ public class DENOPTIMFragmentTest
     @Test
     public void testHandlingAPsAsObjOrProperty() throws Exception
     {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -99,6 +108,12 @@ public class DENOPTIMFragmentTest
     	// WARNING: the conversion does not project the atom properties into
     	// molecular properties. So the APs do not appear in the mol properties
         // unless we project the APs to properties (see projectAPsToProperties)
+        
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
     	
         DENOPTIMFragment frg1 = new DENOPTIMFragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -143,6 +158,12 @@ public class DENOPTIMFragmentTest
     @Test
     public void testClone() throws Exception
     {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
         DENOPTIMFragment v = new DENOPTIMFragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));

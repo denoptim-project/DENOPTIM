@@ -161,6 +161,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * @param atomPosNum the index of the source atom (0-based)
      * @param atomConnections the total number of connections
      * @param apConnections the number of free connections
+     * @param apRule the first part of the APClass
+     * @param apSubClass the second part of the APClass (an integer)
+     * @param apClass the APClass (apRule:apSubClass)
      * @param dirVec the AP direction vector end (the beginning ate the 
      * coords of the source atom). This must array have 3 entries.
      */
@@ -324,7 +327,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	            }
             }
             this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule)
-                    .getValence();           
+                    .getValence();
+            this.totalConnections = this.freeConnections;
 	    } catch (Throwable t) {
 	        t.printStackTrace();
 			throw new DENOPTIMException("Cannot construct AP from string '" 

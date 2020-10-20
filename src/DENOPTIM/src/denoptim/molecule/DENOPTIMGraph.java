@@ -916,13 +916,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     @Override
     public DENOPTIMGraph clone()
     {
-        //TODO-V3: should this be replaced by DenoptimIO.deepCopy?
+        //TODO-V3: should this be replaced by DenoptimIO.deepCopy? NO!
         
         /*
         return (DENOPTIMGraph) DenoptimIO.deepCopy(this);
         */
         
-        // When cloning the VertedID remains the same so we'll have two 
+        // When cloning, the VertedID remains the same so we'll have two 
         // deep-copies of the same vertex having the same VertexID
         ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
         for (DENOPTIMVertex vOrig : gVertices)
@@ -2338,20 +2338,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * that is to be connected to R
      * @param bndType the bond type between R and I
      * @param newSymSets of symmetric sets. This parameter is only used to keep
-     *               track
-     * of the symmetric copies of I. Simply provide an empty data structure.
+     * track of the symmetric copies of I. Simply provide an empty data 
+     * structure.
      */
 
     public void appendGraphOnAP(DENOPTIMVertex parentVertex, int parentAPIdx,
                                 DENOPTIMGraph subGraph,
                                 DENOPTIMVertex childVertex, int childAPIdx,
                                 BondType bndType,
-                                Map<Integer,SymmetricSet> newSymSets
-    ) throws DENOPTIMException {
+                                Map<Integer,SymmetricSet> newSymSets) 
+                                        throws DENOPTIMException 
+    {
 
         // Clone and renumber the subgraph to ensure uniqueness
         DENOPTIMGraph sgClone = subGraph.clone();
-
+        
         //DENOPTIMGraph sgClone = (DENOPTIMGraph) DenoptimIO.deepCopy(subGraph);
         sgClone.renumberGraphVertices();
 
@@ -2374,8 +2375,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     parentAPIdx,
                     childAPIdx,
                     rcnP,
-                    rcnC
-            );
+                    rcnC);
         }
         else
         {
@@ -2402,7 +2402,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             addVertex(sgClone.getVertexList().get(i));
 
             // also need to tmp store pointers to symmetric vertexes
-            // TODO: check. Why is this working on subGraph and not on sgClone?
+            // Why is this working on subGraph and not on sgClone?
+            // Since we are only checking is there is symmetry, there should be
+            // no difference between doing it on sgClone or subGraph.
             if (subGraph.hasSymmetryInvolvingVertex(origV.getVertexId()))
             {
                 if (newSymSets.containsKey(origV.getVertexId()))
@@ -2414,7 +2416,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 {
                     newSymSets.put(origV.getVertexId(),
                             sgClone.getSymSetForVertexID(
-                                    sgClone.getVertexList().get(i).getVertexId()));
+                                    sgClone.getVertexList().get(i)
+                                    .getVertexId()));
                 }
             }
             else
@@ -2514,27 +2517,27 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                    DENOPTIMVertex childVertex, int childAPIdx,
                                    BondType bndType,
                                    Map<Integer,SymmetricSet> newSymSets,
-                                   boolean onAllSymmAPs
-    ) throws DENOPTIMException {
+                                   boolean onAllSymmAPs)
+                                           throws DENOPTIMException 
+    {
 
         SymmetricSet symAPs = parentVertex.getSymmetricAPs(parentAPIdx);
         if (symAPs != null && onAllSymmAPs)
         {
             ArrayList<Integer> apLst = symAPs.getList();
             for (int idx : apLst) {
-                if (!parentVertex.getAttachmentPoints().get(idx).isAvailable()) {
+                if (!parentVertex.getAttachmentPoints().get(idx).isAvailable()) 
+                {
                     continue;
                 }
                 appendGraphOnAP(parentVertex, idx, subGraph, childVertex,
-                        childAPIdx, bndType, newSymSets
-                );
+                        childAPIdx, bndType, newSymSets);
             }
         }
         else
         {
             appendGraphOnAP(parentVertex, parentAPIdx, subGraph, childVertex,
-                    childAPIdx, bndType, newSymSets
-            );
+                    childAPIdx, bndType, newSymSets);
         }
     }
 
@@ -2552,7 +2555,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             int verbosity) 
     {
         ArrayList<Integer> matches = new ArrayList<>();
-        for (DENOPTIMVertex v : findVertices(query, verbosity)) {
+        for (DENOPTIMVertex v : findVertices(query, verbosity)) 
+        {
             matches.add(v.getVertexId());
         }
         return matches;

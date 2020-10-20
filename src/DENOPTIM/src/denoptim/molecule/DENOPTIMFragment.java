@@ -466,6 +466,29 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     /**
      * Add an attachment point to the specifies atom
+     * @param srcAtmId the index of the source atom in the atom list of this 
+     * chemical representation. Index must be 0-based.
+     * @param propAPClass the attachment point class, or null, if class should not 
+     * be defines.
+     * @param vector the coordinates of the 3D point representing the end of 
+     * the attachment point direction vector, or null. The coordinates must be
+     * consistent with the coordinates of the atoms.
+     * @param valence the valences used by this AP.
+     * @throws DENOPTIMException 
+     */
+
+    public void addAP(int srcAtmId, String propAPClass, Point3d vector, 
+            int valence) 
+            throws DENOPTIMException
+    {
+        IAtom srcAtm = mol.getAtom(srcAtmId);
+        addAP(srcAtm, propAPClass, vector, valence);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Add an attachment point to the specifies atom
      * @param srcAtm the source atom in the atom list of this 
      * chemical representation.
      * @param propAPClass the attachment point class, or null, if class should not 
@@ -477,13 +500,38 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
 
     public void addAP(IAtom srcAtm, String propAPClass, Point3d vector) 
+            throws DENOPTIMException
+    {
+        addAP(srcAtm,propAPClass,vector,-1);
+    }
+        
+//-----------------------------------------------------------------------------
+
+    /**
+     * Add an attachment point to the specifies atom
+     * @param srcAtm the source atom in the atom list of this 
+     * chemical representation.
+     * @param propAPClass the attachment point class, or null, if class should not 
+     * be defines.
+     * @param vector the coordinates of the 3D point representing the end of 
+     * the attachment point direction vector, or null. The coordinates must be
+     * consistent with the coordinates of the atoms.
+     * @param valence the valences used by this AP.
+     * @throws DENOPTIMException 
+     */
+
+    public void addAP(IAtom srcAtm, String propAPClass, Point3d vector, 
+            int valence) 
     		throws DENOPTIMException
     {
     	int atmId = mol.getAtomNumber(srcAtm);
-    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
-    	ap.setAtomPositionNumber(atmId);
-    	ap.setAPClass(propAPClass);
-    	ap.setDirectionVector(new double[]{vector.x, vector.y, vector.z});
+    	String apRule = propAPClass.split(
+    	        DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
+        int sub = Integer.parseInt(propAPClass.split(
+                DENOPTIMConstants.SEPARATORAPPROPSCL)[1]);
+    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(atmId, valence,
+    	        valence, apRule, sub, propAPClass, 
+    	        new double[] {vector.x, vector.y, vector.z});
     	
     	//This adds the AP to the list of the superclass
     	addAttachmentPoint(ap);

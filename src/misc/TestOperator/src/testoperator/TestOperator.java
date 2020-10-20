@@ -68,7 +68,6 @@ public class TestOperator
 // TODO: adapt for general operations
 
             System.out.println("Initial graphs: ");
-            System.out.println(" ");
             System.out.println("v:"+TestOperatorParameters.mvid
                                +" of MALE: "+male);
             System.out.println(" ");
@@ -90,7 +89,6 @@ public class TestOperator
 
             // do crossover
             System.out.println("Initial graphs now with unique vertexID: ");
-            System.out.println(" ");
             System.out.println("v:"+TestOperatorParameters.mvid+" (now:"+newmvid
                                +") of MALE: "+male);
             System.out.println(" ");
@@ -99,7 +97,7 @@ public class TestOperator
             System.out.println(" ");
 
             DENOPTIMGraphOperations.performCrossover(male,newmvid,
-                                                     female,newfvid);
+                                                     female,newfvid,true);
 
             System.out.println("Result of crossover:");
             System.out.println(" ");

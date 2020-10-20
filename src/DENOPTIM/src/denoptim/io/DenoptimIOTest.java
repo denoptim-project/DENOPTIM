@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.vecmath.Point3d;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
+import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -42,6 +44,7 @@ import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for input/output
@@ -148,6 +151,21 @@ public class DenoptimIOTest
     @Test
     public void testReadAllAPClasses() throws Exception
     {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put("classAtmC",BondType.SINGLE);
+        map.put("otherClass",BondType.SINGLE);
+        map.put("classAtmH",BondType.SINGLE);
+        map.put("apClassO",BondType.SINGLE);
+        map.put("apClassObis",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
     	DENOPTIMFragment frag = new DENOPTIMFragment();
     	IAtom atmC = new Atom("C");
     	atmC.setPoint3d(new Point3d(0.0, 0.0, 1.0));
@@ -185,8 +203,8 @@ public class DenoptimIOTest
     	Set<String> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
     	
     	assertEquals(6,allAPC.size(),"Size did not match");
-    	assertTrue(allAPC.contains("apClassObis:0"),"Contains failed (1)");
-    	assertTrue(allAPC.contains("otherClass:0"),"Contains failed (2)");
+    	assertTrue(allAPC.contains("apClassObis:0"),"Contains APClass (1)");
+    	assertTrue(allAPC.contains("otherClass:0"),"Contains APClass (2)");
     }
     
 //------------------------------------------------------------------------------

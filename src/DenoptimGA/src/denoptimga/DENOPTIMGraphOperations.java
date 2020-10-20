@@ -36,6 +36,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
@@ -80,8 +81,7 @@ public class DENOPTIMGraphOperations
             int mvid = male.getVertexAtPosition(i).getVertexId();
             int mfragid = male.getVertexAtPosition(i).getMolId();
 
-            //TODO del
-            System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
+            //System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
 
             // if the fragment is a capping group or the scaffold itself ignore
             if (mtype == BBType.SCAFFOLD || mtype == BBType.CAP)
@@ -112,7 +112,7 @@ public class DENOPTIMGraphOperations
                 // get edge toward parent vertex
                 int fedgeid = female.getIndexOfEdgeWithParent(fvid);
                 DENOPTIMEdge fedge = female.getEdgeAtPosition(fedgeid);
-
+                
                 //Check condition for considering this combination
                 if (isCrossoverPossible(medge, fedge))
                 {
@@ -151,9 +151,6 @@ public class DENOPTIMGraphOperations
      */
     private static boolean isCrossoverPossible(DENOPTIMEdge eA, DENOPTIMEdge eB)
     {
-        //TODO del
-        System.out.println("Checking XOVER: \n"+eA+"\n"+eB);
-        
         String apClassSrcA = eA.getSourceReaction();
         String apClassTrgA = eA.getTargetReaction();
         String apClassSrcB = eB.getSourceReaction();
@@ -464,7 +461,11 @@ public class DENOPTIMGraphOperations
                     else
                     {
                         String msg = "BUG: Unsuccesfull fragment add on "
-                                        + typ + " AP. Please, report this bug.";
+                                        + typ + " AP. Please, report this bug. "
+                                        + "Growing graph: " + molGraph 
+                                        + System.getProperty("line.separator") 
+                                        + "Vertex/AP on growing graph: " 
+                                        + chosenFrgAndAp;
                         DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                         throw new DENOPTIMException(msg);
                     }
@@ -525,6 +526,7 @@ public class DENOPTIMGraphOperations
         int nvid = GraphUtils.getUniqueVertexIndex();
         DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(nvid, 
                 fid, BBType.FRAGMENT);
+        
         // update the level of the vertex based on its parent
         int lvl = curVertex.getLevel();
         fragVertex.setLevel(lvl+1);
@@ -1197,6 +1199,25 @@ if(debug)
         return performCrossover(male,mvid,female,fvid);
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Performs crossover between two graphs on a given pair of vertexIDs
+     * @param male the first Graph
+     * @param female the second Graph
+     * @param mvid vertexID of the root vertex of the branch of male to exchange
+     * @param fvid vertexID of the root vertex of the branch of female to
+     * exchange
+     * @par
+     * @return <code>true</code> if a new graph has been successfully produced
+     * @throws DENOPTIMException
+     */
+
+    public static boolean performCrossover(DENOPTIMGraph male, int mvid,
+                        DENOPTIMGraph female, int fvid) throws DENOPTIMException
+    {
+        return performCrossover(male, mvid, female, fvid, false);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1212,7 +1233,8 @@ if(debug)
      */
 
     public static boolean performCrossover(DENOPTIMGraph male, int mvid,
-                        DENOPTIMGraph female, int fvid) throws DENOPTIMException
+                        DENOPTIMGraph female, int fvid, boolean debug) 
+                                throws DENOPTIMException
     {
         //TODO-V3 massive use of pointers (i.e., integers pointing to a position 
         // in a list of things) should be replaced with use of references

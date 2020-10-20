@@ -503,7 +503,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns the list of all APClasses on present on this fragment.
+     * Returns the list of all APClasses present on this vertex.
      * @return the list of APClassess
      */
     
@@ -521,6 +521,31 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         return lst;
     }
     
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns the list of all APClasses present on free attachment point
+     * on this vertex.
+     * @return the list of APClassess
+     */
+    
+    public ArrayList<String> getAllAvailableAPClasses()
+    {
+        ArrayList<String> lst = new ArrayList<String>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            if (!ap.isAvailable())
+                continue;
+            
+            String apCls = ap.getAPClass();
+            if (!lst.contains(apCls))
+            {
+                lst.add(apCls);
+            }
+        }
+        return lst;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -528,16 +553,47 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param target target vertex
      * @param sourceAPIndex index of Attachment point in source vertex
      * @param targetAPIndex index of Attachment point in target vertex
-     * @param srcRcn the reaction scheme at the source
-     * @param trgRcn the reaction scheme at the target
      * @return DENOPTIMEdge
      */
+    
+    //TODO-V3 also this is tmp: will be replaced once AP owner will be available
 
     public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
                                         int sourceAPIndex,
+                                        int targetAPIndex) 
+    {
+        //System.err.println("Connecting vertices RCN");
+        DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
+                .get(sourceAPIndex);
+        String srcAPC = sourceAP.getAPClass();
+        
+        DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
+                .get(targetAPIndex);
+        String trgAPC = targetAP.getAPClass();
+        
+        return connectVertices(target, sourceAPIndex, targetAPIndex, srcAPC, 
+                trgAPC);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Connects this vertex to target by an edge based on reaction type.
+     * @param target target vertex
+     * @param sourceAPIndex index of Attachment point in source vertex
+     * @param targetAPIndex index of Attachment point in target vertex
+     * @param srcAPC the reaction scheme at the source
+     * @param trgAPC the reaction scheme at the target
+     * @return DENOPTIMEdge
+     */
+    
+    //TODO-V3 get rid of this once edge constructor will not need all these details
+    
+    public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
+                                        int sourceAPIndex,
                                         int targetAPIndex,
-                                        String srcRcn,
-                                        String trgRcn
+                                        String srcAPC,
+                                        String trgAPC
     ) {
         //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
@@ -548,7 +604,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         if (sourceAP.isAvailable() && targetAP.isAvailable())
         {
             //System.err.println("Available APs");
-            String rname = trgRcn.substring(0, trgRcn.indexOf(':'));
+            String rname = trgAPC.substring(0, trgAPC.indexOf(':'));
 
             // look up the reaction bond order table
             BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
@@ -560,8 +616,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     targetAPIndex,
                     bndTyp
             );
-            edge.setSourceReaction(srcRcn);
-            edge.setTargetReaction(trgRcn);
+            edge.setSourceReaction(srcAPC);
+            edge.setTargetReaction(trgAPC);
 
             // update the attachment point info
             sourceAP.updateFreeConnections(-bndTyp.getValence());
