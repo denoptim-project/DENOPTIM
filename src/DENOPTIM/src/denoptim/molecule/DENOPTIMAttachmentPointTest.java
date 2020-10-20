@@ -25,10 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint
@@ -52,6 +55,12 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFString() throws Exception
     {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+
 		DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap.setAPClass(APCLASS);
     	ap.setFreeConnections(APCONN);

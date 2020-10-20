@@ -56,6 +56,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
 /**
@@ -625,7 +626,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			mol.setProperty(DENOPTIMConstants.APTAG,null);
 			mol.setProperty(DENOPTIMConstants.APCVTAG,null);
 			
-			fragment = new DENOPTIMFragment(mol);
+			fragment = new DENOPTIMFragment(mol,BBType.UNDEFINED);
 
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
@@ -735,7 +736,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			for (IAtomContainer iac : DenoptimIO.readMoleculeData(
 												file.getAbsolutePath(),format))
 			{
-			    fragmentLibrary.add(new DENOPTIMFragment(iac));
+			    fragmentLibrary.add(new DENOPTIMFragment(iac,BBType.UNDEFINED));
 			    addedOne = true;
 			}
 			
@@ -1158,8 +1159,9 @@ public class GUIFragmentInspector extends GUICardPanel
   	/**
   	 * Forces the user to specify a properly formatted APClass.
   	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the question
-  	 * @return 
+  	 * @param mustReply set to <code>true</code> to prevent escaping the 
+  	 * question
+  	 * @return the APClass
   	 * @throws DENOPTIMException 
   	 */
 	public static String ensureGoodAPClassString(String currApClass, 

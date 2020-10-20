@@ -35,6 +35,8 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -121,12 +123,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * Builds a new molecular fragment kind of vertex.
      * @param bbId 0-based index of building block in the library
-     * @param bbType the type of building block 0:scaffold, 1:fragment, 
+     * @param bbt the type of building block 0:scaffold, 1:fragment, 
      * 2:capping group
      */
-    public static DENOPTIMVertex newVertexFromLibrary(int bbId, int bbType)
+    public static DENOPTIMVertex newVertexFromLibrary(int bbId, BBType bbt)
     {
-        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(), bbId, bbType);
+        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(),bbId,bbt);
     }
     
 //------------------------------------------------------------------------------
@@ -139,7 +141,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * 2:capping group
      */
     public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
-            int bbType)
+            BBType bbt)
     {   
         // This is just to initialise the vertex. The actual type of vertex
         // returned by this method depends on the what we get from the
@@ -148,7 +150,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         try
         {
             //NB: this returns a clone of the vertex stored in the library
-            v = FragmentSpace.getVertexFromLibrary(bbType,bbId);
+            v = FragmentSpace.getVertexFromLibrary(bbt,bbId);
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -466,16 +468,18 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     //TODO-V3 remove this tmp stuff
 
-    @Deprecated
-    public int getFragmentType()
+    public BBType getFragmentType()
     {
-        System.err.println("ERROR! Attempt to get fragType from vertex");
-        return -999;
+        //TODO-V3: delete
+        System.err.println("WARNING! Attempt to get fragType from vertex");
+        return BBType.UNDEFINED;
     }
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 remove this tmp stuff
+    //TODO-V3 remove this tmp stuff? this is marked "deprecated" to discourage
+    // its use, but there is currently no better alternative than using 
+    // this pointer.
     
     @Deprecated
     public int getMolId()
@@ -499,7 +503,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns the list of all APClasses on present on this fragment.
+     * Returns the list of all APClasses present on this vertex.
      * @return the list of APClassess
      */
     
@@ -517,6 +521,31 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         return lst;
     }
     
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns the list of all APClasses present on free attachment point
+     * on this vertex.
+     * @return the list of APClassess
+     */
+    
+    public ArrayList<String> getAllAvailableAPClasses()
+    {
+        ArrayList<String> lst = new ArrayList<String>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            if (!ap.isAvailable())
+                continue;
+            
+            String apCls = ap.getAPClass();
+            if (!lst.contains(apCls))
+            {
+                lst.add(apCls);
+            }
+        }
+        return lst;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -524,16 +553,47 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param target target vertex
      * @param sourceAPIndex index of Attachment point in source vertex
      * @param targetAPIndex index of Attachment point in target vertex
-     * @param srcRcn the reaction scheme at the source
-     * @param trgRcn the reaction scheme at the target
      * @return DENOPTIMEdge
      */
+    
+    //TODO-V3 also this is tmp: will be replaced once AP owner will be available
 
     public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
                                         int sourceAPIndex,
+                                        int targetAPIndex) 
+    {
+        //System.err.println("Connecting vertices RCN");
+        DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
+                .get(sourceAPIndex);
+        String srcAPC = sourceAP.getAPClass();
+        
+        DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
+                .get(targetAPIndex);
+        String trgAPC = targetAP.getAPClass();
+        
+        return connectVertices(target, sourceAPIndex, targetAPIndex, srcAPC, 
+                trgAPC);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Connects this vertex to target by an edge based on reaction type.
+     * @param target target vertex
+     * @param sourceAPIndex index of Attachment point in source vertex
+     * @param targetAPIndex index of Attachment point in target vertex
+     * @param srcAPC the reaction scheme at the source
+     * @param trgAPC the reaction scheme at the target
+     * @return DENOPTIMEdge
+     */
+    
+    //TODO-V3 get rid of this once edge constructor will not need all these details
+    
+    public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
+                                        int sourceAPIndex,
                                         int targetAPIndex,
-                                        String srcRcn,
-                                        String trgRcn
+                                        String srcAPC,
+                                        String trgAPC
     ) {
         //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
@@ -544,29 +604,29 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         if (sourceAP.isAvailable() && targetAP.isAvailable())
         {
             //System.err.println("Available APs");
-            String rname = trgRcn.substring(0, trgRcn.indexOf(':'));
+            String rname = trgAPC.substring(0, trgAPC.indexOf(':'));
 
             // look up the reaction bond order table
-            int bndOrder = FragmentSpace.getBondOrderMap().get(rname);
-            //System.err.println("Bond: " + bndOrder + " " + srcRcn + " " + trgRcn);
+            BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
 
             // create a new edge
             DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
                     target.getVertexId(),
                     sourceAPIndex,
                     targetAPIndex,
-                    bndOrder
+                    bndTyp
             );
-            edge.setSourceReaction(srcRcn);
-            edge.setTargetReaction(trgRcn);
+            edge.setSourceReaction(srcAPC);
+            edge.setTargetReaction(trgAPC);
 
             // update the attachment point info
-            sourceAP.updateFreeConnections(-bndOrder); // decrement the connections
-            targetAP.updateFreeConnections(-bndOrder); // decrement the connections
+            sourceAP.updateFreeConnections(-bndTyp.getValence());
+            targetAP.updateFreeConnections(-bndTyp.getValence());
 
             return edge;
         } else {
-            System.err.println("ERROR! Attempt to make edge using unavailable AP!"
+            System.err.println("ERROR! Attempt to make edge using unavailable "
+                    + "APs!"
                     + System.getProperty("line.separator")
                     + "Vertex: "+getVertexId()
                     +" AP-A(available:"+sourceAP.isAvailable()+"): "+sourceAP
@@ -605,17 +665,24 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         DENOPTIMAttachmentPoint dap_A = getAttachmentPoints().get(iA);
         DENOPTIMAttachmentPoint dap_B = other.getAttachmentPoints().get(iB);
 
-        // if no reaction/class specific info available set to single bond
-        int bndOrder = 1;
-
+        //TODO-V3 test this if block
+        
+        int chosenBO = 1;
+        if (dap_A.getFreeConnections()>1 && dap_B.getFreeConnections()>1)
+        {
+            int maxBO = Math.max(dap_A.getFreeConnections(), 
+                    dap_B.getFreeConnections());
+            chosenBO = rng.nextInt(maxBO-1) + 1;
+        }
+        
         // create a new edge
         DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(), other.getVertexId(),
-                iA, iB, bndOrder);
+                iA, iB, BondType.parseInt(chosenBO));
 
         // update the attachment point info
-        dap_A.updateFreeConnections(-bndOrder); // decrement the connections
-        dap_B.updateFreeConnections(-bndOrder); // decrement the connections
-
+        dap_A.updateFreeConnections(-chosenBO); // decrement the connections
+        dap_B.updateFreeConnections(-chosenBO); // decrement the connections
+        
         return edge;
     }
 

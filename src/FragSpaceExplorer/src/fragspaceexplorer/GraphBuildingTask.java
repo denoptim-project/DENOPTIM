@@ -37,6 +37,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
@@ -293,21 +294,21 @@ public class GraphBuildingTask implements Callable
             {
                 int sVId = srcAp.getVertexId();
                 int sFId = srcAp.getVertexMolId();
-                int sFTyp = srcAp.getVertexMolType();
+                BBType sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
                 DENOPTIMVertex srcVrtx = molGraph.getVertexWithId(sVId);
                 
-                String sCls = 
-                          srcVrtx.getAttachmentPoints().get(sApId).getAPClass();
+                String sCls = srcVrtx.getAttachmentPoints().get(
+                        sApId).getAPClass();
     
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
                 int tVId = trgAp.getVertexId();
                 int tFId = trgAp.getVertexMolId();
-                int tFTyp = trgAp.getVertexMolType(); 
+                BBType tFTyp = trgAp.getVertexMolType(); 
                 int tApId = trgAp.getApId();
         
                 // type -1 is used to represent unused AP
-                if (tFTyp == -1) 
+                if (tFTyp == BBType.NONE) 
                 {
                     continue;
                 }

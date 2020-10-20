@@ -19,6 +19,9 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
+
+import denoptim.molecule.DENOPTIMEdge.BondType;
+
 import java.io.Serializable;
 
 /**
@@ -36,7 +39,7 @@ public class DENOPTIMRing implements Serializable
     /**
      * Bond type (i.e., bond order) to be used between head and tail vertices
      */
-    private int bndTyp = 1; 
+    private BondType bndTyp = BondType.UNDEFINED; 
 
 //------------------------------------------------------------------------------
 
@@ -112,7 +115,7 @@ public class DENOPTIMRing implements Serializable
 
     public int getSize()
     {
-	return verteces.size();
+        return verteces.size();
     }
 
 //------------------------------------------------------------------------------
@@ -122,7 +125,7 @@ public class DENOPTIMRing implements Serializable
      * the head and the tail vertices
      */
 
-    public int getBondType()
+    public BondType getBondType()
     {
         return bndTyp;
     }
@@ -134,9 +137,9 @@ public class DENOPTIMRing implements Serializable
      * the head and the tail vertices
      */
 
-    public void setBondType(int bndType)
+    public void setBondType(BondType bndType)
     {
-        this.bndTyp = bndTyp;
+        this.bndTyp = bndType;
     }
 
 //------------------------------------------------------------------------------

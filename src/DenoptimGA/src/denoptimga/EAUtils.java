@@ -54,6 +54,7 @@ import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
@@ -716,8 +717,8 @@ public class EAUtils
         lstFragmentClass = new HashMap<>();
         for (int i=0; i<bbs.size(); i++)
         {
-        	DENOPTIMVertex bb = bbs.get(i);
-            ArrayList<String> lstRcn = bb.getAllAPClasses();
+        	DENOPTIMVertex v = bbs.get(i);
+            ArrayList<String> lstRcn = v.getAllAvailableAPClasses();
             lstFragmentClass.put(i, lstRcn);
         }
     }
@@ -922,7 +923,7 @@ public class EAUtils
 
         //TODO-V3: use a type-agnostic w.r.t vertex constructor
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, 0);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD);
         
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
@@ -1060,7 +1061,7 @@ public class EAUtils
             if (fid != -1)
             {
                 DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), fid, 2);
+                        GraphUtils.getUniqueVertexIndex(), fid, BBType.CAP);
                 
                 fragVertex.setLevel(lvl+1);
 
@@ -1353,7 +1354,7 @@ public class EAUtils
 
             // no capping of a capping group
 
-            if (curVertex.getFragmentType() == 2)
+            if (curVertex.getFragmentType() == BBType.CAP)
             {
                 //String msg = "Attempting to cap a capping group. Check your data.";
                 //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
@@ -1830,9 +1831,9 @@ MF: TO BE TESTED
             selectClassBasedFragment(DENOPTIMAttachmentPoint curDap)
                                                         throws DENOPTIMException
     {
-        String rcn = curDap.getAPClass();
+        String srcAPC = curDap.getAPClass();
         int fid = -1, apid = -1, rnd = -1;
-        String cmpReac = null;
+        String chosenTrgAPC = null;
 
         MersenneTwister rng = RandomUtils.getRNG();
 
@@ -1840,27 +1841,27 @@ MF: TO BE TESTED
         // check if this reaction bond is already satisfied
         if (curDap.isAvailable())
         {
-            ArrayList<String> lstRcn = findMatchingClass(rcn);
-            if (lstRcn == null)
+            ArrayList<String> candidateAPCs = findMatchingClass(srcAPC);
+            if (candidateAPCs == null)
             {
-                String msg = "No matching class found for " + rcn;
+                String msg = "No matching APClass found for " + srcAPC;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
 
-            if(lstRcn.size() == 1)
+            if(candidateAPCs.size() == 1)
             {
-                cmpReac = lstRcn.get(0);
+                chosenTrgAPC = candidateAPCs.get(0);
             }
             else
             {
                 // if there are multiple compatible reactions, random selection
-                rnd = rng.nextInt(lstRcn.size());
-                cmpReac = lstRcn.get(rnd);
+                rnd = rng.nextInt(candidateAPCs.size());
+                chosenTrgAPC = candidateAPCs.get(rnd);
             }
 
             // get the list of fragment indices with matching reaction cmpReac
-            ArrayList<Integer> reacFrags = getFragmentList(cmpReac);
+            ArrayList<Integer> reacFrags = getFragmentList(chosenTrgAPC);
             if (!reacFrags.isEmpty())
             {
                 // choose a random fragment if there are more than 1
@@ -1876,13 +1877,19 @@ MF: TO BE TESTED
 
                 // choose one of the compatible APs on the chosen fragment
                 ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                        FragmentSpace.getVertexFromLibrary(1, fid).getAttachmentPoints();
+                        FragmentSpace.getVertexFromLibrary(BBType.FRAGMENT, 
+                                fid).getAttachmentPoints();
         		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
         		for (int i=0; i<fragAPs.size(); i++)
         		{
-        		    if (fragAPs.get(i).getAPClass().equals(cmpReac))
+        		    //NB: here we check isAvailable because if the building 
+        		    // block is a template then some of its APc are not usable
+        		    // and therefore should not be listed here
+        		    
+        		    if (fragAPs.get(i).getAPClass().equals(chosenTrgAPC)
+        		            && fragAPs.get(i).isAvailable())
         		    {
-        			compatApIds.add(i);
+        		        compatApIds.add(i);
         		    }
         		}
                 if (compatApIds.size() == 1)
@@ -1897,7 +1904,8 @@ MF: TO BE TESTED
             }
         }
 
-	IdFragmentAndAP res = new IdFragmentAndAP(-1,fid,1,apid,-1,-1);
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, fid, BBType.FRAGMENT, 
+                apid, -1, -1);
 
         return res;
     }

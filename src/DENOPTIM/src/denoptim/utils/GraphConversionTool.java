@@ -36,6 +36,8 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.*;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
 /**
@@ -127,14 +129,43 @@ public class GraphConversionTool
             int dap_idx_v1 = edge.getSourceDAP();
             int dap_idx_v2 = edge.getTargetDAP();
 
-            int dap1_anum = v1.
-                            getAttachmentPoints().
-                            get(dap_idx_v1).
-                            getAtomPositionNumber();
-            int dap2_anum = v2.
-                            getAttachmentPoints().
-                            get(dap_idx_v2).
-                            getAtomPositionNumber();
+            int dap1_anum = -1;
+            try
+            {
+                dap1_anum = v1.getAttachmentPoints().get(dap_idx_v1).
+                                getAtomPositionNumber();
+            } catch (Exception e)
+            {
+                System.out.println(" ");
+                System.out.println("Exception when trying to get source atom "
+                        + "ID.");
+                System.out.println("GraphMSG: "+g.getMsg());
+                System.out.println("Graph: "+g);
+                System.out.println("Edge: "+edge);
+                System.out.println("Vertex: "+v1);
+                System.out.println("AP id: "+dap_idx_v1);
+                System.out.println("AP: "+v1.getAttachmentPoints().get(dap_idx_v1));
+                throw e;
+            }
+            
+            int dap2_anum = -1;
+            try
+            {
+                dap2_anum = v2.getAttachmentPoints().get(dap_idx_v2).
+                                getAtomPositionNumber();
+            } catch (Exception e)
+            {
+                System.out.println(" ");
+                System.out.println("Exception when trying to get source atom "
+                        + "ID.");
+                System.out.println("GraphMSG: "+g.getMsg());
+                System.out.println("Graph: "+g);
+                System.out.println("Edge: "+edge);
+                System.out.println("Vertex: "+v2);
+                System.out.println("AP id: "+dap_idx_v2);
+                System.out.println("AP: "+v2.getAttachmentPoints().get(dap_idx_v2));
+                throw e;
+            }
 
             // get the new atom indices for the dap's
             int atom1 = getCorrespondingAtomNumber(lstDVA, v1_id, dap1_anum);
@@ -142,17 +173,9 @@ public class GraphConversionTool
 
             if (atom1 >= 0 && atom2 >= 0)
             {
-                switch (edge.getBondType())
+                if (edge.getBondType().hasCDKAnalogue())
                 {
-                case 1:
-                    mol.addBond(atom1, atom2, IBond.Order.SINGLE);
-                    break;
-                case 2:
-                    mol.addBond(atom1, atom2, IBond.Order.DOUBLE);
-                    break;
-                case 3:
-                    mol.addBond(atom1, atom2, IBond.Order.TRIPLE);
-                    break;
+                    mol.addBond(atom1, atom2, edge.getBondType().getCDKOrder());
                 }
             }
             else
@@ -202,21 +225,9 @@ public class GraphConversionTool
                 int idSrcH = mol.getAtomNumber(cH.get(0));
                 int idSrcT = mol.getAtomNumber(cT.get(0));
 
-                int bndOrder = r.getBondType(); 
-                switch (bndOrder)
+                if (r.getBondType().hasCDKAnalogue())
                 {
-                case 1:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
-                    break;
-                case 2:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.DOUBLE);
-                    break;
-                case 3:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.TRIPLE);
-                    break;
-                default:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
-                    break;
+                    mol.addBond(idSrcH, idSrcT, r.getBondType().getCDKOrder());
                 }
             }
         }
@@ -321,14 +332,21 @@ public class GraphConversionTool
             // molid
             int molid = Integer.parseInt(s3[1]) - 1;
             // fragment/scaffold
-            int fragtype = Integer.parseInt(s3[2]);
+            BBType fragtype = BBType.parseInt(Integer.parseInt(s3[2]));
             // level
             int level = Integer.parseInt(s3[3]);
 	            
             //TODO-V3: this is where a type-agnostic constructor should be used
-            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
+            DENOPTIMVertex dv;
+            if (FragmentSpace.isDefined())
+            {
+                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
+            } else {
+                dv =  new EmptyVertex(vid);
+            }
             dv.setLevel(level);
 
+            
             //TODO-V3:check the symmetry on the vertex is properly imported
             // NB: now, we cannot record which APs are symmetric from the string
 		    // representation of a graph without the library of fragments.
@@ -353,7 +371,7 @@ public class GraphConversionTool
     
                 int trgDAP = Integer.parseInt(s4[3]);
     
-                int btype = Integer.parseInt(s4[4]);
+                BondType btype = BondType.parseStr(s4[4]);
     
                 DENOPTIMEdge ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
                                                         trgDAP, btype);
@@ -423,7 +441,7 @@ public class GraphConversionTool
         for (int i=0; i<edges.size(); i++)
         {
             DENOPTIMEdge edge = edges.get(i);
-            int bndOrder = edge.getBondType();
+            BondType bndTyp = edge.getBondType();
             int srcvid = edge.getSourceVertex();
             int trgvid = edge.getTargetVertex();
             int iA = edge.getSourceDAP();
@@ -467,8 +485,8 @@ public class GraphConversionTool
             DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
 		    if (useMolInfo)
 	        {
-                apA.updateFreeConnections(-bndOrder);
-                apB.updateFreeConnections(-bndOrder);
+                apA.updateFreeConnections(-bndTyp.getValence());
+                apB.updateFreeConnections(-bndTyp.getValence());
 		    }
         }
 
@@ -480,8 +498,7 @@ public class GraphConversionTool
             {
                 if (e.getTargetVertex() == vid || e.getSourceVertex() == vid)
                 {
-                    int bt = e.getBondType();
-                    r.setBondType(bt);
+                    r.setBondType(e.getBondType());
                     break;
                 }
             }

@@ -57,12 +57,65 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Index of the graph building block contained in the vertex
      */
     private int buildingBlockId = -99; //Initialised to meaningless value
-    
-    //TODO-V3 to enum
-    /*
-     * 0:scaffold, 1:fragment, 2:capping group
+
+    /**
+     * The type of building block. This is used to easily distinguish among
+     * building blocks that can be used to start new graphs (i.e., the so-called
+     * scaffolds), those that can be use anywhere (i.e., fragments), and 
+     * building blocks that can be used to saturate open valences (i.e., the 
+     * capping groups).
      */
-    private int buildingBlockType = -99; //Initialised to meaningless value
+    
+    public enum BBType {
+        UNDEFINED, SCAFFOLD, FRAGMENT, CAP, NONE;
+        
+        private int i = -99;
+        
+        static {
+            NONE.i = -1;
+            SCAFFOLD.i = 0;
+            FRAGMENT.i = 1;
+            CAP.i = 2;
+        }
+        
+        /**
+         * Translates the integer into the enum
+         * @param i 0:scaffold, 1:fragment, 2:capping group
+         * @return the corresponding enum
+         */
+        public static BBType parseInt(int i) {
+            BBType bbt;
+            switch (i)
+            {
+                case 0:
+                    bbt = SCAFFOLD;
+                    break;
+                case 1:
+                    bbt = FRAGMENT;
+                    break;
+                case 2:
+                    bbt = CAP;
+                    break;
+                default:
+                    bbt = UNDEFINED;
+                    break;
+            }
+            return bbt;
+        }
+        
+        /**
+         * @return 0:scaffold, 1:fragment, 2:capping group
+         */
+        public int toOldInt()
+        {
+            return i;
+        }
+    }
+    
+    /**
+     * Type of this building block
+     */
+    private BBType buildingBlockType = BBType.UNDEFINED;
     
     /*
      * attachment points on this vertex
@@ -120,10 +173,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(int vertexId, IAtomContainer mol) 
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
         super (vertexId);
+        
+        this.setBuildingBlockType(bbt);
         
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
@@ -179,9 +234,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
+    public DENOPTIMFragment(IAtomContainer mol, BBType bbt) 
+            throws DENOPTIMException
     {    	
-    	this(-1,mol);
+    	this(-1,mol,bbt);
     }
     
 //------------------------------------------------------------------------------
@@ -326,17 +382,18 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     /**
      *
-     * @return <code>true</code> if vertex is a fragment
+     * @return the
      */
 
-    public int getFragmentType()
+    @Override
+    public BBType getFragmentType()
     {
         return buildingBlockType;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setFragmentType(int fType)
+    private void setBuildingBlockType(BBType fType)
     {
         buildingBlockType = fType;
     }
@@ -344,8 +401,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @return the id of the molecule
+     * Returns the ID of this fragment. The ID is the index in the list of
+     * all building blocks of the same type.
+     * @return the numerical ID of this fragment.
      */
     public int getMolId()
     {
@@ -406,6 +464,29 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     /**
      * Add an attachment point to the specifies atom
+     * @param srcAtmId the index of the source atom in the atom list of this 
+     * chemical representation. Index must be 0-based.
+     * @param propAPClass the attachment point class, or null, if class should not 
+     * be defines.
+     * @param vector the coordinates of the 3D point representing the end of 
+     * the attachment point direction vector, or null. The coordinates must be
+     * consistent with the coordinates of the atoms.
+     * @param valence the valences used by this AP.
+     * @throws DENOPTIMException 
+     */
+
+    public void addAP(int srcAtmId, String propAPClass, Point3d vector, 
+            int valence) 
+            throws DENOPTIMException
+    {
+        IAtom srcAtm = mol.getAtom(srcAtmId);
+        addAP(srcAtm, propAPClass, vector, valence);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Add an attachment point to the specifies atom
      * @param srcAtm the source atom in the atom list of this 
      * chemical representation.
      * @param propAPClass the attachment point class, or null, if class should not 
@@ -417,13 +498,40 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
 
     public void addAP(IAtom srcAtm, String propAPClass, Point3d vector) 
+            throws DENOPTIMException
+    {
+        addAP(srcAtm,propAPClass,vector,-1);
+    }
+        
+//-----------------------------------------------------------------------------
+
+    /**
+     * Add an attachment point to the specifies atom
+     * @param srcAtm the source atom in the atom list of this 
+     * chemical representation.
+     * @param propAPClass the attachment point class, or null, if class should not 
+     * be defines.
+     * @param vector the coordinates of the 3D point representing the end of 
+     * the attachment point direction vector, or null. The coordinates must be
+     * consistent with the coordinates of the atoms.
+     * @param valence the valences used by this AP.
+     * @throws DENOPTIMException 
+     */
+
+    public void addAP(IAtom srcAtm, String propAPClass, Point3d vector, 
+            int valence) 
     		throws DENOPTIMException
     {
     	int atmId = mol.getAtomNumber(srcAtm);
-    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this);
-    	ap.setAtomPositionNumber(atmId);
-    	ap.setAPClass(propAPClass);
-    	ap.setDirectionVector(new double[]{vector.x, vector.y, vector.z});
+
+    	String apRule = propAPClass.split(
+    	        DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
+        int sub = Integer.parseInt(propAPClass.split(
+                DENOPTIMConstants.SEPARATORAPPROPSCL)[1]);
+    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, atmId,
+                valence, valence, new double[] {vector.x, vector.y, vector.z},
+                apRule, propAPClass, sub
+        );
     	
     	//This adds the AP to the list of the superclass
     	addAttachmentPoint(ap);
@@ -731,10 +839,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    propAPClass = propAPClass + stingAPP;
 	
 			    //Build SDF property "ATTACHMENT_POINT"
-			    int BndOrd = FragmentSpace.getBondOrderForAPClass(
-                    		ap.getAPClass());
-
-			    String sBO = Integer.toString(BndOrd);
+			    String sBO = FragmentSpace.getBondOrderForAPClass(
+                        ap.getAPClass()).toOldString();
 			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
 			    {
@@ -763,14 +869,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 		try {
 		    this.projectAPsToProperties();
 		    //deep copy of mol is created in the DENOPTIMFragment constructor
-			clone = new DENOPTIMFragment(getVertexId(),mol);
+			clone = new DENOPTIMFragment(getVertexId(),mol,buildingBlockType);
 		} catch (Exception e) {
 		    e.printStackTrace();
 			String msg = "Failed to clone DENOPTIMFragment! " +clone;
 			System.err.println(msg);
 		}
 		clone.setMolId(this.getMolId());
-		clone.setFragmentType(this.getFragmentType());
+		clone.setBuildingBlockType(this.getFragmentType());
 		
 		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : this.getSymmetricAPSets())
@@ -977,7 +1083,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public String toString()
     {
         return getVertexId()+ "_" + (buildingBlockId + 1) + "_" +
-                buildingBlockType + "_" + getLevel();
+                buildingBlockType.toOldInt() + "_" + getLevel();
     }
     
 //------------------------------------------------------------------------------

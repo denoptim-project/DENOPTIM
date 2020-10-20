@@ -45,6 +45,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.GenUtils;
@@ -580,17 +581,15 @@ public class TreeBuilder3D
         int preNumAtms = mol.getAtomCount();
         mol.add(inFrag);
         int newIdSrcAtmB = idSrcAtmB + preNumAtms;
-        switch (edge.getBondType())
+        
+        BondType bndTyp = edge.getBondType();
+        if (bndTyp.hasCDKAnalogue())
         {
-        case 1:
-            mol.addBond(idSrcAtmA, newIdSrcAtmB, IBond.Order.SINGLE);
-            break;
-        case 2:
-            mol.addBond(idSrcAtmA, newIdSrcAtmB, IBond.Order.DOUBLE);
-            break;
-        case 3:
-            mol.addBond(idSrcAtmA, newIdSrcAtmB, IBond.Order.TRIPLE);
-            break;
+            mol.addBond(idSrcAtmA, newIdSrcAtmB, bndTyp.getCDKOrder());
+        } else {
+            System.out.println("WARNING! Attempt to add ring closing bond "
+                    + "did not add any actual chemical bond because the "
+                    + "bond type of the chord is '" + bndTyp +"'.");
         }
 
         // Store copies of APs properly oriented

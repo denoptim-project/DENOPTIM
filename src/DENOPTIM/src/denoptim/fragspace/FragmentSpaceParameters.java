@@ -28,7 +28,9 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
 
 
@@ -122,6 +124,11 @@ public class FragmentSpaceParameters
      * Flag signalling the use of graph templates
      */
     protected static boolean useTemplates = false;
+    
+    /**
+     * TMP flag selecting type of test template
+     */
+    protected static boolean useCyclicTemplate = false;
 
     /**
      * Verbosity level
@@ -186,9 +193,15 @@ public class FragmentSpaceParameters
     
 //------------------------------------------------------------------------------
     
+    //TODO-V3 tmp code
     public static boolean hasTemplates()
     {
         return useTemplates;
+    }
+    //TODO-V3 tmp code
+    public static boolean useCyclicTemplate()
+    {
+        return useCyclicTemplate;
     }
 
 //------------------------------------------------------------------------------
@@ -276,14 +289,22 @@ public class FragmentSpaceParameters
             }
             break;
             
-        //NB: this is supposed to be without "=" sign because it's a parameter without value
+        //NB: this is supposed to be without "=" sign because it's a parameter
+        // without value
         case "FS-ENFORCESYMMETRY":
     	    enforceSymmetry = true;
     	    break;
     	    
+    	//TODO-V3: this is temporary stuff needed to test templates
         case "FS-USETEMPLATES=":
             useTemplates = true;
             break;
+        case "FS-USECYCLICTEMPLATE=":
+            useTemplates = true;
+            useCyclicTemplate = true;
+            break;
+            
+            
     	case "FS-CONSTRAINSYMMETRY=":
     	    symmetryConstraints = true;
     	    try
@@ -418,78 +439,15 @@ public class FragmentSpaceParameters
 //------------------------------------------------------------------------------
 
     /**
-     * Processes a list of atom containers and builds a list of vertexes.
-     * @param iacs the list of atom containers.
-     * @return the list of vertexes.
-     * @throws DENOPTIMException
-     */
-    
-    //TODO-V3: adapt to templates.
-    
-    private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
-            ArrayList<IAtomContainer> iacs) throws DENOPTIMException
-    {
-    	ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
-    	for (IAtomContainer iac : iacs)
-    	{
-    		list.add(new DENOPTIMFragment(iac));
-    	}
-    	return list;
-    }
-//------------------------------------------------------------------------------
-
-    /**
      * Read the information collected in the parameters stored in this class
      * and create the fragment space accordingly.
      * @throws DENOPTIMException
      */
     public static void processParameters() throws DENOPTIMException
     {
-        ArrayList<DENOPTIMVertex> scaffLib = convertsIACsToVertexes(
-                DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold"));
-        
-        ArrayList<DENOPTIMVertex> fragLib = convertsIACsToVertexes(
-        DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment"));
-
-        ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
-    	HashMap<String,ArrayList<String>> cpMap = 
-    			new HashMap<String,ArrayList<String>>();
-    	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
-    	HashMap<String,String> capMap = new HashMap<String,String>();
-    	HashSet<String> forbEnds = new HashSet<String>();
-    	HashMap<String,ArrayList<String>> rcCpMap = 
-    			new HashMap<String,ArrayList<String>>();
-        
-        if (cappingLibFile.length() > 0)
-        {
-            cappLib = convertsIACsToVertexes(DenoptimIO.readInLibraryOfFragments(cappingLibFile,
-            		"capping group"));
-        }
-
-        if (compMatrixFile.length() > 0)
-        {
-            DenoptimIO.readCompatibilityMatrix(compMatrixFile,
-						cpMap,
-						boMap,
-						capMap,
-						forbEnds);
-        }
-
-        if (rcCompMatrixFile != null && rcCompMatrixFile.length() > 0)
-        {
-        	DenoptimIO.readRCCompatibilityMatrix(rcCompMatrixFile,rcCpMap);
-        }
-
-        if (compMatrixFile.length() > 0)
-        {
-		    FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib,cpMap,
-		    		boMap,capMap,forbEnds,rcCpMap);
-		    FragmentSpace.setSymmConstraints(symmConstraintsMap);
-        }
-        else
-        {
-        	FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib);
-        }        
+        FragmentSpace.defineFragmentSpace(scaffoldLibFile, fragmentLibFile, 
+                cappingLibFile, compMatrixFile, rcCompMatrixFile, 
+                symmConstraintsMap); 
     }
 
 //------------------------------------------------------------------------------

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.io.Serializable;
 
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**
@@ -73,6 +74,7 @@ public class ClosableChain implements Cloneable, Serializable
             String[] clParts = clStr.trim().split("/");
             int molID = Integer.parseInt(clParts[0]);
             int ftype = Integer.parseInt(clParts[1]);
+            BBType bbt = BBType.parseInt(ftype);
             String[] partsAps = clParts[2].split("ap");
             int apLeft = Integer.parseInt(partsAps[1]);
     	    int apRight = Integer.parseInt(partsAps[2]);
@@ -81,7 +83,7 @@ public class ClosableChain implements Cloneable, Serializable
         		tuningPoint = i;
         		lastFType = ftype;
     	    }
-    	    ChainLink cl = new ChainLink(molID, ftype, apLeft, apRight);
+    	    ChainLink cl = new ChainLink(molID, bbt, apLeft, apRight);
     	    links.add(cl);
     	}
     }
@@ -189,7 +191,7 @@ public class ClosableChain implements Cloneable, Serializable
         if (vert instanceof DENOPTIMFragment)
         {
             int vertMolID = ((DENOPTIMFragment)vert).getMolId();
-            int vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
+            BBType vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
             for (int i=0; i<links.size(); i++)
             {
                 ChainLink cl = links.get(i);
@@ -224,7 +226,7 @@ public class ClosableChain implements Cloneable, Serializable
         if (vert instanceof DENOPTIMFragment)
         {
             int vertMolID = ((DENOPTIMFragment)vert).getMolId();
-            int vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
+            BBType vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
         	for (int i=0; i<links.size(); i++)
         	{
         	    ChainLink cl = links.get(i);

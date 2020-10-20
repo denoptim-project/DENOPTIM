@@ -42,6 +42,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
@@ -188,15 +190,15 @@ public class CyclicGraphHandler
                     arrLst.addAll(path.getVertecesPath());                    
                     DENOPTIMRing ring = new DENOPTIMRing(arrLst);
 
-                    int bndTypI = 
+                    BondType bndTypI = 
                            molGraph.getIncidentEdges(vI).get(0).getBondType();
-                    int bndTypJ = 
+                    BondType bndTypJ = 
                            molGraph.getIncidentEdges(vJ).get(0).getBondType();
                     if (bndTypI != bndTypJ)
                     {
                         String s = "Attempt to close rings is not compatible "
                         + "to the different bond type specified by the "
-                        + "head and tail APs: (" + bndTypI + "!=" + 
+                        + "head and tail APs: (" + bndTypI + "!=" 
                         + bndTypJ + " for vertices " + vI + " " 
                         + vJ + ")";
                         throw new DENOPTIMException(s);
@@ -562,8 +564,8 @@ public class CyclicGraphHandler
                             DENOPTIMRing ring = new DENOPTIMRing(arrLst);
 
                             List<DENOPTIMEdge> es = path.getEdgesPath();
-                            int btH = es.get(0).getBondType();
-                            int btT = es.get(es.size()-1).getBondType();
+                            BondType btH = es.get(0).getBondType();
+                            BondType btT = es.get(es.size()-1).getBondType();
                             if (btH != btT)
                             {
                                 String s = "Attempt to close rings is not "
@@ -1162,22 +1164,19 @@ public class CyclicGraphHandler
 
             // Assuming that APClasses on both sides agree on bond order
             // and that vI and vY are proper RCVs
-            int bndOrd = graph.getIncidentEdges(vI).get(0).getBondType();
-            IBond bnd = new Bond(srcI,srcJ);
-            switch (bndOrd)
+            
+            BondType bndTyp = graph.getIncidentEdges(vI).get(0).getBondType();
+            if (bndTyp.hasCDKAnalogue())
             {
-            case 1:
-                bnd.setOrder(IBond.Order.SINGLE);
-                break;
-            case 2:
-                bnd.setOrder(IBond.Order.DOUBLE);
-                break;
-            case 3:
-                bnd.setOrder(IBond.Order.TRIPLE);
-                break;
+                IBond bnd = new Bond(srcI,srcJ);
+                bnd.setOrder(bndTyp.getCDKOrder());
+                mol.addBond(bnd);
+            } else {
+                System.out.println("WARNING! Attempt to add ring closing bond "
+                        + "did not add any actual chemical bond because the "
+                        + "bond type of the chord is '" + bndTyp +"'.");
             }
-            mol.addBond(bnd);
-
+            
             if (verbosity > 1)
             {
                 System.out.println(" ==> UPDATING RingSizeManager <==");
@@ -1525,21 +1524,15 @@ public class CyclicGraphHandler
         int iSrcT = mol.getAtomNumber(srcT);
         toRemove.add(atmH);
         toRemove.add(atmT);
-        int bndTyp = subGraph.getEdgesPath().get(0).getBondType();
-        switch (bndTyp)
+        
+        BondType bndTyp = subGraph.getEdgesPath().get(0).getBondType();
+        if (bndTyp.hasCDKAnalogue())
         {
-        case (1):
-            mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-            break;
-        case (2):
-            mol.addBond(iSrcH, iSrcT, IBond.Order.DOUBLE);
-            break;
-        case (3):
-            mol.addBond(iSrcH, iSrcT, IBond.Order.TRIPLE);
-            break;
-        default:
-            mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-            break;
+            mol.addBond(iSrcH, iSrcT, bndTyp.getCDKOrder());
+        } else {
+            System.out.println("WARNING! Attempt to add ring closing bond "
+                    + "did not add any actual chemical bond because the "
+                    + "bond type of the chord is '" + bndTyp +"'.");
         }
 
         // Remove atoms
@@ -1550,7 +1543,7 @@ public class CyclicGraphHandler
 
          if (verbosity > 1)
         {
-            System.out.println("Molecular representation of path incluses:");
+            System.out.println("Molecular representation of path includes:");
                 for (IAtom a : mol.atoms())
             {
                 System.out.println("  " + a.getSymbol() 
@@ -1789,7 +1782,8 @@ public class CyclicGraphHandler
 
             // check for orphan coordinating atoms:
             // they have RCAs but none of them is included in a rings
-            if (vert.getLevel() == 0 && vertFrag.getFragmentType() == 1)
+            if (vert.getLevel() == 0 
+                    && vertFrag.getFragmentType() == BBType.FRAGMENT)
             {
 
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeAtPosition(

@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.vecmath.Point3d;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
+import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -42,6 +44,7 @@ import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for input/output
@@ -73,7 +76,7 @@ public class DenoptimIOTest
 		aps1.add(new DENOPTIMAttachmentPoint(v1, 1, 1, 1));
 		v1.setAttachmentPoints(aps1);
     	graph.addVertex(v1);
-    	graph.addEdge(new DENOPTIMEdge(0, 1, 0, 0, 1));
+    	graph.addEdge(new DENOPTIMEdge(0, 1, 0, 0));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps2 = new ArrayList<>();
 		DENOPTIMVertex v2 = new EmptyVertex(2);
@@ -81,15 +84,15 @@ public class DenoptimIOTest
 		aps2.add(new DENOPTIMAttachmentPoint(v2, 1, 1, 1));
 		v2.setAttachmentPoints(aps2);
     	graph.addVertex(v2);
-    	graph.addEdge(new DENOPTIMEdge(1, 2, 1, 0, 1));
+    	graph.addEdge(new DENOPTIMEdge(1, 2, 1, 0));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps3 = new ArrayList<>();
 		DENOPTIMVertex v3 = new EmptyVertex(3);
 		aps3.add(new DENOPTIMAttachmentPoint(v3, 0, 1, 1));
 		v3.setAttachmentPoints(aps3);
     	graph.addVertex(v3);
-    	graph.addEdge(new DENOPTIMEdge(2, 3, 1, 0, 1));
-    	
+    	graph.addEdge(new DENOPTIMEdge(2, 3, 1, 0));
+
     	ArrayList<DENOPTIMAttachmentPoint> aps4 = new ArrayList<>();
 		DENOPTIMVertex v4 = new EmptyVertex(4);
 		aps4.add(new DENOPTIMAttachmentPoint(v4, 0, 1, 1));
@@ -97,28 +100,28 @@ public class DenoptimIOTest
 		aps4.add(new DENOPTIMAttachmentPoint(v4, 2, 1, 1));
 		v4.setAttachmentPoints(aps4);
 		graph.addVertex(v4);
-		graph.addEdge(new DENOPTIMEdge(0, 4, 1, 0, 1));
+		graph.addEdge(new DENOPTIMEdge(0, 4, 1, 0));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps5 = new ArrayList<>();
 		DENOPTIMVertex v5 = new EmptyVertex(5);
 		aps5.add(new DENOPTIMAttachmentPoint(v5, 0, 1, 1));
 		v5.setAttachmentPoints(aps5);
     	graph.addVertex(v5);
-    	graph.addEdge(new DENOPTIMEdge(4, 5, 1, 0, 1));
+    	graph.addEdge(new DENOPTIMEdge(4, 5, 1, 0));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps6 = new ArrayList<>();
 		DENOPTIMVertex v6 = new EmptyVertex(6);
 		aps6.add(new DENOPTIMAttachmentPoint(v6, 0, 1, 1));
 		v6.setAttachmentPoints(aps6);
     	graph.addVertex(v6);
-    	graph.addEdge(new DENOPTIMEdge(0, 6, 2, 0, 1));
+    	graph.addEdge(new DENOPTIMEdge(0, 6, 2, 0));
     	
     	ArrayList<DENOPTIMAttachmentPoint> aps7 = new ArrayList<>();
 		DENOPTIMVertex v7 = new EmptyVertex(7);
 		aps7.add(new DENOPTIMAttachmentPoint(v7, 0, 1, 1));
 		v7.setAttachmentPoints(aps7);
     	graph.addVertex(v7);
-    	graph.addEdge(new DENOPTIMEdge(4, 7, 2, 0, 1));
+    	graph.addEdge(new DENOPTIMEdge(4, 7, 2, 0));
     	
     	graph.addRing(new DENOPTIMRing(new ArrayList<>(
 				Arrays.asList(v5, v4, v0, v1, v2, v3))));
@@ -148,6 +151,21 @@ public class DenoptimIOTest
     @Test
     public void testReadAllAPClasses() throws Exception
     {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put("classAtmC",BondType.SINGLE);
+        map.put("otherClass",BondType.SINGLE);
+        map.put("classAtmH",BondType.SINGLE);
+        map.put("apClassO",BondType.SINGLE);
+        map.put("apClassObis",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        map.put("",BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
     	DENOPTIMFragment frag = new DENOPTIMFragment();
     	IAtom atmC = new Atom("C");
     	atmC.setPoint3d(new Point3d(0.0, 0.0, 1.0));
@@ -185,8 +203,8 @@ public class DenoptimIOTest
     	Set<String> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
     	
     	assertEquals(6,allAPC.size(),"Size did not match");
-    	assertTrue(allAPC.contains("apClassObis:0"),"Contains failed (1)");
-    	assertTrue(allAPC.contains("otherClass:0"),"Contains failed (2)");
+    	assertTrue(allAPC.contains("apClassObis:0"),"Contains APClass (1)");
+    	assertTrue(allAPC.contains("otherClass:0"),"Contains APClass (2)");
     }
     
 //------------------------------------------------------------------------------

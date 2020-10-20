@@ -26,12 +26,19 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.silent.Bond;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 /**
  * Unit test for DENOPTIMVertex
@@ -122,6 +129,13 @@ public class DENOPTIMVertexTest
     @Test
     public void testClone() throws Exception
     {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        String APRULE = "apc";
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.DOUBLE);
+        FragmentSpace.setBondOrderMap(map);
+
         ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
         DENOPTIMVertex v = new EmptyVertex(0);
         apsA.add(new DENOPTIMAttachmentPoint(v, 1, 1, 1));
@@ -150,11 +164,15 @@ public class DENOPTIMVertexTest
         ((DENOPTIMFragment) v).addAtom(a3);
         ((DENOPTIMFragment) v).addBond(new Bond(a1, a2));
         ((DENOPTIMFragment) v).addBond(new Bond(a2, a3));
-        String APCLASS = "apc:0";
-        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        ((DENOPTIMFragment) v).addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        String APCLASS = APRULE + DENOPTIMConstants.SEPARATORAPPROPSCL +"0";
+        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(
+                new double[]{0.0, 2.2, 3.3}));
+        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(
+                new double[]{0.0, 0.0, 3.3}));
+        ((DENOPTIMFragment) v).addAP(2, APCLASS, new Point3d(
+                new double[]{0.0, 0.0, 1.1}));
+        ((DENOPTIMFragment) v).addAP(0, APCLASS, new Point3d(
+                new double[]{3.0, 0.0, 3.3}));
         v.setLevel(62);
         
         c = v.clone();

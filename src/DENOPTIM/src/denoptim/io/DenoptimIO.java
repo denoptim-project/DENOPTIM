@@ -101,8 +101,10 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -1303,7 +1305,8 @@ public class DenoptimIO
 			for (IAtomContainer mol : DenoptimIO.readMoleculeData(
 					fragLib.getAbsolutePath()))
 			{
-				DENOPTIMFragment frag = new DENOPTIMFragment(mol);
+				DENOPTIMFragment frag = new DENOPTIMFragment(mol,
+				        BBType.UNDEFINED);
                 for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints())
 				{
 					allCLasses.add(ap.getAPClass());
@@ -1324,13 +1327,13 @@ public class DenoptimIO
      *
      * @param fileName the file to be read
      * @param compReacMap container for the APClass compatibility rules
-     * @param reacBonds container for the APClass-to-bond order
+     * @param boMap container for the APClass-to-bond order
      * @param reacCap container for the capping rules
      * @param forbEnd container for the definition of forbidden ends
      */
     public static void writeCompatibilityMatrix(String fileName,
             HashMap<String, ArrayList<String>> compReacMap,
-            HashMap<String, Integer> reacBonds, HashMap<String, String> reacCap,
+            HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
             Set<String> forbEnd)
             throws DENOPTIMException
     {
@@ -1369,11 +1372,12 @@ public class DenoptimIO
     	sb.append(DENOPTIMConstants.APCMAPIGNORE);
     	sb.append(" APClass-to-BondOrder").append(NL);
     	SortedSet<String> keysBO = new TreeSet<String>();
-    	keysBO.addAll(reacBonds.keySet());
+    	keysBO.addAll(boMap.keySet());
     	for (String apc : keysBO)
     	{
     		sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
-    		sb.append(apc).append(" ").append(reacBonds.get(apc)).append(NL);
+    		sb.append(apc).append(" ").append(
+    		        boMap.get(apc).toOldString()).append(NL);
     	}
     	
     	sb.append(DENOPTIMConstants.APCMAPIGNORE);
@@ -1405,14 +1409,14 @@ public class DenoptimIO
      * Read the APclass compatibility matrix data from file.
      * @param fileName the file to be read
      * @param compReacMap container for the APClass compatibility rules
-     * @param reacBonds container for the APClass-to-bond order
+     * @param boMap container for the APClass-to-bond type  rules
      * @param reacCap container for the capping rules
      * @param forbEnd container for the definition of forbidden ends
      * @throws DENOPTIMException
      */
     public static void readCompatibilityMatrix(String fileName,
             HashMap<String, ArrayList<String>> compReacMap,
-            HashMap<String, Integer> reacBonds, HashMap<String, String> reacCap,
+            HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
             Set<String> forbEnd)
             throws DENOPTIMException
     {
@@ -1462,7 +1466,7 @@ public class DenoptimIO
                             String err = "Incomplete reaction bondorder data.";
                             throw new DENOPTIMException(err + " " + fileName);
                         }
-                        reacBonds.put(str[1], new Integer(str[2]));
+                        boMap.put(str[1], BondType.parseStr(str[2]));
                     }
                     else
                     {
@@ -1523,7 +1527,7 @@ public class DenoptimIO
             throw new DENOPTIMException(err + " " + fileName);
         }
 
-        if (reacBonds.isEmpty())
+        if (boMap.isEmpty())
         {
             String err = "No bond data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);

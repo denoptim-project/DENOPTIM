@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-
+import denoptim.molecule.DENOPTIMEdge.BondType;
 /**
  * Each attachment point is annotated by the number (position) of the atom
  * in the molecule, the number of bonds it is associated with, the current
@@ -149,7 +149,11 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * @param atomPosNum the index of the source atom (0-based)
      * @param atomConnections the total number of connections
      * @param apConnections the number of free connections
-     * @param dirVec the AP direction vector end (the beginning ate the
+     * @param dirVec the AP direction vector end (the beginning at the coords
+     *               of the source atom). This must array have 3 entries.
+     * @param apRule the first part of the APClass
+     * @param apSubClass the second part of the APClass (an integer)
+     * @param apClass the APClass (apRule:apSubClass)
      */
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
                                    int atomConnections, int apConnections,
@@ -305,7 +309,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
 	            	this.dirVec[2] = Double.parseDouble(coord[2]);
 	            }
             }
-            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule);           
+            this.freeConnections = FragmentSpace.getBondOrderForAPClass(apRule)
+                    .getValence();
+            this.totalConnections = this.freeConnections;
 	    } catch (Throwable t) {
 	        t.printStackTrace();
 			throw new DENOPTIMException("Cannot construct AP from string '" 
@@ -423,44 +429,91 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
         apClass = m_class;
     }
     
+//-----------------------------------------------------------------------------
+
+    /**
+     * Evaluates the given string as a candidate attachment point rule, i.e., 
+     * as name of a fragmentation rule that generates attachment points.
+     * @param s the string to evaluate
+     * @return <code>true</code> if the given string can be used as attachment
+     * point rule.
+     */
+    
+    //TODO-V3 move to APClass class
+    public static boolean isValidAPRuleString(String s)
+    {
+        return s.matches("^[a-zA-Z0-9_-]*$");
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Evaluate the given string as a candidate for attachment point subclass,
+     * i.e., the attachment point class component discriminating the two sides 
+     * of a bond being broken to yield two attachment points.
+     * @param s the string to evaluate
+     * @return <code>true</code> if the given string can be used as 
+     */
+    
+    //TODO-V3 move to APClass class
+    public static boolean isValidAPSubCLassString(String s)
+    {
+        return s.matches("^[0-9]*$");
+    }
+    
 //------------------------------------------------------------------------------
     
     /**
      * Evaluate is a candidate string can be used as APClass. This method checks
      * whether the string reflects the expected syntax of an APClass string
-     * 
+     * @return <code>true</code> if the given string can be used as attachment
+     * point class.
      */
     
-    public static boolean isValidAPClassString(String temptAPClass)
+    //TODO-V3 move to APClass class
+    public static boolean isValidAPClassString(String s)
     {
-		if (!temptAPClass.matches("^[a-z,A-Z,0-9].*"))
+		if (!s.matches("^[a-z,A-Z,0-9].*"))
 			return false;
 		
-		if (!temptAPClass.matches(".*[0-9]$"))
+		if (!s.matches(".*[0-9]$"))
 			return false;
 		
-		if (temptAPClass.contains(" "))
+		if (s.contains(" "))
 			return false;
 		
-		if (!temptAPClass.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
+		if (!s.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
 			return false;
-		
-		/*
-		//Avoiding StringUtils
-		int numSep = StringUtils.countMatches(temptAPClass,
-				DENOPTIMConstants.SEPARATORAPPROPSCL);
-		*/
 		
 		int numSep = 0;
-		for (int i=0; i<temptAPClass.length(); i++)
+		for (int i=0; i<s.length(); i++)
 		{
-			if (temptAPClass.charAt(i) == DENOPTIMConstants.SEPARATORAPPROPSCL.charAt(0))
+			if (s.charAt(i) == DENOPTIMConstants.SEPARATORAPPROPSCL.charAt(0))
 			{
 				numSep++;
 			}
 		}
+		if (numSep != 1)
+		    return false;
+		
+		String apRule = s.split(DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
+		String sub = s.split(DENOPTIMConstants.SEPARATORAPPROPSCL)[1];
+        
+        return isValidAPRuleString(apRule) && isValidAPSubCLassString(sub);
+    }
+    
+//------------------------------------------------------------------------------
 
-        return 1 == numSep;
+    /**
+     * Returns the APRule component of the given APClass
+     * @param apc the APClass to parse
+     * @return the APRule
+     */
+    
+    //TODO-V3 move to APClass class
+    public static String getAPRule(String apc)
+    {
+        return apc.split(DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
     }
 
 //------------------------------------------------------------------------------

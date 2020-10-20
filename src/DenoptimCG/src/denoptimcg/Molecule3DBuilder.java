@@ -42,6 +42,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
@@ -705,31 +706,26 @@ public class Molecule3DBuilder
      * atoms
      */
 
-    public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc, int bondType)
+    public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc, 
+            BondType bndTyp)
     {
         this.newRingClosures.add(nRc);
         this.overalRCScore = Double.NaN;
 
         int iA = fmol.getAtomNumber(atmA);
         int iB = fmol.getAtomNumber(atmB);
-
-        if (verbosity > 2)
-            System.out.println("ADDING BOND: "+iA+" "+iB);
-
-        String btStr = "SINGLE";        
-        switch (bondType)
+       
+        if (bndTyp.hasCDKAnalogue())
         {
-            case (2):
-                btStr = "DOUBLE";
-                break;
-            case (3):
-                btStr = "TRIPLE";
-                break;
-            default:
-                btStr = "SINGLE";
-                break;
+            this.fmol.addBond(iA, iB, bndTyp.getCDKOrder());
+            if (verbosity > 2)
+                System.out.println("ADDING BOND: "+iA+" "+iB);
+        } else {
+            System.out.println("WARNING! Attempt to add ring closing bond "
+                    + "did not add any actual chemical bond because the "
+                    + "bond type of the chord is '" + bndTyp +"'.");
         }
-        this.fmol.addBond(iA, iB, IBond.Order.valueOf(btStr));
+
         if (iA < iB)
         {
             this.tmol.addBond(iA+1, iB+1);

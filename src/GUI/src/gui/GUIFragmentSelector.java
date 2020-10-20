@@ -37,6 +37,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
 /**
@@ -127,7 +128,8 @@ public class GUIFragmentSelector extends GUIModalDialog
 		for (IAtomContainer mol : fragLib)
 		{				
 			try {
-				DENOPTIMFragment frg = new DENOPTIMFragment(mol);
+				DENOPTIMFragment frg = new DENOPTIMFragment(mol, 
+				        BBType.UNDEFINED);
 				if (mol.getProperty(PRESELECTEDAPSFIELD) != null)
 				{
 				    frg.setProperty(PRESELECTEDAPSFIELD,
