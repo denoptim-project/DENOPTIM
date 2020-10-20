@@ -45,7 +45,8 @@ public class DENOPTIMTemplateTest
     //TODO-V3: reactivate
     //@BeforeAll
     public static void SetUpClass() {
-        testAP = new DENOPTIMAttachmentPoint(0, 1, 1);
+        EmptyVertex dummyVertex = new EmptyVertex();
+        testAP = new DENOPTIMAttachmentPoint(dummyVertex, 0, 1, 1);
     }
 	
 //------------------------------------------------------------------------------

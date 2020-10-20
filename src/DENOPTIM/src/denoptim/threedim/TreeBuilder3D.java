@@ -82,26 +82,26 @@ public class TreeBuilder3D
      * per each vertex ID
      */
     private Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
-                     new HashMap <Integer,ArrayList<DENOPTIMAttachmentPoint>>();
+            new HashMap<>();
 
     /**
      * Map of rototranslated <code>DENOPTIMAttachmentPoint</code>
      * per each <code>DENOPTIMEdge</code> (edge has no unique ID)
      */
     private Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
-                new HashMap <DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>>();
+            new HashMap<>();
 
     /**
      * Map of rototranslated APs per each <code>IAtom</code>
      */
-    private Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom = 
-                new HashMap <IAtom,ArrayList<DENOPTIMAttachmentPoint>>();
+    private Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom =
+            new HashMap<>();
 
     /**
      * Map of rototranslated APs per each <code>IBond</code>
      */
     private Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
-                new HashMap <IBond,ArrayList<DENOPTIMAttachmentPoint>>();
+            new HashMap<>();
 
     /**
      * Flag to ensure syncronization between fields
@@ -203,34 +203,24 @@ public class TreeBuilder3D
         
         // Store copy of APs
         ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag =
-                                    new ArrayList<DENOPTIMAttachmentPoint>();
+                new ArrayList<>();
         for (int i=0; i<rootVrtx.getNumberOfAP(); i++)
         {
             DENOPTIMAttachmentPoint ap = rootVrtx.getAttachmentPoints().get(i);
             // For first vertex the atomPositionNumber remains the same
             int atmPos = ap.getAtomPositionNumber();
-            int connNum = ap.getTotalConnections();
-            int apConn = ap.getFreeConnections();
-            String apCls = ap.getAPClass();
-            double[] pt = ap.getDirectionVector();
-
-            DENOPTIMAttachmentPoint apCopy = new DENOPTIMAttachmentPoint(atmPos,
-                                                                        connNum,
-                                                                         apConn,
-                                            new double[] {pt[0], pt[1], pt[2]});
-
-            apCopy.setAPClass(apCls);
-            apsOnThisFrag.add(apCopy);
+            DENOPTIMAttachmentPoint apClone = ap.clone();
+            apsOnThisFrag.add(apClone);
             IAtom srcAtm = mol.getAtom(atmPos);
-            if (apsPerAtom.keySet().contains(srcAtm))
+            if (apsPerAtom.containsKey(srcAtm))
             {
-                apsPerAtom.get(srcAtm).add(apCopy);
+                apsPerAtom.get(srcAtm).add(apClone);
             }
             else
             {
                 ArrayList<DENOPTIMAttachmentPoint> apsOnThisAtm =
-                                      new ArrayList<DENOPTIMAttachmentPoint>();
-                apsOnThisAtm.add(apCopy);
+                        new ArrayList<>();
+                apsOnThisAtm.add(apClone);
                 apsPerAtom.put(srcAtm,apsOnThisAtm);
             }
         }
@@ -604,35 +594,23 @@ public class TreeBuilder3D
         }
 
         // Store copies of APs properly oriented
-        ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag =
-                                    new ArrayList<DENOPTIMAttachmentPoint>();
+        ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag = new ArrayList<>();
         for (int i=0; i<inVtx.getNumberOfAP(); i++)
         {
             DENOPTIMAttachmentPoint oriAP = inVtx.getAttachmentPoints().get(i);
             // For vertices other than the first AtomPositionNumber in mol
             int atmPos = oriAP.getAtomPositionNumber() + preNumAtms;
-            int connNum = oriAP.getTotalConnections();
-            int apConn = oriAP.getFreeConnections();
-            String apCls = oriAP.getAPClass();
-            Point3d pt = allApsAsPt3D.get(i);
-
-            DENOPTIMAttachmentPoint newAP = new DENOPTIMAttachmentPoint(
-                                               atmPos,
-                                               connNum,
-                                               apConn,
-                                               new double[] {pt.x, pt.y, pt.z});
-
-            newAP.setAPClass(apCls);
+            DENOPTIMAttachmentPoint newAP = oriAP.clone();
             apsOnThisFrag.add(newAP);
             IAtom srcAtm = mol.getAtom(atmPos);
-            if (apsPerAtom.keySet().contains(srcAtm))
+            if (apsPerAtom.containsKey(srcAtm))
             {
                 apsPerAtom.get(srcAtm).add(newAP);
             }
             else
             {
                 ArrayList<DENOPTIMAttachmentPoint> apsOnThisAtm =
-                                      new ArrayList<DENOPTIMAttachmentPoint>();
+                        new ArrayList<>();
                 apsOnThisAtm.add(newAP);
                 apsPerAtom.put(srcAtm,apsOnThisAtm);
             }
@@ -657,13 +635,12 @@ public class TreeBuilder3D
             DENOPTIMEdge nextEdge = graph.getEdgeAtPosition(iEdge);
 
             // Get the AP from the current vertex to the next
-            DENOPTIMAttachmentPoint nextApA = apsOnThisFrag.get(
-                                                       nextEdge.getSourceDAP());
+            DENOPTIMAttachmentPoint nextApA =
+                    apsOnThisFrag.get(nextEdge.getSourceDAP());
             int newIdSrcAtmA = nextApA.getAtomPositionNumber();
 
             // Add AP to the map of APs per Edges
-            ArrayList<DENOPTIMAttachmentPoint> apOnNextEdge =
-                                      new ArrayList<DENOPTIMAttachmentPoint>();
+            ArrayList<DENOPTIMAttachmentPoint> apOnNextEdge = new ArrayList<>();
             apOnNextEdge.add(nextApA);
             apsPerEdge.put(nextEdge,apOnNextEdge);
 

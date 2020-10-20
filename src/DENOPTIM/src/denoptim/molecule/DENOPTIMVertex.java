@@ -190,7 +190,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     // some of the entire list of APs of a vertex read-in from a string
     // representation of a graph. Tha's obviously not ideal, so eventually
     // we must get rid of it and move this back to protected.
-    public abstract void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> m_lstAP);
+    public abstract void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP);
     
 //------------------------------------------------------------------------------
     
