@@ -1528,18 +1528,33 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * For the given graph remove all capping groups if any
+     * Remove all capping groups on this graph
      */
 
-    public void removeCappingGroups() {
+    public void removeCappingGroups()
+    {
         ArrayList<DENOPTIMVertex> lstVerts = getVertexList();
-        for (DENOPTIMVertex vtx : lstVerts) {
-            if (vtx instanceof DENOPTIMFragment) {
-                DENOPTIMFragment frag = (DENOPTIMFragment) vtx;
-                if (frag.getFragmentType() == 2 && !isVertexInRing(vtx)) {
-                    removeVertex(vtx);
-                }
+        ArrayList<Integer> rvids = new ArrayList<>();
+        for (int i=0; i<lstVerts.size(); i++)
+        {
+            DENOPTIMVertex vtx = lstVerts.get(i);
+            if (vtx instanceof DENOPTIMFragment == false)
+            {
+                continue;
             }
+            // capping groups have fragment type 2
+            if (((DENOPTIMFragment) vtx).getFragmentType() == 2
+                    && !isVertexInRing(vtx))
+            {
+                rvids.add(vtx.getVertexId());
+            }
+        }
+
+        // remove the vids from the vertex lst
+        for (int i=0; i<rvids.size(); i++)
+        {
+            int vid = rvids.get(i);
+            removeVertex(getVertexWithId(vid));
         }
     }
 

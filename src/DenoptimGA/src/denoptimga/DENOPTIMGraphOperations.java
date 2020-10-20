@@ -1274,7 +1274,7 @@ if(debug)
         }
         for (Integer svid : toRemoveFromM)
         {
-            male.deleteVertex(svid);
+            male.removeVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
@@ -1307,7 +1307,7 @@ if(debug)
         }
         for (Integer svid : toRemoveFromF)
         {
-            female.deleteVertex(svid);
+            female.removeVertex(svid);
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        
