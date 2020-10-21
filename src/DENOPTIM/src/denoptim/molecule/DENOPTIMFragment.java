@@ -80,7 +80,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         
         /**
          * Translates the integer into the enum
-         * @param 0:scaffold, 1:fragment, 2:capping group
+         * @param i 0:scaffold, 1:fragment, 2:capping group
          * @return the corresponding enum
          */
         public static BBType parseInt(int i) {
@@ -152,8 +152,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     /**
      * Constructor for a molecular fragment kind of vertex.
      * @param vertexId unique identified of the vertex
-     * @param bbId 0-based index of building block in the library
-     * @param bbType the type of building block 0:scaffold, 1:fragment, 2:capping group
      */
 
     public DENOPTIMFragment(int vertexId)
@@ -170,7 +168,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Constructor from another atom container, which has APs only as 
      * molecular properties. WARNING: other properties of the atom container
      * are not imported!
-     * @param vetexId the identifier of the vertex to construct
+     * @param vertexId the identifier of the vertex to construct
      * @param mol the molecular representation
      * @throws DENOPTIMException 
      */
@@ -525,13 +523,15 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     		throws DENOPTIMException
     {
     	int atmId = mol.getAtomNumber(srcAtm);
+
     	String apRule = propAPClass.split(
     	        DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
         int sub = Integer.parseInt(propAPClass.split(
                 DENOPTIMConstants.SEPARATORAPPROPSCL)[1]);
-    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(atmId, valence,
-    	        valence, apRule, sub, propAPClass, 
-    	        new double[] {vector.x, vector.y, vector.z});
+    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, atmId,
+                valence, valence, new double[] {vector.x, vector.y, vector.z},
+                apRule, propAPClass, sub
+        );
     	
     	//This adds the AP to the list of the superclass
     	addAttachmentPoint(ap);
@@ -544,7 +544,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         }
         else
         {
-        	apList = new ArrayList<DENOPTIMAttachmentPoint>();
+        	apList = new ArrayList<>();
         	apList.add(ap);
     	}
         
@@ -1097,9 +1097,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAPs)
+    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP)
     {
-        this.lstAPs = lstAPs;
+        this.lstAPs = lstAP;
     }
     
 //------------------------------------------------------------------------------

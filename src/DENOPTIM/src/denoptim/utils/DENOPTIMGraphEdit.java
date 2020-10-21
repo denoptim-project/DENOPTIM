@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.io.Serializable;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.*;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -266,8 +267,12 @@ public class DENOPTIMGraphEdit
             {
                 fconn = Integer.parseInt(strPrts[2]);
             }
-            DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(apid,
-            		conn,fconn);
+
+            // TODO(Discuss with Marco if ok using dummyVertex)
+            EmptyVertex dummyVertex = new EmptyVertex();
+            DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(
+                    dummyVertex, apid, conn, fconn
+            );
 		    if (strPrts.length > 3)
 		    {
                 // AP class

@@ -48,6 +48,7 @@ public class DENOPTIMAttachmentPointTest
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
+	private final EmptyVertex dummyVertex = new EmptyVertex();
 	
 //-----------------------------------------------------------------------------
 	
@@ -59,8 +60,8 @@ public class DENOPTIMAttachmentPointTest
         HashMap<String, BondType> map = new HashMap<String, BondType>();
         map.put(APRULE,BondType.SINGLE);
         FragmentSpace.setBondOrderMap(map);
-        
-    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
+
+		DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap.setAPClass(APCLASS);
     	ap.setFreeConnections(APCONN);
     	ap.setAtomPositionNumber(ATMID);
@@ -83,8 +84,7 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFStringNoDirVec() throws Exception
     {
-
-    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
+    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap.setAPClass(APCLASS);
     	ap.setFreeConnections(APCONN);
     	ap.setAtomPositionNumber(ATMID);
@@ -106,25 +106,27 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSortAPs() throws Exception
     {
-    	DENOPTIMAttachmentPoint ap1 = new DENOPTIMAttachmentPoint(0,2,1);
-    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(1,1,1);
+    	DENOPTIMAttachmentPoint ap1 =
+				new DENOPTIMAttachmentPoint(dummyVertex, 0,2,1);
+    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1,1,1);
     	
-    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint();
+    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap3.setAPClass("AA:0");
     	ap3.setAtomPositionNumber(4);
     	ap3.setDirectionVector(DIRVEC);
     	
-    	DENOPTIMAttachmentPoint ap4 = new DENOPTIMAttachmentPoint();
+    	DENOPTIMAttachmentPoint ap4 = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap4.setAPClass("AA:1");
     	ap4.setAtomPositionNumber(4);
     	ap4.setDirectionVector(DIRVEC);
     	
-    	DENOPTIMAttachmentPoint ap5 = new DENOPTIMAttachmentPoint();
+    	DENOPTIMAttachmentPoint ap5 = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap5.setAPClass(APCLASS);
     	ap5.setAtomPositionNumber(5);
     	ap5.setDirectionVector(new double[]{1.1, 2.2, 3.3});
 
-    	DENOPTIMAttachmentPoint ap6 = new DENOPTIMAttachmentPoint();
+    	DENOPTIMAttachmentPoint ap6 = new DENOPTIMAttachmentPoint(dummyVertex);
     	ap6.setAPClass(APCLASS);
     	ap6.setAtomPositionNumber(5);
     	ap6.setDirectionVector(new double[]{2.2, 2.2, 3.3});
@@ -154,8 +156,10 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals() throws Exception
     {
-    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
-    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
     	
     	assertEquals(-1,apA.compareTo(apB),"Comparison driven by ID.");
     	assertTrue(apA.equals(apB),"Equals ignores ID.");
@@ -168,8 +172,10 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals_DiffArcAtm() throws Exception
     {
-    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
-    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(2, 2, 1);
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(dummyVertex
+				, 2, 2, 1);
     	
     	assertFalse(apA.equals(apB));
     }
@@ -179,9 +185,11 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals_SameAPClass() throws Exception
     {
-    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
     	apA.setAPClass("classA:0");
-    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
     	apB.setAPClass("classA:0");
     	
     	assertTrue(apA.equals(apB));
@@ -192,9 +200,11 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals_DiffAPClass() throws Exception
     {
-    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
     	apA.setAPClass("classA:0");
-    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
+    	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(dummyVertex
+				, 1, 2, 1);
     	apB.setAPClass("classB:0");
     	
     	assertFalse(apA.equals(apB));

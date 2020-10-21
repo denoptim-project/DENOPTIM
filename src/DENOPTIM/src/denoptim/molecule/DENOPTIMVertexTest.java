@@ -55,22 +55,22 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_Equal() throws Exception
     {
-    	ArrayList<DENOPTIMAttachmentPoint> apsA = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
-    	apsA.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
-    	
-    	ArrayList<DENOPTIMAttachmentPoint> apsB = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
-    	apsB.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
+    	ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 0, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 1, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 2, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 3, 1, 1));
+        vA.setAttachmentPoints(apsA);
+
+    	ArrayList<DENOPTIMAttachmentPoint> apsB = new ArrayList<>();
+        DENOPTIMVertex vB = new EmptyVertex(90);
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 0, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 1, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 2, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 3, 1, 1));
+        vB.setAttachmentPoints(apsB);
+        //NB: vertex ID must be ignores by the sameAs method
 
     	assertTrue(vA.sameAs(vB, reason));	
     }
@@ -80,22 +80,22 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_DiffAPConnection() throws Exception
     {
-    	ArrayList<DENOPTIMAttachmentPoint> apsA = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
-    	apsA.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
-    	
-    	ArrayList<DENOPTIMAttachmentPoint> apsB = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
-    	apsB.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(3, 1, 2)); //diff
-    	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
+    	ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 0, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 1, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 2, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 3, 1, 1));
+        vA.setAttachmentPoints(apsA);
+
+    	ArrayList<DENOPTIMAttachmentPoint> apsB = new ArrayList<>();
+        DENOPTIMVertex vB = new EmptyVertex(90);
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 0, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 1, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 2, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 3, 1, 2)); //diff
+        vB.setAttachmentPoints(apsB);
+        //NB: vertex ID must be ignores by the sameAs method
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
@@ -105,21 +105,21 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_DiffAPNum() throws Exception
     {
-    	ArrayList<DENOPTIMAttachmentPoint> apsA = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
-    	apsA.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	apsA.add(new DENOPTIMAttachmentPoint(3, 1, 1));
-    	DENOPTIMVertex vA = new EmptyVertex(0, apsA);
-    	
-    	ArrayList<DENOPTIMAttachmentPoint> apsB = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
-    	apsB.add(new DENOPTIMAttachmentPoint(0, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-    	apsB.add(new DENOPTIMAttachmentPoint(2, 1, 1));
-    	//NB: vertex ID must be ignores by the sameAs method
-    	DENOPTIMVertex vB = new EmptyVertex(90, apsB);
+    	ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
+        DENOPTIMVertex vA = new EmptyVertex(0, apsA);
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 0, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 1, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 2, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(vA, 3, 1, 1));
+        vA.setAttachmentPoints(apsA);
+
+    	ArrayList<DENOPTIMAttachmentPoint> apsB = new ArrayList<>();
+        DENOPTIMVertex vB = new EmptyVertex(90);
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 0, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 1, 1, 1));
+        apsB.add(new DENOPTIMAttachmentPoint(vB, 2, 1, 1));
+        vB.setAttachmentPoints(apsB);
+        //NB: vertex ID must be ignores by the sameAs method
 
     	assertFalse(vA.sameAs(vB, reason));	
     }
@@ -135,13 +135,13 @@ public class DENOPTIMVertexTest
         HashMap<String, BondType> map = new HashMap<String, BondType>();
         map.put(APRULE,BondType.DOUBLE);
         FragmentSpace.setBondOrderMap(map);
-        
-        ArrayList<DENOPTIMAttachmentPoint> apsA = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        apsA.add(new DENOPTIMAttachmentPoint(1, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(2, 2, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(3, 2, 1));
-        DENOPTIMVertex v = new EmptyVertex(0, apsA);
+
+        ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
+        DENOPTIMVertex v = new EmptyVertex(0);
+        apsA.add(new DENOPTIMAttachmentPoint(v, 1, 1, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(v, 2, 2, 1));
+        apsA.add(new DENOPTIMAttachmentPoint(v, 3, 2, 1));
+        v.setAttachmentPoints(apsA);
         v.setLevel(26);
         
         DENOPTIMVertex c = v.clone();

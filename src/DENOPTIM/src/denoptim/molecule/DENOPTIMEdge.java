@@ -191,7 +191,6 @@ public class DENOPTIMEdge implements Serializable,Cloneable
      * @param m_trg vertex ID of the target vertex
      * @param m_srcDAP index of the AP on the source vertex
      * @param m_trgDAP index of the AP on the target vertex
-     * @param m_btype the bond type
      */
     public DENOPTIMEdge(int m_src, int m_trg, int m_srcDAP, int m_trgDAP)
     {

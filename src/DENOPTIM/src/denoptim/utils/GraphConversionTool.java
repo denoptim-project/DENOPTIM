@@ -465,7 +465,7 @@ public class GraphConversionTool
 				{
 				    while (lstAPsrc.size() <= (iA+1))
 				    {
-				        lstAPsrc.add(new DENOPTIMAttachmentPoint());
+				        lstAPsrc.add(new DENOPTIMAttachmentPoint(src));
 				    }
 				}
 				src.setAttachmentPoints(lstAPsrc);
@@ -475,7 +475,7 @@ public class GraphConversionTool
                 {
                     while (lstAPtrg.size() <= (iB+1))
                     {
-                        lstAPtrg.add(new DENOPTIMAttachmentPoint());
+                        lstAPtrg.add(new DENOPTIMAttachmentPoint(trg));
                     }
                 }
                 trg.setAttachmentPoints(lstAPtrg);

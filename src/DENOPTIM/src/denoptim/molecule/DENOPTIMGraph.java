@@ -3065,9 +3065,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
                 case (DENOPTIMGraphEdit.DELETEVERTEX):
                 {
-                    DENOPTIMVertexQuery query =
-                            new DENOPTIMVertexQuery(edit.getFocusVertex(),
-                                    edit.getFocusEdge());
+                    DENOPTIMVertexQuery query = new DENOPTIMVertexQuery(
+                            edit.getFocusVertex(), edit.getFocusEdge()
+                    );
                     ArrayList<Integer> matches = modGraph.findVerticesIds(
                             query, verbosity);
                     for (int vid : matches)
