@@ -48,6 +48,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
@@ -85,6 +86,8 @@ public class EAUtils
 
     // flag for debugging
     private static final boolean DEBUG = false;
+    
+    private static final String NL = System.getProperty("line-separator");
 
 //------------------------------------------------------------------------------
 
@@ -205,17 +208,18 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Selects a single parent  using the scheme specified.
+     * Selects a single parent using the scheme specified.
      * @param popln
      * @return the index of the parent
      */
+    
+    //TODO-V3 merge this with the selectParents to get a selectParents(population,how_many_do_you_want)
 
     protected static int selectSingleParent(ArrayList<DENOPTIMMolecule> popln)
     {
         int selmate = -1;
         int stype = GAParameters.getSelectionStrategyType();
 
-        //MersenneTwister rng = GAParameters.getRNG();
         MersenneTwister rng = RandomUtils.getRNG();
 
         int[] mates = null;
@@ -236,7 +240,6 @@ public class EAUtils
             break;
         }
 
-
         selmate = mates[rng.nextInt(2)];
 
         return selmate;
@@ -245,22 +248,24 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Selects two parents for crossover using the scheme specified.
-     * @param molPopulation
-     * @return array of parents for crossover
+     * Selects two parents for crossover.
+     * @param molPopulation the population of candidates.
+     * @return array of parents for crossover.
      */
 
     protected static int[] selectParents(ArrayList<DENOPTIMMolecule> molPopulation)
     {
         int[] mates = null;
-        int stype = GAParameters.getSelectionStrategyType();
 
-        //MersenneTwister rng = GAParameters.getRNG();
         MersenneTwister rng = RandomUtils.getRNG();
+        
+        //TODO-V3 make this work on a subset of population members chosen
+        // according to APClass compatibility, thus getting rid of the 
+        // if statement.
 
         if (!FragmentSpace.useAPclassBasedApproach())
         {
-            switch (stype)
+            switch (GAParameters.getSelectionStrategyType())
             {
             case 1:
                 mates = SelectionHelper.performTournamentSelection
@@ -348,14 +353,12 @@ public class EAUtils
                     selection[1] = indices.get(0);
                     break;
                 default:
-                    //MersenneTwister rng = GAParameters.getRNG();
                     MersenneTwister rng = RandomUtils.getRNG();
                     selection[1] = indices.get(rng.nextInt(indices.size()));
                     break;
             }
             indices.clear();
         }
-        
         return selection;
     }
                             
@@ -363,96 +366,80 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Perform a mutation such as deletion, append or substitution
-     * @param molGraph
-     * @return <code>true</code> if the mutation is successful
+     * Mutates the given graph in a single vertex. The graph will be altered and
+     * the original structure and content of the graph are lost. 
+     * Use this method on a clone of the graph if you intend to retain the 
+     * original somewhere somewhere.
+     * @param molGraph the graph to mutate.
+     * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
 
-    protected static boolean performMutation(DENOPTIMGraph molGraph)
+    //TODO-V3: move to DENOPTIMGraphOperations
+    
+    public static boolean performMutation(DENOPTIMGraph molGraph)
                                                     throws DENOPTIMException
     {
+        boolean status = false;
         String msg;
-
-        //System.err.println("performMutation " + molGraph.getGraphId());
-
-        // This is done to maintain a unique vertex-id mapping
-        molGraph.renumberGraphVertices();
-
-        if (FragmentSpace.useAPclassBasedApproach())
+        
+        
+        // Get vertexes that can be mutated: they can be part of subgraphs 
+        // embedded in templates
+        Set<DENOPTIMVertex> mutableVrtxs = molGraph.getMutableSites();
+        if (mutableVrtxs.size() == 0)
         {
-            // remove the capping groups
-            molGraph.removeCappingGroups();
+            msg = "Graph has no mutable site. Mutation aborted.";
+            DENOPTIMLogger.appLogger.info(msg);
+            return false;
+        }
+        
+        // Make random decisions
+        MersenneTwister rng = RandomUtils.getRNG();
+        int chosenKindOfMutation = rng.nextInt(2);
+        int chosenMutationSite = rng.nextInt(mutableVrtxs.size());
+        DENOPTIMVertex molVertex = null;
+        int i=0;
+        for (DENOPTIMVertex v : mutableVrtxs)
+        {
+            if (i == chosenMutationSite)
+            {
+                molVertex = v;
+                break;
+            }
+            i++;
         }
 
-        boolean status;
-
-        MersenneTwister rng = RandomUtils.getRNG();
-        
-        int rnd = rng.nextInt(2);
-
-        int k = rng.nextInt(molGraph.getVertexCount());
-        if (k == 0)
-            k = k + 1; // not selecting the first vertex
-        DENOPTIMVertex molVertex = molGraph.getVertexAtPosition(k);
-
-
-        switch (rnd) 
+        switch (chosenKindOfMutation) 
         {
             case 0:
-                // substitute vertex
-                // select vertex to substitute
-                //System.err.println("FRAGMENT SUBSTITUTION");
-                
-                msg = "Performing fragment substitution mutation\n";
-                DENOPTIMLogger.appLogger.info(msg);
+                msg = "Vertex mutation - substitution: ";
                 status = DENOPTIMGraphOperations.
-                        substituteFragment(molGraph, molVertex);
-                if (status)
-                {
-                    msg = "Fragment substitution successful.\n";
-                    //molGraph.setMsg(molGraph.getMsg() + " <> Substitution");
-                }
-                else
-                    msg = "Fragment substitution unsuccessful.\n";
-                DENOPTIMLogger.appLogger.info(msg);
+                        substituteFragment(molVertex.getGraphOwner(), molVertex);
                 break;
+                
             case 1:
-                //System.err.println("FRAGMENT APPEND");
-                
-                msg = "Performing fragment append.\n";
-                DENOPTIMLogger.appLogger.info(msg);
-		// nerer done directly on the scaffold -> symmetry falg = false
+                msg = "Vertex mutation - append: ";
                 status = DENOPTIMGraphOperations.
-                        extendGraph(molGraph, molVertex, false, false);
-                if (status)
-                {
-                    msg = "Fragment append successful.\n";
-                    //molGraph.setMsg(molGraph.getMsg() + " <> Append");
-                }
-                else
-                    msg = "Fragment append unsuccessful.\n";
-                DENOPTIMLogger.appLogger.info(msg);
+                        extendGraph(molVertex.getGraphOwner(), molVertex, false, false);
                 break;
-            default:
-                // select delete vertex
                 
-                //System.err.println("FRAGMENT DELETION");
-                
-                msg = "Performing vertex deletion\n";
-                DENOPTIMLogger.appLogger.info(msg);
-                // Deletion
-                status = DENOPTIMGraphOperations.deleteFragment(molGraph,molVertex);
-                if (status)
-                {
-                    msg = "Vertex deletion successful.\n";
-                    //molGraph.setMsg(molGraph.getMsg() + " <> Deletion");
-                }
-                else
-                    msg = "Vertex deletion unsuccessful.\n";
-                DENOPTIMLogger.appLogger.info(msg);
+            case 2:
+                msg = "Vertex mutation - deletion: ";
+                status = DENOPTIMGraphOperations.deleteFragment(molVertex.getGraphOwner(), molVertex);
                 break;
         }
+        
+        if (status)
+            msg = "successful.";
+        else
+            msg = "unsuccessful.";
+        
+        DENOPTIMLogger.appLogger.info(msg);
+        
+        // This is done to maintain a unique vertex-id mapping. 
+        molGraph.renumberGraphVertices();
+        
         return status;
     }
 

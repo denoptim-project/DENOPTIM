@@ -126,6 +126,10 @@ fi
 
 cd "$wDir"
 
+#
+# t97: under development - mutation involving templates
+#
+#runTest "t97"
 
 #
 # t98: under development - crossover involving templates

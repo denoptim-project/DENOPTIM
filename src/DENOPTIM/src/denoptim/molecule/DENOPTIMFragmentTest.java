@@ -31,6 +31,7 @@ import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
@@ -185,6 +186,7 @@ public class DENOPTIMFragmentTest
         v.setVertexId(18);
         v.setLevel(26);
         v.setAsRCV(true);
+        v.setBuildingBlockType(BBType.SCAFFOLD);
         
         DENOPTIMVertex c = v.clone();
         
@@ -204,7 +206,34 @@ public class DENOPTIMFragmentTest
         assertEquals(v.getLevel(), c.getLevel(), "Level");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
         assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");  
+        assertEquals(v.getFragmentType(),
+                ((DENOPTIMFragment)c).getFragmentType(), "Building bloc ktype");
     }
     
 //------------------------------------------------------------------------------
+
+
+    @Test
+    public void testGetMutationSites() throws Exception
+    {
+        IAtomContainer iac = new AtomContainer();
+        DENOPTIMFragment v = new DENOPTIMFragment(iac,BBType.FRAGMENT);
+        assertEquals(1,v.getMutationSites().size(),
+                "Fragments return themselves as mutable sites.");
+        v = new DENOPTIMFragment(iac,BBType.SCAFFOLD);
+        assertEquals(0,v.getMutationSites().size(),
+                "Scaffolds so not return any mutable site.");
+        v = new DENOPTIMFragment(iac,BBType.CAP);
+        assertEquals(0,v.getMutationSites().size(),
+                "Capping groups so not return any mutable site.");
+        v = new DENOPTIMFragment(iac,BBType.UNDEFINED);
+        assertEquals(1,v.getMutationSites().size(),
+                "Undefined building block return themselves as mutable sites.");
+        v = new DENOPTIMFragment(iac,BBType.NONE);
+        assertEquals(1,v.getMutationSites().size(),
+                "'None' building block return themselves as mutable sites.");
+    }
+    
+//------------------------------------------------------------------------------
+
 }

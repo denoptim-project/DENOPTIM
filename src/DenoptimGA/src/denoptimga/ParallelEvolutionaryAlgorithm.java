@@ -54,6 +54,8 @@ public class ParallelEvolutionaryAlgorithm
 {
     final List<Future<String>> futures;
     final ArrayList<FTask> submitted;
+    
+    //TODO-V3 change to Executor and initialize based on GAParameters.parallelizationScheme
     final ThreadPoolExecutor tcons;
    
     private final String fsep = System.getProperty("file.separator");
@@ -139,10 +141,10 @@ public class ParallelEvolutionaryAlgorithm
             if (tsk.foundException())
             {
                 hasprobs = true;
-	        DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-							      + tsk.toString());
-		DENOPTIMLogger.appLogger.log(Level.SEVERE,
-							 tsk.getErrorMessage());
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
+                                                              + tsk.toString());
+                DENOPTIMLogger.appLogger.log(Level.SEVERE,
+                                                         tsk.getErrorMessage());
                 break;
             }
         }
@@ -186,17 +188,17 @@ public class ParallelEvolutionaryAlgorithm
         HashSet<String> lstUID = new HashSet<>(1024);
 
         // first collect UIDs of previously known individuals
-	if (!GAParameters.getUIDFileIn().equals(""))
-	{
-//TODO: if same file avoid re-write
+        if (!GAParameters.getUIDFileIn().equals(""))
+        {
+            //TODO: if same file avoid re-write
             EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
             EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
-	}
+        }
 
         // placeholder for the molecules
         ArrayList<DENOPTIMMolecule> molPopulation = new ArrayList<>();
 
-	// then, get the molecules from the initial population file 
+        // then, get the molecules from the initial population file 
         String inifile = GAParameters.getInitialPopulationFile();
         if (inifile.length() > 0)
         {
@@ -205,7 +207,7 @@ public class ParallelEvolutionaryAlgorithm
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
         }
 
-	// we are done with initial UIDs
+        // we are done with initial UIDs
         lstUID.clear();
         lstUID = null;
 
@@ -264,8 +266,8 @@ public class ParallelEvolutionaryAlgorithm
                     "Fitter molecules introduced in Generation {0}\n", curGen);
             }
 
-            sb.append(genDir).append(fsep).append("Gen")
-                .append(GenUtils.getPaddedString(ndigits, curGen)).append(".txt");
+            sb.append(genDir).append(fsep).append("Gen").append(
+                    GenUtils.getPaddedString(ndigits, curGen)).append(".txt");
 
             // dump population details to file
             genOutfile = sb.toString();
@@ -273,16 +275,18 @@ public class ParallelEvolutionaryAlgorithm
 
             EAUtils.outputPopulationDetails(molPopulation, genOutfile);
             
-            DENOPTIMLogger.appLogger.log(Level.INFO,"Generation {0}" + " completed\n"
+            DENOPTIMLogger.appLogger.log(
+                    Level.INFO,"Generation {0}" + " completed\n"
                             + "----------------------------------------"
-                            + "----------------------------------------\n", curGen);
+                            + "----------------------------------------\n",
+                            curGen);
 
             // check for stagnation
             if (numStag >= GAParameters.getNumberOfConvergenceGenerations())
             {
                 // write a log message
-                DENOPTIMLogger.appLogger.log(Level.WARNING,
-                    "No change in population over {0} iterations. Stopping EA. \n",
+                DENOPTIMLogger.appLogger.log(Level.WARNING,"No change in "
+                        + "population over {0} iterations. Stopping EA. \n",
                         numStag);
                 break;
             }
@@ -337,8 +341,6 @@ public class ParallelEvolutionaryAlgorithm
         DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed.\n");
     }
 
-
-
 //------------------------------------------------------------------------------
 
     /**
@@ -355,10 +357,8 @@ public class ParallelEvolutionaryAlgorithm
                                 String genDir) throws DENOPTIMException
     {
         // temporary store for inchi codes
-        ArrayList<String> codes = EAUtils.getInchiCodes(molPopulation);
+        ArrayList<String> inchisInPop = EAUtils.getInchiCodes(molPopulation);
 
-        //double sdev_old = EAUtils.getPopulationSD(molPopulation);
-        
         // keep a clone of the current population for the parents to be
         // chosen from
         ArrayList<DENOPTIMMolecule> clone_popln;
@@ -366,18 +366,17 @@ public class ParallelEvolutionaryAlgorithm
         synchronized (molPopulation)
         {
             //TODO-V3 get rid of serialization-based deep copying
-            clone_popln =
-                (ArrayList<DENOPTIMMolecule>) DenoptimIO.deepCopy(molPopulation);
+            clone_popln = (ArrayList<DENOPTIMMolecule>) DenoptimIO.deepCopy(
+                    molPopulation);
         }
 
-        int n = GAParameters.getNumberOfChildren() + clone_popln.size();
+        int newPopSize = GAParameters.getNumberOfChildren() + clone_popln.size();
 
         int f0 = 0, f1 = 0, f2 = 0;
 
         Integer numtry = 0;
         int MAX_TRIES = GAParameters.getMaxTriesFactor();
 
-        //System.err.println("EvolvePopulation " + genDir);
         String molName, inchi, smiles;
 
         int Xop = -1, Mop = -1, Bop = -1;
@@ -385,6 +384,15 @@ public class ParallelEvolutionaryAlgorithm
 
         try
         {
+            //TODO-V3: adapt to allow synchronous AND asynchronous parallelization scheme
+            /*
+             * Need to "pause" the submission of tasks when there are no more
+             * seats for new children, and launch only one of the xover kids when 
+             * there is only 1 seat for a new children. 
+             * Then, wait for completion of the previously submitted tasks, and
+             * if any fails, create only the new tasks needed to fulfil
+             * GAParameters.getNumberOfChildren().
+             */
             while (true)
             {
                 if (checkForException())
@@ -397,18 +405,15 @@ public class ParallelEvolutionaryAlgorithm
                 {
                     if (numtry == MAX_TRIES)
                     {
-//                        MF: the cleanup method removed also uncompleted tasks
-//                        causing their results to be forgotten.
                         cleanupCompleted(tcons, futures, submitted);
-//                      cleanup(tcons, futures, submitted);
                         break;
                     }
                 }
 
                 synchronized (molPopulation)
                 {
-                    //System.err.println("PSIZE: " + molPopulation.size());
-                    if (molPopulation.size() == n || molPopulation.size() > n)
+                    if (molPopulation.size() == newPopSize 
+                            || molPopulation.size() > newPopSize)
                     {
                         break;
                     }
@@ -420,30 +425,36 @@ public class ParallelEvolutionaryAlgorithm
                 Mop = -1;
                 Bop = -1;
 
-
-                //System.err.println("Selected parents: " + i1 + " " + i2);
-
-                if (RandomUtils.nextBoolean(GAParameters.getCrossoverProbability()))
-                //if (GenUtils.nextBoolean(GAParameters.getRNG(), 
-                //        GAParameters.getCrossoverProbability()))
+                //TODO-V3: balance decision so that the 
+                // 100% = %XOVER + %MUT + %NEW 
+                // use random number to decide which operation to do.
+                
+                if (RandomUtils.nextBoolean(
+                        GAParameters.getCrossoverProbability()))
                 {
                     int numatt = 0;
                     int i1 = -1, i2 = -1;
                     boolean foundPars = false;
 
+                    //TODO-V3 this while block seems to be needed only to 
+                    // account for the fact that it might be impossible to find 
+                    // compatible parents. So, if the selectParents is made able
+                    // to detect whether it is ìNOT possible to select compatible 
+                    // parents, this block becomes useless and can be removed
                     while (numatt < MAX_EVOLVE_ATTEMPTS)
                     {
                         int parents[] = EAUtils.selectParents(clone_popln);
                         if (parents[0] == -1 || parents[1] == -1)
                         {
-                            DENOPTIMLogger.appLogger.info("Failed to identify compatible parents for crossover/mutation.");
+                            DENOPTIMLogger.appLogger.info("Failed to identify "
+                                    + "compatible parents for crossover/mutation.");
                             continue;
                         }
 
-                        // perform crossover
                         if (parents[0] == parents[1])
                         {
-                            DENOPTIMLogger.appLogger.info("Crossover has indentical partners.");
+                            DENOPTIMLogger.appLogger.info("Crossover has "
+                                    + "indentical partners.");
                             numatt++;
                             continue;
                         }
@@ -457,18 +468,16 @@ public class ParallelEvolutionaryAlgorithm
 
                     if (foundPars)
                     {
-                        String molid1 = FilenameUtils.getBaseName(clone_popln.get(i1).getMoleculeFile());
-                        String molid2 = FilenameUtils.getBaseName(clone_popln.get(i2).getMoleculeFile());
+                        String molid1 = FilenameUtils.getBaseName(
+                                clone_popln.get(i1).getMoleculeFile());
+                        String molid2 = FilenameUtils.getBaseName(
+                                clone_popln.get(i2).getMoleculeFile());
 
                         int gid1 = clone_popln.get(i1).getMoleculeGraph().getGraphId();
                         int gid2 = clone_popln.get(i2).getMoleculeGraph().getGraphId();
 
-
-                        //System.err.println("MALE: " + clone_popln.get(i1).getMoleculeGraph().toString());
-                        //System.err.println("FEMALE: " + clone_popln.get(i2).getMoleculeGraph().toString());
-
-
                         // clone the parents
+                        //TODO-V3 get rid of serialization based deep copying
                         graph1 = (DENOPTIMGraph) DenoptimIO.deepCopy
                                         (clone_popln.get(i1).getMoleculeGraph());
                         graph2 = (DENOPTIMGraph) DenoptimIO.deepCopy
@@ -504,13 +513,9 @@ public class ParallelEvolutionaryAlgorithm
                     }
                 }
 
-                if (RandomUtils.nextBoolean(GAParameters.getMutationProbability()))
-                //if (GenUtils.nextBoolean(GAParameters.getRNG(), 
-                //    GAParameters.getMutationProbability()))
+                if (RandomUtils.nextBoolean(
+                        GAParameters.getMutationProbability()))
                 {
-                    // select mutation
-                    // select a random parent from the pool
-
                     int numatt = 0;
                     int i3 = -1;
                     boolean foundPars = false;
@@ -519,7 +524,9 @@ public class ParallelEvolutionaryAlgorithm
                         i3 = EAUtils.selectSingleParent(clone_popln);
                         if (i3 == -1)
                         {
-                            DENOPTIMLogger.appLogger.info("Invalid parent selection.");
+                            //TODO-V3 this should never be possible
+                            DENOPTIMLogger.appLogger.info("Invalid parent "
+                                    + "selection.");
                             numatt++;
                             continue;
                         }
@@ -529,13 +536,15 @@ public class ParallelEvolutionaryAlgorithm
 
                     if (foundPars)
                     {
-                        //System.err.println("SELECTING MUTATION");
-                        graph3 = (DENOPTIMGraph) DenoptimIO.deepCopy
-                                            (clone_popln.get(i3).getMoleculeGraph());
+                        //TODO-V3 get rid of serialization based deep copying
+                        graph3 = (DENOPTIMGraph) DenoptimIO.deepCopy(
+                                clone_popln.get(i3).getMoleculeGraph());
                         f1 += 1;
 
-                        String molid3 = FilenameUtils.getBaseName(clone_popln.get(i3).getMoleculeFile());
-                        int gid3 = clone_popln.get(i3).getMoleculeGraph().getGraphId();
+                        String molid3 = FilenameUtils.getBaseName(
+                                clone_popln.get(i3).getMoleculeFile());
+                        int gid3 = clone_popln.get(i3).getMoleculeGraph()
+                                .getGraphId();
 
                         if (EAUtils.performMutation(graph3))
                         {
@@ -547,14 +556,12 @@ public class ParallelEvolutionaryAlgorithm
                     }
                     else
                     {
-                        if (graph3 != null)
-                        {
-                            graph3.cleanup();
-                        }
                         graph3 = null;
                     }
                 }
 
+                // ... if neither xover not mutation has been done, we build a 
+                // new graph from scratch
                 if (Xop == -1 && Mop == -1)
                 {
                     f2++;
@@ -567,6 +574,7 @@ public class ParallelEvolutionaryAlgorithm
                     }
                 }
 
+                // Bop can be != 1 due to impossibility of building a new graph?
                 if (Bop == 1)
                 {
                     Object[] res = EAUtils.evaluateGraph(graph4);
@@ -617,8 +625,9 @@ public class ParallelEvolutionaryAlgorithm
 //                    }
 
                     // file extensions will be added later
-                    molName = "M" + GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                            GraphUtils.getUniqueMoleculeIndex());
+                    molName = "M" + GenUtils.getPaddedString(
+                            DENOPTIMConstants.MOLDIGITS,
+                            GraphUtils.getUniqueMoleculeIndex());
 
                     int taskId = TaskUtils.getUniqueTaskIndex();
 
@@ -629,20 +638,22 @@ public class ParallelEvolutionaryAlgorithm
                                            genDir, taskId, molPopulation,
                                            numtry,GAParameters.getUIDFileOut());
 
+                    //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
+                    // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
                     submitted.add(task);
                     futures.add(tcons.submit(task));
 
                     synchronized (molPopulation)
                     {
-                        //System.err.println("PSIZE: " + molPopulation.size());
-
-                        if (molPopulation.size() == n || molPopulation.size() > n)
+                        if (molPopulation.size() == newPopSize 
+                                || molPopulation.size() > newPopSize)
                         {
                             break;
                         }
                     }
 
                 }
+                
                 if (Xop == 1)
                 {
                     if (graph1 != null)
@@ -695,9 +706,9 @@ public class ParallelEvolutionaryAlgorithm
 //                        }
 
                         // file extensions will be added later
-                        molName = "M" +
-                                GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                                GraphUtils.getUniqueMoleculeIndex());
+                        molName = "M" + GenUtils.getPaddedString(
+                                DENOPTIMConstants.MOLDIGITS,
+                                GraphUtils.getUniqueMoleculeIndex());
 
                         int taskId = TaskUtils.getUniqueTaskIndex();
 
@@ -708,12 +719,15 @@ public class ParallelEvolutionaryAlgorithm
                                            cmol, genDir, taskId, molPopulation,
                                            numtry,GAParameters.getUIDFileOut());
 
+                        //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
+                        // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
                         submitted.add(task1);
                         futures.add(tcons.submit(task1));
 
                         synchronized (molPopulation)
                         {
-                            if (molPopulation.size() == n || molPopulation.size() > n)
+                            if (molPopulation.size() == newPopSize 
+                                    || molPopulation.size() > newPopSize)
                             {
                                 break;
                             }
@@ -772,9 +786,9 @@ public class ParallelEvolutionaryAlgorithm
 //                        }
 
                         // file extensions will be added later
-                        molName = "M" +
-                                GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                                GraphUtils.getUniqueMoleculeIndex());
+                        molName = "M" + GenUtils.getPaddedString(
+                                DENOPTIMConstants.MOLDIGITS,
+                                GraphUtils.getUniqueMoleculeIndex());
 
                         int taskId = TaskUtils.getUniqueTaskIndex();
 
@@ -786,12 +800,15 @@ public class ParallelEvolutionaryAlgorithm
                                                 numtry, 
                                                 GAParameters.getUIDFileOut());
 
+                        //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
+                        // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
+                        
                         submitted.add(task2);
                         futures.add(tcons.submit(task2));
 
                         synchronized (molPopulation)
                         {
-                            if (molPopulation.size() == n || molPopulation.size() > n)
+                            if (molPopulation.size() == newPopSize || molPopulation.size() > newPopSize)
                             {
                                 break;
                             }
@@ -866,12 +883,15 @@ public class ParallelEvolutionaryAlgorithm
                                                 numtry, 
                                                 GAParameters.getUIDFileOut());
 
+                        //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
+                        // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
+                        
                         submitted.add(task3);
                         futures.add(tcons.submit(task3));
 
                         synchronized (molPopulation)
                         {
-                            if (molPopulation.size() == n || molPopulation.size() > n)
+                            if (molPopulation.size() == newPopSize || molPopulation.size() > newPopSize)
                             {
                                 break;
                             }
@@ -895,12 +915,6 @@ public class ParallelEvolutionaryAlgorithm
             throw new DENOPTIMException(ex);
         }
 
-//        System.err.println("After (*X*).");
-//        for (FitnessTask z : submitted)
-//        {
-//            System.err.println(z.toString());
-//        }
-
         StringBuilder sb = new StringBuilder(256);
         sb.append("Crossover Attempted: ").append(f0).append("\n");
         sb.append("Mutation Attempted: ").append(f1).append("\n");
@@ -911,7 +925,6 @@ public class ParallelEvolutionaryAlgorithm
 
         // sort the population
         Collections.sort(molPopulation, Collections.reverseOrder());
-
 
         if (GAParameters.getReplacementStrategy() == 1)
         {
@@ -926,30 +939,27 @@ public class ParallelEvolutionaryAlgorithm
                 }
 
                 // trim the population to the desired size
-                molPopulation.subList(GAParameters.getPopulationSize(), k).clear();
+                molPopulation.subList(
+                        GAParameters.getPopulationSize(), k).clear();
             }
         }
         
         cleanup(clone_popln);
 
-        // check if the new population contains a molecule from the children
-        // produced. If yes, return true
+        // check if the new population contains a children produced here
+        // If yes, return true
         
         boolean updated = false;
         for (int i=0; i<molPopulation.size(); i++)
         {
-            if (!codes.contains(molPopulation.get(i).getMoleculeUID()))
+            if (!inchisInPop.contains(molPopulation.get(i).getMoleculeUID()))
             {
                 updated = true;
                 break;
             }
         }
         
-        //double sdev_new = EAUtils.getPopulationSD(molPopulation);
-        //if (Math.abs(sdev_new - sdev_old) < 0.01)
-        //    updated = false;
-        
-        codes.clear();
+        inchisInPop.clear();
         return updated;
     }
 

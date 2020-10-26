@@ -54,6 +54,11 @@ public class EvolutionaryAlgorithm
 {
     private final String fsep = System.getProperty("file.separator");
 
+    //TODO-V3 get rid of this entire class.
+    // Use and rename the ParallelEvolutionary algorithm, and make it submit a 
+    // batch of tasks and wait for completion like done here
+    
+    @Deprecated
     public void runGA() throws DENOPTIMException
     {
         StopWatch watch = new StopWatch();
@@ -237,12 +242,12 @@ public class EvolutionaryAlgorithm
         int MAX_EVOLVE_ATTEMPTS = 10;
 
 
-        int n = GAParameters.getNumberOfChildren() + molPopulation.size();
+        int newPopSize = GAParameters.getNumberOfChildren() + molPopulation.size();
 
         int f0 = 0, f1 = 0, f2 = 0;
 
 
-        while (molPopulation.size() < n)
+        while (molPopulation.size() < newPopSize)
         {
             DENOPTIMGraph graph1 = null, graph2 = null, graph3 = null,
                     graph4 = null;
@@ -430,7 +435,7 @@ public class EvolutionaryAlgorithm
                         graph4.cleanup();
                         graph4 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, newPopSize))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -442,7 +447,7 @@ public class EvolutionaryAlgorithm
                             molPopulation.addAll(results);
                         }
 
-                        if (molPopulation.size() == n)
+                        if (molPopulation.size() == newPopSize)
                             break;
                     }
                 }
@@ -484,7 +489,7 @@ public class EvolutionaryAlgorithm
                         graph1.cleanup();
                         graph1 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, newPopSize))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -495,7 +500,7 @@ public class EvolutionaryAlgorithm
                             molPopulation.addAll(results);
                         }
 
-                        if (molPopulation.size() == n)
+                        if (molPopulation.size() == newPopSize)
                             break;
                     }
                 }
@@ -537,7 +542,7 @@ public class EvolutionaryAlgorithm
                         graph2.cleanup();
                         graph2 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, newPopSize))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -549,7 +554,7 @@ public class EvolutionaryAlgorithm
                             molPopulation.addAll(results);
                         }
 
-                        if (molPopulation.size() == n)
+                        if (molPopulation.size() == newPopSize)
                             break;
                     }
                 }
@@ -594,7 +599,7 @@ public class EvolutionaryAlgorithm
                         graph3.cleanup();
                         graph3 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph3, res3, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph3, res3, genDir, newPopSize))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -606,7 +611,7 @@ public class EvolutionaryAlgorithm
                             molPopulation.addAll(results);
                         }
 
-                        if (molPopulation.size() == n)
+                        if (molPopulation.size() == newPopSize)
                             break;
                     }
                 }

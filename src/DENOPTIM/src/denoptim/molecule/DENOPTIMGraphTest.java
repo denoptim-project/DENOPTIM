@@ -200,6 +200,13 @@ public class DENOPTIMGraphTest {
 		// Other graph, but is the same graph
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
+        ArrayList<DENOPTIMAttachmentPoint> aps0B = new ArrayList<>();
+        DENOPTIMVertex v0B = new EmptyVertex(90);
+        aps0B.add(new DENOPTIMAttachmentPoint(v0B, 0, 1, 1));
+        aps0B.add(new DENOPTIMAttachmentPoint(v0B, 1, 1, 1));
+        aps0B.add(new DENOPTIMAttachmentPoint(v0B, 2, 1, 1));
+        v0B.setAttachmentPoints(aps0B);
+        graphB.addVertex(v0B);
 		ArrayList<DENOPTIMAttachmentPoint> aps1B = new ArrayList<>();
 		DENOPTIMVertex v1B = new EmptyVertex(91);
 		aps1B.add(new DENOPTIMAttachmentPoint(v1B, 0, 1, 1));
@@ -223,7 +230,7 @@ public class DENOPTIMGraphTest {
     	*/
 
 		StringBuilder reason = new StringBuilder();
-		assertTrue(graphA.sameAs(graphB, reason));
+		assertTrue(graphA.sameAs(graphB, reason), reason.toString());
 	}
 
 //------------------------------------------------------------------------------
@@ -1031,6 +1038,39 @@ public class DENOPTIMGraphTest {
 		assertEquals(graph.graphId, clone.graphId,
 				"Graph ID");
 	}
+	
+//------------------------------------------------------------------------------
+	
+    @Test
+    public void testGetMutationSites() throws Exception
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMTemplate tmpl = DENOPTIMTemplate.getTestTemplate(2);
+        graph.addVertex(tmpl);
+
+        //TODO del
+        System.out.println("FIRST");
+        System.out.println("GRAOH: "+graph);
+        for (DENOPTIMVertex v : graph.getMutableSites())
+            System.out.println(" -> "+v.getVertexId()+" "+v.getGraphOwner().graphId);
+        
+        assertEquals(1,graph.getMutableSites().size(),
+                "Size of mutation size list in case of frozen template");
+       
+        graph = new DENOPTIMGraph();
+        tmpl = DENOPTIMTemplate.getTestTemplate(0);
+        graph.addVertex(tmpl);
+
+        //TODO del
+        System.out.println("SECOND");
+        System.out.println("GRAOH: "+graph);
+        for (DENOPTIMVertex v : graph.getMutableSites())
+            System.out.println(" -> "+v.getVertexId()+" "+v.getGraphOwner().graphId);
+        
+        assertEquals(2,graph.getMutableSites().size(),
+                "Size of mutation size list in case of free template");
+
+    }
 //------------------------------------------------------------------------------
 
 }

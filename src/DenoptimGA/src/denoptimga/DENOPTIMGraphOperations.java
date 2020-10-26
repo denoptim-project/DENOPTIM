@@ -202,6 +202,7 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
+    //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant
     protected static boolean substituteFragment
                             (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex)
                                                     throws DENOPTIMException
@@ -243,6 +244,12 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
+  //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant
+    
+    //TODO-V3 distinguish between 
+    // 1) removing a vertex and the branch starting on it
+    // 2) removing a vertex and try to glue the child branch to the parent one
+    
     protected static boolean deleteFragment
                             (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex)
                                                     throws DENOPTIMException
@@ -289,12 +296,14 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the graph has been modified
      */
      
+  //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant
+    
     protected static boolean extendGraph(DENOPTIMGraph molGraph,
                                          DENOPTIMVertex curVertex, 
                                          boolean extend, 
                                          boolean symmetryOnAp) 
                                                         throws DENOPTIMException
-    {
+    {   
         // return true if the append has been successful
         boolean status = false;
 

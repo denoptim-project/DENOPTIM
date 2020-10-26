@@ -19,6 +19,9 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
@@ -405,6 +408,16 @@ public class EmptyVertex extends DENOPTIMVertex
     public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
         return lstSymAPs;
+    }
+
+//------------------------------------------------------------------------------
+
+    @Override
+    public Set<DENOPTIMVertex> getMutationSites()
+    {
+        Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
+        set.add(this);
+        return set;
     }
 
 //------------------------------------------------------------------------------

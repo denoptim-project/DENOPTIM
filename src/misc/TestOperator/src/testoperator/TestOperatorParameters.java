@@ -54,7 +54,22 @@ public class TestOperatorParameters
      * Working directory
      */
     protected static String workDir = ".";
+    
+    /**
+     * Testable Operators 
+     */
+    protected enum Operator {MUTATION,XOVER}
+    
+    /**
+     * Chosen operator
+     */
+    protected static Operator operatorToTest = Operator.XOVER;
 
+    /**
+     * Target vertex ID for mutation
+     */
+    protected static int mutationTarget;
+    
     /**
      * Input File male
      */
@@ -209,37 +224,49 @@ public class TestOperatorParameters
         String msg = "";
         switch (key.toUpperCase())
         {
-        case "TESTGENOPS-WORKDIR=":
-            workDir = value;
-            break;
-	case "TESTGENOPS-INPFILEMALE=":
-	    inpFileM = value;
-	    break;
-        case "TESTGENOPS-INPFILEFEMALE=":
-	    inpFileF = value;
-            break;
-        case "TESTGENOPS-VERTEXMALE=":
-             mvid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-APMALE=":
-             mapid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-VERTEXFEMALE=":
-             fvid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-APFEMALE=":
-             fapid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-OUTFILEMALE=":
-            outFileM = value;
-            break;
-        case "TESTGENOPS-OUTFILEFEMALE=":
-            outFileF = value;
-            break;
-        default:
-             msg = "Keyword " + key + " is not a known TestOperator-"
+            case "TESTGENOPS-OP=MUTATION":
+                operatorToTest = Operator.MUTATION;
+                break;
+            case "TESTGENOPS-INPFILE=":
+                inpFileM = value;
+                break;
+            case "TESTGENOPS-OUTFILE=":
+                outFileM = value;
+                break;
+            case "TESTGENOPS-MUTATIONAT=":
+                mutationTarget = Integer.parseInt(value);
+               break;
+            case "TESTGENOPS-WORKDIR=":
+                workDir = value;
+                break;
+            case "TESTGENOPS-INPFILEMALE=":
+                inpFileM = value;
+                break;
+            case "TESTGENOPS-INPFILEFEMALE=":
+    	    inpFileF = value;
+                break;
+            case "TESTGENOPS-VERTEXMALE=":
+                 mvid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-APMALE=":
+                 mapid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-VERTEXFEMALE=":
+                 fvid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-APFEMALE=":
+                 fapid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-OUTFILEMALE=":
+                outFileM = value;
+                break;
+            case "TESTGENOPS-OUTFILEFEMALE=":
+                outFileF = value;
+                break;
+            default:
+                 msg = "Keyword " + key + " is not a known TestOperator-"
                                        + "related keyword. Check input files.";
-            throw new DENOPTIMException(msg);
+                 throw new DENOPTIMException(msg);
         }
     }
 
@@ -258,12 +285,12 @@ public class TestOperatorParameters
             return;
         }
 
-	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
-	{
-	   msg = "Directory " + workDir + " not found. Please specify an "
-		 + "existing directory.";
-	   throw new DENOPTIMException(msg);
-	}
+    	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+    	{
+    	   msg = "Directory " + workDir + " not found. Please specify an "
+    		 + "existing directory.";
+    	   throw new DENOPTIMException(msg);
+    	}
 
         if (!DenoptimIO.checkExists(inpFileM))
         {
@@ -271,7 +298,8 @@ public class TestOperatorParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (!DenoptimIO.checkExists(inpFileF))
+        if (operatorToTest == Operator.XOVER
+                && !DenoptimIO.checkExists(inpFileF))
         {
             msg = "Input file '" + inpFileF + "' not found.";
             throw new DENOPTIMException(msg);

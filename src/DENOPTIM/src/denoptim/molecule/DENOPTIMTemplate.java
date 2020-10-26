@@ -2,7 +2,9 @@ package denoptim.molecule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -61,6 +63,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * contracts of previous levels. 0 means exterior attachment points are constant, 1 means the subgraph structure is
      * constant, and 2 means the vertices are constant.
      */
+    //TODO-V3: make enum
     private int contractLevel = 0;
     private List<DENOPTIMAttachmentPoint> exteriorAPs;
 
@@ -141,6 +144,33 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         return new DENOPTIMTemplate(0, molecularId, );
     }
     */
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method meant for devel phase only.
+     */
+    //TODO-V3 Remove.
+    
+    public static DENOPTIMTemplate getTestTemplate(int contractLevel) 
+    {
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
+        DENOPTIMVertex vrtx = new EmptyVertex(0);
+        vrtx.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx,0,1,1));
+        vrtx.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx,1,1,1));
+
+        DENOPTIMVertex vrtx2 = new EmptyVertex(1);
+        vrtx2.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx2,0,1,1));
+        vrtx2.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx2,1,1,1));
+
+        template.interiorGraph.addVertex(vrtx);
+        template.interiorGraph.addVertex(vrtx2);
+        template.interiorGraph.addEdge(new DENOPTIMEdge(0,1,0,1));
+        
+        //Fully frozen
+        template.contractLevel = contractLevel;
+        return template;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -466,6 +496,33 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         return null;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+    @Override
+    public Set<DENOPTIMVertex> getMutationSites()
+    {
+        Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
+        switch (contractLevel)
+        { 
+            case 2:
+            {
+                set.add(this);
+                break;
+            }
+            
+            default:
+            {
+                for (DENOPTIMVertex v : interiorGraph.gVertices)
+                {
+                    set.addAll(v.getMutationSites());
+                }
+                break;
+            }
+        }
+        return set;
+    }
+    
+//------------------------------------------------------------------------------
+    
 }
 

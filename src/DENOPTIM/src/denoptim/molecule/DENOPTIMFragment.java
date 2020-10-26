@@ -19,8 +19,10 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.vecmath.Point3d;
 
@@ -393,7 +395,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //------------------------------------------------------------------------------
 
-    private void setBuildingBlockType(BBType fType)
+    protected void setBuildingBlockType(BBType fType)
     {
         buildingBlockType = fType;
     }
@@ -1118,5 +1120,27 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         return lstSymAPs;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+    @Override
+    public Set<DENOPTIMVertex> getMutationSites()
+    {
+        Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
+        switch (buildingBlockType)
+        {
+            case CAP:
+                break;
+                
+            case SCAFFOLD:
+                break;
+                
+            default:
+                set.add(this);
+                break;
+        }
+        return set;
+    }
+    
+//------------------------------------------------------------------------------
+
 }

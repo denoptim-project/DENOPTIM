@@ -22,11 +22,12 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 
 import denoptim.utils.RandomUtils;
+
 import org.apache.commons.math3.random.MersenneTwister;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import java.io.Serializable;
@@ -52,6 +53,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Version UID
      */
     private static final long serialVersionUID = -6093013990421027436L;
+    
+    /**
+     * Graph that includes this vertex
+     */
+    private DENOPTIMGraph owner;
 
     /**
      * Unique identifier associated with the vertex instance
@@ -603,7 +609,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
         if (sourceAP.isAvailable() && targetAP.isAvailable())
         {
-            //System.err.println("Available APs");
             String rname = trgAPC.substring(0, trgAPC.indexOf(':'));
 
             // look up the reaction bond order table
@@ -614,8 +619,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     target.getVertexId(),
                     sourceAPIndex,
                     targetAPIndex,
-                    bndTyp
-            );
+                    bndTyp);
+            
             edge.setSourceReaction(srcAPC);
             edge.setTargetReaction(trgAPC);
 
@@ -640,9 +645,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * connects this vertex to other based on their free AP connections
-     * @param other vertex
-     * @return edge connecting the vertices
+     * connects this vertex to other using any randomly chosen pair of 
+     * attachment points.
+     * @param other vertex.
+     * @return edge connecting the vertices.
      */
 
     public DENOPTIMEdge connectVertices(DENOPTIMVertex other)
@@ -655,7 +661,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
         // select random APs - these are the indices in the list
         MersenneTwister rng = RandomUtils.getRNG();
-
 
         //int iA = apA.get(GAParameters.getRNG().nextInt(apA.size()));
         //int iB = apB.get(GAParameters.getRNG().nextInt(apB.size()));
@@ -692,6 +697,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Connects this vertex to other based on their free AP connections
      * @param other vertex
      */
+    
+    //TODO-V3 cleanup
+    @Deprecated
     public void join(DENOPTIMVertex other) {
         List<DENOPTIMAttachmentPoint> apsA = getAttachmentPoints();
         List<DENOPTIMAttachmentPoint> apsB = other.getAttachmentPoints();
@@ -699,6 +707,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             throw new IllegalArgumentException("Vertex has no attachment " +
                     "points");
         }
+        //Absolutely NO!
         Random random = new Random();
         DENOPTIMAttachmentPoint apA = apsA.get(random.nextInt(apsA.size()));
         DENOPTIMAttachmentPoint apB = apsB.get(random.nextInt(apsB.size()));
@@ -708,5 +717,32 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //            bondOrder =
 //        }
     }
+
+//------------------------------------------------------------------------------
+
+    public void resetGraphOwner()
+    {
+        this.owner = null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void setGraphOwner(DENOPTIMGraph owner)
+    {
+        this.owner = owner;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public DENOPTIMGraph getGraphOwner()
+    {
+        return owner;
+    }
+
+//------------------------------------------------------------------------------
+
+    public abstract Set<DENOPTIMVertex> getMutationSites();
+    
+//------------------------------------------------------------------------------
 
 }

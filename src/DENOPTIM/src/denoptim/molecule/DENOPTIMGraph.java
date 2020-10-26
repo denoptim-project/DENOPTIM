@@ -38,6 +38,7 @@ import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.*;
+
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.graph.MoleculeGraphs;
@@ -77,6 +78,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             ArrayList<DENOPTIMEdge> m_edges)
     {
         gVertices = m_vertices;
+        for (DENOPTIMVertex v : gVertices)
+            v.setGraphOwner(this);
         gEdges = m_edges;
         gRings = new ArrayList<>();
         closableChains = new ArrayList<>();
@@ -90,8 +93,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             ArrayList<DENOPTIMEdge> m_edges,
                             ArrayList<DENOPTIMRing> m_rings)
     {
-        gVertices = m_vertices;
-        gEdges = m_edges;
+        this(m_vertices, m_edges);
         gRings = m_rings;
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
@@ -105,9 +107,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             ArrayList<DENOPTIMRing> m_rings,
                             ArrayList<SymmetricSet> m_symVerts)
     {
-        gVertices = m_vertices;
-        gEdges = m_edges;
-        gRings = m_rings;
+        this(m_vertices, m_edges, m_rings);
         closableChains = new ArrayList<>();
         symVertices = m_symVerts;
         localMsg = "";
@@ -121,11 +121,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             ArrayList<ClosableChain> m_closableChains,
                             ArrayList<SymmetricSet> m_symVerts)
     {
-        gVertices = m_vertices;
-        gEdges = m_edges;
-        gRings = m_rings;
+        this(m_vertices, m_edges, m_rings, m_symVerts);
         closableChains = m_closableChains;
-        symVertices = m_symVerts;
         localMsg = "";
     }
 
@@ -475,6 +472,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public void addVertex(DENOPTIMVertex m_vertex)
     {
+        m_vertex.setGraphOwner(this);
         gVertices.add(m_vertex);
     }
 
@@ -494,6 +492,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         	return;
         }
         
+        m_vertex.resetGraphOwner();
         int vid = m_vertex.getVertexId();
             
         // delete also any ring involving the removed vertex
@@ -574,6 +573,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return ((m_pos >= gVertices.size()) || m_pos < 0) ? null :
                 gVertices.get(m_pos);
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check if the graph contains the specified vertex.
+     * @param v the vertex.
+     * @return <code>true</code> if the vertex belong tho this graph.
+     */
+    public boolean containsVertex(DENOPTIMVertex v)
+    {
+        return gVertices.contains(v);
     }
     
 //------------------------------------------------------------------------------
@@ -2268,21 +2279,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Connects two vertices using any, randomly chosen pair of APs.
-     * This method ignored the APClass.
-     * @param a vertex
-     * @param b vertex
-     * @return edge connecting the vertices
-     */
-
-    public static DENOPTIMEdge connectVertices(DENOPTIMVertex a, DENOPTIMVertex b)
-    {
-        return a.connectVertices(b);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Append a graph (incoming=I) onto this (receiving=R).
      * Can append one or more copies of the same graph. The corresponding
      * vertex and attachment point ID for each connection are given in
@@ -3079,5 +3075,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         return modGraph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public Set<DENOPTIMVertex> getMutableSites()
+    {
+        Set<DENOPTIMVertex> mutableSites = new HashSet<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : gVertices)
+        {
+            mutableSites.addAll(v.getMutationSites());
+        }
+        return mutableSites;
     }
 }
