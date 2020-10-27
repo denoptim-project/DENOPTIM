@@ -44,6 +44,7 @@ import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
 
 /**
@@ -189,25 +190,25 @@ public class DENOPTIMGraphOperations
         return compatibleClasses.contains(childAPclass);
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
-     * for the vertex in question, disconnect all of its edges, update
-     * valences of other vertices, replace the fragment id of the vertex
-     * in question and then rejoin bonds. A new fragment may be added at
-     * any available attachment point
-     * @param molGraph graph of the molecule
-     * @param curVertex 
+     * Substitutes a vertex. Deletes the given vertex from the graph that owns
+     * it, and removes any child vertex (i.e., reachable from the given vertex
+     * by a directed path). Then it tries to extent the graph from the the
+     * parent vertex (i.e., the one that was originally holding the given 
+     * vertex). Moreover, additional extension may occur on
+     * any available attachment point of the parent vertex.
+     * @param vertex to mutate (the given vertex).
      * @return <code>true</code> if substitution is successful
      * @throws DENOPTIMException
      */
 
-    //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant
-    protected static boolean substituteFragment
-                            (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex)
+    protected static boolean substituteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
     {
-        int vid = curVertex.getVertexId();
+        int vid = vertex.getVertexId();
+        DENOPTIMGraph molGraph = vertex.getGraphOwner();
 
         // first get the edge with the parent
         int eidx = molGraph.getIndexOfEdgeWithParent(vid);
@@ -225,10 +226,10 @@ public class DENOPTIMGraphOperations
 
         // Need to remember symmetry because we are deleting the symm. vertices
         boolean symmetry = molGraph.hasSymmetryInvolvingVertex(vid);
-
+        
         // delete the vertex and its children and all its symmetric partners
-        deleteFragment(molGraph, curVertex);
-
+        deleteFragment(vertex);
+        
         // extend the graph at this vertex but without recursion
         return extendGraph(molGraph, pvertex, false, symmetry);
     }
@@ -238,23 +239,20 @@ public class DENOPTIMGraphOperations
     /**
      * Deletion mutation removes the vertex and also the
      * symmetric partners on its parent.
-     * @param molGraph
-     * @param curVertex
+     * @param vertex
      * @return <code>true</code> if deletion is successful
      * @throws DENOPTIMException
      */
 
-  //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant
-    
     //TODO-V3 distinguish between 
     // 1) removing a vertex and the branch starting on it
     // 2) removing a vertex and try to glue the child branch to the parent one
     
-    protected static boolean deleteFragment
-                            (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex)
+    protected static boolean deleteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
     {
-        int vid = curVertex.getVertexId();
+        int vid = vertex.getVertexId();
+        DENOPTIMGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vid))
         {
@@ -282,8 +280,8 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * function that will keep extending the graph
-     * probability of addition depends on the growth probability
+     * function that will keep extending the graph. The
+     * probability of addition depends on the growth probability scheme.
      *
      * @param molGraph molecular graph
      * @param curVertex vertex to which further fragments will be appended
@@ -1428,6 +1426,70 @@ if(debug)
             r = RandomUtils.nextBoolean(GAParameters.getSymmetryProbability());
         }
         return r;
+    }
+   
+//------------------------------------------------------------------------------
+    
+    /**
+     * Mutates the given graph in a single vertex. The graph will be altered and
+     * the original structure and content of the graph are lost. You want to
+     * use this method on a clone of the graph if you intend to retain the 
+     * original somewhere.
+     * @param molGraph the graph to mutate.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMGraph molGraph)
+                                                    throws DENOPTIMException
+    {   
+        boolean status = false;
+        String msg = "";
+        
+        // Get vertexes that can be mutated: they can be part of subgraphs 
+        // embedded in templates
+        Set<DENOPTIMVertex> mutableVrtxs = molGraph.getMutableSites();
+        if (mutableVrtxs.size() == 0)
+        {
+            msg = "Graph has no mutable site. Mutation aborted.";
+            DENOPTIMLogger.appLogger.info(msg);
+            return false;
+        }
+        
+        DENOPTIMVertex molVertex = RandomUtils.randomlyChooseOne(mutableVrtxs);
+
+        MutationType chosenKindOfMutation = RandomUtils.randomlyChooseOne(
+                molVertex.getMutationTypes());
+        switch (chosenKindOfMutation) 
+        {
+            case CHANGEBRANCH:
+                msg = "Vertex mutation - substitution: ";
+                status = substituteFragment(molVertex);
+                break;
+                
+            case EXTEND:
+                msg = "Vertex mutation - append: ";
+                status = extendGraph(molVertex.getGraphOwner(), molVertex, 
+                        false, false);
+                break;
+                
+            case DELETE:
+                msg = "Vertex mutation - deletion: ";
+                status = deleteFragment(molVertex);
+                break;
+        }
+        
+        if (status)
+            msg = "successful.";
+        else
+            msg = "unsuccessful.";
+        
+        DENOPTIMLogger.appLogger.info(msg);
+        
+        // This is done to maintain a unique vertex-id mapping. 
+        molGraph.renumberGraphVertices();
+        
+        return status;
     }
 
 //------------------------------------------------------------------------------

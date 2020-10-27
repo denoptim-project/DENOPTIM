@@ -19,6 +19,7 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MutationType;
 
 /**
  * Class representing a continuously connected portion of molecular object
@@ -1139,6 +1141,17 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
         }
         return set;
+    }
+    
+//------------------------------------------------------------------------------
+
+    //TODO-V3 might need to use a field to set the mutation types in case of use in a template
+    
+    @Override
+    public Set<MutationType> getMutationTypes()
+    {
+        //TODO-V3: this will change probably with the
+        return new HashSet<MutationType>(Arrays.asList(MutationType.values()));
     }
     
 //------------------------------------------------------------------------------

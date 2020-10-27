@@ -20,7 +20,11 @@ package denoptim.utils;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Set;
+
 import org.apache.commons.math3.random.MersenneTwister;
+
+import denoptim.molecule.DENOPTIMVertex;
 
 /**
  *
@@ -66,6 +70,24 @@ public class RandomUtils
     public static MersenneTwister getRNG()
     {
         return MTRAND;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static <T> T randomlyChooseOne(Set<T> set)
+    {
+        int chosen = MTRAND.nextInt(set.size());
+        int i=0;
+        T chosenObj = null;
+        for (T o : set)
+        {
+            if (i == chosen)
+            {
+                chosenObj = o;
+            }
+            i++;
+        }
+        return chosenObj;
     }
 
 //------------------------------------------------------------------------------

@@ -361,88 +361,6 @@ public class EAUtils
         }
         return selection;
     }
-                            
-                            
-//------------------------------------------------------------------------------
-
-    /**
-     * Mutates the given graph in a single vertex. The graph will be altered and
-     * the original structure and content of the graph are lost. 
-     * Use this method on a clone of the graph if you intend to retain the 
-     * original somewhere somewhere.
-     * @param molGraph the graph to mutate.
-     * @return <code>true</code> if the mutation is successful.
-     * @throws DENOPTIMException
-     */
-
-    //TODO-V3: move to DENOPTIMGraphOperations
-    
-    public static boolean performMutation(DENOPTIMGraph molGraph)
-                                                    throws DENOPTIMException
-    {
-        boolean status = false;
-        String msg;
-        
-        
-        // Get vertexes that can be mutated: they can be part of subgraphs 
-        // embedded in templates
-        Set<DENOPTIMVertex> mutableVrtxs = molGraph.getMutableSites();
-        if (mutableVrtxs.size() == 0)
-        {
-            msg = "Graph has no mutable site. Mutation aborted.";
-            DENOPTIMLogger.appLogger.info(msg);
-            return false;
-        }
-        
-        // Make random decisions
-        MersenneTwister rng = RandomUtils.getRNG();
-        int chosenKindOfMutation = rng.nextInt(2);
-        int chosenMutationSite = rng.nextInt(mutableVrtxs.size());
-        DENOPTIMVertex molVertex = null;
-        int i=0;
-        for (DENOPTIMVertex v : mutableVrtxs)
-        {
-            if (i == chosenMutationSite)
-            {
-                molVertex = v;
-                break;
-            }
-            i++;
-        }
-
-        switch (chosenKindOfMutation) 
-        {
-            case 0:
-                msg = "Vertex mutation - substitution: ";
-                status = DENOPTIMGraphOperations.
-                        substituteFragment(molVertex.getGraphOwner(), molVertex);
-                break;
-                
-            case 1:
-                msg = "Vertex mutation - append: ";
-                status = DENOPTIMGraphOperations.
-                        extendGraph(molVertex.getGraphOwner(), molVertex, false, false);
-                break;
-                
-            case 2:
-                msg = "Vertex mutation - deletion: ";
-                status = DENOPTIMGraphOperations.deleteFragment(molVertex.getGraphOwner(), molVertex);
-                break;
-        }
-        
-        if (status)
-            msg = "successful.";
-        else
-            msg = "unsuccessful.";
-        
-        DENOPTIMLogger.appLogger.info(msg);
-        
-        // This is done to maintain a unique vertex-id mapping. 
-        molGraph.renumberGraphVertices();
-        
-        return status;
-    }
-
 
 //------------------------------------------------------------------------------
 
@@ -1320,8 +1238,8 @@ public class EAUtils
     /**
      * Add a capping group if free connection is available
      * Addition of Capping groups does not update the symmetry table
-     * for a symmetric graph. Before crossover/mutation we must delete the
-     * capping groups and then perform the prescribed operation
+     * for a symmetric graph. Before crossover we must delete the
+     * capping groups.
      * @param molGraph
      */
 

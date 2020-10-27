@@ -19,10 +19,13 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.utils.MutationType;
 
 /**
  * An empty vertex has the behaviours of a vertex, but has no molecular
@@ -418,6 +421,15 @@ public class EmptyVertex extends DENOPTIMVertex
         Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
         set.add(this);
         return set;
+    }
+    
+//------------------------------------------------------------------------------
+
+    //TODO-V3 might need to use a fiels to set the mutation types in case of use in a template
+    @Override
+    public Set<MutationType> getMutationTypes()
+    {
+        return new HashSet<MutationType>(Arrays.asList(MutationType.values()));
     }
 
 //------------------------------------------------------------------------------

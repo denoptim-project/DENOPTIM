@@ -28,7 +28,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.exception.DENOPTIMException;
 import denoptimga.DENOPTIMGraphOperations;
-import denoptimga.EAUtils;
 
 /**
  * Tool to test genetic operators
@@ -93,7 +92,7 @@ public class TestOperator
         System.out.println(g);
         System.out.println(" ");
     
-        EAUtils.performMutation(g);
+        DENOPTIMGraphOperations.performMutation(g);
         
         //TODO-V3 need a way to control what fragment will be introduced
     }

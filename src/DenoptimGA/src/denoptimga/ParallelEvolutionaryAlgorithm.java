@@ -441,6 +441,7 @@ public class ParallelEvolutionaryAlgorithm
                     // compatible parents. So, if the selectParents is made able
                     // to detect whether it is ìNOT possible to select compatible 
                     // parents, this block becomes useless and can be removed
+                    
                     while (numatt < MAX_EVOLVE_ATTEMPTS)
                     {
                         int parents[] = EAUtils.selectParents(clone_popln);
@@ -533,7 +534,7 @@ public class ParallelEvolutionaryAlgorithm
                         foundPars = true;
                         break;
                     }
-
+                     
                     if (foundPars)
                     {
                         //TODO-V3 get rid of serialization based deep copying
@@ -546,7 +547,7 @@ public class ParallelEvolutionaryAlgorithm
                         int gid3 = clone_popln.get(i3).getMoleculeGraph()
                                 .getGraphId();
 
-                        if (EAUtils.performMutation(graph3))
+                        if (DENOPTIMGraphOperations.performMutation(graph3))
                         {
                             graph3.setGraphId(GraphUtils.getUniqueGraphIndex());
                             Mop = 1;

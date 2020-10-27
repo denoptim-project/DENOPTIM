@@ -39,6 +39,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
@@ -742,6 +743,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     public abstract Set<DENOPTIMVertex> getMutationSites();
+
+//------------------------------------------------------------------------------
+
+    public abstract Set<MutationType> getMutationTypes();
     
 //------------------------------------------------------------------------------
 

@@ -13,6 +13,7 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 
 import org.apache.commons.math3.util.OpenIntToDoubleHashMap.Iterator;
 import org.openscience.cdk.Atom;
@@ -520,6 +521,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             }
         }
         return set;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public Set<MutationType> getMutationTypes()
+    {
+        return new HashSet<MutationType>(Arrays.asList(MutationType.values()));
     }
     
 //------------------------------------------------------------------------------

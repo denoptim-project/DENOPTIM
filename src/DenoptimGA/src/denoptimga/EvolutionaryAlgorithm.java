@@ -368,7 +368,7 @@ public class EvolutionaryAlgorithm
                     String molid3 = FilenameUtils.getBaseName(clone_popln.get(i3).getMoleculeFile());
                     int gid3 = clone_popln.get(i3).getMoleculeGraph().getGraphId();
 
-                    if (EAUtils.performMutation(graph3))
+                    if (DENOPTIMGraphOperations.performMutation(graph3))
                     {
                         graph3.setGraphId(GraphUtils.getUniqueGraphIndex());
                         Mop = 1;
