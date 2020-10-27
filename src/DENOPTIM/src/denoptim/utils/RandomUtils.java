@@ -20,6 +20,7 @@ package denoptim.utils;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.Set;
 
 import org.apache.commons.math3.random.MersenneTwister;
@@ -27,9 +28,9 @@ import org.apache.commons.math3.random.MersenneTwister;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**
- *
- * @author vishwesv
+ * Toolbox for random number generation.
  */
+
 public class RandomUtils
 {
     private static long RNDSEED = 0L;
@@ -74,12 +75,16 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
     
-    public static <T> T randomlyChooseOne(Set<T> set)
+    /**
+     * Chooses one member among the given collection.
+     */
+    
+    public static <T> T randomlyChooseOne(Collection<T> c)
     {
-        int chosen = MTRAND.nextInt(set.size());
+        int chosen = MTRAND.nextInt(c.size());
         int i=0;
         T chosenObj = null;
-        for (T o : set)
+        for (T o : c)
         {
             if (i == chosen)
             {

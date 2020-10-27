@@ -2,9 +2,12 @@
 # Parameters for DENOPTIM
 #
 TESTGENOPS-OP=MUTATION
-TESTGENOPS-inpFile=OTF_WDIR/male.sdf
-TESTGENOPS-outFile=male_xo.sdf
-TESTGENOPS-MUTATIONAT=623
+TESTGENOPS-inpFile=OTF_WDIR/graph.sdf
+TESTGENOPS-outFile=graph_mut.sdf
+TESTGENOPS-MutationTarget=623
+#TESTGENOPS-MutationType=DELETE
+TESTGENOPS-MutationType=EXTEND
+#TESTGENOPS-MutationType=CHANGEBRANCH
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf

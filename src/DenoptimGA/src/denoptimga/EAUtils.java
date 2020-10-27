@@ -564,26 +564,7 @@ public class EAUtils
         }
         GraphUtils.updateVertexCounter(val);
     }
-
-//------------------------------------------------------------------------------
-
-    protected static void updatePool(HashMap<Integer, ArrayList<Integer>> mp,
-                                Integer key, Integer b)
-    {
-        if (mp.containsKey(key))
-        {
-            ArrayList<Integer> lst = mp.get(key);
-            lst.add(b);
-            mp.put(key, lst);
-        }
-        else
-        {
-            ArrayList<Integer> lst = new ArrayList<>();
-            lst.add(b);
-            mp.put(key, lst);
-        }
-    }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -607,70 +588,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @param query the reaction whose equivalents are to be identified
-     * @return list of reaction matching the query
-     */
-
-    protected static ArrayList<String> findMatchingClass(String query)
-    {
-        HashMap<String, ArrayList<String>> mp = 
-                                         FragmentSpace.getCompatibilityMatrix();
-
-        return mp.get(query);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * select a fragment with a compatible reaction of lstReac
-     * @param lstReac list of reactions that are compatible with the molecule
-     * @return matching fragment index
-     */
-    @SuppressWarnings("empty-statement")
-    protected static int selectRandomReactionFragment(ArrayList<String> lstReac)
-    {
-        // find fragments with compatible reactions
-        ArrayList<DENOPTIMVertex> mols = FragmentSpace.getFragmentLibrary();
-        ArrayList<Integer> lstMols = new ArrayList<>();
-
-        for (int i=0; i<mols.size(); i++)
-        {
-                DENOPTIMVertex mol = mols.get(i);
-            ArrayList<String> mReac = mol.getAllAPClasses();
-            // check reaction compatibility
-            for (int j=0; j<mReac.size(); j++)
-            {
-                if (lstReac.contains(mReac.get(j)));
-                {
-                    if (!lstMols.contains(i))
-                    {
-                        lstMols.add(i);
-                    }
-                }
-            }
-        }
-
-        if (lstMols.isEmpty())
-        {
-            return -1;
-        }
-        else if (lstMols.size() == 1)
-        {
-            return 0;
-        }
-        else
-        {
-            MersenneTwister rng = RandomUtils.getRNG();
-            //int idx = GAParameters.getRNG().nextInt(lstMols.size());
-            int idx = rng.nextInt(lstMols.size());
-            return lstMols.get(idx);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Select randomly a fragment from the available list
      * @return the fragment index
      */
@@ -688,86 +605,6 @@ public class EAUtils
 
         }
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @param numAP select a fragment with #APs less than numAP
-     * @param equals select a fragment with #APs = numAP
-     * @return the index of the molecule in the library. -1 if no molecule available
-     */
-    protected static int selectRandomFragment(int numAP, boolean equals)
-    {
-        int r = -1;
-        
-        MersenneTwister rng = RandomUtils.getRNG();
-
-        // select fragment with APs = maxAP
-        if (equals)
-        {
-            ArrayList<Integer> lst = 
-                    FragmentSpace.getMapOfFragsPerNumAps().get(numAP);
-            if (lst != null && lst.size() > 0)
-            {
-                //int j = GAParameters.getRNG().nextInt(lst.size());
-                int j = rng.nextInt(lst.size());
-                return lst.get(j);
-            }
-        }
-        else
-        {
-            // select a fragment that has #APs < numAP
-            // select from the fragment pool
-
-            // need to do this in case, the pool does not have members
-            // with the desired AP
-
-            //System.err.println("Looking for frags with #AP: " + numAP);
-
-            ArrayList<Integer> vlst = new ArrayList<>();
-
-            if (numAP == 1)
-            {
-                ArrayList<Integer> lst = 
-                        FragmentSpace.getMapOfFragsPerNumAps().get(numAP);
-                if (lst != null && lst.size() > 0)
-                {
-                    //int j = GAParameters.getRNG().nextInt(lst.size());
-                    int j = rng.nextInt(lst.size());
-                    return lst.get(j);
-                }
-            }
-
-            for (int k=numAP-1; k>0; k--)
-            {
-                ArrayList<Integer> lst = 
-                        FragmentSpace.getMapOfFragsPerNumAps().get(k);
-                if (lst != null)
-                    vlst.add(k);
-            }
-
-
-            //System.err.println("Found vlst: " + vlst.size());
-
-            if (!vlst.isEmpty())
-            {
-                //int l = GAParameters.getRNG().nextInt(vlst.size());
-                int l = rng.nextInt(vlst.size());
-                int k = vlst.get(l);
-                ArrayList<Integer> lst = 
-                        FragmentSpace.getMapOfFragsPerNumAps().get(k);
-
-                //int j = GAParameters.getRNG().nextInt(lst.size());
-                int j = rng.nextInt(lst.size());
-                return lst.get(j);
-            }
-        }
-
-        //System.err.println("NO fragment selected");
-
-        return -1;
-    }
-
 
 //------------------------------------------------------------------------------
 
@@ -1017,36 +854,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Find a list of fragments which match the reaction scheme
-     * @param cmpReac
-     * @return a list of fragment indices that have reaction names equal to
-     * cmpReac.
-     */
-
-    protected static ArrayList<Integer> getFragmentList(String cmpReac)
-    {
-        ArrayList<Integer> lstFragIdx = new ArrayList<>();
-
-        Iterator<Map.Entry<Integer, ArrayList<String>>> entries = FragmentSpace
-                .getMapAPClassesPerFragment().entrySet().iterator();
-        while (entries.hasNext())
-        {
-            Map.Entry<Integer, ArrayList<String>> entry = entries.next();
-            Integer key = entry.getKey();
-            ArrayList<String> clst = entry.getValue();
-            if (clst.contains(cmpReac))
-            {
-                if (!lstFragIdx.contains(key))
-                    lstFragIdx.add(key);
-            }
-        }
-
-        return lstFragIdx;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Evaluates the possibility of closing rings in a given graph and if
      * any ring can be closed choses one of the combinations of ring closures
      * that involves the highest number of new rings.
@@ -1198,8 +1005,7 @@ public class EAUtils
     /**
      * Add a capping group if free connection is available
      * Addition of Capping groups does not update the symmetry table
-     * for a symmetric graph. Before crossover we must delete the
-     * capping groups.
+     * for a symmetric graph.
      * @param molGraph
      */
 
@@ -1266,56 +1072,6 @@ public class EAUtils
             }
         }
         return false;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Checks if the atoms at the given positions have similar environments
-     * i.e. are similar in atom types etc.
-     * @param mol
-     * @param a1 atom position
-     * @param a2 atom position
-     * @return <code>true</code> if atoms have similar environments
-     */
-
-    protected static boolean isCompatible(IAtomContainer mol, int a1, int a2)
-    {
-        // check atom types
-        IAtom atm1 = mol.getAtom(a1);
-        IAtom atm2 = mol.getAtom(a2);
-
-        if (atm1.getSymbol().compareTo(atm2.getSymbol()) != 0)
-            return false;
-
-        // check connected bonds
-        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
-            return false;
-
-
-        // check connected atoms
-        if (mol.getConnectedAtomsCount(atm1)!=mol.getConnectedAtomsCount(atm2))
-            return false;
-
-        List<IAtom> la1 = mol.getConnectedAtomsList(atm2);
-        List<IAtom> la2 = mol.getConnectedAtomsList(atm2);
-
-        int k = 0;
-        for (int i=0; i<la1.size(); i++)
-        {
-            IAtom b1 = la1.get(i);
-            for (int j=0; j<la2.size(); j++)
-            {
-                IAtom b2 = la2.get(j);
-                if (b1.getSymbol().compareTo(b2.getSymbol()) == 0)
-                {
-                    k++;
-                    break;
-                }
-            }
-        }
-
-        return k == la1.size();
     }
 
 //------------------------------------------------------------------------------
@@ -1594,34 +1350,6 @@ public class EAUtils
         return res;
     }
 
-//------------------------------------------------------------------------------
-
-    /**
-     * Write the graph or the molecular representation of a DENOPTIMGraph that
-     * did not fulfill one of the criteria evaluated
-     * @param graph graph representation
-     * @param mol molecular representation
-     * @param cause message explaining the causes for rejecting the molecule
-     */
-/*
-MF: TO BE TESTED
-    private static void writeRejectedGraph(DENOPTIMGraph graph,
-                        IAtomContainer mol, String cause)
-                        throws DENOPTIMException
-    {
-        IAtomContainer molecule = new AtomContainer();
-        if ( mol != null )
-        {
-            molecule = mol;
-        }
-
-        molecule.setProperty("DENOPTIMGraph", graph.toString());
-        molecule.setProperty("Cause", cause);
-
-        String rejectedFile = "checkRejectedMols.sdf";
-        DenoptimIO.writeMolecule(rejectedFile, molecule, true);
-    }
-*/
   //------------------------------------------------------------------------------
 
     /**
@@ -1676,139 +1404,8 @@ MF: TO BE TESTED
         double lambda =GAParameters.getGrowthMultiplier();
         double sigmaOne = GAParameters.getGrowthFactorSteepSigma();
         double sigmaTwo = GAParameters.getGrowthFactorMiddleSigma();
-        return getGrowthProbabilityAtLevel(level, scheme, lambda, sigmaOne, sigmaTwo);
-    }
-
-
-//------------------------------------------------------------------------------
-
-    /**
-     * For the class associated with the AP identify a compatible fragment and
-     * a proper attachment point in it. This method searches only among 
-     * fragments (i.e., library of type 1).
-     * @param curDap the attachment point for which we ask for a partner.
-     * @return the vector of indeces defining the chosen fragment and the
-     * chosen attachment point. Note, the fist index is always -1, since 
-     * no verted ID is assigned to the chosen fragment by this method.
-     */
-
-    protected static IdFragmentAndAP selectClassBasedFragment(
-            DENOPTIMAttachmentPoint curDap) throws DENOPTIMException
-    {
-        //TODO-C4
-        System.out.println("Gerring CB-frags for AP "+curDap);
-        
-        String srcAPC = curDap.getAPClass();
-        int fid = -1, apid = -1, rnd = -1;
-        String chosenTrgAPC = null;
-
-        MersenneTwister rng = RandomUtils.getRNG();
-
-        // loop through the reactions for the current AP
-        // check if this reaction bond is already satisfied
-        if (curDap.isAvailable())
-        {
-            ArrayList<String> candidateAPCs = findMatchingClass(srcAPC);
-            if (candidateAPCs == null)
-            {
-                String msg = "No matching APClass found for " + srcAPC;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
-            }
-
-            if(candidateAPCs.size() == 1)
-            {
-                chosenTrgAPC = candidateAPCs.get(0);
-            }
-            else
-            {
-                // if there are multiple compatible reactions, random selection
-                rnd = rng.nextInt(candidateAPCs.size());
-                chosenTrgAPC = candidateAPCs.get(rnd);
-            }
-
-            // get the list of fragment indices with matching reaction cmpReac
-            ArrayList<Integer> reacFrags = getFragmentList(chosenTrgAPC);
-            if (!reacFrags.isEmpty())
-            {
-                // choose a random fragment if there are more than 1
-                if (reacFrags.size() == 1)
-                {
-                    fid = reacFrags.get(0);
-                }
-                else
-                {
-                    rnd = rng.nextInt(reacFrags.size());
-                    fid = reacFrags.get(rnd);
-                }
-
-                // choose one of the compatible APs on the chosen fragment
-                ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                        FragmentSpace.getVertexFromLibrary(BBType.FRAGMENT, 
-                                fid).getAttachmentPoints();
-                ArrayList<Integer> compatApIds = new ArrayList<Integer>();
-                for (int i=0; i<fragAPs.size(); i++)
-                {
-                    //NB: here we check isAvailable because if the building 
-                    // block is a template then some of its APc are not usable
-                    // and therefore should not be listed here
-                    
-                    if (fragAPs.get(i).getAPClass().equals(chosenTrgAPC)
-                            && fragAPs.get(i).isAvailable())
-                    {
-                        compatApIds.add(i);
-                    }
-                }
-                if (compatApIds.size() == 1)
-                {
-                    apid = compatApIds.get(0);
-                }
-                else
-                {
-                    rnd = rng.nextInt(compatApIds.size());
-                    apid = compatApIds.get(rnd);
-                }
-            }
-        }
-
-        IdFragmentAndAP res = new IdFragmentAndAP(-1, fid, BBType.FRAGMENT, 
-                apid, -1, -1);
-
-        return res;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * For the given vertex identify the index of the attachment point
-     * that has the matching class
-     * @param fragVertex
-     * @param cmpReac reaction associated with the vertex
-     * @return index of the attachment point
-     */
-
-    protected static int selectClassBasedAP(DENOPTIMVertex fragVertex,
-                                                String cmpReac)
-    {
-        // get the list of indices of the compatible reaction AP
-        ArrayList<Integer> apIdx =
-                fragVertex.getCompatibleClassAPIndex(cmpReac);
-
-        MersenneTwister rng = RandomUtils.getRNG();
-        int fapidx = -1;
-        if (apIdx.size() == 1)
-        {
-            fapidx = apIdx.get(0);
-        }
-        // if there are more than 1 compatible AP choose randomly
-        else
-        {
-            //int rnd = GAParameters.getRNG().nextInt(apIdx.size());
-            int rnd = rng.nextInt(apIdx.size());
-            fapidx = apIdx.get(rnd);
-        }
-
-        return fapidx;
+        return getGrowthProbabilityAtLevel(level, scheme, lambda, sigmaOne, 
+                sigmaTwo);
     }
 
 //------------------------------------------------------------------------------

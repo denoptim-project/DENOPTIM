@@ -29,19 +29,14 @@ import javax.vecmath.Point3d;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.Bond;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IPseudoAtom;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.MutationType;
 
 /**
  * Class representing a continuously connected portion of molecular object
@@ -1141,17 +1136,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
         }
         return set;
-    }
-    
-//------------------------------------------------------------------------------
-
-    //TODO-V3 might need to use a field to set the mutation types in case of use in a template
-    
-    @Override
-    public Set<MutationType> getMutationTypes()
-    {
-        //TODO-V3: this will change probably with the
-        return new HashSet<MutationType>(Arrays.asList(MutationType.values()));
     }
     
 //------------------------------------------------------------------------------

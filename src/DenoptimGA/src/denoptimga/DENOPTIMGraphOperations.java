@@ -208,30 +208,30 @@ public class DENOPTIMGraphOperations
                                                     throws DENOPTIMException
     {
         int vid = vertex.getVertexId();
-        DENOPTIMGraph molGraph = vertex.getGraphOwner();
+        DENOPTIMGraph graph = vertex.getGraphOwner();
 
         // first get the edge with the parent
-        int eidx = molGraph.getIndexOfEdgeWithParent(vid);
+        int eidx = graph.getIndexOfEdgeWithParent(vid);
         if (eidx == -1)
         {
-            String msg = "Program Bug in substituteFragment: " +
-                                            "Unable to locate parent edge.";
+            String msg = "Program Bug in substituteFragment: Unable to locate "
+                    + "parent edge for vertex "+vertex+" in graph "+graph;
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
         // vertex id of the parent
-        int pvid = molGraph.getEdgeAtPosition(eidx).getSourceVertex();
-        DENOPTIMVertex pvertex = molGraph.getVertexWithId(pvid);
+        int pvid = graph.getEdgeAtPosition(eidx).getSourceVertex();
+        DENOPTIMVertex pvertex = graph.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
-        boolean symmetry = molGraph.hasSymmetryInvolvingVertex(vid);
+        boolean symmetry = graph.hasSymmetryInvolvingVertex(vid);
         
         // delete the vertex and its children and all its symmetric partners
         deleteFragment(vertex);
         
         // extend the graph at this vertex but without recursion
-        return extendGraph(molGraph, pvertex, false, symmetry);
+        return extendGraph(graph, pvertex, false, symmetry);
     }
 
 //------------------------------------------------------------------------------
@@ -302,9 +302,6 @@ public class DENOPTIMGraphOperations
                                          boolean symmetryOnAp) 
                                                         throws DENOPTIMException
     {   
-        //TODO-C4
-        debug=true;
-        
         // return true if the append has been successful
         boolean status = false;
 
@@ -615,22 +612,31 @@ public class DENOPTIMGraphOperations
                                               curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint curDap = lstDaps.get(dapidx);
         
-        IdFragmentAndAP res;
+        // Initialize with an empty pointer
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
+                -1, -1);
         if (!FragmentSpace.useAPclassBasedApproach())
         {
+            //TODO-V3 get rid of EAUtils and use fragment space
             int fid = EAUtils.selectRandomFragment();
             res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
         }
         else
         {
-            res = EAUtils.selectClassBasedFragment(curDap);
+            ArrayList<IdFragmentAndAP> candidates = 
+                    FragmentSpace.getFragAPsCompatibleWithClass(
+                    curDap.getAPClass());
+            if (candidates.size() > 0)
+            {
+                res = RandomUtils.randomlyChooseOne(candidates);
+            }
         }
         return res;
     }
 
 //------------------------------------------------------------------------------
 
-    protected static boolean  attachFragmentInClosableChain(
+    protected static boolean attachFragmentInClosableChain(
                                                DENOPTIMVertex curVertex, 
                                                int dapidx,
                                                DENOPTIMGraph molGraph,
@@ -656,7 +662,7 @@ DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
         // 2) an empty list because no fragments allow to close rings
         // 3) "-1" as molID that means there are closable chains that
         //    terminate at the current level, so we let the standard 
-        //    routine proceede selecting an extension of the chain
+        //    routine proceeds selecting an extension of the chain
         //    or cap this end.
 
         // Choose a candidate and attach it to the graph
@@ -1507,7 +1513,7 @@ if(debug)
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType) throws DENOPTIMException
     {   
-        // Check for sensible calls
+        // Deal with nonsensical calls
         if (vertex.getGraphOwner() == null)
         {
             DENOPTIMLogger.appLogger.info("Vertex has no owner - "
@@ -1520,6 +1526,8 @@ if(debug)
                     + "'" + mType + "' - Mutation aborted");
             return false;
         }
+        
+        int graphId = vertex.getGraphOwner().getGraphId();
         
         boolean done = false;
         switch (mType) 
@@ -1540,7 +1548,7 @@ if(debug)
         }
         
         String msg = "Mutation '" + mType.toString() + "' on vertex " +
-        vertex.toString() + ": ";
+        vertex.toString() + " (graph " + graphId+"): ";
         if (done)
             msg = msg + "done";
         else

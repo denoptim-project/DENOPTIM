@@ -37,5 +37,5 @@ GA-mutationProbability=0.8
 GA-symmetryProbability=0.0
 GA-growthProbScheme=sigma
 GA-GrowthSigmaSteepness=2.0
-GA-GrowthSigmaMiddle=0.0
+GA-GrowthSigmaMiddle=-0.5
 GA-replacementStrategy=NONE

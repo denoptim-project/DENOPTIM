@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 
 
@@ -75,7 +76,7 @@ public class FragmentSpaceUtils
 					    int fragId) throws DENOPTIMException
     {   
 		// Classify according to number of APs
-        int nAps = frg.getNumberOfAP();
+        int nAps = frg.getFreeAPCount();
 		if (nAps != 0)
 		{
             if (FragmentSpace.getMapOfFragsPerNumAps().containsKey(nAps))
@@ -102,10 +103,17 @@ public class FragmentSpaceUtils
 	        
 		    for (int j=0; j<lstAPs.size(); j++)
 		    {
+		        DENOPTIMAttachmentPoint ap = lstAPs.get(j);
 				ArrayList<Integer> apId = new ArrayList<Integer>();
 				apId.add(fragId);
 				apId.add(j);
-				String cls = lstAPs.get(j).getAPClass();
+				String cls = ap.getAPClass();
+				
+				if (!ap.isAvailable())
+				{
+				    continue;
+				}
+				
 			    if (FragmentSpace.getMapFragsAPsPerAPClass().containsKey(cls))
 				{
 				    FragmentSpace.getMapFragsAPsPerAPClass().get(cls)

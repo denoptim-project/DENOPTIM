@@ -725,8 +725,7 @@ public class FragmentSpace
      * @return the list of AP identifiers.
      */
 
-    public static ArrayList<IdFragmentAndAP> getFragsWithAPClass(
-                                                                 String apclass)
+    public static ArrayList<IdFragmentAndAP> getFragsWithAPClass(String apclass)
     {
         ArrayList<IdFragmentAndAP> lst = new ArrayList<IdFragmentAndAP>();
         
@@ -735,7 +734,7 @@ public class FragmentSpace
             for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apclass))
             {
                 IdFragmentAndAP apId = new IdFragmentAndAP(-1, //vertexId
-                                               idxs.get(0), //MolId,
+                                                   idxs.get(0), //MolId,
                                                    BBType.FRAGMENT,
                                                    idxs.get(1), //ApId
                                                    -1, //noVSym
@@ -843,11 +842,8 @@ public class FragmentSpace
     /**
      * Returns the list of attachment points found in the fragment 
      * space and that are compatible with a given AP class. 
-     * Multiple APs can be found for each fragment, 
-     * thus this method returns pairs of
-     * integers identifying the fragment (first integer in the pair) and the
-     * AP (second index in the pair).
-     * @param srcApCls the AP class for which we want compatible APs
+     * Multiple APs can be found for each fragment.
+     * @param srcApCls the AP class for which we want compatible APs.
      */
     
     public static ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithClass(
@@ -868,6 +864,13 @@ public class FragmentSpace
                 compatFragAps.addAll(
                         FragmentSpace.getFragsWithAPClass(compClass));
             }
+        }
+        
+        //TODO-V3: keep or trash?
+        if (compatFragAps.size()==0)
+        {
+            System.out.println("WARNING: No compatible AP found in the "
+                    + "fragment space for APClass '" + srcApCls + "'.");
         }
         
         return compatFragAps;
