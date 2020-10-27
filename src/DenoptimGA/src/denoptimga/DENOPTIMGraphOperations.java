@@ -294,21 +294,28 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the graph has been modified
      */
      
-  //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant
-    
+  //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant: remove molGraph parameter
+  
     protected static boolean extendGraph(DENOPTIMGraph molGraph,
                                          DENOPTIMVertex curVertex, 
                                          boolean extend, 
                                          boolean symmetryOnAp) 
                                                         throws DENOPTIMException
     {   
+        //TODO-C4
+        debug=true;
+        
         // return true if the append has been successful
         boolean status = false;
 
         // check if the fragment has available APs
         if (!curVertex.hasFreeAP())
+        {
+            if (debug)
+                System.err.println("Cannot extend graph that has no free AP!");
             return status;
-
+        }
+        
         int lvl = curVertex.getLevel();
         int curVrtId = curVertex.getVertexId();
         int grphId = molGraph.getGraphId();
@@ -1431,65 +1438,117 @@ if(debug)
 //------------------------------------------------------------------------------
     
     /**
-     * Mutates the given graph in a single vertex. The graph will be altered and
-     * the original structure and content of the graph are lost. You want to
-     * use this method on a clone of the graph if you intend to retain the 
-     * original somewhere.
-     * @param molGraph the graph to mutate.
+     * Tries to do mutate the given graph. The mutation site and type are 
+     * chosen randomly according the the possibilities declared by the graph.
+     * The graph that owns the vertex will be altered and
+     * the original structure and content of the graph will be lost.
+     * @param graph the graph to mutate.
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
     
-    public static boolean performMutation(DENOPTIMGraph molGraph)
+    public static boolean performMutation(DENOPTIMGraph graph)
                                                     throws DENOPTIMException
-    {   
-        boolean status = false;
-        String msg = "";
-        
+    {  
         // Get vertexes that can be mutated: they can be part of subgraphs 
         // embedded in templates
-        Set<DENOPTIMVertex> mutableVrtxs = molGraph.getMutableSites();
-        if (mutableVrtxs.size() == 0)
+        Set<DENOPTIMVertex> mutable = graph.getMutableSites();
+        if (mutable.size() == 0)
         {
-            msg = "Graph has no mutable site. Mutation aborted.";
+            String msg = "Graph has no mutable site. Mutation aborted.";
             DENOPTIMLogger.appLogger.info(msg);
             return false;
         }
         
-        DENOPTIMVertex molVertex = RandomUtils.randomlyChooseOne(mutableVrtxs);
-
-        MutationType chosenKindOfMutation = RandomUtils.randomlyChooseOne(
-                molVertex.getMutationTypes());
-        switch (chosenKindOfMutation) 
+        return performMutation(RandomUtils.randomlyChooseOne(mutable));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Tries to do mutate the given vertex. We assume the vertex to belong to a 
+     * graph, if not no mutation is done. The mutation type is
+     * chosen randomly according the the possibilities declared by the vertex.
+     * The graph that owns the vertex will be altered and
+     * the original structure and content of the graph will be lost.
+     * @param vertex the vertex to mutate.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMVertex vertex) 
+            throws DENOPTIMException
+    {  
+        if (vertex.getGraphOwner() == null)
+        {
+            DENOPTIMLogger.appLogger.info("Vertex has no owner - "
+                    + "Mutation aborted");
+            return false;
+        }
+        MutationType mType = RandomUtils.randomlyChooseOne(
+                vertex.getMutationTypes());
+        return performMutation(vertex, mType);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Mutates the given vertex according to the given mutation type, if
+     * possible. Vertex that do not belong to any graph or that do not
+     * allow the requested kind of mutation, are not mutated.
+     * The graph that owns the vertex ill be altered and
+     * the original structure and content of the graph will be lost. 
+     * @param vertex the vertex to mutate.
+     * @param mType the type of mutation to perform.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMVertex vertex, 
+            MutationType mType) throws DENOPTIMException
+    {   
+        // Check for sensible calls
+        if (vertex.getGraphOwner() == null)
+        {
+            DENOPTIMLogger.appLogger.info("Vertex has no owner - "
+                    + "Mutation aborted");
+            return false;
+        }
+        if (!vertex.getMutationTypes().contains(mType))
+        {
+            DENOPTIMLogger.appLogger.info("Vertex does not allow mutation type "
+                    + "'" + mType + "' - Mutation aborted");
+            return false;
+        }
+        
+        boolean done = false;
+        switch (mType) 
         {
             case CHANGEBRANCH:
-                msg = "Vertex mutation - substitution: ";
-                status = substituteFragment(molVertex);
+                done = substituteFragment(vertex);
                 break;
                 
             case EXTEND:
-                msg = "Vertex mutation - append: ";
-                status = extendGraph(molVertex.getGraphOwner(), molVertex, 
+                vertex.getGraphOwner().removeCappingGroupsOn(vertex);
+                done = extendGraph(vertex.getGraphOwner(), vertex, 
                         false, false);
                 break;
                 
             case DELETE:
-                msg = "Vertex mutation - deletion: ";
-                status = deleteFragment(molVertex);
+                done = deleteFragment(vertex);
                 break;
         }
         
-        if (status)
-            msg = "successful.";
+        String msg = "Mutation '" + mType.toString() + "' on vertex " +
+        vertex.toString() + ": ";
+        if (done)
+            msg = msg + "done";
         else
-            msg = "unsuccessful.";
+            msg = msg + "unsuccessful";
         
         DENOPTIMLogger.appLogger.info(msg);
         
-        // This is done to maintain a unique vertex-id mapping. 
-        molGraph.renumberGraphVertices();
-        
-        return status;
+        return done;
     }
 
 //------------------------------------------------------------------------------

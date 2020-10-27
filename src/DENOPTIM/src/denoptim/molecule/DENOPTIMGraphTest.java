@@ -27,8 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 
 /**
  * Unit test for DENOPTIMGraph
@@ -1047,12 +1051,6 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         DENOPTIMTemplate tmpl = DENOPTIMTemplate.getTestTemplate(2);
         graph.addVertex(tmpl);
-
-        //TODO del
-        System.out.println("FIRST");
-        System.out.println("GRAOH: "+graph);
-        for (DENOPTIMVertex v : graph.getMutableSites())
-            System.out.println(" -> "+v.getVertexId()+" "+v.getGraphOwner().graphId);
         
         assertEquals(1,graph.getMutableSites().size(),
                 "Size of mutation size list in case of frozen template");
@@ -1060,17 +1058,113 @@ public class DENOPTIMGraphTest {
         graph = new DENOPTIMGraph();
         tmpl = DENOPTIMTemplate.getTestTemplate(0);
         graph.addVertex(tmpl);
-
-        //TODO del
-        System.out.println("SECOND");
-        System.out.println("GRAOH: "+graph);
-        for (DENOPTIMVertex v : graph.getMutableSites())
-            System.out.println(" -> "+v.getVertexId()+" "+v.getGraphOwner().graphId);
         
         assertEquals(2,graph.getMutableSites().size(),
                 "Size of mutation size list in case of free template");
-
     }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testRemoveCapping() throws Exception
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        
+        IAtomContainer iac1 = new AtomContainer();
+        iac1.addAtom(new Atom("C"));
+        DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
+        v1.addAttachmentPoint(new DENOPTIMAttachmentPoint(v1, 0, 1, 1));
+        v1.addAttachmentPoint(new DENOPTIMAttachmentPoint(v1, 0, 1, 1));
+
+        IAtomContainer iac2 = new AtomContainer();
+        iac2.addAtom(new Atom("O"));
+        DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
+        v2.addAttachmentPoint(new DENOPTIMAttachmentPoint(v2, 0, 1, 1));
+        v2.addAttachmentPoint(new DENOPTIMAttachmentPoint(v2, 0, 1, 1));
+        
+        IAtomContainer iac3 = new AtomContainer();
+        iac3.addAtom(new Atom("H"));
+        DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
+        v3.addAttachmentPoint(new DENOPTIMAttachmentPoint(v3, 0, 1, 1));
+        
+        IAtomContainer iac4 = new AtomContainer();
+        iac4.addAtom(new Atom("H"));
+        DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
+        v4.addAttachmentPoint(new DENOPTIMAttachmentPoint(v4, 0, 1, 1));
+        
+        graph.addVertex(v1);
+        graph.addVertex(v2);
+        graph.addVertex(v3);
+        graph.addVertex(v4);
+        graph.addEdge(new DENOPTIMEdge(1, 2, 0, 0));
+        graph.addEdge(new DENOPTIMEdge(1, 3, 1, 0));
+        graph.addEdge(new DENOPTIMEdge(2, 4, 1, 0));
+        
+        assertEquals(4,graph.getVertexCount(),
+                "#vertexes in graph before removal");
+        assertTrue(graph == v4.getGraphOwner());
+        
+        graph.removeCappingGroupsOn(v2);
+
+        assertEquals(3,graph.getVertexCount(),
+                "#vertexes in graph before removal");
+        assertFalse(graph.containsVertex(v4), 
+                "Capping is still contained");
+        assertTrue(null == v4.getGraphOwner(), 
+                "Owner of removed capping group is null");
+        
+        
+        DENOPTIMGraph graph2 = new DENOPTIMGraph();
+        
+        IAtomContainer iac12 = new AtomContainer();
+        iac12.addAtom(new Atom("C"));
+        DENOPTIMVertex v12 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
+        v12.addAttachmentPoint(new DENOPTIMAttachmentPoint(v12, 0, 1, 1));
+        v12.addAttachmentPoint(new DENOPTIMAttachmentPoint(v12, 0, 1, 1));
+
+        IAtomContainer iac22 = new AtomContainer();
+        iac22.addAtom(new Atom("O"));
+        DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
+        v22.addAttachmentPoint(new DENOPTIMAttachmentPoint(v22, 0, 1, 1));
+        v22.addAttachmentPoint(new DENOPTIMAttachmentPoint(v22, 0, 1, 1));
+        
+        IAtomContainer iac32 = new AtomContainer();
+        iac32.addAtom(new Atom("H"));
+        DENOPTIMVertex v32 = new DENOPTIMFragment(23, iac32, BBType.CAP);
+        v32.addAttachmentPoint(new DENOPTIMAttachmentPoint(v32, 0, 1, 1));
+        
+        IAtomContainer iac42 = new AtomContainer();
+        iac42.addAtom(new Atom("H"));
+        DENOPTIMVertex v42 = new DENOPTIMFragment(24, iac42, BBType.CAP);
+        v42.addAttachmentPoint(new DENOPTIMAttachmentPoint(v42, 0, 1, 1));
+        
+        graph2.addVertex(v12);
+        graph2.addVertex(v22);
+        graph2.addVertex(v32);
+        graph2.addVertex(v42);
+        graph2.addEdge(new DENOPTIMEdge(21, 22, 0, 0));
+        graph2.addEdge(new DENOPTIMEdge(21, 23, 1, 0));
+        graph2.addEdge(new DENOPTIMEdge(22, 24, 1, 0));
+        
+        assertEquals(4,graph2.getVertexCount(),
+                "#vertexes in graph before removal (B)");
+        assertTrue(graph2 == v32.getGraphOwner());
+        assertTrue(graph2 == v42.getGraphOwner());
+        
+        graph2.removeCappingGroups();
+
+        assertEquals(2,graph2.getVertexCount(),
+                "#vertexes in graph before removal (B)");
+        assertFalse(graph.containsVertex(v42), 
+                "Capping is still contained (B)");
+        assertFalse(graph.containsVertex(v32), 
+                "Capping is still contained (C)");
+        assertTrue(null == v42.getGraphOwner(), 
+                "Owner of removed capping group is null (B)");
+        assertTrue(null == v32.getGraphOwner(), 
+                "Owner of removed capping group is null (C)");
+    }
+    
 //------------------------------------------------------------------------------
 
 }

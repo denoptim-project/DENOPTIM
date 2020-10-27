@@ -10,3 +10,4 @@ lib/DENOPTIM.jar
 bin/
 .idea
 *.iml
+*.swp

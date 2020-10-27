@@ -34,6 +34,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
+import denoptim.utils.MutationType;
+import denoptim.utils.RandomUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 
 
@@ -56,6 +58,11 @@ public class TestOperatorParameters
     protected static String workDir = ".";
     
     /**
+     * Seed for generation of pseudo-random numbers
+     */
+    protected static long randomSeed = 1234567890L;
+    
+    /**
      * Testable Operators 
      */
     protected enum Operator {MUTATION,XOVER}
@@ -69,6 +76,11 @@ public class TestOperatorParameters
      * Target vertex ID for mutation
      */
     protected static int mutationTarget;
+    
+    /**
+     * Type of mutation to perform
+     */
+    protected static MutationType mutationType;
     
     /**
      * Input File male
@@ -224,8 +236,8 @@ public class TestOperatorParameters
         String msg = "";
         switch (key.toUpperCase())
         {
-            case "TESTGENOPS-OP=MUTATION":
-                operatorToTest = Operator.MUTATION;
+            case "TESTGENOPS-OP=":
+                operatorToTest = Operator.valueOf(value);
                 break;
             case "TESTGENOPS-INPFILE=":
                 inpFileM = value;
@@ -233,9 +245,12 @@ public class TestOperatorParameters
             case "TESTGENOPS-OUTFILE=":
                 outFileM = value;
                 break;
-            case "TESTGENOPS-MUTATIONAT=":
+            case "TESTGENOPS-MUTATIONTARGET=":
                 mutationTarget = Integer.parseInt(value);
-               break;
+                break;
+            case "TESTGENOPS-MUTATIONTYPE=":
+                mutationType = MutationType.valueOf(value);
+                break;
             case "TESTGENOPS-WORKDIR=":
                 workDir = value;
                 break;
@@ -243,19 +258,19 @@ public class TestOperatorParameters
                 inpFileM = value;
                 break;
             case "TESTGENOPS-INPFILEFEMALE=":
-    	    inpFileF = value;
+    	        inpFileF = value;
                 break;
             case "TESTGENOPS-VERTEXMALE=":
-                 mvid = Integer.parseInt(value);
+                mvid = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-APMALE=":
-                 mapid = Integer.parseInt(value);
+                mapid = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-VERTEXFEMALE=":
-                 fvid = Integer.parseInt(value);
+                fvid = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-APFEMALE=":
-                 fapid = Integer.parseInt(value);
+                fapid = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-OUTFILEMALE=":
                 outFileM = value;
@@ -325,6 +340,8 @@ public class TestOperatorParameters
 
     public static void processParameters() throws DENOPTIMException
     {
+        RandomUtils.initialiseRNG(randomSeed);
+        
         if (FragmentSpaceParameters.fsParamsInUse())
         {
             FragmentSpaceParameters.processParameters();

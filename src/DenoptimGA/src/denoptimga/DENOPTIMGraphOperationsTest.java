@@ -34,13 +34,13 @@ import denoptim.molecule.DENOPTIMTemplate;
  * @author Marco Foscato
  */
 
-public class EAUtilsTest
+public class DENOPTIMGraphOperationsTest
 {
 
 //------------------------------------------------------------------------------
 	
     //@Test
-    public void testMutationOnUnmutableTemplate() throws Exception
+    public void test() throws Exception
     {
 
 

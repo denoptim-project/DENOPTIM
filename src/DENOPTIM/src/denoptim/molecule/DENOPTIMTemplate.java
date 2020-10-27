@@ -286,7 +286,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMVertex vH6 = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
         
-        
         template.interiorGraph.addVertex(vA);
         template.interiorGraph.addVertex(vB);
         template.interiorGraph.addVertex(vC);
@@ -300,7 +299,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         template.interiorGraph.addVertex(vH5);
         template.interiorGraph.addVertex(vH6);
         
-
         DENOPTIMEdge eARcv = vA.connectVertices(vRCV1, 3, 0);
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 3);
         DENOPTIMEdge eBC = vB.connectVertices(vC, 0, 3);

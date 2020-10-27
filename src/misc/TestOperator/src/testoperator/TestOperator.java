@@ -23,9 +23,11 @@ import java.io.File;
 
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 import denoptim.utils.GraphConversionTool;
 import denoptim.io.DenoptimIO; 
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.exception.DENOPTIMException;
 import denoptimga.DENOPTIMGraphOperations;
 
@@ -79,22 +81,35 @@ public class TestOperator
     
 //------------------------------------------------------------------------------
     
-    //TODO-V3
     private static void runMutation() throws DENOPTIMException
     {
         DENOPTIMGraph g = 
                 GraphConversionTool.getGraphFromString(DenoptimIO.readSDFFile(
                                        TestOperatorParameters.inpFileM).get(0)
                                          .getProperty("GraphENC").toString());
-
     
         System.out.println("Initial graphs: ");
         System.out.println(g);
         System.out.println(" ");
-    
-        DENOPTIMGraphOperations.performMutation(g);
+        MutationType mt = TestOperatorParameters.mutationType;
+        int vid = TestOperatorParameters.mutationTarget;
+        System.out.println("Attempting mutation '" + mt + "' on vertex " +vid);
         
-        //TODO-V3 need a way to control what fragment will be introduced
+        DENOPTIMVertex v = g.getVertexWithId(vid);
+        if (v == null)
+        {
+            System.out.println("VertexID '" +vid +  "' not found in graph "+g);
+            System.exit(-1);
+        }
+    
+        DENOPTIMGraphOperations.performMutation(v,mt);
+
+        System.out.println("Result of mutation:");
+        System.out.println(g);
+        System.out.println(" ");
+    
+        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, 
+                 GraphConversionTool.convertGraphToMolecule(g,true),false);
     }
     
 //------------------------------------------------------------------------------

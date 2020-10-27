@@ -896,9 +896,28 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         return -1;
     }
+
+//------------------------------------------------------------------------------  
     
+    /**
+     * @param vertex the vertex for which the first level of child vertices 
+     * need to be found.
+     * @return list of child vertices.
+     */
+
+    public ArrayList<DENOPTIMVertex> getChildVertices(DENOPTIMVertex vertex)
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<>();
+        
+        for (int vid : getChildVertices(vertex.getVertexId()))
+        {
+            lst.add(this.getVertexWithId(vid));
+        }
+        return lst;
+    }
     
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------  
+    
     /**
      * @param m_vid the vertex id for which the child vertices need to be found
      * @return Arraylist containing the vertex ids of the child vertices
@@ -1504,7 +1523,36 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return false;
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Remove capping groups on the given vertex of this graph
+     */
+
+    public void removeCappingGroupsOn(DENOPTIMVertex vertex)
+    {
+        ArrayList<DENOPTIMVertex> toDel = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex vtx : this.getChildVertices(vertex))
+        {
+            if (vtx instanceof DENOPTIMFragment == false)
+            {
+                continue;
+            }
+            // capping groups have fragment type 2
+            if (((DENOPTIMFragment) vtx).getFragmentType() == BBType.CAP
+                    && !isVertexInRing(vtx))
+            {
+                toDel.add(vtx);
+            }
+        }
+
+        for (DENOPTIMVertex v : toDel)
+        {
+            removeVertex(v);
+        }
+    }
+    
 //------------------------------------------------------------------------------
 
     /**

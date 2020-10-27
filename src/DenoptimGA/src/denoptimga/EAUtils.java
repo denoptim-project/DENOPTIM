@@ -104,12 +104,12 @@ public class EAUtils
     {
         StringBuilder sb = new StringBuilder(512);
 
-	//Headers
+            //Headers
         sb.append(String.format("%-20s", "#Name "));
         sb.append(String.format("%-20s", "GraphId "));
         sb.append(String.format("%-30s", "UID "));
         sb.append(String.format("%-15s","Fitness "));
-	sb.append("Source ");
+            sb.append("Source ");
         sb.append(System.getProperty("line.separator"));
 
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
@@ -124,10 +124,10 @@ public class EAUtils
                 if (mname != null)
                     sb.append(String.format("%-20s", mname));
                 sb.append(String.format("%-20s", 
-					  mol.getMoleculeGraph().getGraphId()));
+                        mol.getMoleculeGraph().getGraphId()));
                 sb.append(String.format("%-30s", mol.getMoleculeUID()));
                 sb.append(df.format(mol.getMoleculeFitness()));
-		sb.append("    ").append(mol.getMoleculeFile());
+                sb.append("    ").append(mol.getMoleculeFile());
                 sb.append(System.getProperty("line.separator"));
             }
         }
@@ -389,7 +389,7 @@ public class EAUtils
                 if (sdfile != null)
                 {
                     FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-		}
+                }
                 if (imgfile != null)
                 {
                     FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
@@ -429,7 +429,7 @@ public class EAUtils
 
         String fsep = System.getProperty("file.separator");
 
-	HashSet<String> uidsFromInitPop = new HashSet();
+        HashSet<String> uidsFromInitPop = new HashSet();
         for (int i=0; i<mols.size(); i++)
         {
             DENOPTIMGraph graph = null;
@@ -491,7 +491,7 @@ public class EAUtils
                 }
             }
 
-	    // Add molecule to population, unless it has previously known UID
+            // Add molecule to population, unless it has previously known UID
             if (lstInchi.add(molinchi))
             {
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
@@ -512,10 +512,10 @@ public class EAUtils
                 pmol.setMoleculeFile(molfile);
                 pmol.setImageFile(null);
                 molPopulation.add(pmol);
-		uidsFromInitPop.add(molinchi);
+                uidsFromInitPop.add(molinchi);
             }
         }
-	writeUID(GAParameters.getUIDFileOut(),uidsFromInitPop,true);
+        writeUID(GAParameters.getUIDFileOut(),uidsFromInitPop,true);
 
         if (molPopulation.isEmpty())
         {
@@ -535,18 +535,18 @@ public class EAUtils
         StringBuilder sb = new StringBuilder(256);
         Iterator<String> iter = lstInchi.iterator();
 
-	boolean  first = true;
+        boolean  first = true;
         while(iter.hasNext())
         {
-	    if (first)
-	    {
+            if (first)
+            {
                 sb.append(iter.next());
-		first = false;
-	    }
-	    else
-	    {
+                first = false;
+            }
+            else
+            {
                 sb.append(System.getProperty("line.separator")).append(iter.next());
-	    }
+            }
         }
 
         DenoptimIO.writeData(outfile, sb.toString(), append);
@@ -597,6 +597,8 @@ public class EAUtils
      * This is done in order to make selection of fragments based on #APs easier
      * @param bbs the list of building blocks to analyze
      */
+    
+    //TODO-V3: Is this the right place for this...no. Move it into Fragment space
     protected static void poolFragments(ArrayList<DENOPTIMVertex> bbs)
     {
         fragmentPool = new HashMap<>();
@@ -622,7 +624,7 @@ public class EAUtils
         lstFragmentClass = new HashMap<>();
         for (int i=0; i<bbs.size(); i++)
         {
-        	DENOPTIMVertex v = bbs.get(i);
+                DENOPTIMVertex v = bbs.get(i);
             ArrayList<String> lstRcn = v.getAllAvailableAPClasses();
             lstFragmentClass.put(i, lstRcn);
         }
@@ -659,7 +661,7 @@ public class EAUtils
     protected static ArrayList<String> findMatchingClass(String query)
     {
         HashMap<String, ArrayList<String>> mp = 
-					 FragmentSpace.getCompatibilityMatrix();
+                                         FragmentSpace.getCompatibilityMatrix();
 
         return mp.get(query);
     }
@@ -680,7 +682,7 @@ public class EAUtils
 
         for (int i=0; i<mols.size(); i++)
         {
-        	DENOPTIMVertex mol = mols.get(i);
+                DENOPTIMVertex mol = mols.get(i);
             ArrayList<String> mReac = mol.getAllAPClasses();
             // check reaction compatibility
             for (int j=0; j<mReac.size(); j++)
@@ -927,7 +929,7 @@ public class EAUtils
         ArrayList<Integer> lstFragIdx = new ArrayList<>();
         for (int i=0; i<FragmentSpace.getCappingLibrary().size(); i++)
         {
-        	DENOPTIMVertex mol = FragmentSpace.getCappingLibrary().get(i);
+                DENOPTIMVertex mol = FragmentSpace.getCappingLibrary().get(i);
             ArrayList<String> lstRcn = mol.getAllAPClasses();
             if (lstRcn.contains(cmpReac))
                 lstFragIdx.add(i);
@@ -1119,7 +1121,7 @@ public class EAUtils
                                   FragmentSpaceParameters.getRotSpaceDefFile(),
                                                                    true, true);
         
-	// get the set of possible RCA combinations = ring closures
+        // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler(
                                       FragmentSpace.getScaffoldLibrary(),
                                       FragmentSpace.getFragmentLibrary(),
@@ -1198,11 +1200,11 @@ public class EAUtils
             }
         }
 
-	// Update the IAtomContainer representation
-	DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
+        // Update the IAtomContainer representation
+        DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
         res[2] = mol;
 
-	// Update the SMILES representation
+        // Update the SMILES representation
         String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
         if (molsmiles == null)
         {
@@ -1211,9 +1213,9 @@ public class EAUtils
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             molsmiles = "FAIL: NO SMILES GENERATED";
         }
-	res[1] = molsmiles;
+        res[1] = molsmiles;
 
-	// Update the INCHI key representation
+        // Update the INCHI key representation
         ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
         if (pr.getFirst() == null)
         {
@@ -1221,7 +1223,7 @@ public class EAUtils
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             pr.setFirst("UNDEFINED");
         }
-	res[0] = pr.getFirst();
+        res[0] = pr.getFirst();
 
         if (DEBUG)
         {
@@ -1677,7 +1679,7 @@ MF: TO BE TESTED
      */
     
     public static double getGrowthProbabilityAtLevel(int level, int scheme, 
-    		double lambda, double sigmaOne, double sigmaTwo)
+                    double lambda, double sigmaOne, double sigmaTwo)
     {
         double prob = 0.0;
         
@@ -1732,10 +1734,12 @@ MF: TO BE TESTED
      * no verted ID is assigned to the chosen fragment by this method.
      */
 
-    protected static IdFragmentAndAP
-            selectClassBasedFragment(DENOPTIMAttachmentPoint curDap)
-                                                        throws DENOPTIMException
+    protected static IdFragmentAndAP selectClassBasedFragment(
+            DENOPTIMAttachmentPoint curDap) throws DENOPTIMException
     {
+        //TODO-C4
+        System.out.println("Gerring CB-frags for AP "+curDap);
+        
         String srcAPC = curDap.getAPClass();
         int fid = -1, apid = -1, rnd = -1;
         String chosenTrgAPC = null;
@@ -1784,19 +1788,19 @@ MF: TO BE TESTED
                 ArrayList<DENOPTIMAttachmentPoint> fragAPs =
                         FragmentSpace.getVertexFromLibrary(BBType.FRAGMENT, 
                                 fid).getAttachmentPoints();
-        		ArrayList<Integer> compatApIds = new ArrayList<Integer>();
-        		for (int i=0; i<fragAPs.size(); i++)
-        		{
-        		    //NB: here we check isAvailable because if the building 
-        		    // block is a template then some of its APc are not usable
-        		    // and therefore should not be listed here
-        		    
-        		    if (fragAPs.get(i).getAPClass().equals(chosenTrgAPC)
-        		            && fragAPs.get(i).isAvailable())
-        		    {
-        		        compatApIds.add(i);
-        		    }
-        		}
+                ArrayList<Integer> compatApIds = new ArrayList<Integer>();
+                for (int i=0; i<fragAPs.size(); i++)
+                {
+                    //NB: here we check isAvailable because if the building 
+                    // block is a template then some of its APc are not usable
+                    // and therefore should not be listed here
+                    
+                    if (fragAPs.get(i).getAPClass().equals(chosenTrgAPC)
+                            && fragAPs.get(i).isAvailable())
+                    {
+                        compatApIds.add(i);
+                    }
+                }
                 if (compatApIds.size() == 1)
                 {
                     apid = compatApIds.get(0);
