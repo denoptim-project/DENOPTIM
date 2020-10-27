@@ -173,17 +173,6 @@ public class ParallelEvolutionaryAlgorithm
         // create the directory for the current generation
         DenoptimIO.createDirectory(genDir);
 
-        // create a fragment pool based on the number of attachment points
-        if (!FragmentSpace.useAPclassBasedApproach()) {
-            EAUtils.poolFragments(FragmentSpace.getFragmentLibrary());
-        }
-        else
-        {
-            // create a fragment pool based on the reactions each fragment
-            // is associated with
-            EAUtils.poolAPClasses(FragmentSpace.getFragmentLibrary());
-        }
-
         // store all inchi keys
         HashSet<String> lstUID = new HashSet<>(1024);
 

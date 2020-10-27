@@ -74,16 +74,6 @@ public class EvolutionaryAlgorithm
         // create the directory for the current generation
         DenoptimIO.createDirectory(genDir);
 
-        // create a fragment pool based on the number of attachment points
-        if (!FragmentSpace.useAPclassBasedApproach())
-            EAUtils.poolFragments(FragmentSpace.getFragmentLibrary());
-        else
-        {
-            // create a fragment pool based on the reactions each fragment
-            // is associated with
-            EAUtils.poolAPClasses(FragmentSpace.getFragmentLibrary());
-        }
-
         // create the population
 
         // store all unique molecule ids (can be inchi codes)

@@ -688,7 +688,7 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
    
     public static HashMap<Integer,ArrayList<String>> 
-                                                    getMapAPClassesPerFragment()
+    getMapAPClassesPerFragment()
     {
         return apClassesPerFrag;
     }

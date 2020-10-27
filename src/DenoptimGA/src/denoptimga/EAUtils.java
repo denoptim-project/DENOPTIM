@@ -75,14 +75,8 @@ import denoptim.utils.RotationalSpaceUtils;
  * @author Marco Foscato
  */
 public class EAUtils
-{
-    // cluster the fragments based on their #APs
-    protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
-    
+{   
     protected static DecimalFormat df = new DecimalFormat();
-
-    // for each fragment store the reactions associated with it
-    protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
 
     // flag for debugging
     private static final boolean DEBUG = false;
@@ -593,46 +587,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * pools fragments based on the number of attachment points.
-     * This is done in order to make selection of fragments based on #APs easier
-     * @param bbs the list of building blocks to analyze
-     */
-    
-    //TODO-V3: Is this the right place for this...no. Move it into Fragment space
-    protected static void poolFragments(ArrayList<DENOPTIMVertex> bbs)
-    {
-        fragmentPool = new HashMap<>();
-
-        for (int i=0; i<bbs.size(); i++)
-        {
-            DENOPTIMVertex bb = bbs.get(i);
-            int len = bb.getNumberOfAP();
-            if (len != 0)
-                updatePool(fragmentPool, len, i);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * For each building block collect the reactions it is involved in
-     * @param bbs
-     */
-
-    protected static void poolAPClasses(ArrayList<DENOPTIMVertex> bbs)
-    {
-        lstFragmentClass = new HashMap<>();
-        for (int i=0; i<bbs.size(); i++)
-        {
-                DENOPTIMVertex v = bbs.get(i);
-            ArrayList<String> lstRcn = v.getAllAvailableAPClasses();
-            lstFragmentClass.put(i, lstRcn);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Select randomly a base fragment
      * @return index of a seed fragment
      */
@@ -751,7 +705,8 @@ public class EAUtils
         // select fragment with APs = maxAP
         if (equals)
         {
-            ArrayList<Integer> lst = fragmentPool.get(numAP);
+            ArrayList<Integer> lst = 
+                    FragmentSpace.getMapOfFragsPerNumAps().get(numAP);
             if (lst != null && lst.size() > 0)
             {
                 //int j = GAParameters.getRNG().nextInt(lst.size());
@@ -773,7 +728,8 @@ public class EAUtils
 
             if (numAP == 1)
             {
-                ArrayList<Integer> lst = fragmentPool.get(numAP);
+                ArrayList<Integer> lst = 
+                        FragmentSpace.getMapOfFragsPerNumAps().get(numAP);
                 if (lst != null && lst.size() > 0)
                 {
                     //int j = GAParameters.getRNG().nextInt(lst.size());
@@ -784,7 +740,8 @@ public class EAUtils
 
             for (int k=numAP-1; k>0; k--)
             {
-                ArrayList<Integer> lst = fragmentPool.get(k);
+                ArrayList<Integer> lst = 
+                        FragmentSpace.getMapOfFragsPerNumAps().get(k);
                 if (lst != null)
                     vlst.add(k);
             }
@@ -797,7 +754,8 @@ public class EAUtils
                 //int l = GAParameters.getRNG().nextInt(vlst.size());
                 int l = rng.nextInt(vlst.size());
                 int k = vlst.get(l);
-                ArrayList<Integer> lst = fragmentPool.get(k);
+                ArrayList<Integer> lst = 
+                        FragmentSpace.getMapOfFragsPerNumAps().get(k);
 
                 //int j = GAParameters.getRNG().nextInt(lst.size());
                 int j = rng.nextInt(lst.size());
@@ -1069,8 +1027,8 @@ public class EAUtils
     {
         ArrayList<Integer> lstFragIdx = new ArrayList<>();
 
-        Iterator<Map.Entry<Integer, ArrayList<String>>> entries =
-                                    lstFragmentClass.entrySet().iterator();
+        Iterator<Map.Entry<Integer, ArrayList<String>>> entries = FragmentSpace
+                .getMapAPClassesPerFragment().entrySet().iterator();
         while (entries.hasNext())
         {
             Map.Entry<Integer, ArrayList<String>> entry = entries.next();
@@ -1909,14 +1867,6 @@ MF: TO BE TESTED
         for (String str:lst)
             lstInchi.add(str);
         lst.clear();
-    }
-
-//------------------------------------------------------------------------------
-   
-    protected static void cleanup()
-    {
-        fragmentPool.clear();
-        lstFragmentClass.clear();        
     }
   
 //------------------------------------------------------------------------------    
