@@ -20,6 +20,8 @@
 package denoptim.molecule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -76,6 +78,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     private int level = -99; //Initialised to meaningless value
 
+    /**
+     * List of mutations that we can perform on this vertex
+     */
+    private Set<MutationType> allowedMutatioTypes = new HashSet<MutationType>(
+            Arrays.asList(MutationType.values()));
 
 //------------------------------------------------------------------------------
 
@@ -746,7 +753,24 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public abstract Set<MutationType> getMutationTypes();
+    public void setMutationTypes(Set<MutationType> set)
+    {
+        allowedMutatioTypes = set;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void addMutationType(MutationType mt)
+    {
+        allowedMutatioTypes.add(mt);
+    }
+    
+//------------------------------------------------------------------------------
+
+    public Set<MutationType> getMutationTypes()
+    {
+        return allowedMutatioTypes;
+    }
     
 //------------------------------------------------------------------------------
 

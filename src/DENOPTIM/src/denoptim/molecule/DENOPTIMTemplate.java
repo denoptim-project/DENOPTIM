@@ -230,12 +230,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         template.interiorGraph.addEdge(eAB);
         
+        
         /*
         System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
         System.out.println("TEMPLATE's APs: ");
         //for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints())
         //    System.out.println("  "+ap+" free="+ap.isAvailable());
         */
+        
+        template.freezeTemplate();
         
         return template;
     }
@@ -336,6 +339,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         //for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints())
         //    System.out.println("  "+ap+" free="+ap.isAvailable());
         */
+        
+        template.freezeTemplate();
         
         return template;
     }
@@ -501,6 +506,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public Set<DENOPTIMVertex> getMutationSites()
     {
         Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
+        
+        // I doubt templates will ever be used as capping groups, but
+        // just in case, then they are not considered mutable sites
+        if (buildingBlockType == BBType.CAP
+                || buildingBlockType == BBType.SCAFFOLD)
+        {
+            return set;
+        }
+
         switch (contractLevel)
         { 
             case 2:
@@ -519,14 +533,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             }
         }
         return set;
-    }
-    
-//------------------------------------------------------------------------------
-
-    @Override
-    public Set<MutationType> getMutationTypes()
-    {
-        return new HashSet<MutationType>(Arrays.asList(MutationType.values()));
     }
     
 //------------------------------------------------------------------------------

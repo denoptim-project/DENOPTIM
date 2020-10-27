@@ -1,8 +1,8 @@
 #!/bin/bash
 
 wrkDir=`pwd`
-logFile="t98.log"
-paramFile="t98.params"
+logFile="t97.log"
+paramFile="t97.params"
 
 mv data/* "$wrkDir"
 rm -rf data
@@ -23,10 +23,10 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-if ! grep -q 'TestOperator run completed' "$wrkDir"/t98.log
+if ! grep -q 'TestOperator run completed' "$wrkDir"/t97.log
 then
     echo " "
-    echo "Test 't98' NOT PASSED (symptom: completion msg not found)"
+    echo "Test 't97' NOT PASSED (symptom: completion msg not found)"
     exit 1
 else
     echo " "
