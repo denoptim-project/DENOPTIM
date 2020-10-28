@@ -316,9 +316,6 @@ public class TreeBuilder3D
                              +"-"+mol.getAtomNumber(b.getAtom(1))+" AP = "+ap);
                 }
             }
-	    System.out.println("PAUSE: end of "
-			       +"TreeBuilder3D.convertGraphTo3DAtomContainer");
-            GenUtils.pause();
         }
 
         return mol;
@@ -350,6 +347,7 @@ public class TreeBuilder3D
         if (debug)
         {
             System.err.println("Appending 3D fragment via edge: "+edge);
+            System.err.println("#Atoms on growing mol: "+mol.getAtomCount());
         }
 
         // Get the incoming fragment
@@ -383,6 +381,12 @@ public class TreeBuilder3D
             System.err.println("ERROR! TreeBuilder3D not ready to deal with "
                     + "anything else than DENOPTIMFragments!!!");
             System.exit(-1);
+        }
+        
+        if (debug)
+        {
+            System.err.println("Incoming vertex : "+inVtx);
+            System.err.println("Incoming IAC #atoms: "+inFragOri.getAtomCount());
         }
         
         IAtomContainer inFrag = new AtomContainer();
@@ -435,7 +439,7 @@ public class TreeBuilder3D
 
         if (debug)
         {
-	    System.err.println("After first translation and Before rotation");
+            System.err.println("After first translation and Before rotation");
             System.err.println("srcApA "+srcApA);
             System.err.println("trgApA "+trgApA);
             System.err.println("vectApA "+vectApA);
@@ -600,6 +604,7 @@ public class TreeBuilder3D
             // For vertices other than the first AtomPositionNumber in mol
             int atmPos = oriAP.getAtomPositionNumber() + preNumAtms;
             DENOPTIMAttachmentPoint newAP = oriAP.clone();
+            newAP.setAtomPositionNumber(atmPos);
             apsOnThisFrag.add(newAP);
             IAtom srcAtm = mol.getAtom(atmPos);
             if (apsPerAtom.containsKey(srcAtm))
@@ -627,7 +632,7 @@ public class TreeBuilder3D
         // Remember also relation between APs and bonds in the IAtomContainer
         IBond b = mol.getBond(mol.getAtom(idSrcAtmA),mol.getAtom(newIdSrcAtmB));
         apsPerBond.put(b,apsPerEdge.get(edge));
-
+        
         // Recursion on all the edges leaving from this fragment
         for (int iEdge : graph.getIndexOfEdgesWithChild(idInVrx))
         {
