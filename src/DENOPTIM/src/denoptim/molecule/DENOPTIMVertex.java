@@ -151,8 +151,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Builds a new molecular fragment kind of vertex.
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
-     * @param bbType the type of building block 0:scaffold, 1:fragment, 
-     * 2:capping group
+     * @param bbt the type of building block
      */
     public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
             BBType bbt)
@@ -624,13 +623,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
             // create a new edge
             DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
-                    target.getVertexId(),
-                    sourceAPIndex,
-                    targetAPIndex,
-                    bndTyp);
-            
-            edge.setSourceReaction(srcAPC);
-            edge.setTargetReaction(trgAPC);
+                    target.getVertexId(), sourceAPIndex, targetAPIndex,
+                    bndTyp, srcAPC, trgAPC);
 
             // update the attachment point info
             sourceAP.updateFreeConnections(-bndTyp.getValence());

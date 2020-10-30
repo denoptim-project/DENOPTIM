@@ -23,9 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -81,9 +78,9 @@ public class DENOPTIMEdgeTest
     public void testSameAs_SameAPClass() throws Exception
     {
     	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eA.setSourceReaction("classA");
+    	eA.setSrcApClass("classA");
     	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eB.setSourceReaction("classA");
+    	eB.setSrcApClass("classA");
     	
     	assertTrue(eA.sameAs(eB, reason));	
     }
@@ -94,9 +91,9 @@ public class DENOPTIMEdgeTest
     public void testSameAs_DiffAPClass() throws Exception
     {
     	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eA.setSourceReaction("classA");
+    	eA.setSrcApClass("classA");
     	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eB.setSourceReaction("classB");
+    	eB.setSrcApClass("classB");
     	
     	assertFalse(eA.sameAs(eB, reason));	
     }

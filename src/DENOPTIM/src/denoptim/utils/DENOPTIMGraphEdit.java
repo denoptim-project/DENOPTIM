@@ -21,22 +21,15 @@ package denoptim.utils;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.io.Serializable;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.*;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.rings.ClosableChain;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
 
 
 /**
@@ -231,7 +224,7 @@ public class DENOPTIMGraphEdit
 		        {
 		        	srcAPC = strPrts[5];
 		        }
-		        this.focusEdge.setSourceReaction(srcAPC);
+		        this.focusEdge.setSrcApClass(srcAPC);
 
                 //target APClass
                 String trgAPC = "*";
@@ -239,7 +232,7 @@ public class DENOPTIMGraphEdit
                 {
                     trgAPC = strPrts[6];
                 }
-			this.focusEdge.setTargetReaction(trgAPC);
+			this.focusEdge.setTrgApClass(trgAPC);
 		    }
         }
 

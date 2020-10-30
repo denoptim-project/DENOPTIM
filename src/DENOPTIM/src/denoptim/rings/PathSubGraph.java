@@ -20,14 +20,9 @@ package denoptim.rings;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
-import java.util.HashMap;
 
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.AxisAngle4d;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -37,14 +32,8 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
-import denoptim.rings.RingClosureFinder;
 import denoptim.threedim.TreeBuilder3D;
-import denoptim.utils.GenUtils;
-import denoptim.utils.ObjectPair;
 
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -276,26 +265,26 @@ public class PathSubGraph
             if (vertHere == turningPointVert)
             {
                 insideOut = true;
-                apIdBack2Here = edgeToBack.getTargetDAP();
-                apIdHere2Back = edgeToBack.getSourceDAP();
-                apIdHere2Frnt = edgeToFrnt.getSourceDAP();
-                apIdFrnt2Here = edgeToFrnt.getTargetDAP();
+                apIdBack2Here = edgeToBack.getTrgApIndex();
+                apIdHere2Back = edgeToBack.getSrcApIndex();
+                apIdHere2Frnt = edgeToFrnt.getSrcApIndex();
+                apIdFrnt2Here = edgeToFrnt.getTrgApIndex();
             }
             else
             {
                 if (insideOut)
                 {
-                    apIdBack2Here = edgeToBack.getSourceDAP();
-                    apIdHere2Back = edgeToBack.getTargetDAP();
-                    apIdHere2Frnt = edgeToFrnt.getSourceDAP();
-                    apIdFrnt2Here = edgeToFrnt.getTargetDAP();
+                    apIdBack2Here = edgeToBack.getSrcApIndex();
+                    apIdHere2Back = edgeToBack.getTrgApIndex();
+                    apIdHere2Frnt = edgeToFrnt.getSrcApIndex();
+                    apIdFrnt2Here = edgeToFrnt.getTrgApIndex();
                 }
                 else
                 {
-                    apIdBack2Here = edgeToBack.getTargetDAP();
-                    apIdHere2Back = edgeToBack.getSourceDAP();
-                    apIdHere2Frnt = edgeToFrnt.getTargetDAP();
-                    apIdFrnt2Here = edgeToFrnt.getSourceDAP();
+                    apIdBack2Here = edgeToBack.getTrgApIndex();
+                    apIdHere2Back = edgeToBack.getSrcApIndex();
+                    apIdHere2Frnt = edgeToFrnt.getTrgApIndex();
+                    apIdFrnt2Here = edgeToFrnt.getSrcApIndex();
                 }
             }
 

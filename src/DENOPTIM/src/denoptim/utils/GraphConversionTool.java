@@ -21,19 +21,16 @@ package denoptim.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.*;
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -119,15 +116,15 @@ public class GraphConversionTool
             DENOPTIMEdge edge = g.getEdgeList().get(i);
 
             // get the vertex ids
-            int v1_id = edge.getSourceVertex();
-            int v2_id = edge.getTargetVertex();
+            int v1_id = edge.getSrcVertex();
+            int v2_id = edge.getTrgVertex();
 
 
             DENOPTIMVertex v1 = g.getVertexWithId(v1_id);
             DENOPTIMVertex v2 = g.getVertexWithId(v2_id);
 
-            int dap_idx_v1 = edge.getSourceDAP();
-            int dap_idx_v2 = edge.getTargetDAP();
+            int dap_idx_v1 = edge.getSrcApIndex();
+            int dap_idx_v2 = edge.getTrgApIndex();
 
             int dap1_anum = -1;
             try
@@ -378,8 +375,8 @@ public class GraphConversionTool
     
                 if (s4.length > 5)
                 {
-                    ne.setSourceReaction(s4[5]);
-                    ne.setTargetReaction(s4[6]);
+                    ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
+                            trgDAP, btype, s4[5], s4[6]);
                 }
                 edges.add(ne);
             }
@@ -442,10 +439,10 @@ public class GraphConversionTool
         {
             DENOPTIMEdge edge = edges.get(i);
             BondType bndTyp = edge.getBondType();
-            int srcvid = edge.getSourceVertex();
-            int trgvid = edge.getTargetVertex();
-            int iA = edge.getSourceDAP();
-            int iB = edge.getTargetDAP();
+            int srcvid = edge.getSrcVertex();
+            int trgvid = edge.getTrgVertex();
+            int iA = edge.getSrcApIndex();
+            int iB = edge.getTrgApIndex();
 
             //System.err.println("iA=" + iA + " " + "iB=" + iB);
 
@@ -496,7 +493,7 @@ public class GraphConversionTool
             int vid = r.getHeadVertex().getVertexId();
             for (DENOPTIMEdge e : edges)
             {
-                if (e.getTargetVertex() == vid || e.getSourceVertex() == vid)
+                if (e.getTrgVertex() == vid || e.getSrcVertex() == vid)
                 {
                     r.setBondType(e.getBondType());
                     break;

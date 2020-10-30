@@ -1324,23 +1324,23 @@ public class CyclicGraphHandler
         int vIdI = vI.getVertexId();
         int edgeIdI = molGraph.getIndexOfEdgeWithParent(vIdI);
         DENOPTIMEdge edgeI = molGraph.getEdgeAtPosition(edgeIdI);
-        int srcApIdI = edgeI.getSourceDAP();
+        int srcApIdI = edgeI.getSrcApIndex();
         DENOPTIMVertex pvI = molGraph.getParent(vIdI);
         DENOPTIMAttachmentPoint srcApI = pvI.getAttachmentPoints().get(
                                                                     srcApIdI);
         int srcAtmIdI = srcApI.getAtomPositionNumber();
-        String parentAPClsI = edgeI.getSourceReaction();
+        String parentAPClsI = edgeI.getSrcApClass();
 
         // Get details on the second vertex (tail)
         int vIdJ = vJ.getVertexId();
         int edgeIdJ = molGraph.getIndexOfEdgeWithParent(vIdJ);
         DENOPTIMEdge edgeJ = molGraph.getEdgeAtPosition(edgeIdJ);
-        int srcApIdJ = edgeJ.getSourceDAP();
+        int srcApIdJ = edgeJ.getSrcApIndex();
         DENOPTIMVertex pvJ = molGraph.getParent(vIdJ);
         DENOPTIMAttachmentPoint srcApJ =
                                       pvJ.getAttachmentPoints().get(srcApIdJ);
         int srcAtmIdJ = srcApJ.getAtomPositionNumber();
-        String parentAPClsJ = edgeJ.getSourceReaction();
+        String parentAPClsJ = edgeJ.getSrcApClass();
         
         // exclude if no entry in RC-Compatibility map
         if (!rcCPMap.containsKey(parentAPClsI))
@@ -1788,7 +1788,7 @@ public class CyclicGraphHandler
 
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeAtPosition(
                                        molGraph.getIndexOfEdgeWithParent(vId));
-                String apClassToScaffold = edgeToParnt.getTargetReaction();
+                String apClassToScaffold = edgeToParnt.getTrgApClass();
 //TODO-V3: change. hard coded class of ligand
                 if (!apClassToScaffold.equals("MAmine:1"))
                 {

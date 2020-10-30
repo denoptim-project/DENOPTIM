@@ -71,9 +71,7 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.GraphUtils;
 
 
 /**
@@ -1497,13 +1495,13 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		for (DENOPTIMEdge dnE : dnG.getEdgeList())
 		{
-			String srcIdx = Integer.toString(dnE.getSourceVertex());
-			String trgIdx = Integer.toString(dnE.getTargetVertex());
+			String srcIdx = Integer.toString(dnE.getSrcVertex());
+			String trgIdx = Integer.toString(dnE.getTrgVertex());
 			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,true);
-			e.setAttribute("dnp.srcAPId", dnE.getSourceDAP());
-			e.setAttribute("dnp.trgAPId", dnE.getTargetDAP());
-			e.setAttribute("dnp.srcAPClass", dnE.getSourceReaction());
-			e.setAttribute("dnp.trgAPClass", dnE.getTargetReaction());
+			e.setAttribute("dnp.srcAPId", dnE.getSrcApIndex());
+			e.setAttribute("dnp.trgAPId", dnE.getTrgApIndex());
+			e.setAttribute("dnp.srcAPClass", dnE.getSrcApClass());
+			e.setAttribute("dnp.trgAPClass", dnE.getTrgApClass());
 			e.setAttribute("dnp.bondType", dnE.getBondType());
 		}
 		 

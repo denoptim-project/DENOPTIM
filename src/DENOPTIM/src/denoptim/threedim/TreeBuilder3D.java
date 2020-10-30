@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Matrix3d;
@@ -44,11 +43,9 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.GenUtils;
 
 
 /**
@@ -234,7 +231,7 @@ public class TreeBuilder3D
 
             // Get the AP from the current vertex to the next
             DENOPTIMAttachmentPoint apSrc = apsOnThisFrag.get(
-                                                           edge.getSourceDAP());
+                                                           edge.getSrcApIndex());
             int atmPosApSrc = apSrc.getAtomPositionNumber();
 
             // Add AP to the map of APs per Edges
@@ -351,7 +348,7 @@ public class TreeBuilder3D
         }
 
         // Get the incoming fragment
-        DENOPTIMVertex inVtx = graph.getVertexWithId(edge.getTargetVertex());
+        DENOPTIMVertex inVtx = graph.getVertexWithId(edge.getTrgVertex());
         int idInVrx = inVtx.getVertexId();
         
         if (!inVtx.containsAtoms())
@@ -409,7 +406,7 @@ public class TreeBuilder3D
         }
 
         // Get the attachment point on the incoming fragment (i.e., ApB)
-        int idApB = edge.getTargetDAP();
+        int idApB = edge.getTrgApIndex();
         DENOPTIMAttachmentPoint apB = inVtx.getAttachmentPoints().get(idApB);
         int idSrcAtmB = apB.getAtomPositionNumber();
         Point3d trgApB = new Point3d(allApsAsPt3D.get(idApB));
@@ -640,7 +637,7 @@ public class TreeBuilder3D
 
             // Get the AP from the current vertex to the next
             DENOPTIMAttachmentPoint nextApA =
-                    apsOnThisFrag.get(nextEdge.getSourceDAP());
+                    apsOnThisFrag.get(nextEdge.getSrcApIndex());
             int newIdSrcAtmA = nextApA.getAtomPositionNumber();
 
             // Add AP to the map of APs per Edges

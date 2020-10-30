@@ -333,7 +333,7 @@ public class Molecule3DBuilder
         int vtxId = tatm.getVertexId();
         int edgeId = molGraph.getIndexOfEdgeWithParent(vtxId);
         DENOPTIMEdge edge = molGraph.getEdgeAtPosition(edgeId);
-        cls = edge.getSourceReaction();
+        cls = edge.getSrcApClass();
         return cls;
     }
 
@@ -826,7 +826,7 @@ public class Molecule3DBuilder
             int vtxId = nTa.getVertexId();
             int edgeId = nMolGraph.getIndexOfEdgeWithParent(vtxId);
             DENOPTIMEdge edge = nMolGraph.getEdgeAtPosition(edgeId);
-            cls = edge.getSourceReaction();
+            cls = edge.getSrcApClass();
             nRca.setApClass(cls);
             nAttractors.add(nRca);
             nAttToAtmID.put(nRca,ioatm);
