@@ -1656,14 +1656,12 @@ public class DenoptimIO
     		boolean useFragSpace) throws DENOPTIMException
     {
     	String filename = file.getAbsolutePath();
-    	ArrayList<DENOPTIMMolecule> mols = new ArrayList<DENOPTIMMolecule>();
+    	ArrayList<DENOPTIMMolecule> mols = new ArrayList<>();
     	ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
     	for (IAtomContainer iac : iacs)
     	{   			
     		DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
-            
             mol.setMoleculeFile(filename);
-            
             mols.add(mol);
     	}
     	

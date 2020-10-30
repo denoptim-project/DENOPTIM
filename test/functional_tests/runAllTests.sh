@@ -139,32 +139,32 @@ runTest "t1"
 #
 # t2: parallel combinatorial builder from given root (default format: STRING)
 #
-runTest "t2"
+#runTest "t2"
 
 #
 # t3: parallel combinatorial builder with enforced symmetry
 #
-runTest "t3"
+#runTest "t3"
 
 #
 # t4: parallel combinatorial builder from STRING-like user-provided root graph and enforced symmetry
 #
-runTest "t4"
+#runTest "t4"
 
 #
 # t5: parallel combinatorial building til exhaustion of space
 #
-runTest "t5"
+#runTest "t5"
 
 #
 # p6: partial exploration of fragment space that generates checkpoint and serialized graphs for other tests.
 #
-runTest "p6"
+#runTest "p6"
 
 #
 # t6: restart FragSpaceExplorer from checkpoint file; non-first, non-last iteration
 #
-runTest "t6"
+#runTest "t6"
 
 #
 # p7: exploration of fragment space that generates serialized graphs for t7
@@ -180,22 +180,22 @@ runTest "t6"
 #
 # t8: conversion of serialized checkpoint file to human readable string
 #
-runTest "t8"
+#runTest "t8"
 
 #
 # t9: FragSpaceExplorer with symmetry constraints
 #
-runTest "t9"
+#runTest "t9"
 
 #
 # t10: FragSpaceExplorer with symmetry constraints and enforced symmetry
 #
-runTest "t10"
+#runTest "t10"
 
 #
 # t11: Genetic algorithm running with enforced symmetry.
 #
-runTest "t11"
+#runTest "t11"
 
 #
 # t12: Genetic algorithm running with symmetry constraints.

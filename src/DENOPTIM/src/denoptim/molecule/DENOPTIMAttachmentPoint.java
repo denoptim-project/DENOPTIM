@@ -177,9 +177,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
      * method of DENOPTIMAttachmentPoint.
      * @throws DENOPTIMException
      */
-    public DENOPTIMAttachmentPoint(String str, String format)
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, String str,
+                                   String format)
     		throws DENOPTIMException
     {
+        this(owner);
+//        id = FragmentSpace.apID.getAndIncrement();
     	switch (format)
     	{
     		case "SDF":
@@ -194,7 +197,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable
     			throw new DENOPTIMException("Unknown format for string "
     					+ "representation of DENOPTIMAttachmentPoint");
     	}
-    	id = FragmentSpace.apID.getAndIncrement();
     }
 //-----------------------------------------------------------------------------
 	

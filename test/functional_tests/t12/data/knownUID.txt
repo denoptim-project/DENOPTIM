@@ -1,4 +1,0 @@
-MMMMMMMMMMMMMM-UHFFFAOYSA-N
-This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;
-This UID is also in the UIDFileIn, 12345, .;-_@*
-PPPPPPPPPPPPPP-UHFFFAOYSA-N

@@ -730,7 +730,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    		DENOPTIMConstants.SEPARATORAPPROPAPS);
 			    
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(moreAPonThisAtm[0],"SDF");
+			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0],
+                                "SDF");
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
@@ -740,7 +741,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    	//WARNING here we have to switch to 1-based enumeration
 			    	// because we import from SDF string
 					DENOPTIMAttachmentPoint apMany = 
-							new DENOPTIMAttachmentPoint(atmID+1 
+							new DENOPTIMAttachmentPoint(this, atmID+1
 									+ DENOPTIMConstants.SEPARATORAPPROPAAP
 									+ moreAPonThisAtm[j], "SDF");
 					allAPs.add(apMany);
@@ -749,7 +750,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			else 
 			{
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(onThisAtm,"SDF");
+			    		new DENOPTIMAttachmentPoint(this, onThisAtm,"SDF");
 			    allAPs.add(ap);
 			}
 	    }

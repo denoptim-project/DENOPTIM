@@ -68,11 +68,15 @@ public class DENOPTIMAttachmentPointTest
     	ap.setDirectionVector(DIRVEC);
     	
     	String str2 = ap.getSingleAPStringSDF(true);
-    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(str2,"SDF");
+    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
+				, str2,
+				"SDF");
     	
     	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
     			+ ap.getSingleAPStringSDF(false);
-    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(str3,"SDF");
+    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
+				, str3,
+				"SDF");
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));
@@ -90,11 +94,14 @@ public class DENOPTIMAttachmentPointTest
     	ap.setAtomPositionNumber(ATMID);
     	
     	String str2 = ap.getSingleAPStringSDF(true);
-    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(str2,"SDF");
+    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
+				, str2,"SDF");
     	
     	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
     			+ ap.getSingleAPStringSDF(false);
-    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(str3,"SDF");
+    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
+				, str3,
+				"SDF");
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));

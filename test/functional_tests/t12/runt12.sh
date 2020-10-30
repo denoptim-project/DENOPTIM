@@ -20,7 +20,7 @@ exec 6>&1
 exec > "$logFile"
 exec 2>&1
 "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimGA.jar" "$paramFile"
-exec 1>&6 6>&- 
+exec 1>&6 6>&-
 
 #Check outcome
 function isInUIDVector() {
@@ -73,4 +73,3 @@ else
     echo "Test 't12' PASSED"
 fi
 exit 0
-
