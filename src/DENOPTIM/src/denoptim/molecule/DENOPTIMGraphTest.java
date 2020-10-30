@@ -77,17 +77,17 @@ public class DENOPTIMGraphTest {
 		buildVertexAndConnectToGraph(v7, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(4, 7, 2, 0));
 
-		graph.addRing(new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+		graph.addRing(new DENOPTIMRing(new ArrayList<>(
 				Arrays.asList(v5, v4, v0, v1, v2, v3))));
 
-		graph.addRing(new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+		graph.addRing(new DENOPTIMRing(new ArrayList<>(
 				Arrays.asList(v6, v0, v4, v7))));
 
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<Integer>(Arrays.asList(3, 5))));
+				new ArrayList<>(Arrays.asList(3, 5))));
 
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<Integer>(Arrays.asList(6, 7))));
+				new ArrayList<>(Arrays.asList(6, 7))));
 
 		// Current string encoding this graph is
 //    	  "0 0_1_0_0,1_1_1_0,2_1_1_0,3_1_1_0,4_1_1_0,5_1_1_0,"
@@ -476,13 +476,13 @@ public class DENOPTIMGraphTest {
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0));
 
-		ArrayList<DENOPTIMVertex> vrA = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrA = new ArrayList<>();
 		vrA.add(v1);
 		vrA.add(v0);
 		vrA.add(v2);
 		DENOPTIMRing rA = new DENOPTIMRing(vrA);
 		graphA.addRing(rA);
-		ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<>();
 		vrA2.add(v3);
 		vrA2.add(v0);
 		vrA2.add(v4);
@@ -512,13 +512,13 @@ public class DENOPTIMGraphTest {
 		buildVertexAndConnectToGraph(v4b, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(90, 94, 3, 0));
 
-		ArrayList<DENOPTIMVertex> vrB = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrB = new ArrayList<>();
 		vrB.add(v1b);
 		vrB.add(v0b);
 		vrB.add(v2b);
 		DENOPTIMRing rB = new DENOPTIMRing(vrB);
 		graphB.addRing(rB);
-		ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<>();
 		vrB2.add(v4b);
 		vrB2.add(v0b);
 		vrB2.add(v3b);
@@ -559,13 +559,13 @@ public class DENOPTIMGraphTest {
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(0, 4, 3, 0));
 
-		ArrayList<DENOPTIMVertex> vrA = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrA = new ArrayList<>();
 		vrA.add(v1);
 		vrA.add(v0);
 		vrA.add(v2);
 		DENOPTIMRing rA = new DENOPTIMRing(vrA);
 		graphA.addRing(rA);
-		ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrA2 = new ArrayList<>();
 		vrA2.add(v3);
 		vrA2.add(v0);
 		vrA2.add(v4);
@@ -595,13 +595,13 @@ public class DENOPTIMGraphTest {
 		buildVertexAndConnectToGraph(v4b, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(90, 94, 3, 0));
 
-		ArrayList<DENOPTIMVertex> vrB = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrB = new ArrayList<>();
 		vrB.add(v1b);
 		vrB.add(v0b);
 		vrB.add(v4b);
 		DENOPTIMRing rB = new DENOPTIMRing(vrB);
 		graphB.addRing(rB);
-		ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<DENOPTIMVertex>();
+		ArrayList<DENOPTIMVertex> vrB2 = new ArrayList<>();
 		vrB2.add(v2b);
 		vrB2.add(v0b);
 		vrB2.add(v3b);
@@ -680,10 +680,10 @@ public class DENOPTIMGraphTest {
 		buildVertexAndConnectToGraph(v7, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(4, 7, 2, 0));
 
-		graph.addRing(new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+		graph.addRing(new DENOPTIMRing(new ArrayList<>(
 				Arrays.asList(v5, v4, v0, v1, v2, v3))));
 
-		graph.addRing(new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+		graph.addRing(new DENOPTIMRing(new ArrayList<>(
 				Arrays.asList(v6, v0, v4, v7))));
 
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
@@ -832,7 +832,7 @@ public class DENOPTIMGraphTest {
 
 //------------------------------------------------------------------------------
 
-	private ArrayList<DENOPTIMAttachmentPoint> buildVertexAndConnectToGraph(
+	private void buildVertexAndConnectToGraph(
 			DENOPTIMVertex v, int apCount, DENOPTIMGraph graph) {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
@@ -844,6 +844,5 @@ public class DENOPTIMGraphTest {
 		v.setAttachmentPoints(aps);
 		graph.addVertex(v);
 //		graph.addEdge(new DENOPTIMEdge(0, 1, 0, 0));
-		return aps;
 	}
 }
