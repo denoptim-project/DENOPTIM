@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: graphlistshandler.GraphListsHandler
+Class-Path: lib/cdk-1.4.19.jar lib/DENOPTIM.jar lib/commons-io-2.4.jar
+

@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: testoperator.TestOperator
-Class-Path: lib/cdk-1.4.19.jar lib/vecmath.jar lib/DENOPTIM.jar DenoptimGA.jar
+Class-Path: lib/cdk-1.4.19.jar lib/DENOPTIM.jar DenoptimGA.jar
 
