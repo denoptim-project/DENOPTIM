@@ -768,4 +768,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Get attachment point i on this vertex
+     * @param i index of attachment point on this vertex
+     * @return attachment point i on this vertex
+     */
+    public DENOPTIMAttachmentPoint getAP(int i) {
+        return getAttachmentPoints().get(i);
+    }
+
 }
