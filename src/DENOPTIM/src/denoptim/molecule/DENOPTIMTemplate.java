@@ -166,7 +166,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         template.interiorGraph.addVertex(vrtx);
         template.interiorGraph.addVertex(vrtx2);
-        template.interiorGraph.addEdge(new DENOPTIMEdge(0,1,0,1));
+        template.interiorGraph.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
+                vrtx2.getAP(1), 0,1,0,1));
         
         //Fully frozen
         template.contractLevel = contractLevel;

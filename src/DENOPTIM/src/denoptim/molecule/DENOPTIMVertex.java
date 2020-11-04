@@ -683,8 +683,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         
         // create a new edge
-        DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(), other.getVertexId(),
-                iA, iB, BondType.parseInt(chosenBO));
+        DENOPTIMEdge edge = new DENOPTIMEdge(getAP(iA), other.getAP(iB),
+                getVertexId(), other.getVertexId(), iA, iB,
+                BondType.parseInt(chosenBO));
 
         // update the attachment point info
         dap_A.updateFreeConnections(-chosenBO); // decrement the connections
@@ -777,4 +778,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         return getAttachmentPoints().get(i);
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Add ap to the end of the list of this vertex's list of attachment points
+     * @param ap attachment point to add to this vertex
+     */
+    public void addAP(DENOPTIMAttachmentPoint ap) {
+        getAttachmentPoints().add(ap);
+    }
 }

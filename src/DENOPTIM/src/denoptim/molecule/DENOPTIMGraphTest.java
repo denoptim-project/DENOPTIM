@@ -632,7 +632,8 @@ public class DENOPTIMGraphTest {
 		DENOPTIMVertex vertex1 = new EmptyVertex(1);
 		vertex1.setAttachmentPoints(new ArrayList<>(Arrays.asList(ap0)));
 
-		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getVertexId(),
+		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getAP(0),
+				vertex1.getAP(0), vertex0.getVertexId(),
 				vertex1.getVertexId(), 0, 0);
 
 		DENOPTIMGraph graph = new DENOPTIMGraph();

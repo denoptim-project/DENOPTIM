@@ -293,24 +293,21 @@ public class PathSubGraph
 			     + apIdHere2Back + "_" + revChainID; 
 
             // Build the DENOPTIMGraph with edges directed from VA to VB
-            if (i == 1)
-            {
+            if (i == 1) {
                 gVertices.add(vertBack);
             }
             gVertices.add(vertHere);
-            gEdges.add(new DENOPTIMEdge(vertBack.getVertexId(),
-                                        vertHere.getVertexId(),
-                                        apIdBack2Here,
-                                        apIdHere2Back,
-                                        edgeToBack.getBondType()));
+            gEdges.add(new DENOPTIMEdge(vertBack.getAP(apIdBack2Here),
+                    vertHere.getAP(apIdHere2Back), vertBack.getVertexId(),
+                    vertHere.getVertexId(), apIdBack2Here, apIdHere2Back,
+                    edgeToBack.getBondType()));
             if (i == vertPathVAVB.size()-2)
             {
                 gVertices.add(vertFrnt);
-                gEdges.add(new DENOPTIMEdge(vertHere.getVertexId(),
-                                            vertFrnt.getVertexId(),
-                                            apIdHere2Frnt,
-                                            apIdFrnt2Here,
-                                            edgeToFrnt.getBondType()));
+                gEdges.add(new DENOPTIMEdge(vertHere.getAP(apIdHere2Frnt),
+                        vertFrnt.getAP(apIdFrnt2Here), vertHere.getVertexId(),
+                        vertFrnt.getVertexId(), apIdHere2Frnt, apIdFrnt2Here,
+                        edgeToFrnt.getBondType()));
             }
         }
 

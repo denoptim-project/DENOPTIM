@@ -2419,7 +2419,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         else
         {
-            edge = new DENOPTIMEdge(parentVertex.getVertexId(),
+            edge = new DENOPTIMEdge(parentVertex.getAP(parentAPIdx),
+                    cvClone.getAP(childAPIdx), parentVertex.getVertexId(),
                     cvClone.getVertexId(), parentAPIdx, childAPIdx, bndType);
             // decrement the num. of available connections
             dap_Parent.updateFreeConnections(-bndType.getValence());

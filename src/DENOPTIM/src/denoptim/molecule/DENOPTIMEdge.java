@@ -87,24 +87,20 @@ public class DENOPTIMEdge implements Serializable,Cloneable
     public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAp,
                         DENOPTIMAttachmentPoint trgAp, int srcVertex,
                         int trgVertex, int srcApIndex, int trgApIndex) {
-        this(srcVertex, trgVertex, srcApIndex, trgApIndex, BondType.SINGLE);
-        this.srcAp = srcAp;
-        this.trgAp = trgAp;
+        this(srcAp, trgAp, srcVertex, trgVertex, srcApIndex, trgApIndex,
+                BondType.SINGLE);
     }
 
-
 //------------------------------------------------------------------------------
-    
-    /**
-     * Constructor for an edge from all parameters
-     * @param srcVertex vertex ID of the source vertex
-     * @param trgVertex vertex ID of the target vertex
-     * @param srcApIndex index of the AP on the source vertex
-     * @param trgApIndex index of the AP on the target vertex
-     */
-    public DENOPTIMEdge(int srcVertex, int trgVertex, int srcApIndex, int trgApIndex)
+
+    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAp,
+                        DENOPTIMAttachmentPoint trgAp, int srcVertex,
+                        int trgVertex, int srcApIndex, int trgApIndex,
+                        BondType bondType)
     {
-        this(srcVertex, trgVertex, srcApIndex, trgApIndex, BondType.SINGLE);
+        this(srcVertex, trgVertex, srcApIndex, trgApIndex, bondType, "", "");
+        this.srcAp = srcAp;
+        this.trgAp = trgAp;
     }
 
 //------------------------------------------------------------------------------

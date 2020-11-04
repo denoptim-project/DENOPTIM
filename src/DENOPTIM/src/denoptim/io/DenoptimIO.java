@@ -120,8 +120,7 @@ import org.openscience.cdk.smiles.InvPair;
 import java.util.logging.Level;
 
 
-public class DenoptimIO
-{
+public class DenoptimIO {
     private static final String NL = System.getProperty("line.separator");
 
     // A list of properties used by CDK algorithms which must never be
@@ -129,7 +128,7 @@ public class DenoptimIO
 
     private static final ArrayList<String> cdkInternalProperties
             = new ArrayList<>(Arrays.asList(new String[]
-                {InvPair.CANONICAL_LABEL, InvPair.INVARIANCE_PAIR}));
+            {InvPair.CANONICAL_LABEL, InvPair.INVARIANCE_PAIR}));
 
 //------------------------------------------------------------------------------
 
@@ -141,56 +140,39 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<IAtomContainer> readLinksToMols(String fileName)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
         String sCurrentLine;
 
         BufferedReader br = null;
 
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((sCurrentLine = br.readLine()) != null)
-            {
+            while ((sCurrentLine = br.readLine()) != null) {
                 sCurrentLine = sCurrentLine.trim();
-                if (sCurrentLine.length() == 0)
-                {
+                if (sCurrentLine.length() == 0) {
                     continue;
                 }
                 if (GenUtils.getFileExtension(sCurrentLine).
-                        compareToIgnoreCase(".smi") == 0)
-                {
+                        compareToIgnoreCase(".smi") == 0) {
                     throw new DENOPTIMException("Fragment files in SMILES format not supported.");
                 }
 
                 ArrayList<IAtomContainer> mols = readSDFFile(sCurrentLine);
                 lstContainers.addAll(mols);
             }
-        }
-        catch (FileNotFoundException fnfe)
-        {
+        } catch (FileNotFoundException fnfe) {
             throw new DENOPTIMException(fnfe);
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        catch (DENOPTIMException de)
-        {
+        } catch (DENOPTIMException de) {
             throw de;
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -209,39 +191,28 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<IAtomContainer> readSDFFile(String fileName)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         MDLV2000Reader mdlreader = null;
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
 
-        try
-        {
+        try {
             mdlreader = new MDLV2000Reader(new FileReader(new File(fileName)));
             ChemFile chemFile = (ChemFile) mdlreader.read((ChemObject) new ChemFile());
             lstContainers.addAll(
                     ChemFileManipulator.getAllAtomContainers(chemFile));
-        }
-        catch (CDKException | IOException cdke)
-        {
+        } catch (CDKException | IOException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        finally
-        {
-            try
-            {
-                if (mdlreader != null)
-                {
+        } finally {
+            try {
+                if (mdlreader != null) {
                     mdlreader.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
 
-        if (lstContainers.isEmpty())
-        {
+        if (lstContainers.isEmpty()) {
             throw new DENOPTIMException("No data found in " + fileName);
         }
 
@@ -250,7 +221,7 @@ public class DenoptimIO
     }
 
 //------------------------------------------------------------------------------
-    
+
     /**
      * Reads a file SDF file possible containing multiple molecules,
      * and returns only the first one.
@@ -260,44 +231,32 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static IAtomContainer readSingleSDFFile(String fileName)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         MDLV2000Reader mdlreader = null;
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
 
-        try
-        {
-	    if (!checkExists(fileName))
-	    {
-		String msg = "ERROR! file '" + fileName + "' not found!";
-		throw new DENOPTIMException(msg);
-	    }
+        try {
+            if (!checkExists(fileName)) {
+                String msg = "ERROR! file '" + fileName + "' not found!";
+                throw new DENOPTIMException(msg);
+            }
             mdlreader = new MDLV2000Reader(new FileReader(new File(fileName)));
             ChemFile chemFile = (ChemFile) mdlreader.read((ChemObject) new ChemFile());
             lstContainers.addAll(
                     ChemFileManipulator.getAllAtomContainers(chemFile));
-        }
-        catch (Throwable cdke)
-        {
+        } catch (Throwable cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        finally
-        {
-            try
-            {
-                if (mdlreader != null)
-                {
+        } finally {
+            try {
+                if (mdlreader != null) {
                     mdlreader.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
 
-        if (lstContainers.isEmpty())
-        {
+        if (lstContainers.isEmpty()) {
             throw new DENOPTIMException("No data found in " + fileName);
         }
 
@@ -310,39 +269,28 @@ public class DenoptimIO
      * Writes the 2D/3D representation of the molecule to multi-SD file
      *
      * @param fileName The file to be written to
-     * @param mols The molecules to be written
+     * @param mols     The molecules to be written
      * @throws DENOPTIMException
      */
     public static void writeFragmentSet(String fileName,
-            ArrayList<DENOPTIMFragment> mols)
-            throws DENOPTIMException
-    {
+                                        ArrayList<DENOPTIMFragment> mols)
+            throws DENOPTIMException {
         SDFWriter sdfWriter = null;
-        try
-        {
+        try {
             IAtomContainerSet molSet = new AtomContainerSet();
-            for (int idx = 0; idx < mols.size(); idx++)
-            {
+            for (int idx = 0; idx < mols.size(); idx++) {
                 molSet.addAtomContainer(mols.get(idx).getIAtomContainer());
             }
             sdfWriter = new SDFWriter(new FileWriter(new File(fileName)));
             sdfWriter.write(molSet);
-        }
-        catch (CDKException | IOException cdke)
-        {
+        } catch (CDKException | IOException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        finally
-        {
-            try
-            {
-                if (sdfWriter != null)
-                {
+        } finally {
+            try {
+                if (sdfWriter != null) {
                     sdfWriter.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -354,39 +302,28 @@ public class DenoptimIO
      * Writes the 2D/3D representation of the molecule to multi-SD file
      *
      * @param fileName The file to be written to
-     * @param mols The molecules to be written
+     * @param mols     The molecules to be written
      * @throws DENOPTIMException
      */
     public static void writeMoleculeSet(String fileName,
-            ArrayList<IAtomContainer> mols)
-            throws DENOPTIMException
-    {
+                                        ArrayList<IAtomContainer> mols)
+            throws DENOPTIMException {
         SDFWriter sdfWriter = null;
-        try
-        {
+        try {
             IAtomContainerSet molSet = new AtomContainerSet();
-            for (int idx = 0; idx < mols.size(); idx++)
-            {
+            for (int idx = 0; idx < mols.size(); idx++) {
                 molSet.addAtomContainer(mols.get(idx));
             }
             sdfWriter = new SDFWriter(new FileWriter(new File(fileName)));
             sdfWriter.write(molSet);
-        }
-        catch (CDKException | IOException cdke)
-        {
+        } catch (CDKException | IOException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        finally
-        {
-            try
-            {
-                if (sdfWriter != null)
-                {
+        } finally {
+            try {
+                if (sdfWriter != null) {
                     sdfWriter.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -398,34 +335,24 @@ public class DenoptimIO
      * Writes a single molecule to the specified file
      *
      * @param fileName The file to be written to
-     * @param mol The molecule to be written
+     * @param mol      The molecule to be written
      * @param append
      * @throws DENOPTIMException
      */
     public static void writeMolecule(String fileName, IAtomContainer mol,
-            boolean append) throws DENOPTIMException
-    {
+                                     boolean append) throws DENOPTIMException {
         SDFWriter sdfWriter = null;
-        try
-        {
+        try {
             sdfWriter = new SDFWriter(new FileWriter(new File(fileName), append));
             sdfWriter.write(mol);
-        }
-        catch (CDKException | IOException cdke)
-        {
+        } catch (CDKException | IOException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        finally
-        {
-            try
-            {
-                if (sdfWriter != null)
-                {
+        } finally {
+            try {
+                if (sdfWriter != null) {
                     sdfWriter.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -434,33 +361,21 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     public static void writeMol2File(String fileName, IAtomContainer mol,
-            boolean append) throws DENOPTIMException
-    {
+                                     boolean append) throws DENOPTIMException {
         Mol2Writer mol2Writer = null;
-        try
-        {
+        try {
             mol2Writer = new Mol2Writer(new FileWriter(new File(fileName), append));
             mol2Writer.write(mol);
-        }
-        catch (CDKException cdke)
-        {
+        } catch (CDKException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (mol2Writer != null)
-                {
+        } finally {
+            try {
+                if (mol2Writer != null) {
                     mol2Writer.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -469,33 +384,21 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     public static void writeXYZFile(String fileName, IAtomContainer mol,
-            boolean append) throws DENOPTIMException
-    {
+                                    boolean append) throws DENOPTIMException {
         XYZWriter xyzWriter = null;
-        try
-        {
+        try {
             xyzWriter = new XYZWriter(new FileWriter(new File(fileName), append));
             xyzWriter.write(mol);
-        }
-        catch (CDKException cdke)
-        {
+        } catch (CDKException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (xyzWriter != null)
-                {
+        } finally {
+            try {
+                if (xyzWriter != null) {
                     xyzWriter.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -507,39 +410,28 @@ public class DenoptimIO
      * Writes multiple smiles string array to the specified file
      *
      * @param fileName The file to be written to
-     * @param smiles array of smiles strings to be written
-     * @param append if
-     * <code>true</code> append to the file
+     * @param smiles   array of smiles strings to be written
+     * @param append   if
+     *                 <code>true</code> append to the file
      * @throws DENOPTIMException
      */
     public static void writeSmilesSet(String fileName, String[] smiles,
-            boolean append) throws DENOPTIMException
-    {
+                                      boolean append) throws DENOPTIMException {
         FileWriter fw = null;
-        try
-        {
+        try {
             fw = new FileWriter(new File(fileName), append);
-            for (int i = 0; i < smiles.length; i++)
-            {
+            for (int i = 0; i < smiles.length; i++) {
                 fw.write(smiles[i] + NL);
                 fw.flush();
             }
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (fw != null)
-                {
+        } finally {
+            try {
+                if (fw != null) {
                     fw.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -552,35 +444,25 @@ public class DenoptimIO
      *
      * @param fileName The file to be written to
      * @param smiles
-     * @param append if
-     * <code>true</code> append to the file
+     * @param append   if
+     *                 <code>true</code> append to the file
      * @throws DENOPTIMException
      */
     public static void writeSmiles(String fileName, String smiles,
-            boolean append) throws DENOPTIMException
-    {
+                                   boolean append) throws DENOPTIMException {
         FileWriter fw = null;
-        try
-        {
+        try {
             fw = new FileWriter(new File(fileName), append);
             fw.write(smiles + NL);
             fw.flush();
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (fw != null)
-                {
+        } finally {
+            try {
+                if (fw != null) {
                     fw.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -597,30 +479,20 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeData(String fileName, String data, boolean append)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         FileWriter fw = null;
-        try
-        {
+        try {
             fw = new FileWriter(new File(fileName), append);
             fw.write(data + NL);
             fw.flush();
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (fw != null)
-                {
+        } finally {
+            try {
+                if (fw != null) {
                     fw.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -636,44 +508,32 @@ public class DenoptimIO
      * @param append
      * @throws DENOPTIMException
      */
-    public static void serializeToFile(String fileName, Object obj, 
-								 boolean append)
-							throws DENOPTIMException
-    {
-    	FileOutputStream fos = null;
-    	ObjectOutputStream oos = null;
-        try
-        {
+    public static void serializeToFile(String fileName, Object obj,
+                                       boolean append)
+            throws DENOPTIMException {
+        FileOutputStream fos = null;
+        ObjectOutputStream oos = null;
+        try {
             fos = new FileOutputStream(fileName, append);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(obj);
             oos.close();
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             t.printStackTrace();
             throw new DENOPTIMException("Cannot serialize object.", t);
-        }
-        finally
-        {
-    	    try
-    	    {
-    	        fos.flush();
+        } finally {
+            try {
+                fos.flush();
                 fos.close();
                 fos = null;
-    	    } 
-    	    catch (Throwable t)
-    	    {
-    	        throw new DENOPTIMException("Cannot close FileOutputStream",t);
-    	    }
-            try
-            {
+            } catch (Throwable t) {
+                throw new DENOPTIMException("Cannot close FileOutputStream", t);
+            }
+            try {
                 oos.close();
                 oos = null;
-            } 
-            catch (Throwable t)
-            {
-                throw new DENOPTIMException("Cannot close ObjectOutputStream",t);
+            } catch (Throwable t) {
+                throw new DENOPTIMException("Cannot close ObjectOutputStream", t);
             }
         }
     }
@@ -682,44 +542,34 @@ public class DenoptimIO
 
     /**
      * Deserialize a <code>DENOPTIMGraph</code> from a given file
+     *
      * @param file the given file
      * @return the graph
      * @throws DENOPTIMException if anything goes wrong
      */
 
     public static DENOPTIMGraph deserializeDENOPTIMGraph(File file)
-                                                        throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         DENOPTIMGraph graph = null;
         FileInputStream fis = null;
         ObjectInputStream ois = null;
-        try
-        {
+        try {
             fis = new FileInputStream(file);
             ois = new ObjectInputStream(fis);
             graph = (DENOPTIMGraph) ois.readObject();
             ois.close();
-        }
-        catch (InvalidClassException ice)
-        {
-	    String msg = "Attempt to deserialized old graph generated by an "
-                        + "older version of DENOPTIM. A serialized graph "
-			+ "can only be read by the version of DENOPTIM that "
-			+ "has generate the serialized file.";
+        } catch (InvalidClassException ice) {
+            String msg = "Attempt to deserialized old graph generated by an "
+                    + "older version of DENOPTIM. A serialized graph "
+                    + "can only be read by the version of DENOPTIM that "
+                    + "has generate the serialized file.";
             throw new DENOPTIMException(msg);
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             throw new DENOPTIMException(t);
-        }
-        finally
-        {
-            try
-            {
+        } finally {
+            try {
                 fis.close();
-            }
-            catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 throw new DENOPTIMException(t);
             }
         }
@@ -737,19 +587,16 @@ public class DenoptimIO
      * @throws Exception
      */
     public static void createZipFile(String zipOutputFileName,
-            String[] filesToZip) throws Exception
-    {
+                                     String[] filesToZip) throws Exception {
         FileOutputStream fos = new FileOutputStream(zipOutputFileName);
         ZipOutputStream zos = new ZipOutputStream(fos);
         int bytesRead;
         byte[] buffer = new byte[1024];
         CRC32 crc = new CRC32();
-        for (int i = 0, n = filesToZip.length; i < n; i++)
-        {
+        for (int i = 0, n = filesToZip.length; i < n; i++) {
             String fname = filesToZip[i];
             File cFile = new File(fname);
-            if (!cFile.exists())
-            {
+            if (!cFile.exists()) {
                 //System.err.println("Skipping: " + fname);
                 continue;
             }
@@ -757,8 +604,7 @@ public class DenoptimIO
             BufferedInputStream bis = new BufferedInputStream(
                     new FileInputStream(cFile));
             crc.reset();
-            while ((bytesRead = bis.read(buffer)) != -1)
-            {
+            while ((bytesRead = bis.read(buffer)) != -1) {
                 crc.update(buffer, 0, bytesRead);
             }
             bis.close();
@@ -771,8 +617,7 @@ public class DenoptimIO
             ze.setSize(cFile.length());
             ze.setCrc(crc.getValue());
             zos.putNextEntry(ze);
-            while ((bytesRead = bis.read(buffer)) != -1)
-            {
+            while ((bytesRead = bis.read(buffer)) != -1) {
                 zos.write(buffer, 0, bytesRead);
             }
             bis.close();
@@ -788,25 +633,21 @@ public class DenoptimIO
      * @param fileName
      * @throws DENOPTIMException
      */
-    public static void deleteFile(String fileName) throws DENOPTIMException
-    {
+    public static void deleteFile(String fileName) throws DENOPTIMException {
         File f = new File(fileName);
         // Make sure the file or directory exists and isn't write protected
-        if (!f.exists())
-        {
+        if (!f.exists()) {
             //System.err.println("Delete: no such file or directory: " + fileName);
             return;
         }
 
-        if (!f.canWrite())
-        {
+        if (!f.canWrite()) {
             //System.err.println("Delete: write protected: " + fileName);
             return;
         }
 
         // If it is a directory, make sure it is empty
-        if (f.isDirectory())
-        {
+        if (f.isDirectory()) {
             //System.err.println("Delete operation on directory not supported");
             return;
         }
@@ -814,8 +655,7 @@ public class DenoptimIO
         // Attempt to delete it
         boolean success = f.delete();
 
-        if (!success)
-        {
+        if (!success) {
             throw new DENOPTIMException("Deletion of " + fileName + " failed.");
         }
     }
@@ -826,52 +666,41 @@ public class DenoptimIO
      * Delete all files with pathname containing a given string
      *
      * @param path
-     * @param pattern 
+     * @param pattern
      * @throws DENOPTIMException
      */
-    public static void deleteFilesContaining(String path, String pattern) 
-							throws DENOPTIMException
-    {
+    public static void deleteFilesContaining(String path, String pattern)
+            throws DENOPTIMException {
         File folder = new File(path);
-	File[] listOfFiles = folder.listFiles();
-	for (int i=0; i<listOfFiles.length; i++)
-	{
-	    if (listOfFiles[i].isFile())
-	    {
-		String name = listOfFiles[i].getName();
-		if (name.contains(pattern))
-		{
-		    deleteFile(listOfFiles[i].getAbsolutePath());
-		}
-	    }
+        File[] listOfFiles = folder.listFiles();
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                String name = listOfFiles[i].getName();
+                if (name.contains(pattern)) {
+                    deleteFile(listOfFiles[i].getAbsolutePath());
+                }
+            }
         }
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     *
      * @param fileName
-     * @return
-     * <code>true</code> if directory is successfully created
+     * @return <code>true</code> if directory is successfully created
      */
-    public static boolean createDirectory(String fileName)
-    {
+    public static boolean createDirectory(String fileName) {
         return (new File(fileName)).mkdir();
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     *
      * @param fileName
-     * @return
-     * <code>true</code> if file exists
+     * @return <code>true</code> if file exists
      */
-    public static boolean checkExists(String fileName)
-    {
-        if (fileName.length() > 0)
-        {
+    public static boolean checkExists(String fileName) {
+        if (fileName.length() > 0) {
             return (new File(fileName)).exists();
         }
         return false;
@@ -886,42 +715,29 @@ public class DenoptimIO
      * @return number of lines in the file
      * @throws DENOPTIMException
      */
-    public static int countLinesInFile(String fileName) throws DENOPTIMException
-    {
+    public static int countLinesInFile(String fileName) throws DENOPTIMException {
         BufferedInputStream bis = null;
-        try
-        {
+        try {
             bis = new BufferedInputStream(new FileInputStream(fileName));
             byte[] c = new byte[1024];
             int count = 0;
             int readChars = 0;
-            while ((readChars = bis.read(c)) != -1)
-            {
-                for (int i = 0; i < readChars; ++i)
-                {
-                    if (c[i] == '\n')
-                    {
+            while ((readChars = bis.read(c)) != -1) {
+                for (int i = 0; i < readChars; ++i) {
+                    if (c[i] == '\n') {
                         ++count;
                     }
                 }
             }
             return count;
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (bis != null)
-                {
+        } finally {
+            try {
+                if (bis != null) {
                     bis.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -930,59 +746,44 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     *
      * @param fileName
      * @return list of fingerprints in bit representation
      * @throws DENOPTIMException
      */
     public static ArrayList<BitSet> readFingerprintData(String fileName)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         ArrayList<BitSet> fps = new ArrayList<>();
 
         BufferedReader br = null;
         String sCurrentLine;
 
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((sCurrentLine = br.readLine()) != null)
-            {
-                if (sCurrentLine.trim().length() == 0)
-                {
+            while ((sCurrentLine = br.readLine()) != null) {
+                if (sCurrentLine.trim().length() == 0) {
                     continue;
                 }
                 String[] str = sCurrentLine.split(", ");
                 int n = str.length - 1;
                 BitSet bs = new BitSet(n);
-                for (int i = 0; i < n; i++)
-                {
+                for (int i = 0; i < n; i++) {
                     bs.set(i, Boolean.parseBoolean(str[i + 1]));
                 }
                 fps.add(bs);
             }
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
 
-        if (fps.isEmpty())
-        {
+        if (fps.isEmpty()) {
             throw new DENOPTIMException("No data found in file: " + fileName);
         }
 
@@ -998,14 +799,12 @@ public class DenoptimIO
      * @return a deep copy of an object
      * @throws DENOPTIMException
      */
-    
-    public static Object deepCopy(Object oldObj) throws DENOPTIMException
-    {
+
+    public static Object deepCopy(Object oldObj) throws DENOPTIMException {
         Object newObj = null;
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
-        try
-        {
+        try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             oos = new ObjectOutputStream(bos);
             // serialize and pass the object
@@ -1014,31 +813,22 @@ public class DenoptimIO
             ByteArrayInputStream bin =
                     new ByteArrayInputStream(bos.toByteArray());
             ois = new ObjectInputStream(bin);
-            
+
             oos.close();
-            
+
             newObj = ois.readObject();
             ois.close();
-        }
-        catch (IOException | ClassNotFoundException ioe)
-        {
+        } catch (IOException | ClassNotFoundException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (oos != null)
-                {
+        } finally {
+            try {
+                if (oos != null) {
                     oos.close();
                 }
-                if (ois != null)
-                {
+                if (ois != null) {
                     ois.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -1048,48 +838,44 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Read the min, max, mean, and median of a population from 
+     * Read the min, max, mean, and median of a population from
      * "Gen.*\.txt" file
      *
      * @param fileName
      * @return list of data
      * @throws DENOPTIMException
      */
-    public static double[] readPopulationProps(File file) 
-    		throws DENOPTIMException
-    {
-    	double[] vals = new double[4];
-    	ArrayList<String> txt = readList(file.getAbsolutePath());
-    	for (String line : txt)
-    	{
-    		if (line.trim().length() < 8)
-    		{
-    			continue;
-    		}
-    		
-    		String key = line.toUpperCase().trim().substring(0,8);
-    		switch (key)
-    		{
-    		case ("MIN:    "):
-    			vals[0] = Double.parseDouble(line.split("\\s+")[1]);
-    			break;
-    		
-    		case ("MAX:    "):
-    			vals[1] = Double.parseDouble(line.split("\\s+")[1]);
-    			break;
-    		
-    		case ("MEAN:   "):
-    			vals[2] = Double.parseDouble(line.split("\\s+")[1]);
-    			break;
-    		
-    		case ("MEDIAN: "):
-    			vals[3] = Double.parseDouble(line.split("\\s+")[1]);
-    			break;		
-    		}
-    	}
-    	return vals;
+    public static double[] readPopulationProps(File file)
+            throws DENOPTIMException {
+        double[] vals = new double[4];
+        ArrayList<String> txt = readList(file.getAbsolutePath());
+        for (String line : txt) {
+            if (line.trim().length() < 8) {
+                continue;
+            }
+
+            String key = line.toUpperCase().trim().substring(0, 8);
+            switch (key) {
+                case ("MIN:    "):
+                    vals[0] = Double.parseDouble(line.split("\\s+")[1]);
+                    break;
+
+                case ("MAX:    "):
+                    vals[1] = Double.parseDouble(line.split("\\s+")[1]);
+                    break;
+
+                case ("MEAN:   "):
+                    vals[2] = Double.parseDouble(line.split("\\s+")[1]);
+                    break;
+
+                case ("MEDIAN: "):
+                    vals[3] = Double.parseDouble(line.split("\\s+")[1]);
+                    break;
+            }
+        }
+        return vals;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -1099,44 +885,31 @@ public class DenoptimIO
      * @return list of data
      * @throws DENOPTIMException
      */
-    public static ArrayList<String> readList(String fileName) throws DENOPTIMException
-    {
+    public static ArrayList<String> readList(String fileName) throws DENOPTIMException {
         ArrayList<String> lst = new ArrayList<>();
         BufferedReader br = null;
         String line = null;
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null)
-            {
-                if (line.trim().length() == 0)
-                {
+            while ((line = br.readLine()) != null) {
+                if (line.trim().length() == 0) {
                     continue;
                 }
                 lst.add(line.trim());
             }
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
 
-        if (lst.isEmpty())
-        {
+        if (lst.isEmpty()) {
             throw new DENOPTIMException("No data found in file: " + fileName);
         }
 
@@ -1154,12 +927,10 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeXYZFile(String fileName, ArrayList<String> atom_symbols,
-            ArrayList<Point3d> atom_coords) throws DENOPTIMException
-    {
+                                    ArrayList<Point3d> atom_coords) throws DENOPTIMException {
         FileWriter fw = null;
         FormatStringBuffer fsb = new FormatStringBuffer("%-8.6f");
-        try
-        {
+        try {
             String molname = fileName.substring(0, fileName.length() - 4);
             fw = new FileWriter(new File(fileName));
             int numatoms = atom_symbols.size();
@@ -1169,8 +940,7 @@ public class DenoptimIO
 
             String line = "", st = "";
 
-            for (int i = 0; i < atom_symbols.size(); i++)
-            {
+            for (int i = 0; i < atom_symbols.size(); i++) {
                 st = atom_symbols.get(i);
                 Point3d p3 = atom_coords.get(i);
 
@@ -1180,22 +950,14 @@ public class DenoptimIO
                 fw.write(line + NL);
                 fw.flush();
             }
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (fw != null)
-                {
+        } finally {
+            try {
+                if (fw != null) {
                     fw.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -1211,30 +973,20 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static String getChemDoodleString(IAtomContainer mol)
-            throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         StringWriter stringWriter = new StringWriter();
         MDLV2000Writer mw = null;
-        try
-        {
+        try {
             mw = new MDLV2000Writer(stringWriter);
             mw.write(mol);
-        }
-        catch (CDKException cdke)
-        {
+        } catch (CDKException cdke) {
             throw new DENOPTIMException(cdke);
-        }
-        finally
-        {
-            try
-            {
-                if (mw != null)
-                {
+        } finally {
+            try {
+                if (mw != null) {
                     mw.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
@@ -1247,8 +999,7 @@ public class DenoptimIO
 
         StringBuilder sb = new StringBuilder(1024);
         sb.append("var molFile = '");
-        for (int i = 0; i < Moleculelines.length; i++)
-        {
+        for (int i = 0; i < Moleculelines.length; i++) {
             sb.append(Moleculelines[i]);
             sb.append("\\n");
         }
@@ -1259,276 +1010,221 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     public static void writeMolecule2D(String fileName, IAtomContainer mol)
-                                                        throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         MDLV2000Writer writer = null;
 
-        try
-        {
+        try {
             writer = new MDLV2000Writer(new FileWriter(new File(fileName)));
             Properties customSettings = new Properties();
             customSettings.setProperty("ForceWriteAs2DCoordinates", "true");
             PropertiesListener listener = new PropertiesListener(customSettings);
             writer.addChemObjectIOListener(listener);
             writer.writeMolecule(mol);
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new DENOPTIMException(ex);
-        }
-        finally
-        {
-            try
-            {
-                if (writer != null)
-                {
+        } finally {
+            try {
+                if (writer != null) {
                     writer.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
     }
-    
+
 //------------------------------------------------------------------------------
 
-    public static Set<String> readAllAPClasses(File fragLib)
-    {
-    	Set<String> allCLasses = new HashSet<String>();
-    	try {
-			for (IAtomContainer mol : DenoptimIO.readMoleculeData(
-					fragLib.getAbsolutePath()))
-			{
-				DENOPTIMFragment frag = new DENOPTIMFragment(mol,
-				        BBType.UNDEFINED);
-                for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints())
-				{
-					allCLasses.add(ap.getAPClass());
-				}
-			}
-		} catch (DENOPTIMException e) {
-			System.out.println("Could not read data from '" + fragLib +"'. "
-					+ "Cause: " + e.getMessage());
-		}
-    	
-    	return allCLasses;
+    public static Set<String> readAllAPClasses(File fragLib) {
+        Set<String> allCLasses = new HashSet<String>();
+        try {
+            for (IAtomContainer mol : DenoptimIO.readMoleculeData(
+                    fragLib.getAbsolutePath())) {
+                DENOPTIMFragment frag = new DENOPTIMFragment(mol,
+                        BBType.UNDEFINED);
+                for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints()) {
+                    allCLasses.add(ap.getAPClass());
+                }
+            }
+        } catch (DENOPTIMException e) {
+            System.out.println("Could not read data from '" + fragLib + "'. "
+                    + "Cause: " + e.getMessage());
+        }
+
+        return allCLasses;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
      * The class compatibility matrix
      *
-     * @param fileName the file to be read
+     * @param fileName    the file to be read
      * @param compReacMap container for the APClass compatibility rules
-     * @param boMap container for the APClass-to-bond order
-     * @param reacCap container for the capping rules
-     * @param forbEnd container for the definition of forbidden ends
+     * @param boMap       container for the APClass-to-bond order
+     * @param reacCap     container for the capping rules
+     * @param forbEnd     container for the definition of forbidden ends
      */
     public static void writeCompatibilityMatrix(String fileName,
-            HashMap<String, ArrayList<String>> compReacMap,
-            HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
-            Set<String> forbEnd)
-            throws DENOPTIMException
-    {
-    	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
-    	Date date = new Date();
-    	String dateStr = dateFormat.format(date);
-    	
-    	StringBuilder sb = new StringBuilder();
-    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
-    	sb.append(" Compatibility matrix data").append(NL);
-    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
-    	sb.append(" Written by DENOPTIM-GUI on ").append(dateStr).append(NL);
-    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
-    	sb.append(" APCLass Compatibility rules").append(NL);
-    	SortedSet<String> keysCPMap = new TreeSet<String>();
-    	keysCPMap.addAll(compReacMap.keySet());
-    	for (String srcAPC : keysCPMap)
-    	{
-    		sb.append(DENOPTIMConstants.APCMAPCOMPRULE).append(" ");
-    		sb.append(srcAPC).append(" ");
-    		for (int i=0; i<compReacMap.get(srcAPC).size(); i++)
-    		{
-    			String trgAPC = compReacMap.get(srcAPC).get(i);
-    			sb.append(trgAPC);
-    			if (i != (compReacMap.get(srcAPC).size()-1))
-    			{
-    				sb.append(",");
-    			}
-    			else
-    			{
-    				sb.append(NL);
-    			}
-    		}
-    	}
-    	
-    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
-    	sb.append(" APClass-to-BondOrder").append(NL);
-    	SortedSet<String> keysBO = new TreeSet<String>();
-    	keysBO.addAll(boMap.keySet());
-    	for (String apc : keysBO)
-    	{
-    		sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
-    		sb.append(apc).append(" ").append(
-    		        boMap.get(apc).toOldString()).append(NL);
-    	}
-    	
-    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
-    	sb.append(" Capping rules").append(NL);
-    	SortedSet<String> keysCap = new TreeSet<String>();
-    	keysCap.addAll(reacCap.keySet());
-    	for (String apc : keysCap)
-    	{
-    		sb.append(DENOPTIMConstants.APCMAPCAPPING).append(" ");
-    		sb.append(apc).append(" ").append(reacCap.get(apc)).append(NL);
-    	}
-    	
-    	sb.append(DENOPTIMConstants.APCMAPIGNORE);
-    	sb.append(" Forbidden ends").append(NL);
-    	SortedSet<String> sortedFE = new TreeSet<String>();
-    	sortedFE.addAll(forbEnd);
-    	for (String apc : sortedFE)
-    	{
-    		sb.append(DENOPTIMConstants.APCMAPFORBEND).append(" ");
-    		sb.append(apc).append(" ").append(NL);
-    	}
-    	
-    	DenoptimIO.writeData(fileName, sb.toString(), false);
+                                                HashMap<String, ArrayList<String>> compReacMap,
+                                                HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
+                                                Set<String> forbEnd)
+            throws DENOPTIMException {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+        Date date = new Date();
+        String dateStr = dateFormat.format(date);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(DENOPTIMConstants.APCMAPIGNORE);
+        sb.append(" Compatibility matrix data").append(NL);
+        sb.append(DENOPTIMConstants.APCMAPIGNORE);
+        sb.append(" Written by DENOPTIM-GUI on ").append(dateStr).append(NL);
+        sb.append(DENOPTIMConstants.APCMAPIGNORE);
+        sb.append(" APCLass Compatibility rules").append(NL);
+        SortedSet<String> keysCPMap = new TreeSet<String>();
+        keysCPMap.addAll(compReacMap.keySet());
+        for (String srcAPC : keysCPMap) {
+            sb.append(DENOPTIMConstants.APCMAPCOMPRULE).append(" ");
+            sb.append(srcAPC).append(" ");
+            for (int i = 0; i < compReacMap.get(srcAPC).size(); i++) {
+                String trgAPC = compReacMap.get(srcAPC).get(i);
+                sb.append(trgAPC);
+                if (i != (compReacMap.get(srcAPC).size() - 1)) {
+                    sb.append(",");
+                } else {
+                    sb.append(NL);
+                }
+            }
+        }
+
+        sb.append(DENOPTIMConstants.APCMAPIGNORE);
+        sb.append(" APClass-to-BondOrder").append(NL);
+        SortedSet<String> keysBO = new TreeSet<String>();
+        keysBO.addAll(boMap.keySet());
+        for (String apc : keysBO) {
+            sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
+            sb.append(apc).append(" ").append(
+                    boMap.get(apc).toOldString()).append(NL);
+        }
+
+        sb.append(DENOPTIMConstants.APCMAPIGNORE);
+        sb.append(" Capping rules").append(NL);
+        SortedSet<String> keysCap = new TreeSet<String>();
+        keysCap.addAll(reacCap.keySet());
+        for (String apc : keysCap) {
+            sb.append(DENOPTIMConstants.APCMAPCAPPING).append(" ");
+            sb.append(apc).append(" ").append(reacCap.get(apc)).append(NL);
+        }
+
+        sb.append(DENOPTIMConstants.APCMAPIGNORE);
+        sb.append(" Forbidden ends").append(NL);
+        SortedSet<String> sortedFE = new TreeSet<String>();
+        sortedFE.addAll(forbEnd);
+        for (String apc : sortedFE) {
+            sb.append(DENOPTIMConstants.APCMAPFORBEND).append(" ");
+            sb.append(apc).append(" ").append(NL);
+        }
+
+        DenoptimIO.writeData(fileName, sb.toString(), false);
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
      * Read the APclass compatibility matrix data from file.
-     * @param fileName the file to be read
+     *
+     * @param fileName    the file to be read
      * @param compReacMap container for the APClass compatibility rules
-     * @param boMap container for the APClass-to-bond type  rules
-     * @param reacCap container for the capping rules
-     * @param forbEnd container for the definition of forbidden ends
+     * @param boMap       container for the APClass-to-bond type  rules
+     * @param reacCap     container for the capping rules
+     * @param forbEnd     container for the definition of forbidden ends
      * @throws DENOPTIMException
      */
     public static void readCompatibilityMatrix(String fileName,
-            HashMap<String, ArrayList<String>> compReacMap,
-            HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
-            Set<String> forbEnd)
-            throws DENOPTIMException
-    {
+                                               HashMap<String, ArrayList<String>> compReacMap,
+                                               HashMap<String, BondType> boMap, HashMap<String, String> reacCap,
+                                               Set<String> forbEnd)
+            throws DENOPTIMException {
 
         BufferedReader br = null;
         String line = null;
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null)
-            {
-                if (line.trim().length() == 0)
-                {
+            while ((line = br.readLine()) != null) {
+                if (line.trim().length() == 0) {
                     continue;
                 }
 
-                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
-                {
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE)) {
                     continue;
                 }
 
-                if (line.startsWith(DENOPTIMConstants.APCMAPCOMPRULE))
-                {
+                if (line.startsWith(DENOPTIMConstants.APCMAPCOMPRULE)) {
                     String str[] = line.split("\\s+");
-                    if (str.length < 3)
-                    {
+                    if (str.length < 3) {
                         String err = "Incomplete reaction compatibility data.";
                         throw new DENOPTIMException(err + " " + fileName);
                     }
 
                     // to account for multiple compatibilities
                     String strRcn[] = str[2].split(",");
-                    for (int i=0; i<strRcn.length; i++)
+                    for (int i = 0; i < strRcn.length; i++)
                         strRcn[i] = strRcn[i].trim();
 
                     compReacMap.put(str[1],
                             new ArrayList<>(Arrays.asList(strRcn)));
 
-                }
-                else
-                {
-                    if (line.startsWith(DENOPTIMConstants.APCMAPAP2BO))
-                    {
+                } else {
+                    if (line.startsWith(DENOPTIMConstants.APCMAPAP2BO)) {
                         String str[] = line.split("\\s+");
-                        if (str.length != 3)
-                        {
+                        if (str.length != 3) {
                             String err = "Incomplete reaction bondorder data.";
                             throw new DENOPTIMException(err + " " + fileName);
                         }
                         boMap.put(str[1], BondType.parseStr(str[2]));
-                    }
-                    else
-                    {
-                        if (line.startsWith(DENOPTIMConstants.APCMAPCAPPING))
-                        {
+                    } else {
+                        if (line.startsWith(DENOPTIMConstants.APCMAPCAPPING)) {
                             String str[] = line.split("\\s+");
-                            if (str.length != 3)
-                            {
+                            if (str.length != 3) {
                                 String err = "Incomplete capping reaction data.";
                                 throw new DENOPTIMException(err + " " + fileName);
                             }
                             reacCap.put(str[1], str[2]);
+                        } else {
+                            if (line.startsWith(DENOPTIMConstants.APCMAPFORBEND)) {
+                                String str[] = line.split("\\s+");
+                                if (str.length != 2) {
+                                    for (int is = 1; is < str.length; is++) {
+                                        forbEnd.add(str[is]);
+                                    }
+                                } else {
+                                    forbEnd.add(str[1]);
+                                }
+                            }
                         }
-                        else
-			{
-			    if (line.startsWith(DENOPTIMConstants.APCMAPFORBEND))
-			    {
-				String str[] = line.split("\\s+");
-				if (str.length != 2)
-				{
-				    for (int is=1; is<str.length; is++)
-				    {
-					forbEnd.add(str[is]);
-				    }
-				}
-				else
-				{
-				    forbEnd.add(str[1]);
-				}
-			    }
-			}
                     }
                 }
             }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
+        } catch (NumberFormatException | IOException nfe) {
             throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
 
-        if (compReacMap.isEmpty())
-        {
+        if (compReacMap.isEmpty()) {
             String err = "No reaction compatibility data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);
         }
 
-        if (boMap.isEmpty())
-        {
+        if (boMap.isEmpty()) {
             String err = "No bond data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);
         }
@@ -1537,7 +1233,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads the APclass compatibility matrix for ring-closing connections 
+     * Reads the APclass compatibility matrix for ring-closing connections
      * (the RC-CPMap).
      * Note that RC-CPMap is by definition symmetric. Though, <code>true</code>
      * entries can be defined either from X:Y or Y:X, and we make sure
@@ -1546,126 +1242,102 @@ public class DenoptimIO
      * order, in the regular compatibility matrix as we wont
      * check it this condition is satisfied.
      *
-     * @param fileName 
+     * @param fileName
      * @param rcCompMap
      * @throws DENOPTIMException
      */
     public static void readRCCompatibilityMatrix(String fileName,
-            HashMap<String, ArrayList<String>> rcCompMap)
-            throws DENOPTIMException
-    {
+                                                 HashMap<String, ArrayList<String>> rcCompMap)
+            throws DENOPTIMException {
         BufferedReader br = null;
         String line = null;
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null)
-            {
-                if (line.trim().length() == 0)
-                {
+            while ((line = br.readLine()) != null) {
+                if (line.trim().length() == 0) {
                     continue;
                 }
 
-                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
-                {
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE)) {
                     continue;
                 }
 
-                if (line.startsWith(DENOPTIMConstants.APCMAPCOMPRULE))
-                {
+                if (line.startsWith(DENOPTIMConstants.APCMAPCOMPRULE)) {
                     String str[] = line.split("\\s+");
-                    if (str.length < 3)
-                    {
+                    if (str.length < 3) {
                         String err = "Incomplete reaction compatibility data.";
                         throw new DENOPTIMException(err + " " + fileName);
                     }
 
                     // to account for multiple compatibilities
                     String strRcn[] = str[2].split(",");
-                    for (int i=0; i<strRcn.length; i++)
-		    {
+                    for (int i = 0; i < strRcn.length; i++) {
                         strRcn[i] = strRcn[i].trim();
 
-		        if (rcCompMap.containsKey(str[1]))
-		        {
-			    rcCompMap.get(str[1]).add(strRcn[i]);
-		        }
-		        else
-		        {
-			    ArrayList<String> rccomp = new ArrayList<String>();
-			    rccomp.add(strRcn[i]);
-                            rcCompMap.put(str[1],rccomp);
-		        }
-
-                        if (rcCompMap.containsKey(strRcn[i]))
-                        {
-                            rcCompMap.get(strRcn[i]).add(str[1]);
+                        if (rcCompMap.containsKey(str[1])) {
+                            rcCompMap.get(str[1]).add(strRcn[i]);
+                        } else {
+                            ArrayList<String> rccomp = new ArrayList<String>();
+                            rccomp.add(strRcn[i]);
+                            rcCompMap.put(str[1], rccomp);
                         }
-                        else
-                        {
+
+                        if (rcCompMap.containsKey(strRcn[i])) {
+                            rcCompMap.get(strRcn[i]).add(str[1]);
+                        } else {
                             ArrayList<String> rccomp = new ArrayList<String>();
                             rccomp.add(str[1]);
-                            rcCompMap.put(strRcn[i],rccomp);
+                            rcCompMap.put(strRcn[i], rccomp);
                         }
-		    }
+                    }
                 }
             }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
+        } catch (NumberFormatException | IOException nfe) {
             throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
 
-        if (rcCompMap.isEmpty())
-        {
+        if (rcCompMap.isEmpty()) {
             String err = "No reaction compatibility data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);
         }
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
-     * Reads SDF files that represent one or more tested candidates. Candidates 
-     * are provided with a graph representation, a unique identifier, and 
+     * Reads SDF files that represent one or more tested candidates. Candidates
+     * are provided with a graph representation, a unique identifier, and
      * either a fitness value or a mol_error defining why this candidate could
      * not be evaluated.
-     * @param file the SDF file to read
+     *
+     * @param file         the SDF file to read
      * @param useFragSpace use <code>true</code> if a fragment space is defined
-     * and we can use it to interpret the graph finding a full meaning for the 
-     * nodes in the graph.
+     *                     and we can use it to interpret the graph finding a full meaning for the
+     *                     nodes in the graph.
      * @return the list of candidates
      * @throws DENOPTIMException is something goes wrong while reading the file
-     * or interpreting its content
+     *                           or interpreting its content
      */
-    public static ArrayList<DENOPTIMMolecule> readDENOPTIMMolecules(File file, 
-    		boolean useFragSpace) throws DENOPTIMException
-    {
-    	String filename = file.getAbsolutePath();
-    	ArrayList<DENOPTIMMolecule> mols = new ArrayList<>();
-    	ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
-    	for (IAtomContainer iac : iacs)
-    	{   			
-    		DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
+    public static ArrayList<DENOPTIMMolecule> readDENOPTIMMolecules(File file,
+                                                                    boolean useFragSpace) throws DENOPTIMException {
+        String filename = file.getAbsolutePath();
+        ArrayList<DENOPTIMMolecule> mols = new ArrayList<>();
+        ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
+        for (IAtomContainer iac : iacs) {
+            DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
             mol.setMoleculeFile(filename);
             mols.add(mol);
-    	}
-    	
-    	return mols;
+        }
+
+        return mols;
     }
 
 //------------------------------------------------------------------------------
@@ -1674,66 +1346,61 @@ public class DenoptimIO
      * Reads the molecules in a file. Expects filenames with commonly accepted
      * extensions (i.e., .smi and .sdf). Unrecognized extensions will be
      * interpreted as links (i.e., pathnames) to SDF files.
+     *
      * @param fileName the pathname of the file to read.
      * @return the list of molecules
      * @throws DENOPTIMException
      */
     public static ArrayList<IAtomContainer> readMoleculeData(String fileName)
-                                                        throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         ArrayList<IAtomContainer> mols;
         // check file extension
         if (GenUtils.getFileExtension(fileName).
-                                    compareToIgnoreCase(".smi") == 0)
-        {
+                compareToIgnoreCase(".smi") == 0) {
             throw new DENOPTIMException("Fragment files in SMILES format not"
-            		+ " supported.");
-        }
-        else if (GenUtils.getFileExtension(fileName).
-                                    compareToIgnoreCase(".sdf") == 0)
-        {
+                    + " supported.");
+        } else if (GenUtils.getFileExtension(fileName).
+                compareToIgnoreCase(".sdf") == 0) {
             mols = DenoptimIO.readSDFFile(fileName);
         }
         // process everything else as a text file with links to individual 
         // molecules
-        else
-        {
+        else {
             mols = DenoptimIO.readLinksToMols(fileName);
         }
         return mols;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
-     * Reads the molecules in a file with specifies format. Acceptable formats 
+     * Reads the molecules in a file with specifies format. Acceptable formats
      * are TXT, SD, and SDF.
+     *
      * @param fileName the pathname of the file to read.
-     * @param format a string defining how to interpret the file.
+     * @param format   a string defining how to interpret the file.
      * @return the list of molecules
      * @throws DENOPTIMException
      */
-    public static ArrayList<IAtomContainer> readMoleculeData(String fileName, 
-    		String format) throws DENOPTIMException
-    {
+    public static ArrayList<IAtomContainer> readMoleculeData(String fileName,
+                                                             String format) throws DENOPTIMException {
         ArrayList<IAtomContainer> mols;
-        switch (format)
-        {
-        	case "SDF":
-        		mols = DenoptimIO.readSDFFile(fileName);
-        		break;
-        		
-        	case "SD":
-        		mols = DenoptimIO.readSDFFile(fileName);
-        		break;
-        		
-        	case "TXT":
-        		mols = DenoptimIO.readLinksToMols(fileName);
-        		break;
-        		
-        	default:
-        		throw new DENOPTIMException("Molecular file format '" + format 
-        				+ "' is not recognized.");
+        switch (format) {
+            case "SDF":
+                mols = DenoptimIO.readSDFFile(fileName);
+                break;
+
+            case "SD":
+                mols = DenoptimIO.readSDFFile(fileName);
+                break;
+
+            case "TXT":
+                mols = DenoptimIO.readLinksToMols(fileName);
+                break;
+
+            default:
+                throw new DENOPTIMException("Molecular file format '" + format
+                        + "' is not recognized.");
         }
         return mols;
     }
@@ -1742,31 +1409,26 @@ public class DenoptimIO
 
     /**
      * Writes a PNG representation of the molecule
-     * @param mol the molecule
+     *
+     * @param mol      the molecule
      * @param fileName output file
      * @throws DENOPTIMException
      */
 
     public static void moleculeToPNG(IAtomContainer mol, String fileName)
-                                                        throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         IAtomContainer iac = null;
-        if (!GeometryTools.has2DCoordinates(mol))
-        {
+        if (!GeometryTools.has2DCoordinates(mol)) {
             iac = DENOPTIMMoleculeUtils.generate2DCoordinates(mol);
-        }
-        else
-        {
+        } else {
             iac = mol;
         }
 
-        if (iac == null)
-        {
+        if (iac == null) {
             throw new DENOPTIMException("Failed to generate 2D coordinates.");
         }
 
-        try
-        {
+        try {
             int WIDTH = 500;
             int HEIGHT = 500;
             // the draw area and the image should be the same size
@@ -1799,9 +1461,9 @@ public class DenoptimIO
             renderer.setup(iac, drawArea);
 
             // paint the background
-            Graphics2D g2 = (Graphics2D)image.getGraphics();
+            Graphics2D g2 = (Graphics2D) image.getGraphics();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		                     RenderingHints.VALUE_ANTIALIAS_ON);
+                    RenderingHints.VALUE_ANTIALIAS_ON);
 
             g2.setColor(Color.WHITE);
             g2.fillRect(0, 0, WIDTH, HEIGHT);
@@ -1811,10 +1473,8 @@ public class DenoptimIO
             renderer.paint(iac, new AWTDrawVisitor(g2),
                     new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
 
-            ImageIO.write((RenderedImage)image, "PNG", new File(fileName));
-        }
-        catch (IOException ioe)
-        {
+            ImageIO.write((RenderedImage) image, "PNG", new File(fileName));
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
         }
     }
@@ -1823,6 +1483,7 @@ public class DenoptimIO
 
     /**
      * Write the molecule in V3000 format.
+     *
      * @param outfile
      * @param mol
      * @throws Exception
@@ -1830,19 +1491,18 @@ public class DenoptimIO
 
     @SuppressWarnings("ConvertToTryWithResources")
     private static void writeV3000File(String outfile, IAtomContainer mol)
-                                                        throws DENOPTIMException
-    {
+            throws DENOPTIMException {
         StringBuilder sb = new StringBuilder(1024);
 
         String title = (String) mol.getProperty(CDKConstants.TITLE);
         if (title == null)
             title = "";
-        if(title.length() > 80)
-            title=title.substring(0, 80);
+        if (title.length() > 80)
+            title = title.substring(0, 80);
         sb.append(title).append("\n");
 
-    	sb.append("  CDK     ").append(new SimpleDateFormat("MMddyyHHmm").
-                                        format(System.currentTimeMillis()));
+        sb.append("  CDK     ").append(new SimpleDateFormat("MMddyyHHmm").
+                format(System.currentTimeMillis()));
         sb.append("\n\n");
 
         sb.append("  0  0  0     0  0            999 V3000\n");
@@ -1851,10 +1511,9 @@ public class DenoptimIO
         sb.append("M  V30 COUNTS ").append(mol.getAtomCount()).append(" ").
                 append(mol.getBondCount()).append(" 0 0 0\n");
         sb.append("M  V30 BEGIN ATOM\n");
-        for (int f = 0; f < mol.getAtomCount(); f++)
-        {
+        for (int f = 0; f < mol.getAtomCount(); f++) {
             IAtom atom = mol.getAtom(f);
-            sb.append("M  V30 ").append((f+1)).append(" ").append(atom.getSymbol()).
+            sb.append("M  V30 ").append((f + 1)).append(" ").append(atom.getSymbol()).
                     append(" ").append(atom.getPoint3d().x).append(" ").
                     append(atom.getPoint3d().y).append(" ").
                     append(atom.getPoint3d().z).append(" ").append("0");
@@ -1865,21 +1524,17 @@ public class DenoptimIO
 
         Iterator<IBond> bonds = mol.bonds().iterator();
         int f = 0;
-        while (bonds.hasNext())
-        {
+        while (bonds.hasNext()) {
             IBond bond = bonds.next();
             int bondType = bond.getOrder().numeric();
             String bndAtoms = "";
             if (bond.getStereo() == IBond.Stereo.UP_INVERTED ||
-                        bond.getStereo() == IBond.Stereo.DOWN_INVERTED ||
-                        bond.getStereo() == IBond.Stereo.UP_OR_DOWN_INVERTED)
-            {
+                    bond.getStereo() == IBond.Stereo.DOWN_INVERTED ||
+                    bond.getStereo() == IBond.Stereo.UP_OR_DOWN_INVERTED) {
                 // turn around atom coding to correct for inv stereo
                 bndAtoms = mol.getAtomNumber(bond.getAtom(1)) + 1 + " ";
                 bndAtoms += mol.getAtomNumber(bond.getAtom(0)) + 1;
-            }
-            else
-            {
+            } else {
                 bndAtoms = mol.getAtomNumber(bond.getAtom(0)) + 1 + " ";
                 bndAtoms += mol.getAtomNumber(bond.getAtom(1)) + 1;
             }
@@ -1912,7 +1567,7 @@ public class DenoptimIO
 //                    stereo += "0";
 //            }
 
-            sb.append("M  V30 ").append((f+1)).append(" ").append(bondType).
+            sb.append("M  V30 ").append((f + 1)).append(" ").append(bondType).
                     append(" ").append(bndAtoms).append("\n");
             f = f + 1;
         }
@@ -1921,13 +1576,10 @@ public class DenoptimIO
         sb.append("M  V30 END CTAB\n");
         sb.append("M  END\n\n");
 
-        Map<Object,Object> sdFields = mol.getProperties();
-        if(sdFields != null)
-        {
-            for (Object propKey : sdFields.keySet())
-            {
-                if (!cdkInternalProperties.contains((String) propKey))
-                {
+        Map<Object, Object> sdFields = mol.getProperties();
+        if (sdFields != null) {
+            for (Object propKey : sdFields.keySet()) {
+                if (!cdkInternalProperties.contains((String) propKey)) {
                     sb.append("> <").append(propKey).append(">");
                     sb.append("\n");
                     sb.append("").append(sdFields.get(propKey));
@@ -1941,15 +1593,12 @@ public class DenoptimIO
 
         //System.err.println(sb.toString());
 
-        try
-        {
+        try {
 
             FileWriter fw = new FileWriter(outfile);
             fw.write(sb.toString());
             fw.close();
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
         }
     }
@@ -1958,305 +1607,269 @@ public class DenoptimIO
 
     /**
      * Reads a list of graph editing tasks from a text file
+     *
      * @param fileName the pathname of the file to read
      * @return the list of editing tasks
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraphEdit> readDENOPTIMGraphEditFromFile(
-                                                                String fileName)
-                                                        throws DENOPTIMException
-    {
-        ArrayList<DENOPTIMGraphEdit> lst = new ArrayList<DENOPTIMGraphEdit>();
+            String fileName)
+            throws DENOPTIMException {
+        ArrayList<DENOPTIMGraphEdit> lst = new ArrayList<>();
         BufferedReader br = null;
         String line = null;
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null)
-            {
-                if (line.trim().length() == 0)
-                {
+            while ((line = br.readLine()) != null) {
+                if (line.trim().length() == 0) {
                     continue;
                 }
 
-                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
-                {
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE)) {
                     continue;
                 }
 
                 DENOPTIMGraphEdit graphEdit;
-                try
-                {
-		    graphEdit = new DENOPTIMGraphEdit(line.trim());
-                }
-                catch (Throwable t)
-                {
+                try {
+                    graphEdit = new DENOPTIMGraphEdit(line.trim());
+                } catch (Throwable t) {
                     String msg = "Cannot convert string to DENOPTIMGraphEdit. "
-                                 + "Check line '" + line.trim() + "'";
+                            + "Check line '" + line.trim() + "'";
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                    throw new DENOPTIMException(msg,t);
+                    throw new DENOPTIMException(msg, t);
                 }
                 lst.add(graphEdit);
             }
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             String msg = "Cannot read file " + fileName;
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            throw new DENOPTIMException(msg,ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+            throw new DENOPTIMException(msg, ioe);
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
-	return lst;
+        return lst;
     }
 
 //------------------------------------------------------------------------------
 
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from file
+     *
      * @param fileName the pathname of the file to read
-     * @param format the file format to expect
-     * @param useFS set to <code>true</code> when there is a defined 
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential 
-     * mismatch between fragment space and graph representation.
+     * @param format   the file format to expect
+     * @param useFS    set to <code>true</code> when there is a defined
+     *                 fragment space that contains the fragments used to build the graphs.
+     *                 Otherwise, use <code>false</code>. This will create only as many APs as
+     *                 needed to satisfy the graph representation, thus creating a potential
+     *                 mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-    		            String fileName, String format, boolean useFS) 
-    		            		throws DENOPTIMException
-    {
-		switch (format)
-		{
-			case "TXT":
-				return DenoptimIO.readDENOPTIMGraphsFromFile(fileName, useFS);
-				
-			case "SDF":
-				return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
-				
-			case "SER":
-				return DenoptimIO.readDENOPTIMGraphsFromSerFile(fileName);
-		}
-    	return new ArrayList<DENOPTIMGraph>();
+            String fileName, String format, boolean useFS)
+            throws DENOPTIMException {
+        switch (format) {
+            case "TXT":
+                return DenoptimIO.readDENOPTIMGraphsFromFile(fileName, useFS);
+
+            case "SDF":
+                return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
+
+            case "SER":
+                return DenoptimIO.readDENOPTIMGraphsFromSerFile(fileName);
+        }
+        return new ArrayList<DENOPTIMGraph>();
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from a serialized graph.
-     * @param fileName the pathname of the file to read. 
-     * mismatch between fragment space and graph representation.
-     * @return 
+     *
+     * @param fileName the pathname of the file to read.
+     *                 mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
-    
+
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSerFile(
-    		String fileName) throws DENOPTIMException
-    {
-    	ArrayList<DENOPTIMGraph> list = new ArrayList<DENOPTIMGraph>();
-    	list.add(deserializeDENOPTIMGraph(new File(fileName)));
-    	return list;
+            String fileName) throws DENOPTIMException {
+        ArrayList<DENOPTIMGraph> list = new ArrayList<DENOPTIMGraph>();
+        list.add(deserializeDENOPTIMGraph(new File(fileName)));
+        return list;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from a SDF file
+     *
      * @param fileName the pathname of the file to read
-     * @param useFS set to <code>true</code> when there is a defined 
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential 
-     * mismatch between fragment space and graph representation.
+     * @param useFS    set to <code>true</code> when there is a defined
+     *                 fragment space that contains the fragments used to build the graphs.
+     *                 Otherwise, use <code>false</code>. This will create only as many APs as
+     *                 needed to satisfy the graph representation, thus creating a potential
+     *                 mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
-								String fileName, boolean useFS)
-							throws DENOPTIMException
-    {
-    	ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
-    	ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
-    	int i=0;
-    	for (IAtomContainer mol : mols)
-    	{
-    		i++;
-    		Object prop = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
-    		if (prop == null)
-    		{
-    			throw new DENOPTIMException("Attempt to load graph form "
-    					+ "SDF that lacks a '" + DENOPTIMConstants.GRAPHTAG 
-    					+ "' tag. Check molecule " + i);
-    		}
-    		DENOPTIMGraph g = GraphConversionTool.getGraphFromString(
-                                                  prop.toString().trim(),useFS);
-    		lstGraphs.add(g);
-    	}
-    	return lstGraphs;
+            String fileName, boolean useFS)
+            throws DENOPTIMException {
+        ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
+        ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
+        int i = 0;
+        for (IAtomContainer mol : mols) {
+            i++;
+            Object prop = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
+            if (prop == null) {
+                throw new DENOPTIMException("Attempt to load graph form "
+                        + "SDF that lacks a '" + DENOPTIMConstants.GRAPHTAG
+                        + "' tag. Check molecule " + i);
+            }
+            DENOPTIMGraph g = GraphConversionTool.getGraphFromString(
+                    prop.toString().trim(), useFS);
+            lstGraphs.add(g);
+        }
+        return lstGraphs;
     }
 
 //------------------------------------------------------------------------------
 
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from a text file
+     *
      * @param fileName the pathname of the file to read
-     * @param useFS set to <code>true</code> when there is a defined 
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential 
-     * mismatch between fragment space and graph representation.
+     * @param useFS    set to <code>true</code> when there is a defined
+     *                 fragment space that contains the fragments used to build the graphs.
+     *                 Otherwise, use <code>false</code>. This will create only as many APs as
+     *                 needed to satisfy the graph representation, thus creating a potential
+     *                 mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-					String fileName, boolean useFS) throws DENOPTIMException
-    {
+            String fileName, boolean useFS) throws DENOPTIMException {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
         String line = null;
-        try
-        {
+        try {
             br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null)
-            {
-                if (line.trim().length() == 0)
-                {
+            while ((line = br.readLine()) != null) {
+                if (line.trim().length() == 0) {
                     continue;
                 }
 
-                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE))
-                {
+                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE)) {
                     continue;
                 }
 
-				DENOPTIMGraph g;
-				try
-				{
-				    g = GraphConversionTool.getGraphFromString(
-				    		line.trim(),useFS);
-				}
-				catch (Throwable t)
-				{
-				    String msg = "Cannot convert string to DENOPTIMGraph. "
-					         + "Check line '" + line.trim() + "'";
-				    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-		                    throw new DENOPTIMException(msg,t);
-				}
-				lstGraphs.add(g);
-		    }
-		}
-        catch (IOException ioe)
-        {
-		    String msg = "Cannot read file " + fileName;
-		    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-	            throw new DENOPTIMException(msg,ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
+                DENOPTIMGraph g;
+                try {
+                    g = GraphConversionTool.getGraphFromString(
+                            line.trim(), useFS);
+                } catch (Throwable t) {
+                    String msg = "Cannot convert string to DENOPTIMGraph. "
+                            + "Check line '" + line.trim() + "'";
+                    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                    throw new DENOPTIMException(msg, t);
+                }
+                lstGraphs.add(g);
+            }
+        } catch (IOException ioe) {
+            String msg = "Cannot read file " + fileName;
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            throw new DENOPTIMException(msg, ioe);
+        } finally {
+            try {
+                if (br != null) {
                     br.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
-		return lstGraphs;
+        return lstGraphs;
     }
-  
+
 //------------------------------------------------------------------------------
 
     /**
      * Writes the string representation of the graphs to file.
+     *
      * @param fileName the file where to print
-     * @param graphs the list of graphs to print
-     * @param append use <code>true</code> to append
+     * @param graphs   the list of graphs to print
+     * @param append   use <code>true</code> to append
      * @throws DENOPTIMException
      */
-    public static void writeGraphsToFile(String fileName, 
-    		ArrayList<DENOPTIMGraph> graphs, boolean append) 
-    				throws DENOPTIMException
-    {
-    	StringBuilder sb = new StringBuilder();
-    	for(DENOPTIMGraph g : graphs)
-    	{
-    		sb.append(g.toString()).append(NL);
-    	}
-    	writeData(fileName, sb.toString(), append);
+    public static void writeGraphsToFile(String fileName,
+                                         ArrayList<DENOPTIMGraph> graphs, boolean append)
+            throws DENOPTIMException {
+        StringBuilder sb = new StringBuilder();
+        for (DENOPTIMGraph g : graphs) {
+            sb.append(g.toString()).append(NL);
+        }
+        writeData(fileName, sb.toString(), append);
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
      * Writes the string representation of a graph to file.
+     *
      * @param fileName the file where to print
-     * @param graph the graph to print
-     * @param append use <code>true</code> to append
+     * @param graph    the graph to print
+     * @param append   use <code>true</code> to append
      * @throws DENOPTIMException
      */
-    public static void writeGraphToFile(String fileName, DENOPTIMGraph graph, 
-    		boolean append) throws DENOPTIMException
-    {
-    	writeData(fileName, graph.toString(), append);
+    public static void writeGraphToFile(String fileName, DENOPTIMGraph graph,
+                                        boolean append) throws DENOPTIMException {
+        writeData(fileName, graph.toString(), append);
     }
 
 //------------------------------------------------------------------------------
-    
+
     /**
      * Looks for a writable location where to put temporary files and returns
      * an absolute pathname to the folder where tmp files can be created.
+     *
      * @return a  writable absolute path
      */
-	public static String getTempFolder() {
-		
+    public static String getTempFolder() {
+
         ArrayList<String> tmpFolders = new ArrayList<String>();
-        tmpFolders.add(System.getProperty("file.separator")+"tmp");
-        tmpFolders.add(System.getProperty("file.separator")+"scratch");
+        tmpFolders.add(System.getProperty("file.separator") + "tmp");
+        tmpFolders.add(System.getProperty("file.separator") + "scratch");
         tmpFolders.add(System.getProperty("java.io.tmpdir"));
 
         String tmpPathName = "";
         String tmpFolder = "";
-        for (String t : tmpFolders)
-        {
-        	tmpFolder = t;
-        	tmpPathName = tmpFolder + System.getProperty("file.separator")
-        			+ "Denoptim_tmpFile";
-            if (DenoptimIO.canWriteAndReadTo(tmpPathName))
-            {
+        for (String t : tmpFolders) {
+            tmpFolder = t;
+            tmpPathName = tmpFolder + System.getProperty("file.separator")
+                    + "Denoptim_tmpFile";
+            if (DenoptimIO.canWriteAndReadTo(tmpPathName)) {
                 break;
             }
         }
-		return tmpFolder;
-	}
-	
+        return tmpFolder;
+    }
+
 //------------------------------------------------------------------------------
-	
-	/**
-	 * Check whether we can write and read to a given pathname
-	 * @param pathName
-	 * @return <code>true</code> if we can write and read in that pathname
-	 */
-    public static boolean canWriteAndReadTo(String pathName)
-    {
+
+    /**
+     * Check whether we can write and read to a given pathname
+     *
+     * @param pathName
+     * @return <code>true</code> if we can write and read in that pathname
+     */
+    public static boolean canWriteAndReadTo(String pathName) {
         boolean res = true;
         try {
             DenoptimIO.writeData(pathName, "TEST", false);
@@ -2266,44 +1879,39 @@ public class DenoptimIO
         }
         return res;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Reads a library of fragments from SDF file and checks that every fragment
      * has the AP tag.
+     *
      * @param fileName name of the SDF file
-     * @param kindStr the kind of fragment to be read. Used for logging.
+     * @param kindStr  the kind of fragment to be read. Used for logging.
      * @return the list of fragments as atom containers.
      * @throws DENOPTIMException
      */
     public static ArrayList<IAtomContainer> readInLibraryOfFragments(
-    		String fileName, String kindStr) throws DENOPTIMException
-    {
-    	ArrayList<IAtomContainer> lib = new ArrayList<IAtomContainer>();
+            String fileName, String kindStr) throws DENOPTIMException {
+        ArrayList<IAtomContainer> lib = new ArrayList<IAtomContainer>();
         int i = 0;
-        for (IAtomContainer mol : readMoleculeData(fileName))
-        {
+        for (IAtomContainer mol : readMoleculeData(fileName)) {
             i++;
             Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
-            if (ap == null)
-            {
+            if (ap == null) {
                 DENOPTIMLogger.appLogger.log(Level.WARNING,
-                     "No attachment point information for " + kindStr + " " 
-                     + i + " in file '" + fileName + "'. I'm ignoring it!");
-            }
-            else
-            {
-            	lib.add(mol);
+                        "No attachment point information for " + kindStr + " "
+                                + i + " in file '" + fileName + "'. I'm ignoring it!");
+            } else {
+                lib.add(mol);
             }
         }
-        if (lib.isEmpty())
-        {
+        if (lib.isEmpty()) {
             throw new DENOPTIMException("Scaffold library has no entries.");
         }
-    	return lib;
+        return lib;
     }
-    
+
 //------------------------------------------------------------------------------
 
 }

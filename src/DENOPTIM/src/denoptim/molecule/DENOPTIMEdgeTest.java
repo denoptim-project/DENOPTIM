@@ -33,70 +33,77 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
  * @author Marco Foscato
  */
 
-public class DENOPTIMEdgeTest
-{
+public class DENOPTIMEdgeTest {
 	private StringBuilder reason = new StringBuilder();
-	
-//------------------------------------------------------------------------------
-	
-    @Test
-    public void testSameAs_Equal() throws Exception
-    {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
+	private final DENOPTIMAttachmentPoint dummyAp =
+			new DENOPTIMAttachmentPoint(new EmptyVertex());
 
-    	assertTrue(eA.sameAs(eB, reason));	
-    }
-    
 //------------------------------------------------------------------------------
-	
-    @Test
-    public void testSameAs_DiffAtm() throws Exception
-    {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 1, 0, BondType.UNDEFINED);
-    	DENOPTIMEdge eC = new DENOPTIMEdge(0, 1, 0, 1, BondType.UNDEFINED);
 
-    	assertFalse(eA.sameAs(eB, reason));	
-    	assertFalse(eA.sameAs(eC, reason));	
-    }
-    
+	@Test
+	public void testSameAs_Equal() throws Exception {
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+
+		assertTrue(eA.sameAs(eB, reason));
+	}
+
 //------------------------------------------------------------------------------
-	
-    @Test
-    public void testSameAs_DiffBndTyp() throws Exception
-    {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.SINGLE);
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.DOUBLE);
-    	
-    	assertFalse(eA.sameAs(eB, reason));	
-    }
-    
+
+	@Test
+	public void testSameAs_DiffAtm() throws Exception {
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 1, 0,
+				BondType.UNDEFINED);
+		DENOPTIMEdge eC = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 1,
+				BondType.UNDEFINED);
+
+		assertFalse(eA.sameAs(eB, reason));
+		assertFalse(eA.sameAs(eC, reason));
+	}
+
 //------------------------------------------------------------------------------
-	
-    @Test
-    public void testSameAs_SameAPClass() throws Exception
-    {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eA.setSrcApClass("classA");
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eB.setSrcApClass("classA");
-    	
-    	assertTrue(eA.sameAs(eB, reason));	
-    }
-    
+
+	@Test
+	public void testSameAs_DiffBndTyp() throws Exception {
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.SINGLE);
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.DOUBLE);
+
+		assertFalse(eA.sameAs(eB, reason));
+	}
+
 //------------------------------------------------------------------------------
-	
-    @Test
-    public void testSameAs_DiffAPClass() throws Exception
-    {
-    	DENOPTIMEdge eA = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eA.setSrcApClass("classA");
-    	DENOPTIMEdge eB = new DENOPTIMEdge(0, 1, 0, 0, BondType.UNDEFINED);
-    	eB.setSrcApClass("classB");
-    	
-    	assertFalse(eA.sameAs(eB, reason));	
-    }
-    
+
+	@Test
+	public void testSameAs_SameAPClass() throws Exception {
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+		eA.setSrcApClass("classA");
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+		eB.setSrcApClass("classA");
+
+		assertTrue(eA.sameAs(eB, reason));
+	}
+
+//------------------------------------------------------------------------------
+
+	@Test
+	public void testSameAs_DiffAPClass() throws Exception {
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+		eA.setSrcApClass("classA");
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
+				BondType.UNDEFINED);
+		eB.setSrcApClass("classB");
+
+		assertFalse(eA.sameAs(eB, reason));
+	}
+
 //------------------------------------------------------------------------------
 }
