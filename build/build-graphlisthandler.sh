@@ -20,7 +20,7 @@ rm javafiles.txt
 
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Main-Class: graphlistshandler.GraphListsHandler" >> manifest.mf
-echo "Class-Path: lib/cdk-1.4.19.jar lib/vecmath.jar lib/DENOPTIM.jar lib/commons-io-2.4.jar" >> manifest.mf
+echo "Class-Path: lib/cdk-1.4.19.jar lib/DENOPTIM.jar lib/commons-io-2.4.jar" >> manifest.mf
 echo >> manifest.mf
 
 jar cvfm GraphListsHandler.jar manifest.mf graphlistshandler 

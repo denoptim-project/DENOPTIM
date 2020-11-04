@@ -20,7 +20,7 @@ rm javafiles.txt
 
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Main-Class: testoperator.TestOperator" >> manifest.mf
-echo "Class-Path: lib/cdk-1.4.19.jar lib/vecmath.jar lib/DENOPTIM.jar DenoptimGA.jar" >> manifest.mf
+echo "Class-Path: lib/cdk-1.4.19.jar lib/DENOPTIM.jar DenoptimGA.jar" >> manifest.mf
 echo >> manifest.mf
 
 jar cvfm TestOperator.jar manifest.mf testoperator 
