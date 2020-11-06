@@ -198,7 +198,8 @@ public class DENOPTIMGraphEdit {
                 btype = Integer.parseInt(strPrts[4]);
             }
 
-            //TODO: Look here MARCO!!!
+            // TODO: Broken code. Only here to allow code to compile.
+            // Change this section when wildcard problem solved.
             DENOPTIMVertex srcVertex = new EmptyVertex(srcVertexId);
             // Have to fill source and target vertex with enough APs
             for (int i = 0; i <= srcAPId; i++) {
@@ -208,12 +209,12 @@ public class DENOPTIMGraphEdit {
             for (int i = 0; i <= trgAPId; i++) {
                 trgVertex.addAP(new DENOPTIMAttachmentPoint(trgVertex));
             }
-//		    this.focusEdge = new DENOPTIMEdge(srcVertex.getAP(srcAPId),
-//                    trgVertex.getAP(trgAPId), srcVertexId, trgVertexId,
-//                    srcAPId, trgAPId, BondType.parseInt(btype));
-            this.focusEdge = new DENOPTIMEdge(srcVertexId, trgVertexId,
+		    this.focusEdge = new DENOPTIMEdge(srcVertex.getAP(srcAPId),
+                    trgVertex.getAP(trgAPId), srcVertexId, trgVertexId,
                     srcAPId, trgAPId, BondType.parseInt(btype));
-
+            // old code
+//            this.focusEdge = new DENOPTIMEdge(srcVertexId, trgVertexId,
+//                    srcAPId, trgAPId, BondType.parseInt(btype));
 
             if (strPrts.length > 5) {
                 //source APClass
@@ -221,18 +222,21 @@ public class DENOPTIMGraphEdit {
                 if (!strPrts[5].equals("*")) {
                     srcAPC = strPrts[5];
                 }
-                this.focusEdge.setSrcApClass(srcAPC);
-//                srcVertex.getAP(srcAPId).setAPClass(srcAPC);
+                // old code
+//                this.focusEdge.setSrcApClass(srcAPC);
+                srcVertex.getAP(srcAPId).setAPClass(srcAPC);
 
                 //target APClass
                 String trgAPC = "*";
                 if (!strPrts[6].equals("*")) {
                     trgAPC = strPrts[6];
                 }
-                this.focusEdge.setTrgApClass(trgAPC);
-//                trgVertex.getAP(trgAPId).setAPClass(trgAPC);
+                //old code
+//                this.focusEdge.setTrgApClass(trgAPC);
+                trgVertex.getAP(trgAPId).setAPClass(trgAPC);
 
             }
+            // TODO: End of broken code section
         }
 
         if (-1 != startOfAP) {

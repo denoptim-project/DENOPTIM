@@ -460,8 +460,7 @@ public class GraphEdParameters
      * @throws DENOPTIMException
      */
 
-    public static void processParameters() throws DENOPTIMException
-    {
+    public static void processParameters() throws DENOPTIMException {
         if (FragmentSpaceParameters.fsParamsInUse())
         {
             FragmentSpaceParameters.processParameters();
