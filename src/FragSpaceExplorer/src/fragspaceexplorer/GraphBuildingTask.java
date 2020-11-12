@@ -41,6 +41,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.task.DENOPTIMTask;
 import denoptim.task.ProcessHandler;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.FragmentUtils;
@@ -57,7 +58,7 @@ import denoptim.utils.ObjectPair;
  * @author Marco Foscato
  */
 
-public class GraphBuildingTask implements Callable
+public class GraphBuildingTask extends DENOPTIMTask
 {
     /**
      * Flag about completion
@@ -160,17 +161,6 @@ public class GraphBuildingTask implements Callable
     public int getNumberOfSubTasks()
     {
         return nSubTasks;
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
-     * @return the ID of this task
-     */
- 
-    public String getId()
-    {
-        return id;
     }
 
 //------------------------------------------------------------------------------

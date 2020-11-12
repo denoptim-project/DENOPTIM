@@ -36,6 +36,11 @@ import denoptim.utils.GraphConversionTool;
 public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializable
 {
     /**
+	 * Version UID
+	 */
+	private static final long serialVersionUID = -3132192038061270220L;
+
+	/**
      * molecule representation as a graph of vertices and edges
      */
     private DENOPTIMGraph molGraph;
@@ -381,11 +386,11 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     // the specified object.
 
     @Override
-    public int compareTo(DENOPTIMMolecule B)
+    public int compareTo(DENOPTIMMolecule other)
     {
-        if (this.molFitness > B.molFitness)
+        if (this.molFitness > other.molFitness)
             return 1;
-        else if (this.molFitness < B.molFitness)
+        else if (this.molFitness < other.molFitness)
             return -1;
         return 0;
     }

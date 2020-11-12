@@ -205,7 +205,7 @@ runTest "t12"
 #
 # t12b: Syncronous genetic algorithm running with symmetry constraints.
 #
-#runTest "t12b"
+runTest "t12b"
 
 #
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation

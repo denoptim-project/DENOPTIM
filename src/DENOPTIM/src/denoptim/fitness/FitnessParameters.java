@@ -57,6 +57,11 @@ public class FitnessParameters
      * Formulation of the internally provided fitness
      */
     protected static Object fitEquation = "";
+    
+    /**
+     * Flag controlling production of png graphics for each candidate
+     */
+    protected static boolean makePictures = false;
 
 
 //------------------------------------------------------------------------------
@@ -71,6 +76,13 @@ public class FitnessParameters
     public static boolean useExternalFitness()
     {
         return useExternalFitness;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static boolean makePictures()
+    {
+        return makePictures;
     }
 
 //------------------------------------------------------------------------------
@@ -139,10 +151,14 @@ public class FitnessParameters
         	fitParamsInUse = true;
         	useExternalFitness = false;
             break;
+            
+        case "FP-MAKEPICTURES":
+	        makePictures = true;
+	        break;
 
         default:
-             msg = "Keyword " + key + " is not a known fitness-"
-                                          + "related keyword. Check input files.";
+             msg = "Keyword " + key + " is not a known fitness-related "
+             		+ "keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }

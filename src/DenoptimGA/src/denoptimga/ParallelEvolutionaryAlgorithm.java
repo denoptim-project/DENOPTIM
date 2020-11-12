@@ -41,6 +41,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.task.FitnessTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -53,7 +54,7 @@ import denoptim.utils.TaskUtils;
 public class ParallelEvolutionaryAlgorithm
 {
     final List<Future<Object>> futures;
-    final ArrayList<FTask> submitted;
+    final ArrayList<FitnessTask> submitted;
     final ThreadPoolExecutor tcons;
    
     private final String fsep = System.getProperty("file.separator");
@@ -134,15 +135,15 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (FTask tsk:submitted)
+        for (FitnessTask tsk:submitted)
         {
             if (tsk.foundException())
             {
                 hasprobs = true;
-	        DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-							      + tsk.toString());
-		DENOPTIMLogger.appLogger.log(Level.SEVERE,
-							 tsk.getErrorMessage());
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
+                                                              + tsk.toString());
+                DENOPTIMLogger.appLogger.log(Level.SEVERE,
+                                                         tsk.getErrorMessage());
                 break;
             }
         }
@@ -185,17 +186,17 @@ public class ParallelEvolutionaryAlgorithm
         HashSet<String> lstUID = new HashSet<>(1024);
 
         // first collect UIDs of previously known individuals
-	if (!GAParameters.getUIDFileIn().equals(""))
-	{
+        if (!GAParameters.getUIDFileIn().equals(""))
+        {
 //TODO: if same file avoid re-write
             EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
             EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
-	}
+        }
 
         // placeholder for the molecules
         ArrayList<DENOPTIMMolecule> molPopulation = new ArrayList<>();
 
-	// then, get the molecules from the initial population file 
+        // then, get the molecules from the initial population file 
         String inifile = GAParameters.getInitialPopulationFile();
         if (inifile.length() > 0)
         {
@@ -204,7 +205,7 @@ public class ParallelEvolutionaryAlgorithm
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
         }
 
-	// we are done with initial UIDs
+        // we are done with initial UIDs
         lstUID.clear();
         lstUID = null;
 
@@ -372,7 +373,7 @@ public class ParallelEvolutionaryAlgorithm
 
         int f0 = 0, f1 = 0, f2 = 0;
 
-        Integer numtry = 0;
+        Integer numTries = 0;
         int MAX_TRIES = GAParameters.getMaxTriesFactor();
 
         //System.err.println("EvolvePopulation " + genDir);
@@ -391,9 +392,9 @@ public class ParallelEvolutionaryAlgorithm
                     throw new DENOPTIMException("Errors found during execution.");
                 }
 
-                synchronized (numtry)
+                synchronized (numTries)
                 {
-                    if (numtry == MAX_TRIES)
+                    if (numTries == MAX_TRIES)
                     {
 //                        MF: the cleanup method removed also uncompleted tasks
 //                        causing their results to be forgotten.
@@ -579,17 +580,17 @@ public class ParallelEvolutionaryAlgorithm
 
                     if (res == null)
                     {
-                        synchronized(numtry)
+                        synchronized(numTries)
                         {
-                            numtry++;
+                            numTries++;
                         }
                         continue;
                     }
                     else
                     {
-                        synchronized(numtry)
+                        synchronized(numTries)
                         {
-                            numtry = 0;
+                            numTries = 0;
                         }
                     }
 
@@ -623,9 +624,9 @@ public class ParallelEvolutionaryAlgorithm
                     smiles = res[1].toString().trim();
                     IAtomContainer cmol = (IAtomContainer) res[2];
 
-                    FTask task = new FTask(molName, graph4, inchi, smiles, cmol,
+                    FitnessTask task = new FitnessTask(molName, graph4, inchi, smiles, cmol,
                                            genDir, taskId, molPopulation,
-                                           numtry,GAParameters.getUIDFileOut());
+                                           numTries,GAParameters.getUIDFileOut());
 
                     submitted.add(task);
                     futures.add(tcons.submit(task));
@@ -657,17 +658,17 @@ public class ParallelEvolutionaryAlgorithm
 
                         if (res1 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -702,9 +703,9 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res1[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res1[2];
 
-                        FTask task1 = new FTask(molName, graph1, inchi, smiles,
+                        FitnessTask task1 = new FitnessTask(molName, graph1, inchi, smiles,
                                            cmol, genDir, taskId, molPopulation,
-                                           numtry,GAParameters.getUIDFileOut());
+                                           numTries,GAParameters.getUIDFileOut());
 
                         submitted.add(task1);
                         futures.add(tcons.submit(task1));
@@ -734,17 +735,17 @@ public class ParallelEvolutionaryAlgorithm
 
                         if (res2 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -779,9 +780,9 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res2[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res2[2];
 
-                        FTask task2 = new FTask(molName, graph2, inchi, smiles,
+                        FitnessTask task2 = new FitnessTask(molName, graph2, inchi, smiles,
                                                 cmol, genDir, taskId, molPopulation,
-                                                numtry, 
+                                                numTries, 
                                                 GAParameters.getUIDFileOut());
 
                         submitted.add(task2);
@@ -814,17 +815,17 @@ public class ParallelEvolutionaryAlgorithm
 
                         if (res3 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -859,9 +860,9 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res3[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res3[2];
 
-                        FTask task3 = new FTask(molName, graph3, inchi, smiles,
+                        FitnessTask task3 = new FitnessTask(molName, graph3, inchi, smiles,
                                                 cmol, genDir, taskId, molPopulation,
-                                                numtry, 
+                                                numTries, 
                                                 GAParameters.getUIDFileOut());
 
                         submitted.add(task3);
@@ -983,7 +984,7 @@ public class ParallelEvolutionaryAlgorithm
             }
         }
 
-        Integer numtry = 0;
+        Integer numTries = 0;
 
         try
         {
@@ -994,9 +995,9 @@ public class ParallelEvolutionaryAlgorithm
                     stopRun();
                     throw new DENOPTIMException("Errors found during execution.");
                 }
-                synchronized (numtry)
+                synchronized (numTries)
                 {
-                    if (numtry == MAX_TRIES)
+                    if (numTries == MAX_TRIES)
                     {
 //                      MF: the cleanup method removed also uncompleted tasks
 //                      causing their results to be forgotten.
@@ -1023,9 +1024,9 @@ public class ParallelEvolutionaryAlgorithm
 
                 if (molGraph == null)
                 {
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        numtry++;
+                        numTries++;
                     }
                     continue;
                 }
@@ -1044,18 +1045,18 @@ public class ParallelEvolutionaryAlgorithm
                 if (res == null)
                 {
                     molGraph.cleanup();
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        numtry++;
+                        numTries++;
                     }
                     continue;
                 }
                 else
                 {
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        if(numtry > 0)
-                            numtry--;
+                        if(numTries > 0)
+                            numTries--;
                     }
                 }
                     
@@ -1093,8 +1094,8 @@ public class ParallelEvolutionaryAlgorithm
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];
 
-                FTask task = new FTask(molName, molGraph, inchi, smiles, cmol,
-                                        genDir, taskId, molPopulation, numtry,
+                FitnessTask task = new FitnessTask(molName, molGraph, inchi, smiles, cmol,
+                                        genDir, taskId, molPopulation, numTries,
                                         GAParameters.getUIDFileOut());
                 submitted.add(task);
                 futures.add(tcons.submit(task));
@@ -1114,14 +1115,14 @@ public class ParallelEvolutionaryAlgorithm
         }
 
 
-        if (numtry == MAX_TRIES)
+        if (numTries == MAX_TRIES)
         {
             stopRun();
 
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts.\n", numtry);
+                    "Unable to initialize molecules in {0} attempts.\n", numTries);
             throw new DENOPTIMException("Unable to initialize molecules in " +
-                            numtry + " attempts.");
+                            numTries + " attempts.");
         }
 
         molPopulation.trimToSize();
@@ -1133,14 +1134,14 @@ public class ParallelEvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
-                            ArrayList<FTask> submitted)
+                            ArrayList<FitnessTask> submitted)
     {
         for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (FTask tsk: submitted)
+        for (FitnessTask tsk: submitted)
         {
             tsk.stopTask();
         }
@@ -1154,7 +1155,7 @@ public class ParallelEvolutionaryAlgorithm
 
     private void cleanupCompleted(ThreadPoolExecutor tcons,
                                   List<Future<Object>> futures,
-                                      ArrayList<FTask> submitted)
+                                      ArrayList<FitnessTask> submitted)
     {
         ArrayList<Integer> completed = new ArrayList<>();
 

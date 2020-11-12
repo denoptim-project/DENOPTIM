@@ -63,7 +63,7 @@ public class CombinatorialExplorerByLayer
     /**
      * Storage of references to the submitted subtasks as <code>Future</code>
      */
-    final List<Future<String>> futures;
+    final List<Future<Object>> futures;
 
     /**
      * Storage of references to the submitted subtasks.
@@ -821,10 +821,10 @@ public class CombinatorialExplorerByLayer
      * clean all reference to submitted tasks
      */
 
-    private void cleanup(ThreadPoolExecutor tpe, List<Future<String>> futures,
+    private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
                             ArrayList<GraphBuildingTask> submitted)
     {
-        for (Future f : futures)
+        for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
@@ -845,7 +845,7 @@ public class CombinatorialExplorerByLayer
      * clean all reference to submitted tasks that are completed
      */
 
-    private void cleanupCompleted(List<Future<String>> futures,
+    private void cleanupCompleted(List<Future<Object>> futures,
                                          ArrayList<GraphBuildingTask> submitted)
                                                         throws DENOPTIMException
     {

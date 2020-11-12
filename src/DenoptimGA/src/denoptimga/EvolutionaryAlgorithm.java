@@ -37,6 +37,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.task.DENOPTIMTask;
 import denoptim.task.DENOPTIMTaskManager;
+import denoptim.task.FitnessTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -234,7 +235,7 @@ public class EvolutionaryAlgorithm
         int Xop = -1, Mop = -1, Bop = -1;
 
         int MAX_EVOLVE_ATTEMPTS = 10;
-
+        int numTries = 0;
 
         int n = GAParameters.getNumberOfChildren() + molPopulation.size();
 
@@ -429,7 +430,7 @@ public class EvolutionaryAlgorithm
                         graph4.cleanup();
                         graph4 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -483,7 +484,7 @@ public class EvolutionaryAlgorithm
                         graph1.cleanup();
                         graph1 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -536,7 +537,7 @@ public class EvolutionaryAlgorithm
                         graph2.cleanup();
                         graph2 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -593,7 +594,8 @@ public class EvolutionaryAlgorithm
                         graph3.cleanup();
                         graph3 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph3, res3, genDir, n))
+                    else if (addTask(tasks, molPopulation.size(), graph3, res3, 
+                    		genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 DENOPTIMTaskManager.executeTasks(tasks,
@@ -659,17 +661,13 @@ public class EvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     /**
-     * @param population of molecules
-     * @param current task queue
-     * @param inchicode, smiles and 2D representation - array
-     * @param the current working directory for storing output results
      * @return <code>true</code> if task list has sufficient number of tasks
-     *         for parallel processing
+     * for parallel processing
      */
 
     private boolean addTask(ArrayList<DENOPTIMTask> tasks, int cursize,
                             DENOPTIMGraph molGraph, Object[] res, String wrkDir,
-                            int n) throws DENOPTIMException
+                            int n, int numTries) throws DENOPTIMException
     {
         if (res == null)
             return false;
@@ -692,7 +690,8 @@ public class EvolutionaryAlgorithm
 
         DENOPTIMTask task = new FitnessTask(molName, molGraph,
                                 inchi, smiles, (IAtomContainer) res[2],
-                                wrkDir, taskId, GAParameters.getUIDFileOut());
+                                wrkDir, taskId, null, numTries, 
+                                GAParameters.getUIDFileOut());
 
         tasks.add(task);
 
@@ -702,7 +701,6 @@ public class EvolutionaryAlgorithm
 
         return tasks.size() >= q;
     }
-
 
 //------------------------------------------------------------------------------
 
@@ -721,7 +719,7 @@ public class EvolutionaryAlgorithm
     {
         final int MAX_TRIES = GAParameters.getPopulationSize() * 
                                              GAParameters.getMaxTriesFactor();
-        int t = 0;
+        int numTries = 0;
 
         int npop = GAParameters.getPopulationSize();
 
@@ -753,12 +751,11 @@ public class EvolutionaryAlgorithm
 
         while (molPopulation.size() < GAParameters.getPopulationSize())
         {
-            if (t == MAX_TRIES)
+            if (numTries == MAX_TRIES)
                 break;
 
             // generate a random graph
             DENOPTIMGraph molGraph = EAUtils.buildGraph();
-            //System.err.println(molGraph.toString());
             if (molGraph == null)
                 continue;
 
@@ -818,11 +815,12 @@ GenUtils.pause();
             }
 
             // add to the task list for further processing
-            if (addTask(tasks, molPopulation.size(), molGraph, res, genDir, npop))
+            if (addTask(tasks, molPopulation.size(), molGraph, res, genDir, 
+            		npop, numTries))
             {
                 //System.err.println("Launching batch of: " + tasks.size());
                 // decrement tries
-                t += tasks.size();
+                numTries += tasks.size();
 
                 ArrayList<DENOPTIMMolecule> results =
                         DENOPTIMTaskManager.executeTasks(tasks,
@@ -834,8 +832,8 @@ GenUtils.pause();
                 {
                     molPopulation.addAll(results);
                     // decrement tries
-                    if (t > 0)
-                        t -= tasks.size();
+                    if (numTries > 0)
+                        numTries -= tasks.size();
                 }
 
                 if (molPopulation.size() == GAParameters.getPopulationSize())
@@ -843,13 +841,13 @@ GenUtils.pause();
             }
         }
 
-        if (t == MAX_TRIES)
+        if (numTries == MAX_TRIES)
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts.\n", t);
+                    "Unable to initialize molecules in {0} attempts.\n", numTries);
 
             throw new DENOPTIMException("Unable to initialize molecules in " +
-                            t + " attempts.");
+                            numTries + " attempts.");
         }
 
         molPopulation.trimToSize();

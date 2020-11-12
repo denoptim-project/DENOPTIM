@@ -194,11 +194,6 @@ public class GAParameters
     protected static int numParallelTasks = 0;
 
     /**
-     * Flag controlling production of 2D images
-     */
-    protected static boolean showGraphics = true;
-
-    /**
      * Flag controlling how to sort the population based on the fitness
      */
     protected static boolean sortOrderDecreasing = true;
@@ -380,14 +375,6 @@ public class GAParameters
     {
         return initPoplnFile;
     }
-    
-
-//------------------------------------------------------------------------------
-
-    protected static boolean getGraphicsCreationStatus()
-    {
-        return showGraphics;
-    }
 
 //------------------------------------------------------------------------------
 
@@ -474,16 +461,6 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         numParallelTasks = Integer.parseInt(option);
-                    }
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-SHOWGRAPHICS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        showGraphics = Boolean.parseBoolean(option);
                     }
                     continue;
                 }
