@@ -52,7 +52,7 @@ import denoptim.utils.TaskUtils;
  */
 public class ParallelEvolutionaryAlgorithm
 {
-    final List<Future<String>> futures;
+    final List<Future<Object>> futures;
     final ArrayList<FTask> submitted;
     final ThreadPoolExecutor tcons;
    
@@ -1132,10 +1132,10 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
-    private void cleanup(ThreadPoolExecutor tcons, List<Future<String>> futures,
+    private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
                             ArrayList<FTask> submitted)
     {
-        for (Future f : futures)
+        for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
@@ -1153,7 +1153,7 @@ public class ParallelEvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     private void cleanupCompleted(ThreadPoolExecutor tcons,
-                                  List<Future<String>> futures,
+                                  List<Future<Object>> futures,
                                       ArrayList<FTask> submitted)
     {
         ArrayList<Integer> completed = new ArrayList<>();
