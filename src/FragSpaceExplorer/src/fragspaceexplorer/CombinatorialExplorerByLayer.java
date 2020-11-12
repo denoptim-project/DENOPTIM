@@ -155,8 +155,8 @@ public class CombinatorialExplorerByLayer
         tpe.setRejectedExecutionHandler(new RejectedExecutionHandler()
         {
             @Override
-            public void rejectedExecution(Runnable r, 
-                                                    ThreadPoolExecutor executor)
+            public void rejectedExecution(Runnable r,
+            		ThreadPoolExecutor executor)
             {
                 try
                 {
@@ -340,26 +340,26 @@ public class CombinatorialExplorerByLayer
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 
             Collection<File> lst = FileUtils.listFiles(
-                                  new File(FSEUtils.getNameOfStorageDir(level)),
-                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
-                                                                         false);
-	    // Keep only safely completed serialized graphs
-	    serFromChkRestart = lst.size();
-	    for (File f : lst)
-	    {
-		String fName = f.getName();
-		int serGrphID = Integer.parseInt(fName.substring(
-				            DENOPTIMConstants.SERGFILENAMEROOT.length(),
-                          fName.length()-DENOPTIMConstants.SERGFILENAMEEXT.length()-1));
-		if (serGrphID > chk.getLatestSafelyCompletedGraphId())
-		{
-		    msg = "Removing non-safely completed graph '" + fName + "'";
+            		new File(FSEUtils.getNameOfStorageDir(level)),
+            		new String[] {DENOPTIMConstants.SERGFILENAMEEXT},false);
+            // Keep only safely completed serialized graphs
+            serFromChkRestart = lst.size();
+            for (File f : lst)
+            {
+                String fName = f.getName();
+                int serGrphID = Integer.parseInt(fName.substring(
+                		DENOPTIMConstants.SERGFILENAMEROOT.length(),
+                		fName.length() 
+                		- DENOPTIMConstants.SERGFILENAMEEXT.length()-1));
+                if (serGrphID > chk.getLatestSafelyCompletedGraphId())
+                {
+                    msg = "Removing non-safely completed graph '" + fName + "'";
                     DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-		    serFromChkRestart--;
-		    DenoptimIO.deleteFile(FSEUtils.getNameOfStorageDir(level) 
-					              + File.separator + fName);
-		}
-	    }
+                    serFromChkRestart--;
+                    DenoptimIO.deleteFile(FSEUtils.getNameOfStorageDir(level)
+                    		+ File.separator + fName);
+                }
+            }
         }
 
         boolean interrupted = false;
@@ -381,8 +381,8 @@ public class CombinatorialExplorerByLayer
                     if (allTasksCompleted())
                     {
                         Collection<File> lst = FileUtils.listFiles(
-                                  new File(FSEUtils.getNameOfStorageDir(level)),
-                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
+                        		new File(FSEUtils.getNameOfStorageDir(level)),
+                        		new String[]{DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
                         int outCount = lst.size() - serFromChkRestart;
                         int totSubmSubTasks = countSubTasks();
@@ -466,9 +466,9 @@ public class CombinatorialExplorerByLayer
                 try
                 {
                     Collection<File> lstRootsForNextLev = FileUtils.listFiles(
-                                new File(FSEUtils.getNameOfStorageDir(level-1)),
-                                       new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
-                                                                         false);
+                    		new File(FSEUtils.getNameOfStorageDir(level-1)),
+                    		new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
+                    		false);
                     if (lstRootsForNextLev.size() == 0)
                     {
                         noRoot = true;
@@ -637,9 +637,8 @@ public class CombinatorialExplorerByLayer
                     FragsCombination fragsToAdd = fcf.next();
 
                     GraphBuildingTask task = new GraphBuildingTask(tId,
-                                                                      rootGraph,
-                                                                     fragsToAdd,
-                                                                         level);
+                    		rootGraph, fragsToAdd, level, 
+                    		FSEParameters.getVerbosity());
 
                     ArrayList<Integer> nextIds = fcf.getNextIds();
                     task.setNextIds(nextIds);
@@ -655,74 +654,74 @@ public class CombinatorialExplorerByLayer
                     itersFromChkPt++;
 
                     // Code meant only for preparation of checkpoint files
-		    // The two following variables define at which point in the
-		    // exploration of the space we want to stop.
-		    int maxL = 2;
-		    int maxI = 50;
+                    // The two following variables define at which point in the
+                    // exploration of the space we want to stop.
+                    int maxL = 2;
+                    int maxI = 50;
                     if (FSEParameters.prepareFilesForTests())
-		    {
-			System.out.println("Wait until "+level+"=="+maxL+" and "
-		                 +(total+fcf.getNumGeneratedCombs())+"=="+maxI);
-			if (level>=maxL && 
-			    (total+fcf.getNumGeneratedCombs()>=maxI))
+                    {
+                        System.out.println("Wait until "+level+"=="+maxL+" and "
+                                 +(total+fcf.getNumGeneratedCombs())+"=="+maxI);
+                        if (level>=maxL && 
+                            (total+fcf.getNumGeneratedCombs()>=maxI))
                         {
-			    String key = "NONE";
+                            String key = "NONE";
                             System.out.println("Execution stopped: now waiting "
-				 + " for checkpoint file to mature");
-			    int iWait=0;
-			    int nEqual = 0;
-			    ArrayList<Integer> oldIds =new ArrayList<Integer>();
-			    ArrayList<Integer> nowIds =new ArrayList<Integer>();
+                                 + " for checkpoint file to mature");
+                            int iWait=0;
+                            int nEqual = 0;
+                            ArrayList<Integer> oldIds =new ArrayList<Integer>();
+                            ArrayList<Integer> nowIds =new ArrayList<Integer>();
                             makeCheckPoint();
-			    oldIds.addAll(
-				    FSEParameters.getCheckPoint().getNextIds());
+                            oldIds.addAll(
+                                    FSEParameters.getCheckPoint().getNextIds());
                             while (true)
                             {
-				iWait++;
-				Thread.sleep(1000); // in millisec
-				if (iWait > 120)
-				{
-			            System.out.println("NOT CONVERGED");
-			            System.exit(1);
-				}
+                                iWait++;
+                                Thread.sleep(1000); // in millisec
+                                if (iWait > 120)
+                                {
+                                    System.out.println("NOT CONVERGED");
+                                    System.exit(1);
+                                }
                                 makeCheckPoint();
-				nowIds.clear();
-				nowIds.addAll(
-				    FSEParameters.getCheckPoint().getNextIds());
-				System.out.println(oldIds + " " + nowIds 
-						   + " nEqualChecks:" + nEqual);
-				boolean converged = true;
-				if (nowIds.size() != oldIds.size())
-				{
-				    converged = false;
-				}
-				else
-				{
-				    for (int iId=0; iId<nowIds.size(); iId++)
-				    {
-				        if (nowIds.get(iId) != oldIds.get(iId))
-				        {
-					    nEqual = 0;
-					    converged = false;
-					    break;
-					}
-				    }
-				}
-				if (!converged)
-				{
-			            oldIds.clear();
-				    oldIds.addAll(nowIds);
-				    continue;
-				}
-				nEqual++;
-				if (nEqual >= 10)
-				{
-				    break;
-				}
-			    }
-			    System.out.println("Stopped with converged "
-					         + "checkpoint IDs: " + nowIds);
-			    System.exit(0);
+                                nowIds.clear();
+                                nowIds.addAll(
+                                    FSEParameters.getCheckPoint().getNextIds());
+                                System.out.println(oldIds + " " + nowIds 
+                                                   + " nEqualChecks:" + nEqual);
+                                boolean converged = true;
+                                if (nowIds.size() != oldIds.size())
+                                {
+                                    converged = false;
+                                }
+                                else
+                                {
+                                    for (int iId=0; iId<nowIds.size(); iId++)
+                                    {
+                                        if (nowIds.get(iId) != oldIds.get(iId))
+                                        {
+                                            nEqual = 0;
+                                            converged = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!converged)
+                                {
+                                    oldIds.clear();
+                                    oldIds.addAll(nowIds);
+                                    continue;
+                                }
+                                nEqual++;
+                                if (nEqual >= 10)
+                                {
+                                    break;
+                                }
+                            }
+                            System.out.println("Stopped with converged "
+                                                 + "checkpoint IDs: " + nowIds);
+                            System.exit(0);
                         }
                     }
                 }
@@ -768,7 +767,7 @@ public class CombinatorialExplorerByLayer
             {
                 makeCheckPoint();
                 System.out.println("Ctrl-Z once converged: " +
-				    FSEParameters.getCheckPoint().getNextIds());
+                                    FSEParameters.getCheckPoint().getNextIds());
                 GenUtils.pause();
             }
         }
@@ -791,13 +790,10 @@ public class CombinatorialExplorerByLayer
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
         ArrayList<DENOPTIMAttachmentPoint> scafAPs =
-                                      FragmentUtils.getAPForFragment(scafIdx,0);
+        		FragmentUtils.getAPForFragment(scafIdx,0);
 
         DENOPTIMVertex scafVertex = new DENOPTIMVertex(
-                                              GraphUtils.getUniqueVertexIndex(),
-                                                                        scafIdx,
-                                                                        scafAPs,
-                                                                             0);
+        		GraphUtils.getUniqueVertexIndex(), scafIdx, scafAPs, 0);
 
         // as for DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);
@@ -839,37 +835,6 @@ public class CombinatorialExplorerByLayer
         tpe.getQueue().clear();
     }
 
-//------------------------------------------------------------------------------
-
-    /**
-     * clean all reference to submitted tasks that are completed
-     */
-
-    private void cleanupCompleted(List<Future<Object>> futures,
-                                         ArrayList<GraphBuildingTask> submitted)
-                                                        throws DENOPTIMException
-    {
-        ArrayList<Integer> completed = new ArrayList<>();
-
-        for (int ift=0; ift<submitted.size(); ift++)
-        {
-            if (submitted.get(ift).isCompleted())
-                completed.add(ift);
-        }
-
-        for (int ift=completed.size(); ift>0; ift--)
-        {
-            submitted.remove(submitted.get(ift-1));
-            try
-            {
-                futures.get(ift-1).get();
-            }
-            catch (Throwable t)
-            {
-                throw new DENOPTIMException(t);
-            }
-        }
-    }
-
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------   
+    
 }

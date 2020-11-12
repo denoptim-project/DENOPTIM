@@ -38,10 +38,10 @@ import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
- * Task that calls the fitness provider.
+ * Task that calls the fitness provider for a candidate population member.
  */
 
-public class FitnessTask extends DENOPTIMTask
+public class FitnessTask extends Task
 {
     private final String molName;
     private final DENOPTIMGraph molGraph;
@@ -51,34 +51,8 @@ public class FitnessTask extends DENOPTIMTask
     private final String workDir;
     private volatile ArrayList<DENOPTIMMolecule> curPopln;
     private volatile Integer numtry;
-    private boolean completed = false;
-    private boolean hasException = false;
     private String errMsg = "";
     private final String fileUID;
-
-    private final String SEP = System.getProperty("file.separator");
-    private final String NL = System.getProperty("line.separator");
-    
-    /**
-     * A user-assigned id for this task.
-     */
-    private String id = null;
-
-    private ProcessHandler ph_sc;
-
-//------------------------------------------------------------------------------
-    
-    public boolean foundException()
-    {
-        return hasException;
-    }
-
-//------------------------------------------------------------------------------
-
-    public String getErrorMessage()
-    {
-        return errMsg;
-    }
 
 //------------------------------------------------------------------------------
     
@@ -100,6 +74,7 @@ public class FitnessTask extends DENOPTIMTask
             String m_smiles, IAtomContainer m_iac, String m_dir, int m_Id,
             ArrayList<DENOPTIMMolecule> m_popln, Integer m_try, String m_fileUID)
     {
+    	super(m_Id);
         molName = m_molName;
         workDir = m_dir;
         molinchi = m_inchi;
@@ -107,7 +82,6 @@ public class FitnessTask extends DENOPTIMTask
         molsmiles = m_smiles;
         molinchi = m_inchi;
         molGraph = m_molGraph;
-        id = "" + m_Id;
         curPopln = m_popln;
         fileUID = m_fileUID;
         numtry = m_try;
@@ -134,45 +108,45 @@ public class FitnessTask extends DENOPTIMTask
         result.setMoleculeUID(molinchi);
         result.setMoleculeSmiles(molsmiles);
         
-        String molFinalFile = workDir + SEP + molName + "_FIT.sdf";
-        String molINITFile = workDir + SEP + molName + "_I.sdf";
-        String molImgfile = workDir + SEP + molName + ".png";
+        String finalFitFile = workDir + SEP + molName + "_FIT.sdf";
+        String initialFile = workDir + SEP + molName + "_I.sdf";
+        String pictureFile = workDir + SEP + molName + ".png";
         
-
-        result.setMoleculeFile(molFinalFile);
+        result.setMoleculeFile(finalFitFile);
 
         //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
         // write the input for the fitness provider
-        DenoptimIO.writeMolecule(molINITFile, molInit, false);
+        DenoptimIO.writeMolecule(initialFile, molInit, false);
 
         String shell = System.getenv("SHELL");
         StringBuilder cmdStr = new StringBuilder();
         cmdStr.append(shell).append(" ")
                 .append(FitnessParameters.getExternalFitnessProvider())
-                .append(" ").append(molINITFile).append(" ").append(molFinalFile)
+                .append(" ").append(initialFile).append(" ").append(finalFitFile)
                 .append(" ").append(workDir).append(" ").append(id)
                 .append(" ").append(fileUID);
         
         String msg = "Calling fitness provider: => " + cmdStr + NL;
         DENOPTIMLogger.appLogger.log(Level.INFO, msg);
 
-        ph_sc = new ProcessHandler(cmdStr.toString(), id);
+        processHandler = new ProcessHandler(cmdStr.toString(), 
+        		Integer.toString(id));
         try
         {
-            ph_sc.runProcess();
+            processHandler.runProcess();
             cmdStr.setLength(0);
 
-            if (ph_sc.getExitCode() != 0)
+            if (processHandler.getExitCode() != 0)
             {
                 hasException = true;
                 msg = "Failed to execute "
                              + System.getenv("SHELL")
                              + " script '"
                              + FitnessParameters.getExternalFitnessProvider()
-                             + "' on " + molINITFile;
+                             + "' on " + initialFile;
                 errMsg = msg;
                 DENOPTIMLogger.appLogger.severe(msg);
-                DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
+                DENOPTIMLogger.appLogger.severe(processHandler.getErrorOutput());
                 throw new DENOPTIMException(msg);
             }
 
@@ -181,7 +155,7 @@ public class FitnessTask extends DENOPTIMTask
             boolean unreadable = false;
             try
             {
-                processedMol = DenoptimIO.readSingleSDFFile(molFinalFile);
+                processedMol = DenoptimIO.readSingleSDFFile(finalFitFile);
                 if (processedMol.isEmpty())
                 {
                     unreadable=true;
@@ -200,9 +174,9 @@ public class FitnessTask extends DENOPTIMTask
                 // make a copy of the unreadable FIT file that will be replaced
                 String fitFileCp = workDir + SEP + molName 
                                                           + "_UnreadbleFIT.sdf";
-                FileUtils.copyFile(new File(molFinalFile), 
+                FileUtils.copyFile(new File(finalFitFile), 
                                    new File(fitFileCp));
-                FileUtils.deleteQuietly(new File(molFinalFile));
+                FileUtils.deleteQuietly(new File(finalFitFile));
                 
                 String err = "#FTask: Unable to retrive data. See " + fitFileCp;
 
@@ -213,7 +187,7 @@ public class FitnessTask extends DENOPTIMTask
                 processedMol.setProperty("MOL_ERROR", err);
                 processedMol.setProperty("GCODE", molGraph.getGraphId());
                 processedMol.setProperty("GraphENC", molGraph.toString());
-                DenoptimIO.writeMolecule(molFinalFile, processedMol, false);
+                DenoptimIO.writeMolecule(finalFitFile, processedMol, false);
                 
                 result.setError(err);
                 completed = true;
@@ -281,7 +255,7 @@ public class FitnessTask extends DENOPTIMTask
                 {
                     processedMol.setProperty("GraphMsg", molGraph.getMsg());
                 }
-                DenoptimIO.writeMolecule(molFinalFile, processedMol, false);
+                DenoptimIO.writeMolecule(finalFitFile, processedMol, false);
 
                 result.setMoleculeFitness(fitVal);
 
@@ -305,8 +279,8 @@ public class FitnessTask extends DENOPTIMTask
                 {
                     try
                     {
-                        DENOPTIMMoleculeUtils.moleculeToPNG(processedMol, molImgfile);
-                        result.setImageFile(molImgfile);
+                        DENOPTIMMoleculeUtils.moleculeToPNG(processedMol, pictureFile);
+                        result.setImageFile(pictureFile);
                     }
                     catch (Exception ex)
                     {
@@ -319,12 +293,12 @@ public class FitnessTask extends DENOPTIMTask
             else
             {
                 hasException = true;
-                msg = "Could not find \"FITNESS\" tag in file: " + molFinalFile;
+                msg = "Could not find \"FITNESS\" tag in file: " + finalFitFile;
                 errMsg = msg;
                 DENOPTIMLogger.appLogger.severe(msg);
                 throw new DENOPTIMException(msg);
             }
-            ph_sc = null;
+            processHandler = null;
         }
         catch (Exception ex)
         {
@@ -337,37 +311,5 @@ public class FitnessTask extends DENOPTIMTask
     }
 
 //------------------------------------------------------------------------------
-   
-    /**
-     * @return <code>true</code> if the task is completed
-     */
-    public boolean isCompleted()
-    {
-        return completed;
-    }
 
-//------------------------------------------------------------------------------
-    
-    public void stopTask()
-    {
-        if (completed)
-        {
-            return;
-        }
-        if (ph_sc != null)
-        {
-            System.err.println("Calling stop on Process: " + id + " " + molName);
-            ph_sc.stopProcess();
-        }
-    }
-
-//------------------------------------------------------------------------------
-    
-    @Override
-    public String toString()
-    {
-        return id + " " + molName + " " + completed;
-    }
-
-//------------------------------------------------------------------------------
 }

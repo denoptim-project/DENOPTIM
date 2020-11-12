@@ -21,7 +21,6 @@ package fragspaceexplorer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
@@ -31,7 +30,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
@@ -41,8 +39,8 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
-import denoptim.task.DENOPTIMTask;
 import denoptim.task.ProcessHandler;
+import denoptim.task.Task;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.FragmentUtils;
 import denoptim.utils.GenUtils;
@@ -58,23 +56,8 @@ import denoptim.utils.ObjectPair;
  * @author Marco Foscato
  */
 
-public class GraphBuildingTask extends DENOPTIMTask
+public class GraphBuildingTask extends Task
 {
-    /**
-     * Flag about completion
-     */
-    private boolean completed = false;
-
-    /**
-     * Flag about exception
-     */
-    private boolean hasException = false;
-
-    /**
-     * Exception thrown
-     */
-    private Throwable thrownExc;
-
     /**
      * The graph that is expanded
      */
@@ -86,7 +69,7 @@ public class GraphBuildingTask extends DENOPTIMTask
     private int rootId;
 
     /**
-     * GraphID: may be from the original graph of from its latest generated 
+     * GraphID: may be from the original graph or from its latest generated 
      * cyclic alternative.
      */
     private int graphId;
@@ -102,19 +85,9 @@ public class GraphBuildingTask extends DENOPTIMTask
     private FragsCombination fragsToAdd;
 
     /**
-     * A user-assigned id for this task.
-     */
-    private String id = null;
-
-    /**
      * Number of subtasks
      */
     private int nSubTasks = 0;
-
-    /**
-     * Executor for external bash script
-     */
-    private ProcessHandler ph_sc;
 
     /**
      * Vector of indeces identifying the next combination of fragments.
@@ -122,36 +95,36 @@ public class GraphBuildingTask extends DENOPTIMTask
      */
     private ArrayList<Integer> nextIds;
 
-    /**
-     * Verbosity level
-     */
-    private int verbosity = FSEParameters.getVerbosity();
-
-
 //------------------------------------------------------------------------------
+   
+    /**
+     * Constructor
+     */
  
-    /**
-     * @return <code>true</code> if an exception has been thrown within this 
-     * subtask, which also includes the scenario where the executed external
-     * script returned a non-zero exit status.
-     */
-  
-    public boolean foundException()
+    public GraphBuildingTask(int id, DENOPTIMGraph m_molGraph, 
+    		FragsCombination fragsToAdd, int level, int verbosity) throws DENOPTIMException
     {
-        return hasException;
+        super(id);
+        try
+        {
+        	//TODO: replace all serialization-based deep cloning with deep clone method
+            molGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph);
+            molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+            rootId = m_molGraph.getGraphId();
+            graphId = molGraph.getGraphId();
+        }
+        catch (DENOPTIMException de)
+        {
+            hasException = true;
+            thrownExc = de;
+            String msg = "Unable to copy root graph";
+            throw new DENOPTIMException(msg,de);
+        }
+        this.fragsToAdd = fragsToAdd;
+        this.level = level;  
+        this.verbosity = verbosity;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @return the exception thrown within this task
-     */
-
-    public Throwable getException()
-    {
-        return thrownExc;
-    }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -220,41 +193,12 @@ public class GraphBuildingTask extends DENOPTIMTask
     {
         try
         {
-            this.nextIds = (ArrayList) nextIds.clone();
+            this.nextIds = (ArrayList<Integer>) nextIds.clone();
         }
         catch (Throwable t)
         {
             throw new DENOPTIMException(t);
         }
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
-     * Constructor
-     */
- 
-    public GraphBuildingTask(int m_Id, DENOPTIMGraph m_molGraph, 
-                                     FragsCombination m_fragsToAdd, int m_level)
-                                                        throws DENOPTIMException
-    {
-        id = "" + m_Id;
-        try
-        {
-            molGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph);
-            molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-            rootId = m_molGraph.getGraphId();
-            graphId = molGraph.getGraphId();
-        }
-        catch (DENOPTIMException de)
-        {
-            hasException = true;
-            thrownExc = de;
-            String msg = "Unable to copy root graph";
-            throw new DENOPTIMException(msg,de);
-        }
-        fragsToAdd = m_fragsToAdd;
-        level = m_level;      
     }
 
 //------------------------------------------------------------------------------
@@ -282,7 +226,7 @@ public class GraphBuildingTask extends DENOPTIMTask
             }
             if (verbosity > 0)
             {
-                msg = msg +  System.getProperty("line.separator");
+                msg = msg + NL;
                 DENOPTIMLogger.appLogger.info(msg);
             }
 
@@ -292,8 +236,6 @@ public class GraphBuildingTask extends DENOPTIMTask
             for (IdFragmentAndAP srcAp : fragsToAdd.keySet())
             {
                 int sVId = srcAp.getVertexId();
-                int sFId = srcAp.getVertexMolId();
-                int sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
                 DENOPTIMVertex srcVrtx = molGraph.getVertexWithId(sVId);
                 String sCls = 
@@ -426,11 +368,10 @@ public class GraphBuildingTask extends DENOPTIMTask
                     for (int ig = 0; ig<altCyclicGraphs.size(); ig++)
                     {
                         DENOPTIMGraph g = altCyclicGraphs.get(ig);
-                        int gId = g.getGraphId();
-
+                        
                         if (verbosity > 0)
                         {
-                            msg = "Graph " + gId 
+                            msg = "Graph " + g.getGraphId()
                                   + " is cyclic alternative "
                                   + (ig+1) + "/" + altCyclicGraphs.size()
                                   + " " + lst;
@@ -445,9 +386,8 @@ public class GraphBuildingTask extends DENOPTIMTask
                         try 
                         {
                             // Prepare molecular representation
-                            GraphConversionTool gct = new GraphConversionTool();
-                            IAtomContainer mol = gct.convertGraphToMolecule(g,
-                                                                          true);
+                            IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(g, true);
+                            
                             // Level that generated this graph
                             altRes[4] = level;
                             
@@ -477,12 +417,12 @@ public class GraphBuildingTask extends DENOPTIMTask
                       
                             // Store graph
                             FSEUtils.storeGraphOfLevel(g,level,rootId,nextIds);
-                            graphId = gId;
+                            graphId = g.getGraphId();
     
                             // Optionally perform external task
                             if (FSEParameters.submitExternalTask())
                             {
-                                executeExternalBASHScript(altRes,gId);
+                                executeExternalBASHScript(altRes);
                             }
                         }
                         catch (Throwable t)
@@ -508,7 +448,7 @@ public class GraphBuildingTask extends DENOPTIMTask
                     	fseRes[2] = res [2];
                     	fseRes[3] = rootId;
                     	fseRes[4] = level;
-                        executeExternalBASHScript(fseRes, molGraph.getGraphId());
+                        executeExternalBASHScript(fseRes);
                     }
                 }
             }
@@ -532,11 +472,9 @@ public class GraphBuildingTask extends DENOPTIMTask
      * Execute the external script.
      * @param res the vector containing the results from the evaluation of the
      * graph representation
-     * @param gId the ID of the graph for which the external task is submitted
      */
 
-    private void executeExternalBASHScript(Object[] res, int gId) 
-                                                                throws Throwable
+    private void executeExternalBASHScript(Object[] res) throws Throwable
     {
         // prepare variables
         String molinchi = res[0].toString().trim();
@@ -549,20 +487,15 @@ public class GraphBuildingTask extends DENOPTIMTask
         molInit.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
         molInit.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         
-
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
         		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
         String workDir = FSEParameters.getWorkDirectory();
-        String fsep = System.getProperty("file.separator");
-        String molInitFile = workDir + fsep + molName 
+        String molInitFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTIN;
-        String molFinalFile = workDir + fsep + molName 
+        String molFinalFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
-
         molInit.setProperty(CDKConstants.TITLE, molName);
-
-        // write current graph to file as molecular objects
         DenoptimIO.writeMolecule(molInitFile, molInit, false);
 
         //TODO: deal with internal fitness and other kinds of fitness
@@ -585,78 +518,23 @@ public class GraphBuildingTask extends DENOPTIMTask
             DENOPTIMLogger.appLogger.log(Level.INFO, "Executing: {0}", cmdStr);
         }
 
-        // run it
-        ph_sc = new ProcessHandler(cmdStr.toString(), id);
+        // run the process
+        processHandler = new ProcessHandler(cmdStr.toString(), 
+        		Integer.toString(id));
 
-        try
+        processHandler.runProcess();
+        if (processHandler.getExitCode() != 0)
         {
-            ph_sc.runProcess();
-            if (ph_sc.getExitCode() != 0)
-            {
-                String msg = "Failed to execute "
-                             + FitnessParameters.getExternalFitnessProviderInterpreter().toString()
-                             + " script '"
-                             + FitnessParameters.getExternalFitnessProvider()
-                             + "' on " + molInitFile;
-                DENOPTIMLogger.appLogger.severe(msg);
-                DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
-                throw new DENOPTIMException(msg);
-            }
-            ph_sc = null;
+            String msg = "Failed to execute " + FitnessParameters
+            		.getExternalFitnessProviderInterpreter().toString()
+		        + " script '"
+		        + FitnessParameters.getExternalFitnessProvider()
+		        + "' on " + molInitFile;
+            DENOPTIMLogger.appLogger.severe(msg);
+            DENOPTIMLogger.appLogger.severe(processHandler.getErrorOutput());
+            throw new DENOPTIMException(msg);
         }
-        catch (Exception ex)
-        {
-            throw new DENOPTIMException(ex);
-        }
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
-     * @return <code>true</code> if the task is completed
-     */
-
-    public boolean isCompleted()
-    {
-        return completed;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Stop the task if not already completed
-     */
-
-    public void stopTask()
-    {
-        if (completed)
-        {
-            return;
-        }
-        if (ph_sc != null)
-        {
-            System.err.println("Calling stop on processes from "
-                                                   + "GraphBuildingTask " + id);
-            ph_sc.stopProcess();
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns a string identifying this task for its ID and reporting whether
-     * an exception has been thrown and if the tasks is completed.
-     */
-    
-    @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("GraphBuildingTask [id=").append(id).
-           append(", hasException=").append(hasException).
-           append(", completed=").append(completed).
-           append("] ");
-        return sb.toString();
+        processHandler = null;
     }
 
 //------------------------------------------------------------------------------

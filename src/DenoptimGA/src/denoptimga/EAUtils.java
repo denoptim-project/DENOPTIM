@@ -83,6 +83,8 @@ public class EAUtils
     // for each fragment store the reactions associated with it
     protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
 
+    private static final String NL =System.getProperty("line.separator");
+    
     // flag for debugging
     private static final boolean DEBUG = false;
 
@@ -152,7 +154,7 @@ public class EAUtils
         if (sdev > 0.0001)
         {
             StringBuilder sb = new StringBuilder(128);
-            sb.append("\n\n#####POPULATION SUMMARY#####\n");
+            sb.append(NL+NL+"#####POPULATION SUMMARY#####"+NL);
             int n = popln.size();
             sb.append(String.format("%-30s", "SIZE:")).append(String.format("%12s", n));
             sb.append(System.getProperty("line.separator"));
@@ -191,7 +193,7 @@ public class EAUtils
                 scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
             }
 
-            sb.append("\n\n#####SCAFFOLD ANALYSIS#####\n");
+            sb.append(NL+NL+"#####SCAFFOLD ANALYSIS#####"+NL);
             for (Map.Entry pairs : scf_cntr.entrySet())
             {
                 sb.append(pairs.getKey()).append(" ").append(pairs.getValue()).append(System.getProperty("line.separator"));
@@ -406,34 +408,34 @@ public class EAUtils
                 // select vertex to substitute
                 //System.err.println("FRAGMENT SUBSTITUTION");
                 
-                msg = "Performing fragment substitution mutation\n";
+                msg = "Performing fragment substitution mutation"+NL;
                 DENOPTIMLogger.appLogger.info(msg);
                 status = DENOPTIMGraphOperations.
                         substituteFragment(molGraph, molVertex);
                 if (status)
                 {
-                    msg = "Fragment substitution successful.\n";
+                    msg = "Fragment substitution successful."+NL;
                     //molGraph.setMsg(molGraph.getMsg() + " <> Substitution");
                 }
                 else
-                    msg = "Fragment substitution unsuccessful.\n";
+                    msg = "Fragment substitution unsuccessful."+NL;
                 DENOPTIMLogger.appLogger.info(msg);
                 break;
             case 1:
                 //System.err.println("FRAGMENT APPEND");
                 
-                msg = "Performing fragment append.\n";
+                msg = "Performing fragment append."+NL;
                 DENOPTIMLogger.appLogger.info(msg);
                                 // nerer done directly on the scaffold -> symmetry falg = false
                 status = DENOPTIMGraphOperations.
                         extendGraph(molGraph, molVertex, false, false);
                 if (status)
                 {
-                    msg = "Fragment append successful.\n";
+                    msg = "Fragment append successful."+NL;
                     //molGraph.setMsg(molGraph.getMsg() + " <> Append");
                 }
                 else
-                    msg = "Fragment append unsuccessful.\n";
+                    msg = "Fragment append unsuccessful."+NL;
                 DENOPTIMLogger.appLogger.info(msg);
                 break;
             default:
@@ -441,17 +443,17 @@ public class EAUtils
                 
                 //System.err.println("FRAGMENT DELETION");
                 
-                msg = "Performing vertex deletion\n";
+                msg = "Performing vertex deletion"+NL;
                 DENOPTIMLogger.appLogger.info(msg);
                 // Deletion
                 status = DENOPTIMGraphOperations.deleteFragment(molGraph,molVertex);
                 if (status)
                 {
-                    msg = "Vertex deletion successful.\n";
+                    msg = "Vertex deletion successful."+NL;
                     //molGraph.setMsg(molGraph.getMsg() + " <> Deletion");
                 }
                 else
-                    msg = "Vertex deletion unsuccessful.\n";
+                    msg = "Vertex deletion unsuccessful."+NL;
                 DENOPTIMLogger.appLogger.info(msg);
                 break;
         }
@@ -2089,7 +2091,7 @@ MF: TO BE TESTED
                             + vtx.getVertexId()
                             + " MolId: " + (vtx.getMolId() + 1)
                             + " Ftype: " + vtx.getFragmentType()
-                            + "\n"+ molGraph+" \n "
+                            + NL+ molGraph + NL
                             + " AP class: " + apClass;
                         DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
                         break;

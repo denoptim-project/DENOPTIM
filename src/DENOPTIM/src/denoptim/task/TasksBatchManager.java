@@ -33,10 +33,10 @@ import denoptim.molecule.DENOPTIMMolecule;
 
 
 /**
- * Class that manages the tasks and executes the required processes
+ * Class that manages the submission of a batch of tasks.
  * @author Vishwesh Venkatraman
  */
-public class DENOPTIMTaskManager
+public class TasksBatchManager
 {
 
 //------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public class DENOPTIMTaskManager
      */
 
     public static ArrayList<DENOPTIMMolecule>
-            executeTasks(final ArrayList<DENOPTIMTask> tasks, int numOfProcessors)
+            executeTasks(final ArrayList<Task> tasks, int numOfProcessors)
                                                         throws DENOPTIMException
     {
         int numOfJobs = tasks.size();
@@ -93,7 +93,7 @@ public class DENOPTIMTaskManager
                 }
                 catch (InterruptedException ie)
                 {
-                    for (DENOPTIMTask tsk : tasks)
+                    for (Task tsk : tasks)
                     {
                         tsk.stopTask();
                     }

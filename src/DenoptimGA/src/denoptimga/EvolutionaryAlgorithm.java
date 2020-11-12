@@ -35,8 +35,8 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
-import denoptim.task.DENOPTIMTask;
-import denoptim.task.DENOPTIMTaskManager;
+import denoptim.task.Task;
+import denoptim.task.TasksBatchManager;
 import denoptim.task.FitnessTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
@@ -222,7 +222,7 @@ public class EvolutionaryAlgorithm
         // temporary store for inchi codes
         ArrayList<String> codes = EAUtils.getInchiCodes(molPopulation);
 
-        ArrayList<DENOPTIMTask> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = new ArrayList<>();
         
         double sdev_old = EAUtils.getPopulationSD(molPopulation);
         
@@ -433,7 +433,7 @@ public class EvolutionaryAlgorithm
                     else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
-                                DENOPTIMTaskManager.executeTasks(tasks,
+                                TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
 
@@ -487,7 +487,7 @@ public class EvolutionaryAlgorithm
                     else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
-                                DENOPTIMTaskManager.executeTasks(tasks,
+                                TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
                         if (results != null && results.size() > 0)
@@ -540,7 +540,7 @@ public class EvolutionaryAlgorithm
                     else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
-                                DENOPTIMTaskManager.executeTasks(tasks,
+                                TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
 
@@ -598,7 +598,7 @@ public class EvolutionaryAlgorithm
                     		genDir, n, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
-                                DENOPTIMTaskManager.executeTasks(tasks,
+                                TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
 
@@ -665,7 +665,7 @@ public class EvolutionaryAlgorithm
      * for parallel processing
      */
 
-    private boolean addTask(ArrayList<DENOPTIMTask> tasks, int cursize,
+    private boolean addTask(ArrayList<Task> tasks, int cursize,
                             DENOPTIMGraph molGraph, Object[] res, String wrkDir,
                             int n, int numTries) throws DENOPTIMException
     {
@@ -688,7 +688,7 @@ public class EvolutionaryAlgorithm
         if (res[1] != null)
             smiles = res[1].toString().trim();
 
-        DENOPTIMTask task = new FitnessTask(molName, molGraph,
+        Task task = new FitnessTask(molName, molGraph,
                                 inchi, smiles, (IAtomContainer) res[2],
                                 wrkDir, taskId, null, numTries, 
                                 GAParameters.getUIDFileOut());
@@ -747,7 +747,7 @@ public class EvolutionaryAlgorithm
             }
         }
 
-        ArrayList<DENOPTIMTask> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = new ArrayList<>();
 
         while (molPopulation.size() < GAParameters.getPopulationSize())
         {
@@ -823,7 +823,7 @@ GenUtils.pause();
                 numTries += tasks.size();
 
                 ArrayList<DENOPTIMMolecule> results =
-                        DENOPTIMTaskManager.executeTasks(tasks,
+                        TasksBatchManager.executeTasks(tasks,
                                             GAParameters.getNumberOfCPU());
                 tasks.clear();
 
