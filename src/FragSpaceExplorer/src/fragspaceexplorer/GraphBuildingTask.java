@@ -39,6 +39,8 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.task.FitnessTask;
+import denoptim.task.OffspringFitnessTask;
 import denoptim.task.ProcessHandler;
 import denoptim.task.Task;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -56,13 +58,8 @@ import denoptim.utils.ObjectPair;
  * @author Marco Foscato
  */
 
-public class GraphBuildingTask extends Task
+public class GraphBuildingTask extends FitnessTask
 {
-    /**
-     * The graph that is expanded
-     */
-    private DENOPTIMGraph molGraph;
-
     /**
      * The graph ID of the root graph
      */
@@ -101,25 +98,16 @@ public class GraphBuildingTask extends Task
      * Constructor
      */
  
-    public GraphBuildingTask(int id, DENOPTIMGraph m_molGraph, 
-    		FragsCombination fragsToAdd, int level, int verbosity) throws DENOPTIMException
+    public GraphBuildingTask(DENOPTIMGraph m_molGraph, 
+    		FragsCombination fragsToAdd, int level, String workDir, 
+    		int verbosity) throws DENOPTIMException
     {
-        super(id);
-        try
-        {
-        	//TODO: replace all serialization-based deep cloning with deep clone method
-            molGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph);
-            molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-            rootId = m_molGraph.getGraphId();
-            graphId = molGraph.getGraphId();
-        }
-        catch (DENOPTIMException de)
-        {
-            hasException = true;
-            thrownExc = de;
-            String msg = "Unable to copy root graph";
-            throw new DENOPTIMException(msg,de);
-        }
+    	//TODO: replace all serialization-based deep cloning with deep clone method
+        super((DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph));
+        molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+        rootId = m_molGraph.getGraphId();
+        graphId = molGraph.getGraphId();
+        this.workDir = workDir;
         this.fragsToAdd = fragsToAdd;
         this.level = level;  
         this.verbosity = verbosity;
@@ -386,7 +374,9 @@ public class GraphBuildingTask extends Task
                         try 
                         {
                             // Prepare molecular representation
-                            IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(g, true);
+                            IAtomContainer mol = 
+                            		GraphConversionTool.convertGraphToMolecule(
+                            				g, true);
                             
                             // Level that generated this graph
                             altRes[4] = level;
@@ -422,7 +412,7 @@ public class GraphBuildingTask extends Task
                             // Optionally perform external task
                             if (FSEParameters.submitExternalTask())
                             {
-                                executeExternalBASHScript(altRes);
+                                sendToFitnessProvider(altRes);
                             }
                         }
                         catch (Throwable t)
@@ -448,7 +438,7 @@ public class GraphBuildingTask extends Task
                     	fseRes[2] = res [2];
                     	fseRes[3] = rootId;
                     	fseRes[4] = level;
-                        executeExternalBASHScript(fseRes);
+                    	sendToFitnessProvider(fseRes);
                     }
                 }
             }
@@ -474,7 +464,7 @@ public class GraphBuildingTask extends Task
      * graph representation
      */
 
-    private void executeExternalBASHScript(Object[] res) throws Throwable
+    private void sendToFitnessProvider(Object[] res) throws Throwable
     {
         // prepare variables
         String molinchi = res[0].toString().trim();
@@ -497,45 +487,11 @@ public class GraphBuildingTask extends Task
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
         molInit.setProperty(CDKConstants.TITLE, molName);
         DenoptimIO.writeMolecule(molInitFile, molInit, false);
-
-        //TODO: deal with internal fitness and other kinds of fitness
-
-        //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
-
-        // build command
-        StringBuilder cmdStr = new StringBuilder();
-        String shell = System.getenv("SHELL");
-        cmdStr.append(shell).append(" ")
-              .append(FitnessParameters.getExternalFitnessProvider())
-              .append(" ").append(molInitFile)
-              .append(" ").append(molFinalFile)
-              .append(" ").append(workDir)
-              .append(" ").append(id)
-              .append(" ").append(FSEParameters.getUIDFileName());
-
-        if (verbosity > 0)
-        {
-            DENOPTIMLogger.appLogger.log(Level.INFO, "Executing: {0}", cmdStr);
-        }
-
-        // run the process
-        processHandler = new ProcessHandler(cmdStr.toString(), 
-        		Integer.toString(id));
-
-        processHandler.runProcess();
-        if (processHandler.getExitCode() != 0)
-        {
-            String msg = "Failed to execute " + FitnessParameters
-            		.getExternalFitnessProviderInterpreter().toString()
-		        + " script '"
-		        + FitnessParameters.getExternalFitnessProvider()
-		        + "' on " + molInitFile;
-            DENOPTIMLogger.appLogger.severe(msg);
-            DENOPTIMLogger.appLogger.severe(processHandler.getErrorOutput());
-            throw new DENOPTIMException(msg);
-        }
-        processHandler = null;
+        
+        executeFitnessProvider(molInitFile, molFinalFile, 
+        		FSEParameters.getUIDFileName());
     }
+
 
 //------------------------------------------------------------------------------
     

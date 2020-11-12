@@ -601,8 +601,8 @@ public class CombinatorialExplorerByLayer
             if (restartFromChkPt && firstAfterRestart)
             {
                 firstAfterRestart = false;
-                fcf.setStartingPoint(
-                                    FSEParameters.getCheckPoint().getNextIds());
+                fcf.setStartingPoint(FSEParameters.getCheckPoint()
+                		.getNextIds());
             }
 
             // Print summary
@@ -633,11 +633,11 @@ public class CombinatorialExplorerByLayer
                         throw new DENOPTIMException(msg,thrownByTask);
                     }
 
-                    int tId = TaskUtils.getUniqueTaskIndex();
                     FragsCombination fragsToAdd = fcf.next();
 
-                    GraphBuildingTask task = new GraphBuildingTask(tId,
-                    		rootGraph, fragsToAdd, level, 
+                    GraphBuildingTask task = new GraphBuildingTask(
+                    		rootGraph, fragsToAdd, level,
+                    		FSEParameters.getWorkDirectory(),
                     		FSEParameters.getVerbosity());
 
                     ArrayList<Integer> nextIds = fcf.getNextIds();

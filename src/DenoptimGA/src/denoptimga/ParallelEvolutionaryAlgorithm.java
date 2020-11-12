@@ -41,7 +41,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
-import denoptim.task.FitnessTask;
+import denoptim.task.OffspringFitnessTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -54,7 +54,7 @@ import denoptim.utils.TaskUtils;
 public class ParallelEvolutionaryAlgorithm
 {
     final List<Future<Object>> futures;
-    final ArrayList<FitnessTask> submitted;
+    final ArrayList<OffspringFitnessTask> submitted;
     final ThreadPoolExecutor tcons;
    
     private final String fsep = System.getProperty("file.separator");
@@ -135,7 +135,7 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (FitnessTask tsk:submitted)
+        for (OffspringFitnessTask tsk:submitted)
         {
             if (tsk.foundException())
             {
@@ -619,13 +619,11 @@ public class ParallelEvolutionaryAlgorithm
                     molName = "M" + GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                             GraphUtils.getUniqueMoleculeIndex());
 
-                    int taskId = TaskUtils.getUniqueTaskIndex();
-
                     smiles = res[1].toString().trim();
                     IAtomContainer cmol = (IAtomContainer) res[2];
 
-                    FitnessTask task = new FitnessTask(molName, graph4, inchi, smiles, cmol,
-                                           genDir, taskId, molPopulation,
+                    OffspringFitnessTask task = new OffspringFitnessTask(molName, graph4, inchi, smiles, cmol,
+                                           genDir, molPopulation,
                                            numTries,GAParameters.getUIDFileOut());
 
                     submitted.add(task);
@@ -698,13 +696,11 @@ public class ParallelEvolutionaryAlgorithm
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
 
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
                         smiles = res1[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res1[2];
 
-                        FitnessTask task1 = new FitnessTask(molName, graph1, inchi, smiles,
-                                           cmol, genDir, taskId, molPopulation,
+                        OffspringFitnessTask task1 = new OffspringFitnessTask(molName, graph1, inchi, smiles,
+                                           cmol, genDir, molPopulation,
                                            numTries,GAParameters.getUIDFileOut());
 
                         submitted.add(task1);
@@ -774,14 +770,12 @@ public class ParallelEvolutionaryAlgorithm
                         molName = "M" +
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
-
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
+                        
                         smiles = res2[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res2[2];
 
-                        FitnessTask task2 = new FitnessTask(molName, graph2, inchi, smiles,
-                                                cmol, genDir, taskId, molPopulation,
+                        OffspringFitnessTask task2 = new OffspringFitnessTask(molName, graph2, inchi, smiles,
+                                                cmol, genDir, molPopulation,
                                                 numTries, 
                                                 GAParameters.getUIDFileOut());
 
@@ -854,14 +848,11 @@ public class ParallelEvolutionaryAlgorithm
                         molName = "M" +
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
-
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
                         smiles = res3[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res3[2];
 
-                        FitnessTask task3 = new FitnessTask(molName, graph3, inchi, smiles,
-                                                cmol, genDir, taskId, molPopulation,
+                        OffspringFitnessTask task3 = new OffspringFitnessTask(molName, graph3, inchi, smiles,
+                                                cmol, genDir, molPopulation,
                                                 numTries, 
                                                 GAParameters.getUIDFileOut());
 
@@ -1089,13 +1080,11 @@ public class ParallelEvolutionaryAlgorithm
                         GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                     GraphUtils.getUniqueMoleculeIndex());
 
-                int taskId = TaskUtils.getUniqueTaskIndex();
-
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];
 
-                FitnessTask task = new FitnessTask(molName, molGraph, inchi, smiles, cmol,
-                                        genDir, taskId, molPopulation, numTries,
+                OffspringFitnessTask task = new OffspringFitnessTask(molName, molGraph, inchi, smiles, cmol,
+                                        genDir, molPopulation, numTries,
                                         GAParameters.getUIDFileOut());
                 submitted.add(task);
                 futures.add(tcons.submit(task));
@@ -1134,14 +1123,14 @@ public class ParallelEvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
-                            ArrayList<FitnessTask> submitted)
+                            ArrayList<OffspringFitnessTask> submitted)
     {
         for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (FitnessTask tsk: submitted)
+        for (OffspringFitnessTask tsk: submitted)
         {
             tsk.stopTask();
         }
@@ -1155,7 +1144,7 @@ public class ParallelEvolutionaryAlgorithm
 
     private void cleanupCompleted(ThreadPoolExecutor tcons,
                                   List<Future<Object>> futures,
-                                      ArrayList<FitnessTask> submitted)
+                                      ArrayList<OffspringFitnessTask> submitted)
     {
         ArrayList<Integer> completed = new ArrayList<>();
 

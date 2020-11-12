@@ -20,9 +20,9 @@ package denoptim.task;
 
 import java.util.concurrent.Callable;
 
+
 /**
- * This class must be extended by those that perform a fitness evaluation
- * @author Vishwesh Venkatraman
+ * A task that can throw exceptions.
  */
 
 public abstract class Task implements Callable<Object>
@@ -59,7 +59,11 @@ public abstract class Task implements Callable<Object>
      */
     protected ProcessHandler processHandler;
     
-
+    /**
+     * Pathname of work directory
+     */
+    protected String workDir = "";
+    
     /**
      * Verbosity level
      */
