@@ -1636,12 +1636,12 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * check if the graph to molecule translation
+     * check conversion of the graph to molecule translation
      * @param molGraph the molecular graph representation
-     * @return an object array containing the inchi code, the smiles string
-     *         and the 2D representation of the molecule
-     *         <code>null</code> is returned if inchi/smiles/2D conversion fails
-     *         An additional check is the number of atoms in the graph
+     * @return an object array containing the inchi code, the molecular
+     * representation of the candidate, and additional attributes. Or 
+     * <code>null</code> is returned if inchi/smiles/2D conversion fails
+     * An additional check is the number of atoms in the graph
      */
 
     protected static Object[] evaluateGraph(DENOPTIMGraph molGraph)
@@ -1655,11 +1655,10 @@ public class EAUtils
         }
 
         // calculate the molecule representation
-        GraphConversionTool gct = new GraphConversionTool();
-        IAtomContainer mol = gct.convertGraphToMolecule(molGraph,true);
+        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(molGraph,true);
         if (mol == null)
-        {
-            String msg ="Evaluation of graph: graph-to-mol returned null!" 
+        { 
+            String msg ="Evaluation of graph: graph-to-mol returned null! " 
                                                         + molGraph.toString();
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             molGraph.cleanup();
@@ -1677,16 +1676,6 @@ public class EAUtils
             mol.removeAllElements();
             return null;
         }
-
-//TODO del or make optional
-//        IAtomContainer mol2D = DENOPTIMMoleculeUtils.generate2DCoordinates(mol);
-//        //IAtomContainer mol2D = DENOPTIMMoleculeUtils.get2DStructureUsingBabel(mol);
-//        if (mol2D == null)
-//        {
-//            String msg = "Evaluation of graph: mol2D is null!" + molGraph.toString();
-//            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-//            return null;
-//        }
 
         // hopefully the null shouldn't happen if all goes well
         String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);

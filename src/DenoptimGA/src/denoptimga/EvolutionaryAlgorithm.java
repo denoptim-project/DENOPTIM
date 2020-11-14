@@ -37,7 +37,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
-import denoptim.task.OffspringFitnessTask;
+import denoptim.task.OffspringEvaluationTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -686,7 +686,7 @@ public class EvolutionaryAlgorithm
         if (res[1] != null)
             smiles = res[1].toString().trim();
 
-        Task task = new OffspringFitnessTask(molName, molGraph,
+        Task task = new OffspringEvaluationTask(molName, molGraph,
                                 inchi, smiles, (IAtomContainer) res[2],
                                 wrkDir,  null, numTries, 
                                 GAParameters.getUIDFileOut());

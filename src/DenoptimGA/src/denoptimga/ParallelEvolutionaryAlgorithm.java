@@ -41,7 +41,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
-import denoptim.task.OffspringFitnessTask;
+import denoptim.task.OffspringEvaluationTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -54,7 +54,7 @@ import denoptim.utils.TaskUtils;
 public class ParallelEvolutionaryAlgorithm
 {
     final List<Future<Object>> futures;
-    final ArrayList<OffspringFitnessTask> submitted;
+    final ArrayList<OffspringEvaluationTask> submitted;
     final ThreadPoolExecutor tcons;
    
     private final String fsep = System.getProperty("file.separator");
@@ -135,7 +135,7 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (OffspringFitnessTask tsk:submitted)
+        for (OffspringEvaluationTask tsk:submitted)
         {
             if (tsk.foundException())
             {
@@ -622,7 +622,7 @@ public class ParallelEvolutionaryAlgorithm
                     smiles = res[1].toString().trim();
                     IAtomContainer cmol = (IAtomContainer) res[2];
 
-                    OffspringFitnessTask task = new OffspringFitnessTask(molName, graph4, inchi, smiles, cmol,
+                    OffspringEvaluationTask task = new OffspringEvaluationTask(molName, graph4, inchi, smiles, cmol,
                                            genDir, molPopulation,
                                            numTries,GAParameters.getUIDFileOut());
 
@@ -699,7 +699,7 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res1[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res1[2];
 
-                        OffspringFitnessTask task1 = new OffspringFitnessTask(molName, graph1, inchi, smiles,
+                        OffspringEvaluationTask task1 = new OffspringEvaluationTask(molName, graph1, inchi, smiles,
                                            cmol, genDir, molPopulation,
                                            numTries,GAParameters.getUIDFileOut());
 
@@ -774,7 +774,7 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res2[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res2[2];
 
-                        OffspringFitnessTask task2 = new OffspringFitnessTask(molName, graph2, inchi, smiles,
+                        OffspringEvaluationTask task2 = new OffspringEvaluationTask(molName, graph2, inchi, smiles,
                                                 cmol, genDir, molPopulation,
                                                 numTries, 
                                                 GAParameters.getUIDFileOut());
@@ -851,7 +851,7 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res3[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res3[2];
 
-                        OffspringFitnessTask task3 = new OffspringFitnessTask(molName, graph3, inchi, smiles,
+                        OffspringEvaluationTask task3 = new OffspringEvaluationTask(molName, graph3, inchi, smiles,
                                                 cmol, genDir, molPopulation,
                                                 numTries, 
                                                 GAParameters.getUIDFileOut());
@@ -1083,7 +1083,7 @@ public class ParallelEvolutionaryAlgorithm
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];
 
-                OffspringFitnessTask task = new OffspringFitnessTask(molName, molGraph, inchi, smiles, cmol,
+                OffspringEvaluationTask task = new OffspringEvaluationTask(molName, molGraph, inchi, smiles, cmol,
                                         genDir, molPopulation, numTries,
                                         GAParameters.getUIDFileOut());
                 submitted.add(task);
@@ -1123,14 +1123,14 @@ public class ParallelEvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
-                            ArrayList<OffspringFitnessTask> submitted)
+                            ArrayList<OffspringEvaluationTask> submitted)
     {
         for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (OffspringFitnessTask tsk: submitted)
+        for (OffspringEvaluationTask tsk: submitted)
         {
             tsk.stopTask();
         }
@@ -1144,7 +1144,7 @@ public class ParallelEvolutionaryAlgorithm
 
     private void cleanupCompleted(ThreadPoolExecutor tcons,
                                   List<Future<Object>> futures,
-                                      ArrayList<OffspringFitnessTask> submitted)
+                                      ArrayList<OffspringEvaluationTask> submitted)
     {
         ArrayList<Integer> completed = new ArrayList<>();
 

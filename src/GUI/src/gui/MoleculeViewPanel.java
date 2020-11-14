@@ -171,7 +171,7 @@ public class MoleculeViewPanel extends JSplitPane
 
 	/**
 	 * Loads a structure in the Jmol viewer.
-	 * @param mol the structure to load
+	 * @param fitProvMol the structure to load
 	 */
 	public void loadChemicalStructureFromFile(String pathName)
 	{

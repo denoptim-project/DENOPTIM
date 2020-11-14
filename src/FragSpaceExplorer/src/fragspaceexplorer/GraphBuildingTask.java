@@ -40,7 +40,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.task.FitnessTask;
-import denoptim.task.OffspringFitnessTask;
+import denoptim.task.OffspringEvaluationTask;
 import denoptim.task.ProcessHandler;
 import denoptim.task.Task;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -103,10 +103,12 @@ public class GraphBuildingTask extends FitnessTask
     		int verbosity) throws DENOPTIMException
     {
     	//TODO: replace all serialization-based deep cloning with deep clone method
+    	// We are going to modify the grapf si this cannot be a reference to the
+    	// original.
         super((DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph));
-        molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+        dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = m_molGraph.getGraphId();
-        graphId = molGraph.getGraphId();
+        graphId = dGraph.getGraphId();
         this.workDir = workDir;
         this.fragsToAdd = fragsToAdd;
         this.level = level;  
@@ -210,7 +212,7 @@ public class GraphBuildingTask extends FitnessTask
                     msg = msg + DENOPTIMConstants.EOL 
                           + "   "+src+" - "+fragsToAdd.get(src);
                 }
-                msg = msg + DENOPTIMConstants.EOL + " - RootGraph: " + molGraph;
+                msg = msg + DENOPTIMConstants.EOL + " - RootGraph: " + dGraph;
             }
             if (verbosity > 0)
             {
@@ -225,7 +227,7 @@ public class GraphBuildingTask extends FitnessTask
             {
                 int sVId = srcAp.getVertexId();
                 int sApId = srcAp.getApId();
-                DENOPTIMVertex srcVrtx = molGraph.getVertexWithId(sVId);
+                DENOPTIMVertex srcVrtx = dGraph.getVertexWithId(sVId);
                 String sCls = 
                           srcVrtx.getAttachmentPoints().get(sApId).getAPClass();
     
@@ -276,8 +278,8 @@ public class GraphBuildingTask extends FitnessTask
                     throw new DENOPTIMException(msg);
                 }
     
-                molGraph.addVertex(trgVrtx);
-                molGraph.addEdge(edge);
+                dGraph.addVertex(trgVrtx);
+                dGraph.addEdge(edge);
             }
 
             // Append new symmetric sets
@@ -286,12 +288,12 @@ public class GraphBuildingTask extends FitnessTask
                 SymmetricSet ss = newSymSets.get(ssId);
                 if (ss.size() > 1)
                 {
-                    molGraph.addSymmetricSetOfVertices(ss);
+                    dGraph.addSymmetricSetOfVertices(ss);
                 }
             }
 
             // Evaluate graph
-            Object[] res = GraphUtils.evaluateGraph(molGraph);
+            Object[] res = GraphUtils.evaluateGraph(dGraph);
             if (res == null) // null is used to indicate an unacceptable graph
             {
                 if (verbosity > 1)
@@ -303,7 +305,7 @@ public class GraphBuildingTask extends FitnessTask
                 nSubTasks = 1;
 
                 // Store graph
-                FSEUtils.storeGraphOfLevel(molGraph,level,rootId,nextIds);
+                FSEUtils.storeGraphOfLevel(dGraph,level,rootId,nextIds);
             }
             else
             {
@@ -316,7 +318,7 @@ public class GraphBuildingTask extends FitnessTask
                 boolean needsCaps = false;
                 if (FragmentSpace.useAPclassBasedApproach())
                 {
-                    needsCaps = GraphUtils.graphNeedsCappingGroups(molGraph);
+                    needsCaps = GraphUtils.graphNeedsCappingGroups(dGraph);
                 }
 
                 ArrayList<DENOPTIMGraph> altCyclicGraphs =
@@ -324,7 +326,7 @@ public class GraphBuildingTask extends FitnessTask
                 if (!needsCaps)
                 {
                     altCyclicGraphs = 
-                        GraphUtils.makeAllGraphsWithDifferentRingSets(molGraph);
+                        GraphUtils.makeAllGraphsWithDifferentRingSets(dGraph);
                 }
                 int sz = altCyclicGraphs.size();
                 if (sz>0 && !needsCaps)
@@ -333,7 +335,7 @@ public class GraphBuildingTask extends FitnessTask
 
                     if (verbosity > 0)
                     {
-                        msg = "Graph " + molGraph.getGraphId() 
+                        msg = "Graph " + dGraph.getGraphId() 
                               + " is replaced by " + sz
                               + " cyclic alternatives.";
                         DENOPTIMLogger.appLogger.info(msg); 
@@ -427,15 +429,15 @@ public class GraphBuildingTask extends FitnessTask
                     nSubTasks = 1;
 
                     // Store graph
-                    FSEUtils.storeGraphOfLevel(molGraph,level,rootId,nextIds);
+                    FSEUtils.storeGraphOfLevel(dGraph,level,rootId,nextIds);
                    
                     // Optionally perform external task 
                     if (FSEParameters.submitExternalTask() && !needsCaps)
                     {
                     	Object[] fseRes = new Object[5];
-                    	fseRes[0] = res [0];
-                    	fseRes[1] = res [1];
-                    	fseRes[2] = res [2];
+                    	fseRes[0] = res[0];
+                    	fseRes[1] = res[1];
+                    	fseRes[2] = res[2];
                     	fseRes[3] = rootId;
                     	fseRes[4] = level;
                     	sendToFitnessProvider(fseRes);
@@ -459,39 +461,33 @@ public class GraphBuildingTask extends FitnessTask
 //------------------------------------------------------------------------------
     
     /**
-     * Execute the external script.
      * @param res the vector containing the results from the evaluation of the
      * graph representation
      */
 
     private void sendToFitnessProvider(Object[] res) throws Throwable
     {
-        // prepare variables
         String molinchi = res[0].toString().trim();
         String molsmiles = res[1].toString().trim();
-        IAtomContainer molInit = (IAtomContainer) res[2];
+        fitProvMol = (IAtomContainer) res[2];
         String parentGraphId = res[3].toString().trim();
         String level = res[4].toString().trim();
-        molInit.setProperty("InChi", molinchi);
-        molInit.setProperty("SMILES", molsmiles);
-        molInit.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
-        molInit.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
-        
+        fitProvMol.setProperty("InChi", molinchi);
+        fitProvMol.setProperty("SMILES", molsmiles);
+        fitProvMol.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
+        fitProvMol.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
         		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
-        String workDir = FSEParameters.getWorkDirectory();
-        String molInitFile = workDir + SEP + molName 
+        fitProvMol.setProperty(CDKConstants.TITLE, molName);
+        fitProvInputFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTIN;
-        String molFinalFile = workDir + SEP + molName 
+        fitProvOutFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
-        molInit.setProperty(CDKConstants.TITLE, molName);
-        DenoptimIO.writeMolecule(molInitFile, molInit, false);
+        fitProvUIDFile = FSEParameters.getUIDFileName();
         
-        executeFitnessProvider(molInitFile, molFinalFile, 
-        		FSEParameters.getUIDFileName());
+        runFitnessProvider();
     }
-
 
 //------------------------------------------------------------------------------
     

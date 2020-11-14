@@ -28,7 +28,8 @@ import java.util.concurrent.Callable;
 public abstract class Task implements Callable<Object>
 {
     /**
-     * Flag about completion
+     * Flag about completion. Should be set to <code>true</code> only by the
+     * call() method.
      */
     protected boolean completed = false;
 

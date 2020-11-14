@@ -73,6 +73,10 @@ public class FitnessParameters
 
 //------------------------------------------------------------------------------
 
+    /**
+     * @return <code>true</code> if we are asked to execute an external fitness 
+     * provider.
+     */
     public static boolean useExternalFitness()
     {
         return useExternalFitness;
@@ -80,6 +84,10 @@ public class FitnessParameters
     
 //------------------------------------------------------------------------------
 
+    /**
+     * @return <code>true</code> if generation of the candidate's picture is 
+     * required.
+     */
     public static boolean makePictures()
     {
         return makePictures;
@@ -88,8 +96,8 @@ public class FitnessParameters
 //------------------------------------------------------------------------------
 
     /**
-     * Gets the pathname of the external executable file
-     * @return the pathname to the external fitness provider
+     * Gets the pathname of the external executable file.
+     * @return the pathname to the external fitness provider.
      */
     public static String getExternalFitnessProvider()
     {
@@ -99,8 +107,8 @@ public class FitnessParameters
 //------------------------------------------------------------------------------
 
     /**
-     * The name of the interpreter used to run the external fitness provider
-     * @return the interpreter name
+     * The name of the interpreter used to run the external fitness provider.
+     * @return the interpreter name.
      */
     public static String getExternalFitnessProviderInterpreter()
     {

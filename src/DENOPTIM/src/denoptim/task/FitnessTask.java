@@ -19,50 +19,172 @@
 
 package denoptim.task;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
+import org.apache.commons.io.FileUtils;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.CDKConstants;
+import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.GraphConversionTool;
 import denoptim.utils.TaskUtils;
 
 /**
- * Task that represents the call for a assessing a given graph with any 
- * fitness provider.
+ * Task that assesses the fitness of a given graph.
  */
 
 public abstract class FitnessTask extends Task
 {
-    protected final DENOPTIMGraph molGraph;
+	/**
+	 * The graph representation of the entity to evaluate.
+	 */
+    protected final DENOPTIMGraph dGraph;
+    
+	/**
+	 * The chemical representation of the entity to evaluate. We do not check 
+	 * for consistency between this member and the graph representation.
+	 * This data structure holds also lost of attributes that are not used
+	 * in all subclasses extending the FitnessTask. Moreover, it will be updated
+	 * once a presumably refined molecular representation is produced by
+	 * a fitness provider.
+	 */
+    protected IAtomContainer fitProvMol = null;
+    
+    /**
+     * The data structure holding the results of this task
+     */
+    protected DENOPTIMMolecule result = new DENOPTIMMolecule();
+    
+    /**
+     * The file where we store the input to the fitness provider.
+     */
+    protected String fitProvInputFile = "noName.sdf";
+    
+    /**
+     * The file where we store the final output from the fitness provider.
+     */
+    protected String fitProvOutFile = "noName.sdf";
+    
+    /**
+     * The file where we store the a graphical representation of the candidate 
+     * (i.e., a picture).
+     */
+    protected String fitProvPNGFile = "noName.png";
+    
+    /**
+     * The file where we store the list of unique identifiers or previously 
+     * evaluated candidates.
+     */
+    protected String fitProvUIDFile = null;
+    
+    /**
+     * Flag specifying if a valid fitness value is required to consider the
+     * task successfully complete.
+     */
+    protected boolean fitnessIsRequired = false;
 
 //------------------------------------------------------------------------------
     
     public FitnessTask(DENOPTIMGraph molGraph)
     {
     	super(TaskUtils.getUniqueTaskIndex());
-        this.molGraph = molGraph;
+        this.dGraph = molGraph;
+        result.setMoleculeGraph(molGraph);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * This method runs the actual evaluation of the fitness, whether that is 
+     * run internally (i.e., within this instance of the JAVA VM), or 
+     * delegated to an external child process.
+     * @return the object with data obtained from the fitness provider.
+     * @throws Throwable when something went wrong in the call to the fitness
+     * provider.
+     */
+    protected DENOPTIMMolecule runFitnessProvider() throws Throwable
+    {
+    	// Ensure these two variables have been set
+        result.setMoleculeFile(fitProvOutFile);
+        if (fitProvMol == null)
+    	{
+    	    fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
+    	    		true);
+    	}
+    	
+    	// Write file with input data to fitness provider
+        DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
+        
+        // Run fitness provider
+        if (FitnessParameters.useExternalFitness())
+        {
+	        if (!runExternalFitness())
+	        {
+	            return result;
+	        }
+        } else {
+        	if (!runInternalFitness())
+	        {
+	            return result;
+	        }
+        }
+        
+        // Optional image creation
+        if (FitnessParameters.makePictures())
+        {
+            try
+            {
+                DENOPTIMMoleculeUtils.moleculeToPNG(fitProvMol,fitProvPNGFile);
+                result.setImageFile(fitProvPNGFile);
+            }
+            catch (Exception ex)
+            {
+                result.setImageFile(null);
+                DENOPTIMLogger.appLogger.log(Level.WARNING, 
+                    "Unable to create image. {0}", ex.getMessage());
+            }
+        }
+        
+        return result;
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if it is all good, <code>false</code> in case 
+     * of any reason for premature returning of the results (error generated in
+     * from the external tool, rejection on the candidate).
+     * @throws Exception 
+     */
 
-    protected void executeFitnessProvider(String inFile, String outFile, 
-    		String uidFile) throws Throwable
-    {
-        
-        //TODO: deal with internal fitness and other kinds of fitness
-    	
-        // build command
-        StringBuilder sb = new StringBuilder();
+	private boolean runExternalFitness() throws Exception 
+	{
+		StringBuilder sb = new StringBuilder();
         sb.append(FitnessParameters.getExternalFitnessProviderInterpreter());
-        sb.append(" ").append(FitnessParameters.getExternalFitnessProvider())
-              .append(" ").append(inFile)
-              .append(" ").append(outFile)
+        sb.append(" ").append(
+        		FitnessParameters.getExternalFitnessProvider())
+              .append(" ").append(fitProvInputFile)
+              .append(" ").append(fitProvOutFile)
               .append(" ").append(workDir)
-              .append(" ").append(id)
-              .append(" ").append(uidFile);
-
-        String msg = "Calling fitness provider: => " + sb + NL;
+              .append(" ").append(id);
+        if (fitProvUIDFile != null)
+        {
+            sb.append(" ").append(fitProvUIDFile);
+        }
+        
+        String msg = "Calling external fitness provider: => " + sb + NL;
         DENOPTIMLogger.appLogger.log(Level.INFO, msg);
 
         // run the process
@@ -75,15 +197,181 @@ public abstract class FitnessTask extends Task
             msg = "Failed to execute fitness provider " 
                 + FitnessParameters.getExternalFitnessProviderInterpreter()
                     .toString()
-		        + " command '"
-		        + FitnessParameters.getExternalFitnessProvider()
-		        + "' on " + inFile;
+		        + " command '" + FitnessParameters.getExternalFitnessProvider()
+		        + "' on " + fitProvInputFile;
             DENOPTIMLogger.appLogger.severe(msg);
-            DENOPTIMLogger.appLogger.severe(processHandler.getErrorOutput());
+            DENOPTIMLogger.appLogger.severe(
+            		processHandler.getErrorOutput());
             throw new DENOPTIMException(msg);
         }
         processHandler = null;
-    }
+        
+        // Read results from fitness provider
+        IAtomContainer processedMol = new AtomContainer();
+        boolean unreadable = false;
+        try
+        {
+            processedMol = DenoptimIO.readSingleSDFFile(fitProvOutFile);
+            if (processedMol.isEmpty())
+            {
+                unreadable=true;
+            }
+        }
+        catch (Throwable t)
+        {
+            unreadable=true;
+        }
+        
+        // Check readability and 
+        if (unreadable)
+        {
+        	// If file is not properly readable, we keep track of the 
+        	// unreadable file, and we label the candidate to signal the 
+        	// error, and we replace the unreadable one with a file that 
+        	// is readable.
+        	
+            msg = "Unreadable file from fitness provider run (Task " + id 
+            		+ "). Check " + result.getName() + ".";
+            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+            
+            //TODO use constant
+            String fileBkp = fitProvOutFile + "_Unreadble";
+            FileUtils.copyFile(new File(fitProvOutFile), new File(fileBkp));
+            FileUtils.deleteQuietly(new File(fitProvOutFile));
+            
+            String err = "#FTask: Unable to retrive data. See " + fileBkp;
+            processedMol = new AtomContainer();
+            processedMol.addAtom(new Atom("H"));
+            processedMol.setProperty(CDKConstants.TITLE, result.getName());
+            processedMol.setProperty("MOL_ERROR", err);
+            processedMol.setProperty("GCODE", dGraph.getGraphId());
+            processedMol.setProperty("GraphENC", dGraph.toString());
+            DenoptimIO.writeMolecule(fitProvOutFile, processedMol, false);
+
+            result.setError(err);
+            return false;
+        }
+        
+        // Unique identifier might be updated by the fitness provider, so
+        // we need to update in the the returned value
+        if (processedMol.getProperty(DENOPTIMConstants.UNIQUEIDTAG) != null)
+        {
+            result.setMoleculeUID(processedMol.getProperty(
+            		DENOPTIMConstants.UNIQUEIDTAG).toString());
+        }
+        
+        if (processedMol.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
+        {
+        	String err = processedMol.getProperty(
+        			DENOPTIMConstants.MOLERRORTAG).toString();
+            msg = result.getName() + " has an error ("+err+")";
+            DENOPTIMLogger.appLogger.info(msg);
+
+            result.setError(err);
+            return false;
+        }
+        
+        if (processedMol.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
+        {
+            String fitprp = processedMol.getProperty(
+            		DENOPTIMConstants.FITNESSTAG).toString();
+            double fitVal = 0.0;
+            try
+            {
+                fitVal = Double.parseDouble(fitprp);
+            }
+            catch (Throwable t)
+            {
+                hasException = true;
+                msg = "Fitness value '" + fitprp + "' of " 
+                        + result.getName() + " could not be converted "
+                        + "to double.";
+                errMsg = msg;
+                DENOPTIMLogger.appLogger.severe(msg);
+                dGraph.cleanup();
+                throw new DENOPTIMException(msg);
+            }
+
+            if (Double.isNaN(fitVal))
+            {
+                hasException = true;
+                msg = "Fitness value is NaN for " + result.getName();
+                errMsg = msg;
+                DENOPTIMLogger.appLogger.severe(msg);
+                dGraph.cleanup();
+                throw new DENOPTIMException(msg);
+            }
+
+            processedMol.setProperty("GCODE", dGraph.getGraphId());                
+            processedMol.setProperty("SMILES", result.getMoleculeSmiles());
+            processedMol.setProperty("GraphENC", dGraph.toString());
+            if (dGraph.getMsg() != null)
+            {
+                processedMol.setProperty("GraphMsg", dGraph.getMsg());
+            }
+            
+            // Update molecular representation of this object
+            fitProvMol = processedMol;
+            DenoptimIO.writeMolecule(fitProvOutFile, processedMol, false);
+            result.setMoleculeFitness(fitVal);
+        } else {
+            if (fitnessIsRequired)
+            {
+                hasException = true;
+                msg = "Could not find \"FITNESS\" tag in: " + fitProvOutFile;
+                errMsg = msg;
+                DENOPTIMLogger.appLogger.severe(msg);
+                throw new DENOPTIMException(msg);
+        	}
+        }
+        return true;
+	}
+	
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if it is all good, <code>false</code> in case 
+     * of any reason for premature returning of the results.
+     * @throws DENOPTIMException 
+     * @throws Exception 
+     */
+	
+	private boolean runInternalFitness() throws DENOPTIMException 
+	{
+		String msg = "Calling internal fitness provider: => "+ NL;
+	    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+
+		//Calculate descriptors
+	    
+	    //TODO
+	    
+	    // on fitProvMol
+		
+	    //TODO
+	    
+	    
+		//Use equation to calculate fitness
+		
+	    //TODO
+	    double fitVal = 0.0;
+
+
+        if (Double.isNaN(fitVal))
+        {
+            hasException = true;
+            msg = "Fitness value is NaN for " + result.getName();
+            errMsg = msg;
+            DENOPTIMLogger.appLogger.severe(msg);
+            dGraph.cleanup();
+            throw new DENOPTIMException(msg);
+        }
+        
+        // Store a written copy of the result to file
+        DenoptimIO.writeMolecule(fitProvOutFile, fitProvMol, false);
+        result.setMoleculeFitness(fitVal);
+	   
+		return true;
+	}
 
 //------------------------------------------------------------------------------
 
