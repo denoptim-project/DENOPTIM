@@ -150,10 +150,10 @@ public class DENOPTIMGraphOperations
      */
     private static boolean isCrossoverPossible(DENOPTIMEdge eA, DENOPTIMEdge eB)
     {
-        String apClassSrcA = eA.getSrcApClass();
-        String apClassTrgA = eA.getTrgApClass();
-        String apClassSrcB = eB.getSrcApClass();
-        String apClassTrgB = eB.getTrgApClass();
+        String apClassSrcA = eA.getSrcAPClass();
+        String apClassTrgA = eA.getTrgAPClass();
+        String apClassSrcB = eB.getSrcAPClass();
+        String apClassTrgB = eB.getTrgAPClass();
         
         if (isCompatible(apClassSrcA, apClassTrgB))
         {
@@ -961,8 +961,8 @@ if(debug)
                                              curVertex.getVertexId()));
             int prntId = parent.getMolId();
             BBType prntTyp = parent.getFragmentType();
-            int prntAp = edge.getSrcApIndex();
-            int chidAp = edge.getTrgApIndex();
+            int prntAp = edge.getSrcAPID();
+            int chidAp = edge.getTrgAPID();
             for (ClosableChain cc : molGraph.getClosableChains())
             {
 //TODO del 
@@ -1271,10 +1271,10 @@ if(debug)
         int eidxF = female.getIndexOfEdgeWithParent(fvid);
         DENOPTIMEdge eM = male.getEdgeAtPosition(eidxM);
         DENOPTIMEdge eF = female.getEdgeAtPosition(eidxF);
-        int apidxMP = eM.getSrcApIndex(); // ap index of the male parent
-        int apidxMC = eM.getTrgApIndex(); // ap index of the male
-        int apidxFC = eF.getTrgApIndex(); // ap index of the female
-        int apidxFP = eF.getSrcApIndex(); // ap index of the female parent
+        int apidxMP = eM.getSrcAPID(); // ap index of the male parent
+        int apidxMC = eM.getTrgAPID(); // ap index of the male
+        int apidxFC = eF.getTrgAPID(); // ap index of the female
+        int apidxFP = eF.getSrcAPID(); // ap index of the female parent
         BondType bndOrder = eM.getBondType();
 
         if(debug)
@@ -1315,7 +1315,7 @@ if(debug)
             DENOPTIMEdge se = male.getEdgeWithParent(svid);
             DENOPTIMVertex spv = male.getParent(svid);
             symParVertM.add(spv);
-            symmParAPidxM.add(se.getSrcApIndex());
+            symmParAPidxM.add(se.getSrcAPID());
             toRemoveFromM.add(svid);
         }
         for (Integer svid : toRemoveFromM)
@@ -1348,7 +1348,7 @@ if(debug)
             DENOPTIMEdge se = female.getEdgeWithParent(svid);
             DENOPTIMVertex spv = female.getParent(svid);
             symParVertF.add(spv);
-            symmParAPidxF.add(se.getSrcApIndex());
+            symmParAPidxF.add(se.getSrcAPID());
             toRemoveFromF.add(svid);
         }
         for (Integer svid : toRemoveFromF)

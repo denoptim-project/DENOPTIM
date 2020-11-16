@@ -123,8 +123,8 @@ public class GraphConversionTool
             DENOPTIMVertex v1 = g.getVertexWithId(v1_id);
             DENOPTIMVertex v2 = g.getVertexWithId(v2_id);
 
-            int dap_idx_v1 = edge.getSrcApIndex();
-            int dap_idx_v2 = edge.getTrgApIndex();
+            int dap_idx_v1 = edge.getSrcAPID();
+            int dap_idx_v2 = edge.getTrgAPID();
 
             int dap1_anum = -1;
             try
@@ -317,7 +317,7 @@ public class GraphConversionTool
         // split vertices on the comma
         String s2[] = vStr.split(",");
 
-        ArrayList<DENOPTIMVertex> vertices = new ArrayList<DENOPTIMVertex>();
+        ArrayList<DENOPTIMVertex> vertices = new ArrayList<>();
 
         // for each vertex
         for (int i=0; i<s2.length; i++)
@@ -359,24 +359,46 @@ public class GraphConversionTool
             s2 = eStr.split(",");
             for (int i=0; i<s2.length; i++)
             {
-                String s4[] = s2[i].split("_");
-                int srcVertex = Integer.parseInt(s4[0]);
+                String[] s4 = s2[i].split("_");
+                int srcVrtxID = Integer.parseInt(s4[0]);
     
-                int srcDAP = Integer.parseInt(s4[1]);
+                int srcAPID = Integer.parseInt(s4[1]);
     
-                int trgVertex = Integer.parseInt(s4[2]);
+                int trgVrtxID = Integer.parseInt(s4[2]);
     
-                int trgDAP = Integer.parseInt(s4[3]);
+                int trgAPID = Integer.parseInt(s4[3]);
     
                 BondType btype = BondType.parseStr(s4[4]);
+
+                /* Find source and target attachment points of edge */
+                DENOPTIMAttachmentPoint srcAP =
+                        new DENOPTIMAttachmentPoint(new EmptyVertex());
+                DENOPTIMAttachmentPoint trgAP =
+                        new DENOPTIMAttachmentPoint(new EmptyVertex());
+                try {
+                    for (int j = 0, apsFound = 0; apsFound < 2; j++) {
+                        DENOPTIMVertex vertex = vertices.get(j);
+                        if (vertex.getVertexId() == srcVrtxID) {
+                            srcAP = vertex.getAP(srcAPID);
+                            apsFound++;
+                        } else if (vertex.getVertexId() == trgVrtxID) {
+                            trgAP = vertex.getAP(trgAPID);
+                            apsFound++;
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    throw new IllegalStateException("source or target " +
+                            "attachment point not present on source or target" +
+                            " vertex", e);
+                }
     
-                DENOPTIMEdge ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
-                                                        trgDAP, btype);
+                DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, srcVrtxID,
+                        trgVrtxID, srcAPID, trgAPID, btype);
     
                 if (s4.length > 5)
                 {
-                    ne = new DENOPTIMEdge(srcVertex, trgVertex, srcDAP,
-                            trgDAP, btype, s4[5], s4[6]);
+                    ne = new DENOPTIMEdge(srcAP, trgAP, srcVrtxID, trgVrtxID,
+                            srcAPID, trgAPID, btype, s4[5], s4[6]);
                 }
                 edges.add(ne);
             }
@@ -441,8 +463,8 @@ public class GraphConversionTool
             BondType bndTyp = edge.getBondType();
             int srcvid = edge.getSrcVertex();
             int trgvid = edge.getTrgVertex();
-            int iA = edge.getSrcApIndex();
-            int iB = edge.getTrgApIndex();
+            int iA = edge.getSrcAPID();
+            int iB = edge.getTrgAPID();
 
             //System.err.println("iA=" + iA + " " + "iB=" + iB);
 

@@ -83,10 +83,10 @@ public class DENOPTIMEdgeTest {
 	public void testSameAs_SameAPClass() throws Exception {
 		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eA.setSrcApClass("classA");
+		eA.setSrcAPClass("classA");
 		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eB.setSrcApClass("classA");
+		eB.setSrcAPClass("classA");
 
 		assertTrue(eA.sameAs(eB, reason));
 	}
@@ -97,10 +97,10 @@ public class DENOPTIMEdgeTest {
 	public void testSameAs_DiffAPClass() throws Exception {
 		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eA.setSrcApClass("classA");
+		eA.setSrcAPClass("classA");
 		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eB.setSrcApClass("classB");
+		eB.setSrcAPClass("classB");
 
 		assertFalse(eA.sameAs(eB, reason));
 	}

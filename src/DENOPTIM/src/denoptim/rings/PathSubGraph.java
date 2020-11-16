@@ -265,26 +265,26 @@ public class PathSubGraph
             if (vertHere == turningPointVert)
             {
                 insideOut = true;
-                apIdBack2Here = edgeToBack.getTrgApIndex();
-                apIdHere2Back = edgeToBack.getSrcApIndex();
-                apIdHere2Frnt = edgeToFrnt.getSrcApIndex();
-                apIdFrnt2Here = edgeToFrnt.getTrgApIndex();
+                apIdBack2Here = edgeToBack.getTrgAPID();
+                apIdHere2Back = edgeToBack.getSrcAPID();
+                apIdHere2Frnt = edgeToFrnt.getSrcAPID();
+                apIdFrnt2Here = edgeToFrnt.getTrgAPID();
             }
             else
             {
                 if (insideOut)
                 {
-                    apIdBack2Here = edgeToBack.getSrcApIndex();
-                    apIdHere2Back = edgeToBack.getTrgApIndex();
-                    apIdHere2Frnt = edgeToFrnt.getSrcApIndex();
-                    apIdFrnt2Here = edgeToFrnt.getTrgApIndex();
+                    apIdBack2Here = edgeToBack.getSrcAPID();
+                    apIdHere2Back = edgeToBack.getTrgAPID();
+                    apIdHere2Frnt = edgeToFrnt.getSrcAPID();
+                    apIdFrnt2Here = edgeToFrnt.getTrgAPID();
                 }
                 else
                 {
-                    apIdBack2Here = edgeToBack.getTrgApIndex();
-                    apIdHere2Back = edgeToBack.getSrcApIndex();
-                    apIdHere2Frnt = edgeToFrnt.getTrgApIndex();
-                    apIdFrnt2Here = edgeToFrnt.getSrcApIndex();
+                    apIdBack2Here = edgeToBack.getTrgAPID();
+                    apIdHere2Back = edgeToBack.getSrcAPID();
+                    apIdHere2Frnt = edgeToFrnt.getTrgAPID();
+                    apIdFrnt2Here = edgeToFrnt.getSrcAPID();
                 }
             }
 

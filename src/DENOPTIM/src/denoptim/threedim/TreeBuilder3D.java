@@ -231,7 +231,7 @@ public class TreeBuilder3D
 
             // Get the AP from the current vertex to the next
             DENOPTIMAttachmentPoint apSrc = apsOnThisFrag.get(
-                                                           edge.getSrcApIndex());
+                                                           edge.getSrcAPID());
             int atmPosApSrc = apSrc.getAtomPositionNumber();
 
             // Add AP to the map of APs per Edges
@@ -406,7 +406,7 @@ public class TreeBuilder3D
         }
 
         // Get the attachment point on the incoming fragment (i.e., ApB)
-        int idApB = edge.getTrgApIndex();
+        int idApB = edge.getTrgAPID();
         DENOPTIMAttachmentPoint apB = inVtx.getAttachmentPoints().get(idApB);
         int idSrcAtmB = apB.getAtomPositionNumber();
         Point3d trgApB = new Point3d(allApsAsPt3D.get(idApB));
@@ -637,7 +637,7 @@ public class TreeBuilder3D
 
             // Get the AP from the current vertex to the next
             DENOPTIMAttachmentPoint nextApA =
-                    apsOnThisFrag.get(nextEdge.getSrcApIndex());
+                    apsOnThisFrag.get(nextEdge.getSrcAPID());
             int newIdSrcAtmA = nextApA.getAtomPositionNumber();
 
             // Add AP to the map of APs per Edges

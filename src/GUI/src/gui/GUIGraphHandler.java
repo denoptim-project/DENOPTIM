@@ -1498,10 +1498,10 @@ public class GUIGraphHandler extends GUICardPanel
 			String srcIdx = Integer.toString(dnE.getSrcVertex());
 			String trgIdx = Integer.toString(dnE.getTrgVertex());
 			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,true);
-			e.setAttribute("dnp.srcAPId", dnE.getSrcApIndex());
-			e.setAttribute("dnp.trgAPId", dnE.getTrgApIndex());
-			e.setAttribute("dnp.srcAPClass", dnE.getSrcApClass());
-			e.setAttribute("dnp.trgAPClass", dnE.getTrgApClass());
+			e.setAttribute("dnp.srcAPId", dnE.getSrcAPID());
+			e.setAttribute("dnp.trgAPId", dnE.getTrgAPID());
+			e.setAttribute("dnp.srcAPClass", dnE.getSrcAPClass());
+			e.setAttribute("dnp.trgAPClass", dnE.getTrgAPClass());
 			e.setAttribute("dnp.bondType", dnE.getBondType());
 		}
 		 
