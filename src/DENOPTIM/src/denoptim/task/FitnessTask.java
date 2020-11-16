@@ -33,6 +33,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fitness.FitnessProvider;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
@@ -318,7 +319,8 @@ public abstract class FitnessTask extends Task
             if (fitnessIsRequired)
             {
                 hasException = true;
-                msg = "Could not find \"FITNESS\" tag in: " + fitProvOutFile;
+                msg = "Could not find '" + DENOPTIMConstants.FITNESSTAG 
+                		+ "' tag in: " + fitProvOutFile;
                 errMsg = msg;
                 DENOPTIMLogger.appLogger.severe(msg);
                 throw new DENOPTIMException(msg);
@@ -338,23 +340,15 @@ public abstract class FitnessTask extends Task
 	
 	private boolean runInternalFitness() throws DENOPTIMException 
 	{
-		String msg = "Calling internal fitness provider: => "+ NL;
+		String msg = "Calling internal fitness provider. "+ NL;
 	    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
 
-		//Calculate descriptors
-	    
-	    //TODO
-	    
-	    // on fitProvMol
-		
-	    //TODO
-	    
-	    
-		//Use equation to calculate fitness
-		
-	    //TODO
-	    double fitVal = 0.0;
-
+	    double fitVal;
+		try {
+			fitVal = FitnessProvider.getFitness(fitProvMol);
+		} catch (Exception e) {
+			throw new DENOPTIMException("Failed to calculate fitness.", e);
+		}
 
         if (Double.isNaN(fitVal))
         {
