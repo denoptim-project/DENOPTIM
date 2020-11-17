@@ -174,12 +174,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         
         if (v instanceof DENOPTIMFragment)
         {
-            //TODO-M6 del
-            System.out.println("HERE: "+vertexId+" "+bbId+" "+APClass.RCAAPCLASSSET);
-            System.out.println("      "+v.getAttachmentPoints().get(0).getAPClass());
-            System.out.println("      "+(v.getNumberOfAP() == 1)+" "+(v.getNumberOfAP() == 1 
-                    && APClass.RCAAPCLASSSET.contains(
-                            v.getAttachmentPoints().get(0).getAPClass())));
             v.setAsRCV(v.getNumberOfAP() == 1 
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));

@@ -818,51 +818,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------    
     
     /**
-     * Obtain the vertex connected at the AP
-     *
-     * @param vertex
-     * @param dapidx
-     * @param rcn
-     * @return the vertex connected at the AP
-     */
-    
-    //TODO-M6 check: is this ever used?
-    public DENOPTIMVertex getBondingVertex(DENOPTIMVertex vertex, int dapidx, 
-            APClass rcn)
-    {
-        int n = getEdgeCount();
-        for (int i = 0; i < n; i++)
-        {
-            DENOPTIMEdge edge = getEdgeList().get(i);
-
-            // get the vertex ids
-            int v1_id = edge.getSrcVertex();
-            int v2_id = edge.getTrgVertex();
-            
-            int dap_idx_v1 = edge.getSrcAPID();
-            
-            if (rcn != null)
-            {
-                APClass rcstr = edge.getSrcAPClass();
-                if (vertex.getVertexId() == v1_id && dap_idx_v1 == dapidx 
-                        && rcstr.equals(rcn))
-                {
-                    return getVertexWithId(v2_id);
-                }
-            }
-            else
-            {
-                if (vertex.getVertexId() == v1_id && dap_idx_v1 == dapidx)
-                    return getVertexWithId(v2_id);
-            }
-        }
-
-        return null;
-    }
-    
-//------------------------------------------------------------------------------    
-    
-    /**
      * 
      * @param srcVert
      * @param dapidx the AP corresponding to the source fragment
@@ -2236,9 +2191,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
         
-      //TODO-M6 del
-        System.out.println("#######   allCombsOfRings: "+allCombsOfRings.size());
-
         // Keep closable chains that are relevant for chelate formation
         if (RingClosureParameters.buildChelatesMode())
         {
@@ -2264,20 +2216,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             //TODO-M6
             // This is what we should use 
             //DENOPTIMGraph newGraph = this.clone();
-            
-            //TODO-M6 del
-            System.out.println("_____Original");
-            for (DENOPTIMAttachmentPoint ap : this.getAttachmentPoints())
-            {
-                APClass a = ap.getAPClass();
-                System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-            }
-            System.out.println("_____CClone");
-            for (DENOPTIMAttachmentPoint ap : newGraph.getAttachmentPoints())
-            {
-                APClass a = ap.getAPClass();
-                System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-            }
                 
             HashMap<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -2439,11 +2377,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     cvClone,
                     parentAPIdx,
                     childAPIdx);
-            /*
-             //TODO-M6: check this
-                    dap_Parent.getAPClass(),
-                    dap_Child.getAPClass());
-                    */
         }
         else
         {

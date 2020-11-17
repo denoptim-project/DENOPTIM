@@ -583,28 +583,20 @@ public class DenoptimIO {
         for (DENOPTIMAttachmentPoint ap : graph.getAttachmentPoints())
         {
             APClass a = ap.getAPClass();
-            ap.setAPClass(APClass.make(a.toString()));
+            if (a!=null)
+            {
+                ap.setAPClass(APClass.make(a.toString()));
+            }
         }
         for (DENOPTIMEdge e : graph.getEdgeList())
         {
             APClass srcApc = e.getSrcAPClass();
             APClass trgApc = e.getTrgAPClass();
-            e.setSrcAPClass(APClass.make(srcApc.toString()));
-            e.setTrgAPClass(APClass.make(trgApc.toString()));
-        }
-        
-      //TODO-M6 del
-        System.out.println("_____in DESer ");
-        for (DENOPTIMAttachmentPoint ap : graph.getAttachmentPoints())
-        {
-            APClass a = ap.getAPClass();
-            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-        }
-        for (DENOPTIMEdge e : graph.getEdgeList())
-        {
-            APClass src = e.getSrcAPClass();
-            APClass trg = e.getTrgAPClass();
-            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
+            if (srcApc!=null && trgApc!=null)
+            {
+                e.setSrcAPClass(APClass.make(srcApc.toString()));
+                e.setTrgAPClass(APClass.make(trgApc.toString()));
+            }
         }
 
         return graph;

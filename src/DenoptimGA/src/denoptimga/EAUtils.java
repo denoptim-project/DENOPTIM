@@ -735,8 +735,7 @@ public class EAUtils
      * @param molGraph
      * @param curVertex
      * @param dapIdx
-     * @return id of the vertex added; -1 if capping is not required
-     * found
+     * @return id of the vertex added; -1 if capping is not required.
      */
 
     protected static int attachCappingFragmentAtPosition
@@ -745,44 +744,40 @@ public class EAUtils
     {
         int lvl = curVertex.getLevel();
 
-        APClass rcn =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
+        APClass apcSrc =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
         // locate the capping group for this rcn
-        APClass rcnCap = getCappingGroup(rcn);
+        APClass apcCap = getCappingGroup(apcSrc);
 
-        if (rcnCap != null)
+        if (apcCap != null)
         {
 
-            int fid = getCappingFragment(rcnCap);
+            int bbIdCap = getCappingFragment(apcCap);
 
-            if (fid != -1)
+            if (bbIdCap != -1)
             {
-                DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), fid, BBType.CAP);
+                DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                        GraphUtils.getUniqueVertexIndex(), bbIdCap, BBType.CAP);
                 
-                fragVertex.setLevel(lvl+1);
+                capVrtx.setLevel(lvl+1);
 
                 //Get the index of the AP of the capping group to use
                 //(always the first and only AP)
-                ArrayList<Integer> apIdx =
-                        fragVertex.getCompatibleClassAPIndex(rcnCap);
-                int dap = apIdx.get(0);
-
                 DENOPTIMEdge edge = curVertex.connectVertices(
-                        fragVertex, dapIdx, dap, rcn, rcnCap
+                        capVrtx, dapIdx, 0, apcSrc, apcCap
                 );
                 if (edge != null)
                 {
                     // add the fragment as a vertex
-                    molGraph.addVertex(fragVertex);
+                    molGraph.addVertex(capVrtx);
 
                     molGraph.addEdge(edge);
 
-                    return fragVertex.getVertexId();
+                    return capVrtx.getVertexId();
                 }
                 else
                 {
                     String msg = "Unable to connect capping group "
-                                     + fragVertex + " to graph" + molGraph;
+                                     + capVrtx + " to graph" + molGraph;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -790,7 +785,7 @@ public class EAUtils
             else
             {
                 String msg = "Capping is required but no proper capping "
-                                + "fragment found with APCalss " + rcnCap;
+                                + "fragment found with APCalss " + apcCap;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
                 throw new DENOPTIMException(msg);
             }

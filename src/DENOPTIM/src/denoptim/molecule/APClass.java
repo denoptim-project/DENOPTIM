@@ -68,8 +68,8 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      */
     public static APClass make(String ruleAndSunClass) throws DENOPTIMException 
     { 
-        //TODO-V3 this is needed only because at present we need APClass to
-        // define endges. Eventually get rid of this dependency
+        //TODO-V3 this is needed only because at present we need an APClass 
+        // object to define edges. Eventually get rid of this dependency
         if (ruleAndSunClass.equals(""))
             ruleAndSunClass = "noclass:0";
         
@@ -124,8 +124,6 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
         APClass newApc = new APClass();
         newApc.setRule(rule);
         newApc.setSubClass(subClass);
-        //TODO-M6
-        System.out.println("_____ADDING APCLass "+newApc+" "+newApc.hashCode());
         synchronized (uniqueAPClasses)
         {
             uniqueAPClasses.add(newApc);
@@ -267,8 +265,6 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
         // and those on APs refer to the same instances. So, we cannot use 
         // the .contains() method on the CPMap entry.
         
-        //return FragmentSpace.getCompatibleAPClasses(this).contains(other);
-        
         ArrayList<APClass> listOfCompat = FragmentSpace.getCompatibleAPClasses(this);
         if (listOfCompat != null)
         {
@@ -298,7 +294,10 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     
 //------------------------------------------------------------------------------
     
-    //TODO-M6 doesn't make sense!
+    /**
+     * WARNING: this method does NOT clone! It just returns the reference to 
+     * this. We keep this method to avoid any attempt to cloning an APClass.
+     */
     @Override
     public APClass clone() {
         return this;

@@ -255,28 +255,6 @@ public class CyclicGraphHandler
                                         new HashMap<ObjectPair,PathSubGraph>();
         ArrayList<DENOPTIMVertex> rcaVertLst = molGraph.getFreeRCVertices();
         
-        //TODO-M6 del
-        System.out.println("List of RCVs: "+rcaVertLst.size());
-        verbosity =3;
-        //TODO-M6 del
-        /*
-        Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId = 
-                     DENOPTIMMoleculeUtils.getVertexToAtomIdMap(rcaVertLst,mol);
-*/
-      //TODO-M6 del
-        System.out.println("_____in CGH.getPossibleCombinationOfRings");
-        for (DENOPTIMAttachmentPoint ap : molGraph.getAttachmentPoints())
-        {
-            APClass a = ap.getAPClass();
-            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-        }
-        for (DENOPTIMEdge e : molGraph.getEdgeList())
-        {
-            APClass src = e.getSrcAPClass();
-            APClass trg = e.getTrgAPClass();
-            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
-        }
-        
         // Get manager of ring size problems
         RingSizeManager rsm = new RingSizeManager();
         rsm.initialize(mol, molGraph);
@@ -292,19 +270,10 @@ public class CyclicGraphHandler
                 DENOPTIMVertex vJ = rcaVertLst.get(j);
                 if (!rsm.getCompatibilityOfPair(vI,vJ))
                 {
-                  //TODO-M6 del
-                    System.out.println("incompatible pair "+vI+" "+vJ+" in "+molGraph);
-                    System.out.println(" vI");
-                    for (DENOPTIMAttachmentPoint ap : vI.getAttachmentPoints())
+                    if (verbosity > 1)
                     {
-                        APClass a = ap.getAPClass();
-                        System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-                    }
-                    System.out.println(" graph");
-                    for (DENOPTIMAttachmentPoint ap : molGraph.getAttachmentPoints())
-                    {
-                        APClass a = ap.getAPClass();
-                        System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
+                        System.out.println("Rejecting RC-incompatible pair " 
+                                + vI + " "+ vJ);
                     }
                     continue;
                 }
@@ -312,9 +281,6 @@ public class CyclicGraphHandler
                 // make the new candidate RCA pair
                 PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
-                
-              //TODO-M6 del
-                System.out.println("keepRcaPair: "+keepRcaPair);
 
                 if (!keepRcaPair)
                 {
@@ -1241,15 +1207,6 @@ public class CyclicGraphHandler
         }
 
         //---------------------------------------------------------------------
-
-        //TODO-M6
-        /*
-        public boolean getCompatibilityOfPair(int i, int j)
-        {
-            return compatibilityOfPairs[i][j];
-        }
-*/
-        //---------------------------------------------------------------------
     }
 
 //-----------------------------------------------------------------------------
@@ -1266,21 +1223,15 @@ public class CyclicGraphHandler
         private ArrayList<Double> angs;
 
         //---------------------------------------------------------------------
+        
         public ClosableConf(List<IBond> bonds, ArrayList<Double> dihedrals)
         {
             this.bonds = bonds;
             this.angs = dihedrals;
         }
 
-        //TODO-M6
-        /*
         //---------------------------------------------------------------------
-        public List<IBond> getBonds()
-        {
-            return bonds;
-        }
-*/
-        //---------------------------------------------------------------------
+
         public boolean shareBond(ClosableConf other)
         {
             boolean shareBnd = false;
@@ -1393,15 +1344,6 @@ public class CyclicGraphHandler
         DENOPTIMAttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
         int srcAtmIdJ = srcApJ.getAtomPositionNumber();
         APClass parentAPClsJ = edgeJ.getSrcAPClass();
-        
-        //TODO-M6
-        System.out.println("I: "+parentAPClsI.hashCode()+" "+parentAPClsI);
-        System.out.println("J: "+parentAPClsJ.hashCode()+" "+parentAPClsJ);
-        System.out.println("rcCPMap: "+rcCPMap.size());
-        for (APClass a : rcCPMap.keySet())
-        {
-            System.out.println("   "+a.hashCode()+" "+a+" "+a.equals(parentAPClsI));
-        }
         
         // exclude if no entry in RC-Compatibility map
         if (!rcCPMap.containsKey(parentAPClsI))

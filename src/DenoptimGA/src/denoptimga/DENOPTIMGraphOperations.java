@@ -156,37 +156,14 @@ public class DENOPTIMGraphOperations
         APClass apClassSrcB = eB.getSrcAPClass();
         APClass apClassTrgB = eB.getTrgAPClass();
         
-        if (isCompatible(apClassSrcA, apClassTrgB))
+        if (apClassSrcA.isCPMapCompatibleWith(apClassTrgB))
         {
-            if (isCompatible(apClassSrcB, apClassTrgA))
+            if (apClassSrcB.isCPMapCompatibleWith(apClassTrgA))
             {
                 return true;
             }
         }
         return false;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Check the compatibility between two classes. Note that, due to the non 
-     * symmetric nature of the compatibility matrix, the result for
-     * isCompatible(A,B) may be different from isCompatible(B,A)
-     * @param apClassSrcA class of the attachment point (AP) on the parent
-     * vertex (inner level)
-     * @param apClassTrgB class of the attachment point (AP) on the child
-     * vertex (outer level)
-     * @return <code>true</code> if the combination corresponds to a true entry
-     * in the compatibility matrix meaning that the two classes, in the 
-     * specified order, are compatible
-     */
-
-    private static boolean isCompatible(APClass apClassSrcA, 
-            APClass apClassTrgB)
-    {
-        ArrayList<APClass> compatibleClasses = 
-                    FragmentSpace.getCompatibilityMatrix().get(apClassSrcA);
-        return compatibleClasses.contains(apClassTrgB);
     }
 
 //------------------------------------------------------------------------------

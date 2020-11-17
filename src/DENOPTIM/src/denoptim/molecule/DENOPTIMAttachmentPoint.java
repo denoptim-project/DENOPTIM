@@ -472,7 +472,7 @@ Comparable<DENOPTIMAttachmentPoint>
 
     /**
      * Returns the Attachment Point class.
-     * @return the APClass
+     * @return the APClass or null.
      */
     public APClass getAPClass()
     {
