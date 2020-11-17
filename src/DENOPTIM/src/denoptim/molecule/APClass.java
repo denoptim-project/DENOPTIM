@@ -12,6 +12,9 @@ import denoptim.fragspace.FragmentSpace;
 
 public class APClass implements Cloneable,Comparable<APClass>,Serializable
 {
+    
+    //TODO-M6 remove serializable interface
+    
     /**
      * Version UID
      */
@@ -33,6 +36,12 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      * Set unique APClasses
      */
     public static Set<APClass> uniqueAPClasses = new HashSet<APClass>();
+    
+    /**
+     * Synchronisation lock. Used to guard alteration of the set of unique
+     * APClasses.
+     */
+    private final static Object uniqueAPClassesLock = new Object();
 
     /**
      * Recognised attachment point classes of RingClosingAttractor
@@ -41,16 +50,26 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     	    new HashSet<APClass>(){{
     	        APClass a = getUnique("ATplus",0);
     	        add(a);
-    	        uniqueAPClasses.add(a);
+    	        synchronized (uniqueAPClassesLock)
+                {
+    	            uniqueAPClasses.add(a);
+                }
     	        
     	        APClass b = getUnique("ATminus",0);
                 add(b);
-                uniqueAPClasses.add(b);
+                synchronized (uniqueAPClassesLock)
+                {
+                    uniqueAPClasses.add(b);
+                }
                 
                 APClass c = getUnique("ATneutral",0);
                 add(c);
-                uniqueAPClasses.add(c);
+                synchronized (uniqueAPClassesLock)
+                {
+                    uniqueAPClasses.add(c);
+                }
                 }};
+               
 
 //------------------------------------------------------------------------------
 
@@ -113,19 +132,21 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      */
     private static APClass getUnique(String rule, int subClass)
     {
-        for (APClass existingApc : uniqueAPClasses)
-        {
-            if (existingApc.getRule().equals(rule)
-                    && existingApc.getSubClass()==subClass)
-            {
-                return existingApc;
-            }
-        }
+
         APClass newApc = new APClass();
-        newApc.setRule(rule);
-        newApc.setSubClass(subClass);
-        synchronized (uniqueAPClasses)
+        synchronized (uniqueAPClassesLock)
         {
+            for (APClass existingApc : uniqueAPClasses)
+            {
+                if (existingApc.getRule().equals(rule)
+                        && existingApc.getSubClass()==subClass)
+                {
+                    newApc = existingApc;
+                    break;
+                }
+            }
+            newApc.setRule(rule);
+            newApc.setSubClass(subClass);
             uniqueAPClasses.add(newApc);
         }
         return newApc;
