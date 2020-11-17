@@ -373,12 +373,12 @@ public class EmptyVertex extends DENOPTIMVertex
      * @return the list of APClassess
      */
 
-    public ArrayList<String> getAllAPClasses()
+    public ArrayList<APClass> getAllAPClasses()
     {
-        ArrayList<String> lst = new ArrayList<String>();
+        ArrayList<APClass> lst = new ArrayList<APClass>();
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            String apCls = ap.getAPClass().toString();
+            APClass apCls = ap.getAPClass();
             if (!lst.contains(apCls))
             {
                 lst.add(apCls);

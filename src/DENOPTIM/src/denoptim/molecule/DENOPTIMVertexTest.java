@@ -183,7 +183,10 @@ public class DENOPTIMVertexTest
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
         assertEquals(v.getLevel(), c.getLevel(), "Level");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
-        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code"); 
+        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");
+        assertEquals(v.getAllAPClasses(),c.getAllAPClasses(),"APClass list");
+        assertEquals(v.getAllAPClasses().get(0).hashCode(),
+                c.getAllAPClasses().get(0).hashCode(),"APClass hash code");
     }
     
 //------------------------------------------------------------------------------

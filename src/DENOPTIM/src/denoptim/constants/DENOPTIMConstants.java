@@ -124,7 +124,7 @@ public final class DENOPTIMConstants
      * Keyword identifying compatibility matrix file lines with
      * forbidden ends
      */
-    public static final String APCMAPFORBEND = "DEL";
+    public static final String APCMAPFORBIDDENEND = "DEL";
     
     /**
      * Keyword identifying compatibility matrix file lines with
@@ -275,14 +275,6 @@ public final class DENOPTIMConstants
             put("ATN", "ATN");
         };
     };
-
-    /**
-     * Recognized attachment point classes of RingClosingAttractor
-     */
-    public static final Set<String> RCAAPCLASSSET = 
-		    new HashSet<>(Arrays.asList(new String[] {"ATplus:0",
-			"ATminus:0", "ATneutral:0"}
-		    ));
 
     /**
      * Smallest difference for comparison of double and float numbers.

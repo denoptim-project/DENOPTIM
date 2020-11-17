@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
@@ -37,6 +38,7 @@ public class DENOPTIMEdgeTest {
 	private StringBuilder reason = new StringBuilder();
 	private final DENOPTIMAttachmentPoint dummyAp =
 			new DENOPTIMAttachmentPoint(new EmptyVertex());
+	private final String APCSEP = DENOPTIMConstants.SEPARATORAPPROPSCL;
 
 //------------------------------------------------------------------------------
 
@@ -83,10 +85,10 @@ public class DENOPTIMEdgeTest {
 	public void testSameAs_SameAPClass() throws Exception {
 		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eA.setSrcAPClass("classA");
+		eA.setSrcAPClass(APClass.make("classA"+APCSEP+"0"));
 		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eB.setSrcAPClass("classA");
+		eB.setSrcAPClass(APClass.make("classA"+APCSEP+"0"));
 
 		assertTrue(eA.sameAs(eB, reason));
 	}
@@ -97,10 +99,10 @@ public class DENOPTIMEdgeTest {
 	public void testSameAs_DiffAPClass() throws Exception {
 		DENOPTIMEdge eA = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eA.setSrcAPClass("classA");
+		eA.setSrcAPClass(APClass.make("classA"+APCSEP+"0"));
 		DENOPTIMEdge eB = new DENOPTIMEdge(dummyAp, dummyAp, 0, 1, 0, 0,
 				BondType.UNDEFINED);
-		eB.setSrcAPClass("classB");
+		eB.setSrcAPClass(APClass.make("classB"+APCSEP+"0"));
 
 		assertFalse(eA.sameAs(eB, reason));
 	}

@@ -34,6 +34,9 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
 
@@ -655,6 +658,23 @@ public class FSEParameters
 				{
                     rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
 								rootGraphsFile,true);
+                  //TODO-M6 del
+                    System.out.println("_____in FSEParams");
+                    for (int i=0; i<rootGraphs.size(); i++)
+                    {
+                        System.out.println("  Graph "+i);
+                        for (DENOPTIMAttachmentPoint ap : rootGraphs.get(i).getAttachmentPoints())
+                        {
+                            APClass a = ap.getAPClass();
+                            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
+                        }
+                        for (DENOPTIMEdge e : rootGraphs.get(i).getEdgeList())
+                        {
+                            APClass src = e.getSrcAPClass();
+                            APClass trg = e.getTrgAPClass();
+                            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
+                        } 
+                    }
 				}
 				else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))
 				{

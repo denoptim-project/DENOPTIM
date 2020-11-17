@@ -28,6 +28,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
@@ -117,8 +118,8 @@ public class FragmentSpaceParameters
     /**
      * List of constitutional symmetry constraints
      */
-    protected static HashMap<String, Double> symmConstraintsMap = 
-						  new HashMap<String, Double>();
+    protected static HashMap<APClass, Double> symmConstraintsMap = 
+						  new HashMap<APClass, Double>();
     
     /**
      * Flag signalling the use of graph templates
@@ -318,7 +319,7 @@ public class FragmentSpaceParameters
                               + "[APClass (String)] [probability (Double)].";
                         throw new DENOPTIMException(msg);
         		    }
-        		    String apClass = words[0];
+        		    APClass apClass = APClass.make(words[0]);
         		    double prob = 0.0;
         		    try
         		    {

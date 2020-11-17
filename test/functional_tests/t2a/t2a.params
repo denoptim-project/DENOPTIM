@@ -1,0 +1,29 @@
+#
+# This is the parameter file for test 't2'
+#
+
+# Parameters for FragmentSpaceExplorer
+FSE-WorkDir=OTF_WDIR
+FSE-UidFile=OTF_WDIR/MOLUID.txt
+FSE-NumOfProcessors=1
+FSE-MAXLEVEL=0
+FSE-VERBOSITY=1
+FSE-ROOTGRAPHS=OTF_WDIR/roots.txt
+FP-Source=OTF_WDIR/fitness_provider.sh
+FP-Interpreter=BASH
+
+# Definition of the Fragment Space 
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds-1.2
+
+# RingClosureParameters
+RC-CLOSERINGS
+RC-RCCINDEX=OTF_WDIR/RCCONFS_ID_t2.txt
+RC-EVALUATIONCLOSABILITYMODE=CONSTITUTION
+RC-CLOSABLERINGSMARTS=C1[C,O]CC[C,O]1
+RC-CLOSABLERINGSMARTS=C1[C,O]CCC[C,O]1
+RC-CLOSABLERINGSMARTS=C1[C,O]CCCC[C,O]1

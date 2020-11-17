@@ -36,6 +36,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -167,11 +168,13 @@ public class DenoptimIOTest {
 				+ System.getProperty("file.separator") + "frag.sdf";
 		DenoptimIO.writeFragmentSet(tmpFile, frags);
 
-		Set<String> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
+		Set<APClass> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
 
 		assertEquals(6, allAPC.size(), "Size did not match");
-		assertTrue(allAPC.contains("apClassObis:0"), "Contains APClass (1)");
-		assertTrue(allAPC.contains("otherClass:0"), "Contains APClass (2)");
+		assertTrue(allAPC.contains(APClass.make("apClassObis:0")), 
+		        "Contains APClass (1)");
+		assertTrue(allAPC.contains(APClass.make("otherClass:0")), 
+		        "Contains APClass (2)");
 	}
 
 //------------------------------------------------------------------------------

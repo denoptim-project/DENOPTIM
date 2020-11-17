@@ -26,6 +26,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.molecule.APClass;
 
 
 /**
@@ -122,7 +123,7 @@ public class RingClosingAttractor
     /**
      * Class of the Attachment Point represented by this RCA
      */
-    private String apClass = "none";
+    private APClass apClass;
 
     /**
      * Flag: this RingClosingAttractor is used to close a ring
@@ -250,7 +251,7 @@ public class RingClosingAttractor
      * @return the attachment point class
      */
 
-    public String getApClass()
+    public APClass getApClass()
     {
         return apClass;
     }
@@ -260,12 +261,12 @@ public class RingClosingAttractor
     /**
      * Set the class of the Attachment Point occupied by this 
      * RingClosingAttractor, if any.
-     * @param apClass the string format of the attachment point class
+     * @param apclass2 the string format of the attachment point class
      */
 
-    public void setApClass(String apClass)
+    public void setApClass(APClass apclass2)
     {
-        this.apClass = apClass;
+        this.apClass = apclass2;
     }
 
 //-----------------------------------------------------------------------------

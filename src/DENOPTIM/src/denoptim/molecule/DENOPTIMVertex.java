@@ -34,7 +34,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import java.io.Serializable;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
@@ -175,9 +174,15 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         
         if (v instanceof DENOPTIMFragment)
         {
+            //TODO-M6 del
+            System.out.println("HERE: "+vertexId+" "+bbId+" "+APClass.RCAAPCLASSSET);
+            System.out.println("      "+v.getAttachmentPoints().get(0).getAPClass());
+            System.out.println("      "+(v.getNumberOfAP() == 1)+" "+(v.getNumberOfAP() == 1 
+                    && APClass.RCAAPCLASSSET.contains(
+                            v.getAttachmentPoints().get(0).getAPClass())));
             v.setAsRCV(v.getNumberOfAP() == 1 
-                && DENOPTIMConstants.RCAAPCLASSSET.contains(
-                        v.getAttachmentPoints().get(0).getAPClass().toString()));
+                && APClass.RCAAPCLASSSET.contains(
+                        v.getAttachmentPoints().get(0).getAPClass()));
         }
         return v;
     }
@@ -450,14 +455,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     /**
      *
-     * @param cmpReac list of reactions of the source vertex attachment point
+     * @param cmpReac list of APClasses of the attachment point we want to 
      * @return list of indices of the attachment points in vertex that has
      * the corresponding reaction
      */
 
     public ArrayList<Integer> getCompatibleClassAPIndex(
-            String cmpReac
-    ) {
+            APClass cmpReac) {
         ArrayList<DENOPTIMAttachmentPoint> apLst = getAttachmentPoints();
         ArrayList<Integer> apIdx = new ArrayList<>();
         for (int i = 0; i < apLst.size(); i++)
@@ -466,8 +470,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             if (dap.isAvailable())
             {
                 // check if this AP has the compatible reactions
-                String dapReac = dap.getAPClass().toString();
-                if (dapReac.compareToIgnoreCase(cmpReac) == 0)
+                APClass dapReac = dap.getAPClass();
+                if (dapReac.isCPMapCompatibleWith(cmpReac))
                 {
                     apIdx.add(i);
                 }
@@ -520,12 +524,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @return the list of APClassess
      */
     
-    public ArrayList<String> getAllAPClasses()
+    public ArrayList<APClass> getAllAPClasses()
     {
-        ArrayList<String> lst = new ArrayList<String>();
+        ArrayList<APClass> lst = new ArrayList<APClass>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
-            String apCls = ap.getAPClass().toString();
+            APClass apCls = ap.getAPClass();
             if (!lst.contains(apCls))
             {
                 lst.add(apCls);
@@ -542,15 +546,15 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @return the list of APClassess
      */
     
-    public ArrayList<String> getAllAvailableAPClasses()
+    public ArrayList<APClass> getAllAvailableAPClasses()
     {
-        ArrayList<String> lst = new ArrayList<String>();
+        ArrayList<APClass> lst = new ArrayList<APClass>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
             if (!ap.isAvailable())
                 continue;
             
-            String apCls = ap.getAPClass().toString();
+            APClass apCls = ap.getAPClass();
             if (!lst.contains(apCls))
             {
                 lst.add(apCls);
@@ -578,11 +582,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
                 .get(sourceAPIndex);
-        String srcAPC = sourceAP.getAPClass().toString();
+        APClass srcAPC = sourceAP.getAPClass();
         
         DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
                 .get(targetAPIndex);
-        String trgAPC = targetAP.getAPClass().toString();
+        APClass trgAPC = targetAP.getAPClass();
         
         return connectVertices(target, sourceAPIndex, targetAPIndex, srcAPC, 
                 trgAPC);
@@ -601,12 +605,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     
     //TODO-V3 get rid of this once edge constructor will not need all these details
-    
+    //TODO-M6 should be able to get rid of it
+    @Deprecated
     public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
                                         int sourceAPIndex,
                                         int targetAPIndex,
-                                        String srcAPC,
-                                        String trgAPC
+                                        APClass srcAPC,
+                                        APClass trgAPC
     ) {
         //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
@@ -616,7 +621,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
         if (sourceAP.isAvailable() && targetAP.isAvailable())
         {
-            String rname = trgAPC.substring(0, trgAPC.indexOf(':'));
+            String rname = trgAPC.getRule();
 
             // look up the reaction bond order table
             BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
@@ -692,33 +697,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         dap_B.updateFreeConnections(-chosenBO); // decrement the connections
         
         return edge;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Connects this vertex to other based on their free AP connections
-     * @param other vertex
-     */
-    
-    //TODO-V3 cleanup
-    @Deprecated
-    public void join(DENOPTIMVertex other) {
-        List<DENOPTIMAttachmentPoint> apsA = getAttachmentPoints();
-        List<DENOPTIMAttachmentPoint> apsB = other.getAttachmentPoints();
-        if (apsA.isEmpty() || apsB.isEmpty()) {
-            throw new IllegalArgumentException("Vertex has no attachment " +
-                    "points");
-        }
-        //Absolutely NO!
-        Random random = new Random();
-        DENOPTIMAttachmentPoint apA = apsA.get(random.nextInt(apsA.size()));
-        DENOPTIMAttachmentPoint apB = apsB.get(random.nextInt(apsB.size()));
-
-        int bondOrder = 1;
-//        if (FragmentSpace.useAPclassBasedApproach()) {
-//            bondOrder =
-//        }
     }
 
 //------------------------------------------------------------------------------

@@ -31,6 +31,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -321,13 +322,13 @@ public class GraphUtils
         ArrayList<DENOPTIMAttachmentPoint> curAPs =
                                                 curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint srcAP = curAPs.get(srcAPIdx);
-        String srcAPCls = srcAP.getAPClass().toString();
+        APClass srcAPCls = srcAP.getAPClass();
         
         // identify the target AP (on the appended vertex)
         DENOPTIMAttachmentPoint trgAP = incomingVertex.getAttachmentPoints()
                 .get(trgAPIdx);
 
-        String trgAPCls = trgAP.getAPClass().toString();
+        APClass trgAPCls = trgAP.getAPClass();
 
         // create the new DENOPTIMEdge
         DENOPTIMEdge edge;

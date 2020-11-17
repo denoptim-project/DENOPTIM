@@ -89,7 +89,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	 * These can be found in a fragment space or collected from
 	 * fragment libraries
 	 */
-	private SortedSet<String> allAPClasses = new TreeSet<String>();
+	private SortedSet<APClass> allAPClasses = new TreeSet<APClass>();
 	
 	/**
      * List of all APRules. This list can be edited by creating/removing an 
@@ -102,27 +102,27 @@ public class CompatibilityMatrixForm extends JPanel {
 	 * These can be found in a fragment space or collected from
 	 * the capping group library
 	 */
-	private SortedSet<String> allCapAPClasses = new TreeSet<String>();
+	private SortedSet<APClass> allCapAPClasses = new TreeSet<APClass>();
 	
 	/**
 	 * Sorted list of APClasses in the map of compatibility rules
 	 */
-	private SortedSet<String> allAPClsInCPMap = new TreeSet<String>();
+	private SortedSet<APClass> allAPClsInCPMap = new TreeSet<APClass>();
 	
     /**
      * Data structure that stored the true entries of the 
      * attachment point classes compatibility matrix
      */
-    private HashMap<String, ArrayList<String>> compatMap = 
-    			new HashMap<String, ArrayList<String>>(); 
+    private HashMap<APClass, ArrayList<APClass>> compatMap = 
+    			new HashMap<APClass, ArrayList<APClass>>(); 
 
     /**
      * Data structure that stores compatible APclasses for joining APs 
      * in ring-closing bonds. Symmetric, purpose specific
      * compatibility matrix.
      */
-    private HashMap<String, ArrayList<String>> rcCompatMap = 
-    			new HashMap<String, ArrayList<String>>();
+    private HashMap<APClass, ArrayList<APClass>> rcCompatMap = 
+    			new HashMap<APClass, ArrayList<APClass>>();
 
     /**
      * Data structure that stores the correspondence between bond type
@@ -135,12 +135,13 @@ public class CompatibilityMatrixForm extends JPanel {
      * Data structure that stores the AP-classes to be used to cap unused
      * APS on the growing molecule.
      */
-    private HashMap<String, String> cappingMap = new HashMap<String, String>();
+    private HashMap<APClass, APClass> cappingMap = 
+            new HashMap<APClass, APClass>();
 
     /**
      * Data structure that stores AP classes that cannot be held unused
      */
-    private Set<String> forbiddenEndList = new HashSet<String>();
+    private HashSet<APClass> forbiddenEndList = new HashSet<APClass>();
 	
 	private JTabbedPane tabbedPane;
 	
@@ -199,17 +200,17 @@ public class CompatibilityMatrixForm extends JPanel {
         		+ "source APClass.");
         btnAddCompRul.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                DefaultListModel<String> srcAPCs =
+                DefaultListModel<String> sAPCsStr =
                         new DefaultListModel<String>();
-                JList<String> srcClsList = new JList<String>(srcAPCs);
-                for (String apc : allAPClasses)
+                JList<String> srcClsList = new JList<String>(sAPCsStr);
+                for (APClass apc : allAPClasses)
                 {
                     if (!compatMap.keySet().contains(apc))
                     {
-                    	srcAPCs.addElement(apc);
+                    	sAPCsStr.addElement(apc.toString());
                     }
                 }
-                srcAPCs.addElement("<html><b><i>Define a new APClass...<i>"
+                sAPCsStr.addElement("<html><b><i>Define a new APClass...<i>"
                 		+ "</b></html>");
                 srcClsList.setSelectionMode(
                 		ListSelectionModel.SINGLE_SELECTION);
@@ -217,9 +218,9 @@ public class CompatibilityMatrixForm extends JPanel {
                 DefaultListModel<String> trgAPCs =
                         new DefaultListModel<String>();
                 JList<String> trgClsList = new JList<String>(trgAPCs);
-                for (String apc : allAPClasses)
+                for (APClass apc : allAPClasses)
                 {
-                	trgAPCs.addElement(apc);
+                	trgAPCs.addElement(apc.toString());
                 }
                 trgAPCs.addElement("<html><b><i>Define a new APClass...<i>"
                 		+ "</b></html>");
@@ -235,14 +236,16 @@ public class CompatibilityMatrixForm extends JPanel {
                 twoListsPanel.setLayout(lyoAddCapRule);
                 lyoAddCapRule.setAutoCreateGaps(true);
                 lyoAddCapRule.setAutoCreateContainerGaps(true);
-                lyoAddCapRule.setHorizontalGroup(lyoAddCapRule.createSequentialGroup()
+                lyoAddCapRule.setHorizontalGroup(
+                        lyoAddCapRule.createSequentialGroup()
                 	.addGroup(lyoAddCapRule.createParallelGroup()
                 			.addComponent(headSrc)
                         	.addComponent(scrollSrc))
                     .addGroup(lyoAddCapRule.createParallelGroup()
                     	.addComponent(headTrg)
                     	.addComponent(scrollTrg)));
-                lyoAddCapRule.setVerticalGroup(lyoAddCapRule.createSequentialGroup()
+                lyoAddCapRule.setVerticalGroup(
+                        lyoAddCapRule.createSequentialGroup()
                     .addGroup(lyoAddCapRule.createParallelGroup()
                     	.addComponent(headSrc)
                     	.addComponent(headTrg))
@@ -262,13 +265,13 @@ public class CompatibilityMatrixForm extends JPanel {
 	                //NB: we allow a single selection in the src APClass list
                 	Integer idSrc = srcClsList.getSelectedIndices()[0];
                 	
-                	String srcAPClass = "NONE";
-                	if (idSrc.intValue() == (srcAPCs.size()-1))
+                	APClass srcAPClass = null;
+                	if (idSrc.intValue() == (sAPCsStr.size()-1))
                 	{
                 		try {
-                			srcAPClass = GUIFragmentInspector
+                			srcAPClass = APClass.make(GUIFragmentInspector
 									.ensureGoodAPClassString("",
-											"Define new Source APClass",true);
+											"Define new Source APClass",true));
                 			if (allAPClasses.contains(srcAPClass))
                 			{
                 				JOptionPane.showMessageDialog(null,
@@ -276,12 +279,12 @@ public class CompatibilityMatrixForm extends JPanel {
     		        					+"</code>' is not new!</html>",
     		        	                "Error",
     		        	                JOptionPane.WARNING_MESSAGE,
-    		        	                UIManager.getIcon("OptionPane.errorIcon"));
+    		        	                UIManager.getIcon(
+    		        	                        "OptionPane.errorIcon"));
     		        			return;
                 			}
 							allAPClasses.add(srcAPClass);
-							allAPRules.add(
-							        DENOPTIMAttachmentPoint.getAPRule(srcAPClass));
+							allAPRules.add(srcAPClass.getRule());
 						} catch (DENOPTIMException e1) {
 		        			JOptionPane.showMessageDialog(null,
 		        					"<html>Error definging anew APClass.<br>"
@@ -295,10 +298,18 @@ public class CompatibilityMatrixForm extends JPanel {
                 	}
                 	else
                 	{
-                		srcAPClass = (String) srcAPCs.getElementAt(idSrc);
+                		try
+                        {
+                            srcAPClass = APClass.make(
+                                    sAPCsStr.getElementAt(idSrc));
+                        } catch (DENOPTIMException e1)
+                        {
+                            // Unreachable thanks to ensureGoodAPClassString()
+                            e1.printStackTrace();
+                        }
                 	}
 
-	                ArrayList<String> trgCPClasses = new ArrayList<String>();
+	                ArrayList<APClass> trgCPClasses = new ArrayList<APClass>();
 	                for (Integer id : trgClsList.getSelectedIndices())
 	                {
 	                	if (id.intValue() == (trgAPCs.size()-1))
@@ -314,11 +325,12 @@ public class CompatibilityMatrixForm extends JPanel {
 	    		        					+"</code>' is not new!</html>",
 	    		        	                "Error",
 	    		        	                JOptionPane.WARNING_MESSAGE,
-	    		        	                UIManager.getIcon("OptionPane.errorIcon"));
+	    		        	                UIManager.getIcon(
+	    		        	                        "OptionPane.errorIcon"));
 	    		        			return;
 	                			}
-								trgCPClasses.add(newAPC);
-								allAPClasses.add(newAPC);
+								trgCPClasses.add(APClass.make(newAPC));
+								allAPClasses.add(APClass.make(newAPC));
 								allAPRules.add(
 								        DENOPTIMAttachmentPoint.getAPRule(
 								                newAPC));
@@ -328,8 +340,15 @@ public class CompatibilityMatrixForm extends JPanel {
 	                	}
 	                	else
 	                	{
-	                		trgCPClasses.add(
-	                				(String) trgAPCs.getElementAt(id));
+	                		try
+                            {
+                                trgCPClasses.add(APClass.make(
+                                		(String) trgAPCs.getElementAt(id)));
+                            } catch (DENOPTIMException e1)
+                            {
+                                // Unreachable thanks to ensureGoodAPClassString
+                                e1.printStackTrace();
+                            }
 	                	}
 	                }
 	                
@@ -374,11 +393,11 @@ public class CompatibilityMatrixForm extends JPanel {
                     DefaultListModel<String> srcAPCs =
                             new DefaultListModel<String>();
                     JList<String> srcClsList = new JList<String>(srcAPCs);
-                    for (String apc : allAPClasses)
+                    for (APClass apc : allAPClasses)
                     {
                         if (!compatMap.keySet().contains(apc))
                         {
-                        	srcAPCs.addElement(apc);
+                        	srcAPCs.addElement(apc.toString());
                         }
                     }
                     srcClsList.setSelectionMode(
@@ -393,9 +412,19 @@ public class CompatibilityMatrixForm extends JPanel {
                     List<String> selSrc = srcClsList.getSelectedValuesList();
                     if (selSrc.size() > 0)
                     {
-                    	for (String srcAPClass : selSrc)
+                    	for (String srcAPClassStr : selSrc)
                     	{
-                    		ArrayList<String> newTrg = new ArrayList<String>();
+                    	    APClass srcAPClass = null;
+                            try
+                            {
+                                srcAPClass = APClass.make(srcAPClassStr);
+                            } catch (DENOPTIMException e1)
+                            {
+                                //should never happen
+                                e1.printStackTrace();
+                            }
+                    		ArrayList<APClass> newTrg = 
+                    		        new ArrayList<APClass>();
                     		newTrg.addAll(compatMap.get(srcOrig));
 	    	                compatMap.put(srcAPClass,newTrg);
 	    	                allAPClsInCPMap.add(srcAPClass);
@@ -604,9 +633,9 @@ public class CompatibilityMatrixForm extends JPanel {
                 DefaultListModel<String> srcAPRs =
                         new DefaultListModel<String>();
                 JList<String> apRulesList = new JList<String>(srcAPRs);
-                for (String apc : allAPClasses)
+                for (APClass apc : allAPClasses)
                 {
-                    String apr = DENOPTIMAttachmentPoint.getAPRule(apc);
+                    String apr = apc.getRule();
                     if (!bondTypeMap.keySet().contains(apr))
                     {
                     	srcAPRs.addElement(apr);
@@ -824,11 +853,11 @@ public class CompatibilityMatrixForm extends JPanel {
                 DefaultListModel<String> srcAPCs =
                         new DefaultListModel<String>();
                 JList<String> srcClsList = new JList<String>(srcAPCs);
-                for (String apc : allAPClasses)
+                for (APClass apc : allAPClasses)
                 {
                     if (!cappingMap.keySet().contains(apc))
                     {
-                    	srcAPCs.addElement(apc);
+                    	srcAPCs.addElement(apc.toString());
                     }
                 }
                 srcAPCs.addElement("<html><b><i>Define a new APClass...<i>"
@@ -837,9 +866,9 @@ public class CompatibilityMatrixForm extends JPanel {
                 DefaultListModel<String> capAPCs =
                         new DefaultListModel<String>();
                 JList<String> capClsList = new JList<String>(capAPCs);
-                for (String apc : allCapAPClasses)
+                for (APClass apc : allCapAPClasses)
                 {
-                	capAPCs.addElement(apc);
+                	capAPCs.addElement(apc.toString());
                 }
                 capAPCs.addElement("<html><b><i>Define a new APClass...<i>"
                 		+ "</b></html>");
@@ -880,13 +909,13 @@ public class CompatibilityMatrixForm extends JPanel {
                 {
 	                //NB: we allow a single selection in the cap APClass list
                 	Integer idc = capClsList.getSelectedIndices()[0];
-                	String cappingAPClass = "NONE";
+                	APClass cappingAPClass = null;
                 	if (idc.intValue() == (capAPCs.size()-1))
                 	{
                 		try {
-                			cappingAPClass = GUIFragmentInspector
+                			cappingAPClass = APClass.make(GUIFragmentInspector
 									.ensureGoodAPClassString("",
-									"Define new Capping Group APClass", false);
+									"Define new Capping Group APClass", false));
                 			if (allAPClasses.contains(cappingAPClass))
                 			{
                 				JOptionPane.showMessageDialog(null,
@@ -898,8 +927,7 @@ public class CompatibilityMatrixForm extends JPanel {
     		        			return;
                 			}
 							allAPClasses.add(cappingAPClass);
-							allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(
-							        cappingAPClass));
+							allAPRules.add(cappingAPClass.getRule());
 						} catch (DENOPTIMException e1) {
 		        			JOptionPane.showMessageDialog(null,
 		        					"<html>Error definging a new APClass.<br>"
@@ -913,7 +941,15 @@ public class CompatibilityMatrixForm extends JPanel {
                 	}
                 	else
                 	{
-                		cappingAPClass = (String) capAPCs.getElementAt(idc);
+                		try
+                        {
+                            cappingAPClass = APClass.make(
+                                    (String) capAPCs.getElementAt(idc));
+                        } catch (DENOPTIMException e1)
+                        {
+                            //this should never happen
+                            e1.printStackTrace();
+                        }
                 	}
 	                
 	                for (Integer id : srcClsList.getSelectedIndices())
@@ -921,9 +957,10 @@ public class CompatibilityMatrixForm extends JPanel {
 	                	if (id.intValue() == (srcAPCs.size()-1))
 	                	{
 	                		try {
-								String newAPC = GUIFragmentInspector
+	                		    APClass newAPC = APClass.make(
+	                		            GUIFragmentInspector
 										.ensureGoodAPClassString("",
-										"Define new Source APClass", false);
+										"Define new Source APClass", false));
 	                			if (allAPClasses.contains(newAPC))
 	                			{
 	                				JOptionPane.showMessageDialog(null,
@@ -938,16 +975,23 @@ public class CompatibilityMatrixForm extends JPanel {
 			                    		cappingAPClass});
 			                    cappingMap.put(newAPC,cappingAPClass);
 								allAPClasses.add(newAPC);
-								allAPRules.add(
-								        DENOPTIMAttachmentPoint.getAPRule(
-								                newAPC));
+								allAPRules.add(newAPC.getRule());
 							} catch (DENOPTIMException e1) {
 								continue;
 							} 
 	                	}
 	                	else
 	                	{
-		                    String srcAPClass = (String) srcAPCs.getElementAt(id);
+	                	    APClass srcAPClass = null;
+                            try
+                            {
+                                srcAPClass = APClass.make(
+                                        (String) srcAPCs.getElementAt(id));
+                            } catch (DENOPTIMException e1)
+                            {
+                                //this should never happen
+                                e1.printStackTrace();
+                            }
 		                    tabModCapping.addRow(new Object[]{srcAPClass,
 		                    		cappingAPClass});
 		                    cappingMap.put(srcAPClass,cappingAPClass);
@@ -1072,11 +1116,11 @@ public class CompatibilityMatrixForm extends JPanel {
     			DefaultListModel<String> claLstModel = 
     					new DefaultListModel<String>();
     			JList<String> clsList = new JList<String>(claLstModel);
-    			for (String apc : allAPClasses)
+    			for (APClass apc : allAPClasses)
     			{
     				if (!forbiddenEndList.contains(apc))
     				{
-    					claLstModel.addElement(apc);
+    					claLstModel.addElement(apc.toString());
     				}
     			}
     			claLstModel.addElement("<html><b><i>Define a new APClass...<i>"
@@ -1093,9 +1137,9 @@ public class CompatibilityMatrixForm extends JPanel {
                 	if (id.intValue() == (claLstModel.size()-1))
                 	{
                 		try {
-							String newAPC = GUIFragmentInspector
+                		    APClass newAPC = APClass.make(GUIFragmentInspector
 									.ensureGoodAPClassString("",
-									"Define new APClass", false);
+									"Define new APClass", false));
                 			if (allAPClasses.contains(newAPC))
                 			{
                 				JOptionPane.showMessageDialog(null,
@@ -1109,15 +1153,23 @@ public class CompatibilityMatrixForm extends JPanel {
                 			tabModFrbEnd.addRow(new Object[]{newAPC});
     	    				forbiddenEndList.add(newAPC);
 							allAPClasses.add(newAPC);
-							allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(
-							        newAPC));
+							allAPRules.add(newAPC.getRule());
 						} catch (DENOPTIMException e1) {
 							continue;
 						} 
                 	}
                 	else
                 	{
-	        			String apClass = (String) claLstModel.getElementAt(id);
+                	    APClass apClass = null;
+                        try
+                        {
+                            apClass = APClass.make(
+                                    (String) claLstModel.getElementAt(id));
+                        } catch (DENOPTIMException e1)
+                        {
+                            //this should never happen
+                            e1.printStackTrace();
+                        }
 	    				tabModFrbEnd.addRow(new Object[]{apClass});
 	    				forbiddenEndList.add(apClass);
                 	}
@@ -1504,10 +1556,10 @@ public class CompatibilityMatrixForm extends JPanel {
 	protected void importCPMapFromFile(File inFile)
 	{	
 		//Read data from file
-        compatMap = new HashMap<String,ArrayList<String>>();
+        compatMap = new HashMap<APClass,ArrayList<APClass>>();
         bondTypeMap = new HashMap<String,BondType>();
-        cappingMap = new HashMap<String,String>();
-        forbiddenEndList = new HashSet<String>();
+        cappingMap = new HashMap<APClass,APClass>();
+        forbiddenEndList = new HashSet<APClass>();
         try {
 			DenoptimIO.readCompatibilityMatrix(inFile.getAbsolutePath(),
 						compatMap,
@@ -1575,7 +1627,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		CompatRulesHeader h = new CompatRulesHeader();
 		h.setAlignmentX(LEFT_ALIGNMENT);
 		panelCPRules.add(h);
-		for (String srcAPClass : allAPClsInCPMap)
+		for (APClass srcAPClass : allAPClsInCPMap)
 		{
 			CompatibilityRuleLine r = new CompatibilityRuleLine(srcAPClass);
 			r.setAlignmentX(LEFT_ALIGNMENT);
@@ -1626,14 +1678,15 @@ public class CompatibilityMatrixForm extends JPanel {
         }
         
         // Get sorted list of table rows
-		ArrayList<String> sortedCappings = new ArrayList<String>();
+		ArrayList<APClass> sortedCappings = new ArrayList<APClass>();
 	    sortedCappings.addAll(cappingMap.keySet());
 	    Collections.sort(sortedCappings);
 	    
 	    // Re-build table
-	    for (String apc : sortedCappings)
+	    for (APClass apc : sortedCappings)
 	    {
-	        tabModCapping.addRow(new Object[]{apc, cappingMap.get(apc)});
+	        tabModCapping.addRow(
+	                new Object[]{apc.toString(), cappingMap.get(apc)});
 	    }
 	}
 	
@@ -1650,14 +1703,14 @@ public class CompatibilityMatrixForm extends JPanel {
         }
 		
         // Get sorted list of table rows
-        ArrayList<String> sortedFrbEnds = new ArrayList<String>();
+        ArrayList<APClass> sortedFrbEnds = new ArrayList<APClass>();
         sortedFrbEnds.addAll(forbiddenEndList);
         Collections.sort(sortedFrbEnds);
         
         // Re-build table
-        for (String apc : sortedFrbEnds)
+        for (APClass apc : sortedFrbEnds)
         {
-        	tabModFrbEnd.addRow(new Object[]{apc});
+        	tabModFrbEnd.addRow(new Object[]{apc.toString()});
         }
 	}
 	
@@ -1674,19 +1727,19 @@ public class CompatibilityMatrixForm extends JPanel {
 	{
 		if (cleanup)
 		{
-			allAPClasses = new TreeSet<String>();
+			allAPClasses = new TreeSet<APClass>();
 		}
 		
 		allAPClasses.addAll(compatMap.keySet());
 		
-		for (ArrayList<String> apcs : compatMap.values())
+		for (ArrayList<APClass> apcs : compatMap.values())
 		{
 			allAPClasses.addAll(apcs);
 		}
 		
-		for (String apc : allAPClasses)
+		for (APClass apc : allAPClasses)
 		{
-		    allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(apc));
+		    allAPRules.add(apc.getRule());
 		}
 	}
 	
@@ -1703,13 +1756,13 @@ public class CompatibilityMatrixForm extends JPanel {
 	{
 		if (cleanup)
 		{
-			allCapAPClasses = new TreeSet<String>();
+			allCapAPClasses = new TreeSet<APClass>();
 		}
 		allCapAPClasses.addAll(cappingMap.values());
 		allAPClasses.addAll(allCapAPClasses);
-		for (String apc : allAPClasses)
+		for (APClass apc : allAPClasses)
         {
-            allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(apc));
+            allAPRules.add(apc.getRule());
         }
 	}
 	
@@ -1729,7 +1782,7 @@ public class CompatibilityMatrixForm extends JPanel {
 				Cursor.WAIT_CURSOR));
 		if (cleanup)
 		{
-			allAPClasses = new TreeSet<String>();
+			allAPClasses = new TreeSet<APClass>();
 			allAPRules = new TreeSet<String>();
 		}
 		
@@ -1738,9 +1791,9 @@ public class CompatibilityMatrixForm extends JPanel {
 			allAPClasses.addAll(DenoptimIO.readAllAPClasses(fragLib));
 		}
 		
-		for (String apc : allAPClasses)
+		for (APClass apc : allAPClasses)
         {
-            allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(apc));
+            allAPRules.add(apc.getRule());
         }
 		
 		this.setCursor(Cursor.getPredefinedCursor(
@@ -1767,7 +1820,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		private JButton btnAdd;
 		private TrgRemovalListener trgDelListener;
 		
-		private String srcAPClass;
+		private APClass srcAPClass;
 		
 		private boolean isSelected = false;
 		
@@ -1780,23 +1833,23 @@ public class CompatibilityMatrixForm extends JPanel {
 		
 	//-------------------------------------------------------------------------
 
-		public CompatibilityRuleLine(String apclass)
+		public CompatibilityRuleLine(APClass srcAPClass)
 		{
-			this.srcAPClass = apclass;
-			this.setName(srcAPClass);
+			this.srcAPClass = srcAPClass;
+			this.setName(srcAPClass.toString());
 			this.setBackground(DEFAULTBACKGROUND);
 			this.setLayout(new BorderLayout());
 			
 			this.trgDelListener = new TrgRemovalListener(srcAPClass,this);
 			
-			srcClassName = new JTextField(srcAPClass);
+			srcClassName = new JTextField(srcAPClass.toString());
 			srcClassName.setBorder(null);
 			srcClassName.setOpaque(false);
 			srcClassName.setEditable(false);
 			srcClassName.setForeground(Color.BLACK);
 			srcClassName.setFont(UIManager.getLookAndFeelDefaults()
 					.getFont("Label.font"));
-			srcClassName.setToolTipText(srcAPClass);
+			srcClassName.setToolTipText(srcAPClass.toString());
 			srcClassName.addMouseListener(this);
 			srcClassNameScroller = new JScrollPane(srcClassName,
 	        		JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -1810,7 +1863,7 @@ public class CompatibilityMatrixForm extends JPanel {
 			this.add(srcClassNameScroller, BorderLayout.WEST);
 			
 			trgClassesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			for (String trgAPClass : compatMap.get(srcAPClass))
+			for (APClass trgAPClass : compatMap.get(srcAPClass))
 			{
 				TargetAPClassToken trg = new TargetAPClassToken(trgAPClass);
 				trg.addPropertyChangeListener(
@@ -1835,9 +1888,9 @@ public class CompatibilityMatrixForm extends JPanel {
 	                DefaultListModel<String> trgAPCs =
 	                        new DefaultListModel<String>();
 	                JList<String> trgClsList = new JList<String>(trgAPCs);
-	                for (String apc : allAPClasses)
+	                for (APClass apc : allAPClasses)
 	                {
-	                	trgAPCs.addElement(apc);
+	                	trgAPCs.addElement(apc.toString());
 	                }
 	                trgAPCs.addElement("<html><b><i>Define a new APClass...<i>"
 	                		+ "</b></html>");
@@ -1854,16 +1907,18 @@ public class CompatibilityMatrixForm extends JPanel {
 
 	                if (trgClsList.getSelectedIndices().length > 0)
 	                {
-		                ArrayList<String> trgCPClasses = new ArrayList<String>();
+		                ArrayList<APClass> trgCPClasses = 
+		                        new ArrayList<APClass>();
 		                for (Integer id : trgClsList.getSelectedIndices())
 		                {
 		                	if (id.intValue() == (trgAPCs.size()-1))
 		                	{
 		                		try {
-									String newAPC = GUIFragmentInspector
+		                		    APClass newAPC = APClass.make(
+		                		            GUIFragmentInspector
 											.ensureGoodAPClassString("",
 											"Define new compatible APClass",
-											false);
+											false));
 		                			if (allAPClasses.contains(newAPC))
 		                			{
 		                				JOptionPane.showMessageDialog(null,
@@ -1871,22 +1926,28 @@ public class CompatibilityMatrixForm extends JPanel {
 		    		        					+"</code>' is not new!</html>",
 		    		        	                "Error",
 		    		        	                JOptionPane.WARNING_MESSAGE,
-		    		        	                UIManager.getIcon("OptionPane.errorIcon"));
+		    		        	                UIManager.getIcon(
+		    		        	                       "OptionPane.errorIcon"));
 		    		        			return;
 		                			}
 									trgCPClasses.add(newAPC);
 									allAPClasses.add(newAPC);
-									allAPRules.add(
-									        DENOPTIMAttachmentPoint.getAPRule(
-									                newAPC));
+									allAPRules.add(newAPC.getRule());
 								} catch (DENOPTIMException e1) {
 									continue;
 								} 
 		                	}
 		                	else
 		                	{
-		                		trgCPClasses.add(
-		                				(String) trgAPCs.getElementAt(id));
+		                		try
+                                {
+                                    trgCPClasses.add(APClass.make(
+                                    		(String) trgAPCs.getElementAt(id)));
+                                } catch (DENOPTIMException e1)
+                                {
+                                    //this will never happen
+                                    e1.printStackTrace();
+                                }
 		                	}
 		                }
 		                compatMap.get(srcAPClass).addAll(trgCPClasses);
@@ -1930,7 +1991,7 @@ public class CompatibilityMatrixForm extends JPanel {
 			boolean found = false;
 			int n = 0;
 			
-			if (srcAPClass.matches(regex))
+			if (srcAPClass.toString().matches(regex))
 			{
 				found = true;
 				n = 1;
@@ -2011,10 +2072,10 @@ public class CompatibilityMatrixForm extends JPanel {
 	 */
 	private class TrgRemovalListener implements PropertyChangeListener
 	{
-		private String srcAPClass;
+		private APClass srcAPClass;
 		private Component srcAPClassRulesPanel;
 		
-		public TrgRemovalListener(String srcAPClass, Component panel)
+		public TrgRemovalListener(APClass srcAPClass, Component panel)
 		{
 			this.srcAPClass = srcAPClass;
 			this.srcAPClassRulesPanel = panel;
@@ -2067,7 +2128,7 @@ public class CompatibilityMatrixForm extends JPanel {
     
     private class TargetAPClassToken extends JPanel
     {
-    	private String trgAPClass;
+    	private APClass trgAPClass;
     	private JTextField trgAPClLabel;
     	private JButton btnDel;
     	
@@ -2078,11 +2139,11 @@ public class CompatibilityMatrixForm extends JPanel {
 		private final Color DEFAULTBACKGROUND = 
 				UIManager.getLookAndFeelDefaults().getColor("Panel.background");
     	
-    	public TargetAPClassToken(String apclass)
+    	public TargetAPClassToken(APClass trgAPClass)
     	{
     		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-    		this.trgAPClass = apclass;
-    		trgAPClLabel = new JTextField(trgAPClass);
+    		this.trgAPClass = trgAPClass;
+    		trgAPClLabel = new JTextField(trgAPClass.toString());
     		trgAPClLabel.setBorder(null);
     		trgAPClLabel.setOpaque(false);
     		trgAPClLabel.setEditable(false);
@@ -2134,7 +2195,7 @@ public class CompatibilityMatrixForm extends JPanel {
     	
     	public boolean matchesAPClass(String regex)
     	{
-    		return trgAPClass.matches(regex);
+    		return trgAPClass.toString().matches(regex);
     	}
     	
     //-------------------------------------------------------------------------

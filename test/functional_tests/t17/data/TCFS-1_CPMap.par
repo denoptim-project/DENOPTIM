@@ -35,7 +35,6 @@ RCN LTrisAminoPhosphineN:0 LAminoPhosphineCycloN:1
 RCN OPhosphiniteSub:1 SubRS:1,SubRM:1,SubArS:1,SubArM:1,SubArL:1
 RCN OPhosphiteSub:1 SubRS:1,SubRM:1,SubRL:1,SubArS:1,SubArM:1,SubArL:1
 RCN OPhosphoniteSub:1 SubRS:1,SubArS:1,SubArL:1
-RCN sArCl:1 none
 RCN scaff:0 M6HPyrimidinylidene:1,MPyrrolidinylidene:1,MIsoindolylidene:1,MImidazolidinylidene:1,MImidazolylidene:1,MBisAminoPhosphine:1,MMonoAminoPhosphine:1,MPhosphine:1,MPhosphinite:1,MPhosphite:1,MPhosphole:1,MPhosphonite:1,MTrisAminoPhosphine:1
 RCN Xlig:0 Xlig:1
 # CLASS-to-BondOrder conversion

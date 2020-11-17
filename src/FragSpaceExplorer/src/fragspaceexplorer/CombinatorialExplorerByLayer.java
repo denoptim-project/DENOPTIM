@@ -40,7 +40,9 @@ import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
@@ -581,7 +583,7 @@ public class CombinatorialExplorerByLayer
         }
         Collection<File> files = FileUtils.listFiles(new File(prevLevDirName),
                        new String[] {DENOPTIMConstants.SERGFILENAMEEXT}, false);
-        ArrayList<File> lstFiles = new ArrayList(files);
+        ArrayList<File> lstFiles = new ArrayList<File>(files);
         Collections.sort(lstFiles);
         for (File file : lstFiles) 
         {
@@ -635,6 +637,20 @@ public class CombinatorialExplorerByLayer
 
                     int tId = TaskUtils.getUniqueTaskIndex();
                     FragsCombination fragsToAdd = fcf.next();
+                    
+                    //TODO-M6 del
+                    System.out.println("_____in CEBL ");
+                    for (DENOPTIMAttachmentPoint ap : rootGraph.getAttachmentPoints())
+                    {
+                        APClass a = ap.getAPClass();
+                        System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
+                    }
+                    for (DENOPTIMEdge e : rootGraph.getEdgeList())
+                    {
+                        APClass src = e.getSrcAPClass();
+                        APClass trg = e.getTrgAPClass();
+                        System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
+                    }
 
                     GraphBuildingTask task = new GraphBuildingTask(tId,
                                                               rootGraph.clone(),

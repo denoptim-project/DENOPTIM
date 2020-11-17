@@ -137,6 +137,12 @@ cd "$wDir"
 runTest "t1"
 
 #
+# t2a: combinatorial builder forces to build a specific graph 
+# This is meant to quickly indentify misfunctioning handing of potential cycles)
+#
+runTest "t2a"
+
+#
 # t2: parallel combinatorial builder from given root (default format: STRING)
 #
 runTest "t2"

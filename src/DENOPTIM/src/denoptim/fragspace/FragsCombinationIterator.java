@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.utils.GraphUtils;
@@ -172,8 +172,8 @@ public class FragsCombinationIterator
                     {
                         if (ss.contains(apIdx))
                         {
-                            String apClass = v.getAttachmentPoints().get(
-                                    apIdx).getAPClass().toString();
+                            APClass apClass = v.getAttachmentPoints().get(
+                                    apIdx).getAPClass();
                             if (!FragmentSpace.imposeSymmetryOnAPsOfClass(
                                     apClass))
                             {
@@ -211,7 +211,7 @@ public class FragsCombinationIterator
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
             DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
-            String srcApCls = frag.getAttachmentPoints().get(apId).getAPClass().toString();
+            APClass srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 
             ArrayList<IdFragmentAndAP> candsForThisSrc = 
@@ -237,7 +237,7 @@ public class FragsCombinationIterator
             // Get other possible destinies for the free AP
             // NOTE: in principle there should be only ONE capping group, but
             //       this is made to work also in case of more than one group.
-            String capApCls = FragmentSpace.getCappingClass(srcApCls);
+            APClass capApCls = FragmentSpace.getCappingClass(srcApCls);
             if (capApCls != null)
             {
                 // Use of capping groups
@@ -555,7 +555,8 @@ public class FragsCombinationIterator
                 {
                     if (ss.contains(srcApId))
                     {
-                        String apClass = v.getAttachmentPoints().get(srcApId).getAPClass().toString();
+                        APClass apClass = v.getAttachmentPoints().get(srcApId)
+                                .getAPClass();
                         if (!FragmentSpace.imposeSymmetryOnAPsOfClass(apClass))
                         {
                             continue;

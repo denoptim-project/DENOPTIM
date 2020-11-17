@@ -64,6 +64,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -1104,8 +1105,8 @@ public class GUIGraphHandler extends GUICardPanel
 			// Identify the source vertex/node and its AP
 			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
 				
-			String sCls = srcVertex.getAttachmentPoints().get(srcApId).getAPClass().toString();
-			String tCls = trgVertex.getAttachmentPoints().get(trgApId).getAPClass().toString();
+			APClass sCls = srcVertex.getAttachmentPoints().get(srcApId).getAPClass();
+			APClass tCls = trgVertex.getAttachmentPoints().get(trgApId).getAPClass();
 				
 			trgVertex.setLevel(srcVertex.getLevel() + 1);
 				

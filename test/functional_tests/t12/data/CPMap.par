@@ -1,7 +1,6 @@
 # 
 # CompatibilityMatrix for Class Based Builders
 # 
-RCN cca:0 none
 RCN ccb:0 cca:0
 RCN co:0 coa:1
 RCN cob:1 cca:0
