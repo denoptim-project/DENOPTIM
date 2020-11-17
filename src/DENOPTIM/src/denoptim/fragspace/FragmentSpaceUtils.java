@@ -107,7 +107,7 @@ public class FragmentSpaceUtils
 				ArrayList<Integer> apId = new ArrayList<Integer>();
 				apId.add(fragId);
 				apId.add(j);
-				String cls = ap.getAPClass();
+				String cls = ap.getAPClass().toString();
 				
 				if (!ap.isAvailable())
 				{

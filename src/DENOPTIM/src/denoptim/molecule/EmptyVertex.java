@@ -333,7 +333,7 @@ public class EmptyVertex extends DENOPTIMVertex
             if (dap.isAvailable())
             {
                 // check if this AP has the compatible reactions
-                String dapReac = dap.getAPClass();
+                String dapReac = dap.getAPClass().toString();
                 if (dapReac.compareToIgnoreCase(cmpReac) == 0)
                 {
                     apIdx.add(i);
@@ -378,7 +378,7 @@ public class EmptyVertex extends DENOPTIMVertex
         ArrayList<String> lst = new ArrayList<String>();
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            String apCls = ap.getAPClass();
+            String apCls = ap.getAPClass().toString();
             if (!lst.contains(apCls))
             {
                 lst.add(apCls);

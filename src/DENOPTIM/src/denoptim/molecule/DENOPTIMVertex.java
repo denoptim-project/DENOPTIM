@@ -177,7 +177,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         {
             v.setAsRCV(v.getNumberOfAP() == 1 
                 && DENOPTIMConstants.RCAAPCLASSSET.contains(
-                        v.getAttachmentPoints().get(0).getAPClass()));
+                        v.getAttachmentPoints().get(0).getAPClass().toString()));
         }
         return v;
     }
@@ -466,7 +466,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             if (dap.isAvailable())
             {
                 // check if this AP has the compatible reactions
-                String dapReac = dap.getAPClass();
+                String dapReac = dap.getAPClass().toString();
                 if (dapReac.compareToIgnoreCase(cmpReac) == 0)
                 {
                     apIdx.add(i);
@@ -525,7 +525,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         ArrayList<String> lst = new ArrayList<String>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
-            String apCls = ap.getAPClass();
+            String apCls = ap.getAPClass().toString();
             if (!lst.contains(apCls))
             {
                 lst.add(apCls);
@@ -550,7 +550,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             if (!ap.isAvailable())
                 continue;
             
-            String apCls = ap.getAPClass();
+            String apCls = ap.getAPClass().toString();
             if (!lst.contains(apCls))
             {
                 lst.add(apCls);
@@ -578,11 +578,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
                 .get(sourceAPIndex);
-        String srcAPC = sourceAP.getAPClass();
+        String srcAPC = sourceAP.getAPClass().toString();
         
         DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
                 .get(targetAPIndex);
-        String trgAPC = targetAP.getAPClass();
+        String trgAPC = targetAP.getAPClass().toString();
         
         return connectVertices(target, sourceAPIndex, targetAPIndex, srcAPC, 
                 trgAPC);

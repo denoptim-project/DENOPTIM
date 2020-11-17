@@ -317,6 +317,7 @@ public class FragmentSpace
      * @param the identified of a specific attachment point.
      * @return the AP class or null
      */
+    //TODO-M6 to APClass
     public static String getAPClassForFragment(IdFragmentAndAP apId)
     {
         String cls = null;
@@ -324,7 +325,7 @@ public class FragmentSpace
         {
             DENOPTIMVertex frg = FragmentSpace.getVertexFromLibrary(
                         apId.getVertexMolType(), apId.getVertexMolId());
-            cls = frg.getAttachmentPoints().get(apId.getApId()).getAPClass();
+            cls = frg.getAttachmentPoints().get(apId.getApId()).getAPClass().toString();
         }
         catch (Throwable t)
         {
@@ -473,6 +474,7 @@ public class FragmentSpace
      * @param query the APClass of the attachment point on the capping group
      * @return all the capping groups which have the given APclass
      */
+    //TODO-M6 use APClass
     public static ArrayList<Integer> getCappingGroupsWithAPClass(String query)
     {
         ArrayList<Integer> selected = new ArrayList<>();
@@ -482,7 +484,7 @@ public class FragmentSpace
             try 
             {
             apc = getVertexFromLibrary(BBType.CAP, i)
-                    .getAttachmentPoints().get(0).getAPClass();
+                    .getAttachmentPoints().get(0).getAPClass().toString();
                 if (apc.equals(query))
                 {
                     selected.add(i);

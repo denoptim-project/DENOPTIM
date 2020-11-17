@@ -321,13 +321,13 @@ public class GraphUtils
         ArrayList<DENOPTIMAttachmentPoint> curAPs =
                                                 curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint srcAP = curAPs.get(srcAPIdx);
-        String srcAPCls = srcAP.getAPClass();
+        String srcAPCls = srcAP.getAPClass().toString();
         
         // identify the target AP (on the appended vertex)
         DENOPTIMAttachmentPoint trgAP = incomingVertex.getAttachmentPoints()
                 .get(trgAPIdx);
 
-        String trgAPCls = trgAP.getAPClass();
+        String trgAPCls = trgAP.getAPClass().toString();
 
         // create the new DENOPTIMEdge
         DENOPTIMEdge edge;

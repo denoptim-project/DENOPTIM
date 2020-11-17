@@ -299,7 +299,7 @@ public class GraphBuildingTask implements Callable
                 DENOPTIMVertex srcVrtx = molGraph.getVertexWithId(sVId);
                 
                 String sCls = srcVrtx.getAttachmentPoints().get(
-                        sApId).getAPClass();
+                        sApId).getAPClass().toString();
     
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
                 int tVId = trgAp.getVertexId();
@@ -307,8 +307,8 @@ public class GraphBuildingTask implements Callable
                 BBType tFTyp = trgAp.getVertexMolType(); 
                 int tApId = trgAp.getApId();
         
-                // type -1 is used to represent unused AP
-                if (tFTyp == BBType.NONE) 
+                // type "NONE" is used to represent unused AP
+                if (tFTyp == BBType.NONE || tFTyp == BBType.UNDEFINED)
                 {
                     continue;
                 }
@@ -338,7 +338,7 @@ public class GraphBuildingTask implements Callable
 
                 trgVrtx.setLevel(srcVrtx.getLevel() + 1);
                 
-                String tCls = trgVrtx.getAttachmentPoints().get(tApId).getAPClass();
+                String tCls = trgVrtx.getAttachmentPoints().get(tApId).getAPClass().toString();
                 
                 DENOPTIMEdge edge = srcVrtx.connectVertices(
                         trgVrtx, sApId, tApId, sCls, tCls

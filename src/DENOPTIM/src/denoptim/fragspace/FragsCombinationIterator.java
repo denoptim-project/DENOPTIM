@@ -173,9 +173,9 @@ public class FragsCombinationIterator
                         if (ss.contains(apIdx))
                         {
                             String apClass = v.getAttachmentPoints().get(
-                                                            apIdx).getAPClass();
+                                    apIdx).getAPClass().toString();
                             if (!FragmentSpace.imposeSymmetryOnAPsOfClass(
-                                                                       apClass))
+                                    apClass))
                             {
                                 continue;
                             }
@@ -211,7 +211,7 @@ public class FragsCombinationIterator
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
             DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
-            String srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
+            String srcApCls = frag.getAttachmentPoints().get(apId).getAPClass().toString();
 
             // Create data structure for candidates 
             ArrayList<IdFragmentAndAP> candsForThisSrc = 
@@ -390,7 +390,7 @@ public class FragsCombinationIterator
                                + nextIds + ", size:" + totCandsPerAP + ")"); 
         }
 
-	// While defining the combination of fragments we aso keep track
+	// While defining the combination of fragments we also keep track
 	// of which incoming fragments are related by symmetry (i.e., we
 	// set the symmetric set ID for each incoming vertex) to allow
 	// an easy update of the graph's SymmetricSet list
@@ -555,8 +555,7 @@ public class FragsCombinationIterator
                 {
                     if (ss.contains(srcApId))
                     {
-                        String apClass = v.getAttachmentPoints().get(
-                                                          srcApId).getAPClass();
+                        String apClass = v.getAttachmentPoints().get(srcApId).getAPClass().toString();
                         if (!FragmentSpace.imposeSymmetryOnAPsOfClass(apClass))
                         {
                             continue;

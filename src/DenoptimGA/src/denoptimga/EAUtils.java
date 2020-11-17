@@ -751,7 +751,7 @@ public class EAUtils
     {
         int lvl = curVertex.getLevel();
 
-        String rcn =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
+        String rcn =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass().toString();
         // locate the capping group for this rcn
         String rcnCap = getCappingGroup(rcn);
 
@@ -1426,12 +1426,11 @@ public class EAUtils
         for (DENOPTIMVertex vtx : vertices)
         {
             ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();
-            // loop thru the APs of the current vertex
             for (DENOPTIMAttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())
                 {
-                    String apClass = dp.getAPClass();
+                    String apClass = dp.getAPClass().toString();
                     if (classOfForbEnds.contains(apClass))
                     {
                         found = true;

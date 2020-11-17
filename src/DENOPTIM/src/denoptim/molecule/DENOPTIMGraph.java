@@ -1511,7 +1511,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex v : getVertexList()) {
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
                 if (ap.isAvailable()
-                        && FragmentSpace.getCappingClass(ap.getAPClass()) !=null
+                        && FragmentSpace.getCappingClass(ap.getAPClass().toString()) !=null
                 ) {
                     return true;
                 }
@@ -2297,7 +2297,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 if (dp.isAvailable())
                 {
-                    String apClass = dp.getAPClass();
+                    String apClass = dp.getAPClass().toString();
                     if (classOfForbEnds.contains(apClass))
                     {
                         found = true;
@@ -2408,14 +2408,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         DENOPTIMEdge edge = null;
         if (FragmentSpace.useAPclassBasedApproach())
         {
-            String rcnP = dap_Parent.getAPClass();
-            String rcnC = dap_Child.getAPClass();
             edge = parentVertex.connectVertices(
                     cvClone,
                     parentAPIdx,
                     childAPIdx,
-                    rcnP,
-                    rcnC);
+                    dap_Parent.getAPClass().toString(),
+                    dap_Child.getAPClass().toString());
         }
         else
         {

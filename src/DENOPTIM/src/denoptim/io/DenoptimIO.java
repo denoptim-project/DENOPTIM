@@ -1045,7 +1045,7 @@ public class DenoptimIO {
                 DENOPTIMFragment frag = new DENOPTIMFragment(mol,
                         BBType.UNDEFINED);
                 for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints()) {
-                    allCLasses.add(ap.getAPClass());
+                    allCLasses.add(ap.getAPClass().toString());
                 }
             }
         } catch (DENOPTIMException e) {
