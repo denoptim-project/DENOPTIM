@@ -49,9 +49,29 @@ import org.openscience.cdk.interfaces.IAtomContainer;
  */
 public class DENOPTIMGraph implements Serializable, Cloneable
 {
+    /**
+     * Version UID
+     */
+    private static final long serialVersionUID = 8245921129778644804L;
+    
+    /**
+     * The vertices belonging to this graph.
+     */
     ArrayList<DENOPTIMVertex> gVertices;
+    
+    /**
+     * The edges belonging to this graph.
+     */
     ArrayList<DENOPTIMEdge> gEdges;
+    
+    /**
+     * The rings defined in this graph.
+     */
     ArrayList<DENOPTIMRing> gRings;
+    
+    /**
+     * The potentially closable chains of vertices.
+     */
     ArrayList<ClosableChain> closableChains;
     
     /*
@@ -65,6 +85,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     ArrayList<SymmetricSet> symVertices;
     
+    /**
+     * A free-format string used to record simple properties in the graph. For
+     * instance, whether this graph comes from a given initial population or
+     * is generated anew from scratch, or from mutation/crossover.
+     */
     String localMsg;
 
 
@@ -1469,7 +1494,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex v : getVertexList()) {
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
                 if (ap.isAvailable()
-                        && FragmentSpace.getCappingClass(ap.getAPClass()) !=null
+                        && FragmentSpace.getAPClassOfCappingVertex(ap.getAPClass()) !=null
                 ) {
                     return true;
                 }
@@ -2176,9 +2201,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 false);
 
         // Set rotatable property as property of IBond
-        //TODO-M6 ignore return value
-        ArrayList<ObjectPair> rotBonds =
-                RotationalSpaceUtils.defineRotatableBonds(mol,
+        RotationalSpaceUtils.defineRotatableBonds(mol,
                         FragmentSpaceParameters.getRotSpaceDefFile(),
                         true, true);
 
@@ -2209,13 +2232,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (Set<DENOPTIMRing> ringSet : allCombsOfRings)
         {
             // clone root graph
-            //TODO-V3 get rid of serialization-based deep copying
-            DENOPTIMGraph newGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(this);
-            // the above messes with the APClass references
-            
-            //TODO-M6
-            // This is what we should use 
-            //DENOPTIMGraph newGraph = this.clone();
+            DENOPTIMGraph newGraph = this.clone();
                 
             HashMap<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());

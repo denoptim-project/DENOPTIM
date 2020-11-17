@@ -250,36 +250,7 @@ public class GraphBuildingTask implements Callable
                                                         throws DENOPTIMException
     {
         id = "" + m_Id;
-        
-      //TODO-M6 del
-        System.out.println("_____in GBT init origin");
-        for (DENOPTIMAttachmentPoint ap : m_molGraph.getAttachmentPoints())
-        {
-            APClass a = ap.getAPClass();
-            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-        }
-        for (DENOPTIMEdge e : m_molGraph.getEdgeList())
-        {
-            APClass src = e.getSrcAPClass();
-            APClass trg = e.getTrgAPClass();
-            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
-        } 
         molGraph = m_molGraph.clone();
-        
-      //TODO-M6 del
-        System.out.println("_____in GBT clone");
-        for (DENOPTIMAttachmentPoint ap : molGraph.getAttachmentPoints())
-        {
-            APClass a = ap.getAPClass();
-            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-        }
-        for (DENOPTIMEdge e : molGraph.getEdgeList())
-        {
-            APClass src = e.getSrcAPClass();
-            APClass trg = e.getTrgAPClass();
-            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
-        } 
-        
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = m_molGraph.getGraphId();
         graphId = molGraph.getGraphId();
