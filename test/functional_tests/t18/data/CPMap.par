@@ -5,9 +5,6 @@ RCN cca:0 ccb:0,ATminus:0,ATplus:0
 RCN ccb:0 cca:0,ATminus:0,ATplus:0
 RCN co:0 coa:1
 RCN cob:1 cca:0
-RCN ATminus:0 none
-RCN ATplus:0 none
-RCN ch:0 none
 # CLASS-to-BondOrder conversion
 RBO ATminus 1
 RBO ATplus 1

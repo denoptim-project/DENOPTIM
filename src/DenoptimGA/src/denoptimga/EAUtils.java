@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -43,18 +42,15 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
@@ -80,8 +76,6 @@ public class EAUtils
 
     // flag for debugging
     private static final boolean DEBUG = false;
-    
-    private static final String NL = System.getProperty("line-separator");
 
 //------------------------------------------------------------------------------
 
@@ -423,7 +417,7 @@ public class EAUtils
 
         String fsep = System.getProperty("file.separator");
 
-        HashSet<String> uidsFromInitPop = new HashSet();
+        HashSet<String> uidsFromInitPop = new HashSet<String>();
         for (int i=0; i<mols.size(); i++)
         {
             DENOPTIMGraph graph = null;
@@ -693,7 +687,7 @@ public class EAUtils
      * @return the index of capping group
      */
 
-    protected static int getCappingFragment(String rcnCap)
+    protected static int getCappingFragment(APClass rcnCap)
     {
         if (rcnCap == null)
             return -1;
@@ -719,13 +713,13 @@ public class EAUtils
      */
 
     protected static ArrayList<Integer> getCompatibleCappingFragments(
-                                                                 String cmpReac)
+            APClass cmpReac)
     {
         ArrayList<Integer> lstFragIdx = new ArrayList<>();
         for (int i=0; i<FragmentSpace.getCappingLibrary().size(); i++)
         {
                 DENOPTIMVertex mol = FragmentSpace.getCappingLibrary().get(i);
-            ArrayList<String> lstRcn = mol.getAllAPClasses();
+            ArrayList<APClass> lstRcn = mol.getAllAPClasses();
             if (lstRcn.contains(cmpReac))
                 lstFragIdx.add(i);
         }
@@ -741,8 +735,7 @@ public class EAUtils
      * @param molGraph
      * @param curVertex
      * @param dapIdx
-     * @return id of the vertex added; -1 if capping is not required
-     * found
+     * @return id of the vertex added; -1 if capping is not required.
      */
 
     protected static int attachCappingFragmentAtPosition
@@ -751,44 +744,40 @@ public class EAUtils
     {
         int lvl = curVertex.getLevel();
 
-        String rcn =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass().toString();
+        APClass apcSrc =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
         // locate the capping group for this rcn
-        String rcnCap = getCappingGroup(rcn);
+        APClass apcCap = getCappingGroup(apcSrc);
 
-        if (rcnCap != null)
+        if (apcCap != null)
         {
 
-            int fid = getCappingFragment(rcnCap);
+            int bbIdCap = getCappingFragment(apcCap);
 
-            if (fid != -1)
+            if (bbIdCap != -1)
             {
-                DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), fid, BBType.CAP);
+                DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                        GraphUtils.getUniqueVertexIndex(), bbIdCap, BBType.CAP);
                 
-                fragVertex.setLevel(lvl+1);
+                capVrtx.setLevel(lvl+1);
 
                 //Get the index of the AP of the capping group to use
                 //(always the first and only AP)
-                ArrayList<Integer> apIdx =
-                        fragVertex.getCompatibleClassAPIndex(rcnCap);
-                int dap = apIdx.get(0);
-
                 DENOPTIMEdge edge = curVertex.connectVertices(
-                        fragVertex, dapIdx, dap, rcn, rcnCap
+                        capVrtx, dapIdx, 0, apcSrc, apcCap
                 );
                 if (edge != null)
                 {
                     // add the fragment as a vertex
-                    molGraph.addVertex(fragVertex);
+                    molGraph.addVertex(capVrtx);
 
                     molGraph.addEdge(edge);
 
-                    return fragVertex.getVertexId();
+                    return capVrtx.getVertexId();
                 }
                 else
                 {
                     String msg = "Unable to connect capping group "
-                                     + fragVertex + " to graph" + molGraph;
+                                     + capVrtx + " to graph" + molGraph;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -796,7 +785,7 @@ public class EAUtils
             else
             {
                 String msg = "Capping is required but no proper capping "
-                                + "fragment found with APCalss " + rcnCap;
+                                + "fragment found with APCalss " + apcCap;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
                 throw new DENOPTIMException(msg);
             }
@@ -814,26 +803,14 @@ public class EAUtils
      * @return For the given reaction return the corresponding capping group
      */
 
-    protected static String getCappingGroup(String rcn) throws DENOPTIMException
+    protected static APClass getCappingGroup(APClass rcn) 
+            throws DENOPTIMException
     {
-        String capRcn = null;
+        APClass capRcn = null;
 
         if (FragmentSpace.getCappingMap().containsKey(rcn))
         {
-            String rcns = FragmentSpace.getCappingMap().get(rcn);
-            if (rcns.contains(","))
-            {
-                String[] st = rcns.split(",");
-                MersenneTwister rng = RandomUtils.getRNG();
-                //int k = GAParameters.getRNG().nextInt(st.length);
-                int k = rng.nextInt(st.length);
-                capRcn = st[k];
-            }
-            else
-            {
-                capRcn = rcns;
-            }
-
+            capRcn = FragmentSpace.getCappingMap().get(rcn);
             if (capRcn == null)
             {
                 String msg = "Failure in reading APClass of capping group for "
@@ -1042,8 +1019,7 @@ public class EAUtils
                 if (curDap.isAvailable())
                 {
                     //Add capping group if required by capping map
-                    int nvid = attachCappingFragmentAtPosition(molGraph,
-                                                                curVertex, j);
+                    attachCappingFragmentAtPosition(molGraph, curVertex, j);
                 }
             }
         }
@@ -1153,8 +1129,8 @@ public class EAUtils
         }
 
         // calculate the molecule representation
-        GraphConversionTool gct = new GraphConversionTool();
-        IAtomContainer mol = gct.convertGraphToMolecule(molGraph,true);
+        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(
+                molGraph, true);
         if (mol == null)
         {
             String msg ="Evaluation of graph: graph-to-mol returned null!" 
@@ -1421,8 +1397,7 @@ public class EAUtils
     protected static boolean foundForbiddenEnd(DENOPTIMGraph molGraph)
     {
         ArrayList<DENOPTIMVertex> vertices = molGraph.getVertexList();
-        Set<String> classOfForbEnds = FragmentSpace.getForbiddenEndList();
-        boolean found = false;
+        Set<APClass> classOfForbEnds = FragmentSpace.getForbiddenEndList();
         for (DENOPTIMVertex vtx : vertices)
         {
             ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();
@@ -1430,7 +1405,24 @@ public class EAUtils
             {
                 if (dp.isAvailable())
                 {
-                    String apClass = dp.getAPClass().toString();
+                    APClass apClass = dp.getAPClass();
+                    //TODO-V3 remove loop once we can ensure all APClass intances
+                    // refer to the unique ones
+                    for (APClass fe : classOfForbEnds)
+                    {
+                        if (fe.equals(apClass))
+                        {
+                            String msg = "Forbidden free AP for Vertex: "
+                                + vtx.getVertexId()
+                                + " MolId: " + (vtx.getMolId() + 1)
+                                + " Ftype: " + vtx.getFragmentType()
+                                + "\n"+ molGraph+" \n "
+                                + " AP class: " + apClass;
+                            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                            return true;
+                        }
+                    }
+                    /*
                     if (classOfForbEnds.contains(apClass))
                     {
                         found = true;
@@ -1443,15 +1435,12 @@ public class EAUtils
                         DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
                         break;
                     }
+                    */
                 }
-            }
-            if (found)
-            {
-                break;
             }
         }
 
-        return found;
+        return false;
     }
 
 //------------------------------------------------------------------------------

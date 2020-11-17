@@ -49,9 +49,29 @@ import org.openscience.cdk.interfaces.IAtomContainer;
  */
 public class DENOPTIMGraph implements Serializable, Cloneable
 {
+    /**
+     * Version UID
+     */
+    private static final long serialVersionUID = 8245921129778644804L;
+    
+    /**
+     * The vertices belonging to this graph.
+     */
     ArrayList<DENOPTIMVertex> gVertices;
+    
+    /**
+     * The edges belonging to this graph.
+     */
     ArrayList<DENOPTIMEdge> gEdges;
+    
+    /**
+     * The rings defined in this graph.
+     */
     ArrayList<DENOPTIMRing> gRings;
+    
+    /**
+     * The potentially closable chains of vertices.
+     */
     ArrayList<ClosableChain> closableChains;
     
     /*
@@ -65,6 +85,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     ArrayList<SymmetricSet> symVertices;
     
+    /**
+     * A free-format string used to record simple properties in the graph. For
+     * instance, whether this graph comes from a given initial population or
+     * is generated anew from scratch, or from mutation/crossover.
+     */
     String localMsg;
 
 
@@ -818,50 +843,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------    
     
     /**
-     * Obtain the vertex connected at the AP
-     *
-     * @param vertex
-     * @param dapidx
-     * @param rcn
-     * @return the vertex connected at the AP
-     */
-    
-    public DENOPTIMVertex getBondingVertex(DENOPTIMVertex vertex, int dapidx, 
-                                                String rcn)
-    {
-        int n = getEdgeCount();
-        for (int i = 0; i < n; i++)
-        {
-            DENOPTIMEdge edge = getEdgeList().get(i);
-
-            // get the vertex ids
-            int v1_id = edge.getSrcVertex();
-            int v2_id = edge.getTrgVertex();
-            
-            int dap_idx_v1 = edge.getSrcAPID();
-            
-            if (rcn != null)
-            {
-                String rcstr = edge.getSrcAPClass();
-                if (vertex.getVertexId() == v1_id && dap_idx_v1 == dapidx 
-                        && rcstr.equals(rcn))
-                {
-                    return getVertexWithId(v2_id);
-                }
-            }
-            else
-            {
-                if (vertex.getVertexId() == v1_id && dap_idx_v1 == dapidx)
-                    return getVertexWithId(v2_id);
-            }
-        }
-
-        return null;
-    }
-    
-//------------------------------------------------------------------------------    
-    
-    /**
      * 
      * @param srcVert
      * @param dapidx the AP corresponding to the source fragment
@@ -936,12 +917,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns a deep-copy of this graph. The vertex IDs are not changed, so you
-     * might want to renumber the graph with 
+     * Returns almost " deep-copy" of this graph. Only the APCLass members of 
+     * member of this class should remain references to the original APClasses.
+     * The vertex IDs are not changed, so you might want to renumber the graph.
      */
     @Override
     public DENOPTIMGraph clone()
     {
+        
         //TODO-V3: should this be replaced by DenoptimIO.deepCopy? NO!
         
         /*
@@ -1511,7 +1494,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex v : getVertexList()) {
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
                 if (ap.isAvailable()
-                        && FragmentSpace.getCappingClass(ap.getAPClass().toString()) !=null
+                        && FragmentSpace.getAPClassOfCappingVertex(ap.getAPClass()) !=null
                 ) {
                     return true;
                 }
@@ -2218,8 +2201,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 false);
 
         // Set rotatable property as property of IBond
-        ArrayList<ObjectPair> rotBonds =
-                RotationalSpaceUtils.defineRotatableBonds(mol,
+        RotationalSpaceUtils.defineRotatableBonds(mol,
                         FragmentSpaceParameters.getRotSpaceDefFile(),
                         true, true);
 
@@ -2231,7 +2213,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 FragmentSpace.getRCCompatibilityMatrix());
         ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
-
+        
         // Keep closable chains that are relevant for chelate formation
         if (RingClosureParameters.buildChelatesMode())
         {
@@ -2250,8 +2232,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (Set<DENOPTIMRing> ringSet : allCombsOfRings)
         {
             // clone root graph
-            //TODO-V3 get rid of serialization-based deep copying
-            DENOPTIMGraph newGraph = (DENOPTIMGraph) DenoptimIO.deepCopy(this);
+            DENOPTIMGraph newGraph = this.clone();
+                
             HashMap<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
@@ -2288,7 +2270,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public boolean hasForbiddenEnd()
     {
         ArrayList<DENOPTIMVertex> vertices = getVertexList();
-        Set<String> classOfForbEnds = FragmentSpace.getForbiddenEndList();
+        Set<APClass> classOfForbEnds = FragmentSpace.getForbiddenEndList();
         boolean found = false;
         for (DENOPTIMVertex vtx : vertices)
         {
@@ -2297,7 +2279,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 if (dp.isAvailable())
                 {
-                    String apClass = dp.getAPClass().toString();
+                    APClass apClass = dp.getAPClass();
                     if (classOfForbEnds.contains(apClass))
                     {
                         found = true;
@@ -2411,9 +2393,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             edge = parentVertex.connectVertices(
                     cvClone,
                     parentAPIdx,
-                    childAPIdx,
-                    dap_Parent.getAPClass().toString(),
-                    dap_Child.getAPClass().toString());
+                    childAPIdx);
         }
         else
         {
@@ -2781,7 +2761,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition AP class
-            if (!eInQuery.getTrgAPClass().equals("*"))
+            if (!eInQuery.getTrgAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -2800,7 +2780,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
                 matches = newLst;
             }
-            if (!eInQuery.getSrcAPClass().equals("*"))
+            if (!eInQuery.getSrcAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -2880,7 +2860,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition AP class
-            if (!eOutQuery.getTrgAPClass().equals("*"))
+            if (!eOutQuery.getTrgAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -2899,7 +2879,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
                 matches = newLst;
             }
-            if (!eOutQuery.getSrcAPClass().equals("*"))
+            if (!eOutQuery.getSrcAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -3051,7 +3031,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     for (int pid : matches)
                     {
                         int wantedApID = edit.getFocusEdge().getSrcAPID();
-                        String wantedApCl =
+                        APClass wantedApCl =
                                 edit.getFocusEdge().getSrcAPClass();
                         ArrayList<Integer> symmUnqChilds =
                                 modGraph.getChildVertices(pid);
@@ -3070,9 +3050,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                 continue;
                             }
                             // Apply the query on the AP Class
-                            String srcApCl = modGraph.getEdgeWithParent(
+                            APClass srcApCl = modGraph.getEdgeWithParent(
                                     cid).getSrcAPClass();
-                            if (!wantedApCl.equals("*")
+                            if (!wantedApCl.equals(new APClass())
                                     && !wantedApCl.equals(srcApCl))
                             {
                                 continue;

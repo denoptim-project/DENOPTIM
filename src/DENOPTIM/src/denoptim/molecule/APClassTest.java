@@ -22,28 +22,39 @@ package denoptim.molecule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.exception.DENOPTIMException;
 
 /**
- * Unit test for DENOPTIMAttachmentPoint
+ * Unit test for APClass
  * 
  * @author Marco Foscato
  */
 
 public class APClassTest
 {
-	
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testConstructor() throws Exception
+    {
+        assertThrows(DENOPTIMException.class, () -> {APClass.make("r7: :f9");}, 
+                "Wrong syntax for whole APClass string");
+        assertThrows(DENOPTIMException.class, () -> {APClass.make("r ",0);}, 
+                "Wrong syntax for 'rule' string");
+    }
+    
 //-----------------------------------------------------------------------------
 	
     @Test
@@ -77,9 +88,47 @@ public class APClassTest
     @Test
     public void testEquals() throws Exception
     {
-        APClass a = new APClass("a:1");
-        APClass b = new APClass("a:1");
+        APClass a = APClass.make("a:1");
+        APClass b = APClass.make("a:1");
         assertTrue(a.equals(b));
+        assertTrue(a==b,"a==b operator");
+        
+        APClass c = APClass.make("a",1);
+        assertTrue(a.equals(c));
+        assertTrue(c.equals(b));
+        assertTrue(a==c,"a==c operator");
+        assertTrue(c==b,"c==b operator");
+        
+        APClass d = APClass.make("a:0");
+        APClass e = APClass.make("b:1");
+        assertFalse(a.equals(d));
+        assertFalse(a.equals(e));
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testListContains() throws Exception
+    {
+        APClass a = APClass.make("a:1");
+        APClass b = APClass.make("a:1");
+        APClass c = APClass.make("a",1);
+        APClass d = a;
+        
+        List<APClass> list = new ArrayList<APClass>();
+        list.add(a);
+        assertTrue(list.contains(a),"List contains A");
+        assertTrue(list.contains(d),"List contains B");
+        assertTrue(list.contains(c),"List contains C");
+        assertTrue(list.contains(b),"List contains D");
+        
+        Map<APClass,APClass> map = new HashMap<APClass,APClass>();
+        map.put(a,b);
+        map.put(c,d);
+        assertTrue(map.containsKey(a),"Map contains A");
+        assertTrue(map.containsKey(b),"Map contains B");
+        assertTrue(map.containsKey(c),"Map contains C");
+        assertTrue(map.containsKey(d),"Map contains D");
     }
     
 //-----------------------------------------------------------------------------
@@ -87,10 +136,10 @@ public class APClassTest
     @Test
     public void testCompareTo() throws Exception
     {
-        APClass a = new APClass("ab:2");
-        APClass b = new APClass("ab:1");
-        APClass c = new APClass("dc:1");
-        APClass d = new APClass("ef:0");
+        APClass a = APClass.make("ab:2");
+        APClass b = APClass.make("ab:1");
+        APClass c = APClass.make("dc:1");
+        APClass d = APClass.make("ef:0");
         List<APClass> l = new ArrayList<APClass>(Arrays.asList(d,a,b,c));
         Collections.sort(l);
         List<APClass> ref = new ArrayList<APClass>(Arrays.asList(b,a,c,d));

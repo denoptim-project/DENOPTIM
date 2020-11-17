@@ -21,7 +21,6 @@ package denoptim.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -140,10 +140,14 @@ public class DenoptimIOTest {
 		atmH.setPoint3d(new Point3d(0.0, 1.0, 1.0));
 		frag.addAtom(atmC);
 		frag.addAtom(atmH);
-		frag.addAP(atmC, "classAtmC:5", new Point3d(1.0, 0.0, 0.0));
-		frag.addAP(atmC, "classAtmC:5", new Point3d(1.0, 1.0, 0.0));
-		frag.addAP(atmC, "otherClass:0", new Point3d(-1.0, 0.0, 0.0));
-		frag.addAP(atmH, "classAtmH:1", new Point3d(1.0, 2.0, 2.0));
+		frag.addAP(atmC, APClass.make("classAtmC:5"), 
+		        new Point3d(1.0, 0.0, 0.0));
+		frag.addAP(atmC, APClass.make("classAtmC:5"), 
+		        new Point3d(1.0, 1.0, 0.0));
+		frag.addAP(atmC, APClass.make("otherClass:0"), 
+		        new Point3d(-1.0, 0.0, 0.0));
+		frag.addAP(atmH, APClass.make("classAtmH:1"), 
+		        new Point3d(1.0, 2.0, 2.0));
 		frag.projectAPsToProperties();
 
 		DENOPTIMFragment frag2 = new DENOPTIMFragment();
@@ -153,10 +157,14 @@ public class DenoptimIOTest {
 		atmH.setPoint3d(new Point3d(0.0, 1.0, 1.0));
 		frag2.addAtom(atmO);
 		frag2.addAtom(atmH2);
-		frag2.addAP(atmO, "apClassO:5", new Point3d(1.0, 0.0, 0.0));
-		frag2.addAP(atmO, "apClassO:6", new Point3d(1.0, 1.0, 0.0));
-		frag2.addAP(atmO, "apClassObis:0", new Point3d(-1.0, 0.0, 0.0));
-		frag2.addAP(atmH2, "classAtmH:1", new Point3d(1.0, 2.0, 2.0));
+		frag2.addAP(atmO, APClass.make("apClassO:5"), 
+		        new Point3d(1.0, 0.0, 0.0));
+		frag2.addAP(atmO, APClass.make("apClassO:6"), 
+		        new Point3d(1.0, 1.0, 0.0));
+		frag2.addAP(atmO, APClass.make("apClassObis:0"), 
+		        new Point3d(-1.0, 0.0, 0.0));
+		frag2.addAP(atmH2, APClass.make("classAtmH:1"), 
+		        new Point3d(1.0, 2.0, 2.0));
 		frag2.projectAPsToProperties();
 
 		ArrayList<DENOPTIMFragment> frags = new ArrayList<DENOPTIMFragment>();
@@ -167,11 +175,13 @@ public class DenoptimIOTest {
 				+ System.getProperty("file.separator") + "frag.sdf";
 		DenoptimIO.writeFragmentSet(tmpFile, frags);
 
-		Set<String> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
+		Set<APClass> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
 
 		assertEquals(6, allAPC.size(), "Size did not match");
-		assertTrue(allAPC.contains("apClassObis:0"), "Contains APClass (1)");
-		assertTrue(allAPC.contains("otherClass:0"), "Contains APClass (2)");
+		assertTrue(allAPC.contains(APClass.make("apClassObis:0")), 
+		        "Contains APClass (1)");
+		assertTrue(allAPC.contains(APClass.make("otherClass:0")), 
+		        "Contains APClass (2)");
 	}
 
 //------------------------------------------------------------------------------

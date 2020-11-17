@@ -7,8 +7,6 @@ RCN co1:0 coa:1
 RCN co2:0 coa:1
 RCN co:0 coa:1
 RCN cob:1 cca:0
-RCN ATneutral:0 none
-RCN ch:0 none
 # CLASS-to-BondOrder conversion
 RBO ATneutral 1
 RBO cca 1

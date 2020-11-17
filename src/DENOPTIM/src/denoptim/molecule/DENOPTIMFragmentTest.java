@@ -74,10 +74,14 @@ public class DENOPTIMFragmentTest
     	frg1.addAtom(a3);
     	frg1.addBond(new Bond(a1, a2));
     	frg1.addBond(new Bond(a2, a3));
-    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-    	frg1.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-    	frg1.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+    	frg1.addAP(a3, APClass.make(APCLASS), 
+    	        new Point3d(new double[]{0.0, 2.2, 3.3}));
+    	frg1.addAP(a3, APClass.make(APCLASS), 
+    	        new Point3d(new double[]{0.0, 0.0, 3.3}));
+    	frg1.addAP(a3, APClass.make(APCLASS), 
+    	        new Point3d(new double[]{0.0, 0.0, 1.1}));
+    	frg1.addAP(a1, APClass.make(APCLASS), 
+    	        new Point3d(new double[]{3.0, 0.0, 3.3}));
     	
     	frg1.projectAPsToProperties(); 
     	String apStr = frg1.getProperty(DENOPTIMConstants.APTAG).toString();
@@ -125,13 +129,20 @@ public class DENOPTIMFragmentTest
         frg1.addAtom(a3);
         frg1.addBond(new Bond(a1, a2));
         frg1.addBond(new Bond(a2, a3));
-        frg1.addAP(0, APCLASS, new Point3d(new double[]{1.0, 2.5, 3.3}));
-        frg1.addAP(0, APRULE+APCSEP+"2", new Point3d(new double[]{2.0, -2.5, 3.3}));
-        frg1.addAP(0, APRULE+APCSEP+"3", new Point3d(new double[]{-2.0, -2.5, 3.3}));
-        frg1.addAP(1, APCLASS, new Point3d(new double[]{2.5, 2.5, 3.3}));
-        frg1.addAP(2, APCLASS, new Point3d(new double[]{3.0, 2.5, 3.3}));
-        frg1.addAP(2, APRULE+APCSEP+"2", new Point3d(new double[]{4.0, -2.5, 3.3}));
-        frg1.addAP(2, APRULE+APCSEP+"4", new Point3d(new double[]{-4.0, -2.5, 3.3}));
+        frg1.addAP(a1, APClass.make(APCLASS), 
+                new Point3d(new double[]{1.0, 2.5, 3.3}));
+        frg1.addAP(a1, APClass.make(APRULE+APCSEP+"2"), 
+                new Point3d(new double[]{2.0, -2.5, 3.3}));
+        frg1.addAP(a1, APClass.make(APRULE+APCSEP+"3"), 
+                new Point3d(new double[]{-2.0, -2.5, 3.3}));
+        frg1.addAP(a2, APClass.make(APCLASS), 
+                new Point3d(new double[]{2.5, 2.5, 3.3}));
+        frg1.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{3.0, 2.5, 3.3}));
+        frg1.addAP(a3, APClass.make(APRULE+APCSEP+"2"), 
+                new Point3d(new double[]{4.0, -2.5, 3.3}));
+        frg1.addAP(a3, APClass.make(APRULE+APCSEP+"4"), 
+                new Point3d(new double[]{-4.0, -2.5, 3.3}));
         frg1.projectAPsToProperties();
 
         //System.out.println("Initial Symm set: "+orig.getSymmetricAPSets());
@@ -174,10 +185,14 @@ public class DENOPTIMFragmentTest
         v.addAtom(a3);
         v.addBond(new Bond(a1, a2));
         v.addBond(new Bond(a2, a3));
-        v.addAP(2, APCLASS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        v.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        v.addAP(2, APCLASS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        v.addAP(0, APCLASS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        v.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v.addAP(a1, APClass.make(APCLASS), 
+                new Point3d(new double[]{3.0, 0.0, 3.3}));
         
         ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
         ssaps.add(new SymmetricSet(new ArrayList<Integer>(

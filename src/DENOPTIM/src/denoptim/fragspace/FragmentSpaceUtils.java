@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
@@ -50,9 +51,9 @@ public class FragmentSpaceUtils
 		if (apClassBasedApproch)
 		{
 		    FragmentSpace.setFragsApsPerApClass(
-				   new HashMap<String,ArrayList<ArrayList<Integer>>>());
+				   new HashMap<APClass,ArrayList<ArrayList<Integer>>>());
 		    FragmentSpace.setAPClassesPerFrag(
-					      new HashMap<Integer,ArrayList<String>>());
+					      new HashMap<Integer,ArrayList<APClass>>());
 		}
 		for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
 		{
@@ -94,7 +95,7 @@ public class FragmentSpaceUtils
 		if (FragmentSpace.useAPclassBasedApproach())
 		{
 		    // Collect classes per fragment
-		    ArrayList<String> lstAPC = frg.getAllAPClasses();
+		    ArrayList<APClass> lstAPC = frg.getAllAPClasses();
 	        FragmentSpace.getMapAPClassesPerFragment().put(fragId,lstAPC);
 	        
 		    // Classify according to AP-Classes
@@ -107,7 +108,7 @@ public class FragmentSpaceUtils
 				ArrayList<Integer> apId = new ArrayList<Integer>();
 				apId.add(fragId);
 				apId.add(j);
-				String cls = ap.getAPClass().toString();
+				APClass cls = ap.getAPClass();
 				
 				if (!ap.isAvailable())
 				{

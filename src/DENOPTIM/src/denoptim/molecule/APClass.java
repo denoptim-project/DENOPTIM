@@ -1,12 +1,20 @@
 package denoptim.molecule;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 
 public class APClass implements Cloneable,Comparable<APClass>,Serializable
 {
+    
+    //TODO-M6 remove serializable interface
+    
     /**
      * Version UID
      */
@@ -23,6 +31,45 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      * the two asymmetric sides of a bond but upon fragmentation
      */
     private int subClass;
+   
+    /**
+     * Set unique APClasses
+     */
+    public static Set<APClass> uniqueAPClasses = new HashSet<APClass>();
+    
+    /**
+     * Synchronisation lock. Used to guard alteration of the set of unique
+     * APClasses.
+     */
+    private final static Object uniqueAPClassesLock = new Object();
+
+    /**
+     * Recognised attachment point classes of RingClosingAttractor
+     */
+    public static final Set<APClass> RCAAPCLASSSET = 
+    	    new HashSet<APClass>(){{
+    	        APClass a = getUnique("ATplus",0);
+    	        add(a);
+    	        synchronized (uniqueAPClassesLock)
+                {
+    	            uniqueAPClasses.add(a);
+                }
+    	        
+    	        APClass b = getUnique("ATminus",0);
+                add(b);
+                synchronized (uniqueAPClassesLock)
+                {
+                    uniqueAPClasses.add(b);
+                }
+                
+                APClass c = getUnique("ATneutral",0);
+                add(c);
+                synchronized (uniqueAPClassesLock)
+                {
+                    uniqueAPClasses.add(c);
+                }
+                }};
+               
 
 //------------------------------------------------------------------------------
 
@@ -35,10 +82,15 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor for a fully defined APClass
-     * @throws DENOPTIMException 
+     * Creates an APClass if it does not exist already, or returns the 
+     * reference to the existing instance.
      */
-    public APClass(String ruleAndSunClass) throws DENOPTIMException {
+    public static APClass make(String ruleAndSunClass) throws DENOPTIMException 
+    { 
+        //TODO-V3 this is needed only because at present we need an APClass 
+        // object to define edges. Eventually get rid of this dependency
+        if (ruleAndSunClass.equals(""))
+            ruleAndSunClass = "noclass:0";
         
         if (!isValidAPClassString(ruleAndSunClass))
         {
@@ -49,8 +101,7 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
         }
         String[] parts = ruleAndSunClass.split(
                 DENOPTIMConstants.SEPARATORAPPROPSCL);
-        this.rule = parts[0];
-        this.subClass = Integer.parseInt(parts[1]);
+        return getUnique(parts[0], Integer.parseInt(parts[1]));
     }
     
 //------------------------------------------------------------------------------
@@ -59,10 +110,10 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      * Constructor for a fully defined APClass
      * @throws DENOPTIMException 
      */
-    public APClass(String rule, int subClass) throws DENOPTIMException {
+    public static APClass make(String rule, int subClass) 
+            throws DENOPTIMException {
         if (isValidAPRuleString(rule)) {        
-            this.rule = rule;
-            this.subClass = subClass;
+            return getUnique(rule, subClass);
         } else {
             throw new DENOPTIMException("Invalid sttempt to make APClass out "
                     + "of '" + rule + "' and '" + subClass + "'.");
@@ -72,12 +123,67 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
 //------------------------------------------------------------------------------
     
     /**
+     * checks is there is already a instance with the given members, if not it 
+     * created one. In either case, returns the reference to that instance of 
+     * APClass.
+     * @param rule
+     * @param subClass
+     * @return reference to the APClass instance with the given members.
+     */
+    private static APClass getUnique(String rule, int subClass)
+    {
+
+        APClass newApc = new APClass();
+        synchronized (uniqueAPClassesLock)
+        {
+            for (APClass existingApc : uniqueAPClasses)
+            {
+                if (existingApc.getRule().equals(rule)
+                        && existingApc.getSubClass()==subClass)
+                {
+                    newApc = existingApc;
+                    break;
+                }
+            }
+            newApc.setRule(rule);
+            newApc.setSubClass(subClass);
+            uniqueAPClasses.add(newApc);
+        }
+        return newApc;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void setRule(String rule) {
+        this.rule = rule;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void setSubClass(int sumClass) {
+        this.subClass = sumClass;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * @return the main part of this APClass, which typically corresponds to 
      * name of the fragmentation rule that generated attachment point with this
      * APClass.
      */
     public String getRule() {
         return rule;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the secondary part of this APClass, which typically corresponds
+     * to the discriminating factor that distinguishes between asymmetric 
+     * fragments.
+     */
+    public int getSubClass() {
+        return subClass;
     }
     
 //------------------------------------------------------------------------------
@@ -164,6 +270,35 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
         return APClass.isValidAPRuleString(apRule) 
                 && APClass.isValidAPSubCLassString(sub);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check compatibility as defined in the compatibility matrix.
+     * @param other
+     * @return <code>true</code> is APs of these two classes are allowed to
+     * for new vertex-vertex connections.
+     */
+    public boolean isCPMapCompatibleWith(APClass other)
+    {
+        //TODO-V3 when we'll use a unique list of APClasses this will become 
+        // more light, but now we cannot assume that the APClasses in the CPMap
+        // and those on APs refer to the same instances. So, we cannot use 
+        // the .contains() method on the CPMap entry.
+        
+        ArrayList<APClass> listOfCompat = FragmentSpace.getCompatibleAPClasses(this);
+        if (listOfCompat != null)
+        {
+            for (APClass compatApc : listOfCompat)
+            {
+                if (other.equals(compatApc))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 //------------------------------------------------------------------------------
     
@@ -180,17 +315,13 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * WARNING: this method does NOT clone! It just returns the reference to 
+     * this. We keep this method to avoid any attempt to cloning an APClass.
+     */
     @Override
     public APClass clone() {
-        APClass c = null;
-        try
-        {
-            c = new APClass(rule,subClass);
-        } catch (DENOPTIMException e)
-        {
-            //This cannot happen upon cloning
-        }
-        return c;
+        return this;
     }
     
 //------------------------------------------------------------------------------

@@ -150,7 +150,7 @@ Comparable<DENOPTIMAttachmentPoint>
                                    int apSubClass) 
                                            throws DENOPTIMException {
         this(owner, atomPosNum, atomConnections, apConnections, dirVec);
-        this.apClass = new APClass(apRule,apSubClass);
+        this.apClass = APClass.make(apRule,apSubClass);
     }
     
 //------------------------------------------------------------------------------
@@ -277,7 +277,7 @@ Comparable<DENOPTIMAttachmentPoint>
             
             if (apc != null)
             {
-                this.apClass = new APClass(apc,subApc);
+                this.apClass = APClass.make(apc,subApc);
             }
         }
     }
@@ -311,7 +311,7 @@ Comparable<DENOPTIMAttachmentPoint>
                             + "subclass, and coordinates");
             }
             
-            this.apClass = new APClass(details[0],Integer.parseInt(details[1]));
+            this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
             
             if (details.length == 3)
             {
@@ -439,7 +439,19 @@ Comparable<DENOPTIMAttachmentPoint>
     
     public void setAPClass(String m_class) throws DENOPTIMException
     {
-        apClass = new APClass(m_class);
+        apClass = APClass.make(m_class);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Set the Attachment Point class. 
+     * @param apClass the new APClass.
+     */
+    
+    public void setAPClass(APClass apClass) throws DENOPTIMException
+    {
+        this.apClass = apClass;
     }
     
 //-----------------------------------------------------------------------------
@@ -460,7 +472,7 @@ Comparable<DENOPTIMAttachmentPoint>
 
     /**
      * Returns the Attachment Point class.
-     * @return the APClass
+     * @return the APClass or null.
      */
     public APClass getAPClass()
     {
