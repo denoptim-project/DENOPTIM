@@ -1104,9 +1104,8 @@ public class GUIGraphHandler extends GUICardPanel
 			// Identify the source vertex/node and its AP
 			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
 				
-			String sCls = srcVertex.getAttachmentPoints().get(srcApId)
-						.getAPClass();
-			String tCls = trgVertex.getAttachmentPoints().get(trgApId).getAPClass();
+			String sCls = srcVertex.getAttachmentPoints().get(srcApId).getAPClass().toString();
+			String tCls = trgVertex.getAttachmentPoints().get(trgApId).getAPClass().toString();
 				
 			trgVertex.setLevel(srcVertex.getLevel() + 1);
 				

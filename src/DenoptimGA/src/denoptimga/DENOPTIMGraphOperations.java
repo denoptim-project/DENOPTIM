@@ -395,7 +395,7 @@ public class DENOPTIMGraphOperations
             }
 
             // Decide on symmetric substitution within this vertex...
-            boolean cpOnSymAPs = applySymmetry(curDap.getAPClass());
+            boolean cpOnSymAPs = applySymmetry(curDap.getAPClass().toString());
             SymmetricSet symAPs = new SymmetricSet();
             if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
             {
@@ -564,8 +564,8 @@ public class DENOPTIMGraphOperations
         else
         {
             int fapidx = chosenFrgAndAp.getApId();
-            String rcn = curDap.getAPClass(); //on the src
-            String cmpReac = fragVertex.getAttachmentPoints().get(fapidx).getAPClass();
+            String rcn = curDap.getAPClass().toString(); //on the src
+            String cmpReac = fragVertex.getAttachmentPoints().get(fapidx).getAPClass().toString();
 
             edge = curVertex.connectVertices(
                     fragVertex,
@@ -623,7 +623,7 @@ public class DENOPTIMGraphOperations
         {
             ArrayList<IdFragmentAndAP> candidates = 
                     FragmentSpace.getFragAPsCompatibleWithClass(
-                    curDap.getAPClass());
+                    curDap.getAPClass().toString());
             if (candidates.size() > 0)
             {
                 res = RandomUtils.randomlyChooseOne(candidates);
@@ -709,13 +709,13 @@ if(debug)
     System.out.println("Before update: "+molGraph.getClosableChains().size());
                     // update list of candidate closable chains
                     molGraph.getClosableChains().removeAll(
-                                                chosenFfCc.getIncompatibleCC());
+                            chosenFfCc.getIncompatibleCC());
 //TODO del
 if(debug)
     System.out.println("After update: "+molGraph.getClosableChains().size());
 
                     if (applySymmetry(curVertex.getAttachmentPoints().get(
-                                                          dapidx).getAPClass()))
+                            dapidx).getAPClass().toString()))
                     {
 //TODO
 //TODO: implement symmetric substitution with closability bias

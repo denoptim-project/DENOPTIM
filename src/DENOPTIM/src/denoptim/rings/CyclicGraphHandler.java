@@ -252,7 +252,6 @@ public class CyclicGraphHandler
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                                         new HashMap<ObjectPair,PathSubGraph>();
-
         ArrayList<DENOPTIMVertex> rcaVertLst = molGraph.getFreeRCVertices();
         
         Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId = 
@@ -1833,7 +1832,7 @@ public class CyclicGraphHandler
                     {
                         DENOPTIMAttachmentPoint ap =
                                         cVrtx.getAttachmentPoints().get(0);
-                        String apCls = ap.getAPClass();
+                        String apCls = ap.getAPClass().toString();
                         if (rcasOnThisVertex.keySet().contains(apCls))
                         {
                             rcasOnThisVertex.get(apCls).add(cVrtx);

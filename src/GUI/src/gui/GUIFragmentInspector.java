@@ -54,7 +54,7 @@ import org.openscience.cdk.interfaces.IBond;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 
@@ -1090,7 +1090,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	        	if (fragmentViewer.mapAPs.containsKey(apId))
 	        	{
 	        		String origApClass = 
-	        				fragmentViewer.mapAPs.get(apId).getAPClass();
+	        				fragmentViewer.mapAPs.get(apId).getAPClass().toString();
 	        		if (!origApClass.equals(currApClass))
 	        		{
 	        			try {
@@ -1168,7 +1168,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			String title, boolean mustReply) throws DENOPTIMException 
 	{		
 		String preStr = "";
-		while (!DENOPTIMAttachmentPoint.isValidAPClassString(currApClass))
+		while (!APClass.isValidAPClassString(currApClass))
     	{
 			if (currApClass != "")
 			{

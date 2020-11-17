@@ -281,8 +281,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 if (atomsAreCompatible(mol, d1.getAtomPositionNumber(),
                                     d2.getAtomPositionNumber()))
                 {
-                    // check if reactions are compatible
-                    if (isFragmentClassCompatible(d1, d2))
+                    // check if reactions are compatible w.r.t. symmetry
+                    if (d1.getAPClass().compareTo(d2.getAPClass()) == 0)
                     {
                         Integer i2 = j;
                         lst.add(i2);
@@ -347,34 +347,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         }
 
         return k == la1.size();
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Compare attachment points based on the AP class
-     * @param A attachment point information
-     * @param B attachment point information
-     * @return <code>true</code> if the points have the same class or
-     * else <code>false</code>
-     */
-
-    private static boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint A,
-                                                      DENOPTIMAttachmentPoint B)
-    {
-        String strA = A.getAPClass();
-        String strB = B.getAPClass();
-        if (strA != null && strB != null)
-        {
-            if (strA.compareToIgnoreCase(strB) == 0)
-                    return true;
-        }
-        else
-        {        
-            return true;
-        }
-
-        return false;
     }
     
 //------------------------------------------------------------------------------
@@ -522,15 +494,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     		throws DENOPTIMException
     {
     	int atmId = mol.getAtomNumber(srcAtm);
-
-    	String apRule = propAPClass.split(
-    	        DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
-        int sub = Integer.parseInt(propAPClass.split(
-                DENOPTIMConstants.SEPARATORAPPROPSCL)[1]);
     	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, atmId,
                 valence, valence, new double[] {vector.x, vector.y, vector.z},
-                apRule, propAPClass, sub
-        );
+                new APClass(propAPClass));
     	
     	//This adds the AP to the list of the superclass
     	addAttachmentPoint(ap);
@@ -840,7 +806,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	
 			    //Build SDF property "ATTACHMENT_POINT"
 			    String sBO = FragmentSpace.getBondOrderForAPClass(
-                        ap.getAPClass()).toOldString();
+                        ap.getAPClass().toString()).toOldString();
 			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
 			    {

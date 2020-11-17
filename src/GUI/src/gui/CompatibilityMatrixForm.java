@@ -68,6 +68,7 @@ import javax.swing.table.DefaultTableModel;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
@@ -1211,7 +1212,7 @@ public class CompatibilityMatrixForm extends JPanel {
             String title, boolean mustReply) throws DENOPTIMException 
     {       
         String preStr = "";
-        while (!DENOPTIMAttachmentPoint.isValidAPRuleString(currApRule))
+        while (!APClass.isValidAPRuleString(currApRule))
         {
             if (currApRule != "")
             {
