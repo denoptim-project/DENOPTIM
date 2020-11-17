@@ -638,8 +638,8 @@ public class FragmentSpace
      * be capped
      * @return the APClass of the capping group or null
      */
-//TODO-M6 rename
-    public static APClass getCappingClass(APClass srcApClass)
+
+    public static APClass getAPClassOfCappingVertex(APClass srcApClass)
     {
         return cappingMap.get(srcApClass);
     }

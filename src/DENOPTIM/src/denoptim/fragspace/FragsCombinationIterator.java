@@ -237,7 +237,7 @@ public class FragsCombinationIterator
             // Get other possible destinies for the free AP
             // NOTE: in principle there should be only ONE capping group, but
             //       this is made to work also in case of more than one group.
-            APClass capApCls = FragmentSpace.getCappingClass(srcApCls);
+            APClass capApCls = FragmentSpace.getAPClassOfCappingVertex(srcApCls);
             if (capApCls != null)
             {
                 // Use of capping groups

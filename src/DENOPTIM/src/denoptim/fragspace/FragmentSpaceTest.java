@@ -119,10 +119,10 @@ public class FragmentSpaceTest
     	frg1.addAtom(a3);
     	frg1.addBond(new Bond(a1, a2));
     	frg1.addBond(new Bond(a2, a3));
-    	frg1.addAP(2, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
-    	frg1.addAP(2, APC1, new Point3d(new double[]{0.0, 0.0, 3.3}));
-    	frg1.addAP(2, APC2, new Point3d(new double[]{0.0, 0.0, 1.1}));
-    	frg1.addAP(0, APC3, new Point3d(new double[]{3.0, 0.0, 3.3}));
+    	frg1.addAP(a3, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+    	frg1.addAP(a3, APC1, new Point3d(new double[]{0.0, 0.0, 3.3}));
+    	frg1.addAP(a3, APC2, new Point3d(new double[]{0.0, 0.0, 1.1}));
+    	frg1.addAP(a1, APC3, new Point3d(new double[]{3.0, 0.0, 3.3}));
     	frg1.projectAPsToProperties();
     	fragLib.add(frg1);
     	
@@ -132,17 +132,17 @@ public class FragmentSpaceTest
         frg2.addAtom(a21);
         frg2.addAtom(a22);
         frg2.addBond(new Bond(a21, a22));
-        frg2.addAP(1, APC2, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg2.addAP(1, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        frg2.addAP(a22, APC2, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg2.addAP(a22, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
         frg2.projectAPsToProperties();
         fragLib.add(frg2);
         
         DENOPTIMFragment frg3 = new DENOPTIMFragment();
         Atom a31 = new Atom("P", new Point3d(new double[]{0.0, 1.1, 2.2}));
         frg3.addAtom(a31);
-        frg3.addAP(0, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg3.addAP(0, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        frg3.addAP(0, APC3, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        frg3.addAP(a31, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg3.addAP(a31, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        frg3.addAP(a31, APC3, new Point3d(new double[]{0.0, 0.0, 1.1}));
         frg3.projectAPsToProperties();
         fragLib.add(frg3);
         
@@ -159,10 +159,10 @@ public class FragmentSpaceTest
         frg4.addAtom(a43);
         frg4.addBond(new Bond(a41, a42));
         frg4.addBond(new Bond(a42, a43));
-        frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        frg4.addAP(0, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg4.addAP(a43, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg4.addAP(a43, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        frg4.addAP(a43, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        frg4.addAP(a41, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
         frg4.projectAPsToProperties();
         // NB: in the sorted list the last AP is first!
         scaffLib.add(frg4);
@@ -170,9 +170,9 @@ public class FragmentSpaceTest
         DENOPTIMFragment frg5 = new DENOPTIMFragment();
         Atom a51 = new Atom("Zn", new Point3d(new double[]{5.0, 1.1, 2.2}));
         frg5.addAtom(a51);
-        frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
-        frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
-        frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
+        frg5.addAP(a51, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
+        frg5.addAP(a51, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
+        frg5.addAP(a51, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
         frg5.projectAPsToProperties();
         scaffLib.add(frg5);
         
@@ -183,14 +183,14 @@ public class FragmentSpaceTest
         DENOPTIMFragment frg6 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         frg6.addAtom(a61);
-        frg6.addAP(0, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
+        frg6.addAP(a61, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
         frg6.projectAPsToProperties();
         cappLib.add(frg6);
         
         DENOPTIMFragment frg7 = new DENOPTIMFragment();
         Atom a71 = new Atom("Cl", new Point3d(new double[]{10.0, 1.1, 2.2}));
         frg7.addAtom(a71);
-        frg7.addAP(0, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
+        frg7.addAP(a71, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
         frg7.projectAPsToProperties();
         cappLib.add(frg7);
 

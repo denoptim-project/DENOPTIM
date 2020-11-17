@@ -876,7 +876,7 @@ public class GUIFragmentInspector extends GUICardPanel
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
     	vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
     	try {
-			fragment.addAP(srcAtm, apClass, vector);
+			fragment.addAP(srcAtm, APClass.make(apClass), vector);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
