@@ -142,6 +142,11 @@ runTest "t1"
 runTest "t2"
 
 #
+# t2b: t2 with internal fitness evaluation
+#
+runTest "t2b"
+
+#
 # t3: parallel combinatorial builder with enforced symmetry
 #
 runTest "t3"
@@ -203,9 +208,19 @@ runTest "t11"
 runTest "t12"
 
 #
+# t12a: t12 with internal fitness
+#
+runTest "t12a"
+
+#
 # t12b: Syncronous genetic algorithm running with symmetry constraints.
 #
 runTest "t12b"
+
+#
+# t12c: t12b with internal fitness
+#
+runTest "t12c"
 
 #
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation

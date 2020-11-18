@@ -111,6 +111,9 @@ public class OffspringEvaluationTask extends FitnessTask
         catch (Throwable ex)
         {
             hasException = true;
+            errMsg = "Exception while running fitness provider";
+            thrownExc = ex;
+            ex.printStackTrace();
             throw new DENOPTIMException(ex);
         }
 

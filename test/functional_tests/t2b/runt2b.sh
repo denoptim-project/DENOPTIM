@@ -39,6 +39,22 @@ then
     exit -1
 fi
 
+n=0;n=$(grep -i -l Zagreb "$wrkDir"/FSE*/*out.sdf | wc -l | awk '{print $1}')
+if [ $n != 2 ]
+then
+    echo " "
+    echo "Test 't2b' NOT PASSED (symptom: some descriptors were not reported - found $n)"
+    exit 1
+fi
+
+n=0;n=$(grep -l FITNESS "$wrkDir"/FSE*/*out.sdf | wc -l | awk '{print $1}')
+if [ $n != 2 ]
+then
+    echo " "
+    echo "Test 't2b' NOT PASSED (symptom: some fitness value were not reported - found $n)"
+    exit 1
+fi
+
 grep -q 'FragSpaceExplorer run completed' "$wrkDir"/FSE*.log
 if [[ $? != 0 ]]
 then

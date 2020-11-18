@@ -409,6 +409,7 @@ public class GAParameters
 
         FragmentSpaceParameters.printParameters();
         RingClosureParameters.printParameters();
+        FitnessParameters.printParameters();
     }
 
 //------------------------------------------------------------------------------
@@ -836,6 +837,11 @@ public class GAParameters
         if (RingClosureParameters.allowRingClosures())
         {
             RingClosureParameters.processParameters();
+        }
+        
+        if (FitnessParameters.fitParamsInUse())
+        {
+            FitnessParameters.processParameters();
         }
         
         System.err.println("Program log file: " + logFile);

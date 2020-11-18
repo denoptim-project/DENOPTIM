@@ -56,6 +56,8 @@ public class ParallelEvolutionaryAlgorithm
     final List<Future<Object>> futures;
     final ArrayList<OffspringEvaluationTask> submitted;
     final ThreadPoolExecutor tcons;
+
+    private Throwable ex;
    
     private final String fsep = System.getProperty("file.separator");
  
@@ -135,15 +137,15 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (OffspringEvaluationTask tsk:submitted)
+        for (OffspringEvaluationTask tsk : submitted)
         {
             if (tsk.foundException())
             {
                 hasprobs = true;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-                                                              + tsk.toString());
-                DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                                                         tsk.getErrorMessage());
+                + tsk.toString() + ". ErrorMessage: '" + tsk.getErrorMessage() 
+                + "'. ExceptionInTask: "+tsk.getException());
+                ex = tsk.getException().getCause();
                 break;
             }
         }
@@ -389,7 +391,8 @@ public class ParallelEvolutionaryAlgorithm
                 if (checkForException())
                 {
                     stopRun();
-                    throw new DENOPTIMException("Errors found during execution.");
+                    throw new DENOPTIMException("Errors found during sub-tasks "
+                    		+ "execution.", ex);
                 }
 
                 synchronized (numTries)
@@ -984,7 +987,8 @@ public class ParallelEvolutionaryAlgorithm
                 if (checkForException())
                 {
                     stopRun();
-                    throw new DENOPTIMException("Errors found during execution.");
+                    throw new DENOPTIMException("Errors found during sub tasks "
+                    		+ "execution.", ex);
                 }
                 synchronized (numTries)
                 {

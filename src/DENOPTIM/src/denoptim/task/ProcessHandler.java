@@ -20,6 +20,8 @@ package denoptim.task;
 
 import java.io.IOException;
 
+import denoptim.exception.DENOPTIMException;
+
 /**
  *
  * @author Vishwesh Venkatraman
@@ -64,10 +66,11 @@ public class ProcessHandler
      * written to these streams is not used by the application. The generally
      * accepted solution for this problem is a stream gobbler thread that does
      * nothing but consume data from an input stream until stopped.
+     * @throws DENOPTIMException 
      * @throws Exception
      */
 
-    public void runProcess() throws Exception
+    public void runProcess() throws DENOPTIMException
     {
         try
         {
@@ -109,40 +112,36 @@ public class ProcessHandler
         }
         catch(IllegalArgumentException iae)
         {
-            //iae.printStackTrace();
-            //System.out.println("Error: " + iae.getMessage());
             proc.destroy();
-            throw iae;
+            throw new DENOPTIMException(iae);
         }
         catch(NullPointerException npe)
         {
-            //ie.printStackTrace();
-            System.out.println("Error: " + npe.getMessage());
             proc.destroy();
-            throw npe;
+            throw  new DENOPTIMException(npe);
         }
         catch(IOException ioe)
         {
-            //ioe.printStackTrace();
-            //System.err.println("Error: " + ioe.getMessage());
             proc.destroy();
-            throw ioe;
+            throw  new DENOPTIMException(ioe);
         }
         catch(Exception e)
         {
-            //e.printStackTrace();
-            //System.err.println("Error: " + e.getMessage());
             proc.destroy();
-            throw e;
+            throw  new DENOPTIMException(e);
         }
         finally
         {
             if (proc != null)
             {
-                proc.getOutputStream().close();
-                proc.getInputStream().close();
-                proc.getErrorStream().close();
-                proc.destroy();
+                try {
+					proc.getOutputStream().close();
+					proc.getInputStream().close();
+					proc.getErrorStream().close();
+					proc.destroy();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
             }
         }
     }

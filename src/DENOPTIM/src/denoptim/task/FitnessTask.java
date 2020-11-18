@@ -20,6 +20,7 @@
 package denoptim.task;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
@@ -110,17 +111,21 @@ public abstract class FitnessTask extends Task
      * run internally (i.e., within this instance of the JAVA VM), or 
      * delegated to an external child process.
      * @return the object with data obtained from the fitness provider.
-     * @throws Throwable when something went wrong in the call to the fitness
-     * provider.
+     * @throws DENOPTIMException
      */
-    protected DENOPTIMMolecule runFitnessProvider() throws Throwable
+    protected DENOPTIMMolecule runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
         result.setMoleculeFile(fitProvOutFile);
         if (fitProvMol == null)
     	{
-    	    fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
-    	    		true);
+    	    try {
+				fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
+						true);
+			} catch (DENOPTIMException e) {
+				throw new DENOPTIMException("Failed conversion of graph to "
+						+ "chemical representation",e);
+			}
     	}
     	
     	// Write file with input data to fitness provider
@@ -165,10 +170,11 @@ public abstract class FitnessTask extends Task
      * @return <code>true</code> if it is all good, <code>false</code> in case 
      * of any reason for premature returning of the results (error generated in
      * from the external tool, rejection on the candidate).
+     * @throws DENOPTIMException 
      * @throws Exception 
      */
 
-	private boolean runExternalFitness() throws Exception 
+	private boolean runExternalFitness() throws DENOPTIMException
 	{
 		StringBuilder sb = new StringBuilder();
         sb.append(FitnessParameters.getExternalFitnessProviderInterpreter());
@@ -235,7 +241,13 @@ public abstract class FitnessTask extends Task
             
             //TODO use constant
             String fileBkp = fitProvOutFile + "_Unreadble";
-            FileUtils.copyFile(new File(fitProvOutFile), new File(fileBkp));
+            try {
+				FileUtils.copyFile(new File(fitProvOutFile), new File(fileBkp));
+			} catch (IOException e) {
+				// At this point the file must be there!
+				throw new DENOPTIMException("File '"+ fitProvOutFile + "' has "
+						+ "disappeared (it was there, but not anymore!)");
+			}
             FileUtils.deleteQuietly(new File(fitProvOutFile));
             
             String err = "#FTask: Unable to retrive data. See " + fileBkp;
@@ -286,6 +298,7 @@ public abstract class FitnessTask extends Task
                         + result.getName() + " could not be converted "
                         + "to double.";
                 errMsg = msg;
+                thrownExc = t;
                 DENOPTIMLogger.appLogger.severe(msg);
                 dGraph.cleanup();
                 throw new DENOPTIMException(msg);
