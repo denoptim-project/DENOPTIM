@@ -30,6 +30,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.qsar.DescriptorEngine;
+import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
@@ -47,13 +49,26 @@ public class FitnessProviderTest
     @Test
     public void testConfigureDescriptorsList() throws Exception
     {
-    	List<String> descriptorClassNames = new ArrayList<String>(Arrays.asList(
-		"org.openscience.cdk.qsar.descriptors.molecular.ZagrebIndexDescriptor",
-		"org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor"));
-    	    	
-    	FitnessProvider.configureDescriptors(descriptorClassNames);
+    	List<String> classNames = new ArrayList<String>();
+    	classNames.add("org.openscience.cdk.qsar.descriptors.molecular."
+    			+ "ZagrebIndexDescriptor");
+    	classNames.add("org.openscience.cdk.qsar.descriptors.molecular."
+    			+ "AtomCountDescriptor");
+		DescriptorEngine engine = new DescriptorEngine(classNames);
+		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
     	
-    	assertEquals(2, FitnessProvider.engine.getDescriptorInstances().size(),
+    	List<DescriptorForFitness> descriptors = new ArrayList<DescriptorForFitness>();
+    	for (int i=0; i<iDescs.size(); i++)
+    	{
+    		IDescriptor iDesc = iDescs.get(i);
+    		DescriptorForFitness dv = new DescriptorForFitness(iDesc.getDescriptorNames()[0],
+    				classNames.get(i), iDesc, 0);
+    		descriptors.add(dv);
+    	}
+    	    	
+    	FitnessProvider fp = new FitnessProvider(descriptors,"no eq neede");
+    	
+    	assertEquals(2, fp.engine.getDescriptorInstances().size(),
     			"Number of descriptors from custom list");
     }
 	
@@ -71,18 +86,32 @@ public class FitnessProviderTest
     	     System.err.println(e.getMessage());
     	 }
     	
-    	List<String> descriptorsClassNames = new ArrayList<String>(
-    			Arrays.asList(
-		"org.openscience.cdk.qsar.descriptors.molecular.ZagrebIndexDescriptor",
-		"org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor"));
+    	List<String> classNames = new ArrayList<String>();
+    	classNames.add("org.openscience.cdk.qsar.descriptors.molecular."
+    			+ "ZagrebIndexDescriptor");
+    	classNames.add("org.openscience.cdk.qsar.descriptors.molecular."
+    			+ "AtomCountDescriptor");
+		DescriptorEngine engine = new DescriptorEngine(classNames);
+		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
     	
-    	FitnessProvider.configureDescriptors(descriptorsClassNames);
+    	List<DescriptorForFitness> descriptors = new ArrayList<DescriptorForFitness>();
+    	for (int i=0; i<iDescs.size(); i++)
+    	{
+    		IDescriptor iDesc = iDescs.get(i);
+    		DescriptorForFitness dv = new DescriptorForFitness(iDesc.getDescriptorNames()[0],
+    				classNames.get(i), iDesc, 0);
+    		descriptors.add(dv);
+    	}
+    	    	
+    	String expression = "${" + descriptors.get(0).shortName 
+        		+" + " + descriptors.get(1).shortName + "}";
     	
-        double fitness = FitnessProvider.getFitness(mol);
+    	FitnessProvider fp = new FitnessProvider(descriptors,expression);
+    	double fitness = fp.getFitness(mol);
         
         // The descriptors values must be already in the mol properties map
         Map<Object, Object> props = mol.getProperties();
-        assertEquals(2,props.size(),"Number of properties in processed mol");
+        assertEquals(3,props.size(),"Number of properties in processed mol");
         List<Object> keys = new ArrayList<Object>();
         for (Object k : props.keySet()) 
         {

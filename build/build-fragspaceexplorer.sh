@@ -17,7 +17,7 @@ if [ ! -f lib/DENOPTIM.jar ]; then
 fi
 
 find ../src/FragSpaceExplorer/src/ -name *.java > javafiles.txt
-javac -cp lib/cdk-1.4.19.jar:lib/vecmath.jar:lib/commons-io-2.4.jar:lib/commons-lang3-3.1.jar:lib/DENOPTIM.jar @javafiles.txt -encoding utf-8 -d .
+javac -cp lib/cdk-1.4.19.jar:lib/vecmath.jar:lib/commons-io-2.4.jar:lib/commons-lang3-3.1.jar:lib/commons-el-1.0.jar:lib/javax.servlet-1.4.jar:lib/DENOPTIM.jar @javafiles.txt -encoding utf-8 -d .
 
 
 if [ "$?" != "0" ]; then
@@ -31,7 +31,7 @@ rm javafiles.txt
 
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Main-Class: fragspaceexplorer.FragSpaceExplorer" >> manifest.mf
-echo "Class-Path: lib/cdk-1.4.19.jar lib/vecmath.jar lib/commons-io-2.4.jar lib/commons-lang3-3.1.jar lib/DENOPTIM.jar " >> manifest.mf
+echo "Class-Path: lib/cdk-1.4.19.jar lib/vecmath.jar lib/commons-io-2.4.jar lib/commons-lang3-3.1.jar lib/commons-el-1.0.jar lib/javax.servlet-1.4.jar lib/DENOPTIM.jar " >> manifest.mf
 echo >> manifest.mf
 
 jar cvfm FragSpaceExplorer.jar manifest.mf fragspaceexplorer

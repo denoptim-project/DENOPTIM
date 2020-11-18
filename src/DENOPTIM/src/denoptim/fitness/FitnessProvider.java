@@ -1,11 +1,13 @@
 package denoptim.fitness;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import javax.servlet.jsp.el.ELException;
+import javax.servlet.jsp.el.VariableResolver;
+
+import org.apache.commons.el.ExpressionEvaluatorImpl;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorEngine;
@@ -18,13 +20,13 @@ import org.openscience.cdk.qsar.result.IDescriptorResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 
 /**
  * DENOPTIM's (internal) fitness provider class calculates CDK descriptors for a 
  * given chemical thing, and combines the descriptors to calculate a single
- * numerical results (i.e., the fitness) according to an equation given in the
- * {@link FitnessParameters}.
+ * numerical results (i.e., the fitness) according to an equation.
  * 
  * @author Marco Foscato
  */
@@ -34,39 +36,70 @@ public class FitnessProvider
 	/**
 	 * The engine that collects and calculates descriptors
 	 */
-	protected static DescriptorEngine engine;
+	protected DescriptorEngine engine;
+	
+	/**
+	 * The collection of descriptors to consider
+	 */
+	private List<DescriptorForFitness> descriptors;
+	
+	/**
+	 * The equation used to calculate the fitness value
+	 */
+	private String expression;
+	
 	
 //------------------------------------------------------------------------------
 
 	/**
-	 * Configures the internal fitness provider according to the given 
-	 * parameters.
+	 * Constructs an instance that will calculated the fitness according to
+	 * the given parameters.
 	 */
 	
-	//TODO use our Descriptor class
-	public static void configureDescriptors(List<String> classNames)
+	public FitnessProvider(List<DescriptorForFitness> descriptors, String expression)
 	{
+		this.descriptors = descriptors;
+		this.expression = expression;
+		
+		// We use an empty list here because the instances of the descriptors 
+		// are taken from the parameters, rather than built by the constructor
+		// of the engine. So we only need to instantiate the engine.
+		engine = new DescriptorEngine(new ArrayList<String>());
+		
+		List<IDescriptor> iDescs = new ArrayList<IDescriptor>();
+        List<DescriptorSpecification> specs = 
+        		new ArrayList<DescriptorSpecification>();
+		for (DescriptorForFitness d : descriptors)
+		{
+			IDescriptor impl = d.implementation;
+			iDescs.add(impl);
+			specs.add(impl.getSpecification());
+		}
+		
+		/* 
+		// In alternative, we could give only the classNames and let the engine 
+		// instantiate the descriptor instances.
+		List<String> classNames = new ArrayList<String>();
+		for (Descriptor d : descriptors)
+		{
+			classNames.add(d.className);
+		}
+		
 		engine = new DescriptorEngine(classNames);
-		List<IDescriptor> descriptors =  engine.instantiateDescriptors(
-				classNames);
-        List<DescriptorSpecification> specs = engine.initializeSpecifications(
-        		descriptors);
-	    engine.setDescriptorInstances(descriptors);
-	    engine.setDescriptorSpecifications(specs);
-	}
-	
-//------------------------------------------------------------------------------
-
-	/**
-	 * Configures the internal fitness provider according to the given 
-	 * parameters.
-	 */
-	
-	public static void configureDescriptors(List<String> classNames, 
-			List<DescriptorSpecification> specs)
-	{
-		engine = new DescriptorEngine(classNames);
+		
 		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
+        List<DescriptorSpecification> specs = 
+        		engine.initializeSpecifications(iDescs);
+		for (int i=0; i<descriptors.size(); i++)
+		{
+			Descriptor d = descriptors.get(i);
+			if (d.specs!=null)
+			{
+				specs.set(i, d.specs);
+			}
+		}
+		*/
+        
 	    engine.setDescriptorInstances(iDescs);
 	    engine.setDescriptorSpecifications(specs);
 	}
@@ -74,17 +107,16 @@ public class FitnessProvider
 //------------------------------------------------------------------------------
 
 	/**
-	 * Calculated the fitness according to the current configuration. Before
-	 * calling this method, make sure you have called either 
-	 * {@link FitnessProvider#configureDefault()} or 
-	 * {@link FitnessProvider#configureCustom()} with appropriate arguments.
+	 * Calculated the fitness according to the current configuration. The values
+	 * of the descriptors, as well as the fitness value, are added to the
+	 * properties of the atom container.
 	 * @param iac the chemical object to evaluate.
 	 * @return the final value of the fitness.
 	 * @throws Exception if an error occurs during calculation of the descriptor
 	 * or any initial configuration was missing/wrong.
 	 */
 	
-	public static double getFitness(IAtomContainer iac) throws Exception 
+	public double getFitness(IAtomContainer iac) throws Exception 
 	{
 		if (engine == null)
 		{
@@ -94,16 +126,18 @@ public class FitnessProvider
 	
 		// Calculate all descriptors. The results are put in the properties of
 		// the IAtomContainer (as DescriptorValue identified by 
-		// DescriptorSpecification keys)
+		// DescriptorSpecification keys) and we later translate these into
+		// plain human readable strings.
 		engine.process(iac);
 		
 		// Collect numerical values needed to calculate the fitness
-		Map<String,Double> valuesMap = new HashMap<String,Double>();
+		HashMap<String,Double> valuesMap = new HashMap<String,Double>();
         for (int i=0; i<engine.getDescriptorInstances().size(); i++)
         {
+        	DescriptorForFitness descriptor = descriptors.get(i);
         	IDescriptor desc = engine.getDescriptorInstances().get(i);
         	
-        	String descName = "Desc-"+i; //TODO get from fitness equation
+        	String descName = descriptor.shortName;
         	double val = Double.NaN;
         	
         	DescriptorSpecification descSpec = 
@@ -130,7 +164,7 @@ public class FitnessProvider
             } else if (result instanceof DoubleArrayResult) 
             {
             	DoubleArrayResult a = (DoubleArrayResult) result;
-            	int id = 0; //TODO take from settings
+            	int id = descriptor.resultId;
             	if (id >= a.length())
             	{
             		throw new Exception("Value ID out of range for descriptor "
@@ -148,7 +182,7 @@ public class FitnessProvider
             } else if (result instanceof IntegerArrayResult) 
             {
             	IntegerArrayResult a = (IntegerArrayResult) result;
-            	int id = 0; //TODO take from settings
+            	int id = descriptor.resultId;
             	if (id >= a.length())
             	{
             		throw new Exception("Value ID out of range for descriptor "
@@ -171,20 +205,29 @@ public class FitnessProvider
             valuesMap.put(descName,val);
         }
         
+        // Calculate the fitness from the expression and descriptor values
+		ExpressionEvaluatorImpl evaluator = new ExpressionEvaluatorImpl();
+		VariableResolver resolver = new VariableResolver() {
+			@Override
+			public Double resolveVariable(String varName) throws ELException {
+				Double value = null;
+				if (!valuesMap.containsKey(varName))
+				{
+					throw new ELException("Variable '" + varName 
+							+ "' cannot be resolved");
+				} else {
+					value = valuesMap.get(varName);
+				}
+				return value;
+			}
+		};
 		
-        
-		//TODO: del
-        for (Entry<String, Double> e : valuesMap.entrySet())
-        {
-        	System.out.println(" ---> "+e.getKey()+": "+e.getValue());
-        }
-        
-
-		// Use given equation to calculate the overall fitness
-		double fitness = 0.206;
-		//TODO: implement this
-		
+		double fitness = (double) evaluator.evaluate(expression, Double.class, 
+				resolver, null);
+		iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
 		return fitness;
 	}
 
+//------------------------------------------------------------------------------
+	
 }

@@ -18,7 +18,28 @@
 
 package denoptim.fitness;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+import javax.servlet.jsp.el.ELException;
+import javax.servlet.jsp.el.VariableResolver;
+
+import org.apache.commons.el.ExpressionEvaluatorImpl;
+import org.openscience.cdk.qsar.DescriptorEngine;
+import org.openscience.cdk.qsar.DescriptorSpecification;
+import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -46,22 +67,33 @@ public class FitnessParameters
     /**
      * Pathname of an external fitness provider executable
      */
-    protected static String externalExe = "";
+    private static String externalExe = "";
 
     /**
      * Interpreter for the external fitness provider
      */
-    protected static String interpreterExternalExe = "BASH";
+    private static String interpreterExternalExe = "BASH";
 
     /**
      * Formulation of the internally provided fitness
      */
-    protected static Object fitEquation = "";
+    private static String fitnessExpression = "";
+    
+    /**
+     * The list of descriptors needed to calculate the fitness with internal 
+     * fitness provider.
+     */
+    private static List<DescriptorForFitness> descriptors;
+    
+    /**
+     * List of descriptor's short names
+     */
+    private static List<String> variablesInEquation;
     
     /**
      * Flag controlling production of png graphics for each candidate
      */
-    protected static boolean makePictures = false;
+    private static boolean makePictures = false;
 
 
 //------------------------------------------------------------------------------
@@ -107,12 +139,33 @@ public class FitnessParameters
 //------------------------------------------------------------------------------
 
     /**
-     * The name of the interpreter used to run the external fitness provider.
+     * Gets the interpreter used to run the external fitness provider.
      * @return the interpreter name.
      */
     public static String getExternalFitnessProviderInterpreter()
     {
         return interpreterExternalExe;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the expression used to calculate the fitness with the internal
+     * fitness provider
+     */
+    public static String getFitnessExpression()
+    {
+    	return fitnessExpression;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return list of descriptors needed to calculate the fitness
+     */
+    public static List<DescriptorForFitness> getDescriptors()
+    {
+    	return descriptors;
     }
 
 //------------------------------------------------------------------------------
@@ -155,12 +208,13 @@ public class FitnessParameters
             break;
             
         case "FP-EQUATION=":
-        	fitEquation = value;
+        	fitnessExpression = value;
         	fitParamsInUse = true;
         	useExternalFitness = false;
             break;
             
         case "FP-MAKEPICTURES":
+        	fitParamsInUse = true;
 	        makePictures = true;
 	        break;
 
@@ -170,6 +224,37 @@ public class FitnessParameters
             throw new DENOPTIMException(msg);
         }
     }
+    
+//------------------------------------------------------------------------------
+
+	private static void parseFitnessExpressionToDefineDescriptors(String value) 
+			throws DENOPTIMException 
+	{
+		// Parse expression to get the names of all variables
+		ExpressionEvaluatorImpl extractor = new ExpressionEvaluatorImpl();
+		variablesInEquation = new ArrayList<String>();
+        VariableResolver collector = new VariableResolver() {
+			
+			@Override
+			public Double resolveVariable(String varName) throws ELException {
+				if (!variablesInEquation.contains(varName))
+				{
+					variablesInEquation.add(varName);
+				}
+				return 1.0;
+			}
+		};
+		try {
+			extractor.evaluate(fitnessExpression, Double.class, collector, null);
+		} catch (ELException e) {
+			throw new DENOPTIMException("ERROR: unable to parse fitness "
+					+ "expression.",e);
+		}
+
+		// Collect the descriptors needed to calculate the fitness
+		descriptors = DescriptorUtils.findAllDescriptorImplementations(
+				variablesInEquation);
+	}
 
 //------------------------------------------------------------------------------
 
@@ -213,7 +298,10 @@ public class FitnessParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-
+    	if (!fitnessExpression.equals(""))
+    	{
+        	parseFitnessExpressionToDefineDescriptors(fitnessExpression);
+    	}
     }
 
 //------------------------------------------------------------------------------
@@ -229,13 +317,14 @@ public class FitnessParameters
         sb.append(" FitnessParameters ").append(eol);
         for (Field f : FitnessParameters.class.getDeclaredFields()) 
         {
-            try
+        	try
             {
                 sb.append(f.getName()).append(" = ").append(
                             f.get(FitnessParameters.class)).append(eol);
             }
             catch (Throwable t)
             {
+            	t.printStackTrace();
                 sb.append("ERROR! Unable to print FitnessParameters.");
                 break;
             }

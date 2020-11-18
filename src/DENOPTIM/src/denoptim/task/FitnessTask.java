@@ -20,8 +20,6 @@
 package denoptim.task;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
@@ -345,7 +343,10 @@ public abstract class FitnessTask extends Task
 
 	    double fitVal;
 		try {
-			fitVal = FitnessProvider.getFitness(fitProvMol);
+			FitnessProvider fp = new FitnessProvider(
+					FitnessParameters.getDescriptors(),
+					FitnessParameters.getFitnessExpression());
+			fitVal = fp.getFitness(fitProvMol);
 		} catch (Exception e) {
 			throw new DENOPTIMException("Failed to calculate fitness.", e);
 		}
