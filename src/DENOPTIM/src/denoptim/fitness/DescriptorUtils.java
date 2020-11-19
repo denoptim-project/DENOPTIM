@@ -1,13 +1,22 @@
 package denoptim.fitness;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.openscience.cdk.qsar.DescriptorEngine;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
@@ -18,27 +27,77 @@ import denoptim.logging.DENOPTIMLogger;
 public class DescriptorUtils
 {
 	
+	private static final String FS = System.getProperty("file.separator");
+	private static final String NL = System.getProperty("line.separator");
+	
 //------------------------------------------------------------------------------
 	
-	private static List<String> getClassNamesToCDKDescriptors()
+	public static List<String> getClassNamesToCDKDescriptors()
 	{
-		File mainClassPath = new File(System.getProperty("java.class.path"));
+		// Search for CDK jar file
+		String qsarDescPkg = "org.openscience.cdk.qsar.descriptors";
+		qsarDescPkg = qsarDescPkg.replaceAll("\\.", FS);
+		String cdkJarPathName  = "";
+		String classPath = System.getProperty("java.class.path");
+		String[] jarsAndDirs = classPath.split(File.pathSeparator);
+		for (int i = 0; i < jarsAndDirs.length; i++)
+		{
+			String pathName = jarsAndDirs[i];
+			if (!pathName.endsWith(".jar"))
+			{
+				continue;
+			}
+			JarFile jarFile;
+			try {
+                jarFile = new JarFile(pathName);
+                Enumeration<JarEntry> enumeration = jarFile.entries();
+                while (enumeration.hasMoreElements()) {
+                    JarEntry jarEntry = enumeration.nextElement();
+                    if (jarEntry.toString().contains(qsarDescPkg))
+                    {
+                    	cdkJarPathName = pathName;
+                    	break;
+                    }
+                }
+			} catch (IOException e) {
+				e.printStackTrace();
+            }
+			
+			if (cdkJarPathName.equals(""))
+			{
+				File parentFolder = new File(System.getProperty("user.dir"));
+				if (pathName.endsWith("DenoptimGA.jar") 
+						|| pathName.endsWith("FragSpaceExplorer.jar")
+						|| pathName.endsWith("GUI.jar"))
+				{
+					File myClassPath = new File(pathName);
+					if (pathName.contains(FS))
+					{
+						parentFolder = new File(myClassPath.getParent());
+					}
+				}
+				File libFolder = new File(parentFolder.getAbsolutePath() 
+						+ FS + "lib");
+				FileFilter fileFilter = new WildcardFileFilter("cdk*.jar");
+				File[] cands = libFolder.listFiles(fileFilter);
+				if (cands.length == 1)
+				{
+				    cdkJarPathName = cands[0].getAbsolutePath();
+				}
+			} else {
+				break;
+			}
+		}
 		
-		//TODO: check if cdk is in mainClassPath, if not then try to force
-		// with finding it using  mainClassPath.getParent()
-		
-		//From Eclipse has CDK System.out.println("CLASSPATH: "+mainClassPath);
-		
-		String FS = System.getProperty("file.separator");
-		String NL = System.getProperty("line.separator");
-		
-		// WARNING! Hard-coded pathname of CDK jar file!
-		// TOTO: get this from classpath.
-		
-		String cdkJarPathName = mainClassPath.getParent() + FS + "lib" + FS 
-				+ "cdk-1.4.19.jar";
-		//TODO change! this is very bad! Get rid of it ASAP!
-		cdkJarPathName = "/Users/marco/tools/DENOPTIM_master/build/lib/cdk-1.4.19.jar";
+		if (cdkJarPathName.equals(""))
+		{
+			//TODO change! this is very bad! 
+			cdkJarPathName = "lib/cdk-1.4.19.jar";
+			String msg = "WARNING: Could not locate the CDK classes! "
+					+ " Trying to enforce use of " + cdkJarPathName;
+			Exception e = new Exception(msg);
+			e.printStackTrace();
+		}
 		
 		List<String> classNames = 
 				DescriptorEngine.getDescriptorClassNameByPackage(null, 

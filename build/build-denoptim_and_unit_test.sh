@@ -50,9 +50,9 @@ echo "--------------------- Done building DENOPTIM.jar ---------------------"
 #java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar:../lib/javax.servlet-1.4.jar:../lib/commons-el-1.0.jar --scan-classpath --details=tree
 
 # To run only DENOPTIM's tests
-java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar:../lib/javax.servlet-1.4.jar:../lib/commons-el-1.0.jar -p denoptim
+java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar:../lib/javax.servlet-1.4.jar:../lib/commons-el-1.0.jar:lib/commons-io-2.4.jar -p denoptim
 
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar:../lib/javax.servlet-1.4.jar:../lib/commons-el-1.0.jar -c denoptim.fitness.FitnessProviderTest
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar:../lib/javax.servlet-1.4.jar:../lib/commons-el-1.0.jar:lib/commons-io-2.4.jar -c denoptim.fitness.DescriptorUtilsTest
 
