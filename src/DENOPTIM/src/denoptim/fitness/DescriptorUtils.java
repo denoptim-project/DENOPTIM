@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.openscience.cdk.qsar.DescriptorEngine;
+import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
@@ -16,13 +17,18 @@ import denoptim.logging.DENOPTIMLogger;
 
 public class DescriptorUtils
 {
-
+	
 //------------------------------------------------------------------------------
-
-	public static List<DescriptorForFitness> findAllDescriptorImplementations(
-			List<String> requiredDescriptors) throws DENOPTIMException
+	
+	private static List<String> getClassNamesToCDKDescriptors()
 	{
 		File mainClassPath = new File(System.getProperty("java.class.path"));
+		
+		//TODO: check if cdk is in mainClassPath, if not then try to force
+		// with finding it using  mainClassPath.getParent()
+		
+		//From Eclipse has CDK System.out.println("CLASSPATH: "+mainClassPath);
+		
 		String FS = System.getProperty("file.separator");
 		String NL = System.getProperty("line.separator");
 		
@@ -31,10 +37,37 @@ public class DescriptorUtils
 		
 		String cdkJarPathName = mainClassPath.getParent() + FS + "lib" + FS 
 				+ "cdk-1.4.19.jar";
+		//TODO change! this is very bad! Get rid of it ASAP!
+		cdkJarPathName = "/Users/marco/tools/DENOPTIM_master/build/lib/cdk-1.4.19.jar";
 		
 		List<String> classNames = 
 				DescriptorEngine.getDescriptorClassNameByPackage(null, 
 						new String[]{cdkJarPathName});
+		return classNames;
+	}
+//------------------------------------------------------------------------------
+
+	public static DescriptorEngine getCDKDescriptorEngine()
+	{
+		return new DescriptorEngine(getClassNamesToCDKDescriptors());
+	}
+	
+//------------------------------------------------------------------------------
+
+	/**
+	 * Searches for descriptor implementations.
+	 * @param requiredDescriptors list of descriptor short names that we want
+	 * to obtain. All the rest will be ignored. This parameter can be null, in 
+	 * which case we'll return all the descriptors.
+	 * @return the list of descriptor information bundles.
+	 * @throws DENOPTIMException
+	 */
+	public static List<DescriptorForFitness> findAllDescriptorImplementations(
+			List<String> requiredDescriptors) throws DENOPTIMException
+	{
+		List<String> classNames = new ArrayList<String>();
+		classNames.addAll(getClassNamesToCDKDescriptors());
+		// We might want to add more... one day
 		
 		//We use the engine to get the instances of descriptors calculators
 		DescriptorEngine engine = new DescriptorEngine(classNames);
@@ -52,7 +85,7 @@ public class DescriptorUtils
 			String className = classNames.get(i);
 			String[] descrNames = iDescs.get(i).getDescriptorNames();
 			String simpleName = iDescs.get(i).getClass().getSimpleName();
-			if (descrNames !=null)
+			if (descrNames != null)
 			{
 				for (int j=0; j<descrNames.length;j++)
 				{
@@ -66,16 +99,32 @@ public class DescriptorUtils
 						throw new DENOPTIMException(msg);
 					}
 					unq.put(descName,simpleName);
-					for (String requiredDescName : requiredDescriptors)
+					boolean isChosen = false;
+					if (requiredDescriptors == null)
 					{
-						if (descName.equals(requiredDescName))
+						isChosen = true;
+					} else {
+						for (String requiredDescName : requiredDescriptors)
 						{
-							chosenOnesShortNames.add(simpleName);
-							DescriptorForFitness d = new DescriptorForFitness(
-									descName, className, iDescs.get(i), j);
-							chosenOnes.add(d);
-							break;
+							if (descName.equals(requiredDescName))
+							{
+								isChosen = true;
+								break;
+							}
 						}
+					}
+					if (isChosen)
+					{
+						chosenOnesShortNames.add(simpleName);
+						IDescriptor impl = iDescs.get(i);
+						DescriptorSpecification ds = impl.getSpecification();
+						DescriptorForFitness d = new DescriptorForFitness(
+								descName, className,impl, j,
+								engine.getDictionaryType(ds),
+								engine.getDictionaryClass(ds),
+								engine.getDictionaryDefinition(ds),
+								engine.getDictionaryTitle(ds));
+						chosenOnes.add(d);
 					}
 				}
 			}

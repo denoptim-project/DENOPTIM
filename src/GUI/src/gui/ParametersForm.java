@@ -125,6 +125,30 @@ public class ParametersForm extends JPanel implements IParametersForm
     /**
      * Produced the KEY:VALUE string for a general text field. 
      * The text can include numbers, characters, or both.
+     * @param key the keyword.
+     * @param field the txt field.
+     * @param prefix string to be put before the VALUE.
+     * @param suffix string to be put after the VALUE.
+     * @return the KEY:VALUE string including newline character at the end.
+     */
+    
+    protected String getStringIfNotEmpty(String key, JTextField field, 
+    		String prefix, String suffix)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	if (!field.getText().equals(""))
+    	{
+    		sb.append(key).append("=");
+    		sb.append(prefix).append(field.getText()).append(suffix).append(NL);
+    	}
+    	return sb.toString();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Produced the KEY:VALUE string for a general text field. 
+     * The text can include numbers, characters, or both.
      * @param key the keyword
      * @param field the txt field
      * @return the KEY:VALUE string including newline character at the end.

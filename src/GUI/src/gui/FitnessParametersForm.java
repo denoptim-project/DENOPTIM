@@ -18,12 +18,19 @@
 
 package gui;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,10 +42,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.DescriptorForFitness;
+import denoptim.fitness.DescriptorUtils;
 
 /**
  * Form collecting input parameters for a setting-up the fitness provider.
@@ -114,19 +131,23 @@ public class FitnessParametersForm extends ParametersForm
 
         localBlock1 = new JPanel();
         localBlock1.setVisible(false);
-        localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
+        localBlock1.setLayout(new BoxLayout(localBlock1, 
+        		SwingConstants.VERTICAL));
         
         localBlock2 = new JPanel();
         localBlock2.setVisible(true);
-        localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
+        localBlock2.setLayout(new BoxLayout(localBlock2, 
+        		SwingConstants.VERTICAL));
         
         localBlock3 = new JPanel();
         localBlock3.setVisible(false);
-        localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
+        localBlock3.setLayout(new BoxLayout(localBlock3, 
+        		SwingConstants.VERTICAL));
         
         localBlock4 = new JPanel();
         localBlock4.setVisible(true);
-        localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
+        localBlock4.setLayout(new BoxLayout(localBlock4, 
+        		SwingConstants.VERTICAL));
         
         String toolTipSrcOrNew = "Tick here to use settings from file.";
         lineSrcOrNew = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -151,9 +172,11 @@ public class FitnessParametersForm extends ParametersForm
         block.add(localBlock1);
         block.add(localBlock2);
         
-        String toolTipFPSource = "<html>Pathname of a DENOPTIM's parameter file with fitness-provider settings.</html>";
+        String toolTipFPSource = "<html>Pathname of a DENOPTIM's parameter "
+        		+ "file with fitness-provider settings.</html>";
         lineFPSource = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblFPSource = new JLabel("Use parameters from file:", SwingConstants.LEFT);
+        lblFPSource = new JLabel("Use parameters from file:", 
+        		SwingConstants.LEFT);
         lblFPSource.setToolTipText(toolTipFPSource);
         txtFPSource = new JTextField();
         txtFPSource.setToolTipText(toolTipFPSource);
@@ -171,7 +194,8 @@ public class FitnessParametersForm extends ParametersForm
         	public void actionPerformed(ActionEvent e) {
 	        	try 
 	        	{
-					importParametersFromDenoptimParamsFile(txtFPSource.getText());
+					importParametersFromDenoptimParamsFile(
+							txtFPSource.getText());
 				} 
 	        	catch (Exception e1) 
 	        	{
@@ -179,7 +203,9 @@ public class FitnessParametersForm extends ParametersForm
 	        		{
 	        			e1.printStackTrace();
 						JOptionPane.showMessageDialog(null,
-								"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
+								"<html>Exception occurred while importing "
+								+ "parameters.<br>Please, report this to the "
+								+ "DENOPTIM team.</html>",
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
 				                UIManager.getIcon("OptionPane.errorIcon"));
@@ -207,20 +233,16 @@ public class FitnessParametersForm extends ParametersForm
         		+ "output SDF file with the <code>&lt;FITNESS&gt;</code> or "
         		+ "<code>&lt;MOL_ERROR&gt;</code> tags.</html>";
         lineIntOrExt = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        rdbIntOrExt = new JRadioButton("Use external fitnes provider:");
+        rdbIntOrExt = new JRadioButton("Use external fitnes provider");
         rdbIntOrExt.setToolTipText(toolTipIntOrExt);
         
-        //TODO: tmp code to restrict functionality
-        rdbIntOrExt.setSelected(true);
-		localBlock3.setVisible(true);
-		localBlock4.setVisible(false);
-        rdbIntOrExt.setEnabled(false);
+        rdbIntOrExt.setSelected(false);
+		//localBlock3.setVisible(true);
+		//localBlock4.setVisible(false);
+        rdbIntOrExt.setEnabled(true);
         
         rdbIntOrExt.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		
-        		//TODO: activate when fully implemented
-        		/*
         		if (rdbIntOrExt.isSelected())
         		{
     				localBlock3.setVisible(true);
@@ -231,7 +253,6 @@ public class FitnessParametersForm extends ParametersForm
         			localBlock3.setVisible(false);
         			localBlock4.setVisible(true);
         		}
-        		*/
         	}
         });
         lineIntOrExt.add(rdbIntOrExt);
@@ -243,14 +264,16 @@ public class FitnessParametersForm extends ParametersForm
 
         String toolTipFitProviderSource = "Pathname of the executable file.";
         lineFitProviderSource = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblFitProviderSource = new JLabel("Fitness provider executable:", SwingConstants.LEFT);
+        lblFitProviderSource = new JLabel("Fitness provider executable:", 
+        		SwingConstants.LEFT);
         lblFitProviderSource.setPreferredSize(fileLabelSize);
         lblFitProviderSource.setToolTipText(toolTipFitProviderSource);
         txtFitProviderSource = new JTextField();
         txtFitProviderSource.setToolTipText(toolTipFitProviderSource);
         txtFitProviderSource.setPreferredSize(fileFieldSize);
         txtFitProviderSource.getDocument().addDocumentListener(fieldListener);
-        mapKeyFieldToValueField.put(keyFitProviderSource.toUpperCase(),txtFitProviderSource);
+        mapKeyFieldToValueField.put(keyFitProviderSource.toUpperCase(), 
+        		txtFitProviderSource);
         btnFitProviderSource = new JButton("Browse");
         btnFitProviderSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -262,35 +285,176 @@ public class FitnessParametersForm extends ParametersForm
         lineFitProviderSource.add(btnFitProviderSource);
         localBlock3.add(lineFitProviderSource);
         
-        String toolTipFitProviderInterpreter = "Interpreter to be used for the fitness provider executable";
-        lineFitProviderInterpreter = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblFitProviderInterpreter = new JLabel("Interpreter for fitnes provider", SwingConstants.LEFT);
+        String toolTipFitProviderInterpreter = "Interpreter to be used for the "
+        		+ "fitness provider executable";
+        lineFitProviderInterpreter = new JPanel(
+        		new FlowLayout(FlowLayout.LEFT));
+        lblFitProviderInterpreter = new JLabel("Interpreter for fitnes "
+        		+ "provider", SwingConstants.LEFT);
         lblFitProviderInterpreter.setPreferredSize(fileLabelSize);
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
-        cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH", "Python", "JAVA"});
+        cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH",
+        		"Python", "JAVA"});
         cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
         
         //TODO: remove when functionality is fully implemented
         cmbFitProviderInterpreter.setEnabled(false);
         
-        mapKeyFieldToValueField.put(keyFitProviderInterpreter.toUpperCase(),cmbFitProviderInterpreter);
+        mapKeyFieldToValueField.put(keyFitProviderInterpreter.toUpperCase(), 
+        		cmbFitProviderInterpreter);
         lineFitProviderInterpreter.add(lblFitProviderInterpreter);
         lineFitProviderInterpreter.add(cmbFitProviderInterpreter);
         localBlock3.add(lineFitProviderInterpreter);
 
-        String toolTipEq = "Define integrated fitness provider equation.";
+        String toolTipEq = "Define integrated fitness provider expression.";
         lineEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblEq = new JLabel("<html>Calculate fitness (F) with equation  <i>F=</i></html>", SwingConstants.LEFT);
+        lblEq = new JLabel("<html>Compute fitness as "
+        		+ "<i>Fitness = </i>${</html>", SwingConstants.LEFT);
+        JLabel lblEqEnd = new JLabel("<html>}</html>", SwingConstants.LEFT);
         //lblEq.setPreferredSize(fileLabelSize);
         lblEq.setToolTipText(toolTipEq);
         txtEq = new JTextField();
-        txtEq.setToolTipText(toolTipEq);
-        txtEq.setPreferredSize(strFieldSize);
+        txtEq.setToolTipText("<html>Type here the expression computing the fitness value out of atomic/molecular descriptors.<br>Descriptors can be selected in the below tree.</html>");
+        Dimension fitEqSize = new Dimension(500, 2*preferredHeight);
+        txtEq.setPreferredSize(fitEqSize);
         txtEq.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyEq.toUpperCase(),txtEq);
         lineEq.add(lblEq);
         lineEq.add(txtEq);
+        lineEq.add(lblEqEnd);
         localBlock4.add(lineEq);
+        
+        String toolTipDescs = "<html>To select descriptor names:"
+        		+ "<ol><li>Browse the list of descriptors (double click to expand/reduce a node),"
+        		+ "</li><li>Click on the name of the descriptor you want to select,"
+        		+ "</li><li>Copy the selected name (<code>ctrl+C</code>/<code>command+C</code>), click in the fitness expression field, and paste (<code>ctrl+V</code><code>command+V</code>).</li>"
+        		+ "</ol></html>";
+        
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
+        		"CDK Descriptors");
+        DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
+        JTree descTree = new JTree(treeModel);
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        renderer.setLeafIcon(null);
+        descTree.setCellRenderer(renderer);
+        descTree.setRootVisible(true);
+        descTree.setShowsRootHandles(true);
+        //NB: appearance depends on look and feel. On Mac no lines, even if asked
+        descTree.putClientProperty("JTree.lineStyle", "Angled");
+        descTree.setToolTipText(toolTipDescs);
+        JScrollPane descTreeScrollPane = new JScrollPane(descTree);
+        
+        //Populate the tree
+        List<DescriptorForFitness> allDescs = null;
+        try {
+        	allDescs = DescriptorUtils.findAllDescriptorImplementations(null);
+		} catch (DENOPTIMException e1) {
+			System.out.println("No descriptor imoplementation found!");
+			e1.printStackTrace();
+		}
+        // First identify the main klasses (first layer)
+        Map<String,DescriptorTreeNode> mainClassificationNodes = 
+        		new HashMap<String,DescriptorTreeNode>();
+        for (DescriptorForFitness dff : allDescs)
+        {	
+        	String[] klasses = new String[]{"Unclassified"};
+        	if (dff.getDictClasses()!=null)
+        	{
+        		klasses = dff.getDictClasses();
+        	}
+        	for (String kls : klasses)
+        	{
+        		if (!mainClassificationNodes.containsKey(kls))
+        		{
+        			DescriptorTreeNode klassNode = new DescriptorTreeNode(kls);
+        			rootNode.add(klassNode);
+        			mainClassificationNodes.put(kls, klassNode);
+        		}
+        	}
+        }
+        
+        // Then populate each class
+        for (String klass : mainClassificationNodes.keySet())
+        {
+        	DescriptorTreeNode klassNode = mainClassificationNodes.get(klass);
+        	Map<String,DescriptorTreeNode> descriptorNodes = 
+        			new HashMap<String,DescriptorTreeNode>();
+	        for (DescriptorForFitness dff : allDescs)
+	        {
+	        	//TODO: check if getting the dictionary from DictionaryDatabase
+	        	// allows to get also the description in addition to definition
+	        	
+	        	// Decide if this descriptor goes under the present klass
+	        	List<String> klasses = new ArrayList<String>();
+	        	if (dff.getDictClasses() == null)
+	        	{
+	        		if (!klass.equals("Unclassified"))
+	        		{
+	        			continue;
+	        		} else {
+	        			klasses.add(klass);
+	        		}
+	        	} else {
+	        		klasses = new ArrayList<String>(
+		        			Arrays.asList(dff.getDictClasses()));
+	        	}
+	        	if (!klasses.contains(klass))
+	        	{
+	        		continue;
+	        	}
+	        	
+	        	// Identify parent node: either a klassNore or a descriptorNode
+        		DescriptorTreeNode parentNode = klassNode;
+        		if (dff.getImplementation().getDescriptorNames().length > 1)
+        		{
+	        		String descriptorName = dff.getImplementation().getClass()
+	        				.getSimpleName();
+	        		if (!descriptorNodes.containsKey(descriptorName))
+	        		{
+	        			DescriptorTreeNode descNode = new DescriptorTreeNode(descriptorName,dff);
+	        			parentNode.add(descNode);
+	        			descriptorNodes.put(descriptorName, descNode);
+	        		}
+	        		parentNode = descriptorNodes.get(descriptorName);
+        		}
+        		
+        		// Finally make the node for the present desc-to-fitness
+        		DescriptorTreeNode dtn = new DescriptorTreeNode(dff);
+        		parentNode.add(dtn);
+	        }
+        }
+        
+        
+        
+        
+        //TODO del
+        /*
+        DefaultMutableTreeNode vegetableNode = new DefaultMutableTreeNode("Vegetables");
+        DefaultMutableTreeNode fruitNode = new DefaultMutableTreeNode("Fruits");
+        rootNode.add(vegetableNode);
+        rootNode.add(fruitNode);
+        for (int i=0; i<50; i++)
+        	vegetableNode.add(new DefaultMutableTreeNode("Node-"+i));
+        	*/
+        
+        
+        JPanel descDescriptionPane = new JPanel();
+        descDescriptionPane.setToolTipText("Select a descriptor in the left "
+        		+ "panel to display its details.");
+        descDescriptionPane.add(new JLabel(
+        		"Descriptor Details"));
+        
+        JSplitPane splitPaneDescs = new JSplitPane();
+        splitPaneDescs.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+        splitPaneDescs.setOneTouchExpandable(true);
+        splitPaneDescs.setResizeWeight(0.5);
+        splitPaneDescs.setLeftComponent(descTreeScrollPane);
+        splitPaneDescs.setRightComponent(descDescriptionPane);
+        JPanel lineDescsTree = new JPanel();
+        lineDescsTree.setLayout(new BorderLayout(2,2));
+        lineDescsTree.add(splitPaneDescs);
+        localBlock4.add(lineDescsTree);
+        
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
         
@@ -332,6 +496,41 @@ public class FitnessParametersForm extends ParametersForm
         */
         
         this.add(scrollablePane);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @SuppressWarnings("serial")
+	private class DescriptorTreeNode extends DefaultMutableTreeNode
+    {
+		protected DescriptorForFitness dff;
+
+		/**
+		 * Constructor meant for nodes representing an actual descriptor value.
+		 * For example, one of the values computed by a descriptor that returns
+		 * multiple values.
+		 */
+		public DescriptorTreeNode(DescriptorForFitness dff) {
+			super(dff.getShortName());
+			this.dff = dff;
+		}
+
+		/**
+		 * Constructor meant for nodes representing descriptors that return
+		 * multiple values.
+		 */
+		public DescriptorTreeNode(String descriptorName, DescriptorForFitness dff) {
+			super(descriptorName);
+			this.dff = dff;
+		}
+
+		/**
+		 * Constructor meant for nodes that represent only the main descriptor 
+		 * classes (e.g., molecular, protein,electronic, etc.).
+		 */
+		public DescriptorTreeNode(String kls) {
+			super(kls);
+		}
     }
     
 //-----------------------------------------------------------------------------
@@ -433,7 +632,7 @@ public class FitnessParametersForm extends ParametersForm
         }
         else
         {
-        	sb.append(getStringIfNotEmpty(keyEq,txtEq));
+        	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}"));
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }

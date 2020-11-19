@@ -1022,7 +1022,7 @@ public class FSParametersForm extends ParametersForm
         );
         localBlock4.add(linePar21);
 
-        String toolTipPar25 = "Specifies the maximum number of rotatable bonds for which 3D chain closability is evaluated. Chains with a number of rotatable bonds higher than this value are assumed closable.";
+        String toolTipPar25 = "<html>Specifies the maximum number of rotatable bonds for which 3D chain closability is evaluated. <br>Chains with a number of rotatable bonds higher than this value are assumed closable.</html>";
         linePar25 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar25 = new JLabel("Max. rotatable bonds:", SwingConstants.LEFT);
         lblPar25.setPreferredSize(fileLabelSize);
@@ -1036,7 +1036,7 @@ public class FSParametersForm extends ParametersForm
         linePar25.add(txtPar25);
         localBlock5.add(linePar25);
 
-        String toolTipPar26 = "Specifies the torsion angle step (degrees) to be used for the evaluation of 3D chain closability by scanning the torsional space.";
+        String toolTipPar26 = "<html>Specifies the torsion angle step (degrees) to be used for the evaluation of 3D chain closability by scanning the torsional space.</html>";
         linePar26 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar26 = new JLabel("Dihedral angle step:", SwingConstants.LEFT);
         lblPar26.setPreferredSize(fileLabelSize);

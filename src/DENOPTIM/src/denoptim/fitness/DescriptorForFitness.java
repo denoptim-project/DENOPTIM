@@ -31,7 +31,27 @@ public class DescriptorForFitness
 	 * single value.
 	 */
 	protected int resultId = 0;
-
+	
+	/**
+	 * The type of descriptor as define in the descriptor dictionary.
+	 */
+	protected String dictType;
+	
+	/**
+	 * The class(es) of descriptor as define in the descriptor dictionary.
+	 */
+	protected String[] dictClasses;
+	
+	/**
+	 * The Definition of descriptor as define in the descriptor dictionary.
+	 */
+	protected String dictDefinition;
+	
+	/**
+	 * The title of descriptor as define in the descriptor dictionary.
+	 */
+	protected String dictTitle;
+	
 //------------------------------------------------------------------------------
 
 	public DescriptorForFitness(String shortName, String className, 
@@ -41,6 +61,47 @@ public class DescriptorForFitness
 		this.className = className;
 		this.implementation = implementation;
 		this.resultId = resultId;
+	}
+	
+//------------------------------------------------------------------------------
+
+	public DescriptorForFitness(String shortName, String className, 
+			IDescriptor implementation, int resultId, String dictType,
+			String[] dictClasses, String dictDefinition, String dictTitle)
+	{
+		this(shortName, className, implementation, resultId);
+		this.dictType = dictType;
+		this.dictClasses = dictClasses;
+		this.dictDefinition = dictDefinition;
+		this.dictTitle = dictTitle;
+	}
+	
+//------------------------------------------------------------------------------
+	
+	public String getShortName()
+	{
+		return shortName;
+	}
+	
+//------------------------------------------------------------------------------
+
+	public String getClassName()
+	{
+		return className;
+	}
+	
+//------------------------------------------------------------------------------
+
+	public IDescriptor getImplementation()
+	{
+		return implementation;
+	}
+	
+//------------------------------------------------------------------------------
+
+	public String[] getDictClasses()
+	{
+		return dictClasses;
 	}
 	
 //------------------------------------------------------------------------------
@@ -61,6 +122,29 @@ public class DescriptorForFitness
 				specs.getImplementationIdentifier());
 		sb.append(", implVendor:").append(
 				specs.getImplementationVendor()).append("]");
+		return sb.toString();
+	}
+
+//------------------------------------------------------------------------------
+	
+	//TODO improve: now it is only meant to print on stdout
+	public String getDictString() 
+	{
+		String NL = System.getProperty("line.separator");
+		StringBuilder sb = new StringBuilder();
+		sb.append("Titile: ").append(dictTitle).append(NL);
+		sb.append("Type: ").append(dictType).append(NL);
+		sb.append("Definition: ").append(dictDefinition).append(NL);
+		sb.append("Classes: ");
+		if (dictClasses != null)
+		{
+			for (String c : dictClasses)
+			{
+			    sb.append(c).append(" ");
+			}
+		}
+		sb.append(NL);
+		
 		return sb.toString();
 	}
 
