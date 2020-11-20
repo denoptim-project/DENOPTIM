@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
@@ -50,6 +51,11 @@ import denoptim.molecule.SymmetricSet;
 
 public class DenoptimIOTest
 {
+
+    private final String SEP = System.getProperty("file.separator");
+
+    @TempDir
+    File tempDir;
 
 	
 //------------------------------------------------------------------------------
@@ -186,6 +192,26 @@ public class DenoptimIOTest
     	assertEquals(6,allAPC.size(),"Size did not match");
     	assertTrue(allAPC.contains("apClassObis:0"),"Contains failed (1)");
     	assertTrue(allAPC.contains("otherClass:0"),"Contains failed (2)");
+    }
+    
+//---------------------------------------------------------------------------
+
+    @Test
+    public void testGetNewFolder() throws Exception
+    {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String baseName = "tmpDenoptimJUnit";
+    	File parent = new File(this.tempDir.getAbsoluteFile() + SEP + baseName);
+    	File newFolder1 = DenoptimIO.getAvailableFileName(parent, baseName);
+    	DenoptimIO.createDirectory(newFolder1.getAbsolutePath());
+    	File newFolder2 = DenoptimIO.getAvailableFileName(parent, baseName);
+    	DenoptimIO.createDirectory(newFolder2.getAbsolutePath());
+    	File newFolder3 = DenoptimIO.getAvailableFileName(parent, baseName);
+    	DenoptimIO.createDirectory(newFolder3.getAbsolutePath());
+    	
+    	assertTrue(newFolder1.exists(),"Fitst folder exists");
+    	assertTrue(newFolder2.exists(),"Second folder exists");
+    	assertTrue(newFolder3.exists(),"Third folder exists");
     }
     
 //------------------------------------------------------------------------------

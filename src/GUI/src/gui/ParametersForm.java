@@ -414,7 +414,20 @@ public class ParametersForm extends JPanel implements IParametersForm
             			ioe);
             }
         }
+        
+        //adapt visibility to imported parameters
+        adaptVisibility();
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Overwritten by subclasses. Sets visibility of panels according to the
+     * current selections and field content.
+     */
+	protected void adaptVisibility() 
+	{
+	}
 
 //-----------------------------------------------------------------------------
     

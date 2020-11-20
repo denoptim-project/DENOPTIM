@@ -23,6 +23,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import denoptim.task.StaticTaskManager;
+
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
@@ -122,6 +124,8 @@ public class GUI
 	 */
 	protected void closeIfAllSaved()
 	{
+		//TODO: add option to prevent the closing in case of running child threads
+    	StaticTaskManager.stopAll();
 		if (mainPanel.hasUnsavedChanges())
 		{
 			String[] options = new String[]{"Yes","No"};

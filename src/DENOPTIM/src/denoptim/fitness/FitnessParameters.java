@@ -324,12 +324,13 @@ public class FitnessParameters
 				for (String varName : atmBndSpecDescToVars.get(descName))
 				{
 					ArrayList<String> smarts = atmBndSpecDescSMARTS.get(varName);
-					dff.varName.add(varName);
+					dff.varNames.add(varName);
 					dff.smarts.put(varName, smarts);
 				}
 			}
 		}
 		
+		/*
 		String NL = System.getProperty("line.separator");
 		StringBuilder sb = new StringBuilder();
 		sb.append("Variables defined for each descriptor:"+NL);
@@ -338,6 +339,8 @@ public class FitnessParameters
 			DescriptorForFitness d = descriptors.get(i);
 			sb.append(" -> "+d.getShortName()+" "+d.getVariableNames()+NL);
 		}
+	    DENOPTIMLogger.appLogger.info(sb.toString());
+	    */
 	}
 
 //------------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,6 +33,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.task.DenoptimGATask;
+import denoptim.task.DummyTask;
+import denoptim.task.StaticTaskManager;
+import denoptim.task.Task;
 
 /**
  * Class representing the general structure of a form including a specific
@@ -112,47 +120,8 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				StringBuilder sb = new StringBuilder();
-				for (IParametersForm p : allParams)
-				{
-				    try 
-				    {
-						p.putParametersToString(sb);
-					} 
-				    catch (Exception e1) 
-				    {
-						JOptionPane.showMessageDialog(null,
-				                e1.getMessage(),
-				                "Error",
-				                JOptionPane.ERROR_MESSAGE,
-				                UIManager.getIcon("OptionPane.errorIcon"));
-						return;
-					}
-				}
 				File outFile = DenoptimGUIFileOpener.saveFile();
-				if (outFile == null)
-				{
-					return;
-				}
-				try
-				{
-				    FileWriter fw = new FileWriter(outFile);
-				    fw.write(sb.toString());
-				    fw.close();
-				    
-				    for (IParametersForm p : allParams)
-				    {
-				    	p.setUnsavedChanges(false);
-				    }
-				}
-				catch (IOException io)
-				{
-					JOptionPane.showMessageDialog(null,
-			                "Could not write to '" + outFile + "'!.",
-			                "Error",
-			                JOptionPane.PLAIN_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-				}
+				printAllParamsToFile(outFile);
 			}
 		});
 		commandsPane.add(btnSaveParams);
@@ -170,6 +139,68 @@ public class GUIPrepare extends GUICardPanel
 		});
 		commandsPane.add(btnValidate);
 		*/
+
+		
+		JButton btnRun = new JButton("Run...",
+				UIManager.getIcon("Menu.arrowIcon"));
+		btnRun.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String msg = "<html><body width='%1s'><p>Running a DENOPTIM "
+						+ "experiment from the graphical user interface "
+						+ "(GUI) makes it dependent on "
+						+ "the GUI itself. Therefore, if the GUI is closed "
+						+ "or shut down, "
+						+ "the experiment will be terminated as well.</p><br>";
+				msg = msg + StaticTaskManager.getQueueSnapshot();
+				msg = msg + "<p>Continue?</p></body></html>";
+				String[] options = new String[]{"Yes", "Cancel"};
+				int res = JOptionPane.showOptionDialog(null,
+						String.format(msg, 450),
+						"WARNING",
+						JOptionPane.DEFAULT_OPTION,
+		                JOptionPane.QUESTION_MESSAGE,
+		                UIManager.getIcon("OptionPane.warningIcon"),
+		                options,
+		                options[1]);
+				switch (res)
+				{
+					case 0:
+						String location = "unknownLocation";
+						try {
+							Task task = buildTaskRunningDenoptimMainClass();
+							File wrkSpace = prepareWorkSpace();
+							File paramFile = instatiateParametersFile(wrkSpace);
+							if (printAllParamsToFile(paramFile))
+							{
+								StaticTaskManager.submit(task);
+							} else {
+								throw new DENOPTIMException("Failed to make "
+										+ "parameter file '" + paramFile + "'");
+							}
+							location = wrkSpace.getAbsolutePath();
+						} catch (DENOPTIMException e1) {
+							JOptionPane.showMessageDialog(null,
+									"Could not start task. " + e1.getMessage()
+									+ ". " + e1.getCause().getMessage(),
+				                    "ERROR",
+				                    JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						JOptionPane.showMessageDialog(null,
+								"<html>Experiment submitted!<br>"
+								+ "All files and results are under <br>"
+								+ location+"</html>",
+			                    "Submitted",
+			                    JOptionPane.INFORMATION_MESSAGE);
+						break;
+						
+					case 1:
+						break;
+				}
+			}
+		});
+		commandsPane.add(btnRun);
+		
 		
 		/*
 		JButton btnSubmit = new JButton("Submit...",
@@ -183,7 +214,8 @@ public class GUIPrepare extends GUICardPanel
 		commandsPane.add(btnSubmit);
 		*/
 
-		JButton btnCanc = new JButton("Close Tab");
+		JButton btnCanc = new JButton("Close Tab", 
+				UIManager.getIcon("FileView.fileIcon"));
 		btnCanc.setToolTipText("Closes this tab.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
 		commandsPane.add(btnCanc);
@@ -207,8 +239,131 @@ public class GUIPrepare extends GUICardPanel
 			}
 		});
 		commandsPane.add(btnHelp);
-
 	}
+	
+//------------------------------------------------------------------------------
+	
+	private String getAchronimFromClass()
+	{
+		String baseName = "none";
+		if (this instanceof GUIPrepareGARun)
+		{
+			baseName = "GA";
+		} else if (this instanceof GUIPrepareFSERun)
+		{
+			baseName = "FSE";
+		}
+		return baseName;
+	}
+	
+//------------------------------------------------------------------------------
+	
+	private File instatiateParametersFile(File wrkSpace)
+	{
+		String baseName = getAchronimFromClass() + ".params";
+		File paramFile = new File (wrkSpace.getAbsolutePath() 
+				+ System.getProperty("file.separator") + baseName);
+		return paramFile;
+	}
+
+//------------------------------------------------------------------------------
+	
+	/**
+	 * @param task that will make use of the parameters printed by this method.
+	 * @param outFile where we'll try to print the parameters.
+	 * @return <code>false</code> if we could not produce the file
+	 */
+	private boolean printAllParamsToFile(File outFile)
+	{	
+		StringBuilder sb = new StringBuilder();
+		for (IParametersForm p : allParams)
+		{
+		    try 
+		    {
+				p.putParametersToString(sb);
+			} 
+		    catch (Exception e1) 
+		    {
+				JOptionPane.showMessageDialog(null,
+		                e1.getMessage(),
+		                "Error",
+		                JOptionPane.ERROR_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"));
+				return false;
+			}
+		}
+		
+		// It might be coming from a JOptionPane, which might return null
+		// upon user's attempt to cancel the printing task.
+		if (outFile == null)
+		{
+			return false;
+		}
+		
+		try
+		{
+		    FileWriter fw = new FileWriter(outFile);
+		    fw.write(sb.toString());
+		    fw.close();
+		    
+		    for (IParametersForm p : allParams)
+		    {
+		    	p.setUnsavedChanges(false);
+		    }
+		}
+		catch (IOException io)
+		{
+			JOptionPane.showMessageDialog(null,
+	                "Could not write to '" + outFile + "'!.",
+	                "Error",
+	                JOptionPane.PLAIN_MESSAGE,
+	                UIManager.getIcon("OptionPane.errorIcon"));
+			return false;
+		}
+		return true;
+	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * The type of main to run is determined by which subclass calls this method
+	 * @throws DENOPTIMException 
+	 */
+	private Task buildTaskRunningDenoptimMainClass() throws DENOPTIMException
+	{
+		Task task = null;
+		if (this instanceof GUIPrepareGARun)
+		{
+			//TODO del
+			System.out.println("MAKE a GS task");
+			
+			task = new DenoptimGATask();
+		} else if (this instanceof GUIPrepareFSERun)
+		{
+			//TODO
+			System.out.println("MAKE a FSE task");
+			task = new DummyTask(2);
+		}
+		return task;
+	}
+	
+//------------------------------------------------------------------------------
+	
+	public File prepareWorkSpace() throws DENOPTIMException
+	{
+		String baseName = getAchronimFromClass() + "_run";
+		
+		//Make a work space
+		File parent = new File(GUIPreferences.tmpSpace);
+		File wrkSpace = DenoptimIO.getAvailableFileName(parent, baseName);
+		DenoptimIO.createDirectory(wrkSpace.getAbsolutePath());
+		
+		//TODO del
+		System.out.println("New folder "+wrkSpace);
+		
+		return wrkSpace;
+	}
+//------------------------------------------------------------------------------
 	
 	public void importParametersFromDenoptimParamsFile(File file)
 	{

@@ -40,6 +40,7 @@ import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -77,6 +78,7 @@ import java.util.Map;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
@@ -121,6 +123,8 @@ import java.util.logging.Level;
 
 public class DenoptimIO
 {
+
+	private static final String FS = System.getProperty("file.separator");
     private static final String NL = System.getProperty("line.separator");
 
     // A list of properties used by CDK algorithms which must never be
@@ -2285,6 +2289,37 @@ public class DenoptimIO
             throw new DENOPTIMException("Scaffold library has no entries.");
         }
     	return lib;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static File getAvailableFileName(File parent, String baseName)
+    		throws DENOPTIMException
+    {
+    	File newFolder = null;
+    	if (!parent.exists())
+    	{
+    		if (!createDirectory(parent.getAbsolutePath()))
+    		{
+    			throw new DENOPTIMException("Cannot make folder '"+parent+"'");
+    		}
+    	}
+		FileFilter fileFilter = new WildcardFileFilter(baseName+"*");
+		File[] cands = parent.listFiles(fileFilter);
+		int i=0;
+		boolean goon = true;
+		while (goon)
+		{
+			i++;
+			int iFolder = i + cands.length;
+			newFolder = new File(parent + FS + baseName + "_" + iFolder);
+			if (!newFolder.exists())
+			{
+				goon = false;
+				break;
+			}
+		}
+    	return newFolder;
     }
     
 //------------------------------------------------------------------------------

@@ -273,16 +273,7 @@ public class FitnessParametersForm extends ParametersForm
         
         rdbIntOrExt.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		if (rdbIntOrExt.isSelected())
-        		{
-    				localBlock3.setVisible(true);
-        			localBlock4.setVisible(false);
-        		}
-        		else
-        		{
-        			localBlock3.setVisible(false);
-        			localBlock4.setVisible(true);
-        		}
+        		setVisibilityAccordingToFitnessProviderSelection();
         	}
         });
         lineIntOrExt.add(rdbIntOrExt);
@@ -670,6 +661,30 @@ public class FitnessParametersForm extends ParametersForm
     
 //------------------------------------------------------------------------------
     
+    protected void setVisibilityAccordingToFitnessProviderSelection() 
+	{
+		if (rdbIntOrExt.isSelected())
+		{
+			localBlock3.setVisible(true);
+			localBlock4.setVisible(false);
+		}
+		else
+		{
+			localBlock3.setVisible(false);
+			localBlock4.setVisible(true);
+		}
+	}
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    protected void adaptVisibility() 
+    {
+    	setVisibilityAccordingToFitnessProviderSelection();
+    }
+
+//------------------------------------------------------------------------------
+    
     @SuppressWarnings("serial")
 	private class DescriptorTreeNode extends DefaultMutableTreeNode
     {
@@ -815,7 +830,7 @@ public class FitnessParametersForm extends ParametersForm
         }
         else
         {
-        	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}")).append(NL);
+        	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}"));
         	sb.append(getStringIfNotEmpty(keyMoreEq,txtMoreEq,true));
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       

@@ -61,6 +61,11 @@ public class FitnessProvider
 	 */
 	private String expression;
 	
+    /**
+     * Synchronisation lock
+     */
+    private Object LOCK = new Object();
+	
 	
 //------------------------------------------------------------------------------
 
@@ -71,26 +76,39 @@ public class FitnessProvider
 	
 	public FitnessProvider(List<DescriptorForFitness> descriptors, String expression)
 	{
-		this.descriptors = descriptors;
 		this.expression = expression;
+	
+		// We cannot use the list<DescriptorsForFitness> parameter directly
+		// otherwise we hit concurrent modification exception because multiple
+		// threads will run the exact same instance of the implementation
+		this.descriptors = new ArrayList<DescriptorForFitness>();
+				
+		//TODO del
+		//System.out.println("Constructing fitnessProvider from #desps = "+descriptors.size());
 		
-		// We use an empty list here because the instances of the descriptors 
-		// are taken from the parameters, rather than built by the constructor
-		// of the engine. So we only need to instantiate the engine.
-		engine = new DescriptorEngine(new ArrayList<String>());
-		
-		List<IDescriptor> iDescs = new ArrayList<IDescriptor>();
-        List<DescriptorSpecification> specs = 
-        		new ArrayList<DescriptorSpecification>();
-		for (DescriptorForFitness d : descriptors)
+		// Take classnames from the parameter, and make new instances of DFF
+		ArrayList<String> classnames = new ArrayList<String>();
+		for (int i=0; i<descriptors.size(); i++)
 		{
-			IDescriptor impl = d.implementation;
-			iDescs.add(impl);
-			specs.add(impl.getSpecification());
+			DescriptorForFitness dff = descriptors.get(i);
+			classnames.add(dff.getClassName());
+			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		
-	    engine.setDescriptorInstances(iDescs);
-	    engine.setDescriptorSpecifications(specs);
+		//TODO del
+		//System.out.println("Classnames: "+classnames.size()+": "+classnames);
+				
+		// Now we instatiate new instances of the descriptors implementations
+		engine = new DescriptorEngine(classnames);
+		List<IDescriptor> newInstances = engine.getDescriptorInstances();
+		for (int i=0; i<this.descriptors.size(); i++)
+		{
+			this.descriptors.get(i).implementation = newInstances.get(i);
+		}
+        List<DescriptorSpecification> newSpecs = 
+        		engine.getDescriptorSpecifications();
+		engine.setDescriptorInstances(newInstances);
+	    engine.setDescriptorSpecifications(newSpecs);
 	}
 	
 //------------------------------------------------------------------------------
@@ -107,17 +125,25 @@ public class FitnessProvider
 	
 	public double getFitness(IAtomContainer iac) throws Exception 
 	{
+		boolean debug = true; // for debug only!
+		
 		if (engine == null)
 		{
 			throw new DENOPTIMException("Internal fitness provider has not been"
 					+ " configured.");
 		}
-	
+		
 		// Calculate all descriptors. The results are put in the properties of
 		// the IAtomContainer (as DescriptorValue identified by 
 		// DescriptorSpecification keys) and we later translate these into
 		// plain human readable strings.
-		engine.process(iac);
+
+		synchronized (LOCK) 
+		{
+			engine.process(iac);
+		}
+		
+		if (debug) System.out.println("Descriptor instances: "+engine.getDescriptorInstances().size());
 		
 		// Collect numerical values needed to calculate the fitness
 		HashMap<String,Double> valuesMap = new HashMap<String,Double>();
@@ -127,6 +153,7 @@ public class FitnessProvider
         	IDescriptor desc = engine.getDescriptorInstances().get(i);
         	
         	String descName = descriptor.shortName;
+        	if (debug) System.out.println("Working on descriptor '"+descName+"'");
         	
         	DescriptorSpecification descSpec = 
         			engine.getDescriptorSpecifications().get(i);
@@ -135,6 +162,7 @@ public class FitnessProvider
         	Map<String, String> smarts = new HashMap<String, String>();
         	for (String varName : descriptor.getVariableNames())
         	{
+        		if (debug) System.out.println("Processing varName = '"+varName+"'");
         		if (descriptor.smarts.containsKey(varName))
         		{
         			if (descriptor.smarts.get(varName).size()!=1)
@@ -172,8 +200,7 @@ public class FitnessProvider
 	            allMatches = msq.getAllMatches();
         	}
         	
-        	//TODO del
-        	//System.out.println("Getting value from descriptor "+i+" "+descName);
+        	if (debug) System.out.println("Getting value from descriptor "+i+" "+descName);
         	
         	//Molecular/Atomic/bond descriptors are stored accordingly
         	DescriptorValue value = null;
@@ -196,8 +223,7 @@ public class FitnessProvider
         			{
         				continue;
         			}
-        			//TODO del
-        			//System.out.println("AtomIDs contributing to "+varName+":"+hits);
+        			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
         			if (hits.size() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
@@ -226,8 +252,7 @@ public class FitnessProvider
 		                    iac.setProperty(varName+"_"+valCounter,val);
                     	}
                     }
-                    //TODO del
-                    //System.out.println("Values contributing to "+varName+": "+vals);
+                    if (debug) System.out.println("Values contributing to "+varName+": "+vals);
                     double overallValue = DENOPTIMMathUtils.mean(vals);
                     valuesMap.put(varName, overallValue);
                     iac.setProperty(varName,overallValue);
@@ -240,8 +265,7 @@ public class FitnessProvider
         			{
         				continue;
         			}
-        			//TODO del
-        			//System.out.println("AtomIDs contributing to "+varName+":"+hits);
+        			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
         			if (hits.size() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
@@ -269,8 +293,7 @@ public class FitnessProvider
 		        		valCounter++;
 	                    iac.setProperty(varName+"_"+valCounter,val);
                     }
-                    //TODO del
-        			//System.out.println("Values contributing to "+varName+": "+vals);
+                    if (debug) System.out.println("Values contributing to "+varName+": "+vals);
                     double overallValue = DENOPTIMMathUtils.mean(vals);
                     valuesMap.put(varName, overallValue);
                     iac.setProperty(varName,overallValue);
@@ -286,8 +309,7 @@ public class FitnessProvider
         	}
         }
         
-        //TODO del
-        //System.out.println("VARIABLES: "+valuesMap);
+        if (debug) System.out.println("VARIABLES: "+valuesMap);
         
         // Calculate the fitness from the expression and descriptor values
 		ExpressionEvaluatorImpl evaluator = new ExpressionEvaluatorImpl();
@@ -329,7 +351,7 @@ public class FitnessProvider
        	if (value == null)
     	{
     		throw new Exception("Null value from calcualation of descriptor"
-    				+ " " + descName + "(for variable '" + varName + "'");
+    				+ " " + descName + " (for variable '" + varName + "'");
     	}
     	IDescriptorResult result = value.getValue();
     	if (result == null)

@@ -25,8 +25,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 
 public class DescriptorUtils
-{
-	
+{	
 	private static final String FS = System.getProperty("file.separator");
 	private static final String NL = System.getProperty("line.separator");
 	

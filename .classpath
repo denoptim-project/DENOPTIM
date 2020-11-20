@@ -22,7 +22,7 @@
 	<classpathentry kind="lib" path="lib/junit-jupiter-migrationsupport-5.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/junit-jupiter-params-5.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-1.4.19.jar"/>
+	<classpathentry kind="lib" path="lib/cdk-1.4.19.jar" sourcepath="/Users/marco/tools/cdk/cdk-cdk-1.4.19"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="module" value="true"/>

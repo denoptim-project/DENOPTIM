@@ -8,6 +8,8 @@ import java.util.Map;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
 
+import denoptim.exception.DENOPTIMException;
+
 /**
  * This is a reference to a specific descriptor value. Not the numerical result,
  * but the identity of the value.
@@ -35,7 +37,7 @@ public class DescriptorForFitness
 	 * descriptor in equations. The list must contain only the shortName 
 	 * unless we have atom/bond specific descriptor
 	 */
-	protected List<String> varName = new ArrayList<String>();
+	protected List<String> varNames = new ArrayList<String>();
 	
 	/**
 	 * Pointer to a specific results among those that are produced by the 
@@ -78,12 +80,29 @@ public class DescriptorForFitness
 			IDescriptor implementation, int resultId)
 	{
 		this.shortName = shortName;
-		this.varName.add(shortName);
+		this.varNames.add(shortName);
 		this.className = className;
 		this.implementation = implementation;
 		this.resultId = resultId;
 	}
 	
+//------------------------------------------------------------------------------
+
+	private DescriptorForFitness(String shortName, String className, 
+			int resultId, List<String> varNames, 
+			Map<String,ArrayList<String>> smarts, String dictType,
+			String[] dictClasses, String dictDefinition, String dictTitle)
+	{
+		this.shortName = shortName;
+		this.varNames = varNames;
+		this.className = className;
+		//this.implementation does have to stay null
+		this.resultId = resultId;
+		this.smarts = smarts;
+		this.dictType = dictType;
+		this.dictClasses = dictClasses;
+		this.dictTitle = dictTitle;
+	}
 //------------------------------------------------------------------------------
 
 	public DescriptorForFitness(String shortName, String className, 
@@ -113,7 +132,7 @@ public class DescriptorForFitness
 	 */
 	public List<String> getVariableNames()
 	{
-		return varName;
+		return varNames;
 	}
 	
 //------------------------------------------------------------------------------
@@ -165,7 +184,7 @@ public class DescriptorForFitness
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("DescriptorForFitness [shortName:").append(shortName);
-		sb.append(", varName:").append(varName);		
+		sb.append(", varName:").append(varNames);		
 		sb.append(", className:").append(className);
 		sb.append(", resultId:").append(resultId);
 		DescriptorSpecification specs = implementation.getSpecification();
@@ -203,6 +222,24 @@ public class DescriptorForFitness
 		sb.append(NL);
 		
 		return sb.toString();
+	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * This is a sort of clooning that builds a new DescriptorForFitness with 
+	 * the fields on this one, but a null implementation. The latter will
+	 * have to be instatiated elsewhere.
+	 * @return
+	 */
+
+	public DescriptorForFitness cloneAllButImpl() 
+	{
+		// NB: this private constructor by-passes the implementation!
+		DescriptorForFitness newDff = new DescriptorForFitness(shortName, 
+				className, resultId, varNames, smarts, dictType, dictClasses, 
+				dictDefinition, dictTitle);
+		return newDff;
 	}
 
 //------------------------------------------------------------------------------
