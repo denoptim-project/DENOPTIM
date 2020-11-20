@@ -188,8 +188,7 @@ public class GUIPrepare extends GUICardPanel
 						}
 						JOptionPane.showMessageDialog(null,
 								"<html>Experiment submitted!<br>"
-								+ "All files and results are under <br>"
-								+ location+"</html>",
+								+ "See under " + location+"</html>",
 			                    "Submitted",
 			                    JOptionPane.INFORMATION_MESSAGE);
 						break;
@@ -334,15 +333,10 @@ public class GUIPrepare extends GUICardPanel
 		Task task = null;
 		if (this instanceof GUIPrepareGARun)
 		{
-			//TODO del
-			System.out.println("MAKE a GS task");
-			
 			task = new DenoptimGATask();
 		} else if (this instanceof GUIPrepareFSERun)
 		{
-			//TODO
-			System.out.println("MAKE a FSE task");
-			task = new DummyTask(2);
+			throw new DENOPTIMException("FSE task NOT IMPLEMENTED YET");
 		}
 		return task;
 	}
@@ -352,15 +346,9 @@ public class GUIPrepare extends GUICardPanel
 	public File prepareWorkSpace() throws DENOPTIMException
 	{
 		String baseName = getAchronimFromClass() + "_run";
-		
-		//Make a work space
 		File parent = new File(GUIPreferences.tmpSpace);
 		File wrkSpace = DenoptimIO.getAvailableFileName(parent, baseName);
 		DenoptimIO.createDirectory(wrkSpace.getAbsolutePath());
-		
-		//TODO del
-		System.out.println("New folder "+wrkSpace);
-		
 		return wrkSpace;
 	}
 //------------------------------------------------------------------------------

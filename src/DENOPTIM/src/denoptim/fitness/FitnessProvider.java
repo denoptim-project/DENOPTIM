@@ -61,11 +61,6 @@ public class FitnessProvider
 	 */
 	private String expression;
 	
-    /**
-     * Synchronisation lock
-     */
-    private Object LOCK = new Object();
-	
 	
 //------------------------------------------------------------------------------
 
@@ -82,10 +77,7 @@ public class FitnessProvider
 		// otherwise we hit concurrent modification exception because multiple
 		// threads will run the exact same instance of the implementation
 		this.descriptors = new ArrayList<DescriptorForFitness>();
-				
-		//TODO del
-		//System.out.println("Constructing fitnessProvider from #desps = "+descriptors.size());
-		
+
 		// Take classnames from the parameter, and make new instances of DFF
 		ArrayList<String> classnames = new ArrayList<String>();
 		for (int i=0; i<descriptors.size(); i++)
@@ -95,9 +87,6 @@ public class FitnessProvider
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		
-		//TODO del
-		//System.out.println("Classnames: "+classnames.size()+": "+classnames);
-				
 		// Now we instatiate new instances of the descriptors implementations
 		engine = new DescriptorEngine(classnames);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();
@@ -125,7 +114,7 @@ public class FitnessProvider
 	
 	public double getFitness(IAtomContainer iac) throws Exception 
 	{
-		boolean debug = true; // for debug only!
+		boolean debug = false; // for debug only!
 		
 		if (engine == null)
 		{
@@ -137,11 +126,7 @@ public class FitnessProvider
 		// the IAtomContainer (as DescriptorValue identified by 
 		// DescriptorSpecification keys) and we later translate these into
 		// plain human readable strings.
-
-		synchronized (LOCK) 
-		{
-			engine.process(iac);
-		}
+		engine.process(iac);
 		
 		if (debug) System.out.println("Descriptor instances: "+engine.getDescriptorInstances().size());
 		
