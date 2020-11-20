@@ -22,11 +22,15 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,23 +39,34 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
+
+import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.DescriptorForFitness;
@@ -113,6 +128,21 @@ public class FitnessParametersForm extends ParametersForm
     JPanel lineEq;
     JLabel lblEq;
     JTextField txtEq;
+    
+    String keyMoreEq = "FP-DescriptorSpecs";
+    JPanel lineMoreEq;
+    JLabel lblMoreEq;
+    JEditorPane txtMoreEq;
+    
+    JPanel descDefinitionPane;
+    JScrollPane descDefScrollPane;
+    JLabel lblDDValueTitle;
+    JLabel lblDDValueName;
+    JLabel lblDDValueDefinition;
+    JLabel lblDDValueDescripton;
+    JLabel lblDDValueClasses;
+    JLabel lblDDValueParams;
+    JLabel lblDDValueSource;
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
         
@@ -324,6 +354,24 @@ public class FitnessParametersForm extends ParametersForm
         lineEq.add(lblEqEnd);
         localBlock4.add(lineEq);
         
+        String toolTipMoreEq = "<html>Define atom/bond specific descriptors."
+        		+ "<br> One per line, e.g.: <br> "
+        		+ "<code>aPol_3 = ${atomSpecific('aPol',3)}</code><br>"
+        		+ "<code>aPol_4 = ${atomSpecific('aPol',4)}</code></html>";
+        lineMoreEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblMoreEq = new JLabel("<html>Atom/bond specific descriptors:</html>");
+        txtMoreEq = new JEditorPane();
+        Dimension moreEqSize = new Dimension(500, 3*preferredHeight);
+        txtMoreEq.setPreferredSize(moreEqSize);
+        mapKeyFieldToValueField.put(keyMoreEq.toUpperCase(), 
+        		txtMoreEq);
+        lineMoreEq.setToolTipText(toolTipMoreEq);
+        JScrollPane moreEqScrollPane = new JScrollPane(txtMoreEq);
+        lineMoreEq.add(lblMoreEq);
+        lineMoreEq.add(moreEqScrollPane);
+        localBlock4.add(lineMoreEq);
+        
+        
         String toolTipDescs = "<html>To select descriptor names:"
         		+ "<ol><li>Browse the list of descriptors (double click to expand/reduce a node),"
         		+ "</li><li>Click on the name of the descriptor you want to select,"
@@ -339,9 +387,70 @@ public class FitnessParametersForm extends ParametersForm
         descTree.setCellRenderer(renderer);
         descTree.setRootVisible(true);
         descTree.setShowsRootHandles(true);
-        //NB: appearance depends on look and feel. On Mac no lines, even if asked
+        //NB: appearance depends on lookAndfeel. On Mac no lines, even if asked
         descTree.putClientProperty("JTree.lineStyle", "Angled");
         descTree.setToolTipText(toolTipDescs);
+        int dValLength = 350;
+		descTree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				TreePath selPath = e.getPath();
+				DefaultMutableTreeNode selTreeNode = (DefaultMutableTreeNode) 
+						selPath.getLastPathComponent();
+				if (!(selTreeNode instanceof DescriptorTreeNode)
+						|| !selTreeNode.isLeaf())
+				{
+					return;
+				}
+				DescriptorTreeNode selNode = (DescriptorTreeNode) selTreeNode;
+				DescriptorForFitness dff = selNode.dff;
+
+				String titStr = dff.getDictTitle();
+				titStr = "<html><body width='%1s'>" + titStr + "</body></html>";
+				lblDDValueTitle.setText(String.format(titStr, dValLength));
+				lblDDValueName.setText(dff.getShortName());
+				
+				String defStr = dff.getDictDefinition();
+				defStr = "<html><body width='%1s'>" + defStr + "</body></html>";
+				lblDDValueDefinition.setText(String.format(defStr, dValLength));
+				
+				lblDDValueDescripton.setText("No additional descripton available");
+
+				String clsStr = Arrays.toString(dff.getDictClasses());
+				clsStr = "<html><body width='%1s'>" + clsStr + "</body></html>";
+				lblDDValueClasses.setText(String.format(clsStr, dValLength));
+				
+				String parStr ="";
+				IDescriptor iDesc = dff.getImplementation();
+				String[] parNames = iDesc.getParameterNames();
+				Object[] params = iDesc.getParameters();
+				//NB: some classes return null to avoid adding a way to alter
+				// the default parameters.
+				if (params == null)
+				{
+					parStr = "Undeclared parameters. See source code.";
+				} else {
+					for (int ip=0; ip<parNames.length; ip++)
+					{
+						if (ip>0)
+						{
+							parStr = parStr + "<br>";
+						}
+						parStr = parStr + parNames[ip] + " = (" 
+								+ iDesc.getParameterType(parNames[ip])
+								.getClass().getSimpleName() + ") "
+								+ params[ip];
+					}
+				}
+				parStr = "<html><body width='%1s'>" + parStr + "</body></html>";
+				lblDDValueParams.setText(String.format(parStr, dValLength));
+				
+				String srcStr = dff.getClassName();
+				srcStr = "<html><body width='%1s'>" + srcStr + "</body></html>";
+				lblDDValueSource.setText(String.format(srcStr, dValLength));
+				
+			}
+		});
         JScrollPane descTreeScrollPane = new JScrollPane(descTree);
         
         //Populate the tree
@@ -349,7 +458,7 @@ public class FitnessParametersForm extends ParametersForm
         try {
         	allDescs = DescriptorUtils.findAllDescriptorImplementations(null);
 		} catch (DENOPTIMException e1) {
-			System.out.println("No descriptor imoplementation found!");
+			System.out.println("No descriptor implementation found!");
 			e1.printStackTrace();
 		}
         // First identify the main klasses (first layer)
@@ -424,32 +533,93 @@ public class FitnessParametersForm extends ParametersForm
 	        }
         }
         
+        Dimension ddLabelsSize = new Dimension(100,30);
+        JLabel lblDDTitle = new JLabel("<html><b>Title:</b></html>");
+        lblDDTitle.setPreferredSize(ddLabelsSize);
+        JLabel lblDDName = new JLabel("<html><b>Name:</b></html>");
+        lblDDName.setPreferredSize(ddLabelsSize);
+        JLabel lblDDDefinition = new JLabel("<html><b>Definition:</b></html>");
+        lblDDDefinition.setPreferredSize(ddLabelsSize);
+        JLabel lblDDDescription = new JLabel("<html><b>Description:</b></html>");
+        lblDDDescription.setPreferredSize(ddLabelsSize);
+        JLabel lblDDClasses = new JLabel("<html><b>Classification:</b></html>");
+        lblDDClasses.setPreferredSize(ddLabelsSize);
+        JLabel lblDDParams = new JLabel("<html><b>Parameters:</b></html>");
+        lblDDParams.setPreferredSize(ddLabelsSize);
+        JLabel lblDDSource = new JLabel("<html><b>Implementation:</b></html>");
+        lblDDSource.setPreferredSize(ddLabelsSize);
         
-        
-        
-        //TODO del
         /*
-        DefaultMutableTreeNode vegetableNode = new DefaultMutableTreeNode("Vegetables");
-        DefaultMutableTreeNode fruitNode = new DefaultMutableTreeNode("Fruits");
-        rootNode.add(vegetableNode);
-        rootNode.add(fruitNode);
-        for (int i=0; i<50; i++)
-        	vegetableNode.add(new DefaultMutableTreeNode("Node-"+i));
-        	*/
+        String txt = "<html><body width='%1s'>asdf asdf as a  a fga fga "
+    			+ "fv afv asf asfva fv afv afsvasfdv  af s  s  sd sd   sd "
+    			+ "SD  DG</body></html>";
+        String.format(txt, 300)
+        */
+        lblDDValueTitle = new JLabel();
+        lblDDValueName = new JLabel();
+        lblDDValueDefinition = new JLabel();
+        lblDDValueDescripton = new JLabel();
+        lblDDValueClasses = new JLabel();
+        lblDDValueParams = new JLabel();
+        lblDDValueSource = new JLabel();
         
-        
-        JPanel descDescriptionPane = new JPanel();
-        descDescriptionPane.setToolTipText("Select a descriptor in the left "
-        		+ "panel to display its details.");
-        descDescriptionPane.add(new JLabel(
-        		"Descriptor Details"));
+
+        descDefinitionPane = new JPanel();
+        GroupLayout lyoDescDefPanel = new GroupLayout(descDefinitionPane);
+        descDefinitionPane.setLayout(lyoDescDefPanel);
+        lyoDescDefPanel.setAutoCreateGaps(true);
+        lyoDescDefPanel.setAutoCreateContainerGaps(true);
+        lyoDescDefPanel.setHorizontalGroup(lyoDescDefPanel.createSequentialGroup()
+                    .addGroup(lyoDescDefPanel.createParallelGroup()
+                    		.addComponent(lblDDName)
+                    		.addComponent(lblDDTitle)
+                    		.addComponent(lblDDClasses)
+                    		.addComponent(lblDDDefinition)
+                    		//.addComponent(lblDDDescription)
+                    		.addComponent(lblDDParams)
+                    		.addComponent(lblDDSource)
+                    		)
+                    .addGroup(lyoDescDefPanel.createParallelGroup()
+                    		.addComponent(lblDDValueName)
+                    		.addComponent(lblDDValueTitle)
+                    		.addComponent(lblDDValueClasses)
+                    		.addComponent(lblDDValueDefinition)
+                    		//.addComponent(lblDDValueDescripton)
+                    		.addComponent(lblDDValueParams)
+                    		.addComponent(lblDDValueSource)
+                    		));
+        lyoDescDefPanel.setVerticalGroup(lyoDescDefPanel.createSequentialGroup()
+                .addGroup(lyoDescDefPanel.createParallelGroup()
+                		.addComponent(lblDDName)
+                		.addComponent(lblDDValueName))
+                .addGroup(lyoDescDefPanel.createParallelGroup()
+                		.addComponent(lblDDTitle)
+                		.addComponent(lblDDValueTitle))
+                .addGroup(lyoDescDefPanel.createParallelGroup()
+                		.addComponent(lblDDClasses)
+                		.addComponent(lblDDValueClasses))
+                .addGroup(lyoDescDefPanel.createParallelGroup()
+                		.addComponent(lblDDDefinition)
+                		.addComponent(lblDDValueDefinition))
+        //        .addGroup(lyoDescDefPanel.createParallelGroup()
+        //        		.addComponent(lblDDDescription)
+        //        		.addComponent(lblDDValueDescripton))
+                .addGroup(lyoDescDefPanel.createParallelGroup()
+                		.addComponent(lblDDParams)
+                		.addComponent(lblDDValueParams))
+                .addGroup(lyoDescDefPanel.createParallelGroup()
+                		.addComponent(lblDDSource)
+                		.addComponent(lblDDValueSource))
+                );
+
+        descDefScrollPane = new JScrollPane(descDefinitionPane);
         
         JSplitPane splitPaneDescs = new JSplitPane();
         splitPaneDescs.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
         splitPaneDescs.setOneTouchExpandable(true);
         splitPaneDescs.setResizeWeight(0.5);
         splitPaneDescs.setLeftComponent(descTreeScrollPane);
-        splitPaneDescs.setRightComponent(descDescriptionPane);
+        splitPaneDescs.setRightComponent(descDefScrollPane);
         JPanel lineDescsTree = new JPanel();
         lineDescsTree.setLayout(new BorderLayout(2,2));
         lineDescsTree.add(splitPaneDescs);
@@ -504,6 +674,7 @@ public class FitnessParametersForm extends ParametersForm
 	private class DescriptorTreeNode extends DefaultMutableTreeNode
     {
 		protected DescriptorForFitness dff;
+		protected boolean isLeaf = false;
 
 		/**
 		 * Constructor meant for nodes representing an actual descriptor value.
@@ -513,6 +684,7 @@ public class FitnessParametersForm extends ParametersForm
 		public DescriptorTreeNode(DescriptorForFitness dff) {
 			super(dff.getShortName());
 			this.dff = dff;
+			this.isLeaf = true;
 		}
 
 		/**
@@ -578,7 +750,8 @@ public class FitnessParametersForm extends ParametersForm
   		else
   		{
 			JOptionPane.showMessageDialog(null,
-					"<html>Parameter '" + key + "' is not recognized<br> and will be ignored.</html>",
+					"<html>Parameter '" + key + "' is not recognized<br> and "
+							+ "will be ignored.</html>",
 	                "WARNING",
 	                JOptionPane.WARNING_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -586,10 +759,17 @@ public class FitnessParametersForm extends ParametersForm
   		}
     
  		switch (valueFieldClass)
- 		{				
+ 		{	
+			case "class javax.swing.JEditorPane":
+ 				if (key.equals(keyMoreEq)) 
+    			{
+ 					String old = txtMoreEq.getText();
+ 				    txtMoreEq.setText(old + NL + value);
+    			}
+ 				break;
+ 				
  			case "class javax.swing.JTextField":
  				((JTextField) valueField).setText(value);
- 				
  				if (key.equals(keyFitProviderSource)) 
     			{
  				    rdbIntOrExt.setSelected(true);
@@ -624,15 +804,19 @@ public class FitnessParametersForm extends ParametersForm
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
+    	sb.append(NL);
         sb.append("# Fitness Provider - paramerers").append(NL);
         if (rdbIntOrExt.isSelected())
         {
-	        sb.append(getStringIfNotEmpty(keyFitProviderSource,txtFitProviderSource));
-	        sb.append(keyFitProviderInterpreter).append("=").append(cmbFitProviderInterpreter.getSelectedItem()).append(NL);
+	        sb.append(getStringIfNotEmpty(keyFitProviderSource,
+	        		txtFitProviderSource));
+	        sb.append(keyFitProviderInterpreter).append("=").append(
+	        		cmbFitProviderInterpreter.getSelectedItem()).append(NL);
         }
         else
         {
-        	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}"));
+        	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}")).append(NL);
+        	sb.append(getStringIfNotEmpty(keyMoreEq,txtMoreEq,true));
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }

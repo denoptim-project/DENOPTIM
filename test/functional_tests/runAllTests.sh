@@ -147,6 +147,12 @@ runTest "t2"
 runTest "t2b"
 
 #
+# t2c: parallel combinatorial builder from given root with internal fitness
+# and atom/bond specific descriptors
+#
+runTest "t2c"
+
+#
 # t3: parallel combinatorial builder with enforced symmetry
 #
 runTest "t3"

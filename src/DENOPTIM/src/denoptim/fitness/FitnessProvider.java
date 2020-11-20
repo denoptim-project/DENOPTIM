@@ -1,27 +1,40 @@
 package denoptim.fitness;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
 import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.VariableResolver;
 
 import org.apache.commons.el.ExpressionEvaluatorImpl;
-
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.qsar.DescriptorEngine;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.DescriptorValue;
+import org.openscience.cdk.qsar.IAtomPairDescriptor;
+import org.openscience.cdk.qsar.IAtomicDescriptor;
+import org.openscience.cdk.qsar.IBondDescriptor;
 import org.openscience.cdk.qsar.IDescriptor;
+import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IDescriptorResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.smiles.smarts.parser.SMARTSParser;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.ObjectPair;
 
 /**
  * DENOPTIM's (internal) fitness provider class calculates CDK descriptors for a 
@@ -76,30 +89,6 @@ public class FitnessProvider
 			specs.add(impl.getSpecification());
 		}
 		
-		/* 
-		// In alternative, we could give only the classNames and let the engine 
-		// instantiate the descriptor instances.
-		List<String> classNames = new ArrayList<String>();
-		for (Descriptor d : descriptors)
-		{
-			classNames.add(d.className);
-		}
-		
-		engine = new DescriptorEngine(classNames);
-		
-		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
-        List<DescriptorSpecification> specs = 
-        		engine.initializeSpecifications(iDescs);
-		for (int i=0; i<descriptors.size(); i++)
-		{
-			Descriptor d = descriptors.get(i);
-			if (d.specs!=null)
-			{
-				specs.set(i, d.specs);
-			}
-		}
-		*/
-        
 	    engine.setDescriptorInstances(iDescs);
 	    engine.setDescriptorSpecifications(specs);
 	}
@@ -138,72 +127,167 @@ public class FitnessProvider
         	IDescriptor desc = engine.getDescriptorInstances().get(i);
         	
         	String descName = descriptor.shortName;
-        	double val = Double.NaN;
         	
         	DescriptorSpecification descSpec = 
         			engine.getDescriptorSpecifications().get(i);
-        	DescriptorValue value = (DescriptorValue) iac.getProperty(descSpec);
-        	if (value == null)
+        	
+        	// Identify specific atom and bonds
+        	Map<String, String> smarts = new HashMap<String, String>();
+        	for (String varName : descriptor.getVariableNames())
         	{
-        		throw new Exception("Null value from calcualation of descriptor"
-        				+ " " + descName);
-        	}
-        	IDescriptorResult result = value.getValue();
-        	if (result == null)
-        	{
-        		throw new Exception("Null result from calcualation of "
-        				+ "descriptor " + descName);
+        		if (descriptor.smarts.containsKey(varName))
+        		{
+        			if (descriptor.smarts.get(varName).size()!=1)
+        			{
+        				throw new DENOPTIMException("Handling of multiple "
+        						+ "SMARTS identifiers is not implemented yet. "
+        						+ "Please, let the DENOPTIM developers know "
+        						+ "about your interest in this "
+        						+ "functionality.");
+        				/*
+	        			int iSmarts=-1;
+	        			for (String oneSmarts : descriptor.smarts.get(varName))
+	        			{
+	        				iSmarts++;
+	        				smarts.put(varName+"@"+iSmarts, oneSmarts);
+	        			}
+	        			*/
+        			}
+        			smarts.put(varName, descriptor.smarts.get(varName).get(0));
+        		}
         	}
         	
-            if (result instanceof DoubleResult) 
-            {
-                val = ((DoubleResult) result).doubleValue();
-            } else if (result instanceof IntegerResult) 
-            {
-                val = ((IntegerResult) result).intValue();
-            } else if (result instanceof DoubleArrayResult) 
-            {
-            	DoubleArrayResult a = (DoubleArrayResult) result;
-            	int id = descriptor.resultId;
-            	if (id >= a.length())
-            	{
-            		throw new Exception("Value ID out of range for descriptor "
-            				+ descName);
-            	}
-            	val = a.get(id);
-            	
-            	//We also keep track of the entire vector
-            	List<String> list = new ArrayList<String>();
-                for (int j=0; j<a.length(); j++) 
-                {
-                    list.add(String.valueOf(a.get(j)));
-                }
-                iac.setProperty(desc.getClass().getName(),list);
-            } else if (result instanceof IntegerArrayResult) 
-            {
-            	IntegerArrayResult a = (IntegerArrayResult) result;
-            	int id = descriptor.resultId;
-            	if (id >= a.length())
-            	{
-            		throw new Exception("Value ID out of range for descriptor "
-            				+ descName);
-            	}
-            	val = a.get(id);
-
-            	//We also keep track of the entire vector
-            	List<String> list = new ArrayList<String>();
-                for (int j=0; j<a.length(); j++) 
-                {
-                    list.add(String.valueOf(a.get(j)));
-                }
-                iac.setProperty(desc.getClass().getName(),list);
-            }
-            
-    		// We also transform the single values into human-readable results
-            iac.getProperties().remove(descSpec);
-            iac.setProperty(descName,val);
-            valuesMap.put(descName,val);
+        	Map<String,List<List<Integer>>> allMatches = 
+        			new HashMap<String,List<List<Integer>>>();
+        	if (smarts.size() != 0)
+        	{
+	        	ManySMARTSQuery msq = new ManySMARTSQuery(iac, smarts);
+	            if (msq.hasProblems())
+	            {
+	                String msg = "WARNING! Problems while searching for "
+	                		+ "specific atoms/bonds using SMARTS: " 
+	                		+ msq.getMessage();
+	                throw new DENOPTIMException(msg,msq.getProblem());
+	            }
+	            allMatches = msq.getAllMatches();
+        	}
+        	
+        	//TODO del
+        	//System.out.println("Getting value from descriptor "+i+" "+descName);
+        	
+        	//Molecular/Atomic/bond descriptors are stored accordingly
+        	DescriptorValue value = null;
+        	if (desc instanceof IMolecularDescriptor)
+        	{
+        		// The value might be an array, but the DescriptorForFitness
+        		// known which entry to take, and for each entry the descName
+        		// is unique. Thus, no loop here.
+        		value = (DescriptorValue) iac.getProperty(descSpec);
+        		double val = processValue(descName, descriptor, desc, descSpec, 
+        				value, descName, iac);
+        		valuesMap.put(descName, val);
+                iac.setProperty(descName,val);
+                iac.getProperties().remove(descSpec);
+        	} else if (desc instanceof IAtomicDescriptor) {
+        		for (String varName : descriptor.getVariableNames())
+        		{
+        			List<List<Integer>> hits = allMatches.get(varName);
+        			if (hits==null)
+        			{
+        				continue;
+        			}
+        			//TODO del
+        			//System.out.println("AtomIDs contributing to "+varName+":"+hits);
+        			if (hits.size() > 1)
+        			{
+        				String msg = "Multiple hits with SMARTS identifier for "
+        						+ varName + ". Taking average of all values.";
+        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        			}
+        			int valCounter = -1;
+        			List<Double> vals = new ArrayList<Double>();
+                    for (List<Integer> singleMatch : hits)
+                    {
+                    	if (singleMatch.size()!=1)
+                    	{
+                    		String msg = "Multiple entries in a single hit "
+                    				+ "with SMARTS identifier for "
+            						+ varName + ". Taking average of values.";
+            				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+                    	}
+                    	for (Integer atmId : singleMatch)
+                    	{
+		        			IAtom atm = iac.getAtom(atmId);
+		        			value = (DescriptorValue) atm.getProperty(descSpec);
+		        			double val = processValue(descName, descriptor, 
+		        					 desc, descSpec, value, varName, iac);
+		        			vals.add(val);
+		        			valCounter++;
+		                    iac.setProperty(varName+"_"+valCounter,val);
+                    	}
+                    }
+                    //TODO del
+                    //System.out.println("Values contributing to "+varName+": "+vals);
+                    double overallValue = DENOPTIMMathUtils.mean(vals);
+                    valuesMap.put(varName, overallValue);
+                    iac.setProperty(varName,overallValue);
+        		}
+        	} else if (desc instanceof IBondDescriptor) {
+        		for (String varName : descriptor.getVariableNames())
+        		{
+        			List<List<Integer>> hits = allMatches.get(varName);
+        			if (hits==null)
+        			{
+        				continue;
+        			}
+        			//TODO del
+        			//System.out.println("AtomIDs contributing to "+varName+":"+hits);
+        			if (hits.size() > 1)
+        			{
+        				String msg = "Multiple hits with SMARTS identifier for "
+        						+ varName + ". Taking average of all values.";
+        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        			}
+        			int valCounter = -1;
+        			List<Double> vals = new ArrayList<Double>();
+                    for (List<Integer> singleMatch : hits)
+                    {
+                    	if (singleMatch.size() != 2)
+                    	{
+                    		String msg = "Number of entries is != 2 for a "
+                    				+ "single hit with SMARTS identifier for "
+            						+ varName + ". I do not know how to deal "
+            						+ "with this.";
+                    		throw new DENOPTIMException(msg);
+                    	}
+                    	IBond bnd = iac.getBond(iac.getAtom(singleMatch.get(0)),
+                    			iac.getAtom(singleMatch.get(1)));
+                    	value = (DescriptorValue) bnd.getProperty(descSpec);
+		        		double val = processValue(descName, descriptor, 
+		        					 desc, descSpec, value, varName, iac);
+		        		vals.add(val);
+		        		valCounter++;
+	                    iac.setProperty(varName+"_"+valCounter,val);
+                    }
+                    //TODO del
+        			//System.out.println("Values contributing to "+varName+": "+vals);
+                    double overallValue = DENOPTIMMathUtils.mean(vals);
+                    valuesMap.put(varName, overallValue);
+                    iac.setProperty(varName,overallValue);
+        		}
+        	} else if (desc instanceof IAtomPairDescriptor) {
+        		throw new Exception("AtomPair-kind of descriptors are not yet "
+        				+ " usable. Upgrade the code. ");
+        		//TODO: implement this part...
+        	} else {
+        		throw new Exception("Type of descriptor "+ descName + " is "
+        				+ "unknown. Cannot understand if it should be thrated "
+        				+ "as molecular, atomic, or bond descriptr.");
+        	}
         }
+        
+        //TODO del
+        //System.out.println("VARIABLES: "+valuesMap);
         
         // Calculate the fitness from the expression and descriptor values
 		ExpressionEvaluatorImpl evaluator = new ExpressionEvaluatorImpl();
@@ -226,6 +310,82 @@ public class FitnessProvider
 				resolver, null);
 		iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
 		return fitness;
+	}
+	
+//------------------------------------------------------------------------------
+
+	/**
+	 * Takes the value and checks that it is all good, then processes the value 
+	 * to extract the result defined by the DescriptorForFitness, puts a 
+	 * human-readable version in the molecular representation, and the numerical
+	 * value for fitness calculation in the appropriate map.
+	 * @throws Exception 
+	 */
+	private double processValue(String descName, DescriptorForFitness descriptor,
+			IDescriptor implementation, 
+			DescriptorSpecification descSpec, DescriptorValue value,
+			String varName, IAtomContainer iac) throws Exception 
+	{
+       	if (value == null)
+    	{
+    		throw new Exception("Null value from calcualation of descriptor"
+    				+ " " + descName + "(for variable '" + varName + "'");
+    	}
+    	IDescriptorResult result = value.getValue();
+    	if (result == null)
+    	{
+    		throw new Exception("Null result from calcualation of "
+    				+ "descriptor " + descName + "(for variable '" 
+    				+ varName + "'");
+    	}
+    	
+    	double valueToFitness = Double.NaN;
+    	
+        if (result instanceof DoubleResult) 
+        {
+            valueToFitness = ((DoubleResult) result).doubleValue();
+        } else if (result instanceof IntegerResult) 
+        {
+            valueToFitness = ((IntegerResult)result).intValue();
+        } else if (result instanceof DoubleArrayResult) 
+        {
+        	DoubleArrayResult a = (DoubleArrayResult) result;
+        	int id = descriptor.resultId;
+        	if (id >= a.length())
+        	{
+        		throw new Exception("Value ID out of range for descriptor "
+        				+ descName);
+        	}
+        	valueToFitness = a.get(id);
+        	
+        	//We also keep track of the entire vector
+        	List<String> list = new ArrayList<String>();
+            for (int j=0; j<a.length(); j++) 
+            {
+                list.add(String.valueOf(a.get(j)));
+            }
+            iac.setProperty(implementation.getClass().getName(),list);
+        } else if (result instanceof IntegerArrayResult) 
+        {
+        	IntegerArrayResult array = (IntegerArrayResult) result;
+        	int id = descriptor.resultId;
+        	if (id >= array.length())
+        	{
+        		throw new Exception("Value ID out of range for descriptor "
+        				+ descName);
+        	}
+        	valueToFitness = array.get(id);
+
+        	//We also keep track of the entire vector
+        	List<String> list = new ArrayList<String>();
+            for (int j=0; j<array.length(); j++) 
+            {
+                list.add(String.valueOf(array.get(j)));
+            }
+            iac.setProperty(implementation.getClass().getName(),list);
+        }
+       
+        return valueToFitness;
 	}
 
 //------------------------------------------------------------------------------

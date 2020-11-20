@@ -21,6 +21,7 @@ package denoptim.fitness;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -34,6 +35,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.servlet.jsp.el.ELException;
+import javax.servlet.jsp.el.FunctionMapper;
 import javax.servlet.jsp.el.VariableResolver;
 
 import org.apache.commons.el.ExpressionEvaluatorImpl;
@@ -80,6 +82,27 @@ public class FitnessParameters
     private static String fitnessExpression = "";
     
     /**
+     * List of definitions for atom/Bond specific descriptors
+     */
+	private static List<String> atmBndSpecDescExpressions = 
+			new ArrayList<String>();
+
+    /**
+     * Map defining relation between descriptors names (the shortNames) and 
+     * variable that take values from the results of that descriptors
+     * calculation.
+     */
+	private static Map<String,ArrayList<String>> atmBndSpecDescToVars = 
+			new HashMap<String,ArrayList<String>>();
+	
+    /**
+     * Map defining relation between variable names and atom/Bond specific 
+     * descriptor calcualtion.
+     */
+	private static Map<String,ArrayList<String>> atmBndSpecDescSMARTS = 
+			new HashMap<String,ArrayList<String>>();
+    
+    /**
      * The list of descriptors needed to calculate the fitness with internal 
      * fitness provider.
      */
@@ -88,7 +111,7 @@ public class FitnessParameters
     /**
      * List of descriptor's short names
      */
-    private static List<String> variablesInEquation;
+    private static List<String> descriptorsGeneratingVariables;
     
     /**
      * Flag controlling production of png graphics for each candidate
@@ -213,6 +236,10 @@ public class FitnessParameters
         	useExternalFitness = false;
             break;
             
+        case "FP-DESCRIPTORSPECS=":
+        	atmBndSpecDescExpressions.add(value);
+        	break;
+            
         case "FP-MAKEPICTURES":
         	fitParamsInUse = true;
 	        makePictures = true;
@@ -224,7 +251,7 @@ public class FitnessParameters
             throw new DENOPTIMException(msg);
         }
     }
-    
+	
 //------------------------------------------------------------------------------
 
 	private static void parseFitnessExpressionToDefineDescriptors(String value) 
@@ -232,30 +259,120 @@ public class FitnessParameters
 	{
 		// Parse expression to get the names of all variables
 		ExpressionEvaluatorImpl extractor = new ExpressionEvaluatorImpl();
-		variablesInEquation = new ArrayList<String>();
+		descriptorsGeneratingVariables = new ArrayList<String>();
         VariableResolver collector = new VariableResolver() {
 			
 			@Override
 			public Double resolveVariable(String varName) throws ELException {
-				if (!variablesInEquation.contains(varName))
+				if (!descriptorsGeneratingVariables.contains(varName))
 				{
-					variablesInEquation.add(varName);
+					descriptorsGeneratingVariables.add(varName);
 				}
 				return 1.0;
 			}
 		};
+		FunctionMapper funcsMap = new FunctionMapper() {
+
+			@Override
+			public Method resolveFunction(String nameSpace, String methodName) {
+				try {
+					return FitnessParameters.class.getMethod(methodName, 
+							String.class, String.class, String.class);
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
 		try {
-			extractor.evaluate(fitnessExpression, Double.class, collector, null);
+			//NB this is not really an evaluation because the variableResolver
+			// and function map parse the data the get from the  
+			// ExpressionEvaluator
+			extractor.evaluate(fitnessExpression, Double.class, collector, 
+					null);
 		} catch (ELException e) {
 			throw new DENOPTIMException("ERROR: unable to parse fitness "
 					+ "expression.",e);
 		}
-
+		
+		try {
+			//NB this is not really an evaluation because the variableResolver
+			// and function map only parse the data they get from the 
+			// ExpressionEvaluator
+			for (String descriptorDefinition : atmBndSpecDescExpressions)
+			{
+				extractor.evaluate(descriptorDefinition, Double.class, 
+						collector, funcsMap);
+			}
+		} catch (ELException e) {
+			throw new DENOPTIMException("ERROR: unable to parse fitness "
+					+ "expression.",e);
+		}
+		
 		// Collect the descriptors needed to calculate the fitness
 		descriptors = DescriptorUtils.findAllDescriptorImplementations(
-				variablesInEquation);
+				descriptorsGeneratingVariables);
+		
+		// Add specifications to atom/bond specific descriptors
+		for (DescriptorForFitness dff : descriptors)
+		{
+			String descName = dff.getShortName();
+			if (atmBndSpecDescToVars.keySet().contains(descName))
+			{
+				for (String varName : atmBndSpecDescToVars.get(descName))
+				{
+					ArrayList<String> smarts = atmBndSpecDescSMARTS.get(varName);
+					dff.varName.add(varName);
+					dff.smarts.put(varName, smarts);
+				}
+			}
+		}
+		
+		String NL = System.getProperty("line.separator");
+		StringBuilder sb = new StringBuilder();
+		sb.append("Variables defined for each descriptor:"+NL);
+	    for (int i=0; i<descriptors.size(); i++)
+		{
+			DescriptorForFitness d = descriptors.get(i);
+			sb.append(" -> "+d.getShortName()+" "+d.getVariableNames()+NL);
+		}
 	}
 
+//------------------------------------------------------------------------------
+
+	/**
+	 * Fake function definition that is only used to parse the expressions 
+	 * defining atom specific descriptors. This method is public only because
+	 * is must be found by the ExpressionEvaluator, but should not be used
+	 * outside the FitnessPArameters class.
+	 */
+	
+	public static Double atomSpecific(String varName, String descName, 
+			String smartsIdentifier)
+	{
+		if (!descriptorsGeneratingVariables.contains(descName))
+		{
+			descriptorsGeneratingVariables.add(descName);
+		}
+		descriptorsGeneratingVariables.remove(varName);
+		
+		ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
+				smartsIdentifier.split("\\s+")));
+		
+		if (atmBndSpecDescToVars.keySet().contains(descName))
+		{
+			atmBndSpecDescToVars.get(descName).add(varName);
+		} else {
+			ArrayList<String> lst = new ArrayList<String>();
+			lst.add(varName);
+			atmBndSpecDescToVars.put(descName, lst);
+		}
+		atmBndSpecDescSMARTS.put(varName, smarts);
+		return 0.0; //just a dummy number to fulfil the executor expectations
+	}
+	
 //------------------------------------------------------------------------------
 
     public static void checkParameters() throws DENOPTIMException
