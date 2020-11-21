@@ -35,7 +35,8 @@ public class DenoptimGA
 
     public static void printUsage()
     {
-        System.err.println("Usage: java -jar DenoptimGA.jar ConfigFile");
+        System.err.println("Usage: java -jar DenoptimGA.jar ConfigFile "
+        		+ "[workDir]");
         System.exit(-1);
     }
 
@@ -46,14 +47,16 @@ public class DenoptimGA
      */
     public static void main(String[] args)
     {
-        // TODO code application logic here
         if (args.length < 1)
         {
             printUsage();
         }
 
         String configFile = args[0];
-        
+        if (args.length > 1)
+        {
+        	GAParameters.dataDir = args[1];
+        }
         EvolutionaryAlgorithm evoGA;
         ParallelEvolutionaryAlgorithm pGA = null;
         try
@@ -99,4 +102,5 @@ public class DenoptimGA
     }
     
 //------------------------------------------------------------------------------        
+
 }

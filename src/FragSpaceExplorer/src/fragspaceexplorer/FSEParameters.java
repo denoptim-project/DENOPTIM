@@ -54,7 +54,7 @@ public class FSEParameters
     /**
      * Working directory
      */
-    private static String workDir = ".";
+    protected static String workDir = System.getProperty("user.dir");
 
     /**
      * Log file
@@ -90,7 +90,7 @@ public class FSEParameters
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
      * and reported as <code>String</code>s.
      */
-    private static String dbRootDir = ".";  
+    private static String dbRootDir = workDir;  
 
     /**
      * Number of processors
@@ -602,13 +602,9 @@ public class FSEParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-        boolean success = false;
 		String curDir = workDir;
-		if (curDir.equals("."))
-		{
-	            curDir = System.getProperty("user.dir");
-		}
         String fileSep = System.getProperty("file.separator");
+        boolean success = false;
         while (!success)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");

@@ -51,7 +51,7 @@ public class GAParameters
     /**
      * Pathname to the working directory for the current run
      */
-    protected static String dataDir = "";
+    protected static String dataDir = System.getProperty("user.dir");
 
     /**
      * Pathname of user defined parameters
@@ -766,14 +766,14 @@ public class GAParameters
 
     protected static void createWorkingDirectory() throws DENOPTIMException
     {
-        boolean success = false;
-        String curDir = System.getProperty("user.dir");
         String fileSep = System.getProperty("file.separator");
+        String cdataDir = dataDir;
+        boolean success = false;
         while (!success)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
             String str = "RUN" + sdf.format(new Date());
-            dataDir = curDir + fileSep + str;
+            dataDir = cdataDir + fileSep + str;
             success = DenoptimIO.createDirectory(dataDir);
         }
     }

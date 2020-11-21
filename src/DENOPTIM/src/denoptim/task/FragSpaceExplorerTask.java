@@ -28,12 +28,12 @@ import denoptim.utils.TaskUtils;
  * GUI.
  */
 
-public class DenoptimGATask extends Task
+public class FragSpaceExplorerTask extends Task
 {
 
 //------------------------------------------------------------------------------
     
-    public DenoptimGATask()
+    public FragSpaceExplorerTask()
     {
     	super(TaskUtils.getUniqueTaskIndex());
     }
@@ -43,20 +43,20 @@ public class DenoptimGATask extends Task
     @Override
     public Object call()
     {
-    	System.out.println("Running DenoptimGA task "+id+" called...");
+    	System.out.println("Running FragSpaceExplorer task "+id+" called...");
     	
     	//TODO
     	
     	
-    	System.out.println("DenoptimGA task "+id+" done!");
+    	System.out.println("FragSpaceExplorer task "+id+" done!");
 		return null;
     }
     
 //------------------------------------------------------------------------------ 
 
-    public static void denoptimGAMainCaller(String[] args)
+    public static void denoptimFSEMainCaller(String[] args)
     {
-    	//DenoptimGA.main(args);
+    	//TODO
     }
     
 //------------------------------------------------------------------------------

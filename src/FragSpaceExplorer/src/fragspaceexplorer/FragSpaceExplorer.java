@@ -60,7 +60,8 @@ public class FragSpaceExplorer
 
     public static void printUsage()
     {
-        System.err.println("Usage: java -jar FragSpaceExplorer.jar ConfigFile");
+        System.err.println("Usage: java -jar FragSpaceExplorer.jar ConfigFile "
+        		+ "[workDir]");
         System.exit(-1);
     }
 
@@ -77,8 +78,12 @@ public class FragSpaceExplorer
         }
 
         String configFile = args[0];
+        if (args.length > 1)
+        {
+        	FSEParameters.workDir = args[1];
+        }
         
-	CombinatorialExplorerByLayer pCombExp = null;
+        CombinatorialExplorerByLayer pCombExp = null;
         try
         {
             FSEParameters.readParameterFile(configFile);
@@ -91,10 +96,10 @@ public class FragSpaceExplorer
         }
         catch (DENOPTIMException de)
         {
-	    if (pCombExp != null)
-	    {
+        	if (pCombExp != null)
+            {
                 pCombExp.stopRun();
-	    }
+            }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
             System.exit(-1);
         }

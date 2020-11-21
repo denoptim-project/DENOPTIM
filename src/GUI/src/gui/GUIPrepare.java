@@ -38,6 +38,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.task.DenoptimGATask;
 import denoptim.task.DummyTask;
+import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.StaticTaskManager;
 import denoptim.task.Task;
 
@@ -336,7 +337,7 @@ public class GUIPrepare extends GUICardPanel
 			task = new DenoptimGATask();
 		} else if (this instanceof GUIPrepareFSERun)
 		{
-			throw new DENOPTIMException("FSE task NOT IMPLEMENTED YET");
+			task = new FragSpaceExplorerTask();
 		}
 		return task;
 	}
