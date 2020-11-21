@@ -39,6 +39,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.task.DenoptimGATask;
 import denoptim.task.DummyTask;
 import denoptim.task.FragSpaceExplorerTask;
+import denoptim.task.GUIInvokedMainTask;
 import denoptim.task.StaticTaskManager;
 import denoptim.task.Task;
 
@@ -168,11 +169,13 @@ public class GUIPrepare extends GUICardPanel
 					case 0:
 						String location = "unknownLocation";
 						try {
-							Task task = buildTaskRunningDenoptimMainClass();
+							GUIInvokedMainTask task = buildMainCall();
 							File wrkSpace = prepareWorkSpace();
 							File paramFile = instatiateParametersFile(wrkSpace);
 							if (printAllParamsToFile(paramFile))
 							{
+								task.setConfigFile(paramFile);
+								task.setWorkSpace(wrkSpace);
 								StaticTaskManager.submit(task);
 							} else {
 								throw new DENOPTIMException("Failed to make "
@@ -329,9 +332,9 @@ public class GUIPrepare extends GUICardPanel
 	 * The type of main to run is determined by which subclass calls this method
 	 * @throws DENOPTIMException 
 	 */
-	private Task buildTaskRunningDenoptimMainClass() throws DENOPTIMException
+	private GUIInvokedMainTask buildMainCall() throws DENOPTIMException
 	{
-		Task task = null;
+		GUIInvokedMainTask task = null;
 		if (this instanceof GUIPrepareGARun)
 		{
 			task = new DenoptimGATask();

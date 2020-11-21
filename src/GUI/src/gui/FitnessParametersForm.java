@@ -18,19 +18,11 @@
 
 package gui;
 
-import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
-import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
-
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,21 +41,16 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.openscience.cdk.qsar.IDescriptor;
@@ -678,6 +665,14 @@ public class FitnessParametersForm extends ParametersForm
 //------------------------------------------------------------------------------
     
     @Override
+    protected void preliminatyTasksUponImportingParams()
+    {
+    	txtMoreEq.setText("");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
     protected void adaptVisibility() 
     {
     	setVisibilityAccordingToFitnessProviderSelection();
@@ -779,16 +774,29 @@ public class FitnessParametersForm extends ParametersForm
  				if (key.equals(keyMoreEq)) 
     			{
  					String old = txtMoreEq.getText();
- 				    txtMoreEq.setText(old + NL + value);
+ 					if (old.equals(""))
+ 					{
+ 						txtMoreEq.setText(value);
+ 					} else {
+ 				        txtMoreEq.setText(old + NL + value);
+ 					}
     			}
  				break;
  				
  			case "class javax.swing.JTextField":
- 				((JTextField) valueField).setText(value);
  				if (key.equals(keyFitProviderSource)) 
     			{
  				    rdbIntOrExt.setSelected(true);
     			}
+ 				if (key.equals(keyEq))
+ 				{
+ 					value = value.trim();
+ 					if (value.startsWith("${") && value.endsWith("}"));
+ 					{
+ 						value = value.substring(2, value.lastIndexOf("}"));
+ 					}
+ 				}
+ 				((JTextField) valueField).setText(value);
  				break;
  				
  			case "class javax.swing.JRadioButton":

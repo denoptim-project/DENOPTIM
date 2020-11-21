@@ -243,7 +243,7 @@ public class FSEParametersForm extends ParametersForm
         
         String toolTipPar2 = "<html>Specifies up to which level we'll add layers of fragments.<br>Note that the root (i.e., scaffold or root graph) is assigned <code>level = -1</code>.<br>Therefore, if the maximum level permitted is 3, then we will try to append <br>up to 4 layers of fragments (levels = 0, 1, 2, and 3).</html>";
         linePar2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar2 = new JLabel("Maximum level numer to consider:", SwingConstants.LEFT);
+        lblPar2 = new JLabel("Maximum level number to consider:", SwingConstants.LEFT);
         lblPar2.setPreferredSize(fileLabelSize);
         lblPar2.setToolTipText(toolTipPar2);
         txtPar2 = new JTextField();
@@ -255,7 +255,7 @@ public class FSEParametersForm extends ParametersForm
         linePar2.add(txtPar2);
         localBlock2.add(linePar2);
 
-        String toolTipPar7 = "Specifies the number of asynchronous processes that can be run in parallel. Usually this corresponds to the number of slave cores, if 1 such core corresponds to 1 external tas";
+        String toolTipPar7 = "<html>Specifies the number of asynchronous processes that can be <br>run in parallel. Usually this number corresponds to the number of slave cores,<br>i.e., one slave core corresponds to 1 external task.</html>";
         linePar7 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar7 = new JLabel("Mas. number parallel tasks:", SwingConstants.LEFT);
         lblPar7.setPreferredSize(fileLabelSize);
@@ -364,9 +364,9 @@ public class FSEParametersForm extends ParametersForm
         linePar1.add(btnPar1);
         advOptsBlock.add(linePar1);
 
-        String toolTipPar4 = "Specifies the pathname of the root of the folder tree of generate graphs.";
+        String toolTipPar4 = "Specifies the pathname to the root of the folder tree of generated graphs.";
         linePar4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar4 = new JLabel("Location of DENOPTIMGRaph database:", SwingConstants.LEFT);
+        lblPar4 = new JLabel("Location of DENOPTIMGraph database:", SwingConstants.LEFT);
         lblPar4.setPreferredSize(fileLabelSize);
         lblPar4.setToolTipText(toolTipPar4);
         txtPar4 = new JTextField();
@@ -399,7 +399,7 @@ public class FSEParametersForm extends ParametersForm
         linePar5.add(txtPar5);
         advOptsBlock.add(linePar5);
 
-        String toolTipPar6 = "Specifies the sleeping time (or time step, in seconds) between checks for completion of one or more tasks. Accepts only integer number";
+        String toolTipPar6 = "<html>Specifies the sleeping time (or time step, in seconds) between <br>checks for completion of one or more tasks. Accepts only integer number<html>";
         linePar6 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar6 = new JLabel("Time between checks for completion:", SwingConstants.LEFT);
         lblPar6.setPreferredSize(fileLabelSize);
@@ -413,7 +413,7 @@ public class FSEParametersForm extends ParametersForm
         linePar6.add(txtPar6);
         advOptsBlock.add(linePar6);
 
-        String toolTipPar11 = "<html>Specifies the distance between two subsequent updates of the<br> checkpoint information as a number of generated graphs.</html>";
+        String toolTipPar11 = "<html>Specifies to update the checkpoint information every # generated graphs.</html>";
         linePar11 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar11 = new JLabel("Make checkpoint every # graphs:", SwingConstants.LEFT);
         lblPar11.setPreferredSize(fileLabelSize);

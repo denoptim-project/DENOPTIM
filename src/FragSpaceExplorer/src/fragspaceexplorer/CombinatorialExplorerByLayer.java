@@ -389,8 +389,10 @@ public class CombinatorialExplorerByLayer
                         if (outCount != totSubmSubTasks  &&  level > -1)
                         {
                             msg = "Mismatch between the number of submitted "
-                                  + "tasks and the reported graphs ("
-                                  + totSubmSubTasks + "/" + outCount + ")";
+                                  + "tasks (" + totSubmSubTasks + ") and those "
+                                  + "listed in " 
+                                  + FSEUtils.getNameOfStorageDir(level)
+                                  + "(" + outCount + ")";
                             DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
                             throw new DENOPTIMException(msg);
                         }
@@ -682,7 +684,9 @@ public class CombinatorialExplorerByLayer
                                 if (iWait > 120)
                                 {
                                     System.out.println("NOT CONVERGED");
-                                    System.exit(1);
+                                    throw new DENOPTIMException("Generation of "
+                                    		+ "checkpoint file did not "
+                                    		+ "converge.");
                                 }
                                 makeCheckPoint();
                                 nowIds.clear();
@@ -721,7 +725,9 @@ public class CombinatorialExplorerByLayer
                             }
                             System.out.println("Stopped with converged "
                                                  + "checkpoint IDs: " + nowIds);
-                            System.exit(0);
+                            throw new DENOPTIMException("Stopping due to "
+                            		+ "request of generating checkpoint data "
+                            		+ "for testing purposes");
                         }
                     }
                 }

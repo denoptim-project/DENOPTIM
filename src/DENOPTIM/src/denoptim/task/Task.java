@@ -18,6 +18,7 @@
 
 package denoptim.task;
 
+import java.io.File;
 import java.util.concurrent.Callable;
 
 
@@ -97,6 +98,27 @@ public abstract class Task implements Callable<Object>
     {
     	this.verbosity = verbosity;
     }
+//------------------------------------------------------------------------------
+    
+    /**
+     * Sets the pathname of the work space, i.e., the location where the task 
+     * is supposed to use move to or to threat as the result of "pwd" at runtime
+     */
+    public void setWorkSpace(File workDir)
+    {
+    	setWorkSpace(workDir.getAbsolutePath());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Sets the pathname of the work space, i.e., the location where the task 
+     * is supposed to use move to or to threat as the result of "pwd" at runtime
+     */
+    public void setWorkSpace(String workDirPathname)
+    {
+    	this.workDir = workDirPathname;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -156,6 +178,8 @@ public abstract class Task implements Callable<Object>
             System.err.println("Calling stop on processes from " 
             		+ this.getClass().getName() + " " + id);
             processHandler.stopProcess();
+        } else {
+        	Thread.currentThread().interrupt();
         }
     }
     

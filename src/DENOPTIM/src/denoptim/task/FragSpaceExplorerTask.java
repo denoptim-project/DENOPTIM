@@ -19,46 +19,26 @@
 
 package denoptim.task;
 
-import denoptim.utils.TaskUtils;
-//import denoptimga.DenoptimGA;
+import denoptim.exception.DENOPTIMException;
+import fragspaceexplorer.FragSpaceExplorer;
 
 /**
- * Task that runs a DENOPTIM experiment with the genetic algorithm. This class
- * meant to run and manage a call to the DenoptimGA Main class from within the
- * GUI.
+ * Task that runs a DENOPTIM experiment with the fragment space explorer. 
+ * This class is meant to call the FragSPaceExplorer.main method from within
+ * the GUI.
  */
 
-public class FragSpaceExplorerTask extends Task
+public class FragSpaceExplorerTask extends GUIInvokedMainTask
 {
 
-//------------------------------------------------------------------------------
-    
-    public FragSpaceExplorerTask()
-    {
-    	super(TaskUtils.getUniqueTaskIndex());
-    }
-
-//------------------------------------------------------------------------------
-
-    @Override
-    public Object call()
-    {
-    	System.out.println("Running FragSpaceExplorer task "+id+" called...");
-    	
-    	//TODO
-    	
-    	
-    	System.out.println("FragSpaceExplorer task "+id+" done!");
-		return null;
-    }
-    
 //------------------------------------------------------------------------------ 
 
-    public static void denoptimFSEMainCaller(String[] args)
-    {
-    	//TODO
-    }
+	@Override
+	protected void mainCaller(String[] args) throws DENOPTIMException {
+		FragSpaceExplorer.main(args);
+	}
     
 //------------------------------------------------------------------------------
 
 }
+

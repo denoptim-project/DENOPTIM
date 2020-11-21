@@ -26,7 +26,7 @@ import denoptim.utils.GenUtils;
 
 /**
  *
- * @author Vishwesh Venkatraman 
+ * @author Vishwesh Venkatraman
  */
 public class DenoptimGA
 {
@@ -37,19 +37,21 @@ public class DenoptimGA
     {
         System.err.println("Usage: java -jar DenoptimGA.jar ConfigFile "
         		+ "[workDir]");
-        System.exit(-1);
     }
 
 //------------------------------------------------------------------------------    
     
     /**
      * @param args the command line arguments
+     * @throws DENOPTIMException in any case of not-normal termination
      */
-    public static void main(String[] args)
+    public static void main(String[] args) throws DENOPTIMException
     {
         if (args.length < 1)
         {
             printUsage();
+            throw new DENOPTIMException("Cannot run. Need at least one argument"
+            		+ "to run DenoptimGA main method.");
         }
 
         String configFile = args[0];
@@ -68,13 +70,11 @@ public class DenoptimGA
             
             if (GAParameters.parallelizationScheme == 1)
             {
-                System.err.println("Using synchronous parallelization scheme.");
                 evoGA = new EvolutionaryAlgorithm();
                 evoGA.runGA();
             }
             else
             {
-                System.err.println("Using asynchronous parallelization scheme.");
                 pGA = new ParallelEvolutionaryAlgorithm();
                 pGA.runGA();
             }
@@ -88,17 +88,17 @@ public class DenoptimGA
             }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
             GenUtils.printExceptionChain(de);
-            System.exit(-1);
+            throw new DENOPTIMException("Error in DenootimGA run.", de);
         }
         catch (Exception e)
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
             GenUtils.printExceptionChain(e);
-            System.exit(-1);
+            throw new DENOPTIMException("Error in DenootimGA run.", e);
         }
 
-        // normal completion
-        System.exit(0);
+        // normal completion: do NOT call System exit(0) as we might be calling
+        // this main from another thread, which would be killed as well.
     }
     
 //------------------------------------------------------------------------------        

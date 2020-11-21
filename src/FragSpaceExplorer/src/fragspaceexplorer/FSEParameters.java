@@ -90,7 +90,7 @@ public class FSEParameters
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
      * and reported as <code>String</code>s.
      */
-    private static String dbRootDir = workDir;  
+    protected static String dbRootDir = ".";
 
     /**
      * Number of processors
@@ -506,15 +506,14 @@ public class FSEParameters
 
 	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
 	{
-	   msg = "Directory " + workDir + " not found. Please specify an "
+	   msg = "Directory '" + workDir + "' not found. Please specify an "
 		 + "existing directory.";
 	   throw new DENOPTIMException(msg);
 	}
 
-	if (!dbRootDir.equals(workDir) && 
-					!DenoptimIO.checkExists(dbRootDir))
+	if (!dbRootDir.equals(workDir) && !DenoptimIO.checkExists(dbRootDir))
 	{
-	    msg = "Directory " + dbRootDir + " not found. "
+	    msg = "Directory '" + dbRootDir + "' not found. "
 		  + "Please specify an existing directory where to put "
                   + "the DB of generated DENOPTIMGraphs.";
 	   throw new DENOPTIMException(msg);
@@ -612,7 +611,7 @@ public class FSEParameters
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);
         }
-		if (dbRootDir.equals("."))
+		if (dbRootDir.equals(".") || dbRootDir.equals(""))
 		{
 		    dbRootDir = workDir;
 		}

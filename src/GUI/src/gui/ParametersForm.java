@@ -371,6 +371,8 @@ public class ParametersForm extends JPanel implements IParametersForm
     				+ " file name.");
     	}
     	
+    	preliminatyTasksUponImportingParams();
+    	
         String line;
         BufferedReader br = null;
         try
@@ -418,6 +420,16 @@ public class ParametersForm extends JPanel implements IParametersForm
         //adapt visibility to imported parameters
         adaptVisibility();
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Overwritten by subclasses. Does any preliminary tasks, such as cleaning
+     * 
+     */
+	protected void preliminatyTasksUponImportingParams() 
+	{
+	}
     
 //------------------------------------------------------------------------------
 

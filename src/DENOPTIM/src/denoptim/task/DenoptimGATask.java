@@ -19,45 +19,23 @@
 
 package denoptim.task;
 
-import denoptim.utils.TaskUtils;
-//import denoptimga.DenoptimGA;
+import denoptim.exception.DENOPTIMException;
+import denoptimga.DenoptimGA;
 
 /**
  * Task that runs a DENOPTIM experiment with the genetic algorithm. This class
- * meant to run and manage a call to the DenoptimGA Main class from within the
- * GUI.
+ * is meant to run the DenoptimGA.main method from within the GUI.
  */
 
-public class DenoptimGATask extends Task
+public class DenoptimGATask extends GUIInvokedMainTask
 {
 
-//------------------------------------------------------------------------------
-    
-    public DenoptimGATask()
-    {
-    	super(TaskUtils.getUniqueTaskIndex());
-    }
-
-//------------------------------------------------------------------------------
-
-    @Override
-    public Object call()
-    {
-    	System.out.println("Running DenoptimGA task "+id+" called...");
-    	
-    	//TODO
-    	
-    	
-    	System.out.println("DenoptimGA task "+id+" done!");
-		return null;
-    }
-    
 //------------------------------------------------------------------------------ 
 
-    public static void denoptimGAMainCaller(String[] args)
-    {
-    	//DenoptimGA.main(args);
-    }
+	@Override
+	protected void mainCaller(String[] args) throws DENOPTIMException {
+		DenoptimGA.main(args);
+	}
     
 //------------------------------------------------------------------------------
 

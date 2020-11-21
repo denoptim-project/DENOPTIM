@@ -2,6 +2,7 @@ package denoptim.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
@@ -28,14 +29,9 @@ public class StaticTaskManager
 	 * The executor of threads
 	 */
 	private static ThreadPoolExecutor tpe; 
-	
-	/**
-	 * List that collects the tasks that were submitted
-	 */
-    private static ArrayList<Task> submitted = new ArrayList<Task>();
 
     /**
-     * Maps the relation between a task that is submitted and its future result
+     * Maps the relation between a task that is submitted and its future handle
      */
 	private static Map<Task,Future<?>> subToFutureMap = 
 			new HashMap<Task,Future<?>>();
@@ -43,7 +39,7 @@ public class StaticTaskManager
 	/**
 	 * Number of threads
 	 */
-	private static final int maxthreads = 2;
+	private static final int maxthreads = 1;
 	
 	/**
 	 * Queue size
@@ -54,7 +50,6 @@ public class StaticTaskManager
     
     private StaticTaskManager()
     {
-    	System.out.println("INITIALIZING STATICTASK MANAGER");
     	tpe = new ThreadPoolExecutor(maxthreads, maxthreads, Long.MAX_VALUE, 
     			TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     	
@@ -79,8 +74,7 @@ public class StaticTaskManager
         
         // What to do in case of shutdown signal
         Runtime.getRuntime().addShutdownHook(new ShutDownHook());
-        
-        // Initialize empty threads
+
         tpe.prestartAllCoreThreads();
     }
     
@@ -105,20 +99,14 @@ public class StaticTaskManager
             }
             catch (InterruptedException ie)
             {
-                for (int i=0; i< submitted.size(); i++)
-                {
-                    Task task = submitted.get(i);
-                    Future<?> expectation = subToFutureMap.get(task);
-                    expectation.cancel(true);
-                    task.stopTask();
-                }
-                submitted.clear();
+            	stopAll();
                 subToFutureMap.clear();
                 tpe.purge();
                 tpe.getQueue().clear();
                 tpe.shutdownNow();
                 
                 // and stop possibly alive thread
+                //TODO is this needed? It should not
                 Thread.currentThread().interrupt();
             }
         }
@@ -144,8 +132,8 @@ public class StaticTaskManager
     public static String getQueueSnapshot()
     {
     	String s = "Approximate queue status:<ul>"
-    			+ "<li>Max # running = " + tpe.getPoolSize() + "</li>"
-    			+ "<li>Running tasks = " + tpe.getActiveCount() + "</li>"
+    			+ "<li>Running tasks = " + tpe.getActiveCount() + "/"
+    			+ tpe.getPoolSize() + "</li>"
     	    	+ "<li>Queue Size    = " + tpe.getQueue().size()+ "</li></ul>";
     	return s;
     }
@@ -154,32 +142,40 @@ public class StaticTaskManager
     
     public static void submit(Task task)
     {
-    	submitted.add(task);
     	Future<?> future = tpe.submit(task);
     	subToFutureMap.put(task,future);
+    	//TODO: check how we can remove terminated tasks from the map
     }
     
 //------------------------------------------------------------------------------
     
     public static void stop(Task task)
     {
-    	if (submitted.contains(task))
-    	{
-    		task.stopTask();
+		task.stopTask();
+		if (subToFutureMap.containsKey(task))
+		{
     		subToFutureMap.get(task).cancel(true);
     		subToFutureMap.remove(task);
-    	}
+		}
     }
     
 //------------------------------------------------------------------------------
     
-
 	public static void stopAll() 
 	{
-		for (Task task : submitted)
-		{
-			stop(task);
-		}
+		for (Task task : subToFutureMap.keySet())
+    	{
+    		Future<?> expectation = subToFutureMap.get(task);
+            expectation.cancel(true);
+            task.stopTask();
+        }
+	}
+	
+//------------------------------------------------------------------------------
+
+	public static boolean hasActive()
+	{
+		return tpe.getActiveCount() > 0;
 	}
 
 //------------------------------------------------------------------------------

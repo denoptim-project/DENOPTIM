@@ -486,6 +486,10 @@ public class GraphBuildingTask extends FitnessTask
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
         fitProvUIDFile = FSEParameters.getUIDFileName();
         
+        
+        //TODO del
+        System.out.println("Mol "+molName+" inchi:"+molinchi);
+        
         runFitnessProvider();
     }
 
