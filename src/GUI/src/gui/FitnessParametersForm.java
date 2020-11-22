@@ -23,6 +23,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -339,16 +342,36 @@ public class FitnessParametersForm extends ParametersForm
         lineMoreEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblMoreEq = new JLabel("<html>Atom/bond specific descriptors:</html>");
         txtMoreEq = new JEditorPane();
-        Dimension moreEqSize = new Dimension(500, 3*preferredHeight);
+        Dimension moreEqSize = new Dimension(500, 6*preferredHeight);
         txtMoreEq.setPreferredSize(moreEqSize);
+		// Adding the scroll pane gives problems and clashes with the scrollpane on the JTree (hypothesis)
+        //JScrollPane txtMoreEqScrollPane = new JScrollPane(txtMoreEq);
         mapKeyFieldToValueField.put(keyMoreEq.toUpperCase(), 
         		txtMoreEq);
         lineMoreEq.setToolTipText(toolTipMoreEq);
-        JScrollPane moreEqScrollPane = new JScrollPane(txtMoreEq);
-        lineMoreEq.add(lblMoreEq);
-        lineMoreEq.add(moreEqScrollPane);
+        JButton btnMoreEq = new JButton("Add atom-specific variable");
+        btnMoreEq.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ExpressionDefDialog dialog = new ExpressionDefDialog();
+				String res = (String) dialog.showDialog();
+				if (res!=null && !res.equals(""))
+				{
+					if (txtMoreEq.getText().equals(""))
+					{
+						txtMoreEq.setText(res);
+					} else {
+						txtMoreEq.setText(txtMoreEq.getText()
+								+ System.getProperty("line.separator")
+								+ res);
+					}
+				}
+			}
+		});
+        lineMoreEq.add(btnMoreEq);
+        //lineMoreEq.add(txtMoreEqScrollPane);
+        lineMoreEq.add(txtMoreEq);
         localBlock4.add(lineMoreEq);
-        
         
         String toolTipDescs = "<html>To select descriptor names:"
         		+ "<ol><li>Browse the list of descriptors (double click to expand/reduce a node),"
@@ -527,12 +550,6 @@ public class FitnessParametersForm extends ParametersForm
         JLabel lblDDSource = new JLabel("<html><b>Implementation:</b></html>");
         lblDDSource.setPreferredSize(ddLabelsSize);
         
-        /*
-        String txt = "<html><body width='%1s'>asdf asdf as a  a fga fga "
-    			+ "fv afv asf asfva fv afv afsvasfdv  af s  s  sd sd   sd "
-    			+ "SD  DG</body></html>";
-        String.format(txt, 300)
-        */
         lblDDValueTitle = new JLabel();
         lblDDValueName = new JLabel();
         lblDDValueDefinition = new JLabel();
@@ -541,7 +558,6 @@ public class FitnessParametersForm extends ParametersForm
         lblDDValueParams = new JLabel();
         lblDDValueSource = new JLabel();
         
-
         descDefinitionPane = new JPanel();
         GroupLayout lyoDescDefPanel = new GroupLayout(descDefinitionPane);
         descDefinitionPane.setLayout(lyoDescDefPanel);
@@ -842,5 +858,87 @@ public class FitnessParametersForm extends ParametersForm
         	sb.append(getStringIfNotEmpty(keyMoreEq,txtMoreEq,true));
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private class ExpressionDefDialog extends GUIModalDialog
+    {
+    	public ExpressionDefDialog()
+    	{
+    		super();
+    		this.setBounds(150, 150, 500, 200);
+    		this.setTitle("Define atom-specific variable");
+    		
+    		Dimension sizeNameFields = new Dimension(200,preferredHeight);
+    		Dimension sizeNameLbls = new Dimension(120,preferredHeight);
+    		
+			JPanel rowOne = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JLabel lblDescName = new JLabel("Descriptor name: ");
+			lblDescName.setPreferredSize(sizeNameLbls);
+			lblDescName.setToolTipText("<html>This is the pre-defined short "
+					+ "name "
+					+ "reported <br>in "
+					+ "the collection of descriptors.</html>");
+			JTextField txtDescName = new JTextField();
+			txtDescName.setPreferredSize(sizeNameFields);
+			rowOne.add(lblDescName);
+			rowOne.add(txtDescName);
+			
+			JPanel rowTwo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JLabel lblVarName = new JLabel("Variable name: ");
+			lblVarName.setPreferredSize(sizeNameLbls);
+			lblVarName.setToolTipText("<html>This is the string identifying the "
+					+ "user-defined variable <br> in the expression of the "
+					+ "fitness.</html>");
+			JTextField txtVarName = new JTextField();
+			txtVarName.setPreferredSize(sizeNameFields);
+			rowTwo.add(lblVarName);
+			rowTwo.add(txtVarName);
+			
+			JPanel rowThree = new JPanel();
+			rowThree.setLayout(new BorderLayout());
+			JLabel lblSmarts = new JLabel("SMARTS:");
+			lblSmarts.setToolTipText("<html>The SMARTS query used to identify "
+					+ "specific atom/bonds to <br> "
+					+ "be used for the calculation of "
+					+ "the numerical value of this variable.</html>");
+			JEditorPane txtSmarts = new JEditorPane();
+			JScrollPane txtSmartsScrollPane = new JScrollPane(txtSmarts);
+			rowThree.add(lblSmarts,BorderLayout.WEST);
+			rowThree.add(txtSmartsScrollPane,BorderLayout.CENTER);
+			JPanel firstTwo = new JPanel();
+			firstTwo.setLayout(new BoxLayout(firstTwo, 
+					SwingConstants.VERTICAL));
+			firstTwo.add(rowOne);
+			firstTwo.add(rowTwo);
+			addToNorthPane(firstTwo);
+			addToCentralPane(rowThree);
+			this.btnDone.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (txtVarName.getText().equals("")
+							&& txtDescName.getText().equals("")
+							&& txtSmarts.getText().equals(""))
+					{
+						result = "";
+					} else {
+						result = "${atomSpecific('" + txtVarName.getText() 
+						+ "','" + txtDescName.getText() + "','"
+						+ txtSmarts.getText() + "')}";
+					}
+					close();
+				}
+			});
+			this.btnCanc.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					result = "";
+					close();
+				}
+			});
+    	}
     }
 }
