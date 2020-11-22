@@ -490,7 +490,14 @@ public class GUIInspectGARun extends GUICardPanel
 		plot.setDomainGridlinePaint(Color.LIGHT_GRAY);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
 		plot.setSeriesRenderingOrder(SeriesRenderingOrder.FORWARD);
-		plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+		// The following brings the points for datasetAllFit on top of the
+		// mean/min/max/median lines, thus allowing selection of points
+		// even in presence of these line series, which would otherwise (if in
+		// front-most layer) prevent the mouse clicked event to identify the 
+		// item from datasetAllFit, thus preventing to display the molecular
+		// representation of that item.
+		plot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
+		
 		// main dataset (all items with fitness)
 		Shape shape0 = new Ellipse2D.Double(
 				 -GUIPreferences.chartPointSize/2.0,
