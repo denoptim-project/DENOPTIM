@@ -153,6 +153,11 @@ runTest "t2b"
 runTest "t2c"
 
 #
+# t2d: with python driven fitness provider
+#
+runTest "t2d"
+
+#
 # t3: parallel combinatorial builder with enforced symmetry
 #
 runTest "t3"

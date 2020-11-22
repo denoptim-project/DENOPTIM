@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.task;
+package denoptimga;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,14 +29,19 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.task.FitnessTask;
+import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.TaskUtils;
+import fragspaceexplorer.FSEParameters;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a
@@ -48,6 +53,11 @@ public class OffspringEvaluationTask extends FitnessTask
     private final String molName;
     private volatile ArrayList<DENOPTIMMolecule> curPopln;
     private volatile Integer numtry;
+    
+    /**
+     * Tool for generating 3D models assembling 3D building blocks.
+     */
+    private TreeBuilder3D tb3d;
     
 //------------------------------------------------------------------------------
     
@@ -80,16 +90,6 @@ public class OffspringEvaluationTask extends FitnessTask
         result.setMoleculeUID(inchi);
         result.setMoleculeSmiles(smiles);
         
-        fitProvMol.setProperty(CDKConstants.TITLE, molName);
-        fitProvMol.setProperty("GCODE", dGraph.getGraphId());
-        fitProvMol.setProperty("InChi", inchi);
-        fitProvMol.setProperty("SMILES", smiles);
-        fitProvMol.setProperty("GraphENC", dGraph.toString());
-        if (dGraph.getMsg() != null)
-        {
-        	fitProvMol.setProperty("GraphMsg", dGraph.getMsg());
-        }
-        
         // Define pathnames to files used/produced by fitness provider
         //TODO use constants
         fitProvOutFile = workDir + SEP + molName + "_FIT.sdf";
@@ -103,6 +103,37 @@ public class OffspringEvaluationTask extends FitnessTask
     @Override
     public Object call() throws DENOPTIMException, Exception
     {
+    	// Optionally improve the molecular representation, which
+        // is otherwise only given by the collection of building
+        // blocks (not aligned, nor roto-translated)
+        if (FitnessParameters.make3dTree())
+        {
+        	TreeBuilder3D tb3d = new TreeBuilder3D(
+        			FragmentSpace.getScaffoldLibrary(),
+        			FragmentSpace.getFragmentLibrary(),
+        			FragmentSpace.getCappingLibrary());
+        	
+            try {
+                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(dGraph);
+            	//DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
+                fitProvMol = mol;
+        	} catch (Throwable t) {
+        		//we have it already from before
+        	}
+        }
+        fitProvMol.setProperty(CDKConstants.TITLE, molName);
+        fitProvMol.setProperty("SMILES", result.getMoleculeSmiles());
+        fitProvMol.setProperty("InChi", result.getMoleculeUID());
+        fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, 
+        		dGraph.getGraphId());
+        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
+        		result.getMoleculeUID());
+        fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
+        if (dGraph.getMsg() != null)
+        {
+        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getMsg());
+        }
+        
         // Run the fitness provider, whatever that is
         try
         {

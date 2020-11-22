@@ -41,7 +41,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
-import denoptim.task.OffspringEvaluationTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -1057,32 +1056,10 @@ public class ParallelEvolutionaryAlgorithm
                     
 
                 // Create the task
-                // check if the molinchi has been encountered before
                 String inchi = res[0].toString().trim();
-                
-                /*
-                if (lstInchi.contains(inchi))
-                {
-                    synchronized(numtry)
-                    {
-                        numtry++;
-                    }
-                    continue;
-                }
-                else
-                {
-                    lstInchi.add(inchi);
-                    synchronized(numtry)
-                    {
-                        numtry = 0;
-                    }
-                }
-                */
-
-                // file extensions will be added later
-                String molName = "M" +
-                        GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                    GraphUtils.getUniqueMoleculeIndex());
+                String molName = "M" + GenUtils.getPaddedString(
+                		DENOPTIMConstants.MOLDIGITS,
+                		GraphUtils.getUniqueMoleculeIndex());
 
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];

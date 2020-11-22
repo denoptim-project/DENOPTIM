@@ -82,9 +82,10 @@ public class FSEParameters
     private static String uidFile = "UID.txt";
 
     /**
-     * Flag: optionally perform an external task for each accepted graph
+     * Flag: optionally perform an evaluation of the fitness/descriptors on
+     *  each accepted graph
      */
-    private static boolean externalTask = false;
+    private static boolean runFitnessTask = false;
 
     /**
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
@@ -136,12 +137,12 @@ public class FSEParameters
 
     /**
      * Flag requiring generation of the checkpoint files for the testing suite.
-     * When <code>true</code> allows to stop the asyncronous, parallized 
+     * When <code>true</code> allows to stop the asyncronous, parallelized 
      * exploration of a fragment space so that checkpoint files and 
      * serialized graphs can be generated and used to prepare the test suite.
      */
     private static boolean prepareChkAndSerForTests = false;
-
+    
     /**
      * Verbosity level
      */
@@ -185,16 +186,16 @@ public class FSEParameters
 
 //-----------------------------------------------------------------------------
 
-    public static boolean submitExternalTask()
+    public static boolean submitFitnessTask()
     {
-	return externalTask;
+	    return runFitnessTask;
     }
 
 //-----------------------------------------------------------------------------
 
     public static String getDBRoot()
     {
-	return dbRootDir;
+	    return dbRootDir;
     }
 
 //-----------------------------------------------------------------------------
@@ -208,14 +209,14 @@ public class FSEParameters
 
     public static long getMaxWait()
     {
-	return maxWait;
+	    return maxWait;
     }
 
 //-----------------------------------------------------------------------------
 
     public static long getWaitStep()
     {
-	return waitStep;
+	    return waitStep;
     }
 
 //-----------------------------------------------------------------------------
@@ -229,14 +230,14 @@ public class FSEParameters
 
     public static boolean useGivenRoots()
     {
-	return useGivenRoots;
+	    return useGivenRoots;
     }
 
 //-----------------------------------------------------------------------------
 
     public static int getCheckPointStep()
     {
-	return chkptStep;
+	    return chkptStep;
     }
 
 //-----------------------------------------------------------------------------
@@ -250,28 +251,28 @@ public class FSEParameters
 
     public static FSECheckPoint getCheckPoint()
     {
-	return chkpt;
+	    return chkpt;
     }
 
 //-----------------------------------------------------------------------------
 
     public static boolean restartFromCheckPoint()
     {
-	return chkptRestart;
+	    return chkptRestart;
     }
 
 //-----------------------------------------------------------------------------
 
     public static boolean prepareFilesForTests()
     {
-	return prepareChkAndSerForTests;
+	    return prepareChkAndSerForTests;
     }
 
 //-----------------------------------------------------------------------------
 
     public static int getVerbosity()
     {
-	return verbosity;
+	    return verbosity;
     }
 
 //-----------------------------------------------------------------------------
@@ -483,8 +484,8 @@ public class FSEParameters
             }
             break;
         default:
-             msg = "Keyword " + key + " is not a known FragmentSpaceExplorer-"
-                                       + "related keyword. Check input files.";
+             msg = "Keyword " + key + " is not a known FragmentSpaceExplorer-" 
+            		 + "related keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }
@@ -639,7 +640,7 @@ public class FSEParameters
         if (FitnessParameters.fitParamsInUse())
         {
             FitnessParameters.processParameters();
-            externalTask = true;
+            runFitnessTask = true;
         }
         
 		if (useGivenRoots)

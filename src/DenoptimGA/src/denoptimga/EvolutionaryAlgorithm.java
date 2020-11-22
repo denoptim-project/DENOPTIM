@@ -37,7 +37,6 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
-import denoptim.task.OffspringEvaluationTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;

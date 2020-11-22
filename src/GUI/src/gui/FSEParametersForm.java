@@ -104,7 +104,7 @@ public class FSEParametersForm extends ParametersForm
     JPanel linePar8;
     JLabel lblPar8;
     JTextField txtPar8;
-
+    
     String keyPar1 = "FSE-WorkDir";
     JPanel linePar1;
     JLabel lblPar1;
@@ -342,7 +342,7 @@ public class FSEParametersForm extends ParametersForm
         linePar8.add(lblPar8);
         linePar8.add(txtPar8);
         advOptsBlock.add(linePar8);
-
+        
         String toolTipPar1 = "Specifies the pathname of the directory where files will be created";
         linePar1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar1 = new JLabel("Work space:", SwingConstants.LEFT);
@@ -570,17 +570,17 @@ public class FSEParametersForm extends ParametersForm
         	importParametersFromDenoptimParamsFile(txtFSESource.getText());
         }
         
-        sb.append(getStringIfNotEmpty(keyPar2,txtPar2));;
-        sb.append(getStringIfNotEmpty(keyPar7,txtPar7));;
+        sb.append(getStringIfNotEmpty(keyPar2,txtPar2));
+        sb.append(getStringIfNotEmpty(keyPar7,txtPar7));
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));
         sb.append(getStringIfNotEmpty(keyPar9,txtPar9));
         sb.append(keyPar10).append("=").append(cmbPar10.getSelectedItem()).append(NL);
-        sb.append(getStringIfNotEmpty(keyPar8,txtPar8));;
+        sb.append(getStringIfNotEmpty(keyPar8,txtPar8));
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(getStringIfNotEmpty(keyPar4,txtPar4));
-        sb.append(getStringIfNotEmpty(keyPar5,txtPar5));;
-        sb.append(getStringIfNotEmpty(keyPar6,txtPar6));;
-        sb.append(getStringIfNotEmpty(keyPar11,txtPar11));;
+        sb.append(getStringIfNotEmpty(keyPar5,txtPar5));
+        sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
+        sb.append(getStringIfNotEmpty(keyPar11,txtPar11));
         sb.append(getStringIfNotEmpty(keyPar12,txtPar12));
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }

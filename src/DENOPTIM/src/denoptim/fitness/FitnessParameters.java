@@ -117,6 +117,16 @@ public class FitnessParameters
      * Flag controlling production of png graphics for each candidate
      */
     private static boolean makePictures = false;
+    
+    /**
+     * Flag requesting the generation of a 3d-tree model instead of a plain
+     * collection of 3d building blocks. In the latter, the coordinated of each
+     * fragment are not changed when building the molecular representation that
+     * is sent to the fitness provider. Setting this to <code>true</code> asks
+     * for roto-translation of each fragment, but does not perform any 
+     * energy-driven refinement of the geometry.
+     */
+    private static boolean make3DTrees = true;
 
 
 //------------------------------------------------------------------------------
@@ -146,6 +156,19 @@ public class FitnessParameters
     public static boolean makePictures()
     {
         return makePictures;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are asked to make a tree-like 3d 
+     * molecular model prior fitness evaluation. The model is built by aligning
+     * 3d-building blocks to the attachment point vectors, so there is no 
+     * energy refinement.
+     */
+    public static boolean make3dTree()
+    {
+    	return make3DTrees;
     }
 
 //------------------------------------------------------------------------------
@@ -244,6 +267,10 @@ public class FitnessParameters
         	fitParamsInUse = true;
 	        makePictures = true;
 	        break;
+	        
+        case "FP-NO3DTREEMODEL":
+        	make3DTrees = false;
+        	break;
 
         default:
              msg = "Keyword " + key + " is not a known fitness-related "
@@ -399,10 +426,11 @@ public class FitnessParameters
         	{
 	        	case "BASH":
 	        		break;
-/*
-//TODO: add these
+	        		
 	        	case "PYTHON":
 	        		break;
+/*
+//TODO: add 
 	        	case "JAVA":
 	        		break;
 */

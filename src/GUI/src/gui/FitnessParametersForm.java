@@ -97,6 +97,10 @@ public class FitnessParametersForm extends ParametersForm
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
     
+    String key3dTrees = "FP-No3dTreeModel";
+    JPanel line3dTrees;
+    JRadioButton rdb3dTrees;
+    
     JPanel lineFPSource;
     JLabel lblFPSource;
     JTextField txtFPSource;
@@ -251,6 +255,20 @@ public class FitnessParametersForm extends ParametersForm
         lineFPSource.add(btnFPSource);
         lineFPSource.add(btnLoadFPSource);
         localBlock1.add(lineFPSource);
+        
+        
+        String toolTip3dTrees = "<html>Tick here to enable/disable preliminary "
+        		+ "generation of a unrefined<br>3D geometry prior to fitness "
+        		+ "evaluation.<br>These models are build by aligning the given "
+        		+ "3D fragments<br> to the attachment point vectors. "
+        		+ "These models are <br>not energy-refined.</html>";
+        line3dTrees = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdb3dTrees = new JRadioButton("Make unrefined 3d model.");
+        rdb3dTrees.setToolTipText(toolTip3dTrees);
+        rdb3dTrees.setSelected(true);
+        mapKeyFieldToValueField.put(key3dTrees.toUpperCase(), rdb3dTrees);
+        line3dTrees.add(rdb3dTrees);
+        localBlock2.add(line3dTrees);
 
         String toolTipIntOrExt = "<html>A fitness provider is an existing "
         		+ "tool or script.<br> The fitness provider must produce an "
@@ -309,11 +327,9 @@ public class FitnessParametersForm extends ParametersForm
         lblFitProviderInterpreter.setPreferredSize(fileLabelSize);
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
         cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH",
-        		"Python", "JAVA"});
+        		"Python"});
         cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
-        
-        //TODO: remove when functionality is fully implemented
-        cmbFitProviderInterpreter.setEnabled(false);
+        cmbFitProviderInterpreter.setEnabled(true);
         
         mapKeyFieldToValueField.put(keyFitProviderInterpreter.toUpperCase(), 
         		cmbFitProviderInterpreter);
@@ -821,7 +837,12 @@ public class FitnessParametersForm extends ParametersForm
  				break;
  				
  			case "class javax.swing.JRadioButton":
- 				((JRadioButton) valueField).setSelected(true);
+ 				if (key.toUpperCase().equals(key3dTrees.toUpperCase()))
+ 				{
+ 					((JRadioButton) valueField).setSelected(false);
+ 				} else {
+ 					((JRadioButton) valueField).setSelected(true);
+ 				}
  				break;
  				
  			case "class javax.swing.JComboBox":
@@ -873,6 +894,10 @@ public class FitnessParametersForm extends ParametersForm
         		sb.append(keyMoreEq).append("=").append(
         				tabMoreEqMod.getValueAt(i, 1)).append(NL);
             }
+        }
+        if (!rdb3dTrees.isSelected())
+        {
+            sb.append(key3dTrees).append(NL);
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }
