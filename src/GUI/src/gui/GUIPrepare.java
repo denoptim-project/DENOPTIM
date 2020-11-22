@@ -143,7 +143,7 @@ public class GUIPrepare extends GUICardPanel
 		*/
 
 		
-		JButton btnRun = new JButton("Run...",
+		JButton btnRun = new JButton("Run now...",
 				UIManager.getIcon("Menu.arrowIcon"));
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -206,17 +206,49 @@ public class GUIPrepare extends GUICardPanel
 		
 		
 		/*
+		//
+		//TODO? Right now it only prints the configuration file in a new folder
+		//But, running the experiments requires a command from the user and 
+		//from outside this JVM. Moreover, that command is platform specific.
+		//
 		JButton btnSubmit = new JButton("Submit...",
 		UIManager.getIcon("Menu.arrowIcon"));
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO
-				getNonImplementedError();
+					String location = "unknownLocation";
+					try {
+						File wrkSpace = prepareWorkSpace();
+						File paramFile = instatiateParametersFile(wrkSpace);
+						if (!printAllParamsToFile(paramFile))
+						{
+							throw new DENOPTIMException("Failed to make "
+									+ "parameter file '" + paramFile + "'");
+						}
+						location = wrkSpace.getAbsolutePath();
+					} catch (DENOPTIMException e1) {
+						JOptionPane.showMessageDialog(null,
+								"Could not prepare work space. " 
+								+ e1.getMessage()
+								+ ". " + e1.getCause().getMessage(),
+			                    "ERROR",
+			                    JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					// We have only the .params file under the tmp space
+					// Should get copies of all input files and place them under 
+					// the same location.
+
+					JOptionPane.showMessageDialog(null,
+							"<html>The experiment is all set up under<br>"
+							+ location+"</html>",
+		                    "Prepared. Now, submit!",
+		                    JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		commandsPane.add(btnSubmit);
 		*/
-
+		
 		JButton btnCanc = new JButton("Close Tab", 
 				UIManager.getIcon("FileView.fileIcon"));
 		btnCanc.setToolTipText("Closes this tab.");
@@ -242,6 +274,25 @@ public class GUIPrepare extends GUICardPanel
 			}
 		});
 		commandsPane.add(btnHelp);
+	}
+
+//------------------------------------------------------------------------------
+
+	/**
+	 * This will get the dafault name of the JAR file with "Main" class defined
+	 * for the kind of task we are submitting: DenoptimGA or FragSpaceEsplorer.
+	 */
+	private String getNameOfCorrespondingJAR()
+	{
+		String baseName = "some_name.jar";
+		if (this instanceof GUIPrepareGARun)
+		{
+			baseName = "DenoptimGA";
+		} else if (this instanceof GUIPrepareFSERun)
+		{
+			baseName = "FragSpaceExplorer";
+		}
+		return baseName;
 	}
 	
 //------------------------------------------------------------------------------
