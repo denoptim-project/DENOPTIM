@@ -19,6 +19,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -44,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
@@ -51,6 +53,7 @@ import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -122,7 +125,8 @@ public class FitnessParametersForm extends ParametersForm
     String keyMoreEq = "FP-DescriptorSpecs";
     JPanel lineMoreEq;
     JLabel lblMoreEq;
-    JEditorPane txtMoreEq;
+    JTable tabMoreEq;
+    DefaultTableModel tabMoreEqMod;
     
     JPanel descDefinitionPane;
     JScrollPane descDefScrollPane;
@@ -325,7 +329,7 @@ public class FitnessParametersForm extends ParametersForm
         //lblEq.setPreferredSize(fileLabelSize);
         lblEq.setToolTipText(toolTipEq);
         txtEq = new JTextField();
-        txtEq.setToolTipText("<html>Type here the expression computing the fitness value out of atomic/molecular descriptors.<br>Descriptors can be selected in the below tree.</html>");
+        txtEq.setToolTipText("<html>Type here the expression computing the fitness value out of predefined descriptors and custom variables.<br>Descriptors can be selected from the 'Available descriptors' section (below).<br>Custom variables, including atom-specific descriptors, can descriptors can be defined in the 'Custom variables' section.</html>");
         Dimension fitEqSize = new Dimension(500, 2*preferredHeight);
         txtEq.setPreferredSize(fitEqSize);
         txtEq.getDocument().addDocumentListener(fieldListener);
@@ -335,43 +339,10 @@ public class FitnessParametersForm extends ParametersForm
         lineEq.add(lblEqEnd);
         localBlock4.add(lineEq);
         
-        String toolTipMoreEq = "<html>Define atom/bond specific descriptors."
-        		+ "<br> One per line, e.g.: <br> "
-        		+ "<code>aPol_3 = ${atomSpecific('aPol',3)}</code><br>"
-        		+ "<code>aPol_4 = ${atomSpecific('aPol',4)}</code></html>";
-        lineMoreEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblMoreEq = new JLabel("<html>Atom/bond specific descriptors:</html>");
-        txtMoreEq = new JEditorPane();
-        Dimension moreEqSize = new Dimension(500, 6*preferredHeight);
-        txtMoreEq.setPreferredSize(moreEqSize);
-		// Adding the scroll pane gives problems and clashes with the scrollpane on the JTree (hypothesis)
-        //JScrollPane txtMoreEqScrollPane = new JScrollPane(txtMoreEq);
-        mapKeyFieldToValueField.put(keyMoreEq.toUpperCase(), 
-        		txtMoreEq);
-        lineMoreEq.setToolTipText(toolTipMoreEq);
-        JButton btnMoreEq = new JButton("Add atom-specific variable");
-        btnMoreEq.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ExpressionDefDialog dialog = new ExpressionDefDialog();
-				String res = (String) dialog.showDialog();
-				if (res!=null && !res.equals(""))
-				{
-					if (txtMoreEq.getText().equals(""))
-					{
-						txtMoreEq.setText(res);
-					} else {
-						txtMoreEq.setText(txtMoreEq.getText()
-								+ System.getProperty("line.separator")
-								+ res);
-					}
-				}
-			}
-		});
-        lineMoreEq.add(btnMoreEq);
-        //lineMoreEq.add(txtMoreEqScrollPane);
-        lineMoreEq.add(txtMoreEq);
-        localBlock4.add(lineMoreEq);
+        JLabel lblDescTreeTitle = new JLabel("Available descriptors:");
+        JPanel lineDescTreeTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lineDescTreeTitle.add(lblDescTreeTitle);
+        localBlock4.add(lineDescTreeTitle);
         
         String toolTipDescs = "<html>To select descriptor names:"
         		+ "<ol><li>Browse the list of descriptors (double click to expand/reduce a node),"
@@ -619,6 +590,49 @@ public class FitnessParametersForm extends ParametersForm
         lineDescsTree.add(splitPaneDescs);
         localBlock4.add(lineDescsTree);
         
+        lblMoreEq = new JLabel("Custom variables definition:");
+        JPanel lineMoreEqTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lineMoreEqTitle.add(lblMoreEq);
+        localBlock4.add(lineMoreEqTitle);
+        
+        String toolTipMoreEq = "<html>Define atom/bond specific descriptors.</html>";
+        lineMoreEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        
+        tabMoreEqMod = new DefaultTableModel();
+        tabMoreEqMod.setColumnCount(2);
+        String column_names[]= {"<html><b>Variable</b></html>", 
+        		"<html><b>Definition</b></html>"};
+        tabMoreEqMod.setColumnIdentifiers(column_names);
+        tabMoreEq = new JTable(tabMoreEqMod);
+        tabMoreEq.setToolTipText(toolTipMoreEq);
+        tabMoreEq.putClientProperty("terminateEditOnFocusLost", true);
+        tabMoreEq.getColumnModel().getColumn(0).setMinWidth(75);
+        tabMoreEq.getColumnModel().getColumn(1).setMinWidth(100);
+        tabMoreEq.setGridColor(Color.LIGHT_GRAY);
+		JTableHeader tabMoreEqHeader = tabMoreEq.getTableHeader();
+		tabMoreEqHeader.setPreferredSize(new Dimension(120, 20));
+		JScrollPane tabMoreEqScrollPane = new JScrollPane(tabMoreEq);
+		//tabMoreEqScrollPane.setMinimumSize(new Dimension(240,30));
+
+        mapKeyFieldToValueField.put(keyMoreEq.toUpperCase(), 
+        		tabMoreEqMod);
+
+        JButton btnMoreEq = new JButton("Add atom-specific variable");
+        btnMoreEq.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ExpressionDefDialog dialog = new ExpressionDefDialog();
+				Object[] res = (Object[]) dialog.showDialog();
+				if (res!=null)
+				{
+					tabMoreEqMod.addRow(res);
+				}
+			}
+		});
+        lineMoreEq.add(tabMoreEqScrollPane);
+        lineMoreEq.add(btnMoreEq);
+        localBlock4.add(lineMoreEq);
+        
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
         
@@ -683,7 +697,11 @@ public class FitnessParametersForm extends ParametersForm
     @Override
     protected void preliminatyTasksUponImportingParams()
     {
-    	txtMoreEq.setText("");
+    	int initialRowCount = tabMoreEqMod.getRowCount();
+    	for (int i=0; i<initialRowCount; i++)
+    	{
+    		tabMoreEqMod.removeRow(0);
+    	}
     }
     
 //------------------------------------------------------------------------------
@@ -786,19 +804,6 @@ public class FitnessParametersForm extends ParametersForm
     
  		switch (valueFieldClass)
  		{	
-			case "class javax.swing.JEditorPane":
- 				if (key.equals(keyMoreEq)) 
-    			{
- 					String old = txtMoreEq.getText();
- 					if (old.equals(""))
- 					{
- 						txtMoreEq.setText(value);
- 					} else {
- 				        txtMoreEq.setText(old + NL + value);
- 					}
-    			}
- 				break;
- 				
  			case "class javax.swing.JTextField":
  				if (key.equals(keyFitProviderSource)) 
     			{
@@ -824,10 +829,18 @@ public class FitnessParametersForm extends ParametersForm
  				break;
  				
  			case "class javax.swing.table.DefaultTableModel":
-
- 				//WARNING: there might be cases where we do not take all the records
-
- 				((DefaultTableModel) valueField).addRow(value.split(" "));
+ 				if (key.equals(keyMoreEq)) 
+    			{
+ 					String noHead = value.replace("${atomSpecific('", "");
+ 					Object[] rowContent = new Object[2];
+ 					rowContent[0] = noHead.split("'")[0];
+ 					rowContent[1] = value;
+ 					((DefaultTableModel) valueField).addRow(rowContent);
+    			} else {
+    				//WARNING: there might be other cases where we do not take 
+    				// all the row/columns
+    				((DefaultTableModel) valueField).addRow(value.split(" "));
+    			}
  				break;
  				
  			default:
@@ -855,7 +868,11 @@ public class FitnessParametersForm extends ParametersForm
         else
         {
         	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}"));
-        	sb.append(getStringIfNotEmpty(keyMoreEq,txtMoreEq,true));
+        	for (int i=0; i<tabMoreEqMod.getRowCount(); i++) 
+            {
+        		sb.append(keyMoreEq).append("=").append(
+        				tabMoreEqMod.getValueAt(i, 1)).append(NL);
+            }
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }
@@ -874,6 +891,17 @@ public class FitnessParametersForm extends ParametersForm
     		Dimension sizeNameLbls = new Dimension(120,preferredHeight);
     		
 			JPanel rowOne = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JLabel lblVarName = new JLabel("Variable name: ");
+			lblVarName.setPreferredSize(sizeNameLbls);
+			lblVarName.setToolTipText("<html>This is the string representing "
+					+ "a user-defined variable <br> in the expression of the "
+					+ "fitness.</html>");
+			JTextField txtVarName = new JTextField();
+			txtVarName.setPreferredSize(sizeNameFields);
+			rowOne.add(lblVarName);
+			rowOne.add(txtVarName);
+			
+			JPanel rowTwo = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			JLabel lblDescName = new JLabel("Descriptor name: ");
 			lblDescName.setPreferredSize(sizeNameLbls);
 			lblDescName.setToolTipText("<html>This is the pre-defined short "
@@ -882,19 +910,8 @@ public class FitnessParametersForm extends ParametersForm
 					+ "the collection of descriptors.</html>");
 			JTextField txtDescName = new JTextField();
 			txtDescName.setPreferredSize(sizeNameFields);
-			rowOne.add(lblDescName);
-			rowOne.add(txtDescName);
-			
-			JPanel rowTwo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			JLabel lblVarName = new JLabel("Variable name: ");
-			lblVarName.setPreferredSize(sizeNameLbls);
-			lblVarName.setToolTipText("<html>This is the string identifying the "
-					+ "user-defined variable <br> in the expression of the "
-					+ "fitness.</html>");
-			JTextField txtVarName = new JTextField();
-			txtVarName.setPreferredSize(sizeNameFields);
-			rowTwo.add(lblVarName);
-			rowTwo.add(txtVarName);
+			rowTwo.add(lblDescName);
+			rowTwo.add(txtDescName);
 			
 			JPanel rowThree = new JPanel();
 			rowThree.setLayout(new BorderLayout());
@@ -922,11 +939,12 @@ public class FitnessParametersForm extends ParametersForm
 							&& txtDescName.getText().equals("")
 							&& txtSmarts.getText().equals(""))
 					{
-						result = "";
+						result = null;
 					} else {
-						result = "${atomSpecific('" + txtVarName.getText() 
-						+ "','" + txtDescName.getText() + "','"
-						+ txtSmarts.getText() + "')}";
+						result = new Object[] {txtVarName.getText(), 
+								"${atomSpecific('" + txtVarName.getText() 
+								+ "','" + txtDescName.getText() + "','"
+								+ txtSmarts.getText() + "')}"};
 					}
 					close();
 				}
@@ -935,7 +953,7 @@ public class FitnessParametersForm extends ParametersForm
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					result = "";
+					result = null;
 					close();
 				}
 			});
