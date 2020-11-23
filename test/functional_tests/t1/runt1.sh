@@ -74,7 +74,7 @@ do
     echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$tinkerparFile"
     echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/DenoptimCG/data/rotatableBonds-1.0" >> "$tinkerparFile"
 
-    echo "CG-wrkDir=$wrkDir" >> "$tinkerparFile"
+    echo "CG-workDir=$wrkDir" >> "$tinkerparFile"
     # location of the TINKER tools
     echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$tinkerparFile"
     echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$tinkerparFile"

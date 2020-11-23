@@ -38,7 +38,7 @@ if [ $? -ne 0 ]; then
     echo "Failed to create DENOPTIM-GUI.jar."
     exit -1
 fi
-echo "------------------------- Done building DENOPTIM ------------------------"
+echo "--------------------- Done building DENOPTIM-GUI.jar ---------------------"
 
 # Make a jar for the DeniptimGA for backgrownd jobs
 
@@ -56,7 +56,7 @@ if [ $? -ne 0 ]; then
     echo "Failed to create DenoptimGA.jar."
     exit -1
 fi
-echo "----------------------- Done building DenoptimGA ------------------------"
+echo "--------------------- Done building DenoptimGA.jar ----------------------"
 
 # Make a jar for the DeniptimGA for backgrownd jobs
 
@@ -74,6 +74,6 @@ if [ $? -ne 0 ]; then
     echo "Failed to create FragSpaceExplorer.jar."
     exit -1
 fi
-echo "-------------------- Done building FragSpaceExplorer --------------------"
+echo "------------------ Done building FragSpaceExplorer.jar  ------------------"
 
 rm -rf manifest.mf gui denoptim denoptimga fragspaceexplorer images

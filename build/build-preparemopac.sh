@@ -11,7 +11,7 @@ fi
 
 
 if [ ! -f DENOPTIM-GUI.jar ]; then
-    echo "Failed to locate DENOPTIM-GUI.jar in ../lib"
+    echo "Failed to locate DENOPTIM-GUI.jar"
     exit -1
 fi
 cp DENOPTIM-GUI.jar lib/

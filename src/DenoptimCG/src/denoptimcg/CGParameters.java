@@ -526,8 +526,8 @@ public class CGParameters
 
     public static void checkParameters() throws DENOPTIMException
     {
-	checkNotNull("wrkDir",wrkDir,"CG-WRKDIR");
-	checkFileExists(wrkDir);
+		checkNotNull("wrkDir",wrkDir,"CG-WORKDIR");
+		checkFileExists(wrkDir);
 
         checkNotNull("inpSDFFile",inpSDFFile,"CG-INPSDF");
         checkFileExists(inpSDFFile);

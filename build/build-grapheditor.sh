@@ -10,13 +10,8 @@ if [ -d ../lib ]; then
 fi
 
 
-
-if [ ! -f lib/DENOPTIM-GUI.jar ]; then
-	echo "Failed to create GraphEditor.jar. Cannot locate DENOPTIM-GUI.jar in lib"
-    exit -1
-fi
 if [ ! -f DENOPTIM-GUI.jar ]; then
-    echo "Failed to locate DENOPTIM-GUI.jar in ../lib"
+    echo "Failed to locate DENOPTIM-GUI.jar"
     exit -1
 fi
 cp DENOPTIM-GUI.jar lib/
