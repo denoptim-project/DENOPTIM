@@ -470,7 +470,7 @@ public class CGParameters
         case "CG-OUTSDF=":
             outSDFFile = value;
             break;
-        case "CG-WRKDIR=":
+        case "CG-WORKDIR=":
             wrkDir = value;
             break;
 /*

@@ -183,11 +183,27 @@ with version and license details.</p>
 			</td>
 		</tr>
 		<tr valign="middle">
+			<td width="154"><p align="center">JMol</p>
+			</td>
+			<td width="193"><p align="center">LGPL 2.0</p>
+			</td>
+			<td width="311"><p align="center">Version 14.29.55</p>
+			</td>
+		</tr>
+		<tr valign="middle">
+			<td width="154"><p align="center">apiguardian</p>
+			</td>
+			<td width="193"><p align="center">Apache v2.0</p>
+			</td>
+			<td width="311"><p align="center">Version 1.1.0</p>
+			</td>
+		</tr>
+		<tr valign="middle">
 			<td width="154"><p align="center">CDK</p>
 			</td>
-			<td width="193"><p align="center">GNU</p>
+			<td width="193"><p align="center">LGPL v2.1</p>
 			</td>
-			<td width="311"><p align="center">Version 1.4.17 or above</p>
+			<td width="311"><p align="center">Version 1.4.19</p>
 			</td>
 		</tr>
 		<tr valign="middle">
@@ -196,6 +212,14 @@ with version and license details.</p>
 			<td width="193"><p align="center">Apache v2</p>
 			</td>
 			<td width="311"><p align="center">Version 2.4.0	</p>
+			</td>
+		</tr>
+		<tr valign="middle">
+			<td width="154"><p align="center">Commons-el</p>
+			</td>
+			<td width="193"><p align="center">Apache v2</p>
+			</td>
+			<td width="311"><p align="center">Version 1.0 </p>
 			</td>
 		</tr>
 		<tr valign="middle">
@@ -223,11 +247,51 @@ with version and license details.</p>
 			</td>
 		</tr>
 		<tr valign="middle">
+			<td width="154"><p align="center">Commons-lang</p>
+			</td>
+			<td width="193"><p align="center">Apache v2</p>
+			</td>
+			<td width="311"><p align="center">Version 3.1.0 </p>
+			</td>
+		</tr>
+		<tr valign="middle">
+			<td width="154"><p align="center">graphstream</p>
+			</td>
+			<td width="193"><p align="center">LGPL v3.0</p>
+			</td>
+			<td width="311"><p align="center">Version 1.3</p>
+			</td>
+		</tr>
+		<tr valign="middle">
+			<td width="154"><p align="center">JavaServlet</p>
+			</td>
+			<td width="193"><p align="center">CDDL v1.1</p>
+			</td>
+			<td width="311"><p align="center">Version 1.4</p>
+			</td>
+		</tr>
+		<tr valign="middle">
+			<td width="154"><p align="center">jfreechart</p>
+			</td>
+			<td width="193"><p align="center">LGPL v2.1</p>
+			</td>
+			<td width="311"><p align="center">Version 1.5</p>
+			</td>
+		</tr>
+		<tr valign="middle">
+			<td width="154"><p align="center">JUnit5</p>
+			</td>
+			<td width="193"><p align="center">EPC 2.0</p>
+			</td>
+			<td width="311"><p align="center">Version 5.5.2</p>
+			</td>
+		</tr>
+		<tr valign="middle">
 			<td width="154"><p align="center">vecmath</p>
 			</td>
-			<td width="193"><p align="center">GNU GPL v2</p>
+			<td width="193"><p align="center">GPL v2.0</p>
 			</td>
-			<td width="311"><p align="center">Version 1.5.2</p>
+			<td width="311"><p align="center">-</p>
 			</td>
 		</tr>
 	</tbody>
@@ -240,17 +304,8 @@ with version and license details.</p>
 	and <i>Oracle</i> Java implementations available. Although both
 	should be compatible, it is advisable to stick to a single version.</p></li>
 	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>CDK</b></font> (<a href="https://cdk.github.io/">https://cdk.github.io/</a>) This
-	library is used within DENOPTIM for basic operations of molecules
-	such as calculation of SMILES and InChi keys.</p></li>
-	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>Commons-io</b></font> (<a href="https://commons.apache.org/proper/commons-io/">https://commons.apache.org/proper/commons-io/</a>) Library
-	of utilities to assist with developing IO functionality.</p></li>
-	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>Commons-lang</b></font> (<a href="https://commons.apache.org/proper/commons-lang/">https://commons.apache.org/proper/commons-lang/</a>) Provides a host of helper utilities for the <i>java.lang</i> API, notably String manipulation methods, basic numerical methods,
-	object reflection, concurrency, creation and serialization and
-	System properties.</p></li>
-	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>Commons-cli</b></font> (<a href="https://commons.apache.org/proper/commons-cli/">https://commons.apache.org/proper/commons-cli/</a>) Library providing an API for parsing command line options passed to programs.</p></li>
-	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>Commons-math</b></font> (<a href="https://commons.apache.org/proper/commons-math/">https://commons.apache.org/proper/commons-math/</a>) 
-	library provides mathematics and statistics components beyond
-	those provided by Java and commons-lang.</p></li>
+	library is used within DENOPTIM for representing chemical objects and performing basic operations
+	such as calculation of SMILES, InChi keys, and Descriptors.</p></li>
 </ul>
 
 <hr>
@@ -294,22 +349,24 @@ Representation of Chemical Entities</h2>
 <h3 class="western"><a name="Toc43997_808352928"></a>Graphs</h3>
 
 <p>DENOPTIM perceives chemical entities as graphs
-(outer graph in Figure 1) where each vertex contains a fragment
-and each edge represents a bonding interaction or a spatial
-relationship. The vertices and edges are organized in a spanning tree
-(T), which is acyclic by definition,
-and a set of fundamental cycles (Fc). The latter includes the chords:
-edges that do not belong to the spanning tree and that define cycles
-of vertices. Fragments can contain any
+(outer graph in Figure 1) that are collections of vertices and edges. A vertex is a building block decorated with a list of attachment points (APs, arrows in Figure 1) that can be used to make edges with other vertices. Use of an attachment point is exclusive: edges can only be made between two attachment points that are available, i.e., not used to make other edges.</p> 
+<p>A vertex is typically a container for a molecular fragment. Fragments can contain any
 number of atoms or pseudo-atoms, and are represented by graphs themselves
-(inner graph), though DENOPTIM perceived them as single entities.</p>
+(inner graph in Figure 1), though DENOPTIM perceived them as single entities.</p> 
+<p>Edges represent an abstract relation between vertices that can typically be translated into an actual bond, but can also represent a pseudo-bond, or a spatial relation.</p>
+
+<p>Vertices and edges are organized in a spanning tree
+(T), which is acyclic by definition,
+and a set of fundamental cycles (Fc). The latter set defined the chords:
+edges that do not belong to the spanning tree and that define cycles
+of vertices.</p>
 <figure> 
 	<img src="figures/graphs.png" alt="figures/graphs.png" width="750"/>
 	<figcaption><i>Figure 1: Graph representation of chemical entities in DENOPTIM.</i></figcaption>
 </figure>
 
 <h3 class="western"><a name="Toc14749_799972446"></a>Fragments</h3>
-<p>Molecular fragments are generated by the fragmentation of compounds taken from
+<p>Molecular fragments are typically generated by the fragmentation of molecular models of compounds taken from
 databases of interest. For instance, libraries of molecules, of
 crystal structures, of previously generated molecular models.
 Fragments have different roles in DENOPTIM:
@@ -327,50 +384,43 @@ Fragments have different roles in DENOPTIM:
 </ul></p>
 
 <p>Each fragment is characterized by its chemical constitution (i.e., atom,
-bonds, charges) and a set of attachment points. Each attachment point
-(AP) defines where (i.e., on which atom/pseudo-atom) and possibly how
-fragments can be connected to each other (i.e., formal bond order,
-geometry). DENOPTIM currently supports two strategies for handling
+bonds, charges) and a set of attachment points. These attachment points are then projected to at the vertex level, so that when a vertex contains a fragment, the list of APS of the vertex is indeed the list defined by the underlying fragment. 
+Each attachment point
+(AP) defines where (i.e., on which atom/pseudo-atom) and possibly additional information such as formal bond order,
+geometry. DENOPTIM currently supports two strategies for handling
 attachment points: the valence-based approach, and the class-based
 approach.</code></p>
 
 <h4 class="western"><a name="Toc14751_799972446"></a>Valence-based approach</h4>
-<p>Within the valence-based strategy each attachment points is a portion of the
+<p>Within the valence-based strategy, each attachment points is a portion of the
 user-defined free valence of a specific atom. Combination
 of attachment points are controlled only by the number of open
 valences on the atoms.</p>
 
 <h4 class="western"><a name="Toc14753_799972446"></a>Class-based approach</h4>
-<p> When using class-based strategy each attachment point is annotated with an
-any-string type of label  specifying the so-called <i>class</i> of the attachment point (APClass).
-The fragmentation performed by GM3DFragmenter (available at
-<a href="https://github.com/denoptim-project/GM3DFragmenter">https://github.com/denoptim-project/GM3DFragmenter</a>) 
-uses cutting rules to chop molecules and store information on the connected chemical environment (i.e.,
-codified into the APClass) 
-of each side of all broken bonds. For each broken bond two attachment
-points are generated with complementary classes (cutting rule labeled <code>#1
-</code> generates classes <code>#1a</code> and <code>#1b</code>).
-The resulting fragments are uninterrupted portions of molecules with
-any number of atoms, bonds, and class-annotated attachment points. 
-Within the class-based approach valence rules are not applied, therefore models of active species and
-transition states can be generated automatically.</p>
-<figure> 
-	<img src="figures/fragmentation.png" alt="figures/fragmentation.git" width="600"/>
-	<figcaption><i>Figure 2: Generation of a fragment library according to the
-		class-based approach</i></figcaption>
-</figure>
-</p>
+<p> When using class-based strategy, each attachment point is annotated with a
+label (i.e., a string with no spaces) specifying the so-called <i>class</i> of the attachment point (APClass).
+The APClass can be freely defined also by the user (e.g., via the GUI) as long as it adheres to the following syntax. 
+<pre>&lt;string&gt;:&lt;int&gt;</pre> where 
+<ul>
+	<li><code>&lt;string&gt;</code> is an alphanumeric string, and</li>
+	<li><code>&lt;int&gt;</code> is a positive integer number.</li>
+</ul>
+To explain this syntax, we consider how fragmentation is performed, for instance, by GM3DFragmenter (available at
+<a href="https://github.com/denoptim-project/GM3DFragmenter">https://github.com/denoptim-project/GM3DFragmenter</a>). 
+The fragmentation algorithm
+uses cutting rules to identify the bond to break when generating fragments. 
+For each broken bond two attachment
+points are generated (one on each side of the broken bond) and, in order to distinguish between the two sides of the broken bond, these attachment points are given two complementary APClasses. These APClasses share a common part (the reference to the cutting rule) and have an additional suffix that makes them distinguishable. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.<p>
 
-<h3 class="western"><a name="Toc40904_11917307261"></a>Capping procedure</h3>
+<p>When working with the class-based approach valence rules are not imposed and the possibility to connect attachment points is decided by a Compatibility Matrix (see below). This allows to define a completely customizable set of rules for building any kind of entity, including  models of disconnected systems, active species and transition states. However, in order to make sure that the entities built with by class-based approach are valid chemical entities, an additional procedure takes care of saturating free attachment points that, if left unused, would result in unwanted open valences. This procedure is called "capping" and it adds "capping groups" on specifically defined free attachment points.</p>
 
-<p>The capping groups are used to saturate open valences when a
-standard “hydrogenation” routine (i.e., addition of H to every
+<p>The use of capping groups is particularly useful when standard “hydrogenation” routine (i.e., addition of H to every
 open valence) is expected to fail. This occurs when the chemical
-entities under construction are not standard organic molecules for
-which “hydrogenation” tools have been trained. The capping
-procedure operates only within the class-based paradigm. The AP
-classes to be capped and the AP classes of the capping groups are
-defined by the user in the compatibility matrix file (see Compatibility Matrix file ).</p>
+entities under construction are not standard organic molecules similar to those for
+which “hydrogenation” tools have been trained.</p> 
+
+<p>The settings of the capping procedure define the list of APClasses that need to be capped, and the APClasses of the capping groups to use for each of the APClasses that need capping. These settings are part of the Compatibility Matrix file (see below).</p>
 
 <h3 class="western"><a name="Toc43999_808352928"></a>Symmetry</h3>
 
@@ -380,10 +430,15 @@ symmetry. In order to be compatible with the use of both 2D and 3D
 fragments, the identification of symmetric APs considers only a
 restricted set of topological features of the APs and the surrounding
 chemical environment. In practice, APs are considered symmetric when
-they have i) same attachment point class, ii) same element as the
-AP’s source atom, iii) same type and number of bonds connected to
-the source atom, iv) same element and number of atoms connected to
-the source atom. Users can control the probability of symmetric
+they have<ul>
+<li>same attachment point class,</li>
+<li> same element as the
+AP’s source atom, </li>
+<li> same type and number of bonds connected to
+the source atom, </li>
+<li>same element and number of atoms connected to
+the source atom.</li>
+</ul> Users can control the probability of symmetric
 operations on specific AP classes by setting a numerical value (i.e.,
 0-100% probability of symmetric operations). 
 </p>
@@ -391,49 +446,36 @@ operations on specific AP classes by setting a numerical value (i.e.,
 <h2 class="western"><a name="Toc42056_808352928"></a>Fitness evaluation</h2>
 
 <p>DENOPTIM main programs generate chemicals entities
-automatically and offers the possibility to submit a subtask for each
+automatically and save them into SDF files (structure-data file, (see <a href="#Toc10339_2456711212">Candidate Chemical Entity Files</a>): one file for each candidate chemical entity generated. This file contains the chemical
+representation of the entity as 2D/3D structure with
+connectivity table together with its graph representation, and can be used for further processing of the candidate. In fact, DENOPTIM offers the possibility to submit a subtask for each
 new entity encountered. This calculation is commonly referred as to
-the fitness evaluation owing to the fact that a fitness value, or
+the "fitness evaluation" owing to the fact that a fitness value, or
 figure of merit, is a typical way to quantify the extent 
 a candidate entity is suitable to a specific function or use.</p>
 
-<p>To ensure general applicability, the calculation of the fitness is performed outside
-DENOPTIM and is controlled by an external tool, i.e., 
-the <b>fitness provider</b>, usually a BASH script. This script is prepared by the user
-according to the needs of the specific case. DENOPTIM programs can be asked to
-will then execute the fitness provider, wait for completion, and retrieve the 
-results that can contain either the fitness or an error message. Note that DENOPTIM programs do not
-interact with the running script.</p>
-<p>For each candidate chemical entity that a DENOPTIM program generates,
-the program produces an SDF file (structure-data
-file) that is meant to communicate the definition of the entity to the fitness provider script. This SDF
-file (see <a href="#Toc10339_2456711212">Candidate Chemical Entity Files</a>) contains the chemical
-representation of the entity as 2D/3D structure with
-connectivity table, and its DENOPTIM representation (i.e., DENOPTIMgraph),
-and is named after the internally unique numerical
-ID of the entity (e.g., <b>M#_I.sdf</b> where <b>#</b> is the
-numerical ID and <b>_I</b> identifies the file as the input for the fitness provider script, i.e.,
-a Candidate Chemical Entity File).</p>
-
-<p>The fitness provider script is expected to do the following tasks, or to manage
-subtasks that perform the following tasks in a completely independent way for each single entity:
-<ol>
-	<li>Read the input SDF file, which is a <a href="#Toc10339_2456711212">Candidate Chemical Entity File</a>.</li>
-	<li>Perform all molecular modeling tasks, including, for instance, 3D model construction, property
-	calculations, output file parsing, and post processing.</li>
-	<li>Calculate the fitness value from the above modeling tasks</li>
-	<li>Create an output SDF file (see <a href="#Toc16853_799972446">Fitness Files</a>) for storing
-	the fitness value of the item (or a properly formatted error message) in addition to any useful output
-	data that might be used to post-process the results.</li>
-</ol>
-</p>
+<p>The fitness provider can be
+<ul>
+	<li>internal: uses functionality within DENOPTIM to calculate descriptors and combine them into a numerical fitness value. The internal fitness provider does not perform any molecular modeling, such as geometry optimization and the like.</li>
+	<li>external: an executable placed outside of the DENOPTIM package. Currently <code>bash</code> o <code>python</code> scripts are supported. This ensures general applicability, as the external fitness provider can perform any sort of task, including any molecular modeling task. In fact, an external fitness provider is expected to do the following tasks:
+	<ol>
+        <li>Read the <a href="#Toc10339_2456711212">SDF file produced by DENOPTIM</a>.</li>
+        <li>Perform all molecular modeling tasks, including, for example, 3D model construction, property
+        calculations, output file parsing, and post processing.</li>
+        <li>Calculate the fitness value from the above modeling tasks</li>
+        <li>Create an output SDF file (see <a href="#Toc16853_799972446">Fitness Files</a>) for storing
+        the fitness value of the candidate entity (or a properly formatted error message) in addition to any useful output
+        data that might be used to post-process the results.</li>
+	</ol>
+	DENOPTIM programs execute the fitness provider, wait for completion, and retrieve the final results from the <a href="#Toc16853_799972446">output fitness File</a>. Note that DENOPTIM programs do not interact with the running script.</li>
+</ul></p>
 
 <hr>
 
 <h1 class="western"><a name="Toc14759_799972446"></a>Main DENOPTIM programs</h1>
 
 <h2 class="western"><a name="Toc13237_799972446"></a>DenoptimGA</h2>
-<p>The search and optimization method is driven by a genetic algorithm </code>where
+<p>Molecular design where performance optimization is driven by a genetic algorithm where
 each molecule (a virtual chromosome) is represented by a graph. The
 overall schematic of the genetic algorithm (GA) is shown in Figure 3.
 The algorithm begins with a population of molecules that can be given
@@ -451,12 +493,12 @@ from scratch.</p>
 <h3 class="western"><a name="Toc40898_1191730726"></a>Genetic Operations</h3>
 <p>In DENOPTIM, crossover (see Algorithm 1) and mutation are the main
 genetic operators used. Currently, these schemes are restricted to a
-single point. In addition, the vertex corresponding to the scaffold
+single point in a graph. In addition, the vertex corresponding to the scaffold
 is not subject to crossover or mutation, i.e.,
 only vertices attached to the scaffold partake in the genetic
 exchange. In addition, for symmetric graphs, addition or removal of a
 vertex can be propagated across all points related
-by symmetry. Where classes are involved,
+by symmetry. Where APclasses are involved,
 crossover points are chosen according to the rules defined in the compatibility matrix.
 </p>
 
@@ -500,9 +542,7 @@ the probability of appending a fragment to a free AP
 is typically chosen to decrease with the
 distance of the free AP from the root of the graph. 
 This distance is the so-called <i>level</i>, and refers to the fragment
-holding the free AP (Figure 4). 
-At the scaffold level (L<sub>0</sub>),
-the fragments are always added with a probability 1. 
+holding the free AP (Figure 4).
 For the levels L<sub>&gt;0</sub>
 the probability is lowered according to any one of the following
 schemes:</p>
@@ -548,8 +588,7 @@ DENOPTIM the following selection strategies are available:</p>
 	<li><b>RouletteWheel (RW)</b>: In
 	this sampling scheme, each chromosome is assigned a portion/slice of
 	the roulette wheel, the area of the portion being proportional to
-	its fitness. The wheel is then spun a number of times (equal to the
-	size of the population) and the chromosome corresponding to the
+	its fitness. The wheel is then spun a number of times and the chromosome corresponding to the
 	slice that comes under the wheel marker is added to the pool.</li>
 	<li><b>Stochastic universal sampling (SUS)</b>: 
 	differs from RW in that it uses <i>N</i> (number
@@ -564,10 +603,6 @@ DENOPTIM the following selection strategies are available:</p>
 	</p>
 </ul>
 
-<p>The selection schemes are used
-to create a mating pool of chromosomes. The size is preset to 50% of
-the population.</p>
-
 <h3 class="western"><a name="Toc14761_799972446"></a>GA Parallelization Schemes</h3>
 
 <p>Two parallelization schemes based on the consumer-producer pattern
@@ -581,19 +616,11 @@ while some jobs may be completed sooner, the program will still wait
 for the other submitted tasks to complete.</p>
 <p>To remove this waiting time, the second scheme (SCH-2) enables
 continuous submission so that new jobs may be launched whenever free
-CPUs are available. While this will speed-up the processing, the user
-runs the risk of carrying out more fitness evaluations than
-necessary. Although one could potentially kill such tasks, we have
-decided against it given that some of the evaluations are generally
-run on the supercomputer and would thus result in unnecessary loss of
-computer time. Additionally, DenoptimGA
-can only kill the launched process. There is no guarantee that
-subprocesses will be killed. In any case, supercomputer jobs are
-outside its scope. Another aspect of this scheme is that results from
+CPUs are available. Notably, a side effect of this scheme is that results from
 a long running calculation, for e.g. started in <code>Gen01</code>, may only be
 available in <code>Gen20</code>. In such cases, the evaluated molecule will become
-part of the population only in that generation. The generational
-behaviour of the GA is subsequently lost.</p>
+part of the population only in generation 20. The fixed generational
+behavior of the GA is subsequently lost.</p>
 
 <h3 class="western"><a name="Toc17842_799972446"></a>DenoptimGA Input</h3>
 
@@ -601,8 +628,7 @@ behaviour of the GA is subsequently lost.</p>
 form of a text file containing one input parameter per each line. The
 <code>#</code> character is used to denote a
 comment and lines starting with this character are not processed.
-Each input parameter is specified by means of a keyword, which may or
-may not require the specification of a value (syntax: keyword=value).
+Each input parameter is specified by means of a keyword.
 The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder.</p>
 
 <h3 class="western"><a name="Toc16845_799972446"></a>DenoptimGA Output</h3>
@@ -615,8 +641,8 @@ and time (<code>HHMMSS</code>). All files generated by DENOPTIN associated with 
 stored in this folder. Instead, files managed by the fitness provider
 script are not controlled by DenoptimGA and can thus be placed 
 anywhere. Files pertaining to a specific generation are stored in
-subfolders <code>RUNDDMMYYYYHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
-experiment are collected in subfolder <code>RUNDDMMYYYYHHMMSS/Final</code> (see Figure 5).</p>
+sub-folders <code>RUNDDMMYYYYHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
+experiment are collected in sub-folder <code>RUNDDMMYYYYHHMMSS/Final</code> (see Figure 5).</p>
 
 <figure> 
 	<img src="figures/ga_folders.png" alt="figures/ga_folders.png" width="500" border="0"/>
@@ -668,14 +694,10 @@ or with the completion of the maximum allowed level set by the user
 Graphs that are complete (i.e., no capping needed) and acceptable
 (i.e., respecting all constraints imposed by the user; for instance
 max. number of heavy atoms, max. molecular weight, etc.) can be sent
-to an external subtask using the same fitness-provider mechanism of
-the external BASH script as described for DenoptimGA. For
+to a fitness evaluation task performed by an internal or external fitness provider. For
 example, the external subtask may include 3D model construction and
 property evaluation, or calculation of a fitness. 
 </p>
-<p>The construction and evaluation of each graph runs as a parallel
-asynchronous process that can optionally execute the external
-subtasks.</p>
 
 <h3 class="western"><a name="Toc17844_799972446"></a>FragSpaceExplorer Input</h3>
 
@@ -971,9 +993,6 @@ without providing that specific keyword in the input file.</p>
 		<td width="54%"><p>Specifies a single constitutional ring closability condition by a
 			single SMARTS string. This keyword may be used multiple times to
 			provide a list of constitutional ring closability conditions.</p>
-			<p><br/>
-
-			</p>
 			<p>Example:</p>
 			<p><code>RC-ClosableRingSMARTS=C1CCCCC1</code></p>
 			<p><code>RC-ClosableRingSMARTS=C1CCCCCC1</code></p>
@@ -985,29 +1004,17 @@ without providing that specific keyword in the input file.</p>
 		<td width="54%"><p>Specifies the bias associated to a given ring size when selecting
 			the combination of rings (i.e., RCAs) for a given graph. 
 			</p>
-			<p><br/>
-
-			</p>
 			<p>The syntax is:</p>
-			<p><code>RC-</code><code>R</code><code>ing</code><code>S</code><code>ize</code><code>B</code><code>ias</code><code>=</code><code>&lt;size&gt;</code><code>
-			</code><code>&lt;bias&gt;</code></p>
-			<p><br/>
-
-			</p>
+			<p><code>RC-RingSizeBias=&lt;size&gt;
+			&lt;bias&gt;</code></p>
 			<p>Multiple occurrence of this keyword can be used.</p>
-			<p><br/>
-
-			</p>
 			<p>Example: the following lines give to all 6-member rings a
 			probability of being formed that is twice that given to all
 			5-member rings. Instead 7-membered rings will never be formed.  
 			</p>
-			<p><code>RC-RingSizeBias=5
-			1</code></p>
-			<p><code>RC-RingSizeBias=6
-			2</code></p>
-			<p><code>RC-RingSizeBias=7
-			0</code></p>
+			<p><code>RC-RingSizeBias=5 1</code></p>
+			<p><code>RC-RingSizeBias=6 2</code></p>
+			<p><code>RC-RingSizeBias=7 0</code></p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1151,18 +1158,10 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-ShowGraphics</code></p>
-		</td>
-		<td width="60%"><p>Specifies whether to produce the 2D molecular representation for
-			each candidate. Takes strings as <code>true</code>
-			and <code>false</code>.</p>
-		</td>
-	</tr>
-	<tr valign="middle">
 		<td width="40%"><p><code>GA-SortByIncreasingFitness</code></p>
 		</td>
 		<td width="60%"><p>Requires to sort the candidates according 
-			to ascending rather than decending fitness.</p>
+			to ascending rather than descending fitness.</p>
 		</td>
 	</tr>
 	<tr >
@@ -1383,7 +1382,7 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="40%"><p><code>CG-KeepDummyAtoms</code></p>
 		</td>
-		<td width="60%"><p>Dummy atoms are used to handle linearities and multihapto bonds.
+		<td width="60%"><p>Dummy atoms are used to handle linearities and multi-hapto bonds.
 			By default all dummy atoms are removed before returning the final
 			structure. This keyword prevents removal of the dummy atoms. No
 			value needed.</p>
@@ -1602,6 +1601,43 @@ without providing that specific keyword in the input file.</p>
 		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
 		</td>
 	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+
+	<tr valign="middle">
+		<td width="40%"><p><code>FP-No3dTreeModel</code></p>
+		</td>
+		<td width="60%"><p>Prevents reporting candidates using a three-dimensional molecular model that is built by aligning each building block to the attachment point vector of its parent building block. Such "three-dimensional tree" (3d-tree) structure is not refined in any way, and is only meant to provide a somewhat preliminary geometry to be further refined. Using this keyword prevents the generation of such 3d-trees, and makes denoptim build a molecular model that uses original Cartesian coordinates of the building blocks as provided  in the libraries of scaffolds, fragments and capping groups.</p>
+		</td>
+	</tr>
+
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Internal Fitness Provider</p>
+		</td>
+	</tr>
+	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>FP-Equation</code></p>
+		</td>
+		<td width="60%"><p>Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as &#43;, &#45;, &#42;, &#47;, &#37; (Modulo/remainder), and parenthesis. The expression must start with <code>&#36;&#123;</code> and end with <code>&#125;</code>. For example, <pre><code>&#36;&#123;0.23&#42;nBase &#45; 1.1&#42;naAromAtom &#43; myVariable&#125;</code></pre> is a valid expression where <code>nBase</code> and <code>naAromAtom</code> are the names of molecular descriptors implemented in the CDK library, and <code>myVariable</code> is the name of a user-defined variable. The latter is defined by meas of a <code>FP-DescriptorSpecs</code> keyword, see below.</p>
+		</td>
+	</tr>
+	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>FP-DescriptorSpecs</code></p>
+		</td>
+		<td width="60%"><p>Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax: <pre><code>&#36;&#123;atomSpecific('&lt;variableName&gt;','&lt;descriptor_name&gt;','&lt;SMARTS&gt;')&#125;</code></pre>
+		where <ul>
+			<li><code>&lt;variableName&gt;</code> is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the <code>FP-Equation</code> keyword,</li>
+			<li><code>&lt;descriptor_name&gt;</code>, is the name of the descriptor in the CDK implementation, </li>
+			<li><code>&lt;SMARTS&gt;</code> is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.</li>
+		</ul></p>
+		</td>
+	</tr>
+
 	<tr>
 		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>External Fitness Provider</p>
 		</td>
@@ -1615,9 +1651,8 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="40%"><p><code>FP-Interpreter</code></p>
 		</td>
-		<td width="60%"><p>Specifies the kinf of interpretere to use when running the external fitness provider.</p>
+		<td width="60%"><p>Specifies the interpreter to use when running the external fitness provider source file.</p>
 		</td>
-	</tr>
 </table>
 
 <hr>
@@ -1660,7 +1695,7 @@ n1:v1&nbsp;n2:v2
 
 <p>Where <i>c1</i>, <i>c2</i>, and <i>c3</i> are
 the attachment point classes of the attachment points located
-respectively on atoms <i>n1</i>, <i>n2</i>, and <i>n3</i>. Note the syntax for the two
+respectively on atoms <i>n1</i>, and <i>n2</i>. Note the syntax for the two
 attachment points on atom <i>n2</i>. While the number of open valences
 remains a single number (i.e., <i>v2</i> &gt; 1), multiple AP classes have
 to be reported in the <code>&lt;CLASS&gt;</code> tag.</p>
@@ -1687,7 +1722,7 @@ information related to the class-based approach:</p>
 	<li>the definition of the AP class compatibility matrix (lines
 	starting with <code>RCN</code> keyword, comma-separated entries),</li>
 	<li>the AP class-to-bond order conversion key (<code>RBO</code> keyword),</li>
-	<li>the rules to append capping groups (<cose><b>CAP</b></cose> keyword),</li>
+	<li>the rules to append capping groups (<cose>CAP</cose> keyword),</li>
 	<li>the rules to discharge a graph if an AP of a specific APclass is not
 	used (<code>DEL</code> keyword).</li>
 </ul>
@@ -1742,6 +1777,7 @@ molecules (i.e., initial population). To be properly interpreted by
 DENOPTIM this SDF file must include the following tags:</p>
 <ul>
 	<li><code>&lt;FITNESS&gt;</code> tag specifying the numerical fitness value.</li>
+	<li><code>&lt;UID&gt;</code> tag specifying the unique identifier of the chemical entity (often the InChiKey).</li>
 	<li><code>&lt;GraphENC&gt;</code> tag specifying the essential part of the graph representation of the chemical entity.</li>
 </ul>
 
@@ -1750,20 +1786,15 @@ DENOPTIM this SDF file must include the following tags:</p>
 
 <p>SDF format file used to
 communicate the definition of any candidate chemical entity (e.g., a
-new candidate molecule in a molecular design run) to the fitness
-provider script (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
+new candidate molecule in a molecular design run) to external fitness
+providers (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
 
-<p>DenoptimGA outputs the 2D/3D structure of the molecule (in SDF format) together with its DENOPTIMGraph representation 
+<p>DENOPTIM programs output the 2D/3D structure of the molecule (in SDF format) together with its DENOPTIMGraph representation 
 (tag <code>&lt;GraphENC&gt;</code>) and additional information
-(i.e., SMILES, InChiKey). The content of these candidate
-chemical entity files is not meant for visualization within any molecule viewer, as the Cartesian coordinates reported in these files are not refined. These files are, in fact, only intended as a starting point for further calculations within
-the fitness provider script.</p>
+(i.e., SMILES, InChiKey). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a nonsensically geometrical arrangement of the atoms.</p>
 
 <h3 class="western"><a name="Toc16853_799972446"></a>Fitness Files</h3>
-<p>SDF format file used to return an evaluated chemical entity from the external subtask which
-has performed the evaluation of the fitness of the candidate entity,
-back to the main task (i.e., DenoptimGA, or FragSpaceExplorer). Such
-“fitness file” must contain one of these two tags:</p>
+<p>SDF format files used to store the final results for an evaluated chemical entity and to receive the fitness value from any external fitness provider. These files must contain one of these two tags:</p>
 <ul>
 	<li><code>&lt;MOL_ERROR&gt;</code> tag specifying
 	that the candidate entity cannot be coupled with a fitness value.
@@ -1780,10 +1811,11 @@ back to the main task (i.e., DenoptimGA, or FragSpaceExplorer). Such
 	<li><code>&lt;FITNESS&gt;</code> tag specifying the numerical value of the fitness (NB:
 	ensure is not NaN!)</li>
 </ul>
+<p>Additional tag defining an unique identifier of the entity (i.e., <code>&gt; &lt;UID&gt;</code>) is also needed.</p>
 
 <p>Any type and number of descriptors and properties can be included in the SDF file using the 
-<code>&gt;&nbsp;&lt;DATA&gt; </code> tags (where <code>DATA</code>
-is replaced by the name of a specific data tag). The number and kind of descriptors depends
+'<code>&gt;&nbsp;&lt;DATA&gt;</code>' syntax, where <code>DATA</code>
+is replaced by the name of a specific data tag. The number and kind of descriptors depends
 on the specific application.</p>
 
 <p>Example of a fitness file with properly terminated calculation of the fitness value:</p>

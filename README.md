@@ -112,6 +112,7 @@ Instead, libraries used by DENOPTIM programs are licensed according to their res
 * jfreechart: GNU Lesser General Public License 2.1
 * graphstream: GNU Lesser General Public License 3.0
 * junit: Eclipse Public License 2.0
+* javax.servlet: CDDL 1.1
 
 
 ## Cite DENOPTIM

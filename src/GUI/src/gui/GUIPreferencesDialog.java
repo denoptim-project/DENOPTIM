@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 
 public class GUIPreferencesDialog extends GUIModalDialog
@@ -99,7 +100,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlTmpSpace = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblTmpSpace = new JLabel(namTmpSpace + ":");
         txtTmpSpace = new JTextField();
-        txtTmpSpace.setPreferredSize(strFieldSize);
+        txtTmpSpace.setPreferredSize(fileLabelSize);
         txtTmpSpace.setText(GUIPreferences.tmpSpace+"");
         pnlTmpSpace.add(lblTmpSpace);
         pnlTmpSpace.add(txtTmpSpace);
@@ -171,7 +172,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 		mustParseToInt(txtGraphTxtSize, namGraphTxtSize);
 		mustParseToInt(txtGraphNodeSize, namGraphNodeSize);
 		mustParseToInt(txtChartPointSize, namChartPointSize);
-		mustParseBeReadableWritable(txtTmpSpace, namTmpSpace);
+		pathMustBeReadableWritable(txtTmpSpace, namTmpSpace);
 	}
 
 //-----------------------------------------------------------------------------
@@ -193,11 +194,12 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 	
-	private void mustParseBeReadableWritable(JTextField field, String name)
+	private void pathMustBeReadableWritable(JTextField field, String name)
 	{
-		if (!DenoptimIO.canWriteAndReadTo(field.getText()
+		String testFileName = field.getText()
 				+ System.getProperty("file.separator") 
-				+ "test"))
+				+ "test";
+		if (!DenoptimIO.canWriteAndReadTo(testFileName))
 		{
 			inputIsOK = false;
 			JOptionPane.showMessageDialog(null,
@@ -206,6 +208,11 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
+		}
+		try {
+			DenoptimIO.deleteFile(testFileName);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
 		}
 	}
 	
