@@ -157,7 +157,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
-		fragmentViewer = new FragmentViewPanel(true);
+		fragmentViewer = new FragmentViewPanel(this,true);
 		fragmentViewer.addPropertyChangeListener("APDATA", 
 				new PropertyChangeListener() {
 			@Override
@@ -210,6 +210,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					fragLib = DenoptimIO.readMoleculeData(
 							inFile.getAbsolutePath());
 				} catch (Exception e1) {
+					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null,
 			                "<html>Could not read fragments from file"
 			                + "<br>'" + inFile + "'"
@@ -344,6 +345,17 @@ public class GUIFragmentInspector extends GUICardPanel
 				{
 					return;
 				}
+				if (!inFile.getName().endsWith(".sdf"))
+				{
+					JOptionPane.showMessageDialog(null,
+			                "<html>Expecting and MDL SDF file, but file<br>'"
+							+ inFile.getAbsolutePath() + "' does not have .sdf"
+							+ " extension.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
 				importStructureFromFile(inFile);
 			}
 		});
@@ -390,6 +402,8 @@ public class GUIFragmentInspector extends GUICardPanel
 			    + "<br><b>WARNING:</b> this action cannot be undone!<html>");
 		btnAtmToAP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				fragment = fragmentViewer.getLoadedStructure();
+				
 				ArrayList<IAtom> selectedAtms = 
 						fragmentViewer.getAtomsSelectedFromJMol();
 				
@@ -492,8 +506,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		
         pnlSaveEdits = new JPanel();
         btnSaveEdits = new JButton("Save Changes");
-        btnSaveEdits.setForeground(Color.RED);
-        btnSaveEdits.setEnabled(false);
+        //btnSaveEdits.setForeground(Color.RED);
+        btnSaveEdits.setEnabled(true);
         btnSaveEdits.setToolTipText("<html>Save the current fragment replacing"
         		+ " <br>the original fragment in the loaded library.</html>");
         btnSaveEdits.addActionListener(new ActionListener() {
@@ -503,7 +517,6 @@ public class GUIFragmentInspector extends GUICardPanel
         });
         pnlSaveEdits.add(btnSaveEdits);
         fragCtrlPane.add(pnlSaveEdits);
-		
 		this.add(fragCtrlPane,BorderLayout.EAST);
 		
 		
@@ -595,10 +608,13 @@ public class GUIFragmentInspector extends GUICardPanel
 						+ "<p>Hover over buttons get a tip.</p>"
 						+ "<br>"
 						+ "<p>Right-click on the Jmol viewer will open the "
-						+ "Jmol menu. However, Jmol cannot handle the "
+						+ "Jmol menu. However, since Jmol cannot handle the "
 						+ "attachment points data. Therefore, Jmol "
 						+ "functionality should only be used on systems "
-						+ "that have no attachment points.</p></html>";
+						+ "that have no attachment points, or for alterations "
+						+ "of the molecular structure that do not change the "
+						+ "list of atoms au to the last atom decorated with an "
+						+ "attachment point.</p></html>";
 				JOptionPane.showMessageDialog(null, 
 						String.format(txt, 400),
 	                    "Tips",
@@ -665,9 +681,9 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Cleanup
 		clearCurrentSystem();
 		
-		// Load the structure using CACTUS service via Jmol
+		// Load the structure using CACTUS service or CDK builder
 		try {
-			fragmentViewer.loadSMILESFromRemote(smiles);
+			fragmentViewer.loadSMILES(smiles);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			return;
@@ -684,6 +700,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// finalize GUI status
 		updateFragListSpinner();
 		unsavedChanges = true;
+        btnSaveEdits.setEnabled(true);
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
@@ -813,7 +830,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		fragment = null;
 		
 		// Clear viewer?
-		// No, its clears upon loading of a new system.
+		// No, it clears upon loading of a new system.
 		// The exception (i.e., removal of the last fragment) is dealt with by
 		// submitting "zap" only in that occasion.
 		
@@ -843,7 +860,7 @@ public class GUIFragmentInspector extends GUICardPanel
      */
     private boolean convertAtomToAP(IAtom trgAtm, String apClass)
     {
-    	// Accept ONLY if the atom has one and only one connected neighbor
+    	// Accept ONLY if the atom has one and only one connected neighbour
     	if (fragment.getConnectedAtomsCount(trgAtm) != 1)
     	{
     		String str = "";
@@ -957,7 +974,7 @@ public class GUIFragmentInspector extends GUICardPanel
 
 	private void deprotectEditedSystem()
 	{
-		btnSaveEdits.setEnabled(false);
+		//btnSaveEdits.setEnabled(false);
 		btnAddFrag.setEnabled(true);
 		btnOpenFrags.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
@@ -1066,11 +1083,10 @@ public class GUIFragmentInspector extends GUICardPanel
 
   	private void saveUnsavedChanges() 
   	{
+  		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+  		
   		if (fragmentViewer.hasUnsavedAPEdits())
   		{
-	  		// Retrieve chemical object from the viewer
-	  		fragment = fragmentViewer.getLoadedStructure();
-	  		
 	  		// Import changes from AP table into molecular representation
 	        for (int i=0; i<fragmentViewer.apTabModel.getRowCount(); i++) 
 	        {	        	
@@ -1121,20 +1137,36 @@ public class GUIFragmentInspector extends GUICardPanel
 	    			return;	
 	        	}
 	        }
-	  		
-	  		// Overwrite fragment in library
-	  		fragmentLibrary.set(currFrgIdx, fragment);
 	  	}
+  		
+  		// Retrieve chemical object from the viewer, if edited, otherwise
+  		// we get what is already in 'fragment'
+  		fragment = fragmentViewer.getLoadedStructure();
+  		if (fragmentLibrary.size()==0 
+  				&& (fragment==null || fragment.getAPCount()==0))
+  		{
+  			//Nothing to same
+  	        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+  			return;
+  		}
+  		fragmentLibrary.set(currFrgIdx,fragment);
         
         // Reload fragment from library to refresh table and viewer
     	activateTabEditsListener(false);
-    	loadCurrentFragIdxToViewer();
-  		
+    	try {
+    	    loadCurrentFragIdxToViewer();
+    	} catch (Throwable t) {
+			//This can happen if the viewer has been started but is empty
+    		// E.G:, if the cactvs server is down).
+    		// We just keep going, and make sure we get the default cursor back.
+		}
   		// Release constraints
     	activateTabEditsListener(true);
     	fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
 				fragmentLibrary.size(), 1));
         deprotectEditedSystem();
+  		
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   	}
 
 //----------------------------------------------------------------------------

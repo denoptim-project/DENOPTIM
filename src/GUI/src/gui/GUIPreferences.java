@@ -23,6 +23,7 @@ package gui;
  * 
  * @author Marco Foscato
  */
+
 public class GUIPreferences {
 
 	/**
@@ -44,5 +45,15 @@ public class GUIPreferences {
 	 * Readable/writable space for tmp files
 	 */
 	protected static String tmpSpace = "/tmp";
+
+	/**
+	 * Available engines used to do SMILES-to-3D conversion
+	 */
+	protected enum SMITo3DEngine {CACTVS, CDK};
 	
+	/**
+	 * Selects the engine used to do SMILES-to-3D conversion
+	 */
+	protected static SMITo3DEngine smiTo3dResolver = 
+			SMITo3DEngine.CACTVS;
 }

@@ -268,6 +268,10 @@ public class MainToolBar extends JMenuBar {
 					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
 							file));
 				} catch (Exception e1) {
+					if (file == null)
+					{
+						return;
+					}
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
 							"FRAGMENTS", "GRAPHS", "CompatibilityMatrix",  
 							"GA-RUN", "FSE-RUN", "SERGRAPH"};
@@ -284,8 +288,7 @@ public class MainToolBar extends JMenuBar {
 							"Select file type",
 							JOptionPane.OK_CANCEL_OPTION,
 		                     JOptionPane.ERROR_MESSAGE);
-
-					if (res != JOptionPane.YES_OPTION)
+					if (res != JOptionPane.OK_OPTION)
 					{
 						return;
 					}

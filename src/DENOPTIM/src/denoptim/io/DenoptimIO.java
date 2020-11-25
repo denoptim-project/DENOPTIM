@@ -147,10 +147,10 @@ public class DenoptimIO
             throws DENOPTIMException
     {
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
-        String sCurrentLine;
+        String sCurrentLine = null;
 
         BufferedReader br = null;
-
+        
         try
         {
             br = new BufferedReader(new FileReader(fileName));
@@ -164,16 +164,32 @@ public class DenoptimIO
                 if (GenUtils.getFileExtension(sCurrentLine).
                         compareToIgnoreCase(".smi") == 0)
                 {
-                    throw new DENOPTIMException("Fragment files in SMILES format not supported.");
+                    throw new DENOPTIMException("Fragment files in SMILES "
+                    		+ "format not supported.");
                 }
 
-                ArrayList<IAtomContainer> mols = readSDFFile(sCurrentLine);
-                lstContainers.addAll(mols);
+                try {
+					ArrayList<IAtomContainer> mols = readSDFFile(sCurrentLine);
+					lstContainers.addAll(mols);
+				} catch (Exception e) {
+					e.printStackTrace();
+		            throw new DENOPTIMException("<html>File '" + fileName 
+		            		+ "' <br>seems "
+		            		+ "to be a "
+		            		+ "list of links to other files, but line <br>'" 
+		            		+ sCurrentLine + "' <br>does not point to an "
+            				+ "existing "
+            				+ "file. <br>"
+		            		+ "Pleae check your input. Is it really a list of "
+		            		+ "links? "
+		            		+ "<br>If not, make sure it has a standard"
+		            		+ "extension (e.g., .smi, .sdf)</html>");
+				}
             }
         }
         catch (FileNotFoundException fnfe)
         {
-            throw new DENOPTIMException(fnfe);
+        	throw new DENOPTIMException("File '" + fileName + "' not found.");
         }
         catch (IOException ioe)
         {

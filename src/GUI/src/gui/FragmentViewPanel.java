@@ -23,11 +23,14 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,17 +45,31 @@ import javax.vecmath.Point3d;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
+import org.jmol.smiles.InvalidSmilesException;
 import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.modeling.builder3d.ModelBuilder3D;
+import org.openscience.cdk.modeling.builder3d.TemplateHandler3D;
+import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
+import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.FragmentUtils;
+import gui.GUIPreferences.SMITo3DEngine;
 
 
 /**
@@ -94,16 +111,11 @@ public class FragmentViewPanel extends JSplitPane
 	
 	private String tmpSDFFile;
 	
-//-----------------------------------------------------------------------------
+	private JComponent parent;
 	
-	/**
-	 * Constructor
-	 */
-	public FragmentViewPanel()
-	{
-		initialize(340);
-	}
-	
+	private final Object LOCK = new Object();
+
+
 //-----------------------------------------------------------------------------
 
 	/**
@@ -113,8 +125,19 @@ public class FragmentViewPanel extends JSplitPane
 	 */
 	public FragmentViewPanel(boolean editableTable)
 	{
-		editableAPTable = editableTable;
-		initialize(340);
+		this(null,editableTable);
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Constructor that allows to specify whether the AP table is editable or 
+	 * not.
+	 * @param editableTable use <code>true</code> to make the AP table editable
+	 */
+	public FragmentViewPanel(JComponent parent, boolean editableTable)
+	{
+		this(parent,editableTable,340);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -125,8 +148,9 @@ public class FragmentViewPanel extends JSplitPane
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
-	public FragmentViewPanel(boolean editableTable, int dividerPosition)
+	public FragmentViewPanel(JComponent parent, boolean editableTable, int dividerPosition)
 	{
+		this.parent = parent;
 		editableAPTable = editableTable;
 		initialize(dividerPosition);
 	}
@@ -205,8 +229,15 @@ public class FragmentViewPanel extends JSplitPane
 	 * Waits until Jmol is finished.
 	 * @param milliSecFirst
 	 */
-	private void waitForJmolViewer(int milliSecFirst)
+	private void waitForJmolViewer(int milliSecFirst, String cause)
 	{
+		if (parent!=null)
+		{
+			parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		} else {
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		}
+		
 		// We wait
 		try {
 			Thread.sleep(milliSecFirst);
@@ -225,11 +256,17 @@ public class FragmentViewPanel extends JSplitPane
 			System.out.println("Waiting "+now);
 			if (now > wallTime)
 			{
-				this.setCursor(Cursor.getPredefinedCursor(
-						Cursor.DEFAULT_CURSOR));
+				if (parent!=null)
+				{
+					parent.setCursor(Cursor.getPredefinedCursor(
+							Cursor.DEFAULT_CURSOR));
+				} else {
+					this.setCursor(Cursor.getPredefinedCursor(
+							Cursor.DEFAULT_CURSOR));
+				}
 				String[] options = new String[]{"Yes","No"};
 				int res = JOptionPane.showOptionDialog(null,
-		                "<html>Slow response from Jmol.<br>Keep waiting?</html>",
+		                "<html>" + cause + ".<br>Keep waiting? (5 sec)</html>",
 		                "Should we wait for another 5 seconds?",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
@@ -238,12 +275,30 @@ public class FragmentViewPanel extends JSplitPane
 		                options[1]);
 				if (res == 1)
 				{
+					System.out.println("Give up waiting");
+					jmolPanel.viewer.haltScriptExecution();
+					clearMolecularViewer();
+					if (parent!=null)
+					{
+						parent.setCursor(Cursor.getPredefinedCursor(
+								Cursor.DEFAULT_CURSOR));
+					} else {
+						this.setCursor(Cursor.getPredefinedCursor(
+								Cursor.DEFAULT_CURSOR));
+					}
 					break;
 				}
 				else
 				{
-					this.setCursor(Cursor.getPredefinedCursor(
-							Cursor.WAIT_CURSOR));
+					System.out.println("Keep waiting...");
+					if (parent!=null)
+					{
+						parent.setCursor(Cursor.getPredefinedCursor(
+								Cursor.WAIT_CURSOR));
+					} else {
+						this.setCursor(Cursor.getPredefinedCursor(
+								Cursor.WAIT_CURSOR));
+					}
 					newDate = new Date();
 					wallTime = newDate.getTime() + 5000; // 5 seconds
 				}
@@ -258,6 +313,55 @@ public class FragmentViewPanel extends JSplitPane
 	
 //-----------------------------------------------------------------------------
 	
+	private void testCDKgenerator(String smiles) throws CDKException, 
+	CloneNotSupportedException, IOException
+	{
+		IMolecule molecule = null;
+
+		SmilesParser sp = new SmilesParser(
+				DefaultChemObjectBuilder.getInstance());
+		molecule = sp.parseSmiles(smiles);
+		
+	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
+	    		molecule.getBuilder());
+	    adder.addImplicitHydrogens(molecule);
+		
+		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(
+				molecule.getBuilder());
+	    for (IAtom atom : molecule.atoms()) 
+	    {
+	        IAtomType type = matcher.findMatchingAtomType(molecule, atom);
+	        AtomTypeManipulator.configure(atom, type);
+	    }
+	    
+	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(molecule);
+	    
+		TemplateHandler3D tHandler3d = TemplateHandler3D.getInstance();
+		String forceFieldName = "mmff94";
+		ModelBuilder3D 	md3b = ModelBuilder3D.getInstance(tHandler3d,
+				forceFieldName);
+		molecule = md3b.generate3DCoordinates(molecule, false);
+
+		// Load the system int oJmol
+		loadPlainStructure(molecule);
+		
+		// Run Jmol MM energy minimization
+		jmolPanel.viewer.evalString("minimize");
+		waitForJmolViewer(1500,"Energy minimization is taking some time.");
+		
+		// Re-load
+		IAtomContainer iac;
+		try {
+			iac = getStructureFromJmolViewer();
+			loadPlainStructure(iac);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
+			clearMolecularViewer();
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
 	public String getDataFromJmol()
 	{
 		return jmolPanel.viewer.getData("*", "txt");
@@ -266,39 +370,121 @@ public class FragmentViewPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Loads a molecule based on the remote CACTUS service. Requires connection
-	 * to the Internet.
+	 * Loads a molecule build from a smiles string. The 3D geometry is either 
+	 * taken from remote CACTUS service (requires connection
+	 * to the Internet) or built with CDK tools, as a fall-back. The CDK
+	 * builder, however will produce a somewhat lower quality conformation than
+	 * that obtained from on online generator.
 	 * @param smiles the SMILES of the molecule to load
+	 * @return <code>true</code> if the SMILES could be converted into a 3D 
+	 * structure
 	 * @throws DENOPTIMException 
 	 */
-	public void loadSMILESFromRemote(String smiles) throws DENOPTIMException
-	{
-		// Load the structure using CACTUS service via Jmol
-		jmolPanel.viewer.evalString("load $"+smiles);
-		waitForJmolViewer(1500);
-		
-		// NB: this is a workaround to the lack of try/catch mechanism when
-		// executing Jmol commands.
-		// We want to catch errors that prevent loading the structure
-		// For example, offline mode and invalid SMILES
-		String data = getDataFromJmol();		
-		if (data == null || data.equals(""))
+	public boolean loadSMILES(String smiles)
+	{	
+		if (parent!=null)
 		{
-			System.out.println("DATA: "+data);
-			JOptionPane.showMessageDialog(null,
-	                "<html>Could not find a valid structure.<br>"
-	                + "Possible reasons are:"
-	                + "<ul>"
-	                + "<li>unreachable remote service (we are offline)</li>"
-	                + "<li>no available structure for SMILES string<br>'" 
-	                + smiles 
-	                + "'</li></ul><br>"
-	                + "Please create such structure and import it as SDF file."
-	                + "</html>",
-	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
-			throw new DENOPTIMException("No SMILES imported");
+			parent.setCursor(Cursor.getPredefinedCursor(
+					Cursor.WAIT_CURSOR));
+		} else {
+			this.setCursor(Cursor.getPredefinedCursor(
+					Cursor.WAIT_CURSOR));
+		}
+		
+		switch (GUIPreferences.smiTo3dResolver)
+		{
+		case CACTVS:
+			jmolPanel.viewer.evalString("load $"+smiles);
+			waitForJmolViewer(1500,
+					"Slow response from https://cactus.nci.nih.gov");
+			// NB: this is a workaround to the lack of try/catch mechanism when
+			// executing Jmol commands.
+			// We want to catch errors that prevent loading the structure
+			// For example, offline mode and invalid SMILES
+			String data = getDataFromJmol();
+			
+			if (data == null || data.equals(""))
+			{
+				String[] options = new String[] {"Build 3D guess","Abandon"}; 
+				int res = JOptionPane.showOptionDialog(null,
+		                "<html>Could not find a valid structure.<br>"
+		                + "Possible reasons are:"
+		                + "<ul>"
+		                + "<li>unreachable remote service (we are offline)</li>"
+		                + "<li>too slow response from online service</li>"
+		                + "<li>no available structure for SMILES string<br>'" 
+		                + smiles 
+		                + "'</li></ul><br>"
+		                + "You can try to build a guess 3D structure, or<br>"
+		                + "prepare a refined structure elsewhere and import "
+		                + "it as "
+		                + "SDF file.</html>",
+		                "Error",
+		                JOptionPane.OK_CANCEL_OPTION,
+		                JOptionPane.QUESTION_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"),
+		                options, 
+		                options[0]);
+				if (res == 0)
+				{
+					try {
+						testCDKgenerator(smiles);
+					} catch (CDKException | CloneNotSupportedException 
+							| IOException e1) {
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null,
+				                "<html>Could not make 3D structure from SMILES."
+				                + " Cause: '"+e1.getMessage()+"'</html>",
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+						if (parent!=null)
+						{
+							parent.setCursor(Cursor.getPredefinedCursor(
+									Cursor.DEFAULT_CURSOR));
+						} else {
+							this.setCursor(Cursor.getPredefinedCursor(
+									Cursor.DEFAULT_CURSOR));
+						}
+						return false;
+					}
+				} else {
+					if (parent!=null)
+					{
+						parent.setCursor(Cursor.getPredefinedCursor(
+								Cursor.DEFAULT_CURSOR));
+					} else {
+						this.setCursor(Cursor.getPredefinedCursor(
+								Cursor.DEFAULT_CURSOR));
+					}
+					return false;
+				}
+			}
+			break;
+			
+		case CDK:
+			try {
+				testCDKgenerator(smiles);
+			} catch (CDKException | CloneNotSupportedException 
+					| IOException e1) {
+				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null,
+		                "<html>Could not make 3D structure from SMILES. "
+		                + "Cause: '"+e1.getMessage()+"'</html>",
+		                "Error",
+		                JOptionPane.ERROR_MESSAGE,
+		                UIManager.getIcon("OptionPane.errorIcon"));
+				if (parent!=null)
+				{
+					parent.setCursor(Cursor.getPredefinedCursor(
+							Cursor.DEFAULT_CURSOR));
+				} else {
+					this.setCursor(Cursor.getPredefinedCursor(
+							Cursor.DEFAULT_CURSOR));
+				}
+				return false;
+			}
+			break;
 		}
 		
 		// Now we should have a structure loaded in the viewer, 
@@ -310,11 +496,22 @@ public class FragmentViewPanel extends JSplitPane
 			JOptionPane.showMessageDialog(null,
 	                "<html>Could not understand Jmol system.</html>",
 	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
+	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
-			return;
+			return false;
 		}
+		
 		setJmolViewer();
+		
+		if (parent!=null)
+		{
+			parent.setCursor(Cursor.getPredefinedCursor(
+					Cursor.DEFAULT_CURSOR));
+		} else {
+			this.setCursor(Cursor.getPredefinedCursor(
+					Cursor.DEFAULT_CURSOR));
+		}
+		return true;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -325,6 +522,10 @@ public class FragmentViewPanel extends JSplitPane
 		IAtomContainer mol = new AtomContainer();
 		
 		String strData = getDataFromJmol();
+		if (strData.trim().equals(""))
+		{
+			throw new DENOPTIMException("Attempt to get data from viewer, but data is empty");
+		}
 		strData = strData.replaceAll("[0-9] \\s+ 999 V2000", 
 				"0  0  0  0  0999 V2000");
 		String[] lines = strData.split("\\n");
@@ -333,7 +534,7 @@ public class FragmentViewPanel extends JSplitPane
 			clearMolecularViewer();
 			clearAPTable();
 			throw new DENOPTIMException("Unexpected format in Jmol molecular "
-					+ "data: " + strData);
+					+ "data: '" + strData + "'");
 		}
 		if (!lines[3].matches(".*999 V2000.*"))
 		{
@@ -369,14 +570,91 @@ public class FragmentViewPanel extends JSplitPane
 	
 	/**
 	 * Returns the chemical representation of the currently loaded chemical
-	 * object.
+	 * object. In case of mismatch between the system loaded into the Jmol
+	 * viewer and the one in the local memory, we take that from Jmol.
 	 * @return the chemical representation of what is currently visualized.
+	 * Can be empty and null.
 	 */
 	public DENOPTIMFragment getLoadedStructure()
 	{
+		DENOPTIMFragment fromViewer = new DENOPTIMFragment();
+		try {
+			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer());
+			putAPsFromTableIntoIAtomContainer(fromViewer);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
+			return fragment;
+		}
+		
+		// NB: APs cannot be added directly into Jmol, so the only thing
+		// that can change there is the molecular structure
+		if (fromViewer.getAtomCount() != fragment.getAtomCount())
+		{
+			return fromViewer;
+		}
+		
+		boolean sameSMILES = false;
+		try {
+			sameSMILES = DENOPTIMMoleculeUtils.getSMILESForMolecule(
+					fromViewer)
+					.equals(DENOPTIMMoleculeUtils.getSMILESForMolecule(
+							fragment));
+		} catch (DENOPTIMException e) {
+			// we get false
+		}
+		if (!sameSMILES)
+		{
+			return fromViewer;
+		}
+		
+		//Maybe the geometry is different
+		double thrld = 0.0001;
+		for (int i=0; i<fragment.getAtomCount(); i++)
+		{
+			Point3d pA = fromViewer.getAtom(i).getPoint3d();
+			Point3d pB = fragment.getAtom(i).getPoint3d();
+			if (pA.distance(pB)>thrld)
+			{
+				return fromViewer;
+			}
+		}
+
+		setJmolViewer();
+
 		return fragment;
 	}
 	
+//-----------------------------------------------------------------------------
+	
+	private void putAPsFromTableIntoIAtomContainer(DENOPTIMFragment mol) 
+			throws DENOPTIMException 
+	{
+		if (mapAPs == null || mapAPs.isEmpty())
+		{
+			return;
+		}
+		
+		if (mol.getAPCount() == mapAPs.size())
+		{
+			return;
+		}
+		
+        for (int apId : mapAPs.keySet())
+        {
+        	DENOPTIMAttachmentPoint ap = mapAPs.get(apId);
+        	if (apId >= mol.getAtomCount())
+        	{
+        		throw new DENOPTIMException("The atom list has changed and is"
+        				+ "no longer compatible with the list of attachment "
+        				+ "points. Cannot convert the current system to a "
+        				+ "valid fragment.");
+        	}
+        	
+        	int srcAtmId = ap.getAtomPositionNumber();
+        	mol.addAP(srcAtmId, ap.getAPClass(), ap.getDirectionVector());
+        }
+	}
+
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -385,7 +663,18 @@ public class FragmentViewPanel extends JSplitPane
 	 */
 	public void loadPlainStructure(IAtomContainer mol)
 	{
-		fragment = (DENOPTIMFragment) mol;
+		if (mol instanceof DENOPTIMFragment)
+		{
+			fragment = (DENOPTIMFragment) mol;
+		} else {
+			try {
+				fragment = new DENOPTIMFragment(mol);
+			} catch (DENOPTIMException e) {
+				//Should never happen
+				e.printStackTrace();
+			}
+		}
+		
 		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(null,
@@ -407,7 +696,9 @@ public class FragmentViewPanel extends JSplitPane
 			System.out.println("Error writing TMP file '" + tmpSDFFile + "'");
 			System.out.println("Please, report this to the DENOPTIM team.");
 		}
+		
 		jmolPanel.viewer.openFile(tmpSDFFile);
+
 		setJmolViewer();
 	}
 
@@ -523,7 +814,7 @@ public class FragmentViewPanel extends JSplitPane
 	 */
 	public void clearMolecularViewer()
 	{
-		jmolPanel.viewer.evalString("zap");
+		jmolPanel.viewer.evalString("print \"my clearing method\"; zap");
 	}
 
 //-----------------------------------------------------------------------------
@@ -592,7 +883,6 @@ public class FragmentViewPanel extends JSplitPane
 	
 	private class JmolPanel extends JPanel 
 	{
-
         /**
 		 * Version UID
 		 */

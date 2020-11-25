@@ -45,13 +45,13 @@ import denoptim.constants.DENOPTIMConstants;
 
 public class DenoptimGUIFileOpener 
 {
+	protected static JFileChooser fileChooser = new JFileChooser(
+			FileSystemView.getFileSystemView().getHomeDirectory()); 
 	
 //-----------------------------------------------------------------------------
 	
 	public static File pickFileOrFolder()
 	{
-		JFileChooser fileChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory()); 
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		File file;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
@@ -81,13 +81,11 @@ public class DenoptimGUIFileOpener
 	
 	public static Set<File> pickManyFile() 
 	{
-		JFileChooser filesChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory()); 
-		filesChooser.setMultiSelectionEnabled(true);
+		fileChooser.setMultiSelectionEnabled(true);
 		Set<File> files = new HashSet<File>();
-		if (filesChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
-			File[] arr = filesChooser.getSelectedFiles();
+			File[] arr = fileChooser.getSelectedFiles();
 			for (int i=0; i<arr.length; i++)
 			{
 				files.add(arr[i]);
@@ -104,7 +102,6 @@ public class DenoptimGUIFileOpener
 	
 	public static File pickFile() 
 	{
-		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory()); 
 		File file;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
@@ -133,8 +130,6 @@ public class DenoptimGUIFileOpener
 	
 	public static File pickFolder() 
 	{
-		JFileChooser fileChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory());
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser.setDialogTitle("Choose the folder to be loaded");
 		File file;
@@ -153,8 +148,6 @@ public class DenoptimGUIFileOpener
 	
 	public static File saveFile() 
 	{
-		JFileChooser fileChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory());
 		File file;
 		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
 		{

@@ -25,9 +25,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -36,6 +38,7 @@ import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import gui.GUIPreferences.SMITo3DEngine;
 
 public class GUIPreferencesDialog extends GUIModalDialog
 {
@@ -82,6 +85,12 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private JPanel pnlTmpSpace;
     private JLabel lblTmpSpace;
     private JTextField txtTmpSpace;
+    
+    private String namSMILESTo3D = "SMILES-to-3D converer";
+    private JPanel pnlSMILESTo3D;
+    private JComboBox cmbSMILESTo3D;
+    private JLabel lblSMILESTo3D;
+    
 	
 	
 	private boolean inputIsOK = true;
@@ -108,8 +117,31 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
         centralPanel.add(new JSeparator());
         
+        JPanel titleFragments = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titleFragments.add(new JLabel("<html><b>Handling of fragments</b></html>"));
+        centralPanel.add(titleFragments);
+        
+        pnlSMILESTo3D = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblSMILESTo3D = new JLabel(namSMILESTo3D + ": " 
+        		+ GUIPreferences.smiTo3dResolver + " - Change to ");
+        cmbSMILESTo3D = new JComboBox(SMITo3DEngine.values());
+        cmbSMILESTo3D.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GUIPreferences.smiTo3dResolver = (SMITo3DEngine) 
+						cmbSMILESTo3D.getSelectedItem();
+				lblSMILESTo3D.setText(namSMILESTo3D + ": " 
+        		+ GUIPreferences.smiTo3dResolver + " - Change to ");
+			}
+		});
+        pnlSMILESTo3D.add(lblSMILESTo3D);
+        pnlSMILESTo3D.add(cmbSMILESTo3D);
+        centralPanel.add(pnlSMILESTo3D);
+        
+        centralPanel.add(new JSeparator());
+        
         JPanel titleGraphViewer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        titleGraphViewer.add(new JLabel("<html><b>Graph viewer</b></html>"));
+        titleGraphViewer.add(new JLabel("<html><b>Graph visualization</b></html>"));
         centralPanel.add(titleGraphViewer);
         
         pnlGraphTxtSize = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -133,7 +165,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         centralPanel.add(new JSeparator());
         
         JPanel titleEvolutionPlots = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        titleEvolutionPlots.add(new JLabel("<html><b>Evolution Run Plots</b></html>"));
+        titleEvolutionPlots.add(new JLabel("<html><b>Evolution run plots</b></html>"));
         centralPanel.add(titleEvolutionPlots);
         
         pnlChartPointSize = new JPanel(new FlowLayout(FlowLayout.LEFT));
