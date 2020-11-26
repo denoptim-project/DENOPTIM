@@ -15,7 +15,7 @@
 #
 # Settings:
 #
-
+ 
 # Path to TINKER executables
 # Currently required only by t1 that will be skipped if the following is empty.
 export tinkerPathDENOPTIM=""
