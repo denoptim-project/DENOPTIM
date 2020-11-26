@@ -7,3 +7,4 @@ lib/DENOPTIM.jar
 bin/
 src/misc/GraphListAnalysis/
 test/functional_tests/runT.sh
+.DS_Store

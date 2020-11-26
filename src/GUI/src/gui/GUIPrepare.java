@@ -20,6 +20,10 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -92,10 +96,16 @@ public class GUIPrepare extends GUICardPanel
 		
 		// Buttons go below the tabs
 		JPanel commandsPane = new JPanel();
+		commandsPane.setLayout(new GridBagLayout());
+		GridBagConstraints cmdGridConstraints = new GridBagConstraints();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
+		JButton btnLoadParams = new JButton("Load Parameters");
+		// Adding an Icon overwrites the fontsize, no matter the setFont
+		/*
 		JButton btnLoadParams = new JButton("Load Parameters",
 				UIManager.getIcon("FileView.directoryIcon"));
+				*/
 		btnLoadParams.setToolTipText("<html>Reads a DENOPTIM parameter file,"
 				+ "<br>and imports parameters into the form.</html>");
 		btnLoadParams.addActionListener(new ActionListener() {
@@ -114,10 +124,18 @@ public class GUIPrepare extends GUICardPanel
 			    }
 			}
 		});
-		commandsPane.add(btnLoadParams);
+		cmdGridConstraints.gridx = 0;
+		cmdGridConstraints.gridy = 0;
+		cmdGridConstraints.ipadx = 5;
+		cmdGridConstraints.ipady = 5;
+		commandsPane.add(btnLoadParams,cmdGridConstraints);
 		
+		JButton btnSaveParams = new JButton("Save Parameters");
+		// Adding an Icon overwrites the fontsize, no matter the setFont
+		/*
 		JButton btnSaveParams = new JButton("Save Parameters",
 				UIManager.getIcon("FileView.hardDriveIcon"));
+				*/
 		btnSaveParams.setToolTipText("<html>Write all parameters to file."
 				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
@@ -126,12 +144,12 @@ public class GUIPrepare extends GUICardPanel
 				printAllParamsToFile(outFile);
 			}
 		});
-		commandsPane.add(btnSaveParams);
+		cmdGridConstraints.gridx = 1;
+		commandsPane.add(btnSaveParams,cmdGridConstraints);
 		
 		/*
 		//TODO		
 	    JButton btnValidate = new JButton("Validate Parameters",
-	    UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
 	    btnValidate.setToolTipText("Check the correctness of the parameters");
 		btnValidate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -143,8 +161,11 @@ public class GUIPrepare extends GUICardPanel
 		*/
 
 		
-		JButton btnRun = new JButton("Run now...",
-				UIManager.getIcon("Menu.arrowIcon"));
+		JButton btnRun = new JButton("Run now...");//,
+		//		UIManager.getIcon("Menu.arrowIcon"));
+		// Using the arrowIcon causes problems with adoptopenjdk-1.8
+		// due to casting of the JButton into a JMenuItem. This could be
+		// due to the fact thet the arrow icon is meant for a menu. 
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String msg = "<html><body width='%1s'><p>Running a DENOPTIM "
@@ -202,7 +223,8 @@ public class GUIPrepare extends GUICardPanel
 				}
 			}
 		});
-		commandsPane.add(btnRun);
+		cmdGridConstraints.gridx = 2;
+		commandsPane.add(btnRun,cmdGridConstraints);
 		
 		
 		/*
@@ -212,7 +234,6 @@ public class GUIPrepare extends GUICardPanel
 		//from outside this JVM. Moreover, that command is platform specific.
 		//
 		JButton btnSubmit = new JButton("Submit...",
-		UIManager.getIcon("Menu.arrowIcon"));
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					String location = "unknownLocation";
@@ -249,11 +270,16 @@ public class GUIPrepare extends GUICardPanel
 		commandsPane.add(btnSubmit);
 		*/
 		
+		JButton btnCanc = new JButton("Close Tab");
+		// Adding the icon overrites font size no matter setFont
+		/*
 		JButton btnCanc = new JButton("Close Tab", 
 				UIManager.getIcon("FileView.fileIcon"));
+		*/
 		btnCanc.setToolTipText("Closes this tab.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
-		commandsPane.add(btnCanc);
+		cmdGridConstraints.gridx = 3;
+		commandsPane.add(btnCanc,cmdGridConstraints);
 		
 		JButton btnHelp = new JButton("?");
 		btnHelp.setToolTipText("Help");
@@ -273,7 +299,8 @@ public class GUIPrepare extends GUICardPanel
 	                    JOptionPane.PLAIN_MESSAGE);
 			}
 		});
-		commandsPane.add(btnHelp);
+		cmdGridConstraints.gridx = 4;
+		commandsPane.add(btnHelp,cmdGridConstraints);
 	}
 
 //------------------------------------------------------------------------------
