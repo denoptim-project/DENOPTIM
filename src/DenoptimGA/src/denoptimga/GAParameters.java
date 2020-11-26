@@ -206,7 +206,47 @@ public class GAParameters
     /**
      * Print level
      */
-    protected static int print_level = 0; 
+    protected static int print_level = 0;
+    
+//------------------------------------------------------------------------------
+    
+    public static void resetParameters() 
+    {
+    	dataDir = System.getProperty("user.dir");
+    	paramFile = "";
+    	initPoplnFile = "";
+    	uidFileIn = "";
+    	uidFileOut = "";
+    	//final: DEFUIDFILEOUTNAME = "MOLUID.txt";
+    	visitedGraphsFile = "GRAPHS.txt";
+    	failedSDF = "";
+    	logFile = "";
+    	populationSize = 50;
+    	numOfChildren = 5;
+    	numConvGen = 5;
+    	numGenerations = 100;
+    	maxTriesPerPop = 25;
+    	replacementStrategy = 1;
+    	growthProbabilityScheme = 0;
+    	growthMultiplier = 0.5;
+    	growthSigmaSteepness = 1.0;
+    	growthSigmaMiddle = 2.5;
+    	mutationProbability = 0.2;
+    	symmetricSubProbability = 0.8;
+    	crossoverProbability = 0.8;
+    	xoverSelectionMode = 3;
+    	strXoverSelectionMode = "STOCHASTIC UNIVERSAL SAMPLING";
+    	seed = 0L;
+    	parallelizationScheme = 1;
+    	numParallelTasks = 0;
+    	sortOrderDecreasing = true;
+    	precisionLevel = 3;
+    	print_level = 0;
+    	
+        FragmentSpaceParameters.resetParameters();
+        RingClosureParameters.resetParameters();
+        FitnessParameters.resetParameters();
+    }
 
    
 //------------------------------------------------------------------------------

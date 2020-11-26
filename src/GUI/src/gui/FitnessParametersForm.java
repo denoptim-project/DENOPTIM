@@ -20,6 +20,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -339,14 +340,18 @@ public class FitnessParametersForm extends ParametersForm
 
         String toolTipEq = "Define integrated fitness provider expression.";
         lineEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblEq = new JLabel("<html>Compute fitness as "
-        		+ "<i>Fitness = </i>${</html>", SwingConstants.LEFT);
+        lblEq = new JLabel("<html><i>Fitness = </i>${</html>", 
+        		SwingConstants.LEFT);
         JLabel lblEqEnd = new JLabel("<html>}</html>", SwingConstants.LEFT);
         //lblEq.setPreferredSize(fileLabelSize);
         lblEq.setToolTipText(toolTipEq);
         txtEq = new JTextField();
-        txtEq.setToolTipText("<html>Type here the expression computing the fitness value out of predefined descriptors and custom variables.<br>Descriptors can be selected from the 'Available descriptors' section (below).<br>Custom variables, including atom-specific descriptors, can descriptors can be defined in the 'Custom variables' section.</html>");
-        Dimension fitEqSize = new Dimension(500, 2*preferredHeight);
+        txtEq.setToolTipText("<html>Type here the expression for computing the fitness value out of predefined<br>"
+        		+ "descriptors and custom variables.<ul>"
+        		+ "<li>Descriptors can be selected from the 'Available descriptors' section (below).</li>"
+        		+ "<li>Custom variables, including atom-specific descriptors, can be defined in <br>"
+        		+ "the 'Custom variables' section.</li></ul></html>");
+        Dimension fitEqSize = new Dimension(700, 2*preferredHeight);
         txtEq.setPreferredSize(fitEqSize);
         txtEq.getDocument().addDocumentListener(fieldListener);
         mapKeyFieldToValueField.put(keyEq.toUpperCase(),txtEq);
@@ -363,7 +368,8 @@ public class FitnessParametersForm extends ParametersForm
         String toolTipDescs = "<html>To select descriptor names:"
         		+ "<ol><li>Browse the list of descriptors (double click to expand/reduce a node),"
         		+ "</li><li>Click on the name of the descriptor you want to select,"
-        		+ "</li><li>Copy the selected name (<code>ctrl+C</code>/<code>command+C</code>), click in the fitness expression field, and paste (<code>ctrl+V</code><code>command+V</code>).</li>"
+        		+ "</li><li>Copy the selected name (<code>ctrl+C</code>/<code>command+C</code>), click in the fitness<br>"
+        		+ "expression field, and paste (<code>ctrl+V</code><code>command+V</code>).</li>"
         		+ "</ol></html>";
         
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
@@ -612,7 +618,8 @@ public class FitnessParametersForm extends ParametersForm
         localBlock4.add(lineMoreEqTitle);
         
         String toolTipMoreEq = "<html>Define atom/bond specific descriptors.</html>";
-        lineMoreEq = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lineMoreEq = new JPanel();
+        lineMoreEq.setLayout(new BoxLayout(lineMoreEq, BoxLayout.LINE_AXIS));
         
         tabMoreEqMod = new DefaultTableModel();
         tabMoreEqMod.setColumnCount(2);
@@ -645,6 +652,8 @@ public class FitnessParametersForm extends ParametersForm
 				}
 			}
 		});
+        tabMoreEqScrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
+        btnMoreEq.setAlignmentY(Component.TOP_ALIGNMENT);
         lineMoreEq.add(tabMoreEqScrollPane);
         lineMoreEq.add(btnMoreEq);
         localBlock4.add(lineMoreEq);

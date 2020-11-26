@@ -95,9 +95,7 @@ public class GUIPrepare extends GUICardPanel
 		super.add(tabbedPane, BorderLayout.CENTER);
 		
 		// Buttons go below the tabs
-		JPanel commandsPane = new JPanel();
-		commandsPane.setLayout(new GridBagLayout());
-		GridBagConstraints cmdGridConstraints = new GridBagConstraints();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
 		JButton btnLoadParams = new JButton("Load Parameters");
@@ -124,11 +122,7 @@ public class GUIPrepare extends GUICardPanel
 			    }
 			}
 		});
-		cmdGridConstraints.gridx = 0;
-		cmdGridConstraints.gridy = 0;
-		cmdGridConstraints.ipadx = 5;
-		cmdGridConstraints.ipady = 5;
-		commandsPane.add(btnLoadParams,cmdGridConstraints);
+		commandsPane.add(btnLoadParams);
 		
 		JButton btnSaveParams = new JButton("Save Parameters");
 		// Adding an Icon overwrites the fontsize, no matter the setFont
@@ -144,8 +138,7 @@ public class GUIPrepare extends GUICardPanel
 				printAllParamsToFile(outFile);
 			}
 		});
-		cmdGridConstraints.gridx = 1;
-		commandsPane.add(btnSaveParams,cmdGridConstraints);
+		commandsPane.add(btnSaveParams);
 		
 		/*
 		//TODO		
@@ -223,8 +216,7 @@ public class GUIPrepare extends GUICardPanel
 				}
 			}
 		});
-		cmdGridConstraints.gridx = 2;
-		commandsPane.add(btnRun,cmdGridConstraints);
+		commandsPane.add(btnRun);
 		
 		
 		/*
@@ -278,8 +270,7 @@ public class GUIPrepare extends GUICardPanel
 		*/
 		btnCanc.setToolTipText("Closes this tab.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
-		cmdGridConstraints.gridx = 3;
-		commandsPane.add(btnCanc,cmdGridConstraints);
+		commandsPane.add(btnCanc);
 		
 		JButton btnHelp = new JButton("?");
 		btnHelp.setToolTipText("Help");
@@ -299,8 +290,7 @@ public class GUIPrepare extends GUICardPanel
 	                    JOptionPane.PLAIN_MESSAGE);
 			}
 		});
-		cmdGridConstraints.gridx = 4;
-		commandsPane.add(btnHelp,cmdGridConstraints);
+		commandsPane.add(btnHelp);
 	}
 
 //------------------------------------------------------------------------------

@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GenUtils;
+import fragspaceexplorer.FSEParameters;
 
 /**
  *
@@ -53,6 +54,9 @@ public class DenoptimGA
             throw new DENOPTIMException("Cannot run. Need at least one argument"
             		+ "to run DenoptimGA main method.");
         }
+        
+    	//needed by static parameters, and in case of subsequent runs in the same JVM
+    	GAParameters.resetParameters(); 
 
         String configFile = args[0];
         if (args.length > 1)
@@ -62,7 +66,7 @@ public class DenoptimGA
         EvolutionaryAlgorithm evoGA;
         ParallelEvolutionaryAlgorithm pGA = null;
         try
-        {
+        {	
             GAParameters.readParameterFile(configFile);
             GAParameters.checkParameters();
             GAParameters.processParameters();

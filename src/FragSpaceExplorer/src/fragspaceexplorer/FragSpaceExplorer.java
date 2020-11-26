@@ -78,6 +78,9 @@ public class FragSpaceExplorer
             throw new DENOPTIMException("Cannot run FragSpaceExplorer. Need "
             		+ "at least one argument to call FragSpaceExplorer.main");
         }
+        
+        //needed by static parameters, and in case of subsequent runs in the same JVM
+    	FSEParameters.resetParameters(); 
 
         String configFile = args[0];
         if (args.length > 1)
@@ -88,7 +91,7 @@ public class FragSpaceExplorer
         CombinatorialExplorerByLayer pCombExp = null;
         try
         {
-            FSEParameters.readParameterFile(configFile);
+        	FSEParameters.readParameterFile(configFile);
             FSEParameters.checkParameters();
             FSEParameters.processParameters();
             FSEParameters.printParameters();

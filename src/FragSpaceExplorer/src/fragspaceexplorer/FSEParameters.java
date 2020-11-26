@@ -147,7 +147,40 @@ public class FSEParameters
      * Verbosity level
      */
     private static int verbosity = 0;
+    
+    
+//-----------------------------------------------------------------------------
 
+    //TODO-V3 with a static collection of parameters, running subsequent
+    // experiments from the GUI ends up reusing parameters from the previous
+    // run. so we need a way to clean-up old values
+    public static void resetParameters()
+    {
+        fseParamsInUse = false;
+        workDir = System.getProperty("user.dir");
+        logFile = "FSE.log";
+        rootGraphsFile = null;
+        useGivenRoots = false;
+        rootGraphsFormat = DENOPTIMConstants.GRAPHFORMATSTRING; //Default
+        rootGraphs = null;
+        uidFile = "UID.txt";
+        runFitnessTask = false;
+        dbRootDir = ".";
+        numCPU = 1;
+        maxWait = 600000L;
+        waitStep = 5000L;
+        maxLevel = 2;
+        chkptStep = 100;
+        chkpt = null;
+        chkptFile = null;
+        chkptRestart = false;
+        prepareChkAndSerForTests = false;
+        verbosity = 0;
+        
+        FragmentSpaceParameters.resetParameters();
+        RingClosureParameters.resetParameters();
+        FitnessParameters.resetParameters();        
+    }
 
 //-----------------------------------------------------------------------------
 

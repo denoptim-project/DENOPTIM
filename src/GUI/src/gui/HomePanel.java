@@ -19,6 +19,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -178,7 +179,7 @@ public class HomePanel extends GUICardPanel
 		
 		
 		JTextPane email = new JTextPane();
-		email.setForeground(UIManager.getColor("Button.light"));
+		email.setForeground(Color.BLUE.darker());
 		email.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		email.setBackground(UIManager.getColor("Button.background"));
 		email.setText("denoptim.project@gmail.com");

@@ -718,11 +718,10 @@ public class GUIGraphHandler extends GUICardPanel
 		this.add(graphCtrlPane,BorderLayout.EAST);
 		
 		// Panel with buttons to the bottom of the frame
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenGraphs = new JButton("Load Library of Graphs",
-					UIManager.getIcon("FileView.directoryIcon"));
+		btnOpenGraphs = new JButton("Load Library of Graphs");
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -736,8 +735,7 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnOpenGraphs);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Graphs",
-				UIManager.getIcon("FileView.hardDriveIcon"));
+		JButton btnSaveFrags = new JButton("Save Library of Graphs");
 		btnSaveFrags.setToolTipText("Write all graphs to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

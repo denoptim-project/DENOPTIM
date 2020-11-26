@@ -127,8 +127,27 @@ public class FitnessParameters
      * energy-driven refinement of the geometry.
      */
     private static boolean make3DTrees = true;
+    
+    
+//------------------------------------------------------------------------------
 
 
+    public static void resetParameters()
+    {
+    	fitParamsInUse = false;
+    	useExternalFitness = true;
+    	externalExe = "";
+    	interpreterExternalExe = "BASH";
+    	fitnessExpression = "";
+    	atmBndSpecDescExpressions = new ArrayList<String>();
+    	atmBndSpecDescToVars = new HashMap<String,ArrayList<String>>();
+    	atmBndSpecDescSMARTS = new HashMap<String,ArrayList<String>>();
+    	descriptors = null;
+    	descriptorsGeneratingVariables = null;
+    	makePictures = false;
+    	make3DTrees = true;
+    }
+    
 //------------------------------------------------------------------------------
 
     public static boolean fitParamsInUse()

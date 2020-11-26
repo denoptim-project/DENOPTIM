@@ -119,13 +119,11 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		this.add(cpMapHandler, BorderLayout.CENTER);
 		
 		// Panel with buttons to the bottom of the frame
-		
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
 		
-		btnLoadCPMap = new JButton("Load Compatibility Matrix",
-					UIManager.getIcon("FileView.directoryIcon"));
+		btnLoadCPMap = new JButton("Load Compatibility Matrix");
 		btnLoadCPMap.setToolTipText(String.format("<html><body width='%1s'>"
 				+ "Reads from file all compatibility matrix data including: "
 				+ "<ul><li>APClass compatibility rules</li>"
@@ -157,8 +155,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		commandsPane.add(btnImportAPClasses);
 		
 		
-		JButton btnSaveFrags = new JButton("Save Compatibility Matrix",
-				UIManager.getIcon("FileView.hardDriveIcon"));
+		JButton btnSaveFrags = new JButton("Save Compatibility Matrix");
 		btnSaveFrags.setToolTipText(String.format("<html><body width='%1s'>"
 				+ "Writes to file all compatibility matrix data including: "
 				+ "<ul><li>APClass compatibility rules</li>"

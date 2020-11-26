@@ -32,6 +32,8 @@ import java.util.logging.Level;
  * @author Vishwesh Venkatraman
  */
 
+//TODO-V3: singleton by design. Will have to be changed into a thread-specific class
+
 public class DENOPTIMLogger 
 {
     public static final Logger appLogger = Logger.getLogger("DENOPTIMLogger");
@@ -60,8 +62,18 @@ public class DENOPTIMLogger
     
     public void setupLogger(String logFile) throws IOException
     {
-        if (!hasBeenSet)
-        {
+    	//TODO: this is a hack to allow changing setup and use the singleton
+    	// logger for two different and independent experiments run is a 
+    	// sequence (parallelization not possible yet.
+    	
+    	int n = appLogger.getHandlers().length;
+    	for (int i=0; i<n; i++)
+    	{
+    	    appLogger.removeHandler(appLogger.getHandlers()[0]);
+    	}
+    	//this commenting is still part of the hack
+    	//if (!hasBeenSet)
+        //{
             boolean toFile = false;
             FileHandler fileHdlr = new FileHandler(logFile);
             if (logFile.endsWith(".html"))
@@ -89,7 +101,7 @@ public class DENOPTIMLogger
             }
             appLogger.setLevel(Level.FINEST);
             hasBeenSet = true;
-        }
+        //}
     }
 
 //------------------------------------------------------------------------------

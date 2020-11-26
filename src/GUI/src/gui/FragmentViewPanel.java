@@ -611,8 +611,8 @@ public class FragmentViewPanel extends JSplitPane
 		double thrld = 0.0001;
 		for (int i=0; i<fragment.getAtomCount(); i++)
 		{
-			Point3d pA = fromViewer.getAtom(i).getPoint3d();
-			Point3d pB = fragment.getAtom(i).getPoint3d();
+			Point3d pA = FragmentUtils.getPoint3d(fromViewer.getAtom(i));
+			Point3d pB = FragmentUtils.getPoint3d(fragment.getAtom(i));
 			if (pA.distance(pB)>thrld)
 			{
 				return fromViewer;
@@ -642,12 +642,17 @@ public class FragmentViewPanel extends JSplitPane
         for (int apId : mapAPs.keySet())
         {
         	DENOPTIMAttachmentPoint ap = mapAPs.get(apId);
-        	if (apId >= mol.getAtomCount())
+        	//NB here the inequity considers two completely disjoint indexes
+        	//but is the only thing that seems valid at the stage were the atoms
+        	//contained in the Jmol viewer may vary freely from the APs 
+        	//collected in mapAPs
+        	if (apId > mol.getAtomCount())
         	{
         		throw new DENOPTIMException("The atom list has changed and is"
         				+ "no longer compatible with the list of attachment "
         				+ "points. Cannot convert the current system to a "
-        				+ "valid fragment.");
+        				+ "valid fragment. "
+        				+ "apId:" + apId + " #atms:" + mol.getAtomCount());
         	}
         	
         	int srcAtmId = ap.getAtomPositionNumber();

@@ -738,4 +738,14 @@ public class DENOPTIMAttachmentPoint implements Serializable
     }
     
 //-----------------------------------------------------------------------------
+    
+    // TODO-V3 Upon merging branches this method can be removed
+
+	public static String getOnlyRule(String apClass) {
+		String[] parts = apClass.split(
+        		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
+		return parts[0];
+	}
+    
+//-----------------------------------------------------------------------------
 }

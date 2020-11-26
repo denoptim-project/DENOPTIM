@@ -521,12 +521,10 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		
 		// Panel with buttons to the bottom of the frame
-		
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenFrags = new JButton("Load Library of Fragments",
-					UIManager.getIcon("FileView.directoryIcon"));
+		btnOpenFrags = new JButton("Load Library of Fragments");
 		btnOpenFrags.setToolTipText("Reads fragments or structures from "
 				+ "file.");
 		btnOpenFrags.addActionListener(new ActionListener() {
@@ -541,8 +539,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		});
 		commandsPane.add(btnOpenFrags);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Fragments",
-				UIManager.getIcon("FileView.hardDriveIcon"));
+		JButton btnSaveFrags = new JButton("Save Library of Fragments");
 		btnSaveFrags.setToolTipText("Write all fragments to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

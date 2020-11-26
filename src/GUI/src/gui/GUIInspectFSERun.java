@@ -219,7 +219,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		this.add(centralPanel,BorderLayout.CENTER);
 
 		// Button to the bottom of the card
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		this.add(commandsPane, BorderLayout.SOUTH);
 		JButton btnCanc = new JButton("Close Tab");
 		btnCanc.setToolTipText("Closes this FSERun Inspector.");

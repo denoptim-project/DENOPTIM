@@ -220,6 +220,51 @@ public class RingClosureParameters
      */
     protected static boolean serializeRCCs = false;
 
+//------------------------------------------------------------------------------
+    
+    public static void resetParameters()
+    {
+    	verbosity = 0;
+    	rcParamsInUse = false;
+    	closeRings = false;
+    	buildChelatesMode = false;
+    	selectFragsFromCC = false;
+    	rcStrategy = "BONDOVERLAP";
+    	rceMode = 0;
+    	maxRotBonds = 9; //TODO [n+2] => benzene has n=6 so: 8
+    	maxRingSize = 9;
+    	minRcaPerType = 0;
+    	maxRcaPerType = 50;
+    	minRingClosures = 0;
+    	maxRingClosures = 50;
+    	linearityLimit = 178.5;
+    	rcTolDist = 0.33;
+    	pathConfSearchExtraTol = 1.1;
+    	rcMaxDot = -0.75;
+    	pathConfSearchStep = 12.0;
+    	ringSizeBias = new ArrayList<Integer>()
+            {{
+                for (int i=0; i<maxRingSize+1; i++)
+                {
+                    add(0);
+                }
+    	    if (maxRingSize>=7)
+    	    {
+                    // WARNING: if the default value of maxRingSize is changed
+                    // also the default content of this array has to change
+                    set(5,2);
+                    set(6,4);
+                    set(7,1);
+    	    }
+            }};
+        ringClosabCondAsSMARTS = new HashMap<String,String>();
+        reqElInRings = new HashSet<String>();
+        rccIndex = "";
+        rccFolder = "";
+        exhaustiveConfSrch = false; 
+        checkInterdepPaths = false;
+        serializeRCCs = false;
+    }
 
 //----------------------------------------------------------------------------
 

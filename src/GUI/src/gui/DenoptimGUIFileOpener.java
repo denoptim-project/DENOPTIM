@@ -18,7 +18,6 @@
 
 package gui;
 
-import java.awt.FileDialog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -53,15 +52,12 @@ public class DenoptimGUIFileOpener
 	public static File pickFileOrFolder()
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		File file;
+		File file = null;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
-		else
-		{
-			return null;
-		}
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		return file;
 	}
 
@@ -102,14 +98,11 @@ public class DenoptimGUIFileOpener
 	
 	public static File pickFile() 
 	{
-		File file;
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		File file = null;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
-		}
-		else
-		{
-			return null;
 		}
 		return file;
 	}
@@ -131,16 +124,14 @@ public class DenoptimGUIFileOpener
 	public static File pickFolder() 
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fileChooser.setDialogTitle("Choose the folder to be loaded");
-		File file;
+		fileChooser.setDialogTitle("Choose Folder to Load");
+		File file = null;
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
-		else
-		{
-			return null;
-		}
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setDialogTitle("Open");
 		return file;
 	}
 	
