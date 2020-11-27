@@ -263,7 +263,7 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFileOrFolder();
+				File file = DenoptimGUIFileOpener.pickFileOrFolder(open);
 				try {
 					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
 							file));

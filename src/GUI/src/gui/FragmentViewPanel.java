@@ -819,7 +819,7 @@ public class FragmentViewPanel extends JSplitPane
 	 */
 	public void clearMolecularViewer()
 	{
-		jmolPanel.viewer.evalString("print \"my clearing method\"; zap");
+		jmolPanel.viewer.evalString("zap");
 	}
 
 //-----------------------------------------------------------------------------

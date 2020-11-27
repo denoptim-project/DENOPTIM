@@ -394,7 +394,7 @@ public class GUIGraphHandler extends GUICardPanel
 						break;
 					
 					case 1:
-						File inFile = DenoptimGUIFileOpener.pickFile();
+						File inFile = DenoptimGUIFileOpener.pickFile(btnAddGraph);
 						if (inFile == null 
 								|| inFile.getAbsolutePath().equals(""))
 						{
@@ -540,7 +540,19 @@ public class GUIGraphHandler extends GUICardPanel
 				+ "attachment point<html>");
 		btnAddVrtx.setEnabled(false);
 		btnAddVrtx.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {								
+			public void actionPerformed(ActionEvent e) {	
+				if (!hasFragSpace)
+				{
+					JOptionPane.showMessageDialog(null,
+			                "<html>No fragment space is currently "
+			                + "loaded!<br>"
+			                + "You must first load a fragment space before "
+			                + "trying to build graphs.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
 				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
@@ -558,7 +570,7 @@ public class GUIGraphHandler extends GUICardPanel
 					extendGraphFromFragSpace(selAps);
 					
 					// Update viewer
-					loadDnGraphToViewer();
+					loadDnGraphToViewer(true);
 					
 					// Protect edited system
 			        unsavedChanges = true;
@@ -594,7 +606,7 @@ public class GUIGraphHandler extends GUICardPanel
 					}
 					
 					// Update viewer
-					loadDnGraphToViewer();
+					loadDnGraphToViewer(true);
 					
 			        // Protect the temporary "dnGraph" obj
 			        unsavedChanges = true;
@@ -725,7 +737,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenGraphs);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -739,7 +751,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnSaveFrags.setToolTipText("Write all graphs to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile();
+				File outFile = DenoptimGUIFileOpener.saveFile(btnSaveFrags);
 				if (outFile == null)
 				{
 					return;
@@ -751,7 +763,7 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				catch (Exception ex)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnSaveFrags,
 			                "Could not write to '" + outFile + "'!.",
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
@@ -977,7 +989,7 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraph.addVertex(scaffVertex);
 		
 		// Put the graph to the viewer
-		loadDnGraphToViewer();
+		loadDnGraphToViewer(false);
 		enableGraphDependentButtons(true);
 		unsavedChanges = true;
         protectEditedSystem();
@@ -1229,7 +1241,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Display the first
 		currGrphIdx = 0;
 		
-		loadCurrentGraphIdxToViewer();
+		loadCurrentGraphIdxToViewer(false);
 		updateGraphListSpinner();
 	}
 
@@ -1247,7 +1259,7 @@ public class GUIGraphHandler extends GUICardPanel
 				molLibrary.addAll(DenoptimIO.readMoleculeData(
 						file.getAbsolutePath()));
 			} catch (DENOPTIMException e) {
-				System.out.println("Could not read molecules from " + file);
+				System.out.println("WARNING: Could not read molecular representation from " + file);
 				for (int i=0; i<graphs.size(); i++)
 				{
 					molLibrary.add(new AtomContainer());
@@ -1257,7 +1269,7 @@ public class GUIGraphHandler extends GUICardPanel
 			// Display the first of the imported ones
 			currGrphIdx = oldSize;
 			
-			loadCurrentGraphIdxToViewer();
+			loadCurrentGraphIdxToViewer(false);
 			updateGraphListSpinner();
 		}
 	}
@@ -1362,7 +1374,7 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Loads the graph corresponding to the field {@link #currGrphIdx}
 	 */
-	private void loadCurrentGraphIdxToViewer()
+	private void loadCurrentGraphIdxToViewer(boolean keepSprites)
 	{
 		if (dnGraphLibrary == null)
 		{
@@ -1379,7 +1391,7 @@ public class GUIGraphHandler extends GUICardPanel
     	clearCurrentSystem();
     	
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
-		loadDnGraphToViewer();
+		loadDnGraphToViewer(keepSprites);
 		
 		if (molLibrary.get(currGrphIdx).getAtomCount() > 0)
 		{
@@ -1406,7 +1418,7 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void loadDnGraphToViewer()
+	private void loadDnGraphToViewer(boolean keepSprites)
 	{
 		if (fragViewer != null)
 		{
@@ -1417,7 +1429,12 @@ public class GUIGraphHandler extends GUICardPanel
 		graph = convertDnGraphToGSGraph(dnGraph);
 		
 		// Keep a snapshot of the old data visualized
-		oldGSStatus = graphViewer.getStatusSnapshot();
+		if (keepSprites)
+		{
+			oldGSStatus = graphViewer.getStatusSnapshot();
+		} else {
+			oldGSStatus = null;
+		}
 		
 		graphViewer.cleanup();
 		graphViewer.loadGraphToViewer(graph,oldGSStatus);
@@ -1624,7 +1641,7 @@ public class GUIGraphHandler extends GUICardPanel
         	//NB here we convert from 1-based index in GUI to 0-based index
         	currGrphIdx = ((Integer) graphNavigSpinner.getValue())
         			.intValue() - 1;
-        	loadCurrentGraphIdxToViewer();
+        	loadCurrentGraphIdxToViewer(false);
         }
 	}
 	
@@ -1662,13 +1679,13 @@ public class GUIGraphHandler extends GUICardPanel
 			fsParsForm = new FSParametersForm(this.getSize());
 			addToCentralPane(fsParsForm);
 			
-			this.btnDone.setText("Create Fragment Space");
-			this.btnDone.setToolTipText("<html>Uses the parameters defined "
+			btnDone.setText("Create Fragment Space");
+			btnDone.setToolTipText("<html>Uses the parameters defined "
 					+ "above to"
 					+ "<br> build a fragment space and make it available to"
 					+ "<br>the graph handler.</html>");
 			
-			this.btnDone.addActionListener(new ActionListener() {
+			btnDone.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {					
@@ -1693,7 +1710,7 @@ public class GUIGraphHandler extends GUICardPanel
 						msg = msg + "<br>Please alter the "
 								+ "settings and try again.</html>";
 								
-						JOptionPane.showMessageDialog(null, msg,
+						JOptionPane.showMessageDialog(btnDone, msg,
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
 				                UIManager.getIcon("OptionPane.errorIcon"));
@@ -1838,7 +1855,7 @@ public class GUIGraphHandler extends GUICardPanel
 	    		}
 	
 	    		// We use the currGrphIdx to load another dnGraph
-		    	loadCurrentGraphIdxToViewer();
+		    	loadCurrentGraphIdxToViewer(true);
 		    	updateGraphListSpinner();
     		}
     		else

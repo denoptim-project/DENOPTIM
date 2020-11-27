@@ -172,7 +172,6 @@ public class DenoptimIO
 					ArrayList<IAtomContainer> mols = readSDFFile(sCurrentLine);
 					lstContainers.addAll(mols);
 				} catch (Exception e) {
-					e.printStackTrace();
 		            throw new DENOPTIMException("<html>File '" + fileName 
 		            		+ "' <br>seems "
 		            		+ "to be a "
@@ -183,7 +182,7 @@ public class DenoptimIO
 		            		+ "Pleae check your input. Is it really a list of "
 		            		+ "links? "
 		            		+ "<br>If not, make sure it has a standard"
-		            		+ "extension (e.g., .smi, .sdf)</html>");
+		            		+ "extension (e.g., .smi, .sdf)</html>",e);
 				}
             }
         }
@@ -1701,6 +1700,8 @@ public class DenoptimIO
         // molecules
         else
         {
+        	System.out.println("Interpreting file '" + fileName + "' as a list "
+        			+ "of links.");
             mols = DenoptimIO.readLinksToMols(fileName);
         }
         return mols;

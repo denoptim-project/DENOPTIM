@@ -135,7 +135,7 @@ public class HomePanel extends GUICardPanel
 				+ "evolutionary experiment  (i.e., folder named RUN...)");
 		btnReadGAOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFolder();
+				File file = DenoptimGUIFileOpener.pickFolder(btnReadGAOutput);
 				if (file == null)
 				{
 					return;
@@ -151,7 +151,7 @@ public class HomePanel extends GUICardPanel
 				+ "combinatorial experiment  (i.e., folder named FSE...)");
         btnReadFSEOutput.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                File file = DenoptimGUIFileOpener.pickFolder();
+                File file = DenoptimGUIFileOpener.pickFolder(btnReadFSEOutput);
                 if (file == null)
                 {
                         return;

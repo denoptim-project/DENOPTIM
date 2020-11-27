@@ -250,6 +250,7 @@ public class GraphViewerPanel extends JPanel
 		viewer.enableAutoLayout();
 		
 		sman = new SpriteManager(graph);
+		
 		appendSpritesFromSnapshot(prevStatus);
 		// Not working. See comment in the method.
 		//placeNodesAccordingToSnapshot(prevStatus);

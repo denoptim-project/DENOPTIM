@@ -249,6 +249,8 @@ public class FSParametersForm extends ParametersForm
         
     String NL = System.getProperty("line.separator");
     
+//------------------------------------------------------------------------------
+    
     public FSParametersForm(Dimension d)
     {
     	mapKeyFieldToValueField = new HashMap<String,Object>();
@@ -316,7 +318,7 @@ public class FSParametersForm extends ParametersForm
         btnFSSource = new JButton("Browse");
         btnFSSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtFSSource);
+                DenoptimGUIFileOpener.pickFile(txtFSSource,btnFSSource);
            }
         });
         btnLoadFSSource = new JButton("Load...");
@@ -333,7 +335,7 @@ public class FSParametersForm extends ParametersForm
 	        		if (e1.getMessage().equals("") || e1.getMessage() == null)
 	        		{
 	        			e1.printStackTrace();
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnLoadFSSource,
 								"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
@@ -341,7 +343,7 @@ public class FSParametersForm extends ParametersForm
 	        		}
 	        		else
 	        		{
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnLoadFSSource,
 								e1.getMessage(),
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
@@ -370,7 +372,7 @@ public class FSParametersForm extends ParametersForm
         btnPar1 = new JButton("Browse");
         btnPar1.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar1);
+                DenoptimGUIFileOpener.pickFile(txtPar1,btnPar1);
            }
         });
         linePar1.add(lblPar1);
@@ -391,7 +393,7 @@ public class FSParametersForm extends ParametersForm
         btnPar2 = new JButton("Browse");
         btnPar2.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar2);
+                DenoptimGUIFileOpener.pickFile(txtPar2,btnPar2);
            }
         });
         linePar2.add(lblPar2);
@@ -412,7 +414,7 @@ public class FSParametersForm extends ParametersForm
         btnPar3 = new JButton("Browse");
         btnPar3.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar3);
+                DenoptimGUIFileOpener.pickFile(txtPar3,btnPar3);
            }
         });
         linePar3.add(lblPar3);
@@ -433,7 +435,7 @@ public class FSParametersForm extends ParametersForm
         btnCPMat = new JButton("Browse");
         btnCPMat.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtCPMat);
+                DenoptimGUIFileOpener.pickFile(txtCPMat,btnCPMat);
            }
         });
         lineCPMat.add(lblCPMat);
@@ -454,7 +456,7 @@ public class FSParametersForm extends ParametersForm
         btnPar6 = new JButton("Browse");
         btnPar6.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar6);
+                DenoptimGUIFileOpener.pickFile(txtPar6,btnPar6);
            }
         });
         linePar6.add(lblPar6);
@@ -544,7 +546,7 @@ public class FSParametersForm extends ParametersForm
         		}
         		catch (Throwable t)
         		{
-        			JOptionPane.showMessageDialog(null,
+        			JOptionPane.showMessageDialog(btnPar11Insert,
         					"<html>The current parameters do not create a valid fragment space.<br>"
         					+ "It looks like you want to manually insert APClasses.<br>"
         					+ "If this is not true, you must adjust the parameters defining the fragment space.</html>",
@@ -558,7 +560,7 @@ public class FSParametersForm extends ParametersForm
 	        		while (!done)
 	        		{
 		        		String apClass = (String)JOptionPane.showInputDialog(
-		        		                    null,
+		        							btnPar11Insert,
 		        		                    "Choose attachment point class:",
 		        		                    "apClass",
 		        		                    JOptionPane.PLAIN_MESSAGE,
@@ -575,7 +577,13 @@ public class FSParametersForm extends ParametersForm
 		        				{
 		        					if (apClass.equals(tabPar11.getValueAt(i, 0)))
 		        					{
-		        						JOptionPane.showMessageDialog(null, "<html>apClass already in the table.<br>Choose another class.", "Duplicate apClass", JOptionPane.ERROR_MESSAGE);
+		        						JOptionPane.showMessageDialog(
+		        								btnPar11Insert, 
+		        								"<html>apClass already in the "
+		        								+ "table.<br>Choose another "
+		        								+ "class.", 
+		        								"Duplicate apClass", 
+		        								JOptionPane.ERROR_MESSAGE);
 		        						goodChoice = false;
 		        						break;
 		        					}
@@ -599,7 +607,7 @@ public class FSParametersForm extends ParametersForm
 	        		while (!done)
 	        		{
 		        		String apClass = (String)JOptionPane.showInputDialog(
-			                    null,
+		        				btnPar11Insert,
 			                    "<html>No fragment library found.<br>Type an attachment point class:</html>",
 			                    "apClass",
 			                    JOptionPane.PLAIN_MESSAGE);
@@ -613,7 +621,11 @@ public class FSParametersForm extends ParametersForm
 								{
 									if (apClass.equals(tabPar11.getValueAt(i, 0)))
 									{
-										JOptionPane.showMessageDialog(null, "<html>apClass already in the table.<br>Choose another class.", "Duplicate apClass", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(
+												btnPar11Insert, 
+												"<html>apClass already in the table.<br>Choose another class.", 
+												"Duplicate apClass", 
+												JOptionPane.ERROR_MESSAGE);
 										goodChoice = false;
 										break;
 									}
@@ -711,7 +723,7 @@ public class FSParametersForm extends ParametersForm
         btnPar5 = new JButton("Browse");
         btnPar5.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar5);
+                DenoptimGUIFileOpener.pickFile(txtPar5,btnPar5);
            }
         });
         linePar5.add(lblPar5);
@@ -794,7 +806,7 @@ public class FSParametersForm extends ParametersForm
         		while (!done)
         		{
 	        		String rsBias = (String)JOptionPane.showInputDialog(
-		                    null,
+	        				btnPar22Insert,
 		                    "Specify ring size:",
 		                    "Ring Size",
 		                    JOptionPane.PLAIN_MESSAGE);
@@ -808,7 +820,9 @@ public class FSParametersForm extends ParametersForm
 							{
 								if (rsBias.equals(tabPar22.getValueAt(i, 0)))
 								{
-									JOptionPane.showMessageDialog(null, "<html>Rins size already in the table.<br>Choose another size or modify the value of the bias in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(
+											btnPar22Insert,
+											"<html>Rins size already in the table.<br>Choose another size or modify the value of the bias in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
 									goodChoice = false;
 									break;
 								}
@@ -949,7 +963,7 @@ public class FSParametersForm extends ParametersForm
         		while (!done)
         		{
 	        		String rcRule = (String)JOptionPane.showInputDialog(
-		                    null,
+	        				btnPar21Insert,
 		                    "Specify ring-closability rules:",
 		                    "Add Constitutional Closability Rule",
 		                    JOptionPane.PLAIN_MESSAGE);
@@ -963,7 +977,11 @@ public class FSParametersForm extends ParametersForm
 							{
 								if (rcRule.equals(tabPar21.getValueAt(i, 0)))
 								{
-									JOptionPane.showMessageDialog(null, "<html>Rule already in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(
+											btnPar21Insert,
+											"<html>Rule already in the table.</html>", 
+											"Duplicate Entry", 
+											JOptionPane.ERROR_MESSAGE);
 									goodChoice = false;
 									break;
 								}
@@ -1095,7 +1113,7 @@ public class FSParametersForm extends ParametersForm
         btnPar30 = new JButton("Browse");
         btnPar30.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar30);
+                DenoptimGUIFileOpener.pickFile(txtPar30,btnPar30);
            }
         });
         linePar30.add(lblPar30);
@@ -1116,7 +1134,7 @@ public class FSParametersForm extends ParametersForm
         btnPar31 = new JButton("Browse");
         btnPar31.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFolder(txtPar31);
+                DenoptimGUIFileOpener.pickFolder(txtPar31,btnPar31);
            }
         });
         linePar31.add(lblPar31);
@@ -1227,8 +1245,9 @@ public class FSParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(null,
-					"<html>Parameter '" + key + "' is not recognized.<br>Ignoring line.</html>",
+			JOptionPane.showMessageDialog(this,
+					"<html>Parameter '" + key 
+					+ "' is not recognized.<br>Ignoring line.</html>",
 	                "WARNING",
 	                JOptionPane.WARNING_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -1253,9 +1272,13 @@ public class FSParametersForm extends ParametersForm
 
  				//WARNING: there might be cases where we do not take all the records
 
-    			if (key.equals(keyPar22) && (((DefaultTableModel) valueField).getRowCount() == 0)) 
+    			if (key.equals(keyPar22) 
+    					&& 
+    					(((DefaultTableModel) valueField).getRowCount() == 0)) 
     			{
-    				((DefaultTableModel) valueField).addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias</b></html>"});
+    				((DefaultTableModel) valueField).addRow(new Object[]{
+    						"<html><b>Ring Size</b></html>", 
+    						"<html><b>Bias</b></html>"});
     			}
 
  				((DefaultTableModel) valueField).addRow(value.split(" "));

@@ -1585,6 +1585,39 @@ public class CompatibilityMatrixForm extends JPanel {
 	}
 	
 //-----------------------------------------------------------------------------
+
+	/**
+	 * Reads all the APClasses found in a list of files
+	 * @param fragLibs the list of file to inspect.
+	 * @param cleanup set <code>true</code> to cleanup previous listing of 
+	 * APclasses.
+	 */
+	
+	public void importAllAPClassesFromCappingGroupLibs(Set<File> fragLibs,
+			boolean cleanup)
+	{
+		this.setCursor(Cursor.getPredefinedCursor(
+				Cursor.WAIT_CURSOR));
+		if (cleanup)
+		{
+			allCapAPClasses = new TreeSet<String>();
+		}
+		
+		for (File fragLib : fragLibs)
+		{
+			allCapAPClasses.addAll(DenoptimIO.readAllAPClasses(fragLib));
+		}
+		
+		for (String apc : allCapAPClasses)
+		{
+		    allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(apc));
+		}
+		
+		this.setCursor(Cursor.getPredefinedCursor(
+				Cursor.DEFAULT_CURSOR));
+	}
+	
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Reads all the APClasses found in a list of files

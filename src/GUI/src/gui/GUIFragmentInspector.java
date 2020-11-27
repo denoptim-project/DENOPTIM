@@ -199,7 +199,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnAddFrag.setToolTipText("Append fragment taken from file.");
 		btnAddFrag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnAddFrag);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -211,7 +211,7 @@ public class GUIFragmentInspector extends GUICardPanel
 							inFile.getAbsolutePath());
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnAddFrag,
 			                "<html>Could not read fragments from file"
 			                + "<br>'" + inFile + "'"
 			                + "<br>Hint on cause: " + e1.getMessage() 
@@ -224,7 +224,7 @@ public class GUIFragmentInspector extends GUICardPanel
 
 				if (fragLib.size() == 0)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnAddFrag,
 			                "<html>No fragments in file"
 			                + "<br>'" + inFile + "'</html>",
 			                "Error",
@@ -245,7 +245,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				String txt = "<html><body width='%1s'>Do you want to "
 						+ "append all fragments of only selected ones?"
 						+ "</html>";
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(btnAddFrag,
 		                String.format(txt,200),
 		                "Append Fragments",
 		                JOptionPane.DEFAULT_OPTION,
@@ -296,7 +296,7 @@ public class GUIFragmentInspector extends GUICardPanel
 							DenoptimIO.writeMoleculeSet(tmpSDFFile, selectedFrags);
 							importFragmentsFromFile(new File(tmpSDFFile));
 						} catch (DENOPTIMException e1) {
-							JOptionPane.showMessageDialog(null,
+							JOptionPane.showMessageDialog(btnAddFrag,
 					                "<html>Could not read import fragments.<br>"
 					                + "Error reading tmp file"
 					                + "<br>'" + inFile + "'"
@@ -340,7 +340,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				+ " from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenMol);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -529,7 +529,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				+ "file.");
 		btnOpenFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenFrags);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -543,7 +543,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnSaveFrags.setToolTipText("Write all fragments to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile();
+				File outFile = DenoptimGUIFileOpener.saveFile(btnSaveFrags);
 				if (outFile == null)
 				{
 					return;

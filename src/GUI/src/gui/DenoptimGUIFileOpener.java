@@ -18,6 +18,7 @@
 
 package gui;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -48,12 +49,12 @@ public class DenoptimGUIFileOpener
 			FileSystemView.getFileSystemView().getHomeDirectory()); 
 	
 //-----------------------------------------------------------------------------
-	
-	public static File pickFileOrFolder()
+
+	public static File pickFileOrFolder(Component parent)
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		File file = null;
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
@@ -63,9 +64,9 @@ public class DenoptimGUIFileOpener
 
 //-----------------------------------------------------------------------------
 
-	public static File pickFile(JTextField txtField) 
+	public static File pickFile(JTextField txtField, Component parent) 
 	{
-		File file = pickFile();
+		File file = pickFile(parent);
 		if (file != null)
 		{
 		    txtField.setText(file.getAbsolutePath());
@@ -74,44 +75,44 @@ public class DenoptimGUIFileOpener
 	}
 	
 //-----------------------------------------------------------------------------
-	
-	public static Set<File> pickManyFile() 
+
+	public static Set<File> pickManyFile(Component parent) 
 	{
 		fileChooser.setMultiSelectionEnabled(true);
-		Set<File> files = new HashSet<File>();
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		fileChooser.setDialogTitle("Select one or more files");
+		Set<File> files = null;
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
+			files = new HashSet<File>();
 			File[] arr = fileChooser.getSelectedFiles();
 			for (int i=0; i<arr.length; i++)
 			{
 				files.add(arr[i]);
 			}
 		}
-		else
-		{
-			return null;
-		}
+		fileChooser.setDialogTitle("Open");
+		fileChooser.setMultiSelectionEnabled(false);
 		return files;
 	}
 	
 //-----------------------------------------------------------------------------
 	
-	public static File pickFile() 
+	public static File pickFile(Component parent) 
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		File file = null;
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
 		return file;
 	}
-	
+		
 //-----------------------------------------------------------------------------
-	
-	public static File pickFolder(JTextField txtField) 
+		
+	public static File pickFolder(JTextField txtField, Component parent) 
 	{
-		File file = pickFolder();
+		File file = pickFolder(parent);
 		if (file != null)
 		{
 		    txtField.setText(file.getAbsolutePath());
@@ -121,12 +122,12 @@ public class DenoptimGUIFileOpener
 	
 //-----------------------------------------------------------------------------
 	
-	public static File pickFolder() 
+	public static File pickFolder(Component parent) 
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser.setDialogTitle("Choose Folder to Load");
 		File file = null;
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
@@ -137,10 +138,10 @@ public class DenoptimGUIFileOpener
 	
 //-----------------------------------------------------------------------------
 	
-	public static File saveFile() 
+	public static File saveFile(Component parent) 
 	{
 		File file;
-		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}

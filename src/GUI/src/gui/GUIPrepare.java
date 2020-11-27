@@ -108,7 +108,7 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>and imports parameters into the form.</html>");
 		btnLoadParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnLoadParams);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -134,7 +134,7 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile();
+				File outFile = DenoptimGUIFileOpener.saveFile(btnSaveParams);
 				printAllParamsToFile(outFile);
 			}
 		});
