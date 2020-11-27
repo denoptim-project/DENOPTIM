@@ -40,14 +40,9 @@ import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.IGraphBuildingBlock;
-import denoptim.molecule.SymmetricSet;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.TaskUtils;
 
@@ -545,7 +540,7 @@ public class CombinatorialExplorerByLayer
                     // Vertex ID in root can be whatever and we ignore them
                     // when setting new vertex IDs. To do this, we change sign
                     // to the old IDs to avoid them clashing with the new ones,
-                    rootGraph.changeSignToVertexID();
+                    rootGraph.changeSignOfVertexID();
                     // ...and renumber starting from vertex ID = 1.
                     rootGraph.renumberGraphVertices();
                     rootGraph.setGraphId(GraphUtils.getUniqueGraphIndex());

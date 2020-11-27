@@ -76,7 +76,7 @@ public class GraphUtils
     {
         if (vertexCounter.get() >= val)
         {
-            String msg = "Attempt to reser the unique vertex ID using "
+            String msg = "Attempt to reset the unique vertex ID using "
                          + val + " while the current value is "
                          + vertexCounter.get();
             throw new DENOPTIMException(msg);

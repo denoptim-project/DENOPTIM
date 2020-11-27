@@ -1865,7 +1865,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     @Deprecated
-    public void changeSignToVertexID()
+    public void changeSignOfVertexID()
     {
         HashMap<Integer, Integer> nmap = new HashMap<>();
         for (int i=0; i<getVertexCount(); i++)
@@ -1878,11 +1878,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
             for (int j=0; j<getEdgeCount(); j++)
             {
-                if (getEdgeList().get(j).getSrcVertex() == vid) {
-                    getEdgeList().get(j).setSrcVertex(nvid);
+                DENOPTIMEdge e = getEdgeList().get(j);
+                if (e.getSrcVertex() == vid) {
+                    e.setSrcVertex(nvid);
                 }
-                if (getEdgeList().get(j).getTrgVertex() == vid) {
-                    getEdgeList().get(j).setTrgVertex(nvid);
+                if (e.getTrgVertex() == vid) {
+                    e.setTrgVertex(nvid);
                 }
             }
         }
@@ -1903,7 +1904,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Reassign vertex IDs to a graph.
      * Before any operation is performed on the graph, its vertices are
      * renumbered so as to differentiate them from their progenitors
-     *
      */
 
     public void renumberGraphVertices()
@@ -1917,11 +1917,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Reassign vertex IDs to a graph.
      * Before any operation is performed on the graph, its vertices are
      * renumbered so as to differentiate them from their progenitors
-     * @return the key to convert old IDs into new ones
+     * @return map with old IDs as key and new IDs as values
      */
 
-    public HashMap<Integer,Integer> renumberVerticesGetMap() {
-        HashMap<Integer, Integer> nmap = new HashMap<>();
+    public Map<Integer,Integer> renumberVerticesGetMap() {
+        Map<Integer, Integer> nmap = new HashMap<>();
 
         // for the vertices in the graph, get new vertex ids
         Set<DENOPTIMEdge> doneSrc = new HashSet<>();
@@ -2234,7 +2234,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             // clone root graph
             DENOPTIMGraph newGraph = this.clone();
                 
-            HashMap<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
+            Map<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
             // add rings

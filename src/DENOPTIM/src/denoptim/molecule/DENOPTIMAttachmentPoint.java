@@ -162,13 +162,11 @@ Comparable<DENOPTIMAttachmentPoint>
      * @param apConnections the number of free connections
      * @param dirVec the AP direction vector end (the beginning at the coords
      *               of the source atom). This must array have 3 entries.
-     * @param apClass the APClass 
-     * @throws DENOPTIMException 
+     * @param apClass the APClass
      */
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
                                    int atomConnections, int apConnections,
-                                   double[] dirVec, APClass apClass) 
-                                           throws DENOPTIMException {
+                                   double[] dirVec, APClass apClass) {
         this(owner, atomPosNum, atomConnections, apConnections, dirVec);
         this.apClass = apClass;
     }
@@ -719,19 +717,13 @@ Comparable<DENOPTIMAttachmentPoint>
             }
         } else {
             DENOPTIMAttachmentPoint c = null;
-            try
-            {
-                c = new DENOPTIMAttachmentPoint(
-                        getOwner(),
-                        atomPostionNumber,
-                        totalConnections,
-                        freeConnections,
-                        dirVec,
-                        apClass.clone());
-            } catch (DENOPTIMException e)
-            {
-                // this cannot happen upon cloning
-            }
+            c = new DENOPTIMAttachmentPoint(
+                    getOwner(),
+                    atomPostionNumber,
+                    totalConnections,
+                    freeConnections,
+                    dirVec,
+                    apClass.clone());
             return c;
         }
     }
@@ -804,7 +796,7 @@ Comparable<DENOPTIMAttachmentPoint>
 
     /**
      * Compare attachment points based on the reaction types
-     * @param other to compare against
+//     * @param other to compare against
      * @return <code>true</code> if the points share a common reaction or more
      */
     // Do not delete this method although unused
