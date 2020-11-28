@@ -136,11 +136,18 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         molFile = m_molFile;
         hasFitness = true;
     }
-    
 //------------------------------------------------------------------------------
     
     public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace) 
     		throws DENOPTIMException
+    {
+    	this(iac, useFragSpace, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace, 
+    		boolean allowNoUID) throws DENOPTIMException
     {
     	// Initialize, then we try to take info from IAtomContainer
         this.molUID = "UNDEFINED";
@@ -192,8 +199,13 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
             this.molUID = (iac.getProperty(
             		DENOPTIMConstants.UNIQUEIDTAG).toString());
         } catch (Exception e) {
-        	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
+        	if (allowNoUID)
+        	{
+        		this.molUID = "noUID";
+        	} else {
+        		throw new DENOPTIMException("Could not create DENOPTIMMolecule."
         			+ " Could not read UID.", e);
+        	}
         }
         try
         {

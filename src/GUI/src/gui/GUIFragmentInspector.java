@@ -1244,6 +1244,16 @@ public class GUIFragmentInspector extends GUICardPanel
 	{
 		return unsavedChanges;
 	}
+	
+//-----------------------------------------------------------------------------
+
+	/*
+	 * This is needed to stop Jmol threads upon closure of this gui card.
+	 */
+	public void dispose() 
+	{
+		fragmentViewer.dispose();
+	}
 		
 //-----------------------------------------------------------------------------
   	

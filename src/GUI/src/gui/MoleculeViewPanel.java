@@ -212,7 +212,7 @@ public class MoleculeViewPanel extends JSplitPane
 					// is needed. We only need its string representation.
 					
 					item = new DENOPTIMMolecule(DenoptimIO.readMoleculeData(
-							file.getAbsolutePath()).get(0),false);
+							file.getAbsolutePath()).get(0),false,true);
 				} catch (DENOPTIMException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -311,34 +311,16 @@ public class MoleculeViewPanel extends JSplitPane
 		sb.append("set picking ATOMS").append(NL);
 		jmolPanel.viewer.evalString(sb.toString());
 	}
-	
+
 //-----------------------------------------------------------------------------
-	
-	private class JmolPanel extends JPanel 
+  
+    /*
+     * This is needed to stop Jmol threads
+     */
+	public void dispose() 
 	{
-
-        /**
-		 * Version UID
-		 */
-		private static final long serialVersionUID = 1699908697703788097L;
-
-		JmolViewer viewer;
-
-        private final Dimension hostPanelSize = new Dimension();
-
-        public JmolPanel() {
-            viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
-            null, null, null, null, null); //NB: can add listener here
-        }
-        
-        //---------------------------------------------------------------------
-
-		@Override
-        public void paint(Graphics g) {
-            getSize(hostPanelSize);
-            viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
-        }
-    }
+		jmolPanel.dispose();
+	}
   	
 //-----------------------------------------------------------------------------
 

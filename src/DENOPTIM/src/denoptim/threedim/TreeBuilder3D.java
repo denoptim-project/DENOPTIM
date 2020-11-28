@@ -45,6 +45,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.FragmentUtils;
 import denoptim.utils.GenUtils;
 
 
@@ -232,8 +233,8 @@ public class TreeBuilder3D
 
             // Get two point defining the AP vector in 3D
             Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
-            Point3d srcPtApSrc = new Point3d(iacRootVrtx.getAtom(
-                                                     atmPosApSrc).getPoint3d());
+            Point3d srcPtApSrc = new Point3d(FragmentUtils.getPoint3d(
+            		iacRootVrtx.getAtom(atmPosApSrc)));
 
             // Append 3D fragment on AP-vector and start recursion
             append3DFragmentsViaEdges(atmPosApSrc,srcPtApSrc,trgPtApSrc,edge);
@@ -374,13 +375,15 @@ public class TreeBuilder3D
         DENOPTIMAttachmentPoint apB = inVtx.getAttachmentPoints().get(idApB);
         int idSrcAtmB = apB.getAtomPositionNumber();
         Point3d trgApB = new Point3d(allApsAsPt3D.get(idApB));
-        Point3d srcApB = new Point3d(inFrag.getAtom(idSrcAtmB).getPoint3d());
+        Point3d srcApB = new Point3d(FragmentUtils.getPoint3d(
+        		inFrag.getAtom(idSrcAtmB)));
 
         // Translate atoms and APs of fragment so that trgApB is on srcApA
         Point3d tr1 = new Point3d();
         tr1.sub(trgApB,srcApA);
         for (IAtom atm : inFrag.atoms())
         {
+        	atm.setPoint3d(FragmentUtils.getPoint3d(atm));
             atm.getPoint3d().sub(tr1);
         }
         for (Point3d pt : allApsAsPt3D)
@@ -388,7 +391,8 @@ public class TreeBuilder3D
             pt.sub(tr1);
         }
         trgApB = new Point3d(allApsAsPt3D.get(idApB));
-        srcApB = new Point3d(inFrag.getAtom(idSrcAtmB).getPoint3d());
+        srcApB = new Point3d(FragmentUtils.getPoint3d(
+        		inFrag.getAtom(idSrcAtmB)));
 
         //Get Vectors ApA and ApB (NOTE: inverse versus of ApB!!!)
         Vector3d vectApA = new Vector3d();
@@ -424,7 +428,7 @@ public class TreeBuilder3D
                 rotAxis = DENOPTIMMathUtils.getNormalDirection(vectApA);
             }
             Matrix3d rotMat = new Matrix3d();
-	    rotAxis.normalize();
+	        rotAxis.normalize();
             rotMat.set(new AxisAngle4d(rotAxis,rotAng));
 
             if (debug)
@@ -437,6 +441,7 @@ public class TreeBuilder3D
             // Rotate atoms and APs of fragment
             for (IAtom atm : inFrag.atoms())
             {
+            	//At this point all atoms have point3d
                 atm.getPoint3d().sub(srcApA);
                 rotMat.transform(atm.getPoint3d());
                 atm.getPoint3d().add(srcApA);

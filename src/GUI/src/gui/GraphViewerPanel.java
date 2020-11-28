@@ -207,6 +207,16 @@ public class GraphViewerPanel extends JPanel
 	 */
 	public void cleanup()
 	{
+		if (viewer != null)
+		{
+			try {
+				viewer.close();
+			} catch (Throwable t)
+			{
+				System.out.println(t.getMessage() + " from closing GS-viewer.");
+			}
+		}
+		
 		for (Component c : this.getComponents())
 		{
 			this.remove(c);
@@ -818,6 +828,13 @@ public class GraphViewerPanel extends JPanel
 				super.mouseReleased(e);
 			}
 		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	public void dispose() 
+	{
+		cleanup();
 	}
 
 //-----------------------------------------------------------------------------

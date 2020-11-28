@@ -20,6 +20,7 @@ package gui;
 
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -113,8 +114,6 @@ public class FragmentViewPanel extends JSplitPane
 	
 	private JComponent parent;
 	
-	private final Object LOCK = new Object();
-
 
 //-----------------------------------------------------------------------------
 
@@ -253,7 +252,7 @@ public class FragmentViewPanel extends JSplitPane
 		{	
 			Date newDate = new Date();
 			long now = newDate.getTime();
-			System.out.println("Waiting "+now);
+			System.out.println("Waiting for Jmol (timespot "+now+")");
 			if (now > wallTime)
 			{
 				if (parent!=null)
@@ -885,33 +884,6 @@ public class FragmentViewPanel extends JSplitPane
 	}
 	
 //-----------------------------------------------------------------------------
-	
-	private class JmolPanel extends JPanel 
-	{
-        /**
-		 * Version UID
-		 */
-		private static final long serialVersionUID = 1699908697703788097L;
-
-		JmolViewer viewer;
-
-        private final Dimension hostPanelSize = new Dimension();
-
-        public JmolPanel() {
-            viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
-            null, null, null, null, null); //NB: can add listener here
-        }
-        
-        //---------------------------------------------------------------------
-
-		@Override
-        public void paint(Graphics g) {
-            getSize(hostPanelSize);
-            viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
-        }
-    }
-	
-//-----------------------------------------------------------------------------
 
 	/**
 	 * Identifies which attachment points are selected in the visualized table
@@ -1017,6 +989,16 @@ public class FragmentViewPanel extends JSplitPane
 			System.out.println(t.getCause());
 		}
     }
+
+//-----------------------------------------------------------------------------
+    
+    /*
+     * This is needed to stop Jmol threads
+     */
+	public void dispose() 
+	{
+		jmolPanel.dispose();
+	}
   	
 //-----------------------------------------------------------------------------
 
