@@ -570,8 +570,10 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Returns the chemical representation of the currently loaded chemical
 	 * object. In case of mismatch between the system loaded into the Jmol
-	 * viewer and the one in the local memory, we take that from Jmol.
-	 * @return the chemical representation of what is currently visualized.
+	 * viewer and the one in the local memory, we take that from Jmol and
+	 * made it be The 'current fragment'. Previously set references to the
+	 * previous 'current fragment' will make no sense anymore.
+	 * @return the chemical representation of what is currently visualised.
 	 * Can be empty and null.
 	 */
 	public DENOPTIMFragment getLoadedStructure()
@@ -589,7 +591,8 @@ public class FragmentViewPanel extends JSplitPane
 		// that can change there is the molecular structure
 		if (fromViewer.getAtomCount() != fragment.getAtomCount())
 		{
-			return fromViewer;
+			fragment = fromViewer;
+			return fragment;
 		}
 		
 		boolean sameSMILES = false;
@@ -603,7 +606,8 @@ public class FragmentViewPanel extends JSplitPane
 		}
 		if (!sameSMILES)
 		{
-			return fromViewer;
+			fragment = fromViewer;
+			return fragment;
 		}
 		
 		//Maybe the geometry is different
@@ -614,7 +618,8 @@ public class FragmentViewPanel extends JSplitPane
 			Point3d pB = FragmentUtils.getPoint3d(fragment.getAtom(i));
 			if (pA.distance(pB)>thrld)
 			{
-				return fromViewer;
+				fragment = fromViewer;
+				return fragment;
 			}
 		}
 
@@ -641,20 +646,21 @@ public class FragmentViewPanel extends JSplitPane
         for (int apId : mapAPs.keySet())
         {
         	DENOPTIMAttachmentPoint ap = mapAPs.get(apId);
+        	int srcAtmId = ap.getAtomPositionNumber();
+        	
         	//NB here the inequity considers two completely disjoint indexes
         	//but is the only thing that seems valid at the stage were the atoms
         	//contained in the Jmol viewer may vary freely from the APs 
         	//collected in mapAPs
-        	if (apId > mol.getAtomCount())
+        	if (srcAtmId > mol.getAtomCount())
         	{
-        		throw new DENOPTIMException("The atom list has changed and is"
+        		throw new DENOPTIMException("The atom list has changed and is "
         				+ "no longer compatible with the list of attachment "
         				+ "points. Cannot convert the current system to a "
         				+ "valid fragment. "
-        				+ "apId:" + apId + " #atms:" + mol.getAtomCount());
+        				+ "srcAtmId:" + srcAtmId 
+        				+ " #atms:" + mol.getAtomCount());
         	}
-        	
-        	int srcAtmId = ap.getAtomPositionNumber();
         	mol.addAP(srcAtmId, ap.getAPClass(), ap.getDirectionVector());
         }
 	}
