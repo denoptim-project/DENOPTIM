@@ -277,8 +277,6 @@ public class FitnessParametersForm extends ParametersForm
         rdbIntOrExt.setToolTipText(toolTipIntOrExt);
         
         rdbIntOrExt.setSelected(false);
-		//localBlock3.setVisible(true);
-		//localBlock4.setVisible(false);
         rdbIntOrExt.setEnabled(true);
         
         rdbIntOrExt.addActionListener(new ActionListener(){
@@ -823,15 +821,15 @@ public class FitnessParametersForm extends ParametersForm
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;
   		}
-    
+  		
  		switch (valueFieldClass)
- 		{	
+ 		{
  			case "class javax.swing.JTextField":
- 				if (key.equals(keyFitProviderSource)) 
+ 				if (key.toUpperCase().equals(keyFitProviderSource.toUpperCase())) 
     			{
  				    rdbIntOrExt.setSelected(true);
     			}
- 				if (key.equals(keyEq))
+ 				if (key.toUpperCase().equals(keyEq.toUpperCase()))
  				{
  					value = value.trim();
  					if (value.startsWith("${") && value.endsWith("}"));
@@ -856,7 +854,7 @@ public class FitnessParametersForm extends ParametersForm
  				break;
  				
  			case "class javax.swing.table.DefaultTableModel":
- 				if (key.equals(keyMoreEq)) 
+ 				if (key.toUpperCase().equals(keyMoreEq.toUpperCase())) 
     			{
  					String noHead = value.replace("${atomSpecific('", "");
  					Object[] rowContent = new Object[2];

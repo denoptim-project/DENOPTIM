@@ -18,6 +18,9 @@
 
 package gui;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * The collection of tunable preferences.
  * 
@@ -42,6 +45,11 @@ public class GUIPreferences {
 	protected static int chartPointSize = 8;
 	
 	/**
+	 * MolecularViewer: list of SDF tags specifying which properties to display.
+	 */
+	public static TreeSet<String> chosenSDFTags = new TreeSet<String>();
+	
+	/**
 	 * Readable/writable space for tmp files
 	 */
 	protected static String tmpSpace = "/tmp";
@@ -56,4 +64,5 @@ public class GUIPreferences {
 	 */
 	protected static SMITo3DEngine smiTo3dResolver = 
 			SMITo3DEngine.CACTVS;
+	
 }

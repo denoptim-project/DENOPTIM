@@ -21,7 +21,7 @@
 ###############################################################################
 
 ###############################################################################
-# Settings nad Parameters
+# Settings and Parameters
 ###############################################################################
 
 #Java
@@ -126,7 +126,7 @@ function abandonDueToChild {
 }
 
 #
-# Cleanup all tmp files accorsing to the cleanup flag
+# Cleanup all tmp files according to the cleanup flag
 #
 function cleanUpTmpFiles {
     if [ "$cleanup" == 0 ]
@@ -233,7 +233,7 @@ fi
 #
 # Recover molecular model (bahs-only extraction of one molecules from SDF)
 #
-echo "Retriving molecular model from DB..."
+echo "Retrieving molecular model from DB..."
 nFile=$(wc -l "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
 nFirst=$(grep -n -m1 "\$\$\$\$" "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
 nUID=$(grep -n "$uid" "$allMolsSDF"  | awk '{gsub(":"," ",$0); print $1}')
@@ -267,7 +267,7 @@ echo "All done. Returning $outSDF"
 
 
 #
-# Cleanup is done in finish function upon trappin the exit command
+# Cleanup is done in finish function upon trapping the exit command
 #
 
 

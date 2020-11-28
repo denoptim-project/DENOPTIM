@@ -22,7 +22,6 @@ GA-symmetryProbability=0.0
 GA-growthProbScheme=sigma
 GA-GrowthSigmaSteepness=3.0
 GA-GrowthSigmaMiddle=2.5
-GA-ShowGraphics=false
 GA-PrecisionLevel=5
 
 # Definition of the Fragment Space 

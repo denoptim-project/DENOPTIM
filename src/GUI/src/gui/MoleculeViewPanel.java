@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -201,6 +202,8 @@ public class MoleculeViewPanel extends JSplitPane
 		                "Error",
 		                JOptionPane.PLAIN_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));
+				this.setCursor(Cursor.getPredefinedCursor(
+						Cursor.DEFAULT_CURSOR));
 				return;
 			}
 			else
@@ -216,12 +219,14 @@ public class MoleculeViewPanel extends JSplitPane
 				} catch (DENOPTIMException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					this.setCursor(Cursor.getPredefinedCursor(
+							Cursor.DEFAULT_CURSOR));
 					return;
 				}
 			}
 		}
 
-		fillDataTable();
+		fillDataTable(file);
 		
 		jmolPanel.viewer.openFile(file.getAbsolutePath());
 		setJmolViewer();
@@ -231,16 +236,20 @@ public class MoleculeViewPanel extends JSplitPane
 	
 //-----------------------------------------------------------------------------
 	
-	private void fillDataTable()
+	/**
+	 * @param molFile can be null, used only to get more datan than what already
+	 * collected in the DNEOPTIMMolecule class.
+	 */
+	private void fillDataTable(File molFile)
 	{
 		
 		if (item.getName() != null) 
 		{
-			dataTabModel.addRow(new Object[] { "Name", item.getName() });
+			dataTabModel.addRow(new Object[] {"Name", item.getName() });
 		}
 		if (item.getMoleculeUID() != null) 
 		{
-			dataTabModel.addRow(new Object[] { "UID", item.getMoleculeUID() });
+			dataTabModel.addRow(new Object[] {"UID", item.getMoleculeUID() });
 		}
 		if (item.hasFitness())
 		{
@@ -251,17 +260,36 @@ public class MoleculeViewPanel extends JSplitPane
 		{
 			if (item.getError() != null) 
 			{
-				dataTabModel.addRow(new Object[] { "Error", item.getError() });
+				dataTabModel.addRow(new Object[] {"Error", item.getError() });
 			}
 		}
 		if (item.getGeneration() > -1) 
 		{
-			dataTabModel.addRow(new Object[] { "Generation",
+			dataTabModel.addRow(new Object[] {"Generation",
 					item.getGeneration() });
 		}
 		if (item.getComments() != null) 
 		{
-			dataTabModel.addRow(new Object[] { "Source", item.getComments() });
+			dataTabModel.addRow(new Object[] {"Source", item.getComments() });
+		}
+		if (molFile != null)
+		{
+			try {
+				IAtomContainer mol = DenoptimIO.readSingleSDFFile(
+						molFile.getAbsolutePath());
+				for (String key : GUIPreferences.chosenSDFTags)
+				{
+					Object p = mol.getProperty(key);
+					if (p == null)
+					{
+						continue;
+					}
+					dataTabModel.addRow(new Object[] {key, p.toString()});
+				}
+			} catch (DENOPTIMException e) {
+				System.out.println("Could not read descriptors from '" 
+						+ molFile + "': "+e.getLocalizedMessage());
+			}
 		}
 	}
 
