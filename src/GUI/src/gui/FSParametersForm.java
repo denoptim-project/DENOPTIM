@@ -1030,7 +1030,8 @@ public class FSParametersForm extends ParametersForm
                                         .addComponent(btnPar21Cleanup))
                         .addComponent(tabPar21))
         );
-        grpLyoPar21.setVerticalGroup(grpLyoPar21.createParallelGroup(GroupLayout.Alignment.LEADING)
+        grpLyoPar21.setVerticalGroup(grpLyoPar21.createParallelGroup(
+        		GroupLayout.Alignment.LEADING)
                 .addComponent(lblPar21)
                 .addGroup(grpLyoPar21.createSequentialGroup()
                         .addGroup(grpLyoPar21.createParallelGroup()

@@ -18,8 +18,13 @@
 
 package gui;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeSet;
+
+import org.openscience.cdk.CDKConstants;
+
+import denoptim.constants.DENOPTIMConstants;
 
 /**
  * The collection of tunable preferences.
@@ -48,6 +53,25 @@ public class GUIPreferences {
 	 * MolecularViewer: list of SDF tags specifying which properties to display.
 	 */
 	public static TreeSet<String> chosenSDFTags = new TreeSet<String>();
+	
+	/**
+	 * MolecularViewer: default list of SDF tags with corresponding string
+	 * to display instead of tag.
+	 */
+	public static Map<String,String> defualtSDFTags;
+	static {
+		defualtSDFTags = new HashMap<String,String>();
+		defualtSDFTags.put(CDKConstants.TITLE,"Name");
+		defualtSDFTags.put(DENOPTIMConstants.UNIQUEIDTAG,"UID");
+		defualtSDFTags.put(DENOPTIMConstants.FITNESSTAG,"Fitness");
+		defualtSDFTags.put(DENOPTIMConstants.MOLERRORTAG,"Error");
+		defualtSDFTags.put("Generation","Generation");
+		defualtSDFTags.put(DENOPTIMConstants.GMSGTAG,"Origin");
+		for (String s : defualtSDFTags.keySet())
+		{
+			chosenSDFTags.add(s);
+		}
+	}
 	
 	/**
 	 * Readable/writable space for tmp files

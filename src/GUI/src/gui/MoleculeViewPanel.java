@@ -20,15 +20,31 @@ package gui;
 
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -38,8 +54,10 @@ import javax.swing.table.JTableHeader;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
+import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMMolecule;
@@ -73,6 +91,7 @@ public class MoleculeViewPanel extends JSplitPane
 	private JScrollPane tabPanel;
 	protected DefaultTableModel dataTabModel;
 	protected JTable dataTable;
+	private JPopupMenu dataTabPopMenu;
 	
 	private String tmpSDFFile;
 	
@@ -127,8 +146,40 @@ public class MoleculeViewPanel extends JSplitPane
 		dataTable = new JTable(dataTabModel);
 		dataTable.getColumnModel().getColumn(0).setMaxWidth(75);
 		dataTable.setGridColor(Color.LIGHT_GRAY);
+		dataTable.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				showPopup(e);
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				showPopup(e);
+			}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				showPopup(e);
+			}
+		});
 		JTableHeader dataTabHeader = dataTable.getTableHeader();
 		dataTabHeader.setPreferredSize(new Dimension(100, 20));
+		dataTabHeader.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				showPopup(e);
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				showPopup(e);
+			}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				showPopup(e);
+			}
+		});
 		tabPanel = new JScrollPane(dataTable);
 		tabPanel.setMinimumSize(new Dimension(100,30));
 		this.setBottomComponent(tabPanel);
@@ -137,7 +188,75 @@ public class MoleculeViewPanel extends JSplitPane
 		tmpSDFFile = Utils.getTempFile("Denoptim_MolViewer_loadedMol.sdf");
 
 	}
-	
+
+//-----------------------------------------------------------------------------
+
+	private void showPopup(MouseEvent e)
+	{
+		if (!e.isPopupTrigger() || item == null)
+		{
+			return;
+		}
+		// We take the list of potentially available properties
+		// from the SDF of the item.
+		IAtomContainer mol;
+		TreeMap<String,String> availableProps = new TreeMap<String,String>();
+		try {
+			mol = DenoptimIO.readSingleSDFFile(item.getMoleculeFile());
+		} catch (DENOPTIMException e1) {
+			return;
+		}
+		for (Object propRef : mol.getProperties().keySet())
+		{
+			String key = propRef.toString();
+			String val = key;
+			if (GUIPreferences.defualtSDFTags.keySet().contains(key))
+			{
+				val = GUIPreferences.defualtSDFTags.get(key);
+			}
+			availableProps.put(key,val);
+		}
+		
+		dataTabPopMenu = new JPopupMenu("Add/Remove Rows");
+		for (Entry<String, String> entry : availableProps.entrySet())
+		{
+			JCheckBoxMenuItem mi = new JCheckBoxMenuItem(entry.getValue());
+			if (GUIPreferences.chosenSDFTags.contains(entry.getKey()))
+			{
+				mi.setSelected(true);
+			} else {
+				mi.setSelected(false);
+			}
+			mi.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					//At this point the menuItem is already selected
+					// You can use this to verify:
+					/*
+					for (Component c : dataTabPopMenu.getComponents())
+					{
+						if (c instanceof JCheckBoxMenuItem)
+						{
+							JCheckBoxMenuItem i = (JCheckBoxMenuItem) c;
+							System.out.println("   "+i.isSelected()+" "+i);
+						}
+					}
+					*/
+					if (!mi.isSelected())
+					{
+						mi.setSelected(false);
+						GUIPreferences.chosenSDFTags.remove(entry.getKey());
+					} else {
+						mi.setSelected(true);
+						GUIPreferences.chosenSDFTags.add(entry.getKey());
+					}
+					fillDataTable(mol);
+				}
+			});
+			dataTabPopMenu.add(mi);
+		}
+		dataTabPopMenu.show(e.getComponent(), e.getX(), e.getY());
+	}
+
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -217,7 +336,6 @@ public class MoleculeViewPanel extends JSplitPane
 					item = new DENOPTIMMolecule(DenoptimIO.readMoleculeData(
 							file.getAbsolutePath()).get(0),false,true);
 				} catch (DENOPTIMException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					this.setCursor(Cursor.getPredefinedCursor(
 							Cursor.DEFAULT_CURSOR));
@@ -233,62 +351,103 @@ public class MoleculeViewPanel extends JSplitPane
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
-	
+
 //-----------------------------------------------------------------------------
-	
+
 	/**
-	 * @param molFile can be null, used only to get more datan than what already
+	 * @param molFile can be null, used only to get more data than what already
 	 * collected in the DNEOPTIMMolecule class.
 	 */
 	private void fillDataTable(File molFile)
 	{
+		IAtomContainer mol = null;
+		if (molFile != null)
+		{
+			try {
+				mol = DenoptimIO.readSingleSDFFile(molFile.getAbsolutePath());
+			} catch (DENOPTIMException e) {
+				System.out.println("Could not read descriptors from '" 
+						+ molFile + "': "+e.getLocalizedMessage());
+			}
+		}
+		fillDataTable(mol);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * @param molFile can be null, used only to get more data than what already
+	 * collected in the DNEOPTIMMolecule class.
+	 */
+	private void fillDataTable(IAtomContainer mol)
+	{
+		cleardataTable();
 		
-		if (item.getName() != null) 
+		Set<String> fromDnMol = new HashSet<String>();
+		fromDnMol.add(CDKConstants.TITLE);
+		fromDnMol.add(DENOPTIMConstants.UNIQUEIDTAG);
+		fromDnMol.add(DENOPTIMConstants.FITNESSTAG);
+		fromDnMol.add(DENOPTIMConstants.MOLERRORTAG);
+		fromDnMol.add("Generation");
+		fromDnMol.add(DENOPTIMConstants.GMSGTAG);
+		
+		TreeSet<String> chosen = GUIPreferences.chosenSDFTags;
+		Map<String,String> defPropMap = GUIPreferences.defualtSDFTags;
+		
+		if (item.getName() != null && chosen.contains(CDKConstants.TITLE)) 
 		{
-			dataTabModel.addRow(new Object[] {"Name", item.getName() });
+			dataTabModel.addRow(new Object[] {
+					defPropMap.get(CDKConstants.TITLE),
+					item.getName() });
 		}
-		if (item.getMoleculeUID() != null) 
+		if (item.getMoleculeUID() != null && chosen.contains(
+				DENOPTIMConstants.UNIQUEIDTAG)) 
 		{
-			dataTabModel.addRow(new Object[] {"UID", item.getMoleculeUID() });
+			dataTabModel.addRow(new Object[] {
+					defPropMap.get(DENOPTIMConstants.UNIQUEIDTAG), 
+					item.getMoleculeUID() });
 		}
-		if (item.hasFitness())
+		if (item.hasFitness() && chosen.contains(
+				DENOPTIMConstants.FITNESSTAG))
 		{
-			dataTabModel.addRow(new Object[]{"Fitness", 
+			dataTabModel.addRow(new Object[]{
+					defPropMap.get(DENOPTIMConstants.FITNESSTAG), 
 					item.getMoleculeFitness()});
 		}
 		else
 		{
-			if (item.getError() != null) 
+			if (item.getError() != null && chosen.contains(
+					DENOPTIMConstants.MOLERRORTAG)) 
 			{
-				dataTabModel.addRow(new Object[] {"Error", item.getError() });
+				dataTabModel.addRow(new Object[] {
+						defPropMap.get(DENOPTIMConstants.MOLERRORTAG),
+						item.getError() });
 			}
 		}
-		if (item.getGeneration() > -1) 
+		if (item.getGeneration() > -1 && chosen.contains("Generation")) 
 		{
-			dataTabModel.addRow(new Object[] {"Generation",
+			dataTabModel.addRow(new Object[] {
+					defPropMap.get("Generation"),
 					item.getGeneration() });
 		}
-		if (item.getComments() != null) 
+		if (item.getComments() != null && chosen.contains(
+				DENOPTIMConstants.GMSGTAG)) 
 		{
-			dataTabModel.addRow(new Object[] {"Source", item.getComments() });
+			dataTabModel.addRow(new Object[] {
+					defPropMap.get(DENOPTIMConstants.GMSGTAG),
+					item.getComments() });
 		}
-		if (molFile != null)
+		
+		if (mol != null)
 		{
-			try {
-				IAtomContainer mol = DenoptimIO.readSingleSDFFile(
-						molFile.getAbsolutePath());
-				for (String key : GUIPreferences.chosenSDFTags)
+			for (String key : GUIPreferences.chosenSDFTags)
+			{
+				Object p = mol.getProperty(key);
+				if (p == null || fromDnMol.contains(key))
 				{
-					Object p = mol.getProperty(key);
-					if (p == null)
-					{
-						continue;
-					}
-					dataTabModel.addRow(new Object[] {key, p.toString()});
+					continue;
 				}
-			} catch (DENOPTIMException e) {
-				System.out.println("Could not read descriptors from '" 
-						+ molFile + "': "+e.getLocalizedMessage());
+				dataTabModel.addRow(new Object[] {key, p.toString()});
 			}
 		}
 	}
