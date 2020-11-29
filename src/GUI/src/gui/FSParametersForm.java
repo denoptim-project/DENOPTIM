@@ -24,6 +24,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.rings.RingClosureParameters;
 
 /**
  * Form collecting input parameters for defining the fragment space.
@@ -787,17 +789,27 @@ public class FSParametersForm extends ParametersForm
         linePar18.add(txtPar18);
         localBlock3.add(linePar18);
 
-        String toolTipPar22 = "<html>Specifies the bias associated to a given ring size.<br> The bias is used when chosing among combination of rings (i.e., RCAs) for a given graph.</html>";
+        String toolTipPar22 = "<html>Specifies the bias associated to a given ring size.<br> The bias is an integer used as a weight when chosing among<br>combination of rings (i.e., RCAs) for a given graph.</html>";
         linePar22 = new JPanel(new FlowLayout(FlowLayout.LEFT));      
         lblPar22 = new JLabel("Ring size preference biases:", SwingConstants.LEFT);
         lblPar22.setPreferredSize(fileLabelSize);
         lblPar22.setToolTipText(toolTipPar22);
         tabModPar22 = new DefaultTableModel();
         tabModPar22.setColumnCount(2);
+        ArrayList<Integer> ringSizeBias = RingClosureParameters.getRingSizeBias();
+        for (int ib=0; ib<ringSizeBias.size(); ib++)
+        {
+        	int w = ringSizeBias.get(ib);
+        	if (w > 0)
+        	{
+        		tabModPar22.addRow(new Object[] {ib,w});
+        	}
+        }
         tabModPar22.addTableModelListener(tabFieldChange);
         mapKeyFieldToValueField.put(keyPar22.toUpperCase(),tabModPar22);
         tabPar22 = new JTable(tabModPar22);
         tabPar22.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        tabPar22.setToolTipText("Ring size (1st column) and bias (2nd column) must be positive integers.");
         btnPar22Insert = new JButton("Add Bias");
         btnPar22Insert.setToolTipText("Click to set a new ring size bias.");
         btnPar22Insert.addActionListener(new ActionListener(){
@@ -832,9 +844,9 @@ public class FSParametersForm extends ParametersForm
 						{
 		        			if (tabPar22.getRowCount() == 0)
 		        			{
-		        				tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias</b></html>"});
+		        				tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias (int)</b></html>"});
 		        			}
-							tabModPar22.addRow(new Object[]{rsBias, 1.00});
+							tabModPar22.addRow(new Object[]{rsBias, 1});
 							done = true;
 						}
 					}
@@ -913,7 +925,7 @@ public class FSParametersForm extends ParametersForm
         lblPar19 = new JLabel("Type of ring-closability conditions", SwingConstants.LEFT);
         lblPar19.setPreferredSize(fileLabelSize);
         lblPar19.setToolTipText(toolTipPar19);
-        cmbPar19 = new JComboBox<String>(new String[] {"Constitution", "3D-Conformation", "Constitution_and_3D-Conformation"});
+        cmbPar19 = new JComboBox<String>(new String[] {"Ring_size", "Constitution", "3D-Conformation", "Constitution_and_3D-Conformation"});
         cmbPar19.setToolTipText(toolTipPar19);
         cmbPar19.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyPar19.toUpperCase(),cmbPar19);
@@ -928,7 +940,7 @@ public class FSParametersForm extends ParametersForm
             			
         			case "3D-Conformation":
         				localBlock4.setVisible(false);
-            			localBlock5.setVisible(true); 
+            			localBlock5.setVisible(true);
             			break;
             			
         			case "Constitution_and_3D-Conformation":
@@ -1124,7 +1136,7 @@ public class FSParametersForm extends ParametersForm
 
         String toolTipPar31 = "Pathname of the folder containing the archive of ring closing conformations.";
         linePar31 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar31 = new JLabel("Root folder of closable chain archive:", SwingConstants.LEFT);
+        lblPar31 = new JLabel("Root folder of chains archive:", SwingConstants.LEFT);
         lblPar31.setPreferredSize(fileLabelSize);
         lblPar31.setToolTipText(toolTipPar31);
         txtPar31 = new JTextField();
@@ -1281,7 +1293,7 @@ public class FSParametersForm extends ParametersForm
     						"<html><b>Ring Size</b></html>", 
     						"<html><b>Bias</b></html>"});
     			}
-
+    			
  				((DefaultTableModel) valueField).addRow(value.split(" "));
  				break;
  				

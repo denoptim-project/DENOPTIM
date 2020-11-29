@@ -158,6 +158,11 @@ runTest "t2c"
 runTest "t2d"
 
 #
+# t2e: with closability defined only by ring size
+#
+runTest "t2e"
+
+#
 # t3: parallel combinatorial builder with enforced symmetry
 #
 runTest "t3"
