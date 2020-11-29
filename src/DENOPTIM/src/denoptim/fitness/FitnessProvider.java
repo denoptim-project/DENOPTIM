@@ -206,6 +206,10 @@ public class FitnessProvider
         			List<List<Integer>> hits = allMatches.get(varName);
         			if (hits==null)
         			{
+        				String msg = "No hits for SMARTS of " + varName + ": "
+        						+ "setting variable value to 0.0";
+        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        				valuesMap.put(varName, 0.0);
         				continue;
         			}
         			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
@@ -248,6 +252,10 @@ public class FitnessProvider
         			List<List<Integer>> hits = allMatches.get(varName);
         			if (hits==null)
         			{
+        				String msg = "No hits for SMARTS of " + varName + ": "
+        						+ "setting variable value to 0.0";
+        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        				valuesMap.put(varName, 0.0);
         				continue;
         			}
         			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
@@ -289,8 +297,8 @@ public class FitnessProvider
         		//TODO: implement this part...
         	} else {
         		throw new Exception("Type of descriptor "+ descName + " is "
-        				+ "unknown. Cannot understand if it should be thrated "
-        				+ "as molecular, atomic, or bond descriptr.");
+        				+ "unknown. Cannot understand if it should be threated "
+        				+ "as molecular, atomic, or bond descriptor.");
         	}
         }
         

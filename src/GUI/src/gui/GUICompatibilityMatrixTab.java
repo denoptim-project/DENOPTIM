@@ -151,6 +151,10 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				Set<File> files = DenoptimGUIFileOpener.pickManyFiles(
 						btnImportAPClasses);
+				if (files == null || files.size() == 0)
+				{
+					return;
+				}
 				
 				String[] options = new String[]{"Cancel", 
 						"Capping Groups",

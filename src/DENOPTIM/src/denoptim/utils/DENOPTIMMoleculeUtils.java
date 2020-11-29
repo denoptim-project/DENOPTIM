@@ -316,11 +316,11 @@ public class DENOPTIMMoleculeUtils
                throw new DENOPTIMException(cdke);
             }
         }
-        catch (IllegalArgumentException iae)
+        catch (Throwable t)
         {
 //TODO del or make systematic
 	    DenoptimIO.writeMolecule("moldeule_causing_failure.sdf",fmol,false);
-            throw new DENOPTIMException(iae);
+            throw new DENOPTIMException(t);
         }
         return smiles;
     }
