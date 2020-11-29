@@ -210,7 +210,8 @@ public class FitnessParametersForm extends ParametersForm
         btnFPSource = new JButton("Browse");
         btnFPSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtFPSource);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtFPSource,
+                		btnFPSource);
            }
         });
         btnLoadFPSource = new JButton("Load...");
@@ -306,7 +307,8 @@ public class FitnessParametersForm extends ParametersForm
         btnFitProviderSource = new JButton("Browse");
         btnFitProviderSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtFitProviderSource);
+                DenoptimGUIFileOpener.pickFileForTxtField(
+                		txtFitProviderSource, btnFitProviderSource);
            }
         });
         lineFitProviderSource.add(lblFitProviderSource);
@@ -322,8 +324,8 @@ public class FitnessParametersForm extends ParametersForm
         		+ "provider", SwingConstants.LEFT);
         lblFitProviderInterpreter.setPreferredSize(fileLabelSize);
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
-        cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"BASH",
-        		"Python"});
+        cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"bash",
+        		"python"});
         cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
         cmbFitProviderInterpreter.setEnabled(true);
         

@@ -74,7 +74,7 @@ public class FitnessParameters
     /**
      * Interpreter for the external fitness provider
      */
-    private static String interpreterExternalExe = "BASH";
+    private static String interpreterExternalExe = "bash";
 
     /**
      * Formulation of the internally provided fitness
@@ -137,7 +137,7 @@ public class FitnessParameters
     	fitParamsInUse = false;
     	useExternalFitness = true;
     	externalExe = "";
-    	interpreterExternalExe = "BASH";
+    	interpreterExternalExe = "bash";
     	fitnessExpression = "";
     	atmBndSpecDescExpressions = new ArrayList<String>();
     	atmBndSpecDescToVars = new HashMap<String,ArrayList<String>>();

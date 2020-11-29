@@ -80,7 +80,7 @@
 <p align="center" style="font-size: 44pt">DENOPTIM</p>
 <p align="center" style="font-size: 32pt"><i>De novo</i> Optimization of In/organic Molecules</p>
 <p><br/></p>
-<p align="center" style="font-size: 20pt"><i>Version 2.0.0, January 2020</i></p>
+<p align="center" style="font-size: 20pt"><i>Version 2.2.0, November 2020</i></p>
 <p align="center" style="font-size: 20pt">User Manual</p>
 <p><br/></p>
 
@@ -108,6 +108,7 @@
 		</ul></li>
 		<li><a href="#Toc14759_799972446">Main programs of the DENOPTIM package</a>
 		<ul>
+			<li><a href="#Toc13237_799972445">DENOPTIM-GUI: the graphical user interface</a></li>
 			<li><a href="#Toc13237_799972446">DenoptimGA</a>
 			<ul>
 				<li><a href="#Toc40898_1191730726">Genetic Operations</a></li>
@@ -473,6 +474,10 @@ a candidate entity is suitable to a specific function or use.</p>
 <hr>
 
 <h1 class="western"><a name="Toc14759_799972446"></a>Main DENOPTIM programs</h1>
+
+<h2 class="western"><a name="Toc13237_799972445"></a>DENOPTIM-GUI: the graphical user interface</h2>
+<p>The graphical user interface (GUI) is the main interface used for preparing and inspecting DENOPTIM files and experiments. To launch the GUI just double click on the DENOPTIM-GUI.jar file or run <pre class="bash"><code> java -jar DENOPTIM-GUI.jar </code></pre></p>
+<p>The GUI offers also the possibility to run de novo design and virtual screening experiments that can otherwise be run by background processes with DenoptimGA.jar and FragSpaceExplorer.jar (see below). The threads executing GUI-controlled experiments are fully dependent on the GUI, and will be terminated upon closure of the GUI (the user receives a warning, in such cases). Moreover, the fragment space used in the GUI-controlled experiments is the same one defined within the GUI (for instance, to manually build graphs). Changes done to the fragment space defined in a GUI will affect the experiments controlled by that GUI. </p>
 
 <h2 class="western"><a name="Toc13237_799972446"></a>DenoptimGA</h2>
 <p>Molecular design where performance optimization is driven by a genetic algorithm where

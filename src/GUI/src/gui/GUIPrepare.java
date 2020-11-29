@@ -134,7 +134,7 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile(btnSaveParams);
+				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveParams);
 				printAllParamsToFile(outFile);
 			}
 		});

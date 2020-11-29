@@ -318,7 +318,7 @@ public class FSParametersForm extends ParametersForm
         btnFSSource = new JButton("Browse");
         btnFSSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtFSSource,btnFSSource);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtFSSource,btnFSSource);
            }
         });
         btnLoadFSSource = new JButton("Load...");
@@ -372,7 +372,7 @@ public class FSParametersForm extends ParametersForm
         btnPar1 = new JButton("Browse");
         btnPar1.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar1,btnPar1);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar1,btnPar1);
            }
         });
         linePar1.add(lblPar1);
@@ -393,7 +393,7 @@ public class FSParametersForm extends ParametersForm
         btnPar2 = new JButton("Browse");
         btnPar2.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar2,btnPar2);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar2,btnPar2);
            }
         });
         linePar2.add(lblPar2);
@@ -414,7 +414,7 @@ public class FSParametersForm extends ParametersForm
         btnPar3 = new JButton("Browse");
         btnPar3.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar3,btnPar3);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar3,btnPar3);
            }
         });
         linePar3.add(lblPar3);
@@ -435,7 +435,7 @@ public class FSParametersForm extends ParametersForm
         btnCPMat = new JButton("Browse");
         btnCPMat.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtCPMat,btnCPMat);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtCPMat,btnCPMat);
            }
         });
         lineCPMat.add(lblCPMat);
@@ -456,7 +456,7 @@ public class FSParametersForm extends ParametersForm
         btnPar6 = new JButton("Browse");
         btnPar6.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar6,btnPar6);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar6,btnPar6);
            }
         });
         linePar6.add(lblPar6);
@@ -723,7 +723,7 @@ public class FSParametersForm extends ParametersForm
         btnPar5 = new JButton("Browse");
         btnPar5.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar5,btnPar5);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar5,btnPar5);
            }
         });
         linePar5.add(lblPar5);
@@ -1114,7 +1114,7 @@ public class FSParametersForm extends ParametersForm
         btnPar30 = new JButton("Browse");
         btnPar30.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar30,btnPar30);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar30,btnPar30);
            }
         });
         linePar30.add(lblPar30);
@@ -1135,7 +1135,7 @@ public class FSParametersForm extends ParametersForm
         btnPar31 = new JButton("Browse");
         btnPar31.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFolder(txtPar31,btnPar31);
+                DenoptimGUIFileOpener.pickFolderForTxtField(txtPar31,btnPar31);
            }
         });
         linePar31.add(lblPar31);

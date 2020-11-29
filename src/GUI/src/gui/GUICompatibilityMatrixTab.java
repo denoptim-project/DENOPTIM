@@ -149,7 +149,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "all classes in the current tab.</html>",300));
 		btnImportAPClasses.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Set<File> files = DenoptimGUIFileOpener.pickManyFile(
+				Set<File> files = DenoptimGUIFileOpener.pickManyFiles(
 						btnImportAPClasses);
 				
 				String[] options = new String[]{"Cancel", 
@@ -187,7 +187,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "<li>Definition of forbidden ends.</li></ul></html>",250));
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile(btnSaveFrags);
+				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null || cpMapHandler == null)
 				{
 					return;

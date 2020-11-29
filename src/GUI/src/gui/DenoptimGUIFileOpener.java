@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -64,7 +65,7 @@ public class DenoptimGUIFileOpener
 
 //-----------------------------------------------------------------------------
 
-	public static File pickFile(JTextField txtField, Component parent) 
+	public static File pickFileForTxtField(JTextField txtField, Component parent) 
 	{
 		File file = pickFile(parent);
 		if (file != null)
@@ -76,7 +77,7 @@ public class DenoptimGUIFileOpener
 	
 //-----------------------------------------------------------------------------
 
-	public static Set<File> pickManyFile(Component parent) 
+	public static Set<File> pickManyFiles(Component parent) 
 	{
 		fileChooser.setMultiSelectionEnabled(true);
 		fileChooser.setDialogTitle("Select one or more files");
@@ -110,7 +111,8 @@ public class DenoptimGUIFileOpener
 		
 //-----------------------------------------------------------------------------
 		
-	public static File pickFolder(JTextField txtField, Component parent) 
+	public static File pickFolderForTxtField(JTextField txtField, 
+			Component parent) 
 	{
 		File file = pickFolder(parent);
 		if (file != null)
@@ -138,7 +140,7 @@ public class DenoptimGUIFileOpener
 	
 //-----------------------------------------------------------------------------
 	
-	public static File saveFile(Component parent) 
+	public static File pickFileForSaving(Component parent) 
 	{
 		File file;
 		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
@@ -147,11 +149,13 @@ public class DenoptimGUIFileOpener
 		}
 		else
 		{
+			/*
 			JOptionPane.showMessageDialog(null,
 					"Could not save. Try again.",
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
+	                */
 			return null;
 		}
 		return file;

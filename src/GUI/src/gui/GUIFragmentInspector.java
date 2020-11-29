@@ -543,7 +543,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnSaveFrags.setToolTipText("Write all fragments to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile(btnSaveFrags);
+				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null)
 				{
 					return;

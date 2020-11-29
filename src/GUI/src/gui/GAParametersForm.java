@@ -301,7 +301,8 @@ public class GAParametersForm extends ParametersForm
         btnGASource = new JButton("Browse");
         btnGASource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtGASource);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtGASource,
+                		btnGASource);
            }
         });
         btnLoadGASource = new JButton("Load...");
@@ -740,7 +741,7 @@ public class GAParametersForm extends ParametersForm
         btnPar20 = new JButton("Browse");
         btnPar20.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar20);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar20,btnPar20);
            }
         });
         linePar20.add(lblPar20);
@@ -761,7 +762,7 @@ public class GAParametersForm extends ParametersForm
         btnPar21 = new JButton("Browse");
         btnPar21.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar21);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar21,btnPar21);
            }
         });
         linePar21.add(lblPar21);
@@ -782,7 +783,7 @@ public class GAParametersForm extends ParametersForm
         btnPar22 = new JButton("Browse");
         btnPar22.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar22);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar22,btnPar22);
            }
         });
         linePar22.add(lblPar22);
