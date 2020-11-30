@@ -8,7 +8,7 @@ FSE-UidFile=OTF_WDIR/MOLUID.txt
 FSE-NumOfProcessors=OTF_PROCS
 FSE-MAXLEVEL=2
 FP-Source=OTF_WDIR/fitness_provider.sh
-FP-Interpreter=BASH
+FP-Interpreter=bash
 FSE-ROOTGRAPHS=OTF_WDIR/roots.txt
 FSE-ROOTGRAPHSFORMAT=string
 

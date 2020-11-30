@@ -81,7 +81,7 @@ public class ConformationalSearchPSSROT
 //------------------------------------------------------------------------------    
     /**
      * Performs PSSROT conformational search for all molecules in the list
-     * @param mol the list of input molecules 
+     * @param fitProvMol the list of input molecules 
      * @return the list of generated conformations.
      * @throws DENOPTIMException
      */

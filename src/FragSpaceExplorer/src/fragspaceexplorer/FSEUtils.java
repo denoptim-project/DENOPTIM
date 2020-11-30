@@ -67,28 +67,28 @@ public class FSEUtils
      */
 
     public static int getGraphIdFromStorageFile(String fileName) 
-							throws DENOPTIMException
+                                                        throws DENOPTIMException
     {
-	String msg ="";
-	if (fileName.contains(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT)) && 
+        String msg ="";
+        if (fileName.contains(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT)) && 
             fileName.contains(Pattern.quote(".")))
-	{
-	     msg = "Failed attempt to extract a graphId from String '" 
-			 + fileName + "'";
-	    throw new DENOPTIMException(msg);
-	}
-	String[] p1 = fileName.split(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT));
-	String[] p2 = p1[1].split(Pattern.quote("."));
-	int graphId = -1;
-	try
-	{
-	    graphId = Integer.parseInt(p2[0]);
-	}
-	catch (Throwable t)
-	{
-	    throw new DENOPTIMException(msg);
-	}
-	return graphId;
+        {
+             msg = "Failed attempt to extract a graphId from String '" 
+                         + fileName + "'";
+            throw new DENOPTIMException(msg);
+        }
+        String[] p1 = fileName.split(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT));
+        String[] p2 = p1[1].split(Pattern.quote("."));
+        int graphId = -1;
+        try
+        {
+            graphId = Integer.parseInt(p2[0]);
+        }
+        catch (Throwable t)
+        {
+            throw new DENOPTIMException(msg);
+        }
+        return graphId;
     }
 
 //------------------------------------------------------------------------------
@@ -99,10 +99,10 @@ public class FSEUtils
    
     public static String getBaseNameOfStorageFile(int graphId)
     {
-	String baseName = DENOPTIMConstants.SERGFILENAMEROOT
+        String baseName = DENOPTIMConstants.SERGFILENAMEROOT
                           + graphId + "."
                           + DENOPTIMConstants.SERGFILENAMEEXT;
-	return baseName;
+        return baseName;
     }
 
 //------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public class FSEUtils
                           + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level
                           + DENOPTIMConstants.FSEP
-			  + getBaseNameOfStorageFile(graphId);
+                          + getBaseNameOfStorageFile(graphId);
         return fileName;
     }
 
@@ -156,12 +156,12 @@ public class FSEUtils
     {
         for (DENOPTIMGraph g : lstGraphs)
         {
-	    //NOTE: the arraylist is supposed to hold the indeces used to 
-	    //      create the next combination of fragments, but this method
-	    //      is used only for graphs built with the base scaffolds or 
-	    //      the naked root graphs. Therefore there is no set of indeces
-	    //      to store and we fed the method with an empty array.
-	    // NOTE2: the root Id is set to zero for the same reason.
+            //NOTE: the arraylist is supposed to hold the indeces used to 
+            //      create the next combination of fragments, but this method
+            //      is used only for graphs built with the base scaffolds or 
+            //      the naked root graphs. Therefore there is no set of indeces
+            //      to store and we fed the method with an empty array.
+            // NOTE2: the root Id is set to zero for the same reason.
             storeGraphOfLevel(g,level,0,new ArrayList());
         }
     }
@@ -181,28 +181,28 @@ public class FSEUtils
 
     protected static void storeGraphOfLevel(DENOPTIMGraph graph, int level, 
                             int rootId, ArrayList<Integer> nextIds) 
-							throws DENOPTIMException
+                                                        throws DENOPTIMException
     {
-	String outDir = getNameOfStorageDir(level);
-	if (!DenoptimIO.checkExists(outDir))
-	{
-	    try
-	    {
-		FileUtils.forceMkdir(new File(outDir));
-	    }
-	    catch (Throwable t)
-	    {
-		String msg = "Cannot create folder " + outDir;
-		throw new DENOPTIMException(msg,t);
-	    }
-	}
+        String outDir = getNameOfStorageDir(level);
+        if (!DenoptimIO.checkExists(outDir))
+        {
+            try
+            {
+                FileUtils.forceMkdir(new File(outDir));
+            }
+            catch (Throwable t)
+            {
+                String msg = "Cannot create folder " + outDir;
+                throw new DENOPTIMException(msg,t);
+            }
+        }
 
         String fileSer = getNameOfStorageFile(level,graph.getGraphId());
-	String indexFile = getNameOfStorageIndexFile(level);
-	String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
-			   + rootId + " " + nextIds;
-	SingletonFileAccess.getInstance().serializeToFile(fileSer,graph,true);
-	SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
+        String indexFile = getNameOfStorageIndexFile(level);
+        String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
+                           + rootId + " " + nextIds;
+        SingletonFileAccess.getInstance().serializeToFile(fileSer,graph,true);
+        SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
     }
 
 //------------------------------------------------------------------------------
@@ -249,7 +249,7 @@ public class FSEUtils
      */
 
     public static FSECheckPoint deserializeCheckpoint(String file)
-							throws DENOPTIMException
+                                                        throws DENOPTIMException
     {
         FSECheckPoint chkpt = null;
         FileInputStream fis = null;
@@ -275,8 +275,8 @@ public class FSEUtils
             {
                 throw new DENOPTIMException(t);
             }
-	}
-	return chkpt;
+        }
+        return chkpt;
     }
 
 //------------------------------------------------------------------------------

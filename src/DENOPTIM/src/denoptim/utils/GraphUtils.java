@@ -1037,7 +1037,7 @@ public class GraphUtils
      * are not consistent with the actual arrangement of fragments.
      * @param molGraph the molecular graph representation
      * @return an object array containing the inchi code, the SMILES string
-     *         and the 2D representation of the molecule.
+     *         and a molecular representation of the molecule.
      *         <code>null</code> is returned if any check or conversion fails.
      * @throws DENOPTIMException
      */
@@ -1117,7 +1117,7 @@ public class GraphUtils
                 return null;
             }
         }
-        mol.setProperty("MOL_WT", mw);
+        //mol.setProperty("MOL_WT", mw);
 
         // 1C) number of rotatable bonds
         int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
@@ -1131,7 +1131,7 @@ public class GraphUtils
                 return null;
             }
         }
-        mol.setProperty("ROT_BND", nrot);
+        //mol.setProperty("ROT_BND", nrot);
         
         // 1D) unacceptable free APs
         if (FragmentSpace.useAPclassBasedApproach())

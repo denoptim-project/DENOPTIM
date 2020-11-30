@@ -1,0 +1,34 @@
+#
+# This is the parameter file for test t12c
+#
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-ConstrainSymmetry=ch:0 1.0
+FS-ConstrainSymmetry=co:0 1.0
+
+# Use internal fitness provider
+FP-EQUATION=${nHBAcc + 0.2*nAtom + 3*Zagreb}
+
+# Genetic Algorithm parameters
+GA-UIDFileIn=OTF_WDIR/knownUID.txt
+GA-InitPoplnFile=OTF_WDIR/initialPop.sdf
+GA-randomSeed=8572368003836
+FP-Interpreter=bash
+GA-Parallelization=synchronous
+GA-numParallelTasks=4
+GA-populationSize=8
+GA-numChildren=4
+GA-numGenerations=3
+GA-numConvGen=9
+GA-XOverSelectionMode=TS
+GA-crossoverProbability=0.750
+GA-mutationProbability=0.750
+GA-symmetryProbability=0.0
+GA-growthProbScheme=sigma
+GA-GrowthSigmaSteepness=1.0
+GA-GrowthSigmaMiddle=1.0
+GA-replacementStrategy=NONE

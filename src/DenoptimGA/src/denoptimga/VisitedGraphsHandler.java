@@ -78,7 +78,7 @@ public class VisitedGraphsHandler
         this.libScaff = libScaff;
         this.libFrag = libFrag;
         this.libCap = libCap;
-	this.mp = mp;
+	    this.mp = mp;
     }
 
 //------------------------------------------------------------------------------
@@ -169,7 +169,6 @@ public class VisitedGraphsHandler
         catch (Exception de)
         {
             LOGGER.log(Level.SEVERE, null, de); 
-            System.exit(-1);
         }
         finally
         {

@@ -21,7 +21,10 @@ package gui;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+
+import denoptim.task.StaticTaskManager;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -112,7 +115,18 @@ public class GUI
 		menuBar.setRefToMainPanel(mainPanel);
 		menuBar.setRefToMasterGUI(this);
 		
-		mainPanel.add(new HomePanel(mainPanel));		
+		mainPanel.add(new HomePanel(mainPanel));
+		
+		// We instantiate also the task manager, even it it might not be used
+		// This is to pre-start the tasks and get a more reliable queue status
+		// at any given time after this point.
+		StaticTaskManager.getInstance();
+		
+		//Set the timing of tooltips
+		ToolTipManager.sharedInstance().setDismissDelay(6000);
+		ToolTipManager.sharedInstance().setInitialDelay(1000);
+		ToolTipManager.sharedInstance().setReshowDelay(100);
+		
 	}
 	
 //-----------------------------------------------------------------------------
@@ -122,13 +136,51 @@ public class GUI
 	 */
 	protected void closeIfAllSaved()
 	{
+		if (StaticTaskManager.hasActive())
+		{
+			String[] options = new String[]{"Yes, stop running tasks","No"};
+			int res = JOptionPane.showOptionDialog(null,
+					"<html>Found running tasks.<br>Do you want to "
+				            + "stop all running tasks?</html>",
+				    "Stop all?", 
+	                JOptionPane.YES_NO_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[1]);
+		    if (res == 1 || res == -1)
+		    {
+		    	return;
+		    }
+		}
+		
+    	try {
+			StaticTaskManager.stopAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+			String[] options = new String[]{"Yes, stop and close"};
+			int res = JOptionPane.showOptionDialog(null,
+					"<html>Problems killing the running tasks.<br>Will force "
+					+ "quit all tasks and shutdown.</html>",
+				    "Force quit", 
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[0]);
+			Runtime.getRuntime().halt(0);
+		}
+    	
 		if (mainPanel.hasUnsavedChanges())
 		{
+			/*
+			//FOR SOME REASON USING HTML HERE PREVENTS DISPLAYING THE TEXT
+			"<html>Found unsaved changes.<br>Are you sure you want to "
+            + "close this window?</html>",
+            */
 			String[] options = new String[]{"Yes","No"};
-			int res = JOptionPane.showOptionDialog(frame,
-					"<html>Found unsaved changes.<br>Are you sure you want to "
-				            + "close this window?<html>",
-				            "Close Window?", 
+			int res = JOptionPane.showOptionDialog(null,"Found unsaved changes. Are you sure you want to close this window?",
+				    "Close Window?", 
 	                JOptionPane.DEFAULT_OPTION,
 	                JOptionPane.QUESTION_MESSAGE,
 	                UIManager.getIcon("OptionPane.warningIcon"),
@@ -136,12 +188,14 @@ public class GUI
 	                options[1]);
 		    if (res == 0)
 		    {
-		        System.exit(0);
+				Runtime.getRuntime().halt(0);
 		    }
 		}
 		else
 		{
-			System.exit(0);
+			//System.exit(0); //this will wait for synch locks to the released
+			// but here we want to really stop the JVM and kill all threads.
+			Runtime.getRuntime().halt(0);
 		}
 	}
 	

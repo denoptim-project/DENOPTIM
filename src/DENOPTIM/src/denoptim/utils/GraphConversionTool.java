@@ -56,6 +56,9 @@ public class GraphConversionTool
      * @return CDK representation of the molecular graph
      */
 
+	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
+    // with a flag that controls wether we rototranslate the building blocks or not
+	
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
     {
@@ -156,7 +159,6 @@ public class GraphConversionTool
                         + "Kindly check your input files."
                         + "Error occurred while dealing with edge " + edge
                         + " and vertexes " + v1 + " and " + v2 + ".";
-                //System.err.println("ERROR: " + g.toString());
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
@@ -219,7 +221,7 @@ public class GraphConversionTool
  
         lstDVA.clear();
 
-	// Store graph as property
+	    // Store graph as property
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
         if (g.getMsg() != null)

@@ -198,7 +198,7 @@ public class DENOPTIMMoleculeUtils
     /**
      * Replace unused ring closing attractors (RCA) with H atoms and 
      * remove used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
-     * while adding the ring closing bonds
+     * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 
      * @throws denoptim.exception.DENOPTIMException 
@@ -206,63 +206,63 @@ public class DENOPTIMMoleculeUtils
     public static void removeRCA(IAtomContainer mol, DENOPTIMGraph graph) 
 						      throws DENOPTIMException
     {
-	// add ring-closing bonds
-	ArrayList<DENOPTIMVertex> usedRcvs = graph.getUsedRCVertices();
-        Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
-                      DENOPTIMMoleculeUtils.getVertexToAtmIdMap(usedRcvs,mol);
-	ArrayList<IAtom> atmsToRemove = new ArrayList<>();
-	ArrayList<Boolean> doneVrtx = new ArrayList<>(
-				  Collections.nCopies(usedRcvs.size(),false));
-	for (DENOPTIMVertex v : usedRcvs)
-	{
-	    if (doneVrtx.get(usedRcvs.indexOf(v)))
-	    {
-		continue;
-	    }
-	    ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
-	    if (rings.size() != 1)
-	    {
-		String s = "Unexpected inconsistency between used RCV list "
-			   + v + " in {" + usedRcvs + "}"
-			   + "and list of DENOPTIMRings "
-			   + "{" + rings + "}. Check Code!";
-		throw new DENOPTIMException(s);
-	    }
-	    DENOPTIMVertex vH = rings.get(0).getHeadVertex();
-            DENOPTIMVertex vT = rings.get(0).getTailVertex();
-	    IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
-	    IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
-	    int iSrcH = mol.getAtomNumber(
-				        mol.getConnectedAtomsList(aH).get(0));
-            int iSrcT = mol.getAtomNumber(
-					mol.getConnectedAtomsList(aT).get(0));
-	    atmsToRemove.add(aH);
-	    atmsToRemove.add(aT);
-
-	    switch (rings.get(0).getBondType())
-	    {
-	    case (1):
-	        mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-		break;
-	    case (2):
-		mol.addBond(iSrcH, iSrcT, IBond.Order.DOUBLE);
-		break;
-	    case (3):
-		mol.addBond(iSrcH, iSrcT, IBond.Order.TRIPLE);
-	        break;
-	    default:
-		mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-	        break;
-	    }
-	    doneVrtx.set(usedRcvs.indexOf(vH),true);
-            doneVrtx.set(usedRcvs.indexOf(vT),true);
-	}
-
-	// remove used RCAs
-	for (IAtom a : atmsToRemove)
-	{
-	    mol.removeAtomAndConnectedElectronContainers(a);
-	}
+		// add ring-closing bonds
+		ArrayList<DENOPTIMVertex> usedRcvs = graph.getUsedRCVertices();
+	    Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
+	    		DENOPTIMMoleculeUtils.getVertexToAtmIdMap(usedRcvs,mol);
+		ArrayList<IAtom> atmsToRemove = new ArrayList<>();
+		ArrayList<Boolean> doneVrtx = new ArrayList<>(
+					  Collections.nCopies(usedRcvs.size(),false));
+		for (DENOPTIMVertex v : usedRcvs)
+		{
+		    if (doneVrtx.get(usedRcvs.indexOf(v)))
+		    {
+		    	continue;
+		    }
+		    ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
+		    if (rings.size() != 1)
+		    {
+				String s = "Unexpected inconsistency between used RCV list "
+					   + v + " in {" + usedRcvs + "}"
+					   + "and list of DENOPTIMRings "
+					   + "{" + rings + "}. Check Code!";
+				throw new DENOPTIMException(s);
+		    }
+		    DENOPTIMVertex vH = rings.get(0).getHeadVertex();
+	        DENOPTIMVertex vT = rings.get(0).getTailVertex();
+		    IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
+		    IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
+		    int iSrcH = mol.getAtomNumber(
+					        mol.getConnectedAtomsList(aH).get(0));
+	        int iSrcT = mol.getAtomNumber(
+						mol.getConnectedAtomsList(aT).get(0));
+		    atmsToRemove.add(aH);
+		    atmsToRemove.add(aT);
+	
+		    switch (rings.get(0).getBondType())
+		    {
+			    case (1):
+			        mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
+					break;
+			    case (2):
+					mol.addBond(iSrcH, iSrcT, IBond.Order.DOUBLE);
+					break;
+			    case (3):
+			    	mol.addBond(iSrcH, iSrcT, IBond.Order.TRIPLE);
+			        break;
+			    default:
+			    	mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
+			        break;
+		    }
+		    doneVrtx.set(usedRcvs.indexOf(vH),true);
+	        doneVrtx.set(usedRcvs.indexOf(vT),true);
+		}
+	
+		// remove used RCAs
+		for (IAtom a : atmsToRemove)
+		{
+		    mol.removeAtomAndConnectedElectronContainers(a);
+		}
 
         // convert remaining PseudoAtoms to H
 	removeRCA(mol);
@@ -316,11 +316,11 @@ public class DENOPTIMMoleculeUtils
                throw new DENOPTIMException(cdke);
             }
         }
-        catch (IllegalArgumentException iae)
+        catch (Throwable t)
         {
 //TODO del or make systematic
 	    DenoptimIO.writeMolecule("moldeule_causing_failure.sdf",fmol,false);
-            throw new DENOPTIMException(iae);
+            throw new DENOPTIMException(t);
         }
         return smiles;
     }

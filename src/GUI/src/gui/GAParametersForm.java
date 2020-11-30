@@ -128,10 +128,6 @@ public class GAParametersForm extends ParametersForm
     JLabel lblPar2;
     JComboBox<String> cmbPar2;
 
-    String keyPar4 = "GA-ShowGraphics";
-    JPanel linePar4;
-    JRadioButton rdbPar4;
-
     String keyPar5 = "GA-SortByIncreasingFitness";
     JPanel linePar5;
     JRadioButton rdbPar5;
@@ -305,7 +301,8 @@ public class GAParametersForm extends ParametersForm
         btnGASource = new JButton("Browse");
         btnGASource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtGASource);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtGASource,
+                		btnGASource);
            }
         });
         btnLoadGASource = new JButton("Load...");
@@ -708,15 +705,6 @@ public class GAParametersForm extends ParametersForm
         linePar2.add(cmbPar2);
         advOptsBlock.add(linePar2);
 
-        String toolTipPar4 = "<html>Specifies whether to produce the 2D molecular representation for each candidate.</html>";
-        linePar4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        rdbPar4 = new JRadioButton("Prepare 2D graphs for candidates");
-        rdbPar4.setToolTipText(toolTipPar4);
-        rdbPar4.addChangeListener(rdbFieldChange);
-        mapKeyFieldToValueField.put(keyPar4.toUpperCase(),rdbPar4);
-        linePar4.add(rdbPar4);
-        advOptsBlock.add(linePar4);
-
         String toolTipPar5 = "Specifies whether the candidates should be reported in descending or ascending order of fitness.";
         linePar5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbPar5 = new JRadioButton("Sort by descending fitness");
@@ -753,7 +741,7 @@ public class GAParametersForm extends ParametersForm
         btnPar20 = new JButton("Browse");
         btnPar20.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar20);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar20,btnPar20);
            }
         });
         linePar20.add(lblPar20);
@@ -774,7 +762,7 @@ public class GAParametersForm extends ParametersForm
         btnPar21 = new JButton("Browse");
         btnPar21.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar21);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar21,btnPar21);
            }
         });
         linePar21.add(lblPar21);
@@ -795,7 +783,7 @@ public class GAParametersForm extends ParametersForm
         btnPar22 = new JButton("Browse");
         btnPar22.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar22);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar22,btnPar22);
            }
         });
         linePar22.add(lblPar22);
@@ -1056,7 +1044,6 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem()).append(NL);
-        sb.append(getStringIfSelected(keyPar4,rdbPar4));
         sb.append(getStringIfSelected(keyPar5,rdbPar5));
         sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
         sb.append(getStringIfNotEmpty(keyPar7,txtPar7));

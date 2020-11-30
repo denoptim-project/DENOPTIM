@@ -24,6 +24,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.rings.RingClosureParameters;
 
 /**
  * Form collecting input parameters for defining the fragment space.
@@ -249,6 +251,8 @@ public class FSParametersForm extends ParametersForm
         
     String NL = System.getProperty("line.separator");
     
+//------------------------------------------------------------------------------
+    
     public FSParametersForm(Dimension d)
     {
     	mapKeyFieldToValueField = new HashMap<String,Object>();
@@ -316,7 +320,7 @@ public class FSParametersForm extends ParametersForm
         btnFSSource = new JButton("Browse");
         btnFSSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtFSSource);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtFSSource,btnFSSource);
            }
         });
         btnLoadFSSource = new JButton("Load...");
@@ -333,7 +337,7 @@ public class FSParametersForm extends ParametersForm
 	        		if (e1.getMessage().equals("") || e1.getMessage() == null)
 	        		{
 	        			e1.printStackTrace();
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnLoadFSSource,
 								"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
@@ -341,7 +345,7 @@ public class FSParametersForm extends ParametersForm
 	        		}
 	        		else
 	        		{
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnLoadFSSource,
 								e1.getMessage(),
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
@@ -370,7 +374,7 @@ public class FSParametersForm extends ParametersForm
         btnPar1 = new JButton("Browse");
         btnPar1.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar1);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar1,btnPar1);
            }
         });
         linePar1.add(lblPar1);
@@ -391,7 +395,7 @@ public class FSParametersForm extends ParametersForm
         btnPar2 = new JButton("Browse");
         btnPar2.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar2);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar2,btnPar2);
            }
         });
         linePar2.add(lblPar2);
@@ -412,7 +416,7 @@ public class FSParametersForm extends ParametersForm
         btnPar3 = new JButton("Browse");
         btnPar3.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar3);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar3,btnPar3);
            }
         });
         linePar3.add(lblPar3);
@@ -433,7 +437,7 @@ public class FSParametersForm extends ParametersForm
         btnCPMat = new JButton("Browse");
         btnCPMat.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtCPMat);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtCPMat,btnCPMat);
            }
         });
         lineCPMat.add(lblCPMat);
@@ -454,7 +458,7 @@ public class FSParametersForm extends ParametersForm
         btnPar6 = new JButton("Browse");
         btnPar6.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar6);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar6,btnPar6);
            }
         });
         linePar6.add(lblPar6);
@@ -544,7 +548,7 @@ public class FSParametersForm extends ParametersForm
         		}
         		catch (Throwable t)
         		{
-        			JOptionPane.showMessageDialog(null,
+        			JOptionPane.showMessageDialog(btnPar11Insert,
         					"<html>The current parameters do not create a valid fragment space.<br>"
         					+ "It looks like you want to manually insert APClasses.<br>"
         					+ "If this is not true, you must adjust the parameters defining the fragment space.</html>",
@@ -558,7 +562,7 @@ public class FSParametersForm extends ParametersForm
 	        		while (!done)
 	        		{
 		        		String apClass = (String)JOptionPane.showInputDialog(
-		        		                    null,
+		        							btnPar11Insert,
 		        		                    "Choose attachment point class:",
 		        		                    "apClass",
 		        		                    JOptionPane.PLAIN_MESSAGE,
@@ -575,7 +579,13 @@ public class FSParametersForm extends ParametersForm
 		        				{
 		        					if (apClass.equals(tabPar11.getValueAt(i, 0)))
 		        					{
-		        						JOptionPane.showMessageDialog(null, "<html>apClass already in the table.<br>Choose another class.", "Duplicate apClass", JOptionPane.ERROR_MESSAGE);
+		        						JOptionPane.showMessageDialog(
+		        								btnPar11Insert, 
+		        								"<html>apClass already in the "
+		        								+ "table.<br>Choose another "
+		        								+ "class.", 
+		        								"Duplicate apClass", 
+		        								JOptionPane.ERROR_MESSAGE);
 		        						goodChoice = false;
 		        						break;
 		        					}
@@ -599,7 +609,7 @@ public class FSParametersForm extends ParametersForm
 	        		while (!done)
 	        		{
 		        		String apClass = (String)JOptionPane.showInputDialog(
-			                    null,
+		        				btnPar11Insert,
 			                    "<html>No fragment library found.<br>Type an attachment point class:</html>",
 			                    "apClass",
 			                    JOptionPane.PLAIN_MESSAGE);
@@ -613,7 +623,11 @@ public class FSParametersForm extends ParametersForm
 								{
 									if (apClass.equals(tabPar11.getValueAt(i, 0)))
 									{
-										JOptionPane.showMessageDialog(null, "<html>apClass already in the table.<br>Choose another class.", "Duplicate apClass", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(
+												btnPar11Insert, 
+												"<html>apClass already in the table.<br>Choose another class.", 
+												"Duplicate apClass", 
+												JOptionPane.ERROR_MESSAGE);
 										goodChoice = false;
 										break;
 									}
@@ -711,7 +725,7 @@ public class FSParametersForm extends ParametersForm
         btnPar5 = new JButton("Browse");
         btnPar5.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar5);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar5,btnPar5);
            }
         });
         linePar5.add(lblPar5);
@@ -775,17 +789,28 @@ public class FSParametersForm extends ParametersForm
         linePar18.add(txtPar18);
         localBlock3.add(linePar18);
 
-        String toolTipPar22 = "<html>Specifies the bias associated to a given ring size.<br> The bias is used when chosing among combination of rings (i.e., RCAs) for a given graph.</html>";
+        String toolTipPar22 = "<html>Specifies the bias associated to a given ring size.<br> The bias is an integer used as a weight when chosing among<br>combination of rings (i.e., RCAs) for a given graph.</html>";
         linePar22 = new JPanel(new FlowLayout(FlowLayout.LEFT));      
         lblPar22 = new JLabel("Ring size preference biases:", SwingConstants.LEFT);
         lblPar22.setPreferredSize(fileLabelSize);
         lblPar22.setToolTipText(toolTipPar22);
         tabModPar22 = new DefaultTableModel();
         tabModPar22.setColumnCount(2);
+        tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias (int)</b></html>"});
+        ArrayList<Integer> ringSizeBias = RingClosureParameters.getRingSizeBias();
+        for (int ib=0; ib<ringSizeBias.size(); ib++)
+        {
+        	int w = ringSizeBias.get(ib);
+        	if (w > 0)
+        	{
+        		tabModPar22.addRow(new Object[] {ib,w});
+        	}
+        }
         tabModPar22.addTableModelListener(tabFieldChange);
         mapKeyFieldToValueField.put(keyPar22.toUpperCase(),tabModPar22);
         tabPar22 = new JTable(tabModPar22);
         tabPar22.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        tabPar22.setToolTipText("Ring size (1st column) and bias (2nd column) must be positive integers.");
         btnPar22Insert = new JButton("Add Bias");
         btnPar22Insert.setToolTipText("Click to set a new ring size bias.");
         btnPar22Insert.addActionListener(new ActionListener(){
@@ -794,7 +819,7 @@ public class FSParametersForm extends ParametersForm
         		while (!done)
         		{
 	        		String rsBias = (String)JOptionPane.showInputDialog(
-		                    null,
+	        				btnPar22Insert,
 		                    "Specify ring size:",
 		                    "Ring Size",
 		                    JOptionPane.PLAIN_MESSAGE);
@@ -808,7 +833,9 @@ public class FSParametersForm extends ParametersForm
 							{
 								if (rsBias.equals(tabPar22.getValueAt(i, 0)))
 								{
-									JOptionPane.showMessageDialog(null, "<html>Rins size already in the table.<br>Choose another size or modify the value of the bias in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(
+											btnPar22Insert,
+											"<html>Rins size already in the table.<br>Choose another size or modify the value of the bias in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
 									goodChoice = false;
 									break;
 								}
@@ -818,9 +845,9 @@ public class FSParametersForm extends ParametersForm
 						{
 		        			if (tabPar22.getRowCount() == 0)
 		        			{
-		        				tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias</b></html>"});
+		        				tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias (int)</b></html>"});
 		        			}
-							tabModPar22.addRow(new Object[]{rsBias, 1.00});
+							tabModPar22.addRow(new Object[]{rsBias, 1});
 							done = true;
 						}
 					}
@@ -899,7 +926,7 @@ public class FSParametersForm extends ParametersForm
         lblPar19 = new JLabel("Type of ring-closability conditions", SwingConstants.LEFT);
         lblPar19.setPreferredSize(fileLabelSize);
         lblPar19.setToolTipText(toolTipPar19);
-        cmbPar19 = new JComboBox<String>(new String[] {"Constitution", "3D-Conformation", "Constitution_and_3D-Conformation"});
+        cmbPar19 = new JComboBox<String>(new String[] {"Ring_size", "Constitution", "3D-Conformation", "Constitution_and_3D-Conformation"});
         cmbPar19.setToolTipText(toolTipPar19);
         cmbPar19.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyPar19.toUpperCase(),cmbPar19);
@@ -914,7 +941,7 @@ public class FSParametersForm extends ParametersForm
             			
         			case "3D-Conformation":
         				localBlock4.setVisible(false);
-            			localBlock5.setVisible(true); 
+            			localBlock5.setVisible(true);
             			break;
             			
         			case "Constitution_and_3D-Conformation":
@@ -949,7 +976,7 @@ public class FSParametersForm extends ParametersForm
         		while (!done)
         		{
 	        		String rcRule = (String)JOptionPane.showInputDialog(
-		                    null,
+	        				btnPar21Insert,
 		                    "Specify ring-closability rules:",
 		                    "Add Constitutional Closability Rule",
 		                    JOptionPane.PLAIN_MESSAGE);
@@ -963,7 +990,11 @@ public class FSParametersForm extends ParametersForm
 							{
 								if (rcRule.equals(tabPar21.getValueAt(i, 0)))
 								{
-									JOptionPane.showMessageDialog(null, "<html>Rule already in the table.</html>", "Duplicate Entry", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(
+											btnPar21Insert,
+											"<html>Rule already in the table.</html>", 
+											"Duplicate Entry", 
+											JOptionPane.ERROR_MESSAGE);
 									goodChoice = false;
 									break;
 								}
@@ -1012,7 +1043,8 @@ public class FSParametersForm extends ParametersForm
                                         .addComponent(btnPar21Cleanup))
                         .addComponent(tabPar21))
         );
-        grpLyoPar21.setVerticalGroup(grpLyoPar21.createParallelGroup(GroupLayout.Alignment.LEADING)
+        grpLyoPar21.setVerticalGroup(grpLyoPar21.createParallelGroup(
+        		GroupLayout.Alignment.LEADING)
                 .addComponent(lblPar21)
                 .addGroup(grpLyoPar21.createSequentialGroup()
                         .addGroup(grpLyoPar21.createParallelGroup()
@@ -1022,7 +1054,7 @@ public class FSParametersForm extends ParametersForm
         );
         localBlock4.add(linePar21);
 
-        String toolTipPar25 = "Specifies the maximum number of rotatable bonds for which 3D chain closability is evaluated. Chains with a number of rotatable bonds higher than this value are assumed closable.";
+        String toolTipPar25 = "<html>Specifies the maximum number of rotatable bonds for which 3D chain closability is evaluated. <br>Chains with a number of rotatable bonds higher than this value are assumed closable.</html>";
         linePar25 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar25 = new JLabel("Max. rotatable bonds:", SwingConstants.LEFT);
         lblPar25.setPreferredSize(fileLabelSize);
@@ -1036,7 +1068,7 @@ public class FSParametersForm extends ParametersForm
         linePar25.add(txtPar25);
         localBlock5.add(linePar25);
 
-        String toolTipPar26 = "Specifies the torsion angle step (degrees) to be used for the evaluation of 3D chain closability by scanning the torsional space.";
+        String toolTipPar26 = "<html>Specifies the torsion angle step (degrees) to be used for the evaluation of 3D chain closability by scanning the torsional space.</html>";
         linePar26 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar26 = new JLabel("Dihedral angle step:", SwingConstants.LEFT);
         lblPar26.setPreferredSize(fileLabelSize);
@@ -1095,7 +1127,7 @@ public class FSParametersForm extends ParametersForm
         btnPar30 = new JButton("Browse");
         btnPar30.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFile(txtPar30);
+                DenoptimGUIFileOpener.pickFileForTxtField(txtPar30,btnPar30);
            }
         });
         linePar30.add(lblPar30);
@@ -1105,7 +1137,7 @@ public class FSParametersForm extends ParametersForm
 
         String toolTipPar31 = "Pathname of the folder containing the archive of ring closing conformations.";
         linePar31 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar31 = new JLabel("Root folder of closable chain archive:", SwingConstants.LEFT);
+        lblPar31 = new JLabel("Root folder of chains archive:", SwingConstants.LEFT);
         lblPar31.setPreferredSize(fileLabelSize);
         lblPar31.setToolTipText(toolTipPar31);
         txtPar31 = new JTextField();
@@ -1116,7 +1148,7 @@ public class FSParametersForm extends ParametersForm
         btnPar31 = new JButton("Browse");
         btnPar31.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFolder(txtPar31);
+                DenoptimGUIFileOpener.pickFolderForTxtField(txtPar31,btnPar31);
            }
         });
         linePar31.add(lblPar31);
@@ -1227,8 +1259,9 @@ public class FSParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(null,
-					"<html>Parameter '" + key + "' is not recognized.<br>Ignoring line.</html>",
+			JOptionPane.showMessageDialog(this,
+					"<html>Parameter '" + key 
+					+ "' is not recognized.<br>Ignoring line.</html>",
 	                "WARNING",
 	                JOptionPane.WARNING_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -1253,9 +1286,13 @@ public class FSParametersForm extends ParametersForm
 
  				//WARNING: there might be cases where we do not take all the records
 
-    			if (key.equals(keyPar22) && (((DefaultTableModel) valueField).getRowCount() == 0)) 
+    			if (key.equals(keyPar22) 
+    					&& 
+    					(((DefaultTableModel) valueField).getRowCount() == 0)) 
     			{
-    				((DefaultTableModel) valueField).addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias</b></html>"});
+    				((DefaultTableModel) valueField).addRow(new Object[]{
+    						"<html><b>Ring Size</b></html>", 
+    						"<html><b>Bias</b></html>"});
     			}
 
  				((DefaultTableModel) valueField).addRow(value.split(" "));

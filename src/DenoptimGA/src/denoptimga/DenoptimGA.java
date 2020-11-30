@@ -23,10 +23,11 @@ import java.util.logging.Level;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GenUtils;
+import fragspaceexplorer.FSEParameters;
 
 /**
  *
- * @author Vishwesh Venkatraman 
+ * @author Vishwesh Venkatraman
  */
 public class DenoptimGA
 {
@@ -35,29 +36,37 @@ public class DenoptimGA
 
     public static void printUsage()
     {
-        System.err.println("Usage: java -jar DenoptimGA.jar ConfigFile");
-        System.exit(-1);
+        System.err.println("Usage: java -jar DenoptimGA.jar ConfigFile "
+        		+ "[workDir]");
     }
 
 //------------------------------------------------------------------------------    
     
     /**
      * @param args the command line arguments
+     * @throws DENOPTIMException in any case of not-normal termination
      */
-    public static void main(String[] args)
+    public static void main(String[] args) throws DENOPTIMException
     {
-        // TODO code application logic here
         if (args.length < 1)
         {
             printUsage();
+            throw new DENOPTIMException("Cannot run. Need at least one argument"
+            		+ "to run DenoptimGA main method.");
         }
+        
+    	//needed by static parameters, and in case of subsequent runs in the same JVM
+    	GAParameters.resetParameters(); 
 
         String configFile = args[0];
-        
+        if (args.length > 1)
+        {
+        	GAParameters.dataDir = args[1];
+        }
         EvolutionaryAlgorithm evoGA;
         ParallelEvolutionaryAlgorithm pGA = null;
         try
-        {
+        {	
             GAParameters.readParameterFile(configFile);
             GAParameters.checkParameters();
             GAParameters.processParameters();
@@ -65,13 +74,11 @@ public class DenoptimGA
             
             if (GAParameters.parallelizationScheme == 1)
             {
-                System.err.println("Using synchronous parallelization scheme.");
                 evoGA = new EvolutionaryAlgorithm();
                 evoGA.runGA();
             }
             else
             {
-                System.err.println("Using asynchronous parallelization scheme.");
                 pGA = new ParallelEvolutionaryAlgorithm();
                 pGA.runGA();
             }
@@ -85,18 +92,19 @@ public class DenoptimGA
             }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
             GenUtils.printExceptionChain(de);
-            System.exit(-1);
+            throw new DENOPTIMException("Error in DenootimGA run.", de);
         }
         catch (Exception e)
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
             GenUtils.printExceptionChain(e);
-            System.exit(-1);
+            throw new DENOPTIMException("Error in DenootimGA run.", e);
         }
 
-        // normal completion
-        System.exit(0);
+        // normal completion: do NOT call System exit(0) as we might be calling
+        // this main from another thread, which would be killed as well.
     }
     
 //------------------------------------------------------------------------------        
+
 }

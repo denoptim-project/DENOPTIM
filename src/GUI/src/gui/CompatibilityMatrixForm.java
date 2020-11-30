@@ -66,6 +66,7 @@ import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 
 public class CompatibilityMatrixForm extends JPanel {
 
@@ -86,6 +87,12 @@ public class CompatibilityMatrixForm extends JPanel {
 	 */
 	private SortedSet<String> allAPClasses = new TreeSet<String>();
 	
+	/**
+     * List of all APRules. This list can be edited by creating/removing an 
+     * APRule or by creating/removing an APClass.
+     */
+    private SortedSet<String> allAPRules = new TreeSet<String>();
+    
 	/**
 	 * List of APClasses of capping groups.
 	 * These can be found in a fragment space or collected from
@@ -153,6 +160,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	private DefaultTableModel tabModAPClsBO;
 	private JTable tableAPClsBO;
 	private JButton btnAddAPClsBO;
+	private JButton btnAddAllNewAPClsBO;
 	private JButton btnDelAPClsBO;
 	private JButton btnUpdateAPClsBO;
 	private JButton btnHelpAPClsBO;
@@ -188,7 +196,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		panelCPMap = new JPanel(new BorderLayout());
 		tabbedPane.addTab("APClass compatibility",null,panelCPMap,null);
 
-        btnAddCompRul = new JButton("Add Rule");
+        btnAddCompRul = new JButton("Add Compatibility Rule");
         btnAddCompRul.setToolTipText("Add compatibility rules for a new "
         		+ "source APClass.");
         btnAddCompRul.addActionListener(new ActionListener() {
@@ -274,6 +282,8 @@ public class CompatibilityMatrixForm extends JPanel {
     		        			return;
                 			}
 							allAPClasses.add(srcAPClass);
+							allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(
+									srcAPClass));
 						} catch (DENOPTIMException e1) {
 		        			JOptionPane.showMessageDialog(null,
 		        					"<html>Error definging anew APClass.<br>"
@@ -311,6 +321,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	                			}
 								trgCPClasses.add(newAPC);
 								allAPClasses.add(newAPC);
+								allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPC));
 							} catch (DENOPTIMException e1) {
 								continue;
 							} 
@@ -544,7 +555,8 @@ public class CompatibilityMatrixForm extends JPanel {
 		tabbedPane.addTab("APClass-to-Bond",null,panelAPClsBO,null);
 
         String toolTipAPClsBO = String.format("<html><body width='%1s'>This "
-        		+ "table contains the APClass-to-Bond Order map that defines "
+        		+ "table contains the APClassRule-to-Bond Order map that "
+        		+ "defines "
         		+ "the bond order of bonds that are generated as a result of "
         		+ "a fragment-fragment connection, i.e., an edge in the "
         		+ "DENOPTIMGraph.</html>",300);
@@ -559,7 +571,7 @@ public class CompatibilityMatrixForm extends JPanel {
             }
         };
         tabModAPClsBO.setColumnCount(2);
-        String column_name_bo[]= {"<html><b>APClass</b></html>",
+        String column_name_bo[]= {"<html><b>APClass Rule</b></html>",
                 "<html><b>Bond Order</b></html>"};
         tabModAPClsBO.setColumnIdentifiers(column_name_bo);
         tabModAPClsBO.addTableModelListener(new PausableAPC2BOTabModListener());
@@ -569,22 +581,22 @@ public class CompatibilityMatrixForm extends JPanel {
         tableAPClsBO.setToolTipText(toolTipAPClsBO);
         tableAPClsBO.putClientProperty("terminateEditOnFocusLost", true);
         
-        btnAddAPClsBO = new JButton("Add Rule");
-        btnAddAPClsBO.setToolTipText("Add one or more new APClass-to-Bond "
-        		+ "Rules");
+        btnAddAPClsBO = new JButton("Add Conversion Rule");
+        btnAddAPClsBO.setToolTipText("Add one or more new APClassRule-to-Bond "
+        		+ " conversion rule.");
         btnAddAPClsBO.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                 DefaultListModel<String> srcAPCs =
                         new DefaultListModel<String>();
                 JList<String> srcClsList = new JList<String>(srcAPCs);
-                for (String apc : allAPClasses)
+                for (String apcr : allAPRules)
                 {
-                    if (!bondOrderMap.keySet().contains(apc))
+                    if (!bondOrderMap.keySet().contains(apcr))
                     {
-                    	srcAPCs.addElement(apc);
+                    	srcAPCs.addElement(apcr);
                     }
                 }
-                srcAPCs.addElement("<html><b><i>Define a new APClass...<i>"
+                srcAPCs.addElement("<html><b><i>Define a new APClass Rule...<i>"
                 		+ "</b></html>");
 
                 DefaultListModel<Integer> availBO =
@@ -594,11 +606,10 @@ public class CompatibilityMatrixForm extends JPanel {
                 {
                 	availBO.addElement(i);
                 }
-                boList.setSelectionMode(
-                		ListSelectionModel.SINGLE_SELECTION);
+                boList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
                 JPanel twoListsPanel = new JPanel();
-                JLabel headSrc = new JLabel("APClass:");
+                JLabel headSrc = new JLabel("APClass Rule:");
                 JLabel headBo = new JLabel("Bond Order:");
                 JScrollPane scrollSrc = new JScrollPane(srcClsList);
                 JScrollPane scrollBo = new JScrollPane(boList);
@@ -656,6 +667,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	                			}
 	                			srcAPClasses.add(newAPC);
 								allAPClasses.add(newAPC);
+								allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPC));
 							} catch (DENOPTIMException e1) {
 								continue;
 							}
@@ -675,6 +687,25 @@ public class CompatibilityMatrixForm extends JPanel {
                 }
 			}
 		});
+        
+        btnAddAllNewAPClsBO = new JButton("Add All Conversion Rules");
+        btnAddAllNewAPClsBO.setToolTipText("<html>Adds a conversion rule for "
+        		+ "every APClassRule<br>"
+        		+ "not already included in the table. Bond order = 1 will be "
+        		+ "chosen for <br>"
+        		+ "all the rules added to the table.</html>");
+        btnAddAllNewAPClsBO.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+        	    for (String apr : allAPRules)
+        	    {
+        	    	if (!bondOrderMap.keySet().contains(apr))
+        	    	{
+        	    		bondOrderMap.put(apr, 1);
+        	    	}
+        	    }
+        	    updateAPClassToBondOrderTable();
+            }
+        });
 
         btnUpdateAPClsBO = new JButton("Refresh");
         btnUpdateAPClsBO.setToolTipText("Updates the table with the most "
@@ -718,14 +749,14 @@ public class CompatibilityMatrixForm extends JPanel {
         btnHelpAPClsBO.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String txt = "<html><body width='%1s'><p>This table contains "
-                		+ "the APClass-to-Bond Order mapping. Use the "
+                		+ "the APClassRule-to-Bond Order mapping. Use the "
                 		+ "<code>Refresh</code> button to update a the table "
                 		+ "when APClasses have been added in other tabs. The "
                 		+ "<code>Refresh</code> allows also to recover the "
                 		+ "last available and valid value provided for any "
                 		+ "bond order.</p>"
                 		+ "<br>"
-                		+ "<p>Missing of invalid values (non-integer, "
+                		+ "<p>Missing or invalid values (non-integer, "
                 		+ "value&lt;1 or value&gt;" + MAXBO 
                 		+ ") are highlighted in red, "
                 		+ "and must be changed to acceptable values in order "
@@ -739,6 +770,7 @@ public class CompatibilityMatrixForm extends JPanel {
 
         JPanel panelBtnAPClsBO = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelBtnAPClsBO.add(btnAddAPClsBO);
+        panelBtnAPClsBO.add(btnAddAllNewAPClsBO);
         panelBtnAPClsBO.add(btnDelAPClsBO);
         panelBtnAPClsBO.add(btnUpdateAPClsBO);
         panelBtnAPClsBO.add(btnHelpAPClsBO);
@@ -773,7 +805,7 @@ public class CompatibilityMatrixForm extends JPanel {
         tableCapping = new JTable(tabModCapping);
         tableCapping.setToolTipText(toolTipCapping);
 
-        btnAddCapping = new JButton("Append Capping Rules");
+        btnAddCapping = new JButton("Add Capping Rules");
         btnAddCapping.setToolTipText("Add new lines to the table");
         btnAddCapping.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -854,6 +886,7 @@ public class CompatibilityMatrixForm extends JPanel {
     		        			return;
                 			}
 							allAPClasses.add(cappingAPClass);
+							allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(cappingAPClass));
 						} catch (DENOPTIMException e1) {
 		        			JOptionPane.showMessageDialog(null,
 		        					"<html>Error definging a new APClass.<br>"
@@ -892,6 +925,7 @@ public class CompatibilityMatrixForm extends JPanel {
 			                    		cappingAPClass});
 			                    cappingMap.put(newAPC,cappingAPClass);
 								allAPClasses.add(newAPC);
+								allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPC));
 							} catch (DENOPTIMException e1) {
 								continue;
 							} 
@@ -1015,7 +1049,7 @@ public class CompatibilityMatrixForm extends JPanel {
         tableFrbEnd = new JTable(tabModFrbEnd);
         tableFrbEnd.setToolTipText(toolTipFrbEnd);
         
-        btnAddFrbEnd = new JButton("Add Forbidden End");
+        btnAddFrbEnd = new JButton("Add Forbidden End Rules");
         btnAddFrbEnd.setToolTipText("Define a new forbidden end and add it to "
         		+ "the list.");
         btnAddFrbEnd.addActionListener(new ActionListener() {
@@ -1060,6 +1094,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 			tabModFrbEnd.addRow(new Object[]{newAPC});
     	    				forbiddenEndList.add(newAPC);
 							allAPClasses.add(newAPC);
+							allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPC));
 						} catch (DENOPTIMException e1) {
 							continue;
 						} 
@@ -1510,6 +1545,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		if (cleanup)
 		{
 			allAPClasses = new TreeSet<String>();
+			allAPRules = new TreeSet<String>();
 		}
 		
 		allAPClasses.addAll(compatMap.keySet());
@@ -1517,6 +1553,11 @@ public class CompatibilityMatrixForm extends JPanel {
 		for (ArrayList<String> apcs : compatMap.values())
 		{
 			allAPClasses.addAll(apcs);
+		}
+
+		for (String apc : allAPClasses)
+		{
+		    allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(apc));
 		}
 	}
 	
@@ -1536,6 +1577,44 @@ public class CompatibilityMatrixForm extends JPanel {
 			allCapAPClasses = new TreeSet<String>();
 		}
 		allCapAPClasses.addAll(cappingMap.values());
+		
+		for (String apc : allCapAPClasses)
+		{
+		    allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(apc));
+		}
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Reads all the APClasses found in a list of files
+	 * @param fragLibs the list of file to inspect.
+	 * @param cleanup set <code>true</code> to cleanup previous listing of 
+	 * APclasses.
+	 */
+	
+	public void importAllAPClassesFromCappingGroupLibs(Set<File> fragLibs,
+			boolean cleanup)
+	{
+		this.setCursor(Cursor.getPredefinedCursor(
+				Cursor.WAIT_CURSOR));
+		if (cleanup)
+		{
+			allCapAPClasses = new TreeSet<String>();
+		}
+		
+		for (File fragLib : fragLibs)
+		{
+			allCapAPClasses.addAll(DenoptimIO.readAllAPClasses(fragLib));
+		}
+		
+		for (String apc : allCapAPClasses)
+		{
+		    allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(apc));
+		}
+		
+		this.setCursor(Cursor.getPredefinedCursor(
+				Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1555,11 +1634,17 @@ public class CompatibilityMatrixForm extends JPanel {
 		if (cleanup)
 		{
 			allAPClasses = new TreeSet<String>();
+			allAPRules = new TreeSet<String>();
 		}
 		
 		for (File fragLib : fragLibs)
 		{
 			allAPClasses.addAll(DenoptimIO.readAllAPClasses(fragLib));
+		}
+		
+		for (String apc : allAPClasses)
+		{
+		    allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(apc));
 		}
 		
 		this.setCursor(Cursor.getPredefinedCursor(
@@ -1695,6 +1780,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		                			}
 									trgCPClasses.add(newAPC);
 									allAPClasses.add(newAPC);
+									allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPC));
 								} catch (DENOPTIMException e1) {
 									continue;
 								} 

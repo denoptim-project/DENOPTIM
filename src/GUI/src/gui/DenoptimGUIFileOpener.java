@@ -18,7 +18,7 @@
 
 package gui;
 
-import java.awt.FileDialog;
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -45,31 +46,28 @@ import denoptim.constants.DENOPTIMConstants;
 
 public class DenoptimGUIFileOpener 
 {
+	protected static JFileChooser fileChooser = new JFileChooser(
+			FileSystemView.getFileSystemView().getHomeDirectory()); 
 	
 //-----------------------------------------------------------------------------
-	
-	public static File pickFileOrFolder()
+
+	public static File pickFileOrFolder(Component parent)
 	{
-		JFileChooser fileChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory()); 
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		File file;
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		File file = null;
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
-		else
-		{
-			return null;
-		}
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		return file;
 	}
 
 //-----------------------------------------------------------------------------
 
-	public static File pickFile(JTextField txtField) 
+	public static File pickFileForTxtField(JTextField txtField, Component parent) 
 	{
-		File file = pickFile();
+		File file = pickFile(parent);
 		if (file != null)
 		{
 		    txtField.setText(file.getAbsolutePath());
@@ -78,50 +76,45 @@ public class DenoptimGUIFileOpener
 	}
 	
 //-----------------------------------------------------------------------------
-	
-	public static Set<File> pickManyFile() 
+
+	public static Set<File> pickManyFiles(Component parent) 
 	{
-		JFileChooser filesChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory()); 
-		filesChooser.setMultiSelectionEnabled(true);
-		Set<File> files = new HashSet<File>();
-		if (filesChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		fileChooser.setMultiSelectionEnabled(true);
+		fileChooser.setDialogTitle("Select one or more files");
+		Set<File> files = null;
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
-			File[] arr = filesChooser.getSelectedFiles();
+			files = new HashSet<File>();
+			File[] arr = fileChooser.getSelectedFiles();
 			for (int i=0; i<arr.length; i++)
 			{
 				files.add(arr[i]);
 			}
 		}
-		else
-		{
-			return null;
-		}
+		fileChooser.setDialogTitle("Open");
+		fileChooser.setMultiSelectionEnabled(false);
 		return files;
 	}
 	
 //-----------------------------------------------------------------------------
 	
-	public static File pickFile() 
+	public static File pickFile(Component parent) 
 	{
-		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory()); 
-		File file;
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		File file = null;
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
-		else
-		{
-			return null;
-		}
 		return file;
 	}
-	
+		
 //-----------------------------------------------------------------------------
-	
-	public static File pickFolder(JTextField txtField) 
+		
+	public static File pickFolderForTxtField(JTextField txtField, 
+			Component parent) 
 	{
-		File file = pickFolder();
+		File file = pickFolder(parent);
 		if (file != null)
 		{
 		    txtField.setText(file.getAbsolutePath());
@@ -131,42 +124,38 @@ public class DenoptimGUIFileOpener
 	
 //-----------------------------------------------------------------------------
 	
-	public static File pickFolder() 
+	public static File pickFolder(Component parent) 
 	{
-		JFileChooser fileChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory());
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fileChooser.setDialogTitle("Choose the folder to be loaded");
-		File file;
-		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		fileChooser.setDialogTitle("Choose Folder to Load");
+		File file = null;
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
-		else
-		{
-			return null;
-		}
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setDialogTitle("Open");
 		return file;
 	}
 	
 //-----------------------------------------------------------------------------
 	
-	public static File saveFile() 
+	public static File pickFileForSaving(Component parent) 
 	{
-		JFileChooser fileChooser = new JFileChooser(
-				FileSystemView.getFileSystemView().getHomeDirectory());
 		File file;
-		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
 		}
 		else
 		{
+			/*
 			JOptionPane.showMessageDialog(null,
 					"Could not save. Try again.",
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
+	                */
 			return null;
 		}
 		return file;

@@ -52,9 +52,11 @@ import denoptim.utils.TaskUtils;
  */
 public class ParallelEvolutionaryAlgorithm
 {
-    final List<Future<String>> futures;
-    final ArrayList<FTask> submitted;
+    final List<Future<Object>> futures;
+    final ArrayList<OffspringEvaluationTask> submitted;
     final ThreadPoolExecutor tcons;
+
+    private Throwable ex;
    
     private final String fsep = System.getProperty("file.separator");
  
@@ -134,15 +136,15 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (FTask tsk:submitted)
+        for (OffspringEvaluationTask tsk : submitted)
         {
             if (tsk.foundException())
             {
                 hasprobs = true;
-	        DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-							      + tsk.toString());
-		DENOPTIMLogger.appLogger.log(Level.SEVERE,
-							 tsk.getErrorMessage());
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
+                + tsk.toString() + ". ErrorMessage: '" + tsk.getErrorMessage() 
+                + "'. ExceptionInTask: "+tsk.getException());
+                ex = tsk.getException().getCause();
                 break;
             }
         }
@@ -185,17 +187,17 @@ public class ParallelEvolutionaryAlgorithm
         HashSet<String> lstUID = new HashSet<>(1024);
 
         // first collect UIDs of previously known individuals
-	if (!GAParameters.getUIDFileIn().equals(""))
-	{
+        if (!GAParameters.getUIDFileIn().equals(""))
+        {
 //TODO: if same file avoid re-write
             EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
             EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
-	}
+        }
 
         // placeholder for the molecules
         ArrayList<DENOPTIMMolecule> molPopulation = new ArrayList<>();
 
-	// then, get the molecules from the initial population file 
+        // then, get the molecules from the initial population file 
         String inifile = GAParameters.getInitialPopulationFile();
         if (inifile.length() > 0)
         {
@@ -204,7 +206,7 @@ public class ParallelEvolutionaryAlgorithm
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
         }
 
-	// we are done with initial UIDs
+        // we are done with initial UIDs
         lstUID.clear();
         lstUID = null;
 
@@ -372,7 +374,7 @@ public class ParallelEvolutionaryAlgorithm
 
         int f0 = 0, f1 = 0, f2 = 0;
 
-        Integer numtry = 0;
+        Integer numTries = 0;
         int MAX_TRIES = GAParameters.getMaxTriesFactor();
 
         //System.err.println("EvolvePopulation " + genDir);
@@ -388,12 +390,13 @@ public class ParallelEvolutionaryAlgorithm
                 if (checkForException())
                 {
                     stopRun();
-                    throw new DENOPTIMException("Errors found during execution.");
+                    throw new DENOPTIMException("Errors found during sub-tasks "
+                    		+ "execution.", ex);
                 }
 
-                synchronized (numtry)
+                synchronized (numTries)
                 {
-                    if (numtry == MAX_TRIES)
+                    if (numTries == MAX_TRIES)
                     {
 //                        MF: the cleanup method removed also uncompleted tasks
 //                        causing their results to be forgotten.
@@ -579,17 +582,17 @@ public class ParallelEvolutionaryAlgorithm
 
                     if (res == null)
                     {
-                        synchronized(numtry)
+                        synchronized(numTries)
                         {
-                            numtry++;
+                            numTries++;
                         }
                         continue;
                     }
                     else
                     {
-                        synchronized(numtry)
+                        synchronized(numTries)
                         {
-                            numtry = 0;
+                            numTries = 0;
                         }
                     }
 
@@ -618,14 +621,12 @@ public class ParallelEvolutionaryAlgorithm
                     molName = "M" + GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                             GraphUtils.getUniqueMoleculeIndex());
 
-                    int taskId = TaskUtils.getUniqueTaskIndex();
-
                     smiles = res[1].toString().trim();
                     IAtomContainer cmol = (IAtomContainer) res[2];
 
-                    FTask task = new FTask(molName, graph4, inchi, smiles, cmol,
-                                           genDir, taskId, molPopulation,
-                                           numtry,GAParameters.getUIDFileOut());
+                    OffspringEvaluationTask task = new OffspringEvaluationTask(molName, graph4, inchi, smiles, cmol,
+                                           genDir, molPopulation,
+                                           numTries,GAParameters.getUIDFileOut());
 
                     submitted.add(task);
                     futures.add(tcons.submit(task));
@@ -657,17 +658,17 @@ public class ParallelEvolutionaryAlgorithm
 
                         if (res1 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -697,14 +698,12 @@ public class ParallelEvolutionaryAlgorithm
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
 
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
                         smiles = res1[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res1[2];
 
-                        FTask task1 = new FTask(molName, graph1, inchi, smiles,
-                                           cmol, genDir, taskId, molPopulation,
-                                           numtry,GAParameters.getUIDFileOut());
+                        OffspringEvaluationTask task1 = new OffspringEvaluationTask(molName, graph1, inchi, smiles,
+                                           cmol, genDir, molPopulation,
+                                           numTries,GAParameters.getUIDFileOut());
 
                         submitted.add(task1);
                         futures.add(tcons.submit(task1));
@@ -734,17 +733,17 @@ public class ParallelEvolutionaryAlgorithm
 
                         if (res2 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -773,15 +772,13 @@ public class ParallelEvolutionaryAlgorithm
                         molName = "M" +
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
-
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
+                        
                         smiles = res2[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res2[2];
 
-                        FTask task2 = new FTask(molName, graph2, inchi, smiles,
-                                                cmol, genDir, taskId, molPopulation,
-                                                numtry, 
+                        OffspringEvaluationTask task2 = new OffspringEvaluationTask(molName, graph2, inchi, smiles,
+                                                cmol, genDir, molPopulation,
+                                                numTries, 
                                                 GAParameters.getUIDFileOut());
 
                         submitted.add(task2);
@@ -814,17 +811,17 @@ public class ParallelEvolutionaryAlgorithm
 
                         if (res3 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -853,15 +850,12 @@ public class ParallelEvolutionaryAlgorithm
                         molName = "M" +
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
-
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
                         smiles = res3[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res3[2];
 
-                        FTask task3 = new FTask(molName, graph3, inchi, smiles,
-                                                cmol, genDir, taskId, molPopulation,
-                                                numtry, 
+                        OffspringEvaluationTask task3 = new OffspringEvaluationTask(molName, graph3, inchi, smiles,
+                                                cmol, genDir, molPopulation,
+                                                numTries, 
                                                 GAParameters.getUIDFileOut());
 
                         submitted.add(task3);
@@ -983,7 +977,7 @@ public class ParallelEvolutionaryAlgorithm
             }
         }
 
-        Integer numtry = 0;
+        Integer numTries = 0;
 
         try
         {
@@ -992,11 +986,12 @@ public class ParallelEvolutionaryAlgorithm
                 if (checkForException())
                 {
                     stopRun();
-                    throw new DENOPTIMException("Errors found during execution.");
+                    throw new DENOPTIMException("Errors found during sub tasks "
+                    		+ "execution.", ex);
                 }
-                synchronized (numtry)
+                synchronized (numTries)
                 {
-                    if (numtry == MAX_TRIES)
+                    if (numTries == MAX_TRIES)
                     {
 //                      MF: the cleanup method removed also uncompleted tasks
 //                      causing their results to be forgotten.
@@ -1023,9 +1018,9 @@ public class ParallelEvolutionaryAlgorithm
 
                 if (molGraph == null)
                 {
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        numtry++;
+                        numTries++;
                     }
                     continue;
                 }
@@ -1044,57 +1039,33 @@ public class ParallelEvolutionaryAlgorithm
                 if (res == null)
                 {
                     molGraph.cleanup();
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        numtry++;
+                        numTries++;
                     }
                     continue;
                 }
                 else
                 {
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        if(numtry > 0)
-                            numtry--;
+                        if(numTries > 0)
+                            numTries--;
                     }
                 }
                     
 
                 // Create the task
-                // check if the molinchi has been encountered before
                 String inchi = res[0].toString().trim();
-                
-                /*
-                if (lstInchi.contains(inchi))
-                {
-                    synchronized(numtry)
-                    {
-                        numtry++;
-                    }
-                    continue;
-                }
-                else
-                {
-                    lstInchi.add(inchi);
-                    synchronized(numtry)
-                    {
-                        numtry = 0;
-                    }
-                }
-                */
-
-                // file extensions will be added later
-                String molName = "M" +
-                        GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                    GraphUtils.getUniqueMoleculeIndex());
-
-                int taskId = TaskUtils.getUniqueTaskIndex();
+                String molName = "M" + GenUtils.getPaddedString(
+                		DENOPTIMConstants.MOLDIGITS,
+                		GraphUtils.getUniqueMoleculeIndex());
 
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];
 
-                FTask task = new FTask(molName, molGraph, inchi, smiles, cmol,
-                                        genDir, taskId, molPopulation, numtry,
+                OffspringEvaluationTask task = new OffspringEvaluationTask(molName, molGraph, inchi, smiles, cmol,
+                                        genDir, molPopulation, numTries,
                                         GAParameters.getUIDFileOut());
                 submitted.add(task);
                 futures.add(tcons.submit(task));
@@ -1114,14 +1085,14 @@ public class ParallelEvolutionaryAlgorithm
         }
 
 
-        if (numtry == MAX_TRIES)
+        if (numTries == MAX_TRIES)
         {
             stopRun();
 
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts.\n", numtry);
+                    "Unable to initialize molecules in {0} attempts.\n", numTries);
             throw new DENOPTIMException("Unable to initialize molecules in " +
-                            numtry + " attempts.");
+                            numTries + " attempts.");
         }
 
         molPopulation.trimToSize();
@@ -1132,15 +1103,15 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
-    private void cleanup(ThreadPoolExecutor tcons, List<Future<String>> futures,
-                            ArrayList<FTask> submitted)
+    private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
+                            ArrayList<OffspringEvaluationTask> submitted)
     {
-        for (Future f : futures)
+        for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (FTask tsk: submitted)
+        for (OffspringEvaluationTask tsk: submitted)
         {
             tsk.stopTask();
         }
@@ -1153,8 +1124,8 @@ public class ParallelEvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     private void cleanupCompleted(ThreadPoolExecutor tcons,
-                                  List<Future<String>> futures,
-                                      ArrayList<FTask> submitted)
+                                  List<Future<Object>> futures,
+                                      ArrayList<OffspringEvaluationTask> submitted)
     {
         ArrayList<Integer> completed = new ArrayList<>();
 
