@@ -18,8 +18,6 @@
 
 package gui;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -30,7 +28,6 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import java.awt.CardLayout;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -130,7 +127,6 @@ public class MainToolBar extends JMenuBar {
 	private void initialize() 
 	{		
 		menuDenoptim = new JMenu("DENOPTIM");
-		menuDenoptim.setFont(new Font("Lucida Grande", Font.BOLD, 12));
 		this.add(menuDenoptim);
 		
 		JMenuItem prefs = new JMenuItem("Preferences");

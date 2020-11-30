@@ -64,6 +64,8 @@ public class GUI
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		//This also messes with the keyword shortcuts
+		/*
 		try {
 			UIManager.setLookAndFeel(
             UIManager.getCrossPlatformLookAndFeelClassName());
@@ -72,6 +74,7 @@ public class GUI
 	    	System.err.println("Look and feel not set. We get default, "
 	    			+ "unpredictable look-and-feel.");
 	    }
+	    */
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
