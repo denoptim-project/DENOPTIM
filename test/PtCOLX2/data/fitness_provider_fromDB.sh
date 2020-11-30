@@ -54,6 +54,17 @@ errMsg="Error not assigned."
 ###############################################################################
 
 #
+# Function that takes the value of an SDF property from a file
+# @param $1 name of the property
+# @param $2 the SDF file to analyze
+#
+function getProperty() {
+    propName="$1"
+    file="$2"
+    propValue=$(grep -A1 "> *<${propName}>" "$file" | tail -n 1)
+}
+
+#
 # Function to append a property to an SDF file. Does not overwrite any existing
 # property in the SDF-
 # @param $1 the name of the property to append
@@ -222,26 +233,45 @@ fi
 #
 # Recover molecular model (bash-only extraction of one molecules from SDF)
 #
-echo "Retrieving molecular model from DB..."
-nFile=$(wc -l "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
-nFirst=$(grep -n -m1 "\$\$\$\$" "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
-nUID=$(grep -n "$uid" "$allMolsSDF"  | awk '{gsub(":"," ",$0); print $1}')
-nToEnd=$(tail -n "$((nFile-nUID))" "$allMolsSDF" | grep -n "\$\$\$\$" | head -n 1 | awk '{gsub(":"," ",$0); print $1}')
-nEnd=$((nUID+nToEnd))
-if [ "$nFirst" -gt "$nUID" ]
-then
-    head -n "$nEnd" "$allMolsSDF" > "$preOutSDF"
-else
-    nBegin=$(head -n "$nUID" "$allMolsSDF" | grep -n "\$\$\$\$"  | tail -n 1 | awk '{gsub(":"," ",$0); print $1}')
-    nTot=$((nEnd-nBegin))
-    head -n "$nEnd" "$allMolsSDF" | tail -n "$nTot" > "$preOutSDF"
-fi
-awk -v molNum="$molNum" '{gsub("CandidateEntity",molNum,$0); print $0}' "$preOutSDF" > "$outSDF"
+# WARNING: this is quite slow and inefficient. It is also not really needed
+# for testing furposes. Therefore, it is commented out.
+#
+
+#echo "Retrieving molecular model from DB..."
+#nFile=$(wc -l "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
+#nFirst=$(grep -n -m1 "\$\$\$\$" "$allMolsSDF" | awk '{gsub(":"," ",$0); print $1}')
+#nUID=$(grep -n "$uid" "$allMolsSDF"  | awk '{gsub(":"," ",$0); print $1}')
+#nToEnd=$(tail -n "$((nFile-nUID))" "$allMolsSDF" | grep -n "\$\$\$\$" | head -n 1 | awk '{gsub(":"," ",$0); print $1}')
+#nEnd=$((nUID+nToEnd))
+#if [ "$nFirst" -gt "$nUID" ]
+#then
+#    head -n "$nEnd" "$allMolsSDF" > "$preOutSDF"
+#else
+#    nBegin=$(head -n "$nUID" "$allMolsSDF" | grep -n "\$\$\$\$"  | tail -n 1 | awk '{gsub(":"," ",$0); print $1}')
+#    nTot=$((nEnd-nBegin))
+#    head -n "$nEnd" "$allMolsSDF" | tail -n "$nTot" > "$preOutSDF"
+#fi
+#awk -v molNum="$molNum" '{gsub("CandidateEntity",molNum,$0); print $0}' "$preOutSDF" > "$outSDF"
+#
+##
+## Finally make the output
+##
+#getProperty "GCODE" "$inpSDF"
+#addPropertyToSingleMolSDF "GCODE" "$propValue" "$outSDF"
+#getProperty "GraphENC" "$inpSDF"
+#addPropertyToSingleMolSDF "GraphENC" "$propValue" "$outSDF"
+#getProperty "GraphMsg" "$inpSDF"
+#addPropertyToSingleMolSDF "GraphMsg" "$propValue" "$outSDF"
+#getProperty "ParentGraph" "$inpSDF"
+#addPropertyToSingleMolSDF "ParentGraph" "$propValue" "$outSDF"
+#getProperty "GraphLevel" "$inpSDF"
+#addPropertyToSingleMolSDF "GraphLevel" "$propValue" "$outSDF"
+#
 
 
-#
-# Finally make the output
-#
+# Instead of the inefficient block we take the 3D-tree and attach the fitness to it
+mv "$preOutSDF" "$outSDF"
+
 echo "All done. Returning $outSDF"
 
 

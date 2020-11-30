@@ -127,6 +127,12 @@ public abstract class FitnessTask extends Task
 						+ "chemical representation",e);
 			}
     	}
+        
+        if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
+        		fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG).toString().equals(""))
+        {
+        	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
+        }
     	
     	// Write file with input data to fitness provider
         DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
@@ -317,7 +323,7 @@ public abstract class FitnessTask extends Task
             processedMol.setProperty("GCODE", dGraph.getGraphId());                
             processedMol.setProperty("SMILES", result.getMoleculeSmiles());
             processedMol.setProperty("GraphENC", dGraph.toString());
-            if (dGraph.getMsg() != null)
+            if (dGraph.getMsg() != null && !dGraph.getMsg().equals(""))
             {
                 processedMol.setProperty("GraphMsg", dGraph.getMsg());
             }

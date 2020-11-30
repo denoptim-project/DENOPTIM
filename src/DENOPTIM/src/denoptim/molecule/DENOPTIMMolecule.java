@@ -196,15 +196,15 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
 
         try
         {
-            this.molUID = (iac.getProperty(
-            		DENOPTIMConstants.UNIQUEIDTAG).toString());
+            this.molUID = iac.getProperty(
+            		DENOPTIMConstants.UNIQUEIDTAG).toString();
         } catch (Exception e) {
         	if (allowNoUID)
         	{
         		this.molUID = "noUID";
         	} else {
-        		throw new DENOPTIMException("Could not create DENOPTIMMolecule."
-        			+ " Could not read UID.", e);
+        		throw new DENOPTIMException("Could not read UID to make "
+        				+ "DENOPTIMMolecule.", e);
         	}
         }
         try
@@ -213,8 +213,8 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
             		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
             		useFragSpace);
         } catch (Exception e) {
-        	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
-        			+ " Could not read Graph.", e);
+        	throw new DENOPTIMException("Could not read Graph to make "
+        			+ "DENOPTIMMolecule.", e);
         }
         if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
         {

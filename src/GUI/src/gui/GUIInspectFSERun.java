@@ -346,10 +346,11 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 					JPanel msgPanel = new JPanel(new GridLayout(2, 1));
 					String msg = "<html><body width='%1s'>Could not read data "
-							+ "from '" + molFile + "'. Should we try to "
+							+ "from '" + molFile + "'. Hint on cause: "
+							+ e1.getMessage() + " Should we try to "
 							+ "visualize the results anyway?</html>";
 					JLabel text = new JLabel(String.format(msg, 450));
-					JCheckBox cb = new JCheckBox("Remember decition");
+					JCheckBox cb = new JCheckBox("Remember decision");
 					cb.setSelected(false);
 					msgPanel.add(text);
 					msgPanel.add(cb);
