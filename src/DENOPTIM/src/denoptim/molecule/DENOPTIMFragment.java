@@ -463,7 +463,6 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
-        		System.out.println("No property "+DENOPTIMConstants.APTAG);
         		continue;
             }
         	
