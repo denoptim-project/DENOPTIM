@@ -82,9 +82,9 @@ public class GUI
 				"com.apple.laf.AquaLookAndFeel") && weRunOnMacDarkMode())
 		{
 			UIManager.getLookAndFeelDefaults().put("MenuBar.foreground", 
-					new Color(180,180,180));
+					new Color(150,150,150));
 			UIManager.getLookAndFeelDefaults().put("TableHeader.background", 
-					new Color(180,180,180));
+					new Color(200,200,200));
 		}
 		
 		EventQueue.invokeLater(new Runnable() {
