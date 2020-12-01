@@ -22,11 +22,13 @@ package denoptimga;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -78,8 +80,17 @@ public class EAUtils
     // cluster the fragments based on their #APs
     protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
     
-    protected static DecimalFormat df = new DecimalFormat();
-
+    /**
+     * Locale used to write reports
+     */
+    private static Locale enUsLocale = new Locale("en", "US");
+    
+    /**
+     * Format for decimal fitness numbers that overwrites Locale to en_US
+     */
+    protected static DecimalFormat df = (DecimalFormat)
+    		NumberFormat.getNumberInstance(enUsLocale);
+    
     // for each fragment store the reactions associated with it
     protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
 
@@ -108,8 +119,8 @@ public class EAUtils
         sb.append(String.format("%-20s", "GraphId "));
         sb.append(String.format("%-30s", "UID "));
         sb.append(String.format("%-15s","Fitness "));
-                sb.append("Source ");
-        sb.append(System.getProperty("line.separator"));
+        sb.append("Source ");
+        sb.append(NL);
 
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
         df.setMinimumFractionDigits(GAParameters.getPrecisionLevel());
@@ -127,7 +138,7 @@ public class EAUtils
                 sb.append(String.format("%-30s", mol.getMoleculeUID()));
                 sb.append(df.format(mol.getMoleculeFitness()));
                                 sb.append("    ").append(mol.getMoleculeFile());
-                sb.append(System.getProperty("line.separator"));
+                sb.append(NL);
             }
         }
 
@@ -148,35 +159,34 @@ public class EAUtils
         double sdev = DENOPTIMMathUtils.stddevp(fitness);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
-        
-        String floatForm = "%12." + GAParameters.getPrecisionLevel() + "f";
 
         if (sdev > 0.0001)
         {
             StringBuilder sb = new StringBuilder(128);
             sb.append(NL+NL+"#####POPULATION SUMMARY#####"+NL);
             int n = popln.size();
-            sb.append(String.format("%-30s", "SIZE:")).append(String.format("%12s", n));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "SIZE:"));
+            sb.append(String.format("%12s", n));
+            sb.append(NL);
             double f;
             f = DENOPTIMStatUtils.max(fitness);
-            sb.append(String.format("%-30s", "MAX:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "MAX:")).append(df.format(f));
+            sb.append(NL);
             f = DENOPTIMStatUtils.min(fitness);
-            sb.append(String.format("%-30s", "MIN:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "MIN:")).append(df.format(f));
+            sb.append(NL);
             f = DENOPTIMStatUtils.mean(fitness);
-            sb.append(String.format("%-30s", "MEAN:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "MEAN:")).append(df.format(f));
+            sb.append(NL);
             f = DENOPTIMStatUtils.median(fitness);
-            sb.append(String.format("%-30s", "MEDIAN:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "MEDIAN:")).append(df.format(f));
+            sb.append(NL);
             f = DENOPTIMStatUtils.stddev(fitness, true);
-            sb.append(String.format("%-30s", "STDDEV:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "STDDEV:")).append(df.format(f));
+            sb.append(NL);
             f = DENOPTIMStatUtils.skewness(fitness, true);
-            sb.append(String.format("%-30s", "SKEW:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
+            sb.append(String.format("%-30s", "SKEW:")).append(df.format(f));
+            sb.append(NL);
 
             int sz = FragmentSpace.getScaffoldLibrary().size();
             HashMap<Integer, Integer> scf_cntr = new HashMap<>();
@@ -196,7 +206,8 @@ public class EAUtils
             sb.append(NL+NL+"#####SCAFFOLD ANALYSIS#####"+NL);
             for (Map.Entry pairs : scf_cntr.entrySet())
             {
-                sb.append(pairs.getKey()).append(" ").append(pairs.getValue()).append(System.getProperty("line.separator"));
+                sb.append(pairs.getKey()).append(" ").append(pairs.getValue());
+                sb.append(NL);
             }
             res = sb.toString();
             sb.setLength(0);
@@ -645,7 +656,7 @@ public class EAUtils
                     }
                     else
                     {
-                sb.append(System.getProperty("line.separator")).append(iter.next());
+                sb.append(NL).append(iter.next());
                     }
         }
 

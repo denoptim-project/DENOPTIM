@@ -20,9 +20,15 @@
 package denoptim.task;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.TaskUtils;
+import denoptimga.GAParameters;
 
 /**
  * Task that runs any of the main methods in the denoptim project, such as 
@@ -60,7 +66,7 @@ public abstract class GUIInvokedMainTask extends Task
     public Object call()
     {
     	String implName = this.getClass().getSimpleName();
-    	//TODO log of del
+    	//TODO log or del
     	System.out.println("Calling " + implName +" ("
     			+ " id="+id+", configFile="
     			+ configFilePathName + ", workSpace=" + workDir + ")");
@@ -69,12 +75,26 @@ public abstract class GUIInvokedMainTask extends Task
     	
     	try {
 			mainCaller(args);
-		} catch (DENOPTIMException e) {
-			e.printStackTrace();
+	    	System.out.println(implName + " id="+id+" done!");
+		} catch (Throwable t) {
+        	StringWriter sw = new StringWriter();
+        	PrintWriter pw = new PrintWriter(sw);
+        	t.printStackTrace(pw);
+        	String errFile = workDir + SEP + "ERROR";
+        	System.out.println("ERROR reported in "+errFile);
+            try {
+				DenoptimIO.writeData(errFile, sw.toString(), false);
+	        	System.out.println(implName + " id="+id+" returned an error. "
+	        			+ "See '" + errFile + "'");
+			} catch (DENOPTIMException e) {
+				t.printStackTrace();
+	        	System.out.println(implName + " id="+id+" returned an error. "
+	        			+ "Inspect the log before this line.");
+			}
+            // NB: the static logger should have been set by the main we called
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
 		}
     	
-    	//TODO log of del
-    	System.out.println(implName + " id="+id+" done!");
 		return null;
     }
     

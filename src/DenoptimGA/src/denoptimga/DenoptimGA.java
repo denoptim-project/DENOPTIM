@@ -84,21 +84,15 @@ public class DenoptimGA
             }
 
         }
-        catch (DENOPTIMException de)
+        catch (Throwable t)
         {
             if (pGA != null)
             {
                 pGA.stopRun();
             }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
-            GenUtils.printExceptionChain(de);
-            throw new DENOPTIMException("Error in DenootimGA run.", de);
-        }
-        catch (Exception e)
-        {
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
-            GenUtils.printExceptionChain(e);
-            throw new DENOPTIMException("Error in DenootimGA run.", e);
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
+            GenUtils.printExceptionChain(t);
+            throw new DENOPTIMException("Error in DenootimGA run.", t);
         }
 
         // normal completion: do NOT call System exit(0) as we might be calling

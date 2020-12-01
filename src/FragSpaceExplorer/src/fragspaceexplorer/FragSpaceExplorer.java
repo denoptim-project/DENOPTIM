@@ -99,21 +99,19 @@ public class FragSpaceExplorer
             pCombExp = new CombinatorialExplorerByLayer();
             pCombExp.runPCE();
         }
-        catch (DENOPTIMException de)
+        catch (Throwable t)
         {
         	if (pCombExp != null)
             {
                 pCombExp.stopRun();
             }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
-            throw new DENOPTIMException("Error in FragSpaceExplorer run.", de);
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
+            GenUtils.printExceptionChain(t);
+            throw new DENOPTIMException("Error in FragSpaceExplorer run.", t);
         }
-        catch (Exception e)
-        {
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
-            GenUtils.printExceptionChain(e);
-            throw new DENOPTIMException("Error in FragSpaceExplorer run.", e);
-        }
+        
+        // normal completion: do NOT call System exit(0) as we might be calling
+        // this main from another thread, which would be killed as well.
     }
     
 //------------------------------------------------------------------------------        

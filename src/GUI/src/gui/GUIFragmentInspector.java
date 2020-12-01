@@ -559,8 +559,10 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				catch (Exception ex)
 				{
+					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null,
-			                "Could not write to '" + outFile + "'!.",
+			                "Could not write to '" + outFile + "'! "
+			                + "Hint: "+ex.getMessage(),
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));

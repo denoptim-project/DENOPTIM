@@ -546,17 +546,33 @@ public class FragmentSpace
     */
     public static Integer getBondOrderForAPClass(String apclass)
     {
+    	int bo = 1; //Default
         if (FragmentSpace.getBondOrderMap() == null)
         {
             String msg = "Attemting to get bond order, but no "
                        + "FragmentSpace defined (i.e., null BondOrderMap). "
                        + "Assuming bond order one.";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-	    return new Integer(1);
+            return bo;
         }
         else
         {
-            return FragmentSpace.getBondOrderMap().get(apclass);
+        	//WARNING: here we need to allow returning the default BO=1
+        	// in case we have a loaded/defined fragment space but we ask
+        	// for an entry of the BOMap that does not exist. This can happen
+        	// when we create fragments with the GUI and define a new APClass
+        	// that is not yet included in the loaded fragment space
+        	if (FragmentSpace.getBondOrderMap().keySet().contains(apclass))
+        	{
+        		bo = FragmentSpace.getBondOrderMap().get(apclass);
+        	} else {
+        		String msg = "Attemting to get bond order, but the loaded "
+                        + "FragmentSpace does not contain a rule to translate "
+                        + "APClass '" + apclass + "' into a bond order. "
+                        + "Assuming bond order one.";
+        		DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+        	}
+            return bo;
         }
     }
 
