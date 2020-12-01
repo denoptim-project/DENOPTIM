@@ -133,8 +133,8 @@ public class EAUtils
                 String mname = new File(mol.getMoleculeFile()).getName();
                 if (mname != null)
                     sb.append(String.format("%-20s", mname));
-                sb.append(String.format("%-20s", 
-                                                                                  mol.getMoleculeGraph().getGraphId()));
+                sb.append(String.format("%-20s",
+                		mol.getMoleculeGraph().getGraphId()));
                 sb.append(String.format("%-30s", mol.getMoleculeUID()));
                 sb.append(df.format(mol.getMoleculeFitness()));
                                 sb.append("    ").append(mol.getMoleculeFile());
@@ -160,58 +160,62 @@ public class EAUtils
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
 
+        StringBuilder sb = new StringBuilder(128);
+        sb.append(NL+NL+"#####POPULATION SUMMARY#####"+NL);
+        int n = popln.size();
+        sb.append(String.format("%-30s", "SIZE:"));
+        sb.append(String.format("%12s", n));
+        sb.append(NL);
+        double f;
+        f = DENOPTIMStatUtils.max(fitness);
+        sb.append(String.format("%-30s", "MAX:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.min(fitness);
+        sb.append(String.format("%-30s", "MIN:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.mean(fitness);
+        sb.append(String.format("%-30s", "MEAN:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.median(fitness);
+        sb.append(String.format("%-30s", "MEDIAN:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.stddev(fitness, true);
+        sb.append(String.format("%-30s", "STDDEV:")).append(df.format(f));
+        sb.append(NL);
         if (sdev > 0.0001)
         {
-            StringBuilder sb = new StringBuilder(128);
-            sb.append(NL+NL+"#####POPULATION SUMMARY#####"+NL);
-            int n = popln.size();
-            sb.append(String.format("%-30s", "SIZE:"));
-            sb.append(String.format("%12s", n));
-            sb.append(NL);
-            double f;
-            f = DENOPTIMStatUtils.max(fitness);
-            sb.append(String.format("%-30s", "MAX:")).append(df.format(f));
-            sb.append(NL);
-            f = DENOPTIMStatUtils.min(fitness);
-            sb.append(String.format("%-30s", "MIN:")).append(df.format(f));
-            sb.append(NL);
-            f = DENOPTIMStatUtils.mean(fitness);
-            sb.append(String.format("%-30s", "MEAN:")).append(df.format(f));
-            sb.append(NL);
-            f = DENOPTIMStatUtils.median(fitness);
-            sb.append(String.format("%-30s", "MEDIAN:")).append(df.format(f));
-            sb.append(NL);
-            f = DENOPTIMStatUtils.stddev(fitness, true);
-            sb.append(String.format("%-30s", "STDDEV:")).append(df.format(f));
-            sb.append(NL);
             f = DENOPTIMStatUtils.skewness(fitness, true);
             sb.append(String.format("%-30s", "SKEW:")).append(df.format(f));
             sb.append(NL);
-
-            int sz = FragmentSpace.getScaffoldLibrary().size();
-            HashMap<Integer, Integer> scf_cntr = new HashMap<>();
-            for (int i=1; i<=sz; i++)
-            {
-                scf_cntr.put(i, 0);
-            }
-
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
-            {
-                DENOPTIMMolecule mol = popln.get(i);
-                DENOPTIMGraph g = mol.getMoleculeGraph();
-                int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
-                scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
-            }
-
-            sb.append(NL+NL+"#####SCAFFOLD ANALYSIS#####"+NL);
-            for (Map.Entry pairs : scf_cntr.entrySet())
-            {
-                sb.append(pairs.getKey()).append(" ").append(pairs.getValue());
-                sb.append(NL);
-            }
-            res = sb.toString();
-            sb.setLength(0);
+        } else {
+            sb.append(String.format("%-30s", "SKEW:")).append(" NaN (sdev too small)");
+            sb.append(NL);
         }
+
+        int sz = FragmentSpace.getScaffoldLibrary().size();
+        HashMap<Integer, Integer> scf_cntr = new HashMap<>();
+        for (int i=1; i<=sz; i++)
+        {
+            scf_cntr.put(i, 0);
+        }
+
+        for (int i=0; i<GAParameters.getPopulationSize(); i++)
+        {
+            DENOPTIMMolecule mol = popln.get(i);
+            DENOPTIMGraph g = mol.getMoleculeGraph();
+            int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
+            scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
+        }
+
+        sb.append(NL+NL+"#####SCAFFOLD ANALYSIS#####"+NL);
+        for (Map.Entry pairs : scf_cntr.entrySet())
+        {
+            sb.append(pairs.getKey()).append(" ").append(pairs.getValue());
+            sb.append(NL);
+        }
+        res = sb.toString();
+        sb.setLength(0);
+        
         return res;
     }
     

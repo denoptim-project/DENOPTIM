@@ -28,6 +28,12 @@ import java.util.concurrent.Callable;
 
 public abstract class Task implements Callable<Object>
 {
+	/**
+	 * Flag controlling whether this task is expected to notify the static task
+	 * manager
+	 */
+	protected boolean notify = false;
+	
     /**
      * Flag about completion. Should be set to <code>true</code> only by the
      * call() method.
@@ -185,6 +191,10 @@ public abstract class Task implements Callable<Object>
             		+ this.getClass().getName() + " " + id);
             processHandler.stopProcess();
         } else {
+        	if (notify)
+        	{
+        		StaticTaskManager.subtractDoneTask();
+        	}
         	Thread.currentThread().interrupt();
         }
     }
@@ -206,6 +216,13 @@ public abstract class Task implements Callable<Object>
         sb.append(", completed=").append(completed).append("] ");
         return sb.toString();
     }
+    
+//------------------------------------------------------------------------------
+
+	public void setNotify(boolean notify) 
+	{
+		this.notify = notify;
+	}
     
 //------------------------------------------------------------------------------    
 

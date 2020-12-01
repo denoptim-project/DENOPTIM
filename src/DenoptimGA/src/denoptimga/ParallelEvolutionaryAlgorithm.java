@@ -438,6 +438,7 @@ public class ParallelEvolutionaryAlgorithm
                         if (parents[0] == -1 || parents[1] == -1)
                         {
                             DENOPTIMLogger.appLogger.info("Failed to identify compatible parents for crossover/mutation.");
+                            numatt++;
                             continue;
                         }
 

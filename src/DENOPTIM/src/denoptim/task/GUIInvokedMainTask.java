@@ -95,6 +95,12 @@ public abstract class GUIInvokedMainTask extends Task
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
 		}
     	
+
+    	if (notify)
+    	{
+    		StaticTaskManager.subtractDoneTask();
+    	}
+    	
 		return null;
     }
     

@@ -233,7 +233,7 @@ public class EvolutionaryAlgorithm
 
         int Xop = -1, Mop = -1, Bop = -1;
 
-        int MAX_EVOLVE_ATTEMPTS = 10;
+        int MAX_EVOLVE_ATTEMPTS = 100;
         int numTries = 0;
 
         int n = GAParameters.getNumberOfChildren() + molPopulation.size();
@@ -265,6 +265,7 @@ public class EvolutionaryAlgorithm
                     if (parents[0] == -1 || parents[1] == -1)
                     {
                         DENOPTIMLogger.appLogger.info("Failed to identify compatible parents for crossover/mutation.");
+                        numatt++;
                         continue;
                     }
 
@@ -372,10 +373,6 @@ public class EvolutionaryAlgorithm
                 }
                 else
                 {
-                    if (graph3 != null)
-                    {
-                        graph3.cleanup();
-                    }
                     graph3 = null;
                 }
             }
