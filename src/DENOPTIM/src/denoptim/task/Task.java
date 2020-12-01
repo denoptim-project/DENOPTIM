@@ -71,8 +71,14 @@ public abstract class Task implements Callable<Object>
      */
     protected int verbosity = 0;
 
-    
+    /**
+     * System-dependent file separator
+     */
     protected final String SEP = System.getProperty("file.separator");
+    
+    /**
+     * System-dependent line separator (newline)
+     */
     protected final String NL = System.getProperty("line.separator");
    
 //------------------------------------------------------------------------------
