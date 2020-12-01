@@ -26,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.plaf.MenuBarUI;
 
 import java.awt.CardLayout;
 import java.awt.Color;

@@ -22,15 +22,19 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import denoptim.task.StaticTaskManager;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Graphical User Interface of the DENOPTIM package.
@@ -64,17 +68,22 @@ public class GUI
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		//This also messes with the keyword shortcuts
-		/*
-		try {
-			UIManager.setLookAndFeel(
-            UIManager.getCrossPlatformLookAndFeelClassName());
-	    } 
-	    catch (Exception e) {
-	    	System.err.println("Look and feel not set. We get default, "
-	    			+ "unpredictable look-and-feel.");
-	    }
-	    */
+		
+		// Hack to debug com.apple.laf.AquaLookAndFeel. Such LAF when combined 
+		// with "dark mode" (i.e., the system appearance where all windows have 
+		// dark colors) by setting the background of the MenuBar components to
+		// a dark color (OK, per se), but does not adapt the
+		// foreground color accordingly. 
+		// Thus, the menu is unreadable because painter using
+		// dark grey font on black-ish background. To overcome this problem we
+		// set the foreground to a lighter shade of grey.
+		if (UIManager.getLookAndFeel().getClass().getName().equals(
+				"com.apple.laf.AquaLookAndFeel") && weRunOnMacDarkMode())
+		{
+			UIManager.getLookAndFeelDefaults().put("MenuBar.foreground", 
+					new Color(150,150,150));
+		}
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -88,6 +97,26 @@ public class GUI
 			}
 		});
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Checks if we are in dark mode.
+	 */
+	private static boolean weRunOnMacDarkMode()
+    {
+        try
+        {
+            final Process p = Runtime.getRuntime().exec(new String[] 
+            		{"defaults", "read", "-g", "AppleInterfaceStyle"});
+            p.waitFor(100, TimeUnit.MILLISECONDS);
+            return p.exitValue() == 0;
+        }
+        catch (Throwable ex)
+        {
+            return false;
+        }
+    }
 
 //-----------------------------------------------------------------------------
 	
