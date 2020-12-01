@@ -71,8 +71,9 @@ public class GUI
 		
 		// Hack to debug com.apple.laf.AquaLookAndFeel. Such LAF when combined 
 		// with "dark mode" (i.e., the system appearance where all windows have 
-		// dark colors) by setting the background of the MenuBar components to
-		// a dark color (OK, per se), but does not adapt the
+		// dark colors) tries to change the appearance, but in not fully 
+		// self-consistent. For example, it sets the background 
+		// of the MenuBar components to a dark color, but does not adapt the
 		// foreground color accordingly. 
 		// Thus, the menu is unreadable because painter using
 		// dark grey font on black-ish background. To overcome this problem we
@@ -81,6 +82,8 @@ public class GUI
 				"com.apple.laf.AquaLookAndFeel") && weRunOnMacDarkMode())
 		{
 			UIManager.getLookAndFeelDefaults().put("MenuBar.foreground", 
+					new Color(180,180,180));
+			UIManager.getLookAndFeelDefaults().put("TableHeader.background", 
 					new Color(180,180,180));
 		}
 		
