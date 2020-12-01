@@ -1234,6 +1234,50 @@ public class GUIFragmentInspector extends GUICardPanel
     	
     	return currApClass;
 	}
+	
+//-----------------------------------------------------------------------------
+  	
+  	/**
+  	 * Forces the user to specify a properly formatted APRule, i.e., the 
+  	 * first component of an APClass.
+  	 * @param currApRule the current value of the APRule, or empty string
+  	 * @param mustReply set to <code>true</code> to prevent escaping the question
+  	 * @return 
+  	 * @throws DENOPTIMException 
+  	 */
+	public static String ensureGoodAPRuleString(String currApRule, 
+			String title, boolean mustReply) throws DENOPTIMException 
+	{		
+		String preStr = "";
+		while (!DENOPTIMAttachmentPoint.isValidAPRuleString(currApRule))
+    	{
+			if (currApRule != "")
+			{
+	    		preStr = "APClass rule '" + currApRule + "' is not valid!<br>"
+	    				+ "The valid APClass rile is a string with no spaces "
+	    				+ "and no '"
+	        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
+	    				+ "' character.<br>";
+			}
+			
+    		currApRule = JOptionPane.showInputDialog(null, 
+    				"<html>" + preStr + " Please, provide a valid "
+    				+ "APClass rule string: ",
+    				title,
+    				JOptionPane.PLAIN_MESSAGE);
+        	
+    		if (currApRule == null)
+        	{
+        		currApRule = "";
+        		if (!mustReply)
+        		{
+        			throw new DENOPTIMException();
+        		}
+        	}
+    	}
+    	
+    	return currApRule;
+	}
   	
 //-----------------------------------------------------------------------------
 

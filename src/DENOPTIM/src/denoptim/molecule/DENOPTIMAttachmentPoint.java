@@ -389,9 +389,8 @@ public class DENOPTIMAttachmentPoint implements Serializable
 //------------------------------------------------------------------------------
     
     /**
-     * Evaluate is a candidate string can be used as APClass. This method checks
+     * Evaluate if a candidate string can be used as APClass. This method checks
      * whether the string reflects the expected syntax of an APClass string
-     * 
      */
     
     public static boolean isValidAPClassString(String temptAPClass)
@@ -417,7 +416,8 @@ public class DENOPTIMAttachmentPoint implements Serializable
 		int numSep = 0;
 		for (int i=0; i<temptAPClass.length(); i++)
 		{
-			if (temptAPClass.charAt(i) == DENOPTIMConstants.SEPARATORAPPROPSCL.charAt(0))
+			if (temptAPClass.charAt(i) == 
+					DENOPTIMConstants.SEPARATORAPPROPSCL.charAt(0))
 			{
 				numSep++;
 			}
@@ -427,6 +427,23 @@ public class DENOPTIMAttachmentPoint implements Serializable
 			return false;
 		
 		return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluate if a candidate string can be used as APRule. This method checks
+     * whether the string reflects the expected syntax of an APRule, i.e.,
+     * a string with no spaces and no 
+     * {@value DENOPTIMConstants.SEPARATORAPPROPSCL}.
+     */
+    
+    //TODO-V3 use APClass.isValidAPRuleString()
+    public static boolean isValidAPRuleString(String temptAPRule)
+    {
+		if (temptAPRule == null)
+            return false;
+        return temptAPRule.matches("^[a-zA-Z0-9_-]+$");
     }
 
 //------------------------------------------------------------------------------
