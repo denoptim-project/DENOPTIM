@@ -179,7 +179,6 @@ public class StaticTaskManager
 	    	queueStatusBar.setValue(val+doneTasksCount);
 	    	if (queueStatusBar.getValue() == queueStatusBar.getMaximum())
 	    	{
-	        	System.out.println("Resetting");
 	    		queueStatusBar.setMaximum(1);
 	        	queueStatusBar.setValue(1);
 	    	}

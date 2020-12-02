@@ -33,6 +33,8 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
 
@@ -122,7 +124,18 @@ public class FitnessProvider
 					+ " configured.");
 		}
 		
-		// Calculate all descriptors. The results are put in the properties of
+		// Preparation of the chemical representation
+		
+		// TODO-V3 add possibility to submit external molecular modeling task
+		
+		// Cleanup: remove dummy atoms
+		DummyAtomHandler dah = new DummyAtomHandler(
+				DENOPTIMConstants.DUMMYATMSYMBOL);
+		iac = dah.removeDummyInHapto(iac);
+		iac = dah.removeDummy(iac);
+		
+		// Calculate all descriptors. 
+		// The results are put in the properties of
 		// the IAtomContainer (as DescriptorValue identified by 
 		// DescriptorSpecification keys) and we later translate these into
 		// plain human readable strings.

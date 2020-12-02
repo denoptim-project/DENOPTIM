@@ -133,8 +133,8 @@ public abstract class FitnessTask extends Task
         {
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }
-    	
-    	// Write file with input data to fitness provider
+        
+        // Write file with input data to fitness provider
         DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
         
         // Run fitness provider
@@ -145,6 +145,8 @@ public abstract class FitnessTask extends Task
 	            return result;
 	        }
         } else {
+        	// NB: the internal fitness provider removed dummy atoms before 
+            // calculating CDK descriptors, so the 'fitProvMol' changes
         	if (!runInternalFitness())
 	        {
 	            return result;
@@ -365,6 +367,7 @@ public abstract class FitnessTask extends Task
 			FitnessProvider fp = new FitnessProvider(
 					FitnessParameters.getDescriptors(),
 					FitnessParameters.getFitnessExpression());
+			// NB: here we remove dummy atoms!
 			fitVal = fp.getFitness(fitProvMol);
 		} catch (Exception e) {
 			throw new DENOPTIMException("Failed to calculate fitness.", e);

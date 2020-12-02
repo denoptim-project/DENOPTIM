@@ -31,8 +31,11 @@ import denoptim.task.StaticTaskManager;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.concurrent.TimeUnit;
 
@@ -94,6 +97,18 @@ public class GUI
 					window.frame.pack();
 					window.frame.setLocationRelativeTo(null);
 					window.frame.setVisible(true);
+					window.frame.addWindowFocusListener(new WindowFocusListener() {
+						
+						@Override
+						public void windowLostFocus(WindowEvent e) {
+							StaticTaskManager.queueStatusBar.repaint();
+						}
+						
+						@Override
+						public void windowGainedFocus(WindowEvent e) {
+							StaticTaskManager.queueStatusBar.repaint();
+						}
+					});
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
