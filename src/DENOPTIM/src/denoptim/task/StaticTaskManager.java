@@ -10,6 +10,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JProgressBar;
+
 /**
  * Manager for tasks submitted by the GUI. The main purpose is to launch and
  * manage calls placed upon requests coming from the GUI and aimed at
@@ -45,6 +47,16 @@ public class StaticTaskManager
 	 * Queue size
 	 */
 	private static final int queueSize = 10;
+	
+	/**
+	 * Queue indicator for GUI
+	 */
+	public static final JProgressBar queueStatusBar = new JProgressBar(0, 1);
+	
+	/**
+	 * Synchronisation lock for queue progress bar
+	 */
+	private static final Object LOCK = new Object();
     
 //------------------------------------------------------------------------------
     
@@ -122,6 +134,57 @@ public class StaticTaskManager
     {
     	return instance;
     }
+
+//------------------------------------------------------------------------------
+    
+    public static void addTodoTask()
+    {
+    	addTodoTasks(1);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static void addTodoTasks(int addedTasksCount)
+    {
+    	synchronized (LOCK) {
+	    	int max = queueStatusBar.getMaximum();
+	    	int val = queueStatusBar.getValue();
+	    	if (max==1 && val==1)
+	    	{
+	        	// NB: the progress bar is initialized to max=1/val=1
+	    		// Thus it looks "filled-up", i.e., no pending/running task
+	        	queueStatusBar.setMaximum(addedTasksCount);
+	        	queueStatusBar.setValue(0);
+	    	} else {
+		    	queueStatusBar.setMaximum(max+addedTasksCount);
+		    	queueStatusBar.setValue(val);
+	    	}
+	    	queueStatusBar.repaint();
+    	}
+    }
+
+//------------------------------------------------------------------------------
+    
+    public static void subtractDoneTask()
+    {
+    	subtractDoneTasks(1);
+    }
+//------------------------------------------------------------------------------
+    
+    public static void subtractDoneTasks(int doneTasksCount)
+    {
+    	synchronized (LOCK) {
+	    	int max = queueStatusBar.getMaximum();
+	    	int val = queueStatusBar.getValue();
+	    	queueStatusBar.setValue(val+doneTasksCount);
+	    	if (queueStatusBar.getValue() == queueStatusBar.getMaximum())
+	    	{
+	    		queueStatusBar.setMaximum(1);
+	        	queueStatusBar.setValue(1);
+	    	}
+	    	queueStatusBar.repaint();
+    	}
+    }
     
 //------------------------------------------------------------------------------
     
@@ -142,6 +205,8 @@ public class StaticTaskManager
     
     public static void submit(Task task)
     {
+    	task.setNotify(true);
+    	addTodoTask();
     	Future<?> future = tpe.submit(task);
     	subToFutureMap.put(task,future);
     	//TODO: check how we can remove terminated tasks from the map

@@ -18,6 +18,7 @@
 
 package gui;
 
+import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -26,7 +27,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.plaf.MenuBarUI;
+
+import denoptim.task.StaticTaskManager;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -327,6 +329,13 @@ public class MainToolBar extends JMenuBar {
 		    }
 		});
 		menuHelp.add(usrManual);
+		
+		// From here the items will be added to the RIGHT of the menu bar
+		this.add(Box.createGlue());
+		
+		StaticTaskManager.queueStatusBar.setMaximum(1);
+		StaticTaskManager.queueStatusBar.setValue(1);
+		this.add(StaticTaskManager.queueStatusBar);
 	}
 	
 //-----------------------------------------------------------------------------

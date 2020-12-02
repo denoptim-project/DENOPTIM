@@ -215,6 +215,10 @@ public class CompatibilityMatrixForm extends JPanel {
                 		+ "</b></html>");
                 srcClsList.setSelectionMode(
                 		ListSelectionModel.SINGLE_SELECTION);
+                if (srcClsList.getModel().getSize() == 1)
+                {
+                	srcClsList.setSelectedIndex(0);
+                }
 
                 DefaultListModel<String> trgAPCs =
                         new DefaultListModel<String>();
@@ -227,10 +231,14 @@ public class CompatibilityMatrixForm extends JPanel {
                 		+ "</b></html>");
                 trgClsList.setSelectionMode(
                 		ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                if (trgClsList.getModel().getSize() == 1)
+                {
+                	trgClsList.setSelectedIndex(0);
+                }
 
                 JPanel twoListsPanel = new JPanel();
-                JLabel headSrc = new JLabel("APClass on the growing graph:");
-                JLabel headTrg = new JLabel("APClass on incoming fragment:");
+                JLabel headSrc = new JLabel("APClass on the growing graph");
+                JLabel headTrg = new JLabel("APClass on incoming fragment");
                 JScrollPane scrollSrc = new JScrollPane(srcClsList);
                 JScrollPane scrollTrg = new JScrollPane(trgClsList);
                 GroupLayout lyoAddCapRule = new GroupLayout(twoListsPanel);
@@ -241,22 +249,30 @@ public class CompatibilityMatrixForm extends JPanel {
                 	.addGroup(lyoAddCapRule.createParallelGroup()
                 			.addComponent(headSrc)
                         	.addComponent(scrollSrc))
+                	.addGap(30)
                     .addGroup(lyoAddCapRule.createParallelGroup()
                     	.addComponent(headTrg)
                     	.addComponent(scrollTrg)));
                 lyoAddCapRule.setVerticalGroup(lyoAddCapRule.createSequentialGroup()
                     .addGroup(lyoAddCapRule.createParallelGroup()
                     	.addComponent(headSrc)
+                    	.addGap(10)
                     	.addComponent(headTrg))
                     .addGroup(lyoAddCapRule.createParallelGroup()
                         .addComponent(scrollSrc)
                     	.addComponent(scrollTrg)));
 
-                JOptionPane.showMessageDialog(
-                        null,
-                        twoListsPanel,
-                        "New APClass compatibility rule",
-                        JOptionPane.PLAIN_MESSAGE);
+                int res = JOptionPane.showConfirmDialog(btnAddCompRul,
+                		twoListsPanel, 
+    					"New APClass compatibility rule", 
+    					JOptionPane.OK_CANCEL_OPTION,
+    					JOptionPane.PLAIN_MESSAGE, 
+    					null);
+    			
+    			if (res != JOptionPane.OK_OPTION)
+    			{
+    				return;
+    			}
 
                 if (trgClsList.getSelectedIndices().length > 0
                 		&& srcClsList.getSelectedIndices().length > 0)
@@ -309,7 +325,8 @@ public class CompatibilityMatrixForm extends JPanel {
 								String newAPC = GUIFragmentInspector
 										.ensureGoodAPClassString("",
 										"Define new compatible APClass", false);
-	                			if (allAPClasses.contains(newAPC))
+	                			if (!newAPC.equals(srcAPClass) 
+	                					&& allAPClasses.contains(newAPC))
 	                			{
 	                				JOptionPane.showMessageDialog(null,
 	    		        					"<html>Class '<code>" + newAPC
@@ -384,11 +401,17 @@ public class CompatibilityMatrixForm extends JPanel {
                     srcClsList.setSelectionMode(
                     		ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                     
-                    JOptionPane.showMessageDialog(
-                            null,
-                            new JScrollPane(srcClsList),
-                            "Select source APClasses of new rules",
-                            JOptionPane.PLAIN_MESSAGE);
+                    int res = JOptionPane.showConfirmDialog(btnCopyCompRul,
+                    		new JScrollPane(srcClsList), 
+        					"New APClass sources", 
+        					JOptionPane.OK_CANCEL_OPTION,
+        					JOptionPane.PLAIN_MESSAGE, 
+        					null);
+        			
+        			if (res != JOptionPane.OK_OPTION)
+        			{
+        				return;
+        			}
 
                     List<String> selSrc = srcClsList.getSelectedValuesList();
                     if (selSrc.size() > 0)
@@ -586,18 +609,23 @@ public class CompatibilityMatrixForm extends JPanel {
         		+ " conversion rule.");
         btnAddAPClsBO.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                DefaultListModel<String> srcAPCs =
+				// WARNING: here we only need the rule, not the entire APClass
+                DefaultListModel<String> srcAPRs =
                         new DefaultListModel<String>();
-                JList<String> srcClsList = new JList<String>(srcAPCs);
+                JList<String> srcRlsList = new JList<String>(srcAPRs);
                 for (String apcr : allAPRules)
                 {
                     if (!bondOrderMap.keySet().contains(apcr))
                     {
-                    	srcAPCs.addElement(apcr);
+                    	srcAPRs.addElement(apcr);
                     }
                 }
-                srcAPCs.addElement("<html><b><i>Define a new APClass Rule...<i>"
+                srcAPRs.addElement("<html><b><i>Define a new APClass Rule...<i>"
                 		+ "</b></html>");
+                if (srcRlsList.getModel().getSize() == 1)
+                {
+                	srcRlsList.setSelectedIndex(0);
+                }
 
                 DefaultListModel<Integer> availBO =
                         new DefaultListModel<Integer>();
@@ -607,11 +635,12 @@ public class CompatibilityMatrixForm extends JPanel {
                 	availBO.addElement(i);
                 }
                 boList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                boList.setSelectedIndex(0);
 
                 JPanel twoListsPanel = new JPanel();
                 JLabel headSrc = new JLabel("APClass Rule:");
                 JLabel headBo = new JLabel("Bond Order:");
-                JScrollPane scrollSrc = new JScrollPane(srcClsList);
+                JScrollPane scrollSrc = new JScrollPane(srcRlsList);
                 JScrollPane scrollBo = new JScrollPane(boList);
                 GroupLayout lyoAddBO = new GroupLayout(twoListsPanel);
                 twoListsPanel.setLayout(lyoAddBO);
@@ -631,33 +660,39 @@ public class CompatibilityMatrixForm extends JPanel {
                     .addGroup(lyoAddBO.createParallelGroup()
                         .addComponent(scrollSrc)
                     	.addComponent(scrollBo)));
-
-                JOptionPane.showMessageDialog(
-                        null,
-                        twoListsPanel,
-                        "New APClass-to-Bond Order Rule",
-                        JOptionPane.PLAIN_MESSAGE);
+                
+                int res = JOptionPane.showConfirmDialog(btnAddAPClsBO,
+                		twoListsPanel, 
+    					"New APClass-to-BO Rule", 
+    					JOptionPane.OK_CANCEL_OPTION,
+    					JOptionPane.PLAIN_MESSAGE, 
+    					null);
+    			
+    			if (res != JOptionPane.OK_OPTION)
+    			{
+    				return;
+    			}
 
                 if (boList.getSelectedIndices().length > 0
-                		&& srcClsList.getSelectedIndices().length > 0)
+                		&& srcRlsList.getSelectedIndices().length > 0)
                 {
                 	//NB: we allow a single selection in the boList
                 	Integer idBo = boList.getSelectedIndices()[0];
                 	int bo = ((Integer) availBO.getElementAt(idBo)).intValue();
                 	
-                	ArrayList<String> srcAPClasses = new ArrayList<String>();
-	                for (Integer id : srcClsList.getSelectedIndices())
+                	ArrayList<String> srcAPRules = new ArrayList<String>();
+	                for (Integer id : srcRlsList.getSelectedIndices())
 	                {
-	                	if (id.intValue() == (srcAPCs.size()-1))
+	                	if (id.intValue() == (srcAPRs.size()-1))
 	                	{
 	                		try {
-								String newAPC = GUIFragmentInspector
-										.ensureGoodAPClassString("",
-										"Define APClass", false);
-	                			if (allAPClasses.contains(newAPC))
+								String newAPR = GUIFragmentInspector
+										.ensureGoodAPRuleString("",
+										"Define APClass Rule", false);
+	                			if (allAPRules.contains(newAPR))
 	                			{
 	                				JOptionPane.showMessageDialog(null,
-	    		        					"<html>Class '<code>" + newAPC
+	    		        					"<html>Class '<code>" + newAPR
 	    		        					+"</code>' is not new!</html>",
 	    		        	                "Error",
 	    		        	                JOptionPane.WARNING_MESSAGE,
@@ -665,20 +700,19 @@ public class CompatibilityMatrixForm extends JPanel {
 	    		        	                		"OptionPane.errorIcon"));
 	    		        			return;
 	                			}
-	                			srcAPClasses.add(newAPC);
-								allAPClasses.add(newAPC);
-								allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPC));
+	                			srcAPRules.add(newAPR);
+								allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPR));
 							} catch (DENOPTIMException e1) {
 								continue;
 							}
 	                	}
 	                	else
 	                	{
-	                		srcAPClasses.add((String) srcAPCs.getElementAt(id));
+	                		srcAPRules.add((String) srcAPRs.getElementAt(id));
 	                	}
 	                }
 	                
-	                for (String apc : srcAPClasses)
+	                for (String apc : srcAPRules)
 	                {
 	                	bondOrderMap.put(apc, bo);
 	                }
@@ -821,6 +855,10 @@ public class CompatibilityMatrixForm extends JPanel {
                 }
                 srcAPCs.addElement("<html><b><i>Define a new APClass...<i>"
                 		+ "</b></html>");
+                if (srcClsList.getModel().getSize() == 1)
+                {
+                	srcClsList.setSelectedIndex(0);
+                }
                 
                 DefaultListModel<String> capAPCs =
                         new DefaultListModel<String>();
@@ -831,7 +869,12 @@ public class CompatibilityMatrixForm extends JPanel {
                 }
                 capAPCs.addElement("<html><b><i>Define a new APClass...<i>"
                 		+ "</b></html>");
-                capClsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                capClsList.setSelectionMode(
+                		ListSelectionModel.SINGLE_SELECTION);
+                if (capClsList.getModel().getSize() == 1)
+                {
+                	capClsList.setSelectedIndex(0);
+                }
             
                 JPanel twoListsPanel = new JPanel();
                 JLabel headSrc = new JLabel("APClass of APs to be capped:");
@@ -856,12 +899,18 @@ public class CompatibilityMatrixForm extends JPanel {
                     .addGroup(lyoAddCapRule.createParallelGroup()
                         .addComponent(scrollSrc)
                     	.addComponent(scrollCap)));
-
-                JOptionPane.showMessageDialog(
-                        null,
-                        twoListsPanel,
-                        "Choose combination of source and capping APClasses",
-                        JOptionPane.PLAIN_MESSAGE);
+                
+                int res = JOptionPane.showConfirmDialog(btnAddCapping,
+                		twoListsPanel, 
+    					"Choose APClasses", 
+    					JOptionPane.OK_CANCEL_OPTION,
+    					JOptionPane.PLAIN_MESSAGE, 
+    					null);
+    			
+    			if (res != JOptionPane.OK_OPTION)
+    			{
+    				return;
+    			}
                 
                 if (capClsList.getSelectedIndices().length > 0
                 		&& srcClsList.getSelectedIndices().length > 0)
@@ -1064,14 +1113,25 @@ public class CompatibilityMatrixForm extends JPanel {
     					claLstModel.addElement(apc);
     				}
     			}
-    			claLstModel.addElement("<html><b><i>Define a new APClass...<i>"
+    			claLstModel.addElement("<html><b><i>Define a new APClass..."
+    					+ "          <i>"
                 		+ "</b></html>");
+    			if (clsList.getModel().getSize() == 1)
+                {
+    				clsList.setSelectedIndex(0);
+                }
     			
-    			JOptionPane.showMessageDialog(
-    					null, 
+    			int res = JOptionPane.showConfirmDialog(btnAddFrbEnd,
     					new JScrollPane(clsList), 
-    					"Choose attachment point classes:",
-    					JOptionPane.PLAIN_MESSAGE);
+    					"Choose APClasses", 
+    					JOptionPane.OK_CANCEL_OPTION,
+    					JOptionPane.PLAIN_MESSAGE, 
+    					null);
+    			
+    			if (res != JOptionPane.OK_OPTION)
+    			{
+    				return;
+    			}
 
     			for (Integer id : clsList.getSelectedIndices())
     			{

@@ -89,7 +89,6 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 	private CompatibilityMatrixForm cpMapHandler;
 	
 
-	
 //-----------------------------------------------------------------------------
 	
 	/**
