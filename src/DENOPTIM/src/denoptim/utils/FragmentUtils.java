@@ -141,7 +141,7 @@ public class FragmentUtils
     { 
 
 //TODO: need to update in relation with DENOPTIMFragment class methods
-
+    	
         String apProperty = mol.getProperty(DENOPTIMConstants.APTAG).toString();
         String[] tmpArr = apProperty.split("\\s+");
 

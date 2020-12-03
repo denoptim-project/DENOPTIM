@@ -119,6 +119,7 @@ public abstract class FitnessTask extends Task
         result.setMoleculeFile(fitProvOutFile);
         if (fitProvMol == null)
     	{
+        	// Just in case we do not have any molecular representation already
     	    try {
 				fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
 						true);

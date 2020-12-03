@@ -188,7 +188,7 @@ public class DENOPTIMMoleculeUtils
                 IAtom newAtm = new Atom("H",new Point3d(a.getPoint3d()));
                 newAtm.setProperties(a.getProperties());
 
-		AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
+                AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
             }
         }
     }
@@ -265,7 +265,7 @@ public class DENOPTIMMoleculeUtils
 		}
 
         // convert remaining PseudoAtoms to H
-	removeRCA(mol);
+		removeRCA(mol);
     }
 
 //------------------------------------------------------------------------------

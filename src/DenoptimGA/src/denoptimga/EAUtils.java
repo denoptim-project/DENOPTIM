@@ -1048,12 +1048,13 @@ public class EAUtils
 
     /**
      * Add a capping group fragment to the vertex at the specified
-     * attachment point index
+     * attachment point index.
      * @param molGraph
      * @param curVertex
      * @param dapIdx
      * @return id of the vertex added; -1 if capping is not required
-     * found
+     * @throws DENOPTIMException when capping is required but not found, or 
+     * when we could not attach the capping group for whatever reason.
      */
 
     protected static int attachCappingFragmentAtPosition
@@ -1075,7 +1076,7 @@ public class EAUtils
             {
                 // for the current capping fragment get the list of APs
                 ArrayList<DENOPTIMAttachmentPoint> fragAP = 
-                                                                                 FragmentUtils.getAPForFragment(fid, 2);
+                		FragmentUtils.getAPForFragment(fid, 2);
 
                 DENOPTIMVertex fragVertex =
                            new DENOPTIMVertex(GraphUtils.getUniqueVertexIndex(),
@@ -1090,7 +1091,7 @@ public class EAUtils
                 int dap = apIdx.get(0);
 
                 DENOPTIMEdge edge = GraphUtils.connectVertices(
-                                                       curVertex, fragVertex, dapIdx, dap, rcn, rcnCap);
+                		curVertex, fragVertex, dapIdx, dap, rcn, rcnCap);
                 if (edge != null)
                 {
                     // add the fragment as a vertex
