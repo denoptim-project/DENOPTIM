@@ -371,10 +371,12 @@ public class GraphConversionTool
                 BondType btype = BondType.parseStr(s4[4]);
 
                 /* Find source and target attachment points of edge */
-                DENOPTIMAttachmentPoint srcAP =
-                        new DENOPTIMAttachmentPoint(new EmptyVertex());
-                DENOPTIMAttachmentPoint trgAP =
-                        new DENOPTIMAttachmentPoint(new EmptyVertex());
+                DENOPTIMVertex dummy = new EmptyVertex();
+                dummy.addAP();
+                dummy.addAP();
+                DENOPTIMAttachmentPoint srcAP = dummy.getAP(0);
+                DENOPTIMAttachmentPoint trgAP = dummy.getAP(1);
+
                 try {
                     for (int j = 0, apsFound = 0; apsFound < 2; j++) {
                         DENOPTIMVertex vertex = vertices.get(j);
@@ -484,20 +486,18 @@ public class GraphConversionTool
 				{
 				    while (lstAPsrc.size() <= (iA+1))
 				    {
-				        lstAPsrc.add(new DENOPTIMAttachmentPoint(src));
+				        src.addAP();
 				    }
 				}
-				src.setAttachmentPoints(lstAPsrc);
 		        ArrayList<DENOPTIMAttachmentPoint> lstAPtrg =
 		        		trg.getAttachmentPoints();
                 if (lstAPtrg.size() <= iB)
                 {
                     while (lstAPtrg.size() <= (iB+1))
                     {
-                        lstAPtrg.add(new DENOPTIMAttachmentPoint(trg));
+                        trg.addAP();
                     }
                 }
-                trg.setAttachmentPoints(lstAPtrg);
             }
 		
             DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);

@@ -203,11 +203,11 @@ public class DENOPTIMGraphEdit {
             DENOPTIMVertex srcVertex = new EmptyVertex(srcVertexId);
             // Have to fill source and target vertex with enough APs
             for (int i = 0; i <= srcAPId; i++) {
-                srcVertex.addAP(new DENOPTIMAttachmentPoint(srcVertex));
+                srcVertex.addAP();
             }
             DENOPTIMVertex trgVertex = new EmptyVertex(trgVertexId);
             for (int i = 0; i <= trgAPId; i++) {
-                trgVertex.addAP(new DENOPTIMAttachmentPoint(trgVertex));
+                trgVertex.addAP();
             }
 		    this.focusEdge = new DENOPTIMEdge(srcVertex.getAP(srcAPId),
                     trgVertex.getAP(trgAPId), srcVertexId, trgVertexId,
