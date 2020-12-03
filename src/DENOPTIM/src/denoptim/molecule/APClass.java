@@ -334,8 +334,7 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
         APClass c = (APClass) o;
         return this.rule.equals(c.rule) && this.subClass == c.subClass;
     }
-    
-    
+
 //------------------------------------------------------------------------------
     
 }

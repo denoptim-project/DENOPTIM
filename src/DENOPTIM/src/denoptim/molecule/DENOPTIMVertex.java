@@ -776,8 +776,20 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, double[] dirVec) {
-        addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
-                new APClass());
+        try {
+            addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
+                    APClass.make(""));
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    public void addAP(int atomPositionNumber, int atomConnections,
+                      int apConnections, APClass apClass) {
+        addAP(atomPositionNumber, atomConnections, apConnections,
+                new double[3], apClass);
     }
 
 //------------------------------------------------------------------------------

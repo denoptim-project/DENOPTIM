@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
  * Each attachment point is annotated by the number (position) of the atom
@@ -56,7 +55,7 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * The index of the source atom in the atom list of the fragment (0-based)
      */
-    private int atomPostionNumber;
+    private int atomPositionNumber;
     
     /**
      * the original number of connections of this atom
@@ -69,7 +68,7 @@ Comparable<DENOPTIMAttachmentPoint>
     private int freeConnections; 
     
     /**
-     * The attachment point clss
+     * The attachment point class
      */
     private APClass apClass;
     
@@ -93,7 +92,7 @@ Comparable<DENOPTIMAttachmentPoint>
     @Deprecated
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) {
         this.owner = owner;
-        atomPostionNumber = 0;
+        atomPositionNumber = 0;
         totalConnections = 0;
         freeConnections = 0;
         id = FragmentSpace.apID.getAndIncrement();
@@ -112,7 +111,7 @@ Comparable<DENOPTIMAttachmentPoint>
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
                                    int atomConnections,int apConnections) {
         this(owner);
-        atomPostionNumber = atomPositionNumber;
+        this.atomPositionNumber = atomPositionNumber;
         totalConnections = atomConnections;
         freeConnections = apConnections;
     }
@@ -241,7 +240,7 @@ Comparable<DENOPTIMAttachmentPoint>
             switch (parts[0])
             {
                 case "atomPostionNumber":
-                    this.atomPostionNumber = Integer.parseInt(parts[1]);
+                    this.atomPositionNumber = Integer.parseInt(parts[1]);
                     break;
                     
                 case "totalConnections":
@@ -300,7 +299,7 @@ Comparable<DENOPTIMAttachmentPoint>
                     Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPAAP));
             
             //WARNING here we convert from 1-based to 0-based index
-            this.atomPostionNumber = Integer.parseInt(parts[0])-1;
+            this.atomPositionNumber = Integer.parseInt(parts[0])-1;
 
             String[] details = parts[1].split(
                     Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
@@ -392,7 +391,7 @@ Comparable<DENOPTIMAttachmentPoint>
      */
     public int getAtomPositionNumber()
     {
-        return atomPostionNumber;
+        return atomPositionNumber;
     }
 
 //------------------------------------------------------------------------------
@@ -404,7 +403,7 @@ Comparable<DENOPTIMAttachmentPoint>
      */
     public void setAtomPositionNumber(int m_atomPostionNumber)
     {
-        atomPostionNumber = m_atomPostionNumber;
+        atomPositionNumber = m_atomPostionNumber;
     }
 
 //------------------------------------------------------------------------------
@@ -442,12 +441,12 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Set the Attachment Point class. The APClass is the combination of a main
      * class (or "rule") and a subclass (or direction).  
-     * @param m_class the new APClass.
+     * @param apClass the new APClass.
      */
     
-    public void setAPClass(String m_class) throws DENOPTIMException
+    public void setAPClass(String apClass) throws DENOPTIMException
     {
-        apClass = APClass.make(m_class);
+        this.apClass = APClass.make(apClass);
     }
     
 //------------------------------------------------------------------------------
@@ -712,14 +711,14 @@ Comparable<DENOPTIMAttachmentPoint>
             {
                 return new DENOPTIMAttachmentPoint(
                         getOwner(),
-                        atomPostionNumber,
+                        atomPositionNumber,
                         totalConnections,
                         freeConnections
                 );
             } else {
                 return new DENOPTIMAttachmentPoint(
                         getOwner(),
-                        atomPostionNumber,
+                        atomPositionNumber,
                         totalConnections,
                         freeConnections,
                         dirVec
@@ -729,7 +728,7 @@ Comparable<DENOPTIMAttachmentPoint>
             DENOPTIMAttachmentPoint c = null;
             c = new DENOPTIMAttachmentPoint(
                     getOwner(),
-                    atomPostionNumber,
+                    atomPositionNumber,
                     totalConnections,
                     freeConnections,
                     dirVec,
@@ -756,7 +755,7 @@ Comparable<DENOPTIMAttachmentPoint>
         if (isFirst)
         {
             //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
-            sb.append(atomPostionNumber+1);
+            sb.append(atomPositionNumber +1);
             sb.append(DENOPTIMConstants.SEPARATORAPPROPAAP);
         }
         sb.append(apClass);
@@ -785,7 +784,7 @@ Comparable<DENOPTIMAttachmentPoint>
     public String toString()
     {
         Map<String,Object> pars = new HashMap<String,Object>();
-        pars.put("atomPositionNumber",atomPostionNumber);
+        pars.put("atomPositionNumber", atomPositionNumber);
         pars.put("totalConnections",totalConnections);
         pars.put("freeConnections",freeConnections);
         if (apClass != null)
