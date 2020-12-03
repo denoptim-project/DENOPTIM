@@ -493,6 +493,7 @@ public class TreeBuilder3D
         	// Should we replace it with a capping group?
         	String cappingAPClass = FragmentSpace.getCappingClass(
         			edge.getSourceReaction());
+
         	if (cappingAPClass != null)
         	{
         		int capId = FragmentSpace.getCappingGroupsWithAPClass(

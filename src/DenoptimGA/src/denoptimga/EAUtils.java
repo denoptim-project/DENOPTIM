@@ -1201,7 +1201,8 @@ public class EAUtils
 
     /**
      * Evaluates the possibility of closing rings in a given graph and if
-     * any ring can be closed choses one of the combinations of ring closures
+     * any ring can be closed, it chooses one of the combinations of ring 
+     * closures
      * that involves the highest number of new rings.
      * @param res an object array containing the inchi code, the smiles string
      * and the 2D representation of the molecule. This object can be
@@ -1232,7 +1233,7 @@ public class EAUtils
                                   FragmentSpaceParameters.getRotSpaceDefFile(),
                                                                    true, true);
         
-                // get the set of possible RCA combinations = ring closures
+        // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler(
                                       FragmentSpace.getScaffoldLibrary(),
                                       FragmentSpace.getFragmentLibrary(),
@@ -1311,11 +1312,11 @@ public class EAUtils
             }
         }
 
-                // Update the IAtomContainer representation
-                DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
+        // Update the IAtomContainer representation
+        DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
         res[2] = mol;
 
-                // Update the SMILES representation
+        // Update the SMILES representation
         String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
         if (molsmiles == null)
         {
@@ -1326,7 +1327,7 @@ public class EAUtils
         }
                 res[1] = molsmiles;
 
-                // Update the INCHI key representation
+         // Update the INCHI key representation
         ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
         if (pr.getFirst() == null)
         {
@@ -1334,7 +1335,7 @@ public class EAUtils
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             pr.setFirst("UNDEFINED");
         }
-                res[0] = pr.getFirst();
+        res[0] = pr.getFirst();
 
         if (DEBUG)
         {

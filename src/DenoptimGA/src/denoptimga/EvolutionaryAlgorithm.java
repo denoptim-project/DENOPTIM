@@ -35,6 +35,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
 import denoptim.utils.GenUtils;
@@ -402,6 +403,20 @@ public class EvolutionaryAlgorithm
                             res = null;
                         }
                     }
+                    
+                    
+                    // Check if the chosen combination gives rise to forbidden ends
+                    //TODO-V3 this should be considered already when making the list of
+                    // possible combination of rings
+                    for (DENOPTIMVertex rcv : graph4.getFreeRCVertices())
+                    {
+                    	String apc = graph4.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
+                    	if (FragmentSpace.getCappingClass(apc)==null 
+                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                    	{
+                    		res = null;
+                    	}
+                    }
 
 //TODO: to test more thoroughly
 /*
@@ -457,6 +472,19 @@ public class EvolutionaryAlgorithm
                             res1 = null;
                         }
                     }
+                    
+                     // Check if the chosen combination gives rise to forbidden ends
+                    //TODO-V3 this should be considered already when making the list of
+                    // possible combination of rings
+                    for (DENOPTIMVertex rcv : graph1.getFreeRCVertices())
+                    {
+                    	String apc = graph1.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
+                    	if (FragmentSpace.getCappingClass(apc)==null 
+                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                    	{
+                    		res1 = null;
+                    	}
+                    }
 
 //TODO: to test more thoroughly
 /*
@@ -509,6 +537,18 @@ public class EvolutionaryAlgorithm
                         }
                     }
 
+                    // Check if the choosen combination gives rise to forbidden ends
+                    //TODO-V3 this should be considered already when making the list of
+                    // possible combination of rings
+                    for (DENOPTIMVertex rcv : graph2.getFreeRCVertices())
+                    {
+                    	String apc = graph2.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
+                    	if (FragmentSpace.getCappingClass(apc)==null 
+                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                    	{
+                    		res2 = null;
+                    	}
+                    }
 
 //TODO: to test more thoroughly
 /*
@@ -566,6 +606,18 @@ public class EvolutionaryAlgorithm
                         }
                     }
 
+                    // Check if the chosen combination gives rise to forbidden ends
+                    //TODO-V3 this should be considered already when making the list of
+                    // possible combination of rings
+                    for (DENOPTIMVertex rcv : graph3.getFreeRCVertices())
+                    {
+                    	String apc = graph3.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
+                    	if (FragmentSpace.getCappingClass(apc)==null 
+                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                    	{
+                    		res3 = null;
+                    	}
+                    }
 
 //TODO: to test more thoroughly
 /*
@@ -762,6 +814,19 @@ public class EvolutionaryAlgorithm
                 {
                     res = null;
                 }
+            }
+            
+            // Check if the chosen combination gives rise to forbidden ends
+            //TODO-V3 this should be considered already when making the list of
+            // possible combination of rings
+            for (DENOPTIMVertex rcv : molGraph.getFreeRCVertices())
+            {
+            	String apc = molGraph.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
+            	if (FragmentSpace.getCappingClass(apc)==null 
+            			&& FragmentSpace.getForbiddenEndList().contains(apc))
+            	{
+            		res = null;
+            	}
             }
 
 //TODO: to test more thoroughly and combine with more efficient storage of 
