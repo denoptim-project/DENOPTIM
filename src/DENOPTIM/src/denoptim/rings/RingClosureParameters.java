@@ -846,7 +846,7 @@ public class RingClosureParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-	RingClosuresArchive rcl = new RingClosuresArchive(rccIndex);
+    	RingClosuresArchive rcl = new RingClosuresArchive(rccIndex);
     }
 
 //----------------------------------------------------------------------------

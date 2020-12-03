@@ -188,7 +188,7 @@ public class DENOPTIMMoleculeUtils
                 IAtom newAtm = new Atom("H",new Point3d(a.getPoint3d()));
                 newAtm.setProperties(a.getProperties());
 
-		AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
+                AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
             }
         }
     }
@@ -265,7 +265,7 @@ public class DENOPTIMMoleculeUtils
 		}
 
         // convert remaining PseudoAtoms to H
-	removeRCA(mol);
+		removeRCA(mol);
     }
 
 //------------------------------------------------------------------------------
@@ -318,9 +318,14 @@ public class DENOPTIMMoleculeUtils
         }
         catch (Throwable t)
         {
-//TODO del or make systematic
-	    DenoptimIO.writeMolecule("moldeule_causing_failure.sdf",fmol,false);
-            throw new DENOPTIMException(t);
+        	String fileName = System.getProperty("user.dir") 
+        		+ System.getProperty("file.separator") 
+        		+ "moldeule_causing_failure.sdf";
+        	System.out.println("WARNING: Skipping calculation of SMILES. See "
+        			+ "file '" + fileName + "'");
+        	DenoptimIO.writeMolecule(fileName,fmol,false);
+        	smiles = "calculation_or_SMILES_crashed";
+            //throw new DENOPTIMException(t);
         }
         return smiles;
     }

@@ -391,14 +391,16 @@ public class GraphBuildingTask extends FitnessTask
                         	if (FitnessParameters.make3dTree())
                         	{
 	                        	try {
-	                                mol = tb3d.convertGraphTo3DAtomContainer(g);
+	                                mol = tb3d.convertGraphTo3DAtomContainer(g,true);
 	                        	} catch (Throwable t) {
 	                        		mol = GraphConversionTool
 	                        				.convertGraphToMolecule(g, true);
+	                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
 	                        	}
                         	} else {
                         		mol = GraphConversionTool
                         				.convertGraphToMolecule(g, true);
+                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
                         	}
                             
                             // Level that generated this graph
@@ -407,7 +409,6 @@ public class GraphBuildingTask extends FitnessTask
                             // Parent graph
                             altRes[3] = rootId;
 
-                            DENOPTIMMoleculeUtils.removeRCA(mol,g);
                             altRes[2] = mol;
         
                             // Prepare SMILES
@@ -459,12 +460,12 @@ public class GraphBuildingTask extends FitnessTask
                 	{
                 		IAtomContainer mol;
                     	try {
-                            mol = tb3d.convertGraphTo3DAtomContainer(dGraph);
+                            mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
                     	} catch (Throwable t) {
                     		mol = GraphConversionTool
                     				.convertGraphToMolecule(dGraph, true);
+                        	DENOPTIMMoleculeUtils.removeRCA(mol,dGraph);
                     	}
-                    	DENOPTIMMoleculeUtils.removeRCA(mol,dGraph);
                         res[2] = mol;
                 	}
                    
