@@ -53,23 +53,19 @@ public class DENOPTIMVertexTest
 //------------------------------------------------------------------------------
 	
     @Test
-    public void testSameAs_Equal() throws Exception
+    public void testSameAs_Equal()
     {
-    	ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
         DENOPTIMVertex vA = new EmptyVertex(0);
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 0, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 1, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 2, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 3, 1, 1));
-        vA.setAttachmentPoints(apsA);
+        vA.addAP(0, 1, 1);
+        vA.addAP(1, 1, 1);
+        vA.addAP(2, 1, 1);
+        vA.addAP(3, 1, 1);
 
-    	ArrayList<DENOPTIMAttachmentPoint> apsB = new ArrayList<>();
         DENOPTIMVertex vB = new EmptyVertex(90);
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 0, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 1, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 2, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 3, 1, 1));
-        vB.setAttachmentPoints(apsB);
+        vB.addAP(0, 1, 1);
+        vB.addAP(1, 1, 1);
+        vB.addAP(2, 1, 1);
+        vB.addAP(3, 1, 1);
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertTrue(vA.sameAs(vB, reason));	
@@ -78,23 +74,19 @@ public class DENOPTIMVertexTest
 //------------------------------------------------------------------------------
 	
     @Test
-    public void testSameAs_DiffAPConnection() throws Exception
+    public void testSameAs_DiffAPConnection()
     {
-    	ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
         DENOPTIMVertex vA = new EmptyVertex(0);
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 0, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 1, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 2, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 3, 1, 1));
-        vA.setAttachmentPoints(apsA);
+        vA.addAP(0, 1, 1);
+        vA.addAP(1, 1, 1);
+        vA.addAP(2, 1, 1);
+        vA.addAP(3, 1, 1);
 
-    	ArrayList<DENOPTIMAttachmentPoint> apsB = new ArrayList<>();
         DENOPTIMVertex vB = new EmptyVertex(90);
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 0, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 1, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 2, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 3, 1, 2)); //diff
-        vB.setAttachmentPoints(apsB);
+        vB.addAP(0, 1, 1);
+        vB.addAP(1, 1, 1);
+        vB.addAP(2, 1, 1);
+        vB.addAP(3, 1, 2); //dif
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertFalse(vA.sameAs(vB, reason));	
@@ -103,22 +95,18 @@ public class DENOPTIMVertexTest
 //------------------------------------------------------------------------------
 	
     @Test
-    public void testSameAs_DiffAPNum() throws Exception
+    public void testSameAs_DiffAPNum()
     {
-    	ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
-        DENOPTIMVertex vA = new EmptyVertex(0, apsA);
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 0, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 1, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 2, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(vA, 3, 1, 1));
-        vA.setAttachmentPoints(apsA);
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        vA.addAP(0, 1, 1);
+        vA.addAP(1, 1, 1);
+        vA.addAP(2, 1, 1);
+        vA.addAP(3, 1, 1);
 
-    	ArrayList<DENOPTIMAttachmentPoint> apsB = new ArrayList<>();
         DENOPTIMVertex vB = new EmptyVertex(90);
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 0, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 1, 1, 1));
-        apsB.add(new DENOPTIMAttachmentPoint(vB, 2, 1, 1));
-        vB.setAttachmentPoints(apsB);
+        vB.addAP(0, 1, 1);
+        vB.addAP(1, 1, 1);
+        vB.addAP(2, 1, 1);
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertFalse(vA.sameAs(vB, reason));	
@@ -132,16 +120,14 @@ public class DENOPTIMVertexTest
         // This is just to avoid the warnings about trying to get a bond type
         // when the fragment space in not defined
         String APRULE = "apc";
-        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        HashMap<String, BondType> map = new HashMap<>();
         map.put(APRULE,BondType.DOUBLE);
         FragmentSpace.setBondOrderMap(map);
 
-        ArrayList<DENOPTIMAttachmentPoint> apsA = new ArrayList<>();
         DENOPTIMVertex v = new EmptyVertex(0);
-        apsA.add(new DENOPTIMAttachmentPoint(v, 1, 1, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(v, 2, 2, 1));
-        apsA.add(new DENOPTIMAttachmentPoint(v, 3, 2, 1));
-        v.setAttachmentPoints(apsA);
+        v.addAP(1, 1, 1);
+        v.addAP(2, 2, 1);
+        v.addAP(3, 2, 1);
         v.setLevel(26);
         
         DENOPTIMVertex c = v.clone();

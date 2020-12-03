@@ -137,30 +137,6 @@ Comparable<DENOPTIMAttachmentPoint>
     }
     
 //------------------------------------------------------------------------------
-  
-    /**
-     * Constructor
-     * @param atomPosNum the index of the source atom (0-based).
-     * @param atomConnections the total number of connections.
-     * @param apConnections the number of free connections.
-     * @param dirVec the AP direction vector end (the beginning at the coords
-     *               of the source atom). This must array have 3 entries.
-     * @param apRule the first part of the APClass.
-     * @param apSubClass the second part of the APClass.
-     * @throws DENOPTIMException
-     * @deprecated Use DENOPTIMVertex.addAP(...) instead
-     */
-    @Deprecated
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
-                                   int atomConnections, int apConnections,
-                                   double[] dirVec, String apRule,
-                                   int apSubClass) 
-                                           throws DENOPTIMException {
-        this(owner, atomPosNum, atomConnections, apConnections, dirVec);
-        this.apClass = APClass.make(apRule,apSubClass);
-    }
-    
-//------------------------------------------------------------------------------
     
     /**
      * Constructor

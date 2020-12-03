@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -36,9 +37,18 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 
 public class DENOPTIMEdgeTest {
 	private StringBuilder reason = new StringBuilder();
-	private final DENOPTIMAttachmentPoint dummyAp =
-			new DENOPTIMAttachmentPoint(new EmptyVertex());
+	private DENOPTIMAttachmentPoint dummyAp;
 	private final String APCSEP = DENOPTIMConstants.SEPARATORAPPROPSCL;
+
+//------------------------------------------------------------------------------
+
+	@BeforeEach
+	public void setUp() {
+		DENOPTIMVertex dummyVertex = new EmptyVertex();
+		dummyVertex.addAP();
+		dummyAp = dummyVertex.getAP(0);
+	}
+
 
 //------------------------------------------------------------------------------
 
