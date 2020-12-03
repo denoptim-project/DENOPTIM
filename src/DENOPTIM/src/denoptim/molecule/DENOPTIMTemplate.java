@@ -157,12 +157,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
         DENOPTIMVertex vrtx = new EmptyVertex(0);
-        vrtx.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx,0,1,1));
-        vrtx.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx,1,1,1));
+        vrtx.addAP(0,1,1);
+        vrtx.addAP(1,1,1);
 
         DENOPTIMVertex vrtx2 = new EmptyVertex(1);
-        vrtx2.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx2,0,1,1));
-        vrtx2.addAttachmentPoint(new DENOPTIMAttachmentPoint(vrtx2,1,1,1));
+        vrtx2.addAP(0,1,1);
+        vrtx2.addAP(1,1,1);
 
         template.interiorGraph.addVertex(vrtx);
         template.interiorGraph.addVertex(vrtx2);

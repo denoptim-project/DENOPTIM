@@ -47,7 +47,8 @@ public class DENOPTIMTemplateTest
     //@BeforeAll
     public static void SetUpClass() {
         EmptyVertex dummyVertex = new EmptyVertex();
-        testAP = new DENOPTIMAttachmentPoint(dummyVertex, 0, 1, 1);
+        dummyVertex.addAP(0, 1, 1);
+        testAP = dummyVertex.getAP(0);
     }
 	
 //------------------------------------------------------------------------------

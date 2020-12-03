@@ -260,11 +260,9 @@ public class DENOPTIMGraphEdit {
                 fconn = Integer.parseInt(strPrts[2]);
             }
 
-            // TODO(Discuss with Marco if ok using dummyVertex)
             EmptyVertex dummyVertex = new EmptyVertex();
-            DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(
-                    dummyVertex, apid, conn, fconn
-            );
+            dummyVertex.addAP(apid, conn, fconn);
+            DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
             if (strPrts.length > 3) {
                 // AP class
                 String apClass = "*";

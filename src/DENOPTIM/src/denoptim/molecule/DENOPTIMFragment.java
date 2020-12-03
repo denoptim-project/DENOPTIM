@@ -449,25 +449,16 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             throws DENOPTIMException
     {
         int atmId = mol.getAtomNumber(srcAtm);
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, atmId,
-                valence, valence, new double[] {vector.x, vector.y, vector.z},
-                apc);
-        
-        //This adds the AP to the list of the superclass
-        addAttachmentPoint(ap);
-        
-        ArrayList<DENOPTIMAttachmentPoint> apList;
-        if (getAPCountOnAtom(srcAtm) > 0)
-        {
+        this.addAP(atmId, valence, valence,
+                new double[] {vector.x, vector.y, vector.z}, apc);
+        ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();
+        DENOPTIMAttachmentPoint ap = aps.get(aps.size() - 1);
+
+        ArrayList<DENOPTIMAttachmentPoint> apList = new ArrayList<>();
+        if (getAPCountOnAtom(srcAtm) > 0) {
             apList = getAPListFromAtom(srcAtm);
-            apList.add(ap);
         }
-        else
-        {
-            apList = new ArrayList<>();
-            apList.add(ap);
-        }
-        
+        apList.add(ap);
         srcAtm.setProperty(DENOPTIMConstants.APTAG, apList);
         
         updateSymmetryRelations();

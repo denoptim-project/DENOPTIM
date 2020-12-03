@@ -43,7 +43,7 @@ public class DENOPTIMEdgeTest {
 //------------------------------------------------------------------------------
 
 	@BeforeEach
-	public void setUp() {
+	public void setUpClass() {
 		DENOPTIMVertex dummyVertex = new EmptyVertex();
 		dummyVertex.addAP();
 		dummyAp = dummyVertex.getAP(0);
