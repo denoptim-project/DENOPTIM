@@ -22,8 +22,6 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -80,7 +78,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * List of mutations that we can perform on this vertex
      */
-    private Set<MutationType> allowedMutatioTypes = new HashSet<MutationType>(
+    private Set<MutationType> allowedMutationTypes = new HashSet<MutationType>(
             Arrays.asList(MutationType.values()));
 
 //------------------------------------------------------------------------------
@@ -722,21 +720,21 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     public void setMutationTypes(Set<MutationType> set)
     {
-        allowedMutatioTypes = set;
+        allowedMutationTypes = set;
     }
     
 //------------------------------------------------------------------------------
 
     public void addMutationType(MutationType mt)
     {
-        allowedMutatioTypes.add(mt);
+        allowedMutationTypes.add(mt);
     }
     
 //------------------------------------------------------------------------------
 
     public Set<MutationType> getMutationTypes()
     {
-        return allowedMutatioTypes;
+        return allowedMutationTypes;
     }
     
 //------------------------------------------------------------------------------
@@ -758,5 +756,37 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     public void addAP(DENOPTIMAttachmentPoint ap) {
         getAttachmentPoints().add(ap);
+    }
+
+//------------------------------------------------------------------------------
+
+    public void addAP() {
+        addAP(0, 0, 0);
+    }
+
+//------------------------------------------------------------------------------
+
+    public void addAP(int atomPositionNumber, int atomConnections,
+                      int apConnections) {
+        addAP(atomPositionNumber, atomConnections, apConnections,
+                new double[3]);
+    }
+
+//------------------------------------------------------------------------------
+
+    public void addAP(int atomPositionNumber, int atomConnections,
+                      int apConnections, double[] dirVec) {
+        addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
+                new APClass());
+    }
+
+//------------------------------------------------------------------------------
+
+    public void addAP(int atomPositionNumber, int atomConnections,
+                      int apConnections, double[] dirVec, APClass apClass) {
+
+        addAP(new DENOPTIMAttachmentPoint(this,
+                atomPositionNumber, atomConnections, apConnections, dirVec,
+                apClass));
     }
 }
