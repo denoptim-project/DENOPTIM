@@ -325,9 +325,14 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     }
     
 //------------------------------------------------------------------------------
-    
-    public boolean equals(APClass o) {
-        return this.rule.equals(o.rule) && this.subClass == o.subClass;
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof APClass)) {
+            return false;
+        }
+        APClass c = (APClass) o;
+        return this.rule.equals(c.rule) && this.subClass == c.subClass;
     }
     
     
