@@ -186,18 +186,13 @@ public class DenoptimIOTest {
 
 //------------------------------------------------------------------------------
 
-	private void buildVertexAndConnectToGraph(
-			DENOPTIMVertex v, int apCount, DENOPTIMGraph graph) {
+	private void buildVertexAndConnectToGraph(DENOPTIMVertex v, int apCount,
+											  DENOPTIMGraph graph) {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
-		ArrayList<DENOPTIMAttachmentPoint> aps = new ArrayList<>();
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			aps.add(new DENOPTIMAttachmentPoint(v, atomPos, ATOM_CONNS,
-					AP_CONNS));
+			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
 		}
-		v.setAttachmentPoints(aps);
 		graph.addVertex(v);
-//		graph.addEdge(new DENOPTIMEdge(0, 1, 0, 0));
 	}
-
 }
