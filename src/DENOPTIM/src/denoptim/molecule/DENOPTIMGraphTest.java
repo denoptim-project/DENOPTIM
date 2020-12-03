@@ -145,7 +145,7 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_Equal() throws Exception {
+	public void testSameAs_Equal() {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graphA);
@@ -185,7 +185,7 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_DiffVertex() throws Exception {
+	public void testSameAs_DiffVertex() {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graphA);
@@ -373,7 +373,7 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_SameRings() throws Exception {
+	public void testSameAs_SameRings() {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
@@ -456,7 +456,7 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_DisorderRings() throws Exception {
+	public void testSameAs_DisorderRings() {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
@@ -539,7 +539,7 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_DiffRings() throws Exception {
+	public void testSameAs_DiffRings() {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
@@ -622,15 +622,11 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testGetAvailableAPs_returnsListOfAvailableAPs() {
 		DENOPTIMVertex vertex0 = new EmptyVertex(0);
-		DENOPTIMAttachmentPoint ap0 = new DENOPTIMAttachmentPoint(vertex0, 0, 1,
-				1);
-		DENOPTIMAttachmentPoint ap1 = new DENOPTIMAttachmentPoint(vertex0, 0, 1,
-				1);
-
-		vertex0.setAttachmentPoints(new ArrayList<>(Arrays.asList(ap0, ap1)));
+		vertex0.addAP(0, 1, 1);
+		vertex0.addAP(0, 1, 1);
 
 		DENOPTIMVertex vertex1 = new EmptyVertex(1);
-		vertex1.setAttachmentPoints(new ArrayList<>(Arrays.asList(ap0)));
+		vertex1.addAP(0, 1, 1);
 
 		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getAP(0),
 				vertex1.getAP(0), vertex0.getVertexId(),
@@ -713,7 +709,7 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testGetMutationSites() throws Exception {
+	public void testGetMutationSites() {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 		DENOPTIMTemplate tmpl = DENOPTIMTemplate.getTestTemplate(2);
 		graph.addVertex(tmpl);
@@ -738,24 +734,24 @@ public class DENOPTIMGraphTest {
 		IAtomContainer iac1 = new AtomContainer();
 		iac1.addAtom(new Atom("C"));
 		DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
-		v1.addAttachmentPoint(new DENOPTIMAttachmentPoint(v1, 0, 1, 1));
-		v1.addAttachmentPoint(new DENOPTIMAttachmentPoint(v1, 0, 1, 1));
+		v1.addAP(1, 1, 1);
+		v1.addAP(1, 1, 1);
 
 		IAtomContainer iac2 = new AtomContainer();
 		iac2.addAtom(new Atom("O"));
 		DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
-		v2.addAttachmentPoint(new DENOPTIMAttachmentPoint(v2, 0, 1, 1));
-		v2.addAttachmentPoint(new DENOPTIMAttachmentPoint(v2, 0, 1, 1));
+		v2.addAP(1, 1, 1);
+		v2.addAP(1, 1, 1);
 
 		IAtomContainer iac3 = new AtomContainer();
 		iac3.addAtom(new Atom("H"));
 		DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
-		v3.addAttachmentPoint(new DENOPTIMAttachmentPoint(v3, 0, 1, 1));
+		v3.addAP(1, 1, 1);
 
 		IAtomContainer iac4 = new AtomContainer();
 		iac4.addAtom(new Atom("H"));
 		DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
-		v4.addAttachmentPoint(new DENOPTIMAttachmentPoint(v4, 0, 1, 1));
+		v4.addAP(1, 1, 1);
 
 		graph.addVertex(v1);
 		graph.addVertex(v2);
@@ -784,24 +780,24 @@ public class DENOPTIMGraphTest {
 		IAtomContainer iac12 = new AtomContainer();
 		iac12.addAtom(new Atom("C"));
 		DENOPTIMVertex v21 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
-		v21.addAttachmentPoint(new DENOPTIMAttachmentPoint(v21, 0, 1, 1));
-		v21.addAttachmentPoint(new DENOPTIMAttachmentPoint(v21, 0, 1, 1));
+		v21.addAP(0, 1, 1);
+		v21.addAP(0, 1, 1);
 
 		IAtomContainer iac22 = new AtomContainer();
 		iac22.addAtom(new Atom("O"));
 		DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
-		v22.addAttachmentPoint(new DENOPTIMAttachmentPoint(v22, 0, 1, 1));
-		v22.addAttachmentPoint(new DENOPTIMAttachmentPoint(v22, 0, 1, 1));
+		v22.addAP(0, 1, 1);
+		v22.addAP(0, 1, 1);
 
 		IAtomContainer iac23 = new AtomContainer();
 		iac23.addAtom(new Atom("H"));
 		DENOPTIMVertex v23 = new DENOPTIMFragment(23, iac23, BBType.CAP);
-		v23.addAttachmentPoint(new DENOPTIMAttachmentPoint(v23, 0, 1, 1));
+		v23.addAP(0, 1, 1);
 
 		IAtomContainer iac24 = new AtomContainer();
 		iac24.addAtom(new Atom("H"));
 		DENOPTIMVertex v24 = new DENOPTIMFragment(24, iac24, BBType.CAP);
-		v24.addAttachmentPoint(new DENOPTIMAttachmentPoint(v24, 0, 1, 1));
+		v24.addAP(0, 1, 1);
 
 		graph2.addVertex(v21);
 		graph2.addVertex(v22);
