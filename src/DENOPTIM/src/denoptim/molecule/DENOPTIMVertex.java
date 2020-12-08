@@ -383,9 +383,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
     @Override
     public DENOPTIMVertex clone()
-    {        
-        //TODO-M7
-        System.out.println("cloning from Vertex method!!!!!! ");
+    {
         return (DENOPTIMVertex) clone();
     }
     
@@ -807,6 +805,31 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             }
         }
         return -1;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the edge
+     * that has this vertex as the target, i.e., the edge to the parent vertex.
+     * We assume there is only one such edge.
+     * @return the edge to the parent.
+     */
+
+    protected DENOPTIMEdge getEdgeToParent() {
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUser();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getTrgAP())
+            {
+                return user;
+            }
+        }
+        return null;
     }
     
 //------------------------------------------------------------------------------

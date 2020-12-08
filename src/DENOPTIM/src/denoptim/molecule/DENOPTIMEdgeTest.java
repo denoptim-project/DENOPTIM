@@ -91,9 +91,9 @@ public class DENOPTIMEdgeTest {
 	@Test
 	public void testSameAs_Equal() throws Exception {
 	    
-		DENOPTIMEdge eA = new DENOPTIMEdge(dummyApA1, dummyApA2, 0, 1, 0, 0,
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyApA1, dummyApA2,
 				BondType.UNDEFINED);
-		DENOPTIMEdge eB = new DENOPTIMEdge(dummyApA1, dummyApA2, 0, 1, 0, 0,
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyApA1, dummyApA2,
 				BondType.UNDEFINED);
 
 		assertTrue(eA.sameAs(eB, reason));
@@ -103,9 +103,9 @@ public class DENOPTIMEdgeTest {
 
 	@Test
 	public void testSameAs_DiffBndTyp() throws Exception {
-		DENOPTIMEdge eA = new DENOPTIMEdge(dummyApA1, dummyApA2, 0, 1, 0, 0,
+		DENOPTIMEdge eA = new DENOPTIMEdge(dummyApA1, dummyApA2,
 				BondType.SINGLE);
-		DENOPTIMEdge eB = new DENOPTIMEdge(dummyApA1, dummyApA2, 0, 1, 0, 0,
+		DENOPTIMEdge eB = new DENOPTIMEdge(dummyApA1, dummyApA2,
 				BondType.DOUBLE);
 
 		assertFalse(eA.sameAs(eB, reason));

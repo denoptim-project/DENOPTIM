@@ -13,7 +13,7 @@ import denoptim.fragspace.FragmentSpace;
 public class APClass implements Cloneable,Comparable<APClass>,Serializable
 {
     
-    //TODO-M6 remove serializable interface once json serializer has replaces
+    //TODO-V3 remove serializable interface once json serializer has replaces
     // object based serialization.
     
     /**

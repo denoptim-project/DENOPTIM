@@ -28,9 +28,8 @@ import denoptim.fragspace.FragmentSpace;
 
 /**
  * This class represents the edge between two vertices.
- * @author Vishwesh Venkatraman
- * @author Marco Foscato
  */
+
 public class DENOPTIMEdge implements Serializable
 {
     /**
@@ -88,59 +87,7 @@ public class DENOPTIMEdge implements Serializable
         this(srcAP, trgAP, FragmentSpace.getBondOrderForAPClass(
                   srcAP.getAPClass().toString()));
     }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructor for an edge
-     * @param srcAP attachment point at source end
-     * @param trgAP attachment point at target end
-     */
-     //TODO-M7 del
-     @Deprecated
-    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
-                        DENOPTIMAttachmentPoint trgAP, int srcVertex,
-                        int trgVertex, int srcAPID, int trgAPID) {
-        this(srcAP, trgAP, BondType.SINGLE);
-    }
-
-//------------------------------------------------------------------------------
-    //TODO-V3 constructors for edge will change one ap-ownership is sorted out
-    //TODO-V3 remove
-   //TODO-M7 del
-    @Deprecated
-    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
-                        DENOPTIMAttachmentPoint trgAP, int srcVertex,
-                        int trgVertex, int srcAPID, int trgAPID,
-                        BondType bondType)
-    {
-        this(srcAP, trgAP, bondType);
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
-     * Constructor for an edge from all parameters
-     * @param srcVertex vertex ID of the source vertex
-     * @param trgVertex vertex ID of the target vertex
-     * @param srcAPID index of the AP on the source vertex
-     * @param trgAPID index of the AP on the target vertex
-     * @param bondType the bond type
-     * @param srcAPClass the AP class on the source attachment point
-     * @param trgAPClass the AP class on the target attachment point
-     */
-    //TODO-V3 constructors for edge will change one ap-ownership is sorted out
-    //TODO-V3 remove string-based APClass arguments
-  //TODO-M7 del
-    @Deprecated
-    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
-                        DENOPTIMAttachmentPoint trgAP, int srcVertex,
-                        int trgVertex, int srcAPID, int trgAPID,
-                        BondType bondType, String srcAPClass,
-                        String trgAPClass) {
-        this(srcAP, trgAP, bondType);
-    }
-    
+     
 //------------------------------------------------------------------------------
 
     public DENOPTIMAttachmentPoint getSrcAP()

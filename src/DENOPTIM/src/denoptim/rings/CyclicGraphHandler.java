@@ -50,6 +50,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.GenUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
@@ -249,7 +250,7 @@ public class CyclicGraphHandler
                                                             IAtomContainer mol,
                                                         DENOPTIMGraph molGraph)
                                                        throws DENOPTIMException
-    {
+    {   
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                                         new HashMap<ObjectPair,PathSubGraph>();
@@ -277,9 +278,9 @@ public class CyclicGraphHandler
                     }
                     continue;
                 }
-
                 // make the new candidate RCA pair
                 PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
+                
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
 
                 if (!keepRcaPair)
@@ -1310,19 +1311,6 @@ public class CyclicGraphHandler
                                                       throws DENOPTIMException
     {
         String s = "Evaluation of RCV pair " + vI + " " + vJ + ": ";
-        
-        System.out.println(" graph in evaluateRCVPair");
-        for (DENOPTIMAttachmentPoint ap : molGraph.getAttachmentPoints())
-        {
-            APClass a = ap.getAPClass();
-            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-        }
-        for (DENOPTIMEdge e : molGraph.getEdgeList())
-        {
-            APClass src = e.getSrcAPClass();
-            APClass trg = e.getTrgAPClass();
-            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
-        }   
 
         // Get details on the first vertex (head)
         int vIdI = vI.getVertexId();

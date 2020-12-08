@@ -998,6 +998,64 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return clone;
     }
     
+    //TODO-V3 delete. This was only meant to test the references to the edge with parent vertex
+    
+    public void checkHashed(String fileName)
+    {
+
+        System.out.println("Writing "+fileName+" for graph "+getGraphId());
+        boolean nogood = false;
+        String NL = System.getProperty("line.separator");
+        StringBuilder sb = new StringBuilder();
+        for (DENOPTIMVertex v : gVertices)
+        {
+            sb.append("Vertex "+v+NL);
+            if (v.getEdgeToParent() == null)
+                continue;
+            
+            int vh = v.getEdgeToParent().hashCode();
+            sb.append("hash edge "+vh+NL);
+            boolean found = false;
+            for (DENOPTIMEdge e : gEdges)
+            {
+                
+                if (e.hashCode() == vh)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found)
+            {
+                System.out.println("M7: found mismatch");
+                System.out.println("FromVertex "+v+" hash is: "+vh);
+                for (DENOPTIMEdge ee : gEdges)
+                    System.out.println("   -> "+ee+" "+ee.hashCode());
+                nogood = true;
+            }
+        }
+        
+        for (DENOPTIMEdge ee : gEdges)
+        {
+            sb.append("all edge "+ee+" "+ee.hashCode()+NL);
+        }
+        
+        try
+        {
+            DenoptimIO.writeData(fileName, sb.toString(), false);
+        } catch (DENOPTIMException e)
+        {
+            e.printStackTrace();
+        }
+        if (nogood)
+        {
+            System.out.println("NO GOOD");
+            System.exit(0);
+        }
+        System.out.println("Seems all good");
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -1005,38 +1063,15 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param vid
      * @return the edge whose target vertex has ID same as vid, or null
      */
-//TODO-M7 make consistent with the AP user and use of template
+    
     public DENOPTIMEdge getEdgeWithParent(int vid)
     {
-        
-        for (int j=0; j<getEdgeCount(); j++)
+        DENOPTIMVertex v = getVertexWithId(vid);
+        if (v == null)
         {
-            DENOPTIMEdge edge = getEdgeAtPosition(j);
-
-            if (edge.getTrgVertex() == vid)
-            {
-                return edge;
-            }
+            return null;
         }
-        
-        //TODO-M7 del
-        //code stup for recursion into templates' inner graphs
-        /*
-        for (DENOPTIMVertex v : gVertices)
-        {
-            if (v instanceof DENOPTIMTemplate)
-            {
-                DENOPTIMTemplate t = (DENOPTIMTemplate) v;
-                DENOPTIMEdge e = t.getEmbeddedGraph().getEdgeWithParent(vid);
-                if (e != null)
-                {
-                    return e;
-                }
-            }
-        }
-        */
-        
-        return null;
+        return v.getEdgeToParent();
     }
 
 //------------------------------------------------------------------------------
