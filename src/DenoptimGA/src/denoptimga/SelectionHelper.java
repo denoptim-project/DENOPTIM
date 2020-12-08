@@ -70,14 +70,14 @@ public class SelectionHelper
             if (selectFitter)
             {
                 // Select the fitter candidate.
-                selection[i] = molPopulation.get(p1).getMoleculeFitness() >
-                    molPopulation.get(p2).getMoleculeFitness() ? p1 : p2;
+                selection[i] = molPopulation.get(p1).getFitness() >
+                    molPopulation.get(p2).getFitness() ? p1 : p2;
             }
             else
             {
                 // Select the weaker candidate.
-                selection[i] = molPopulation.get(p2).getMoleculeFitness() >
-                    molPopulation.get(p1).getMoleculeFitness() ? p1 : p2;
+                selection[i] = molPopulation.get(p2).getFitness() >
+                    molPopulation.get(p1).getFitness() ? p1 : p2;
             }
         }
         
@@ -127,7 +127,7 @@ public class SelectionHelper
 
         for (int i=0; i<k; i++)
         {
-            aggregateFitness += molPopulation.get(i).getMoleculeFitness();
+            aggregateFitness += molPopulation.get(i).getFitness();
         }
 
 
@@ -141,7 +141,7 @@ public class SelectionHelper
             // Calculate the number of times this candidate is expected to
             // be selected on average and add it to the cumulative total
             // of expected frequencies.
-            cumulativeExpectation += molPopulation.get(i).getMoleculeFitness()
+            cumulativeExpectation += molPopulation.get(i).getFitness()
                                     / aggregateFitness * sz;
 
             // If f is the expected frequency, the candidate will be selected at
@@ -182,11 +182,11 @@ public class SelectionHelper
         int[] selection = new int[sz];
 
         double[] cumulativeFitnesses = new double[k];
-        cumulativeFitnesses[0] = molPopulation.get(0).getMoleculeFitness();
+        cumulativeFitnesses[0] = molPopulation.get(0).getFitness();
 
         for (int i=1; i<k; i++)
         {
-            double fitness = molPopulation.get(i).getMoleculeFitness();
+            double fitness = molPopulation.get(i).getFitness();
 
             cumulativeFitnesses[i] = cumulativeFitnesses[i-1] + fitness;
         }

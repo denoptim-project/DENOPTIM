@@ -33,50 +33,54 @@ import denoptim.utils.GraphConversionTool;
  * A molecular object with additional data and tags. Additional data includes
  * the DENOPTIM graph representation, fitness/error, and possibly other stuff.
  */
-public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializable
+
+//TODO-V3 rename to Candidate
+
+public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, 
+Serializable, Cloneable
 {
     /**
-     * molecule representation as a graph of vertices and edges
+     * Graph representation
      */
-    private DENOPTIMGraph molGraph;
+    private DENOPTIMGraph graph;
     
     /**
-     * INCHI representation of the generated molecule, we will stick to just the key
+     * Unique identifier
      */
-    private String molUID;
+    private String uid;
 	
     /**
-     * smiles representation
+     * SMILES representation
      */
-    private String molSmiles;
+    private String smiles;
     
     /**
-     * fitness of the molecule
+     * fitness value
      */
-    private double molFitness;
+    private double fitness;
     
     /**
-     * name of the optimized molecule filename
+     * Pathname to SDF file
      */
-    private String molFile;
+    private String sdfFile;
 
     /**
-     * File containing the picture of the molecule
+     * Pathname to an image (i.e., PNG file)
      */
     private String imgFile;
     
     /**
-     * Any comments on the molecule
+     * Any comments
      */
-    private String commments;
+    private String comment;
     
     /**
      * Error that prevented calculation of the fitness
      */
-    private String molError;
+    private String error;
     
     /**
-     * Flag signaling the presence of a fitness value associated
+     * Flag signalling the presence of a fitness value associated
      */
     private boolean hasFitness;
     
@@ -86,9 +90,9 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     private int generationId = -1;
     
     /**
-     * Name (not guaranteed to be unique)
+     * Name of this candidate (not guaranteed to be unique)
      */
-    private String molName;
+    private String name;
     
     /**
      * Level that generated this graph in fragment space exploration
@@ -100,36 +104,55 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
 
     public DENOPTIMMolecule()
     {
-        molUID = "UNDEFINED";
-        molSmiles = "UNDEFINED";
-        molFitness = 0; //This is stupid... only needed by compareTo. TODO: change!
+        uid = "UNDEFINED";
+        smiles = "UNDEFINED";
+        fitness = 0; //This is stupid... only needed by compareTo. TODO: change!
         hasFitness = false;
     }
     
 //------------------------------------------------------------------------------
     
+    //TODO-V3: reorder to make consistent
     public DENOPTIMMolecule(DENOPTIMGraph m_molGraph, String m_molUID, 
                             String m_molSmiles, double m_molFitness)
     {
-        molGraph = m_molGraph;
-        molUID = m_molUID;
-        molSmiles = m_molSmiles;
-        molFitness = m_molFitness;
+        graph = m_molGraph;
+        uid = m_molUID;
+        smiles = m_molSmiles;
+        fitness = m_molFitness;
         hasFitness = true;
    }
 
 //------------------------------------------------------------------------------
 	
+    //TODO-V3: reorder to make consistent
     public DENOPTIMMolecule(String m_molFile, DENOPTIMGraph m_molGraph, 
                             String m_molUID, String m_molSmiles, 
                             double m_molFitness)
     {
-        molGraph = m_molGraph;
-        molUID = m_molUID;
-        molSmiles = m_molSmiles;
-        molFitness = m_molFitness;
-        molFile = m_molFile;
+        graph = m_molGraph;
+        uid = m_molUID;
+        smiles = m_molSmiles;
+        fitness = m_molFitness;
+        sdfFile = m_molFile;
         hasFitness = true;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public DENOPTIMMolecule(String name, DENOPTIMGraph graph, String uid, 
+              String smiles, String molFile, String imgFile,
+              String comment, int generationId, int level)
+    {
+        this.name = name;
+        this.graph = graph;
+        this.uid = uid;
+        this.smiles = smiles;
+        this.sdfFile = molFile;
+        this.imgFile = imgFile;
+        this.comment = comment;
+        this.generationId = generationId;
+        this.level = level; 
     }
     
 //------------------------------------------------------------------------------
@@ -138,20 +161,20 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     		throws DENOPTIMException
     {
     	// Initialize, then we try to take info from IAtomContainer
-        this.molUID = "UNDEFINED";
-        this.molSmiles = "UNDEFINED";
-        this.molFitness = 0; //This is stupid... only needed by compareTo. TODO: change!
+        this.uid = "UNDEFINED";
+        this.smiles = "UNDEFINED";
+        this.fitness = 0; //This is stupid... only needed by compareTo. TODO: change!
         this.hasFitness = false;
 		
-		this.molName = "noname";
+		this.name = "noname";
 		if (iac.getProperty(CDKConstants.TITLE) != null)
 		{
-			this.molName = iac.getProperty(CDKConstants.TITLE).toString();
+			this.name = iac.getProperty(CDKConstants.TITLE).toString();
 		}
 		
         if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
         {
-        	this.molError = iac.getProperty(
+        	this.error = iac.getProperty(
         			DENOPTIMConstants.MOLERRORTAG).toString();
         }
 
@@ -166,7 +189,7 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
                 		+ "IAtomContainer: Fitness value is NaN!";
                 throw new DENOPTIMException(msg);
             }
-            this.molFitness = fitVal;
+            this.fitness = fitVal;
             this.hasFitness = true;
         }
         
@@ -178,15 +201,15 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         
         if (iac.getProperty(DENOPTIMConstants.SMILESTAG) != null)
         {
-        	this.molSmiles = iac.getProperty(
+        	this.smiles = iac.getProperty(
         			DENOPTIMConstants.SMILESTAG).toString();
         }
         
         try
         {
-            this.molUID = (iac.getProperty(
+            this.uid = (iac.getProperty(
             		DENOPTIMConstants.UNIQUEIDTAG).toString());
-            this.molGraph = GraphConversionTool.getGraphFromString(
+            this.graph = GraphConversionTool.getGraphFromString(
             		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
             		useFragSpace);
         } catch (Exception e) {
@@ -196,115 +219,115 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
         }
         if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
         {
-            this.commments = iac.getProperty(
+            this.comment = iac.getProperty(
             		DENOPTIMConstants.GMSGTAG).toString();
         }
     }
 
 //------------------------------------------------------------------------------
     
-    public void setComments(String m_str)
+    public void setComments(String str)
     {
-        commments = m_str;
+        this.comment = str;
     }
     
 //------------------------------------------------------------------------------
     
     public String getComments()
     {
-        return commments;
+        return comment;
     }    
 	
 //------------------------------------------------------------------------------
 
-    public void setMoleculeFile(String m_molFile)
+    public void setSDFFile(String molFile)
     {
-        molFile = m_molFile;
+        this.sdfFile = molFile;
     }	
     
 //------------------------------------------------------------------------------
 
-    public void setImageFile(String m_imgFile)
+    public void setImageFile(String imgFile)
     {
-        imgFile = m_imgFile;
+        this.imgFile = imgFile;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setMoleculeGraph(DENOPTIMGraph m_molGraph)
+    public void setGraph(DENOPTIMGraph graph)
     {
-        molGraph = m_molGraph;
+        this.graph = graph;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setMoleculeUID(String m_UID)
+    public void setUID(String uid)
     {
-        molUID = m_UID;
+        this.uid = uid;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setMoleculeSmiles(String m_molSmiles)
+    public void setSmiles(String smiles)
     {
-        molSmiles = m_molSmiles;
+        this.smiles = smiles;
     }
    
 //------------------------------------------------------------------------------
 
-    public void setMoleculeFitness(double m_fitness)
+    public void setFitness(double fitness)
     {
-        molFitness = m_fitness;
-        hasFitness = true;
+        this.fitness = fitness;
+        this.hasFitness = true;
     }
     
 //------------------------------------------------------------------------------
 
     public void setError(String error)
     {
-        molError = error;
+        this.error = error;
     }
     
 //------------------------------------------------------------------------------
 
     public void setName(String name)
     {
-        molName = name;
+        this.name = name;
     }
     
 //------------------------------------------------------------------------------
 
     public String getName()
     {
-        return molName;
+        return name;
     }
     
 //------------------------------------------------------------------------------
 
     public String getError()
     {
-        return molError;
+        return error;
     }
     
 //------------------------------------------------------------------------------
 
-    public String getMoleculeUID()
+    public String getUID()
     {
-        return molUID;
+        return uid;
     }
 
 //------------------------------------------------------------------------------
 
-    public String getMoleculeSmiles()
+    public String getSmiles()
     {
-        return molSmiles;
+        return smiles;
     }
     
 //------------------------------------------------------------------------------
 
-    public String getMoleculeFile()
+    public String getSDFFile()
     {
-        return molFile;
+        return sdfFile;
     }
     
 //------------------------------------------------------------------------------
@@ -316,16 +339,16 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph getMoleculeGraph()
+    public DENOPTIMGraph getGraph()
     {
-        return molGraph;
+        return graph;
     }
 
 //------------------------------------------------------------------------------
 
-    public double getMoleculeFitness()
+    public double getFitness()
     {
-        return molFitness;
+        return fitness;
     }
     
 //------------------------------------------------------------------------------
@@ -384,9 +407,9 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     @Override
     public int compareTo(DENOPTIMMolecule B)
     {
-        if (this.molFitness > B.molFitness)
+        if (this.fitness > B.fitness)
             return 1;
-        else if (this.molFitness < B.molFitness)
+        else if (this.fitness < B.fitness)
             return -1;
         return 0;
     }
@@ -397,13 +420,13 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     public String toString()
     {
         StringBuilder sb = new StringBuilder(16);
-        String mname = new File(molFile).getName();
+        String mname = new File(sdfFile).getName();
         if (mname != null)
             sb.append(String.format("%-20s", mname));
         
-        sb.append(String.format("%-20s", this.molGraph.getGraphId()));
-        sb.append(String.format("%-30s", molUID));
-        sb.append(String.format("%12.3f", molFitness));
+        sb.append(String.format("%-20s", this.graph.getGraphId()));
+        sb.append(String.format("%-30s", uid));
+        sb.append(String.format("%12.3f", fitness));
 
         return sb.toString();
     }
@@ -412,10 +435,27 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, Serializa
     
     public void cleanup()
     {
-        if (molGraph != null)
-            molGraph.cleanup();
+        if (graph != null)
+            graph.cleanup();
     }
-    
+
+//------------------------------------------------------------------------------        
+
+    public DENOPTIMMolecule clone()
+    {
+        DENOPTIMMolecule c = new DENOPTIMMolecule(name, graph.clone(), uid,
+                smiles, sdfFile, imgFile, comment, generationId,level);
+        if (hasFitness)
+        {
+            c.setFitness(fitness);
+        }
+        if (error!=null)
+        {
+            c.setError(error);
+        }
+        return c;
+    }
+
 //------------------------------------------------------------------------------        
     
 }

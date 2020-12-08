@@ -255,7 +255,7 @@ public class DenoptimRND
 	ArrayList<String> oldUIDs = new ArrayList<String>();
         for (DENOPTIMMolecule mol : molPopulation)
         {
-            oldUIDs.add(mol.getMoleculeUID());
+            oldUIDs.add(mol.getUID());
         }
 
         int n = RNDParameters.getNumberOfChildren() + molPopulation.size();
@@ -298,7 +298,7 @@ public class DenoptimRND
         
         for (DENOPTIMMolecule mol : molPopulation)
         {
-            if (!oldUIDs.contains(mol.getMoleculeUID()))
+            if (!oldUIDs.contains(mol.getUID()))
             {
                 updated = true;
                 break;
@@ -439,7 +439,7 @@ public class DenoptimRND
                 numUsed+=1;
                 StringBuilder sb = new StringBuilder();
                 sb.append(String.format("Selecting graph %d ",rndNum));
-                sb.append(newOne.getMoleculeUID());
+                sb.append(newOne.getUID());
                 sb.append(String.format(" (Usage %d/%d)",numUsed,numAvail));
                 DENOPTIMLogger.appLogger.log(Level.INFO,sb.toString());
                 break;

@@ -223,9 +223,15 @@ public class EvolutionaryAlgorithm
 
         // keep a clone of the current population for the parents to be
         // chosen from.
-      //TODO-V3 get rid of serialization-based deep copying
-        ArrayList<DENOPTIMMolecule> clone_popln =
-                (ArrayList<DENOPTIMMolecule>) DenoptimIO.deepCopy(molPopulation);
+        ArrayList<DENOPTIMMolecule> clone_popln;
+        synchronized (molPopulation)
+        {
+            clone_popln = new ArrayList<DENOPTIMMolecule>();
+            for (DENOPTIMMolecule m : molPopulation)
+            {
+                clone_popln.add(m.clone());
+            }
+        }
 
         int Xop = -1, Mop = -1, Bop = -1;
 
@@ -282,20 +288,17 @@ public class EvolutionaryAlgorithm
 
                 if (foundPars)
                 {
-                    String molid1 = FilenameUtils.getBaseName(clone_popln.get(i1).getMoleculeFile());
-                    String molid2 = FilenameUtils.getBaseName(clone_popln.get(i2).getMoleculeFile());
+                    String molid1 = FilenameUtils.getBaseName(
+                            clone_popln.get(i1).getSDFFile());
+                    String molid2 = FilenameUtils.getBaseName(
+                            clone_popln.get(i2).getSDFFile());
 
-                    int gid1 = clone_popln.get(i1).getMoleculeGraph().getGraphId();
-                    int gid2 = clone_popln.get(i2).getMoleculeGraph().getGraphId();
-
-                    //System.err.println("MALE: " + molPopulation.get(i1).getMoleculeGraph().toString());
-                    //System.err.println("FEMALE: " + molPopulation.get(i2).getMoleculeGraph().toString());
-
+                    int gid1 = clone_popln.get(i1).getGraph().getGraphId();
+                    int gid2 = clone_popln.get(i2).getGraph().getGraphId();
+                    
                     // clone the parents
-                    graph1 = (DENOPTIMGraph) DenoptimIO.deepCopy
-                                        (clone_popln.get(i1).getMoleculeGraph());
-                    graph2 = (DENOPTIMGraph) DenoptimIO.deepCopy
-                                        (clone_popln.get(i2).getMoleculeGraph());
+                    graph1 = clone_popln.get(i1).getGraph().clone();
+                    graph2 = clone_popln.get(i2).getGraph().clone();
 
                     f0 += 2;
 
@@ -350,13 +353,11 @@ public class EvolutionaryAlgorithm
 
                 if (foundPars)
                 {
-                    //System.err.println("SELECTING MUTATION");
-                    graph3 = (DENOPTIMGraph) DenoptimIO.deepCopy
-                                        (clone_popln.get(i3).getMoleculeGraph());
+                    graph3 = clone_popln.get(i3).getGraph().clone();
                     f1 += 1;
 
-                    String molid3 = FilenameUtils.getBaseName(clone_popln.get(i3).getMoleculeFile());
-                    int gid3 = clone_popln.get(i3).getMoleculeGraph().getGraphId();
+                    String molid3 = FilenameUtils.getBaseName(clone_popln.get(i3).getSDFFile());
+                    int gid3 = clone_popln.get(i3).getGraph().getGraphId();
 
                     if (DENOPTIMGraphOperations.performMutation(graph3))
                     {
@@ -641,7 +642,7 @@ public class EvolutionaryAlgorithm
         
         for (DENOPTIMMolecule mol : molPopulation)
         {
-            if (!codes.contains(mol.getMoleculeUID()))
+            if (!codes.contains(mol.getUID()))
             {
                 updated = true;
                 break;

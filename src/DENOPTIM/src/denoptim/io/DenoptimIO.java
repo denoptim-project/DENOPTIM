@@ -588,16 +588,6 @@ public class DenoptimIO {
                 ap.setAPClass(APClass.make(a.toString()));
             }
         }
-        for (DENOPTIMEdge e : graph.getEdgeList())
-        {
-            APClass srcApc = e.getSrcAPClass();
-            APClass trgApc = e.getTrgAPClass();
-            if (srcApc!=null && trgApc!=null)
-            {
-                e.setSrcAPClass(APClass.make(srcApc.toString()));
-                e.setTrgAPClass(APClass.make(trgApc.toString()));
-            }
-        }
 
         return graph;
     }
@@ -622,7 +612,6 @@ public class DenoptimIO {
             String fname = filesToZip[i];
             File cFile = new File(fname);
             if (!cFile.exists()) {
-                //System.err.println("Skipping: " + fname);
                 continue;
             }
 
@@ -818,7 +807,7 @@ public class DenoptimIO {
 //------------------------------------------------------------------------------
 
     /**
-     * Perform a deep copy of the object
+     * Produces a deep copy of the object be serialization.
      *
      * @param oldObj
      * @return a deep copy of an object
@@ -1371,7 +1360,7 @@ public class DenoptimIO {
         ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
         for (IAtomContainer iac : iacs) {
             DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
-            mol.setMoleculeFile(filename);
+            mol.setSDFFile(filename);
             mols.add(mol);
         }
 

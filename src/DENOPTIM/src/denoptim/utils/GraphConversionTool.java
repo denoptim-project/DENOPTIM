@@ -339,6 +339,9 @@ public class GraphConversionTool
             {
                 dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
             } else {
+                // WARNING: in this case we cannot know the exact number of
+                // attachment points, so we will add as many as needed to 
+                // build the graph.
                 dv =  new EmptyVertex(vid);
             }
             dv.setLevel(level);
@@ -376,32 +379,59 @@ public class GraphConversionTool
                 dummy.addAP();
                 DENOPTIMAttachmentPoint srcAP = dummy.getAP(0);
                 DENOPTIMAttachmentPoint trgAP = dummy.getAP(1);
-
+                
                 try {
                     for (int j = 0, apsFound = 0; apsFound < 2; j++) {
                         DENOPTIMVertex vertex = vertices.get(j);
                         if (vertex.getVertexId() == srcVrtxID) {
+                            // WARNING!
+                            // When we import graphs without a definition of the
+                            // fragment space we can only guess how many APs 
+                            // there are on a vertex. Here we add as many as 
+                            // needed to allow formation of the edge.
+                            // Currently we cannot know the index of the src
+                            // atom, so we simply put this index to 0.
+                            for (int k=vertex.getNumberOfAP(); k<(srcAPID+1); 
+                                    k++)
+                            {
+                                vertex.addAP(0,1,1);
+                            }
                             srcAP = vertex.getAP(srcAPID);
+                            if (s4.length > 5) {
+                                srcAP.setAPClass(s4[5]);
+                            }
                             apsFound++;
                         } else if (vertex.getVertexId() == trgVrtxID) {
+                            // WARNING!
+                            // When we import graphs without a definition of the
+                            // fragment space we can only guess how many APs 
+                            // there are on a vertex. Here we add as many as 
+                            // needed to allow formation of the edge.
+                            // Currently we cannot know the index of the src
+                            // atom, so we simply put this index to 0.
+                            for (int k=vertex.getNumberOfAP(); k<(trgAPID+1); 
+                                    k++)
+                            {
+                                vertex.addAP(0,1,1);
+                            }
                             trgAP = vertex.getAP(trgAPID);
+                            if (s4.length > 5) {
+                                trgAP.setAPClass(s4[6]);
+                            }
                             apsFound++;
                         }
                     }
                 } catch (IndexOutOfBoundsException e) {
-                    throw new IllegalStateException("source or target " +
+                    throw new IllegalStateException("Searching for srcVrtxID:"
+                            + srcVrtxID + ", srcAPID:"
+                            + srcAPID + ", trgVrtxID:"
+                            + trgVrtxID + ", trgAPID:"
+                            + trgAPID + ", but source or target " +
                             "attachment point not present on source or target" +
-                            " vertex", e);
+                            " vertex. "+strGraph, e);
                 }
     
-                DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, srcVrtxID,
-                        trgVrtxID, srcAPID, trgAPID, btype);
-    
-                if (s4.length > 5)
-                {
-                    ne = new DENOPTIMEdge(srcAP, trgAP, srcVrtxID, trgVrtxID,
-                            srcAPID, trgAPID, btype, s4[5], s4[6]);
-                }
+                DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, btype);
                 edges.add(ne);
             }
         }
@@ -457,57 +487,6 @@ public class GraphConversionTool
         }
 	
         DENOPTIMGraph g = new DENOPTIMGraph(vertices, edges, rings, symSets);
-
-        // update the attachment point info based on the edge info
-        for (int i=0; i<edges.size(); i++)
-        {
-            DENOPTIMEdge edge = edges.get(i);
-            BondType bndTyp = edge.getBondType();
-            int srcvid = edge.getSrcVertex();
-            int trgvid = edge.getTrgVertex();
-            int iA = edge.getSrcAPID();
-            int iB = edge.getTrgAPID();
-
-            //System.err.println("iA=" + iA + " " + "iB=" + iB);
-
-            DENOPTIMVertex src = g.getVertexWithId(srcvid);
-            DENOPTIMVertex trg = g.getVertexWithId(trgvid);
-	
-		    // Here we fill the vertices with placeholder. This because
-		    // we want to be able to define a graph even without knowing
-		    // anything on the actual fragment contained in the vertex.
-		    // In particular, the list of APs is not knowable from the 
-		    // DENOPTIMGraph without the corresponding library of fragments.
-            if (!useMolInfo)
-            {
-            	ArrayList<DENOPTIMAttachmentPoint> lstAPsrc = 
-							      src.getAttachmentPoints();
-				if (lstAPsrc.size() <= iA)
-				{
-				    while (lstAPsrc.size() <= (iA+1))
-				    {
-				        src.addAP();
-				    }
-				}
-		        ArrayList<DENOPTIMAttachmentPoint> lstAPtrg =
-		        		trg.getAttachmentPoints();
-                if (lstAPtrg.size() <= iB)
-                {
-                    while (lstAPtrg.size() <= (iB+1))
-                    {
-                        trg.addAP();
-                    }
-                }
-            }
-		
-            DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);
-            DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
-		    if (useMolInfo)
-	        {
-                apA.updateFreeConnections(-bndTyp.getValence());
-                apB.updateFreeConnections(-bndTyp.getValence());
-		    }
-        }
 
         // update bond type of chords
         for (DENOPTIMRing r : rings)

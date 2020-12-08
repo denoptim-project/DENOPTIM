@@ -108,14 +108,14 @@ public class EAUtils
             DENOPTIMMolecule mol = popln.get(i);
             if (mol != null)
             {
-                String mname = new File(mol.getMoleculeFile()).getName();
+                String mname = new File(mol.getSDFFile()).getName();
                 if (mname != null)
                     sb.append(String.format("%-20s", mname));
                 sb.append(String.format("%-20s", 
-                        mol.getMoleculeGraph().getGraphId()));
-                sb.append(String.format("%-30s", mol.getMoleculeUID()));
-                sb.append(df.format(mol.getMoleculeFitness()));
-                sb.append("    ").append(mol.getMoleculeFile());
+                        mol.getGraph().getGraphId()));
+                sb.append(String.format("%-30s", mol.getUID()));
+                sb.append(df.format(mol.getFitness()));
+                sb.append("    ").append(mol.getSDFFile());
                 sb.append(System.getProperty("line.separator"));
             }
         }
@@ -177,7 +177,7 @@ public class EAUtils
             for (int i=0; i<GAParameters.getPopulationSize(); i++)
             {
                 DENOPTIMMolecule mol = popln.get(i);
-                DENOPTIMGraph g = mol.getMoleculeGraph();
+                DENOPTIMGraph g = mol.getGraph();
                 int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
                 scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
             }
@@ -308,7 +308,7 @@ public class EAUtils
             // since the population is sorted by fitness, this routine will pick 
             // the fitter parent, although the first parent may be less fit
 
-            DENOPTIMGraph g1 = molPopulation.get(p1).getMoleculeGraph();
+            DENOPTIMGraph g1 = molPopulation.get(p1).getGraph();
 
             ArrayList<Integer> indices = new ArrayList<>();
 
@@ -316,7 +316,7 @@ public class EAUtils
             {
                 if (i == p1)
                     continue;
-                DENOPTIMGraph g2 = molPopulation.get(i).getMoleculeGraph();
+                DENOPTIMGraph g2 = molPopulation.get(i).getGraph();
                 RMap rp = DENOPTIMGraphOperations.locateCompatibleXOverPoints(g1, g2);
                 if (rp != null)
                 {
@@ -371,7 +371,7 @@ public class EAUtils
         {
             for (int i=0; i<GAParameters.getPopulationSize(); i++)
             {
-                String sdfile = popln.get(i).getMoleculeFile();
+                String sdfile = popln.get(i).getSDFFile();
                 String imgfile = popln.get(i).getImageFile();
 
                 if (sdfile != null)
@@ -497,7 +497,7 @@ public class EAUtils
                 DENOPTIMMolecule pmol =
                     new DENOPTIMMolecule(graph, molinchi, molsmiles, fitness);
                 DenoptimIO.writeMolecule(molfile, mol, false);
-                pmol.setMoleculeFile(molfile);
+                pmol.setSDFFile(molfile);
                 pmol.setImageFile(null);
                 molPopulation.add(pmol);
                 uidsFromInitPop.add(molinchi);
@@ -553,7 +553,7 @@ public class EAUtils
         int val = Integer.MIN_VALUE;
         for (DENOPTIMMolecule popln1 : popln)
         {
-            DENOPTIMGraph g = popln1.getMoleculeGraph();
+            DENOPTIMGraph g = popln1.getGraph();
             val = Math.max(val, g.getMaxVertexId());
         }
         GraphUtils.updateVertexCounter(val);
@@ -747,7 +747,7 @@ public class EAUtils
         APClass apcSrc =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
         // locate the capping group for this rcn
         APClass apcCap = getCappingGroup(apcSrc);
-
+        
         if (apcCap != null)
         {
 
@@ -798,34 +798,34 @@ public class EAUtils
 
     /**
      *
-     * @param rcn
+     * @param srcAPC
      * @throws DENOPTIMException
      * @return For the given reaction return the corresponding capping group
      */
 
-    protected static APClass getCappingGroup(APClass rcn) 
+    protected static APClass getCappingGroup(APClass srcAPC) 
             throws DENOPTIMException
     {
-        APClass capRcn = null;
-
-        if (FragmentSpace.getCappingMap().containsKey(rcn))
+        APClass capAPC = null;
+        
+        if (FragmentSpace.getCappingMap().containsKey(srcAPC))
         {
-            capRcn = FragmentSpace.getCappingMap().get(rcn);
-            if (capRcn == null)
+            capAPC = FragmentSpace.getCappingMap().get(srcAPC);
+            if (capAPC == null)
             {
                 String msg = "Failure in reading APClass of capping group for "
-                                 + rcn;
+                                 + srcAPC;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
         }
         else
         {
-            String msg = "CPMap does not require capping for " + rcn;
+            String msg = "CPMap does not require capping for " + srcAPC;
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
         }
 
-        return capRcn;
+        return capAPC;
     }
 
 //------------------------------------------------------------------------------
@@ -1001,7 +1001,6 @@ public class EAUtils
             DENOPTIMVertex curVertex = lstVert.get(i);
 
             // no capping of a capping group
-
             if (curVertex.getFragmentType() == BBType.CAP)
             {
                 //String msg = "Attempting to cap a capping group. Check your data.";
@@ -1042,7 +1041,7 @@ public class EAUtils
 
         for (DENOPTIMMolecule mol : mols)
         {
-            if (mol.getMoleculeUID().compareToIgnoreCase(molcode) == 0)
+            if (mol.getUID().compareToIgnoreCase(molcode) == 0)
             {
                 return true;
             }
@@ -1065,7 +1064,7 @@ public class EAUtils
 
         for (int i=0; i<k; i++)
         {
-            arr[i] = mols.get(i).getMoleculeFitness();
+            arr[i] = mols.get(i).getFitness();
         }
         return arr;
     }
@@ -1102,7 +1101,7 @@ public class EAUtils
 
         for (int i=0; i<k; i++)
         {
-            arr.add(molPopulation.get(i).getMoleculeUID());
+            arr.add(molPopulation.get(i).getUID());
         }
         return arr;
     }
@@ -1152,20 +1151,8 @@ public class EAUtils
             return null;
         }
 
-//TODO del or make optional
-//        IAtomContainer mol2D = DENOPTIMMoleculeUtils.generate2DCoordinates(mol);
-//        //IAtomContainer mol2D = DENOPTIMMoleculeUtils.get2DStructureUsingBabel(mol);
-//        if (mol2D == null)
-//        {
-//            String msg = "Evaluation of graph: mol2D is null!" + molGraph.toString();
-//            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-//            return null;
-//        }
-
         // hopefully the null shouldn't happen if all goes well
         String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
-//TODO del or make optional
-        //String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMoleculeUsingBabel(mol);
         if (molsmiles == null)
         {
             String msg = "Evaluation of graph: SMILES is null! " 
@@ -1406,7 +1393,7 @@ public class EAUtils
                 if (dp.isAvailable())
                 {
                     APClass apClass = dp.getAPClass();
-                    //TODO-V3 remove loop once we can ensure all APClass intances
+                    //TODO-V3 remove loop once we can ensure all APClass instances
                     // refer to the unique ones
                     for (APClass fe : classOfForbEnds)
                     {

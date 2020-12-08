@@ -311,13 +311,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void updateAttachmentPoint(int idx, int delta)
-    {
-        getAttachmentPoints().get(idx).updateFreeConnections(delta);
-    }
-
-//------------------------------------------------------------------------------
-
     public void setLevel(int m_level)
     {
         level = m_level;
@@ -391,6 +384,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     @Override
     public DENOPTIMVertex clone()
     {        
+        //TODO-M7
+        System.out.println("cloning from Vertex method!!!!!! ");
         return (DENOPTIMVertex) clone();
     }
     
@@ -571,7 +566,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                                         int sourceAPIndex,
                                         int targetAPIndex) 
     {
-        //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
                 .get(sourceAPIndex);
         APClass srcAPC = sourceAP.getAPClass();
@@ -618,14 +612,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             // look up the reaction bond order table
             BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
 
-            // create a new edge
-            DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
-                    target.getVertexId(), sourceAPIndex, targetAPIndex,
-                    bndTyp, srcAPC, trgAPC);
-
-            // update the attachment point info
-            sourceAP.updateFreeConnections(-bndTyp.getValence());
-            targetAP.updateFreeConnections(-bndTyp.getValence());
+            // create a new edge (this also updated AP valence count)
+            DENOPTIMEdge edge = new DENOPTIMEdge(sourceAP, targetAP, bndTyp);
 
             return edge;
         } else {
@@ -681,12 +669,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         
         // create a new edge
         DENOPTIMEdge edge = new DENOPTIMEdge(getAP(iA), other.getAP(iB),
-                getVertexId(), other.getVertexId(), iA, iB,
                 BondType.parseInt(chosenBO));
-
-        // update the attachment point info
-        dap_A.updateFreeConnections(-chosenBO); // decrement the connections
-        dap_B.updateFreeConnections(-chosenBO); // decrement the connections
         
         return edge;
     }
@@ -755,6 +738,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param ap attachment point to add to this vertex
      */
     public void addAP(DENOPTIMAttachmentPoint ap) {
+        ap.setOwner(this);
         getAttachmentPoints().add(ap);
     }
 
@@ -774,6 +758,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
+    //TODO-V3. This method creates an empty APClass, which is not supposed to
+    // exist. It must be possible to define an AP without an APClass!
+    // This has to change!
+    
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, double[] dirVec) {
         try {
@@ -801,4 +789,28 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 atomPositionNumber, atomConnections, apConnections, dirVec,
                 apClass));
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the position of the given AP in the list of APs of this vertex
+     * @param ap the AP to find in the list of APs
+     * @return the index (0-n) of <code>ap</code> or -1 if that AP does not 
+     * belong to this vertex.
+     */
+    public int getIndexOfAP(DENOPTIMAttachmentPoint ap)
+    {
+        for (int i=0; i<getAttachmentPoints().size(); i++)
+        {
+            DENOPTIMAttachmentPoint candAp = getAttachmentPoints().get(i);
+            if (candAp == ap)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+//------------------------------------------------------------------------------
+
 }

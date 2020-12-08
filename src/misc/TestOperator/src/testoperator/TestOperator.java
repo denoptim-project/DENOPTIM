@@ -137,9 +137,9 @@ public class TestOperator
         // Remember position of vertex chosen for xover
         int ivmale = male.getIndexOfVertex(TestOperatorParameters.mvid);
         int ivfemale = female.getIndexOfVertex(TestOperatorParameters.fvid);
-             // Ensure uniqueness on vertexID
+        // Ensure uniqueness on vertexID
         male.renumberGraphVertices();
-        male.renumberGraphVertices();
+        female.renumberGraphVertices();
     
         // Get new vid of chosen frags
         int newmvid = male.getVertexAtPosition(ivmale).getVertexId();

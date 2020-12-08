@@ -472,17 +472,6 @@ Comparable<DENOPTIMAttachmentPoint>
     public double[] getDirectionVector()
     {
         return dirVec;
-    }    
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Resets the connections of this AP. Makes all connections free.
-     */
-
-    public void resetFreeConnections()
-    {
-        setFreeConnections(totalConnections);
     }
 
 //------------------------------------------------------------------------------
@@ -807,6 +796,20 @@ Comparable<DENOPTIMAttachmentPoint>
                 && strA.compareToIgnoreCase(strB) == 0;
     }
 */
+  
+//-----------------------------------------------------------------------------
+
+    //TODO-V3: we should not be given the possibility to change the AP's owner
+    // However, this is currently needed because if the DNOPTIMVertex.addAP(...)
+    
+    /**
+     * Sets the reference to the vertex the owns this attachment point.
+     * @param owner the vertex that own this attachment point.
+     */
+    public void setOwner(DENOPTIMVertex owner)
+    {
+        this.owner = owner;
+    }
     
 //-----------------------------------------------------------------------------
 

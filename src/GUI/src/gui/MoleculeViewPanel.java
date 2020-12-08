@@ -238,14 +238,14 @@ public class MoleculeViewPanel extends JSplitPane
 		{
 			dataTabModel.addRow(new Object[] { "Name", item.getName() });
 		}
-		if (item.getMoleculeUID() != null) 
+		if (item.getUID() != null) 
 		{
-			dataTabModel.addRow(new Object[] { "UID", item.getMoleculeUID() });
+			dataTabModel.addRow(new Object[] { "UID", item.getUID() });
 		}
 		if (item.hasFitness())
 		{
 			dataTabModel.addRow(new Object[]{"Fitness", 
-					item.getMoleculeFitness()});
+					item.getFitness()});
 		}
 		else
 		{

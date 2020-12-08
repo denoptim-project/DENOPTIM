@@ -22,6 +22,7 @@ package denoptim.molecule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
 
 public class DENOPTIMGraphTest {
 
-	//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 	@Test
 	public void testRemoveVertex() throws Exception {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
@@ -687,9 +688,9 @@ public class DENOPTIMGraphTest {
 
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
 				new ArrayList<>(Arrays.asList(6, 7))));
-
+		
 		DENOPTIMGraph clone = graph.clone();
-
+        
 		assertEquals(graph.gVertices.size(), clone.gVertices.size(),
 				"Number of vertices");
 		assertEquals(graph.gEdges.size(), clone.gEdges.size(),
@@ -704,6 +705,27 @@ public class DENOPTIMGraphTest {
 				"Local msg");
 		assertEquals(graph.graphId, clone.graphId,
 				"Graph ID");
+		
+		for (int iv=0; iv<graph.getVertexCount(); iv++)
+		{
+		    DENOPTIMVertex vg = graph.getVertexAtPosition(iv);
+		    DENOPTIMVertex vc = clone.getVertexAtPosition(iv);
+		    int hashVG = vg.hashCode();
+		    int hashVC = vc.hashCode();
+            
+		    for (int iap=0; iap<vg.getNumberOfAP(); iap++)
+		    {
+		        assertEquals(vg.getAP(iap).getOwner().hashCode(), hashVG, 
+		                "Reference to vertex owner in ap " + iap + " vertex " 
+		                        + iv + "(G)");
+                assertEquals(vc.getAP(iap).getOwner().hashCode(), hashVC, 
+                        "Reference to vertex owner in ap " + iap + " vertex " 
+                                + iv + " (C)");
+		        assertNotEquals(vc.getAP(iap).getOwner().hashCode(),
+		        vg.getAP(iap).getOwner().hashCode(),
+		        "Owner of AP "+iap+" in vertex "+iv);
+		    }
+		}          
 	}
 
 //------------------------------------------------------------------------------
