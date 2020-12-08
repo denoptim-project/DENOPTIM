@@ -153,8 +153,7 @@ public class PathSubGraph
         int currVert = vA.getVertexId();
         for (int i=-1; i<vA.getLevel(); i++)
         {
-            DENOPTIMEdge edgeToParent = molGraph.getEdgeAtPosition(
-                        molGraph.getIndexOfEdgeWithParent(currVert));
+            DENOPTIMEdge edgeToParent = molGraph.getEdgeWithParent(currVert);
             seedToVAEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
             seedToVA.add(parent);
@@ -173,8 +172,7 @@ public class PathSubGraph
         currVert = vB.getVertexId();
         for (int i=-1; i<vB.getLevel(); i++)
         {
-            DENOPTIMEdge edgeToParent = molGraph.getEdgeAtPosition(
-                        molGraph.getIndexOfEdgeWithParent(currVert));
+            DENOPTIMEdge edgeToParent = molGraph.getEdgeWithParent(currVert);
             seedToVBEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
             seedToVB.add(parent);

@@ -81,6 +81,11 @@ Comparable<DENOPTIMAttachmentPoint>
      * The vertex to which this AP is attached to.
      */
     private DENOPTIMVertex owner;
+    
+    /**
+     * The edge that is using this AP, if any
+     */
+    private DENOPTIMEdge user;
 
 
 //------------------------------------------------------------------------------
@@ -817,6 +822,26 @@ Comparable<DENOPTIMAttachmentPoint>
         return owner;
     }
 
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Sets the reference to the edge that is using this attachment point.
+     * @param edge the user
+     */
+    public void setUser(DENOPTIMEdge edge) {
+        this.user = edge;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Gets the edge that is using this AP, or null if no edge is using this AP.
+     * @return
+     */
+    public DENOPTIMEdge getEdgeUser() {
+        return user;
+    }
+    
 //-----------------------------------------------------------------------------
 
 }

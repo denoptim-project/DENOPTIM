@@ -507,7 +507,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param m_vertex the vertex to remove.
      */
     public void removeVertex(DENOPTIMVertex m_vertex)
-    {   
+    {
+        //TODO-V3: deal with templates. They do not appear in the edges as
+        // target Vertices, so the edges to templates will not be removed
+        // once we remove the template vertex.
+        
         if (!gVertices.contains(m_vertex))
         {
         	return;
@@ -691,6 +695,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             
             srcAP.updateFreeConnections(edge.getBondType().getValence());
             trgAP.updateFreeConnections(edge.getBondType().getValence());
+            
+            srcAP.setUser(null);
+            trgAP.setUser(null);
+            
             gEdges.remove(edge);
         }
     }
@@ -989,48 +997,45 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         return clone;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @param m_vid
-     * @return the index of edge whose target vertex is same as m_vid
+     * Looks for an edge that points to a vertex with the given vertex id.
+     * @param vid
+     * @return the edge whose target vertex has ID same as vid, or null
      */
-
-    public int getIndexOfEdgeWithParent(int m_vid)
+//TODO-M7 make consistent with the AP user and use of template
+    public DENOPTIMEdge getEdgeWithParent(int vid)
     {
+        
         for (int j=0; j<getEdgeCount(); j++)
         {
             DENOPTIMEdge edge = getEdgeAtPosition(j);
 
-            if (edge.getTrgVertex() == m_vid)
-            {
-                return j;
-            }
-        }
-        return -1;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @param m_vid
-     * @return the edge whose target vertex has ID same as m_vid, or null
-     */
-
-    public DENOPTIMEdge getEdgeWithParent(int m_vid)
-    {
-        for (int j=0; j<getEdgeCount(); j++)
-        {
-            DENOPTIMEdge edge = getEdgeAtPosition(j);
-
-            if (edge.getTrgVertex() == m_vid)
+            if (edge.getTrgVertex() == vid)
             {
                 return edge;
             }
         }
+        
+        //TODO-M7 del
+        //code stup for recursion into templates' inner graphs
+        /*
+        for (DENOPTIMVertex v : gVertices)
+        {
+            if (v instanceof DENOPTIMTemplate)
+            {
+                DENOPTIMTemplate t = (DENOPTIMTemplate) v;
+                DENOPTIMEdge e = t.getEmbeddedGraph().getEdgeWithParent(vid);
+                if (e != null)
+                {
+                    return e;
+                }
+            }
+        }
+        */
+        
         return null;
     }
 
@@ -1106,10 +1111,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public DENOPTIMVertex getParent(int m_vid)
     {
-        int idx = getIndexOfEdgeWithParent(m_vid);
-        if (idx != -1)
+        DENOPTIMEdge edge = getEdgeWithParent(m_vid);
+        if (edge != null)  
         {
-            DENOPTIMEdge edge = getEdgeAtPosition(idx);
             int src = edge.getSrcVertex();
             return getVertexWithId(src);
         }
@@ -1120,10 +1124,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public int getParentAPIndex(int m_vid)
     {
-        int idx = getIndexOfEdgeWithParent(m_vid);
-        if (idx != -1)
+        DENOPTIMEdge edge = getEdgeWithParent(m_vid);
+        if (edge != null)
         {
-            DENOPTIMEdge edge = getEdgeAtPosition(idx);
             return edge.getSrcAPID();
         }
         return -1;
@@ -1732,11 +1735,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public int removeEdgeWithParent(int vid)
     {
         int pvid = -1;
-        int eid = getIndexOfEdgeWithParent(vid);
-
-        if (eid != -1)
+        DENOPTIMEdge edge = getEdgeWithParent(vid);
+        if (edge != null)
         {
-            DENOPTIMEdge edge = getEdgeList().get(eid);
             pvid = edge.getSrcAP().getOwner().getVertexId();
             removeEdge(edge);
         }
@@ -2639,7 +2640,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         new ArrayList<DENOPTIMVertex>();
                 for (DENOPTIMVertex v : matches)
                 {
-                    if (getIndexOfEdgeWithParent(v.getVertexId()) < 0)
+                    if (getEdgeWithParent(v.getVertexId()) == null)
                     {
                         continue;
                     }
@@ -2664,7 +2665,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         new ArrayList<>();
                 for (DENOPTIMVertex v : matches)
                 {
-                    if (getIndexOfEdgeWithParent(v.getVertexId()) < 0)
+                    if (getEdgeWithParent(v.getVertexId()) == null)
                     {
                         continue;
                     }
@@ -2689,7 +2690,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         new ArrayList<>();
                 for (DENOPTIMVertex v : matches)
                 {
-                    if (getIndexOfEdgeWithParent(v.getVertexId()) < 0)
+                    if (getEdgeWithParent(v.getVertexId()) == null)
                     {
                         continue;
                     }
@@ -2708,7 +2709,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         new ArrayList<>();
                 for (DENOPTIMVertex v : matches)
                 {
-                    if (getIndexOfEdgeWithParent(v.getVertexId()) < 0)
+                    if (getEdgeWithParent(v.getVertexId()) == null)
                     {
                         continue;
                     }

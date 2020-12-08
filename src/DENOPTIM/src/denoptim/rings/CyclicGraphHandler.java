@@ -1326,8 +1326,7 @@ public class CyclicGraphHandler
 
         // Get details on the first vertex (head)
         int vIdI = vI.getVertexId();
-        int edgeIdI = molGraph.getIndexOfEdgeWithParent(vIdI);
-        DENOPTIMEdge edgeI = molGraph.getEdgeAtPosition(edgeIdI);
+        DENOPTIMEdge edgeI = molGraph.getEdgeWithParent(vIdI);
         int srcApIdI = edgeI.getSrcAPID();
         DENOPTIMVertex pvI = molGraph.getParent(vIdI);
         DENOPTIMAttachmentPoint srcApI = pvI.getAttachmentPoints().get(
@@ -1337,8 +1336,7 @@ public class CyclicGraphHandler
 
         // Get details on the second vertex (tail)
         int vIdJ = vJ.getVertexId();
-        int edgeIdJ = molGraph.getIndexOfEdgeWithParent(vIdJ);
-        DENOPTIMEdge edgeJ = molGraph.getEdgeAtPosition(edgeIdJ);
+        DENOPTIMEdge edgeJ = molGraph.getEdgeWithParent(vIdJ);
         int srcApIdJ = edgeJ.getSrcAPID();
         DENOPTIMVertex pvJ = molGraph.getParent(vIdJ);
         DENOPTIMAttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
@@ -1790,8 +1788,7 @@ public class CyclicGraphHandler
                     && vertFrag.getFragmentType() == BBType.FRAGMENT)
             {
 
-                DENOPTIMEdge edgeToParnt = molGraph.getEdgeAtPosition(
-                                       molGraph.getIndexOfEdgeWithParent(vId));
+                DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
 //TODO-V3: change. hard coded class of ligand
                 if (!apClassToScaffold.toString().equals("MAmine:1"))

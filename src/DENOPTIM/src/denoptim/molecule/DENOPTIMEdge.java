@@ -51,41 +51,43 @@ public class DENOPTIMEdge implements Serializable
 
 //------------------------------------------------------------------------------
     
-      /**
-       * Constructor for an edge that connects two APs. The number of 
-       * connections available in the APs is reduced upon creation of the edge 
-       * and according the the bond type.
-       * @param srcAP attachment point at source end
-       * @param trgAP attachment point at target end
-       * @param bondType defines what kind of bond type this edge should be 
-       * converted to when converting a graph into a chemical representation.
-       */
+    /**
+     * Constructor for an edge that connects two APs. The number of 
+     * connections available in the APs is reduced upon creation of the edge 
+     * and according the the bond type.
+     * @param srcAP attachment point at source end
+     * @param trgAP attachment point at target end
+     * @param bondType defines what kind of bond type this edge should be 
+     * converted to when converting a graph into a chemical representation.
+     */
     
-      public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
+    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
                           DENOPTIMAttachmentPoint trgAP, BondType bondType) {
-          this.srcAP = srcAP;
-          this.trgAP = trgAP;
-          this.bondType = bondType;
-          this.srcAP.updateFreeConnections(-bondType.getValence());
-          this.trgAP.updateFreeConnections(-bondType.getValence());
-      }
+        this.srcAP = srcAP;
+        this.trgAP = trgAP;
+        this.bondType = bondType;
+        this.srcAP.updateFreeConnections(-bondType.getValence());
+        this.trgAP.updateFreeConnections(-bondType.getValence());
+        this.srcAP.setUser(this);
+        this.trgAP.setUser(this);
+    }
       
 //------------------------------------------------------------------------------
       
-      /**
-       * Constructor for an edge that connects two APs. We assume a single bond.
-       * The number of 
-       * connections available in the APs is reduced upon creation of the edge 
-       * and according the the bond type.
-       * @param srcAP attachment point at source end
-       * @param trgAP attachment point at target end
-       */
+    /**
+     * Constructor for an edge that connects two APs. We assume a single bond.
+     * The number of 
+     * connections available in the APs is reduced upon creation of the edge 
+     * and according the the bond type.
+     * @param srcAP attachment point at source end
+     * @param trgAP attachment point at target end
+     */
     
-      public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
+    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
                           DENOPTIMAttachmentPoint trgAP) {
-          this(srcAP, trgAP, FragmentSpace.getBondOrderForAPClass(
+        this(srcAP, trgAP, FragmentSpace.getBondOrderForAPClass(
                   srcAP.getAPClass().toString()));
-      }
+    }
     
 //------------------------------------------------------------------------------
 

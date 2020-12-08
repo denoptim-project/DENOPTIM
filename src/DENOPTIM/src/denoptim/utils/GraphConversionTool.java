@@ -64,10 +64,6 @@ public class GraphConversionTool
     {  
         TreeMap<Integer,TreeMap<Integer,Integer>> atmSrcMap = 
                 new TreeMap<Integer,TreeMap<Integer,Integer>>();
-        
-        //TODOD del
-        System.out.println(" -----");
-        System.out.println("INITIATIN convert: "+atmSrcMap);
 
         IAtomContainer mol = new AtomContainer();
 
@@ -91,8 +87,6 @@ public class GraphConversionTool
             IAtomContainer iac = vertex.getIAtomContainer();
             
             // Project original atom position in atom position in global list
-          //TODO del
-            System.out.println("Filling Map from vid: "+id);
             for(IAtom atom : iac.atoms())
             {
                 int vid = (int) atom.getProperty(
@@ -101,30 +95,17 @@ public class GraphConversionTool
                         DENOPTIMConstants.ATMPROPORIGINALATMID);
                 if (atmSrcMap.containsKey(vid))
                 {
-                    //TODO del
-                    System.out.println("putting "+vid+" "+iatm+" "+l);
                     atmSrcMap.get(vid).put(iatm, l);
                 } else {
                     TreeMap<Integer,Integer> atmPositionInVrtxAndInMol = 
                             new TreeMap<Integer,Integer>();
                     atmPositionInVrtxAndInMol.put(iatm, l);
-                  //TODO del
-                    System.out.println("putting "+vid+" "+iatm+" "+l+" (B)");
                     atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
                 }
                 l++;
             }
 
             mol.add(iac);
-        }
-
-        //TODO del
-        System.out.println("Map of ATOMS");
-        for (int vid : atmSrcMap.keySet())
-        {
-            System.out.println(" VID: "+vid);
-            for (int atmi : atmSrcMap.get(vid).keySet())
-                System.out.println("  "+atmi+" : "+atmSrcMap.get(vid).get(atmi));
         }
         
         // loop through the edges
@@ -138,7 +119,6 @@ public class GraphConversionTool
 
             DENOPTIMVertex v1 = ap1.getOwner();
             DENOPTIMVertex v2 = ap2.getOwner();
-            
             
             try
             {
@@ -327,14 +307,6 @@ public class GraphConversionTool
 
             vertices.add(dv);
         }
-	
-        //TODO del
-        System.out.println("VERTEXES from string");
-        for (DENOPTIMVertex v : vertices)
-        {
-            System.out.println(" -> "+v.hashCode()+" "+v);
-        }
-        
         
         ArrayList<DENOPTIMEdge> edges = new ArrayList<>();
 
@@ -416,13 +388,6 @@ public class GraphConversionTool
                 DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, btype);
                 edges.add(ne);
             }
-        }
-        
-      //TODO del
-        System.out.println("EDGES from string");
-        for (DENOPTIMEdge e : edges)
-        {
-            System.out.println(" -> "+e.hashCode()+" "+e+" "+e.getSrcAP().getOwner().hashCode()+"-"+e.getTrgAP().getOwner().hashCode());
         }
     
         // collect Rings
