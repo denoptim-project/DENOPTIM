@@ -884,13 +884,28 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMVertex> getChildVertices(DENOPTIMVertex vertex)
     {
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<>();
-        
-        for (int vid : getChildVertices(vertex.getVertexId()))
-        {
-            lst.add(this.getVertexWithId(vid));
+        return vertex.getChilddren();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets all the children of the current vertex recursively.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     */
+    public void getChildrenTree(DENOPTIMVertex vertex, 
+            ArrayList<DENOPTIMVertex> children) {
+        ArrayList<DENOPTIMVertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) {
+            return;
         }
-        return lst;
+        for (DENOPTIMVertex child : lst) {
+            if (!children.contains(child)) {
+                children.add(child);
+                getChildrenTree(child, children);
+            }
+        }
     }
     
 //------------------------------------------------------------------------------  
@@ -903,12 +918,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public ArrayList<Integer> getChildVertices(int m_vid)
     {
         ArrayList<Integer> lst = new ArrayList<>();
-        for (int i=0; i<gEdges.size(); i++)
+        DENOPTIMVertex v = getVertexWithId(m_vid);
+        for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
         {
-            DENOPTIMEdge edge = gEdges.get(i);
-            if (edge.getSrcVertex() == m_vid)
+            DENOPTIMEdge e = ap.getEdgeUser();
+            if (e != null && e.getTrgVertex()!=m_vid)
             {
-                lst.add(edge.getTrgVertex());
+                lst.add(e.getTrgVertex());
             }
         }
         return lst;
@@ -1149,23 +1165,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         DENOPTIMEdge edge = getEdgeWithParent(m_vid);
         if (edge != null)  
         {
-            int src = edge.getSrcVertex();
-            return getVertexWithId(src);
+            return edge.getSrcAP().getOwner();
         }
         return null;
-    }
-
-//------------------------------------------------------------------------------
-
-    public int getParentAPIndex(int m_vid)
-    {
-        DENOPTIMEdge edge = getEdgeWithParent(m_vid);
-        if (edge != null)
-        {
-            return edge.getSrcAPID();
-        }
-        return -1;
-    }  
+    } 
     
 //------------------------------------------------------------------------------    
     
@@ -1600,84 +1603,64 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Gets all the children of the current vertex
-     * @param vid the vertex whose children are to be located
-     * @param children list containing the vertex ids of the children
-     */
-    public void getChildren(int vid, ArrayList<Integer> children) {
-        // get the child vertices of vid
-        ArrayList<Integer> lst = getChildVertices(vid);
-        if (lst.isEmpty()) {
-            return;
-        }
-        for (Integer childId : lst) {
-            if (!children.contains(childId)) {
-                children.add(childId);
-                getChildren(childId, children);
-            }
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Extracts the subgraph of a graph G starting from a given vertex in G.
-     * Only the given vertex V and all child vertexes are considered part of
-     * the subgraph, which encodes also rings and symmetric sets. Potential
+     * Extracts the subgraph of a graph G starting from a given seed vertex of 
+     * G.
+     * Only the seed vertex and all child vertexes (and further successors)
+     * are considered part of
+     * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
-     * @param vid the vertex id from which the extraction has to start
+     * @param seed the vertex from which the extraction has to start
      * @return the subgraph
      */
 
-    public DENOPTIMGraph extractSubgraph(int vid)
+    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
             throws DENOPTIMException
     {
         DENOPTIMGraph subGraph = new DENOPTIMGraph();
-
-        // Identify vertices belonging to subgraph (i.e., vid + children)
-        ArrayList<Integer> subGrpVrtIDs = new ArrayList<>();
-        subGrpVrtIDs.add(vid);
-        getChildren(vid, subGrpVrtIDs);
+        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        subGrpVrtxs.add(seed);
+        getChildrenTree(seed, subGrpVrtxs);
         // Copy vertices to subgraph
-        for (Integer i : subGrpVrtIDs)
+        for (DENOPTIMVertex v : subGrpVrtxs)
         {
-            subGraph.addVertex(getVertexWithId(i));
+            subGraph.addVertex(v);
             // vertices are removed later (see below) otherwise also
             // rings and sym.sets are removed
         }
 
-        // Remove the edge joining graph and gubgraph
-        removeEdgeWithParent(vid);
+        // Remove the edge joining graph and subgraph
+        removeEdgeWithParent(seed);
 
         // Identify edges belonging to subgraph
-        Iterator<DENOPTIMEdge> iter1 = getEdgeList().iterator();
-        while (iter1.hasNext())
+        Iterator<DENOPTIMEdge> edgesIterator = getEdgeList().iterator();
+        while (edgesIterator.hasNext())
         {
-            DENOPTIMEdge edge = iter1.next();
-            for (Integer k : subGrpVrtIDs)
+            DENOPTIMEdge edge = edgesIterator.next();
+            for (DENOPTIMVertex v : subGrpVrtxs)
             {
-                if (edge.getSrcVertex() == k || edge.getTrgVertex() == k)
+                if (edge.getSrcAP().getOwner() == v 
+                        || edge.getTrgAP().getOwner() == v)
                 {
                     // Copy edge to subgraph...
                     subGraph.addEdge(edge);
-                    // ...and remove it from molGraph
-                    iter1.remove();
+                    // ...and remove it from this graph
+                    edgesIterator.remove();
                     break;
                 }
             }
         }
 
         // Identify and move rings
-        Iterator<DENOPTIMRing> iter2 = getRings().iterator();
-        while (iter2.hasNext())
+        Iterator<DENOPTIMRing> ringsIterator = getRings().iterator();
+        while (ringsIterator.hasNext())
         {
-            DENOPTIMRing ring = iter2.next();
+            DENOPTIMRing ring = ringsIterator.next();
             boolean rSpanAnySGVrtx = false;
             boolean rWithinSubGrph = true;
             for (int i=0; i<ring.getSize(); i++)
             {
                 int idVrtInRing = ring.getVertexAtPosition(i).getVertexId();
-                if (subGrpVrtIDs.contains(idVrtInRing))
+                if (subGrpVrtxs.contains(getVertexWithId(idVrtInRing)))
                 {
                     rSpanAnySGVrtx = true;
                 }
@@ -1691,9 +1674,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 //copy ring to subgraph
                 subGraph.addRing(ring);
                 //remove ring from molGraph
-                iter2.remove();
+                ringsIterator.remove();
             }
-            //else if (!rSpanAnySGVrtx && rWithinSubGrph) imposible!
+            //else if (!rSpanAnySGVrtx && rWithinSubGrph) impossible!
             else if (!rSpanAnySGVrtx && !rWithinSubGrph)
             {
                 //ignore ring
@@ -1702,21 +1685,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             else if (rSpanAnySGVrtx && !rWithinSubGrph)
             {
                 // only remove ring from molGraph
-                iter2.remove();
+                ringsIterator.remove();
             }
         }
 
-        // Identify and move symmetiric sets
-        Iterator<SymmetricSet> iter3 = getSymSetsIterator();
-        while (iter3.hasNext())
+        // Identify and move symmetric sets
+        Iterator<SymmetricSet> symSetsIterator = getSymSetsIterator();
+        while (symSetsIterator.hasNext())
         {
-            SymmetricSet ss = iter3.next();
+            SymmetricSet ss = symSetsIterator.next();
             boolean ssSpanAnySGVrtx = false;
             boolean ssWithinSubGrph = true;
             SymmetricSet partOfSSInSubGraph = new SymmetricSet();
             for (Integer idVrtInSS : ss.getList())
             {
-                if (subGrpVrtIDs.contains(idVrtInSS))
+                if (subGrpVrtxs.contains(getVertexWithId(idVrtInSS)))
                 {
                     partOfSSInSubGraph.add(idVrtInSS);
                     ssSpanAnySGVrtx = true;
@@ -1731,9 +1714,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 //copy symm.set to subgraph
                 subGraph.addSymmetricSetOfVertices(ss);
                 //remove symm.set from molGraph
-                iter3.remove();
+                symSetsIterator.remove();
             }
-            //else if (!ssSpanAnySGVrtx && ssWithinSubGrph) imposible!
+            //else if (!ssSpanAnySGVrtx && ssWithinSubGrph) impossible!
             else if (!ssSpanAnySGVrtx && !ssWithinSubGrph)
             {
                 //ignore sym.set
@@ -1744,19 +1727,37 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 //copy only portion of sym.set
                 subGraph.addSymmetricSetOfVertices(partOfSSInSubGraph);
                 //remove sym.set from molGraph
-                iter3.remove();
+                symSetsIterator.remove();
             }
         }
 
         // Remove vertices from molGraph
-        for (Integer i : subGrpVrtIDs)
+        for (DENOPTIMVertex v : subGrpVrtxs)
         {
-            removeVertex(i);
+            removeVertex(v);
         }
 
         return subGraph;
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Removes the edge that links the given vertex to its parent
+     * @param vertex the vertex whose edge to parent is to be removed.
+     * @return the id of the parent vertex.
+     */
+
+    public int removeEdgeWithParent(DENOPTIMVertex vertex)
+    {
+        DENOPTIMEdge e = vertex.getEdgeToParent();
+        if (e == null)
+            return -1;
+        int pvid = e.getSrcVertex();
+        removeEdge(e);
+        return pvid;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -1767,6 +1768,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return the id of the parent vertex.
      */
 
+    //TODO-V3 replace with analogue using reference to vertex
     public int removeEdgeWithParent(int vid)
     {
         int pvid = -1;
@@ -1846,12 +1848,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         // now get the vertices attached to vid, i.e., vertex ids
-        ArrayList<Integer> children = new ArrayList<>();
-        getChildren(vid, children);
+        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
+        getChildrenTree(getVertexWithId(vid), children);
 
         // delete the children vertices and associated edges
-        for (int k : children) {
-            removeVertex(k);
+        for (DENOPTIMVertex v : children) {
+            removeVertex(v);
         }
 
         // finally delete the vertex and associated edges

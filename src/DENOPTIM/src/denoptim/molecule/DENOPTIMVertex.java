@@ -22,6 +22,7 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -817,7 +818,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @return the edge to the parent.
      */
 
-    protected DENOPTIMEdge getEdgeToParent() {
+    public DENOPTIMEdge getEdgeToParent() {
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
             DENOPTIMEdge user = ap.getEdgeUser();
@@ -830,6 +831,56 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             }
         }
         return null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the vertex which is the source of the edge
+     * in which this vertex is the target.
+     * @return the vertex parent to this or null.
+     */
+
+    public DENOPTIMVertex getParent() {
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUser();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getTrgAP())
+            {
+                return user.getSrcAP().getOwner();
+            }
+        }
+        return null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the list of vertices which are target of any 
+     * edge departing from this vertex. Only the directly connected children
+     * are considered (no recursion).
+     * @return the list of child vertices (can be empty list, but not null)
+     */
+
+    public ArrayList<DENOPTIMVertex> getChilddren() {
+        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUser();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getSrcAP())
+            {
+                children.add(user.getTrgAP().getOwner());
+            }
+        }
+        return children;
     }
     
 //------------------------------------------------------------------------------

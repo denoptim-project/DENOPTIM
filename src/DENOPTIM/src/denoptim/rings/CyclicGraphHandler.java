@@ -1785,11 +1785,8 @@ public class CyclicGraphHandler
                 }
                 
                 boolean isOrphan = false;
-                ArrayList<Integer> childVertxIDs = 
-                                             molGraph.getChildVertices(vId);
-                for (Integer cvId : childVertxIDs)
+                for (DENOPTIMVertex cVrtx : vert.getChilddren())
                 {
-                    DENOPTIMVertex cVrtx = molGraph.getVertexWithId(cvId);
                     if (cVrtx.isRCV() && !molGraph.isVertexInRing(cVrtx))
                     {
                         isOrphan = true;
@@ -1811,13 +1808,10 @@ public class CyclicGraphHandler
 //TODO: make the full-denticity requirement optional for same/all APclasses
             if (vert.getLevel() > 0)
             {
-                ArrayList<Integer> childVertxIDs =
-                                               molGraph.getChildVertices(vId);
                 Map<String,ArrayList<DENOPTIMVertex>> rcasOnThisVertex =
                                new HashMap<String,ArrayList<DENOPTIMVertex>>();
-                for (Integer cvId : childVertxIDs)
+                for (DENOPTIMVertex cVrtx : vert.getChilddren())
                 {
-                    DENOPTIMVertex cVrtx = molGraph.getVertexWithId(cvId);
                     if (cVrtx.isRCV())
                     {
                         DENOPTIMAttachmentPoint ap =

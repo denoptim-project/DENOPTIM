@@ -1130,7 +1130,7 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Selects proper verices and performs crossover between two graphs
+     * Selects proper vertices and performs crossover between two graphs
      * @param male the first Graph
      * @param female the second Graph
      * @return <code>true</code> if a new graph has been successfully produced
@@ -1140,7 +1140,6 @@ if(debug)
     public static boolean performCrossover(DENOPTIMGraph male,
                                 DENOPTIMGraph female) throws DENOPTIMException
     {
-
         // This is done to maintain a unique vertex-id mapping
         male.renumberGraphVertices();
         female.renumberGraphVertices();
@@ -1356,8 +1355,10 @@ if(debug)
             System.out.println("DBUG: MALE before extraction: "+male);
             System.out.println("DBUG: FEMALE before extraction: "+female);
         }
-        DENOPTIMGraph subG_M =  male.extractSubgraph(mvid);
-        DENOPTIMGraph subG_F =  female.extractSubgraph(fvid);
+        
+        //TODO-V3: make extraction able to deal with templates
+        DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
+        DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
         if (debug)
         {
             System.out.println("DBUG: subGraph from male: "+subG_M);
@@ -1384,12 +1385,12 @@ if(debug)
     /**
      * Decides whether to apply constitutional symmetry or not. Application
      * of this type of symmetry implies that the operation on the graph/molecule
-     * is to be performed on all the attachment point/verteces related to each
+     * is to be performed on all the attachment point/vertices related to each
      * other by "constitutional symmetry". Such type symmetry is defined by
      * {@link DENOPTIM.utils.FragmentUtils.getMatchingAP getMatchingAP} 
-     * for a single fragment, and symmetric verices in a graph are found by
+     * for a single fragment, and symmetric vertices in a graph are found by
      * {@link DENOPTIM.utils.GraphUtils.getSymmetricVertices getSymmetricVertices}.
-     * This method takes into account the effect of the symmetric subtitution 
+     * This method takes into account the effect of the symmetric substitution 
      * probability, and the symmetry-related keywords.
      * @param apClass the attachment point class.
      * @return <code>true</code> if symmetry is to be applied
