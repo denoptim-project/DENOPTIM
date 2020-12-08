@@ -256,6 +256,12 @@ public final class DENOPTIMConstants
      * to which the atom belongs.
      */
     public static final String ATMPROPVERTEXID = "DENOPTIMVertexID";
+    
+    /**
+     * String tag of <code>Atom</code> property used to store the original
+     * position of an atom in the atom list of the fragment.
+     */
+    public static final String ATMPROPORIGINALATMID = "DENOPTIMAtomPosition";
 
     /**
      * String tag of <code>Bond</code>'s property used to store the 

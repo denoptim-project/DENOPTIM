@@ -808,6 +808,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     @Override
     public IAtomContainer getIAtomContainer()
     {
+        for (int atmPos=0; atmPos<mol.getAtomCount(); atmPos++)
+        {
+            IAtom atm = mol.getAtom(atmPos);
+            atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, getVertexId());
+            atm.setProperty(DENOPTIMConstants.ATMPROPORIGINALATMID, atmPos);
+        }
         return mol;
     }
     

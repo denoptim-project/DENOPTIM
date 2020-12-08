@@ -10,6 +10,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -167,7 +168,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         template.interiorGraph.addVertex(vrtx);
         template.interiorGraph.addVertex(vrtx2);
         template.interiorGraph.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
-                vrtx2.getAP(1), 0,1,0,1));
+                vrtx2.getAP(1), BondType.SINGLE));
         
         //Fully frozen
         template.contractLevel = contractLevel;
@@ -227,13 +228,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
         // Make and add a fully defined edge that connects the two vertexes
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 1);
-        //DENOPTIMEdge eAB = GraphUtils.connectVertices(vA,vB,0,1,srcAPClass,trgAPClass);
 
         template.interiorGraph.addEdge(eAB);
         
-        
         /*
-        System.out.println("TEMPLATE's inner graph: "+template.interiorGraph);
         System.out.println("TEMPLATE's APs: ");
         //for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints())
         //    System.out.println("  "+ap+" free="+ap.isAvailable());
@@ -333,6 +331,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         template.interiorGraph.addRing(r);
         
 
+      //TODO-M7 del
+        System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+template.interiorGraph);
+        
         /*
         System.out.println("(F) TEMPLATE's inner graph: "+template.interiorGraph);
         System.out.println("(F) TEMPLATE's #HeavyAtoms: "+template.getHeavyAtomsCount());
@@ -340,6 +341,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         //for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints())
         //    System.out.println("  "+ap+" free="+ap.isAvailable());
         */
+        
+        //TODO-M7 del
+        template.interiorGraph.renumberGraphVertices();
+        
+      //TODO-M7 del
+        System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.interiorGraph);
+
         
         template.freezeTemplate();
         

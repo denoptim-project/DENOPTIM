@@ -568,14 +568,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     {
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
                 .get(sourceAPIndex);
-        APClass srcAPC = sourceAP.getAPClass();
         
         DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
                 .get(targetAPIndex);
-        APClass trgAPC = targetAP.getAPClass();
         
-        return connectVertices(target, sourceAPIndex, targetAPIndex, srcAPC, 
-                trgAPC);
+        return new DENOPTIMEdge(sourceAP,targetAP);
     }
     
 //------------------------------------------------------------------------------
@@ -638,6 +635,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @return edge connecting the vertices.
      */
 
+    //TODO-V3 test this in the non-APClass based approach
     public DENOPTIMEdge connectVertices(DENOPTIMVertex other)
     {
         ArrayList<Integer> apA = getFreeAPList();

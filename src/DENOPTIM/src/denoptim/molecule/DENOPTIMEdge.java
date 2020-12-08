@@ -24,6 +24,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Order;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 
 /**
  * This class represents the edge between two vertices.
@@ -82,7 +83,8 @@ public class DENOPTIMEdge implements Serializable
     
       public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
                           DENOPTIMAttachmentPoint trgAP) {
-          this(srcAP, trgAP, BondType.SINGLE);
+          this(srcAP, trgAP, FragmentSpace.getBondOrderForAPClass(
+                  srcAP.getAPClass().toString()));
       }
     
 //------------------------------------------------------------------------------
