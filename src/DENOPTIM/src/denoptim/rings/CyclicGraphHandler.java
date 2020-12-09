@@ -192,10 +192,8 @@ public class CyclicGraphHandler
                     arrLst.addAll(path.getVertecesPath());                    
                     DENOPTIMRing ring = new DENOPTIMRing(arrLst);
 
-                    BondType bndTypI = 
-                           molGraph.getIncidentEdges(vI).get(0).getBondType();
-                    BondType bndTypJ = 
-                           molGraph.getIncidentEdges(vJ).get(0).getBondType();
+                    BondType bndTypI = vI.getEdgeToParent().getBondType();
+                    BondType bndTypJ = vJ.getEdgeToParent().getBondType();
                     if (bndTypI != bndTypJ)
                     {
                         String s = "Attempt to close rings is not compatible "
@@ -1166,9 +1164,9 @@ public class CyclicGraphHandler
                                mol.getAtom(vIdToAtmId.get(vJ).get(0))).get(0);
 
             // Assuming that APClasses on both sides agree on bond order
-            // and that vI and vY are proper RCVs
+            // and that vI and vJ are proper RCVs
             
-            BondType bndTyp = graph.getIncidentEdges(vI).get(0).getBondType();
+            BondType bndTyp = vI.getEdgeToParent().getBondType();
             if (bndTyp.hasCDKAnalogue())
             {
                 IBond bnd = new Bond(srcI,srcJ);

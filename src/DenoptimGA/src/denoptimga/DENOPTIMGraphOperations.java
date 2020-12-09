@@ -238,12 +238,12 @@ public class DENOPTIMGraphOperations
             }
             for (Integer svid : toRemove)
             {
-                molGraph.removeBranchStartingAt(svid);
+                molGraph.removeBranchStartingAt(molGraph.getVertexWithId(svid));
             }
         }
         else
         {
-            molGraph.removeBranchStartingAt(vid);
+            molGraph.removeBranchStartingAt(molGraph.getVertexWithId(vid));
         }
 
         if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
@@ -1289,7 +1289,7 @@ if(debug)
         }
         for (Integer svid : toRemoveFromM)
         {
-            male.removeBranchStartingAt(svid);
+            male.removeBranchStartingAt(male.getVertexWithId(svid));
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertM.add(male.getParent(mvid));        
@@ -1322,7 +1322,7 @@ if(debug)
         }
         for (Integer svid : toRemoveFromF)
         {
-            female.removeBranchStartingAt(svid);
+            female.removeBranchStartingAt(female.getVertexWithId(svid));
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
         symParVertF.add(female.getParent(fvid));        

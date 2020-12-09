@@ -593,27 +593,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return gVertices.contains(v);
     }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Check if any of the vertexes in this graph has the given ID
-     * @param vId the vertex ID to search for
-     * @return <code>true</code> if the vertex ID is found in this graph
-     */
-    public boolean containsVertexId(int vId)
-    {
-    	boolean res = false;
-    	for (DENOPTIMVertex v : gVertices)
-    	{
-    		if (vId == v.getVertexId())
-    		{
-    			res = true;
-    			break;
-    		}
-    	}
-    	return res;
-    }
 
 //------------------------------------------------------------------------------
 
@@ -623,29 +602,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         int idx = getIndexOfVertex(m_vertexId);
         if (idx != -1)
             v = gVertices.get(idx);
-        return v;
-    }
-
-//------------------------------------------------------------------------------
-
-    public DENOPTIMVertex getVertexWithId(int m_vertexId, int m_lvl)
-    {
-        DENOPTIMVertex v = null;
-        int idx = -1;
-        for (int i=0; i<gVertices.size(); i++)
-        {
-            v = gVertices.get(i);
-            if (v.getVertexId() == m_vertexId && v.getLevel() == m_lvl)
-            {
-                idx = i;
-                break;
-            }
-        }
-
-        if (idx != -1)
-        {
-            v = gVertices.get(idx);
-        }
         return v;
     }
 
@@ -665,19 +621,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return idx;
     }
-
-//------------------------------------------------------------------------------
-
-    public void removeVertex(int m_vertexId)
-    {
-        DENOPTIMVertex v = getVertexWithId(m_vertexId);
-
-        if (v != null)
-        {
-            removeVertex(v);
-        }
-    }
-
 
 //------------------------------------------------------------------------------
 
@@ -777,67 +720,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         return sb.toString();
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @param m_vid the vertex id for which the adjacent vertices need to be found
-     * @return Arraylist containing the vertex ids of the adjacent vertices
-     */
-
-    public ArrayList<Integer> getAdjacentVertices(int m_vid)
-    {
-        ArrayList<Integer> lst = new ArrayList<>();
-        for (int i=0; i<gEdges.size(); i++)
-        {
-            DENOPTIMEdge edge = gEdges.get(i);
-            if (edge.getTrgVertex() == m_vid)
-            {
-                lst.add(edge.getSrcVertex());
-            }
-            if (edge.getSrcVertex() == m_vid)
-            {
-                lst.add(edge.getTrgVertex());
-            }
-        }
-        return lst;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @param v the <code>DENOPTIMVertex</code> for which the incident edges
-     * are to be found
-     * @return the list of incident <code>DENOPTIMEdge</code>s
-     */
-
-    public ArrayList<DENOPTIMEdge> getIncidentEdges(DENOPTIMVertex v)
-    {
-        return getIncidentEdges(v.getVertexId());
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @param vid the index of the <code>DENOPTIMVertex</code> for which the 
-     * incident edges are to be found
-     * @return the list of incident <code>DENOPTIMEdge</code>s
-     */
-
-    public ArrayList<DENOPTIMEdge> getIncidentEdges(int vid)
-    {         
-        ArrayList<DENOPTIMEdge> lst = new ArrayList<DENOPTIMEdge>();
-        for (int i=0; i<gEdges.size(); i++)
-        {
-            DENOPTIMEdge edge = gEdges.get(i);
-            if (edge.getTrgVertex() == vid ||
-                edge.getSrcVertex() == vid)
-            {
-                lst.add(edge);
-            }
-        }
-        return lst;
     }
     
 //------------------------------------------------------------------------------    
@@ -1757,30 +1639,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         removeEdge(e);
         return pvid;
     }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Removes the edge an updates the valence of the attachment points that
-     * were involved in the edge.
-     * @param vid the id of the vertex whose edge with its parent will be 
-     * removed.
-     * @return the id of the parent vertex.
-     */
-
-    //TODO-V3 replace with analogue using reference to vertex
-    public int removeEdgeWithParent(int vid)
-    {
-        int pvid = -1;
-        DENOPTIMEdge edge = getEdgeWithParent(vid);
-        if (edge != null)
-        {
-            pvid = edge.getSrcAP().getOwner().getVertexId();
-            removeEdge(edge);
-        }
-
-        return pvid;
-    }
 
 //------------------------------------------------------------------------------
 
@@ -1794,21 +1652,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
 
-    public boolean removeBranchStartingAt(int vid, boolean symmetry)
+    public boolean removeBranchStartingAt(DENOPTIMVertex v, boolean symmetry)
             throws DENOPTIMException
     {
         boolean res = true;
-        if (hasSymmetryInvolvingVertex(getVertexWithId(vid)) && symmetry)
+        if (hasSymmetryInvolvingVertex(v) && symmetry)
         {
-            ArrayList<Integer> toRemove = new ArrayList<>();
-            for (int i=0; i<getSymSetForVertexID(vid).size(); i++)
+            ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+            for (int i=0; i<getSymSetForVertexID(v.getVertexId()).size(); i++)
             {
-                int svid = getSymSetForVertexID(vid).getList().get(i);
-                toRemove.add(svid);
+                int svid = getSymSetForVertexID(v.getVertexId()).getList().get(i);
+                toRemove.add(getVertexWithId(svid));
             }
-            for (Integer svid : toRemove)
+            for (DENOPTIMVertex sv : toRemove)
             {
-                boolean res2 = removeBranchStartingAt(svid);
+                boolean res2 = removeBranchStartingAt(sv);
                 if (!res2)
                 {
                     res = res2;
@@ -1817,7 +1675,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         else
         {
-            res = removeBranchStartingAt(vid);
+            res = removeBranchStartingAt(v);
         }
 
         return res;
@@ -1834,32 +1692,32 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
 
-    public boolean removeBranchStartingAt(int vid)
+    public boolean removeBranchStartingAt(DENOPTIMVertex v)
             throws DENOPTIMException
     {
         // first delete the edge with the parent vertex
-        int pvid = removeEdgeWithParent(vid);
+        int pvid = removeEdgeWithParent(v);
         if (pvid == -1)
         {
             String msg = "Program Bug detected trying to delete vertex "
-                    + vid + " from graph '" + this + "'. "
+                    + v + " from graph '" + this + "'. "
                     + "Unable to locate parent edge.";
             throw new DENOPTIMException(msg);
         }
 
-        // now get the vertices attached to vid, i.e., vertex ids
+        // now get the vertices attached to v
         ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
-        getChildrenTree(getVertexWithId(vid), children);
+        getChildrenTree(v, children);
 
         // delete the children vertices and associated edges
-        for (DENOPTIMVertex v : children) {
-            removeVertex(v);
+        for (DENOPTIMVertex c : children) {
+            removeVertex(c);
         }
 
         // finally delete the vertex and associated edges
-        removeVertex(vid);
+        removeVertex(v);
 
-        return getVertexWithId(vid) == null;
+        return getVertexWithId(v.getVertexId()) == null;
     }
 
 //------------------------------------------------------------------------------
@@ -2362,11 +2220,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // Clone and renumber the subgraph to ensure uniqueness
         DENOPTIMGraph sgClone = subGraph.clone();
+        // The clones have the same vertex IDs before renumbering vertexes
+        DENOPTIMVertex cvClone = sgClone.getVertexWithId(
+                childVertex.getVertexId());
         sgClone.renumberGraphVertices();
-
-        // Make the connection between molGraph and subGraph
-        DENOPTIMVertex cvClone = sgClone.getVertexAtPosition(
-                subGraph.getIndexOfVertex(childVertex.getVertexId()));
 
         DENOPTIMEdge edge = new DENOPTIMEdge(parentVertex.getAP(parentAPIdx),
                 cvClone.getAP(childAPIdx), bndType);
@@ -3000,6 +2857,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         }
                         for (int cid : symmUnqChilds)
                         {
+                            DENOPTIMVertex cv = getVertexWithId(cid);
                             // Apply the query on the src AP on the focus vertex
                             // -1 id the wildcard
                             int srcApId = modGraph.getEdgeWithParent(
@@ -3016,7 +2874,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             {
                                 continue;
                             }
-                            modGraph.removeBranchStartingAt(cid,symmetry);
+                            modGraph.removeBranchStartingAt(cv,symmetry);
                             int wantedTrgApId = e.getTrgAPID();
                             int trgApLstSize = inGraph.getVertexWithId(
                                     e.getTrgVertex()).getNumberOfAP();
@@ -3050,7 +2908,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             query, verbosity);
                     for (int vid : matches)
                     {
-                        modGraph.removeBranchStartingAt(vid, symmetry);
+                        modGraph.removeBranchStartingAt(getVertexWithId(vid), 
+                                symmetry);
                     }
                     break;
                 }
