@@ -22,6 +22,7 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -311,13 +312,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void updateAttachmentPoint(int idx, int delta)
-    {
-        getAttachmentPoints().get(idx).updateFreeConnections(delta);
-    }
-
-//------------------------------------------------------------------------------
-
     public void setLevel(int m_level)
     {
         level = m_level;
@@ -390,7 +384,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
     @Override
     public DENOPTIMVertex clone()
-    {        
+    {
         return (DENOPTIMVertex) clone();
     }
     
@@ -571,17 +565,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                                         int sourceAPIndex,
                                         int targetAPIndex) 
     {
-        //System.err.println("Connecting vertices RCN");
         DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
                 .get(sourceAPIndex);
-        APClass srcAPC = sourceAP.getAPClass();
         
         DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
                 .get(targetAPIndex);
-        APClass trgAPC = targetAP.getAPClass();
         
-        return connectVertices(target, sourceAPIndex, targetAPIndex, srcAPC, 
-                trgAPC);
+        return new DENOPTIMEdge(sourceAP,targetAP);
     }
     
 //------------------------------------------------------------------------------
@@ -618,14 +608,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             // look up the reaction bond order table
             BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
 
-            // create a new edge
-            DENOPTIMEdge edge = new DENOPTIMEdge(getVertexId(),
-                    target.getVertexId(), sourceAPIndex, targetAPIndex,
-                    bndTyp, srcAPC, trgAPC);
-
-            // update the attachment point info
-            sourceAP.updateFreeConnections(-bndTyp.getValence());
-            targetAP.updateFreeConnections(-bndTyp.getValence());
+            // create a new edge (this also updated AP valence count)
+            DENOPTIMEdge edge = new DENOPTIMEdge(sourceAP, targetAP, bndTyp);
 
             return edge;
         } else {
@@ -650,6 +634,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @return edge connecting the vertices.
      */
 
+    //TODO-V3 test this in the non-APClass based approach
     public DENOPTIMEdge connectVertices(DENOPTIMVertex other)
     {
         ArrayList<Integer> apA = getFreeAPList();
@@ -681,12 +666,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         
         // create a new edge
         DENOPTIMEdge edge = new DENOPTIMEdge(getAP(iA), other.getAP(iB),
-                getVertexId(), other.getVertexId(), iA, iB,
                 BondType.parseInt(chosenBO));
-
-        // update the attachment point info
-        dap_A.updateFreeConnections(-chosenBO); // decrement the connections
-        dap_B.updateFreeConnections(-chosenBO); // decrement the connections
         
         return edge;
     }
@@ -755,6 +735,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param ap attachment point to add to this vertex
      */
     public void addAP(DENOPTIMAttachmentPoint ap) {
+        ap.setOwner(this);
         getAttachmentPoints().add(ap);
     }
 
@@ -774,6 +755,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
+    //TODO-V3. This method creates an empty APClass, which is not supposed to
+    // exist. It must be possible to define an AP without an APClass!
+    // This has to change!
+    
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, double[] dirVec) {
         try {
@@ -801,4 +786,103 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 atomPositionNumber, atomConnections, apConnections, dirVec,
                 apClass));
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the position of the given AP in the list of APs of this vertex
+     * @param ap the AP to find in the list of APs
+     * @return the index (0-n) of <code>ap</code> or -1 if that AP does not 
+     * belong to this vertex.
+     */
+    public int getIndexOfAP(DENOPTIMAttachmentPoint ap)
+    {
+        for (int i=0; i<getAttachmentPoints().size(); i++)
+        {
+            DENOPTIMAttachmentPoint candAp = getAttachmentPoints().get(i);
+            if (candAp == ap)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the edge
+     * that has this vertex as the target, i.e., the edge to the parent vertex.
+     * We assume there is only one such edge.
+     * @return the edge to the parent.
+     */
+
+    public DENOPTIMEdge getEdgeToParent() {
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUser();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getTrgAP())
+            {
+                return user;
+            }
+        }
+        return null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the vertex which is the source of the edge
+     * in which this vertex is the target.
+     * @return the vertex parent to this or null.
+     */
+
+    public DENOPTIMVertex getParent() {
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUser();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getTrgAP())
+            {
+                return user.getSrcAP().getOwner();
+            }
+        }
+        return null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the list of vertices which are target of any 
+     * edge departing from this vertex. Only the directly connected children
+     * are considered (no recursion).
+     * @return the list of child vertices (can be empty list, but not null)
+     */
+
+    public ArrayList<DENOPTIMVertex> getChilddren() {
+        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUser();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getSrcAP())
+            {
+                children.add(user.getTrgAP().getOwner());
+            }
+        }
+        return children;
+    }
+    
+//------------------------------------------------------------------------------
+
 }

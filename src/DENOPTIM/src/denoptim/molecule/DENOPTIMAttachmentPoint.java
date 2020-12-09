@@ -81,6 +81,11 @@ Comparable<DENOPTIMAttachmentPoint>
      * The vertex to which this AP is attached to.
      */
     private DENOPTIMVertex owner;
+    
+    /**
+     * The edge that is using this AP, if any
+     */
+    private DENOPTIMEdge user;
 
 
 //------------------------------------------------------------------------------
@@ -472,17 +477,6 @@ Comparable<DENOPTIMAttachmentPoint>
     public double[] getDirectionVector()
     {
         return dirVec;
-    }    
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Resets the connections of this AP. Makes all connections free.
-     */
-
-    public void resetFreeConnections()
-    {
-        setFreeConnections(totalConnections);
     }
 
 //------------------------------------------------------------------------------
@@ -807,6 +801,20 @@ Comparable<DENOPTIMAttachmentPoint>
                 && strA.compareToIgnoreCase(strB) == 0;
     }
 */
+  
+//-----------------------------------------------------------------------------
+
+    //TODO-V3: we should not be given the possibility to change the AP's owner
+    // However, this is currently needed because if the DNOPTIMVertex.addAP(...)
+    
+    /**
+     * Sets the reference to the vertex the owns this attachment point.
+     * @param owner the vertex that own this attachment point.
+     */
+    public void setOwner(DENOPTIMVertex owner)
+    {
+        this.owner = owner;
+    }
     
 //-----------------------------------------------------------------------------
 
@@ -814,6 +822,26 @@ Comparable<DENOPTIMAttachmentPoint>
         return owner;
     }
 
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Sets the reference to the edge that is using this attachment point.
+     * @param edge the user
+     */
+    public void setUser(DENOPTIMEdge edge) {
+        this.user = edge;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Gets the edge that is using this AP, or null if no edge is using this AP.
+     * @return
+     */
+    public DENOPTIMEdge getEdgeUser() {
+        return user;
+    }
+    
 //-----------------------------------------------------------------------------
 
 }

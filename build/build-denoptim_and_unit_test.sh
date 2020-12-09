@@ -3,8 +3,8 @@
 # build script for DENOPTIM
 find ../src/DENOPTIM/src/ -name *.java > javafiles.txt
 
-#jarsColumnSeparated=$(ls -1 lib/*.jar | while read l ; do echo $l"@@" ; done | tr -d "\n" | sed 's/@@/:/g' | sed 's/\:$//g')
-jarsColumnSeparated="lib/apiguardian-api-1.1.0.jar:lib/cdk-1.4.19.jar:lib/commons-io-2.4.jar:lib/commons-lang3-3.1.jar:lib/commons-math3-3.6.1.jar:lib/junit-jupiter-5.5.2.jar:lib/junit-jupiter-api-5.5.2.jar:lib/junit-jupiter-engine-5.5.2.jar:lib/junit-jupiter-migrationsupport-5.5.2.jar:lib/junit-jupiter-params-5.5.2.jar:lib/vecmath.jar"
+jarsColumnSeparated=$(ls -1 lib/*.jar | while read l ; do echo $l"@@" ; done | tr -d "\n" | sed 's/@@/:/g' | sed 's/\:$//g')
+#jarsColumnSeparated="lib/apiguardian-api-1.1.0.jar:lib/cdk-1.4.19.jar:lib/commons-io-2.4.jar:lib/commons-lang3-3.1.jar:lib/commons-math3-3.6.1.jar:lib/junit-jupiter-5.5.2.jar:lib/junit-jupiter-api-5.5.2.jar:lib/junit-jupiter-engine-5.5.2.jar:lib/junit-jupiter-migrationsupport-5.5.2.jar:lib/junit-jupiter-params-5.5.2.jar:lib/vecmath.jar"
 javac -cp "$jarsColumnSeparated" @javafiles.txt -encoding utf-8 -d .
 
 if [ "$?" != "0" ]; then
@@ -15,9 +15,9 @@ fi
 
 rm javafiles.txt
 
-#jars=$(ls -1 lib/*.jar | while read l ; do echo $l"@@" ; done | tr -d "\n" | sed 's/@@/ /g')
+jars=$(ls -1 lib/*.jar | while read l ; do echo $l"@@" ; done | tr -d "\n" | sed 's/@@/ /g')
 
-jars="lib/apiguardian-api-1.1.0.jar lib/cdk-1.4.19.jar lib/commons-io-2.4.jar lib/commons-lang3-3.1.jar lib/commons-math3-3.6.1.jar lib/junit-jupiter-5.5.2.jar lib/junit-jupiter-api-5.5.2.jar lib/junit-jupiter-engine-5.5.2.jar lib/junit-jupiter-migrationsupport-5.5.2.jar lib/junit-jupiter-params-5.5.2.jar lib/vecmath.jar"
+#jars="lib/apiguardian-api-1.1.0.jar lib/cdk-1.4.19.jar lib/commons-io-2.4.jar lib/commons-lang3-3.1.jar lib/commons-math3-3.6.1.jar lib/junit-jupiter-5.5.2.jar lib/junit-jupiter-api-5.5.2.jar lib/junit-jupiter-engine-5.5.2.jar lib/junit-jupiter-migrationsupport-5.5.2.jar lib/junit-jupiter-params-5.5.2.jar lib/vecmath.jar"
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Class-Path: $jars" >> manifest.mf
 echo >> manifest.mf
@@ -42,7 +42,6 @@ echo "--------------------- Done building DENOPTIM.jar ---------------------"
 # To run all denoptim unit tests
 java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar -p denoptim
 
-
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar -c denoptim.molecule.DENOPTIMVertexTest
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp lib/DENOPTIM.jar:../lib/cdk-1.4.19.jar -c denoptim.molecule.DENOPTIMGraphTest
 

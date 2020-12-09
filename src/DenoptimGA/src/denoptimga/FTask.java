@@ -271,16 +271,16 @@ public class FTask implements Callable
                 }
                 DenoptimIO.writeMolecule(molFinalFile, mol3DFinal, false);
 
-                newmol.setMoleculeFitness(fitVal);
+                newmol.setFitness(fitVal);
                 if (mol3DFinal.getProperty("UID") != null)
                 {
-                    newmol.setMoleculeUID(mol3DFinal.getProperty("UID").toString());
+                    newmol.setUID(mol3DFinal.getProperty("UID").toString());
                 }
                 else
-                newmol.setMoleculeUID(molinchi);
-                newmol.setMoleculeSmiles(molsmiles);
-                newmol.setMoleculeGraph(molGraph);
-                newmol.setMoleculeFile(molFinalFile);
+                newmol.setUID(molinchi);
+                newmol.setSmiles(molsmiles);
+                newmol.setGraph(molGraph);
+                newmol.setSDFFile(molFinalFile);
 
                 // add the newmol to the population list
                 synchronized (curPopln)

@@ -196,13 +196,6 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public void updateAttachmentPoint(int idx, int delta)
-    {
-        lstAPs.get(idx).updateFreeConnections(delta);
-    }
-
-//------------------------------------------------------------------------------
-
     /**
      *
      * @return <code>true</code> if vertex has symmetric APs
@@ -243,11 +236,13 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     public EmptyVertex clone()
     {
-        ArrayList<DENOPTIMAttachmentPoint> cLstAPs =
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        EmptyVertex c = new EmptyVertex(getVertexId());
+        c.setLevel(this.getLevel());
+        c.setAsRCV(this.isRCV());
+        
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            cLstAPs.add(ap.clone());
+            c.addAP(ap.clone());
         }
 
         ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
@@ -255,9 +250,8 @@ public class EmptyVertex extends DENOPTIMVertex
         {
             cLstSymAPs.add(ss.clone());
         }
+        c.setSymmetricAPSets(cLstSymAPs);
 
-        EmptyVertex c = new EmptyVertex(getVertexId(),cLstAPs,cLstSymAPs,isRCV());
-        c.setLevel(this.getLevel());
         return c;
     }
 

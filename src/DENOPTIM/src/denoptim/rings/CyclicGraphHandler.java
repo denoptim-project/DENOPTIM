@@ -50,6 +50,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.GenUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
@@ -249,7 +250,7 @@ public class CyclicGraphHandler
                                                             IAtomContainer mol,
                                                         DENOPTIMGraph molGraph)
                                                        throws DENOPTIMException
-    {
+    {   
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                                         new HashMap<ObjectPair,PathSubGraph>();
@@ -277,9 +278,9 @@ public class CyclicGraphHandler
                     }
                     continue;
                 }
-
                 // make the new candidate RCA pair
                 PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
+                
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
 
                 if (!keepRcaPair)
@@ -1310,24 +1311,10 @@ public class CyclicGraphHandler
                                                       throws DENOPTIMException
     {
         String s = "Evaluation of RCV pair " + vI + " " + vJ + ": ";
-        
-        System.out.println(" graph in evaluateRCVPair");
-        for (DENOPTIMAttachmentPoint ap : molGraph.getAttachmentPoints())
-        {
-            APClass a = ap.getAPClass();
-            System.out.println("  " +ap.getOwner()+ " "+ a + " " + a.hashCode());
-        }
-        for (DENOPTIMEdge e : molGraph.getEdgeList())
-        {
-            APClass src = e.getSrcAPClass();
-            APClass trg = e.getTrgAPClass();
-            System.out.println("  " + e + " "+src.hashCode()+" "+trg.hashCode());
-        }   
 
         // Get details on the first vertex (head)
         int vIdI = vI.getVertexId();
-        int edgeIdI = molGraph.getIndexOfEdgeWithParent(vIdI);
-        DENOPTIMEdge edgeI = molGraph.getEdgeAtPosition(edgeIdI);
+        DENOPTIMEdge edgeI = molGraph.getEdgeWithParent(vIdI);
         int srcApIdI = edgeI.getSrcAPID();
         DENOPTIMVertex pvI = molGraph.getParent(vIdI);
         DENOPTIMAttachmentPoint srcApI = pvI.getAttachmentPoints().get(
@@ -1337,8 +1324,7 @@ public class CyclicGraphHandler
 
         // Get details on the second vertex (tail)
         int vIdJ = vJ.getVertexId();
-        int edgeIdJ = molGraph.getIndexOfEdgeWithParent(vIdJ);
-        DENOPTIMEdge edgeJ = molGraph.getEdgeAtPosition(edgeIdJ);
+        DENOPTIMEdge edgeJ = molGraph.getEdgeWithParent(vIdJ);
         int srcApIdJ = edgeJ.getSrcAPID();
         DENOPTIMVertex pvJ = molGraph.getParent(vIdJ);
         DENOPTIMAttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
@@ -1790,8 +1776,7 @@ public class CyclicGraphHandler
                     && vertFrag.getFragmentType() == BBType.FRAGMENT)
             {
 
-                DENOPTIMEdge edgeToParnt = molGraph.getEdgeAtPosition(
-                                       molGraph.getIndexOfEdgeWithParent(vId));
+                DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
 //TODO-V3: change. hard coded class of ligand
                 if (!apClassToScaffold.toString().equals("MAmine:1"))
@@ -1800,11 +1785,8 @@ public class CyclicGraphHandler
                 }
                 
                 boolean isOrphan = false;
-                ArrayList<Integer> childVertxIDs = 
-                                             molGraph.getChildVertices(vId);
-                for (Integer cvId : childVertxIDs)
+                for (DENOPTIMVertex cVrtx : vert.getChilddren())
                 {
-                    DENOPTIMVertex cVrtx = molGraph.getVertexWithId(cvId);
                     if (cVrtx.isRCV() && !molGraph.isVertexInRing(cVrtx))
                     {
                         isOrphan = true;
@@ -1826,13 +1808,10 @@ public class CyclicGraphHandler
 //TODO: make the full-denticity requirement optional for same/all APclasses
             if (vert.getLevel() > 0)
             {
-                ArrayList<Integer> childVertxIDs =
-                                               molGraph.getChildVertices(vId);
                 Map<String,ArrayList<DENOPTIMVertex>> rcasOnThisVertex =
                                new HashMap<String,ArrayList<DENOPTIMVertex>>();
-                for (Integer cvId : childVertxIDs)
+                for (DENOPTIMVertex cVrtx : vert.getChilddren())
                 {
-                    DENOPTIMVertex cVrtx = molGraph.getVertexWithId(cvId);
                     if (cVrtx.isRCV())
                     {
                         DENOPTIMAttachmentPoint ap =

@@ -90,8 +90,7 @@ public class DENOPTIMGraphOperations
             // get edge toward parent vertex
             // get the edge where the vertex in question is the destination vertex
             // or end vertex. the source vertex then will be the crossover point
-            int medgeid = male.getIndexOfEdgeWithParent(mvid);
-            DENOPTIMEdge medge = male.getEdgeAtPosition(medgeid);
+            DENOPTIMEdge medge = male.getEdgeWithParent(mvid);
 
             for (int j=0; j<female.getVertexCount(); j++)
             {
@@ -110,8 +109,7 @@ public class DENOPTIMGraphOperations
                     continue;
 
                 // get edge toward parent vertex
-                int fedgeid = female.getIndexOfEdgeWithParent(fvid);
-                DENOPTIMEdge fedge = female.getEdgeAtPosition(fedgeid);
+                DENOPTIMEdge fedge = female.getEdgeWithParent(fvid);
                 
                 //Check condition for considering this combination
                 if (isCrossoverPossible(medge, fedge))
@@ -187,8 +185,8 @@ public class DENOPTIMGraphOperations
         DENOPTIMGraph graph = vertex.getGraphOwner();
 
         // first get the edge with the parent
-        int eidx = graph.getIndexOfEdgeWithParent(vid);
-        if (eidx == -1)
+        DENOPTIMEdge e = graph.getEdgeWithParent(vid);
+        if (e == null)
         {
             String msg = "Program Bug in substituteFragment: Unable to locate "
                     + "parent edge for vertex "+vertex+" in graph "+graph;
@@ -197,7 +195,7 @@ public class DENOPTIMGraphOperations
         }
 
         // vertex id of the parent
-        int pvid = graph.getEdgeAtPosition(eidx).getSrcVertex();
+        int pvid = e.getSrcVertex();
         DENOPTIMVertex pvertex = graph.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
@@ -931,9 +929,8 @@ if(debug)
         else
         {
             DENOPTIMVertex parent = molGraph.getParent(curVertex.getVertexId());
-            DENOPTIMEdge edge = molGraph.getEdgeAtPosition(
-                                molGraph.getIndexOfEdgeWithParent(
-                                             curVertex.getVertexId()));
+            DENOPTIMEdge edge = molGraph.getEdgeWithParent(
+                    curVertex.getVertexId());
             int prntId = parent.getMolId();
             BBType prntTyp = parent.getFragmentType();
             int prntAp = edge.getSrcAPID();
@@ -1133,7 +1130,7 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Selects proper verices and performs crossover between two graphs
+     * Selects proper vertices and performs crossover between two graphs
      * @param male the first Graph
      * @param female the second Graph
      * @return <code>true</code> if a new graph has been successfully produced
@@ -1143,7 +1140,6 @@ if(debug)
     public static boolean performCrossover(DENOPTIMGraph male,
                                 DENOPTIMGraph female) throws DENOPTIMException
     {
-
         // This is done to maintain a unique vertex-id mapping
         male.renumberGraphVertices();
         female.renumberGraphVertices();
@@ -1242,21 +1238,19 @@ if(debug)
         // get details about crossover points
         DENOPTIMVertex mvert = male.getVertexWithId(mvid);
         DENOPTIMVertex fvert = female.getVertexWithId(fvid);
-        int eidxM = male.getIndexOfEdgeWithParent(mvid);
-        int eidxF = female.getIndexOfEdgeWithParent(fvid);
-        DENOPTIMEdge eM = male.getEdgeAtPosition(eidxM);
-        DENOPTIMEdge eF = female.getEdgeAtPosition(eidxF);
-        int apidxMP = eM.getSrcAPID(); // ap index of the male parent
-        int apidxMC = eM.getTrgAPID(); // ap index of the male
-        int apidxFC = eF.getTrgAPID(); // ap index of the female
-        int apidxFP = eF.getSrcAPID(); // ap index of the female parent
-        BondType bndOrder = eM.getBondType();
-
         if(debug)
         {
             System.err.println("Male XOVER vertex: " + mvert);
             System.err.println("Female XOVER vertex: " + fvert);
         }
+        
+        DENOPTIMEdge eM = male.getEdgeWithParent(mvid);
+        DENOPTIMEdge eF = female.getEdgeWithParent(fvid);
+        int apidxMP = eM.getSrcAPID(); // ap index of the male parent
+        int apidxMC = eM.getTrgAPID(); // ap index of the male
+        int apidxFC = eF.getTrgAPID(); // ap index of the female
+        int apidxFP = eF.getSrcAPID(); // ap index of the female parent
+        BondType bndOrder = eM.getBondType();
 
         // Identify all verteces symmetric to the ones chosen for xover
         // Xover is to be projected on each of these
@@ -1361,8 +1355,10 @@ if(debug)
             System.out.println("DBUG: MALE before extraction: "+male);
             System.out.println("DBUG: FEMALE before extraction: "+female);
         }
-        DENOPTIMGraph subG_M =  male.extractSubgraph(mvid);
-        DENOPTIMGraph subG_F =  female.extractSubgraph(fvid);
+        
+        //TODO-V3: make extraction able to deal with templates
+        DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
+        DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
         if (debug)
         {
             System.out.println("DBUG: subGraph from male: "+subG_M);
@@ -1389,12 +1385,12 @@ if(debug)
     /**
      * Decides whether to apply constitutional symmetry or not. Application
      * of this type of symmetry implies that the operation on the graph/molecule
-     * is to be performed on all the attachment point/verteces related to each
+     * is to be performed on all the attachment point/vertices related to each
      * other by "constitutional symmetry". Such type symmetry is defined by
      * {@link DENOPTIM.utils.FragmentUtils.getMatchingAP getMatchingAP} 
-     * for a single fragment, and symmetric verices in a graph are found by
+     * for a single fragment, and symmetric vertices in a graph are found by
      * {@link DENOPTIM.utils.GraphUtils.getSymmetricVertices getSymmetricVertices}.
-     * This method takes into account the effect of the symmetric subtitution 
+     * This method takes into account the effect of the symmetric substitution 
      * probability, and the symmetry-related keywords.
      * @param apClass the attachment point class.
      * @return <code>true</code> if symmetry is to be applied

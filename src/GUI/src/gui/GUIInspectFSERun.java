@@ -388,15 +388,15 @@ public class GUIInspectFSERun extends GUICardPanel
         	j++;
         	mapCandsInByLevel.put(j, mol);
         	candsWithFitnessDataPerLevel[0][j] = mol.getLevel();
-        	candsWithFitnessDataPerLevel[1][j] = mol.getMoleculeFitness();
+        	candsWithFitnessDataPerLevel[1][j] = mol.getFitness();
         }
         
         sorted = new ArrayList<DENOPTIMMolecule>();
         sorted.addAll(mapCandsInByLevel.values());
         sorted.sort(new Comparator<DENOPTIMMolecule>() {
 			public int compare(DENOPTIMMolecule a, DENOPTIMMolecule b) {
-				return Double.compare(a.getMoleculeFitness(),
-						b.getMoleculeFitness());
+				return Double.compare(a.getFitness(),
+						b.getFitness());
 			}
 		});
         
@@ -405,7 +405,7 @@ public class GUIInspectFSERun extends GUICardPanel
         {
         	DENOPTIMMolecule mol = sorted.get(i);
         	candsWithFitnessDataSorted[0][i] = i;
-        	candsWithFitnessDataSorted[1][i] = mol.getMoleculeFitness();
+        	candsWithFitnessDataSorted[1][i] = mol.getFitness();
         }
         
         datasetAllFit = new DefaultXYDataset(); 
@@ -628,20 +628,20 @@ public class GUIInspectFSERun extends GUICardPanel
 		
         double[][] selectedCandsDataLev = new double[2][1]; 
     	selectedCandsDataLev[0][0] = mol.getLevel();
-    	selectedCandsDataLev[1][0] = mol.getMoleculeFitness();
+    	selectedCandsDataLev[1][0] = mol.getFitness();
         datasetSelectedLev.removeSeries("Selected_candidates");
         datasetSelectedLev.addSeries("Selected_candidates", selectedCandsDataLev);
 		chartByLevel.getXYPlot().setDataset(1, datasetSelectedLev);
 
 		double[][] selectedCandsDataOrd = new double[2][1]; 
     	selectedCandsDataOrd[0][0] = sorted.indexOf(mol);
-    	selectedCandsDataOrd[1][0] = mol.getMoleculeFitness();        	
+    	selectedCandsDataOrd[1][0] = mol.getFitness();        	
         datasetSelectedOrd.removeSeries("Selected_candidates");
         datasetSelectedOrd.addSeries("Selected_candidates", selectedCandsDataOrd);
 		chartBySorted.getXYPlot().setDataset(1, datasetSelectedOrd);
 		
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(mol.getMoleculeFile());
+		molViewer.loadChemicalStructureFromFile(mol.getSDFFile());
 	}
 	
 //-----------------------------------------------------------------------------

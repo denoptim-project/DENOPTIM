@@ -441,7 +441,7 @@ public class GUIInspectGARun extends GUICardPanel
         	j++;
         	candsWithFitnessMap.put(j, mol);
         	candsWithFitnessData[0][j] = mol.getGeneration();
-        	candsWithFitnessData[1][j] = mol.getMoleculeFitness();
+        	candsWithFitnessData[1][j] = mol.getFitness();
         }
 		datasetAllFit.addSeries("Candidates_with_fitness", candsWithFitnessData);
 		
@@ -642,14 +642,14 @@ public class GUIInspectGARun extends GUICardPanel
         	j++;
         	candsWithFitnessMap.put(j, mol);
         	selectedCandsData[0][j] = mol.getGeneration();
-        	selectedCandsData[1][j] = mol.getMoleculeFitness();
+        	selectedCandsData[1][j] = mol.getFitness();
         }
         datasetSelected.removeSeries("Selected_candidates");
         datasetSelected.addSeries("Selected_candidates", selectedCandsData);
 		chart.getXYPlot().setDataset(1, datasetSelected);
 		
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(mol.getMoleculeFile());
+		molViewer.loadChemicalStructureFromFile(mol.getSDFFile());
 	}
 	
 //-----------------------------------------------------------------------------

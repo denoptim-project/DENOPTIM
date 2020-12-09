@@ -51,9 +51,9 @@ import org.openscience.cdk.graph.PathTools;
 public class PathSubGraph
 {
     /**
-     * The graph representation of this path. 
-     * With respect to the extended <code>DENOPTIMGraph</code>, both
-     * <code>DENOPTIMVertex</code> and <code>DENOPTIMEdge</code> 
+     * The graph representation of this path. Neither
+     * <code>DENOPTIMVertex</code> and <code>DENOPTIMEdge</code>
+     * belong to the original <code>DENOPTIMGraph</code>.
      */
     private DENOPTIMGraph graph;
 
@@ -144,7 +144,7 @@ public class PathSubGraph
     {
         this.vA = vA;
         this.vB = vB;
-
+        
         // Identify the path between vA and vB
         // Obtain path from vA to seed of the graph
         List<DENOPTIMVertex> seedToVA = new ArrayList<DENOPTIMVertex>();
@@ -153,8 +153,7 @@ public class PathSubGraph
         int currVert = vA.getVertexId();
         for (int i=-1; i<vA.getLevel(); i++)
         {
-            DENOPTIMEdge edgeToParent = molGraph.getEdgeAtPosition(
-                        molGraph.getIndexOfEdgeWithParent(currVert));
+            DENOPTIMEdge edgeToParent = molGraph.getEdgeWithParent(currVert);
             seedToVAEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
             seedToVA.add(parent);
@@ -166,6 +165,7 @@ public class PathSubGraph
                 break;
             }
         }
+        
         // Obtain path from vB to seed of the graph
         List<DENOPTIMVertex> seedToVB = new ArrayList<DENOPTIMVertex>();
         List<DENOPTIMEdge> seedToVBEdges = new ArrayList<DENOPTIMEdge>();
@@ -173,8 +173,7 @@ public class PathSubGraph
         currVert = vB.getVertexId();
         for (int i=-1; i<vB.getLevel(); i++)
         {
-            DENOPTIMEdge edgeToParent = molGraph.getEdgeAtPosition(
-                        molGraph.getIndexOfEdgeWithParent(currVert));
+            DENOPTIMEdge edgeToParent = molGraph.getEdgeWithParent(currVert);
             seedToVBEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
             seedToVB.add(parent);
@@ -211,7 +210,7 @@ public class PathSubGraph
                 edgesPathVAVB.add(seedToVAEdges.get(i));
             }
         }
-
+        
         // Build the DENOPTIMGraph and string representations of this sub graph
         chainID = "";
         revChainID = "";
@@ -230,10 +229,9 @@ public class PathSubGraph
             DENOPTIMEdge edgeToFrnt = edgesPathVAVB.get(i);
 
             // The first and the last verteces will always be RCA, and they
-            // may be from the capping library of from the fragments library
+            // may be from the capping library or from the fragments library
             // and this will make the chainID be different for otherwise equal
             // chains. Thus first and last vertex are not seen in the chainID
-            
             
             //TODO-V3 chainID uses molId and fragType from DENOPTIMFragment
             // Therefore, vertexes that are not instances of DENOPTIMFragment
@@ -291,22 +289,25 @@ public class PathSubGraph
             chainID = chainID + apIdHere2Back + "ap" + apIdHere2Frnt + "_";
             revChainID = leftRevChainID + apIdHere2Frnt + "ap"
 			     + apIdHere2Back + "_" + revChainID; 
-
+            
+            // We must work with clones of the actual vertexes/edges
+            DENOPTIMVertex cloneVertBack = vertBack.clone();
+            DENOPTIMVertex cloneVertHere = vertHere.clone();
+            DENOPTIMVertex cloneVertFrnt = vertFrnt.clone();
+            
             // Build the DENOPTIMGraph with edges directed from VA to VB
             if (i == 1) {
-                gVertices.add(vertBack);
+                gVertices.add(cloneVertBack);
             }
-            gVertices.add(vertHere);
-            gEdges.add(new DENOPTIMEdge(vertBack.getAP(apIdBack2Here),
-                    vertHere.getAP(apIdHere2Back), vertBack.getVertexId(),
-                    vertHere.getVertexId(), apIdBack2Here, apIdHere2Back,
+            gVertices.add(cloneVertHere);
+            gEdges.add(new DENOPTIMEdge(cloneVertBack.getAP(apIdBack2Here),
+                    cloneVertHere.getAP(apIdHere2Back),
                     edgeToBack.getBondType()));
             if (i == vertPathVAVB.size()-2)
             {
-                gVertices.add(vertFrnt);
-                gEdges.add(new DENOPTIMEdge(vertHere.getAP(apIdHere2Frnt),
-                        vertFrnt.getAP(apIdFrnt2Here), vertHere.getVertexId(),
-                        vertFrnt.getVertexId(), apIdHere2Frnt, apIdFrnt2Here,
+                gVertices.add(cloneVertFrnt);
+                gEdges.add(new DENOPTIMEdge(cloneVertHere.getAP(apIdHere2Frnt),
+                        cloneVertFrnt.getAP(apIdFrnt2Here),
                         edgeToFrnt.getBondType()));
             }
         }

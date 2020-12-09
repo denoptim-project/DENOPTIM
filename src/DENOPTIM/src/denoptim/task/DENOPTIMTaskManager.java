@@ -122,7 +122,7 @@ public class DENOPTIMTaskManager
             {
                 DENOPTIMMolecule taskResult =
                                     (DENOPTIMMolecule) cservice.take().get();
-                if (!taskResult.getMoleculeUID().equals("UNDEFINED"))
+                if (!taskResult.getUID().equals("UNDEFINED"))
                 {
                     results.add(taskResult);
                 }

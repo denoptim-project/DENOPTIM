@@ -195,5 +195,21 @@ public class DENOPTIMAttachmentPointTest
 		assertFalse(apA.equals(apB));
     }
     
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testClone() throws Exception
+    {
+        dummyVertex.addAP(1, 2, 1, APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint orig = dummyVertex.getAP(
+                dummyVertex.getNumberOfAP()-1);
+        
+        DENOPTIMAttachmentPoint clone = orig.clone();
+        
+        assertEquals(clone.getAPClass().hashCode(),
+                orig.getAPClass().hashCode(),"Hashcode of cloned APClass");
+    }
+    
 //------------------------------------------------------------------------------
+    
 }

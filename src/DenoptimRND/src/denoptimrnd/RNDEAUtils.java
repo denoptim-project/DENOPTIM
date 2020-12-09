@@ -79,9 +79,9 @@ class RNDEAUtils
             if (mol != null)
             {
                 sb.append(String.format("%-20s", 
-					  mol.getMoleculeGraph().getGraphId()));
-                sb.append(String.format("%-30s", mol.getMoleculeUID()));
-                sb.append(df.format(mol.getMoleculeFitness()));
+					  mol.getGraph().getGraphId()));
+                sb.append(String.format("%-30s", mol.getUID()));
+                sb.append(df.format(mol.getFitness()));
                 sb.append(System.getProperty("line.separator"));
             }
         }
@@ -144,7 +144,7 @@ class RNDEAUtils
         for (int i=0; i<RNDParameters.getPopulationSize(); i++)
         {
             DENOPTIMMolecule mol = pop.get(i);
-            DENOPTIMGraph g = mol.getMoleculeGraph();
+            DENOPTIMGraph g = mol.getGraph();
             int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
         }
@@ -182,7 +182,7 @@ class RNDEAUtils
         {
             for (int i=0; i<RNDParameters.getPopulationSize(); i++)
             {
-                String sdfile = pop.get(i).getMoleculeFile();
+                String sdfile = pop.get(i).getSDFFile();
                 String imgfile = pop.get(i).getImageFile();
 
                 if (sdfile != null && imgfile != null)
@@ -215,7 +215,7 @@ class RNDEAUtils
 
         for (int i=0; i<k; i++)
         {
-            arr[i] = mols.get(i).getMoleculeFitness();
+            arr[i] = mols.get(i).getFitness();
         }
         return arr;
     }
@@ -236,7 +236,7 @@ class RNDEAUtils
 
         for (int i=0; i<k; i++)
         {
-            arr.add(molPopulation.get(i).getMoleculeUID());
+            arr.add(molPopulation.get(i).getUID());
         }
         return arr;
     }

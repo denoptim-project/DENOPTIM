@@ -41,6 +41,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -351,12 +352,13 @@ public class ParallelEvolutionaryAlgorithm
         // keep a clone of the current population for the parents to be
         // chosen from
         ArrayList<DENOPTIMMolecule> clone_popln;
-
         synchronized (molPopulation)
         {
-            //TODO-V3 get rid of serialization-based deep copying
-            clone_popln = (ArrayList<DENOPTIMMolecule>) DenoptimIO.deepCopy(
-                    molPopulation);
+            clone_popln = new ArrayList<DENOPTIMMolecule>();
+            for (DENOPTIMMolecule m : molPopulation)
+            {
+                clone_popln.add(m.clone());
+            }
         }
 
         int newPopSize = GAParameters.getNumberOfChildren() + clone_popln.size();
@@ -428,7 +430,7 @@ public class ParallelEvolutionaryAlgorithm
                     //TODO-V3 this while block seems to be needed only to 
                     // account for the fact that it might be impossible to find 
                     // compatible parents. So, if the selectParents is made able
-                    // to detect whether it is ìNOT possible to select compatible 
+                    // to detect whether it is NOT possible to select compatible 
                     // parents, this block becomes useless and can be removed
                     
                     while (numatt < MAX_EVOLVE_ATTEMPTS)
@@ -459,20 +461,16 @@ public class ParallelEvolutionaryAlgorithm
                     if (foundPars)
                     {
                         String molid1 = FilenameUtils.getBaseName(
-                                clone_popln.get(i1).getMoleculeFile());
+                                clone_popln.get(i1).getSDFFile());
                         String molid2 = FilenameUtils.getBaseName(
-                                clone_popln.get(i2).getMoleculeFile());
+                                clone_popln.get(i2).getSDFFile());
 
-                        int gid1 = clone_popln.get(i1).getMoleculeGraph().getGraphId();
-                        int gid2 = clone_popln.get(i2).getMoleculeGraph().getGraphId();
+                        int gid1 = clone_popln.get(i1).getGraph().getGraphId();
+                        int gid2 = clone_popln.get(i2).getGraph().getGraphId();
 
-                        // clone the parents
-                        //TODO-V3 get rid of serialization based deep copying
-                        graph1 = (DENOPTIMGraph) DenoptimIO.deepCopy
-                                        (clone_popln.get(i1).getMoleculeGraph());
-                        graph2 = (DENOPTIMGraph) DenoptimIO.deepCopy
-                                        (clone_popln.get(i2).getMoleculeGraph());
-
+                        graph1 = clone_popln.get(i1).getGraph().clone();
+                        graph2 = clone_popln.get(i2).getGraph().clone();
+                          
                         f0 += 2;
 
                         if (DENOPTIMGraphOperations.performCrossover(graph1, graph2))
@@ -526,14 +524,12 @@ public class ParallelEvolutionaryAlgorithm
                      
                     if (foundPars)
                     {
-                        //TODO-V3 get rid of serialization based deep copying
-                        graph3 = (DENOPTIMGraph) DenoptimIO.deepCopy(
-                                clone_popln.get(i3).getMoleculeGraph());
+                        graph3 = clone_popln.get(i3).getGraph().clone();
                         f1 += 1;
 
                         String molid3 = FilenameUtils.getBaseName(
-                                clone_popln.get(i3).getMoleculeFile());
-                        int gid3 = clone_popln.get(i3).getMoleculeGraph()
+                                clone_popln.get(i3).getSDFFile());
+                        int gid3 = clone_popln.get(i3).getGraph()
                                 .getGraphId();
 
                         if (DENOPTIMGraphOperations.performMutation(graph3))
@@ -942,7 +938,7 @@ public class ParallelEvolutionaryAlgorithm
         boolean updated = false;
         for (int i=0; i<molPopulation.size(); i++)
         {
-            if (!inchisInPop.contains(molPopulation.get(i).getMoleculeUID()))
+            if (!inchisInPop.contains(molPopulation.get(i).getUID()))
             {
                 updated = true;
                 break;

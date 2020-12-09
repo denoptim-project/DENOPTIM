@@ -198,6 +198,7 @@ public class DENOPTIMGraphEdit {
                 btype = Integer.parseInt(strPrts[4]);
             }
 
+            //TODO-V3 fix this
             // TODO: Broken code. Only here to allow code to compile.
             // Change this section when wildcard problem solved.
             DENOPTIMVertex srcVertex = new EmptyVertex(srcVertexId);
@@ -210,11 +211,7 @@ public class DENOPTIMGraphEdit {
                 trgVertex.addAP();
             }
 		    this.focusEdge = new DENOPTIMEdge(srcVertex.getAP(srcAPId),
-                    trgVertex.getAP(trgAPId), srcVertexId, trgVertexId,
-                    srcAPId, trgAPId, BondType.parseInt(btype));
-            // old code
-//            this.focusEdge = new DENOPTIMEdge(srcVertexId, trgVertexId,
-//                    srcAPId, trgAPId, BondType.parseInt(btype));
+                    trgVertex.getAP(trgAPId), BondType.parseInt(btype));
 
             if (strPrts.length > 5) {
                 //source APClass

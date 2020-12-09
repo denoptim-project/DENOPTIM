@@ -54,6 +54,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 
 public class DenoptimIOTest {
 
+    private static final BondType BT = BondType.SINGLE;
 
 //------------------------------------------------------------------------------
 
@@ -65,31 +66,31 @@ public class DenoptimIOTest {
 
 		DENOPTIMVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graph);
-		graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0), 0, 1, 0, 0));
+		graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0),BT));
 
 		DENOPTIMVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graph);
-		graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0), 1, 2, 1, 0));
+		graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0),BT));
 
 		DENOPTIMVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0), 2, 3, 1, 0));
+		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0),BT));
 
 		DENOPTIMVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 3, graph);
-		graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0), 0, 4, 1, 0));
+		graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0),BT));
 
 		DENOPTIMVertex v5 = new EmptyVertex(5);
 		buildVertexAndConnectToGraph(v5, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0), 4, 5, 1, 0));
+		graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0),BT));
 
 		DENOPTIMVertex v6 = new EmptyVertex(6);
 		buildVertexAndConnectToGraph(v6, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0), 0, 6, 2, 0));
+		graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0),BT));
 
 		DENOPTIMVertex v7 = new EmptyVertex(7);
 		buildVertexAndConnectToGraph(v7, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0), 4, 7, 2, 0));
+		graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0),BT));
 
 		graph.addRing(new DENOPTIMRing(new ArrayList<>(
 				Arrays.asList(v5, v4, v0, v1, v2, v3))));

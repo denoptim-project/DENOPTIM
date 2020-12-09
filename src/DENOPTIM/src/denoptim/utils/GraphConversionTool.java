@@ -21,6 +21,8 @@ package denoptim.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -53,14 +55,15 @@ public class GraphConversionTool
      * Generate the CDK atom-bond representation from the graph
      * @param g the molecular graph
      * @param closeRings if <code>true</code> imposes to make ring closing
-     * bonds as specifies by the <code>DENOPTIMRing</code>s in the graph.
+     * bonds as specified by the <code>DENOPTIMRing</code>s in the graph.
      * @return CDK representation of the molecular graph
      */
 
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
-    {
-        ArrayList<DENOPTIMVertexAtom> lstDVA = new ArrayList<>();
+    {  
+        TreeMap<Integer,TreeMap<Integer,Integer>> atmSrcMap = 
+                new TreeMap<Integer,TreeMap<Integer,Integer>>();
 
         IAtomContainer mol = new AtomContainer();
 
@@ -77,114 +80,67 @@ public class GraphConversionTool
             {
                 //TODO-V3 remove, eventually
                 System.out.println("WARNING! THIS VERTEX has NO ATOMS");
-                
-                //TODO-V3 check: here we add an empty map. This will beak 
-                // the code when we call getCorrespondingAtomNumber.
-                lstDVA.add(new DENOPTIMVertexAtom(id, 
-                        new HashMap<Integer, Integer>()));
                 continue;
             }
 
+            // Here we get atoms that are labelled with the original vertex ID
             IAtomContainer iac = vertex.getIAtomContainer();
             
-            for (IAtom atm : iac.atoms())
-            {
-                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,
-                        vertex.getVertexId());
-            }
-
-            mol.add(iac);
-
-            HashMap<Integer, Integer> anum_map = new HashMap<>();
-
+            // Project original atom position in atom position in global list
             for(IAtom atom : iac.atoms())
             {
-                j = iac.getAtomNumber(atom);
-                anum_map.put(j, l);
+                int vid = (int) atom.getProperty(
+                        DENOPTIMConstants.ATMPROPVERTEXID);
+                int iatm = (int) atom.getProperty(
+                        DENOPTIMConstants.ATMPROPORIGINALATMID);
+                if (atmSrcMap.containsKey(vid))
+                {
+                    atmSrcMap.get(vid).put(iatm, l);
+                } else {
+                    TreeMap<Integer,Integer> atmPositionInVrtxAndInMol = 
+                            new TreeMap<Integer,Integer>();
+                    atmPositionInVrtxAndInMol.put(iatm, l);
+                    atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
+                }
                 l++;
             }
 
-            DENOPTIMVertexAtom vtxAtm = new DENOPTIMVertexAtom(id, anum_map);
-            lstDVA.add(vtxAtm);
+            mol.add(iac);
         }
-
-
+        
         // loop through the edges
         n = g.getEdgeCount();
         for (int i=0; i<n; i++)
         {
             DENOPTIMEdge edge = g.getEdgeList().get(i);
 
-            // get the vertex ids
-            int v1_id = edge.getSrcVertex();
-            int v2_id = edge.getTrgVertex();
+            DENOPTIMAttachmentPoint ap1 = edge.getSrcAP();
+            DENOPTIMAttachmentPoint ap2 = edge.getTrgAP();
 
-
-            DENOPTIMVertex v1 = g.getVertexWithId(v1_id);
-            DENOPTIMVertex v2 = g.getVertexWithId(v2_id);
-
-            int dap_idx_v1 = edge.getSrcAPID();
-            int dap_idx_v2 = edge.getTrgAPID();
-
-            int dap1_anum = -1;
-            try
-            {
-                dap1_anum = v1.getAttachmentPoints().get(dap_idx_v1).
-                                getAtomPositionNumber();
-            } catch (Exception e)
-            {
-                System.out.println(" ");
-                System.out.println("Exception when trying to get source atom "
-                        + "ID.");
-                System.out.println("GraphMSG: "+g.getMsg());
-                System.out.println("Graph: "+g);
-                System.out.println("Edge: "+edge);
-                System.out.println("Vertex: "+v1);
-                System.out.println("AP id: "+dap_idx_v1);
-                System.out.println("AP: "+v1.getAttachmentPoints().get(dap_idx_v1));
-                throw e;
-            }
+            DENOPTIMVertex v1 = ap1.getOwner();
+            DENOPTIMVertex v2 = ap2.getOwner();
             
-            int dap2_anum = -1;
             try
             {
-                dap2_anum = v2.getAttachmentPoints().get(dap_idx_v2).
-                                getAtomPositionNumber();
-            } catch (Exception e)
-            {
-                System.out.println(" ");
-                System.out.println("Exception when trying to get source atom "
-                        + "ID.");
-                System.out.println("GraphMSG: "+g.getMsg());
-                System.out.println("Graph: "+g);
-                System.out.println("Edge: "+edge);
-                System.out.println("Vertex: "+v2);
-                System.out.println("AP id: "+dap_idx_v2);
-                System.out.println("AP: "+v2.getAttachmentPoints().get(dap_idx_v2));
-                throw e;
-            }
-
-            // get the new atom indices for the dap's
-            int atom1 = getCorrespondingAtomNumber(lstDVA, v1_id, dap1_anum);
-            int atom2 = getCorrespondingAtomNumber(lstDVA, v2_id, dap2_anum);
-
-            if (atom1 >= 0 && atom2 >= 0)
-            {
+                int dap1_anum = atmSrcMap.get(v1.getVertexId()).get(
+                        ap1.getAtomPositionNumber());
+                int dap2_anum = atmSrcMap.get(v2.getVertexId()).get(
+                        ap2.getAtomPositionNumber());
+                
                 if (edge.getBondType().hasCDKAnalogue())
                 {
-                    mol.addBond(atom1, atom2, edge.getBondType().getCDKOrder());
+                    mol.addBond(dap1_anum, dap2_anum, edge.getBondType().getCDKOrder());
                 }
-            }
-            else
+            } catch (Exception e)
             {
-                String msg = "Incorrect indices. Although this may be a bug, " +
-                        "it is more likely an error in the atom specification. "
-                        + "Kindly check your input files."
-                        + "Error occurred while dealing with edge " + edge
-                        + " and vertexes " + v1 + " and " + v2 + ".";
-                //System.err.println("ERROR: " + g.toString());
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
+                throw new DENOPTIMException("Attemot to find "
+                        + "vid:" + v1.getVertexId() 
+                        + " atmpos:"+ ap1.getAtomPositionNumber() + " "
+                        + "(" + atmSrcMap.containsKey(v1.getVertexId()) + ") "
+                        + "vid:" + v2.getVertexId() 
+                        + " atmpos:"+ ap2.getAtomPositionNumber() + " "
+                        + "(" + atmSrcMap.containsKey(v2.getVertexId()) + ") "
+                        + "failed.", e);
             }
         }
        
@@ -202,8 +158,8 @@ public class GraphConversionTool
                 // ASSUMPTION: Ring closing vertex contains only one atom
                 // that is the RingClosingAttractor (RCA)
 
-                int idH = getCorrespondingAtomNumber(lstDVA, vH_id, 0);
-                int idT = getCorrespondingAtomNumber(lstDVA, vT_id, 0);
+                int idH = atmSrcMap.get(vH_id).get(0);
+                int idT = atmSrcMap.get(vT_id).get(0);
 
                 List<IAtom> cH = mol.getConnectedAtomsList(mol.getAtom(idH)); 
                 List<IAtom> cT = mol.getConnectedAtomsList(mol.getAtom(idT));
@@ -228,10 +184,8 @@ public class GraphConversionTool
                 }
             }
         }
- 
-        lstDVA.clear();
 
-	// Store graph as property
+        // Store graph as property
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
         if (g.getMsg() != null)
@@ -339,6 +293,9 @@ public class GraphConversionTool
             {
                 dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
             } else {
+                // WARNING: in this case we cannot know the exact number of
+                // attachment points, so we will add as many as needed to 
+                // build the graph.
                 dv =  new EmptyVertex(vid);
             }
             dv.setLevel(level);
@@ -350,7 +307,7 @@ public class GraphConversionTool
 
             vertices.add(dv);
         }
-	
+        
         ArrayList<DENOPTIMEdge> edges = new ArrayList<>();
 
         // split edges on the comma
@@ -376,32 +333,59 @@ public class GraphConversionTool
                 dummy.addAP();
                 DENOPTIMAttachmentPoint srcAP = dummy.getAP(0);
                 DENOPTIMAttachmentPoint trgAP = dummy.getAP(1);
-
+                
                 try {
                     for (int j = 0, apsFound = 0; apsFound < 2; j++) {
                         DENOPTIMVertex vertex = vertices.get(j);
                         if (vertex.getVertexId() == srcVrtxID) {
+                            // WARNING!
+                            // When we import graphs without a definition of the
+                            // fragment space we can only guess how many APs 
+                            // there are on a vertex. Here we add as many as 
+                            // needed to allow formation of the edge.
+                            // Currently we cannot know the index of the src
+                            // atom, so we simply put this index to 0.
+                            for (int k=vertex.getNumberOfAP(); k<(srcAPID+1); 
+                                    k++)
+                            {
+                                vertex.addAP(0,1,1);
+                            }
                             srcAP = vertex.getAP(srcAPID);
+                            if (s4.length > 5) {
+                                srcAP.setAPClass(s4[5]);
+                            }
                             apsFound++;
                         } else if (vertex.getVertexId() == trgVrtxID) {
+                            // WARNING!
+                            // When we import graphs without a definition of the
+                            // fragment space we can only guess how many APs 
+                            // there are on a vertex. Here we add as many as 
+                            // needed to allow formation of the edge.
+                            // Currently we cannot know the index of the src
+                            // atom, so we simply put this index to 0.
+                            for (int k=vertex.getNumberOfAP(); k<(trgAPID+1); 
+                                    k++)
+                            {
+                                vertex.addAP(0,1,1);
+                            }
                             trgAP = vertex.getAP(trgAPID);
+                            if (s4.length > 5) {
+                                trgAP.setAPClass(s4[6]);
+                            }
                             apsFound++;
                         }
                     }
                 } catch (IndexOutOfBoundsException e) {
-                    throw new IllegalStateException("source or target " +
+                    throw new IllegalStateException("Searching for srcVrtxID:"
+                            + srcVrtxID + ", srcAPID:"
+                            + srcAPID + ", trgVrtxID:"
+                            + trgVrtxID + ", trgAPID:"
+                            + trgAPID + ", but source or target " +
                             "attachment point not present on source or target" +
-                            " vertex", e);
+                            " vertex. "+strGraph, e);
                 }
     
-                DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, srcVrtxID,
-                        trgVrtxID, srcAPID, trgAPID, btype);
-    
-                if (s4.length > 5)
-                {
-                    ne = new DENOPTIMEdge(srcAP, trgAP, srcVrtxID, trgVrtxID,
-                            srcAPID, trgAPID, btype, s4[5], s4[6]);
-                }
+                DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, btype);
                 edges.add(ne);
             }
         }
@@ -415,7 +399,8 @@ public class GraphConversionTool
             String sr5 = sr4.substring(sr4.indexOf("=") + 1).trim();
             sr5 = sr5.substring(1,sr5.length()-2);
             String[] sr6 = sr5.split(",\\s");
-            ArrayList<DENOPTIMVertex> lstVerteces = new ArrayList<DENOPTIMVertex>();
+            ArrayList<DENOPTIMVertex> lstVerteces =
+                    new ArrayList<DENOPTIMVertex>();
             for (int j=0; j<sr6.length; j++)
             {
                 String sr7[] = sr6[j].split("_");
@@ -457,57 +442,6 @@ public class GraphConversionTool
         }
 	
         DENOPTIMGraph g = new DENOPTIMGraph(vertices, edges, rings, symSets);
-
-        // update the attachment point info based on the edge info
-        for (int i=0; i<edges.size(); i++)
-        {
-            DENOPTIMEdge edge = edges.get(i);
-            BondType bndTyp = edge.getBondType();
-            int srcvid = edge.getSrcVertex();
-            int trgvid = edge.getTrgVertex();
-            int iA = edge.getSrcAPID();
-            int iB = edge.getTrgAPID();
-
-            //System.err.println("iA=" + iA + " " + "iB=" + iB);
-
-            DENOPTIMVertex src = g.getVertexWithId(srcvid);
-            DENOPTIMVertex trg = g.getVertexWithId(trgvid);
-	
-		    // Here we fill the vertices with placeholder. This because
-		    // we want to be able to define a graph even without knowing
-		    // anything on the actual fragment contained in the vertex.
-		    // In particular, the list of APs is not knowable from the 
-		    // DENOPTIMGraph without the corresponding library of fragments.
-            if (!useMolInfo)
-            {
-            	ArrayList<DENOPTIMAttachmentPoint> lstAPsrc = 
-							      src.getAttachmentPoints();
-				if (lstAPsrc.size() <= iA)
-				{
-				    while (lstAPsrc.size() <= (iA+1))
-				    {
-				        src.addAP();
-				    }
-				}
-		        ArrayList<DENOPTIMAttachmentPoint> lstAPtrg =
-		        		trg.getAttachmentPoints();
-                if (lstAPtrg.size() <= iB)
-                {
-                    while (lstAPtrg.size() <= (iB+1))
-                    {
-                        trg.addAP();
-                    }
-                }
-            }
-		
-            DENOPTIMAttachmentPoint apA = src.getAttachmentPoints().get(iA);
-            DENOPTIMAttachmentPoint apB = trg.getAttachmentPoints().get(iB);
-		    if (useMolInfo)
-	        {
-                apA.updateFreeConnections(-bndTyp.getValence());
-                apB.updateFreeConnections(-bndTyp.getValence());
-		    }
-        }
 
         // update bond type of chords
         for (DENOPTIMRing r : rings)
