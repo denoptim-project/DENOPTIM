@@ -138,9 +138,8 @@ public class PathSubGraph
      * the path
      */
 
-    public PathSubGraph(DENOPTIMVertex vA, 
-                   DENOPTIMVertex vB,
-                   DENOPTIMGraph molGraph)
+    public PathSubGraph(DENOPTIMVertex vA, DENOPTIMVertex vB, 
+            DENOPTIMGraph molGraph)
     {
         this.vA = vA;
         this.vB = vB;
@@ -150,14 +149,14 @@ public class PathSubGraph
         List<DENOPTIMVertex> seedToVA = new ArrayList<DENOPTIMVertex>();
         List<DENOPTIMEdge> seedToVAEdges = new ArrayList<DENOPTIMEdge>();
         seedToVA.add(vA);
-        int currVert = vA.getVertexId();
+        DENOPTIMVertex currVert = vA;
         for (int i=-1; i<vA.getLevel(); i++)
         {
-            DENOPTIMEdge edgeToParent = molGraph.getEdgeWithParent(currVert);
+            DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();
             seedToVAEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
             seedToVA.add(parent);
-            currVert = parent.getVertexId();
+            currVert = parent;
             // This is the bugfix that allows to handle graphs with wrong level
             // reported in the fragments
             if (parent.getLevel() == -1)
@@ -170,14 +169,14 @@ public class PathSubGraph
         List<DENOPTIMVertex> seedToVB = new ArrayList<DENOPTIMVertex>();
         List<DENOPTIMEdge> seedToVBEdges = new ArrayList<DENOPTIMEdge>();
         seedToVB.add(vB);
-        currVert = vB.getVertexId();
+        currVert = vB;
         for (int i=-1; i<vB.getLevel(); i++)
         {
-            DENOPTIMEdge edgeToParent = molGraph.getEdgeWithParent(currVert);
+            DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();
             seedToVBEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
             seedToVB.add(parent);
-            currVert = parent.getVertexId();
+            currVert = parent;
             // This is the bugfix that allows to handle graphs with wrong level
             // reported in the fragments
             if (parent.getLevel() == -1)

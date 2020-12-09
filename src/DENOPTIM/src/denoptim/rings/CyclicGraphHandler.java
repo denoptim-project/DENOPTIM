@@ -1314,7 +1314,7 @@ public class CyclicGraphHandler
         int vIdI = vI.getVertexId();
         DENOPTIMEdge edgeI = molGraph.getEdgeWithParent(vIdI);
         int srcApIdI = edgeI.getSrcAPID();
-        DENOPTIMVertex pvI = molGraph.getParent(vIdI);
+        DENOPTIMVertex pvI = molGraph.getParent(vI);
         DENOPTIMAttachmentPoint srcApI = pvI.getAttachmentPoints().get(
                                                                     srcApIdI);
         int srcAtmIdI = srcApI.getAtomPositionNumber();
@@ -1324,7 +1324,7 @@ public class CyclicGraphHandler
         int vIdJ = vJ.getVertexId();
         DENOPTIMEdge edgeJ = molGraph.getEdgeWithParent(vIdJ);
         int srcApIdJ = edgeJ.getSrcAPID();
-        DENOPTIMVertex pvJ = molGraph.getParent(vIdJ);
+        DENOPTIMVertex pvJ = molGraph.getParent(vJ);
         DENOPTIMAttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
         int srcAtmIdJ = srcApJ.getAtomPositionNumber();
         APClass parentAPClsJ = edgeJ.getSrcAPClass();

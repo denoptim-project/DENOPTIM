@@ -928,7 +928,7 @@ if(debug)
         }
         else
         {
-            DENOPTIMVertex parent = molGraph.getParent(curVertex.getVertexId());
+            DENOPTIMVertex parent = molGraph.getParent(curVertex);
             DENOPTIMEdge edge = molGraph.getEdgeWithParent(
                     curVertex.getVertexId());
             int prntId = parent.getMolId();
@@ -1282,7 +1282,7 @@ if(debug)
             }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = male.getEdgeWithParent(svid);
-            DENOPTIMVertex spv = male.getParent(svid);
+            DENOPTIMVertex spv = male.getParent(male.getVertexWithId(svid));
             symParVertM.add(spv);
             symmParAPidxM.add(se.getSrcAPID());
             toRemoveFromM.add(svid);
@@ -1292,7 +1292,7 @@ if(debug)
             male.removeBranchStartingAt(male.getVertexWithId(svid));
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
-        symParVertM.add(male.getParent(mvid));        
+        symParVertM.add(male.getParent(mvert));        
         symmParAPidxM.add(apidxMP);
         if (debug)
         {
@@ -1315,7 +1315,7 @@ if(debug)
             }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = female.getEdgeWithParent(svid);
-            DENOPTIMVertex spv = female.getParent(svid);
+            DENOPTIMVertex spv = female.getParent(female.getVertexWithId(svid));
             symParVertF.add(spv);
             symmParAPidxF.add(se.getSrcAPID());
             toRemoveFromF.add(svid);
@@ -1325,7 +1325,7 @@ if(debug)
             female.removeBranchStartingAt(female.getVertexWithId(svid));
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
-        symParVertF.add(female.getParent(fvid));        
+        symParVertF.add(female.getParent(fvert));        
         symmParAPidxF.add(apidxFP);
         if (debug)
         {

@@ -1042,9 +1042,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getParent(int m_vid)
+    public DENOPTIMVertex getParent(DENOPTIMVertex v)
     {
-        DENOPTIMEdge edge = getEdgeWithParent(m_vid);
+        DENOPTIMEdge edge = v.getEdgeToParent();
         if (edge != null)  
         {
             return edge.getSrcAP().getOwner();
