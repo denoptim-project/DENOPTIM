@@ -196,12 +196,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public boolean hasSymmetryInvolvingVertex(int vid)
+    public boolean hasSymmetryInvolvingVertex(DENOPTIMVertex v)
     {
         boolean res = false;
         for (SymmetricSet ss : symVertices)
         {
-            if (ss.contains(vid)) 
+            if (ss.contains(v.getVertexId())) 
             {
                 res = true;
                 break;
@@ -1798,7 +1798,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             throws DENOPTIMException
     {
         boolean res = true;
-        if (hasSymmetryInvolvingVertex(vid) && symmetry)
+        if (hasSymmetryInvolvingVertex(getVertexWithId(vid)) && symmetry)
         {
             ArrayList<Integer> toRemove = new ArrayList<>();
             for (int i=0; i<getSymSetForVertexID(vid).size(); i++)
@@ -2384,7 +2384,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             // Why is this working on subGraph and not on sgClone?
             // Since we are only checking is there is symmetry, there should be
             // no difference between doing it on sgClone or subGraph.
-            if (subGraph.hasSymmetryInvolvingVertex(origV.getVertexId()))
+            if (subGraph.hasSymmetryInvolvingVertex(origV))
             {
                 if (newSymSets.containsKey(origV.getVertexId()))
                 {

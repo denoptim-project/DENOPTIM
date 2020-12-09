@@ -199,7 +199,7 @@ public class DENOPTIMGraphOperations
         DENOPTIMVertex pvertex = graph.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
-        boolean symmetry = graph.hasSymmetryInvolvingVertex(vid);
+        boolean symmetry = graph.hasSymmetryInvolvingVertex(vertex);
         
         // delete the vertex and its children and all its symmetric partners
         deleteFragment(vertex);
@@ -228,7 +228,7 @@ public class DENOPTIMGraphOperations
         int vid = vertex.getVertexId();
         DENOPTIMGraph molGraph = vertex.getGraphOwner();
 
-        if (molGraph.hasSymmetryInvolvingVertex(vid))
+        if (molGraph.hasSymmetryInvolvingVertex(vertex))
         {
             ArrayList<Integer> toRemove = new ArrayList<Integer>();
             for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
@@ -394,7 +394,7 @@ public class DENOPTIMGraphOperations
             }
 
             // ...and inherit symmetry from previous levels
-            boolean cpOnSymVrts = molGraph.hasSymmetryInvolvingVertex(curVrtId);
+            boolean cpOnSymVrts = molGraph.hasSymmetryInvolvingVertex(curVertex);
             SymmetricSet symVerts = new SymmetricSet();
             if (cpOnSymVrts)
             {
