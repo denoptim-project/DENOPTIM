@@ -110,7 +110,7 @@ public class RotationalSpaceUtils
         } catch (Throwable t) {
             throw new DENOPTIMException(t);
         }
-	    DENOPTIMMoleculeUtils.removeRCA(locMol);
+        DENOPTIMMoleculeUtils.removeRCA(locMol);
 
         // Get definition of rotational space as list of SMARTS queries
         Map<String,String> listQueries = getRotationalSpaceDefinition(
@@ -202,25 +202,24 @@ public class RotationalSpaceUtils
        
             IBond bnd = mol.getBond(mol.getAtom(a1),mol.getAtom(a2));
 
-	    if (excludeRings)
-	    {
+		    if (excludeRings)
+		    {
                 IRingSet rs = allRings.getRings(bnd);
                 if (!rs.isEmpty())
                 {
-		    if (verbosity > 0)
-		    {
+				    if (verbosity > 0)
+				    {
                        System.out.println("Ignoring cyclic bond: "+bnd);
-		    }
+				    }
                     toRemove.add(op);
                     continue;
                 }
-	    }
-
+		    }
             bnd.setProperty(DENOPTIMConstants.BONDPROPROTATABLE, "true");
         }
 
-    	if (excludeRings)
-    	{
+		if (excludeRings)
+		{
             for (ObjectPair op : toRemove)
             {
                 rotatableBonds.remove(op);

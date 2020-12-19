@@ -724,7 +724,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
-        		//System.out.println("No property "+DENOPTIMConstants.APTAG);
         		continue;
             }
         	

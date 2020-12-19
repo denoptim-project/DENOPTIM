@@ -18,6 +18,7 @@
 
 package gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -118,6 +120,63 @@ public class ParametersForm extends JPanel implements IParametersForm
     	rdbFieldChange = new RdbFieldChange();
     	tabFieldChange = new TabFieldChange();
     	cmbFieldChange = new CmbFieldChange();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Produced the KEY:VALUE string for a general text field. 
+     * The text can include numbers, characters, or both.
+     * @param key the keyword.
+     * @param field the txt field.
+     * @param prefix string to be put before the VALUE.
+     * @param suffix string to be put after the VALUE.
+     * @return the KEY:VALUE string including newline character at the end.
+     */
+    
+    protected String getStringIfNotEmpty(String key, JTextField field, 
+    		String prefix, String suffix)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	if (!field.getText().equals(""))
+    	{
+    		sb.append(key).append("=");
+    		sb.append(prefix).append(field.getText()).append(suffix).append(NL);
+    	}
+    	return sb.toString();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Produced the KEY:VALUE string for a general text editor pane
+     * The text can include numbers, characters, or both.
+     * @param key the keyword
+     * @param field the txt editor
+     * @param multipleLines set to <code>true</code> to split the text into
+     * multiple KEY:VALUE lines (all with same KEY)
+     * @return the KEY:VALUE string including newline character at the end.
+     */
+    
+    protected String getStringIfNotEmpty(String key, JEditorPane field, 
+    		boolean multipleLines)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	if (!field.getText().equals(""))
+    	{
+    		if (multipleLines)
+    		{
+    			String[] lines = field.getText().split(
+    					System.getProperty("line.separator"));
+    			for (int i=0; i<lines.length; i++)
+    			{
+    				sb.append(key).append("=").append(lines[i]).append(NL);
+    			}
+    		} else {
+    			sb.append(key).append("=").append(field.getText()).append(NL);
+    		}
+    	}
+    	return sb.toString();
     }
     
 //-----------------------------------------------------------------------------
@@ -313,6 +372,8 @@ public class ParametersForm extends JPanel implements IParametersForm
     				+ " file name.");
     	}
     	
+    	preliminatyTasksUponImportingParams();
+    	
         String line;
         BufferedReader br = null;
         try
@@ -356,7 +417,30 @@ public class ParametersForm extends JPanel implements IParametersForm
             			ioe);
             }
         }
+        
+        //adapt visibility to imported parameters
+        adaptVisibility();
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Overwritten by subclasses. Does any preliminary tasks, such as cleaning
+     * 
+     */
+	protected void preliminatyTasksUponImportingParams() 
+	{
+	}
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Overwritten by subclasses. Sets visibility of panels according to the
+     * current selections and field content.
+     */
+	protected void adaptVisibility() 
+	{
+	}
 
 //-----------------------------------------------------------------------------
     

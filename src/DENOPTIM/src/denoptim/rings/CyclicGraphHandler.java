@@ -911,9 +911,9 @@ public class CyclicGraphHandler
         // Compatibility matrix between pairs of RCAs in the current system.
         private boolean[][] compatibilityOfPairs;
 
-        // Weight factors used to control the likeliness of chosing rings of a
+        // Weight factors used to control the likeliness of choosing rings of a
         // given size for the current system
-        private ArrayList<Integer> w;
+        private ArrayList<Double> w;
 
         // Visited flag for RCAs
         private ArrayList<Boolean> done;
@@ -1006,7 +1006,7 @@ public class CyclicGraphHandler
         private void calculateCompatibilityOfAllRCAPairs() 
                                                        throws DENOPTIMException
         {
-            w = new ArrayList<Integer>(Collections.nCopies(sz, 0));
+            w = new ArrayList<Double>(Collections.nCopies(sz, 0.0));
             compatibilityOfPairs = new boolean[sz][sz];
             for (int i=0; i<sz; i++)
             {
@@ -1417,6 +1417,9 @@ public class CyclicGraphHandler
         boolean closable = false;
         switch (RingClosureParameters.getClosabilityEvalMode())
         {
+        case -1:
+        	closable = true; // ring size has been evaluated before
+        	break;
         case 0:
             closable = evaluateConstitutionalClosability(subGraph,mol);
             break;
@@ -1529,7 +1532,7 @@ public class CyclicGraphHandler
             mol.removeAtomAndConnectedElectronContainers(a);
         }
 
-         if (verbosity > 1)
+         if (verbosity > 2)
         {
             System.out.println("Molecular representation of path includes:");
                 for (IAtom a : mol.atoms())

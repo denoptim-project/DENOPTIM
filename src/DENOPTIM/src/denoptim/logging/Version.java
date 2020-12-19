@@ -38,14 +38,14 @@ public class Version
     public static final String AUTHORS = "Vishwesh Venkatraman, Marco Foscato";
     public static final String CONTRIBUTORS = "";
     public static final String CONTACT = "see https://github.com/denoptim-project";
-    public static final String DATE = "Jan 19, 2020";
-    public static final String MINIMUMJAVAVERSION = "1.5";
+    public static final String DATE = "Nov 30, 2020";
+    public static final String MINIMUMJAVAVERSION = "1.8";
     
     /** The major version number. */
     public static final int MAJOR = 2;
 
     /** The minor version number. */
-    public static final int MINOR = 1;
+    public static final int MINOR = 2;
 
     /** The update letter. */
     public static final int UPDATE = 0;

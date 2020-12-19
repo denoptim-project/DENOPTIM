@@ -18,7 +18,30 @@
 
 package denoptim.fitness;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+import javax.servlet.jsp.el.ELException;
+import javax.servlet.jsp.el.FunctionMapper;
+import javax.servlet.jsp.el.VariableResolver;
+
+import org.apache.commons.el.ExpressionEvaluatorImpl;
+import org.openscience.cdk.qsar.DescriptorEngine;
+import org.openscience.cdk.qsar.DescriptorSpecification;
+import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -46,19 +69,85 @@ public class FitnessParameters
     /**
      * Pathname of an external fitness provider executable
      */
-    protected static String externalExe = "";
+    private static String externalExe = "";
 
     /**
      * Interpreter for the external fitness provider
      */
-    protected static String interpreterExternalExe = "BASH";
+    private static String interpreterExternalExe = "bash";
 
     /**
      * Formulation of the internally provided fitness
      */
-    protected static Object fitEquation = "";
+    private static String fitnessExpression = "";
+    
+    /**
+     * List of definitions for atom/Bond specific descriptors
+     */
+	private static List<String> atmBndSpecDescExpressions = 
+			new ArrayList<String>();
+
+    /**
+     * Map defining relation between descriptors names (the shortNames) and 
+     * variable that take values from the results of that descriptors
+     * calculation.
+     */
+	private static Map<String,ArrayList<String>> atmBndSpecDescToVars = 
+			new HashMap<String,ArrayList<String>>();
+	
+    /**
+     * Map defining relation between variable names and atom/Bond specific 
+     * descriptor calcualtion.
+     */
+	private static Map<String,ArrayList<String>> atmBndSpecDescSMARTS = 
+			new HashMap<String,ArrayList<String>>();
+    
+    /**
+     * The list of descriptors needed to calculate the fitness with internal 
+     * fitness provider.
+     */
+    private static List<DescriptorForFitness> descriptors;
+    
+    /**
+     * List of descriptor's short names
+     */
+    private static List<String> descriptorsGeneratingVariables;
+    
+    /**
+     * Flag controlling production of png graphics for each candidate
+     */
+    private static boolean makePictures = false;
+    
+    /**
+     * Flag requesting the generation of a 3d-tree model instead of a plain
+     * collection of 3d building blocks. In the latter, the coordinated of each
+     * fragment are not changed when building the molecular representation that
+     * is sent to the fitness provider. Setting this to <code>true</code> asks
+     * for roto-translation of each fragment, but does not perform any 
+     * energy-driven refinement of the geometry.
+     */
+    private static boolean make3DTrees = true;
+    
+    
+//------------------------------------------------------------------------------
 
 
+    public static void resetParameters()
+    {
+    	fitParamsInUse = false;
+    	useExternalFitness = true;
+    	externalExe = "";
+    	interpreterExternalExe = "bash";
+    	fitnessExpression = "";
+    	atmBndSpecDescExpressions = new ArrayList<String>();
+    	atmBndSpecDescToVars = new HashMap<String,ArrayList<String>>();
+    	atmBndSpecDescSMARTS = new HashMap<String,ArrayList<String>>();
+    	descriptors = null;
+    	descriptorsGeneratingVariables = null;
+    	makePictures = false;
+    	make3DTrees = true;
+    }
+    
 //------------------------------------------------------------------------------
 
     public static boolean fitParamsInUse()
@@ -68,16 +157,44 @@ public class FitnessParameters
 
 //------------------------------------------------------------------------------
 
+    /**
+     * @return <code>true</code> if we are asked to execute an external fitness 
+     * provider.
+     */
     public static boolean useExternalFitness()
     {
         return useExternalFitness;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if generation of the candidate's picture is 
+     * required.
+     */
+    public static boolean makePictures()
+    {
+        return makePictures;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are asked to make a tree-like 3d 
+     * molecular model prior fitness evaluation. The model is built by aligning
+     * 3d-building blocks to the attachment point vectors, so there is no 
+     * energy refinement.
+     */
+    public static boolean make3dTree()
+    {
+    	return make3DTrees;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Gets the pathname of the external executable file
-     * @return the pathname to the external fitness provider
+     * Gets the pathname of the external executable file.
+     * @return the pathname to the external fitness provider.
      */
     public static String getExternalFitnessProvider()
     {
@@ -87,12 +204,33 @@ public class FitnessParameters
 //------------------------------------------------------------------------------
 
     /**
-     * The name of the interpreter used to run the external fitness provider
-     * @return the interpreter name
+     * Gets the interpreter used to run the external fitness provider.
+     * @return the interpreter name.
      */
     public static String getExternalFitnessProviderInterpreter()
     {
         return interpreterExternalExe;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the expression used to calculate the fitness with the internal
+     * fitness provider
+     */
+    public static String getFitnessExpression()
+    {
+    	return fitnessExpression;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return list of descriptors needed to calculate the fitness
+     */
+    public static List<DescriptorForFitness> getDescriptors()
+    {
+    	return descriptors;
     }
 
 //------------------------------------------------------------------------------
@@ -135,18 +273,155 @@ public class FitnessParameters
             break;
             
         case "FP-EQUATION=":
-        	fitEquation = value;
+        	fitnessExpression = value;
         	fitParamsInUse = true;
         	useExternalFitness = false;
             break;
+            
+        case "FP-DESCRIPTORSPECS=":
+        	atmBndSpecDescExpressions.add(value);
+        	break;
+            
+        case "FP-MAKEPICTURES":
+        	fitParamsInUse = true;
+	        makePictures = true;
+	        break;
+	        
+        case "FP-NO3DTREEMODEL":
+        	make3DTrees = false;
+        	break;
 
         default:
-             msg = "Keyword " + key + " is not a known fitness-"
-                                          + "related keyword. Check input files.";
+             msg = "Keyword " + key + " is not a known fitness-related "
+             		+ "keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }
+	
+//------------------------------------------------------------------------------
 
+	private static void parseFitnessExpressionToDefineDescriptors(String value) 
+			throws DENOPTIMException 
+	{
+		// Parse expression to get the names of all variables
+		ExpressionEvaluatorImpl extractor = new ExpressionEvaluatorImpl();
+		descriptorsGeneratingVariables = new ArrayList<String>();
+        VariableResolver collector = new VariableResolver() {
+			
+			@Override
+			public Double resolveVariable(String varName) throws ELException {
+				if (!descriptorsGeneratingVariables.contains(varName))
+				{
+					descriptorsGeneratingVariables.add(varName);
+				}
+				return 1.0;
+			}
+		};
+		FunctionMapper funcsMap = new FunctionMapper() {
+
+			@Override
+			public Method resolveFunction(String nameSpace, String methodName) {
+				try {
+					return FitnessParameters.class.getMethod(methodName, 
+							String.class, String.class, String.class);
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+		try {
+			//NB this is not really an evaluation because the variableResolver
+			// and function map parse the data the get from the  
+			// ExpressionEvaluator
+			extractor.evaluate(fitnessExpression, Double.class, collector, 
+					null);
+		} catch (ELException e) {
+			throw new DENOPTIMException("ERROR: unable to parse fitness "
+					+ "expression.",e);
+		}
+		
+		try {
+			//NB this is not really an evaluation because the variableResolver
+			// and function map only parse the data they get from the 
+			// ExpressionEvaluator
+			for (String descriptorDefinition : atmBndSpecDescExpressions)
+			{
+				extractor.evaluate(descriptorDefinition, Double.class, 
+						collector, funcsMap);
+			}
+		} catch (ELException e) {
+			throw new DENOPTIMException("ERROR: unable to parse fitness "
+					+ "expression.",e);
+		}
+		
+		// Collect the descriptors needed to calculate the fitness
+		descriptors = DescriptorUtils.findAllDescriptorImplementations(
+				descriptorsGeneratingVariables);
+		
+		// Add specifications to atom/bond specific descriptors
+		for (DescriptorForFitness dff : descriptors)
+		{
+			String descName = dff.getShortName();
+			if (atmBndSpecDescToVars.keySet().contains(descName))
+			{
+				for (String varName : atmBndSpecDescToVars.get(descName))
+				{
+					ArrayList<String> smarts = atmBndSpecDescSMARTS.get(varName);
+					dff.varNames.add(varName);
+					dff.smarts.put(varName, smarts);
+				}
+			}
+		}
+		
+		/*
+		String NL = System.getProperty("line.separator");
+		StringBuilder sb = new StringBuilder();
+		sb.append("Variables defined for each descriptor:"+NL);
+	    for (int i=0; i<descriptors.size(); i++)
+		{
+			DescriptorForFitness d = descriptors.get(i);
+			sb.append(" -> "+d.getShortName()+" "+d.getVariableNames()+NL);
+		}
+	    DENOPTIMLogger.appLogger.info(sb.toString());
+	    */
+	}
+
+//------------------------------------------------------------------------------
+
+	/**
+	 * Fake function definition that is only used to parse the expressions 
+	 * defining atom specific descriptors. This method is public only because
+	 * is must be found by the ExpressionEvaluator, but should not be used
+	 * outside the FitnessPArameters class.
+	 */
+	
+	public static Double atomSpecific(String varName, String descName, 
+			String smartsIdentifier)
+	{
+		if (!descriptorsGeneratingVariables.contains(descName))
+		{
+			descriptorsGeneratingVariables.add(descName);
+		}
+		descriptorsGeneratingVariables.remove(varName);
+		
+		ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
+				smartsIdentifier.split("\\s+")));
+		
+		if (atmBndSpecDescToVars.keySet().contains(descName))
+		{
+			atmBndSpecDescToVars.get(descName).add(varName);
+		} else {
+			ArrayList<String> lst = new ArrayList<String>();
+			lst.add(varName);
+			atmBndSpecDescToVars.put(descName, lst);
+		}
+		atmBndSpecDescSMARTS.put(varName, smarts);
+		return 0.0; //just a dummy number to fulfil the executor expectations
+	}
+	
 //------------------------------------------------------------------------------
 
     public static void checkParameters() throws DENOPTIMException
@@ -170,10 +445,11 @@ public class FitnessParameters
         	{
 	        	case "BASH":
 	        		break;
-/*
-//TODO: add these
+	        		
 	        	case "PYTHON":
 	        		break;
+/*
+//TODO: add 
 	        	case "JAVA":
 	        		break;
 */
@@ -189,7 +465,10 @@ public class FitnessParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-
+    	if (!fitnessExpression.equals(""))
+    	{
+        	parseFitnessExpressionToDefineDescriptors(fitnessExpression);
+    	}
     }
 
 //------------------------------------------------------------------------------
@@ -205,13 +484,14 @@ public class FitnessParameters
         sb.append(" FitnessParameters ").append(eol);
         for (Field f : FitnessParameters.class.getDeclaredFields()) 
         {
-            try
+        	try
             {
                 sb.append(f.getName()).append(" = ").append(
                             f.get(FitnessParameters.class)).append(eol);
             }
             catch (Throwable t)
             {
+            	t.printStackTrace();
                 sb.append("ERROR! Unable to print FitnessParameters.");
                 break;
             }

@@ -1,0 +1,17 @@
+# 
+# Ring Closures CompatibilityMatrix for Class Based Builders
+# 
+# NOTE-1: this matric is symmetric. So if you white RCN X:0 Y:0, the
+#         symmetric entry RCN Y:0 X:0 is assumed as well.
+#
+# NOTE-2: the RC-CPMap considers the APClasses of the AP hosting 
+#         a ring closing attractor (RCA), not the APClass of the 
+#         RCA itself.
+#
+# NOTE-3: it is assumed that APClass-to-bond order relation is properly
+#         given in the regular compatibility matrix for all the APclasses
+#         reported here
+#
+#
+RCN ccb:0 ccb:0
+RCN ccb:0 ch:0

@@ -19,6 +19,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -134,7 +135,7 @@ public class HomePanel extends GUICardPanel
 				+ "evolutionary experiment  (i.e., folder named RUN...)");
 		btnReadGAOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFolder();
+				File file = DenoptimGUIFileOpener.pickFolder(btnReadGAOutput);
 				if (file == null)
 				{
 					return;
@@ -150,7 +151,7 @@ public class HomePanel extends GUICardPanel
 				+ "combinatorial experiment  (i.e., folder named FSE...)");
         btnReadFSEOutput.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                File file = DenoptimGUIFileOpener.pickFolder();
+                File file = DenoptimGUIFileOpener.pickFolder(btnReadFSEOutput);
                 if (file == null)
                 {
                         return;
@@ -178,7 +179,7 @@ public class HomePanel extends GUICardPanel
 		
 		
 		JTextPane email = new JTextPane();
-		email.setForeground(UIManager.getColor("Button.light"));
+		email.setForeground(Color.BLUE.darker());
 		email.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		email.setBackground(UIManager.getColor("Button.background"));
 		email.setText("denoptim.project@gmail.com");

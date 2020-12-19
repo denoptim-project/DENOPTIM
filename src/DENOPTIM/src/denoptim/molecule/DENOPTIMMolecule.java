@@ -40,6 +40,11 @@ public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>,
 Serializable, Cloneable
 {
     /**
+	 * Version UID
+	 */
+	private static final long serialVersionUID = -3132192038061270220L;
+
+	/**
      * Graph representation
      */
     private DENOPTIMGraph graph;
@@ -137,7 +142,6 @@ Serializable, Cloneable
         sdfFile = m_molFile;
         hasFitness = true;
     }
-    
 //------------------------------------------------------------------------------
 
     public DENOPTIMMolecule(String name, DENOPTIMGraph graph, String uid, 
@@ -159,6 +163,14 @@ Serializable, Cloneable
     
     public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace) 
     		throws DENOPTIMException
+    {
+    	this(iac, useFragSpace, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace, 
+    		boolean allowNoUID) throws DENOPTIMException
     {
     	// Initialize, then we try to take info from IAtomContainer
         this.uid = "UNDEFINED";
@@ -204,18 +216,28 @@ Serializable, Cloneable
         	this.smiles = iac.getProperty(
         			DENOPTIMConstants.SMILESTAG).toString();
         }
-        
+
         try
         {
-            this.uid = (iac.getProperty(
-            		DENOPTIMConstants.UNIQUEIDTAG).toString());
-            this.graph = GraphConversionTool.getGraphFromString(
+            this.molUID = iac.getProperty(
+            		DENOPTIMConstants.UNIQUEIDTAG).toString();
+        } catch (Exception e) {
+        	if (allowNoUID)
+        	{
+        		this.molUID = "noUID";
+        	} else {
+        		throw new DENOPTIMException("Could not read UID to make "
+        				+ "DENOPTIMMolecule.", e);
+        	}
+        }
+        try
+        {
+            this.molGraph = GraphConversionTool.getGraphFromString(
             		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
             		useFragSpace);
         } catch (Exception e) {
-            e.printStackTrace();
-        	throw new DENOPTIMException("Could not create DENOPTIMMolecule."
-        			+ " Could not read UID or Graph.", e);
+        	throw new DENOPTIMException("Could not read Graph to make "
+        			+ "DENOPTIMMolecule.", e);
         }
         if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
         {
@@ -405,7 +427,7 @@ Serializable, Cloneable
     // the specified object.
 
     @Override
-    public int compareTo(DENOPTIMMolecule B)
+    public int compareTo(DENOPTIMMolecule other)
     {
         if (this.fitness > B.fitness)
             return 1;

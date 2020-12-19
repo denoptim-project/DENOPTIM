@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -217,7 +219,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		this.add(centralPanel,BorderLayout.CENTER);
 
 		// Button to the bottom of the card
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		this.add(commandsPane, BorderLayout.SOUTH);
 		JButton btnCanc = new JButton("Close Tab");
 		btnCanc.setToolTipText("Closes this FSERun Inspector.");
@@ -314,6 +316,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		System.out.println("Importing data from '" + folder + "'... ");
 		
 		allItems = new ArrayList<DENOPTIMMolecule>();
+		boolean skippFurtherErrors = false;
 		for (File molFile : folder.listFiles(new FileFilter() {
 			
 			@Override
@@ -330,20 +333,49 @@ public class GUIInspectFSERun extends GUICardPanel
 			}
 		}))
 		{			
-			DENOPTIMMolecule mol;
+			DENOPTIMMolecule mol = new DENOPTIMMolecule();
 			try {
 				mol = DenoptimIO.readDENOPTIMMolecules(
 						molFile,false).get(0);
 			} catch (DENOPTIMException e1) {
-				e1.printStackTrace();
-				mainPanel.setCursor(Cursor.getPredefinedCursor(
-						Cursor.DEFAULT_CURSOR));
-				JOptionPane.showMessageDialog(null,
-		                "Could not read data from '" + molFile + "'!",
-		                "Error",
-		                JOptionPane.PLAIN_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
-				return;
+				if (!skippFurtherErrors)
+				{
+					e1.printStackTrace();
+					mainPanel.setCursor(Cursor.getPredefinedCursor(
+							Cursor.DEFAULT_CURSOR));
+	
+					JPanel msgPanel = new JPanel(new GridLayout(2, 1));
+					String msg = "<html><body width='%1s'>Could not read data "
+							+ "from '" + molFile + "'. Hint on cause: "
+							+ e1.getMessage() + " Should we try to "
+							+ "visualize the results anyway?</html>";
+					JLabel text = new JLabel(String.format(msg, 450));
+					JCheckBox cb = new JCheckBox("Remember decision");
+					cb.setSelected(false);
+					msgPanel.add(text);
+					msgPanel.add(cb);
+					String[] options = new String[]{"Yes", "Abandon"};
+					int res = JOptionPane.showOptionDialog(null,
+							msgPanel,
+							"ERROR",
+							JOptionPane.DEFAULT_OPTION,
+			                JOptionPane.QUESTION_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"),
+			                options,
+			                options[1]);
+					if (cb.isSelected())
+					{
+						skippFurtherErrors = true;
+					}
+					switch (res)
+					{
+						case 0:
+							break;
+							
+						case 1:
+							return;
+					}
+				}
 			}
 			
 			if (mol.hasFitness())

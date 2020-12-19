@@ -20,7 +20,10 @@ package denoptim.threedim;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
@@ -38,14 +41,22 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.molecule.DENOPTIMVertexAtom;
+import denoptim.rings.RingClosureParameters;
+import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.FragmentUtils;
+import denoptim.utils.GenUtils;
 
 
 /**
@@ -76,27 +87,27 @@ public class TreeBuilder3D
     private IAtomContainer mol = new AtomContainer();
 
     /**
-     * Map of rototranslated <code>DENOPTIMAttachmentPoint</code>
+     * Map of roto-translated <code>DENOPTIMAttachmentPoint</code>
      * per each vertex ID
      */
     private Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
             new HashMap<>();
 
     /**
-     * Map of rototranslated <code>DENOPTIMAttachmentPoint</code>
+     * Map of roto-translated <code>DENOPTIMAttachmentPoint</code>
      * per each <code>DENOPTIMEdge</code> (edge has no unique ID)
      */
     private Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
             new HashMap<>();
 
     /**
-     * Map of rototranslated APs per each <code>IAtom</code>
+     * Map of roto-translated APs per each <code>IAtom</code>
      */
     private Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom =
             new HashMap<>();
 
     /**
-     * Map of rototranslated APs per each <code>IBond</code>
+     * Map of roto-translated APs per each <code>IBond</code>
      */
     private Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
             new HashMap<>();
@@ -157,14 +168,47 @@ public class TreeBuilder3D
      * @throws DENOPTIMException
      */
 
+    //TODO: should probably merge this with GraphConversionTool.convertGraphToMolecule
+    // with a flag that controls whether we rototranslate the building blocks or not
+    
     public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph m_graph)
                                                         throws DENOPTIMException
     {
+    	return convertGraphTo3DAtomContainer(m_graph,false);
+    }
+    	
+//------------------------------------------------------------------------------
+
+    /**
+     * Created a three-dimensional molecular representation from a given 
+     * DENOPTIMGraph. The conversion creates also two maps to retrace the 
+     * attachment points within the final 3D structure both based on 
+     * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.
+     * To retrieve this information see methods 'getApsPerVertexId' and 
+     * 'getApsPerEdge'. In addition each atom is blended with the unique index
+     * of the DENOPTIMVertex corresponding to the molecular fragment to which
+     * the atom belongs.
+     * Calling this method cleans all the fields (see method 'clean').
+     * 
+     * @param m_graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param removeRCAs when <code>true</code> this method will remove 
+     * RCAs and add bonds to close the rings
+     * defined by the DENOPTIMRings in the graph (does not alter the graph)
+     * @return the <code>AtomContainer</code> representation
+     * @throws DENOPTIMException
+     */
+
+    //TODO: should probably merge this with GraphConversionTool.convertGraphToMolecule
+    // with a flag that controls whether we rototranslate the building blocks or not
+    
+    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph m_graph,
+    		boolean removeRCAs) throws DENOPTIMException
+    {
         // Clean all
         this.clean();
-
+        
         this.graph = m_graph;
-
+        
         // Add the first vertex in the graph (i.e., the root of the tree)
         DENOPTIMVertex rootVrtx = graph.getVertexList().get(0);
         int idRootVrtx = rootVrtx.getVertexId();
@@ -242,15 +286,110 @@ public class TreeBuilder3D
 
             // Get two point defining the AP vector in 3D
             Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
-            Point3d srcPtApSrc = new Point3d(iacRootVrtx.getAtom(
-                                                     atmPosApSrc).getPoint3d());
+            Point3d srcPtApSrc = new Point3d(FragmentUtils.getPoint3d(
+            		iacRootVrtx.getAtom(atmPosApSrc)));
 
             // Append 3D fragment on AP-vector and start recursion
-            append3DFragmentsViaEdges(atmPosApSrc,srcPtApSrc,trgPtApSrc,edge);
+            append3DFragmentsViaEdges(atmPosApSrc,srcPtApSrc,trgPtApSrc,edge,
+            		removeRCAs);
         }
+        
+        // loop through the rings and make chords
+        /*
+        // TODO del: this is replaced by the call to demoveRCAs. However, this 
+        // is an example of how to navigate the graph without dealing with atom
+        // indexes as currently done in GraphConversionTool
+        if (removeRCAs)
+        {
+            for (int i=0; i<this.graph.getRings().size(); i++)
+            {
+                DENOPTIMRing r = this.graph.getRings().get(i);
+                DENOPTIMVertex vH = r.getHeadVertex();
+                DENOPTIMVertex vT = r.getTailVertex();
+                int vH_id = vH.getVertexId();
+                int vT_id = vT.getVertexId();
+                
+                DENOPTIMAttachmentPoint apH = apsPerVertexId.get(vH_id).get(0);
+                DENOPTIMAttachmentPoint apT = apsPerVertexId.get(vT_id).get(0);
+                
+                IBond bndToH = null;
+                IBond bndToT = null;
+                boolean doneH = false;
+                boolean doneT = false;
+                for (IBond b : apsPerBond.keySet())
+                {
+                	ArrayList<DENOPTIMAttachmentPoint> aps = apsPerBond.get(b);
+                	if (!doneH && aps.contains(apH))
+                	{
+                		bndToH = b;
+                		doneH = true;
+                	}
+                	if (!doneT && aps.contains(apT))
+                	{
+                		bndToT = b;
+                		doneT = true;
+                	}
+                	if (doneT && doneH)
+                	{
+                		continue;
+                	}
+                }
+                
+                IAtom atmH = null;
+                if (apsPerAtom.get(bndToH.getAtom(0)).contains(apH))
+                {
+                	atmH = bndToH.getAtom(1);
+                } else if (apsPerAtom.get(bndToH.getAtom(1)).contains(apH))
+                {
+                	atmH = bndToH.getAtom(0);
+                } else {
+                	throw new DENOPTIMException("Could not identify atom "
+                			+ "holding RCA "+vH_id);
+                }
+                
+                IAtom atmT = null;
+                if (apsPerAtom.get(bndToT.getAtom(0)).contains(apT))
+                {
+                	atmT = bndToT.getAtom(1);
+                } else if (apsPerAtom.get(bndToT.getAtom(1)).contains(apT))
+                {
+                	atmT = bndToT.getAtom(0);
+                } else {
+                	throw new DENOPTIMException("Could not identify atom "
+                			+ "holding RCA "+vH_id);
+                }
 
-        this.conversionCompleted = true;
+                int idSrcH = mol.getAtomNumber(atmH);
+                int idSrcT = mol.getAtomNumber(atmT);
 
+                int bndOrder = r.getBondType(); 
+                switch (bndOrder)
+                {
+                case 1:
+                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
+                    break;
+                case 2:
+                    mol.addBond(idSrcH, idSrcT, IBond.Order.DOUBLE);
+                    break;
+                case 3:
+                    mol.addBond(idSrcH, idSrcT, IBond.Order.TRIPLE);
+                    break;
+                default:
+                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
+                    break;
+                }
+            }
+        }
+        */
+
+        if (removeRCAs)
+        {
+        	// This is where we make the rings-closing bonds.
+        	// Unused RCAs were already replaced by capping groups (or removed
+        	// if no capping needed), So this will deal only with used RCAs.
+        	DENOPTIMMoleculeUtils.removeRCA(mol,graph);
+        }
+        
         if (debug)
         {
             String file = "iacTree.sdf";
@@ -276,10 +415,11 @@ public class TreeBuilder3D
                                           new Point3d(ap.getDirectionVector()));
                     System.out.println("Vertex: "+v+" AP-"+i+" = "+ap);
                     cmol.addAtom(atm);
-		    IBond bnd = new Bond(cmol.getAtom(ap.getAtomPositionNumber()),
-			         cmol.getAtom(mol.getAtomCount()+i-1),
-				 IBond.Order.SINGLE);
-		    cmol.addBond(bnd);
+                    IBond bnd = new Bond(cmol.getAtom(
+                    		ap.getAtomPositionNumber()),
+                    		cmol.getAtom(mol.getAtomCount()+i-1),
+                    		IBond.Order.SINGLE);
+                    cmol.addBond(bnd);
                 }
             }
             DenoptimIO.writeMolecule(file, mol, false);
@@ -314,6 +454,14 @@ public class TreeBuilder3D
                 }
             }
         }
+        
+        mol.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
+        mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
+        if (graph.getMsg() != null)
+        {
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, graph.getMsg());
+        }
+        this.conversionCompleted = true;
 
         return mol;
     }
@@ -333,13 +481,14 @@ public class TreeBuilder3D
      * @param trgApA the point in space corresponding to the end of the
      * attachment point vector on the growing molecule
      * @param edge the <code>DENOPTIMEdge</code> corresponding to the
-     * connection this method is charged to make between 3D molecular
+     * connection this method is asked to make between 3D molecular
      * fragments
      * @throws DENOPTIMException
      */
 
     private void append3DFragmentsViaEdges(int idSrcAtmA, Point3d srcApA, 
-                     Point3d trgApA, DENOPTIMEdge edge) throws DENOPTIMException
+                     Point3d trgApA, DENOPTIMEdge edge, boolean removeRCAs) 
+                    		 throws DENOPTIMException
     {
         if (debug)
         {
@@ -349,6 +498,32 @@ public class TreeBuilder3D
 
         // Get the incoming fragment
         DENOPTIMVertex inVtx = graph.getVertexWithId(edge.getTrgVertex());
+        
+        // We may want to replace unused RCVs with capping groups
+        if (removeRCAs && inVtx.isRCV() 
+        		&& graph.getRingsInvolvingVertex(inVtx).size()==0)
+        {
+        	// The incoming vertex is an unused RCV. 
+        	// Should we replace it with a capping group?
+        	String cappingAPClass = FragmentSpace.getCappingClass(
+        			edge.getSourceReaction());
+
+        	if (cappingAPClass != null)
+        	{
+        		int capId = FragmentSpace.getCappingGroupsWithAPClass(
+        				cappingAPClass).get(0);
+        		
+        		ArrayList<DENOPTIMAttachmentPoint> tFAPs =
+                        FragmentUtils.getAPForFragment(capId, 2);
+        		DENOPTIMVertex capVrtx = new DENOPTIMVertex(inVtx.getVertexId(),
+        				capId, tFAPs,2);
+        		inVtx = capVrtx;
+        	} else {
+        		// No capping needed. Then we are done.
+        		return;
+        	}
+        }
+        
         int idInVrx = inVtx.getVertexId();
         
         if (!inVtx.containsAtoms())
@@ -410,13 +585,15 @@ public class TreeBuilder3D
         DENOPTIMAttachmentPoint apB = inVtx.getAttachmentPoints().get(idApB);
         int idSrcAtmB = apB.getAtomPositionNumber();
         Point3d trgApB = new Point3d(allApsAsPt3D.get(idApB));
-        Point3d srcApB = new Point3d(inFrag.getAtom(idSrcAtmB).getPoint3d());
+        Point3d srcApB = new Point3d(FragmentUtils.getPoint3d(
+        		inFrag.getAtom(idSrcAtmB)));
 
         // Translate atoms and APs of fragment so that trgApB is on srcApA
         Point3d tr1 = new Point3d();
         tr1.sub(trgApB,srcApA);
         for (IAtom atm : inFrag.atoms())
         {
+        	atm.setPoint3d(FragmentUtils.getPoint3d(atm));
             atm.getPoint3d().sub(tr1);
         }
         for (Point3d pt : allApsAsPt3D)
@@ -424,7 +601,8 @@ public class TreeBuilder3D
             pt.sub(tr1);
         }
         trgApB = new Point3d(allApsAsPt3D.get(idApB));
-        srcApB = new Point3d(inFrag.getAtom(idSrcAtmB).getPoint3d());
+        srcApB = new Point3d(FragmentUtils.getPoint3d(
+        		inFrag.getAtom(idSrcAtmB)));
 
         //Get Vectors ApA and ApB (NOTE: inverse versus of ApB!!!)
         Vector3d vectApA = new Vector3d();
@@ -460,7 +638,7 @@ public class TreeBuilder3D
                 rotAxis = DENOPTIMMathUtils.getNormalDirection(vectApA);
             }
             Matrix3d rotMat = new Matrix3d();
-	    rotAxis.normalize();
+	        rotAxis.normalize();
             rotMat.set(new AxisAngle4d(rotAxis,rotAng));
 
             if (debug)
@@ -473,6 +651,7 @@ public class TreeBuilder3D
             // Rotate atoms and APs of fragment
             for (IAtom atm : inFrag.atoms())
             {
+            	//At this point all atoms have point3d
                 atm.getPoint3d().sub(srcApA);
                 rotMat.transform(atm.getPoint3d());
                 atm.getPoint3d().add(srcApA);
@@ -539,7 +718,7 @@ public class TreeBuilder3D
             else
             {
                 // NOTE: in this case the RCA is on mol, thus no translation
-		// is needed beacuse thgApB is already on top of srcApA
+		        // is needed because trgApB is already on top of srcApA
             }
         }
         else
@@ -654,7 +833,8 @@ public class TreeBuilder3D
             append3DFragmentsViaEdges(newIdSrcAtmA,
                                       srcNextApA,
                                       trgNextApA,
-                                      nextEdge);
+                                      nextEdge,
+                                      removeRCAs);
         }
     }
 
@@ -749,12 +929,12 @@ public class TreeBuilder3D
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the map of rototranslated APs per each vertex ID. This method 
+     * Returns the map of roto-translated APs per each vertex ID. This method 
      * <b>MUST</b> be called after conversion of the <code>DENOPTIMGraph</code> 
      * into <code>AtomContainer</code>, that is, after having called 
      * {@link #convertGraphTo3DAtomContainer(DENOPTIMGraph) this} method.
      *
-     * @return the <code>Map</code> of all rototranslated 
+     * @return the <code>Map</code> of all roto-translated 
      * <code>DENOPTIMAttachmentPoint</code> per each vertex ID
      * @throws DENOPTIMException
      */
@@ -765,7 +945,7 @@ public class TreeBuilder3D
         if (!conversionCompleted)
         {
             String str = "Misuse of TreeBuilder3D. Cannot return map of "
-                         + "rototranslated APs per each vertex ID before "
+                         + "roto-translated APs per each vertex ID before "
                          + "building the 3D representation.";
             throw new DENOPTIMException(str);
         }
@@ -775,12 +955,12 @@ public class TreeBuilder3D
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the map of rototranslated APs per each DENOPTIMEdge. This method 
+     * Returns the map of roto-translated APs per each DENOPTIMEdge. This method 
      * <b>MUST</b> be called after conversion of the <code>DENOPTIMGraph</code> 
      * into <code>AtomContainer</code>, that is, after having called 
      * {@link #convertGraphTo3DAtomContainer(DENOPTIMGraph) this} method.
      *
-     * @return the <code>Map</code> of all rototranslated 
+     * @return the <code>Map</code> of all roto-translated 
      * <code>DENOPTIMAttachmentPoint</code> per each <code>DENOPTIMEdge</code>
      * @throws DENOPTIMException
      */
@@ -791,7 +971,7 @@ public class TreeBuilder3D
         if (!conversionCompleted)
         {
             String str = "Misuse of TreeBuilder3D. Cannot return map of "
-                         + "rototranslated APs per each DENOPTIMEdge before "
+                         + "roto-translated APs per each DENOPTIMEdge before "
                          + "building the 3D representation.";
             throw new DENOPTIMException(str);
         }
@@ -801,12 +981,12 @@ public class TreeBuilder3D
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the map of rototranslated APs per each source atom. This method 
+     * Returns the map of roto-translated APs per each source atom. This method 
      * <b>MUST</b> be called after conversion of the <code>DENOPTIMGraph</code> 
      * into <code>AtomContainer</code>, that is, after having called 
      * {@link #convertGraphTo3DAtomContainer(DENOPTIMGraph) this} method.
      *
-     * @return the <code>Map</code> of all rototranslated 
+     * @return the <code>Map</code> of all roto-translated 
      * <code>DENOPTIMAttachmentPoint</code> per each <code>IAtom</code>
      * @throws DENOPTIMException
      */
@@ -817,7 +997,7 @@ public class TreeBuilder3D
         if (!conversionCompleted)
         {
             String str = "Misuse of TreeBuilder3D. Cannot return map of "
-                         + "rototranslated APs per each Atom before "
+                         + "roto-translated APs per each Atom before "
                          + "building the 3D representation.";
             throw new DENOPTIMException(str);
         }
@@ -827,13 +1007,13 @@ public class TreeBuilder3D
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the map of rototranslated APs per each bond corresponding to 
+     * Returns the map of roto-translated APs per each bond corresponding to 
      * and interfragment connection. This method 
      * <b>MUST</b> be called after conversion of the <code>DENOPTIMGraph</code> 
      * into <code>AtomContainer</code>, that is, after having called 
      * {@link #convertGraphTo3DAtomContainer(DENOPTIMGraph) this} method.
      *
-     * @return the <code>Map</code> of all rototranslated 
+     * @return the <code>Map</code> of all roto-translated 
      * <code>DENOPTIMAttachmentPoint</code> per each <code>IBond</code>
      * @throws DENOPTIMException
      */
@@ -844,7 +1024,7 @@ public class TreeBuilder3D
         if (!conversionCompleted)
         {
             String str = "Misuse of TreeBuilder3D. Cannot return map of "
-                         + "rototranslated APs per each Atom before "
+                         + "roto-translated APs per each Atom before "
                          + "building the 3D representation.";
             throw new DENOPTIMException(str);
         }

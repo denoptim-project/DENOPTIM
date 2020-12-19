@@ -18,11 +18,20 @@
 
 package gui;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+
+import org.openscience.cdk.CDKConstants;
+
+import denoptim.constants.DENOPTIMConstants;
+
 /**
  * The collection of tunable preferences.
  * 
  * @author Marco Foscato
  */
+
 public class GUIPreferences {
 
 	/**
@@ -41,8 +50,43 @@ public class GUIPreferences {
 	protected static int chartPointSize = 8;
 	
 	/**
+	 * MolecularViewer: list of SDF tags specifying which properties to display.
+	 */
+	public static TreeSet<String> chosenSDFTags = new TreeSet<String>();
+	
+	/**
+	 * MolecularViewer: default list of SDF tags with corresponding string
+	 * to display instead of tag.
+	 */
+	public static Map<String,String> defualtSDFTags;
+	static {
+		defualtSDFTags = new HashMap<String,String>();
+		defualtSDFTags.put(CDKConstants.TITLE,"Name");
+		defualtSDFTags.put(DENOPTIMConstants.UNIQUEIDTAG,"UID");
+		defualtSDFTags.put(DENOPTIMConstants.FITNESSTAG,"Fitness");
+		defualtSDFTags.put(DENOPTIMConstants.MOLERRORTAG,"Error");
+		defualtSDFTags.put("Generation","Generation");
+		defualtSDFTags.put(DENOPTIMConstants.GMSGTAG,"Origin");
+		for (String s : defualtSDFTags.keySet())
+		{
+			chosenSDFTags.add(s);
+		}
+	}
+	
+	/**
 	 * Readable/writable space for tmp files
 	 */
 	protected static String tmpSpace = "/tmp";
+
+	/**
+	 * Available engines used to do SMILES-to-3D conversion
+	 */
+	protected enum SMITo3DEngine {CACTVS, CDK};
+	
+	/**
+	 * Selects the engine used to do SMILES-to-3D conversion
+	 */
+	protected static SMITo3DEngine smiTo3dResolver = 
+			SMITo3DEngine.CACTVS;
 	
 }

@@ -211,8 +211,9 @@ public class GUIFragmentSelector extends GUIModalDialog
 					}
 				}
 				result = new Integer[]{currFrgIdx, currApIdx};
-				fragmentViewer.clearAPTable();
-				fragmentViewer.clearMolecularViewer();
+				//fragmentViewer.clearAPTable();
+				//fragmentViewer.clearMolecularViewer();
+				fragmentViewer.dispose();
 				close();
 			}
 		});

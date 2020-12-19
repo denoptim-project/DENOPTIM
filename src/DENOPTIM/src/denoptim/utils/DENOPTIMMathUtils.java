@@ -20,6 +20,7 @@
 package denoptim.utils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.math.BigDecimal;
 
 import javax.vecmath.Point3d;
@@ -397,6 +398,19 @@ public class DENOPTIMMathUtils
         double sum = sum(a);
         return sum / a.length;
     }
+    
+//------------------------------------------------------------------------------
+    
+	public static double mean(List<Double> vals) 
+	{
+		double[] arr = new double[vals.size()];
+        for (int i=0; i<vals.size(); i++)
+        {
+            arr[i] = vals.get(i);
+        }
+		
+		return mean(arr);
+	}
     
 //------------------------------------------------------------------------------    
 

@@ -51,7 +51,7 @@ public class GAParameters
     /**
      * Pathname to the working directory for the current run
      */
-    protected static String dataDir = "";
+    protected static String dataDir = System.getProperty("user.dir");
 
     /**
      * Pathname of user defined parameters
@@ -194,11 +194,6 @@ public class GAParameters
     protected static int numParallelTasks = 0;
 
     /**
-     * Flag controlling production of 2D images
-     */
-    protected static boolean showGraphics = true;
-
-    /**
      * Flag controlling how to sort the population based on the fitness
      */
     protected static boolean sortOrderDecreasing = true;
@@ -211,7 +206,47 @@ public class GAParameters
     /**
      * Print level
      */
-    protected static int print_level = 0; 
+    protected static int print_level = 0;
+    
+//------------------------------------------------------------------------------
+    
+    public static void resetParameters() 
+    {
+    	dataDir = System.getProperty("user.dir");
+    	paramFile = "";
+    	initPoplnFile = "";
+    	uidFileIn = "";
+    	uidFileOut = "";
+    	//final: DEFUIDFILEOUTNAME = "MOLUID.txt";
+    	visitedGraphsFile = "GRAPHS.txt";
+    	failedSDF = "";
+    	logFile = "";
+    	populationSize = 50;
+    	numOfChildren = 5;
+    	numConvGen = 5;
+    	numGenerations = 100;
+    	maxTriesPerPop = 25;
+    	replacementStrategy = 1;
+    	growthProbabilityScheme = 0;
+    	growthMultiplier = 0.5;
+    	growthSigmaSteepness = 1.0;
+    	growthSigmaMiddle = 2.5;
+    	mutationProbability = 0.2;
+    	symmetricSubProbability = 0.8;
+    	crossoverProbability = 0.8;
+    	xoverSelectionMode = 3;
+    	strXoverSelectionMode = "STOCHASTIC UNIVERSAL SAMPLING";
+    	seed = 0L;
+    	parallelizationScheme = 1;
+    	numParallelTasks = 0;
+    	sortOrderDecreasing = true;
+    	precisionLevel = 3;
+    	print_level = 0;
+    	
+        FragmentSpaceParameters.resetParameters();
+        RingClosureParameters.resetParameters();
+        FitnessParameters.resetParameters();
+    }
 
    
 //------------------------------------------------------------------------------
@@ -381,14 +416,6 @@ public class GAParameters
         return initPoplnFile;
     }
     
-
-//------------------------------------------------------------------------------
-
-    protected static boolean getGraphicsCreationStatus()
-    {
-        return showGraphics;
-    }
-
 //------------------------------------------------------------------------------
 
     protected static void printParameters()
@@ -422,6 +449,7 @@ public class GAParameters
 
         FragmentSpaceParameters.printParameters();
         RingClosureParameters.printParameters();
+        FitnessParameters.printParameters();
     }
 
 //------------------------------------------------------------------------------
@@ -474,16 +502,6 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         numParallelTasks = Integer.parseInt(option);
-                    }
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-SHOWGRAPHICS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        showGraphics = Boolean.parseBoolean(option);
                     }
                     continue;
                 }
@@ -788,14 +806,14 @@ public class GAParameters
 
     protected static void createWorkingDirectory() throws DENOPTIMException
     {
-        boolean success = false;
-        String curDir = System.getProperty("user.dir");
         String fileSep = System.getProperty("file.separator");
+        String cdataDir = dataDir;
+        boolean success = false;
         while (!success)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
             String str = "RUN" + sdf.format(new Date());
-            dataDir = curDir + fileSep + str;
+            dataDir = cdataDir + fileSep + str;
             success = DenoptimIO.createDirectory(dataDir);
         }
     }
@@ -859,6 +877,11 @@ public class GAParameters
         if (RingClosureParameters.allowRingClosures())
         {
             RingClosureParameters.processParameters();
+        }
+        
+        if (FitnessParameters.fitParamsInUse())
+        {
+            FitnessParameters.processParameters();
         }
         
         System.err.println("Program log file: " + logFile);

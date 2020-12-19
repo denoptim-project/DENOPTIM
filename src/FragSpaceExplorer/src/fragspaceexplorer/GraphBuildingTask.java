@@ -21,7 +21,6 @@ package fragspaceexplorer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
@@ -43,7 +42,8 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.IGraphBuildingBlock;
 import denoptim.molecule.SymmetricSet;
-import denoptim.task.ProcessHandler;
+import denoptim.task.FitnessTask;
+import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
@@ -58,35 +58,15 @@ import denoptim.utils.ObjectPair;
  * @author Marco Foscato
  */
 
-public class GraphBuildingTask implements Callable
+public class GraphBuildingTask extends FitnessTask
 {
-    /**
-     * Flag about completion
-     */
-    private boolean completed = false;
-
-    /**
-     * Flag about exception
-     */
-    private boolean hasException = false;
-
-    /**
-     * Exception thrown
-     */
-    private Throwable thrownExc;
-
-    /**
-     * The graph that is expanded
-     */
-    private DENOPTIMGraph molGraph;
-
     /**
      * The graph ID of the root graph
      */
     private int rootId;
 
     /**
-     * GraphID: may be from the original graph of from its latest generated 
+     * GraphID: may be from the original graph or from its latest generated 
      * cyclic alternative.
      */
     private int graphId;
@@ -102,56 +82,44 @@ public class GraphBuildingTask implements Callable
     private FragsCombination fragsToAdd;
 
     /**
-     * A user-assigned id for this task.
-     */
-    private String id = null;
-
-    /**
      * Number of subtasks
      */
     private int nSubTasks = 0;
 
     /**
-     * Executor for external bash script
-     */
-    private ProcessHandler ph_sc;
-
-    /**
-     * Vector of indeces identifying the next combination of fragments.
+     * Vector of indexes identifying the next combination of fragments.
      * This is used only to store info needed to make checkpoint files.
      */
     private ArrayList<Integer> nextIds;
-
+    
     /**
-     * Verbosity level
+     * Tool for generating 3D models assembling 3D building blocks.
      */
-    private int verbosity = FSEParameters.getVerbosity();
-
+    private TreeBuilder3D tb3d;
 
 //------------------------------------------------------------------------------
+   
+    /**
+     * Constructor
+     */
  
-    /**
-     * @return <code>true</code> if an exception has been thrown within this 
-     * subtask, which also includes the scenario where the executed external
-     * script returned a non-zero exit status.
-     */
-  
-    public boolean foundException()
+    public GraphBuildingTask(DENOPTIMGraph m_molGraph, 
+    		FragsCombination fragsToAdd, int level, String workDir, 
+    		int verbosity) throws DENOPTIMException
     {
-        return hasException;
+    	//TODO: replace all serialization-based deep cloning with deep clone method
+    	// We are going to modify the graph is this cannot be a reference to the
+    	// original.
+        super((DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph));
+        dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+        rootId = m_molGraph.getGraphId();
+        graphId = dGraph.getGraphId();
+        this.workDir = workDir;
+        this.fragsToAdd = fragsToAdd;
+        this.level = level;  
+        this.verbosity = verbosity;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @return the exception thrown within this task
-     */
-
-    public Throwable getException()
-    {
-        return thrownExc;
-    }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -161,17 +129,6 @@ public class GraphBuildingTask implements Callable
     public int getNumberOfSubTasks()
     {
         return nSubTasks;
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
-     * @return the ID of this task
-     */
- 
-    public String getId()
-    {
-        return id;
     }
 
 //------------------------------------------------------------------------------
@@ -280,12 +237,20 @@ public class GraphBuildingTask implements Callable
                     msg = msg + DENOPTIMConstants.EOL 
                           + "   "+src+" - "+fragsToAdd.get(src);
                 }
-                msg = msg + DENOPTIMConstants.EOL + " - RootGraph: " + molGraph;
+                msg = msg + DENOPTIMConstants.EOL + " - RootGraph: " + dGraph;
             }
             if (verbosity > 0)
             {
-                msg = msg +  System.getProperty("line.separator");
+                msg = msg + NL;
                 DENOPTIMLogger.appLogger.info(msg);
+            }
+            
+            // Initialize the 3d model builder
+            if (FitnessParameters.make3dTree())
+            {
+            	tb3d = new TreeBuilder3D(FragmentSpace.getScaffoldLibrary(),
+            			FragmentSpace.getFragmentLibrary(),
+            			FragmentSpace.getCappingLibrary());
             }
 
             // Extend graph as requested
@@ -348,8 +313,8 @@ public class GraphBuildingTask implements Callable
                     throw new DENOPTIMException(msg);
                 }
     
-                molGraph.addVertex(trgVrtx);
-                molGraph.addEdge(edge);
+                dGraph.addVertex(trgVrtx);
+                dGraph.addEdge(edge);
             }
 
             // Append new symmetric sets
@@ -358,7 +323,7 @@ public class GraphBuildingTask implements Callable
                 SymmetricSet ss = newSymSets.get(ssId);
                 if (ss.size() > 1)
                 {
-                    molGraph.addSymmetricSetOfVertices(ss);
+                    dGraph.addSymmetricSetOfVertices(ss);
                 }
             }
 
@@ -405,7 +370,7 @@ public class GraphBuildingTask implements Callable
 
                     if (verbosity > 0)
                     {
-                        msg = "Graph " + molGraph.getGraphId() 
+                        msg = "Graph " + dGraph.getGraphId() 
                               + " is replaced by " + sz
                               + " cyclic alternatives.";
                         DENOPTIMLogger.appLogger.info(msg); 
@@ -428,11 +393,10 @@ public class GraphBuildingTask implements Callable
                     for (int ig = 0; ig<altCyclicGraphs.size(); ig++)
                     {
                         DENOPTIMGraph g = altCyclicGraphs.get(ig);
-                        int gId = g.getGraphId();
-
+                        
                         if (verbosity > 0)
                         {
-                            msg = "Graph " + gId 
+                            msg = "Graph " + g.getGraphId()
                                   + " is cyclic alternative "
                                   + (ig+1) + "/" + altCyclicGraphs.size()
                                   + " " + lst;
@@ -447,16 +411,28 @@ public class GraphBuildingTask implements Callable
                         try 
                         {
                             // Prepare molecular representation
-                            GraphConversionTool gct = new GraphConversionTool();
-                            IAtomContainer mol = gct.convertGraphToMolecule(g,
-                                                                          true);
+                        	IAtomContainer mol;
+                        	if (FitnessParameters.make3dTree())
+                        	{
+	                        	try {
+	                                mol = tb3d.convertGraphTo3DAtomContainer(g,true);
+	                        	} catch (Throwable t) {
+	                        		mol = GraphConversionTool
+	                        				.convertGraphToMolecule(g, true);
+	                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
+	                        	}
+                        	} else {
+                        		mol = GraphConversionTool
+                        				.convertGraphToMolecule(g, true);
+                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
+                        	}
+                            
                             // Level that generated this graph
                             altRes[4] = level;
                             
                             // Parent graph
                             altRes[3] = rootId;
 
-                            DENOPTIMMoleculeUtils.removeRCA(mol,g);
                             altRes[2] = mol;
         
                             // Prepare SMILES
@@ -482,9 +458,9 @@ public class GraphBuildingTask implements Callable
                             graphId = gId;
     
                             // Optionally perform external task
-                            if (FSEParameters.submitExternalTask())
+                            if (FSEParameters.submitFitnessTask())
                             {
-                                executeExternalBASHScript(altRes,gId);
+                                sendToFitnessProvider(altRes);
                             }
                         }
                         catch (Throwable t)
@@ -500,17 +476,33 @@ public class GraphBuildingTask implements Callable
 
                     // Store graph
                     FSEUtils.storeGraphOfLevel(molGraph.clone(),level,rootId,nextIds);
+                    
+                    // Optionally improve the molecular representation, which
+                    // is otherwise only given by the collection of building
+                    // blocks (not aligned, nor roto-translated)
+                	if (FitnessParameters.make3dTree())
+                	{
+                		IAtomContainer mol;
+                    	try {
+                            mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
+                    	} catch (Throwable t) {
+                    		mol = GraphConversionTool
+                    				.convertGraphToMolecule(dGraph, true);
+                        	DENOPTIMMoleculeUtils.removeRCA(mol,dGraph);
+                    	}
+                        res[2] = mol;
+                	}
                    
                     // Optionally perform external task 
-                    if (FSEParameters.submitExternalTask() && !needsCaps)
+                    if (FSEParameters.submitFitnessTask() && !needsCaps)
                     {
                     	Object[] fseRes = new Object[5];
-                    	fseRes[0] = res [0];
-                    	fseRes[1] = res [1];
-                    	fseRes[2] = res [2];
+                    	fseRes[0] = res[0];
+                    	fseRes[1] = res[1];
+                    	fseRes[2] = res[2];
                     	fseRes[3] = rootId;
                     	fseRes[4] = level;
-                        executeExternalBASHScript(fseRes, molGraph.getGraphId());
+                    	sendToFitnessProvider(fseRes);
                     }
                 }
             }
@@ -531,134 +523,33 @@ public class GraphBuildingTask implements Callable
 //------------------------------------------------------------------------------
     
     /**
-     * Execute the external script.
      * @param res the vector containing the results from the evaluation of the
      * graph representation
-     * @param gId the ID of the graph for which the external task is submitted
      */
 
-    private void executeExternalBASHScript(Object[] res, int gId) 
-                                                                throws Throwable
+    private void sendToFitnessProvider(Object[] res) throws Throwable
     {
-        // prepare variables
         String molinchi = res[0].toString().trim();
         String molsmiles = res[1].toString().trim();
-        IAtomContainer molInit = (IAtomContainer) res[2];
+        fitProvMol = (IAtomContainer) res[2];
         String parentGraphId = res[3].toString().trim();
         String level = res[4].toString().trim();
-        molInit.setProperty("InChi", molinchi);
-        molInit.setProperty("SMILES", molsmiles);
-        molInit.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
-        molInit.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
-        
-
+        fitProvMol.setProperty("InChi", molinchi);
+        fitProvMol.setProperty("UID", molinchi);
+        fitProvMol.setProperty("SMILES", molsmiles);
+        fitProvMol.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
+        fitProvMol.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
         		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
-        String workDir = FSEParameters.getWorkDirectory();
-        String fsep = System.getProperty("file.separator");
-        String molInitFile = workDir + fsep + molName 
+        fitProvMol.setProperty(CDKConstants.TITLE, molName);
+        fitProvInputFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTIN;
-        String molFinalFile = workDir + fsep + molName 
+        fitProvOutFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
-
-        molInit.setProperty(CDKConstants.TITLE, molName);
-
-        // write current graph to file as molecular objects
-        DenoptimIO.writeMolecule(molInitFile, molInit, false);
-
-        //TODO: deal with internal fitness and other kinds of fitness
-
-        //TODO change to allow other kinds of external tools (probably merge FitnessTask and FTask and put it under denoptim.fitness package
-
-        // build command
-        StringBuilder cmdStr = new StringBuilder();
-        String shell = System.getenv("SHELL");
-        cmdStr.append(shell).append(" ")
-              .append(FitnessParameters.getExternalFitnessProvider())
-              .append(" ").append(molInitFile)
-              .append(" ").append(molFinalFile)
-              .append(" ").append(workDir)
-              .append(" ").append(id)
-              .append(" ").append(FSEParameters.getUIDFileName());
-
-        if (verbosity > 0)
-        {
-            DENOPTIMLogger.appLogger.log(Level.INFO, "Executing: {0}", cmdStr);
-        }
-
-        // run it
-        ph_sc = new ProcessHandler(cmdStr.toString(), id);
-
-        try
-        {
-            ph_sc.runProcess();
-            if (ph_sc.getExitCode() != 0)
-            {
-                String msg = "Failed to execute "
-                             + FitnessParameters.getExternalFitnessProviderInterpreter().toString()
-                             + " script '"
-                             + FitnessParameters.getExternalFitnessProvider()
-                             + "' on " + molInitFile;
-                DENOPTIMLogger.appLogger.severe(msg);
-                DENOPTIMLogger.appLogger.severe(ph_sc.getErrorOutput());
-                throw new DENOPTIMException(msg);
-            }
-            ph_sc = null;
-        }
-        catch (Exception ex)
-        {
-            throw new DENOPTIMException(ex);
-        }
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
-     * @return <code>true</code> if the task is completed
-     */
-
-    public boolean isCompleted()
-    {
-        return completed;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Stop the task if not already completed
-     */
-
-    public void stopTask()
-    {
-        if (completed)
-        {
-            return;
-        }
-        if (ph_sc != null)
-        {
-            System.err.println("Calling stop on processes from "
-                                                   + "GraphBuildingTask " + id);
-            ph_sc.stopProcess();
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns a string identifying this task for its ID and reporting whether
-     * an exception has been thrown and if the tasks is completed.
-     */
-    
-    @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("GraphBuildingTask [id=").append(id).
-           append(", hasException=").append(hasException).
-           append(", completed=").append(completed).
-           append("] ");
-        return sb.toString();
+        fitProvUIDFile = FSEParameters.getUIDFileName();
+        
+        runFitnessProvider();
     }
 
 //------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 #
 
 # Fitness provider
-FP-INTERPRETER=BASH
+FP-INTERPRETER=bash
 FP-SOURCE=data/fitness_provider_fromDB.sh
 
 # Parameters for the fragment space exploration

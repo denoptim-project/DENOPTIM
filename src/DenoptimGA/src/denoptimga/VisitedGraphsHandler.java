@@ -78,7 +78,7 @@ public class VisitedGraphsHandler
         this.libScaff = libScaff;
         this.libFrag = libFrag;
         this.libCap = libCap;
-	this.mp = mp;
+	    this.mp = mp;
     }
 
 //------------------------------------------------------------------------------
@@ -157,11 +157,15 @@ public class VisitedGraphsHandler
                 channel.force(true);
                 appended = true;
             }
-        } catch (Exception de) {
-            LOGGER.log(Level.SEVERE, null, de);
-            System.exit(-1);
-        } finally {
-            try {
+        }
+        catch (Exception de)
+        {
+            LOGGER.log(Level.SEVERE, null, de); 
+        }
+        finally
+        {
+            try 
+            {
                 // close the channel
                 if (channel != null)
                     channel.close();

@@ -73,11 +73,12 @@ public class RingClosureParameters
 
     /**
      * The ring closability evaluation mode:
+     * -1= only ring rize bias
      * 0 = only constitution of candidate ring,
      * 1 = only closability of 3D chain,
      * 2 = both 0 and 1.
      */
-    protected static int rceMode = 0;
+    protected static int rceMode = -1;
 
     /**
      * Maximum number of rotatable bonds for which conformational space
@@ -157,7 +158,7 @@ public class RingClosureParameters
      * Relative weight of ring sizes to bias the selection of a ring 
      * combination among the various alternatives.
      */
-    protected static ArrayList<Integer> ringSizeBias = new ArrayList()
+    protected static ArrayList<Integer> ringSizeBias = new ArrayList<Integer>()
         {{
             for (int i=0; i<maxRingSize+1; i++)
             {
@@ -220,6 +221,51 @@ public class RingClosureParameters
      */
     protected static boolean serializeRCCs = false;
 
+//------------------------------------------------------------------------------
+    
+    public static void resetParameters()
+    {
+    	verbosity = 0;
+    	rcParamsInUse = false;
+    	closeRings = false;
+    	buildChelatesMode = false;
+    	selectFragsFromCC = false;
+    	rcStrategy = "BONDOVERLAP";
+    	rceMode = -1;
+    	maxRotBonds = 9; //TODO [n+2] => benzene has n=6 so: 8
+    	maxRingSize = 9;
+    	minRcaPerType = 0;
+    	maxRcaPerType = 50;
+    	minRingClosures = 0;
+    	maxRingClosures = 50;
+    	linearityLimit = 178.5;
+    	rcTolDist = 0.33;
+    	pathConfSearchExtraTol = 1.1;
+    	rcMaxDot = -0.75;
+    	pathConfSearchStep = 12.0;
+    	ringSizeBias = new ArrayList<Integer>()
+            {{
+                for (int i=0; i<maxRingSize+1; i++)
+                {
+                    add(0);
+                }
+    	    if (maxRingSize>=7)
+    	    {
+                    // WARNING: if the default value of maxRingSize is changed
+                    // also the default content of this array has to change
+                    set(5,2);
+                    set(6,4);
+                    set(7,1);
+    	    }
+            }};
+        ringClosabCondAsSMARTS = new HashMap<String,String>();
+        reqElInRings = new HashSet<String>();
+        rccIndex = "";
+        rccFolder = "";
+        exhaustiveConfSrch = false; 
+        checkInterdepPaths = false;
+        serializeRCCs = false;
+    }
 
 //----------------------------------------------------------------------------
 
@@ -408,20 +454,21 @@ public class RingClosureParameters
     public static void interpretKeyword(String line) throws DENOPTIMException
     {
         String key = line.trim();
-	String value = "";
-	if (line.contains("="))
-	{
-	    key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-	}
-	try
-	{
-            interpretKeyword(key,value);
-	}
-	catch (DENOPTIMException e)
-	{
-	    throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-	}
+		String value = "";
+		if (line.contains("="))
+		{
+		    key = line.substring(0,line.indexOf("=") + 1).trim();
+	        value = line.substring(line.indexOf("=") + 1).trim();
+		}
+		
+		try
+		{
+	            interpretKeyword(key,value);
+		}
+		catch (DENOPTIMException e)
+		{
+		    throw new DENOPTIMException(e.getMessage()+" Check line "+line);
+		}
     }
 
 //----------------------------------------------------------------------------
@@ -434,9 +481,9 @@ public class RingClosureParameters
         switch (key.toUpperCase())
         {
         case "RC-VERBOSITY=":
-	    try
-	    {
-            verbosity = Integer.parseInt(value);
+		    try
+		    {
+	            verbosity = Integer.parseInt(value);
             }
             catch (Throwable t)
             {
@@ -470,6 +517,10 @@ public class RingClosureParameters
         case "RC-EVALUATIONCLOSABILITYMODE=":
         	switch (value.toUpperCase())
         	{
+	        	case "RING_SIZE":
+	    			rceMode = -1;
+	    			break;
+	    			
         		case "CONSTITUTION":
         			rceMode = 0;
         			break;
@@ -612,39 +663,50 @@ public class RingClosureParameters
             String[] words = value.split("\\s+");
             if (words.length != 2)
             {
-                 msg = "Unable to read ring size and bias weight from "
+                 msg = "Unable to read ring size and bias wevight from "
                              + "'" + value + "'. Expected syntax is: "
                              + "'5 2' as to specify that 5-member rings "
                              + "are given a weight of 2.";
                 throw new DENOPTIMException(msg);
             }
+            int size = -1;
+            int weight = 0;
             try
             {
-                int size = Integer.parseInt(words[0]);
-                int weight = Integer.parseInt(words[1]);
-                if (weight < 0)
-                {
-                    msg = "Bias for ring size must be >= 0";
-                    throw new DENOPTIMException(msg);
-                }
-                if (size > maxRingSize)
-                {
-                    for (int i=maxRingSize+1; i<size; i++)
-                    {
-                        ringSizeBias.add(0);
-                    }
-                    ringSizeBias.add(weight);
-                    maxRingSize = size;
-                }
-                else
-                {
-                    ringSizeBias.set(size,weight);
-                }
-            }
-            catch (Throwable t)
+                size = Integer.parseInt(words[0]);
+            } catch (Throwable t)
             {
-                msg = "Unable to understand value '" + value + "'";
+            	throw new DENOPTIMException("Ring size must be an integer");
+            }
+            try
+            {
+                weight = Integer.parseInt(words[1]);
+            } catch (Throwable t)
+            {
+            	throw new DENOPTIMException("Bias weight must be an integer");
+            }
+            if (size < 0)
+            {
+                msg = "Ring size must be >= 0";
                 throw new DENOPTIMException(msg);
+            }
+            if (weight < 0)
+            {
+                msg = "Bias for ring size must be >= 0";
+                throw new DENOPTIMException(msg);
+            }
+            if (size > maxRingSize)
+            {
+                for (int i=maxRingSize+1; i<size; i++)
+                {
+                    ringSizeBias.add(0);
+                }
+                ringSizeBias.add(weight);
+                maxRingSize = size;
+            }
+            else
+            {
+                ringSizeBias.set(size,weight);
             }
             break;
         case "RC-CLOSABLERINGSMARTS=":
@@ -703,6 +765,7 @@ public class RingClosureParameters
         {
             msg = "Unknown ring-closure evaluation mode '" + rceMode + "' "
 		  + "Acceptable values are: "
+          + "-1 (only ring size)"
 		  + "0 (only contitutional), "
 		  + "1 (only 3D chain), "
 		  + "2 (both constitutional and 3D chain). ";
@@ -783,7 +846,7 @@ public class RingClosureParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-	RingClosuresArchive rcl = new RingClosuresArchive(rccIndex);
+    	RingClosuresArchive rcl = new RingClosuresArchive(rccIndex);
     }
 
 //----------------------------------------------------------------------------

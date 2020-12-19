@@ -135,6 +135,27 @@ public class FragmentSpaceParameters
      * Verbosity level
      */
     protected static int verbosity = 0;
+    
+//------------------------------------------------------------------------------
+    
+    public static void resetParameters()
+    {
+    	fsParamsInUse = false;
+    	scaffoldLibFile = "";
+    	fragmentLibFile = "";
+    	cappingLibFile = "";
+    	compMatrixFile = "";
+    	rcCompMatrixFile = "";
+    	rotBndsFile = "";
+    	apClassBasedApproch = false;
+    	maxHeavyAtom = 100;
+    	maxRotatableBond = 20;
+    	maxMW = 500;
+    	enforceSymmetry = false;
+    	symmetryConstraints = false;
+    	symmConstraintsMap = new HashMap<String, Double>();
+    	verbosity = 0;
+	}
 
 //------------------------------------------------------------------------------
 

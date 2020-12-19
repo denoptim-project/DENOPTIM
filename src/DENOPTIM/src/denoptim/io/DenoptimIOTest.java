@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
@@ -55,6 +56,11 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 public class DenoptimIOTest {
 
     private static final BondType BT = BondType.SINGLE;
+
+    private final String SEP = System.getProperty("file.separator");
+
+    @TempDir
+    File tempDir;
 
 //------------------------------------------------------------------------------
 

@@ -158,7 +158,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
-		fragmentViewer = new FragmentViewPanel(true);
+		fragmentViewer = new FragmentViewPanel(this,true);
 		fragmentViewer.addPropertyChangeListener("APDATA", 
 				new PropertyChangeListener() {
 			@Override
@@ -200,7 +200,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnAddFrag.setToolTipText("Append fragment taken from file.");
 		btnAddFrag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnAddFrag);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -211,7 +211,8 @@ public class GUIFragmentInspector extends GUICardPanel
 					fragLib = DenoptimIO.readMoleculeData(
 							inFile.getAbsolutePath());
 				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null,
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(btnAddFrag,
 			                "<html>Could not read fragments from file"
 			                + "<br>'" + inFile + "'"
 			                + "<br>Hint on cause: " + e1.getMessage() 
@@ -224,7 +225,7 @@ public class GUIFragmentInspector extends GUICardPanel
 
 				if (fragLib.size() == 0)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnAddFrag,
 			                "<html>No fragments in file"
 			                + "<br>'" + inFile + "'</html>",
 			                "Error",
@@ -245,7 +246,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				String txt = "<html><body width='%1s'>Do you want to "
 						+ "append all fragments of only selected ones?"
 						+ "</html>";
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(btnAddFrag,
 		                String.format(txt,200),
 		                "Append Fragments",
 		                JOptionPane.DEFAULT_OPTION,
@@ -296,7 +297,7 @@ public class GUIFragmentInspector extends GUICardPanel
 							DenoptimIO.writeMoleculeSet(tmpSDFFile, selectedFrags);
 							importFragmentsFromFile(new File(tmpSDFFile));
 						} catch (DENOPTIMException e1) {
-							JOptionPane.showMessageDialog(null,
+							JOptionPane.showMessageDialog(btnAddFrag,
 					                "<html>Could not read import fragments.<br>"
 					                + "Error reading tmp file"
 					                + "<br>'" + inFile + "'"
@@ -340,9 +341,20 @@ public class GUIFragmentInspector extends GUICardPanel
 				+ " from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenMol);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
+					return;
+				}
+				if (!inFile.getName().endsWith(".sdf"))
+				{
+					JOptionPane.showMessageDialog(null,
+			                "<html>Expecting and MDL SDF file, but file<br>'"
+							+ inFile.getAbsolutePath() + "' does not have .sdf"
+							+ " extension.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
 				importStructureFromFile(inFile);
@@ -391,6 +403,8 @@ public class GUIFragmentInspector extends GUICardPanel
 			    + "<br><b>WARNING:</b> this action cannot be undone!<html>");
 		btnAtmToAP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				fragment = fragmentViewer.getLoadedStructure();
+				
 				ArrayList<IAtom> selectedAtms = 
 						fragmentViewer.getAtomsSelectedFromJMol();
 				
@@ -493,8 +507,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		
         pnlSaveEdits = new JPanel();
         btnSaveEdits = new JButton("Save Changes");
-        btnSaveEdits.setForeground(Color.RED);
-        btnSaveEdits.setEnabled(false);
+        //btnSaveEdits.setForeground(Color.RED);
+        btnSaveEdits.setEnabled(true);
         btnSaveEdits.setToolTipText("<html>Save the current fragment replacing"
         		+ " <br>the original fragment in the loaded library.</html>");
         btnSaveEdits.addActionListener(new ActionListener() {
@@ -504,22 +518,19 @@ public class GUIFragmentInspector extends GUICardPanel
         });
         pnlSaveEdits.add(btnSaveEdits);
         fragCtrlPane.add(pnlSaveEdits);
-		
 		this.add(fragCtrlPane,BorderLayout.EAST);
 		
 		
 		// Panel with buttons to the bottom of the frame
-		
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenFrags = new JButton("Load Library of Fragments",
-					UIManager.getIcon("FileView.directoryIcon"));
+		btnOpenFrags = new JButton("Load Library of Fragments");
 		btnOpenFrags.setToolTipText("Reads fragments or structures from "
 				+ "file.");
 		btnOpenFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenFrags);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -529,12 +540,11 @@ public class GUIFragmentInspector extends GUICardPanel
 		});
 		commandsPane.add(btnOpenFrags);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Fragments",
-				UIManager.getIcon("FileView.hardDriveIcon"));
+		JButton btnSaveFrags = new JButton("Save Library of Fragments");
 		btnSaveFrags.setToolTipText("Write all fragments to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile();
+				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null)
 				{
 					return;
@@ -550,8 +560,10 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 				catch (Exception ex)
 				{
+					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null,
-			                "Could not write to '" + outFile + "'!.",
+			                "Could not write to '" + outFile + "'! "
+			                + "Hint: "+ex.getMessage(),
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
@@ -596,10 +608,13 @@ public class GUIFragmentInspector extends GUICardPanel
 						+ "<p>Hover over buttons get a tip.</p>"
 						+ "<br>"
 						+ "<p>Right-click on the Jmol viewer will open the "
-						+ "Jmol menu. However, Jmol cannot handle the "
+						+ "Jmol menu. However, since Jmol cannot handle the "
 						+ "attachment points data. Therefore, Jmol "
 						+ "functionality should only be used on systems "
-						+ "that have no attachment points.</p></html>";
+						+ "that have no attachment points, or for alterations "
+						+ "of the molecular structure that do not change the "
+						+ "list of atoms au to the last atom decorated with an "
+						+ "attachment point.</p></html>";
 				JOptionPane.showMessageDialog(null, 
 						String.format(txt, 400),
 	                    "Tips",
@@ -666,9 +681,9 @@ public class GUIFragmentInspector extends GUICardPanel
 		// Cleanup
 		clearCurrentSystem();
 		
-		// Load the structure using CACTUS service via Jmol
+		// Load the structure using CACTUS service or CDK builder
 		try {
-			fragmentViewer.loadSMILESFromRemote(smiles);
+			fragmentViewer.loadSMILES(smiles);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			return;
@@ -685,6 +700,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// finalize GUI status
 		updateFragListSpinner();
 		unsavedChanges = true;
+        btnSaveEdits.setEnabled(true);
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
@@ -814,7 +830,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		fragment = null;
 		
 		// Clear viewer?
-		// No, its clears upon loading of a new system.
+		// No, it clears upon loading of a new system.
 		// The exception (i.e., removal of the last fragment) is dealt with by
 		// submitting "zap" only in that occasion.
 		
@@ -958,7 +974,7 @@ public class GUIFragmentInspector extends GUICardPanel
 
 	private void deprotectEditedSystem()
 	{
-		btnSaveEdits.setEnabled(false);
+		//btnSaveEdits.setEnabled(false);
 		btnAddFrag.setEnabled(true);
 		btnOpenFrags.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
@@ -1067,11 +1083,10 @@ public class GUIFragmentInspector extends GUICardPanel
 
   	private void saveUnsavedChanges() 
   	{
+  		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+  		
   		if (fragmentViewer.hasUnsavedAPEdits())
   		{
-	  		// Retrieve chemical object from the viewer
-	  		fragment = fragmentViewer.getLoadedStructure();
-	  		
 	  		// Import changes from AP table into molecular representation
 	        for (int i=0; i<fragmentViewer.apTabModel.getRowCount(); i++) 
 	        {	        	
@@ -1122,20 +1137,36 @@ public class GUIFragmentInspector extends GUICardPanel
 	    			return;	
 	        	}
 	        }
-	  		
-	  		// Overwrite fragment in library
-	  		fragmentLibrary.set(currFrgIdx, fragment);
 	  	}
+  		
+  		// Retrieve chemical object from the viewer, if edited, otherwise
+  		// we get what is already in 'fragment'
+  		fragment = fragmentViewer.getLoadedStructure();
+  		if (fragmentLibrary.size()==0 
+  				&& (fragment==null || fragment.getAPCount()==0))
+  		{
+  			//Nothing to same
+  	        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+  			return;
+  		}
+  		fragmentLibrary.set(currFrgIdx,fragment);
         
         // Reload fragment from library to refresh table and viewer
     	activateTabEditsListener(false);
-    	loadCurrentFragIdxToViewer();
-  		
+    	try {
+    	    loadCurrentFragIdxToViewer();
+    	} catch (Throwable t) {
+			//This can happen if the viewer has been started but is empty
+    		// E.G:, if the cactvs server is down).
+    		// We just keep going, and make sure we get the default cursor back.
+		}
   		// Release constraints
     	activateTabEditsListener(true);
     	fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
 				fragmentLibrary.size(), 1));
         deprotectEditedSystem();
+  		
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   	}
 
 //----------------------------------------------------------------------------
@@ -1205,6 +1236,50 @@ public class GUIFragmentInspector extends GUICardPanel
     	
     	return currApClass;
 	}
+	
+//-----------------------------------------------------------------------------
+  	
+  	/**
+  	 * Forces the user to specify a properly formatted APRule, i.e., the 
+  	 * first component of an APClass.
+  	 * @param currApRule the current value of the APRule, or empty string
+  	 * @param mustReply set to <code>true</code> to prevent escaping the question
+  	 * @return 
+  	 * @throws DENOPTIMException 
+  	 */
+	public static String ensureGoodAPRuleString(String currApRule, 
+			String title, boolean mustReply) throws DENOPTIMException 
+	{		
+		String preStr = "";
+		while (!DENOPTIMAttachmentPoint.isValidAPRuleString(currApRule))
+    	{
+			if (currApRule != "")
+			{
+	    		preStr = "APClass rule '" + currApRule + "' is not valid!<br>"
+	    				+ "The valid APClass rile is a string with no spaces "
+	    				+ "and no '"
+	        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
+	    				+ "' character.<br>";
+			}
+			
+    		currApRule = JOptionPane.showInputDialog(null, 
+    				"<html>" + preStr + " Please, provide a valid "
+    				+ "APClass rule string: ",
+    				title,
+    				JOptionPane.PLAIN_MESSAGE);
+        	
+    		if (currApRule == null)
+        	{
+        		currApRule = "";
+        		if (!mustReply)
+        		{
+        			throw new DENOPTIMException();
+        		}
+        	}
+    	}
+    	
+    	return currApRule;
+	}
   	
 //-----------------------------------------------------------------------------
 
@@ -1216,6 +1291,16 @@ public class GUIFragmentInspector extends GUICardPanel
 	public boolean hasUnsavedChanges()
 	{
 		return unsavedChanges;
+	}
+	
+//-----------------------------------------------------------------------------
+
+	/*
+	 * This is needed to stop Jmol threads upon closure of this gui card.
+	 */
+	public void dispose() 
+	{
+		fragmentViewer.dispose();
 	}
 		
 //-----------------------------------------------------------------------------
