@@ -39,6 +39,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMVertex;
@@ -583,9 +584,9 @@ public class ParallelEvolutionaryAlgorithm
                     // possible combination of rings
                     for (DENOPTIMVertex rcv : graph4.getFreeRCVertices())
                     {
-                    	String apc = graph4.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                    	if (FragmentSpace.getCappingClass(apc)==null 
-                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                        APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                        if (FragmentSpace.getCappingMap().get(apc)==null 
+                                && FragmentSpace.getForbiddenEndList().contains(apc))
                     	{
                     		res = null;
                     	}
@@ -675,9 +676,9 @@ public class ParallelEvolutionaryAlgorithm
                         // possible combination of rings
                         for (DENOPTIMVertex rcv : graph1.getFreeRCVertices())
                         {
-                        	String apc = graph1.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                        	if (FragmentSpace.getCappingClass(apc)==null 
-                        			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                            if (FragmentSpace.getCappingMap().get(apc)==null 
+                                    && FragmentSpace.getForbiddenEndList().contains(apc))
                         	{
                         		res1 = null;
                         	}
@@ -766,9 +767,9 @@ public class ParallelEvolutionaryAlgorithm
                         // possible combination of rings
                         for (DENOPTIMVertex rcv : graph2.getFreeRCVertices())
                         {
-                        	String apc = graph2.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                        	if (FragmentSpace.getCappingClass(apc)==null 
-                        			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                            if (FragmentSpace.getCappingMap().get(apc)==null 
+                                    && FragmentSpace.getForbiddenEndList().contains(apc))
                         	{
                         		res2 = null;
                         	}
@@ -862,9 +863,9 @@ public class ParallelEvolutionaryAlgorithm
                         // possible combination of rings
                         for (DENOPTIMVertex rcv : graph3.getFreeRCVertices())
                         {
-                        	String apc = graph3.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                        	if (FragmentSpace.getCappingClass(apc)==null 
-                        			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                            if (FragmentSpace.getCappingMap().get(apc)==null 
+                                    && FragmentSpace.getForbiddenEndList().contains(apc))
                         	{
                         		res3 = null;
                         	}
@@ -1095,9 +1096,9 @@ public class ParallelEvolutionaryAlgorithm
                 // possible combination of rings
                 for (DENOPTIMVertex rcv : molGraph.getFreeRCVertices())
                 {
-                	String apc = molGraph.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                	if (FragmentSpace.getCappingClass(apc)==null 
-                			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                    APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                    if (FragmentSpace.getCappingMap().get(apc)==null 
+                            && FragmentSpace.getForbiddenEndList().contains(apc))
                 	{
                 		res = null;
                 	}
@@ -1131,9 +1132,10 @@ public class ParallelEvolutionaryAlgorithm
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];
 
-                OffspringEvaluationTask task = new OffspringEvaluationTask(molName, molGraph, inchi, smiles, cmol,
-                                        genDir, molPopulation, numTries,
-                                        GAParameters.getUIDFileOut());
+                OffspringEvaluationTask task = new OffspringEvaluationTask(
+                        molName, molGraph, inchi, smiles, cmol, 
+                        genDir, molPopulation, numTries,
+                        GAParameters.getUIDFileOut());
                 submitted.add(task);
                 futures.add(tcons.submit(task));
             }

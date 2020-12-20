@@ -99,12 +99,6 @@ public class CompatibilityMatrixForm extends JPanel {
     private SortedSet<String> allAPRules = new TreeSet<String>();
 	
 	/**
-     * List of all APRules. This list can be edited by creating/removing an 
-     * APRule or by creating/removing an APClass.
-     */
-    private SortedSet<String> allAPRules = new TreeSet<String>();
-    
-	/**
 	 * List of APClasses of capping groups.
 	 * These can be found in a fragment space or collected from
 	 * the capping group library
@@ -666,7 +660,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 JList<String> srcRlsList = new JList<String>(srcAPRs);
                 for (String apcr : allAPRules)
                 {
-                    if (!bondOrderMap.keySet().contains(apcr))
+                    if (!bondTypeMap.keySet().contains(apcr))
                     {
                     	srcAPRs.addElement(apcr);
                     }
@@ -691,7 +685,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 JPanel twoListsPanel = new JPanel();
                 JLabel headApr = new JLabel("APClass:");
                 JLabel headBo = new JLabel("Chemical Bond:");
-                JScrollPane scrollApr = new JScrollPane(apRulesList);
+                JScrollPane scrollApr = new JScrollPane(srcRlsList);
                 JScrollPane scrollBo = new JScrollPane(boList);
                 GroupLayout lyoAddBO = new GroupLayout(twoListsPanel);
                 twoListsPanel.setLayout(lyoAddBO);
@@ -762,12 +756,12 @@ public class CompatibilityMatrixForm extends JPanel {
 	                	}
 	                }
 	                
-	                for (String apc : srcAPRules)
+	                for (String apr : srcAPRules)
 	                {
 	                	bondTypeMap.put(apr, bo);
 	                }
 	                
-	                updateAPRuleToBondTypeTable();
+	                updateAPClassToBondOrderTable();
                 }
 			}
 		});
@@ -782,9 +776,9 @@ public class CompatibilityMatrixForm extends JPanel {
             public void actionPerformed(ActionEvent e) {
         	    for (String apr : allAPRules)
         	    {
-        	    	if (!bondOrderMap.keySet().contains(apr))
+        	    	if (!bondTypeMap.keySet().contains(apr))
         	    	{
-        	    		bondOrderMap.put(apr, 1);
+        	    		bondTypeMap.put(apr, BondType.SINGLE);
         	    	}
         	    }
         	    updateAPClassToBondOrderTable();
@@ -796,7 +790,7 @@ public class CompatibilityMatrixForm extends JPanel {
         		+ "recent list of APRules");
         btnUpdateAPClsBO.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	updateAPRuleToBondTypeTable();
+            	updateAPClassToBondOrderTable();
             }
         });
         
@@ -1486,7 +1480,7 @@ public class CompatibilityMatrixForm extends JPanel {
                             0).toString();
                     bondTypeMap.put(apc, availBO.getElementAt(idBo));
                     
-                    updateAPRuleToBondTypeTable();
+                    updateAPClassToBondOrderTable();
                 }
             }
             
@@ -1540,7 +1534,7 @@ public class CompatibilityMatrixForm extends JPanel {
 					{
 						return;
 					}
-					bondOrderMap.put(apc, value);
+					bondTypeMap.put(apc, value);
 				} catch (NumberFormatException e1) {
 					// value is so invalid we ignore it
 				}
@@ -1672,7 +1666,7 @@ public class CompatibilityMatrixForm extends JPanel {
         
         //Place data into GUI
         updateAPClassCompatibilitiesList();
-        updateAPRuleToBondTypeTable();
+        updateAPClassToBondOrderTable();
         updateCappingRulesTable();
         updateForbiddenEndsTable();
 	}
@@ -1725,7 +1719,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	
 //-----------------------------------------------------------------------------
 	
-	private void updateAPRuleToBondTypeTable()
+	private void updateAPClassToBondOrderTable()
 	{
 		activateTabEditsListener(false); 
 		
@@ -1868,7 +1862,7 @@ public class CompatibilityMatrixForm extends JPanel {
 				Cursor.WAIT_CURSOR));
 		if (cleanup)
 		{
-			allCapAPClasses = new TreeSet<String>();
+			allCapAPClasses = new TreeSet<APClass>();
 		}
 		
 		for (File fragLib : fragLibs)
@@ -1876,9 +1870,9 @@ public class CompatibilityMatrixForm extends JPanel {
 			allCapAPClasses.addAll(DenoptimIO.readAllAPClasses(fragLib));
 		}
 		
-		for (String apc : allCapAPClasses)
+		for (APClass apc : allCapAPClasses)
 		{
-		    allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(apc));
+		    allAPRules.add(apc.getRule());
 		}
 		
 		this.setCursor(Cursor.getPredefinedCursor(

@@ -76,8 +76,6 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.FragmentUtils;
-import denoptim.utils.GraphUtils;
 
 
 /**

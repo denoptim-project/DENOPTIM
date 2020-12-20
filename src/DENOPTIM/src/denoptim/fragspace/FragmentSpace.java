@@ -183,6 +183,52 @@ public class FragmentSpace
     /**
      * Define all components of a fragment space that implements the attachment
      * point class-approach.
+     * @param scaffLib library of fragments used to start the construction of
+     * any new graph (i.e., seed or root fragments, a.k.a. scaffolds).
+     * @param fragLib library of fragments for general purpose.
+     * @param cappLib library of single-AP fragments used to cap free attachment 
+     * points (i.e., the capping groups).
+     * @param cpMap the APClass compatibility map. This data structure is a 
+     * map of the APClass-on-growing-graph (key) to list of permitted APClasses
+     * on incoming fragment (values).
+     * @param boMap the map of APClass into bond order. This data structure is a 
+     * map of APClass (keys) to bond order as integer (values).
+     * @param capMap the capping rules. This data structure is a map of  
+     * APClass-to-cap (keys) to APClass-of-capping-group (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot 
+     * be left unused neither capped. 
+     * @param rcCpMap the APClass compatibility matrix for ring closures.
+     * @throws DENOPTIMException
+     */
+    public static void defineFragmentSpace(ArrayList<DENOPTIMVertex> scaffLib,
+            ArrayList<DENOPTIMVertex> fragLib,
+            ArrayList<DENOPTIMVertex> cappLib,
+            HashMap<APClass,ArrayList<APClass>> cpMap,
+            HashMap<String, BondType> boMap,
+            HashMap<APClass,APClass> capMap,
+            HashSet<APClass> forbEnds,
+            HashMap<APClass,ArrayList<APClass>> rcCpMap) throws DENOPTIMException
+    {
+        setScaffoldLibrary(scaffLib);
+        setFragmentLibrary(fragLib);
+        setCappingLibrary(cappLib);
+        setCompatibilityMatrix(cpMap);
+        apClassBasedApproch = true;
+        setBondOrderMap(boMap);
+        setCappingMap(capMap);
+        setForbiddenEndList(forbEnds);
+        setRCCompatibilityMatrix(rcCpMap);
+   
+        FragmentSpaceUtils.groupAndClassifyFragments(apClassBasedApproch);
+        
+        isValid = true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Define all components of a fragment space that implements the attachment
+     * point class-approach.
      * @param scaffFile pathname to library of fragments used to start 
      * the 
      * construction of
@@ -605,33 +651,22 @@ public class FragmentSpace
     */
     public static BondType getBondOrderForAPClass(String apclass)
     {
-    	int bo = 1; //Default
-        if (FragmentSpace.getBondOrderMap() == null)
+        String apRule = apclass.split(DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
+        if (bondOrderMap == null)
         {
             String msg = "Attempting to get bond order, but no "
                        + "FragmentSpace defined (i.e., null BondOrderMap). "
                        + "Assuming bond order one.";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-            return bo;
+
+            Exception e = new Exception(msg);
+            e.printStackTrace();
+
+            return BondType.UNDEFINED;
         }
-        else 
+        else
         {
-        	//WARNING: here we need to allow returning the default BO=1
-        	// in case we have a loaded/defined fragment space but we ask
-        	// for an entry of the BOMap that does not exist. This can happen
-        	// when we create fragments with the GUI and define a new APClass
-        	// that is not yet included in the loaded fragment space
-        	if (FragmentSpace.getBondOrderMap().keySet().contains(apclass))
-        	{
-        		bo = FragmentSpace.getBondOrderMap().get(apclass);
-        	} else {
-        		String msg = "Attemting to get bond order, but the loaded "
-                        + "FragmentSpace does not contain a rule to translate "
-                        + "APClass '" + apclass + "' into a bond order. "
-                        + "Assuming bond order one.";
-        		DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-        	}
-            return bo;
+            return bondOrderMap.getOrDefault(apRule, BondType.UNDEFINED);
         }
     }
 

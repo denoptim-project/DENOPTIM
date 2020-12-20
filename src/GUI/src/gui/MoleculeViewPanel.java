@@ -202,7 +202,7 @@ public class MoleculeViewPanel extends JSplitPane
 		IAtomContainer mol;
 		TreeMap<String,String> availableProps = new TreeMap<String,String>();
 		try {
-			mol = DenoptimIO.readSingleSDFFile(item.getMoleculeFile());
+			mol = DenoptimIO.readSingleSDFFile(item.getSDFFile());
 		} catch (DENOPTIMException e1) {
 			return;
 		}
@@ -400,19 +400,19 @@ public class MoleculeViewPanel extends JSplitPane
 					defPropMap.get(CDKConstants.TITLE),
 					item.getName() });
 		}
-		if (item.getMoleculeUID() != null && chosen.contains(
+		if (item.getUID() != null && chosen.contains(
 				DENOPTIMConstants.UNIQUEIDTAG)) 
 		{
 			dataTabModel.addRow(new Object[] {
 					defPropMap.get(DENOPTIMConstants.UNIQUEIDTAG), 
-					item.getMoleculeUID() });
+					item.getUID() });
 		}
 		if (item.hasFitness() && chosen.contains(
 				DENOPTIMConstants.FITNESSTAG))
 		{
 			dataTabModel.addRow(new Object[]{
 					defPropMap.get(DENOPTIMConstants.FITNESSTAG), 
-					item.getMoleculeFitness()});
+					item.getFitness()});
 		}
 		else
 		{

@@ -42,6 +42,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
@@ -49,13 +50,10 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.rings.RingClosureParameters;
-import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.molecule.DENOPTIMVertexAtom;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GenUtils;
 
 
@@ -286,7 +284,7 @@ public class TreeBuilder3D
 
             // Get two point defining the AP vector in 3D
             Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
-            Point3d srcPtApSrc = new Point3d(FragmentUtils.getPoint3d(
+            Point3d srcPtApSrc = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
             		iacRootVrtx.getAtom(atmPosApSrc)));
 
             // Append 3D fragment on AP-vector and start recursion
@@ -505,18 +503,16 @@ public class TreeBuilder3D
         {
         	// The incoming vertex is an unused RCV. 
         	// Should we replace it with a capping group?
-        	String cappingAPClass = FragmentSpace.getCappingClass(
-        			edge.getSourceReaction());
+        	APClass cappingAPClass = FragmentSpace.getAPClassOfCappingVertex(
+        			edge.getSrcAP().getAPClass());
 
         	if (cappingAPClass != null)
         	{
         		int capId = FragmentSpace.getCappingGroupsWithAPClass(
         				cappingAPClass).get(0);
         		
-        		ArrayList<DENOPTIMAttachmentPoint> tFAPs =
-                        FragmentUtils.getAPForFragment(capId, 2);
-        		DENOPTIMVertex capVrtx = new DENOPTIMVertex(inVtx.getVertexId(),
-        				capId, tFAPs,2);
+        		DENOPTIMVertex capVrtx = FragmentSpace.getVertexFromLibrary(
+        		        BBType.CAP, capId);
         		inVtx = capVrtx;
         	} else {
         		// No capping needed. Then we are done.
@@ -585,7 +581,7 @@ public class TreeBuilder3D
         DENOPTIMAttachmentPoint apB = inVtx.getAttachmentPoints().get(idApB);
         int idSrcAtmB = apB.getAtomPositionNumber();
         Point3d trgApB = new Point3d(allApsAsPt3D.get(idApB));
-        Point3d srcApB = new Point3d(FragmentUtils.getPoint3d(
+        Point3d srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
         		inFrag.getAtom(idSrcAtmB)));
 
         // Translate atoms and APs of fragment so that trgApB is on srcApA
@@ -593,7 +589,7 @@ public class TreeBuilder3D
         tr1.sub(trgApB,srcApA);
         for (IAtom atm : inFrag.atoms())
         {
-        	atm.setPoint3d(FragmentUtils.getPoint3d(atm));
+        	atm.setPoint3d(DENOPTIMMoleculeUtils.getPoint3d(atm));
             atm.getPoint3d().sub(tr1);
         }
         for (Point3d pt : allApsAsPt3D)
@@ -601,7 +597,7 @@ public class TreeBuilder3D
             pt.sub(tr1);
         }
         trgApB = new Point3d(allApsAsPt3D.get(idApB));
-        srcApB = new Point3d(FragmentUtils.getPoint3d(
+        srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
         		inFrag.getAtom(idSrcAtmB)));
 
         //Get Vectors ApA and ApB (NOTE: inverse versus of ApB!!!)

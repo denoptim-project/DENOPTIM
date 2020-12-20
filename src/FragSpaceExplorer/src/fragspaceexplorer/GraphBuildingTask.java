@@ -199,25 +199,6 @@ public class GraphBuildingTask extends FitnessTask
 //------------------------------------------------------------------------------
    
     /**
-     * Constructor
-     */
- 
-    public GraphBuildingTask(int m_Id, DENOPTIMGraph m_molGraph, 
-                                     FragsCombination m_fragsToAdd, int m_level)
-                                                        throws DENOPTIMException
-    {
-        id = "" + m_Id;
-        molGraph = m_molGraph.clone();
-        molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-        rootId = m_molGraph.getGraphId();
-        graphId = molGraph.getGraphId();
-        fragsToAdd = m_fragsToAdd;
-        level = m_level;      
-    }
-
-//------------------------------------------------------------------------------
-   
-    /**
      * Calls the task
      */
  
@@ -262,7 +243,7 @@ public class GraphBuildingTask extends FitnessTask
                 int sFId = srcAp.getVertexMolId();
                 BBType sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
-                DENOPTIMVertex srcVrtx = molGraph.getVertexWithId(sVId);
+                DENOPTIMVertex srcVrtx = dGraph.getVertexWithId(sVId);
                 
                 APClass sCls = srcVrtx.getAttachmentPoints().get(
                         sApId).getAPClass();
@@ -328,7 +309,7 @@ public class GraphBuildingTask extends FitnessTask
             }
 
             // Evaluate graph
-            Object[] res = molGraph.evaluateGraph();
+            Object[] res = dGraph.evaluateGraph();
             if (res == null) // null is used to indicate an unacceptable graph
             {
                 if (verbosity > 1)
@@ -340,7 +321,7 @@ public class GraphBuildingTask extends FitnessTask
                 nSubTasks = 1;
 
                 // Store graph
-                FSEUtils.storeGraphOfLevel(molGraph.clone(),level,rootId,nextIds);
+                FSEUtils.storeGraphOfLevel(dGraph.clone(),level,rootId,nextIds);
             }
             else
             {
@@ -353,14 +334,14 @@ public class GraphBuildingTask extends FitnessTask
                 boolean needsCaps = false;
                 if (FragmentSpace.useAPclassBasedApproach())
                 {
-                    needsCaps = molGraph.graphNeedsCappingGroups();
+                    needsCaps = dGraph.graphNeedsCappingGroups();
                 }
 
                 ArrayList<DENOPTIMGraph> altCyclicGraphs = new ArrayList<DENOPTIMGraph>();
                 if (!needsCaps)
                 {
                     altCyclicGraphs =
-                            molGraph.makeAllGraphsWithDifferentRingSets();
+                            dGraph.makeAllGraphsWithDifferentRingSets();
                 }
                 int sz = altCyclicGraphs.size();
                 
@@ -376,7 +357,7 @@ public class GraphBuildingTask extends FitnessTask
                         DENOPTIMLogger.appLogger.info(msg); 
                     }
 
-                    // WARNING! If cyclic versions of molGraph are available,
+                    // WARNING! If cyclic versions of dGraph are available,
                     // we IGNORE the acyclic original. This is because,
                     // if at all possible, the acyclic graph is built anyway
                     // using capping groups instead of ring closing attractors.
@@ -393,10 +374,11 @@ public class GraphBuildingTask extends FitnessTask
                     for (int ig = 0; ig<altCyclicGraphs.size(); ig++)
                     {
                         DENOPTIMGraph g = altCyclicGraphs.get(ig);
+                        int gId = g.getGraphId();
                         
                         if (verbosity > 0)
                         {
-                            msg = "Graph " + g.getGraphId()
+                            msg = "Graph " + gId
                                   + " is cyclic alternative "
                                   + (ig+1) + "/" + altCyclicGraphs.size()
                                   + " " + lst;
@@ -475,7 +457,7 @@ public class GraphBuildingTask extends FitnessTask
                     nSubTasks = 1;
 
                     // Store graph
-                    FSEUtils.storeGraphOfLevel(molGraph.clone(),level,rootId,nextIds);
+                    FSEUtils.storeGraphOfLevel(dGraph.clone(),level,rootId,nextIds);
                     
                     // Optionally improve the molecular representation, which
                     // is otherwise only given by the collection of building

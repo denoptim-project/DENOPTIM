@@ -153,7 +153,7 @@ public class FragmentSpaceParameters
     	maxMW = 500;
     	enforceSymmetry = false;
     	symmetryConstraints = false;
-    	symmConstraintsMap = new HashMap<String, Double>();
+    	symmConstraintsMap = new HashMap<APClass, Double>();
     	verbosity = 0;
 	}
 

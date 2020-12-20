@@ -33,6 +33,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMVertex;
@@ -407,8 +408,8 @@ public class EvolutionaryAlgorithm
                     // possible combination of rings
                     for (DENOPTIMVertex rcv : graph4.getFreeRCVertices())
                     {
-                    	String apc = graph4.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                    	if (FragmentSpace.getCappingClass(apc)==null 
+                    	APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                    	if (FragmentSpace.getCappingMap().get(apc)==null 
                     			&& FragmentSpace.getForbiddenEndList().contains(apc))
                     	{
                     		res = null;
@@ -438,7 +439,7 @@ public class EvolutionaryAlgorithm
                         graph4.cleanup();
                         graph4 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, newPopSize))
+                    else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, newPopSize, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 TasksBatchManager.executeTasks(tasks,
@@ -475,9 +476,9 @@ public class EvolutionaryAlgorithm
                     // possible combination of rings
                     for (DENOPTIMVertex rcv : graph1.getFreeRCVertices())
                     {
-                    	String apc = graph1.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                    	if (FragmentSpace.getCappingClass(apc)==null 
-                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                        APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                        if (FragmentSpace.getCappingMap().get(apc)==null 
+                                && FragmentSpace.getForbiddenEndList().contains(apc))
                     	{
                     		res1 = null;
                     	}
@@ -505,7 +506,7 @@ public class EvolutionaryAlgorithm
                         graph1.cleanup();
                         graph1 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, newPopSize))
+                    else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, newPopSize, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 TasksBatchManager.executeTasks(tasks,
@@ -539,9 +540,9 @@ public class EvolutionaryAlgorithm
                     // possible combination of rings
                     for (DENOPTIMVertex rcv : graph2.getFreeRCVertices())
                     {
-                    	String apc = graph2.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                    	if (FragmentSpace.getCappingClass(apc)==null 
-                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                        APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                        if (FragmentSpace.getCappingMap().get(apc)==null 
+                                && FragmentSpace.getForbiddenEndList().contains(apc))
                     	{
                     		res2 = null;
                     	}
@@ -570,7 +571,7 @@ public class EvolutionaryAlgorithm
                         graph2.cleanup();
                         graph2 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, newPopSize))
+                    else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, newPopSize, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 TasksBatchManager.executeTasks(tasks,
@@ -608,9 +609,9 @@ public class EvolutionaryAlgorithm
                     // possible combination of rings
                     for (DENOPTIMVertex rcv : graph3.getFreeRCVertices())
                     {
-                    	String apc = graph3.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-                    	if (FragmentSpace.getCappingClass(apc)==null 
-                    			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                        APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                        if (FragmentSpace.getCappingMap().get(apc)==null 
+                                && FragmentSpace.getForbiddenEndList().contains(apc))
                     	{
                     		res3 = null;
                     	}
@@ -639,7 +640,7 @@ public class EvolutionaryAlgorithm
                         graph3.cleanup();
                         graph3 = null;
                     }
-                    else if (addTask(tasks, molPopulation.size(), graph3, res3, genDir, newPopSize))
+                    else if (addTask(tasks, molPopulation.size(), graph3, res3, genDir, newPopSize, numTries))
                     {
                         ArrayList<DENOPTIMMolecule> results =
                                 TasksBatchManager.executeTasks(tasks,
@@ -817,9 +818,9 @@ public class EvolutionaryAlgorithm
             // possible combination of rings
             for (DENOPTIMVertex rcv : molGraph.getFreeRCVertices())
             {
-            	String apc = molGraph.getEdgeWithParent(rcv.getVertexId()).getSourceReaction();
-            	if (FragmentSpace.getCappingClass(apc)==null 
-            			&& FragmentSpace.getForbiddenEndList().contains(apc))
+                APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                if (FragmentSpace.getCappingMap().get(apc)==null 
+                        && FragmentSpace.getForbiddenEndList().contains(apc))
             	{
             		res = null;
             	}

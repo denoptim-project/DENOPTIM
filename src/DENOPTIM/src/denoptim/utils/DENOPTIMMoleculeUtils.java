@@ -175,7 +175,7 @@ public class DENOPTIMMoleculeUtils
 
         for (DENOPTIMVertex v : usedRcvs)
         {
-            if (doneVrtx.get(usedRcvs.indexOf(v)))
+            if (doneVertices.get(usedRcvs.indexOf(v)))
             {
                 continue;
             }
@@ -209,8 +209,8 @@ public class DENOPTIMMoleculeUtils
                         + "bond type of the chord is '" + bndTyp +"'.");
             }
 
-            doneVertices.set(usedRcvs.indexOf(vHead),true);
-            doneVertices.set(usedRcvs.indexOf(vTail),true);
+            doneVertices.set(usedRcvs.indexOf(vH),true);
+            doneVertices.set(usedRcvs.indexOf(vT),true);
 	    }
 
         // remove used RCAs

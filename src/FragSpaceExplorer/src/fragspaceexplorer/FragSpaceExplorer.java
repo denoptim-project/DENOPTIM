@@ -105,7 +105,7 @@ public class FragSpaceExplorer
     	    {
                     pCombExp.stopRun();
     	    }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
             System.exit(-1);
         }
         

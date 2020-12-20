@@ -37,8 +37,10 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
@@ -58,67 +60,74 @@ public class TreeBuilder3DTest
     @Test
     public void testConversionTo3dTree() throws Exception
     {
+        APClass a0 = APClass.make("a:0");
+        APClass b0 = APClass.make("b:0");
+        APClass h0 = APClass.make("h:0");
+        APClass ap0 = APClass.make("ATplus:0");
+        APClass am0 = APClass.make("ATminus:0");
+        
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 0.0, 0.0}));
     	frg1.addAtom(a1);
     	frg1.addAtom(a2);
     	frg1.addBond(new Bond(a1, a2));
-    	frg1.addAP(0, "a:0", new Point3d(new double[]{0.0, 1.0, 1.0}));
-    	frg1.addAP(1, "a:0", new Point3d(new double[]{1.0, 1.0, 1.0}));
+    	frg1.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}), 1);
     	frg1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment frg2 = new DENOPTIMFragment();
     	Atom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	frg2.addAtom(a3);
-    	frg2.addAP(0, "a:0", new Point3d(new double[]{0.0, 1.0, 1.0}));
-    	frg2.addAP(0, "b:0", new Point3d(new double[]{0.0, -1.0, -1.0}));   
+    	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	frg2.addAP(0, b0, new Point3d(new double[]{0.0, -1.0, -1.0}), 1);   
     	frg2.projectAPsToProperties(); 
 
     	DENOPTIMFragment rca1 = new DENOPTIMFragment();
     	Atom a4 = new Atom("ATP", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	rca1.addAtom(a4);
-    	rca1.addAP(0, "ATplus:0", new Point3d(new double[]{0.0, 1.0, 1.0}));
+    	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	rca1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment rca2 = new DENOPTIMFragment();
     	Atom a5 = new Atom("ATM", new Point3d(new double[]{1.0, 0.0, 0.0}));
     	rca2.addAtom(a5);
-    	rca2.addAP(0, "ATminus:0", new Point3d(new double[]{0.0, 1.0, 1.0}));
+    	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	rca2.projectAPsToProperties(); 
     	
     	DENOPTIMFragment cap = new DENOPTIMFragment();
     	Atom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	cap.addAtom(a6);
-    	cap.addAP(0, "h:0", new Point3d(new double[]{0.0, 1.0, 1.0}));
+    	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	cap.projectAPsToProperties(); 
     	
-    	ArrayList<IAtomContainer> scaff = new ArrayList<IAtomContainer>();
+    	ArrayList<DENOPTIMVertex> scaff = new ArrayList<DENOPTIMVertex>();
     	scaff.add(frg1);
-    	ArrayList<IAtomContainer> frags = new ArrayList<IAtomContainer>();
+    	ArrayList<DENOPTIMVertex> frags = new ArrayList<DENOPTIMVertex>();
     	frags.add(frg2);
     	frags.add(rca1);
     	frags.add(rca2);
-    	ArrayList<IAtomContainer> caps = new ArrayList<IAtomContainer>();
+    	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
     	caps.add(cap);
     	
-    	HashMap<String,ArrayList<String>> cpMap = 
-    			new HashMap<String,ArrayList<String>>();
-    	cpMap.put("a:0", new ArrayList<String>(Arrays.asList("a:0", "b:0")));
-		HashMap<String,Integer> boMap = new HashMap<String,Integer>();
-		boMap.put("a", 1);
-		boMap.put("b", 1);
-		boMap.put("h", 1);
-		boMap.put("ATplus", 1);
-		boMap.put("ATminus", 1);
-		HashMap<String,String> capMap = new HashMap<String,String>();
-		capMap.put("a:0", "h:0");
-		HashSet<String> forbEnds = new HashSet<String>();
-		forbEnds.add("b:0");
+    	HashMap<APClass,ArrayList<APClass>> cpMap = 
+    			new HashMap<APClass,ArrayList<APClass>>();
+    	cpMap.put(a0, new ArrayList<APClass>(Arrays.asList(a0, b0)));
+		HashMap<String,BondType> boMap = new HashMap<String,BondType>();
+		boMap.put("a", BondType.SINGLE);
+		boMap.put("b", BondType.SINGLE);
+		boMap.put("h", BondType.SINGLE);
+		boMap.put("ATplus", BondType.SINGLE);
+		boMap.put("ATminus", BondType.SINGLE);
+		HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+		capMap.put(a0, h0);
+		HashSet<APClass> forbEnds = new HashSet<APClass>();
+		forbEnds.add(b0);
     	
     	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,boMap,capMap,
     			forbEnds,null);
     	
+    	//TODO-V3: build graph programmatically!!!
     	String graphStr = "1 1_1_0_-1,2_1_1_0,3_3_1_1,4_2_1_0, "
     			+ "1_1_2_0_1_a:0_a:0,"
     			+ "2_1_3_0_1_b:0_ATminus:0,"

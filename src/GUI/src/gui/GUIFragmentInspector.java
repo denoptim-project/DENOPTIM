@@ -1143,7 +1143,7 @@ public class GUIFragmentInspector extends GUICardPanel
   		// we get what is already in 'fragment'
   		fragment = fragmentViewer.getLoadedStructure();
   		if (fragmentLibrary.size()==0 
-  				&& (fragment==null || fragment.getAPCount()==0))
+  				&& (fragment==null || fragment.getNumberOfAP()==0))
   		{
   			//Nothing to same
   	        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1251,7 +1251,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			String title, boolean mustReply) throws DENOPTIMException 
 	{		
 		String preStr = "";
-		while (!DENOPTIMAttachmentPoint.isValidAPRuleString(currApRule))
+		while (!APClass.isValidAPRuleString(currApRule))
     	{
 			if (currApRule != "")
 			{

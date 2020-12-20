@@ -101,7 +101,7 @@ public abstract class FitnessTask extends Task
     {
     	super(TaskUtils.getUniqueTaskIndex());
         this.dGraph = molGraph;
-        result.setMoleculeGraph(molGraph);
+        result.setGraph(molGraph);
     }
 
 //------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public abstract class FitnessTask extends Task
     protected DENOPTIMMolecule runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
-        result.setMoleculeFile(fitProvOutFile);
+        result.setSDFFile(fitProvOutFile);
         if (fitProvMol == null)
     	{
         	// Just in case we do not have any molecular representation already
@@ -276,7 +276,7 @@ public abstract class FitnessTask extends Task
         // we need to update in the the returned value
         if (processedMol.getProperty(DENOPTIMConstants.UNIQUEIDTAG) != null)
         {
-            result.setMoleculeUID(processedMol.getProperty(
+            result.setUID(processedMol.getProperty(
             		DENOPTIMConstants.UNIQUEIDTAG).toString());
         }
         
@@ -324,7 +324,7 @@ public abstract class FitnessTask extends Task
             }
 
             processedMol.setProperty("GCODE", dGraph.getGraphId());                
-            processedMol.setProperty("SMILES", result.getMoleculeSmiles());
+            processedMol.setProperty("SMILES", result.getSmiles());
             processedMol.setProperty("GraphENC", dGraph.toString());
             if (dGraph.getMsg() != null && !dGraph.getMsg().equals(""))
             {
@@ -334,7 +334,7 @@ public abstract class FitnessTask extends Task
             // Update molecular representation of this object
             fitProvMol = processedMol;
             DenoptimIO.writeMolecule(fitProvOutFile, processedMol, false);
-            result.setMoleculeFitness(fitVal);
+            result.setFitness(fitVal);
         } else {
             if (fitnessIsRequired)
             {
@@ -386,7 +386,7 @@ public abstract class FitnessTask extends Task
         
         // Store a written copy of the result to file
         DenoptimIO.writeMolecule(fitProvOutFile, fitProvMol, false);
-        result.setMoleculeFitness(fitVal);
+        result.setFitness(fitVal);
 	   
 		return true;
 	}

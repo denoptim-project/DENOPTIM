@@ -75,7 +75,6 @@ import denoptim.utils.RotationalSpaceUtils;
  */
 public class EAUtils
 {
-    protected static DecimalFormat df = new DecimalFormat();
 
     // cluster the fragments based on their #APs
     protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
@@ -157,7 +156,7 @@ public class EAUtils
     private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> popln)
     {
         double[] fitness = getFitnesses(popln);
-        double sdev = DENOPTIMStatUtils.stddev(fitness);
+        double sdev = DENOPTIMStatUtils.stddev(fitness, true);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
 
@@ -1114,7 +1113,7 @@ public class EAUtils
     protected static double getPopulationSD(ArrayList<DENOPTIMMolecule> molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
-        return DENOPTIMStatUtils.stddev(fitvals);
+        return DENOPTIMStatUtils.stddev(fitvals, true);
     }
     
 

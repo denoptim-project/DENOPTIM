@@ -823,7 +823,7 @@ public class CombinatorialExplorerByLayer
     private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
                             ArrayList<GraphBuildingTask> submitted)
     {
-        for (Future<String> f : futures)
+        for (Future<Object> f : futures)
         {
             f.cancel(true);
         }

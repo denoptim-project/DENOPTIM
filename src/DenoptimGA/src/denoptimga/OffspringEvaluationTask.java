@@ -87,8 +87,8 @@ public class OffspringEvaluationTask extends FitnessTask
         numtry = m_try;
         
         result.setName(molName);
-        result.setMoleculeUID(inchi);
-        result.setMoleculeSmiles(smiles);
+        result.setUID(inchi);
+        result.setSmiles(smiles);
         
         // Define pathnames to files used/produced by fitness provider
         //TODO use constants
@@ -135,12 +135,12 @@ public class OffspringEvaluationTask extends FitnessTask
         	}
         }
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
-        fitProvMol.setProperty("SMILES", result.getMoleculeSmiles());
-        fitProvMol.setProperty("InChi", result.getMoleculeUID());
+        fitProvMol.setProperty("SMILES", result.getSmiles());
+        fitProvMol.setProperty("InChi", result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, 
         		dGraph.getGraphId());
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
-        		result.getMoleculeUID());
+        		result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
         if (dGraph.getMsg() != null)
         {

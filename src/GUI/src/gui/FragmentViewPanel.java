@@ -70,8 +70,6 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.FragmentUtils;
 import gui.GUIPreferences.SMITo3DEngine;
 
 
@@ -589,7 +587,8 @@ public class FragmentViewPanel extends JSplitPane
 	{
 		DENOPTIMFragment fromViewer = new DENOPTIMFragment();
 		try {
-			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer());
+			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer(),
+			        BBType.FRAGMENT);
 			putAPsFromTableIntoIAtomContainer(fromViewer);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
@@ -607,9 +606,9 @@ public class FragmentViewPanel extends JSplitPane
 		boolean sameSMILES = false;
 		try {
 			sameSMILES = DENOPTIMMoleculeUtils.getSMILESForMolecule(
-					fromViewer)
+					fromViewer.getIAtomContainer())
 					.equals(DENOPTIMMoleculeUtils.getSMILESForMolecule(
-							fragment));
+							fragment.getIAtomContainer()));
 		} catch (DENOPTIMException e) {
 			// we get false
 		}
@@ -623,8 +622,10 @@ public class FragmentViewPanel extends JSplitPane
 		double thrld = 0.0001;
 		for (int i=0; i<fragment.getAtomCount(); i++)
 		{
-			Point3d pA = FragmentUtils.getPoint3d(fromViewer.getAtom(i));
-			Point3d pB = FragmentUtils.getPoint3d(fragment.getAtom(i));
+			Point3d pA = DENOPTIMMoleculeUtils.getPoint3d(
+			        fromViewer.getAtom(i));
+			Point3d pB = DENOPTIMMoleculeUtils.getPoint3d(
+			        fragment.getAtom(i));
 			if (pA.distance(pB)>thrld)
 			{
 				fragment = fromViewer;
@@ -647,7 +648,7 @@ public class FragmentViewPanel extends JSplitPane
 			return;
 		}
 		
-		if (mol.getAPCount() == mapAPs.size())
+		if (mol.getNumberOfAP() == mapAPs.size())
 		{
 			return;
 		}
@@ -670,7 +671,9 @@ public class FragmentViewPanel extends JSplitPane
         				+ "srcAtmId:" + srcAtmId 
         				+ " #atms:" + mol.getAtomCount());
         	}
-        	mol.addAP(srcAtmId, ap.getAPClass(), ap.getDirectionVector());
+        	mol.addAP(srcAtmId, ap.getAPClass(), 
+        	        new Point3d(ap.getDirectionVector()), 
+        	        ap.getTotalConnections());
         }
 	}
 
@@ -687,7 +690,7 @@ public class FragmentViewPanel extends JSplitPane
 			fragment = (DENOPTIMFragment) mol;
 		} else {
 			try {
-				fragment = new DENOPTIMFragment(mol);
+				fragment = new DENOPTIMFragment(mol, BBType.FRAGMENT);
 			} catch (DENOPTIMException e) {
 				//Should never happen
 				e.printStackTrace();

@@ -219,12 +219,12 @@ Serializable, Cloneable
 
         try
         {
-            this.molUID = iac.getProperty(
+            this.uid = iac.getProperty(
             		DENOPTIMConstants.UNIQUEIDTAG).toString();
         } catch (Exception e) {
         	if (allowNoUID)
         	{
-        		this.molUID = "noUID";
+        		this.uid = "noUID";
         	} else {
         		throw new DENOPTIMException("Could not read UID to make "
         				+ "DENOPTIMMolecule.", e);
@@ -232,7 +232,7 @@ Serializable, Cloneable
         }
         try
         {
-            this.molGraph = GraphConversionTool.getGraphFromString(
+            this.graph = GraphConversionTool.getGraphFromString(
             		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
             		useFragSpace);
         } catch (Exception e) {
@@ -429,9 +429,9 @@ Serializable, Cloneable
     @Override
     public int compareTo(DENOPTIMMolecule other)
     {
-        if (this.fitness > B.fitness)
+        if (this.fitness > other.fitness)
             return 1;
-        else if (this.fitness < B.fitness)
+        else if (this.fitness < other.fitness)
             return -1;
         return 0;
     }
