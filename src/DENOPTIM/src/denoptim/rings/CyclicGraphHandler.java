@@ -248,7 +248,7 @@ public class CyclicGraphHandler
                                                             IAtomContainer mol,
                                                         DENOPTIMGraph molGraph)
                                                        throws DENOPTIMException
-    {   
+    {
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                                         new HashMap<ObjectPair,PathSubGraph>();
@@ -276,9 +276,15 @@ public class CyclicGraphHandler
                     }
                     continue;
                 }
+                
                 // make the new candidate RCA pair
                 PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
                 
+                if (verbosity > 1)
+                {
+                    System.out.println("Evaluating closability of path " 
+                            + subGraph);
+                }
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
 
                 if (!keepRcaPair)
@@ -460,7 +466,9 @@ public class CyclicGraphHandler
     {
         int objId = this.hashCode();
         String recLab = new String(new char[recCount]).replace("\0", "-");
+        
         boolean debug = false;
+        
         if (debug)
         {
             System.out.println(objId+"-"+recLab+"> Begin of new recursion: "+recCount);
@@ -610,7 +618,7 @@ public class CyclicGraphHandler
                         if (!notNewCmb)
                         {
                             if (debug)
-                                System.out.println(objId+"-"+recLab+"> addinf to all combs of ring.");
+                                System.out.println(objId+"-"+recLab+"> adding to all combs of ring.");
 
                             allCombsOfRings.add(ringsComb);
                             addedNew = true;
@@ -1776,7 +1784,6 @@ public class CyclicGraphHandler
             if (vert.getLevel() == 0 
                     && vertFrag.getFragmentType() == BBType.FRAGMENT)
             {
-
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
 //TODO-V3: change. hard coded class of ligand

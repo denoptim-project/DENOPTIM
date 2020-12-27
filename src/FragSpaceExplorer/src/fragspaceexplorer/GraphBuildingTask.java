@@ -107,10 +107,7 @@ public class GraphBuildingTask extends FitnessTask
     		FragsCombination fragsToAdd, int level, String workDir, 
     		int verbosity) throws DENOPTIMException
     {
-    	//TODO: replace all serialization-based deep cloning with deep clone method
-    	// We are going to modify the graph is this cannot be a reference to the
-    	// original.
-        super((DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph));
+        super(m_molGraph.clone());
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = m_molGraph.getGraphId();
         graphId = dGraph.getGraphId();

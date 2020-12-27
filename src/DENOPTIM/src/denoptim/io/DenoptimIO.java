@@ -838,8 +838,10 @@ public class DenoptimIO
      * @param oldObj
      * @return a deep copy of an object
      * @throws DENOPTIMException
+     * @deprecated avoid serialization-based deep copying.
      */
 
+    @Deprecated
     public static Object deepCopy(Object oldObj) throws DENOPTIMException {
         Object newObj = null;
         ObjectOutputStream oos = null;

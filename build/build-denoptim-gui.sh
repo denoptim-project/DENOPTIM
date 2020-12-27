@@ -1,12 +1,7 @@
 #!/bin/bash
 
-if [ -d ../lib ]; then
-    if [ -d lib ]; then
-        cp -r ../lib/*.jar lib/
-    else
-        cp -r ../lib .        
-    fi 
-fi
+rm -r lib
+cp -r ../lib lib
 cp -r ../src/GUI/images images
 
 find ../src/DENOPTIM/src/ ../src/DenoptimGA/src ../src/FragSpaceExplorer/src ../src/GUI/src -name *.java > javafiles.txt

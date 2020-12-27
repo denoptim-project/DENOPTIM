@@ -248,7 +248,7 @@ public abstract class FitnessTask extends Task
             		+ "). Check " + result.getName() + ".";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
             
-            //TODO use constant
+            //TODO-V3 use constant
             String fileBkp = fitProvOutFile + "_Unreadble";
             try {
 				FileUtils.copyFile(new File(fitProvOutFile), new File(fileBkp));
