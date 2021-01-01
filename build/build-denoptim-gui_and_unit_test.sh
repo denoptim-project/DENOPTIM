@@ -12,4 +12,4 @@ java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM
 
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.threedim.TreeBuilder3DTest
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.molecule.DENOPTIMGraphTest

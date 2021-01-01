@@ -41,5 +41,6 @@
 	<classpathentry kind="lib" path="lib/javax.servlet-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/Jmol-14.31.18.jar"/>
 	<classpathentry kind="lib" path="lib/JmolLib-14.31.18.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.8.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

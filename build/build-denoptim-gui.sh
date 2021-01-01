@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -r lib
+rm -rf lib
 cp -r ../lib lib
 cp -r ../src/GUI/images images
 
