@@ -697,6 +697,18 @@ public class FragmentViewPanel extends JSplitPane
 			}
 		}
 		
+		loadStructure();
+	}
+		
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Loads the structure of the currently loaded 'fragment' (i.e., our member)
+     * into the Jmol viewer.
+     */
+    private void loadStructure()
+    {		
+		
 		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(null,
@@ -735,13 +747,13 @@ public class FragmentViewPanel extends JSplitPane
 	 * the generation of the graphical objects representing the APs.
 	 * @param frag the fragment to visualize
 	 */
-	public void loadFragImentToViewer(DENOPTIMFragment frag)
+	public void loadFragmentToViewer(DENOPTIMFragment frag)
 	{		
 		clearAPTable();
 		
 		this.fragment = frag;
 			
-		loadPlainStructure(fragment.getIAtomContainer());
+		loadStructure();
 		
 		updateAPsMapAndTable();
         

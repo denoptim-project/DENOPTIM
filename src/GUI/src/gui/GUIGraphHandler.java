@@ -955,9 +955,13 @@ public class GUIGraphHandler extends GUICardPanel
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		fragLib.add(((DENOPTIMFragment) bb).getIAtomContainer());
+        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+        	    frag.projectAPsToProperties();
+        		fragLib.add(frag.getIAtomContainer());
         	} else
         	{
+        	    System.out.println("WARNING: Using empty AtomContainer for a "
+        	            + "vertex that is not a fragment!");
         		//TODO deal with templates and other stuff
         		fragLib.add(new AtomContainer());
         	}
@@ -1070,9 +1074,14 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add(((DENOPTIMFragment) bb).getIAtomContainer());
+		        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+		                frag.projectAPsToProperties();
+		        		fragLib.add(frag.getIAtomContainer());
 		        	} else
 		        	{
+		        	    System.out.println("WARNING: Using empty AtomContainer "
+		        	            + "for a "
+		                        + "vertex that is not a fragment!");
 		        		//TODO deal with templates and other stuff
 		        		fragLib.add(new AtomContainer());
 		        	}
@@ -1089,9 +1098,14 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add(((DENOPTIMFragment)bb).getIAtomContainer());
+		        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+		                frag.projectAPsToProperties();
+		        		fragLib.add(frag.getIAtomContainer());
 		        	} else
 		        	{
+		        	    System.out.println("WARNING: Using empty AtomContainer "
+		        	            + "for a "
+		                        + "vertex that is not a fragment!");
 		        		fragLib.add(new AtomContainer());
 		        	}
 		        }
@@ -1216,26 +1230,28 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 			else
 			{
-				IAtomContainer frg = null;
+				IAtomContainer iac = null;
 				try
 				{
 					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
 					        BBType.FRAGMENT,fragId);
 					if (bb instanceof DENOPTIMFragment)
 					{
-						frg = ((DENOPTIMFragment) bb).getIAtomContainer();
+					    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+		                frag.projectAPsToProperties();
+						iac = frag.getIAtomContainer();
 					} else {
 						//TODO deal with templates
-						frg = new AtomContainer();
+						iac = new AtomContainer();
 					}
-					frg.setProperty(PRESELPROP,apId);
+					iac.setProperty(PRESELPROP,apId);
 				}
 				catch (Throwable t)
 				{
 					continue;
 				}
 				genToLocIDMap.put(fragId,compatFrags.size());
-				compatFrags.add(frg);
+				compatFrags.add(iac);
 			}
 		}
 	}
@@ -1654,7 +1670,7 @@ public class GUIGraphHandler extends GUICardPanel
 				return;
 			}
 			
-			fragViewer.loadFragImentToViewer(frag);
+			fragViewer.loadFragmentToViewer(frag);
 			((CardLayout) fragViewerCardHolder.getLayout()).show(
 					fragViewerCardHolder, FRAGVIEWERCARDNAME);
 		}

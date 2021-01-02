@@ -206,9 +206,9 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 				
-				ArrayList<IAtomContainer> fragLib;
+				ArrayList<IAtomContainer> iacLib;
 				try {
-					fragLib = DenoptimIO.readMoleculeData(
+					iacLib = DenoptimIO.readMoleculeData(
 							inFile.getAbsolutePath());
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -223,7 +223,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 
-				if (fragLib.size() == 0)
+				if (iacLib.size() == 0)
 				{
 					JOptionPane.showMessageDialog(btnAddFrag,
 			                "<html>No fragments in file"
@@ -234,7 +234,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 				
-				if (fragLib.size() == 1)
+				if (iacLib.size() == 1)
 				{
 					importFragmentsFromFile(inFile);
 					return;
@@ -272,19 +272,19 @@ public class GUIFragmentInspector extends GUICardPanel
 						int iFrg = -1;
 						while (true)
 						{
-							if (iFrg+1>=fragLib.size())
+							if (iFrg+1>=iacLib.size())
 							{
 								break;
 							}
 							GUIFragmentSelector fragSelector = 
-									new GUIFragmentSelector(fragLib,iFrg+1);
+									new GUIFragmentSelector(iacLib,iFrg+1);
 							fragSelector.setRequireApSelection(false);
 							Object selected = fragSelector.showDialog();
 
 							if (selected != null)
 							{
 								iFrg = ((Integer[]) selected)[0];
-								selectedFrags.add(fragLib.get(iFrg));
+								selectedFrags.add(iacLib.get(iFrg));
 							}
 							else
 							{
@@ -455,7 +455,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					// Use the APs stored in the atoms
 					fragment.updateAPs();
 					
-					fragmentViewer.loadFragImentToViewer(fragment);
+					fragmentViewer.loadFragmentToViewer(fragment);
 					
 			        // Protect the temporary "fragment" obj
 			        unsavedChanges = true;
@@ -492,7 +492,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					
 					fragment.updateAPs();
 					
-					fragmentViewer.loadFragImentToViewer(fragment);
+					fragmentViewer.loadFragmentToViewer(fragment);
 					
 			        // Protect the temporary "fragment" obj
 			        unsavedChanges = true;
@@ -819,7 +819,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		clearCurrentSystem();
 
 		fragment = fragmentLibrary.get(currFrgIdx);
-		fragmentViewer.loadFragImentToViewer(fragment);
+		fragmentViewer.loadFragmentToViewer(fragment);
 	}
 	
 //-----------------------------------------------------------------------------
