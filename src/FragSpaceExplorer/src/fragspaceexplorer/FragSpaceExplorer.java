@@ -34,7 +34,7 @@ import denoptim.utils.GenUtils;
  * </br>
  * Combinations of building blocks (i.e., used defined root graphs or scaffold 
  * fragments, proper fragments, and capping groups) are generated serially while
- * each new graph is handled by a dedicated, asyncrhonous task, thus 
+ * each new graph is handled by a dedicated, asynchronous task, thus 
  * parallelizing the construction, evaluation, and post-processing of each 
  * new graph.
  * </br>
@@ -44,7 +44,7 @@ import denoptim.utils.GenUtils;
  * (see {@link fragspace.FragmentSpaceParameters}). 
  * In such case, if symmetric attachment points are found on a 
  * scaffold/fragment/graph, then the exploration is restricted
- * to such combinations respecting the costitutional symmetry of the APs.
+ * to such combinations respecting the constitutional symmetry of the APs.
  *
  * @author Marco Foscato
  */
@@ -60,28 +60,38 @@ public class FragSpaceExplorer
 
     public static void printUsage()
     {
-        System.err.println("Usage: java -jar FragSpaceExplorer.jar ConfigFile");
-        System.exit(-1);
+        System.err.println("Usage: java -jar FragSpaceExplorer.jar ConfigFile "
+        		+ "[workDir]");
     }
 
 //------------------------------------------------------------------------------    
     /**
      * @param args the command line arguments
+     * @throws DENOPTIMException 
      */
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws DENOPTIMException
     {
         if (args.length < 1)
         {
             printUsage();
+            throw new DENOPTIMException("Cannot run FragSpaceExplorer. Need "
+            		+ "at least one argument to call FragSpaceExplorer.main");
         }
+        
+        //needed by static parameters, and in case of subsequent runs in the same JVM
+    	FSEParameters.resetParameters(); 
 
         String configFile = args[0];
+        if (args.length > 1)
+        {
+        	FSEParameters.workDir = args[1];
+        }
         
         CombinatorialExplorerByLayer pCombExp = null;
         try
         {
-            FSEParameters.readParameterFile(configFile);
+        	FSEParameters.readParameterFile(configFile);
             FSEParameters.checkParameters();
             FSEParameters.processParameters();
             FSEParameters.printParameters();
@@ -89,24 +99,18 @@ public class FragSpaceExplorer
             pCombExp = new CombinatorialExplorerByLayer();
             pCombExp.runPCE();
         }
-        catch (DENOPTIMException de)
+        catch (Throwable t)
         {
     	    if (pCombExp != null)
     	    {
                     pCombExp.stopRun();
     	    }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
             System.exit(-1);
         }
-        catch (Exception e)
-        {
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
-            GenUtils.printExceptionChain(e);
-            System.exit(-1);
-        }
-
-        // normal completion
-        System.exit(0);
+        
+        // normal completion: do NOT call System exit(0) as we might be calling
+        // this main from another thread, which would be killed as well.
     }
     
 //------------------------------------------------------------------------------        

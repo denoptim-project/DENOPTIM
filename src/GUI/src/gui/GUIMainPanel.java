@@ -85,6 +85,14 @@ public class GUIMainPanel extends JPanel
 	{
 		if (comp instanceof GUICardPanel)
 		{
+			if (comp instanceof GUIFragmentInspector)
+			{
+				((GUIFragmentInspector) comp).dispose();
+			}
+			if (comp instanceof GUIGraphHandler)
+			{
+				((GUIGraphHandler) comp).dispose();
+			}
 			toolBar.removeActiveTab((GUICardPanel) comp);
 			super.remove(comp);
 		}

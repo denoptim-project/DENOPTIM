@@ -146,7 +146,7 @@ public class DENOPTIMMoleculeUtils
             {
                 IAtom newAtm = new Atom("H",new Point3d(a.getPoint3d()));
                 newAtm.setProperties(a.getProperties());
-		        AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
+                AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
             }
         }
     }
@@ -156,11 +156,12 @@ public class DENOPTIMMoleculeUtils
     /**
      * Replace unused ring closing attractors (RCA) with H atoms and 
      * remove used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
-     * while adding the ring closing bonds
+     * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 
      * @throws DENOPTIMException if
      */
+
     public static void removeRCA(IAtomContainer mol, DENOPTIMGraph graph)
             throws DENOPTIMException {
 
@@ -171,29 +172,32 @@ public class DENOPTIMMoleculeUtils
         ArrayList<IAtom> atmsToRemove = new ArrayList<>();
         ArrayList<Boolean> doneVertices =
                 new ArrayList<>(Collections.nCopies(usedRcvs.size(),false));
+
         for (DENOPTIMVertex v : usedRcvs)
         {
-            if (doneVertices.get(usedRcvs.indexOf(v))) {
+            if (doneVertices.get(usedRcvs.indexOf(v)))
+            {
                 continue;
             }
-	        ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
-	        if (rings.size() != 1) {
+            ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
+            if (rings.size() != 1)
+            {
                 String s = "Unexpected inconsistency between used RCV list "
-                        + v + " in {" + usedRcvs + "}"
-                        + "and list of DENOPTIMRings "
-                        + "{" + rings + "}. Check Code!";
+                       + v + " in {" + usedRcvs + "}"
+                       + "and list of DENOPTIMRings "
+                       + "{" + rings + "}. Check Code!";
                 throw new DENOPTIMException(s);
             }
-	        DENOPTIMVertex vHead = rings.get(0).getHeadVertex();
-            DENOPTIMVertex vTail = rings.get(0).getTailVertex();
-
-	        IAtom atomHead = mol.getAtom(vIdToAtmId.get(vHead).get(0));
-	        IAtom atomTail = mol.getAtom(vIdToAtmId.get(vTail).get(0));
-
-	        int iSrcH = mol.getAtomNumber(mol.getConnectedAtomsList(atomHead).get(0));
-            int iSrcT = mol.getAtomNumber(mol.getConnectedAtomsList(atomTail).get(0));
-            atmsToRemove.add(atomHead);
-            atmsToRemove.add(atomTail);
+            DENOPTIMVertex vH = rings.get(0).getHeadVertex();
+            DENOPTIMVertex vT = rings.get(0).getTailVertex();
+            IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
+            IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
+            int iSrcH = mol.getAtomNumber(
+                            mol.getConnectedAtomsList(aH).get(0));
+            int iSrcT = mol.getAtomNumber(
+                        mol.getConnectedAtomsList(aT).get(0));
+            atmsToRemove.add(aH);
+            atmsToRemove.add(aT);
 
             BondType bndTyp = rings.get(0).getBondType();
             if (bndTyp.hasCDKAnalogue())
@@ -205,8 +209,8 @@ public class DENOPTIMMoleculeUtils
                         + "bond type of the chord is '" + bndTyp +"'.");
             }
 
-            doneVertices.set(usedRcvs.indexOf(vHead),true);
-            doneVertices.set(usedRcvs.indexOf(vTail),true);
+            doneVertices.set(usedRcvs.indexOf(vH),true);
+            doneVertices.set(usedRcvs.indexOf(vT),true);
 	    }
 
         // remove used RCAs
@@ -265,11 +269,15 @@ public class DENOPTIMMoleculeUtils
                throw new DENOPTIMException(cdke);
             }
         }
-        catch (IllegalArgumentException iae)
+        catch (Throwable t)
         {
-            //TODO del or make systematic
-	        DenoptimIO.writeMolecule("molecule_causing_failure.sdf",fmol,false);
-            throw new DENOPTIMException(iae);
+        	String fileName = System.getProperty("user.dir") 
+        		+ System.getProperty("file.separator") 
+        		+ "moldeule_causing_failure.sdf";
+        	System.out.println("WARNING: Skipping calculation of SMILES. See "
+        			+ "file '" + fileName + "'");
+        	DenoptimIO.writeMolecule(fileName,fmol,false);
+        	smiles = "calculation_or_SMILES_crashed";
         }
         return smiles;
     }

@@ -12,7 +12,7 @@ FS-ENFORCESYMMETRY
 # Genetic Algorithm parameters
 GA-randomSeed=8572368003836
 FP-Source=OTF_WDIR/fitness_provider.sh
-FP-Interpreter=BASH
+FP-Interpreter=bash
 GA-Parallelization=asynchronous
 GA-numParallelTasks=OTF_PROCS
 GA-populationSize=5

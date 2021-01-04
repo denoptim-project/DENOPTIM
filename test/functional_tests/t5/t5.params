@@ -8,7 +8,7 @@ FSE-UidFile=OTF_WDIR/MOLUID.txt
 FSE-NumOfProcessors=1
 FSE-MAXLEVEL=4
 FP-Source=OTF_WDIR/fitness_provider.sh
-FP-Interpreter=BASH
+FP-Interpreter=bash
 #
 FSE-WAITSTEP=0
 

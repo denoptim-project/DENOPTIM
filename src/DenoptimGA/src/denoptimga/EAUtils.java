@@ -22,10 +22,13 @@ package denoptimga;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -71,9 +74,27 @@ import denoptim.utils.RotationalSpaceUtils;
  * @author Marco Foscato
  */
 public class EAUtils
-{   
-    protected static DecimalFormat df = new DecimalFormat();
+{
 
+    // cluster the fragments based on their #APs
+    protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
+    
+    /**
+     * Locale used to write reports
+     */
+    private static Locale enUsLocale = new Locale("en", "US");
+    
+    /**
+     * Format for decimal fitness numbers that overwrites Locale to en_US
+     */
+    protected static DecimalFormat df = (DecimalFormat)
+    		NumberFormat.getNumberInstance(enUsLocale);
+    
+    // for each fragment store the reactions associated with it
+    protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
+
+    private static final String NL =System.getProperty("line.separator");
+    
     // flag for debugging
     private static final boolean DEBUG = false;
 
@@ -92,13 +113,13 @@ public class EAUtils
     {
         StringBuilder sb = new StringBuilder(512);
 
-            //Headers
         sb.append(String.format("%-20s", "#Name "));
         sb.append(String.format("%-20s", "GraphId "));
         sb.append(String.format("%-30s", "UID "));
         sb.append(String.format("%-15s","Fitness "));
-            sb.append("Source ");
-        sb.append(System.getProperty("line.separator"));
+
+        sb.append("Source ");
+        sb.append(NL);
 
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
         df.setMinimumFractionDigits(GAParameters.getPrecisionLevel());
@@ -111,6 +132,7 @@ public class EAUtils
                 String mname = new File(mol.getSDFFile()).getName();
                 if (mname != null)
                     sb.append(String.format("%-20s", mname));
+
                 sb.append(String.format("%-20s", 
                         mol.getGraph().getGraphId()));
                 sb.append(String.format("%-30s", mol.getUID()));
@@ -134,62 +156,66 @@ public class EAUtils
     private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> popln)
     {
         double[] fitness = getFitnesses(popln);
-        double sdev = DENOPTIMStatUtils.stddev(fitness);
+        double sdev = DENOPTIMStatUtils.stddev(fitness, true);
         String res = "";
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
-        
-        String floatForm = "%12." + GAParameters.getPrecisionLevel() + "f";
 
+        StringBuilder sb = new StringBuilder(128);
+        sb.append(NL+NL+"#####POPULATION SUMMARY#####"+NL);
+        int n = popln.size();
+        sb.append(String.format("%-30s", "SIZE:"));
+        sb.append(String.format("%12s", n));
+        sb.append(NL);
+        double f;
+        f = DENOPTIMStatUtils.max(fitness);
+        sb.append(String.format("%-30s", "MAX:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.min(fitness);
+        sb.append(String.format("%-30s", "MIN:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.mean(fitness);
+        sb.append(String.format("%-30s", "MEAN:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.median(fitness);
+        sb.append(String.format("%-30s", "MEDIAN:")).append(df.format(f));
+        sb.append(NL);
+        f = DENOPTIMStatUtils.stddev(fitness, true);
+        sb.append(String.format("%-30s", "STDDEV:")).append(df.format(f));
+        sb.append(NL);
         if (sdev > 0.0001)
         {
-            StringBuilder sb = new StringBuilder(128);
-            sb.append("\n\n#####POPULATION SUMMARY#####\n");
-            int n = popln.size();
-            sb.append(String.format("%-30s", "SIZE:")).append(String.format("%12s", n));
-            sb.append(System.getProperty("line.separator"));
-            double f;
-            f = DENOPTIMStatUtils.max(fitness);
-            sb.append(String.format("%-30s", "MAX:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.min(fitness);
-            sb.append(String.format("%-30s", "MIN:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.mean(fitness);
-            sb.append(String.format("%-30s", "MEAN:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.median(fitness);
-            sb.append(String.format("%-30s", "MEDIAN:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.stddev(fitness);
-            sb.append(String.format("%-30s", "STDDEV:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
-            f = DENOPTIMStatUtils.skewness(fitness);
-            sb.append(String.format("%-30s", "SKEW:")).append(String.format(floatForm, f));
-            sb.append(System.getProperty("line.separator"));
-
-            int sz = FragmentSpace.getScaffoldLibrary().size();
-            HashMap<Integer, Integer> scf_cntr = new HashMap<>();
-            for (int i=1; i<=sz; i++)
-            {
-                scf_cntr.put(i, 0);
-            }
-
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
-            {
-                DENOPTIMMolecule mol = popln.get(i);
-                DENOPTIMGraph g = mol.getGraph();
-                int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
-                scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
-            }
-
-            sb.append("\n\n#####SCAFFOLD ANALYSIS#####\n");
-            for (Map.Entry pairs : scf_cntr.entrySet())
-            {
-                sb.append(pairs.getKey()).append(" ").append(pairs.getValue()).append(System.getProperty("line.separator"));
-            }
-            res = sb.toString();
-            sb.setLength(0);
+            f = DENOPTIMStatUtils.skewness(fitness, true);
+            sb.append(String.format("%-30s", "SKEW:")).append(df.format(f));
+            sb.append(NL);
+        } else {
+            sb.append(String.format("%-30s", "SKEW:")).append(" NaN (sdev too small)");
+            sb.append(NL);
         }
+
+        int sz = FragmentSpace.getScaffoldLibrary().size();
+        HashMap<Integer, Integer> scf_cntr = new HashMap<>();
+        for (int i=1; i<=sz; i++)
+        {
+            scf_cntr.put(i, 0);
+        }
+
+        for (int i=0; i<GAParameters.getPopulationSize(); i++)
+        {
+            DENOPTIMMolecule mol = popln.get(i);
+            DENOPTIMGraph g = mol.getGraph();
+            int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
+            scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
+        }
+
+        sb.append(NL+NL+"#####SCAFFOLD ANALYSIS#####"+NL);
+        for (Map.Entry pairs : scf_cntr.entrySet())
+        {
+            sb.append(pairs.getKey()).append(" ").append(pairs.getValue());
+            sb.append(NL);
+        }
+        res = sb.toString();
+        sb.setLength(0);
+        
         return res;
     }
     
@@ -499,6 +525,7 @@ public class EAUtils
                 DenoptimIO.writeMolecule(molfile, mol, false);
                 pmol.setSDFFile(molfile);
                 pmol.setImageFile(null);
+                pmol.setName(molName);
                 molPopulation.add(pmol);
                 uidsFromInitPop.add(molinchi);
             }
@@ -533,7 +560,7 @@ public class EAUtils
             }
             else
             {
-                sb.append(System.getProperty("line.separator")).append(iter.next());
+                sb.append(NL).append(iter.next());
             }
         }
 
@@ -558,7 +585,7 @@ public class EAUtils
         }
         GraphUtils.updateVertexCounter(val);
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -620,7 +647,7 @@ public class EAUtils
         //TODO-V3: use a type-agnostic w.r.t vertex constructor
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD);
-        
+
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
         
@@ -731,11 +758,13 @@ public class EAUtils
 
     /**
      * Add a capping group fragment to the vertex at the specified
-     * attachment point index
+     * attachment point index.
      * @param molGraph
      * @param curVertex
      * @param dapIdx
-     * @return id of the vertex added; -1 if capping is not required.
+     * @return id of the vertex added; -1 if capping is not required
+     * @throws DENOPTIMException when capping is required but not found, or 
+     * when we could not attach the capping group for whatever reason.
      */
 
     protected static int attachCappingFragmentAtPosition
@@ -765,6 +794,7 @@ public class EAUtils
                 DENOPTIMEdge edge = curVertex.connectVertices(
                         capVrtx, dapIdx, 0, apcSrc, apcCap
                 );
+
                 if (edge != null)
                 {
                     // add the fragment as a vertex
@@ -832,7 +862,8 @@ public class EAUtils
 
     /**
      * Evaluates the possibility of closing rings in a given graph and if
-     * any ring can be closed choses one of the combinations of ring closures
+     * any ring can be closed, it chooses one of the combinations of ring 
+     * closures
      * that involves the highest number of new rings.
      * @param res an object array containing the inchi code, the smiles string
      * and the 2D representation of the molecule. This object can be
@@ -955,6 +986,7 @@ public class EAUtils
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             molsmiles = "FAIL: NO SMILES GENERATED";
         }
+
         res[1] = molsmiles;
 
         // Update the INCHI key representation
@@ -1081,7 +1113,7 @@ public class EAUtils
     protected static double getPopulationSD(ArrayList<DENOPTIMMolecule> molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
-        return DENOPTIMStatUtils.stddev(fitvals);
+        return DENOPTIMStatUtils.stddev(fitvals, true);
     }
     
 
@@ -1109,12 +1141,12 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * check if the graph to molecule translation
+     * check conversion of the graph to molecule translation
      * @param molGraph the molecular graph representation
-     * @return an object array containing the inchi code, the smiles string
-     *         and the 2D representation of the molecule
-     *         <code>null</code> is returned if inchi/smiles/2D conversion fails
-     *         An additional check is the number of atoms in the graph
+     * @return an object array containing the inchi code, the molecular
+     * representation of the candidate, and additional attributes. Or 
+     * <code>null</code> is returned if inchi/smiles/2D conversion fails
+     * An additional check is the number of atoms in the graph
      */
 
     protected static Object[] evaluateGraph(DENOPTIMGraph molGraph)
@@ -1130,9 +1162,10 @@ public class EAUtils
         // calculate the molecule representation
         IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(
                 molGraph, true);
+
         if (mol == null)
-        {
-            String msg ="Evaluation of graph: graph-to-mol returned null!" 
+        { 
+            String msg ="Evaluation of graph: graph-to-mol returned null! " 
                                                         + molGraph.toString();
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             molGraph.cleanup();
@@ -1327,7 +1360,7 @@ public class EAUtils
      * @return probability of adding a new fragment at this level.
      */
     
-    public static double getGrowthProbabilityAtLevel(int level, int scheme, 
+    public static double getGrowthProbabilityAtLevel(int level, int scheme,
                     double lambda, double sigmaOne, double sigmaTwo)
     {
         double prob = 0.0;
@@ -1417,7 +1450,7 @@ public class EAUtils
                             + vtx.getVertexId()
                             + " MolId: " + (vtx.getMolId() + 1)
                             + " Ftype: " + vtx.getFragmentType()
-                            + "\n"+ molGraph+" \n "
+                            + NL+ molGraph + NL
                             + " AP class: " + apClass;
                         DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
                         break;

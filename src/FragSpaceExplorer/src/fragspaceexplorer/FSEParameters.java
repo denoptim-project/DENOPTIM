@@ -57,7 +57,7 @@ public class FSEParameters
     /**
      * Working directory
      */
-    private static String workDir = ".";
+    protected static String workDir = System.getProperty("user.dir");
 
     /**
      * Log file
@@ -85,15 +85,16 @@ public class FSEParameters
     private static String uidFile = "UID.txt";
 
     /**
-     * Flag: optionally perform an external task for each accepted graph
+     * Flag: optionally perform an evaluation of the fitness/descriptors on
+     *  each accepted graph
      */
-    private static boolean externalTask = false;
+    private static boolean runFitnessTask = false;
 
     /**
      * Folder containing <code>DENOPTIMGraph</code>s sorted by level
      * and reported as <code>String</code>s.
      */
-    private static String dbRootDir = ".";  
+    protected static String dbRootDir = ".";
 
     /**
      * Number of processors
@@ -139,17 +140,50 @@ public class FSEParameters
 
     /**
      * Flag requiring generation of the checkpoint files for the testing suite.
-     * When <code>true</code> allows to stop the asyncronous, parallized 
+     * When <code>true</code> allows to stop the asyncronous, parallelized 
      * exploration of a fragment space so that checkpoint files and 
      * serialized graphs can be generated and used to prepare the test suite.
      */
     private static boolean prepareChkAndSerForTests = false;
-
+    
     /**
      * Verbosity level
      */
     private static int verbosity = 0;
+    
+    
+//-----------------------------------------------------------------------------
 
+    //TODO-V3 with a static collection of parameters, running subsequent
+    // experiments from the GUI ends up reusing parameters from the previous
+    // run. so we need a way to clean-up old values
+    public static void resetParameters()
+    {
+        fseParamsInUse = false;
+        workDir = System.getProperty("user.dir");
+        logFile = "FSE.log";
+        rootGraphsFile = null;
+        useGivenRoots = false;
+        rootGraphsFormat = DENOPTIMConstants.GRAPHFORMATSTRING; //Default
+        rootGraphs = null;
+        uidFile = "UID.txt";
+        runFitnessTask = false;
+        dbRootDir = ".";
+        numCPU = 1;
+        maxWait = 600000L;
+        waitStep = 5000L;
+        maxLevel = 2;
+        chkptStep = 100;
+        chkpt = null;
+        chkptFile = null;
+        chkptRestart = false;
+        prepareChkAndSerForTests = false;
+        verbosity = 0;
+        
+        FragmentSpaceParameters.resetParameters();
+        RingClosureParameters.resetParameters();
+        FitnessParameters.resetParameters();        
+    }
 
 //-----------------------------------------------------------------------------
 
@@ -188,16 +222,16 @@ public class FSEParameters
 
 //-----------------------------------------------------------------------------
 
-    public static boolean submitExternalTask()
+    public static boolean submitFitnessTask()
     {
-	return externalTask;
+	    return runFitnessTask;
     }
 
 //-----------------------------------------------------------------------------
 
     public static String getDBRoot()
     {
-	return dbRootDir;
+	    return dbRootDir;
     }
 
 //-----------------------------------------------------------------------------
@@ -211,14 +245,14 @@ public class FSEParameters
 
     public static long getMaxWait()
     {
-	return maxWait;
+	    return maxWait;
     }
 
 //-----------------------------------------------------------------------------
 
     public static long getWaitStep()
     {
-	return waitStep;
+	    return waitStep;
     }
 
 //-----------------------------------------------------------------------------
@@ -232,14 +266,14 @@ public class FSEParameters
 
     public static boolean useGivenRoots()
     {
-	return useGivenRoots;
+	    return useGivenRoots;
     }
 
 //-----------------------------------------------------------------------------
 
     public static int getCheckPointStep()
     {
-	return chkptStep;
+	    return chkptStep;
     }
 
 //-----------------------------------------------------------------------------
@@ -253,28 +287,28 @@ public class FSEParameters
 
     public static FSECheckPoint getCheckPoint()
     {
-	return chkpt;
+	    return chkpt;
     }
 
 //-----------------------------------------------------------------------------
 
     public static boolean restartFromCheckPoint()
     {
-	return chkptRestart;
+	    return chkptRestart;
     }
 
 //-----------------------------------------------------------------------------
 
     public static boolean prepareFilesForTests()
     {
-	return prepareChkAndSerForTests;
+	    return prepareChkAndSerForTests;
     }
 
 //-----------------------------------------------------------------------------
 
     public static int getVerbosity()
     {
-	return verbosity;
+	    return verbosity;
     }
 
 //-----------------------------------------------------------------------------
@@ -486,8 +520,8 @@ public class FSEParameters
             }
             break;
         default:
-             msg = "Keyword " + key + " is not a known FragmentSpaceExplorer-"
-                                       + "related keyword. Check input files.";
+             msg = "Keyword " + key + " is not a known FragmentSpaceExplorer-" 
+            		 + "related keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }
@@ -509,15 +543,14 @@ public class FSEParameters
 
 	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
 	{
-	   msg = "Directory " + workDir + " not found. Please specify an "
+	   msg = "Directory '" + workDir + "' not found. Please specify an "
 		 + "existing directory.";
 	   throw new DENOPTIMException(msg);
 	}
 
-	if (!dbRootDir.equals(workDir) && 
-					!DenoptimIO.checkExists(dbRootDir))
+	if (!dbRootDir.equals(workDir) && !DenoptimIO.checkExists(dbRootDir))
 	{
-	    msg = "Directory " + dbRootDir + " not found. "
+	    msg = "Directory '" + dbRootDir + "' not found. "
 		  + "Please specify an existing directory where to put "
                   + "the DB of generated DENOPTIMGraphs.";
 	   throw new DENOPTIMException(msg);
@@ -605,13 +638,9 @@ public class FSEParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-        boolean success = false;
 		String curDir = workDir;
-		if (curDir.equals("."))
-		{
-	            curDir = System.getProperty("user.dir");
-		}
         String fileSep = System.getProperty("file.separator");
+        boolean success = false;
         while (!success)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
@@ -619,7 +648,7 @@ public class FSEParameters
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);
         }
-		if (dbRootDir.equals("."))
+		if (dbRootDir.equals(".") || dbRootDir.equals(""))
 		{
 		    dbRootDir = workDir;
 		}
@@ -647,7 +676,7 @@ public class FSEParameters
         if (FitnessParameters.fitParamsInUse())
         {
             FitnessParameters.processParameters();
-            externalTask = true;
+            runFitnessTask = true;
         }
         
 		if (useGivenRoots)

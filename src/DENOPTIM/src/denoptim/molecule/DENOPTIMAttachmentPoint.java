@@ -773,37 +773,6 @@ Comparable<DENOPTIMAttachmentPoint>
     
 //-----------------------------------------------------------------------------
 
-    /**
-     * Compare attachment points based on the reaction types
-//     * @param other to compare against
-     * @return <code>true</code> if the points share a common reaction or more
-     */
-    // Do not delete this method although unused
-    /* 
-     MF: Uhm... why should we not remove this?
-     I do not see why we would need this method, which is also wrong
-     because it is not true that APs with same APClass are always compatible.
-     Still, checking for same APClass is done to evaluate whether some APS
-     can be classified as symmetric. I guess, that's where this comes from.
-     So, do remove this among the TODO-V3 actions.
-     
-    public boolean isFragmentClassCompatible(DENOPTIMAttachmentPoint other) {
-        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
-        // if no reaction information is available return true
-        if (!rcnEnabled) {
-            return true;
-        }
-        // if both have reaction info
-        String strA = getAPClass();
-        String strB = other.getAPClass();
-        return strA != null
-                && strB != null
-                && strA.compareToIgnoreCase(strB) == 0;
-    }
-*/
-  
-//-----------------------------------------------------------------------------
-
     //TODO-V3: we should not be given the possibility to change the AP's owner
     // However, this is currently needed because if the DNOPTIMVertex.addAP(...)
     
@@ -841,6 +810,16 @@ Comparable<DENOPTIMAttachmentPoint>
     public DENOPTIMEdge getEdgeUser() {
         return user;
     }
+    
+//-----------------------------------------------------------------------------
+    
+    // TODO-V3 Upon merging branches this method can be removed
+
+	public static String getOnlyRule(String apClass) {
+		String[] parts = apClass.split(
+        		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
+		return parts[0];
+	}
     
 //-----------------------------------------------------------------------------
 

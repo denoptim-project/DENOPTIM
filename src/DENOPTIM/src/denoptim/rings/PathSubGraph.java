@@ -749,6 +749,29 @@ public class PathSubGraph
     {
         this.rcc = rcc;
     }
-
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return a string describing this path to a human reader
+     */
+    
+    @Override
+    public String toString()
+    {
+       StringBuilder sb = new StringBuilder();
+       boolean first = true;
+       for (DENOPTIMVertex v : vertPathVAVB)
+       {
+           if (!first)
+           {
+               sb.append("-");
+           }
+           sb.append(v.getVertexId());
+           first = false;
+       }
+       return sb.toString();
+    }
+     
 //-----------------------------------------------------------------------------
 }

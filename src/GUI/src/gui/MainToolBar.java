@@ -18,8 +18,7 @@
 
 package gui;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -29,8 +28,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import denoptim.task.StaticTaskManager;
+
 import java.awt.CardLayout;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -130,7 +130,6 @@ public class MainToolBar extends JMenuBar {
 	private void initialize() 
 	{		
 		menuDenoptim = new JMenu("DENOPTIM");
-		menuDenoptim.setFont(new Font("Lucida Grande", Font.BOLD, 12));
 		this.add(menuDenoptim);
 		
 		JMenuItem prefs = new JMenuItem("Preferences");
@@ -263,11 +262,15 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFileOrFolder();
+				File file = DenoptimGUIFileOpener.pickFileOrFolder(open);
 				try {
 					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
 							file));
 				} catch (Exception e1) {
+					if (file == null)
+					{
+						return;
+					}
 					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
 							"FRAGMENTS", "GRAPHS", "CompatibilityMatrix",  
 							"GA-RUN", "FSE-RUN", "SERGRAPH"};
@@ -284,8 +287,7 @@ public class MainToolBar extends JMenuBar {
 							"Select file type",
 							JOptionPane.OK_CANCEL_OPTION,
 		                     JOptionPane.ERROR_MESSAGE);
-
-					if (res != JOptionPane.YES_OPTION)
+					if (res != JOptionPane.OK_OPTION)
 					{
 						return;
 					}
@@ -327,6 +329,13 @@ public class MainToolBar extends JMenuBar {
 		    }
 		});
 		menuHelp.add(usrManual);
+		
+		// From here the items will be added to the RIGHT of the menu bar
+		this.add(Box.createGlue());
+		
+		StaticTaskManager.queueStatusBar.setMaximum(1);
+		StaticTaskManager.queueStatusBar.setValue(1);
+		this.add(StaticTaskManager.queueStatusBar);
 	}
 	
 //-----------------------------------------------------------------------------

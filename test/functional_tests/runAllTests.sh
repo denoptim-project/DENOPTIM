@@ -15,7 +15,7 @@
 #
 # Settings:
 #
-
+ 
 # Path to TINKER executables
 # Currently required only by t1 that will be skipped if the following is empty.
 export tinkerPathDENOPTIM=""
@@ -137,15 +137,36 @@ cd "$wDir"
 runTest "t1"
 
 #
-# t2a: combinatorial builder forces to build a specific graph 
+# t2: parallel combinatorial builder from given root (default format: STRING)
+#
+runTest "t2"
+
+#
+# t2a: combinatorial builder forces to build a specific graph
 # This is meant to quickly indentify misfunctioning handing of potential cycles)
 #
 runTest "t2a"
 
 #
-# t2: parallel combinatorial builder from given root (default format: STRING)
+# t2b: t2 with internal fitness evaluation
 #
-runTest "t2"
+runTest "t2b"
+
+#
+# t2c: parallel combinatorial builder from given root with internal fitness
+# and atom/bond specific descriptors
+#
+runTest "t2c"
+
+#
+# t2d: with python driven fitness provider
+#
+runTest "t2d"
+
+#
+# t2e: with closability defined only by ring size
+#
+runTest "t2e"
 
 #
 # t3: parallel combinatorial builder with enforced symmetry
@@ -176,12 +197,12 @@ runTest "t6"
 # p7: exploration of fragment space that generates serialized graphs for t7
 #
 ## runTest "p7" # Repaced by unit testing
-#echo "t7 replaced by unit test"
+echo "t7 replaced by unit test"
 
 #
 # t7: conversion of serialized DENOPTIMgraph to SDF
 #
-## runTest "t7" # Replaced by unit testing
+# runTest "t7" # Repaced by unit testing
 
 #
 # t8: conversion of serialized checkpoint file to human readable string
@@ -207,6 +228,21 @@ runTest "t11"
 # t12: Genetic algorithm running with symmetry constraints.
 #
 runTest "t12"
+
+#
+# t12a: t12 with internal fitness
+#
+runTest "t12a"
+
+#
+# t12b: Syncronous genetic algorithm running with symmetry constraints.
+#
+runTest "t12b"
+
+#
+# t12c: t12b with internal fitness
+#
+runTest "t12c"
 
 #
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation

@@ -358,17 +358,17 @@ public class RingClosureFinder
                     }
                 }
             }
-	    if (stopAtFirstMatch)
-	    {
+    	    if (stopAtFirstMatch)
+    	    {
                 if (res)
                 {
-		    if (verbosity > 1)
-		    {
-			System.out.println("Stop recursive conf. search."
-					   + " (rec.: " + rec + ")");
-		    }
+            	    if (verbosity > 1)
+            	    {
+            		System.out.println("Stop recursive conf. search."
+            				   + " (rec.: " + rec + ")");
+            	    }
                     break;
-		}
+                }
             }
         }
 

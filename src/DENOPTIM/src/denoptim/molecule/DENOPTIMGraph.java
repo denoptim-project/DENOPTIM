@@ -22,6 +22,7 @@ package denoptim.molecule;
 import java.util.*;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.logging.Level;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -40,6 +41,19 @@ import denoptim.utils.*;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 
 /**
@@ -1396,6 +1410,30 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         return lstFreeAPs;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the attachment point with the given identifier, or null if no
+     * AP is found with the given identifier.
+     * @param id identifier of the attachment point to return
+     * @return the attachment point with the given identifier, or null if no
+     * AP is found with the given identifier.
+     */
+    
+    public DENOPTIMAttachmentPoint getAPWithId(int id)
+    {
+        DENOPTIMAttachmentPoint ap = null;
+        for (DENOPTIMAttachmentPoint apCand : getAttachmentPoints())
+        {
+            if (apCand.getID() == id)
+            {
+                ap = apCand;
+                break;
+            }
+        }
+        return ap;
     }
 
 //------------------------------------------------------------------------------
@@ -2929,4 +2967,301 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return mutableSites;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Produces a string that represents this graph and that adheres to the 
+     * JSON format.
+     * @return the JSON format as a single string
+     * @throws DENOPTIMException if the graph contains non-unique vertex IDs or 
+     * AP IDs. Uniqueness of identifiers is required to restore references upon
+     * deserialization.
+     */
+    
+    public String toJson() throws DENOPTIMException
+    {
+        
+        // Check for uniqueness of vertexIDs and APIDs within the 
+        // graph (ignore nested graphs).
+        Set<Integer> unqVrtxIDs = new HashSet<Integer>();
+        Set<Integer> unqApIDs = new HashSet<Integer>();
+        for (DENOPTIMVertex v : gVertices)
+        {
+            if (!unqVrtxIDs.add(v.getVertexId()))
+            {
+                throw new DENOPTIMException("Duplicate vertex ID '" 
+                        + v.getVertexId() 
+                        + "'. Cannot generate JSON string for graph: " + this);
+            }
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (!unqApIDs.add(ap.getID()))
+                {
+                    throw new DENOPTIMException("Duplicate attachment point ID "
+                            + "'" + ap.getID() + "'. "
+                            + "Cannot generate JSON string for graph: " + this);
+                }           }
+        }
+        
+        Gson gson = new GsonBuilder()
+            .registerTypeAdapter(DENOPTIMGraph.class, 
+                    new DENOPTIMGraphSerializer())
+            .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+            // Custom serializer that keeps only the IDs to vertexes and 
+            // APs defined in the list of  vertexes belonging to the graph. 
+            .registerTypeAdapter(DENOPTIMEdge.class, 
+                    new DENOPTIMEdgeSerializer())
+            // Custom serialized that keeps only the IDs to vertexes defined in 
+            // the list of vertexes belonging to the graph
+            .registerTypeAdapter(DENOPTIMRing.class, 
+                    new DENOPTIMRingSerializer())
+            //TODO-V3 add custom de/serialized for symmetric sets
+            .setPrettyPrinting()
+            .create();
+
+        String jsonOutput = gson.toJson(this);
+        return jsonOutput;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a JSON string and returns an instance of this class.
+     * @param json the string to parse.
+     * @return a new instance of this class.
+     */
+
+    public static DENOPTIMGraph fromJson(String json)
+    {   
+        Gson gson = new GsonBuilder()
+            .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+            // Custom deserializer to dispatch to the correct subclass of Vertex
+            .registerTypeAdapter(DENOPTIMVertex.class, 
+                  new DENOPTIMVertexDeserializer())
+            // Custom deserializer takes care of converting ID-based components
+            // to references to vertexes and APs
+            .registerTypeAdapter(DENOPTIMGraph.class, 
+                    new DENOPTIMGraphDeserializer())
+            .setPrettyPrinting()
+            .create();
+
+        DENOPTIMGraph graph = gson.fromJson(json, DENOPTIMGraph.class);
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * We expect unique IDs for vertexes and attachment points.
+     */
+    private static class DENOPTIMGraphSerializer 
+    implements JsonSerializer<DENOPTIMGraph> 
+    {
+        @Override
+        public JsonElement serialize(DENOPTIMGraph g, Type typeOfSrc, 
+                JsonSerializationContext context) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("graphId", g.graphId);
+            jsonObject.add("gVertices", context.serialize(g.gVertices));
+            jsonObject.add("gEdges", context.serialize(g.gEdges));
+            jsonObject.add("gRings", context.serialize(g.gRings));
+            jsonObject.add("symVertices", context.serialize(g.symVertices));
+            return jsonObject;
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class DENOPTIMExclusionStrategy implements ExclusionStrategy 
+    {
+        @Override
+        public boolean shouldSkipField(FieldAttributes field) {
+            // cannot serialize chemical representations: 
+            //     class org.openscience.cdk.Atom declares multiple JSON
+            //     fields named identifier
+            if (field.getDeclaringClass() == DENOPTIMFragment.class 
+                    && field.getName().equals("mol")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
+                    && field.getName().equals("owner")) {
+                return true;
+            }
+
+            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
+                    && field.getName().equals("user")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == DENOPTIMVertex.class 
+                    && field.getName().equals("owner")) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) { 
+            return false; 
+        }
+
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class DENOPTIMEdgeSerializer 
+    implements JsonSerializer<DENOPTIMEdge>
+    {
+        @Override
+        public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc, 
+                JsonSerializationContext context)
+        {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("srcAPID", edge.getSrcAP().getID());
+            jsonObject.addProperty("trgAPID", edge.getTrgAP().getID());
+            jsonObject.add("bondType", context.serialize(edge.getBondType()));
+            return jsonObject;
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class DENOPTIMRingSerializer 
+    implements JsonSerializer<DENOPTIMRing>
+    {
+        @Override
+        public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc, 
+                JsonSerializationContext context)
+        {
+            JsonObject jsonObject = new JsonObject();
+            ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
+            for (int i=0; i<ring.getSize(); i++)
+            {
+                DENOPTIMVertex v = ring.getVertexAtPosition(i);
+                vertexIDs.add(v.getVertexId());
+            }
+            jsonObject.add("vertices",context.serialize(vertexIDs));
+            return jsonObject;
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class DENOPTIMGraphDeserializer 
+    implements JsonDeserializer<DENOPTIMGraph>
+    {
+        @Override
+        public DENOPTIMGraph deserialize(JsonElement json, Type typeOfT, 
+                JsonDeserializationContext context) throws JsonParseException
+        {
+            JsonObject jsonObject = json.getAsJsonObject();
+            
+            // First, build a graph with a graph ID and a list of vertices
+            JsonObject partialJsonObj = new JsonObject();
+            partialJsonObj.add("graphId", jsonObject.get("graphId"));
+            partialJsonObj.add("gVertices", jsonObject.get("gVertices"));
+            // Eventually, also the sym sets will become references...
+            partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
+            
+            Gson gson = new GsonBuilder()
+                .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+                .registerTypeAdapter(DENOPTIMVertex.class, 
+                      new DENOPTIMVertexDeserializer())
+                .setPrettyPrinting()
+                .create();
+           
+            DENOPTIMGraph graph = gson.fromJson(partialJsonObj,
+                    DENOPTIMGraph.class);
+            
+            // Refresh reference and connection counts in all APs
+            for (DENOPTIMVertex v : graph.gVertices)
+            {
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    // Regenerate reference to AP owner
+                    ap.setOwner(v);
+                    //Regenerate reference to APClass
+                    try
+                    {
+                        ap.setAPClass(ap.getAPClass().toString());
+                    } catch (DENOPTIMException e1)
+                    {
+                        throw new JsonParseException(e1);
+                    }
+                    // Reset connection count
+                    ap.setFreeConnections(ap.getTotalConnections());
+                }
+            }
+            
+            // Then, recover those members that are heavily based on references:
+            // edges, rings.
+            JsonArray edgeArr = jsonObject.get("gEdges").getAsJsonArray();
+            for (JsonElement e : edgeArr)
+            {
+                JsonObject o = e.getAsJsonObject();
+                DENOPTIMAttachmentPoint srcAP = graph.getAPWithId(
+                        o.get("srcAPID").getAsInt());
+                DENOPTIMAttachmentPoint trgAP = graph.getAPWithId(
+                        o.get("trgAPID").getAsInt());
+                
+                DENOPTIMEdge edge = new DENOPTIMEdge(srcAP, trgAP, 
+                        context.deserialize(o.get("bondType"),BondType.class));
+                graph.addEdge(edge);
+            }
+            
+            // Now, recover the rings
+            JsonArray ringArr = jsonObject.get("gRings").getAsJsonArray();
+            for (JsonElement e : ringArr)
+            {
+                JsonObject o = e.getAsJsonObject();
+                DENOPTIMRing ring = new DENOPTIMRing();
+                for (JsonElement re : o.get("vertices").getAsJsonArray())
+                {
+                    ring.addVertex(graph.getVertexWithId(re.getAsInt()));
+                }
+                graph.addRing(ring);
+            }
+            
+            return graph;
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class DENOPTIMVertexDeserializer 
+    implements JsonDeserializer<DENOPTIMVertex> 
+    {
+        @Override
+        public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, 
+                JsonDeserializationContext context) throws JsonParseException 
+        {
+            
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            if (jsonObject.has("embeddedGraph")) 
+            {
+                //TODO-V3 log or del
+                System.out.println("DESERIALIZE Template " 
+                + jsonObject.get("vertexId"));
+                return context.deserialize(jsonObject, DENOPTIMTemplate.class);
+            }
+            else if (jsonObject.has("buildingBlockId")) 
+            {
+                //TODO-V3 log or del
+                System.out.println("DESERIALIZE Fragment " 
+                + jsonObject.get("vertexId"));
+                return context.deserialize(jsonObject, DENOPTIMFragment.class);
+            }
+            else 
+            {
+                //TODO-V3 log or del
+                System.out.println("DESERIALIZE EmptyVertex " 
+                + jsonObject.get("vertexId"));
+                return context.deserialize(jsonObject, EmptyVertex.class);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
 }

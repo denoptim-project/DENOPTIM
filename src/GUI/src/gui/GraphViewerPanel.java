@@ -207,6 +207,16 @@ public class GraphViewerPanel extends JPanel
 	 */
 	public void cleanup()
 	{
+		if (viewer != null)
+		{
+			try {
+				viewer.close();
+			} catch (Throwable t)
+			{
+				System.out.println(t.getMessage() + " from closing GS-viewer.");
+			}
+		}
+		
 		for (Component c : this.getComponents())
 		{
 			this.remove(c);
@@ -250,6 +260,7 @@ public class GraphViewerPanel extends JPanel
 		viewer.enableAutoLayout();
 		
 		sman = new SpriteManager(graph);
+		
 		appendSpritesFromSnapshot(prevStatus);
 		// Not working. See comment in the method.
 		//placeNodesAccordingToSnapshot(prevStatus);
@@ -385,8 +396,8 @@ public class GraphViewerPanel extends JPanel
 		{
 			Sprite sSrc = sman.addSprite(sId);
 			sSrc.setAttribute("ui.class", SPRITEATT_UICLASS_APCLASSSRC);
-			sSrc.addAttribute("ui.label", (String)
-					e.getAttribute("dnp.srcAPClass"));
+			sSrc.addAttribute("ui.label",
+					e.getAttribute("dnp.srcAPClass").toString());
 			sSrc.attachToEdge(e.getId());
 			sSrc.setPosition(0.3);
 		}
@@ -401,8 +412,8 @@ public class GraphViewerPanel extends JPanel
 		{
 			Sprite sTrg = sman.addSprite(sId);
 			sTrg.setAttribute("ui.class", SPRITEATT_UICLASS_APCLASSTRG);
-			sTrg.addAttribute("ui.label", (String)
-					e.getAttribute("dnp.trgAPClass"));
+			sTrg.addAttribute("ui.label",
+					e.getAttribute("dnp.trgAPClass").toString());
 			sTrg.attachToEdge(e.getId());
 			sTrg.setPosition(0.7);
 		}
@@ -817,6 +828,13 @@ public class GraphViewerPanel extends JPanel
 				super.mouseReleased(e);
 			}
 		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	public void dispose() 
+	{
+		cleanup();
 	}
 
 //-----------------------------------------------------------------------------

@@ -126,7 +126,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		// Define the list of frags among which we are selecting
 		for (IAtomContainer mol : fragLib)
-		{				
+		{
 			try {
 				DENOPTIMFragment frg = new DENOPTIMFragment(mol, 
 				        BBType.UNDEFINED);
@@ -211,8 +211,9 @@ public class GUIFragmentSelector extends GUIModalDialog
 					}
 				}
 				result = new Integer[]{currFrgIdx, currApIdx};
-				fragmentViewer.clearAPTable();
-				fragmentViewer.clearMolecularViewer();
+				//fragmentViewer.clearAPTable();
+				//fragmentViewer.clearMolecularViewer();
+				fragmentViewer.dispose();
 				close();
 			}
 		});
@@ -259,7 +260,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		clearCurrentSystem();
 
 		fragment = fragmentLibrary.get(currFrgIdx);
-		fragmentViewer.loadFragImentToViewer(fragment);
+		fragmentViewer.loadFragmentToViewer(fragment);
 	}
 	
 //-----------------------------------------------------------------------------

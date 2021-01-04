@@ -23,18 +23,29 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import gui.GUIPreferences.SMITo3DEngine;
 
 public class GUIPreferencesDialog extends GUIModalDialog
 {
@@ -77,13 +88,27 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private JLabel lblChartPointSize;
     private JTextField txtChartPointSize;
     
+    private JPanel linePropTags;
+    private JLabel lblPropTags;
+    private DefaultTableModel tabModPropTags;
+    private JTable tabPropTags;
+    private JButton btnPropTagsInsert;
+    private JButton btnPropTagsCleanup;
+    
     private String namTmpSpace = "Folder for tmp files";
     private JPanel pnlTmpSpace;
     private JLabel lblTmpSpace;
     private JTextField txtTmpSpace;
-	
+    
+    private String namSMILESTo3D = "SMILES-to-3D converer";
+    private JPanel pnlSMILESTo3D;
+    private JComboBox cmbSMILESTo3D;
+    private JLabel lblSMILESTo3D;
+    
 	
 	private boolean inputIsOK = true;
+	
+//------------------------------------------------------------------------------
 
 	public GUIPreferencesDialog()
 	{
@@ -99,7 +124,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlTmpSpace = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblTmpSpace = new JLabel(namTmpSpace + ":");
         txtTmpSpace = new JTextField();
-        txtTmpSpace.setPreferredSize(strFieldSize);
+        txtTmpSpace.setPreferredSize(fileLabelSize);
         txtTmpSpace.setText(GUIPreferences.tmpSpace+"");
         pnlTmpSpace.add(lblTmpSpace);
         pnlTmpSpace.add(txtTmpSpace);
@@ -107,8 +132,31 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
         centralPanel.add(new JSeparator());
         
+        JPanel titleFragments = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titleFragments.add(new JLabel("<html><b>Handling of fragments</b></html>"));
+        centralPanel.add(titleFragments);
+        
+        pnlSMILESTo3D = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblSMILESTo3D = new JLabel(namSMILESTo3D + ": " 
+        		+ GUIPreferences.smiTo3dResolver + " - Change to ");
+        cmbSMILESTo3D = new JComboBox(SMITo3DEngine.values());
+        cmbSMILESTo3D.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GUIPreferences.smiTo3dResolver = (SMITo3DEngine) 
+						cmbSMILESTo3D.getSelectedItem();
+				lblSMILESTo3D.setText(namSMILESTo3D + ": " 
+        		+ GUIPreferences.smiTo3dResolver + " - Change to ");
+			}
+		});
+        pnlSMILESTo3D.add(lblSMILESTo3D);
+        pnlSMILESTo3D.add(cmbSMILESTo3D);
+        centralPanel.add(pnlSMILESTo3D);
+        
+        centralPanel.add(new JSeparator());
+        
         JPanel titleGraphViewer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        titleGraphViewer.add(new JLabel("<html><b>Graph viewer</b></html>"));
+        titleGraphViewer.add(new JLabel("<html><b>Graph visualization</b></html>"));
         centralPanel.add(titleGraphViewer);
         
         pnlGraphTxtSize = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -131,8 +179,95 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
         centralPanel.add(new JSeparator());
         
+        JPanel titleMolViewer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titleMolViewer.add(new JLabel("<html><b>Candidate item visualization</b></html>"));
+        centralPanel.add(titleMolViewer);
+        
+        String toolTipPropTags = "</html>Customizes the list of properties displayed togetther with the chemical representation of an item.</html>";
+        linePropTags = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblPropTags = new JLabel("Additional properties to display:", SwingConstants.LEFT);
+        lblPropTags.setPreferredSize(fileLabelSize);
+        lblPropTags.setToolTipText(toolTipPropTags);
+        tabModPropTags = new DefaultTableModel() {
+        	@Override
+            public boolean isCellEditable(int row, int column) {
+               return false;
+            }
+        };
+        tabModPropTags.setColumnCount(1);
+        for (String propName : GUIPreferences.chosenSDFTags)
+        {
+        	tabModPropTags.addRow(new Object[]{propName});
+        }
+        tabPropTags = new JTable(tabModPropTags);
+        tabPropTags.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        btnPropTagsInsert = new JButton("Add Property Name");
+        btnPropTagsInsert.setToolTipText("Click to add the reference name or SDF tag of the desired property.");
+        btnPropTagsInsert.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		String propName = (String)JOptionPane.showInputDialog(
+	        				btnPropTagsInsert,
+		                    "Specify the reference name or SDF tag of the "
+		                    + "desired property",
+		                    "Specify Property Name",
+		                    JOptionPane.PLAIN_MESSAGE);
+	
+				if ((propName != null) && (propName.length() > 0) 
+						&& !GUIPreferences.chosenSDFTags.contains(propName)) 
+				{  
+					tabModPropTags.addRow(new Object[]{propName});
+					GUIPreferences.chosenSDFTags.add(propName);
+				}    		
+        	}
+        });
+        btnPropTagsCleanup = new JButton("Remove Selected");
+        btnPropTagsCleanup.setToolTipText("Remove all selected entries from the list.");
+        btnPropTagsCleanup.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		if (tabPropTags.getRowCount() > 0) 
+        		{
+        	        if (tabPropTags.getSelectedRowCount() > 0) 
+        	        {
+        	            int selectedRowIds[] = tabPropTags.getSelectedRows();
+        	            Arrays.sort(selectedRowIds);
+        	            for (int i=(selectedRowIds.length-1); i>-1; i--) 
+        	            {
+        	            	String val = tabModPropTags.getValueAt(
+        	            			selectedRowIds[i], 0).toString();
+        	            	GUIPreferences.chosenSDFTags.remove(val);
+        	            	tabModPropTags.removeRow(selectedRowIds[i]);
+        	            }
+        	        }
+        	    }
+        	}
+        });
+        GroupLayout grpLyoPropTags = new GroupLayout(linePropTags);
+        linePropTags.setLayout(grpLyoPropTags);
+        grpLyoPropTags.setAutoCreateGaps(true);
+        grpLyoPropTags.setAutoCreateContainerGaps(true);
+        grpLyoPropTags.setHorizontalGroup(grpLyoPropTags.createSequentialGroup()
+                .addComponent(lblPropTags)
+                .addGroup(grpLyoPropTags.createParallelGroup()
+                        .addGroup(grpLyoPropTags.createSequentialGroup()
+                                        .addComponent(btnPropTagsInsert)
+                                        .addComponent(btnPropTagsCleanup))
+                        .addComponent(tabPropTags))
+        );
+        grpLyoPropTags.setVerticalGroup(grpLyoPropTags.createParallelGroup(
+        		GroupLayout.Alignment.LEADING)
+                .addComponent(lblPropTags)
+                .addGroup(grpLyoPropTags.createSequentialGroup()
+                        .addGroup(grpLyoPropTags.createParallelGroup()
+                                .addComponent(btnPropTagsInsert)
+                                .addComponent(btnPropTagsCleanup))
+                        .addComponent(tabPropTags))
+        );
+        centralPanel.add(linePropTags);
+        
+        centralPanel.add(new JSeparator());
+        
         JPanel titleEvolutionPlots = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        titleEvolutionPlots.add(new JLabel("<html><b>Evolution Run Plots</b></html>"));
+        titleEvolutionPlots.add(new JLabel("<html><b>Evolution run plots</b></html>"));
         centralPanel.add(titleEvolutionPlots);
         
         pnlChartPointSize = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -160,6 +295,9 @@ public class GUIPreferencesDialog extends GUIModalDialog
 			}
 		});
 		
+		this.btnCanc.setEnabled(false);
+		this.btnCanc.setVisible(false);
+		
 		super.addToCentralPane(scrollablePane);
 	}
 	
@@ -171,7 +309,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 		mustParseToInt(txtGraphTxtSize, namGraphTxtSize);
 		mustParseToInt(txtGraphNodeSize, namGraphNodeSize);
 		mustParseToInt(txtChartPointSize, namChartPointSize);
-		mustParseBeReadableWritable(txtTmpSpace, namTmpSpace);
+		pathMustBeReadableWritable(txtTmpSpace, namTmpSpace);
 	}
 
 //-----------------------------------------------------------------------------
@@ -193,11 +331,12 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 	
-	private void mustParseBeReadableWritable(JTextField field, String name)
+	private void pathMustBeReadableWritable(JTextField field, String name)
 	{
-		if (!DenoptimIO.canWriteAndReadTo(field.getText()
+		String testFileName = field.getText()
 				+ System.getProperty("file.separator") 
-				+ "test"))
+				+ "test";
+		if (!DenoptimIO.canWriteAndReadTo(testFileName))
 		{
 			inputIsOK = false;
 			JOptionPane.showMessageDialog(null,
@@ -206,6 +345,11 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
+		}
+		try {
+			DenoptimIO.deleteFile(testFileName);
+		} catch (DENOPTIMException e) {
+			e.printStackTrace();
 		}
 	}
 	

@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -60,7 +62,6 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 	private CompatibilityMatrixForm cpMapHandler;
 	
 
-	
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -91,13 +92,11 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 		this.add(cpMapHandler, BorderLayout.CENTER);
 		
 		// Panel with buttons to the bottom of the frame
-		
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
 		
-		btnLoadCPMap = new JButton("Load Compatibility Matrix",
-					UIManager.getIcon("FileView.directoryIcon"));
+		btnLoadCPMap = new JButton("Load Compatibility Matrix");
 		btnLoadCPMap.setToolTipText(String.format("<html><body width='%1s'>"
 				+ "Reads from file all compatibility matrix data including: "
 				+ "<ul><li>APClass compatibility rules</li>"
@@ -106,7 +105,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
 		btnLoadCPMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnLoadCPMap);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -122,24 +121,49 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "all classes in the current tab.</html>",300));
 		btnImportAPClasses.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Set<File> files = DenoptimGUIFileOpener.pickManyFile();
-				cpMapHandler.importAllAPClassesFromFragmentLibs(files, false);
+				Set<File> files = DenoptimGUIFileOpener.pickManyFiles(
+						btnImportAPClasses);
+				if (files == null || files.size() == 0)
+				{
+					return;
+				}
+				
+				String[] options = new String[]{"Cancel", 
+						"Capping Groups",
+						"Scaffolds and Fragments"};
+				int res = JOptionPane.showOptionDialog(null,
+		                "What type of building block are the imported "
+		                + "APClasses meant for?",
+		                "Select Role for Imported APClasses",
+		                2,
+		                JOptionPane.QUESTION_MESSAGE,
+		                null,
+		                options,
+		                options[2]);
+				
+				if (res == 1)
+				{
+					cpMapHandler.importAllAPClassesFromCappingGroupLibs(files, 
+							false);
+				} else if (res == 2) {
+					cpMapHandler.importAllAPClassesFromFragmentLibs(files, 
+							false);
+				}
 			}
 		});
 		commandsPane.add(btnImportAPClasses);
 		
 		
-		JButton btnSaveFrags = new JButton("Save Compatibility Matrix",
-				UIManager.getIcon("FileView.hardDriveIcon"));
+		JButton btnSaveFrags = new JButton("Save Compatibility Matrix");
 		btnSaveFrags.setToolTipText(String.format("<html><body width='%1s'>"
 				+ "Writes to file all compatibility matrix data including: "
 				+ "<ul><li>APClass compatibility rules</li>"
-				+ "<li>APClass-to-Bond order rules</li>"
+				+ "<li>APClass-to-Bond order conversion rules</li>"
 				+ "<li>Capping rules</li>"
-				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
+				+ "<li>Definition of forbidden ends.</li></ul></html>",250));
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile();
+				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null || cpMapHandler == null)
 				{
 					return;

@@ -41,6 +41,7 @@ import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -78,6 +79,8 @@ import java.util.Map;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.io.SDFWriter;
@@ -123,7 +126,10 @@ import org.openscience.cdk.smiles.InvPair;
 import java.util.logging.Level;
 
 
-public class DenoptimIO {
+public class DenoptimIO
+{
+
+	private static final String FS = System.getProperty("file.separator");
     private static final String NL = System.getProperty("line.separator");
 
     // A list of properties used by CDK algorithms which must never be
@@ -145,11 +151,11 @@ public class DenoptimIO {
     public static ArrayList<IAtomContainer> readLinksToMols(String fileName)
             throws DENOPTIMException {
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
-        String sCurrentLine;
+        String sCurrentLine = null;
 
         BufferedReader br = null;
-
-        try {
+        try
+        {
             br = new BufferedReader(new FileReader(fileName));
             while ((sCurrentLine = br.readLine()) != null) {
                 sCurrentLine = sCurrentLine.trim();
@@ -157,16 +163,36 @@ public class DenoptimIO {
                     continue;
                 }
                 if (GenUtils.getFileExtension(sCurrentLine).
-                        compareToIgnoreCase(".smi") == 0) {
-                    throw new DENOPTIMException("Fragment files in SMILES format not supported.");
+                    compareToIgnoreCase(".smi") == 0)
+                {
+                    throw new DENOPTIMException("Fragment files in SMILES "
+                    		+ "format not supported.");
                 }
 
-                ArrayList<IAtomContainer> mols = readSDFFile(sCurrentLine);
-                lstContainers.addAll(mols);
+                try {
+					ArrayList<IAtomContainer> mols = readSDFFile(sCurrentLine);
+					lstContainers.addAll(mols);
+				} catch (Exception e) {
+		            throw new DENOPTIMException("<html>File '" + fileName 
+		            		+ "' <br>seems "
+		            		+ "to be a "
+		            		+ "list of links to other files, but line <br>'" 
+		            		+ sCurrentLine + "' <br>does not point to an "
+            				+ "existing "
+            				+ "file. <br>"
+		            		+ "Pleae check your input. Is it really a list of "
+		            		+ "links? "
+		            		+ "<br>If not, make sure it has a standard"
+		            		+ "extension (e.g., .smi, .sdf)</html>",e);
+				}
             }
-        } catch (FileNotFoundException fnfe) {
-            throw new DENOPTIMException(fnfe);
-        } catch (IOException ioe) {
+        }
+        catch (FileNotFoundException fnfe)
+        {
+        	throw new DENOPTIMException("File '" + fileName + "' not found.");
+        }
+        catch (IOException ioe)
+        {
             throw new DENOPTIMException(ioe);
         } catch (DENOPTIMException de) {
             throw de;
@@ -812,8 +838,10 @@ public class DenoptimIO {
      * @param oldObj
      * @return a deep copy of an object
      * @throws DENOPTIMException
+     * @deprecated avoid serialization-based deep copying.
      */
 
+    @Deprecated
     public static Object deepCopy(Object oldObj) throws DENOPTIMException {
         Object newObj = null;
         ObjectOutputStream oos = null;
@@ -1392,7 +1420,10 @@ public class DenoptimIO {
         }
         // process everything else as a text file with links to individual 
         // molecules
-        else {
+        else
+        {
+        	System.out.println("Interpreting file '" + fileName + "' as a list "
+        			+ "of links.");
             mols = DenoptimIO.readLinksToMols(fileName);
         }
         return mols;
@@ -1939,6 +1970,37 @@ public class DenoptimIO {
         return lib;
     }
 
+//------------------------------------------------------------------------------
+    
+    public static File getAvailableFileName(File parent, String baseName)
+    		throws DENOPTIMException
+    {
+    	File newFolder = null;
+    	if (!parent.exists())
+    	{
+    		if (!createDirectory(parent.getAbsolutePath()))
+    		{
+    			throw new DENOPTIMException("Cannot make folder '"+parent+"'");
+    		}
+    	}
+		FileFilter fileFilter = new WildcardFileFilter(baseName+"*");
+		File[] cands = parent.listFiles(fileFilter);
+		int i=0;
+		boolean goon = true;
+		while (goon)
+		{
+			i++;
+			int iFolder = i + cands.length;
+			newFolder = new File(parent + FS + baseName + "_" + iFolder);
+			if (!newFolder.exists())
+			{
+				goon = false;
+				break;
+			}
+		}
+    	return newFolder;
+    }
+    
 //------------------------------------------------------------------------------
 
 }

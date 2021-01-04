@@ -248,7 +248,7 @@ public class CyclicGraphHandler
                                                             IAtomContainer mol,
                                                         DENOPTIMGraph molGraph)
                                                        throws DENOPTIMException
-    {   
+    {
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                                         new HashMap<ObjectPair,PathSubGraph>();
@@ -276,9 +276,15 @@ public class CyclicGraphHandler
                     }
                     continue;
                 }
+                
                 // make the new candidate RCA pair
                 PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
                 
+                if (verbosity > 1)
+                {
+                    System.out.println("Evaluating closability of path " 
+                            + subGraph);
+                }
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
 
                 if (!keepRcaPair)
@@ -460,7 +466,9 @@ public class CyclicGraphHandler
     {
         int objId = this.hashCode();
         String recLab = new String(new char[recCount]).replace("\0", "-");
+        
         boolean debug = false;
+        
         if (debug)
         {
             System.out.println(objId+"-"+recLab+"> Begin of new recursion: "+recCount);
@@ -610,7 +618,7 @@ public class CyclicGraphHandler
                         if (!notNewCmb)
                         {
                             if (debug)
-                                System.out.println(objId+"-"+recLab+"> addinf to all combs of ring.");
+                                System.out.println(objId+"-"+recLab+"> adding to all combs of ring.");
 
                             allCombsOfRings.add(ringsComb);
                             addedNew = true;
@@ -911,9 +919,9 @@ public class CyclicGraphHandler
         // Compatibility matrix between pairs of RCAs in the current system.
         private boolean[][] compatibilityOfPairs;
 
-        // Weight factors used to control the likeliness of chosing rings of a
+        // Weight factors used to control the likeliness of choosing rings of a
         // given size for the current system
-        private ArrayList<Integer> w;
+        private ArrayList<Double> w;
 
         // Visited flag for RCAs
         private ArrayList<Boolean> done;
@@ -1006,7 +1014,7 @@ public class CyclicGraphHandler
         private void calculateCompatibilityOfAllRCAPairs() 
                                                        throws DENOPTIMException
         {
-            w = new ArrayList<Integer>(Collections.nCopies(sz, 0));
+            w = new ArrayList<Double>(Collections.nCopies(sz, 0.0));
             compatibilityOfPairs = new boolean[sz][sz];
             for (int i=0; i<sz; i++)
             {
@@ -1417,6 +1425,9 @@ public class CyclicGraphHandler
         boolean closable = false;
         switch (RingClosureParameters.getClosabilityEvalMode())
         {
+        case -1:
+        	closable = true; // ring size has been evaluated before
+        	break;
         case 0:
             closable = evaluateConstitutionalClosability(subGraph,mol);
             break;
@@ -1529,7 +1540,7 @@ public class CyclicGraphHandler
             mol.removeAtomAndConnectedElectronContainers(a);
         }
 
-         if (verbosity > 1)
+         if (verbosity > 2)
         {
             System.out.println("Molecular representation of path includes:");
                 for (IAtom a : mol.atoms())
@@ -1773,7 +1784,6 @@ public class CyclicGraphHandler
             if (vert.getLevel() == 0 
                     && vertFrag.getFragmentType() == BBType.FRAGMENT)
             {
-
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
 //TODO-V3: change. hard coded class of ligand

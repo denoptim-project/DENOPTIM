@@ -55,10 +55,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     private BBType buildingBlockType = BBType.UNDEFINED;
 
     /**
-     * interior graph of the template that can be constrained in various ways depending on the
-     * <code>contractLevel</code>
+     * Graph that is embedded in this vertex. This field differentiates a
+     * template from any other subclass of {@link DENOPTIMVertex}, and its name
+     * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
      */
-    private DENOPTIMGraph interiorGraph = new DENOPTIMGraph();
+    private DENOPTIMGraph embeddedGraph = new DENOPTIMGraph();
 
     /**
      * Denotes the constants in the template. It can take values from 0 to 2 and each level promises to uphold the
@@ -165,9 +166,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         vrtx2.addAP(0,1,1);
         vrtx2.addAP(1,1,1);
 
-        template.interiorGraph.addVertex(vrtx);
-        template.interiorGraph.addVertex(vrtx2);
-        template.interiorGraph.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
+        template.embeddedGraph.addVertex(vrtx);
+        template.embeddedGraph.addVertex(vrtx2);
+        template.embeddedGraph.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
                 vrtx2.getAP(1), BondType.SINGLE));
         
         //Fully frozen
@@ -223,13 +224,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 1, BBType.FRAGMENT);
-        template.interiorGraph.addVertex(vA);
-        template.interiorGraph.addVertex(vB);
+        template.embeddedGraph.addVertex(vA);
+        template.embeddedGraph.addVertex(vB);
         
         // Make and add a fully defined edge that connects the two vertexes
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 1);
 
-        template.interiorGraph.addEdge(eAB);
+        template.embeddedGraph.addEdge(eAB);
         
         /*
         System.out.println("TEMPLATE's APs: ");
@@ -288,18 +289,18 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMVertex vH6 = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
         
-        template.interiorGraph.addVertex(vA);
-        template.interiorGraph.addVertex(vB);
-        template.interiorGraph.addVertex(vC);
-        template.interiorGraph.addVertex(vD);
-        template.interiorGraph.addVertex(vRCV1);
-        template.interiorGraph.addVertex(vRCV2);
-        template.interiorGraph.addVertex(vH1);
-        template.interiorGraph.addVertex(vH2);
-        template.interiorGraph.addVertex(vH3);
-        template.interiorGraph.addVertex(vH4);
-        template.interiorGraph.addVertex(vH5);
-        template.interiorGraph.addVertex(vH6);
+        template.embeddedGraph.addVertex(vA);
+        template.embeddedGraph.addVertex(vB);
+        template.embeddedGraph.addVertex(vC);
+        template.embeddedGraph.addVertex(vD);
+        template.embeddedGraph.addVertex(vRCV1);
+        template.embeddedGraph.addVertex(vRCV2);
+        template.embeddedGraph.addVertex(vH1);
+        template.embeddedGraph.addVertex(vH2);
+        template.embeddedGraph.addVertex(vH3);
+        template.embeddedGraph.addVertex(vH4);
+        template.embeddedGraph.addVertex(vH5);
+        template.embeddedGraph.addVertex(vH6);
         
         DENOPTIMEdge eARcv = vA.connectVertices(vRCV1, 3, 0);
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 3);
@@ -314,25 +315,25 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMEdge eAH5 = vA.connectVertices(vH5, 2, 0);
         DENOPTIMEdge eCH6 = vC.connectVertices(vH6, 2, 0);
         
-        template.interiorGraph.addEdge(eARcv);
-        template.interiorGraph.addEdge(eAB);
-        template.interiorGraph.addEdge(eBC);
-        template.interiorGraph.addEdge(eCD);
-        template.interiorGraph.addEdge(eDRcv);
-        template.interiorGraph.addEdge(eAH1);
-        template.interiorGraph.addEdge(eBH2);
-        template.interiorGraph.addEdge(eCH3);
-        template.interiorGraph.addEdge(eDH4);
-        template.interiorGraph.addEdge(eAH5);
-        template.interiorGraph.addEdge(eCH6);
+        template.embeddedGraph.addEdge(eARcv);
+        template.embeddedGraph.addEdge(eAB);
+        template.embeddedGraph.addEdge(eBC);
+        template.embeddedGraph.addEdge(eCD);
+        template.embeddedGraph.addEdge(eDRcv);
+        template.embeddedGraph.addEdge(eAH1);
+        template.embeddedGraph.addEdge(eBH2);
+        template.embeddedGraph.addEdge(eCH3);
+        template.embeddedGraph.addEdge(eDH4);
+        template.embeddedGraph.addEdge(eAH5);
+        template.embeddedGraph.addEdge(eCH6);
         
         DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
                 Arrays.asList(vRCV1, vA, vB, vC, vD, vRCV2)));
-        template.interiorGraph.addRing(r);
+        template.embeddedGraph.addRing(r);
         
 
       //TODO-M7 del
-        System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+template.interiorGraph);
+        System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+template.embeddedGraph);
         
         /*
         System.out.println("(F) TEMPLATE's inner graph: "+template.interiorGraph);
@@ -343,10 +344,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         */
         
         //TODO-M7 del
-        template.interiorGraph.renumberGraphVertices();
+        template.embeddedGraph.renumberGraphVertices();
         
       //TODO-M7 del
-        System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.interiorGraph);
+        System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.embeddedGraph);
 
         
         template.freezeTemplate();
@@ -375,7 +376,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
     {
-        return interiorGraph.getAvailableAPs();
+        return embeddedGraph.getAvailableAPs();
     }
 
 //------------------------------------------------------------------------------
@@ -406,7 +407,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     //TODO: this will probably change, now it is useful for debugging
     public DENOPTIMGraph getEmbeddedGraph()
     {
-        return interiorGraph;
+        return embeddedGraph;
     }
     
 //-----------------------------------------------------------------------------
@@ -432,7 +433,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        return interiorGraph.getAttachmentPoints();
+        return embeddedGraph.getAttachmentPoints();
     }
     
 //-----------------------------------------------------------------------------
@@ -483,7 +484,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public int getHeavyAtomsCount()
     {
-        return interiorGraph.getHeavyAtomsCount();
+        return embeddedGraph.getHeavyAtomsCount();
     }
 
 //-----------------------------------------------------------------------------
@@ -491,7 +492,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public boolean containsAtoms()
     {
-        return interiorGraph.containsAtoms();
+        return embeddedGraph.containsAtoms();
     }
 
 //-----------------------------------------------------------------------------
@@ -501,7 +502,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         try
         {
-            return GraphConversionTool.convertGraphToMolecule(interiorGraph, true);
+            return GraphConversionTool.convertGraphToMolecule(embeddedGraph, true);
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -534,7 +535,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             
             default:
             {
-                for (DENOPTIMVertex v : interiorGraph.gVertices)
+                for (DENOPTIMVertex v : embeddedGraph.gVertices)
                 {
                     set.addAll(v.getMutationSites());
                 }

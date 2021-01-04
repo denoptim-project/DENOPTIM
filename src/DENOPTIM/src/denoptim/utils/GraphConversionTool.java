@@ -59,6 +59,9 @@ public class GraphConversionTool
      * @return CDK representation of the molecular graph
      */
 
+	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
+    // with a flag that controls weather we rototranslate the building blocks or not
+	
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
     {  
@@ -133,14 +136,13 @@ public class GraphConversionTool
                 }
             } catch (Exception e)
             {
-                throw new DENOPTIMException("Attemot to find "
-                        + "vid:" + v1.getVertexId() 
-                        + " atmpos:"+ ap1.getAtomPositionNumber() + " "
-                        + "(" + atmSrcMap.containsKey(v1.getVertexId()) + ") "
-                        + "vid:" + v2.getVertexId() 
-                        + " atmpos:"+ ap2.getAtomPositionNumber() + " "
-                        + "(" + atmSrcMap.containsKey(v2.getVertexId()) + ") "
-                        + "failed.", e);
+                String msg = "Incorrect indices. Although this may be a bug, " +
+                        "it is more likely an error in the atom specification. "
+                        + "Kindly check your input files."
+                        + "Error occurred while dealing with edge " + edge
+                        + " and vertexes " + v1 + " and " + v2 + ".";
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                throw new DENOPTIMException(msg);
             }
         }
        

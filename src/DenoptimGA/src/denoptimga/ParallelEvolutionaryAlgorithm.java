@@ -39,6 +39,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMVertex;
@@ -53,11 +54,15 @@ import denoptim.utils.TaskUtils;
  */
 public class ParallelEvolutionaryAlgorithm
 {
-    final List<Future<String>> futures;
-    final ArrayList<FTask> submitted;
-    
+
     //TODO-V3 change to Executor and initialize based on GAParameters.parallelizationScheme
+
+    final List<Future<Object>> futures;
+    final ArrayList<OffspringEvaluationTask> submitted;
+    
     final ThreadPoolExecutor tcons;
+
+    private Throwable ex;
    
     private final String fsep = System.getProperty("file.separator");
  
@@ -137,15 +142,15 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (FTask tsk:submitted)
+        for (OffspringEvaluationTask tsk : submitted)
         {
             if (tsk.foundException())
             {
                 hasprobs = true;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-                                                              + tsk.toString());
-                DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                                                         tsk.getErrorMessage());
+                + tsk.toString() + ". ErrorMessage: '" + tsk.getErrorMessage() 
+                + "'. ExceptionInTask: "+tsk.getException());
+                ex = tsk.getException().getCause();
                 break;
             }
         }
@@ -180,7 +185,6 @@ public class ParallelEvolutionaryAlgorithm
         // first collect UIDs of previously known individuals
         if (!GAParameters.getUIDFileIn().equals(""))
         {
-            //TODO: if same file avoid re-write
             EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
             EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
         }
@@ -365,7 +369,7 @@ public class ParallelEvolutionaryAlgorithm
 
         int f0 = 0, f1 = 0, f2 = 0;
 
-        Integer numtry = 0;
+        Integer numTries = 0;
         int MAX_TRIES = GAParameters.getMaxTriesFactor();
 
         String molName, inchi, smiles;
@@ -389,12 +393,13 @@ public class ParallelEvolutionaryAlgorithm
                 if (checkForException())
                 {
                     stopRun();
-                    throw new DENOPTIMException("Errors found during execution.");
+                    throw new DENOPTIMException("Errors found during sub-tasks "
+                    		+ "execution.", ex);
                 }
 
-                synchronized (numtry)
+                synchronized (numTries)
                 {
-                    if (numtry == MAX_TRIES)
+                    if (numTries == MAX_TRIES)
                     {
                         cleanupCompleted(tcons, futures, submitted);
                         break;
@@ -440,6 +445,7 @@ public class ParallelEvolutionaryAlgorithm
                         {
                             DENOPTIMLogger.appLogger.info("Failed to identify "
                                     + "compatible parents for crossover/mutation.");
+                            numatt++;
                             continue;
                         }
 
@@ -572,20 +578,33 @@ public class ParallelEvolutionaryAlgorithm
                             res = null;
                         }
                     }
+                    
+                    // Check if the chosen combination gives rise to forbidden ends
+                    //TODO-V3 this should be considered already when making the list of
+                    // possible combination of rings
+                    for (DENOPTIMVertex rcv : graph4.getFreeRCVertices())
+                    {
+                        APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                        if (FragmentSpace.getCappingMap().get(apc)==null 
+                                && FragmentSpace.getForbiddenEndList().contains(apc))
+                    	{
+                    		res = null;
+                    	}
+                    }
 
                     if (res == null)
                     {
-                        synchronized(numtry)
+                        synchronized(numTries)
                         {
-                            numtry++;
+                            numTries++;
                         }
                         continue;
                     }
                     else
                     {
-                        synchronized(numtry)
+                        synchronized(numTries)
                         {
-                            numtry = 0;
+                            numTries = 0;
                         }
                     }
 
@@ -615,14 +634,12 @@ public class ParallelEvolutionaryAlgorithm
                             DENOPTIMConstants.MOLDIGITS,
                             GraphUtils.getUniqueMoleculeIndex());
 
-                    int taskId = TaskUtils.getUniqueTaskIndex();
-
                     smiles = res[1].toString().trim();
                     IAtomContainer cmol = (IAtomContainer) res[2];
 
-                    FTask task = new FTask(molName, graph4, inchi, smiles, cmol,
-                                           genDir, taskId, molPopulation,
-                                           numtry,GAParameters.getUIDFileOut());
+                    OffspringEvaluationTask task = new OffspringEvaluationTask(molName, graph4, inchi, smiles, cmol,
+                                           genDir, molPopulation,
+                                           numTries,GAParameters.getUIDFileOut());
 
                     //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
                     // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
@@ -653,20 +670,33 @@ public class ParallelEvolutionaryAlgorithm
                                 res1 = null;
                             }
                         }
+                        
+                        // Check if the chosen combination gives rise to forbidden ends
+                        //TODO-V3 this should be considered already when making the list of
+                        // possible combination of rings
+                        for (DENOPTIMVertex rcv : graph1.getFreeRCVertices())
+                        {
+                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                            if (FragmentSpace.getCappingMap().get(apc)==null 
+                                    && FragmentSpace.getForbiddenEndList().contains(apc))
+                        	{
+                        		res1 = null;
+                        	}
+                        }
 
                         if (res1 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -696,14 +726,12 @@ public class ParallelEvolutionaryAlgorithm
                                 DENOPTIMConstants.MOLDIGITS,
                                 GraphUtils.getUniqueMoleculeIndex());
 
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
                         smiles = res1[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res1[2];
 
-                        FTask task1 = new FTask(molName, graph1, inchi, smiles,
-                                           cmol, genDir, taskId, molPopulation,
-                                           numtry,GAParameters.getUIDFileOut());
+                        OffspringEvaluationTask task1 = new OffspringEvaluationTask(molName, graph1, inchi, smiles,
+                                           cmol, genDir, molPopulation,
+                                           numTries,GAParameters.getUIDFileOut());
 
                         //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
                         // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
@@ -733,20 +761,33 @@ public class ParallelEvolutionaryAlgorithm
                                 res2 = null;
                             }
                         }
+                        
+                        // Check if the chosen combination gives rise to forbidden ends
+                        //TODO-V3 this should be considered already when making the list of
+                        // possible combination of rings
+                        for (DENOPTIMVertex rcv : graph2.getFreeRCVertices())
+                        {
+                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                            if (FragmentSpace.getCappingMap().get(apc)==null 
+                                    && FragmentSpace.getForbiddenEndList().contains(apc))
+                        	{
+                        		res2 = null;
+                        	}
+                        }
 
                         if (res2 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -781,9 +822,9 @@ public class ParallelEvolutionaryAlgorithm
                         smiles = res2[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res2[2];
 
-                        FTask task2 = new FTask(molName, graph2, inchi, smiles,
-                                                cmol, genDir, taskId, molPopulation,
-                                                numtry, 
+                        OffspringEvaluationTask task2 = new OffspringEvaluationTask(molName, graph2, inchi, smiles,
+                                                cmol, genDir, molPopulation,
+                                                numTries, 
                                                 GAParameters.getUIDFileOut());
 
                         //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
@@ -816,20 +857,33 @@ public class ParallelEvolutionaryAlgorithm
                                 res3 = null;
                             }
                         }
+                        
+                        // Check if the chosen combination gives rise to forbidden ends
+                        //TODO-V3 this should be considered already when making the list of
+                        // possible combination of rings
+                        for (DENOPTIMVertex rcv : graph3.getFreeRCVertices())
+                        {
+                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                            if (FragmentSpace.getCappingMap().get(apc)==null 
+                                    && FragmentSpace.getForbiddenEndList().contains(apc))
+                        	{
+                        		res3 = null;
+                        	}
+                        }
 
                         if (res3 == null)
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry++;
+                                numTries++;
                             }
                             continue;
                         }
                         else
                         {
-                            synchronized(numtry)
+                            synchronized(numTries)
                             {
-                                numtry = 0;
+                                numTries = 0;
                             }
                         }
 
@@ -858,15 +912,12 @@ public class ParallelEvolutionaryAlgorithm
                         molName = "M" +
                                 GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                                 GraphUtils.getUniqueMoleculeIndex());
-
-                        int taskId = TaskUtils.getUniqueTaskIndex();
-
                         smiles = res3[1].toString().trim();
                         IAtomContainer cmol = (IAtomContainer) res3[2];
 
-                        FTask task3 = new FTask(molName, graph3, inchi, smiles,
-                                                cmol, genDir, taskId, molPopulation,
-                                                numtry, 
+                        OffspringEvaluationTask task3 = new OffspringEvaluationTask(molName, graph3, inchi, smiles,
+                                                cmol, genDir, molPopulation,
+                                                numTries, 
                                                 GAParameters.getUIDFileOut());
 
                         //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
@@ -981,7 +1032,7 @@ public class ParallelEvolutionaryAlgorithm
             }
         }
 
-        Integer numtry = 0;
+        Integer numTries = 0;
 
         try
         {
@@ -990,11 +1041,12 @@ public class ParallelEvolutionaryAlgorithm
                 if (checkForException())
                 {
                     stopRun();
-                    throw new DENOPTIMException("Errors found during execution.");
+                    throw new DENOPTIMException("Errors found during sub tasks "
+                    		+ "execution.", ex);
                 }
-                synchronized (numtry)
+                synchronized (numTries)
                 {
-                    if (numtry == MAX_TRIES)
+                    if (numTries == MAX_TRIES)
                     {
 //                      MF: the cleanup method removed also uncompleted tasks
 //                      causing their results to be forgotten.
@@ -1021,9 +1073,9 @@ public class ParallelEvolutionaryAlgorithm
 
                 if (molGraph == null)
                 {
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        numtry++;
+                        numTries++;
                     }
                     continue;
                 }
@@ -1038,62 +1090,52 @@ public class ParallelEvolutionaryAlgorithm
                         res = null;
                     }
                 }
+                
+                // Check if the chosen combination gives rise to forbidden ends
+                //TODO-V3 this should be considered already when making the list of
+                // possible combination of rings
+                for (DENOPTIMVertex rcv : molGraph.getFreeRCVertices())
+                {
+                    APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+                    if (FragmentSpace.getCappingMap().get(apc)==null 
+                            && FragmentSpace.getForbiddenEndList().contains(apc))
+                	{
+                		res = null;
+                	}
+                }
 
                 if (res == null)
                 {
                     molGraph.cleanup();
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        numtry++;
+                        numTries++;
                     }
                     continue;
                 }
                 else
                 {
-                    synchronized(numtry)
+                    synchronized(numTries)
                     {
-                        if(numtry > 0)
-                            numtry--;
+                        if(numTries > 0)
+                            numTries--;
                     }
                 }
                     
 
                 // Create the task
-                // check if the molinchi has been encountered before
                 String inchi = res[0].toString().trim();
-                
-                /*
-                if (lstInchi.contains(inchi))
-                {
-                    synchronized(numtry)
-                    {
-                        numtry++;
-                    }
-                    continue;
-                }
-                else
-                {
-                    lstInchi.add(inchi);
-                    synchronized(numtry)
-                    {
-                        numtry = 0;
-                    }
-                }
-                */
-
-                // file extensions will be added later
-                String molName = "M" +
-                        GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                    GraphUtils.getUniqueMoleculeIndex());
-
-                int taskId = TaskUtils.getUniqueTaskIndex();
+                String molName = "M" + GenUtils.getPaddedString(
+                		DENOPTIMConstants.MOLDIGITS,
+                		GraphUtils.getUniqueMoleculeIndex());
 
                 String smiles = res[1].toString().trim();
                 IAtomContainer cmol = (IAtomContainer) res[2];
 
-                FTask task = new FTask(molName, molGraph, inchi, smiles, cmol,
-                                        genDir, taskId, molPopulation, numtry,
-                                        GAParameters.getUIDFileOut());
+                OffspringEvaluationTask task = new OffspringEvaluationTask(
+                        molName, molGraph, inchi, smiles, cmol, 
+                        genDir, molPopulation, numTries,
+                        GAParameters.getUIDFileOut());
                 submitted.add(task);
                 futures.add(tcons.submit(task));
             }
@@ -1112,14 +1154,14 @@ public class ParallelEvolutionaryAlgorithm
         }
 
 
-        if (numtry == MAX_TRIES)
+        if (numTries == MAX_TRIES)
         {
             stopRun();
 
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts.\n", numtry);
+                    "Unable to initialize molecules in {0} attempts.\n", numTries);
             throw new DENOPTIMException("Unable to initialize molecules in " +
-                            numtry + " attempts.");
+                            numTries + " attempts.");
         }
 
         molPopulation.trimToSize();
@@ -1130,15 +1172,15 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
-    private void cleanup(ThreadPoolExecutor tcons, List<Future<String>> futures,
-                            ArrayList<FTask> submitted)
+    private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
+                            ArrayList<OffspringEvaluationTask> submitted)
     {
-        for (Future f : futures)
+        for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (FTask tsk: submitted)
+        for (OffspringEvaluationTask tsk: submitted)
         {
             tsk.stopTask();
         }
@@ -1151,8 +1193,8 @@ public class ParallelEvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     private void cleanupCompleted(ThreadPoolExecutor tcons,
-                                  List<Future<String>> futures,
-                                      ArrayList<FTask> submitted)
+                                  List<Future<Object>> futures,
+                                      ArrayList<OffspringEvaluationTask> submitted)
     {
         ArrayList<Integer> completed = new ArrayList<>();
 

@@ -59,6 +59,7 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -73,6 +74,8 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
+import denoptim.threedim.TreeBuilder3D;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 /**
@@ -158,8 +161,10 @@ public class GUIGraphHandler extends GUICardPanel
 	private JPanel molViewerHeader;
 	private JPanel molViewerCardHolder;
 	private JPanel molViewerEmptyCard;
+	private JPanel molViewerNeedUpdateCard;
 	private final String NOFSCARDNAME = "noFSCard";
 	private final String EMPTYCARDNAME = "emptyCard";
+	private final String UPDATETOVIEW = "updateCard";
 	private final String MOLVIEWERCARDNAME = "molViewerCard";
 	private final String FRAGVIEWERCARDNAME = "fragViewerCard";
 	private GraphViewerPanel graphViewer;
@@ -212,6 +217,8 @@ public class GUIGraphHandler extends GUICardPanel
 	 * of compatible fragments
 	 */
 	private Map<Integer,Integer> genToLocIDMap;
+	
+	private boolean updateMolViewer = false;
 	
 //-----------------------------------------------------------------------------
 	
@@ -317,6 +324,14 @@ public class GUIGraphHandler extends GUICardPanel
 		molViewerEmptyCard.setToolTipText(molViewerToolTip);
 		molViewerCardHolder.add(molViewerEmptyCard, EMPTYCARDNAME);
 		
+		molViewerNeedUpdateCard = new JPanel();
+		String txt2b = "<html><body width='%1s'><center>Save changes to "
+				+ "update the molecular representation.</center>"
+				+ "</html>";
+		molViewerNeedUpdateCard.add(new JLabel(String.format(txt2b, 120)));
+		molViewerNeedUpdateCard.setToolTipText(molViewerToolTip);
+		molViewerCardHolder.add(molViewerNeedUpdateCard, UPDATETOVIEW);
+		
 		molViewer = new MoleculeViewPanel();
 		molViewer.enablePartialData(true);
 		molViewerCardHolder.add(molViewer, MOLVIEWERCARDNAME);
@@ -353,7 +368,8 @@ public class GUIGraphHandler extends GUICardPanel
 				String[] options = new String[]{"Build", "File", "Cancel"};
 				int res = JOptionPane.showOptionDialog(null,
 		                "<html>Please choose wherther to start creations "
-		                + "of a new graph, or import graph from file.</html>",
+		                + "of a new graph (Build), "
+		                + "or import graph from file.</html>",
 		                "Specify source of new graph",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
@@ -379,7 +395,7 @@ public class GUIGraphHandler extends GUICardPanel
 						break;
 					
 					case 1:
-						File inFile = DenoptimGUIFileOpener.pickFile();
+						File inFile = DenoptimGUIFileOpener.pickFile(btnAddGraph);
 						if (inFile == null 
 								|| inFile.getAbsolutePath().equals(""))
 						{
@@ -397,7 +413,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnGraphDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					removeCurrentdnGraph();
+					removeCurrentDnGraph();
 				} catch (DENOPTIMException e1) {
 					System.out.println("Exception while removing the current "
 							+ "graph:");
@@ -525,7 +541,19 @@ public class GUIGraphHandler extends GUICardPanel
 				+ "attachment point<html>");
 		btnAddVrtx.setEnabled(false);
 		btnAddVrtx.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {								
+			public void actionPerformed(ActionEvent e) {	
+				if (!hasFragSpace)
+				{
+					JOptionPane.showMessageDialog(null,
+			                "<html>No fragment space is currently "
+			                + "loaded!<br>"
+			                + "You must first load a fragment space before "
+			                + "trying to build graphs.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
 				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
@@ -538,22 +566,26 @@ public class GUIGraphHandler extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				else
-				{
-					extendGraphFromFragSpace(selAps);
-					
-					// Update viewer
-					loadDnGraphToViewer();
-					
-					// Protect edited system
-			        unsavedChanges = true;
-			        protectEditedSystem();
-				}
+				extendGraphFromFragSpace(selAps);
+				
+				// Update viewer
+				loadDnGraphToViewer(true);
+				
+				// Protect edited system
+		        unsavedChanges = true;
+		        protectEditedSystem();
+
+
+				// The molecular representation is updated when we save changes
+		        molViewer.clearAll();
+		        updateMolViewer = true;
+				((CardLayout) molViewerCardHolder.getLayout()).show(
+						molViewerCardHolder, UPDATETOVIEW);
 			}
 		});
 		
 		btnDelSel = new JButton("Remove");
-		btnDelSel.setToolTipText("<html>Removes all selected vertexes from "
+		btnDelSel.setToolTipText("<html>Removes the selected vertexes from "
 				+ "the system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!</html>");
 		btnDelSel.setEnabled(false);
@@ -571,20 +603,39 @@ public class GUIGraphHandler extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				else
-				{				
-					for (DENOPTIMVertex v : selVrtx)
+				
+				// Prevent removal of the scaffold
+				for (DENOPTIMVertex v : selVrtx)
+				{
+					if (v.getLevel() == -1)
 					{
-						dnGraph.removeVertex(v);
+						JOptionPane.showMessageDialog(null,
+								"<html>The scaffold cannot be removed."
+						        + "</html>",
+				                "Error",
+				                JOptionPane.ERROR_MESSAGE,
+				                UIManager.getIcon("OptionPane.errorIcon"));
+						return;
 					}
-					
-					// Update viewer
-					loadDnGraphToViewer();
-					
-			        // Protect the temporary "dnGraph" obj
-			        unsavedChanges = true;
-			        protectEditedSystem();
 				}
+				
+				for (DENOPTIMVertex v : selVrtx)
+				{
+					dnGraph.removeVertex(v);
+				}
+				
+				// Update viewer
+				loadDnGraphToViewer(true);
+				
+		        // Protect the temporary "dnGraph" obj
+		        unsavedChanges = true;
+		        protectEditedSystem();
+			
+				// The molecular representation is updated when we save changes
+		        molViewer.clearAll();
+		        updateMolViewer = true;
+				((CardLayout) molViewerCardHolder.getLayout()).show(
+						molViewerCardHolder, UPDATETOVIEW);
 			}
 		});
 		
@@ -703,15 +754,14 @@ public class GUIGraphHandler extends GUICardPanel
 		this.add(graphCtrlPane,BorderLayout.EAST);
 		
 		// Panel with buttons to the bottom of the frame
-		JPanel commandsPane = new JPanel();
+		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenGraphs = new JButton("Load Library of Graphs",
-					UIManager.getIcon("FileView.directoryIcon"));
+		btnOpenGraphs = new JButton("Load Library of Graphs");
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile();
+				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenGraphs);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -721,12 +771,11 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnOpenGraphs);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Graphs",
-				UIManager.getIcon("FileView.hardDriveIcon"));
+		JButton btnSaveFrags = new JButton("Save Library of Graphs");
 		btnSaveFrags.setToolTipText("Write all graphs to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.saveFile();
+				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null)
 				{
 					return;
@@ -738,7 +787,7 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				catch (Exception ex)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnSaveFrags,
 			                "Could not write to '" + outFile + "'!.",
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
@@ -906,9 +955,13 @@ public class GUIGraphHandler extends GUICardPanel
         {
         	if (bb instanceof DENOPTIMFragment)
         	{
-        		fragLib.add(((DENOPTIMFragment) bb).getIAtomContainer());
+        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+        	    frag.projectAPsToProperties();
+        		fragLib.add(frag.getIAtomContainer());
         	} else
         	{
+        	    System.out.println("WARNING: Using empty AtomContainer for a "
+        	            + "vertex that is not a fragment!");
         		//TODO deal with templates and other stuff
         		fragLib.add(new AtomContainer());
         	}
@@ -962,9 +1015,10 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraph.addVertex(scaffVertex);
 		
 		// Put the graph to the viewer
-		loadDnGraphToViewer();
+		loadDnGraphToViewer(false);
 		enableGraphDependentButtons(true);
 		unsavedChanges = true;
+		updateMolViewer = true;
         protectEditedSystem();
 	}
 	
@@ -1020,9 +1074,14 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add(((DENOPTIMFragment) bb).getIAtomContainer());
+		        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+		                frag.projectAPsToProperties();
+		        		fragLib.add(frag.getIAtomContainer());
 		        	} else
 		        	{
+		        	    System.out.println("WARNING: Using empty AtomContainer "
+		        	            + "for a "
+		                        + "vertex that is not a fragment!");
 		        		//TODO deal with templates and other stuff
 		        		fragLib.add(new AtomContainer());
 		        	}
@@ -1039,9 +1098,14 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		        	if (bb instanceof DENOPTIMFragment)
 		        	{
-		        		fragLib.add(((DENOPTIMFragment)bb).getIAtomContainer());
+		        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+		                frag.projectAPsToProperties();
+		        		fragLib.add(frag.getIAtomContainer());
 		        	} else
 		        	{
+		        	    System.out.println("WARNING: Using empty AtomContainer "
+		        	            + "for a "
+		                        + "vertex that is not a fragment!");
 		        		fragLib.add(new AtomContainer());
 		        	}
 		        }
@@ -1166,26 +1230,28 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 			else
 			{
-				IAtomContainer frg = null;
+				IAtomContainer iac = null;
 				try
 				{
 					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
 					        BBType.FRAGMENT,fragId);
 					if (bb instanceof DENOPTIMFragment)
 					{
-						frg = ((DENOPTIMFragment) bb).getIAtomContainer();
+					    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+		                frag.projectAPsToProperties();
+						iac = frag.getIAtomContainer();
 					} else {
 						//TODO deal with templates
-						frg = new AtomContainer();
+						iac = new AtomContainer();
 					}
-					frg.setProperty(PRESELPROP,apId);
+					iac.setProperty(PRESELPROP,apId);
 				}
 				catch (Throwable t)
 				{
 					continue;
 				}
 				genToLocIDMap.put(fragId,compatFrags.size());
-				compatFrags.add(frg);
+				compatFrags.add(iac);
 			}
 		}
 	}
@@ -1238,7 +1304,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Display the first
 		currGrphIdx = 0;
 		
-		loadCurrentGraphIdxToViewer();
+		loadCurrentGraphIdxToViewer(false);
 		updateGraphListSpinner();
 	}
 
@@ -1256,7 +1322,7 @@ public class GUIGraphHandler extends GUICardPanel
 				molLibrary.addAll(DenoptimIO.readMoleculeData(
 						file.getAbsolutePath()));
 			} catch (DENOPTIMException e) {
-				System.out.println("Could not read molecules from " + file);
+				System.out.println("WARNING: Could not read molecular representation from " + file);
 				for (int i=0; i<graphs.size(); i++)
 				{
 					molLibrary.add(new AtomContainer());
@@ -1266,7 +1332,7 @@ public class GUIGraphHandler extends GUICardPanel
 			// Display the first of the imported ones
 			currGrphIdx = oldSize;
 			
-			loadCurrentGraphIdxToViewer();
+			loadCurrentGraphIdxToViewer(false);
 			updateGraphListSpinner();
 		}
 	}
@@ -1371,7 +1437,7 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Loads the graph corresponding to the field {@link #currGrphIdx}
 	 */
-	private void loadCurrentGraphIdxToViewer()
+	private void loadCurrentGraphIdxToViewer(boolean keepSprites)
 	{
 		if (dnGraphLibrary == null)
 		{
@@ -1388,7 +1454,7 @@ public class GUIGraphHandler extends GUICardPanel
     	clearCurrentSystem();
     	
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
-		loadDnGraphToViewer();
+		loadDnGraphToViewer(keepSprites);
 		
 		if (molLibrary.get(currGrphIdx).getAtomCount() > 0)
 		{
@@ -1415,7 +1481,7 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void loadDnGraphToViewer()
+	private void loadDnGraphToViewer(boolean keepSprites)
 	{
 		if (fragViewer != null)
 		{
@@ -1426,7 +1492,12 @@ public class GUIGraphHandler extends GUICardPanel
 		graph = convertDnGraphToGSGraph(dnGraph);
 		
 		// Keep a snapshot of the old data visualized
-		oldGSStatus = graphViewer.getStatusSnapshot();
+		if (keepSprites)
+		{
+			oldGSStatus = graphViewer.getStatusSnapshot();
+		} else {
+			oldGSStatus = null;
+		}
 		
 		graphViewer.cleanup();
 		graphViewer.loadGraphToViewer(graph,oldGSStatus);
@@ -1536,6 +1607,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Get rid of currently loaded graph
 		dnGraph = null;
         graphViewer.cleanup();
+        //molViewer.clearAll();
 	}
 
 //-----------------------------------------------------------------------------
@@ -1598,7 +1670,7 @@ public class GUIGraphHandler extends GUICardPanel
 				return;
 			}
 			
-			fragViewer.loadFragImentToViewer(frag);
+			fragViewer.loadFragmentToViewer(frag);
 			((CardLayout) fragViewerCardHolder.getLayout()).show(
 					fragViewerCardHolder, FRAGVIEWERCARDNAME);
 		}
@@ -1634,7 +1706,7 @@ public class GUIGraphHandler extends GUICardPanel
         	//NB here we convert from 1-based index in GUI to 0-based index
         	currGrphIdx = ((Integer) graphNavigSpinner.getValue())
         			.intValue() - 1;
-        	loadCurrentGraphIdxToViewer();
+        	loadCurrentGraphIdxToViewer(false);
         }
 	}
 	
@@ -1672,13 +1744,13 @@ public class GUIGraphHandler extends GUICardPanel
 			fsParsForm = new FSParametersForm(this.getSize());
 			addToCentralPane(fsParsForm);
 			
-			this.btnDone.setText("Create Fragment Space");
-			this.btnDone.setToolTipText("<html>Uses the parameters defined "
+			btnDone.setText("Create Fragment Space");
+			btnDone.setToolTipText("<html>Uses the parameters defined "
 					+ "above to"
 					+ "<br> build a fragment space and make it available to"
 					+ "<br>the graph handler.</html>");
 			
-			this.btnDone.addActionListener(new ActionListener() {
+			btnDone.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {					
@@ -1703,7 +1775,7 @@ public class GUIGraphHandler extends GUICardPanel
 						msg = msg + "<br>Please alter the "
 								+ "settings and try again.</html>";
 								
-						JOptionPane.showMessageDialog(null, msg,
+						JOptionPane.showMessageDialog(btnDone, msg,
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
 				                UIManager.getIcon("OptionPane.errorIcon"));
@@ -1823,7 +1895,7 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
     
-    private void removeCurrentdnGraph() throws DENOPTIMException
+    private void removeCurrentDnGraph() throws DENOPTIMException
     {
     	// Clears the "dnGraph" and GUI components, but keep memory of the 
     	// status of the graph of an easy recovery, though since the old graph
@@ -1834,6 +1906,7 @@ public class GUIGraphHandler extends GUICardPanel
     	if (dnGraphLibrary.size()>0)
     	{
     		dnGraphLibrary.remove(currGrphIdx);
+    		molLibrary.remove(currGrphIdx);
     		int libSize = dnGraphLibrary.size();
     		
     		if (libSize > 0)
@@ -1848,7 +1921,7 @@ public class GUIGraphHandler extends GUICardPanel
 	    		}
 	
 	    		// We use the currGrphIdx to load another dnGraph
-		    	loadCurrentGraphIdxToViewer();
+		    	loadCurrentGraphIdxToViewer(true);
 		    	updateGraphListSpinner();
     		}
     		else
@@ -1857,6 +1930,8 @@ public class GUIGraphHandler extends GUICardPanel
     			//Spinner will be fixed by the deprotection routine
     			totalGraphsLabel.setText(Integer.toString(
     					dnGraphLibrary.size()));
+				((CardLayout) molViewerCardHolder.getLayout()).show(
+						molViewerCardHolder, EMPTYCARDNAME);
     			enableGraphDependentButtons(false);
     		}
     		deprotectEditedSystem();
@@ -1869,6 +1944,55 @@ public class GUIGraphHandler extends GUICardPanel
   	{	      		
   		// Overwrite dnGraph in library
   		dnGraphLibrary.set(currGrphIdx, dnGraph);
+  		
+  		if (updateMolViewer)
+  		{
+  			if (hasFragSpace)
+  			{
+	  			TreeBuilder3D tb = new TreeBuilder3D(
+	        			FragmentSpace.getScaffoldLibrary(),
+	        			FragmentSpace.getFragmentLibrary(),
+	        			FragmentSpace.getCappingLibrary());
+	            try {
+	                IAtomContainer mol = tb.convertGraphTo3DAtomContainer(
+	                		dnGraph);
+	            	DENOPTIMMoleculeUtils.removeRCA(mol,dnGraph);
+	                molLibrary.set(currGrphIdx, mol);
+	                mol.setProperty(DENOPTIMConstants.GMSGTAG,"ManuallyBuilt");
+	        	} catch (Throwable t) {
+	        		t.printStackTrace();
+	        		System.out.println("Couldn't make 3D-tree representation: "
+	        				+ t.getMessage());
+	        		molLibrary.set(currGrphIdx, new AtomContainer());
+	        	}
+	            
+	  			if (molLibrary.get(currGrphIdx).getAtomCount() > 0)
+	  			{
+	  			    try {
+	  					molViewer.loadChemicalStructure(molLibrary.get(
+	  							currGrphIdx));
+	  					((CardLayout) molViewerCardHolder.getLayout()).show(
+	  							molViewerCardHolder, MOLVIEWERCARDNAME);
+	  				} catch (Exception e) {
+	  					e.printStackTrace();
+	  					System.out.println("Could not read molecular data: "+
+	  							e.getCause() + " " + e.getMessage());
+	  					((CardLayout) molViewerCardHolder.getLayout()).show(
+	  							molViewerCardHolder, EMPTYCARDNAME);
+	  				}
+	  			}
+	  			else
+	  			{
+	  				System.out.println("No atoms in 3d-tree representation.");
+	  				((CardLayout) molViewerCardHolder.getLayout()).show(
+	  						molViewerCardHolder, EMPTYCARDNAME);
+	  			}
+  			} else {
+  				((CardLayout) molViewerCardHolder.getLayout()).show(
+  						molViewerCardHolder, EMPTYCARDNAME);
+  			}
+  			updateMolViewer = false;
+  		}
   		
   		// Release constraints
         deprotectEditedSystem();
@@ -1884,6 +2008,19 @@ public class GUIGraphHandler extends GUICardPanel
 	public boolean hasUnsavedChanges()
 	{
 		return unsavedChanges;
+	}
+
+//-----------------------------------------------------------------------------
+
+	/*
+	 * This is needed to stop GraphStream and Jmol threads upon closure of this
+	 * gui card.
+	 */
+	public void dispose() 
+	{
+		graphViewer.dispose();
+		fragViewer.dispose();
+		molViewer.dispose();
 	}
 		
 //-----------------------------------------------------------------------------

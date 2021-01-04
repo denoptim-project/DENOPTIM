@@ -8,9 +8,9 @@ DENOPTIM is cross-platform, i.e., runs on Windows, Linux, and MacOS, and comes w
 
 ## Usage
 ### Graphical User Interface
-The graphical user interface (GUI) of DENOPTIM facilitates the preparation and analysis of DENOPTIM experiments. After building the DENOPTIM package (see [Installation](#installation)), the GUI can be launched by double-click on the <code>$DENOPTIM_HOME/build/GUI.jar</code> (Win/Mac/Linux) file or using the following command (Mac/Linux):
+The graphical user interface (GUI) of DENOPTIM facilitates the preparation and analysis of DENOPTIM experiments. After building the DENOPTIM package (see [Installation](#installation)), the GUI can be launched by double-click on the <code>$DENOPTIM_HOME/build/DENOPTIM-GUI.jar</code> (Win/Mac/Linux) file or using the following command (Mac/Linux):
 
-    java -jar $DENOPTIM_HOME/build/GUI.jar
+    java -jar $DENOPTIM_HOME/build/DENOPTIM-GUI.jar
     
 where <code>$DENOPTIM_HOME</code> is the folder you have downloaded/cloned the DENOPTIM distribution.
 
@@ -54,13 +54,13 @@ The complete user manual is available under the <code>doc</code> folder and is a
 * [test](./test): contains some automated functionality tests and the published test case.
 
 ## Installation 
-PREREQUISITE: To install DENOPTIM you need Java (1.5 or above). You can get and install Java from www.oracle.com or http://openjdk.java.net/.
+PREREQUISITE: To install DENOPTIM you need Java JDK version 1.8. You can get and install Java from www.oracle.com, https://adoptopenjdk.net, or https://openjdk.java.net/.
 
 ### Installation (Windows)
 Building DENOPTIM in Windows is currently supported only for the GUI and requires Eclipse IDE (https://www.eclipse.org/). Download the latest release and import the DENOPTIM Java project. You can then run DENOPTIM's GUI as a Java application.
 
 ### Installation (Linux/MacOS)
-1. Check the prerequisite. If the following does not result in version statements or the version is too old (i.e., < 1.5), you should get and install Java from www.oracle.com or http://openjdk.java.net/:
+1. Check the prerequisite. If the following does not result in version statements or the version is not 1.8.xxx, you should get and install Java from www.oracle.com, https://adoptopenjdk.net, or http://openjdk.java.net/:
 
         java -version
         javac -version
@@ -111,6 +111,7 @@ Instead, libraries used by DENOPTIM programs are licensed according to their res
 * jfreechart: GNU Lesser General Public License 2.1
 * graphstream: GNU Lesser General Public License 3.0
 * junit: Eclipse Public License 2.0
+* javax.servlet: CDDL 1.1
 
 
 ## Cite DENOPTIM

@@ -52,7 +52,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	private static final long serialVersionUID = 4415462924969433010L;
 	
     /**
-     * Index of the graph building block contained in the vertex
+     * Index of the graph building block contained in the vertex. 
+     * This field differentiates a
+     * template from any other subclass of {@link DENOPTIMVertex}, and its name
+     * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
      */
     private int buildingBlockId = -99; //Initialised to meaningless value
 
@@ -724,7 +727,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
-        		//System.out.println("No property "+DENOPTIMConstants.APTAG);
         		continue;
             }
         	

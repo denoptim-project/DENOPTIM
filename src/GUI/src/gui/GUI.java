@@ -21,12 +21,23 @@ package gui;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
+import denoptim.task.StaticTaskManager;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Graphical User Interface of the DENOPTIM package.
@@ -60,6 +71,25 @@ public class GUI
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		// Hack to debug com.apple.laf.AquaLookAndFeel. Such LAF when combined 
+		// with "dark mode" (i.e., the system appearance where all windows have 
+		// dark colors) tries to change the appearance, but in not fully 
+		// self-consistent. For example, it sets the background 
+		// of the MenuBar components to a dark color, but does not adapt the
+		// foreground color accordingly. 
+		// Thus, the menu is unreadable because painter using
+		// dark grey font on black-ish background. To overcome this problem we
+		// set the foreground to a lighter shade of grey.
+		if (UIManager.getLookAndFeel().getClass().getName().equals(
+				"com.apple.laf.AquaLookAndFeel") && weRunOnMacDarkMode())
+		{
+			UIManager.getLookAndFeelDefaults().put("MenuBar.foreground", 
+					new Color(150,150,150));
+			UIManager.getLookAndFeelDefaults().put("TableHeader.background", 
+					new Color(200,200,200));
+		}
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -67,12 +97,44 @@ public class GUI
 					window.frame.pack();
 					window.frame.setLocationRelativeTo(null);
 					window.frame.setVisible(true);
+					window.frame.addWindowFocusListener(new WindowFocusListener() {
+						
+						@Override
+						public void windowLostFocus(WindowEvent e) {
+							StaticTaskManager.queueStatusBar.repaint();
+						}
+						
+						@Override
+						public void windowGainedFocus(WindowEvent e) {
+							StaticTaskManager.queueStatusBar.repaint();
+						}
+					});
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Checks if we are in dark mode.
+	 */
+	private static boolean weRunOnMacDarkMode()
+    {
+        try
+        {
+            final Process p = Runtime.getRuntime().exec(new String[] 
+            		{"defaults", "read", "-g", "AppleInterfaceStyle"});
+            p.waitFor(100, TimeUnit.MILLISECONDS);
+            return p.exitValue() == 0;
+        }
+        catch (Throwable ex)
+        {
+            return false;
+        }
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -112,7 +174,18 @@ public class GUI
 		menuBar.setRefToMainPanel(mainPanel);
 		menuBar.setRefToMasterGUI(this);
 		
-		mainPanel.add(new HomePanel(mainPanel));		
+		mainPanel.add(new HomePanel(mainPanel));
+		
+		// We instantiate also the task manager, even it it might not be used
+		// This is to pre-start the tasks and get a more reliable queue status
+		// at any given time after this point.
+		StaticTaskManager.getInstance();
+		
+		//Set the timing of tooltips
+		ToolTipManager.sharedInstance().setDismissDelay(6000);
+		ToolTipManager.sharedInstance().setInitialDelay(1000);
+		ToolTipManager.sharedInstance().setReshowDelay(100);
+		
 	}
 	
 //-----------------------------------------------------------------------------
@@ -122,13 +195,51 @@ public class GUI
 	 */
 	protected void closeIfAllSaved()
 	{
+		if (StaticTaskManager.hasActive())
+		{
+			String[] options = new String[]{"Yes, stop running tasks","No"};
+			int res = JOptionPane.showOptionDialog(null,
+					"<html>Found running tasks.<br>Do you want to "
+				            + "stop all running tasks?</html>",
+				    "Stop all?", 
+	                JOptionPane.YES_NO_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[1]);
+		    if (res == 1 || res == -1)
+		    {
+		    	return;
+		    }
+		}
+		
+    	try {
+			StaticTaskManager.stopAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+			String[] options = new String[]{"Yes, stop and close"};
+			int res = JOptionPane.showOptionDialog(null,
+					"<html>Problems killing the running tasks.<br>Will force "
+					+ "quit all tasks and shutdown.</html>",
+				    "Force quit", 
+	                JOptionPane.DEFAULT_OPTION,
+	                JOptionPane.QUESTION_MESSAGE,
+	                UIManager.getIcon("OptionPane.warningIcon"),
+	                options,
+	                options[0]);
+			Runtime.getRuntime().halt(0);
+		}
+    	
 		if (mainPanel.hasUnsavedChanges())
 		{
+			/*
+			//FOR SOME REASON USING HTML HERE PREVENTS DISPLAYING THE TEXT
+			"<html>Found unsaved changes.<br>Are you sure you want to "
+            + "close this window?</html>",
+            */
 			String[] options = new String[]{"Yes","No"};
-			int res = JOptionPane.showOptionDialog(frame,
-					"<html>Found unsaved changes.<br>Are you sure you want to "
-				            + "close this window?<html>",
-				            "Close Window?", 
+			int res = JOptionPane.showOptionDialog(null,"Found unsaved changes. Are you sure you want to close this window?",
+				    "Close Window?", 
 	                JOptionPane.DEFAULT_OPTION,
 	                JOptionPane.QUESTION_MESSAGE,
 	                UIManager.getIcon("OptionPane.warningIcon"),
@@ -136,12 +247,14 @@ public class GUI
 	                options[1]);
 		    if (res == 0)
 		    {
-		        System.exit(0);
+				Runtime.getRuntime().halt(0);
 		    }
 		}
 		else
 		{
-			System.exit(0);
+			//System.exit(0); //this will wait for synch locks to the released
+			// but here we want to really stop the JVM and kill all threads.
+			Runtime.getRuntime().halt(0);
 		}
 	}
 	
