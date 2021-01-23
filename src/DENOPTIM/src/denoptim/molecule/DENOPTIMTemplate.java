@@ -1,24 +1,14 @@
 package denoptim.molecule;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.MutationType;
 
-import org.apache.commons.math3.util.OpenIntToDoubleHashMap.Iterator;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
@@ -59,7 +49,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * template from any other subclass of {@link DENOPTIMVertex}, and its name
      * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
      */
-    private DENOPTIMGraph embeddedGraph = new DENOPTIMGraph();
+    private DENOPTIMGraph innerGraph = new DENOPTIMGraph();
 
     /**
      * Denotes the constants in the template. It can take values from 0 to 2 and each level promises to uphold the
@@ -68,7 +58,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     //TODO-V3: make enum
     private int contractLevel = 0;
-    private List<DENOPTIMAttachmentPoint> exteriorAPs;
+
+    private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
+
+    private Map<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> outerToInnerAPs;
 
 //------------------------------------------------------------------------------
 
@@ -166,9 +159,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         vrtx2.addAP(0,1,1);
         vrtx2.addAP(1,1,1);
 
-        template.embeddedGraph.addVertex(vrtx);
-        template.embeddedGraph.addVertex(vrtx2);
-        template.embeddedGraph.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
+        template.innerGraph.addVertex(vrtx);
+        template.innerGraph.addVertex(vrtx2);
+        template.innerGraph.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
                 vrtx2.getAP(1), BondType.SINGLE));
         
         //Fully frozen
@@ -224,13 +217,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 1, BBType.FRAGMENT);
-        template.embeddedGraph.addVertex(vA);
-        template.embeddedGraph.addVertex(vB);
+        template.innerGraph.addVertex(vA);
+        template.innerGraph.addVertex(vB);
         
         // Make and add a fully defined edge that connects the two vertexes
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 1);
 
-        template.embeddedGraph.addEdge(eAB);
+        template.innerGraph.addEdge(eAB);
         
         /*
         System.out.println("TEMPLATE's APs: ");
@@ -289,18 +282,18 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMVertex vH6 = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
         
-        template.embeddedGraph.addVertex(vA);
-        template.embeddedGraph.addVertex(vB);
-        template.embeddedGraph.addVertex(vC);
-        template.embeddedGraph.addVertex(vD);
-        template.embeddedGraph.addVertex(vRCV1);
-        template.embeddedGraph.addVertex(vRCV2);
-        template.embeddedGraph.addVertex(vH1);
-        template.embeddedGraph.addVertex(vH2);
-        template.embeddedGraph.addVertex(vH3);
-        template.embeddedGraph.addVertex(vH4);
-        template.embeddedGraph.addVertex(vH5);
-        template.embeddedGraph.addVertex(vH6);
+        template.innerGraph.addVertex(vA);
+        template.innerGraph.addVertex(vB);
+        template.innerGraph.addVertex(vC);
+        template.innerGraph.addVertex(vD);
+        template.innerGraph.addVertex(vRCV1);
+        template.innerGraph.addVertex(vRCV2);
+        template.innerGraph.addVertex(vH1);
+        template.innerGraph.addVertex(vH2);
+        template.innerGraph.addVertex(vH3);
+        template.innerGraph.addVertex(vH4);
+        template.innerGraph.addVertex(vH5);
+        template.innerGraph.addVertex(vH6);
         
         DENOPTIMEdge eARcv = vA.connectVertices(vRCV1, 3, 0);
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 3);
@@ -315,25 +308,25 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMEdge eAH5 = vA.connectVertices(vH5, 2, 0);
         DENOPTIMEdge eCH6 = vC.connectVertices(vH6, 2, 0);
         
-        template.embeddedGraph.addEdge(eARcv);
-        template.embeddedGraph.addEdge(eAB);
-        template.embeddedGraph.addEdge(eBC);
-        template.embeddedGraph.addEdge(eCD);
-        template.embeddedGraph.addEdge(eDRcv);
-        template.embeddedGraph.addEdge(eAH1);
-        template.embeddedGraph.addEdge(eBH2);
-        template.embeddedGraph.addEdge(eCH3);
-        template.embeddedGraph.addEdge(eDH4);
-        template.embeddedGraph.addEdge(eAH5);
-        template.embeddedGraph.addEdge(eCH6);
+        template.innerGraph.addEdge(eARcv);
+        template.innerGraph.addEdge(eAB);
+        template.innerGraph.addEdge(eBC);
+        template.innerGraph.addEdge(eCD);
+        template.innerGraph.addEdge(eDRcv);
+        template.innerGraph.addEdge(eAH1);
+        template.innerGraph.addEdge(eBH2);
+        template.innerGraph.addEdge(eCH3);
+        template.innerGraph.addEdge(eDH4);
+        template.innerGraph.addEdge(eAH5);
+        template.innerGraph.addEdge(eCH6);
         
         DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
                 Arrays.asList(vRCV1, vA, vB, vC, vD, vRCV2)));
-        template.embeddedGraph.addRing(r);
+        template.innerGraph.addRing(r);
         
 
       //TODO-M7 del
-        System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+template.embeddedGraph);
+        System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+template.innerGraph);
         
         /*
         System.out.println("(F) TEMPLATE's inner graph: "+template.interiorGraph);
@@ -344,10 +337,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         */
         
         //TODO-M7 del
-        template.embeddedGraph.renumberGraphVertices();
+        template.innerGraph.renumberGraphVertices();
         
       //TODO-M7 del
-        System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.embeddedGraph);
+        System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.innerGraph);
 
         
         template.freezeTemplate();
@@ -376,7 +369,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
     {
-        return embeddedGraph.getAvailableAPs();
+        return innerGraph.getAvailableAPs();
     }
 
 //------------------------------------------------------------------------------
@@ -405,27 +398,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
     
     //TODO: this will probably change, now it is useful for debugging
-    public DENOPTIMGraph getEmbeddedGraph()
+    public DENOPTIMGraph getInnerGraph()
     {
-        return embeddedGraph;
+        return innerGraph;
     }
-    
-//-----------------------------------------------------------------------------
-    
-    protected void setInteriorGraph(DENOPTIMGraph graph) 
-    {
-        //TODO-V3 is this condition really sensible?
-        if (!graph.getAvailableAPs().containsAll(exteriorAPs)) 
-        {
-            throw new IllegalArgumentException("Graph must have vacant APs " +
-                    "same as exteriorAPs");
-        }
-    }
-    
+
 //-----------------------------------------------------------------------------
 
-    protected void setExteriorAPs(List<DENOPTIMAttachmentPoint> exteriorAPs) {
-        this.exteriorAPs = exteriorAPs;
+    public void setInnerGraph(DENOPTIMGraph innerGraph) {
+        this.innerGraph = innerGraph;
     }
 
 //-----------------------------------------------------------------------------
@@ -433,7 +414,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        return embeddedGraph.getAttachmentPoints();
+        ArrayList<DENOPTIMAttachmentPoint> aps = new ArrayList<>();
+        aps.addAll(requiredAPs);
+        aps.addAll(getInnerGraph().getAvailableAPs());
+        return aps;
     }
     
 //-----------------------------------------------------------------------------
@@ -484,7 +468,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public int getHeavyAtomsCount()
     {
-        return embeddedGraph.getHeavyAtomsCount();
+        return innerGraph.getHeavyAtomsCount();
     }
 
 //-----------------------------------------------------------------------------
@@ -492,7 +476,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public boolean containsAtoms()
     {
-        return embeddedGraph.containsAtoms();
+        return innerGraph.containsAtoms();
     }
 
 //-----------------------------------------------------------------------------
@@ -502,7 +486,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         try
         {
-            return GraphConversionTool.convertGraphToMolecule(embeddedGraph, true);
+            return GraphConversionTool.convertGraphToMolecule(innerGraph, true);
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
@@ -535,7 +519,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             
             default:
             {
-                for (DENOPTIMVertex v : embeddedGraph.gVertices)
+                for (DENOPTIMVertex v : innerGraph.gVertices)
                 {
                     set.addAll(v.getMutationSites());
                 }
@@ -544,8 +528,18 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         return set;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
+    /**
+     * Add ap to the list of required APs on this template
+     * @param ap attachment point to require from this template
+     */
+    @Override
+    public void addAP(DENOPTIMAttachmentPoint ap) {
+        ap.setOwner(this);
+        requiredAPs.add(ap);
+    }
+
 }
 

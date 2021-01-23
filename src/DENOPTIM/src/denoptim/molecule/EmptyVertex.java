@@ -39,8 +39,8 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     private static final long serialVersionUID = 1L;
 
-    /*
-     * attachment points on this vertex
+    /**
+     * Attachment points on this vertex
      */
     private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
 

@@ -28,8 +28,13 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.RandomUtils;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,39 +46,74 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DENOPTIMTemplateTest
 {
-    private static DENOPTIMAttachmentPoint testAP = null;
 
-    //TODO-V3: reactivate
-    //@BeforeAll
-    public static void SetUpClass() {
-        EmptyVertex dummyVertex = new EmptyVertex();
-        dummyVertex.addAP(0, 1, 1);
-        testAP = dummyVertex.getAP(0);
-    }
-	
-//------------------------------------------------------------------------------
-
-/*
     @Test
-    public void testSomething() throws Exception
-    {
+    public void testGetAttachmentPointsReturnsAPsWithTemplateAsOwner() {
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        template.addAP(0, 1, 1);
+        EmptyVertex v = new EmptyVertex();
+        v.addAP(0, 1, 1);
+        DENOPTIMGraph innerGraph = new DENOPTIMGraph();
+        innerGraph.addVertex(v);
+        template.setInnerGraph(innerGraph);
 
+        int totalAPCount = 2;
+        for (int i = 0; i < totalAPCount; i++) {
+            DENOPTIMVertex actualOwner = template.getAttachmentPoints().get(i)
+                    .getOwner();
+            assertEquals(template, actualOwner);
+        }
     }
-*/
-    
+
 //------------------------------------------------------------------------------
 
+    @Test
+    public void testGetAttachmentPointsReturnsCorrectNumberOfAPs() {
+        // Prevents nullpointer exception later
+        RandomUtils.initialiseRNG(13);
 
-    //TODO-V3: complete and reactivate
-    //@Test
-    public void testIfInteriorGraphDoesNotHaveVacantAPsEqualToExteriorAPsThrowIAE() {
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
-        List<DENOPTIMAttachmentPoint> exteriorAPs = new ArrayList<>();
-        exteriorAPs.add(testAP);
-        template.setExteriorAPs(exteriorAPs);
-        DENOPTIMGraph g = new DENOPTIMGraph();
-        assertThrows(IllegalArgumentException.class,
-                () -> template.setInteriorGraph(g)
-        );
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        int templateAPCount = 2;
+        for (int i = 0; i < templateAPCount; i++) {
+            template.addAP(0, 1, 1);
+        }
+        EmptyVertex v1 = new EmptyVertex();
+        int v1APCount = 3;
+        for (int i = 0; i < v1APCount; i++) {
+            v1.addAP(0, 1, 1);
+        }
+        EmptyVertex v2 = new EmptyVertex();
+        int v2APCount = 2;
+        for (int i = 0; i < v2APCount; i++) {
+            v2.addAP(0, 1, 1);
+        }
+        v1.connectVertices(v2);
+        DENOPTIMGraph innerGraph = new DENOPTIMGraph();
+        innerGraph.addVertex(v1);
+        innerGraph.addVertex(v2);
+        template.setInnerGraph(innerGraph);
+
+        // -2 since 2 APs are used to connect v1 and v2.
+        int expectedAPCount = templateAPCount + v1APCount + v2APCount - 2;
+        int actualAPCount = template.getAttachmentPoints().size();
+        assertEquals(expectedAPCount, actualAPCount);
+    }
+
+//------------------------------------------------------------------------------
+
+    @Ignore // "Unfinished test"
+    public void testSetInnerGraphThrowsIllegalArgExcIfRequiredAPsNotPresentOnGraph() throws DENOPTIMException {
+        IAtomContainer singleCarbon = new AtomContainer();
+        singleCarbon.addAtom(new Atom("C"));
+        DENOPTIMFragment v1 = new DENOPTIMFragment(singleCarbon,
+                BBType.FRAGMENT);
+
+        IAtomContainer singleNitrogen = new AtomContainer();
+        singleNitrogen.addAtom(new Atom("N"));
+        DENOPTIMFragment v2 = new DENOPTIMFragment(singleNitrogen,
+                BBType.FRAGMENT);
+
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+
     }
 }

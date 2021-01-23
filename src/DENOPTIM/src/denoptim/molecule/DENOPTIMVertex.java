@@ -199,6 +199,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     protected void addAttachmentPoint(DENOPTIMAttachmentPoint ap)
     {
+        ap.setOwner(this);
         getAttachmentPoints().add(ap);
     }
     
@@ -652,8 +653,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         // select random APs - these are the indices in the list
         MersenneTwister rng = RandomUtils.getRNG();
 
-        //int iA = apA.get(GAParameters.getRNG().nextInt(apA.size()));
-        //int iB = apB.get(GAParameters.getRNG().nextInt(apB.size()));
+        // int iA = apA.get(GAParameters.getRNG().nextInt(apA.size()));
+        // int iB = apB.get(GAParameters.getRNG().nextInt(apB.size()));
         int iA = apA.get(rng.nextInt(apA.size()));
         int iB = apB.get(rng.nextInt(apB.size()));
 
@@ -753,6 +754,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     */
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections) {
         addAP(atomPositionNumber, atomConnections, apConnections,
@@ -764,7 +771,14 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     //TODO-V3. This method creates an empty APClass, which is not supposed to
     // exist. It must be possible to define an AP without an APClass!
     // This has to change!
-    
+    /**
+     * Constructor
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param dirVec the AP direction vector end (the beginning at the coords
+     *               of the source atom). This must array have 3 entries.
+     */
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, double[] dirVec) {
         try {
@@ -777,6 +791,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param apClass the APClass
+     */
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, APClass apClass) {
         addAP(atomPositionNumber, atomConnections, apConnections,
@@ -785,6 +806,15 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param dirVec the AP direction vector end (the beginning at the coords
+     *               of the source atom). This must array have 3 entries.
+     * @param apClass the APClass
+     */
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, double[] dirVec, APClass apClass) {
 
