@@ -54,14 +54,16 @@ public class FitnessProviderTest
     			+ "ZagrebIndexDescriptor");
     	classNames.add("org.openscience.cdk.qsar.descriptors.molecular."
     			+ "AtomCountDescriptor");
-		DescriptorEngine engine = new DescriptorEngine(classNames);
+		DescriptorEngine engine = new DescriptorEngine(classNames,null);
 		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
     	
-    	List<DescriptorForFitness> descriptors = new ArrayList<DescriptorForFitness>();
+    	List<DescriptorForFitness> descriptors = 
+    	        new ArrayList<DescriptorForFitness>();
     	for (int i=0; i<iDescs.size(); i++)
     	{
     		IDescriptor iDesc = iDescs.get(i);
-    		DescriptorForFitness dv = new DescriptorForFitness(iDesc.getDescriptorNames()[0],
+    		DescriptorForFitness dv = new DescriptorForFitness(
+    		        iDesc.getDescriptorNames()[0],
     				classNames.get(i), iDesc, 0);
     		descriptors.add(dv);
     	}
@@ -91,14 +93,16 @@ public class FitnessProviderTest
     			+ "ZagrebIndexDescriptor");
     	classNames.add("org.openscience.cdk.qsar.descriptors.molecular."
     			+ "AtomCountDescriptor");
-		DescriptorEngine engine = new DescriptorEngine(classNames);
+		DescriptorEngine engine = new DescriptorEngine(classNames,null);
 		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
     	
-    	List<DescriptorForFitness> descriptors = new ArrayList<DescriptorForFitness>();
+    	List<DescriptorForFitness> descriptors = 
+    	        new ArrayList<DescriptorForFitness>();
     	for (int i=0; i<iDescs.size(); i++)
     	{
     		IDescriptor iDesc = iDescs.get(i);
-    		DescriptorForFitness dv = new DescriptorForFitness(iDesc.getDescriptorNames()[0],
+    		DescriptorForFitness dv = new DescriptorForFitness(
+    		        iDesc.getDescriptorNames()[0],
     				classNames.get(i), iDesc, 0);
     		descriptors.add(dv);
     	}

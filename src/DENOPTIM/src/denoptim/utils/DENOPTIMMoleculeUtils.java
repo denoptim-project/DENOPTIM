@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.Collections;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -40,26 +41,23 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 
+import net.sf.jniinchi.INCHI_RET;
+
 import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.smiles.SmiFlavor;
 import org.openscience.cdk.smiles.SmilesGenerator;
-import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.inchi.InChIGeneratorFactory;
 import org.openscience.cdk.inchi.InChIGenerator;
-
-import net.sf.jniinchi.INCHI_RET;
-
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.ringsearch.AllRingsFinder;
-import org.openscience.cdk.geometry.GeometryTools;
+import org.openscience.cdk.geometry.GeometryUtil;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.AtomRef;
+import org.openscience.cdk.PseudoAtom;
+import org.openscience.cdk.aromaticity.Kekulization;
+import org.openscience.cdk.config.IsotopeFactory;
+import org.openscience.cdk.config.Isotopes;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.interfaces.IMoleculeSet;
-import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.ringsearch.SSSRFinder;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.result.IntegerResult;
@@ -80,12 +78,12 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
-//TODO del if writing of failing molecule is not made systematic
 
 /**
  * Utilities for molecule conversion
@@ -94,16 +92,17 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
  */
 public class DENOPTIMMoleculeUtils
 {
-    private static final StructureDiagramGenerator SDG = new StructureDiagramGenerator();
-    private static final SmilesParser SMPARSER =
-                    new SmilesParser(DefaultChemObjectBuilder.getInstance());
-    private static final SmilesGenerator SMGEN = new SmilesGenerator(true);
+    private static final StructureDiagramGenerator SDG = 
+            new StructureDiagramGenerator();
+    private static final SmilesGenerator SMGEN = new SmilesGenerator(
+            SmiFlavor.Generic);
     private static final DummyAtomHandler DATMHDLR = new DummyAtomHandler(
 					      DENOPTIMConstants.DUMMYATMSYMBOL);
 
 //------------------------------------------------------------------------------
 
-    public static double getMolecularWeight(IAtomContainer mol) throws DENOPTIMException
+    public static double getMolecularWeight(IAtomContainer mol) 
+            throws DENOPTIMException
     {
         double ret_wd = 0;
         try
@@ -111,13 +110,58 @@ public class DENOPTIMMoleculeUtils
             WeightDescriptor wd = new WeightDescriptor();
             Object[] pars = {"*"};
             wd.setParameters(pars);
-            ret_wd = ((DoubleResult) wd.calculate(mol).getValue()).doubleValue();
+            ret_wd = ((DoubleResult) wd.calculate(mol).getValue())
+                    .doubleValue();
         }
         catch (Exception ex)
         {
             throw new DENOPTIMException(ex);
         }
         return ret_wd;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check element symbol corresponds to real element of Periodic Table
+     * @param atom to check.
+     * @return <code>true</code> if the element symbol correspond to an atom
+     * in the periodic table.
+     */
+
+    public static boolean isElement(IAtom atom)
+    {
+        String symbol = atom.getSymbol();
+        return isElement(symbol);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check element symbol corresponds to real element of Periodic Table
+     * @param symbol of the element to check
+     * @return <code>true</code> if the element symbol correspond to an atom
+     * in the periodic table.
+     */
+
+    public static boolean isElement(String symbol)
+    {
+        boolean res = false;
+        IsotopeFactory ifact = null;
+        try {
+            ifact = Isotopes.getInstance();
+            if (ifact.isElement(symbol))
+            {
+                @SuppressWarnings("unused")
+                IElement el = ifact.getElement(symbol);
+                res = true;
+            }
+        } catch (Throwable t) {
+            System.out.println("ERROR! Unable to create IsotopeFactory "
+                                        + " (in AtomUtils.getAtomicNumber)");
+            System.exit(-1);;
+        }
+        return res;
     }
 
 //------------------------------------------------------------------------------
@@ -136,6 +180,9 @@ public class DENOPTIMMoleculeUtils
             Set<String> rcaElSymbols = DENOPTIMConstants.RCATYPEMAP.keySet();
             for (String rcaEl : rcaElSymbols)
             {
+                //TODO-M9 del
+                    System.out.println("Atom "+a+"is "+a.getClass().getName());
+                
                 if (a.getSymbol().equals(rcaEl))
                 {
                     isRca = true;
@@ -192,10 +239,8 @@ public class DENOPTIMMoleculeUtils
             DENOPTIMVertex vT = rings.get(0).getTailVertex();
             IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
             IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
-            int iSrcH = mol.getAtomNumber(
-                            mol.getConnectedAtomsList(aH).get(0));
-            int iSrcT = mol.getAtomNumber(
-                        mol.getConnectedAtomsList(aT).get(0));
+            int iSrcH = mol.indexOf(mol.getConnectedAtomsList(aH).get(0));
+            int iSrcT = mol.indexOf(mol.getConnectedAtomsList(aT).get(0));
             atmsToRemove.add(aH);
             atmsToRemove.add(aT);
 
@@ -216,7 +261,7 @@ public class DENOPTIMMoleculeUtils
         // remove used RCAs
         for (IAtom a : atmsToRemove)
         {
-            mol.removeAtomAndConnectedElectronContainers(a);
+            mol.removeAtom(a);
         }
 
         // convert remaining PseudoAtoms to H
@@ -253,27 +298,13 @@ public class DENOPTIMMoleculeUtils
         String smiles = "";
         try
         {
-            AllRingsFinder arf = new AllRingsFinder();
-            arf.findAllRings(fmol);
-            SMGEN.setRingFinder(arf);
-            smiles = SMGEN.createSMILES(fmol);
-        }
-        catch (CDKException cdke)
-        {
-            if (cdke.getMessage().contains("Timeout for AllringsFinder exceeded"))
-            {
-                return null;
-            }
-            else
-            {
-               throw new DENOPTIMException(cdke);
-            }
+            smiles = SMGEN.create(fmol);
         }
         catch (Throwable t)
         {
         	String fileName = System.getProperty("user.dir") 
         		+ System.getProperty("file.separator") 
-        		+ "moldeule_causing_failure.sdf";
+        		+ "failed_generation_of_SMILES.sdf";
         	System.out.println("WARNING: Skipping calculation of SMILES. See "
         			+ "file '" + fileName + "'");
         	DenoptimIO.writeMolecule(fileName,fmol,false);
@@ -296,7 +327,6 @@ public class DENOPTIMMoleculeUtils
     public static IAtomContainer generate2DCoordinates(IAtomContainer ac)
                                                     throws DENOPTIMException
     {
-
         IAtomContainer fmol = new AtomContainer();
         try 
         { 
@@ -307,23 +337,22 @@ public class DENOPTIMMoleculeUtils
             throw new DENOPTIMException(e);
         }
 
-        // remove Dummy atoms before generating the inchi
+        // remove Dummy atoms
         fmol = DATMHDLR.removeDummyInHapto(fmol);
 
-        // remove PseudoAtoms
+        // remove ring-closing attractors
         removeRCA(fmol);
 
         // Generate 2D structure diagram (for each connected component).
         IAtomContainer ac2d = new AtomContainer();
-        IMoleculeSet som = ConnectivityChecker.partitionIntoMolecules(fmol);
+        IAtomContainerSet som = ConnectivityChecker.partitionIntoMolecules(
+                fmol);
 
-        SDG.setUseTemplates(true);
-
-        for (int n = 0; n < som.getMoleculeCount(); n++)
+        for (int n = 0; n < som.getAtomContainerCount(); n++)
         {
             synchronized (SDG)
             {
-                IMolecule mol = som.getMolecule(n);
+                IAtomContainer mol = som.getAtomContainer(n);
                 SDG.setMolecule(mol, true);
                 try
                 {
@@ -339,8 +368,8 @@ public class DENOPTIMMoleculeUtils
                 ac2d.add(mol);  // add 2D molecule.
             }
         }
-
-        return GeometryTools.has2DCoordinates(ac2d) ? ac2d : null;
+        
+        return GeometryUtil.has2DCoordinates(ac2d) ? ac2d : null;
     }
 
 //------------------------------------------------------------------------------
@@ -382,8 +411,8 @@ public class DENOPTIMMoleculeUtils
             INCHI_RET ret = gen.getReturnStatus();
             if (ret == INCHI_RET.WARNING)
             {
-                String error = gen.getMessage();
-                // InChI generated, but with warning message
+                //String error = gen.getMessage();
+                //InChI generated, but with warning message
                 //return new ObjectPair(null, error);
             }
             else if (ret != INCHI_RET.OKAY)
@@ -420,8 +449,9 @@ public class DENOPTIMMoleculeUtils
         int value;
         try
         {
-            IMolecularDescriptor descriptor = new RotatableBondsCountDescriptor();
-            descriptor.setParameters(new Object[]{Boolean.FALSE});
+            IMolecularDescriptor descriptor = 
+                    new RotatableBondsCountDescriptor();
+            descriptor.setParameters(new Object[]{Boolean.FALSE,Boolean.FALSE});
             DescriptorValue result = descriptor.calculate(mol);
             value = ((IntegerResult)result.getValue()).intValue();
         }
@@ -430,18 +460,6 @@ public class DENOPTIMMoleculeUtils
             throw new DENOPTIMException(cdke);
         }
         return value;
-    }
-
-//------------------------------------------------------------------------------
-    /**
-     * Calculates the rings in the molecule
-     * @param mol The molecule
-     * @return the set of rings
-     */
-    public static IRingSet getRingsInMolecule(IAtomContainer mol)
-    {
-        SSSRFinder sssrFinder = new SSSRFinder(mol);
-        return sssrFinder.findSSSR();
     }
 
 //------------------------------------------------------------------------------
@@ -495,7 +513,7 @@ public class DENOPTIMMoleculeUtils
             if (vertIDs.contains(vID))
             {
                 DENOPTIMVertex v = vertLst.get(vertIDs.indexOf(vID));
-                int atmID = mol.getAtomNumber(atm);
+                int atmID = mol.indexOf(atm);
                 if (map.containsKey(v))
                 {
                     map.get(v).add(atmID);
@@ -525,7 +543,7 @@ public class DENOPTIMMoleculeUtils
     {
         IAtomContainer iac = mol;
 
-        if (!GeometryTools.has2DCoordinates(mol))
+        if (!GeometryUtil.has2DCoordinates(mol))
         {
             iac = generate2DCoordinates(mol);
         }
@@ -540,14 +558,16 @@ public class DENOPTIMMoleculeUtils
             int WIDTH = 400;
             int HEIGHT = 400;
             
-            GeometryTools.scaleMolecule(iac, 0.9);
-            GeometryTools.translateAllPositive(iac);
+            GeometryUtil.scaleMolecule(iac, 0.9);
+            GeometryUtil.translateAllPositive(iac);
             // the draw area and the image should be the same size
             Rectangle drawArea = new Rectangle(WIDTH, HEIGHT);
-            Image image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
+            Image image = new BufferedImage(WIDTH, HEIGHT, 
+                    BufferedImage.TYPE_4BYTE_ABGR);
 
             // generators make the image elements
-            ArrayList<IGenerator<IAtomContainer>> generators = new ArrayList<>(); 
+            ArrayList<IGenerator<IAtomContainer>> generators = 
+                    new ArrayList<>(); 
             generators.add(new BasicSceneGenerator());
             generators.add(new BasicBondGenerator());
             generators.add(new BasicAtomGenerator());
@@ -562,7 +582,8 @@ public class DENOPTIMMoleculeUtils
             model.set(BasicBondGenerator.BondWidth.class, 2.0);            
             model.set(BasicAtomGenerator.ShowExplicitHydrogens.class, false);
             model.set(BasicAtomGenerator.AtomRadius.class, 0.5);
-            model.set(BasicAtomGenerator.CompactShape.class, BasicAtomGenerator.Shape.OVAL);
+            model.set(BasicAtomGenerator.CompactShape.class, 
+                    BasicAtomGenerator.Shape.OVAL);
 
             // the call to 'setup' only needs to be done on the first paint
             renderer.setup(iac, drawArea);
@@ -578,7 +599,8 @@ public class DENOPTIMMoleculeUtils
             
 
             // the paint method also needs a toolkit-specific renderer
-            renderer.paint(iac, new AWTDrawVisitor(g), new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
+            renderer.paint(iac, new AWTDrawVisitor(g), 
+                    new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
             g.dispose();
 
             ImageIO.write((RenderedImage)image, "PNG", new File(filename));
@@ -616,7 +638,112 @@ public class DENOPTIMMoleculeUtils
         }
         return p;
     }
+    
+//------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
+    /**
+     * Sets zero implicit hydrogen count to all atoms.
+     * @param iac the container to process
+     */
+    public static void setZeroImplicitHydrogensToAllAtoms(IAtomContainer iac)
+    {
+        for (IAtom atm : iac.atoms()) {
+            atm.setImplicitHydrogenCount(0);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets bond order = single to all otherwise unset bonds.
+     * @param iac the container to process
+     */
+    
+    public static void ensureNoUnsetBondOrders(IAtomContainer iac)
+    {
+        try {
+            Kekulization.kekulize(iac);
+        } catch (CDKException e) {
+            DENOPTIMLogger.appLogger.log(Level.WARNING, "Kekulization failed. "
+                    + "Bond orders will be unreliable.");
+        }
+        
+        for (IBond bnd : iac.bonds())
+        {
+            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+            {
+                bnd.setOrder(IBond.Order.SINGLE);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method that constructs an atom that reflect the same atom given as 
+     * parameter in terms of element symbol (or label, for pseudoatoms)
+     * and Cartesian coordinates.
+     * @param oAtm
+     * @return the copy of the original
+     */
+    public static IAtom makeSameAtomAs(IAtom oAtm)
+    {
+        IAtom nAtm = null;
+        String s = getSymbolOrLabel(oAtm);
+        if (DENOPTIMMoleculeUtils.isElement(oAtm))
+        {
+            nAtm = new Atom(s);
+        } else {
+            nAtm = new PseudoAtom(s);
+        }
+        if (oAtm.getPoint3d() != null)
+        {
+            Point3d p3d = oAtm.getPoint3d();
+            nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
+        }
+        return nAtm;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets either the elemental symbol (for standard atoms) of the label (for
+     * pseudoatoms). Other classes implementing IAtom are not considered.
+     * This method is a response to the change from CDK-1.* to CDK-2.*. 
+     * In the old CDK-1.* the getSymbol() method of IAtom would return the label 
+     * for a PseudoAtom, but this behaviour is not retained in newer versions.
+     * @param atm
+     * @return either the element symbol of the label
+     */
+    public static String getSymbolOrLabel(IAtom atm)
+    {
+        String s = "none";
+        if (DENOPTIMMoleculeUtils.isElement(atm))
+        {
+            s = atm.getSymbol();
+        } else {
+            //TODO: one day will account for the possibility of having any 
+            // other implementation of IAtom
+            IAtom a = null;
+            if (atm instanceof AtomRef) 
+            {
+                a = ((AtomRef) atm).deref();
+                if (a instanceof PseudoAtom)
+                {
+                    s = ((PseudoAtom) a).getLabel();
+                } else {
+                    // WARNING: we fall back to standard behaviour, but there
+                    // could still be cases where this is not good...
+                    s = a.getSymbol();
+                }
+            } else if (atm instanceof PseudoAtom)
+            {
+                s = ((PseudoAtom) atm).getLabel();
+            }
+        }       
+        return s;
+    }
+
+//------------------------------------------------------------------------------
 
 }

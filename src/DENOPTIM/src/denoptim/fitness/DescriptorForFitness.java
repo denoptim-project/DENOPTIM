@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
 
@@ -187,7 +188,7 @@ public class DescriptorForFitness
 		sb.append(", varName:").append(varNames);		
 		sb.append(", className:").append(className);
 		sb.append(", resultId:").append(resultId);
-		DescriptorSpecification specs = implementation.getSpecification();
+		IImplementationSpecification specs = implementation.getSpecification();
 		sb.append(", specReference:").append(
 				specs.getSpecificationReference());
 		sb.append(", implTitle:").append(

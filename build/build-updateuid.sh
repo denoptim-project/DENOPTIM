@@ -3,7 +3,7 @@
 # Building UpdateUID
 
 find ../src/UpdateUID/src/ -name *.java > javafiles.txt
-javac -cp lib/cdk-1.4.19.jar:lib/commons-cli-1.3.1.jar @javafiles.txt -encoding utf-8 -d .
+javac -cp lib/cdk-2.3.jar:lib/commons-cli-1.3.1.jar @javafiles.txt -encoding utf-8 -d .
 
 if [ "$?" != "0" ]; then
     rm javafiles.txt
@@ -16,7 +16,7 @@ rm javafiles.txt
 
 echo "Manifest-Version: 1.0" > manifest.mf
 echo "Main-Class: updateuid.UpdateUID" >> manifest.mf
-echo "Class-Path: lib/cdk-1.4.19.jar lib/commons-cli-1.3.1.jar" >> manifest.mf
+echo "Class-Path: lib/cdk-2.3.jar lib/commons-cli-1.3.1.jar" >> manifest.mf
 echo >> manifest.mf
 
 jar cvfm UpdateUID.jar manifest.mf updateuid 

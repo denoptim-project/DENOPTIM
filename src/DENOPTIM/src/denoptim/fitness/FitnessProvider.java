@@ -1,7 +1,6 @@
 package denoptim.fitness;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +10,12 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.VariableResolver;
 
 import org.apache.commons.el.ExpressionEvaluatorImpl;
+import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.qsar.DescriptorEngine;
-import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IAtomPairDescriptor;
 import org.openscience.cdk.qsar.IAtomicDescriptor;
@@ -27,16 +27,13 @@ import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IDescriptorResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
-import org.openscience.cdk.smiles.smarts.parser.SMARTSParser;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ManySMARTSQuery;
-import denoptim.utils.ObjectPair;
 
 /**
  * DENOPTIM's (internal) fitness provider class calculates CDK descriptors for a 
@@ -90,13 +87,13 @@ public class FitnessProvider
 		}
 		
 		// Now we instatiate new instances of the descriptors implementations
-		engine = new DescriptorEngine(classnames);
+		engine = new DescriptorEngine(classnames,null);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();
 		for (int i=0; i<this.descriptors.size(); i++)
 		{
 			this.descriptors.get(i).implementation = newInstances.get(i);
 		}
-        List<DescriptorSpecification> newSpecs = 
+        List<IImplementationSpecification> newSpecs = 
         		engine.getDescriptorSpecifications();
 		engine.setDescriptorInstances(newInstances);
 	    engine.setDescriptorSpecifications(newSpecs);
@@ -153,7 +150,7 @@ public class FitnessProvider
         	String descName = descriptor.shortName;
         	if (debug) System.out.println("Working on descriptor '"+descName+"'");
         	
-        	DescriptorSpecification descSpec = 
+        	IImplementationSpecification descSpec = 
         			engine.getDescriptorSpecifications().get(i);
         	
         	// Identify specific atom and bonds
@@ -183,8 +180,7 @@ public class FitnessProvider
         		}
         	}
         	
-        	Map<String,List<List<Integer>>> allMatches = 
-        			new HashMap<String,List<List<Integer>>>();
+        	Map<String, Mappings> allMatches = new HashMap<String, Mappings>();
         	if (smarts.size() != 0)
         	{
 	        	ManySMARTSQuery msq = new ManySMARTSQuery(iac, smarts);
@@ -216,7 +212,7 @@ public class FitnessProvider
         	} else if (desc instanceof IAtomicDescriptor) {
         		for (String varName : descriptor.getVariableNames())
         		{
-        			List<List<Integer>> hits = allMatches.get(varName);
+        			Mappings hits = allMatches.get(varName);
         			if (hits==null)
         			{
         				String msg = "No hits for SMARTS of " + varName + ": "
@@ -226,7 +222,7 @@ public class FitnessProvider
         				continue;
         			}
         			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
-        			if (hits.size() > 1)
+        			if (hits.count() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
         						+ varName + ". Taking average of all values.";
@@ -234,9 +230,9 @@ public class FitnessProvider
         			}
         			int valCounter = -1;
         			List<Double> vals = new ArrayList<Double>();
-                    for (List<Integer> singleMatch : hits)
+                    for (int[] singleMatch : hits)
                     {
-                    	if (singleMatch.size()!=1)
+                    	if (singleMatch.length != 1)
                     	{
                     		String msg = "Multiple entries in a single hit "
                     				+ "with SMARTS identifier for "
@@ -262,7 +258,7 @@ public class FitnessProvider
         	} else if (desc instanceof IBondDescriptor) {
         		for (String varName : descriptor.getVariableNames())
         		{
-        			List<List<Integer>> hits = allMatches.get(varName);
+        			Mappings hits = allMatches.get(varName);
         			if (hits==null)
         			{
         				String msg = "No hits for SMARTS of " + varName + ": "
@@ -272,7 +268,7 @@ public class FitnessProvider
         				continue;
         			}
         			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
-        			if (hits.size() > 1)
+        			if (hits.count() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
         						+ varName + ". Taking average of all values.";
@@ -280,9 +276,9 @@ public class FitnessProvider
         			}
         			int valCounter = -1;
         			List<Double> vals = new ArrayList<Double>();
-                    for (List<Integer> singleMatch : hits)
+                    for (int[] singleMatch : hits)
                     {
-                    	if (singleMatch.size() != 2)
+                    	if (singleMatch.length != 2)
                     	{
                     		String msg = "Number of entries is != 2 for a "
                     				+ "single hit with SMARTS identifier for "
@@ -290,8 +286,8 @@ public class FitnessProvider
             						+ "with this.";
                     		throw new DENOPTIMException(msg);
                     	}
-                    	IBond bnd = iac.getBond(iac.getAtom(singleMatch.get(0)),
-                    			iac.getAtom(singleMatch.get(1)));
+                    	IBond bnd = iac.getBond(iac.getAtom(singleMatch[0]),
+                    			iac.getAtom(singleMatch[1]));
                     	value = (DescriptorValue) bnd.getProperty(descSpec);
 		        		double val = processValue(descName, descriptor, 
 		        					 desc, descSpec, value, varName, iac);
@@ -351,7 +347,7 @@ public class FitnessProvider
 	 */
 	private double processValue(String descName, DescriptorForFitness descriptor,
 			IDescriptor implementation, 
-			DescriptorSpecification descSpec, DescriptorValue value,
+			IImplementationSpecification descSpec, DescriptorValue value,
 			String varName, IAtomContainer iac) throws Exception 
 	{
        	if (value == null)

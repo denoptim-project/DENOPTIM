@@ -28,6 +28,8 @@ import javax.vecmath.Point3d;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.AtomRef;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -184,19 +186,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         
-        //TODO-V3 get rid of serialization-based deep copying
-        //this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
-        
         this.mol = new AtomContainer();
         for (IAtom oAtm : mol.atoms())
         {
-            IAtom nAtm = new Atom(oAtm.getSymbol());
-            if (oAtm.getPoint3d() != null)
-            {
-                Point3d p3d = oAtm.getPoint3d();
-                nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
-            }
+            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm);
+            
             //TODO-V3 we might need to get more...
+            
             this.mol.addAtom(nAtm);
         }
         
