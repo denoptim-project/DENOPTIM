@@ -68,6 +68,7 @@ import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.font.AWTFontManager;
@@ -98,6 +99,8 @@ public class DENOPTIMMoleculeUtils
             SmiFlavor.Generic);
     private static final DummyAtomHandler DATMHDLR = new DummyAtomHandler(
 					      DENOPTIMConstants.DUMMYATMSYMBOL);
+    private static final  IChemObjectBuilder builder = 
+            SilentChemObjectBuilder.getInstance();
 
 //------------------------------------------------------------------------------
 
@@ -180,10 +183,7 @@ public class DENOPTIMMoleculeUtils
             Set<String> rcaElSymbols = DENOPTIMConstants.RCATYPEMAP.keySet();
             for (String rcaEl : rcaElSymbols)
             {
-                //TODO-M9 del
-                    System.out.println("Atom "+a+"is "+a.getClass().getName());
-                
-                if (a.getSymbol().equals(rcaEl))
+                if (DENOPTIMMoleculeUtils.getSymbolOrLabel(a).equals(rcaEl))
                 {
                     isRca = true;
                     break;
@@ -279,7 +279,7 @@ public class DENOPTIMMoleculeUtils
 
     public static String getSMILESForMolecule(IAtomContainer mol)
             throws DENOPTIMException {
-        IAtomContainer fmol = new AtomContainer();
+        IAtomContainer fmol = builder.newAtomContainer();
         try 
         {
             fmol = mol.clone();
@@ -327,7 +327,7 @@ public class DENOPTIMMoleculeUtils
     public static IAtomContainer generate2DCoordinates(IAtomContainer ac)
                                                     throws DENOPTIMException
     {
-        IAtomContainer fmol = new AtomContainer();
+        IAtomContainer fmol = builder.newAtomContainer();
         try 
         { 
             fmol = ac.clone();
@@ -344,7 +344,7 @@ public class DENOPTIMMoleculeUtils
         removeRCA(fmol);
 
         // Generate 2D structure diagram (for each connected component).
-        IAtomContainer ac2d = new AtomContainer();
+        IAtomContainer ac2d = builder.newAtomContainer();
         IAtomContainerSet som = ConnectivityChecker.partitionIntoMolecules(
                 fmol);
 
@@ -383,7 +383,7 @@ public class DENOPTIMMoleculeUtils
 
     public static ObjectPair getInchiForMolecule(IAtomContainer mol)
             throws DENOPTIMException {
-        IAtomContainer fmol = new AtomContainer();
+        IAtomContainer fmol = builder.newAtomContainer();
         try 
         { 
             fmol = mol.clone();

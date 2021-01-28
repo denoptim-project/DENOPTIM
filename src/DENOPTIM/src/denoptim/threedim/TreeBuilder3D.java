@@ -36,6 +36,8 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -77,12 +79,12 @@ public class TreeBuilder3D
     /**
      * The DENOPTIMGraph representation of the current system
      */
-    private DENOPTIMGraph graph = new DENOPTIMGraph();
+    private DENOPTIMGraph graph;
 
     /**
      * The molecular representation 
      */
-    private IAtomContainer mol = new AtomContainer();
+    private IAtomContainer mol;
 
     /**
      * Map of roto-translated <code>DENOPTIMAttachmentPoint</code>
@@ -114,6 +116,11 @@ public class TreeBuilder3D
      * Flag to ensure syncronization between fields
      */
     private boolean conversionCompleted = false;
+    
+    /**
+     * Private builder of atom containers
+     */
+    private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 
     /**
      * Debug flag
@@ -128,6 +135,8 @@ public class TreeBuilder3D
 
     public TreeBuilder3D()
     {
+        this.graph = new DENOPTIMGraph();
+        this.mol = builder.newAtomContainer();
         this.libScaff =  FragmentSpace.getScaffoldLibrary();
         this.libFrag =  FragmentSpace.getFragmentLibrary();
         this.libCap =  FragmentSpace.getCappingLibrary();
@@ -143,6 +152,7 @@ public class TreeBuilder3D
                          ArrayList<DENOPTIMVertex> libFrag,
                          ArrayList<DENOPTIMVertex> libCap)
     {
+        this();
         this.libScaff = libScaff;
         this.libFrag = libFrag;
         this.libCap = libCap;
@@ -392,7 +402,7 @@ public class TreeBuilder3D
         {
             String file = "iacTree.sdf";
             System.out.println("Writing tree-like IAtomContainer to " + file);
-            IAtomContainer cmol = new AtomContainer();
+            IAtomContainer cmol = builder.newAtomContainer();
             try
             {
                 cmol = mol.clone();
@@ -557,7 +567,7 @@ public class TreeBuilder3D
             System.err.println("Incoming IAC #atoms: "+inFragOri.getAtomCount());
         }
         
-        IAtomContainer inFrag = new AtomContainer();
+        IAtomContainer inFrag = builder.newAtomContainer();
         try
         {
             inFrag = (IAtomContainer) inFragOri.clone();
@@ -910,7 +920,7 @@ public class TreeBuilder3D
     public void clean()
     {
         this.graph = new DENOPTIMGraph();
-        this.mol = new AtomContainer();
+        this.mol = builder.newAtomContainer();
         this.apsPerVertexId =
                       new HashMap<Integer,ArrayList<DENOPTIMAttachmentPoint>>();
         this.apsPerEdge =

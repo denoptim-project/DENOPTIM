@@ -201,14 +201,15 @@ public class FitnessProvider
         	if (desc instanceof IMolecularDescriptor)
         	{
         		// The value might be an array, but the DescriptorForFitness
-        		// known which entry to take, and for each entry the descName
+        		// knows which entry to take, and for each entry the descName
         		// is unique. Thus, no loop here.
         		value = (DescriptorValue) iac.getProperty(descSpec);
         		double val = processValue(descName, descriptor, desc, descSpec, 
         				value, descName, iac);
         		valuesMap.put(descName, val);
                 iac.setProperty(descName,val);
-                iac.getProperties().remove(descSpec);
+                //TODO-M9 remove? why was this here. Commenting it out make t2b pass
+                //iac.getProperties().remove(descSpec);
         	} else if (desc instanceof IAtomicDescriptor) {
         		for (String varName : descriptor.getVariableNames())
         		{

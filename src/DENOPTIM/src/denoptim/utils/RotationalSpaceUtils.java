@@ -28,9 +28,11 @@ import java.io.FileReader;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.silent.RingSet;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -51,6 +53,8 @@ import denoptim.logging.DENOPTIMLogger;
 
 public class RotationalSpaceUtils  
 {
+    private static final  IChemObjectBuilder builder = 
+            SilentChemObjectBuilder.getInstance();
 
     /**
      * Verbosity level
@@ -97,7 +101,7 @@ public class RotationalSpaceUtils
 
         // We'll use SMARTS so get rid of pseudoatoms that can create problems
 	    // We'll use this modified IAtomContainer only when dealing with SMARTS
-        IAtomContainer locMol = new AtomContainer();
+        IAtomContainer locMol = builder.newAtomContainer();
         try {
             locMol = mol.clone();
         } catch (Throwable t) {

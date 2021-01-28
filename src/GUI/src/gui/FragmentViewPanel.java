@@ -53,8 +53,10 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.modeling.builder3d.ModelBuilder3D;
 import org.openscience.cdk.modeling.builder3d.TemplateHandler3D;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -519,7 +521,8 @@ public class FragmentViewPanel extends JSplitPane
 	private IAtomContainer getStructureFromJmolViewer() 
 			throws DENOPTIMException
 	{
-		IAtomContainer mol = new AtomContainer();
+	    IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+		IAtomContainer mol = builder.newAtomContainer();
 		
 		String strData = getDataFromJmol();
 		if (strData.trim().equals(""))

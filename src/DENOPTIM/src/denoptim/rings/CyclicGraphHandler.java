@@ -31,6 +31,8 @@ import org.openscience.cdk.Bond;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.graph.PathTools;
 import org.openscience.cdk.graph.matrix.TopologicalMatrix;
@@ -1465,7 +1467,8 @@ public class CyclicGraphHandler
         }
 
         // Get a working copy of the molecular container
-        IAtomContainer mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer mol = builder.newAtomContainer();
         try
         {
             mol = inMol.clone();

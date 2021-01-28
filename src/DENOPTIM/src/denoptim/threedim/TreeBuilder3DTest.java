@@ -31,6 +31,7 @@ import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
@@ -67,8 +68,8 @@ public class TreeBuilder3DTest
         APClass am0 = APClass.make("ATminus:0");
         
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
-    	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
-    	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 0.0, 0.0}));
+    	IAtom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	IAtom a2 = new Atom("C", new Point3d(new double[]{1.0, 0.0, 0.0}));
     	frg1.addAtom(a1);
     	frg1.addAtom(a2);
     	frg1.addBond(new Bond(a1, a2));
@@ -77,26 +78,26 @@ public class TreeBuilder3DTest
     	frg1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment frg2 = new DENOPTIMFragment();
-    	Atom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	IAtom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	frg2.addAtom(a3);
     	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	frg2.addAP(0, b0, new Point3d(new double[]{0.0, -1.0, -1.0}), 1);   
     	frg2.projectAPsToProperties(); 
 
     	DENOPTIMFragment rca1 = new DENOPTIMFragment();
-    	Atom a4 = new Atom("ATP", new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	IAtom a4 = new PseudoAtom("ATP", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	rca1.addAtom(a4);
     	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	rca1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment rca2 = new DENOPTIMFragment();
-    	Atom a5 = new Atom("ATM", new Point3d(new double[]{1.0, 0.0, 0.0}));
+    	IAtom a5 = new PseudoAtom("ATM", new Point3d(new double[]{1.0, 0.0, 0.0}));
     	rca2.addAtom(a5);
     	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	rca2.projectAPsToProperties(); 
     	
     	DENOPTIMFragment cap = new DENOPTIMFragment();
-    	Atom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	IAtom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	cap.addAtom(a6);
     	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
     	cap.projectAPsToProperties(); 

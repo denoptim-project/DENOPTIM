@@ -33,6 +33,8 @@ import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -147,7 +149,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         super();
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
-        this.mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
     }
     
 //------------------------------------------------------------------------------
@@ -162,7 +165,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         super(vertexId);
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
-        this.mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
     }
     
 //-----------------------------------------------------------------------------
@@ -186,7 +190,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         
-        this.mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
+        
         for (IAtom oAtm : mol.atoms())
         {
             IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm);

@@ -34,6 +34,9 @@ import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObject;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -757,24 +760,25 @@ public class DENOPTIMGraphTest {
 	public void testRemoveCapping() throws Exception {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 
-		IAtomContainer iac1 = new AtomContainer();
+		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+		IAtomContainer iac1 = builder.newAtomContainer();
 		iac1.addAtom(new Atom("C"));
 		DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
 		v1.addAP(1, 1, 1);
 		v1.addAP(1, 1, 1);
 
-		IAtomContainer iac2 = new AtomContainer();
+		IAtomContainer iac2 = builder.newAtomContainer();
 		iac2.addAtom(new Atom("O"));
 		DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
 		v2.addAP(1, 1, 1);
 		v2.addAP(1, 1, 1);
 
-		IAtomContainer iac3 = new AtomContainer();
+		IAtomContainer iac3 = builder.newAtomContainer();
 		iac3.addAtom(new Atom("H"));
 		DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
 		v3.addAP(1, 1, 1);
 
-		IAtomContainer iac4 = new AtomContainer();
+		IAtomContainer iac4 = builder.newAtomContainer();
 		iac4.addAtom(new Atom("H"));
 		DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
 		v4.addAP(1, 1, 1);
@@ -803,24 +807,24 @@ public class DENOPTIMGraphTest {
 
 		DENOPTIMGraph graph2 = new DENOPTIMGraph();
 
-		IAtomContainer iac12 = new AtomContainer();
+		IAtomContainer iac12 = builder.newAtomContainer();
 		iac12.addAtom(new Atom("C"));
 		DENOPTIMVertex v21 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
 		v21.addAP(0, 1, 1);
 		v21.addAP(0, 1, 1);
 
-		IAtomContainer iac22 = new AtomContainer();
+		IAtomContainer iac22 = builder.newAtomContainer();
 		iac22.addAtom(new Atom("O"));
 		DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
 		v22.addAP(0, 1, 1);
 		v22.addAP(0, 1, 1);
 
-		IAtomContainer iac23 = new AtomContainer();
+		IAtomContainer iac23 = builder.newAtomContainer();
 		iac23.addAtom(new Atom("H"));
 		DENOPTIMVertex v23 = new DENOPTIMFragment(23, iac23, BBType.CAP);
 		v23.addAP(0, 1, 1);
 
-		IAtomContainer iac24 = new AtomContainer();
+		IAtomContainer iac24 = builder.newAtomContainer();
 		iac24.addAtom(new Atom("H"));
 		DENOPTIMVertex v24 = new DENOPTIMFragment(24, iac24, BBType.CAP);
 		v24.addAP(0, 1, 1);

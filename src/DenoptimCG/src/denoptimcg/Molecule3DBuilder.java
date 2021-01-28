@@ -34,8 +34,10 @@ import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.silent.RingSet;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -139,7 +141,8 @@ public class Molecule3DBuilder
     public Molecule3DBuilder()
     {
         this.molGraph = new DENOPTIMGraph();
-        this.fmol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.fmol = builder.newAtomContainer();
         this.tmol = new TinkerMolecule();
         this.attractors = new ArrayList<RingClosingAttractor>();
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
@@ -156,10 +159,10 @@ public class Molecule3DBuilder
      * Constructs a <code>Molecule3DBuilder</code> specifying all its features
      * @param molGraph the graph representation
      * @param fmol the CDK molecular representation
-     * @param tmol the intermal coordinates representation
+     * @param tmol the internal coordinates representation
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
-     * indeces)
+     * indexes)
      * @param attractors all the ring closing attractors (RCA)
      * @param attToAtmID the correspondence between RCA and atom index
      * @param allRCACombs all combinations of compatible pairs of RCAs

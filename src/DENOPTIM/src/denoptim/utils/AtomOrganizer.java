@@ -33,6 +33,8 @@ import org.openscience.cdk.Bond;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 
@@ -99,7 +101,8 @@ public class AtomOrganizer
      */
     public IAtomContainer reorderStartingFrom(int seed, IAtomContainer mol)
             throws DENOPTIMException {
-        AtomContainer newMol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer newMol = builder.newAtomContainer();
         int flag = getFreeAtomsFlag(mol);
 
         //find new order of atoms using starting from 'seed'

@@ -115,19 +115,22 @@ public class FitnessProviderTest
         
         // The descriptors values must be already in the mol properties map
         Map<Object, Object> props = mol.getProperties();
-        assertEquals(3,props.size(),"Number of properties in processed mol");
+        // 6 ptops: title, descpSpec, descSpec, Zagreb val, nAtom val, fitness
+        assertEquals(6,props.size(),"Number of properties in processed mol");
         List<Object> keys = new ArrayList<Object>();
         for (Object k : props.keySet()) 
         {
         	keys.add(k);
         }
-        if (props.get(keys.get(0)).toString().equals("10.0"))
+        String snFirts = descriptors.get(0).getShortName();
+        String snSecond = descriptors.get(1).getShortName();
+        if (props.get(snFirts).toString().equals("10.0"))
         {
-        	assertEquals("12.0",props.get(keys.get(1)).toString(), 
+        	assertEquals("12.0",props.get(snSecond).toString(), 
         			"Unexpected descriptor value (A)");
-        } else if (props.get(keys.get(1)).toString().equals("10.0"))
+        } else if (props.get(snSecond).toString().equals("10.0"))
         {
-        	assertEquals("10.0",props.get(keys.get(0)).toString(), 
+        	assertEquals("10.0",props.get(snFirts).toString(), 
         			"Unexpected descriptor value (B)");
         } else {
         	assertTrue(false, "Unexpected descriptor value (C)");
