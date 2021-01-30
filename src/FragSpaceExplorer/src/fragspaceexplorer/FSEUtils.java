@@ -204,7 +204,8 @@ public class FSEUtils
         String indexFile = getNameOfStorageIndexFile(level);
         String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
                            + rootId + " " + nextIds;
-        SingletonFileAccess.getInstance().serializeToFile(fileSer,graph,true);
+        
+        SingletonFileAccess.getInstance().writeData(fileSer,graph.toJson(),true);
         SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
     }
 

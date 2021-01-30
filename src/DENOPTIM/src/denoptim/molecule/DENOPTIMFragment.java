@@ -57,8 +57,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	
     /**
      * Index of the graph building block contained in the vertex. 
-     * This field differentiates a
-     * template from any other subclass of {@link DENOPTIMVertex}, and its name
+     * This field differentiates a fragment
+     * from any other subclass of {@link DENOPTIMVertex}, and its name
      * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
      */
     private int buildingBlockId = -99; //Initialised to meaningless value

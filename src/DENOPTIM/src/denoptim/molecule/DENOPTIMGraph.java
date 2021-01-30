@@ -847,7 +847,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             vClone.setLevel(vOrig.getLevel());
             cListVrtx.add(vClone);
             vidsInClone.put(vClone.getVertexId(),vClone);
-        }   
+        }
         
         ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<>();
         for (DENOPTIMEdge e : gEdges)
@@ -856,7 +856,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             int srcApId = this.getVertexWithId(srcVrtxId).getIndexOfAP(
                     e.getSrcAP());
             
-
             int trgVrtxId = e.getTrgVertex();
             int trgApId = this.getVertexWithId(trgVrtxId).getIndexOfAP(
                     e.getTrgAP());
@@ -3176,6 +3175,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             // Refresh reference and connection counts in all APs
             for (DENOPTIMVertex v : graph.gVertices)
             {
+                // Regenerate reference to fragment owner
+                v.setGraphOwner(graph);
+                
                 for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
                 {
                     // Regenerate reference to AP owner
@@ -3235,28 +3237,67 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, 
                 JsonDeserializationContext context) throws JsonParseException 
         {
-            
             JsonObject jsonObject = json.getAsJsonObject();
 
             if (jsonObject.has("embeddedGraph")) 
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE Template " 
-                + jsonObject.get("vertexId"));
+                        + jsonObject.get("vertexId"));
                 return context.deserialize(jsonObject, DENOPTIMTemplate.class);
             }
             else if (jsonObject.has("buildingBlockId")) 
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE Fragment " 
-                + jsonObject.get("vertexId"));
-                return context.deserialize(jsonObject, DENOPTIMFragment.class);
+                        + jsonObject.get("vertexId"));
+                
+                //TODO-V3: serialize AtomContainer2 somehow (as an SDF string?)
+                
+                // The serialized fragment does NOT include its molecular
+                // representation, which cannot be serialized (so far...)
+                DENOPTIMFragment frag = context.deserialize(jsonObject, 
+                        DENOPTIMFragment.class);
+                
+                // The solution, for now, is to rebuild the fragment from the 
+                // library, and attach to it the serialized data
+                DENOPTIMVertex fragWithMol;
+                try
+                {
+                    fragWithMol = FragmentSpace.getVertexFromLibrary(
+                            frag.getFragmentType(), frag.getMolId());
+                } catch (DENOPTIMException e)
+                {
+                    throw new JsonParseException("Could not get fragment from "
+                            + "library");
+                }
+                ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
+                for (SymmetricSet ss : frag.getSymmetricAPSets())
+                {
+                    cLstSymAPs.add(ss.clone());
+                }
+                fragWithMol.setMutationTypes(frag.getMutationTypes());
+                fragWithMol.setSymmetricAPSets(cLstSymAPs);
+                fragWithMol.setAsRCV(frag.isRCV());
+                fragWithMol.setVertexId(frag.getVertexId());
+                fragWithMol.setLevel(frag.getLevel());
+                for (int iap=0; iap<frag.getNumberOfAP(); iap++)
+                {
+                    DENOPTIMAttachmentPoint oriAP = frag.getAP(iap);
+                    DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
+                    newAP.setID(oriAP.getID());
+                }
+                
+                // WARNING: other fields, such as 'owner' and AP 'user' are
+                // recovered upon deserializing the graph containing this vertex
+                
+                return fragWithMol;
             }
             else 
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE EmptyVertex " 
-                + jsonObject.get("vertexId"));
+                        + jsonObject.get("vertexId"));
                 return context.deserialize(jsonObject, EmptyVertex.class);
             }
         }

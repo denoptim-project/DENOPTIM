@@ -20,6 +20,7 @@ package denoptim.io;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -66,6 +67,10 @@ public class DenoptimIOTest {
 
 	@Test
 	public void testSerializeDeserializeDENOPTIMGraphs() throws Exception {
+	    assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String serFile = tempDir.getAbsolutePath() + SEP + "graph.ser";
+        String jsonFile = tempDir.getAbsolutePath() + SEP + "graph.json";
+        
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graph);
@@ -110,15 +115,16 @@ public class DenoptimIOTest {
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
 				new ArrayList<>(Arrays.asList(6, 7))));
 
-		String tmpFile = DenoptimIO.getTempFolder()
-				+ System.getProperty("file.separator") + "_unit.ser";
-		DenoptimIO.serializeToFile(tmpFile, graph, false);
-
-		DENOPTIMGraph graphA = DenoptimIO.deserializeDENOPTIMGraph(
-				new File(tmpFile));
-
-		StringBuilder reason = new StringBuilder();
-		assertTrue(graph.sameAs(graphA, reason));
+		DenoptimIO.serializeToFile(serFile, graph, false);
+        DENOPTIMGraph graphA = DenoptimIO.deserializeDENOPTIMGraph(
+                new File(serFile));
+        StringBuilder reason = new StringBuilder();
+        assertTrue(graph.sameAs(graphA, reason));
+        
+		DenoptimIO.writeData(jsonFile, graph.toJson(), false);
+		DENOPTIMGraph graphJ = DenoptimIO.readGraphFromJSON(new File(jsonFile));
+		assertNotNull(graphJ,"Graph read from JSON file is null");
+		assertTrue(graph.sameAs(graphJ, reason));
 	}
 
 //------------------------------------------------------------------------------

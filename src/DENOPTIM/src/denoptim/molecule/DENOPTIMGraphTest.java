@@ -28,18 +28,26 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
@@ -50,6 +58,11 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
  */
 
 public class DENOPTIMGraphTest {
+    
+    private final String APRULE = "MyRule";
+    private final String APSUBRULE = "1";
+    private final String APCLASS = APRULE
+            + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 
 //------------------------------------------------------------------------------
 	@Test
@@ -872,7 +885,45 @@ public class DENOPTIMGraphTest {
 
 	@Test
 	public void testFromToJSON() throws Exception {
-    DENOPTIMGraph graph = new DENOPTIMGraph();
+	    DENOPTIMGraph graph = new DENOPTIMGraph();
+	    
+	    //TODO-V3 del: cannot do this without defining a fragment space
+	    /*
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMFragment v0 = new DENOPTIMFragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        v0.addAtom(a1);
+        v0.addAtom(a2);
+        v0.addAtom(a3);
+        v0.addBond(new Bond(a1, a2));
+        v0.addBond(new Bond(a2, a3));
+        v0.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v0.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v0.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v0.addAP(a1, APClass.make(APCLASS), 
+                new Point3d(new double[]{3.0, 0.0, 3.3}));
+        
+        ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
+        ssaps.add(new SymmetricSet(new ArrayList<Integer>(
+                Arrays.asList(0,1,2))));
+        v0.setSymmetricAPSets(ssaps);
+        v0.setVertexId(18);
+        v0.setLevel(26);
+        v0.setAsRCV(true);
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
+        graph.addVertex(v0);
+        */
+        
         DENOPTIMVertex v0 = new EmptyVertex(0);
         buildVertexAndConnectToGraph(v0, 3, graph);
 
@@ -926,8 +977,7 @@ public class DENOPTIMGraphTest {
 //	              + " 0_1_0_0, 4_1_1_0, 7_1_1_0]] "
 //	              + "SymmetricSet [symVrtxIds=[3, 5]] "
 //	              + "SymmetricSet [symVrtxIds=[6, 7]]";
-	    
-
+        
         String json1 = graph.toJson();
         
         DENOPTIMGraph g2 = DENOPTIMGraph.fromJson(json1);
@@ -937,10 +987,9 @@ public class DENOPTIMGraphTest {
         /*
         System.out.println("1:" + graph.toString());
         System.out.println("2:" + g2.toString());
-        assertTrue(graph.toString().equals(g2.toString()), "Roun-trip via JSON and toString.");
+        assertTrue(graph.toString().equals(g2.toString()), "Round-trip via JSON and toString.");
         */
         
-        assertTrue(json1.equals(json2), "Round-trip via JSON is successful"); 
-
+        assertTrue(json1.equals(json2), "Round-trip via JSON is successful");
 	}
 }
