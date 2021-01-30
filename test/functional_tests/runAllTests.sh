@@ -134,64 +134,64 @@ cd "$wDir"
 #
 # t1: use DenoptimCG to build funny molecules.
 #
-runTest "t1"
+#RErunTest "t1"
 
 #
 # t2: parallel combinatorial builder from given root (default format: STRING)
 #
-runTest "t2"
+#RErunTest "t2"
 
 #
 # t2a: combinatorial builder forces to build a specific graph
 # This is meant to quickly indentify misfunctioning handing of potential cycles)
 #
-runTest "t2a"
+#RErunTest "t2a"
 
 #
 # t2b: t2 with internal fitness evaluation
 #
-runTest "t2b"
+#RErunTest "t2b"
 
 #
 # t2c: parallel combinatorial builder from given root with internal fitness
 # and atom/bond specific descriptors
 #
-runTest "t2c"
+#RErunTest "t2c"
 
 #
 # t2d: with python driven fitness provider
 #
-runTest "t2d"
+#RErunTest "t2d"
 
 #
 # t2e: with closability defined only by ring size
 #
-runTest "t2e"
+#RErunTest "t2e"
 
 #
 # t3: parallel combinatorial builder with enforced symmetry
 #
-runTest "t3"
+#RErunTest "t3"
 
 #
 # t4: parallel combinatorial builder from STRING-like user-provided root graph and enforced symmetry
 #
-runTest "t4"
+#RErunTest "t4"
 
 #
 # t5: parallel combinatorial building til exhaustion of space
 #
-runTest "t5"
+#RErunTest "t5"
 
 #
 # p6: partial exploration of fragment space that generates checkpoint and serialized graphs for other tests.
 #
-runTest "p6"
+#RErunTest "p6"
 
 #
 # t6: restart FragSpaceExplorer from checkpoint file; non-first, non-last iteration
 #
-runTest "t6"
+#RErunTest "t6"
 
 #
 # p7: exploration of fragment space that generates serialized graphs for t7
@@ -207,27 +207,27 @@ echo "t7 replaced by unit test"
 #
 # t8: conversion of serialized checkpoint file to human readable string
 #
-runTest "t8"
+#RErunTest "t8"
 
 #
 # t9: FragSpaceExplorer with symmetry constraints
 #
-runTest "t9"
+#RErunTest "t9"
 
 #
 # t10: FragSpaceExplorer with symmetry constraints and enforced symmetry
 #
-runTest "t10"
+#RErunTest "t10"
 
 #
 # t11: Genetic algorithm running with enforced symmetry.
 #
-runTest "t11"
+#RErunTest "t11"
 
 #
 # t12: Genetic algorithm running with symmetry constraints.
 #
-runTest "t12"
+#RErunTest "t12"
 
 #
 # t12a: t12 with internal fitness
@@ -262,7 +262,7 @@ runTest "t15"
 #
 # t16: GraphEditor
 #
-## runTest "t16"
+runTest "t16"
 echo "Skipping t16 until GraphEdit wildcard problem is solved."
 
 #
