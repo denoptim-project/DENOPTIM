@@ -73,6 +73,7 @@ import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.interfaces.*;
+import org.openscience.cdk.interfaces.IAtomType.Hybridization;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
@@ -681,8 +682,9 @@ public class DENOPTIMMoleculeUtils
 
     /**
      * Method that constructs an atom that reflect the same atom given as 
-     * parameter in terms of element symbol (or label, for pseudoatoms)
-     * and Cartesian coordinates.
+     * parameter in terms of element symbol (or label, for pseudoatoms),
+     * and Cartesian coordinates, and most of the other attributes. 
+     * This is basically a cloning method.
      * @param oAtm
      * @return the copy of the original
      */
@@ -700,7 +702,39 @@ public class DENOPTIMMoleculeUtils
         {
             Point3d p3d = oAtm.getPoint3d();
             nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
+        } else if (oAtm.getPoint2d() != null)
+        {
+            Point2d p2d = oAtm.getPoint2d();
+            nAtm.setPoint3d(new Point3d(p2d.x, p2d.y, 0.00001));
         }
+        if (oAtm.getFormalCharge() != null)
+            nAtm.setFormalCharge(oAtm.getFormalCharge());
+        if (oAtm.getBondOrderSum() != null)
+            nAtm.setBondOrderSum(oAtm.getBondOrderSum());
+        if (oAtm.getCharge() != null)
+            nAtm.setCharge(oAtm.getCharge());
+        if (oAtm.getValency() != null)
+            nAtm.setValency(oAtm.getValency());
+        if (oAtm.getExactMass() != null)
+            nAtm.setExactMass(oAtm.getExactMass());
+        if (oAtm.getMassNumber() != null)
+            nAtm.setMassNumber(oAtm.getMassNumber());
+        if (oAtm.getFormalNeighbourCount() != null)
+            nAtm.setFormalNeighbourCount(oAtm.getFormalNeighbourCount());
+        if (oAtm.getFractionalPoint3d() != null)
+            nAtm.setFractionalPoint3d(new Point3d(oAtm.getFractionalPoint3d()));
+        if (oAtm.getHybridization() != null)
+            nAtm.setHybridization(Hybridization.valueOf(
+                    oAtm.getHybridization().toString()));
+        if (oAtm.getImplicitHydrogenCount() != null)
+            nAtm.setImplicitHydrogenCount(oAtm.getImplicitHydrogenCount());
+        if (oAtm.getStereoParity() != null)
+            nAtm.setStereoParity(oAtm.getStereoParity());
+        if (oAtm.getMaxBondOrder() != null)
+            nAtm.setMaxBondOrder(oAtm.getMaxBondOrder());
+        if (oAtm.getNaturalAbundance() != null)
+            nAtm.setNaturalAbundance(oAtm.getNaturalAbundance());
+        
         return nAtm;
     }
 

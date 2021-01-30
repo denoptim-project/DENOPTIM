@@ -176,7 +176,7 @@ public class TreeBuilder3D
      * @throws DENOPTIMException
      */
 
-    //TODO: should probably merge this with GraphConversionTool.convertGraphToMolecule
+    //TODO-V3: should probably merge this with GraphConversionTool.convertGraphToMolecule
     // with a flag that controls whether we rototranslate the building blocks or not
     
     public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph m_graph)
@@ -296,7 +296,7 @@ public class TreeBuilder3D
             Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
             Point3d srcPtApSrc = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
             		iacRootVrtx.getAtom(atmPosApSrc)));
-
+            
             // Append 3D fragment on AP-vector and start recursion
             append3DFragmentsViaEdges(atmPosApSrc,srcPtApSrc,trgPtApSrc,edge,
             		removeRCAs);
@@ -549,9 +549,11 @@ public class TreeBuilder3D
         }
         
         //TODO-V3: any possibility that scaffold does not have an IAtomContainer?
+        
         IAtomContainer inFragOri = inVtx.getIAtomContainer();
         
-        //TODO-V3: this should never happen, so remove once we are sure it does nto happen
+        //TODO-V3: this should never happen, so remove once we are sure it does 
+        // not happen
         if (inFragOri == null)
         {
             Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
@@ -715,7 +717,7 @@ public class TreeBuilder3D
         if (edgeToRCA)
         {
             // Here we set translation vector as to move the incoming fragment
-            // of the lenght of the longest AP. This is to place RCA at 
+            // of the length of the longest AP. This is to place RCA at 
             // a bonding distance from the connected atom
             if (vectApA.length() > vectApB.length())
             {
@@ -778,7 +780,7 @@ public class TreeBuilder3D
                     + "bond type of the chord is '" + bndTyp +"'.");
         }
 
-        // Store copies of APs properly oriented
+        // Store copies of APs with the new orientation (rototranslated)
         ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag = new ArrayList<>();
         for (int i=0; i<inVtx.getNumberOfAP(); i++)
         {
@@ -787,6 +789,8 @@ public class TreeBuilder3D
             int atmPos = oriAP.getAtomPositionNumber() + preNumAtms;
             DENOPTIMAttachmentPoint newAP = oriAP.clone();
             newAP.setAtomPositionNumber(atmPos);
+            newAP.setDirectionVector(new double[]{allApsAsPt3D.get(i).x,
+                    allApsAsPt3D.get(i).y, allApsAsPt3D.get(i).z});
             apsOnThisFrag.add(newAP);
             IAtom srcAtm = mol.getAtom(atmPos);
             if (apsPerAtom.containsKey(srcAtm))

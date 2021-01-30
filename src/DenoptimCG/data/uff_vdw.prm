@@ -141,6 +141,7 @@ atom        118    Uuo   "(Ununoctium)"               118   294.0      9
 #
 atom        120    Xx    "Dummy atom"                   1     1.0      9
 atom        120    Du    "Dummy atom"                   1     1.0      9
+atom        120    R     "Dummy atom"                   1     1.0      9
 #
 atom        121    ATP   "AttractorPLUS"                1     1.0      1
 atom        122    ATM   "AttractorMINUS"               1     1.0      1

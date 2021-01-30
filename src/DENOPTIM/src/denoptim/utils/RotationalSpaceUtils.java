@@ -121,6 +121,9 @@ public class RotationalSpaceUtils
                          + "an error! Selecting only fragment-fragment "
 			 + "bonds. Details: " + msq.getMessage();
             
+            //TODO-M9
+            msq.getProblem().printStackTrace();
+            
             DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
             return rotatableBonds;
         }

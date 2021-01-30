@@ -84,7 +84,7 @@ public class DummyAtomHandler
         //Identify the target atoms to be treated
         for (IAtom atm : mol.atoms())
         {
-            String symbol = atm.getSymbol();
+            String symbol = DENOPTIMMoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
                 if (!isElement(symbol))
@@ -131,13 +131,13 @@ public class DummyAtomHandler
     
     public IAtomContainer removeDummyInHapto(IAtomContainer mol) 
                                                         throws DENOPTIMException
-    {
+    {   
         List<IAtom> dummiesList = new ArrayList<>();
         
         //Identify the target atoms to be treated
         for (IAtom atm : mol.atoms())
         {
-            String symbol = atm.getSymbol();
+            String symbol = DENOPTIMMoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
                 if (!isElement(symbol))
@@ -211,7 +211,10 @@ public class DummyAtomHandler
                     Set<IAtom> s = goupsOfTerms.get(i);
                     System.err.print(" Group "+i+" - Hapticity: "+hapticity.get(i)+" => ");
                     for (IAtom sa : s)
-                        System.err.print((mol.getAtomNumber(sa)+1)+sa.getSymbol()+" ");
+                    {
+                        System.err.print((mol.getAtomNumber(sa)+1)+
+                                DENOPTIMMoleculeUtils.getSymbolOrLabel(sa)+" ");
+                    }
                     System.err.println(" ");
                 }
             }
@@ -315,9 +318,11 @@ public class DummyAtomHandler
                             {
                                 System.err.println("Making a bond between: " + 
                                     mol.getAtomNumber(ligandAtm) + 
-                                    ligandAtm.getSymbol() + " - " + 
+                                    DENOPTIMMoleculeUtils.getSymbolOrLabel(
+                                            ligandAtm) + " - " + 
                                     mol.getAtomNumber(centralAtm) + 
-                                    centralAtm.getSymbol());
+                                    DENOPTIMMoleculeUtils.getSymbolOrLabel(
+                                            centralAtm));
                             }
                             IBond bnd = new Bond(ligandAtm,centralAtm);
                             mol.addBond(bnd);

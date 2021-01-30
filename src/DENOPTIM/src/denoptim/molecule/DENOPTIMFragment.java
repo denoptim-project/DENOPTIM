@@ -196,9 +196,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         for (IAtom oAtm : mol.atoms())
         {
             IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm);
-            
-            //TODO-V3 we might need to get more...
-            
             this.mol.addAtom(nAtm);
         }
         
