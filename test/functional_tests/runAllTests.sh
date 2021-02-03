@@ -134,64 +134,64 @@ cd "$wDir"
 #
 # t1: use DenoptimCG to build funny molecules.
 #
-#RErunTest "t1"
+runTest "t1"
 
 #
 # t2: parallel combinatorial builder from given root (default format: STRING)
 #
-#RErunTest "t2"
+runTest "t2"
 
 #
 # t2a: combinatorial builder forces to build a specific graph
 # This is meant to quickly indentify misfunctioning handing of potential cycles)
 #
-#RErunTest "t2a"
+runTest "t2a"
 
 #
 # t2b: t2 with internal fitness evaluation
 #
-#RErunTest "t2b"
+runTest "t2b"
 
 #
 # t2c: parallel combinatorial builder from given root with internal fitness
 # and atom/bond specific descriptors
 #
-#RErunTest "t2c"
+runTest "t2c"
 
 #
 # t2d: with python driven fitness provider
 #
-#RErunTest "t2d"
+runTest "t2d"
 
 #
 # t2e: with closability defined only by ring size
 #
-#RErunTest "t2e"
+runTest "t2e"
 
 #
 # t3: parallel combinatorial builder with enforced symmetry
 #
-#RErunTest "t3"
+runTest "t3"
 
 #
 # t4: parallel combinatorial builder from STRING-like user-provided root graph and enforced symmetry
 #
-#RErunTest "t4"
+runTest "t4"
 
 #
 # t5: parallel combinatorial building til exhaustion of space
 #
-#RErunTest "t5"
+runTest "t5"
 
 #
 # p6: partial exploration of fragment space that generates checkpoint and serialized graphs for other tests.
 #
-#RErunTest "p6"
+runTest "p6"
 
 #
 # t6: restart FragSpaceExplorer from checkpoint file; non-first, non-last iteration
 #
-#RErunTest "t6"
+runTest "t6"
 
 #
 # p7: exploration of fragment space that generates serialized graphs for t7
@@ -207,27 +207,27 @@ echo "t7 replaced by unit test"
 #
 # t8: conversion of serialized checkpoint file to human readable string
 #
-#RErunTest "t8"
+runTest "t8"
 
 #
 # t9: FragSpaceExplorer with symmetry constraints
 #
-#RErunTest "t9"
+runTest "t9"
 
 #
 # t10: FragSpaceExplorer with symmetry constraints and enforced symmetry
 #
-#RErunTest "t10"
+runTest "t10"
 
 #
 # t11: Genetic algorithm running with enforced symmetry.
 #
-#RErunTest "t11"
+runTest "t11"
 
 #
 # t12: Genetic algorithm running with symmetry constraints.
 #
-#RErunTest "t12"
+runTest "t12"
 
 #
 # t12a: t12 with internal fitness
