@@ -61,7 +61,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
 
-    private Map<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> outerToInnerAPs;
+    private Map<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> innerToOuterAPs;
 
 //------------------------------------------------------------------------------
 
@@ -407,6 +407,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     public void setInnerGraph(DENOPTIMGraph innerGraph) {
         this.innerGraph = innerGraph;
+        this.innerToOuterAPs = new HashMap<>();
+        for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
+            DENOPTIMAttachmentPoint outerAP = innerAP.clone();
+            outerAP.setOwner(this);
+            innerToOuterAPs.put(innerAP, outerAP);
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -416,7 +422,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         ArrayList<DENOPTIMAttachmentPoint> aps = new ArrayList<>();
         aps.addAll(requiredAPs);
-        aps.addAll(getInnerGraph().getAvailableAPs());
+        aps.addAll(innerToOuterAPs.values());
         return aps;
     }
     

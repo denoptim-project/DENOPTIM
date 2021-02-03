@@ -69,7 +69,7 @@ public class DENOPTIMTemplateTest
 
     @Test
     public void testGetAttachmentPointsReturnsCorrectNumberOfAPs() {
-        // Prevents nullpointer exception later
+        // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
 
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
@@ -102,7 +102,8 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Ignore // "Unfinished test"
-    public void testSetInnerGraphThrowsIllegalArgExcIfRequiredAPsNotPresentOnGraph() throws DENOPTIMException {
+    public void testSetInnerGraphThrowsIllegalArgExcIfRequiredAPsNotPresentOnGraph()
+            throws DENOPTIMException {
         IAtomContainer singleCarbon = new AtomContainer();
         singleCarbon.addAtom(new Atom("C"));
         DENOPTIMFragment v1 = new DENOPTIMFragment(singleCarbon,
