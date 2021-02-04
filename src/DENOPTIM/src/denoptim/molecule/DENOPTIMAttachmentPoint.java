@@ -831,7 +831,13 @@ Comparable<DENOPTIMAttachmentPoint>
         		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
 		return parts[0];
 	}
-    
+
+//-----------------------------------------------------------------------------
+
+    public void setTotalConnections(int totalConnections) {
+        this.totalConnections = totalConnections;
+    }
+
 //-----------------------------------------------------------------------------
 
 }

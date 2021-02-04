@@ -96,54 +96,87 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    @Ignore // "Unfinished test"
+    @Test
     public void testSetInnerGraphThrowsIllegalArgExcIfGraphIncompatibleWithRequiredAPs()
             throws DENOPTIMException {
-        int expNumberOfAPs = 2;
-        List<Integer> expAtomConnections = Arrays.asList(1, 2);
-        List<Integer> expApConnections = Arrays.asList(1, 2);
-        List<double[]> expDirVecs = Arrays.asList(
+        int numberOfAPs = 2;
+        List<Integer> atomConnections = Arrays.asList(1, 2);
+        List<Integer> ApConnections = Arrays.asList(1, 2);
+        List<double[]> dirVecs = Arrays.asList(
                 new double[]{1.0, -2.1,3.2},
                 new double[]{-2.0, 1.1, -3.2}
         );
-        List<APClass> expAPClasses = Arrays.asList(
+        List<APClass> APClasses = Arrays.asList(
                 APClass.make("rule1", 0),
                 APClass.make("rule2", 1)
         );
 
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
-        for (int i = 0; i < expNumberOfAPs; i++) {
-            template.addAP(-1, expAtomConnections.get(i),
-                    expApConnections.get(i), expDirVecs.get(i),
-                    expAPClasses.get(i));
+        DENOPTIMVertex v = new EmptyVertex();
+        for (int i = 0; i < numberOfAPs; i++) {
+            template.addAP(-1, atomConnections.get(i),
+                    ApConnections.get(i), dirVecs.get(i),
+                    APClasses.get(i));
+            v.addAP(-1, atomConnections.get(i),
+                    ApConnections.get(i), dirVecs.get(i),
+                    APClasses.get(i));
         }
+        DENOPTIMGraph innerGraph = new DENOPTIMGraph();
+        innerGraph.addVertex(v);
 
-        testAtLeastSameNumberOfAPs(template, expNumberOfAPs);
-        testSameAtomConnections(template, expAtomConnections);
-        testSameApConnections(template, expApConnections);
-        testSameDirVec(template, expDirVecs);
-        testSameAPClass(template, expAPClasses);
+        testAtLeastSameNumberOfAPs(template, numberOfAPs);
+        testSameAtomConnections(template, innerGraph);
+        testSameApConnections(template, innerGraph);
+        testSameDirVec(template, innerGraph);
+        testSameAPClass(template, innerGraph);
     }
 
-    private void testSameAPClass(DENOPTIMTemplate t, List<APClass> expAPClasses) {
-
+    private void testSameAPClass(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
+        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
+        try {
+            ap.setAPClass(innerGraph.getVertexAtPosition(0).getAP(0).getAPClass());
+            assertThrows(IllegalArgumentException.class,
+                    () -> t.setInnerGraph(innerGraph));
+        } catch (DENOPTIMException e) {
+            fail("Expected " + IllegalArgumentException.class + ", but was " + e.getClass());
+        }
     }
 
-    private void testSameDirVec(DENOPTIMTemplate t, List<double[]> expDirVecs) {
-
+    private void testSameDirVec(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
+        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
+        double[] correctDirVec = ap.getDirectionVector();
+        correctDirVec[1] = -correctDirVec[1];
+        assertThrows(IllegalArgumentException.class,
+                () -> t.setInnerGraph(innerGraph));
     }
 
     private void testSameApConnections(DENOPTIMTemplate t,
-                                       List<Integer> expectedApConnections) {
-
+                                       DENOPTIMGraph innerGraph) {
+        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
+        int correctApConnections = ap.getFreeConnections();
+        ap.setFreeConnections(correctApConnections + 1);
+        assertThrows(IllegalArgumentException.class,
+                () -> t.setInnerGraph(innerGraph));
     }
 
     private void testSameAtomConnections(DENOPTIMTemplate t,
-                                         List<Integer> expectedAtomConnections) {
+                                         DENOPTIMGraph innerGraph) {
+        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
+        int correctAtomConnections = ap.getTotalConnections();
+        ap.setTotalConnections(correctAtomConnections + 1);
+        assertThrows(IllegalArgumentException.class,
+                () -> t.setInnerGraph(innerGraph));
     }
 
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
-                                            int expectedNumberOfAPs) {
-
+                                            int expNumberOfAPs) {
+        DENOPTIMVertex v = new EmptyVertex();
+        for (int i = 0; i < expNumberOfAPs - 1; i++) {
+            v.addAP();
+        }
+        DENOPTIMGraph innerGraph = new DENOPTIMGraph();
+        innerGraph.addVertex(v);
+        assertThrows(IllegalArgumentException.class,
+                () -> t.setInnerGraph(innerGraph));
     }
 }
