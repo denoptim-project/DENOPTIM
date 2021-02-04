@@ -58,6 +58,8 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -219,6 +221,9 @@ public class GUIGraphHandler extends GUICardPanel
 	private Map<Integer,Integer> genToLocIDMap;
 	
 	private boolean updateMolViewer = false;
+	
+	private static final  IChemObjectBuilder builder = 
+            SilentChemObjectBuilder.getInstance();
 	
 //-----------------------------------------------------------------------------
 	
@@ -963,7 +968,7 @@ public class GUIGraphHandler extends GUICardPanel
         	    System.out.println("WARNING: Using empty AtomContainer for a "
         	            + "vertex that is not a fragment!");
         		//TODO deal with templates and other stuff
-        		fragLib.add(new AtomContainer());
+        		fragLib.add(builder.newAtomContainer());
         	}
         }
 		if (fragLib.size() == 0)
@@ -995,7 +1000,7 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraphLibrary.add(dnGraph);
 		//NB: we add an empty molecular representation to keep the list
 		// of graphs and that of mol.rep. in sync
-		molLibrary.add(new AtomContainer());
+		molLibrary.add(builder.newAtomContainer());
 		
 		// Since there is no molecular representation in it, we cleanup
 		// the mol viewer and replace it with the placeholder
@@ -1083,7 +1088,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        	            + "for a "
 		                        + "vertex that is not a fragment!");
 		        		//TODO deal with templates and other stuff
-		        		fragLib.add(new AtomContainer());
+		        		fragLib.add(builder.newAtomContainer());
 		        	}
 		        }
 				trgFrgType = BBType.FRAGMENT;
@@ -1106,7 +1111,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        	    System.out.println("WARNING: Using empty AtomContainer "
 		        	            + "for a "
 		                        + "vertex that is not a fragment!");
-		        		fragLib.add(new AtomContainer());
+		        		fragLib.add(builder.newAtomContainer());
 		        	}
 		        }
 				trgFrgType = BBType.CAP;
@@ -1242,7 +1247,7 @@ public class GUIGraphHandler extends GUICardPanel
 						iac = frag.getIAtomContainer();
 					} else {
 						//TODO deal with templates
-						iac = new AtomContainer();
+						iac = builder.newAtomContainer();
 					}
 					iac.setProperty(PRESELPROP,apId);
 				}
@@ -1297,7 +1302,7 @@ public class GUIGraphHandler extends GUICardPanel
 			System.out.println("Could not read molecules from " + file);
 			for (int i=0; i<dnGraphLibrary.size(); i++)
 			{
-				molLibrary.add(new AtomContainer());
+				molLibrary.add(builder.newAtomContainer());
 			}
 		}
 			
@@ -1325,7 +1330,7 @@ public class GUIGraphHandler extends GUICardPanel
 				System.out.println("WARNING: Could not read molecular representation from " + file);
 				for (int i=0; i<graphs.size(); i++)
 				{
-					molLibrary.add(new AtomContainer());
+					molLibrary.add(builder.newAtomContainer());
 				}
 			}
 			
@@ -1963,7 +1968,7 @@ public class GUIGraphHandler extends GUICardPanel
 	        		t.printStackTrace();
 	        		System.out.println("Couldn't make 3D-tree representation: "
 	        				+ t.getMessage());
-	        		molLibrary.set(currGrphIdx, new AtomContainer());
+	        		molLibrary.set(currGrphIdx, builder.newAtomContainer());
 	        	}
 	            
 	  			if (molLibrary.get(currGrphIdx).getAtomCount() > 0)

@@ -17,6 +17,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.qsar.DescriptorEngine;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
@@ -107,7 +108,7 @@ public class DescriptorUtils
 
 	public static DescriptorEngine getCDKDescriptorEngine()
 	{
-		return new DescriptorEngine(getClassNamesToCDKDescriptors());
+		return new DescriptorEngine(getClassNamesToCDKDescriptors(), null);
 	}
 	
 //------------------------------------------------------------------------------
@@ -128,7 +129,7 @@ public class DescriptorUtils
 		// We might want to add more... one day
 		
 		//We use the engine to get the instances of descriptors calculators
-		DescriptorEngine engine = new DescriptorEngine(classNames);
+		DescriptorEngine engine = new DescriptorEngine(classNames, null);
 		List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
         
 		List<DescriptorForFitness> chosenOnes = 
@@ -175,13 +176,22 @@ public class DescriptorUtils
 					{
 						chosenOnesShortNames.add(simpleName);
 						IDescriptor impl = iDescs.get(i);
-						DescriptorSpecification ds = impl.getSpecification();
+						IImplementationSpecification implSpec = 
+						        impl.getSpecification();
 						DescriptorForFitness d = new DescriptorForFitness(
 								descName, className,impl, j,
-								engine.getDictionaryType(ds),
-								engine.getDictionaryClass(ds),
-								engine.getDictionaryDefinition(ds),
-								engine.getDictionaryTitle(ds));
+								engine.getDictionaryType(implSpec),
+								engine.getDictionaryClass(implSpec),
+						//TODO-V3 to test upgrade to cdk2.3
+                                engine.getDictionaryDefinition(
+                                        implSpec.getSpecificationReference()),
+                                engine.getDictionaryTitle(
+                                        implSpec.getSpecificationReference()));
+						//TODO-V3 delete
+						/*
+								engine.getDictionaryDefinition(implSpec),
+								engine.getDictionaryTitle(implSpec));
+						*/
 						chosenOnes.add(d);
 					}
 				}

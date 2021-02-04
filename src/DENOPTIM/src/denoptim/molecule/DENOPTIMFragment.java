@@ -28,9 +28,13 @@ import javax.vecmath.Point3d;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.AtomRef;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -53,8 +57,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	
     /**
      * Index of the graph building block contained in the vertex. 
-     * This field differentiates a
-     * template from any other subclass of {@link DENOPTIMVertex}, and its name
+     * This field differentiates a fragment
+     * from any other subclass of {@link DENOPTIMVertex}, and its name
      * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
      */
     private int buildingBlockId = -99; //Initialised to meaningless value
@@ -145,7 +149,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         super();
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
-        this.mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
     }
     
 //------------------------------------------------------------------------------
@@ -160,7 +165,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         super(vertexId);
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
-        this.mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
     }
     
 //-----------------------------------------------------------------------------
@@ -184,19 +190,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         
-        //TODO-V3 get rid of serialization-based deep copying
-        //this.mol = (IAtomContainer) DenoptimIO.deepCopy(mol);
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
         
-        this.mol = new AtomContainer();
         for (IAtom oAtm : mol.atoms())
         {
-            IAtom nAtm = new Atom(oAtm.getSymbol());
-            if (oAtm.getPoint3d() != null)
-            {
-                Point3d p3d = oAtm.getPoint3d();
-                nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
-            }
-            //TODO-V3 we might need to get more...
+            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm);
             this.mol.addAtom(nAtm);
         }
         

@@ -31,6 +31,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMathUtils;
@@ -417,7 +419,8 @@ public class RingClosureFinder
 
     private static void reportForDebug(String filename, List<Point3d> chain)
     {
-        IAtomContainer mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer mol = builder.newAtomContainer();
         for (int ia=0 ; ia<chain.size(); ia++)
         {
             Atom atm = new Atom("He",chain.get(ia));

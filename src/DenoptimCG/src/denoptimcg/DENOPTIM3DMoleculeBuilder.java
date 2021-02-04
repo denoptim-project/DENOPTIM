@@ -225,8 +225,7 @@ public class DENOPTIM3DMoleculeBuilder
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
                                                         throws DENOPTIMException
     {
-        String msg = "";
-	msg = "Building Multiple 3D representations for "
+        String msg = "Building Multiple 3D representations for "
                  + "graph = " + molGraph.toString();
         System.out.println(msg);
 
@@ -241,7 +240,7 @@ public class DENOPTIM3DMoleculeBuilder
                   + " #frags: " + mol.getGraph().getVertexList().size() 
                   + " #atoms: " + mol.getIAtomContainer().getAtomCount();
             System.out.println(msg);
-	}
+        }
 
         // Evaluate source of isomerism
         // 1: Attempt Ring Closures 
@@ -261,7 +260,7 @@ public class DENOPTIM3DMoleculeBuilder
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
                       + " #rings: " + mol.getGraph().getRings().size();
                 System.out.println(msg);
-	    }
+            }
         }
         else
         {
@@ -391,7 +390,7 @@ public class DENOPTIM3DMoleculeBuilder
             }
         }
 
-        // Generate Interal Coordinates
+        // Generate Internal Coordinates
         TinkerMolecule tmol = TinkerUtils.getICFromIAC(reorderedMol,
                                                    CGParameters.getTinkerMap());
         TinkerUtils.setTinkerTypes(tmol,CGParameters.getTinkerMap());

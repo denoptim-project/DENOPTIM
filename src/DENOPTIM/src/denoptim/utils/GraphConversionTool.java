@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -68,7 +70,8 @@ public class GraphConversionTool
         TreeMap<Integer,TreeMap<Integer,Integer>> atmSrcMap = 
                 new TreeMap<Integer,TreeMap<Integer,Integer>>();
 
-        IAtomContainer mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer mol = builder.newAtomContainer();
 
         int molidx = 0, l = 0, j = 0;
 

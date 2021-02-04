@@ -18,7 +18,6 @@
 
 package denoptim.utils;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,13 +25,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.silent.RingSet;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.interfaces.IRingSet;
+import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -41,16 +41,11 @@ import java.util.logging.Level;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.rings.RingClosingAttractor;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.ObjectPair;
-import denoptim.utils.RingClosingUtils;
 
 
 /**
- * Toolbox for definition and managment of the rotational space, which is given
+ * Tool box for definition and management of the rotational space, which is given
  * by the list of rotatable bonds.
  *
  * @author Marco Foscato 
@@ -58,6 +53,8 @@ import denoptim.utils.RingClosingUtils;
 
 public class RotationalSpaceUtils  
 {
+    private static final  IChemObjectBuilder builder = 
+            SilentChemObjectBuilder.getInstance();
 
     /**
      * Verbosity level
@@ -104,7 +101,7 @@ public class RotationalSpaceUtils
 
         // We'll use SMARTS so get rid of pseudoatoms that can create problems
 	    // We'll use this modified IAtomContainer only when dealing with SMARTS
-        IAtomContainer locMol = new AtomContainer();
+        IAtomContainer locMol = builder.newAtomContainer();
         try {
             locMol = mol.clone();
         } catch (Throwable t) {
@@ -123,6 +120,10 @@ public class RotationalSpaceUtils
             String msg = "WARNING! Attempt to match rotatable bonds returned "
                          + "an error! Selecting only fragment-fragment "
 			 + "bonds. Details: " + msq.getMessage();
+            
+            //TODO-M9
+            msq.getProblem().printStackTrace();
+            
             DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
             return rotatableBonds;
         }
@@ -137,11 +138,11 @@ public class RotationalSpaceUtils
             }
 
             //Put all matches in one list
-            List<List<Integer>> matches = msq.getMatchesOfSMARTS(name);
-            for (List<Integer> singleMatch : matches)
+            Mappings matches = msq.getMatchesOfSMARTS(name);
+            for (int[] singleMatch : matches)
             {
                 //Check assumption on number of atoms involved in each bond
-                if (singleMatch.size() != 2)
+                if (singleMatch.length != 2)
                 {
                     String msg = "DENOPTIM can only deal with bonds involving "
                                 + "2 atoms. Check bond " + singleMatch;
@@ -152,12 +153,9 @@ public class RotationalSpaceUtils
 		//NOTE the index refers to the IAtomContainer locMol that is a
 		//clone of mol and hase the same atom order. Thus we use the
 		//atom idenx to identify atoms in mol rather than locMol.
-                int idAtmA = singleMatch.get(0);
-                int idAtmB = singleMatch.get(1);
-
-                //Store property also in object bond
-                IBond bnd = mol.getBond(mol.getAtom(singleMatch.get(0)),
-                                        mol.getAtom(singleMatch.get(1)));
+                
+                int idAtmA = singleMatch[0];
+                int idAtmB = singleMatch[1];
 
                 // Compare with bonds already in the list
                 boolean alreadyThere = false;
@@ -255,12 +253,12 @@ public class RotationalSpaceUtils
 		String fragIdB = atmB.getProperty(p).toString();
 
                 if (!fragIdA.equals(fragIdB) &&
-                    (mol.getConnectedAtomsCount(atmA) != 1) &&
-                    (mol.getConnectedAtomsCount(atmB) != 1))
+                    (mol.getConnectedBondsCount(atmA) != 1) &&
+                    (mol.getConnectedBondsCount(atmB) != 1))
                 {
                     ObjectPair newRotBnd = new ObjectPair();
-                    int idAtmA = mol.getAtomNumber(atmA);
-                    int idAtmB = mol.getAtomNumber(atmB);
+                    int idAtmA = mol.indexOf(atmA);
+                    int idAtmB = mol.indexOf(atmB);
                     if (idAtmA < idAtmB)
                     {
                         newRotBnd = new ObjectPair(new Integer(idAtmA),

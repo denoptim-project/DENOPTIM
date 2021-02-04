@@ -537,11 +537,11 @@ public class DenoptimIO
      * @param append
      * @throws DENOPTIMException
      */
-    public static void serializeToFile(String fileName, Object obj,
-                                       boolean append)
-            throws DENOPTIMException {
+    public static void serializeToFile(String fileName, Object obj, 
+            boolean append) throws DENOPTIMException {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
+        
         try {
             fos = new FileOutputStream(fileName, append);
             oos = new ObjectOutputStream(fos);
@@ -565,6 +565,48 @@ public class DenoptimIO
                 throw new DENOPTIMException("Cannot close ObjectOutputStream", t);
             }
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read a DENOPTIMGraph from a JSON file containing only one graph
+     *
+     * @param fileName the pathname to the file to read as a JSON file
+     * @return the graph
+     * @throws DENOPTIMException
+     */
+    public static DENOPTIMGraph readGraphFromJSON(File file) 
+            throws DENOPTIMException {
+        DENOPTIMGraph graph = null;
+        BufferedReader br = null;
+        String json = "";
+        try {
+            br = new BufferedReader(new FileReader(file));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                json = json + line;
+            }
+        } catch (IOException ioe) {
+            throw new DENOPTIMException(ioe);
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+
+        if (json.equals("")) {
+            throw new DENOPTIMException("No data found in file: " 
+                    + file.getAbsolutePath());
+        }
+        
+        graph = DENOPTIMGraph.fromJson(json);
+
+        return graph;
     }
 
 //------------------------------------------------------------------------------

@@ -385,7 +385,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
     
     /**
-     * Returns a deep-copy of this vertex
+     * Returns a deep-copy of this vertex. Subclasses override this method.
      * @return a deep-copy
      */
     

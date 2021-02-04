@@ -45,9 +45,6 @@ import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import org.jmol.adapter.smarter.SmarterJmolAdapter;
-import org.jmol.api.JmolViewer;
-import org.jmol.smiles.InvalidSmilesException;
 import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
@@ -56,9 +53,10 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.modeling.builder3d.ModelBuilder3D;
 import org.openscience.cdk.modeling.builder3d.TemplateHandler3D;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -70,7 +68,6 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.DENOPTIMMathUtils;
-import gui.GUIPreferences.SMITo3DEngine;
 
 
 /**
@@ -312,37 +309,36 @@ public class FragmentViewPanel extends JSplitPane
 	
 //-----------------------------------------------------------------------------
 	
-	private void testCDKgenerator(String smiles) throws CDKException, 
+	private void make3DusingCDKgenerator(String smiles) throws CDKException, 
 	CloneNotSupportedException, IOException
 	{
-		IMolecule molecule = null;
+		IAtomContainer mol = null;
 
 		SmilesParser sp = new SmilesParser(
 				DefaultChemObjectBuilder.getInstance());
-		molecule = sp.parseSmiles(smiles);
+		mol = sp.parseSmiles(smiles);
 		
 	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
-	    		molecule.getBuilder());
-	    adder.addImplicitHydrogens(molecule);
+	    		mol.getBuilder());
+	    adder.addImplicitHydrogens(mol);
 		
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(
-				molecule.getBuilder());
-	    for (IAtom atom : molecule.atoms()) 
+				mol.getBuilder());
+	    for (IAtom atom : mol.atoms()) 
 	    {
-	        IAtomType type = matcher.findMatchingAtomType(molecule, atom);
+	        IAtomType type = matcher.findMatchingAtomType(mol, atom);
 	        AtomTypeManipulator.configure(atom, type);
 	    }
 	    
-	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(molecule);
-	    
-		TemplateHandler3D tHandler3d = TemplateHandler3D.getInstance();
-		String forceFieldName = "mmff94";
-		ModelBuilder3D 	md3b = ModelBuilder3D.getInstance(tHandler3d,
-				forceFieldName);
-		molecule = md3b.generate3DCoordinates(molecule, false);
+	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(mol);
+
+        ModelBuilder3D mb3d = ModelBuilder3D.getInstance(
+                TemplateHandler3D.getInstance(), "mmff94", 
+                DefaultChemObjectBuilder.getInstance());
+		mol = mb3d.generate3DCoordinates(mol, false);
 
 		// Load the system int oJmol
-		loadPlainStructure(molecule);
+		loadPlainStructure(mol);
 		
 		// Run Jmol MM energy minimization
 		jmolPanel.viewer.evalString("minimize");
@@ -427,7 +423,7 @@ public class FragmentViewPanel extends JSplitPane
 				if (res == 0)
 				{
 					try {
-						testCDKgenerator(smiles);
+						make3DusingCDKgenerator(smiles);
 					} catch (CDKException | CloneNotSupportedException 
 							| IOException e1) {
 						e1.printStackTrace();
@@ -463,7 +459,7 @@ public class FragmentViewPanel extends JSplitPane
 			
 		case CDK:
 			try {
-				testCDKgenerator(smiles);
+				make3DusingCDKgenerator(smiles);
 			} catch (CDKException | CloneNotSupportedException 
 					| IOException e1) {
 				e1.printStackTrace();
@@ -525,7 +521,8 @@ public class FragmentViewPanel extends JSplitPane
 	private IAtomContainer getStructureFromJmolViewer() 
 			throws DENOPTIMException
 	{
-		IAtomContainer mol = new AtomContainer();
+	    IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+		IAtomContainer mol = builder.newAtomContainer();
 		
 		String strData = getDataFromJmol();
 		if (strData.trim().equals(""))

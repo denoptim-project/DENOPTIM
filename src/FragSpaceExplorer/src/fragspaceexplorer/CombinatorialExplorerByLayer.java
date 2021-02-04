@@ -591,8 +591,8 @@ public class CombinatorialExplorerByLayer
                 continue;
             }
 
-            DENOPTIMGraph rootGraph = DenoptimIO.deserializeDENOPTIMGraph(file);
-            
+            DENOPTIMGraph rootGraph = DenoptimIO.readGraphFromJSON(file);
+                    
             // Get combination factory
             FragsCombinationIterator fcf = new FragsCombinationIterator(
                                                                      rootGraph);

@@ -54,20 +54,20 @@ public class DenoptimCG
         try
         {
             CGParameters.readParameterFile(paramFile);
-	    CGParameters.checkParameters();
+	        CGParameters.checkParameters();
             CGParameters.processParameters();
             CGParameters.printParameters();
             
             // read the input molecule
-            IAtomContainer mol = 
-                    DenoptimIO.readSingleSDFFile(CGParameters.getInputSDFFile());
+            IAtomContainer mol = DenoptimIO.readSingleSDFFile(
+                    CGParameters.getInputSDFFile());
             if (mol.getProperty("GraphENC") != null)
             {
             
                 String graphStr = mol.getProperty("GraphENC").toString();
                 System.err.println("Imported graph: " + graphStr);
-		GraphConversionTool gct = new GraphConversionTool();
-		DENOPTIMGraph grph = gct.getGraphFromString(graphStr);
+        		GraphConversionTool gct = new GraphConversionTool();
+        		DENOPTIMGraph grph = gct.getGraphFromString(graphStr);
 
                 String mname = mol.getProperty("cdk:Title").toString();
                 
@@ -88,9 +88,9 @@ public class DenoptimCG
 //MF: writes more than one structure if needed
                 ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
                 for (int inmol = 0; inmol<nmols.size(); inmol++)
-		{
+                {
                     nmols.get(inmol).setProperties(mol.getProperties());
-		}
+                }
                 // write file
                 DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);
 

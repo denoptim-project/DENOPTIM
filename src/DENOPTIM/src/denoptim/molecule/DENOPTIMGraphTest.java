@@ -28,15 +28,26 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObject;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.Bond;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 
 
@@ -47,6 +58,11 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
  */
 
 public class DENOPTIMGraphTest {
+    
+    private final String APRULE = "MyRule";
+    private final String APSUBRULE = "1";
+    private final String APCLASS = APRULE
+            + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 
 //------------------------------------------------------------------------------
 	@Test
@@ -757,24 +773,25 @@ public class DENOPTIMGraphTest {
 	public void testRemoveCapping() throws Exception {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 
-		IAtomContainer iac1 = new AtomContainer();
+		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+		IAtomContainer iac1 = builder.newAtomContainer();
 		iac1.addAtom(new Atom("C"));
 		DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
 		v1.addAP(1, 1, 1);
 		v1.addAP(1, 1, 1);
 
-		IAtomContainer iac2 = new AtomContainer();
+		IAtomContainer iac2 = builder.newAtomContainer();
 		iac2.addAtom(new Atom("O"));
 		DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
 		v2.addAP(1, 1, 1);
 		v2.addAP(1, 1, 1);
 
-		IAtomContainer iac3 = new AtomContainer();
+		IAtomContainer iac3 = builder.newAtomContainer();
 		iac3.addAtom(new Atom("H"));
 		DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
 		v3.addAP(1, 1, 1);
 
-		IAtomContainer iac4 = new AtomContainer();
+		IAtomContainer iac4 = builder.newAtomContainer();
 		iac4.addAtom(new Atom("H"));
 		DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
 		v4.addAP(1, 1, 1);
@@ -803,24 +820,24 @@ public class DENOPTIMGraphTest {
 
 		DENOPTIMGraph graph2 = new DENOPTIMGraph();
 
-		IAtomContainer iac12 = new AtomContainer();
+		IAtomContainer iac12 = builder.newAtomContainer();
 		iac12.addAtom(new Atom("C"));
 		DENOPTIMVertex v21 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
 		v21.addAP(0, 1, 1);
 		v21.addAP(0, 1, 1);
 
-		IAtomContainer iac22 = new AtomContainer();
+		IAtomContainer iac22 = builder.newAtomContainer();
 		iac22.addAtom(new Atom("O"));
 		DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
 		v22.addAP(0, 1, 1);
 		v22.addAP(0, 1, 1);
 
-		IAtomContainer iac23 = new AtomContainer();
+		IAtomContainer iac23 = builder.newAtomContainer();
 		iac23.addAtom(new Atom("H"));
 		DENOPTIMVertex v23 = new DENOPTIMFragment(23, iac23, BBType.CAP);
 		v23.addAP(0, 1, 1);
 
-		IAtomContainer iac24 = new AtomContainer();
+		IAtomContainer iac24 = builder.newAtomContainer();
 		iac24.addAtom(new Atom("H"));
 		DENOPTIMVertex v24 = new DENOPTIMFragment(24, iac24, BBType.CAP);
 		v24.addAP(0, 1, 1);
@@ -868,7 +885,45 @@ public class DENOPTIMGraphTest {
 
 	@Test
 	public void testFromToJSON() throws Exception {
-    DENOPTIMGraph graph = new DENOPTIMGraph();
+	    DENOPTIMGraph graph = new DENOPTIMGraph();
+	    
+	    //TODO-V3 del: cannot do this without defining a fragment space
+	    /*
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<String, BondType>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMFragment v0 = new DENOPTIMFragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        v0.addAtom(a1);
+        v0.addAtom(a2);
+        v0.addAtom(a3);
+        v0.addBond(new Bond(a1, a2));
+        v0.addBond(new Bond(a2, a3));
+        v0.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v0.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v0.addAP(a3, APClass.make(APCLASS), 
+                new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v0.addAP(a1, APClass.make(APCLASS), 
+                new Point3d(new double[]{3.0, 0.0, 3.3}));
+        
+        ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
+        ssaps.add(new SymmetricSet(new ArrayList<Integer>(
+                Arrays.asList(0,1,2))));
+        v0.setSymmetricAPSets(ssaps);
+        v0.setVertexId(18);
+        v0.setLevel(26);
+        v0.setAsRCV(true);
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
+        graph.addVertex(v0);
+        */
+        
         DENOPTIMVertex v0 = new EmptyVertex(0);
         buildVertexAndConnectToGraph(v0, 3, graph);
 
@@ -922,8 +977,7 @@ public class DENOPTIMGraphTest {
 //	              + " 0_1_0_0, 4_1_1_0, 7_1_1_0]] "
 //	              + "SymmetricSet [symVrtxIds=[3, 5]] "
 //	              + "SymmetricSet [symVrtxIds=[6, 7]]";
-	    
-
+        
         String json1 = graph.toJson();
         
         DENOPTIMGraph g2 = DENOPTIMGraph.fromJson(json1);
@@ -933,10 +987,9 @@ public class DENOPTIMGraphTest {
         /*
         System.out.println("1:" + graph.toString());
         System.out.println("2:" + g2.toString());
-        assertTrue(graph.toString().equals(g2.toString()), "Roun-trip via JSON and toString.");
+        assertTrue(graph.toString().equals(g2.toString()), "Round-trip via JSON and toString.");
         */
         
-        assertTrue(json1.equals(json2), "Round-trip via JSON is successful"); 
-
+        assertTrue(json1.equals(json2), "Round-trip via JSON is successful");
 	}
 }
