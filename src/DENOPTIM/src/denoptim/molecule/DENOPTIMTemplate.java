@@ -405,7 +405,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
 
-    public void setInnerGraph(DENOPTIMGraph innerGraph) {
+    public void setInnerGraph(DENOPTIMGraph innerGraph) throws IllegalArgumentException {
+        if (!isValidInnerGraph(innerGraph)) {
+            throw new IllegalArgumentException("inner graph does not have all" +
+                    " required APs");
+        }
         this.innerGraph = innerGraph;
         this.innerToOuterAPs = new HashMap<>();
         for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
@@ -413,6 +417,44 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             outerAP.setOwner(this);
             innerToOuterAPs.put(innerAP, outerAP);
         }
+    }
+
+    private boolean isValidInnerGraph(DENOPTIMGraph g) {
+        ArrayList<DENOPTIMAttachmentPoint> outerAPs = g.getAvailableAPs();
+        if (outerAPs.size() != requiredAPs.size()) {
+            return false;
+        }
+        Comparator<DENOPTIMAttachmentPoint> c = (ap1, ap2) -> {
+            int diffTotConn =
+                    ap1.getTotalConnections() - ap2.getTotalConnections();
+            if (diffTotConn != 0) {
+                return diffTotConn;
+            }
+            int diffFreeConn =
+                    ap1.getFreeConnections() - ap2.getFreeConnections();
+            if (diffFreeConn != 0) {
+                return diffFreeConn;
+            }
+            double[] dirVec1 = ap1.getDirectionVector();
+            double[] dirVec2 = ap2.getDirectionVector();
+            for (int i = 0; i < dirVec1.length; i++) {
+                double diffDirVec = dirVec1[i] - dirVec2[i];
+                if (diffDirVec < 0)  {
+                    return -1;
+                } else if (diffDirVec > 0) {
+                    return 1;
+                }
+            }
+            return ap1.getAPClass().compareTo(ap2.getAPClass());
+        };
+        outerAPs.sort(c);
+        requiredAPs.sort(c);
+        for (int i = 0; i < outerAPs.size(); i++) {
+            if (c.compare(outerAPs.get(i), requiredAPs.get(i)) != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
 //-----------------------------------------------------------------------------

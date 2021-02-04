@@ -86,7 +86,11 @@ public class DENOPTIMTemplateTest
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v1);
         innerGraph.addVertex(v2);
-        template.setInnerGraph(innerGraph);
+        try {
+            template.setInnerGraph(innerGraph);
+        } catch (IllegalArgumentException e) {
+            // ignore
+        }
 
         // -2 since 2 APs are used to connect v1 and v2.
         int expectedAPCount = templateAPCount + v1APCount + v2APCount - 2;
