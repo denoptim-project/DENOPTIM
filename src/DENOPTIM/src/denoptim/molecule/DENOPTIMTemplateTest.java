@@ -19,18 +19,13 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMFragment.BBType;
-import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
 import jdk.nashorn.internal.ir.annotations.Ignore;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
@@ -102,19 +97,53 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Ignore // "Unfinished test"
-    public void testSetInnerGraphThrowsIllegalArgExcIfRequiredAPsNotPresentOnGraph()
+    public void testSetInnerGraphThrowsIllegalArgExcIfGraphIncompatibleWithRequiredAPs()
             throws DENOPTIMException {
-        IAtomContainer singleCarbon = new AtomContainer();
-        singleCarbon.addAtom(new Atom("C"));
-        DENOPTIMFragment v1 = new DENOPTIMFragment(singleCarbon,
-                BBType.FRAGMENT);
-
-        IAtomContainer singleNitrogen = new AtomContainer();
-        singleNitrogen.addAtom(new Atom("N"));
-        DENOPTIMFragment v2 = new DENOPTIMFragment(singleNitrogen,
-                BBType.FRAGMENT);
+        int expNumberOfAPs = 2;
+        List<Integer> expAtomConnections = Arrays.asList(1, 2);
+        List<Integer> expApConnections = Arrays.asList(1, 2);
+        List<double[]> expDirVecs = Arrays.asList(
+                new double[]{1.0, -2.1,3.2},
+                new double[]{-2.0, 1.1, -3.2}
+        );
+        List<APClass> expAPClasses = Arrays.asList(
+                APClass.make("rule1", 0),
+                APClass.make("rule2", 1)
+        );
 
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        for (int i = 0; i < expNumberOfAPs; i++) {
+            template.addAP(-1, expAtomConnections.get(i),
+                    expApConnections.get(i), expDirVecs.get(i),
+                    expAPClasses.get(i));
+        }
+
+        testAtLeastSameNumberOfAPs(template, expNumberOfAPs);
+        testSameAtomConnections(template, expAtomConnections);
+        testSameApConnections(template, expApConnections);
+        testSameDirVec(template, expDirVecs);
+        testSameAPClass(template, expAPClasses);
+    }
+
+    private void testSameAPClass(DENOPTIMTemplate t, List<APClass> expAPClasses) {
+
+    }
+
+    private void testSameDirVec(DENOPTIMTemplate t, List<double[]> expDirVecs) {
+
+    }
+
+    private void testSameApConnections(DENOPTIMTemplate t,
+                                       List<Integer> expectedApConnections) {
+
+    }
+
+    private void testSameAtomConnections(DENOPTIMTemplate t,
+                                         List<Integer> expectedAtomConnections) {
+    }
+
+    private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
+                                            int expectedNumberOfAPs) {
 
     }
 }
