@@ -63,7 +63,7 @@ public class TestOperatorParameters
     protected static long randomSeed = 1234567890L;
     
     /**
-     * Testable Operators 
+     * Testable Operators
      */
     protected enum Operator {MUTATION,XOVER}
     
@@ -93,22 +93,22 @@ public class TestOperatorParameters
     protected static String inpFileF;
 
     /**
-     * Male VertedID (not index) on witch perform xover
+     * Male VertedID (not index) on which perform xover
      */
     protected static int mvid;
 
     /**
-     * Male AP index on witch perform xover
+     * Male AP index on which perform xover
      */
     protected static int mapid;
 
     /**
-     * Female VertedID (not index) on witch perform xover
+     * Female VertexID (not index) on which perform xover
      */
     protected static int fvid;
 
     /**
-     * Female AP index on witch perform xover
+     * Female AP index on which perform xover
      */
     protected static int fapid;
 

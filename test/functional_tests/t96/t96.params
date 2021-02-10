@@ -1,0 +1,30 @@
+#
+# Parameters for DENOPTIM
+#
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
+
+FS-USETEMPLATES=for now, we only check the existence of this parameter, but its argument not used
+
+# Fitness provider
+FP-Source=OTF_WDIR/fitness_provider.sh
+FP-Interpreter=BASH
+
+# Genetic Algorithm parameters
+GA-Verbosity=2
+GA-randomSeed=13
+GA-Parallelization=synchronous
+GA-numParallelTasks=OTF_PROCS
+GA-populationSize=2
+GA-numChildren=2
+GA-numGenerations=1
+GA-crossoverProbability=1.0
+GA-mutationProbability=0.0
+GA-symmetryProbability=0.0
+GA-replacementStrategy=NONE
