@@ -55,7 +55,7 @@ public class DENOPTIMTemplateTest
         innerGraph.addVertex(v);
         template.setInnerGraph(innerGraph);
 
-        int totalAPCount = 2;
+        int totalAPCount = 1;
         for (int i = 0; i < totalAPCount; i++) {
             DENOPTIMVertex actualOwner = template.getAttachmentPoints().get(i)
                     .getOwner();
@@ -71,11 +71,11 @@ public class DENOPTIMTemplateTest
         RandomUtils.initialiseRNG(13);
 
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
-        int templateAPCount = 2;
+        int requiredAPCount = 2;
         int atmPos = 0;
         int atmConns = 1;
         int apConns = 1;
-        for (int i = 0; i < templateAPCount; i++) {
+        for (int i = 0; i < requiredAPCount; i++) {
             template.addAP(atmPos, atmConns, apConns);
         }
         EmptyVertex v1 = new EmptyVertex();
@@ -97,7 +97,7 @@ public class DENOPTIMTemplateTest
 //        System.err.println(innerGraph.getAvailableAPs().toString());
 
         // -2 since 2 APs are used to connect v1 and v2.
-        int expectedAPCount = templateAPCount + v1APCount + v2APCount - 2;
+        int expectedAPCount = v1APCount + v2APCount - 2;
         int actualAPCount = template.getAttachmentPoints().size();
         assertEquals(expectedAPCount, actualAPCount);
     }
@@ -190,5 +190,9 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
+    @Test
+    public void testAddAPsBeforeSetInnerGraph() {
+        //
+    }
 
 }

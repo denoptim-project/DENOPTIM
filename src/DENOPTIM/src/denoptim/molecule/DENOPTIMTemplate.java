@@ -467,10 +467,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        ArrayList<DENOPTIMAttachmentPoint> aps = new ArrayList<>();
-        aps.addAll(requiredAPs);
-        aps.addAll(innerToOuterAPs.values());
-        return aps;
+        return new ArrayList<>(innerToOuterAPs.values());
     }
     
 //-----------------------------------------------------------------------------
@@ -614,6 +611,5 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         FIXED_STRUCT,
         FIXED
     }
-
 }
 
