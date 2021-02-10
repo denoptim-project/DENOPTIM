@@ -594,5 +594,26 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         requiredAPs.add(ap);
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Enum specifying the whether a template's inner graph is completely
+     * fixed (FIXED), fixed structure (FIXED_STRUCT), or is free (FREE).
+     *
+     * FIXED inner graphs are effectively equivalent to the DENOPTIMFragment
+     * class.
+     * FIXED_STRUCT inner graphs will keep a constant inter-connectivity
+     * between vertices, but the content at each vertex may vary.
+     * FIXED_STRUCT does not guarantee that the AP classes connecting inner
+     * graph vertices will remain the same as the content at vertices change.
+     * FREE inner graphs are free to change however they want both in content
+     * and inter-connectivity, within the confines of the required APs.
+     */
+    public enum ContractLevel {
+        FREE,
+        FIXED_STRUCT,
+        FIXED
+    }
+
 }
 
