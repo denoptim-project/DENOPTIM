@@ -421,9 +421,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     private boolean isValidInnerGraph(DENOPTIMGraph g) {
         ArrayList<DENOPTIMAttachmentPoint> outerAPs = g.getAvailableAPs();
-        if (outerAPs.size() != requiredAPs.size()) {
+        if (outerAPs.size() < requiredAPs.size()) {
             return false;
         }
+        /* Compares total connections, free connections, direction vector
+        coordinates, and APClass, in that order.
+         */
         Comparator<DENOPTIMAttachmentPoint> c = (ap1, ap2) -> {
             int diffTotConn =
                     ap1.getTotalConnections() - ap2.getTotalConnections();
@@ -447,14 +450,16 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             }
             return ap1.getAPClass().compareTo(ap2.getAPClass());
         };
+
         outerAPs.sort(c);
         requiredAPs.sort(c);
-        for (int i = 0; i < outerAPs.size(); i++) {
-            if (c.compare(outerAPs.get(i), requiredAPs.get(i)) != 0) {
-                return false;
+        int matchesLeft = requiredAPs.size();
+        for (int i = 0; matchesLeft != 0 && outerAPs.size() - i >= matchesLeft && i < outerAPs.size(); i++) {
+            if (c.compare(outerAPs.get(i), requiredAPs.get(i)) == 0) {
+                matchesLeft--;
             }
         }
-        return true;
+        return matchesLeft == 0;
     }
 
 //-----------------------------------------------------------------------------
@@ -580,7 +585,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Add ap to the list of required APs on this template
+     * Adds ap to the list of required APs on this template
      * @param ap attachment point to require from this template
      */
     @Override

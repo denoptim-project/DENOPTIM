@@ -21,8 +21,11 @@ package denoptim.molecule;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.RandomUtils;
 import jdk.nashorn.internal.ir.annotations.Ignore;
@@ -69,28 +72,29 @@ public class DENOPTIMTemplateTest
 
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         int templateAPCount = 2;
+        int atmPos = 0;
+        int atmConns = 1;
+        int apConns = 1;
         for (int i = 0; i < templateAPCount; i++) {
-            template.addAP(0, 1, 1);
+            template.addAP(atmPos, atmConns, apConns);
         }
         EmptyVertex v1 = new EmptyVertex();
         int v1APCount = 3;
         for (int i = 0; i < v1APCount; i++) {
-            v1.addAP(0, 1, 1);
+            v1.addAP(atmPos, atmConns, apConns);
         }
         EmptyVertex v2 = new EmptyVertex();
         int v2APCount = 2;
         for (int i = 0; i < v2APCount; i++) {
-            v2.addAP(0, 1, 1);
+            v2.addAP(atmPos, atmConns, apConns);
         }
         v1.connectVertices(v2);
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v1);
         innerGraph.addVertex(v2);
-        try {
-            template.setInnerGraph(innerGraph);
-        } catch (IllegalArgumentException e) {
-            // ignore
-        }
+        template.setInnerGraph(innerGraph);
+
+//        System.err.println(innerGraph.getAvailableAPs().toString());
 
         // -2 since 2 APs are used to connect v1 and v2.
         int expectedAPCount = templateAPCount + v1APCount + v2APCount - 2;
@@ -183,4 +187,8 @@ public class DENOPTIMTemplateTest
         assertThrows(IllegalArgumentException.class,
                 () -> t.setInnerGraph(innerGraph));
     }
+
+//------------------------------------------------------------------------------
+
+
 }
