@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMFragment.BBType;
@@ -32,6 +33,7 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -191,8 +193,39 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testAddAPsBeforeSetInnerGraph() {
-        //
+    public void testCallingAddAPAfterSetInnerGraphThrowsDENOPTIMExc() {
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        t.setInnerGraph(g);
+        assertThrows(DENOPTIMException.class, () -> t.addAP(0, 1, 1));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testAtomPropertyVertexIdReturnsTemplateId() {
+        IAtom a = new Atom("C");
+        IAtomContainer c = new AtomContainer();
+        c.addAtom(a);
+        DENOPTIMVertex v = null;
+        try {
+            v = new DENOPTIMFragment(c, BBType.NONE);
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception thrown");
+        }
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(v);
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
+        t.setInnerGraph(g);
+
+        int expected = t.getVertexId();
+        int actual = t
+                .getInnerGraph()
+                .getVertexAtPosition(0)
+                .getIAtomContainer()
+                .getAtom(0)
+                .getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+        assertEquals(expected, actual);
     }
 
 }

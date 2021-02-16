@@ -62,7 +62,8 @@ public class GraphConversionTool
      */
 
 	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
-    // with a flag that controls weather we rototranslate the building blocks or not
+    // with a flag that controls whether we rototranslate the building blocks
+    // or not
 	
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
@@ -73,15 +74,24 @@ public class GraphConversionTool
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         IAtomContainer mol = builder.newAtomContainer();
 
-        int molidx = 0, l = 0, j = 0;
+        int molAtomCounter = 0;
 
         // loop through the vertices
         int n = g.getVertexCount();
+        // TODO: Remove
+//        System.out.println(g);
+//        System.out.println("Vertex count " + n);
+
         for (int i=0; i<n; i++)
         {
             DENOPTIMVertex vertex = g.getVertexList().get(i);
-            
-            Integer id = vertex.getVertexId();
+
+            // TODO: Remove
+//            if (vertex.getVertexId() == 169) {
+//                System.out.println(g + "\nVertex count=" + g.getVertexCount() + "\n");
+//                System.out.println(vertex + "\n");
+//            }
+
             if (!vertex.containsAtoms())
             {
                 //TODO-V3 remove, eventually
@@ -91,29 +101,42 @@ public class GraphConversionTool
 
             // Here we get atoms that are labelled with the original vertex ID
             IAtomContainer iac = vertex.getIAtomContainer();
-            
+
             // Project original atom position in atom position in global list
             for(IAtom atom : iac.atoms())
             {
-                int vid = (int) atom.getProperty(
+                int vid = atom.getProperty(
                         DENOPTIMConstants.ATMPROPVERTEXID);
-                int iatm = (int) atom.getProperty(
+                int iatm = atom.getProperty(
                         DENOPTIMConstants.ATMPROPORIGINALATMID);
                 if (atmSrcMap.containsKey(vid))
                 {
-                    atmSrcMap.get(vid).put(iatm, l);
+                    atmSrcMap.get(vid).put(iatm, molAtomCounter);
                 } else {
-                    TreeMap<Integer,Integer> atmPositionInVrtxAndInMol = 
+                    TreeMap<Integer,Integer> atmPositionInVrtxAndInMol =
                             new TreeMap<Integer,Integer>();
-                    atmPositionInVrtxAndInMol.put(iatm, l);
+                    atmPositionInVrtxAndInMol.put(iatm, molAtomCounter);
                     atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
                 }
-                l++;
+
+                // TODO: Remove
+//                if (g.getGraphId() == 30 && vertex.getVertexId() == 169) {
+//                    System.out.println(vid + "\n");
+//                    System.out.println(atmSrcMap + "\n");
+//                }
+
+                molAtomCounter++;
             }
 
             mol.add(iac);
         }
-        
+
+        //TODO: Remove
+        if (g.getGraphId() == 30) {
+            System.out.println(atmSrcMap + "\n");
+            System.out.println(g + "\n");
+        }
+
         // loop through the edges
         n = g.getEdgeCount();
         for (int i=0; i<n; i++)
@@ -128,6 +151,14 @@ public class GraphConversionTool
             
             try
             {
+                // TODO: Remove
+//                System.out.println(ap1 + " " + ap1.getAtomPositionNumber());
+//                if (v1.getVertexId() == 169) {
+//                    System.out.println(atmSrcMap + "\n");
+//                    System.out.println(g + "\nVertex count=" + g.getVertexCount() + "\n");
+//                    System.out.println(v1 + "---" + v2 + "\n");
+//                }
+
                 int dap1_anum = atmSrcMap.get(v1.getVertexId()).get(
                         ap1.getAtomPositionNumber());
                 int dap2_anum = atmSrcMap.get(v2.getVertexId()).get(
@@ -139,6 +170,7 @@ public class GraphConversionTool
                 }
             } catch (Exception e)
             {
+                e.printStackTrace();
                 String msg = "Incorrect indices. Although this may be a bug, " +
                         "it is more likely an error in the atom specification. "
                         + "Kindly check your input files."

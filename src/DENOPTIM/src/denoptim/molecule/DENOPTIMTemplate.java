@@ -2,6 +2,7 @@ package denoptim.molecule;
 
 import java.util.*;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -10,6 +11,7 @@ import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
 
 /**
  * A template is a contract that defines subgraph features that can go from 
@@ -281,7 +283,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
         DENOPTIMVertex vH6 = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
-        
+
         template.innerGraph.addVertex(vA);
         template.innerGraph.addVertex(vB);
         template.innerGraph.addVertex(vC);
@@ -307,7 +309,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMEdge eDH4 = vD.connectVertices(vH4, 1, 0);
         DENOPTIMEdge eAH5 = vA.connectVertices(vH5, 2, 0);
         DENOPTIMEdge eCH6 = vC.connectVertices(vH6, 2, 0);
-        
+
         template.innerGraph.addEdge(eARcv);
         template.innerGraph.addEdge(eAB);
         template.innerGraph.addEdge(eBC);
@@ -323,7 +325,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
                 Arrays.asList(vRCV1, vA, vB, vC, vD, vRCV2)));
         template.innerGraph.addRing(r);
-        
 
       //TODO-M7 del
         System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+template.innerGraph);
@@ -338,11 +339,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
         //TODO-M7 del
         template.innerGraph.renumberGraphVertices();
+        template.setInnerGraph(template.innerGraph);
         
       //TODO-M7 del
         System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.innerGraph);
 
-        
+        for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints()) {
+            System.out.println(ap + "apid=" + ap.getID());
+        }
+
         template.freezeTemplate();
         
         return template;
@@ -406,6 +411,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
 
     public void setInnerGraph(DENOPTIMGraph innerGraph) throws IllegalArgumentException {
+        // if (!compatibleWithOldInnerGraph(innerGraph))
         if (!isValidInnerGraph(innerGraph)) {
             throw new IllegalArgumentException("inner graph does not have all" +
                     " required APs");
@@ -463,13 +469,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
 
 //-----------------------------------------------------------------------------
-    
+
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
         return new ArrayList<>(innerToOuterAPs.values());
     }
-    
+
 //-----------------------------------------------------------------------------
     
     // NB: since the list of APs of a template depends on the embedded graph,
@@ -536,10 +542,60 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         try
         {
-            return GraphConversionTool.convertGraphToMolecule(innerGraph, true);
+            IAtomContainer iac = GraphConversionTool
+                    .convertGraphToMolecule(innerGraph, true);
+
+            // We have to ensure outer APs has same atom position as inner APs
+            for (DENOPTIMAttachmentPoint outerAP : getAttachmentPoints()) {
+                DENOPTIMAttachmentPoint innerAP =
+                        getInnerAPFromOuterAP(outerAP);
+                int innerAtmId = innerAP.getAtomPositionNumber();
+                int innerVrtxId = innerAP.getOwner().getVertexId();
+                for (int i = 0; i < iac.getAtomCount(); i++) {
+                    IAtom atom = iac.getAtom(i);
+                    int originalVrtxId =
+                            atom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                    int innerSrcAtmId =
+                            atom.getProperty(DENOPTIMConstants.ATMPROPORIGINALATMID);
+                    if (innerAtmId == innerSrcAtmId && innerVrtxId == originalVrtxId) {
+                        outerAP.setAtomPositionNumber(i);
+                        // TODO: Remove
+                        // System.out.println("Fixed wrong atomposnumbering");
+                    }
+                }
+            }
+
+            /*
+            int vid = (int) atom.getProperty(
+                    DENOPTIMConstants.ATMPROPVERTEXID);
+            int iatm = (int) atom.getProperty(
+                    DENOPTIMConstants.ATMPROPORIGINALATMID);
+            if (atmSrcMap.containsKey(vid))
+            {
+                atmSrcMap.get(vid).put(iatm, l);
+            } else {
+                TreeMap<Integer,Integer> atmPositionInVrtxAndInMol =
+                        new TreeMap<Integer,Integer>();
+                atmPositionInVrtxAndInMol.put(iatm, l);
+                atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
+            }
+            l++;
+            */
+
+            return iac;
         } catch (DENOPTIMException e)
         {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    private DENOPTIMAttachmentPoint getInnerAPFromOuterAP(DENOPTIMAttachmentPoint outerAP) {
+        for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry
+                : innerToOuterAPs.entrySet()) {
+            if (outerAP.equals(entry.getValue())) {
+                return entry.getKey();
+            }
         }
         return null;
     }
