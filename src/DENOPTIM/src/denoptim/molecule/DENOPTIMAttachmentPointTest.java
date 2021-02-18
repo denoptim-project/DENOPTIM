@@ -19,18 +19,17 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import denoptim.exception.DENOPTIMException;
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint
@@ -144,8 +143,12 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals()
     {
-		dummyVertex.addAP(1, 2, 1);
-		dummyVertex.addAP(1, 2, 1);
+		try {
+			dummyVertex.addAP(1, 2, 1);
+			dummyVertex.addAP(1, 2, 1);
+		} catch (DENOPTIMException e) {
+			fail("unexpected exception");
+		}
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
@@ -160,8 +163,12 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals_DiffSrcAtm()
     {
-    	dummyVertex.addAP(1, 2, 1);
-    	dummyVertex.addAP(2, 2, 1);
+		try {
+			dummyVertex.addAP(1, 2, 1);
+			dummyVertex.addAP(2, 2, 1);
+		} catch (DENOPTIMException e) {
+			fail("unexpected exception");
+		}
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 

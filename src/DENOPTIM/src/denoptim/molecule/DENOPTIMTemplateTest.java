@@ -50,9 +50,13 @@ public class DENOPTIMTemplateTest
     @Test
     public void testGetAttachmentPointsReturnsAPsWithTemplateAsOwner() {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
-        template.addAP(0, 1, 1);
         EmptyVertex v = new EmptyVertex();
-        v.addAP(0, 1, 1);
+        try {
+            template.addAP(0, 1, 1);
+            v.addAP(0, 1, 1);
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception");
+        }
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v);
         template.setInnerGraph(innerGraph);
@@ -71,24 +75,27 @@ public class DENOPTIMTemplateTest
     public void testGetAttachmentPointsReturnsCorrectNumberOfAPs() {
         // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
-
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         int requiredAPCount = 2;
         int atmPos = 0;
         int atmConns = 1;
         int apConns = 1;
-        for (int i = 0; i < requiredAPCount; i++) {
-            template.addAP(atmPos, atmConns, apConns);
-        }
         EmptyVertex v1 = new EmptyVertex();
-        int v1APCount = 3;
-        for (int i = 0; i < v1APCount; i++) {
-            v1.addAP(atmPos, atmConns, apConns);
-        }
         EmptyVertex v2 = new EmptyVertex();
+        int v1APCount = 3;
         int v2APCount = 2;
-        for (int i = 0; i < v2APCount; i++) {
-            v2.addAP(atmPos, atmConns, apConns);
+        try {
+            for (int i = 0; i < requiredAPCount; i++) {
+                template.addAP(atmPos, atmConns, apConns);
+            }
+            for (int i = 0; i < v1APCount; i++) {
+                v1.addAP(atmPos, atmConns, apConns);
+            }
+            for (int i = 0; i < v2APCount; i++) {
+                v2.addAP(atmPos, atmConns, apConns);
+            }
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception");
         }
         v1.connectVertices(v2);
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
@@ -182,7 +189,11 @@ public class DENOPTIMTemplateTest
                                             int expNumberOfAPs) {
         DENOPTIMVertex v = new EmptyVertex();
         for (int i = 0; i < expNumberOfAPs - 1; i++) {
-            v.addAP();
+            try {
+                v.addAP();
+            } catch (DENOPTIMException e) {
+                fail("unexpected exception");
+            }
         }
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v);
@@ -213,9 +224,11 @@ public class DENOPTIMTemplateTest
         } catch (DENOPTIMException e) {
             fail("unexpected exception thrown");
         }
+        v.setVertexId(0);
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(v);
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
+        t.setVertexId(1);
         t.setInnerGraph(g);
 
         int expected = t.getVertexId();

@@ -10,7 +10,7 @@ FS-compMatrixFile=OTF_WDIR/CPMap.par
 FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
 FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
 
-FS-USETEMPLATES=for now, we only check the existence of this parameter, but its argument not used
+#FS-USETEMPLATES=for now, we only check the existence of this parameter, but its argument not used
 
 # Parameters controlling handling of cyclic graphs
 #RC-CLOSERINGS=yes, we do!

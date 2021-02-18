@@ -19,11 +19,6 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,6 +26,7 @@ import java.util.Map;
 
 import javax.vecmath.Point3d;
 
+import denoptim.exception.DENOPTIMException;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.silent.Bond;
@@ -39,6 +35,8 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for DENOPTIMVertex
@@ -56,16 +54,20 @@ public class DENOPTIMVertexTest
     public void testSameAs_Equal()
     {
         DENOPTIMVertex vA = new EmptyVertex(0);
-        vA.addAP(0, 1, 1);
-        vA.addAP(1, 1, 1);
-        vA.addAP(2, 1, 1);
-        vA.addAP(3, 1, 1);
-
         DENOPTIMVertex vB = new EmptyVertex(90);
-        vB.addAP(0, 1, 1);
-        vB.addAP(1, 1, 1);
-        vB.addAP(2, 1, 1);
-        vB.addAP(3, 1, 1);
+        try {
+            vA.addAP(0, 1, 1);
+            vA.addAP(1, 1, 1);
+            vA.addAP(2, 1, 1);
+            vA.addAP(3, 1, 1);
+
+            vB.addAP(0, 1, 1);
+            vB.addAP(1, 1, 1);
+            vB.addAP(2, 1, 1);
+            vB.addAP(3, 1, 1);
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception");
+        }
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertTrue(vA.sameAs(vB, reason));	
@@ -76,20 +78,24 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_DiffAPConnection()
     {
-        DENOPTIMVertex vA = new EmptyVertex(0);
-        vA.addAP(0, 1, 1);
-        vA.addAP(1, 1, 1);
-        vA.addAP(2, 1, 1);
-        vA.addAP(3, 1, 1);
+        try {
+            DENOPTIMVertex vA = new EmptyVertex(0);
+            vA.addAP(0, 1, 1);
+            vA.addAP(1, 1, 1);
+            vA.addAP(2, 1, 1);
+            vA.addAP(3, 1, 1);
 
-        DENOPTIMVertex vB = new EmptyVertex(90);
-        vB.addAP(0, 1, 1);
-        vB.addAP(1, 1, 1);
-        vB.addAP(2, 1, 1);
-        vB.addAP(3, 1, 2); //dif
-        //NB: vertex ID must be ignores by the sameAs method
+            DENOPTIMVertex vB = new EmptyVertex(90);
+            vB.addAP(0, 1, 1);
+            vB.addAP(1, 1, 1);
+            vB.addAP(2, 1, 1);
+            vB.addAP(3, 1, 2); //dif
+            //NB: vertex ID must be ignores by the sameAs method
 
-    	assertFalse(vA.sameAs(vB, reason));	
+            assertFalse(vA.sameAs(vB, reason));
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception");
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -97,19 +103,23 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_DiffAPNum()
     {
-        DENOPTIMVertex vA = new EmptyVertex(0);
-        vA.addAP(0, 1, 1);
-        vA.addAP(1, 1, 1);
-        vA.addAP(2, 1, 1);
-        vA.addAP(3, 1, 1);
+        try {
+            DENOPTIMVertex vA = new EmptyVertex(0);
+            vA.addAP(0, 1, 1);
+            vA.addAP(1, 1, 1);
+            vA.addAP(2, 1, 1);
+            vA.addAP(3, 1, 1);
 
-        DENOPTIMVertex vB = new EmptyVertex(90);
-        vB.addAP(0, 1, 1);
-        vB.addAP(1, 1, 1);
-        vB.addAP(2, 1, 1);
-        //NB: vertex ID must be ignores by the sameAs method
+            DENOPTIMVertex vB = new EmptyVertex(90);
+            vB.addAP(0, 1, 1);
+            vB.addAP(1, 1, 1);
+            vB.addAP(2, 1, 1);
+            //NB: vertex ID must be ignores by the sameAs method
 
-    	assertFalse(vA.sameAs(vB, reason));	
+            assertFalse(vA.sameAs(vB, reason));
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception");
+        }
     }
     
 //------------------------------------------------------------------------------

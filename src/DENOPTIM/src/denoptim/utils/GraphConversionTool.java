@@ -111,6 +111,7 @@ public class GraphConversionTool
                         DENOPTIMConstants.ATMPROPORIGINALATMID);
                 if (atmSrcMap.containsKey(vid))
                 {
+                    //
                     atmSrcMap.get(vid).put(iatm, molAtomCounter);
                 } else {
                     TreeMap<Integer,Integer> atmPositionInVrtxAndInMol =
@@ -120,10 +121,9 @@ public class GraphConversionTool
                 }
 
                 // TODO: Remove
-//                if (g.getGraphId() == 30 && vertex.getVertexId() == 169) {
-//                    System.out.println(vid + "\n");
-//                    System.out.println(atmSrcMap + "\n");
-//                }
+                if (g.getGraphId() == 30 && vertex.getVertexId() == 169) {
+                    System.out.println(atmSrcMap + "\n");
+                }
 
                 molAtomCounter++;
             }

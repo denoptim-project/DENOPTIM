@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import denoptim.exception.DENOPTIMException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
@@ -242,7 +243,11 @@ public class EmptyVertex extends DENOPTIMVertex
         
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            c.addAP(ap.clone());
+            try {
+                c.addAP(ap.clone());
+            } catch (DENOPTIMException e) {
+                e.printStackTrace();
+            }
         }
 
         ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();

@@ -19,16 +19,14 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
+import denoptim.exception.DENOPTIMException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for DENOPTIMEdge
@@ -49,15 +47,19 @@ public class DENOPTIMEdgeTest {
 
 	@BeforeEach
 	public void setUpClass() {
-		dummyVertexA = new EmptyVertex();
-		dummyVertexA.addAP();
-		dummyVertexA.addAP();
-		dummyApA1 = dummyVertexA.getAP(0);
-        dummyApA2 = dummyVertexA.getAP(1);
-        
-        dummyVertexB = new EmptyVertex();
-        dummyVertexB.addAP();
-        dummyApB = dummyVertexB.getAP(0);
+		try {
+			dummyVertexA = new EmptyVertex();
+			dummyVertexA.addAP();
+			dummyVertexA.addAP();
+			dummyApA1 = dummyVertexA.getAP(0);
+			dummyApA2 = dummyVertexA.getAP(1);
+
+			dummyVertexB = new EmptyVertex();
+			dummyVertexB.addAP();
+			dummyApB = dummyVertexB.getAP(0);
+		} catch (DENOPTIMException e ) {
+			fail("unexpected exception");
+		}
 	}
 	
 //------------------------------------------------------------------------------
