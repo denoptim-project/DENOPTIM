@@ -741,14 +741,14 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Add ap to the end of the list of this vertex's list of attachment points
      * @param ap attachment point to add to this vertex
      */
-    public void addAP(DENOPTIMAttachmentPoint ap) {
+    public void addAP(DENOPTIMAttachmentPoint ap) throws DENOPTIMException {
         ap.setOwner(this);
         getAttachmentPoints().add(ap);
     }
 
 //------------------------------------------------------------------------------
 
-    public void addAP() {
+    public void addAP() throws DENOPTIMException {
         addAP(0, 0, 0);
     }
 
@@ -761,7 +761,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param apConnections the number of free connections
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections) {
+                      int apConnections) throws DENOPTIMException {
         addAP(atomPositionNumber, atomConnections, apConnections,
                 new double[3]);
     }
@@ -780,13 +780,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      *               of the source atom). This must array have 3 entries.
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, double[] dirVec) {
-        try {
-            addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
-                    APClass.make(""));
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-        }
+                      int apConnections, double[] dirVec) throws  DENOPTIMException {
+        addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
+                APClass.make(""));
     }
 
 //------------------------------------------------------------------------------
@@ -799,7 +795,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param apClass the APClass
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, APClass apClass) {
+                      int apConnections, APClass apClass) throws DENOPTIMException {
         addAP(atomPositionNumber, atomConnections, apConnections,
                 new double[3], apClass);
     }
@@ -816,8 +812,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param apClass the APClass
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, double[] dirVec, APClass apClass) {
-
+                      int apConnections, double[] dirVec, APClass apClass) throws DENOPTIMException {
         addAP(new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, atomConnections, apConnections, dirVec,
                 apClass));

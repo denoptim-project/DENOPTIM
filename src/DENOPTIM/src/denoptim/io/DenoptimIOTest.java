@@ -31,6 +31,7 @@ import java.util.Set;
 
 import javax.vecmath.Point3d;
 
+import denoptim.exception.DENOPTIMException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
@@ -204,7 +205,11 @@ public class DenoptimIOTest {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
+			try {
+				v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
+			} catch (DENOPTIMException e) {
+				e.printStackTrace();
+			}
 		}
 		graph.addVertex(v);
 	}

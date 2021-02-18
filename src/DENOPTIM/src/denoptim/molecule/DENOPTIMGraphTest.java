@@ -19,11 +19,6 @@ package denoptim.molecule;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -49,6 +44,8 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -644,11 +641,14 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testGetAvailableAPs_returnsListOfAvailableAPs() {
 		DENOPTIMVertex vertex0 = new EmptyVertex(0);
-		vertex0.addAP(0, 1, 1);
-		vertex0.addAP(0, 1, 1);
-
 		DENOPTIMVertex vertex1 = new EmptyVertex(1);
-		vertex1.addAP(0, 1, 1);
+		try {
+			vertex0.addAP(0, 1, 1);
+			vertex0.addAP(0, 1, 1);
+			vertex1.addAP(0, 1, 1);
+		} catch (DENOPTIMException e) {
+			fail("unexpected error");
+		}
 
 		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getAP(0),
 		        vertex1.getAP(0));
@@ -657,6 +657,7 @@ public class DENOPTIMGraphTest {
 		graph.addVertex(vertex0);
 		graph.addVertex(vertex1);
 		graph.addEdge(edge0);
+
 
 		//TODO-V3 add assert statements
 	}
@@ -876,7 +877,11 @@ public class DENOPTIMGraphTest {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
+			try {
+				v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
+			} catch (DENOPTIMException e) {
+				fail("unexpected exception");
+			}
 		}
 		graph.addVertex(v);
 	}

@@ -125,7 +125,16 @@ public class TestOperator
                 GraphConversionTool.getGraphFromString(DenoptimIO.readSDFFile(
                                        TestOperatorParameters.inpFileF).get(0)
                                          .getProperty("GraphENC").toString());
-    
+
+        for (DENOPTIMVertex v : male.getVertexList()) {
+            System.out.println("Vertex with id: " + v.getVertexId() + "is " +
+                    "class " + v.getClass().getName());
+        }
+        for (DENOPTIMVertex v : female.getVertexList()) {
+            System.out.println("Vertex with id: " + v.getVertexId() + "is " +
+                    "class " + v.getClass().getName());
+        }
+
         System.out.println("Initial graphs: ");
         System.out.println("v:"+TestOperatorParameters.mvid
                              +" of MALE: "+male);

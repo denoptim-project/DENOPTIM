@@ -62,7 +62,8 @@ public class GraphConversionTool
      */
 
 	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
-    // with a flag that controls weather we rototranslate the building blocks or not
+    // with a flag that controls whether we rototranslate the building blocks
+    // or not
 	
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
@@ -73,15 +74,15 @@ public class GraphConversionTool
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         IAtomContainer mol = builder.newAtomContainer();
 
-        int molidx = 0, l = 0, j = 0;
+        int molAtomCounter = 0;
 
         // loop through the vertices
         int n = g.getVertexCount();
+
         for (int i=0; i<n; i++)
         {
             DENOPTIMVertex vertex = g.getVertexList().get(i);
-            
-            Integer id = vertex.getVertexId();
+
             if (!vertex.containsAtoms())
             {
                 //TODO-V3 remove, eventually
@@ -91,29 +92,31 @@ public class GraphConversionTool
 
             // Here we get atoms that are labelled with the original vertex ID
             IAtomContainer iac = vertex.getIAtomContainer();
-            
+
             // Project original atom position in atom position in global list
             for(IAtom atom : iac.atoms())
             {
-                int vid = (int) atom.getProperty(
+                int vid = atom.getProperty(
                         DENOPTIMConstants.ATMPROPVERTEXID);
-                int iatm = (int) atom.getProperty(
+                int iatm = atom.getProperty(
                         DENOPTIMConstants.ATMPROPORIGINALATMID);
                 if (atmSrcMap.containsKey(vid))
                 {
-                    atmSrcMap.get(vid).put(iatm, l);
+                    //
+                    atmSrcMap.get(vid).put(iatm, molAtomCounter);
                 } else {
-                    TreeMap<Integer,Integer> atmPositionInVrtxAndInMol = 
+                    TreeMap<Integer,Integer> atmPositionInVrtxAndInMol =
                             new TreeMap<Integer,Integer>();
-                    atmPositionInVrtxAndInMol.put(iatm, l);
+                    atmPositionInVrtxAndInMol.put(iatm, molAtomCounter);
                     atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
                 }
-                l++;
+
+                molAtomCounter++;
             }
 
             mol.add(iac);
         }
-        
+
         // loop through the edges
         n = g.getEdgeCount();
         for (int i=0; i<n; i++)
@@ -139,6 +142,7 @@ public class GraphConversionTool
                 }
             } catch (Exception e)
             {
+                e.printStackTrace();
                 String msg = "Incorrect indices. Although this may be a bug, " +
                         "it is more likely an error in the atom specification. "
                         + "Kindly check your input files."
@@ -247,7 +251,7 @@ public class GraphConversionTool
         //TODO-V3 string representation will probably change, so this will require heavy changes
         
     	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
-        String s1[] = strGraph.split("\\s+");
+        String[] s1 = strGraph.split("\\s+");
         int gcode = Integer.parseInt(s1[0]);
         String vStr = s1[1];
         String eStr = "";
