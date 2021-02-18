@@ -251,7 +251,7 @@ public class GraphConversionTool
         //TODO-V3 string representation will probably change, so this will require heavy changes
         
     	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
-        String s1[] = strGraph.split("\\s+");
+        String[] s1 = strGraph.split("\\s+");
         int gcode = Integer.parseInt(s1[0]);
         String vStr = s1[1];
         String eStr = "";

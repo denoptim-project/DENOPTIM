@@ -1,7 +1,7 @@
 #
 # CompatibilityMatrix for Class Based Builders
 #
-RCN c:0 c:0,c:0,hyd:1
+RCN c:0 c:0,hyd:1
 # CLASS-to-BondOrder conversion
 RBO c 1
 RBO hyd 1
