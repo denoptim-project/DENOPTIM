@@ -201,6 +201,11 @@ public final class DENOPTIMConstants
     public static final String GRAPHTAG = "GraphENC";
     
     /**
+     * SDF tag containing graph encoding in JSON format
+     */
+    public static final String GRAPHJSONTAG = "GraphJson";
+    
+    /**
      * SDF tag containing metadata on graph
      */
     public static final String GMSGTAG = "GraphMsg";

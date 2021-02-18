@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/DENOPTIM/src"/>
+	<classpathentry kind="src" path="src/misc/StringConverter/src"/>
 	<classpathentry kind="src" path="src/misc/RDKITFragmenter/src"/>
 	<classpathentry kind="src" path="src/misc/SerConverter/src"/>
 	<classpathentry kind="src" path="src/misc/GraphEditor/src"/>

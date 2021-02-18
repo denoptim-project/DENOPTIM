@@ -105,6 +105,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * is generated anew from scratch, or from mutation/crossover.
      */
     String localMsg;
+    
+
+    /**
+     * Identifier for the format of string representations of a graph
+     */
+    public enum StringFormat {JSON, GraphENC}
 
 
 //------------------------------------------------------------------------------
