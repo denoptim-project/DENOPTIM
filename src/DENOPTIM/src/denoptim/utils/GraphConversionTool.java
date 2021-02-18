@@ -78,19 +78,10 @@ public class GraphConversionTool
 
         // loop through the vertices
         int n = g.getVertexCount();
-        // TODO: Remove
-//        System.out.println(g);
-//        System.out.println("Vertex count " + n);
 
         for (int i=0; i<n; i++)
         {
             DENOPTIMVertex vertex = g.getVertexList().get(i);
-
-            // TODO: Remove
-//            if (vertex.getVertexId() == 169) {
-//                System.out.println(g + "\nVertex count=" + g.getVertexCount() + "\n");
-//                System.out.println(vertex + "\n");
-//            }
 
             if (!vertex.containsAtoms())
             {
@@ -120,21 +111,10 @@ public class GraphConversionTool
                     atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
                 }
 
-                // TODO: Remove
-                if (g.getGraphId() == 30 && vertex.getVertexId() == 169) {
-                    System.out.println(atmSrcMap + "\n");
-                }
-
                 molAtomCounter++;
             }
 
             mol.add(iac);
-        }
-
-        //TODO: Remove
-        if (g.getGraphId() == 30) {
-            System.out.println(atmSrcMap + "\n");
-            System.out.println(g + "\n");
         }
 
         // loop through the edges
@@ -151,14 +131,6 @@ public class GraphConversionTool
             
             try
             {
-                // TODO: Remove
-//                System.out.println(ap1 + " " + ap1.getAtomPositionNumber());
-//                if (v1.getVertexId() == 169) {
-//                    System.out.println(atmSrcMap + "\n");
-//                    System.out.println(g + "\nVertex count=" + g.getVertexCount() + "\n");
-//                    System.out.println(v1 + "---" + v2 + "\n");
-//                }
-
                 int dap1_anum = atmSrcMap.get(v1.getVertexId()).get(
                         ap1.getAtomPositionNumber());
                 int dap2_anum = atmSrcMap.get(v2.getVertexId()).get(
