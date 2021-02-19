@@ -54,6 +54,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -3018,11 +3019,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             .registerTypeAdapter(DENOPTIMVertex.class, 
                     new DENOPTIMVertexSerializer())
                     */
-            /*
-            // Custom serializer to hangle AP mapping
+            // Custom serializer to make json string use AP's ID as key in the 
+            // map. If this is not used, then the key.toString() is used to 
+            // get a string representation of the key.
             .registerTypeAdapter(APMap.class, 
                     new APMapSerializer())
-                    */
             // Custom serializer that keeps only the IDs to vertexes and 
             // APs defined in the list of  vertexes belonging to the graph. 
             .registerTypeAdapter(DENOPTIMEdge.class, 
@@ -3050,10 +3051,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public static DENOPTIMGraph fromJson(String json)
     {   
         Gson gson = new GsonBuilder()
-            .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+            .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
             // Custom deserializer to dispatch to the correct subclass of Vertex
             .registerTypeAdapter(DENOPTIMVertex.class, 
                   new DENOPTIMVertexDeserializer())
+            // Custom deserializer to recover references to APs
+            .registerTypeAdapter(APMap.class, 
+                    new APMapDeserializer())
             // Custom deserializer takes care of converting ID-based components
             // to references to vertexes and APs
             .registerTypeAdapter(DENOPTIMGraph.class, 
@@ -3112,6 +3116,51 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     && field.getName().equals("owner")) {
                 return true;
             }
+            
+            return false;
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) { 
+            return false; 
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class DENOPTIMExclusionStrategyNoAPMap implements ExclusionStrategy 
+    {
+        @Override
+        public boolean shouldSkipField(FieldAttributes field) {
+            // cannot serialize chemical representations: 
+            //     class org.openscience.cdk.Atom declares multiple JSON
+            //     fields named identifier
+            if (field.getDeclaringClass() == DENOPTIMFragment.class 
+                    && field.getName().equals("mol")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
+                    && field.getName().equals("owner")) {
+                return true;
+            }
+
+            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
+                    && field.getName().equals("user")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == DENOPTIMVertex.class 
+                    && field.getName().equals("owner")) {
+                return true;
+            }
+            
+            //TODO-MF remove tmp exclusions
+            
+            if (field.getDeclaringClass() == DENOPTIMTemplate.class 
+                    && field.getName().equals("innerToOuterAPs")) {
+                return true;
+            }
+            
+            
             return false;
         }
 
@@ -3189,7 +3238,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         public JsonElement serialize(APMap apmap, Type typeOfSrc, 
                 JsonSerializationContext context)
         {
-            Map<Integer,DENOPTIMAttachmentPoint> jsonableMap = new TreeMap<>();
+            TreeMap<Integer,DENOPTIMAttachmentPoint> jsonableMap = new TreeMap<>();
             for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry 
                     : apmap.entrySet())
             {
@@ -3256,8 +3305,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             // Eventually, also the sym sets will become references...
             partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
             
+            //TODO del
+            System.out.println("Vertex only deserialization");
+            
             Gson gson = new GsonBuilder()
-                .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+                .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
                 .registerTypeAdapter(DENOPTIMVertex.class, 
                       new DENOPTIMVertexDeserializer())
                 .setPrettyPrinting()
@@ -3333,12 +3385,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             JsonObject jsonObject = json.getAsJsonObject();
 
-            if (jsonObject.has("embeddedGraph")) 
+            if (jsonObject.has("innerGraph")) 
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE Template " 
                         + jsonObject.get("vertexId"));
-                return context.deserialize(jsonObject, DENOPTIMTemplate.class);
+                
+                DENOPTIMTemplate tmpl = context.deserialize(jsonObject, DENOPTIMTemplate.class);
+                
+                //Recover innerToOuter APMap
+                Type type = new TypeToken<TreeMap<Integer,DENOPTIMAttachmentPoint>>(){}.getType();
+                TreeMap<Integer,DENOPTIMAttachmentPoint> map = context.deserialize(
+                        jsonObject.getAsJsonObject("innerToOuterAPs"), type);
+                tmpl.updateInnerToOuter(map);
+                
+                return tmpl;
             }
             else if (jsonObject.has("buildingBlockId")) 
             {
@@ -3358,6 +3419,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 DENOPTIMVertex fragWithMol;
                 try
                 {
+                    // NB: this works well also with templates that are in the library 
                     fragWithMol = FragmentSpace.getVertexFromLibrary(
                             frag.getFragmentType(), frag.getMolId());
                 } catch (DENOPTIMException e)
@@ -3394,6 +3456,25 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         + jsonObject.get("vertexId"));
                 return context.deserialize(jsonObject, EmptyVertex.class);
             }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static class APMapDeserializer 
+    implements JsonDeserializer<APMap> 
+    {
+        @Override
+        public APMap deserialize(JsonElement json, Type typeOfT, 
+                JsonDeserializationContext context) throws JsonParseException 
+        {
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            APMap apMap = new APMap();
+            
+            //TODO-MF
+            
+            return apMap;
         }
     }
     

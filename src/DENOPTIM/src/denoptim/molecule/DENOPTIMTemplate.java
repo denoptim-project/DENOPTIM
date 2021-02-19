@@ -1,8 +1,12 @@
 package denoptim.molecule;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -426,6 +430,21 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
     }
 
+//-----------------------------------------------------------------------------
+    
+    //TODO-MF possibly relocate this and make private
+    public void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
+    {
+        this.innerToOuterAPs = new APMap();
+        for (Entry<Integer, DENOPTIMAttachmentPoint> e : map.entrySet())
+        {
+            DENOPTIMAttachmentPoint innerAP = innerGraph.getAPWithId(e.getKey());
+            this.innerToOuterAPs.put(innerAP, e.getValue());
+        }
+    }
+
+//-----------------------------------------------------------------------------
+    
     private boolean isValidInnerGraph(DENOPTIMGraph g) {
         ArrayList<DENOPTIMAttachmentPoint> outerAPs = g.getAvailableAPs();
         if (outerAPs.size() < requiredAPs.size()) {
@@ -683,5 +702,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         FIXED_STRUCT,
         FIXED
     }
+    
+//------------------------------------------------------------------------------
+
 }
 

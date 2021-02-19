@@ -9,6 +9,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMGraph.StringFormat;
+import denoptim.molecule.DENOPTIMTemplate;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
@@ -94,6 +96,20 @@ public class StringConverter
                 case JSON:
                     g = DENOPTIMGraph.fromJson(input);
                     break;
+            }
+            
+            System.out.println("Vertexes in input graph:");
+            //TODO del
+            for (DENOPTIMVertex v : g.getVertexList())
+            {
+                System.out.println(" -> "+v.getVertexId()+" "+v.getClass().getName());
+                if (v instanceof DENOPTIMTemplate)
+                {
+                    for (DENOPTIMVertex inner : ((DENOPTIMTemplate) v).getInnerGraph().getVertexList())
+                    {
+                        System.out.println("    -> " + inner.getVertexId()+" "+inner.getClass().getName());
+                    }
+                }
             }
             
             System.out.println(" ");
