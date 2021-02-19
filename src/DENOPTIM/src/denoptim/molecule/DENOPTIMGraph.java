@@ -20,7 +20,7 @@
 package denoptim.molecule;
 
 import java.util.*;
-
+import java.util.Map.Entry;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
@@ -3013,6 +3013,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             .registerTypeAdapter(DENOPTIMGraph.class, 
                     new DENOPTIMGraphSerializer())
             .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+            /*
+            // Custom serializer to intercept vertex subclass
+            .registerTypeAdapter(DENOPTIMVertex.class, 
+                    new DENOPTIMVertexSerializer())
+                    */
+            /*
+            // Custom serializer to hangle AP mapping
+            .registerTypeAdapter(APMap.class, 
+                    new APMapSerializer())
+                    */
             // Custom serializer that keeps only the IDs to vertexes and 
             // APs defined in the list of  vertexes belonging to the graph. 
             .registerTypeAdapter(DENOPTIMEdge.class, 
@@ -3109,18 +3119,96 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         public boolean shouldSkipClass(Class<?> clazz) { 
             return false; 
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    //TODO: consider removal. this is just a code stub written to test the 
+    // possibility of having a custom serializer.
+    
+    public static class DENOPTIMVertexSerializer 
+    implements JsonSerializer<DENOPTIMVertex> {
 
+        @Override
+        public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, 
+                JsonSerializationContext context) {
+            
+            //TODO del
+            System.out.println("HERE IN VERTEXSerializer: "+src.getClass().getName());
+            
+            JsonObject jsonObject = new JsonObject();
+            // src.owner creates a loop!
+            jsonObject.addProperty("vertexId", src.getVertexId());
+            jsonObject.addProperty("isRCV", src.isRCV());
+            jsonObject.addProperty("level", src.getLevel());
+            jsonObject.add("allowedMutatioTypes",
+                context.serialize(src.getMutationTypes()));
+                
+
+            //JsonPrimitive jsonObject = new JsonPrimitive(src.vertexId);
+            return jsonObject;
+        }
+    }
+    
+// 
+// public class DENOPTIMVertexSerializer implements JsonSerializer<DENOPTIMVertex> {
+//      // 
+//      // @Override
+//      // public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, JsonSerializationContext context) {
+//      //     JsonObject jsonObject = new JsonObject();
+//      //     jsonObject.addProperty("Name", src.Name);
+//      //     jsonObject.add("Type", context.serialize(src.Type));
+//      //     jsonObject.add("ChildId", context.serialize(src.ChildId));  // recursion!
+//      //     return jsonObject;
+//      // }
+// }
+// 
+// public class DENOPTIMVertexDeserializer implements JsonDeserializer<DENOPTIMVertex> {
+//      // 
+//      // @Override
+//      // public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+//      //     throws JsonParseException {
+//      //     DENOPTIMVertex id = new DENOPTIMVertex();
+//      //     id.Name = json.getAsJsonObject().get("Name").getAsString();
+//      //     id.Type = context.deserialize(json.getAsJsonObject().get("Type"), StructType.class);
+//      //     JsonElement childJson = json.getAsJsonObject().get("ChildId");
+//      //     if (childJson != null) {
+//      //         id.ChildId = context.deserialize(childJson, DENOPTIMVertex.class);  // recursion!
+//      //         id.ChildId.ParentId = id;
+//      //     }
+//      //     return id;
+//      // }
+// }
+
+//------------------------------------------------------------------------------
+    
+    private static class APMapSerializer 
+    implements JsonSerializer<APMap>
+    {   
+        @Override
+        public JsonElement serialize(APMap apmap, Type typeOfSrc, 
+                JsonSerializationContext context)
+        {
+            Map<Integer,DENOPTIMAttachmentPoint> jsonableMap = new TreeMap<>();
+            for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry 
+                    : apmap.entrySet())
+            {
+                jsonableMap.put(entry.getKey().getID(), entry.getValue());
+            }
+            
+            return context.serialize(jsonableMap);
+        }
     }
     
 //------------------------------------------------------------------------------
     
     private static class DENOPTIMEdgeSerializer 
     implements JsonSerializer<DENOPTIMEdge>
-    {
+    {   
         @Override
         public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc, 
                 JsonSerializationContext context)
-        {
+        {            
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("srcAPID", edge.getSrcAP().getID());
             jsonObject.addProperty("trgAPID", edge.getTrgAP().getID());

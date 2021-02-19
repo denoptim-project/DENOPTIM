@@ -64,7 +64,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
 
-    private Map<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> innerToOuterAPs;
+    private APMap innerToOuterAPs;
 
 //------------------------------------------------------------------------------
 
@@ -326,8 +326,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 Arrays.asList(vRCV1, vA, vB, vC, vD, vRCV2)));
         g.addRing(r);
 
-      //TODO-M7 del
-        System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+g);
+        //TODO-M7 del
+        //System.out.println("BEFORE___ TEMPLATE's inner graph (C): "+g);
         
         /*
         System.out.println("(F) TEMPLATE's inner graph: "+template.interiorGraph);
@@ -342,12 +342,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         template.setInnerGraph(g);
         
       //TODO-M7 del
+        /*
         System.out.println("AFTER___ TEMPLATE's inner graph (C): "+template.getInnerGraph());
-
         for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints()) {
             System.out.println(ap + "apid=" + ap.getID());
         }
-
+        */
+        
         template.freezeTemplate();
         
         return template;
@@ -417,7 +418,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     " required APs");
         }
         this.innerGraph = innerGraph;
-        this.innerToOuterAPs = new HashMap<>();
+        this.innerToOuterAPs = new APMap();
         for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
             DENOPTIMAttachmentPoint outerAP = innerAP.clone();
             outerAP.setOwner(this);

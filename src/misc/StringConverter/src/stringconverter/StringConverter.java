@@ -80,7 +80,9 @@ public class StringConverter
                         + inpFileName + "'. Expecting '.sdf' or '.txt'.");
                 System.exit(-1);
             }
-            System.out.println("INPUT: "+ input);
+            
+            //TODO del: too long
+            //System.out.println("INPUT: "+ input);
 
             DENOPTIMGraph g = null;
             switch (inpFormat) 
