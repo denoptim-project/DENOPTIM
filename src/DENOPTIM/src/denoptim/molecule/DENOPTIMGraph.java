@@ -3014,11 +3014,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             .registerTypeAdapter(DENOPTIMGraph.class, 
                     new DENOPTIMGraphSerializer())
             .setExclusionStrategies(new DENOPTIMExclusionStrategy())
-            /*
-            // Custom serializer to intercept vertex subclass
-            .registerTypeAdapter(DENOPTIMVertex.class, 
-                    new DENOPTIMVertexSerializer())
-                    */
             // Custom serializer to make json string use AP's ID as key in the 
             // map. If this is not used, then the key.toString() is used to 
             // get a string representation of the key.
@@ -3055,9 +3050,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             // Custom deserializer to dispatch to the correct subclass of Vertex
             .registerTypeAdapter(DENOPTIMVertex.class, 
                   new DENOPTIMVertexDeserializer())
-            // Custom deserializer to recover references to APs
-            .registerTypeAdapter(APMap.class, 
-                    new APMapDeserializer())
             // Custom deserializer takes care of converting ID-based components
             // to references to vertexes and APs
             .registerTypeAdapter(DENOPTIMGraph.class, 
@@ -3143,7 +3135,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     && field.getName().equals("owner")) {
                 return true;
             }
-
             if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
                     && field.getName().equals("user")) {
                 return true;
@@ -3152,14 +3143,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     && field.getName().equals("owner")) {
                 return true;
             }
-            
-            //TODO-MF remove tmp exclusions
-            
             if (field.getDeclaringClass() == DENOPTIMTemplate.class 
                     && field.getName().equals("innerToOuterAPs")) {
                 return true;
             }
-            
             
             return false;
         }
@@ -3172,7 +3159,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
-    //TODO: consider removal. this is just a code stub written to test the 
+    //TODO-V3: consider removal. this is just a code stub written to test the 
     // possibility of having a custom serializer.
     
     public static class DENOPTIMVertexSerializer 
@@ -3181,10 +3168,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         @Override
         public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, 
                 JsonSerializationContext context) {
-            
-            //TODO del
-            System.out.println("HERE IN VERTEXSerializer: "+src.getClass().getName());
-            
+                       
             JsonObject jsonObject = new JsonObject();
             // src.owner creates a loop!
             jsonObject.addProperty("vertexId", src.getVertexId());
@@ -3305,9 +3289,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             // Eventually, also the sym sets will become references...
             partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
             
-            //TODO del
-            System.out.println("Vertex only deserialization");
-            
             Gson gson = new GsonBuilder()
                 .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
                 .registerTypeAdapter(DENOPTIMVertex.class, 
@@ -3393,6 +3374,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 
                 DENOPTIMTemplate tmpl = context.deserialize(jsonObject, DENOPTIMTemplate.class);
                 
+                //TODO-MF: check deeper nesting levels
+                
+                // Deserialize embedded graph.
+                JsonObject innerGraphJson = jsonObject.getAsJsonObject("innerGraph");
+                DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(innerGraphJson.toString());
+                tmpl.setInnerGraph(innerGraph);
+                
+                // Is the following need? I think so, because we need the IDs 
+                // of outernAPs to be as defined in the json src.
+                
                 //Recover innerToOuter APMap
                 Type type = new TypeToken<TreeMap<Integer,DENOPTIMAttachmentPoint>>(){}.getType();
                 TreeMap<Integer,DENOPTIMAttachmentPoint> map = context.deserialize(
@@ -3458,26 +3449,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
     }
-    
-//------------------------------------------------------------------------------
-    
-    private static class APMapDeserializer 
-    implements JsonDeserializer<APMap> 
-    {
-        @Override
-        public APMap deserialize(JsonElement json, Type typeOfT, 
-                JsonDeserializationContext context) throws JsonParseException 
-        {
-            JsonObject jsonObject = json.getAsJsonObject();
 
-            APMap apMap = new APMap();
-            
-            //TODO-MF
-            
-            return apMap;
-        }
-    }
-    
 //------------------------------------------------------------------------------
     
 }

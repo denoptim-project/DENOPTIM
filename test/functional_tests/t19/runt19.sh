@@ -80,6 +80,8 @@ if [ "$differences" != "" ]; then
     echo "Test 't19' NOT PASSED (symptom: different atom list or connection table)."
     echo "$differences"
     exit -1
+else 
+    echo "Test 't19' PASSED"
 fi
 
 exit 0

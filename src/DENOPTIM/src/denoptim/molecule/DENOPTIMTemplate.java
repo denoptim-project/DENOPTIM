@@ -439,7 +439,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         for (Entry<Integer, DENOPTIMAttachmentPoint> e : map.entrySet())
         {
             DENOPTIMAttachmentPoint innerAP = innerGraph.getAPWithId(e.getKey());
-            this.innerToOuterAPs.put(innerAP, e.getValue());
+            DENOPTIMAttachmentPoint outerAP = e.getValue();
+            outerAP.setOwner(this);
+            this.innerToOuterAPs.put(innerAP, outerAP);
         }
     }
 
