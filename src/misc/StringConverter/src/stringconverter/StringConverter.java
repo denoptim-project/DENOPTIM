@@ -26,21 +26,26 @@ public class StringConverter
     {
         if (args.length < 1)
         {
-            System.err.println("Usage: java -jar StringConverter.jar paramsFile");
+            System.err.println("Usage: java -jar StringConverter.jar parFile");
             System.exit(-1);
         }
 
         try
         {
-            //TODO: logging
-            System.out.println("StringConverter Starts");
+            if (StringConverterParameters.verbosity > 0)
+            {
+                System.out.println("StringConverter Starts");
+            }
             
             StringConverterParameters.readParameterFile(args[0]);
             StringConverterParameters.checkParameters();
             StringConverterParameters.processParameters();
             
-            System.out.println("Reading input string representation ("
+            if (StringConverterParameters.verbosity > 0)
+            {
+                System.out.println("Reading input string representation ("
                     + StringConverterParameters.inpFormat + ")");
+            }
             String inpFileName = StringConverterParameters.inpFile;
             String outFileName = StringConverterParameters.outFile;
             StringFormat inpFormat = StringConverterParameters.inpFormat;
@@ -83,8 +88,10 @@ public class StringConverter
                 System.exit(-1);
             }
             
-            //TODO del: too long
-            //System.out.println("INPUT: "+ input);
+            if (StringConverterParameters.verbosity > 1)
+            {
+                System.out.println("INPUT: "+ input);
+            }
 
             DENOPTIMGraph g = null;
             switch (inpFormat) 
@@ -98,24 +105,52 @@ public class StringConverter
                     break;
             }
             
-            System.out.println("Vertexes in input graph:");
-            //TODO del
-            for (DENOPTIMVertex v : g.getVertexList())
+            
+            if (StringConverterParameters.verbosity > 1)
             {
-                System.out.println(" -> "+v.getVertexId()+" "+v.getClass().getName());
-                if (v instanceof DENOPTIMTemplate)
+                System.out.println("Vertexes in input graph:");
+                for (DENOPTIMVertex v : g.getVertexList())
                 {
-                    for (DENOPTIMVertex inner : ((DENOPTIMTemplate) v).getInnerGraph().getVertexList())
+                    System.out.println(" -> "
+                            +v.getVertexId()+" "+v.getClass().getName()
+                            +" BBType:"+v.getFragmentType()
+                            +" MolID:"+v.getMolId());
+                    if (v instanceof DENOPTIMTemplate)
                     {
-                        System.out.println("    -> " + inner.getVertexId()+" "+inner.getClass().getName());
+                        for (DENOPTIMVertex inner : ((DENOPTIMTemplate) v)
+                                .getInnerGraph().getVertexList())
+                        {
+                            System.out.println("    -> " + inner.getVertexId()
+                            +" "+inner.getClass().getName()
+                            +" BBType:"+inner.getFragmentType()
+                            +" MolID:"+inner.getMolId());
+                            if (inner instanceof DENOPTIMTemplate)
+                            {
+                                for (DENOPTIMVertex innerinner : 
+                                    ((DENOPTIMTemplate) inner)
+                                    .getInnerGraph().getVertexList())
+                                {
+                                    System.out.println("       -> " 
+                                            + innerinner.getVertexId()+" "
+                                            + innerinner.getClass().getName() 
+                                            + " BBType:" 
+                                            + innerinner.getFragmentType() 
+                                            + " MolID:" 
+                                            + innerinner.getMolId());
+                                }
+                            }
+                        }
                     }
                 }
             }
+                
             
-            System.out.println(" ");
-            System.out.println("Converting " +inpFormat + " to " 
+            if (StringConverterParameters.verbosity > 0)
+            {
+                System.out.println("Converting " +inpFormat + " to " 
                     + StringConverterParameters.outFormat + "");
-           
+            }
+            
             // Build new string representation
             String output = "";
             switch (outFormat) 
@@ -160,7 +195,10 @@ public class StringConverter
             System.exit(-1);
         }
 
-        System.out.println("StringConverter run completed");
+        if (StringConverterParameters.verbosity > 0)
+        {
+            System.out.println("StringConverter run completed");
+        }
         System.exit(0);
     }
 }

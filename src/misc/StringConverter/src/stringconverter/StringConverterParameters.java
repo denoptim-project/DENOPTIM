@@ -47,6 +47,11 @@ public class StringConverterParameters
      * Output file format
      */
     protected static StringFormat outFormat = StringFormat.JSON;
+    
+    /**
+     * Verbosity level
+     */
+    protected static int verbosity = 1;
 
 
 //-----------------------------------------------------------------------------
@@ -162,6 +167,9 @@ public class StringConverterParameters
         String msg = "";
         switch (key.toUpperCase())
         {
+            case "STRINGCONVERTER-VERBOSITY=":
+                verbosity = Integer.parseInt(value);
+                break;
             case "STRINGCONVERTER-INPUTFILE=":
                 inpFile = value;
                 break;

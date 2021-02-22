@@ -143,7 +143,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Builds a new molecular fragment kind of vertex.
+     * Make a new vertex that is a copy of a vertex in the fragment space.
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
      * @param bbt the type of building block

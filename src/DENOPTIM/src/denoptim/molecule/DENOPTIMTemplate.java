@@ -9,6 +9,7 @@ import com.google.gson.annotations.Expose;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
@@ -205,9 +206,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * Method meant for devel phase only. 
      */
     //TODO-V3 Remove.
-
-    
-    // WARNING! This is only meant to return a "scaffold" type
     
     public static DENOPTIMTemplate getTestFragmentTemplate() 
     {
@@ -216,6 +214,30 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         else
             return getAcyclicTemplate(BBType.FRAGMENT);
     }  
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method meant for devel phase only. 
+     */
+    //TODO-V3 Remove.
+    
+    public static DENOPTIMTemplate getTestFragmentTemplateBis() 
+    {
+        return getCyclicTemplateBis(BBType.FRAGMENT);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method meant for devel phase only. 
+     */
+    //TODO-V3 Remove.
+    
+    public static DENOPTIMTemplate getTestFragmentTemplateTris() 
+    {
+        return getCyclicTemplateTris(BBType.FRAGMENT);
+    }
     
 //------------------------------------------------------------------------------
     
@@ -263,9 +285,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         //     vRCV1...(chord)....vRCV2 
         //
         
-        
-        //TODO: back to fragment
-        //DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.FRAGMENT);
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
@@ -357,6 +376,173 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
         return template;
     }
+    
+//------------------------------------------------------------------------------
+    
+    //TODO-V3: this will be removed/replaced
+    
+    private static DENOPTIMTemplate getCyclicTemplateBis(BBType bbt) 
+    {
+        // Here we build a graph with ring and two unused APs (the *):
+        //
+        //   H    H H    *        H    *
+        //    \  /   \  /          \  /
+        //     vA-----vB------------vD
+        //      |                   |
+        //     vRCV1...(chord)....vRCV2 
+        //
+        
+        DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
+        
+        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+        DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+        DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 4, BBType.FRAGMENT);
+        DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 5, BBType.FRAGMENT);
+
+        List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
+        
+        DENOPTIMVertex vH1 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+        DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+        DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+        DENOPTIMVertex vH5 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+
+        List<DENOPTIMVertex> caps  = Arrays.asList(vH1, vH2, vH4, vH5);
+
+        List<DENOPTIMVertex> vertices = new ArrayList<>(frags);
+        vertices.addAll(caps);
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        for (DENOPTIMVertex v : vertices) {
+            g.addVertex(v);
+        }
+        
+        DENOPTIMEdge eARcv = vA.connectVertices(vRCV1, 3, 0);
+        DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 3);
+        DENOPTIMEdge eBD = vB.connectVertices(vD, 0, 3);
+        DENOPTIMEdge eDRcv = vD.connectVertices(vRCV2, 0, 0);
+
+        DENOPTIMEdge eAH1 = vA.connectVertices(vH1, 1, 0);
+        DENOPTIMEdge eBH2 = vB.connectVertices(vH2, 1, 0);
+        DENOPTIMEdge eDH4 = vD.connectVertices(vH4, 1, 0);
+        DENOPTIMEdge eAH5 = vA.connectVertices(vH5, 2, 0);
+
+        List<DENOPTIMEdge> edges = Arrays.asList(eARcv, eAB, eBD, eDRcv,
+                eAH1, eBH2, eDH4, eAH5);
+        for (DENOPTIMEdge e : edges) {
+            g.addEdge(e);
+        }
+        
+        DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+                Arrays.asList(vRCV1, vA, vB, vD, vRCV2)));
+        g.addRing(r);
+        
+        //TODO-M7 del
+        g.renumberGraphVertices();
+        template.setInnerGraph(g);
+        
+        template.freezeTemplate();
+        
+        return template;
+    }
+    
+    
+//------------------------------------------------------------------------------
+    
+    //TODO-V3: this will be removed/replaced
+    
+    private static DENOPTIMTemplate getCyclicTemplateTris(BBType bbt) 
+    {
+        // Here we build a graph with ring and two unused APs (the *):
+        //
+        //     H    H H    toOut   H   toOut  H    *  H    *
+        //      \  /   \  /         \  /       \  /    \  /
+        //  -(   vA-----vB-----------vD     )---vB------vD
+        //  |     |                   |                  |
+        //  |    vRCV1...(chord)...vRCV2                 |
+        //  |                                            |
+        // vRCV1.................(chord)................vRCV2 
+        //
+        
+        DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
+        
+        // NB: here we pick one of the templates we must have added to the library
+        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 8, BBType.FRAGMENT);
+        
+        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+        DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+        DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 4, BBType.FRAGMENT);
+        DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 5, BBType.FRAGMENT);
+
+        List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
+        
+        DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+        DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+
+        List<DENOPTIMVertex> caps  = Arrays.asList(vH2, vH4);
+
+        List<DENOPTIMVertex> vertices = new ArrayList<>(frags);
+        vertices.addAll(caps);
+        
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        
+        for (DENOPTIMVertex v : vertices) {
+            g.addVertex(v);
+        }
+        
+        DENOPTIMEdge eARcv = vA.connectVertices(vRCV1, 1, 0);
+        DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 3);
+        DENOPTIMEdge eBD = vB.connectVertices(vD, 0, 3);
+        DENOPTIMEdge eDRcv = vD.connectVertices(vRCV2, 0, 0);
+
+        DENOPTIMEdge eBH2 = vB.connectVertices(vH2, 1, 0);
+        DENOPTIMEdge eDH4 = vD.connectVertices(vH4, 1, 0);
+
+        List<DENOPTIMEdge> edges = Arrays.asList(eARcv, eAB, eBD, eDRcv,
+                eBH2, eDH4);
+        for (DENOPTIMEdge e : edges) {
+            g.addEdge(e);
+        }
+        
+        DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+                Arrays.asList(vRCV1, vA, vB, vD, vRCV2)));
+        g.addRing(r);
+        
+        //TODO-M7 del
+        g.renumberGraphVertices();
+        template.setInnerGraph(g);
+        
+        //TODO-M7 del
+        /*
+        System.out.println("Template NESTED: "+g);
+        for (DENOPTIMVertex v : template.innerGraph.gVertices)
+        {
+            System.out.println(" "+v.getVertexId()+" "+v.getClass().getName());
+        }
+        for (DENOPTIMAttachmentPoint ap : template.getAttachmentPoints()) {
+            System.out.println(ap + "apid=" + ap.getID());
+        }
+        */
+        
+        template.freezeTemplate();
+        
+        return template;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -390,17 +576,24 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     public DENOPTIMTemplate clone()
     {
-        DENOPTIMTemplate c;
-        
-    	//TODO-V3: implement deep cloning. Now it just building a new test template
-        if (this.buildingBlockType == BBType.SCAFFOLD)
-        {
-    	    c = getTestScaffoldTemplate();
-        } else {
-            c = getTestFragmentTemplate();
-        }
+        DENOPTIMTemplate c = new DENOPTIMTemplate(this.buildingBlockType);
         
         c.setVertexId(this.getVertexId());
+        c.buildingBlockType = this.buildingBlockType;
+        c.buildingBlockId = this.buildingBlockId;
+        c.contractLevel = this.contractLevel;
+
+        for (DENOPTIMAttachmentPoint oriAP : this.requiredAPs)
+        {
+            try
+            {
+                c.addAP(oriAP.clone());
+            } catch (DENOPTIMException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        c.setInnerGraph(this.getInnerGraph().clone());
         
         return c;
     }
@@ -432,7 +625,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    //TODO-MF possibly relocate this and make private
+    //TODO-V3 possibly relocate this and make private
     public void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
     {
         this.innerToOuterAPs = new APMap();
@@ -479,6 +672,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return ap1.getAPClass().compareTo(ap2.getAPClass());
         };
 
+        //TODO-V3: is sorting needed?
+        
         outerAPs.sort(c);
         requiredAPs.sort(c);
         int matchesLeft = requiredAPs.size();

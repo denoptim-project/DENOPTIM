@@ -853,8 +853,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             DENOPTIMVertex vClone = vOrig.clone();
             vClone.setLevel(vOrig.getLevel());
             cListVrtx.add(vClone);
-            vidsInClone.put(vClone.getVertexId(),vClone);
-        }
+            vidsInClone.put(vClone.getVertexId(),vClone);}
         
         ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<>();
         for (DENOPTIMEdge e : gEdges)
@@ -3147,6 +3146,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     && field.getName().equals("innerToOuterAPs")) {
                 return true;
             }
+            if (field.getDeclaringClass() == DENOPTIMTemplate.class 
+                    && field.getName().equals("innerGraph")) {
+                return true;
+            }
             
             return false;
         }
@@ -3374,15 +3377,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 
                 DENOPTIMTemplate tmpl = context.deserialize(jsonObject, DENOPTIMTemplate.class);
                 
-                //TODO-MF: check deeper nesting levels
+                // Deserialize embedded graph. Such field is excluded by design because
+                // if not, the above tmpl = context.deserialize(...) call produces
+                // an inner graph with null AP pointers.
                 
-                // Deserialize embedded graph.
                 JsonObject innerGraphJson = jsonObject.getAsJsonObject("innerGraph");
                 DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(innerGraphJson.toString());
                 tmpl.setInnerGraph(innerGraph);
                 
                 // Is the following need? I think so, because we need the IDs 
-                // of outernAPs to be as defined in the json src.
+                // of outernAPs to be as defined in the json string.
                 
                 //Recover innerToOuter APMap
                 Type type = new TypeToken<TreeMap<Integer,DENOPTIMAttachmentPoint>>(){}.getType();
