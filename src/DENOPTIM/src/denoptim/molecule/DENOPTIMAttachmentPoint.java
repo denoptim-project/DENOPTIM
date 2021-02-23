@@ -140,6 +140,25 @@ Comparable<DENOPTIMAttachmentPoint>
         this.dirVec = new double[3];
         System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     * @param atomPosNum the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param apClass the APClass
+     * @deprecated Use DENOPTIMVertex.addAP(...) instead
+     */
+    @Deprecated
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
+                                   int atomConnections, int apConnections,
+                                   APClass apClass) {
+        this(owner, atomPosNum, atomConnections, apConnections,
+                new double[]{0.0, 0.0, 0.0}, apClass);
+    }
+
     
 //------------------------------------------------------------------------------
     
@@ -706,15 +725,22 @@ Comparable<DENOPTIMAttachmentPoint>
                 );
             }
         } else {
-            DENOPTIMAttachmentPoint c = null;
-            c = new DENOPTIMAttachmentPoint(
+            if (dirVec == null) {
+                return new DENOPTIMAttachmentPoint(
+                        getOwner(),
+                        atomPositionNumber,
+                        totalConnections,
+                        freeConnections,
+                        apClass.clone()
+                );
+            }
+            return new DENOPTIMAttachmentPoint(
                     getOwner(),
                     atomPositionNumber,
                     totalConnections,
                     freeConnections,
                     dirVec,
                     apClass.clone());
-            return c;
         }
     }
 

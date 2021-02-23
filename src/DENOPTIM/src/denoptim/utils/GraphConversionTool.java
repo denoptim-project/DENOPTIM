@@ -279,14 +279,14 @@ public class GraphConversionTool
 		}
 
         // split vertices on the comma
-        String s2[] = vStr.split(",");
+        String[] s2 = vStr.split(",");
 
         ArrayList<DENOPTIMVertex> vertices = new ArrayList<>();
 
         // for each vertex
         for (int i=0; i<s2.length; i++)
         {
-            String s3[] = s2[i].split("_");
+            String[] s3 = s2[i].split("_");
 
             // vertex id
             int vid = Integer.parseInt(s3[0]);
@@ -360,6 +360,7 @@ public class GraphConversionTool
                             {
                                 vertex.addAP(0,1,1);
                             }
+
                             srcAP = vertex.getAP(srcAPID);
                             if (s4.length > 5) {
                                 srcAP.setAPClass(s4[5]);
@@ -378,6 +379,7 @@ public class GraphConversionTool
                             {
                                 vertex.addAP(0,1,1);
                             }
+
                             trgAP = vertex.getAP(trgAPID);
                             if (s4.length > 5) {
                                 trgAP.setAPClass(s4[6]);

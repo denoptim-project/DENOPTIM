@@ -257,6 +257,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         g.addVertex(vB);
         DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 1);
         g.addEdge(eAB);
+
         template.setInnerGraph(g);
         
         /*
@@ -661,12 +662,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             }
             double[] dirVec1 = ap1.getDirectionVector();
             double[] dirVec2 = ap2.getDirectionVector();
-            for (int i = 0; i < dirVec1.length; i++) {
-                double diffDirVec = dirVec1[i] - dirVec2[i];
-                if (diffDirVec < 0)  {
-                    return -1;
-                } else if (diffDirVec > 0) {
-                    return 1;
+            if (dirVec1 != null && dirVec2 != null) {
+                for (int i = 0; i < dirVec1.length; i++) {
+                    double diffDirVec = dirVec1[i] - dirVec2[i];
+                    if (diffDirVec < 0) {
+                        return -1;
+                    } else if (diffDirVec > 0) {
+                        return 1;
+                    }
                 }
             }
             return ap1.getAPClass().compareTo(ap2.getAPClass());
