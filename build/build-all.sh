@@ -102,6 +102,15 @@ if [ "$?" != "0" ]; then
 fi
 
 echo
+echo "build-stringconverter.sh"
+bash build-stringconverter.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-stringconverter.sh."
+    exit -1
+fi
+
+
 echo
 
 if [ "$1" = "makedist" ]; then

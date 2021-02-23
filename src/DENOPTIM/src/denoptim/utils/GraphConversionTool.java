@@ -196,6 +196,7 @@ public class GraphConversionTool
 
         // Store graph as property
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
+        //TODO-V3 get JSON
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
         if (g.getMsg() != null)
         {
@@ -300,7 +301,7 @@ public class GraphConversionTool
             DENOPTIMVertex dv;
             if (FragmentSpace.isDefined())
             {
-                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,fragtype);
+                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, fragtype);
             } else {
                 // WARNING: in this case we cannot know the exact number of
                 // attachment points, so we will add as many as needed to 

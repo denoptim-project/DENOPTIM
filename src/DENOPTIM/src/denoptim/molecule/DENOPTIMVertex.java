@@ -22,22 +22,12 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-
-import denoptim.utils.RandomUtils;
+import java.io.Serializable;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.interfaces.IAtomContainer;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
-import java.io.Serializable;
-import java.lang.reflect.Type;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -46,6 +36,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.RandomUtils;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
@@ -152,7 +143,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Builds a new molecular fragment kind of vertex.
+     * Make a new vertex that is a copy of a vertex in the fragment space.
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
      * @param bbt the type of building block
@@ -913,57 +904,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         return children;
     }
-    
-
-//------------------------------------------------------------------------------
-    public static class DENOPTIMVertexSerializer 
-    implements JsonSerializer<DENOPTIMVertex> {
-
-        @Override
-        public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, 
-                JsonSerializationContext context) {
-            JsonObject jsonObject = new JsonObject();
-            // src.owner creates a loop!
-            jsonObject.addProperty("vertexId", src.vertexId);
-            jsonObject.addProperty("isRCV", src.isRCV);
-            jsonObject.addProperty("level", src.level);
-            //jsonObject.add("allowedMutatioTypes",
-            //    context.serialize(src.allowedMutatioTypes));
-
-            //JsonPrimitive jsonObject = new JsonPrimitive(src.vertexId);
-            return jsonObject;
-        }
-    }
-    
-// 
-// public class DENOPTIMVertexSerializer implements JsonSerializer<DENOPTIMVertex> {
-//      // 
-//      // @Override
-//      // public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, JsonSerializationContext context) {
-//      //     JsonObject jsonObject = new JsonObject();
-//      //     jsonObject.addProperty("Name", src.Name);
-//      //     jsonObject.add("Type", context.serialize(src.Type));
-//      //     jsonObject.add("ChildId", context.serialize(src.ChildId));  // recursion!
-//      //     return jsonObject;
-//      // }
-// }
-// 
-// public class DENOPTIMVertexDeserializer implements JsonDeserializer<DENOPTIMVertex> {
-//      // 
-//      // @Override
-//      // public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-//      //     throws JsonParseException {
-//      //     DENOPTIMVertex id = new DENOPTIMVertex();
-//      //     id.Name = json.getAsJsonObject().get("Name").getAsString();
-//      //     id.Type = context.deserialize(json.getAsJsonObject().get("Type"), StructType.class);
-//      //     JsonElement childJson = json.getAsJsonObject().get("ChildId");
-//      //     if (childJson != null) {
-//      //         id.ChildId = context.deserialize(childJson, DENOPTIMVertex.class);  // recursion!
-//      //         id.ChildId.ParentId = id;
-//      //     }
-//      //     return id;
-//      // }
-// }
     
 //------------------------------------------------------------------------------
 

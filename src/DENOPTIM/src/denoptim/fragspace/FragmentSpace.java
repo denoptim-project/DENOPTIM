@@ -303,9 +303,23 @@ public class FragmentSpace
             
             fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplate());
             
+            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
+            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
+            
             System.err.println("WARNING! Running TEMP CODE: Replaced scaffold "
                     + "lib with single test template. Also appending one "
                     + "template to the library of fragments.");
+
+            for (int i=0; i<FragmentSpace.getFragmentLibrary().size(); i++)
+            {
+                DENOPTIMVertex v = FragmentSpace.getFragmentLibrary().get(i);
+                System.err.println(" "+i+": "+v.getClass().getName());
+                if (v instanceof DENOPTIMTemplate)
+                {
+                    DENOPTIMTemplate t = (DENOPTIMTemplate) v;
+                    System.err.println("    Template ("+t.getInnerGraph().getVertexCount()+" frags):"+t.getInnerGraph());
+                }
+            }
         }
         
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());

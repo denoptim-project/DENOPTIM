@@ -1,0 +1,26 @@
+#
+# Parameters for DENOPTIM
+#
+
+STRINGCONVERTER-inputFile=OTF_WDIR/input.txt
+STRINGCONVERTER-outputFile=OTF_WDIR/intermediate.txt
+STRINGCONVERTER-outputFormat=JSON
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
+
+FS-USETEMPLATES=for now, we only check the existence of this parameter, but its argument is not used
+FS-USECYCLICTEMPLATE=again, this is only for testing
+
+# Parameters controlling handling of cyclic graphs
+RC-CLOSERINGS=yes, we do!
+RC-EVALUATIONCLOSABILITYMODE=CONSTITUTION
+RC-CLOSABLERINGSMARTS=C1CCCC1
+RC-CLOSABLERINGSMARTS=C1CCCCC1
+RC-CLOSABLERINGSMARTS=C1CCCCCC1
+

@@ -1,5 +1,7 @@
 package denoptim.molecule;
 
+import java.util.ArrayList;
+
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
@@ -28,6 +30,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
@@ -38,7 +41,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 /**
  * Unit test for DENOPTIMTemplate
  * 
@@ -46,6 +48,89 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DENOPTIMTemplateTest
 {
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testClone() throws Exception
+    {
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        vA.addAP(0,1,1);
+        vA.addAP(0,1,1);
+        vA.addAP(0,2,1);
+        DENOPTIMVertex vB = new EmptyVertex(1);
+        vB.addAP(0,1,1);
+        vB.addAP(0,1,1);
+        DENOPTIMVertex vC = new EmptyVertex(2);
+        vC.addAP(0,1,1);
+        vC.addAP(0,1,1);
+        vA.addAP(0,1,1);
+        DENOPTIMVertex vRcvA = new EmptyVertex(3);
+        vRcvA.addAP(0,1,1);
+        vRcvA.setAsRCV(true);
+        DENOPTIMVertex vRcvC = new EmptyVertex(4);
+        vRcvC.addAP(0,1,1);
+        vRcvC.setAsRCV(true);
+        
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(vA);
+        g.addVertex(vB);
+        g.addVertex(vC);
+        g.addVertex(vRcvA);
+        g.addVertex(vRcvC);
+        
+        DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 1);
+        DENOPTIMEdge eBC = vB.connectVertices(vC, 0, 1);
+        DENOPTIMEdge eARcvA = vA.connectVertices(vRcvA, 1, 0);
+        DENOPTIMEdge eCRcvC = vC.connectVertices(vRcvC, 0, 0);
+        g.addEdge(eAB);
+        g.addEdge(eBC);
+        g.addEdge(eARcvA);
+        g.addEdge(eCRcvC);
+        
+        DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
+                Arrays.asList(vRcvA, vA, vB, vC, vRcvC)));
+        g.addRing(r);
+        
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
+        //TODO-v3 add required APs and check they are cloned properly
+        t.setInnerGraph(g);
+        t.freezeTemplate();
+        
+        DENOPTIMTemplate c = t.clone();
+        
+        assertEquals(t.getFreeAPCount(),c.getFreeAPCount(),"Different #free APs");
+        for (int i=0; i<t.getFreeAPCount(); i++)
+        {
+            DENOPTIMAttachmentPoint oriAP = t.getAP(i);
+            DENOPTIMAttachmentPoint cloAP = c.getAP(i);
+            assertTrue(oriAP.hashCode() != cloAP.hashCode(), "Hashcode of APs");
+            assertTrue(oriAP.getAPClass() == cloAP.getAPClass(), "APClass");
+            assertTrue(oriAP.getAtomPositionNumber() 
+                    == cloAP.getAtomPositionNumber(), "AP AtomSource");
+            assertTrue(oriAP.getTotalConnections() 
+                    == cloAP.getTotalConnections(), "AP total connections");
+        }
+        
+        DENOPTIMGraph oriIG = t.getInnerGraph();
+        DENOPTIMGraph cloIG = c.getInnerGraph();
+        assertTrue(oriIG.hashCode() != cloIG.hashCode(),"InnerGraph graph hash");
+        assertEquals(oriIG.getVertexCount(),
+                cloIG.getVertexCount(),"InnerGraph vertex count");
+        for (int i=0; i<oriIG.getVertexCount(); i++)
+        {
+            DENOPTIMVertex ov = oriIG.getVertexAtPosition(i);
+            DENOPTIMVertex cv = cloIG.getVertexAtPosition(i);
+            assertTrue(ov.hashCode() != cv.hashCode(),"InnerGraph vertex hash");
+        }
+        
+        assertEquals(oriIG.getRingCount(),
+                cloIG.getRingCount(),"InnerGraph ring count");
+        assertEquals(oriIG.getRings().get(0).getSize(),
+                cloIG.getRings().get(0).getSize(),"InnerGraph ring count");
+    }   
+
+//------------------------------------------------------------------------------
 
     @Test
     public void testGetAttachmentPointsReturnsAPsWithTemplateAsOwner() {
