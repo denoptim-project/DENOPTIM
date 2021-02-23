@@ -714,7 +714,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     public void projectAPsToProperties()
     {
-
         //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
 
     	String propAPClass = "";
@@ -809,6 +808,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     @Override
     public IAtomContainer getIAtomContainer()
     {
+        this.projectAPsToProperties();
         for (int atmPos=0; atmPos<mol.getAtomCount(); atmPos++)
         {
             IAtom atm = mol.getAtom(atmPos);

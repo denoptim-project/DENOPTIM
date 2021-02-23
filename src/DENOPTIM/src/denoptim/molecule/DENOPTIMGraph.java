@@ -3419,8 +3419,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             frag.getFragmentType(), frag.getMolId());
                 } catch (DENOPTIMException e)
                 {
-                    throw new JsonParseException("Could not get fragment from "
-                            + "library");
+                    throw new JsonParseException("Could not get "
+                            + frag.getFragmentType() + " from "
+                            + "library. " + e.getMessage());
                 }
                 ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
                 for (SymmetricSet ss : frag.getSymmetricAPSets())

@@ -766,8 +766,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         {
             IAtomContainer iac = GraphConversionTool
                     .convertGraphToMolecule(innerGraph, true);
-
+            
             // We have to ensure outer APs has same atom position as inner APs
+            // And we collects the outer APs per atom at the same time
+            Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = new TreeMap<>();
             for (DENOPTIMAttachmentPoint outerAP : getAttachmentPoints()) {
                 // There probably exists a better solution to this
                 DENOPTIMAttachmentPoint innerAP =
@@ -782,6 +784,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                             atom.getProperty(DENOPTIMConstants.ATMPROPORIGINALATMID);
                     if (innerAtmId == innerSrcAtmId && innerVrtxId == originalVrtxId) {
                         outerAP.setAtomPositionNumber(i);
+                        if (apsPerAtom.containsKey(i))
+                        {
+                            apsPerAtom.get(i).add(outerAP);
+                        } else {
+                            List<DENOPTIMAttachmentPoint> list = 
+                                    new ArrayList<DENOPTIMAttachmentPoint>();
+                            list.add(outerAP);
+                            apsPerAtom.put(i, list);
+                        }
                         // TODO: Remove
                         // System.out.println("Fixed wrong atomposnumbering");
                     }
@@ -811,15 +822,65 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             }
             l++;
             */
+            
+            iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG,innerGraph.toJson());
+            
+            // This is largerly as done in  DENOPTIMFragment.projectAPsToProperties
+            String propAPClass = "";
+            String propAttchPnt = "";
+            for (Integer ii : apsPerAtom.keySet())
+            {
+                //WARNING: here is the 1-based criterion implemented
+                int atmID = ii+1;
+                
+                List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerAtom.get(ii);
+                
+                boolean firstCL = true;
+                for (int i = 0; i<apsOnAtm.size(); i++)
+                {
+                    DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+        
+                    //Build SDF property "CLASS"
+                    String stingAPP = ""; //String Attachment Point Property
+                    if (firstCL)
+                    {
+                        firstCL = false;
+                        stingAPP = ap.getSingleAPStringSDF(true);
+                    } 
+                    else 
+                    {
+                        stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
+                                + ap.getSingleAPStringSDF(false);
+                    }
+                    propAPClass = propAPClass + stingAPP;
+        
+                    //Build SDF property "ATTACHMENT_POINT"
+                    String sBO = FragmentSpace.getBondOrderForAPClass(
+                            ap.getAPClass().toString()).toOldString();
+                    String stBnd = " " + atmID +":"+sBO;
+                    if (propAttchPnt.equals(""))
+                    {
+                        stBnd = stBnd.substring(1);
+                    }
+                    propAttchPnt = propAttchPnt + stBnd;
+                }
+                propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
+            }
 
+            iac.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
+            iac.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+            
             return iac;
         } catch (DENOPTIMException e)
         {
+            //TODO: deal with the situation: report error or state given assumption that allows to go on
             e.printStackTrace();
         }
         return null;
     }
 
+//-----------------------------------------------------------------------------
+    
     private DENOPTIMAttachmentPoint getInnerAPFromOuterAP(DENOPTIMAttachmentPoint outerAP) {
         // Very inefficient solution
         for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry

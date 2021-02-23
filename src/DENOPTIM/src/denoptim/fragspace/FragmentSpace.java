@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -40,6 +41,7 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
@@ -278,24 +280,31 @@ public class FragmentSpace
             setRCCompatibilityMatrix(rcCpMap);
         }
         
-        setScaffoldLibrary(convertsIACsToVertexes(
-                DenoptimIO.readInLibraryOfFragments(
-                        scaffFile,"scaffold"),BBType.SCAFFOLD));
+        isValid = true;
         
-        setFragmentLibrary(convertsIACsToVertexes(
-        DenoptimIO.readInLibraryOfFragments(fragFile,"fragment"),
-        BBType.FRAGMENT));
-        
+        // We load first the capping groups because there should not be any
+        // template in there.
         if (capFile.length() > 0)
         {
+            //TODO-V3 set buildingBlockId
             setCappingLibrary(convertsIACsToVertexes(
                     DenoptimIO.readInLibraryOfFragments(capFile,
                     "capping group"),BBType.CAP));
         }
         
-        isValid = true;
+        //TODO-V3 set buildingBlockId
+        fragmentLib = new ArrayList<DENOPTIMVertex>();
+        appendToVertexLibrary(DenoptimIO.readInLibraryOfFragments(
+                fragFile,"fragment"),BBType.FRAGMENT,fragmentLib);
+        
+        //TODO-V3 set buildingBlockId
+        scaffoldLib = new ArrayList<DENOPTIMVertex>();
+        appendToVertexLibrary(DenoptimIO.readInLibraryOfFragments(
+                        scaffFile,"scaffold"),BBType.SCAFFOLD,scaffoldLib);
+
         
         //TODO-V3: remove: tmp code just for devel phase
+        /*
         if (FragmentSpaceParameters.useTemplates)
         {
             scaffoldLib = new ArrayList<>();
@@ -320,7 +329,22 @@ public class FragmentSpace
                     System.err.println("    Template ("+t.getInnerGraph().getVertexCount()+" frags):"+t.getInnerGraph());
                 }
             }
+            
+            //TODO-MF del
+            DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",scaffoldLib);
+            //DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",fragmentLib);
+            
+            //TODO del
+            System.out.println("WRITTEN!");
+            
+          //TODO del
+            ArrayList<DENOPTIMVertex> wEmpty = convertsIACsToVertexes(
+                    DenoptimIO.readInLibraryOfFragments("/tmp/empty_mols.sdf","fragment"),
+                    BBType.FRAGMENT);
+            System.out.println("READ-IN!");
+            
         }
+        */
         
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());
     }
@@ -334,17 +358,47 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     
-    //TODO-V3: adapt to templates.
+    //TODO-V3: adapt to templates. Move to IO
     
     private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
             ArrayList<IAtomContainer> iacs, BBType bbt) throws DENOPTIMException
     {
         ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
         for (IAtomContainer iac : iacs)
-        {   
-            list.add(new DENOPTIMFragment(iac,bbt));
+        {
+            list.add(convertsIACToVertex(iac,bbt));
         }
         return list;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Processes an atom containers and builds a vertex out of it.
+     * @param iac the  atom containers.
+     * @return the vertex.
+     * @throws DENOPTIMException
+     */
+    
+    //TODO-V3: adapt to templates. Move to IO
+    
+    private static DENOPTIMVertex convertsIACToVertex(IAtomContainer iac, 
+            BBType bbt) throws DENOPTIMException
+    {
+        DENOPTIMVertex v;
+        Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+        if (jsonGraph != null)
+        {
+            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+            //TODO-MF del
+            System.out.println("JSON STRING : "+jsonGraph.toString());
+            DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
+            t.setInnerGraph(g);
+            v = t;
+        } else {
+            v = new DENOPTIMFragment(iac,bbt);
+        }
+        return v;
     }
     
 //------------------------------------------------------------------------------
@@ -429,11 +483,34 @@ public class FragmentSpace
         // indexes according to bbTyp and bbIdx.
         
         String msg = "";
-        if (fragmentLib == null || scaffoldLib == null || cappingLib == null)
+        switch (fTyp)
         {
-            msg = "Cannot retrieve fragments before defining the FragmentSpace";
-            throw new DENOPTIMException(msg);
+            case SCAFFOLD:
+                if (scaffoldLib == null)
+                {
+                    msg = "Cannot retrieve scaffolds before initialising the "
+                            + "scaffold library.";
+                    throw new DENOPTIMException(msg);
+                }
+                break;
+            case FRAGMENT:
+                if (fragmentLib == null)
+                {
+                    msg = "Cannot retrieve fragments before initialising the "
+                            + "fragment library.";
+                    throw new DENOPTIMException(msg);
+                }
+                break;
+            case CAP:
+                if (cappingLib == null)
+                {
+                    msg = "Cannot retrieve capping groups before initialising"
+                            + "the library of capping groups.";
+                    throw new DENOPTIMException(msg);
+                }
+                break;
         }
+        
         DENOPTIMVertex originalVrtx = null;
         switch (fTyp)
         {
@@ -1032,6 +1109,29 @@ public class FragmentSpace
     public static void setScaffoldLibrary(ArrayList<DENOPTIMVertex> lib)
     {
         scaffoldLib = lib;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static void appendToVertexLibrary(ArrayList<IAtomContainer>list, 
+            BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        for(IAtomContainer iac : list)
+        {
+            DENOPTIMVertex v = null;
+            try
+            {
+                v = convertsIACToVertex(iac,bbt);
+            } catch (Throwable e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.err.println("ERROR! Could not import "+bbt+". Failed "
+                        + "conversion of IAtomContainer to "+bbt+".");
+                System.exit(-1);;
+            }
+            library.add(v);
+        }       
     }
 
 //------------------------------------------------------------------------------

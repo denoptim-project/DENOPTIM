@@ -112,6 +112,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
@@ -291,7 +292,56 @@ public class DenoptimIO
 
         return lstContainers.get(0);
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Writes vertexes to SDF file.
+     *
+     * @param pathName The pathname where to write
+     * @param vertexes The list of vertexes to write
+     * @throws DENOPTIMException
+     */
+    public static void writeVertexes(String pathName, 
+            ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException {
+        SDFWriter sdfWriter = null;
+        try {
+            IAtomContainerSet molSet = new AtomContainerSet();
+            for (int idx = 0; idx < vertexes.size(); idx++) {
+                DENOPTIMVertex v = vertexes.get(idx);
+                if (v.containsAtoms())
+                {
+                    molSet.addAtomContainer(v.getIAtomContainer());
+                } else {
+                    //TODO-V3: allow for empty vertex and such non-molecular 
+                    //building blocks.DenoptimIO We can have an empty item in 
+                    // the SDF (i.e., 0 atoms and 0 bonds), and we can put
+                    // the json representation into a property of the empty IAC
+                    
+                    //TOD-MF del
+                    System.out.println("ERROR: writing of non-molecular "
+                            + "building blocks in SDF files is not "
+                            + "ready yet!");
+                    IAtomContainer iac = new AtomContainer();
+                    //iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG,innerGraph.toJson());
+                    molSet.addAtomContainer(iac);
+                }
+            }
+            sdfWriter = new SDFWriter(new FileWriter(new File(pathName)));
+            sdfWriter.write(molSet);
+        } catch (CDKException | IOException cdke) {
+            throw new DENOPTIMException(cdke);
+        } finally {
+            try {
+                if (sdfWriter != null) {
+                    sdfWriter.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
