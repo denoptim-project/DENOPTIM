@@ -439,24 +439,24 @@ public class FragmentSpace
      */
     public static ArrayList<Integer> getCappingGroupsWithAPClass(String query)
     {
-	ArrayList<Integer> selected = new ArrayList<>();
-	for (int i=0; i<cappingLib.size(); i++)
-	{
-	    String apc = "";
-	    try 
-	    {
-		apc = FragmentUtils.getAPForFragment(i,2).get(0).getAPClass();
-		if (apc.equals(query))
+		ArrayList<Integer> selected = new ArrayList<>();
+		for (int i=0; i<cappingLib.size(); i++)
 		{
-		    selected.add(i);
+		    String apc = "";
+		    try 
+		    {
+		    	apc = FragmentUtils.getAPForFragment(i,2).get(0).getAPClass();
+				if (apc.equals(query))
+				{
+				    selected.add(i);
+				}
+		    }
+		    catch (DENOPTIMException de)
+		    {
+		    	// nothing
+		    }
 		}
-	    }
-	    catch (DENOPTIMException de)
-	    {
-		// nothing
-	    } 
-	}
-	return selected;	
+		return selected;	
     }
 
 //------------------------------------------------------------------------------
@@ -593,7 +593,7 @@ public class FragmentSpace
 
     public static String getCappingClass(String srcApClass)
     {
-	return cappingMap.get(srcApClass);
+    	return cappingMap.get(srcApClass);
     }
 
 //------------------------------------------------------------------------------

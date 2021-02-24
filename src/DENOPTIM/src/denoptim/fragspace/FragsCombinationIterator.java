@@ -394,22 +394,22 @@ public class FragsCombinationIterator
                                + nextIds + ", size:" + totCandsPerAP + ")"); 
         }
 
-	// While defining the combination of fragments we aso keep track
-	// of which incoming fragments are related by symmetry (i.e., we
-	// set the symmetric set ID for each incoming vertex) to allow
-	// an easy update of the graph's SymmetricSet list
+		// While defining the combination of fragments we also keep track
+		// of which incoming fragments are related by symmetry (i.e., we
+		// set the symmetric set ID for each incoming vertex) to allow
+		// an easy update of the graph's SymmetricSet list
         FragsCombination currentComb = new FragsCombination();
         ArrayList<Integer> currentIds = new ArrayList<Integer>();
         String msg = "";
         for (int curSrcApIdx=0; curSrcApIdx<actvSrcAps.size(); curSrcApIdx++)
         {
             IdFragmentAndAP src = actvSrcAps.get(curSrcApIdx);
-	    src.setVrtSymSetId(curSrcApIdx);
+            src.setVrtSymSetId(curSrcApIdx);
             ArrayList<IdFragmentAndAP> locCandsList = candFragsPerAP.get(src);
-	    for (IdFragmentAndAP fap : locCandsList)
-	    {
-		fap.setVrtSymSetId(curSrcApIdx);
-	    }
+		    for (IdFragmentAndAP fap : locCandsList)
+		    {
+		    	fap.setVrtSymSetId(curSrcApIdx);
+		    }
             int locTotCands = candFragsPerAP.get(src).size();
             int locCurCandId = nextIds.get(curSrcApIdx);
 

@@ -114,8 +114,21 @@ public class OffspringEvaluationTask extends FitnessTask
         			FragmentSpace.getCappingLibrary());
         	
             try {
-                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(dGraph);
-            	//DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
+            	// TODO-V3
+            	// To get a proper molecular representation we need
+            	// 1) build a 3d tree
+            	// 2) remove RCAs
+            	// 3) remove dummy in multy hapto
+            	// 4) remove dummy in linearities
+            	// All this should be done within the TreeBuilder3D and 
+            	// controlled by flags. Obviously, if we remove all these 
+            	// functional dummy atoms, then we cannot use them anymore,
+            	// So: is are there cases where we need to keep them?
+            	// We can always rebuild the 3d-tree (with Dummy atoms) if
+            	// we need the get it back. Thus, for the moment I do not see
+            	// a reason for keeping the Dus in the molecular representation,
+            	// but potential down stream effects have to be evaluated.
+                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
                 fitProvMol = mol;
         	} catch (Throwable t) {
         		//we have it already from before

@@ -57,7 +57,7 @@ public class GraphConversionTool
      */
 
 	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
-    // with a flag that controls wether we rototranslate the building blocks or not
+    // with a flag that controls weather we rototranslate the building blocks or not
 	
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
