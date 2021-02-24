@@ -224,9 +224,10 @@ public class GraphConversionTool
 	    // Store graph as property
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
-        if (g.getMsg() != null)
+        String msg = g.getMsg();
+        if (msg != null && !msg.isEmpty() && !msg.matches("^\\s*$"))
         {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getMsg());
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, msg);
         }
 
         return mol;

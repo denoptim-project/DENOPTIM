@@ -187,9 +187,9 @@ public class SerConvParameters
         case "SERCONV-WORKDIR=":
             workDir = value;
             break;
-	case "SERCONV-INPFILE=":
-	    inpFile = value;
-	    break;
+		case "SERCONV-INPFILE=":
+		    inpFile = value;
+		    break;
         case "SERCONV-OUTFORMAT=":
             outFormat = value.toUpperCase();
             break;
