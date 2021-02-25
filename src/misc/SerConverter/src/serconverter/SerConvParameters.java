@@ -64,6 +64,11 @@ public class SerConvParameters
      * Output file format
      */
     protected static String outFormat = "TXT";
+    
+    /**
+     * Flag requiring alignement of 3D fragments
+     */
+    protected static boolean make3DTree = false;
 
     /**
      * Output file
@@ -195,6 +200,9 @@ public class SerConvParameters
             break;
         case "SERCONV-OUTFILE=":
             outFile = value;
+            break;
+        case "SERCONV-MAKE3DTREE":
+            make3DTree = true;
             break;
         default:
              msg = "Keyword " + key + " is not a known SerConverter-"
