@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -44,6 +45,8 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
+import denoptim.molecule.SymmetricSet;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GraphUtils;
 
@@ -302,6 +305,27 @@ public class FragmentSpace
         appendToVertexLibrary(DenoptimIO.readInLibraryOfFragments(
                         scaffFile,"scaffold"),BBType.SCAFFOLD,scaffoldLib);
 
+        //TODO-MF del (used to create SDF versions of empty fragments
+        /*
+        EmptyVertex ev = new EmptyVertex(999);
+        ev.addAP(-1,1,1,APClass.make("EmptyAP", 0));
+        ev.addAP(-1,1,1,APClass.make("EmptyAP", 0));
+        ev.addAP(-1,1,1,APClass.make("EmptyAP", 1));
+        ev.addAP(-1,1,1,APClass.make("EmptyAP", 2));
+        ArrayList<SymmetricSet> lst = new ArrayList<SymmetricSet>();
+        SymmetricSet ss = new SymmetricSet(new ArrayList<Integer>(Arrays.asList(0,1)));
+        lst.add(ss);
+        ev.setSymmetricAP(lst);
+        
+        EmptyVertex ev2 = new EmptyVertex(12345);
+        ev2.addAP(-1,1,1,APClass.make("EmptyAP", 0));
+        ev2.addAP(-2,1,1,APClass.make("EmptyAP", 0));
+        
+        fragmentLib.add(ev);
+        fragmentLib.add(ev2);
+        
+        DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",fragmentLib);
+        */
         
         //TODO-V3: remove: tmp code just for devel phase
         /*
@@ -380,21 +404,30 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     
-    //TODO-V3: adapt to templates. Move to IO
+    //TODO-V3: Move to IO
     
     private static DENOPTIMVertex convertsIACToVertex(IAtomContainer iac, 
             BBType bbt) throws DENOPTIMException
     {
         DENOPTIMVertex v;
         Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+        Object jsonVertex = iac.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
         if (jsonGraph != null)
         {
             DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
             //TODO-MF del
-            System.out.println("JSON STRING : "+jsonGraph.toString());
+            System.out.println("Making Template from JSON STRING ");
+            //+jsonGraph.toString());
             DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
             t.setInnerGraph(g);
             v = t;
+        } else if (jsonVertex != null)
+        {
+            //TODO-MF del
+            System.out.println("Making an EmptyVertex from JSON STRING ");
+            
+            EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
+            v = ev;
         } else {
             v = new DENOPTIMFragment(iac,bbt);
         }

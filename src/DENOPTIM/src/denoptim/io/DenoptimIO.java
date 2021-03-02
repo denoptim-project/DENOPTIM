@@ -302,6 +302,7 @@ public class DenoptimIO
      * @param vertexes The list of vertexes to write
      * @throws DENOPTIMException
      */
+    
     public static void writeVertexes(String pathName, 
             ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException {
         SDFWriter sdfWriter = null;
@@ -313,17 +314,18 @@ public class DenoptimIO
                 {
                     molSet.addAtomContainer(v.getIAtomContainer());
                 } else {
-                    //TODO-V3: allow for empty vertex and such non-molecular 
-                    //building blocks.DenoptimIO We can have an empty item in 
-                    // the SDF (i.e., 0 atoms and 0 bonds), and we can put
-                    // the json representation into a property of the empty IAC
-                    
-                    //TOD-MF del
-                    System.out.println("ERROR: writing of non-molecular "
-                            + "building blocks in SDF files is not "
-                            + "ready yet!");
                     IAtomContainer iac = new AtomContainer();
-                    //iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG,innerGraph.toJson());
+                    try {
+                        iac = v.getIAtomContainer();
+                    } catch (Throwable t)
+                    {
+                        t.printStackTrace();
+                        System.out.println("ERROR: something went wrong while "
+                                + "writing of non-molecular "
+                                + "building blocks in SDF files. " 
+                                + t.getMessage());
+                        iac = new AtomContainer();
+                    }
                     molSet.addAtomContainer(iac);
                 }
             }

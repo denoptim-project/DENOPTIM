@@ -1,5 +1,5 @@
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -12,7 +12,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   4  3  0  0  0  0  0  0  0  0999 V2000
    -0.6826    0.0000    0.3453 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -31,7 +31,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   2  1  0  0  0  0  0  0  0  0999 V2000
     0.7650    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -46,7 +46,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   3  2  0  0  0  0  0  0  0  0999 V2000
     1.2492   -0.2378    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -63,7 +63,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
@@ -76,7 +76,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
@@ -89,7 +89,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.2028   -2.4929    1.1479 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -102,7 +102,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
  12 11  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
@@ -799,7 +799,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
   9  8  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
@@ -1330,7 +1330,7 @@ M  END
 
 $$$$
 
-  CDK     02232123333D
+  CDK     03022113003D
 
  15 14  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
@@ -2253,5 +2253,156 @@ M  END
 
 > <ATTACHMENT_POINT>
 10:1 11:1
+
+$$$$
+
+  CDK     0302211300
+
+  0  0  0  0  0  0  0  0  0  0999 V2000
+M  END
+> <CLASS>
+0#EmptyAP:0:0.0000%0.0000%0.0000,EmptyAP:0:0.0000%0.0000%0.0000,EmptyAP:1:0.0000%0.0000%0.0000,EmptyAP:2:0.0000%0.0000%0.0000 
+
+> <ATTACHMENT_POINT>
+0:1 0:1 0:1 0:1
+
+> <VertexJson>
+{
+  "lstAPs": [
+    {
+      "id": 132,
+      "atomPositionNumber": -1,
+      "totalConnections": 1,
+      "freeConnections": 1,
+      "apClass": {
+        "rule": "EmptyAP",
+        "subClass": 0
+      },
+      "dirVec": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": 133,
+      "atomPositionNumber": -1,
+      "totalConnections": 1,
+      "freeConnections": 1,
+      "apClass": {
+        "rule": "EmptyAP",
+        "subClass": 0
+      },
+      "dirVec": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": 134,
+      "atomPositionNumber": -1,
+      "totalConnections": 1,
+      "freeConnections": 1,
+      "apClass": {
+        "rule": "EmptyAP",
+        "subClass": 1
+      },
+      "dirVec": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": 135,
+      "atomPositionNumber": -1,
+      "totalConnections": 1,
+      "freeConnections": 1,
+      "apClass": {
+        "rule": "EmptyAP",
+        "subClass": 2
+      },
+      "dirVec": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "lstSymAPs": [
+    {
+      "symIds": [
+        0,
+        1
+      ]
+    }
+  ],
+  "vertexId": 999,
+  "isRCV": false,
+  "level": -99,
+  "allowedMutationTypes": [
+    "CHANGEBRANCH",
+    "DELETE",
+    "EXTEND"
+  ]
+}
+
+$$$$
+
+  CDK     0302211300
+
+  0  0  0  0  0  0  0  0  0  0999 V2000
+M  END
+> <CLASS>
+-1#EmptyAP:0:0.0000%0.0000%0.0000 0#EmptyAP:0:0.0000%0.0000%0.0000 
+
+> <ATTACHMENT_POINT>
+-1:1 0:1
+
+> <VertexJson>
+{
+  "lstAPs": [
+    {
+      "id": 136,
+      "atomPositionNumber": -1,
+      "totalConnections": 1,
+      "freeConnections": 1,
+      "apClass": {
+        "rule": "EmptyAP",
+        "subClass": 0
+      },
+      "dirVec": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": 137,
+      "atomPositionNumber": -2,
+      "totalConnections": 1,
+      "freeConnections": 1,
+      "apClass": {
+        "rule": "EmptyAP",
+        "subClass": 0
+      },
+      "dirVec": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "lstSymAPs": [],
+  "vertexId": 12345,
+  "isRCV": false,
+  "level": -99,
+  "allowedMutationTypes": [
+    "CHANGEBRANCH",
+    "DELETE",
+    "EXTEND"
+  ]
+}
 
 $$$$

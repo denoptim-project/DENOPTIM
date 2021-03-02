@@ -3083,7 +3083,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
-    private static class DENOPTIMExclusionStrategy implements ExclusionStrategy 
+    public static class DENOPTIMExclusionStrategy implements ExclusionStrategy 
     {
         @Override
         public boolean shouldSkipField(FieldAttributes field) {
@@ -3360,7 +3360,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
-    private static class DENOPTIMVertexDeserializer 
+    public static class DENOPTIMVertexDeserializer 
     implements JsonDeserializer<DENOPTIMVertex> 
     {
         @Override
@@ -3450,7 +3450,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE EmptyVertex " 
                         + jsonObject.get("vertexId"));
-                return context.deserialize(jsonObject, EmptyVertex.class);
+                EmptyVertex ev = EmptyVertex.fromJson(jsonObject.toString());
+                return ev;
             }
         }
     }

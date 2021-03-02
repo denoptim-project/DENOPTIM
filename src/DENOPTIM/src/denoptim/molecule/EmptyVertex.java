@@ -19,16 +19,28 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMGraph.DENOPTIMExclusionStrategy;
+import denoptim.molecule.DENOPTIMGraph.DENOPTIMVertexDeserializer;
+
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
- * An empty vertex has the behaviours of a vertex, but has no molecular
- * within. It has attachment points, as well as relations between those
+ * An empty vertex has the behaviours of a vertex, but has no molecular 
+ * structure. 
+ * It has attachment points, as well as relations between those
  * attachment points, but has no atoms.
  *
  */
@@ -359,11 +371,128 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
 
-      @Override
-      public IAtomContainer getIAtomContainer()
-      {
-          return null;
-      }
+    /**
+     * Although empty vertex do not contain atoms, by definitions, we allow
+     * the generation of an SDF representation that uses an empty atom list.
+     * @return an empty atom container with attachment points rooted on 
+     * non-existing atoms, i.e., atom source index is negative.
+     */
+    
+    @Override
+    public IAtomContainer getIAtomContainer()
+    {
+        IAtomContainer iac = new AtomContainer();
+        
+        // We need to get the APs sorted by pseudo-atom source ID. This
+        // to write the CLASS and ATTACHMENT_PPOINT fileds of the SDF.
+        
+        Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = new TreeMap<>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        {
+            int atmSrcId = ap.getAtomPositionNumber();
+            if (apsPerAtom.containsKey(atmSrcId))
+            {
+                apsPerAtom.get(atmSrcId).add(ap);
+            } else {
+                List<DENOPTIMAttachmentPoint> list = 
+                        new ArrayList<DENOPTIMAttachmentPoint>();
+                list.add(ap);
+                apsPerAtom.put(atmSrcId, list);
+            }
+        }
+        // This is largely as done in  DENOPTIMFragment.projectAPsToProperties
+        String propAPClass = "";
+        String propAttchPnt = "";
+        for (Integer ii : apsPerAtom.keySet())
+        {
+            //WARNING: here is the 1-based criterion implemented also for
+            // fake atom IDs!
+            int atmID = ii+1;
+            
+            List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerAtom.get(ii);
+            
+            boolean firstCL = true;
+            for (int i = 0; i<apsOnAtm.size(); i++)
+            {
+                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+    
+                //Build SDF property "CLASS"
+                String stingAPP = ""; //String Attachment Point Property
+                if (firstCL)
+                {
+                    firstCL = false;
+                    stingAPP = ap.getSingleAPStringSDF(true);
+                } 
+                else 
+                {
+                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
+                            + ap.getSingleAPStringSDF(false);
+                }
+                propAPClass = propAPClass + stingAPP;
+    
+                //Build SDF property "ATTACHMENT_POINT"
+                String sBO = FragmentSpace.getBondOrderForAPClass(
+                        ap.getAPClass().toString()).toOldString();
+                String stBnd = " " + atmID +":"+sBO;
+                if (propAttchPnt.equals(""))
+                {
+                    stBnd = stBnd.substring(1);
+                }
+                propAttchPnt = propAttchPnt + stBnd;
+            }
+            propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
+        }
+
+        iac.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
+        iac.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+        iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        
+        return iac;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Produces a string that represents this vertex and that adheres to the 
+     * JSON format.
+     * @return the JSON format as a single string
+     */
+    
+    //TODO-V3 use relocated json builder... when available
+    
+    public String toJson()
+    {
+        
+        Gson gson = new GsonBuilder()
+            .setExclusionStrategies(new DENOPTIMExclusionStrategy())
+            .setPrettyPrinting()
+            .create();
+        String jsonOutput = gson.toJson(this);
+        return jsonOutput;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a JSON string and returns an instance of this class.
+     * @param json the string to parse.
+     * @return a new instance of this class.
+     */
+
+    //TODO-V3 use relocated json builder... when available
+    
+    public static EmptyVertex fromJson(String json)
+    {   
+        Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .create();
+        EmptyVertex ev = gson.fromJson(json, EmptyVertex.class);
+        for (DENOPTIMAttachmentPoint ap : ev.getAttachmentPoints())
+        {
+            ap.setOwner(ev);
+        }
+        return ev;
+    }
 
 //-----------------------------------------------------------------------------
 

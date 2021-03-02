@@ -206,6 +206,11 @@ public final class DENOPTIMConstants
     public static final String GRAPHJSONTAG = "GraphJson";
     
     /**
+     * SDF tag containing vertex encoding in JSON format
+     */
+    public static final String VERTEXJSONTAG = "VertexJson";
+    
+    /**
      * SDF tag containing metadata on graph
      */
     public static final String GMSGTAG = "GraphMsg";

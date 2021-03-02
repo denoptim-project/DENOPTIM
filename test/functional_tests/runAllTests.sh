@@ -275,5 +275,10 @@ runTest "t17"
 #
 runTest "t18"
 
+#
+# t19: concersion of graph's string representations (with templates and empty vertexes)
+#
+runTest "t19"
+
 echo "All done!"
 exit 0
