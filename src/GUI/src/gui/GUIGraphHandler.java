@@ -74,7 +74,9 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -92,8 +94,7 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Version UID
 	 */
-	private static final long serialVersionUID = 
-			-8303012362366503382L;
+	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Unique identified for instances of this handler
@@ -125,17 +126,6 @@ public class GUIGraphHandler extends GUICardPanel
 	public static AtomicInteger graphUID = new AtomicInteger(1);
 	
 	/**
-	 * The currently loaded graph as GraphStream object
-	 */
-	private Graph graph;
-	
-	/**
-	 * The snapshot of the old (removed) visualized GraphStrem system. 
-	 * Used only to remember stuff like sprites and node positions.
-	 */
-	private GSGraphSnapshot oldGSStatus;
-	
-	/**
 	 * The index of the currently loaded dnGraph [0–(n-1)}
 	 */
 	private int currGrphIdx = 0;
@@ -150,29 +140,16 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private boolean hasFragSpace = false;
 	
-	private JSplitPane centralPane;
-	private JSplitPane leftPane;
-	private FragmentViewPanel fragViewer;
-	private JPanel fragViewerPanel;
-	private JPanel fragViewerHeader;
-	private JPanel fragViewerCardHolder;
-	private JPanel fragViewerEmptyCard;
-	private JPanel fragViewerNoFSCard;
-	private MoleculeViewPanel molViewer;
-	private JPanel molViewerPanel;
-	private JPanel molViewerHeader;
-	private JPanel molViewerCardHolder;
-	private JPanel molViewerEmptyCard;
-	private JPanel molViewerNeedUpdateCard;
-	private final String NOFSCARDNAME = "noFSCard";
-	private final String EMPTYCARDNAME = "emptyCard";
-	private final String UPDATETOVIEW = "updateCard";
-	private final String MOLVIEWERCARDNAME = "molViewerCard";
-	private final String FRAGVIEWERCARDNAME = "fragViewerCard";
-	private GraphViewerPanel graphViewer;
+	// The panel that hosts graph, vertex, and molecular viewers
+	private GraphVertexMolViewerPanel visualPanel;
+	
+	// The panel hosting buttons for manipulation of graphs
 	private JPanel graphCtrlPane;
+	
+	// The panel hosting buttons for navigation in the list of graphs
 	private JPanel graphNavigPane;
 	
+	// Components managing loading of the fragment space
 	private JPanel pnlFragSpace;
 	private JTextField txtFragSpace;
 	private JButton btnFragSpace; 
@@ -249,103 +226,12 @@ public class GUIGraphHandler extends GUICardPanel
 		this.setLayout(new BorderLayout()); 
 		
 		// This card structure includes center, east and south panels:
-		// - (Center) splitPane with graph and fragment viewers
+		// - (Center) where graphs/vertexes/molecules are visualised
 		// - (East) graph controls
 		// - (South) general controls (load, save, close)
 		
-		// The central pane includes two parts: graph viewer, and mol+frag viewers
-		centralPane = new JSplitPane();
-		centralPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		centralPane.setOneTouchExpandable(true);
-		centralPane.setDividerLocation(200);
-		centralPane.setResizeWeight(0.5);
-		
-		// In the left part of the central pane we have the mol and frag viewers
-		leftPane = new JSplitPane();
-		leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		leftPane.setOneTouchExpandable(true);
-		leftPane.setResizeWeight(0.5);
-		centralPane.setLeftComponent(leftPane);
-		
-		graphViewer = new GraphViewerPanel();
-		centralPane.setRightComponent(graphViewer);
-		graphViewer.addPropertyChangeListener(
-				new PropertyChangeListenerProxy(
-						"NODECLICKED", new NodeClickedListener()));
-		
-		fragViewerPanel = new JPanel(new BorderLayout());
-		fragViewerHeader = new JPanel();
-		fragViewerHeader.add(new JLabel("Node content:"));
-		String fragViewerToolTip = "<html>This viewer shows the "
-				+ "chemical structure of the fragment contained in a "
-				+ "specific node.<br>Click on a node to display its "
-				+ "content.</html>";
-		fragViewerHeader.setToolTipText(fragViewerToolTip);
-		fragViewerPanel.add(fragViewerHeader, BorderLayout.NORTH);
-		fragViewerCardHolder = new JPanel(new CardLayout());
-		
-		fragViewerPanel.add(fragViewerCardHolder, BorderLayout.CENTER);
-		
-		fragViewerEmptyCard = new JPanel();
-		String txt = "<html><body width='%1s'><center>No chosen node.</center></html>";
-		fragViewerEmptyCard.add(new JLabel(String.format(txt, 120)));
-		fragViewerEmptyCard.setToolTipText(fragViewerToolTip);
-		fragViewerCardHolder.add(fragViewerEmptyCard, EMPTYCARDNAME);
-		
-		fragViewerNoFSCard = new JPanel();
-		String txtb = "<html><body width='%1s'><center>To inspect the content "
-				+ "of nodes, please load a fragment space.</center></html>";
-		fragViewerNoFSCard.add(new JLabel(String.format(txtb, 120)));
-		fragViewerNoFSCard.setToolTipText(fragViewerToolTip);
-		fragViewerCardHolder.add(fragViewerNoFSCard, NOFSCARDNAME);
-		
-		fragViewer = new FragmentViewPanel(false);
-		fragViewerCardHolder.add(fragViewer, FRAGVIEWERCARDNAME);
-		
-		((CardLayout) fragViewerCardHolder.getLayout()).show(
-				fragViewerCardHolder, NOFSCARDNAME);
-		
-		leftPane.setTopComponent(fragViewerPanel);
-		
-		
-		// The molecular viewer is embedded in a container structure that 
-		// is meant to show/hide the molViewer according to specific needs.
-		molViewerPanel = new JPanel(new BorderLayout());
-		molViewerHeader = new JPanel();
-		molViewerHeader.add(new JLabel("Associated Structure:"));
-		String molViewerToolTip = "<html>This viewer shows the chemical "
-				+ "structure associated with the current graph.</html>";
-		molViewerHeader.setToolTipText(molViewerToolTip);
-		molViewerPanel.add(molViewerHeader, BorderLayout.NORTH);
-		molViewerCardHolder = new JPanel(new CardLayout());
-		
-		molViewerPanel.add(molViewerCardHolder, BorderLayout.CENTER);
-		
-		molViewerEmptyCard = new JPanel();
-		String txt2 = "<html><body width='%1s'><center>No chemical "
-				+ "structure.</center>"
-				+ "</html>";
-		molViewerEmptyCard.add(new JLabel(String.format(txt2, 120)));
-		molViewerEmptyCard.setToolTipText(molViewerToolTip);
-		molViewerCardHolder.add(molViewerEmptyCard, EMPTYCARDNAME);
-		
-		molViewerNeedUpdateCard = new JPanel();
-		String txt2b = "<html><body width='%1s'><center>Save changes to "
-				+ "update the molecular representation.</center>"
-				+ "</html>";
-		molViewerNeedUpdateCard.add(new JLabel(String.format(txt2b, 120)));
-		molViewerNeedUpdateCard.setToolTipText(molViewerToolTip);
-		molViewerCardHolder.add(molViewerNeedUpdateCard, UPDATETOVIEW);
-		
-		molViewer = new MoleculeViewPanel();
-		molViewer.enablePartialData(true);
-		molViewerCardHolder.add(molViewer, MOLVIEWERCARDNAME);
-		((CardLayout) molViewerCardHolder.getLayout()).show(
-				molViewerCardHolder, EMPTYCARDNAME);
-		
-		leftPane.setBottomComponent(molViewerPanel);
-		
-		this.add(centralPane,BorderLayout.CENTER);
+		visualPanel = new GraphVertexMolViewerPanel();
+		this.add(visualPanel,BorderLayout.CENTER);
        
 		// General panel on the right: it containing all controls
         graphCtrlPane = new JPanel();
@@ -559,7 +445,8 @@ public class GUIGraphHandler extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				ArrayList<IdFragmentAndAP> selAps = getAPsSelectedInViewer();				
+				ArrayList<IdFragmentAndAP> selAps = 
+				        visualPanel.getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
@@ -574,18 +461,15 @@ public class GUIGraphHandler extends GUICardPanel
 				extendGraphFromFragSpace(selAps);
 				
 				// Update viewer
-				loadDnGraphToViewer(true);
+				visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
 				
 				// Protect edited system
 		        unsavedChanges = true;
 		        protectEditedSystem();
 
-
 				// The molecular representation is updated when we save changes
-		        molViewer.clearAll();
+		        visualPanel.requireUpdateOfMolecularViewer();
 		        updateMolViewer = true;
-				((CardLayout) molViewerCardHolder.getLayout()).show(
-						molViewerCardHolder, UPDATETOVIEW);
 			}
 		});
 		
@@ -596,7 +480,8 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelSel.setEnabled(false);
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<DENOPTIMVertex> selVrtx = getSelectedNodesInViewer();
+				ArrayList<DENOPTIMVertex> selVrtx = 
+				        visualPanel.getSelectedNodesInViewer();
 				if (selVrtx.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
@@ -630,17 +515,15 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				
 				// Update viewer
-				loadDnGraphToViewer(true);
+                visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
 				
 		        // Protect the temporary "dnGraph" obj
 		        unsavedChanges = true;
 		        protectEditedSystem();
 			
-				// The molecular representation is updated when we save changes
-		        molViewer.clearAll();
-		        updateMolViewer = true;
-				((CardLayout) molViewerCardHolder.getLayout()).show(
-						molViewerCardHolder, UPDATETOVIEW);
+		        // The molecular representation is updated when we save changes
+                visualPanel.requireUpdateOfMolecularViewer();
+                updateMolViewer = true;
 			}
 		});
 		
@@ -666,9 +549,10 @@ public class GUIGraphHandler extends GUICardPanel
 		// Controls of displayed attributes
 		pnlShowLabels = new JPanel();
 		JLabel lblShowHideLabels = new JLabel("Manage graph labels:");
-		cmbLabel = new JComboBox<String>(
-				new String[] {graphViewer.SPRITE_APCLASS, 
-				graphViewer.SPRITE_BNDORD, graphViewer.SPRITE_FRGID});
+		cmbLabel = new JComboBox<String>(new String[] {
+		        GraphViewerPanel.SPRITE_APCLASS, 
+		        GraphViewerPanel.SPRITE_BNDORD, 
+		        GraphViewerPanel.SPRITE_FRGID});
 		cmbLabel.setToolTipText("<html>Select the kind of type of information"
 				+ "<br>to add or remove from the graph view.</html>");
 		cmbLabel.setEnabled(false);
@@ -679,9 +563,9 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddLabel.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (graphViewer.hasSelected())
+				if (visualPanel.hasSelectedNodes())
 				{
-					graphViewer.appendSprites(
+					visualPanel.addLabelsToGraph(
 							cmbLabel.getSelectedItem().toString());
 				}
 				else
@@ -703,9 +587,9 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelLabel.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (graphViewer.hasSelected())
+				if (visualPanel.hasSelectedNodes())
 				{
-					graphViewer.removeSprites(
+				    visualPanel.removeLabelsToGraph(
 							cmbLabel.getSelectedItem().toString());
 				}
 				else
@@ -893,60 +777,6 @@ public class GUIGraphHandler extends GUICardPanel
 		btnAddLabel.setEnabled(enable);
 		btnDelLabel.setEnabled(enable);
 	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Identifies which APs are selected in the graph viewer.
-	 * @return the list of identifiers
-	 */
-	private ArrayList<IdFragmentAndAP> getAPsSelectedInViewer()
-	{
-		ArrayList<IdFragmentAndAP> allIDs = new ArrayList<IdFragmentAndAP>();
-		for (Node n : graphViewer.getSelectedNodes())
-		{
-			if (!n.getAttribute("ui.class").equals("ap"))
-			{
-				continue;
-			}
-			int vId = n.getAttribute("dnp.srcVrtId");
-			int apId = n.getAttribute("dnp.srcVrtApId");
-			
-			IdFragmentAndAP id = null;
-			if (hasFragSpace)
-			{
-				DENOPTIMVertex v = dnGraph.getVertexWithId(vId);
-				id = new IdFragmentAndAP(vId,
-										 v.getMolId(),
-										 v.getFragmentType(),
-										 apId,-99,-99);
-			}
-			else
-			{
-				id = new IdFragmentAndAP(vId,-99,BBType.UNDEFINED,apId,-99,-99);
-			}
-			
-			allIDs.add(id);
-		}
-		return allIDs;
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	private ArrayList<DENOPTIMVertex> getSelectedNodesInViewer()
-	{
-		ArrayList<DENOPTIMVertex> selected = new ArrayList<DENOPTIMVertex>();
-		for (Node n : graphViewer.getSelectedNodes())
-		{
-			if (n.getAttribute("ui.class").equals("ap"))
-			{
-				continue;
-			}
-			int vId = Integer.parseInt(n.getAttribute("dnp.VrtId"));
-			selected.add(dnGraph.getVertexWithId(vId));
-		}	
-		return selected; 
-	}
 
 //-----------------------------------------------------------------------------
 
@@ -967,7 +797,7 @@ public class GUIGraphHandler extends GUICardPanel
         	{
         	    System.out.println("WARNING: Using empty AtomContainer for a "
         	            + "vertex that is not a fragment!");
-        		//TODO deal with templates and other stuff
+        		//TODO-V3 deal with templates and other stuff
         		fragLib.add(builder.newAtomContainer());
         	}
         }
@@ -994,7 +824,6 @@ public class GUIGraphHandler extends GUICardPanel
 		currGrphIdx = dnGraphLibrary.size();
 		dnGraph = new DENOPTIMGraph();
 		dnGraph.setGraphId(graphUID.getAndIncrement());
-		graph = null;
 		
 		// Add new graph and corresponding mol representation
 		dnGraphLibrary.add(dnGraph);
@@ -1004,12 +833,9 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Since there is no molecular representation in it, we cleanup
 		// the mol viewer and replace it with the placeholder
-		molViewer.clearAll();
-		((CardLayout) molViewerCardHolder.getLayout()).show(molViewerCardHolder, EMPTYCARDNAME);
-		
+		visualPanel.clearMolecularViewer();
 		
 		updateGraphListSpinner();
-
 		
 		// Create the node
 		int scaffVrtId = 1;
@@ -1020,7 +846,7 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraph.addVertex(scaffVertex);
 		
 		// Put the graph to the viewer
-		loadDnGraphToViewer(false);
+        visualPanel.loadDnGraphToViewer(dnGraph,false,hasFragSpace);
 		enableGraphDependentButtons(true);
 		unsavedChanges = true;
 		updateMolViewer = true;
@@ -1087,7 +913,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        	    System.out.println("WARNING: Using empty AtomContainer "
 		        	            + "for a "
 		                        + "vertex that is not a fragment!");
-		        		//TODO deal with templates and other stuff
+		        		//TODO-V3 deal with templates and other stuff
 		        		fragLib.add(builder.newAtomContainer());
 		        	}
 		        }
@@ -1157,7 +983,6 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Take the graph that will be extended
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
-		graph = null;
 		
 		// Append the new nodes
 		for (int i=0; i<srcAPs.size(); i++)
@@ -1246,7 +1071,7 @@ public class GUIGraphHandler extends GUICardPanel
 		                frag.projectAPsToProperties();
 						iac = frag.getIAtomContainer();
 					} else {
-						//TODO deal with templates
+						//TODO-V3 deal with templates
 						iac = builder.newAtomContainer();
 					}
 					iac.setProperty(PRESELPROP,apId);
@@ -1263,16 +1088,24 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 
+	/**
+	 * Changes the GUI appearance compatibly to no loaded fragment space
+	 */
 	protected void renderForLackOfFragSpace() 
 	{
 		hasFragSpace = false;
 		txtFragSpace.setText("No fragment space");
 		txtFragSpace.setToolTipText(loadFSToolTip);
 		txtFragSpace.setBackground(Color.ORANGE);
+		visualPanel.bringCardToTopOfVertexViewer(visualPanel.NOFSCARDNAME);
 	}
 	
 //-----------------------------------------------------------------------------
 
+	/**
+     * Changes the GUI appearance and activated buttons that depend on the
+     * fragment space being loaded
+     */
 	protected void renderForPresenceOfFragSpace() 
 	{
 		hasFragSpace = true;
@@ -1290,7 +1123,6 @@ public class GUIGraphHandler extends GUICardPanel
 	 * Imports graphs from file. 
 	 * @param file the file to open
 	 */
-
 	public void importGraphsFromFile(File file)
 	{	
 		dnGraphLibrary = readGraphsFromFile(file);
@@ -1346,7 +1178,7 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
-		//TODO change: this should be done elsewhere, maybe in DenoptimIO
+		//TODO-V3 change: this should be done elsewhere, maybe in DenoptimIO
 		
 		String format="";
 		String ext = FilenameUtils.getExtension(file.getAbsolutePath());
@@ -1364,8 +1196,13 @@ public class GUIGraphHandler extends GUICardPanel
 				format="SER";
 				break;
 				
+            case ("JSON"):
+                format="JSON";
+                break;
+				
 			default:
-				String[] options = {"Abandon", "TXT", "SDF", "SERIALIZED"};
+			    //TODO-V3: add JSON
+			    String[] options = {"Abandon", "TXT", "SDF", "SERIALIZED"};
 				int res = JOptionPane.showOptionDialog(null,
 					"<html>Failed to detect file type from file's "
 					+ "extension.<br>"
@@ -1458,147 +1295,21 @@ public class GUIGraphHandler extends GUICardPanel
     	// status of the graph of an easy recovery, (see GSGraphSnapshot)
     	clearCurrentSystem();
     	
+    	//TODO-MF: this might not be needed
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
-		loadDnGraphToViewer(keepSprites);
 		
 		if (molLibrary.get(currGrphIdx).getAtomCount() > 0)
 		{
-		    try {
-				molViewer.loadChemicalStructure(molLibrary.get(currGrphIdx));
-				((CardLayout) molViewerCardHolder.getLayout()).show(
-						molViewerCardHolder, MOLVIEWERCARDNAME);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println("Could not read molecular data: "+
-						e.getCause() + " " + e.getMessage());
-				((CardLayout) molViewerCardHolder.getLayout()).show(
-						molViewerCardHolder, EMPTYCARDNAME);
-			}
+		    visualPanel.loadDnGraphToViewer(dnGraphLibrary.get(currGrphIdx), 
+		            molLibrary.get(currGrphIdx), keepSprites, hasFragSpace);
 		}
 		else
 		{
-			((CardLayout) molViewerCardHolder.getLayout()).show(
-					molViewerCardHolder, EMPTYCARDNAME);
+		    visualPanel.loadDnGraphToViewer(dnGraphLibrary.get(currGrphIdx),
+		            keepSprites, hasFragSpace);
 		}
 		
 		enableGraphDependentButtons(true);
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	private void loadDnGraphToViewer(boolean keepSprites)
-	{
-		if (fragViewer != null)
-		{
-			fragViewer.clearAll();
-			((CardLayout) fragViewerCardHolder.getLayout()).show(
-					fragViewerCardHolder, EMPTYCARDNAME);
-		}
-		graph = convertDnGraphToGSGraph(dnGraph);
-		
-		// Keep a snapshot of the old data visualized
-		if (keepSprites)
-		{
-			oldGSStatus = graphViewer.getStatusSnapshot();
-		} else {
-			oldGSStatus = null;
-		}
-		
-		graphViewer.cleanup();
-		graphViewer.loadGraphToViewer(graph,oldGSStatus);
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Created a graph object suitable for GraphStrem viewer from a 
-	 * DENOPTIMGraph.
-	 * @param dnG the graph to be converted
-	 * @return the GraphStream object
-	 */
-	private Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
-	{
-		graph = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
-		
-		for (DENOPTIMVertex v : dnG.getVertexList())
-		{
-			// Create representation of this vertex
-			String vID = Integer.toString(v.getVertexId());
-			
-			Node n = graph.addNode(vID);
-			n.addAttribute("ui.label", vID);
-			n.addAttribute("dnp.VrtId", vID);
-			n.setAttribute("dnp.molID", v.getMolId());
-			n.setAttribute("dnp.frgType", v.getFragmentType());
-			switch (v.getFragmentType())
-			{
-				case SCAFFOLD:
-					n.setAttribute("ui.class", "scaffold");
-					break;
-				case FRAGMENT:
-					n.setAttribute("ui.class", "fragment");
-					break;
-				case CAP:
-					n.setAttribute("ui.class", "cap");
-					break;
-			}
-			if (v.isRCV())
-			{
-				n.setAttribute("ui.class", "rcv");
-			}
-			n.setAttribute("dnp.level", v.getLevel());
-			n.setAttribute("dnp.", "");
-			
-			// Create representation of free APs
-			
-			for (int i=0; i<v.getNumberOfAP(); i++)
-			{
-				DENOPTIMAttachmentPoint ap = v.getAttachmentPoints().get(i);
-				if (ap.isAvailable())
-				{
-					String nApId = "v"+vID+"ap"+Integer.toString(i);
-					Node nAP = graph.addNode(nApId);
-					nAP.addAttribute("ui.label", nApId);
-					nAP.setAttribute("ui.class", "ap");
-					nAP.addAttribute("dnp.srcVrtApId", i);
-					nAP.addAttribute("dnp.srcVrtId", v.getVertexId());
-					Edge eAP = graph.addEdge(vID+"-"+nApId,vID,nApId);
-					eAP.setAttribute("ui.class", "ap");
-					eAP.setAttribute("dnp.srcAPClass", ap.getAPClass());
-				}
-			}
-		} 
-		
-		for (DENOPTIMEdge dnE : dnG.getEdgeList())
-		{
-			String srcIdx = Integer.toString(dnE.getSrcVertex());
-			String trgIdx = Integer.toString(dnE.getTrgVertex());
-			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,true);
-			e.setAttribute("dnp.srcAPId", dnE.getSrcAPID());
-			e.setAttribute("dnp.trgAPId", dnE.getTrgAPID());
-			e.setAttribute("dnp.srcAPClass", dnE.getSrcAPClass());
-			e.setAttribute("dnp.trgAPClass", dnE.getTrgAPClass());
-			e.setAttribute("dnp.bondType", dnE.getBondType());
-		}
-		 
-		for (DENOPTIMRing r : dnG.getRings())
-		{
-			String srcIdx = Integer.toString(r.getHeadVertex().getVertexId());
-			String trgIdx = Integer.toString(r.getTailVertex().getVertexId());
-			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,false);
-			e.setAttribute("ui.class", "rc");
-			
-			//WARNING: graphs loaded without having a consistent definition of 
-			// the fragment space will not have all the AP data (which should be 
-			// taken from the fragment space). Therefore, they cannot be 
-			// recognized as RCV, but here we can fix at least part of the issue
-			// by using the DENOPTIMRing to identify the RCVs
-			
-			graph.getNode(srcIdx).setAttribute("ui.class", "rcv");
-			graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
-		}
-		
-		return graph;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1611,8 +1322,7 @@ public class GUIGraphHandler extends GUICardPanel
 	{	
 		// Get rid of currently loaded graph
 		dnGraph = null;
-        graphViewer.cleanup();
-        //molViewer.clearAll();
+        visualPanel.clearCurrentSystem();
 	}
 
 //-----------------------------------------------------------------------------
@@ -1622,63 +1332,6 @@ public class GUIGraphHandler extends GUICardPanel
 		graphNavigSpinner.setModel(new SpinnerNumberModel(currGrphIdx+1, 1, 
 				dnGraphLibrary.size(), 1));
 		totalGraphsLabel.setText(Integer.toString(dnGraphLibrary.size()));
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Listener for identifying the node on which the user has clicked and 
-	 * load the corresponding fragment into the fragment viewer pane.
-	 */
-	private class NodeClickedListener implements PropertyChangeListener
-	{
-		
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) 
-		{
-			// null is used to trigger cleanup
-			if (evt.getNewValue() == null)
-			{
-				if (fragViewer != null)
-				{
-					fragViewer.clearAll();
-					((CardLayout) fragViewerCardHolder.getLayout()).show(
-							fragViewerCardHolder, EMPTYCARDNAME);
-				}
-			}
-			
-			// Otherwise try to load the fragment into the viewer
-			String nodeId = (String) evt.getNewValue();
-			Node n = graph.getNode(nodeId);
-			if (n == null || !hasFragSpace)
-			{
-				return;
-			}
-			
-			DENOPTIMVertex v;
-			try {
-				v = dnGraph.getVertexWithId(
-						Integer.parseInt(nodeId));
-			} catch (NumberFormatException e1) {
-				//e1.printStackTrace();
-				return;
-			}
-			
-			DENOPTIMFragment frag = null;
-			try {
-				DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
-						v.getFragmentType(), v.getMolId());
-				if (bb instanceof DENOPTIMFragment)
-					frag = (DENOPTIMFragment) bb;
-			} catch (DENOPTIMException e) {
-				//e.printStackTrace();
-				return;
-			}
-			
-			fragViewer.loadFragmentToViewer(frag);
-			((CardLayout) fragViewerCardHolder.getLayout()).show(
-					fragViewerCardHolder, FRAGVIEWERCARDNAME);
-		}
 	}
 
 //-----------------------------------------------------------------------------
@@ -1723,16 +1376,19 @@ public class GUIGraphHandler extends GUICardPanel
 		FSParams fsParams = new FSParams(this);
         fsParams.pack();
         fsParams.setVisible(true);
-        
-        ((CardLayout) fragViewerCardHolder.getLayout()).show(
-				fragViewerCardHolder, EMPTYCARDNAME);
+        visualPanel.resetFragViewerCardDeck();
 	}
 	
 //-----------------------------------------------------------------------------
 	
 	private class FSParams extends GUIModalDialog
     {
-		private FSParametersForm fsParsForm;
+		/**
+         * Version ID
+         */
+        private static final long serialVersionUID = 1L;
+
+        private FSParametersForm fsParsForm;
 		
 		private GUIGraphHandler parent;
 		
@@ -1935,8 +1591,8 @@ public class GUIGraphHandler extends GUICardPanel
     			//Spinner will be fixed by the deprotection routine
     			totalGraphsLabel.setText(Integer.toString(
     					dnGraphLibrary.size()));
-				((CardLayout) molViewerCardHolder.getLayout()).show(
-						molViewerCardHolder, EMPTYCARDNAME);
+				visualPanel.bringCardToTopOfMolViewer(
+				        visualPanel.EMPTYCARDNAME);
     			enableGraphDependentButtons(false);
     		}
     		deprotectEditedSystem();
@@ -1950,51 +1606,37 @@ public class GUIGraphHandler extends GUICardPanel
   		// Overwrite dnGraph in library
   		dnGraphLibrary.set(currGrphIdx, dnGraph);
   		
+  		// WARNING: the dnGraph in the visualPanel should be in sync because any
+  		// changes to it has resulted in an update of the graphViewer.
+  		// Still, it is possible to introduce code modifications that make it
+  		// go out of sync.
+  		// Here, we ASSUME the dhGraph displayed in the graphViewer component
+  		// of the visualPanel is in sync with dnGraph. Therefore, we just
+  		// update the molecular viewer.
+  		
   		if (updateMolViewer)
   		{
   			if (hasFragSpace)
   			{
-	  			TreeBuilder3D tb = new TreeBuilder3D(
-	        			FragmentSpace.getScaffoldLibrary(),
-	        			FragmentSpace.getFragmentLibrary(),
-	        			FragmentSpace.getCappingLibrary());
-	            try {
-	                IAtomContainer mol = tb.convertGraphTo3DAtomContainer(
-	                		dnGraph);
-	            	DENOPTIMMoleculeUtils.removeRCA(mol,dnGraph);
-	                molLibrary.set(currGrphIdx, mol);
-	                mol.setProperty(DENOPTIMConstants.GMSGTAG,"ManuallyBuilt");
-	        	} catch (Throwable t) {
-	        		t.printStackTrace();
-	        		System.out.println("Couldn't make 3D-tree representation: "
-	        				+ t.getMessage());
+  			    IAtomContainer mol = visualPanel.updateMolevularViewer();
+  			    if (mol != null)
+  			    {
+      				try
+                    {
+                        DENOPTIMMoleculeUtils.removeRCA(mol,dnGraph);
+                        molLibrary.set(currGrphIdx, mol);
+                        mol.setProperty(DENOPTIMConstants.GMSGTAG,
+                                "ManuallyBuilt");
+                    } catch (DENOPTIMException e)
+                    {
+                        System.err.println("Could not remove RCAs from while "
+                                + "updating mol-viewer.");
+                        e.printStackTrace();
+                    }
+	        	} else {
+	        	    // Logging done within visualPanel
 	        		molLibrary.set(currGrphIdx, builder.newAtomContainer());
 	        	}
-	            
-	  			if (molLibrary.get(currGrphIdx).getAtomCount() > 0)
-	  			{
-	  			    try {
-	  					molViewer.loadChemicalStructure(molLibrary.get(
-	  							currGrphIdx));
-	  					((CardLayout) molViewerCardHolder.getLayout()).show(
-	  							molViewerCardHolder, MOLVIEWERCARDNAME);
-	  				} catch (Exception e) {
-	  					e.printStackTrace();
-	  					System.out.println("Could not read molecular data: "+
-	  							e.getCause() + " " + e.getMessage());
-	  					((CardLayout) molViewerCardHolder.getLayout()).show(
-	  							molViewerCardHolder, EMPTYCARDNAME);
-	  				}
-	  			}
-	  			else
-	  			{
-	  				System.out.println("No atoms in 3d-tree representation.");
-	  				((CardLayout) molViewerCardHolder.getLayout()).show(
-	  						molViewerCardHolder, EMPTYCARDNAME);
-	  			}
-  			} else {
-  				((CardLayout) molViewerCardHolder.getLayout()).show(
-  						molViewerCardHolder, EMPTYCARDNAME);
   			}
   			updateMolViewer = false;
   		}
@@ -2023,9 +1665,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	public void dispose() 
 	{
-		graphViewer.dispose();
-		fragViewer.dispose();
-		molViewer.dispose();
+		visualPanel.dispose();
 	}
 		
 //-----------------------------------------------------------------------------

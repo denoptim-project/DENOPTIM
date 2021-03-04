@@ -709,7 +709,8 @@ public class FragmentViewPanel extends JSplitPane
 		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "<html>No structure loaded.<br>This is most likely a bug!"
+	                "<html>No structure loaded.<br>This is most likely a bug "
+			        + "in FragmentViewPanel. "
 	                + "Please report it to the development team.</html>",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -842,11 +843,13 @@ public class FragmentViewPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Clears the molecular viewer
+	 * Clears the molecular viewer. This operation is slow! 
+	 * It usually a second or two.
 	 */
 	public void clearMolecularViewer()
 	{
-		jmolPanel.viewer.evalString("zap");
+		//TODO-V3: evaluate reducing to the minimum the need to run this: it is a slow command!
+	    jmolPanel.viewer.evalString("zap");
 	}
 
 //-----------------------------------------------------------------------------

@@ -40,7 +40,6 @@ import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.ViewerPipe;
 import org.graphstream.ui.view.util.DefaultMouseManager;
-//import static org.graphstream.algorithm.Toolkit.nodePosition;
 
 public class GraphViewerPanel extends JPanel 
 {
@@ -61,13 +60,13 @@ public class GraphViewerPanel extends JPanel
 	private SpriteManager sman;
 	private GraphMouseManager mouseManager;
 	
-	public final String SPRITE_APCLASS = "sprite.apClass";
-	public final String SPRITE_BNDORD = "sprite.bndOrd";
-	public final String SPRITE_FRGID = "sprite.fragId";
-	public final String SPRITEATT_UICLASS_APCLASSSRC = "apLabelSRC";
-	public final String SPRITEATT_UICLASS_APCLASSTRG = "apLabelTRG";
-	public final String SPRITEATT_UICLASS_BNDORD = "bndTypLabel";
-	public final String SPRITEATT_UICLASS_FRGID = "molIdLabel";
+	public static final String SPRITE_APCLASS = "sprite.apClass";
+	public static final String SPRITE_BNDORD = "sprite.bndOrd";
+	public static final String SPRITE_FRGID = "sprite.fragId";
+	public static final String SPRITEATT_UICLASS_APCLASSSRC = "apLabelSRC";
+	public static final String SPRITEATT_UICLASS_APCLASSTRG = "apLabelTRG";
+	public static final String SPRITEATT_UICLASS_BNDORD = "bndTypLabel";
+	public static final String SPRITEATT_UICLASS_FRGID = "molIdLabel";
 	
 
 //-----------------------------------------------------------------------------

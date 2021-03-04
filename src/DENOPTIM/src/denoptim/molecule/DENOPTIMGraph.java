@@ -3302,7 +3302,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             DENOPTIMGraph graph = gson.fromJson(partialJsonObj,
                     DENOPTIMGraph.class);
             
-            // Refresh reference and connection counts in all APs
+            // Refresh APs
             for (DENOPTIMVertex v : graph.gVertices)
             {
                 // Regenerate reference to fragment owner
@@ -3312,14 +3312,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 {
                     // Regenerate reference to AP owner
                     ap.setOwner(v);
-                    //Regenerate reference to APClass
-                    try
-                    {
-                        ap.setAPClass(ap.getAPClass().toString());
-                    } catch (DENOPTIMException e1)
-                    {
-                        throw new JsonParseException(e1);
-                    }
                     // Reset connection count
                     ap.setFreeConnections(ap.getTotalConnections());
                 }
@@ -3369,82 +3361,116 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             JsonObject jsonObject = json.getAsJsonObject();
 
+            // Desiralization differs for the types of vertexes
+            // First, consider templates
             if (jsonObject.has("innerGraph")) 
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE Template " 
                         + jsonObject.get("vertexId"));
                 
-                DENOPTIMTemplate tmpl = context.deserialize(jsonObject, DENOPTIMTemplate.class);
+                DENOPTIMTemplate tmpl = context.deserialize(jsonObject, 
+                        DENOPTIMTemplate.class);
                 
-                // Deserialize embedded graph. Such field is excluded by design because
-                // if not, the above tmpl = context.deserialize(...) call produces
-                // an inner graph with null AP pointers.
+                // Deserialize embedded graph. Such field is excluded by design 
+                // because if not, the above tmpl = context.deserialize(...) 
+                // call produces an inner graph with null AP pointers.
                 
-                JsonObject innerGraphJson = jsonObject.getAsJsonObject("innerGraph");
-                DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(innerGraphJson.toString());
+                JsonObject innerGraphJson = jsonObject.getAsJsonObject(
+                        "innerGraph");
+                DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(
+                        innerGraphJson.toString());
                 tmpl.setInnerGraph(innerGraph);
                 
-                // Is the following need? I think so, because we need the IDs 
+                // Is the following needed? I think so, because we need the IDs 
                 // of outernAPs to be as defined in the json string.
                 
                 //Recover innerToOuter APMap
-                Type type = new TypeToken<TreeMap<Integer,DENOPTIMAttachmentPoint>>(){}.getType();
-                TreeMap<Integer,DENOPTIMAttachmentPoint> map = context.deserialize(
-                        jsonObject.getAsJsonObject("innerToOuterAPs"), type);
+                Type type = new TypeToken<TreeMap<Integer,
+                        DENOPTIMAttachmentPoint>>(){}.getType();
+                TreeMap<Integer,DENOPTIMAttachmentPoint> map = 
+                        context.deserialize(jsonObject.getAsJsonObject(
+                                "innerToOuterAPs"), type);
                 tmpl.updateInnerToOuter(map);
                 
                 return tmpl;
             }
+            // Then, molecular fragments
             else if (jsonObject.has("buildingBlockId")) 
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE Fragment " 
                         + jsonObject.get("vertexId"));
                 
-                //TODO-V3: serialize AtomContainer2 somehow (as an SDF string?)
+                DENOPTIMVertex v = null;
+                
+                //TODO-V3?: serialize AtomContainer2 somehow (as an SDF string?)
                 
                 // The serialized fragment does NOT include its molecular
                 // representation, which cannot be serialized (so far...)
                 DENOPTIMFragment frag = context.deserialize(jsonObject, 
                         DENOPTIMFragment.class);
+                v = frag;
                 
-                // The solution, for now, is to rebuild the fragment from the 
-                // library, and attach to it the serialized data
-                DENOPTIMVertex fragWithMol;
-                try
+                // The above has these issues:
+                // - mol in null
+                // - AP user/owner is null (fixed in graph deserializatrion)
+                // - APClass has wrong reference to new class (fixed below)
+                
+                if (FragmentSpace.isDefined())
                 {
-                    // NB: this works well also with templates that are in the library 
-                    fragWithMol = FragmentSpace.getVertexFromLibrary(
-                            frag.getFragmentType(), frag.getMolId());
-                } catch (DENOPTIMException e)
-                {
-                    throw new JsonParseException("Could not get "
-                            + frag.getFragmentType() + " from "
-                            + "library. " + e.getMessage());
+                    // If a fragment space exists, we rebuild the fragment from the 
+                    // library, and attach to it the serialized data
+                    DENOPTIMVertex fragWithMol;
+                    try
+                    {
+                        // NB: this works well also with templates that are in the library 
+                        fragWithMol = FragmentSpace.getVertexFromLibrary(
+                                frag.getFragmentType(), frag.getMolId());
+                    } catch (DENOPTIMException e)
+                    {
+                        throw new JsonParseException("Could not get "
+                                + frag.getFragmentType() + " from "
+                                + "library. " + e.getMessage());
+                    }
+                    ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
+                    for (SymmetricSet ss : frag.getSymmetricAPSets())
+                    {
+                        cLstSymAPs.add(ss.clone());
+                    }
+                    fragWithMol.setMutationTypes(frag.getMutationTypes());
+                    fragWithMol.setSymmetricAPSets(cLstSymAPs);
+                    fragWithMol.setAsRCV(frag.isRCV());
+                    fragWithMol.setVertexId(frag.getVertexId());
+                    fragWithMol.setLevel(frag.getLevel());
+                    for (int iap=0; iap<frag.getNumberOfAP(); iap++)
+                    {
+                        DENOPTIMAttachmentPoint oriAP = frag.getAP(iap);
+                        DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
+                        newAP.setID(oriAP.getID());
+                    }
+                    v = fragWithMol;
                 }
-                ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
-                for (SymmetricSet ss : frag.getSymmetricAPSets())
+                
+                // Fix the reference to unique APClass
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
                 {
-                    cLstSymAPs.add(ss.clone());
-                }
-                fragWithMol.setMutationTypes(frag.getMutationTypes());
-                fragWithMol.setSymmetricAPSets(cLstSymAPs);
-                fragWithMol.setAsRCV(frag.isRCV());
-                fragWithMol.setVertexId(frag.getVertexId());
-                fragWithMol.setLevel(frag.getLevel());
-                for (int iap=0; iap<frag.getNumberOfAP(); iap++)
-                {
-                    DENOPTIMAttachmentPoint oriAP = frag.getAP(iap);
-                    DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
-                    newAP.setID(oriAP.getID());
+                    try
+                    {
+                        //TODO: should this be done in an APClassDeserializer?
+                        ap.setAPClass(ap.getAPClass().toString());
+                    } catch (DENOPTIMException e1)
+                    {
+                        throw new JsonParseException(e1);
+                    }
                 }
                 
                 // WARNING: other fields, such as 'owner' and AP 'user' are
                 // recovered upon deserializing the graph containing this vertex
                 
-                return fragWithMol;
+                return v;
             }
+            // Finally, vertexes that are not "molecular" (empty vertex)
             else 
             {
                 //TODO-V3 log or del

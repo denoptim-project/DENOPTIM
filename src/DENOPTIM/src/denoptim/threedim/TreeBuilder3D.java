@@ -221,18 +221,16 @@ public class TreeBuilder3D
         DENOPTIMVertex rootVrtx = graph.getVertexList().get(0);
         int idRootVrtx = rootVrtx.getVertexId();
         
-        //TODO-V3 assumption that scaffold is a Fragment, which cannot hold true 
+        //TODO-V3 assumption that scaffold has atoms in it, but this id not true 
         // in general, so this will have to change 
-        if (rootVrtx instanceof DENOPTIMFragment == false)
+        if (!rootVrtx.containsAtoms())
         {
-            Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
-            e.printStackTrace();
-            System.err.println("ERROR! TreeBuilder3D not ready to deal with "
-                    + "anything else than DENOPTIMFragments!!!");
+            String err = "ERROR! TreeBuilder3D not ready to deal with empty scaffolds!";
+            Exception e = new Exception(err);
+            System.err.println(err);
             System.exit(-1);
         }
         
-        //TODO-V3: any possibility that scaffold does not have an IAtomContainer?
         IAtomContainer iacRootVrtx = rootVrtx.getIAtomContainer();
         
         //TODO-V3: this should never happen, so remove once we are sure it does nto happen
@@ -465,6 +463,7 @@ public class TreeBuilder3D
         
         mol.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
+        mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
         if (graph.getMsg() != null)
         {
             mol.setProperty(DENOPTIMConstants.GMSGTAG, graph.getMsg());

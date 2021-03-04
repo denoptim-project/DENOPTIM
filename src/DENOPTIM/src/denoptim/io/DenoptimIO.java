@@ -1827,6 +1827,12 @@ public class DenoptimIO
             String fileName, String format, boolean useFS)
             throws DENOPTIMException {
         switch (format) {
+            //TODO-V3
+            /*
+            case "JSON":
+                return DenoptimIO.readDENOPTIMGraphsFromJSONFile(fileName, useFS);
+                */
+            
             case "TXT":
                 return DenoptimIO.readDENOPTIMGraphsFromFile(fileName, useFS);
 
@@ -1873,20 +1879,34 @@ public class DenoptimIO
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
             String fileName, boolean useFS)
-            throws DENOPTIMException {
+            throws DENOPTIMException 
+    {
+        if (!useFS)
+        {
+            System.err.println("WARNING! Reading graphs without a "
+                    + "defined fragment space!");
+        }
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
         int i = 0;
         for (IAtomContainer mol : mols) {
             i++;
-            Object prop = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
-            if (prop == null) {
+            // Something very similar is done also in DENOPTIMMolecule
+            DENOPTIMGraph g = null;
+            Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+            Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
+            if (graphEnc == null && json == null) {
                 throw new DENOPTIMException("Attempt to load graph form "
-                        + "SDF that lacks a '" + DENOPTIMConstants.GRAPHTAG
-                        + "' tag. Check molecule " + i);
+                        + "SDF that has neither '" + DENOPTIMConstants.GRAPHTAG
+                        + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG 
+                        + "' tag. Check molecule " + i + " in the SDF file.");
+            } else if (json != null) {
+                String js = json.toString();
+                g = DENOPTIMGraph.fromJson(js);
+            } else {
+                g = GraphConversionTool.getGraphFromString(
+                        graphEnc.toString().trim(), useFS);
             }
-            DENOPTIMGraph g = GraphConversionTool.getGraphFromString(
-                    prop.toString().trim(), useFS);
             lstGraphs.add(g);
         }
         return lstGraphs;

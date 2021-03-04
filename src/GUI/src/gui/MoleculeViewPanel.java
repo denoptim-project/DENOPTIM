@@ -328,10 +328,9 @@ public class MoleculeViewPanel extends JSplitPane
 			else
 			{
 				try {
-					
-					//WARNING: here we always ignore the fragment space because
-					// so far, there is no case where the fully defined graph 
-					// is needed. We only need its string representation.
+				    //WARNING: here we always ignore the fragment space because
+                    // so far, there is no case where the fully defined graph 
+                    // is needed. We only need its string representation.
 					
 					item = new DENOPTIMMolecule(DenoptimIO.readMoleculeData(
 							file.getAbsolutePath()).get(0),false,true);
@@ -345,8 +344,22 @@ public class MoleculeViewPanel extends JSplitPane
 		}
 
 		fillDataTable(file);
-		
+
+		int i=0;
+        while (jmolPanel.viewer.isScriptExecuting())
+        {
+            i++;
+            try
+            {
+                Thread.sleep(100);
+            } catch (InterruptedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 		jmolPanel.viewer.openFile(file.getAbsolutePath());
+
 		setJmolViewer();
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
