@@ -22,6 +22,7 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.io.Serializable;
@@ -72,6 +73,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * if the level at which this vertex is in a graph
      */
     private int level = -99; //Initialised to meaningless value
+    
+    /**
+     * Map of customizable properties
+     */
+    private Map<Object, Object> properties;
 
     /**
      * List of mutations that we can perform on this vertex
@@ -903,6 +909,20 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             }
         }
         return children;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public Object getProperty(Object description)
+    {
+        return properties.get(description);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperty(Object key, Object property)
+    {
+        properties.put(key, property);
     }
     
 //------------------------------------------------------------------------------

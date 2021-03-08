@@ -1146,6 +1146,7 @@ public class FragmentSpace
     
 //------------------------------------------------------------------------------
 
+    //TODO-V3 mode to DenoptimIO
     public static void appendToVertexLibrary(ArrayList<IAtomContainer>list, 
             BBType bbt, ArrayList<DENOPTIMVertex> library)
     {

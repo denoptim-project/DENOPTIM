@@ -69,7 +69,9 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.utils.DENOPTIMMathUtils;
 
 
@@ -105,6 +107,8 @@ public class VertexViewPanel extends JPanel
 	
 	private FragmentViewPanel fragViewer;
 	private JPanel emptyViewerCard;
+	private JPanel evViewerCard;
+	private JPanel tmplViewerCard;
     protected final String EMPTYCARDNAME = "emptyCard";
     protected final String EV_VIEWERCARDNAME = "emptyVertesCard";
     protected final String FRAG_VIEWERCARDNAME = "fragViewerCard";
@@ -167,6 +171,16 @@ public class VertexViewPanel extends JPanel
         emptyViewerCard.add(new JLabel(String.format(txt, 120)));
         emptyViewerCard.setToolTipText(fragViewerToolTip);
         this.add(emptyViewerCard, EMPTYCARDNAME);
+        
+        evViewerCard = new JPanel();
+        evViewerCard.add(new JLabel(String.format("EmptyVertex VIEWER", 120)));
+        evViewerCard.setToolTipText(fragViewerToolTip);
+        this.add(evViewerCard, EV_VIEWERCARDNAME);
+        
+        tmplViewerCard = new JPanel();
+        tmplViewerCard.add(new JLabel(String.format("TEMPLATE VIEWER", 120)));
+        tmplViewerCard.setToolTipText(fragViewerToolTip);
+        this.add(tmplViewerCard, TMPL_VIEWERCARDNAME);
 	        
         fragViewer = new FragmentViewPanel(false);
         apTabModel = fragViewer.apTabModel;
@@ -246,6 +260,38 @@ public class VertexViewPanel extends JPanel
         ((CardLayout) this.getLayout()).show(this, FRAG_VIEWERCARDNAME);
 	}
 
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Loads the given vertex to this viewer.
+     * The molecular data is loaded in the Jmol viewer,
+     * and the attachment point (AP) information in the the list of APs.
+     * Jmol is not aware of AP-related information, so this also launches
+     * the generation of the graphical objects representing the APs.
+     * @param frag the fragment to visualize
+     */
+    public void loadVertexToViewer(DENOPTIMVertex v)
+    {
+        if (v instanceof DENOPTIMFragment) {
+            DENOPTIMFragment frag = (DENOPTIMFragment) v;
+            loadFragmentToViewer(frag);
+        } else if (v instanceof EmptyVertex) {
+            //TODO-MF del
+            System.out.println("___TODO___ visualize EmptyVertex");
+            //fragViewer.loadFragmentToViewer(frag);
+            ((CardLayout) this.getLayout()).show(this, EV_VIEWERCARDNAME);
+        } else if (v instanceof DENOPTIMTemplate) {
+            //TODO-MF del
+            System.out.println("___TODO___ visualize Template");
+            //fragViewer.loadFragmentToViewer(frag);
+            ((CardLayout) this.getLayout()).show(this, TMPL_VIEWERCARDNAME);
+        } else {
+          //TODO-MF del
+            System.out.println("___TODO___ loadinf empty card as a result of instance: "+v.getClass().getName());
+            ((CardLayout) this.getLayout()).show(this, EMPTYCARDNAME);
+        }
+    }
+	
 //-----------------------------------------------------------------------------
 	
 	/**

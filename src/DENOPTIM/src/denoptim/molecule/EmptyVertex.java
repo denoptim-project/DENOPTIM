@@ -548,7 +548,7 @@ public class EmptyVertex extends DENOPTIMVertex
         set.add(this);
         return set;
     }
-
+    
 //------------------------------------------------------------------------------
 
 }

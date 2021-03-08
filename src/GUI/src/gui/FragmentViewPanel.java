@@ -789,8 +789,8 @@ public class FragmentViewPanel extends JSplitPane
 	
 	private void preSelectAPs()
 	{
-		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
-		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
 		if (fragment.getProperty(PRESELPROP) == null)
 		{

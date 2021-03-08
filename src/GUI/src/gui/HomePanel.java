@@ -119,7 +119,7 @@ public class HomePanel extends GUICardPanel
 		JButton btnNewFragments = new JButton("New Fragments");
 		btnNewFragments.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainPanel.add(new GUIFragmentInspector(mainPanel));
+				mainPanel.add(new GUIVertexInspector(mainPanel));
 			}
 		});
 		

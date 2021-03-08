@@ -911,6 +911,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
  
 //-----------------------------------------------------------------------------
 
+    @Override
     public Object getProperty(Object description)
     {
         return mol.getProperty(description);
@@ -918,6 +919,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //-----------------------------------------------------------------------------
     
+    @Override
     public void setProperty(Object description, Object property)
     {
         mol.setProperty(description, property);
@@ -929,7 +931,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         mol.setProperties(properties);
     }
-
     
 //------------------------------------------------------------------------------
     

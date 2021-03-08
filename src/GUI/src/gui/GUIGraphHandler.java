@@ -811,7 +811,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		// Select the scaffold
-		GUIFragmentSelector fragSelector = new GUIFragmentSelector(fragLib);
+		GUIVertexSelector fragSelector = new GUIVertexSelector(fragLib);
 		fragSelector.setRequireApSelection(false);
 		Object selected = fragSelector.showDialog();
 		if (selected == null)
@@ -956,7 +956,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		// Select the incoming fragment and its AP to use
-		GUIFragmentSelector fragSelector = new GUIFragmentSelector(fragLib);
+		GUIVertexSelector fragSelector = new GUIVertexSelector(fragLib);
 		fragSelector.setRequireApSelection(true);
 		Object selected = fragSelector.showDialog();
 		if (selected == null)
@@ -1044,8 +1044,8 @@ public class GUIGraphHandler extends GUICardPanel
     	// then keep unique fragment identifiers, and store unique
 		genToLocIDMap = new HashMap<Integer,Integer>();
 		
-		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
-		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
 		for (IdFragmentAndAP frgApId : compatFragAps)
 		{

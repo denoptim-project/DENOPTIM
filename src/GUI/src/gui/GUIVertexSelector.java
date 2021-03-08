@@ -35,19 +35,20 @@ import javax.swing.event.ChangeListener;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMFragment;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex;
 
 
 /**
- * A modal dialog with a molecular viewer that understands DENOPTIM fragments
- * and allows to select fragments.
+ * A modal dialog with a viewer that understands the different types of 
+ * DENOPTIM vertex 
+ * and allows to select vertexes and, if needed, attachment points.
  * 
  * @author Marco Foscato
  */
 
-public class GUIFragmentSelector extends GUIModalDialog
+public class GUIVertexSelector extends GUIModalDialog
 {
 	/**
 	 * Version UID
@@ -55,20 +56,20 @@ public class GUIFragmentSelector extends GUIModalDialog
 	private static final long serialVersionUID = 912850110991449553L;
 	
 	/**
-	 * The currently loaded list of fragments
+	 * The currently loaded list of vertexes
 	 */
-	private ArrayList<DENOPTIMFragment> fragmentLibrary =
-			new ArrayList<DENOPTIMFragment>();
+	private ArrayList<DENOPTIMVertex> vertexLibrary =
+			new ArrayList<DENOPTIMVertex>();
 	
 	/**
-	 * The currently loaded fragment
+	 * The currently loaded vertex
 	 */
-	private DENOPTIMFragment fragment;
+	private DENOPTIMVertex vertex;
 	
 	/**
-	 * The index of the currently loaded fragment [0–(n-1)}
+	 * The index of the currently loaded vertex [0–(n-1)}
 	 */
-	private int currFrgIdx = 0;
+	private int currVrtxIdx = 0;
 	
 	/**
 	 * The index of the selected AP [0-(n-1)]
@@ -76,14 +77,14 @@ public class GUIFragmentSelector extends GUIModalDialog
 	private int currApIdx = -1;
 	
 	private VertexViewPanel vertexViewer;
-	private JPanel fragCtrlPane;
-	private JPanel fragNavigPanel;
-	private JPanel fragNavigPanel2;
+	private JPanel ctrlPane;
+	private JPanel navigPanel;
+	private JPanel navigPanel2;
 	
-	private JSpinner fragNavigSpinner;
-	private JLabel totalFragsLabel;
-	private final FragSpinnerChangeEvent fragSpinnerListener = 
-			new FragSpinnerChangeEvent();
+	private JSpinner navigSpinner;
+	private JLabel totalVertexesLabel;
+	private final VrtxSpinnerChangeEvent vrtxSpinnerListener = 
+			new VrtxSpinnerChangeEvent();
 	
 	private boolean enforceAPSelection = false;
 	
@@ -101,50 +102,42 @@ public class GUIFragmentSelector extends GUIModalDialog
 
 	/**
 	 * Constructor
-	 * @param fragLib the library of fragment to load
+	 * @param iacLib the library of vertex to load
 	 */
-	public GUIFragmentSelector(ArrayList<IAtomContainer> fragLib)
+	public GUIVertexSelector(ArrayList<IAtomContainer> iacLib)
 	{
-		this(fragLib,0);
+		this(iacLib,0);
 	}
 	
 //-----------------------------------------------------------------------------
 	
 	/**
 	 * Constructor
-	 * @param fragLib the library of fragment to load
-	 * @param initialFragId the 0-based index of the fragment to open 
+	 * @param iacLib the library of vertex to load
+	 * @param initialId the 0-based index of the vertex to open 
 	 * when displaying the dialog
 	 */
-	public GUIFragmentSelector(ArrayList<IAtomContainer> fragLib, 
-			int initialFragId)
+	public GUIVertexSelector(ArrayList<IAtomContainer> iacLib, 
+			int initialId)
 	{
 		super();
 		this.setBounds(150, 150, 400, 550);
-		this.setTitle("Select fragment and AP");
+		this.setTitle("Select Vertex and AP");
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		// Define the list of frags among which we are selecting
-		for (IAtomContainer mol : fragLib)
+		
+		FragmentSpace.appendToVertexLibrary(iacLib,BBType.UNDEFINED,
+		        vertexLibrary);
+		
+		// Define the list of vrtxs among which we are selecting
+		for (int i=0; i<iacLib.size(); i++)
 		{
-			try {
-				DENOPTIMFragment frg = new DENOPTIMFragment(mol, 
-				        BBType.UNDEFINED);
-				if (mol.getProperty(PRESELECTEDAPSFIELD) != null)
-				{
-				    frg.setProperty(PRESELECTEDAPSFIELD,
-				    		mol.getProperty(PRESELECTEDAPSFIELD));
-				}
-				fragmentLibrary.add(frg);
-			} catch (DENOPTIMException e1) {
-				e1.printStackTrace();
-				JOptionPane.showMessageDialog(null,"<html>Error importing "
-						+ "a fragment.<br>The list of fragment is incomplete."
-						+ "<br>Please report this to the DENOPTIM "
-						+ "team.</html>",
-		                "Error",
-		                JOptionPane.PLAIN_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
+		    DENOPTIMVertex v = vertexLibrary.get(i);
+		    IAtomContainer iac = iacLib.get(i);
+		    if (iac.getProperty(PRESELECTEDAPSFIELD) != null)
+			{
+			    v.setProperty(PRESELECTEDAPSFIELD, 
+			            iac.getProperty(PRESELECTEDAPSFIELD));
 			}
 		}
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -153,35 +146,36 @@ public class GUIFragmentSelector extends GUIModalDialog
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
 		
-		// Controls for navigating the fragments list
-        fragCtrlPane = new JPanel();
-        fragCtrlPane.setVisible(true);
+		// Controls for navigating the vertexes list
+        ctrlPane = new JPanel();
+        ctrlPane.setVisible(true);
 		
         // NB: avoid GroupLayout because it interferes with Jmol viewer and causes exception
         
-        fragNavigPanel = new JPanel();
-        fragNavigPanel2 = new JPanel();
-        JLabel navigationLabel1 = new JLabel("Fragment # ");
+        navigPanel = new JPanel();
+        navigPanel2 = new JPanel();
+        JLabel navigationLabel1 = new JLabel("vertex # ");
         JLabel navigationLabel2 = new JLabel("Current library size: ");
-        totalFragsLabel = new JLabel("0");
+        totalVertexesLabel = new JLabel("0");
         
-		fragNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
-		fragNavigSpinner.setToolTipText("Move to fragment number # in the currently loaded library.");
-		fragNavigSpinner.setPreferredSize(new Dimension(75,20));
-		fragNavigSpinner.addChangeListener(fragSpinnerListener);
-        fragNavigPanel.add(navigationLabel1);
-		fragNavigPanel.add(fragNavigSpinner);
-		fragCtrlPane.add(fragNavigPanel);
+		navigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
+		navigSpinner.setToolTipText("Move to vertex number # in the currently "
+		        + "loaded library.");
+		navigSpinner.setPreferredSize(new Dimension(75,20));
+		navigSpinner.addChangeListener(vrtxSpinnerListener);
+        navigPanel.add(navigationLabel1);
+		navigPanel.add(navigSpinner);
+		ctrlPane.add(navigPanel);
 		
-        fragNavigPanel2.add(navigationLabel2);
-        fragNavigPanel2.add(totalFragsLabel);
-		fragCtrlPane.add(fragNavigPanel2);
-		addToNorthPane(fragCtrlPane);
+        navigPanel2.add(navigationLabel2);
+        navigPanel2.add(totalVertexesLabel);
+		ctrlPane.add(navigPanel2);
+		addToNorthPane(ctrlPane);
 		
 		// Edit global dialog controls
-		this.btnDone.setText("Select current fragment");
+		this.btnDone.setText("Select current vertex");
 		this.btnDone.setToolTipText("<html>Process the currently displayed "
-				+ "fragment<br>and the currently selected AP, if any.</html>");
+				+ "vertex<br>and the currently selected AP, if any.</html>");
 		this.btnDone.addActionListener(new ActionListener() {
 			
 			@Override
@@ -194,7 +188,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 				}
 				else
 				{
-					if (fragment.getNumberOfAP()==1)
+					if (vertex.getNumberOfAP()==1)
 					{
 						currApIdx=0;
 					}
@@ -210,22 +204,22 @@ public class GUIFragmentSelector extends GUIModalDialog
 						return;
 					}
 				}
-				result = new Integer[]{currFrgIdx, currApIdx};
+				result = new Integer[]{currVrtxIdx, currApIdx};
 				vertexViewer.dispose();
 				close();
 			}
 		});
 		
-		// Load the first fragment
-		currFrgIdx = initialFragId;
-		loadCurrentFragIdxToViewer();
-		updateFragListSpinner();	
+		// Load the first vertex
+		currVrtxIdx = initialId;
+		loadCurrentVrtxIdxToViewer();
+		updateVrtxListSpinner();	
 	}
 	
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Allows to control whether confirming the selection of a fragment without
+	 * Allows to control whether confirming the selection of a vertex without
 	 * having selected an attachment point is permitted or not.
 	 * @param enforced use <code>true</code> to enforce the selection of an AP.
 	 */
@@ -237,18 +231,18 @@ public class GUIFragmentSelector extends GUIModalDialog
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Loads the fragments corresponding to the field index.
+	 * Loads the vertexes corresponding to the field index.
 	 * The molecular data is loaded in the Jmol viewer,
 	 * and the attachment point (AP) information in the the list of APs.
 	 * Jmol is not aware of AP-related information, so this also launches
 	 * the generation of the graphical objects representing the APs.
 	 */
-	private void loadCurrentFragIdxToViewer()
+	private void loadCurrentVrtxIdxToViewer()
 	{
-		if (fragmentLibrary == null)
+		if (vertexLibrary == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "No list of fragments loaded.",
+	                "No list of vertexes loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -256,18 +250,17 @@ public class GUIFragmentSelector extends GUIModalDialog
 		}
 		
 		clearCurrentSystem();
-
-		fragment = fragmentLibrary.get(currFrgIdx);
-		vertexViewer.loadFragmentToViewer(fragment);
+		vertex = vertexLibrary.get(currVrtxIdx);
+		vertexViewer.loadVertexToViewer(vertex);
 	}
 	
 //-----------------------------------------------------------------------------
 
-	private void updateFragListSpinner()
+	private void updateVrtxListSpinner()
 	{		
-		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-				fragmentLibrary.size(), 1));
-		totalFragsLabel.setText(Integer.toString(fragmentLibrary.size()));
+		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
+				vertexLibrary.size(), 1));
+		totalVertexesLabel.setText(Integer.toString(vertexLibrary.size()));
 	}
 	
 //-----------------------------------------------------------------------------
@@ -275,11 +268,11 @@ public class GUIFragmentSelector extends GUIModalDialog
 	private void clearCurrentSystem()
 	{
 		// Get rid of currently loaded mol
-		fragment = null;
+		vertex = null;
 		
 		// Clear viewer?
 		// No, its clears upon loading of a new system.
-		// The exception (i.e., removal of the last fragment) is dealt with by
+		// The exception (i.e., removal of the last vertex) is dealt with by
 		// submitting "zap" only in that occasion.
 		
 		vertexViewer.clearCurrentSystem();
@@ -287,11 +280,11 @@ public class GUIFragmentSelector extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 	
-	private class FragSpinnerChangeEvent implements ChangeListener
+	private class VrtxSpinnerChangeEvent implements ChangeListener
 	{
 		private boolean inEnabled = true;
 		
-		public FragSpinnerChangeEvent()
+		public VrtxSpinnerChangeEvent()
 		{}
 		
 		/**
@@ -315,8 +308,8 @@ public class GUIFragmentSelector extends GUIModalDialog
         	activateTabEditsListener(false);
         	
         	//NB here we convert from 1-based index in GUI to 0-based index
-        	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
-        	loadCurrentFragIdxToViewer();
+        	currVrtxIdx = ((Integer) navigSpinner.getValue()).intValue() - 1;
+        	loadCurrentVrtxIdxToViewer();
         	
         	activateTabEditsListener(true);
         }

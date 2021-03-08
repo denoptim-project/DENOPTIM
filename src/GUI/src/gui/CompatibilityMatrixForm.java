@@ -287,7 +287,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 	if (idSrc.intValue() == (sAPCsStr.size()-1))
                 	{
                 		try {
-                			srcAPClass = APClass.make(GUIFragmentInspector
+                			srcAPClass = APClass.make(GUIVertexInspector
 									.ensureGoodAPClassString("",
 											"Define new Source APClass",true));
                 			if (allAPClasses.contains(srcAPClass))
@@ -333,7 +333,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	                	if (id.intValue() == (trgAPCs.size()-1))
 	                	{
 	                		try {
-								String newAPC = GUIFragmentInspector
+								String newAPC = GUIVertexInspector
 										.ensureGoodAPClassString("",
 										"Define new compatible APClass", false);
 	                			if (!newAPC.equals(srcAPClass) 
@@ -730,7 +730,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	                	if (id.intValue() == (srcAPRs.size()-1))
 	                	{
 	                		try {
-								String newAPR = GUIFragmentInspector
+								String newAPR = GUIVertexInspector
 										.ensureGoodAPRuleString("",
 										"Define APClass Rule", false);
 	                			if (allAPRules.contains(newAPR))
@@ -982,7 +982,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 	if (idc.intValue() == (capAPCs.size()-1))
                 	{
                 		try {
-                			cappingAPClass = APClass.make(GUIFragmentInspector
+                			cappingAPClass = APClass.make(GUIVertexInspector
 									.ensureGoodAPClassString("",
 									"Define new Capping Group APClass", false));
                 			if (allAPClasses.contains(cappingAPClass))
@@ -1027,7 +1027,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	                	{
 	                		try {
 	                		    APClass newAPC = APClass.make(
-	                		            GUIFragmentInspector
+	                		            GUIVertexInspector
 										.ensureGoodAPClassString("",
 										"Define new Source APClass", false));
 	                			if (allAPClasses.contains(newAPC))
@@ -1217,7 +1217,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 	if (id.intValue() == (claLstModel.size()-1))
                 	{
                 		try {
-                		    APClass newAPC = APClass.make(GUIFragmentInspector
+                		    APClass newAPC = APClass.make(GUIVertexInspector
 									.ensureGoodAPClassString("",
 									"Define new APClass", false));
                 			if (allAPClasses.contains(newAPC))
@@ -2028,7 +2028,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		                	{
 		                		try {
 		                		    APClass newAPC = APClass.make(
-		                		            GUIFragmentInspector
+		                		            GUIVertexInspector
 											.ensureGoodAPClassString("",
 											"Define new compatible APClass",
 											false));

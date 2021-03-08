@@ -240,7 +240,7 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem newFr = new JMenuItem("New Fragments");
 		newFr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainPanel.add(new GUIFragmentInspector(mainPanel));
+				mainPanel.add(new GUIVertexInspector(mainPanel));
 			}
 		});
 		newMenu.add(newFr);		
@@ -365,10 +365,10 @@ public class MainToolBar extends JMenuBar {
 				break;
 		
 			case ("FRAGMENTS"):
-				GUIFragmentInspector fragPanel = 
-					new GUIFragmentInspector(mainPanel);
+				GUIVertexInspector fragPanel = 
+					new GUIVertexInspector(mainPanel);
 				mainPanel.add(fragPanel);
-				fragPanel.importFragmentsFromFile(file,"SDF");
+				fragPanel.importVertexesFromFile(file,"SDF");
 				break;	
 				
 			case ("GRAPHS"):

@@ -2079,7 +2079,8 @@ public class DenoptimIO
             }
         }
         if (lib.isEmpty()) {
-            throw new DENOPTIMException("Scaffold library has no entries.");
+            throw new DENOPTIMException("Library of vertexes has no valid "
+                    + "entries.");
         }
         return lib;
     }
