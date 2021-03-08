@@ -107,7 +107,7 @@ public class VertexViewPanel extends JPanel
 	
 	private FragmentViewPanel fragViewer;
 	private JPanel emptyViewerCard;
-	private JPanel evViewerCard;
+	private EmptyVertexViewPanel evViewerCard;
 	private JPanel tmplViewerCard;
     protected final String EMPTYCARDNAME = "emptyCard";
     protected final String EV_VIEWERCARDNAME = "emptyVertesCard";
@@ -163,23 +163,22 @@ public class VertexViewPanel extends JPanel
 
 	private void initialize(int dividerPosition)
 	{
-	    String fragViewerToolTip = "<html>Vertexes are displaied here using "
-	            + "a viewer that is specific to the type of vertex. </html>";
-	    
-        emptyViewerCard = new JPanel();
+	    emptyViewerCard = new JPanel();
         String txt = "<html><body width='%1s'><center>Empty</center></html>";
         emptyViewerCard.add(new JLabel(String.format(txt, 120)));
-        emptyViewerCard.setToolTipText(fragViewerToolTip);
+        emptyViewerCard.setToolTipText("<html>Vertexes are displayed here "
+                + "using a viewer that is specific to the type of vertex."
+                + "</html>");
         this.add(emptyViewerCard, EMPTYCARDNAME);
         
-        evViewerCard = new JPanel();
-        evViewerCard.add(new JLabel(String.format("EmptyVertex VIEWER", 120)));
-        evViewerCard.setToolTipText(fragViewerToolTip);
+        evViewerCard = new EmptyVertexViewPanel(this, editableAPTable, 300);
+        evViewerCard.setToolTipText("<html>Vertexes that have no content are"
+                + "displayed as graph nodes with attachment points.</html>");
         this.add(evViewerCard, EV_VIEWERCARDNAME);
         
         tmplViewerCard = new JPanel();
         tmplViewerCard.add(new JLabel(String.format("TEMPLATE VIEWER", 120)));
-        tmplViewerCard.setToolTipText(fragViewerToolTip);
+        tmplViewerCard.setToolTipText("TODO: Template viewer");
         this.add(tmplViewerCard, TMPL_VIEWERCARDNAME);
 	        
         fragViewer = new FragmentViewPanel(false);
@@ -276,10 +275,8 @@ public class VertexViewPanel extends JPanel
             DENOPTIMFragment frag = (DENOPTIMFragment) v;
             loadFragmentToViewer(frag);
         } else if (v instanceof EmptyVertex) {
-            //TODO-MF del
-            System.out.println("___TODO___ visualize EmptyVertex");
-            //fragViewer.loadFragmentToViewer(frag);
-            ((CardLayout) this.getLayout()).show(this, EV_VIEWERCARDNAME);
+            EmptyVertex ev = (EmptyVertex) v;
+            loadEmptyVertexToViewer(ev);
         } else if (v instanceof DENOPTIMTemplate) {
             //TODO-MF del
             System.out.println("___TODO___ visualize Template");
@@ -291,7 +288,20 @@ public class VertexViewPanel extends JPanel
             ((CardLayout) this.getLayout()).show(this, EMPTYCARDNAME);
         }
     }
-	
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Loads the given empty vertex to this viewer. This type of vertex does
+     * not have any associated molecular data, but does have attachment points
+     * (APs) that are listed in table of APs.
+     * @param ev the vertex to visualize
+     */
+    public void loadEmptyVertexToViewer(EmptyVertex ev)
+    {       
+        evViewerCard.loadVertexToViewer(ev);
+        ((CardLayout) this.getLayout()).show(this, EV_VIEWERCARDNAME);
+    }
+    
 //-----------------------------------------------------------------------------
 	
 	/**

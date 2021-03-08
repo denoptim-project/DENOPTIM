@@ -21,6 +21,7 @@ package denoptim.molecule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -915,13 +916,22 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
     public Object getProperty(Object description)
     {
-        return properties.get(description);
+        if (properties == null)
+        {
+            return null;
+        } else {
+            return properties.get(description);
+        }
     }
     
 //-----------------------------------------------------------------------------
     
     public void setProperty(Object key, Object property)
     {
+        if (properties == null)
+        {
+            properties = new HashMap<Object, Object>();
+        }
         properties.put(key, property);
     }
     

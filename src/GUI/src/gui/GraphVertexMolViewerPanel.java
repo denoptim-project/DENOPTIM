@@ -89,7 +89,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	/**
 	 * The currently loaded graph as GraphStream object
 	 */
-	private Graph graph = null;
+	private Graph graphGS = null;
 	
 	/**
 	 * The snapshot of the old (removed) visualized GraphStrem system. 
@@ -249,7 +249,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
     
     /**
      * Loads the given graph into the graph viewer.
-     * @param graph the graph to load.
+     * @param dnGraph the graph to load.
      * @param mol the molecular representation of the graph. Use this to avoid
      * converting the graph into a molecular representation every time you load
      * the same graph.
@@ -276,7 +276,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	
 	/**
 	 * Loads the given graph into the graph viewer.
-	 * @param graph the graph to load.
+	 * @param dnGraph the graph to load.
 	 * @param keepSprites if <code>true</code> we'll keep track of old labels.
 	 * @param useFragSpace give <code>true</code> when a fragment space is 
 	 * loaded.
@@ -287,8 +287,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	    hasFragSpace = useFragSpace;
 	    this.dnGraph = dnGraph;
 	    resetFragViewerCardDeck();
-	    
-		graph = convertDnGraphToGSGraph(dnGraph);
 		
 		// Keep a snapshot of the old data visualised
 		if (keepSprites)
@@ -299,7 +297,8 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		}
 		
 		graphViewer.cleanup();
-		graphViewer.loadGraphToViewer(graph,oldGSStatus);
+		graphViewer.loadGraphToViewer(dnGraph,oldGSStatus);
+		graphGS = graphViewer.graph;
 	}
 
 //-----------------------------------------------------------------------------
@@ -415,99 +414,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Created a graph object suitable for GraphStrem viewer from a 
-	 * DENOPTIMGraph.
-	 * @param dnG the graph to be converted
-	 * @return the GraphStream object
-	 */
-	private Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
-	{
-		graph = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
-		
-		for (DENOPTIMVertex v : dnG.getVertexList())
-		{
-			// Create representation of this vertex
-			String vID = Integer.toString(v.getVertexId());
-			
-			Node n = graph.addNode(vID);
-			n.addAttribute("ui.label", vID);
-			n.addAttribute("dnp.VrtId", vID);
-			n.setAttribute("dnp.molID", v.getMolId());
-			n.setAttribute("dnp.frgType", v.getFragmentType());
-			switch (v.getFragmentType())
-			{
-				case SCAFFOLD:
-					n.setAttribute("ui.class", "scaffold");
-					break;
-				case FRAGMENT:
-					n.setAttribute("ui.class", "fragment");
-					break;
-				case CAP:
-					n.setAttribute("ui.class", "cap");
-					break;
-			}
-			if (v.isRCV())
-			{
-				n.setAttribute("ui.class", "rcv");
-			}
-			n.setAttribute("dnp.level", v.getLevel());
-			n.setAttribute("dnp.", "");
-			
-			// Create representation of free APs
-			
-			for (int i=0; i<v.getNumberOfAP(); i++)
-			{
-				DENOPTIMAttachmentPoint ap = v.getAttachmentPoints().get(i);
-				if (ap.isAvailable())
-				{
-					String nApId = "v"+vID+"ap"+Integer.toString(i);
-					Node nAP = graph.addNode(nApId);
-					nAP.addAttribute("ui.label", nApId);
-					nAP.setAttribute("ui.class", "ap");
-					nAP.addAttribute("dnp.srcVrtApId", i);
-					nAP.addAttribute("dnp.srcVrtId", v.getVertexId());
-					Edge eAP = graph.addEdge(vID+"-"+nApId,vID,nApId);
-					eAP.setAttribute("ui.class", "ap");
-					eAP.setAttribute("dnp.srcAPClass", ap.getAPClass());
-				}
-			}
-		} 
-		
-		for (DENOPTIMEdge dnE : dnG.getEdgeList())
-		{
-			String srcIdx = Integer.toString(dnE.getSrcVertex());
-			String trgIdx = Integer.toString(dnE.getTrgVertex());
-			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,true);
-			e.setAttribute("dnp.srcAPId", dnE.getSrcAPID());
-			e.setAttribute("dnp.trgAPId", dnE.getTrgAPID());
-			e.setAttribute("dnp.srcAPClass", dnE.getSrcAPClass());
-			e.setAttribute("dnp.trgAPClass", dnE.getTrgAPClass());
-			e.setAttribute("dnp.bondType", dnE.getBondType());
-		}
-		 
-		for (DENOPTIMRing r : dnG.getRings())
-		{
-			String srcIdx = Integer.toString(r.getHeadVertex().getVertexId());
-			String trgIdx = Integer.toString(r.getTailVertex().getVertexId());
-			Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,false);
-			e.setAttribute("ui.class", "rc");
-			
-			//WARNING: graphs loaded without having a consistent definition of 
-			// the fragment space will not have all the AP data (which should be 
-			// taken from the fragment space). Therefore, they cannot be 
-			// recognized as RCV, but here we can fix at least part of the issue
-			// by using the DENOPTIMRing to identify the RCVs
-			
-			graph.getNode(srcIdx).setAttribute("ui.class", "rcv");
-			graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
-		}
-		
-		return graph;
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
 	 * Clears the current graph viewer but keeps track of the latest graph 
 	 * loaded. 
 	 */
@@ -561,7 +467,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
             
 			// Otherwise try to load the clicked-on vertex into the viewer
 			String nodeId = (String) evt.getNewValue();
-			Node n = graph.getNode(nodeId);
+			Node n = graphGS.getNode(nodeId);
 			if (n == null || !hasFragSpace)
 			{
 				return;

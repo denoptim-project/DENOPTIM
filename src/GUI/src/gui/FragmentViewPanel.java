@@ -129,6 +129,7 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 */
 	public FragmentViewPanel(JComponent parent, boolean editableTable)
@@ -141,6 +142,7 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
@@ -743,17 +745,11 @@ public class FragmentViewPanel extends JSplitPane
 	 * @param frag the fragment to visualize
 	 */
 	public void loadFragmentToViewer(DENOPTIMFragment frag)
-	{		
-		clearAPTable();
-		
-		this.fragment = frag;
-			
-		loadStructure();
-		
-		updateAPsMapAndTable();
-        
-        updateAPsInJmolViewer();
-        
+	{	
+		this.fragment = frag;			
+		loadStructure();		
+		updateAPsMapAndTable();        
+        updateAPsInJmolViewer();        
         preSelectAPs();
 	}
 	

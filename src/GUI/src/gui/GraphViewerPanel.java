@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.JPanel;
 
@@ -31,16 +30,26 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.graphicGraph.GraphicElement;
-import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
-import org.graphstream.ui.view.ViewerPipe;
 import org.graphstream.ui.view.util.DefaultMouseManager;
 
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMVertex;
+
+/**
+ * A Panel that holds the GraphStream representation of a graph.
+ * 
+ * @author Marco Foscato
+ */
 public class GraphViewerPanel extends JPanel 
 {
 
@@ -56,7 +65,7 @@ public class GraphViewerPanel extends JPanel
 	
 	private ViewPanel viewpanel;
 	private Viewer viewer;
-	private Graph graph;
+	protected Graph graph;
 	private SpriteManager sman;
 	private GraphMouseManager mouseManager;
 	
@@ -67,6 +76,7 @@ public class GraphViewerPanel extends JPanel
 	public static final String SPRITEATT_UICLASS_APCLASSTRG = "apLabelTRG";
 	public static final String SPRITEATT_UICLASS_BNDORD = "bndTypLabel";
 	public static final String SPRITEATT_UICLASS_FRGID = "molIdLabel";
+	public static final String SPRITEATT_UICLASS_APID = "apIdLabel";
 	
 
 //-----------------------------------------------------------------------------
@@ -114,9 +124,12 @@ public class GraphViewerPanel extends JPanel
 				+ "text-style: normal; "
 				+ "text-size: " + GUIPreferences.graphLabelFontSize + ";"
 				+ "} "
-				+ "node.fragment {"
-				+ "fill-color: #4484CE; "
+				+ "node.undef {"
+				+ "fill-color: #BF1EE3; "
 				+ "} "
+				+ "node.fragment {"
+                + "fill-color: #4484CE; "
+                + "} "
 				+ "node.scaffold {"
 				+ "fill-color: #F53240; "
 				+ "} "
@@ -187,6 +200,13 @@ public class GraphViewerPanel extends JPanel
 				+ "text-style: normal;"
 				+ "text-background-mode: none;"
 				+ "}"
+				+ "sprite."+SPRITEATT_UICLASS_APID+" {"
+                + "shape: box; "
+                + "size: 0px;" 
+                + "text-mode: normal;"
+                + "text-style: normal;"
+                + "text-background-mode: none;"
+                + "}"
 				+ "sprite."+SPRITEATT_UICLASS_BNDORD+" {"
 				+ "shape: box; "
 				+ "size: 0px;" 
@@ -226,6 +246,135 @@ public class GraphViewerPanel extends JPanel
 	
 //-----------------------------------------------------------------------------
 
+    /**
+     * Load the given DENOPTIM graph to the graph viewer.
+     * @param dnGraph the graph to load
+     */
+    public void loadGraphToViewer(DENOPTIMGraph dnGraph)
+    {
+        loadGraphToViewer(convertDnGraphToGSGraph(dnGraph),null);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Load the given graph to the graph viewer.
+     * @param dnGraph the graph to load
+     * @param prevStatus the snapshot of the previous status. We use this to 
+     * remember previously chosen settings, such as the sprites to be 
+     * displayed, or the position of nodes.
+     */
+    public void loadGraphToViewer(DENOPTIMGraph dnGraph, 
+            GSGraphSnapshot prevStatus)
+    {
+        loadGraphToViewer(convertDnGraphToGSGraph(dnGraph),prevStatus);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Created a graph object suitable for GraphStrem viewer from a 
+     * DENOPTIMGraph.
+     * @param dnG the graph to be converted
+     * @return the GraphStream object
+     */
+    public static Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
+    {
+        Graph graph = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
+        
+        for (DENOPTIMVertex v : dnG.getVertexList())
+        {
+            // Create representation of this vertex
+            String vID = Integer.toString(v.getVertexId());
+            
+            Node n = graph.addNode(vID);
+            n.addAttribute("ui.label", vID);
+            n.addAttribute("dnp.VrtId", vID);
+            n.setAttribute("dnp.molID", v.getMolId());
+            n.setAttribute("dnp.frgType", v.getFragmentType());
+            switch (v.getFragmentType())
+            {
+                case SCAFFOLD:
+                    n.setAttribute("ui.class", "scaffold");
+                    break;
+                case FRAGMENT:
+                    n.setAttribute("ui.class", "fragment");
+                    break;
+                case CAP:
+                    n.setAttribute("ui.class", "cap");
+                    break;
+                case NONE:
+                    n.setAttribute("ui.class", "undef");
+                    break;
+                case UNDEFINED:
+                    n.setAttribute("ui.class", "undef");
+                    break;
+                default:
+                    n.setAttribute("ui.class", "undef");
+                    break;
+            }
+            if (v.isRCV())
+            {
+                n.setAttribute("ui.class", "rcv");
+            }
+            n.setAttribute("dnp.level", v.getLevel());
+            n.setAttribute("dnp.", "");
+            
+            // Create representation of free APs
+            
+            for (int i=0; i<v.getNumberOfAP(); i++)
+            {
+                DENOPTIMAttachmentPoint ap = v.getAttachmentPoints().get(i);
+                if (ap.isAvailable())
+                {
+                    String nApId = "v"+vID+"ap"+Integer.toString(i);
+                    Node nAP = graph.addNode(nApId);
+                    nAP.addAttribute("ui.label", i);
+                    nAP.setAttribute("ui.class", "ap");
+                    nAP.addAttribute("dnp.ApId", i+1);
+                    nAP.addAttribute("dnp.srcVrtApId", i);
+                    nAP.addAttribute("dnp.srcVrtId", v.getVertexId());
+                    Edge eAP = graph.addEdge(vID+"-"+nApId,vID,nApId);
+                    eAP.setAttribute("ui.class", "ap");
+                    eAP.setAttribute("dnp.srcAPClass", ap.getAPClass());
+                }
+            }
+        } 
+        
+        for (DENOPTIMEdge dnE : dnG.getEdgeList())
+        {
+            String srcIdx = Integer.toString(dnE.getSrcVertex());
+            String trgIdx = Integer.toString(dnE.getTrgVertex());
+            Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,true);
+            e.setAttribute("dnp.srcAPId", dnE.getSrcAPID());
+            e.setAttribute("dnp.trgAPId", dnE.getTrgAPID());
+            e.setAttribute("dnp.srcAPClass", dnE.getSrcAPClass());
+            e.setAttribute("dnp.trgAPClass", dnE.getTrgAPClass());
+            e.setAttribute("dnp.bondType", dnE.getBondType());
+        }
+         
+        for (DENOPTIMRing r : dnG.getRings())
+        {
+            String srcIdx = Integer.toString(r.getHeadVertex().getVertexId());
+            String trgIdx = Integer.toString(r.getTailVertex().getVertexId());
+            Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,false);
+            e.setAttribute("ui.class", "rc");
+            
+            //WARNING: graphs loaded without having a consistent definition of 
+            // the fragment space will not have all the AP data (which should be 
+            // taken from the fragment space). Therefore, they cannot be 
+            // recognized as RCV, but here we can fix at least part of the issue
+            // by using the DENOPTIMRing to identify the RCVs
+            
+            graph.getNode(srcIdx).setAttribute("ui.class", "rcv");
+            graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
+        }
+        
+        return graph;
+    }
+	
+//-----------------------------------------------------------------------------
+
 	/**
 	 * Load the given graph to the graph viewer.
 	 * @param g the graph to load
@@ -261,8 +410,11 @@ public class GraphViewerPanel extends JPanel
 		sman = new SpriteManager(graph);
 		
 		appendSpritesFromSnapshot(prevStatus);
+		
 		// Not working. See comment in the method.
 		//placeNodesAccordingToSnapshot(prevStatus);
+
+        addAllAPIdSprites();
 	    
 		viewpanel = viewer.getDefaultView();
 		mouseManager = new GraphMouseManager();
@@ -452,6 +604,39 @@ public class GraphViewerPanel extends JPanel
 			s.setPosition(0.3, 0, 0);
 		}
 	}
+	
+//-----------------------------------------------------------------------------
+
+    private void addAPIdSprite(Node n)
+    {
+        if (!n.getAttribute("ui.class").equals("ap"))
+        {
+            return;
+        }
+        String sId = "APID-"+n.getId();
+        if (!hasSprite(sId))
+        {
+            Sprite s = sman.addSprite(sId);
+            s.setAttribute("ui.class", SPRITEATT_UICLASS_APID);
+            s.addAttribute("ui.label", n.getAttribute("dnp.ApId").toString());
+            s.attachToNode(n.getId()); 
+            s.setPosition(0.2, 0, 0);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Add all the attachment point identifiers to the graph. The identifiers 
+     * are the indexes in the list of APs of the vertex.
+     */
+    public void addAllAPIdSprites()
+    {
+        for (Node n : graph.getNodeSet())
+        {
+            addAPIdSprite(n);
+        }
+    }
 	
 //-----------------------------------------------------------------------------
 	
