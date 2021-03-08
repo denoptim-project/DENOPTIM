@@ -679,22 +679,19 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Loads a structure in the Jmol viewer.
 	 * @param mol the structure to load
+	 * @return the atom container created to visualize the molecular content.
+	 * This is needed for operations involving the identification by means of 
+	 * reference to the atoms selected/present in the viewer.
 	 */
 	public void loadPlainStructure(IAtomContainer mol)
 	{
-		if (mol instanceof DENOPTIMFragment)
-		{
-			fragment = (DENOPTIMFragment) mol;
-		} else {
-			try {
-				fragment = new DENOPTIMFragment(mol, BBType.FRAGMENT);
-			} catch (DENOPTIMException e) {
-				//Should never happen
-				e.printStackTrace();
-			}
+		try {
+			fragment = new DENOPTIMFragment(mol, BBType.UNDEFINED);
+	        loadStructure();
+		} catch (DENOPTIMException e) {
+			//Should never happen
+			e.printStackTrace();
 		}
-		
-		loadStructure();
 	}
 		
 //-----------------------------------------------------------------------------

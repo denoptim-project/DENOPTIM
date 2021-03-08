@@ -100,7 +100,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	private boolean unsavedChanges = false;
 	
-	private FragmentViewPanel fragmentViewer;
+	private VertexViewPanel vertexViewer;
 	private JPanel fragCtrlPane;
 	private JPanel fragNavigPanel;
 	private JPanel fragNavigPanel2;
@@ -158,15 +158,15 @@ public class GUIFragmentInspector extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
-		fragmentViewer = new FragmentViewPanel(this,true);
-		fragmentViewer.addPropertyChangeListener("APDATA", 
+		vertexViewer = new VertexViewPanel(this,true);
+		vertexViewer.addPropertyChangeListener("APDATA", 
 				new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				protectEditedSystem();				
 			}
 		});
-        this.add(fragmentViewer,BorderLayout.CENTER);
+        this.add(vertexViewer,BorderLayout.CENTER);
 		
 		// General panel on the right: it containing all controls
         fragCtrlPane = new JPanel();
@@ -403,10 +403,10 @@ public class GUIFragmentInspector extends GUICardPanel
 			    + "<br><b>WARNING:</b> this action cannot be undone!<html>");
 		btnAtmToAP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fragment = fragmentViewer.getLoadedStructure();
+				fragment = vertexViewer.getLoadedStructure();
 				
 				ArrayList<IAtom> selectedAtms = 
-						fragmentViewer.getAtomsSelectedFromJMol();
+				        vertexViewer.getAtomsSelectedFromJMol();
 				
 				if (selectedAtms.size() == 0)
 				{
@@ -455,7 +455,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					// Use the APs stored in the atoms
 					fragment.updateAPs();
 					
-					fragmentViewer.loadFragmentToViewer(fragment);
+					vertexViewer.loadFragmentToViewer(fragment);
 					
 			        // Protect the temporary "fragment" obj
 			        unsavedChanges = true;
@@ -474,7 +474,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<IAtom> selectedAtms = 
-						fragmentViewer.getAtomsSelectedFromJMol();
+				        vertexViewer.getAtomsSelectedFromJMol();
 				
 				if (selectedAtms.size() == 0)
 				{
@@ -492,7 +492,7 @@ public class GUIFragmentInspector extends GUICardPanel
 					
 					fragment.updateAPs();
 					
-					fragmentViewer.loadFragmentToViewer(fragment);
+					vertexViewer.loadFragmentToViewer(fragment);
 					
 			        // Protect the temporary "fragment" obj
 			        unsavedChanges = true;
@@ -641,15 +641,19 @@ public class GUIFragmentInspector extends GUICardPanel
 			mol.setProperty(DENOPTIMConstants.APTAG,null);
 			mol.setProperty(DENOPTIMConstants.APCVTAG,null);
 			
-			fragment = new DENOPTIMFragment(mol,BBType.UNDEFINED);
+			// NB: here we let the vertexViewer create a fragment object that we
+			// then put into the local library. This to make sure that the 
+			// references to atoms selected in the viewer are referring to
+			// members of the "fragment" object
+			vertexViewer.loadPlainStructure(mol);
+			fragment = vertexViewer.getLoadedStructure();
 
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
 			// The currently viewed fragment (if any) is always part of the lib
 			fragmentLibrary.add(fragment); 
 			currFrgIdx = fragmentLibrary.size()-1;
-			
-			loadCurrentAsPlainStructure();
+
 			updateFragListSpinner();
 			unsavedChanges = true;
 		} catch (Exception e) {
@@ -683,13 +687,13 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		// Load the structure using CACTUS service or CDK builder
 		try {
-			fragmentViewer.loadSMILES(smiles);
+		    vertexViewer.loadSMILES(smiles);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			return;
 		}
 		
-		fragment = fragmentViewer.getLoadedStructure();
+		fragment = vertexViewer.getLoadedStructure();
 		
 		// The system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty:
@@ -786,18 +790,6 @@ public class GUIFragmentInspector extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Puts currently loaded structure in the Jmol viewer.
-	 * This assumes that the structure is already added to the list of 
-	 * IAtomContainers and that the currFrgIdx filed is properly set.
-	 */
-	private void loadCurrentAsPlainStructure()
-	{
-		fragmentViewer.loadPlainStructure(fragment.getIAtomContainer());
-	}
-
-//-----------------------------------------------------------------------------
-	
-	/**
 	 * Loads the fragments corresponding to the field index.
 	 * The molecular data is loaded in the Jmol viewer,
 	 * and the attachment point (AP) information in the the list of APs.
@@ -819,7 +811,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		clearCurrentSystem();
 
 		fragment = fragmentLibrary.get(currFrgIdx);
-		fragmentViewer.loadFragmentToViewer(fragment);
+		vertexViewer.loadFragmentToViewer(fragment);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -834,11 +826,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		// The exception (i.e., removal of the last fragment) is dealt with by
 		// submitting "zap" only in that occasion.
 		
-		// Remove tmp storage of APs
-		fragmentViewer.mapAPs = null;
-		
-		// Remove table of APs
-		fragmentViewer.clearAPTable();
+		vertexViewer.clearCurrentSystem();
 	}
 
 //-----------------------------------------------------------------------------
@@ -929,8 +917,6 @@ public class GUIFragmentInspector extends GUICardPanel
     	{
     		fragment.removeAtomAndConnectedElectronContainers(atm);
     	}
-    	
-    	
     }
 	
 //-----------------------------------------------------------------------------
@@ -986,7 +972,7 @@ public class GUIFragmentInspector extends GUICardPanel
 			.getTextField().setEditable(true); 
 		((DefaultEditor) fragNavigSpinner.getEditor())
 			.getTextField().setForeground(Color.BLACK);
-		fragmentViewer.deprotectEdits();
+		vertexViewer.deprotectEdits();
 		
 		fragSpinnerListener.setEnabled(true);
 	}
@@ -1017,14 +1003,14 @@ public class GUIFragmentInspector extends GUICardPanel
 
     private void activateTabEditsListener(boolean var)
     {
-		fragmentViewer.activateTabEditsListener(var);
+        vertexViewer.activateTabEditsListener(var);
     }
     
 //-----------------------------------------------------------------------------
     
     private void removeCurrentFragment() throws DENOPTIMException
     {
-    	if (fragmentViewer.hasUnsavedAPEdits())
+    	if (vertexViewer.hasUnsavedAPEdits())
     	{
 			String[] options = new String[]{"Yes","No"};
 			int res = JOptionPane.showOptionDialog(null,
@@ -1061,7 +1047,7 @@ public class GUIFragmentInspector extends GUICardPanel
     		
     		if (currFrgIdx==-1 || fragmentLibrary.size()==0)
 			{
-				fragmentViewer.clearMolecularViewer();
+    		    vertexViewer.clearMolecularViewer();
 				currFrgIdx = 0;
 				fragNavigSpinner.setModel(new SpinnerNumberModel(0,0,0,1));
 				totalFragsLabel.setText(Integer.toString(0));
@@ -1085,14 +1071,14 @@ public class GUIFragmentInspector extends GUICardPanel
   	{
   		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
   		
-  		if (fragmentViewer.hasUnsavedAPEdits())
+  		if (vertexViewer.hasUnsavedAPEdits())
   		{
 	  		// Import changes from AP table into molecular representation
-	        for (int i=0; i<fragmentViewer.apTabModel.getRowCount(); i++) 
+	        for (int i=0; i<vertexViewer.apTabModel.getRowCount(); i++) 
 	        {	        	
-	        	int apId = ((Integer) fragmentViewer.apTabModel.getValueAt(i, 0))
+	        	int apId = ((Integer) vertexViewer.apTabModel.getValueAt(i, 0))
 	        			.intValue();
-	        	String currApClass = fragmentViewer.apTabModel.getValueAt(i, 1)
+	        	String currApClass = vertexViewer.apTabModel.getValueAt(i, 1)
 	        			.toString();
 	        	
 	        	// Make sure the new class has a proper syntax
@@ -1102,14 +1088,14 @@ public class GUIFragmentInspector extends GUICardPanel
 					currApClass = "dafaultAPClass:0";
 				}
 	        	
-	        	if (fragmentViewer.mapAPs.containsKey(apId))
+	        	if (vertexViewer.mapAPs.containsKey(apId))
 	        	{
 	        		String origApClass = 
-	        				fragmentViewer.mapAPs.get(apId).getAPClass().toString();
+	        		        vertexViewer.mapAPs.get(apId).getAPClass().toString();
 	        		if (!origApClass.equals(currApClass))
 	        		{
 	        			try {
-	        				fragmentViewer.mapAPs.get(apId).setAPClass(currApClass);
+	        			    vertexViewer.mapAPs.get(apId).setAPClass(currApClass);
 						} catch (DENOPTIMException e) {
 							// We made sure the class is valid, so this
 							// should never happen, though one never knows
@@ -1141,7 +1127,7 @@ public class GUIFragmentInspector extends GUICardPanel
   		
   		// Retrieve chemical object from the viewer, if edited, otherwise
   		// we get what is already in 'fragment'
-  		fragment = fragmentViewer.getLoadedStructure();
+  		fragment = vertexViewer.getLoadedStructure();
   		if (fragmentLibrary.size()==0 
   				&& (fragment==null || fragment.getNumberOfAP()==0))
   		{
@@ -1300,7 +1286,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	public void dispose() 
 	{
-		fragmentViewer.dispose();
+	    vertexViewer.dispose();
 	}
 		
 //-----------------------------------------------------------------------------

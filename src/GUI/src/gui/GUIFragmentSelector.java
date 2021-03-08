@@ -75,7 +75,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 	 */
 	private int currApIdx = -1;
 	
-	private FragmentViewPanel fragmentViewer;
+	private VertexViewPanel vertexViewer;
 	private JPanel fragCtrlPane;
 	private JPanel fragNavigPanel;
 	private JPanel fragNavigPanel2;
@@ -150,8 +150,8 @@ public class GUIFragmentSelector extends GUIModalDialog
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			
 		// The viewer with Jmol and APtable (not editable)
-		fragmentViewer = new FragmentViewPanel(false);
-		addToCentralPane(fragmentViewer);
+		vertexViewer = new VertexViewPanel(false);
+		addToCentralPane(vertexViewer);
 		
 		// Controls for navigating the fragments list
         fragCtrlPane = new JPanel();
@@ -186,7 +186,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<Integer> ids = fragmentViewer.getSelectedAPIDs();
+				ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
 				if (ids.size() > 0)
 				{
 					// WARNING: we take only the first, if many are selected.
@@ -211,9 +211,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 					}
 				}
 				result = new Integer[]{currFrgIdx, currApIdx};
-				//fragmentViewer.clearAPTable();
-				//fragmentViewer.clearMolecularViewer();
-				fragmentViewer.dispose();
+				vertexViewer.dispose();
 				close();
 			}
 		});
@@ -260,7 +258,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		clearCurrentSystem();
 
 		fragment = fragmentLibrary.get(currFrgIdx);
-		fragmentViewer.loadFragmentToViewer(fragment);
+		vertexViewer.loadFragmentToViewer(fragment);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -284,11 +282,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 		// The exception (i.e., removal of the last fragment) is dealt with by
 		// submitting "zap" only in that occasion.
 		
-		// Remove tmp storage of APs
-		fragmentViewer.mapAPs = null;
-		
-		// Remove table of APs
-		fragmentViewer.clearAPTable();
+		vertexViewer.clearCurrentSystem();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -332,7 +326,7 @@ public class GUIFragmentSelector extends GUIModalDialog
 
     private void activateTabEditsListener(boolean var)
     {
-		fragmentViewer.activateTabEditsListener(var);
+        vertexViewer.activateTabEditsListener(var);
     }
 		
 //-----------------------------------------------------------------------------
