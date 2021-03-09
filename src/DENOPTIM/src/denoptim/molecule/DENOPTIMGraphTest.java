@@ -642,13 +642,10 @@ public class DENOPTIMGraphTest {
 	public void testGetAvailableAPs_returnsListOfAvailableAPs() {
 		DENOPTIMVertex vertex0 = new EmptyVertex(0);
 		DENOPTIMVertex vertex1 = new EmptyVertex(1);
-		try {
-			vertex0.addAP(0, 1, 1);
-			vertex0.addAP(0, 1, 1);
-			vertex1.addAP(0, 1, 1);
-		} catch (DENOPTIMException e) {
-			fail("unexpected error");
-		}
+
+		vertex0.addAP(0, 1, 1);
+		vertex0.addAP(0, 1, 1);
+		vertex1.addAP(0, 1, 1);
 
 		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getAP(0),
 		        vertex1.getAP(0));
@@ -877,11 +874,7 @@ public class DENOPTIMGraphTest {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			try {
-				v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
-			} catch (DENOPTIMException e) {
-				fail("unexpected exception");
-			}
+			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
 		}
 		graph.addVertex(v);
 	}

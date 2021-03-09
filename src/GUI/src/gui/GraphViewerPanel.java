@@ -43,6 +43,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**
@@ -256,6 +257,18 @@ public class GraphViewerPanel extends JPanel
     }
     
 //-----------------------------------------------------------------------------
+
+    /**
+     * Load the DENOPTIM graph contained in a template to the graph viewer. 
+     * @param tmpl the template containing the graph to visualize
+     */
+    public void loadGraphToViewer(DENOPTIMTemplate tmpl)
+    {
+        Graph graph = convertDnGraphToGSGraph(tmpl.getInnerGraph(), tmpl);
+        loadGraphToViewer(graph,null);
+    }
+    
+//-----------------------------------------------------------------------------
     
     /**
      * Load the given graph to the graph viewer.
@@ -269,7 +282,7 @@ public class GraphViewerPanel extends JPanel
     {
         loadGraphToViewer(convertDnGraphToGSGraph(dnGraph),prevStatus);
     }
-    
+
 //-----------------------------------------------------------------------------
     
     /**
@@ -279,6 +292,24 @@ public class GraphViewerPanel extends JPanel
      * @return the GraphStream object
      */
     public static Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
+    {
+        return convertDnGraphToGSGraph(dnG, null);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Created a graph object suitable for GraphStrem viewer from a 
+     * DENOPTIMGraph.
+     * @param dnG the graph to be converted
+     * @param tmpl null, or the template that contains the dnG graph. It this is
+     * not null the numbering of the AP nodes will be based on the list of APs 
+     * of the template, otherwise (if tmpl is null) the numbering refers to the
+     * AP list of the vertex that is part of the dnG graph.
+     * @return the GraphStream object
+     */
+    public static Graph convertDnGraphToGSGraph(DENOPTIMGraph dnG, 
+            DENOPTIMTemplate tmpl) 
     {
         Graph graph = new SingleGraph("DENOPTIMGraph#"+dnG.getGraphId());
         
@@ -318,7 +349,6 @@ public class GraphViewerPanel extends JPanel
                 n.setAttribute("ui.class", "rcv");
             }
             n.setAttribute("dnp.level", v.getLevel());
-            n.setAttribute("dnp.", "");
             
             // Create representation of free APs
             
@@ -332,6 +362,7 @@ public class GraphViewerPanel extends JPanel
                     nAP.addAttribute("ui.label", i);
                     nAP.setAttribute("ui.class", "ap");
                     nAP.addAttribute("dnp.ApId", i+1);
+                    nAP.addAttribute("dnp.ApUID", ap.getID());
                     nAP.addAttribute("dnp.srcVrtApId", i);
                     nAP.addAttribute("dnp.srcVrtId", v.getVertexId());
                     Edge eAP = graph.addEdge(vID+"-"+nApId,vID,nApId);
@@ -370,7 +401,38 @@ public class GraphViewerPanel extends JPanel
             graph.getNode(trgIdx).setAttribute("ui.class", "rcv");
         }
         
+        if (tmpl != null)
+        {
+            renumberAPs(tmpl, graph);
+        }
+        
         return graph;
+    }
+    
+//-----------------------------------------------------------------------------    
+
+    private static void renumberAPs(DENOPTIMTemplate tmpl, Graph graph)
+    {
+        for (int i=0; i<tmpl.getAttachmentPoints().size(); i++)
+        {
+            DENOPTIMAttachmentPoint outAP = tmpl.getAttachmentPoints().get(i);
+            DENOPTIMAttachmentPoint inAP = tmpl.getInnerAPFromOuterAP(outAP);
+            for (Node n : graph.getNodeSet())
+            {
+                if (n.getAttribute("ui.class").equals("ap"))
+                {
+                    int gsVrtId = n.getAttribute("dnp.srcVrtId");
+                    int gsApUID = n.getAttribute("dnp.ApUID");
+                    int dnVrtId = inAP.getOwner().getVertexId();
+                    int dnApUID = inAP.getID();
+                    if (gsVrtId == dnVrtId && gsApUID == dnApUID)
+                    {
+                        n.setAttribute("dnp.ApId", i+1);
+                        break;
+                    }
+                }
+            }
+        }
     }
 	
 //-----------------------------------------------------------------------------
@@ -1020,6 +1082,6 @@ public class GraphViewerPanel extends JPanel
 	{
 		cleanup();
 	}
-
+	
 //-----------------------------------------------------------------------------
 }

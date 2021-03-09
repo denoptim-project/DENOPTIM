@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -97,51 +98,63 @@ public class GUIVertexSelector extends GUIModalDialog
 	 * Separator in property used to pre-select APs
 	 */
 	public static final String PRESELECTEDAPSFIELDSEP = "pre-SelectedAPs";
-	
+
 //-----------------------------------------------------------------------------
 
 	/**
 	 * Constructor
-	 * @param iacLib the library of vertex to load
+	 * @param vrtxLib the library of vertex to load
 	 */
-	public GUIVertexSelector(ArrayList<IAtomContainer> iacLib)
+	public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib)
 	{
-		this(iacLib,0);
+		this(vrtxLib,0, false);
 	}
 	
+//-----------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     * @param vrtxLib the library of vertex to load
+     */
+    public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib, boolean use3rd)
+    {
+        this(vrtxLib, 0, use3rd);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     * @param vrtxLib the library of vertex to load
+     * @param initialId the 0-based index of the vertex to open 
+     * when displaying the dialog
+     */
+    public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib, 
+            int initialId)
+    {
+        this(vrtxLib, initialId, false);
+    }
+    
 //-----------------------------------------------------------------------------
 	
 	/**
 	 * Constructor
-	 * @param iacLib the library of vertex to load
+	 * @param vrtxLib the library of vertex to load
 	 * @param initialId the 0-based index of the vertex to open 
 	 * when displaying the dialog
 	 */
-	public GUIVertexSelector(ArrayList<IAtomContainer> iacLib, 
-			int initialId)
+	public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib, 
+			int initialId, boolean use3rd)
 	{
-		super();
+		super(use3rd);
+		vertexLibrary = vrtxLib;
 		this.setBounds(150, 150, 400, 550);
 		this.setTitle("Select Vertex and AP");
-		
+		/*
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
-		FragmentSpace.appendToVertexLibrary(iacLib,BBType.UNDEFINED,
-		        vertexLibrary);
-		
-		// Define the list of vrtxs among which we are selecting
-		for (int i=0; i<iacLib.size(); i++)
-		{
-		    DENOPTIMVertex v = vertexLibrary.get(i);
-		    IAtomContainer iac = iacLib.get(i);
-		    if (iac.getProperty(PRESELECTEDAPSFIELD) != null)
-			{
-			    v.setProperty(PRESELECTEDAPSFIELD, 
-			            iac.getProperty(PRESELECTEDAPSFIELD));
-			}
-		}
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			
+		*/
+		
 		// The viewer with Jmol and APtable (not editable)
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
@@ -172,43 +185,107 @@ public class GUIVertexSelector extends GUIModalDialog
 		ctrlPane.add(navigPanel2);
 		addToNorthPane(ctrlPane);
 		
-		// Edit global dialog controls
-		this.btnDone.setText("Select current vertex");
-		this.btnDone.setToolTipText("<html>Process the currently displayed "
-				+ "vertex<br>and the currently selected AP, if any.</html>");
-		this.btnDone.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
-				if (ids.size() > 0)
-				{
-					// WARNING: we take only the first, if many are selected.
-					currApIdx = ids.get(0);
-				}
-				else
-				{
-					if (vertex.getNumberOfAP()==1)
-					{
-						currApIdx=0;
-					}
-					else if (enforceAPSelection)
-					{
-						JOptionPane.showMessageDialog(null,"<html>"
-								+ "No attachment point (AP) selected.<br>"
-								+ "Please select an AP in the table."
-								+ "</html>",
-				                "Error",
-				                JOptionPane.PLAIN_MESSAGE,
-				                UIManager.getIcon("OptionPane.errorIcon"));
-						return;
-					}
-				}
-				result = new Integer[]{currVrtxIdx, currApIdx};
-				vertexViewer.dispose();
-				close();
-			}
-		});
+		if (use3rd)
+		{
+	        this.btnExtra.setText("Select current vertex");
+            this.btnExtra.setToolTipText("<html>Selects this fragment. "
+                    + "Multiple selections are allowed before hitting the "
+                    + "'Done' button.</html>");
+            this.btnExtra.addActionListener(new ActionListener() {
+                
+                @SuppressWarnings("unchecked")
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
+                    if (ids.size() > 0)
+                    {
+                        // WARNING: we take only the first, if many are selected.
+                        currApIdx = ids.get(0);
+                    }
+                    else
+                    {
+                        if (vertex.getNumberOfAP()==1)
+                        {
+                            currApIdx=0;
+                        }
+                        else if (enforceAPSelection)
+                        {
+                            JOptionPane.showMessageDialog(null,"<html>"
+                                    + "No attachment point (AP) selected.<br>"
+                                    + "Please select an AP in the table."
+                                    + "</html>",
+                                    "Error",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    UIManager.getIcon("OptionPane.errorIcon"));
+                            return;
+                        }
+                    }
+                    if (result == null)
+                    {
+                        result = new ArrayList<ArrayList<Integer>>();
+                    }
+                    boolean alreadySelected = false;
+                    for (ArrayList<Integer> p : 
+                        ((ArrayList<ArrayList<Integer>>)result))
+                    {
+                        if ((p.get(0) == currVrtxIdx) 
+                                && (p.get(1) == currApIdx))
+                        {
+                            alreadySelected = true;
+                            break;
+                        }
+                    }
+                    if (!alreadySelected)
+                    {
+                        ArrayList<Integer> pair = new ArrayList<Integer>();
+                        pair.add(currVrtxIdx);
+                        pair.add(currApIdx);
+                        ((ArrayList<ArrayList<Integer>>)result).add(pair);
+                    }
+                }
+            });
+		} else {
+    		this.btnDone.setText("Select current vertex");
+    		this.btnDone.setToolTipText("<html>Process the currently displayed "
+    				+ "vertex<br>and the currently selected AP, "
+    				+ "if any.</html>");
+    		this.btnDone.addActionListener(new ActionListener() {
+    			
+    			@SuppressWarnings("unchecked")
+                @Override
+    			public void actionPerformed(ActionEvent e) {
+    				ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
+    				if (ids.size() > 0)
+    				{
+    					// WARNING: we take only the first, if many are selected.
+    					currApIdx = ids.get(0);
+    				}
+    				else
+    				{
+    					if (vertex.getNumberOfAP()==1)
+    					{
+    						currApIdx=0;
+    					}
+    					else if (enforceAPSelection)
+    					{
+    						JOptionPane.showMessageDialog(null,"<html>"
+    								+ "No attachment point (AP) selected.<br>"
+    								+ "Please select an AP in the table."
+    								+ "</html>",
+    				                "Error",
+    				                JOptionPane.PLAIN_MESSAGE,
+    				                UIManager.getIcon("OptionPane.errorIcon"));
+    						return;
+    					}
+    				}
+    				result = new ArrayList<Integer>();
+				    ((ArrayList<Integer>)result).add(currVrtxIdx);
+                    ((ArrayList<Integer>)result).add(currApIdx);
+    				vertexViewer.dispose();
+    				close();
+    			}
+    		});
+		}
 		
 		// Load the first vertex
 		currVrtxIdx = initialId;

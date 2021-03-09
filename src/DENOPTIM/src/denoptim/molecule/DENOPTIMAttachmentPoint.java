@@ -529,7 +529,12 @@ Comparable<DENOPTIMAttachmentPoint>
 
     public boolean isAvailable()
     {
-        return freeConnections > 0;
+        if (totalConnections > 0)
+        {
+            return freeConnections > 0;
+        } else {
+            return user == null;
+        }
     }
 
 //------------------------------------------------------------------------------

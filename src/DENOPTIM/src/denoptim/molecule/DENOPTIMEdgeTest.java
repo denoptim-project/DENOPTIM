@@ -47,19 +47,15 @@ public class DENOPTIMEdgeTest {
 
 	@BeforeEach
 	public void setUpClass() {
-		try {
-			dummyVertexA = new EmptyVertex();
-			dummyVertexA.addAP();
-			dummyVertexA.addAP();
-			dummyApA1 = dummyVertexA.getAP(0);
-			dummyApA2 = dummyVertexA.getAP(1);
+		dummyVertexA = new EmptyVertex();
+		dummyVertexA.addAP();
+		dummyVertexA.addAP();
+		dummyApA1 = dummyVertexA.getAP(0);
+		dummyApA2 = dummyVertexA.getAP(1);
 
-			dummyVertexB = new EmptyVertex();
-			dummyVertexB.addAP();
-			dummyApB = dummyVertexB.getAP(0);
-		} catch (DENOPTIMException e ) {
-			fail("unexpected exception");
-		}
+		dummyVertexB = new EmptyVertex();
+		dummyVertexB.addAP();
+		dummyApB = dummyVertexB.getAP(0);
 	}
 	
 //------------------------------------------------------------------------------

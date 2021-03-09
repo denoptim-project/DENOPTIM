@@ -208,10 +208,12 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 				
-				ArrayList<IAtomContainer> iacLib;
+				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-					iacLib = DenoptimIO.readInLibraryOfFragments(
-		                    inFile.getAbsolutePath(),"fragment");
+	               FragmentSpace.appendToVertexLibrary(
+	                        DenoptimIO.readInLibraryOfFragments(
+	                                inFile.getAbsolutePath(),"fragment"),
+	                        BBType.FRAGMENT,vrtxLib);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -225,7 +227,7 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 
-				if (iacLib.size() == 0)
+				if (vrtxLib.size() == 0)
 				{
 					JOptionPane.showMessageDialog(btnAddVrtx,
 			                "<html>No building blocks in file"
@@ -236,7 +238,7 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 				
-				if (iacLib.size() == 1)
+				if (vrtxLib.size() == 1)
 				{
 					importVertexesFromFile(inFile);
 					return;
@@ -269,48 +271,23 @@ public class GUIVertexInspector extends GUICardPanel
 						break;
 						
 					case 1:
-						ArrayList<IAtomContainer> selectedIACs = 
-								new ArrayList<IAtomContainer>();
-						int iVrtx = -1;
-						while (true)
-						{
-							if (iVrtx+1>=iacLib.size())
-							{
-								break;
-							}
-							GUIVertexSelector vrtxSelector = 
-									new GUIVertexSelector(iacLib,iVrtx+1);
-							vrtxSelector.setRequireApSelection(false);
-							Object selected = vrtxSelector.showDialog();
+						ArrayList<DENOPTIMVertex> selectedVrtxs = 
+								new ArrayList<DENOPTIMVertex>();
+						GUIVertexSelector vrtxSelector = 
+						        new GUIVertexSelector(vrtxLib,true);
+						vrtxSelector.setRequireApSelection(false);
+						Object selected = vrtxSelector.showDialog();
 
-							if (selected != null)
-							{
-								iVrtx = ((Integer[]) selected)[0];
-								selectedIACs.add(iacLib.get(iVrtx));
-							}
-							else
-							{
-								break;
-							}
+						if (selected != null)
+						{
+						    ArrayList<ArrayList<Integer>> selList = 
+						            (ArrayList<ArrayList<Integer>>) selected;
+						    for (ArrayList<Integer> pair : selList)
+						    {
+						        selectedVrtxs.add(vrtxLib.get(pair.get(0)));
+						    }
 						}
-						String tmpSDFFile = Utils.getTempFile(
-								"Denoptim_FragViewer_loadedMol.sdf");
-						try {
-							DenoptimIO.writeMoleculeSet(tmpSDFFile, selectedIACs);
-							importVertexesFromFile(new File(tmpSDFFile));
-						} catch (DENOPTIMException e1) {
-							JOptionPane.showMessageDialog(btnAddVrtx,
-					                "<html>Could not import building blocks"
-					                + ".<br>"
-					                + "Error reading tmp file"
-					                + "<br>'" + inFile + "'"
-					                + "<br>Hint on cause: " + e1.getMessage() 
-					                +"</html>",
-					                "Error",
-					                JOptionPane.ERROR_MESSAGE,
-					                UIManager.getIcon("OptionPane.errorIcon"));
-							return;
-						}
+						importVertexes(selectedVrtxs);
 						break;
 					
 					default:
@@ -786,6 +763,59 @@ public class GUIVertexInspector extends GUICardPanel
 		}
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Imports vertexes.
+     * @param list the list of vertexes to import
+     */
+    public void importVertexes(ArrayList<DENOPTIMVertex> list)
+    {   
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
+        int firstOfNew = 0;
+        boolean libFromScrtch = false;
+        if (vertexesLibrary == null)
+        {
+            libFromScrtch = true;
+            vertexesLibrary = new ArrayList<DENOPTIMVertex>();
+        }
+        else
+        {
+            firstOfNew = vertexesLibrary.size();
+        }
+        
+        boolean addedOne = false;
+        if (list.size() > 0)
+        {
+            vertexesLibrary.addAll(list);
+            addedOne = true;
+            
+            // Display the first
+            if (libFromScrtch)
+            {
+                currVrtxIdx = 0;
+            }
+            else if (addedOne)
+            {
+                currVrtxIdx = firstOfNew;
+            }
+            loadCurrentVrtxIdxToViewer();
+            
+            // Update the fragment spinner
+            updateVrtxListSpinner();
+        } else {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            JOptionPane.showMessageDialog(null,
+                    "<html>No vertexes to import from the given list.</html>",
+                    "Error",
+                    JOptionPane.PLAIN_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+        }
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+    
 	
 //-----------------------------------------------------------------------------
 	

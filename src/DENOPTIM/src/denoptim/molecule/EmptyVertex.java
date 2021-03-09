@@ -255,11 +255,7 @@ public class EmptyVertex extends DENOPTIMVertex
         
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            try {
-                c.addAP(ap.clone());
-            } catch (DENOPTIMException e) {
-                e.printStackTrace();
-            }
+            c.addAP(ap.clone());
         }
 
         ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();

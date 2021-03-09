@@ -161,15 +161,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
         DENOPTIMVertex vrtx = new EmptyVertex(0);
         DENOPTIMVertex vrtx2 = new EmptyVertex(1);
-        try {
-            vrtx.addAP(0, 1, 1);
-            vrtx.addAP(1, 1, 1);
+    
+        vrtx.addAP(0, 1, 1);
+        vrtx.addAP(1, 1, 1);
 
-            vrtx2.addAP(0, 1, 1);
-            vrtx2.addAP(1, 1, 1);
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-        }
+        vrtx2.addAP(0, 1, 1);
+        vrtx2.addAP(1, 1, 1);
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vrtx);
         g.addVertex(vrtx2);
@@ -586,13 +583,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         for (DENOPTIMAttachmentPoint oriAP : this.requiredAPs)
         {
-            try
-            {
-                c.addAP(oriAP.clone());
-            } catch (DENOPTIMException e)
-            {
-                e.printStackTrace();
-            }
+            c.addAP(oriAP.clone());
         }
         c.setInnerGraph(this.getInnerGraph().clone());
         
@@ -749,6 +740,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
+    //TODO-V3: test this. it fails for read-in templates!
+    
     @Override
     public boolean containsAtoms()
     {
@@ -881,11 +874,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    private DENOPTIMAttachmentPoint getInnerAPFromOuterAP(DENOPTIMAttachmentPoint outerAP) {
+    public DENOPTIMAttachmentPoint getInnerAPFromOuterAP(
+            DENOPTIMAttachmentPoint outerAP) {
         // Very inefficient solution
         for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry
-                : innerToOuterAPs.entrySet()) {
-            if (outerAP.equals(entry.getValue())) {
+                : innerToOuterAPs.entrySet()) 
+        {
+            if (outerAP == entry.getValue()) 
+            {
                 return entry.getKey();
             }
         }
@@ -932,12 +928,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     /**
      * Adds ap to the list of required APs on this template
      * @param ap attachment point to require from this template
+     * @throws DENOPTIMException 
      */
     @Override
-    public void addAP(DENOPTIMAttachmentPoint ap) throws DENOPTIMException {
+    public void addAP(DENOPTIMAttachmentPoint ap) {
         if (getInnerGraph() != null) {
-            throw new DENOPTIMException("cannot add more required APs after " +
+            System.err.println("cannot add more required APs after " +
                     "setting the inner graph");
+            return;
         }
         ap.setOwner(this);
         requiredAPs.add(ap);

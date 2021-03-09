@@ -19,12 +19,15 @@
 package gui;
 
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -105,14 +109,20 @@ public class VertexViewPanel extends JPanel
 	public boolean alteredAPData = false;
 	protected DefaultTableModel apTabModel;
 	
+	private JPanel titlePanel;
+	
+    private JLabel labTitle;
+    private JButton btnSwitchToNodeViewer;
+    private JButton btnSwitchToMolViewer;
+    
+    private JPanel centralPanel;
+	
+    private JPanel emptyViewerCard;
 	private FragmentViewPanel fragViewer;
-	private JPanel emptyViewerCard;
-	private EmptyVertexViewPanel evViewerCard;
-	private JPanel tmplViewerCard;
+	private VertexAsGraphViewPanel graphNodeViewer;
     protected final String EMPTYCARDNAME = "emptyCard";
-    protected final String EV_VIEWERCARDNAME = "emptyVertesCard";
-    protected final String FRAG_VIEWERCARDNAME = "fragViewerCard";
-    protected final String TMPL_VIEWERCARDNAME = "tmplViewwerCard";
+    protected final String GRAPHVIEWERCARDNAME = "emptyVertesCard";
+    protected final String MOLVIEWERCARDNAME = "fragViewerCard";
 	    
 	private boolean editableAPTable = false;
 	
@@ -153,8 +163,8 @@ public class VertexViewPanel extends JPanel
 	 */
 	public VertexViewPanel(JComponent parent, boolean editableTable, int dividerPosition)
 	{
-	    super(new CardLayout());
-		this.parent = parent;
+	    super(new BorderLayout());
+	    this.parent = parent;
 		this.editableAPTable = editableTable;
 		initialize(dividerPosition);
 	}
@@ -163,30 +173,50 @@ public class VertexViewPanel extends JPanel
 
 	private void initialize(int dividerPosition)
 	{
-	    emptyViewerCard = new JPanel();
-        String txt = "<html><body width='%1s'><center>Empty</center></html>";
-        emptyViewerCard.add(new JLabel(String.format(txt, 120)));
-        emptyViewerCard.setToolTipText("<html>Vertexes are displayed here "
-                + "using a viewer that is specific to the type of vertex."
-                + "</html>");
-        this.add(emptyViewerCard, EMPTYCARDNAME);
+	    centralPanel = new JPanel(new CardLayout());
+	    this.add(centralPanel, BorderLayout.CENTER);
+	    
+	    titlePanel = new JPanel();
+	            
+        labTitle = new JLabel("");
+        titlePanel.add(labTitle);
         
-        evViewerCard = new EmptyVertexViewPanel(this, editableAPTable, 300);
-        evViewerCard.setToolTipText("<html>Vertexes that have no content are"
-                + "displayed as graph nodes with attachment points.</html>");
-        this.add(evViewerCard, EV_VIEWERCARDNAME);
+        btnSwitchToNodeViewer = new JButton("Node View");
+        btnSwitchToNodeViewer.setToolTipText("Switch to graph node depiction "
+                + "of this vertex.");
+        btnSwitchToNodeViewer.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                switchToGraphNodeViewer();
+            }
+        });
+        btnSwitchToNodeViewer.setEnabled(false);
+        titlePanel.add(btnSwitchToNodeViewer);
         
-        tmplViewerCard = new JPanel();
-        tmplViewerCard.add(new JLabel(String.format("TEMPLATE VIEWER", 120)));
-        tmplViewerCard.setToolTipText("TODO: Template viewer");
-        this.add(tmplViewerCard, TMPL_VIEWERCARDNAME);
+        btnSwitchToMolViewer = new JButton("Molecule View");
+        btnSwitchToMolViewer.setToolTipText("Switch to molecular depiction "
+                + "of this vertex.");
+        btnSwitchToMolViewer.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                switchToMolecularViewer();
+            }
+        });
+        btnSwitchToMolViewer.setEnabled(false);
+        titlePanel.add(btnSwitchToMolViewer);
+        
+        this.add(titlePanel, BorderLayout.NORTH);
+        
+        emptyViewerCard = new JPanel();
+        emptyViewerCard.setToolTipText("Vertexes are displayed here.");
+        centralPanel.add(emptyViewerCard, EMPTYCARDNAME);
+        
+        graphNodeViewer = new VertexAsGraphViewPanel(this, editableAPTable, 300);
+        centralPanel.add(graphNodeViewer, GRAPHVIEWERCARDNAME);
 	        
         fragViewer = new FragmentViewPanel(false);
+        centralPanel.add(fragViewer, MOLVIEWERCARDNAME);
         apTabModel = fragViewer.apTabModel;
         
-        this.add(fragViewer, FRAG_VIEWERCARDNAME);
-        
-        ((CardLayout) this.getLayout()).show(this, EMPTYCARDNAME);
+        switchToEmptyCard();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -210,6 +240,32 @@ public class VertexViewPanel extends JPanel
 	{
 		alteredAPData = false;
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void switchToEmptyCard()
+	{
+        btnSwitchToMolViewer.setEnabled(false);
+        btnSwitchToNodeViewer.setEnabled(false);
+	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
+	            EMPTYCARDNAME);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void switchToGraphNodeViewer()
+	{
+	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
+	            GRAPHVIEWERCARDNAME);
+	}
+	
+//-----------------------------------------------------------------------------
+    
+    private void switchToMolecularViewer()
+    {
+        ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
+                MOLVIEWERCARDNAME);
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -226,7 +282,7 @@ public class VertexViewPanel extends JPanel
 	 */
 	public boolean loadSMILES(String smiles)
 	{	
-        ((CardLayout) this.getLayout()).show(this, FRAG_VIEWERCARDNAME);
+	    switchToMolecularViewer();
 	    return fragViewer.loadSMILES(smiles);
 	}
 
@@ -243,7 +299,7 @@ public class VertexViewPanel extends JPanel
 	 */
 	public DENOPTIMFragment getLoadedStructure()
 	{
-        ((CardLayout) this.getLayout()).show(this, FRAG_VIEWERCARDNAME);
+	    switchToMolecularViewer();
 	    return fragViewer.getLoadedStructure();
 	}
 
@@ -256,7 +312,7 @@ public class VertexViewPanel extends JPanel
 	public void loadPlainStructure(IAtomContainer mol)
 	{
 	    fragViewer.loadPlainStructure(mol);
-        ((CardLayout) this.getLayout()).show(this, FRAG_VIEWERCARDNAME);
+	    switchToMolecularViewer();
 	}
 
 //-----------------------------------------------------------------------------
@@ -272,22 +328,24 @@ public class VertexViewPanel extends JPanel
     public void loadVertexToViewer(DENOPTIMVertex v)
     {
         if (v instanceof DENOPTIMFragment) {
+            labTitle.setText("Fragment");
             DENOPTIMFragment frag = (DENOPTIMFragment) v;
             loadFragmentToViewer(frag);
         } else if (v instanceof EmptyVertex) {
+            labTitle.setText("EmptyVertex");
             EmptyVertex ev = (EmptyVertex) v;
             loadEmptyVertexToViewer(ev);
         } else if (v instanceof DENOPTIMTemplate) {
-            //TODO-MF del
-            System.out.println("___TODO___ visualize Template");
-            //fragViewer.loadFragmentToViewer(frag);
-            ((CardLayout) this.getLayout()).show(this, TMPL_VIEWERCARDNAME);
+            labTitle.setText("Template");
+            DENOPTIMTemplate tmpl = (DENOPTIMTemplate) v;
+            loadTemplateToViewer(tmpl);
         } else {
-          //TODO-MF del
-            System.out.println("___TODO___ loadinf empty card as a result of instance: "+v.getClass().getName());
-            ((CardLayout) this.getLayout()).show(this, EMPTYCARDNAME);
+            System.err.println("Loading empty card as a result of vertex with " 
+                    + "type " + v.getClass().getName());
+            switchToEmptyCard();
         }
     }
+
 //-----------------------------------------------------------------------------
     
     /**
@@ -296,10 +354,12 @@ public class VertexViewPanel extends JPanel
      * (APs) that are listed in table of APs.
      * @param ev the vertex to visualize
      */
-    public void loadEmptyVertexToViewer(EmptyVertex ev)
-    {       
-        evViewerCard.loadVertexToViewer(ev);
-        ((CardLayout) this.getLayout()).show(this, EV_VIEWERCARDNAME);
+    private void loadEmptyVertexToViewer(EmptyVertex ev)
+    {
+        btnSwitchToMolViewer.setEnabled(false);
+        btnSwitchToNodeViewer.setEnabled(false);
+        graphNodeViewer.loadVertexToViewer(ev);
+        switchToGraphNodeViewer();
     }
     
 //-----------------------------------------------------------------------------
@@ -312,12 +372,39 @@ public class VertexViewPanel extends JPanel
 	 * the generation of the graphical objects representing the APs.
 	 * @param frag the fragment to visualize
 	 */
-	public void loadFragmentToViewer(DENOPTIMFragment frag)
+	private void loadFragmentToViewer(DENOPTIMFragment frag)
 	{		
 		fragViewer.loadFragmentToViewer(frag);
-		((CardLayout) this.getLayout()).show(this, FRAG_VIEWERCARDNAME);
+        btnSwitchToMolViewer.setEnabled(true);
+        btnSwitchToNodeViewer.setEnabled(true);
+        graphNodeViewer.loadVertexToViewer(frag);
+		switchToMolecularViewer();
 	}
 
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Loads the given template to this viewer. The style of the depiction, 
+     * which is plotted by different viewers, depends on the content of the
+     * template. If the template contains a molecular representation, then a 
+     * molecular viewer will be used. Otherwise a single-node graph will be 
+     * used to represent a template with a partially defined content, but a
+     * given set of attachment points.
+     * @param tmpl the template to visualize
+     */
+    private void loadTemplateToViewer(DENOPTIMTemplate tmpl)
+    {       
+        if (tmpl.containsAtoms())
+        {
+            DENOPTIMFragment frag = new DENOPTIMFragment();
+            loadFragmentToViewer(frag);
+            btnSwitchToMolViewer.setEnabled(true);
+            btnSwitchToNodeViewer.setEnabled(true);
+        }
+        graphNodeViewer.loadVertexToViewer(tmpl);
+        switchToGraphNodeViewer();
+    }
+    
 //-----------------------------------------------------------------------------
 
 	/**
@@ -327,7 +414,7 @@ public class VertexViewPanel extends JPanel
 	{
 	    fragViewer.mapAPs = null;
 		fragViewer.clearAPTable();
-        ((CardLayout) this.getLayout()).show(this, EMPTYCARDNAME);
+		switchToEmptyCard();
 	}
 	
 //-----------------------------------------------------------------------------

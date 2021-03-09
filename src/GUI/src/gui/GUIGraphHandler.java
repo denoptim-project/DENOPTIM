@@ -184,12 +184,12 @@ public class GUIGraphHandler extends GUICardPanel
 	private JButton btnSaveEdits;
 	
 	/**
-	 * Subset of fragments for compatible fragment selecting GUI.
-	 * These fragments are clone of those in the fragment library,
+	 * Subset of vertexes for compatible building block selecting GUI.
+	 * These vertexes are clones of those in the loaded library,
 	 * and are annotate with fragmentID and AP pointers meant to 
-	 * facilitate a quick selection of compatible frag-frag connections.
+	 * facilitate a quick selection of compatible connections.
 	 */
-	private ArrayList<IAtomContainer> compatFrags;
+	private ArrayList<DENOPTIMVertex> compatVrtxs;
 	
 	/**
 	 * Map converting fragIDs in fragment library to fragIDs in subset
@@ -751,9 +751,8 @@ public class GUIGraphHandler extends GUICardPanel
 		commandsPane.add(btnHelp);
 		
 		//TODO del (This is used only for devel phase of debug)
-		/*
 		try {
-			ArrayList<String> lines = DenoptimIO.readList("/Users/mfo051/___/_fs.params");
+			ArrayList<String> lines = DenoptimIO.readList("/Users/marco/butta/___params_w_template");
 			for (String l : lines)
 			{
 			    FragmentSpaceParameters.interpretKeyword(l);
@@ -763,7 +762,7 @@ public class GUIGraphHandler extends GUICardPanel
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
-		*/
+		appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
 		
 	}
 	
@@ -785,23 +784,12 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private void startGraphFromFragSpace()
 	{
-		ArrayList<IAtomContainer> fragLib = new  ArrayList<IAtomContainer>();
+		ArrayList<DENOPTIMVertex> vrtxLib = new  ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex bb : FragmentSpace.getScaffoldLibrary())
         {
-        	if (bb instanceof DENOPTIMFragment)
-        	{
-        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
-        	    frag.projectAPsToProperties();
-        		fragLib.add(frag.getIAtomContainer());
-        	} else
-        	{
-        	    System.out.println("WARNING: Using empty AtomContainer for a "
-        	            + "vertex that is not a fragment!");
-        		//TODO-V3 deal with templates and other stuff
-        		fragLib.add(builder.newAtomContainer());
-        	}
+        	vrtxLib.add(bb.clone());
         }
-		if (fragLib.size() == 0)
+		if (vrtxLib.size() == 0)
 		{
 			JOptionPane.showMessageDialog(null,"No fragments in the library",
 	                "Error",
@@ -811,7 +799,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		// Select the scaffold
-		GUIVertexSelector fragSelector = new GUIVertexSelector(fragLib);
+		GUIVertexSelector fragSelector = new GUIVertexSelector(vrtxLib);
 		fragSelector.setRequireApSelection(false);
 		Object selected = fragSelector.showDialog();
 		if (selected == null)
@@ -878,67 +866,40 @@ public class GUIGraphHandler extends GUICardPanel
 		collectFragAndAPsCompatibleWithSelectedAPs(srcAPs);
 		
 		BBType trgFrgType = BBType.UNDEFINED;
-		ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();		
-		String[] options = new String[]{"Any Fragment",
-				"Compatible Fragments ("+compatFrags.size()+")",
+		ArrayList<DENOPTIMVertex> vertxLib = new ArrayList<DENOPTIMVertex>();		
+		String[] options = new String[]{"Any Vertex",
+				"Compatible Vertexes ("+compatVrtxs.size()+")",
 				"Capping group"};
 		int res = JOptionPane.showOptionDialog(null,
-                "<html>Choose a subset of possible fragments:</html>",
-                "Choose fragment subset",
+                "<html>Choose a subset of possible vertexes:</html>",
+                "Choose Vertex Subset",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 UIManager.getIcon("OptionPane.warningIcon"),
                 options,
                 options[0]);
-
-        //TODO-V3 deal with non-fragment vertexes
-        // Templates do not fit 
-        // within the concept of capping group, so this should 
-        // never happen for templates. Yet, other things than 
-        // templates might need code here
 		
 		switch (res)
 		{
 			case 0:
-				fragLib = new  ArrayList<IAtomContainer>();
+				vertxLib = new  ArrayList<DENOPTIMVertex>();
 		        for (DENOPTIMVertex bb : FragmentSpace.getFragmentLibrary())
 		        {
-		        	if (bb instanceof DENOPTIMFragment)
-		        	{
-		        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
-		                frag.projectAPsToProperties();
-		        		fragLib.add(frag.getIAtomContainer());
-		        	} else
-		        	{
-		        	    System.out.println("WARNING: Using empty AtomContainer "
-		        	            + "for a "
-		                        + "vertex that is not a fragment!");
-		        		//TODO-V3 deal with templates and other stuff
-		        		fragLib.add(builder.newAtomContainer());
-		        	}
+		        	vertxLib.add(bb.clone());
 		        }
 				trgFrgType = BBType.FRAGMENT;
 				break;
+				
 			case 1:
-				fragLib = compatFrags;
+				vertxLib = compatVrtxs;
 				trgFrgType = BBType.FRAGMENT;
 				break;
+				
 			case 2:
-				fragLib = new ArrayList<IAtomContainer>();
+				vertxLib = new ArrayList<DENOPTIMVertex>();
 		        for (DENOPTIMVertex bb : FragmentSpace.getCappingLibrary())
 		        {
-		        	if (bb instanceof DENOPTIMFragment)
-		        	{
-		        	    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
-		                frag.projectAPsToProperties();
-		        		fragLib.add(frag.getIAtomContainer());
-		        	} else
-		        	{
-		        	    System.out.println("WARNING: Using empty AtomContainer "
-		        	            + "for a "
-		                        + "vertex that is not a fragment!");
-		        		fragLib.add(builder.newAtomContainer());
-		        	}
+		            vertxLib.add(bb.clone());
 		        }
 				trgFrgType = BBType.CAP;
 				break;
@@ -946,7 +907,7 @@ public class GUIGraphHandler extends GUICardPanel
 				return;
 		}
 
-		if (fragLib.size() == 0)
+		if (vertxLib.size() == 0)
 		{
 			JOptionPane.showMessageDialog(null,"No fragments in the library",
 	                "Error",
@@ -956,7 +917,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		// Select the incoming fragment and its AP to use
-		GUIVertexSelector fragSelector = new GUIVertexSelector(fragLib);
+		GUIVertexSelector fragSelector = new GUIVertexSelector(vertxLib);
 		fragSelector.setRequireApSelection(true);
 		Object selected = fragSelector.showDialog();
 		if (selected == null)
@@ -1029,7 +990,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private void collectFragAndAPsCompatibleWithSelectedAPs(
 			ArrayList<IdFragmentAndAP> srcAPs) 
 	{
-		compatFrags = new ArrayList<IAtomContainer>();
+		compatVrtxs = new ArrayList<DENOPTIMVertex>();
 		
 		// WARNING: here I re-do most of what is already done in
 		// FragmentSpace.getFragmentsCompatibleWithTheseAPs.
@@ -1049,39 +1010,30 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		for (IdFragmentAndAP frgApId : compatFragAps)
 		{
-			int fragId = frgApId.getVertexMolId();
+			int molId = frgApId.getVertexMolId();
 			int apId = frgApId.getApId();
-			if (genToLocIDMap.keySet().contains(fragId))
+			if (genToLocIDMap.keySet().contains(molId))
 			{
-				IAtomContainer frg = compatFrags.get(
-						genToLocIDMap.get(fragId));
-				String prop = frg.getProperty(PRESELPROP).toString();
-				frg.setProperty(PRESELPROP,prop+PRESELPROPSEP+apId);
+				DENOPTIMVertex vrtx = compatVrtxs.get(
+						genToLocIDMap.get(molId));
+				String prop = vrtx.getProperty(PRESELPROP).toString();
+				vrtx.setProperty(PRESELPROP,prop+PRESELPROPSEP+apId);
 			}
 			else
 			{
-				IAtomContainer iac = null;
+			    DENOPTIMVertex iac = null;
 				try
 				{
 					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
-					        BBType.FRAGMENT,fragId);
-					if (bb instanceof DENOPTIMFragment)
-					{
-					    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
-		                frag.projectAPsToProperties();
-						iac = frag.getIAtomContainer();
-					} else {
-						//TODO-V3 deal with templates
-						iac = builder.newAtomContainer();
-					}
-					iac.setProperty(PRESELPROP,apId);
+					        BBType.FRAGMENT,molId);
+					bb.setProperty(PRESELPROP,apId);
 				}
 				catch (Throwable t)
 				{
 					continue;
 				}
-				genToLocIDMap.put(fragId,compatFrags.size());
-				compatFrags.add(iac);
+				genToLocIDMap.put(molId,compatVrtxs.size());
+				compatVrtxs.add(iac);
 			}
 		}
 	}

@@ -143,12 +143,8 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals()
     {
-		try {
-			dummyVertex.addAP(1, 2, 1);
-			dummyVertex.addAP(1, 2, 1);
-		} catch (DENOPTIMException e) {
-			fail("unexpected exception");
-		}
+		dummyVertex.addAP(1, 2, 1);
+		dummyVertex.addAP(1, 2, 1);
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
@@ -163,12 +159,8 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testEquals_DiffSrcAtm()
     {
-		try {
-			dummyVertex.addAP(1, 2, 1);
-			dummyVertex.addAP(2, 2, 1);
-		} catch (DENOPTIMException e) {
-			fail("unexpected exception");
-		}
+		dummyVertex.addAP(1, 2, 1);
+		dummyVertex.addAP(2, 2, 1);
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 

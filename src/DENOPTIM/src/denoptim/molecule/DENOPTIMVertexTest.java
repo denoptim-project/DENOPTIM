@@ -55,19 +55,15 @@ public class DENOPTIMVertexTest
     {
         DENOPTIMVertex vA = new EmptyVertex(0);
         DENOPTIMVertex vB = new EmptyVertex(90);
-        try {
-            vA.addAP(0, 1, 1);
-            vA.addAP(1, 1, 1);
-            vA.addAP(2, 1, 1);
-            vA.addAP(3, 1, 1);
+        vA.addAP(0, 1, 1);
+        vA.addAP(1, 1, 1);
+        vA.addAP(2, 1, 1);
+        vA.addAP(3, 1, 1);
 
-            vB.addAP(0, 1, 1);
-            vB.addAP(1, 1, 1);
-            vB.addAP(2, 1, 1);
-            vB.addAP(3, 1, 1);
-        } catch (DENOPTIMException e) {
-            fail("unexpected exception");
-        }
+        vB.addAP(0, 1, 1);
+        vB.addAP(1, 1, 1);
+        vB.addAP(2, 1, 1);
+        vB.addAP(3, 1, 1);
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertTrue(vA.sameAs(vB, reason));	
@@ -78,24 +74,20 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_DiffAPConnection()
     {
-        try {
-            DENOPTIMVertex vA = new EmptyVertex(0);
-            vA.addAP(0, 1, 1);
-            vA.addAP(1, 1, 1);
-            vA.addAP(2, 1, 1);
-            vA.addAP(3, 1, 1);
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        vA.addAP(0, 1, 1);
+        vA.addAP(1, 1, 1);
+        vA.addAP(2, 1, 1);
+        vA.addAP(3, 1, 1);
 
-            DENOPTIMVertex vB = new EmptyVertex(90);
-            vB.addAP(0, 1, 1);
-            vB.addAP(1, 1, 1);
-            vB.addAP(2, 1, 1);
-            vB.addAP(3, 1, 2); //dif
-            //NB: vertex ID must be ignores by the sameAs method
+        DENOPTIMVertex vB = new EmptyVertex(90);
+        vB.addAP(0, 1, 1);
+        vB.addAP(1, 1, 1);
+        vB.addAP(2, 1, 1);
+        vB.addAP(3, 1, 2); //dif
+        //NB: vertex ID must be ignores by the sameAs method
 
-            assertFalse(vA.sameAs(vB, reason));
-        } catch (DENOPTIMException e) {
-            fail("unexpected exception");
-        }
+        assertFalse(vA.sameAs(vB, reason));
     }
     
 //------------------------------------------------------------------------------
@@ -103,23 +95,19 @@ public class DENOPTIMVertexTest
     @Test
     public void testSameAs_DiffAPNum()
     {
-        try {
-            DENOPTIMVertex vA = new EmptyVertex(0);
-            vA.addAP(0, 1, 1);
-            vA.addAP(1, 1, 1);
-            vA.addAP(2, 1, 1);
-            vA.addAP(3, 1, 1);
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        vA.addAP(0, 1, 1);
+        vA.addAP(1, 1, 1);
+        vA.addAP(2, 1, 1);
+        vA.addAP(3, 1, 1);
 
-            DENOPTIMVertex vB = new EmptyVertex(90);
-            vB.addAP(0, 1, 1);
-            vB.addAP(1, 1, 1);
-            vB.addAP(2, 1, 1);
-            //NB: vertex ID must be ignores by the sameAs method
+        DENOPTIMVertex vB = new EmptyVertex(90);
+        vB.addAP(0, 1, 1);
+        vB.addAP(1, 1, 1);
+        vB.addAP(2, 1, 1);
+        //NB: vertex ID must be ignores by the sameAs method
 
-            assertFalse(vA.sameAs(vB, reason));
-        } catch (DENOPTIMException e) {
-            fail("unexpected exception");
-        }
+        assertFalse(vA.sameAs(vB, reason));
     }
     
 //------------------------------------------------------------------------------

@@ -45,16 +45,19 @@ import org.graphstream.graph.Graph;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMTemplate;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 
 
 /**
- * A panel to visualize an empty vertex
+ * A panel to visualize a vertex as a graph component 
+ * with attachment point table
  * 
  * @author Marco Foscato
  */
 
-public class EmptyVertexViewPanel extends JSplitPane
+public class VertexAsGraphViewPanel extends JSplitPane
 {
 	/**
 	 * Version UID
@@ -64,7 +67,7 @@ public class EmptyVertexViewPanel extends JSplitPane
 	/**
 	 * The currently loaded fragment
 	 */
-	private EmptyVertex epmtyVrtx;
+	private DENOPTIMVertex vertex;
 	
 	/**
 	 * Temporary list of attachment points of the current fragment
@@ -94,7 +97,7 @@ public class EmptyVertexViewPanel extends JSplitPane
 	 * not.
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 */
-	public EmptyVertexViewPanel(boolean editableTable)
+	public VertexAsGraphViewPanel(boolean editableTable)
 	{
 		this(null,editableTable);
 	}
@@ -107,7 +110,7 @@ public class EmptyVertexViewPanel extends JSplitPane
 	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 */
-	public EmptyVertexViewPanel(JComponent parent, boolean editableTable)
+	public VertexAsGraphViewPanel(JComponent parent, boolean editableTable)
 	{
 		this(parent,editableTable,340);
 	}
@@ -121,7 +124,7 @@ public class EmptyVertexViewPanel extends JSplitPane
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
-	public EmptyVertexViewPanel(JComponent parent, boolean editableTable, 
+	public VertexAsGraphViewPanel(JComponent parent, boolean editableTable, 
 	        int dividerPosition)
 	{
 		this.parent = parent;
@@ -175,10 +178,10 @@ public class EmptyVertexViewPanel extends JSplitPane
 	
 //-----------------------------------------------------------------------------
     
-    public void loadVertexToViewer(EmptyVertex ev)
+    public void loadVertexToViewer(DENOPTIMVertex v)
     {
         clearAPTable();
-        epmtyVrtx = ev;
+        vertex = v;
         loadVertexStructure();
         updateAPsMapAndTable();
         preSelectAPs();
@@ -191,11 +194,19 @@ public class EmptyVertexViewPanel extends JSplitPane
      */
     private void loadVertexStructure()
     {
-        //We plot the empty vertex as a single-node graph
-        DENOPTIMGraph dnGraph = new DENOPTIMGraph();
-        dnGraph.addVertex(epmtyVrtx.clone()); //Clone avoids setting owner of ev
-        graphViewer.cleanup();
-        graphViewer.loadGraphToViewer(dnGraph);
+        if ((vertex instanceof EmptyVertex) 
+                || (vertex instanceof DENOPTIMFragment))
+        {
+            //We plot the empty vertex as a single-node graph
+            DENOPTIMGraph dnGraph = new DENOPTIMGraph();
+            dnGraph.addVertex(vertex.clone()); //Clone avoids setting owner of ev
+            graphViewer.cleanup();
+            graphViewer.loadGraphToViewer(dnGraph);
+        } else {
+            DENOPTIMTemplate tmpl = ((DENOPTIMTemplate) vertex);
+            graphViewer.cleanup();
+            graphViewer.loadGraphToViewer(tmpl);
+        }
     }
 	
 //-----------------------------------------------------------------------------
@@ -232,7 +243,7 @@ public class EmptyVertexViewPanel extends JSplitPane
 		mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
 		
 		ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
-		        epmtyVrtx.getAttachmentPoints();		
+		        vertex.getAttachmentPoints();		
         if (lstAPs.size() == 0)
         {
 			return;
@@ -256,12 +267,12 @@ public class EmptyVertexViewPanel extends JSplitPane
 		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
 		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
-		if (epmtyVrtx.getProperty(PRESELPROP) == null)
+		if (vertex.getProperty(PRESELPROP) == null)
 		{
 			return;
 		}
 		
-		String prop = epmtyVrtx.getProperty(PRESELPROP).toString();
+		String prop = vertex.getProperty(PRESELPROP).toString();
 		String[] parts =prop.split(PRESELPROPSEP);
 		
 		activateTabEditsListener(false);

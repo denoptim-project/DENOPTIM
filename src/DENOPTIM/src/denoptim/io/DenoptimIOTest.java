@@ -205,11 +205,7 @@ public class DenoptimIOTest {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			try {
-				v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
-			} catch (DENOPTIMException e) {
-				e.printStackTrace();
-			}
+			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
 		}
 		graph.addVertex(v);
 	}
