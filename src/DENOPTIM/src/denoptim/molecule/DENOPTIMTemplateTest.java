@@ -32,7 +32,6 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
