@@ -1,5 +1,10 @@
 package denoptim.molecule;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 
 /*
@@ -23,22 +28,12 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMFragment.BBType;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.RandomUtils;
 import org.junit.jupiter.api.Test;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.utils.RandomUtils;
 
 /**
  * Unit test for DENOPTIMTemplate

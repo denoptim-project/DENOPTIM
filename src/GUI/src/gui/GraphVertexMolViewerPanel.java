@@ -20,47 +20,28 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
-import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import org.apache.commons.io.FilenameUtils;
-import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.io.DenoptimIO;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
-import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
@@ -478,13 +459,17 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 				v = dnGraph.getVertexWithId(
 						Integer.parseInt(nodeId));
 			} catch (NumberFormatException e1) {
-				e1.printStackTrace();
-				return;
+			    //When we click on an AP node we get a nodeId that is like v1ap0
+			    // and this triggers this exception, which we can ignore.
+			    return;
 			}
-			
+			//TODO-MF cleanup
+			/*
 			try {
 				DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
 						v.getFragmentType(), v.getMolId());
+				*/
+			    DENOPTIMVertex bb = v.clone();
 				if (bb instanceof DENOPTIMFragment)
 				{
 				    removeNestedGraphViewer(); //Just is case we still have it
@@ -494,24 +479,30 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 				} else if (bb instanceof DENOPTIMTemplate) {
 				    DENOPTIMTemplate t = (DENOPTIMTemplate) bb;
                     fragViewer.clearAll();
-                    fragViewerTmplViewerCard = new GraphVertexMolViewerPanel();
+                    fragViewerTmplViewerCard = 
+                            new GraphVertexMolViewerPanel();
                     fragViewerCardHolder.add(fragViewerTmplViewerCard, 
                             TMPLVIEWERCARDNAME);
-                    fragViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), false, hasFragSpace);
+                    fragViewerTmplViewerCard.loadDnGraphToViewer(
+                            t.getInnerGraph(), false, hasFragSpace);
                     fragViewerTmplViewerCard.updateMolevularViewer();
 				    bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
 				} else if (bb instanceof EmptyVertex) {
 				    removeNestedGraphViewer(); //Just is case we still have it
                     
                     //TODO-V3
-                    System.out.println("WARNING: Visualization of EmptyVertex is not implemented yet");
+                    System.out.println("WARNING: Visualization of "
+                            + "EmptyVertex is not implemented yet");
+                    
                     fragViewer.clearAll();
                     bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
                 }
+				/*
 			} catch (DENOPTIMException e) {
 				e.printStackTrace();
 				return;
 			}
+			*/
 		}
 	}
 	

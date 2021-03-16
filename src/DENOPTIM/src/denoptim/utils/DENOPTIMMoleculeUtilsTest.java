@@ -18,11 +18,9 @@ package denoptim.utils;
  *   You should have received a copy of the GNU Affero General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static denoptim.utils.DENOPTIMMoleculeUtils.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static denoptim.utils.DENOPTIMMoleculeUtils.getPoint3d;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;

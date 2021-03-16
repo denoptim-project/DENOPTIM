@@ -19,9 +19,6 @@
 package denoptim.utils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.text.NumberFormat;
 
 

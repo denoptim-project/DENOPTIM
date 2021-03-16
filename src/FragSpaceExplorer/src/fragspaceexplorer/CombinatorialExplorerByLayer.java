@@ -44,7 +44,6 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.TaskUtils;
 
 
 /**

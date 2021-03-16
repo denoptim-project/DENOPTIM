@@ -18,10 +18,9 @@
 
 package denoptim.rings;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 

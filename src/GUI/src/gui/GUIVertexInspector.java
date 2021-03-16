@@ -46,7 +46,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.vecmath.Point3d;
 
-import denoptim.utils.DENOPTIMMoleculeUtils;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -57,8 +56,9 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 /**
@@ -202,7 +202,7 @@ public class GUIVertexInspector extends GUICardPanel
 		btnAddVrtx.setToolTipText("Append vertex taken from file.");
 		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnAddVrtx);
+				File inFile = GUIFileOpener.pickFile(btnAddVrtx);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -323,7 +323,7 @@ public class GUIVertexInspector extends GUICardPanel
 				+ " from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenMol);
+				File inFile = GUIFileOpener.pickFile(btnOpenMol);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -505,7 +505,7 @@ public class GUIVertexInspector extends GUICardPanel
 				+ "file.");
 		btnOpenVrtxs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenVrtxs);
+				File inFile = GUIFileOpener.pickFile(btnOpenVrtxs);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -519,7 +519,7 @@ public class GUIVertexInspector extends GUICardPanel
 		btnSaveVrtxs.setToolTipText("Write all building blocks to a file.");
 		btnSaveVrtxs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(
+				File outFile = GUIFileOpener.pickFileForSaving(
 				        btnSaveVrtxs);
 				if (outFile == null)
 				{

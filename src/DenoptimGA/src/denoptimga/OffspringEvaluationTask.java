@@ -19,13 +19,9 @@
 
 package denoptimga;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import org.apache.commons.io.FileUtils;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -33,15 +29,11 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.TreeBuilder3D;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.TaskUtils;
-import fragspaceexplorer.FSEParameters;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a

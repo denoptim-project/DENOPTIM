@@ -19,15 +19,12 @@
 package denoptim.utils;
 
 
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosingAttractor;

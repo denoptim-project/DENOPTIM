@@ -35,10 +35,10 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.TreeBuilder3D;
+import denoptim.utils.AtomOrganizer;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.AtomOrganizer;
 import denoptim.utils.RotationalSpaceUtils;
 
 /**

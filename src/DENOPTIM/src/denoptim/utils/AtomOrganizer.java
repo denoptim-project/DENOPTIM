@@ -18,24 +18,21 @@
 
 package denoptim.utils;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.openscience.cdk.Bond;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.exception.DENOPTIMException;
 
 
 /**

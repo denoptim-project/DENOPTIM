@@ -18,25 +18,13 @@
 
 package gui;
 
-import javax.swing.Box;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
-import denoptim.task.StaticTaskManager;
-
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.GridLayout;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -45,6 +33,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.Box;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+import denoptim.task.StaticTaskManager;
 
 
 /**
@@ -262,9 +262,9 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFileOrFolder(open);
+				File file = GUIFileOpener.pickFileOrFolder(open);
 				try {
-					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
+					openFile(file, GUIFileOpener.detectFileFormat(
 							file));
 				} catch (Exception e1) {
 					if (file == null)

@@ -1,5 +1,9 @@
 package denoptim.molecule;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
@@ -22,14 +26,11 @@ package denoptim.molecule;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import denoptim.exception.DENOPTIMException;
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint

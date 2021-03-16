@@ -19,7 +19,6 @@
 package denoptim.utils;
 
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**

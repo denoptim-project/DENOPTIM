@@ -19,24 +19,19 @@
 
 package denoptim.molecule;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
-import denoptim.rings.ClosableChain;
-import denoptim.rings.CyclicGraphHandler;
-import denoptim.rings.RingClosureParameters;
-import denoptim.utils.*;
 
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
@@ -55,6 +50,25 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.rings.ClosableChain;
+import denoptim.rings.CyclicGraphHandler;
+import denoptim.rings.RingClosureParameters;
+import denoptim.utils.DENOPTIMGraphEdit;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMVertexQuery;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
+import denoptim.utils.RotationalSpaceUtils;
 
 
 /**
@@ -3057,6 +3071,32 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             .create();
 
         DENOPTIMGraph graph = gson.fromJson(json, DENOPTIMGraph.class);
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a JSON string and returns an instance of this class.
+     * @param json the string to parse.
+     * @return a new instance of this class.
+     */
+
+    public static DENOPTIMGraph fromJson(Reader reader)
+    {   
+        Gson gson = new GsonBuilder()
+            .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
+            // Custom deserializer to dispatch to the correct subclass of Vertex
+            .registerTypeAdapter(DENOPTIMVertex.class, 
+                  new DENOPTIMVertexDeserializer())
+            // Custom deserializer takes care of converting ID-based components
+            // to references to vertexes and APs
+            .registerTypeAdapter(DENOPTIMGraph.class, 
+                    new DENOPTIMGraphDeserializer())
+            .setPrettyPrinting()
+            .create();
+
+        DENOPTIMGraph graph = gson.fromJson(reader, DENOPTIMGraph.class);
         return graph;
     }
     

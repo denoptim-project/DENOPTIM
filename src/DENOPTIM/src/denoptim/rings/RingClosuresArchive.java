@@ -19,19 +19,19 @@
 package denoptim.rings;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;

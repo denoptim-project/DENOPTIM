@@ -19,17 +19,14 @@
 package grapheditor;
 
 import java.util.logging.Level;
-import java.util.ArrayList;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.GraphConversionTool;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
 
 
 /**

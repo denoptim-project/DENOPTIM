@@ -19,6 +19,7 @@
 
 package denoptim.molecule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.io.Serializable;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.interfaces.IAtomContainer;

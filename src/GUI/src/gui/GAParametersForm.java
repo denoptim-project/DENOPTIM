@@ -49,8 +49,6 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.jfree.chart.ChartFactory;
@@ -301,7 +299,7 @@ public class GAParametersForm extends ParametersForm
         btnGASource = new JButton("Browse");
         btnGASource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtGASource,
+                GUIFileOpener.pickFileForTxtField(txtGASource,
                 		btnGASource);
            }
         });
@@ -741,7 +739,7 @@ public class GAParametersForm extends ParametersForm
         btnPar20 = new JButton("Browse");
         btnPar20.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtPar20,btnPar20);
+                GUIFileOpener.pickFileForTxtField(txtPar20,btnPar20);
            }
         });
         linePar20.add(lblPar20);
@@ -762,7 +760,7 @@ public class GAParametersForm extends ParametersForm
         btnPar21 = new JButton("Browse");
         btnPar21.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtPar21,btnPar21);
+                GUIFileOpener.pickFileForTxtField(txtPar21,btnPar21);
            }
         });
         linePar21.add(lblPar21);
@@ -783,7 +781,7 @@ public class GAParametersForm extends ParametersForm
         btnPar22 = new JButton("Browse");
         btnPar22.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtPar22,btnPar22);
+                GUIFileOpener.pickFileForTxtField(txtPar22,btnPar22);
            }
         });
         linePar22.add(lblPar22);

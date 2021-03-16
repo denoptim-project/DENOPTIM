@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
-import denoptim.utils.GenUtils;
-
 /**
  * RingClosure represents the arrangement of atoms and 
  * PseudoAtoms identifying the head and tail of a chain of atoms.

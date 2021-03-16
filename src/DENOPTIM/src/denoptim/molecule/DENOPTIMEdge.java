@@ -23,7 +23,6 @@ import java.io.Serializable;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Order;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 
 /**
@@ -250,7 +249,7 @@ public class DENOPTIMEdge implements Serializable
         // convention. Eventually, we'll not need this anymore.
         private String oldString = "1";
 
-        private int valenceUsed = -1;
+        private int valenceUsed = 0;
 
         private IBond.Order bo = null;
 
@@ -306,7 +305,7 @@ public class DENOPTIMEdge implements Serializable
         {
             switch (i)
             {
-                case -1:
+                case 0:
                     return NONE;
                 case 1:
                     return SINGLE;

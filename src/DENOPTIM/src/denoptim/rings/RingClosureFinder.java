@@ -21,15 +21,14 @@ package denoptim.rings;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.AxisAngle4d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;

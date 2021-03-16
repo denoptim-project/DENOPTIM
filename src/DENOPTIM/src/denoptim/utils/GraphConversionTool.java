@@ -20,13 +20,11 @@
 package denoptim.utils;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
@@ -36,9 +34,15 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.*;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
+import denoptim.molecule.SymmetricSet;
 
 
 /**

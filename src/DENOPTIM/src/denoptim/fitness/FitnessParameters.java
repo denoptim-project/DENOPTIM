@@ -18,30 +18,19 @@
 
 package denoptim.fitness;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.FunctionMapper;
 import javax.servlet.jsp.el.VariableResolver;
 
 import org.apache.commons.el.ExpressionEvaluatorImpl;
-import org.openscience.cdk.qsar.DescriptorEngine;
-import org.openscience.cdk.qsar.DescriptorSpecification;
-import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;

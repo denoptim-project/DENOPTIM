@@ -33,7 +33,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.utils.GraphConversionTool;
-import denoptim.utils.GraphUtils;
 
 
 /**

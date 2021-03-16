@@ -19,14 +19,10 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeListenerProxy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -52,11 +47,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.io.FilenameUtils;
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
@@ -67,18 +57,13 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileAndFormat;
 import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
 import denoptim.rings.RingClosureParameters;
-import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
@@ -286,7 +271,8 @@ public class GUIGraphHandler extends GUICardPanel
 						break;
 					
 					case 1:
-						File inFile = DenoptimGUIFileOpener.pickFile(btnAddGraph);
+						File inFile = GUIFileOpener.pickFileWithGraph(
+						        btnAddGraph);
 						if (inFile == null 
 								|| inFile.getAbsolutePath().equals(""))
 						{
@@ -650,7 +636,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenGraphs);
+				File inFile = GUIFileOpener.pickFile(btnOpenGraphs);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -664,15 +650,17 @@ public class GUIGraphHandler extends GUICardPanel
 		btnSaveFrags.setToolTipText("Write all graphs to a file.");
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
-				if (outFile == null)
+				FileAndFormat fileAndFormat = 
+				        GUIFileSaver.pickFileForSavingGraphs(btnSaveFrags);
+				if (fileAndFormat == null)
 				{
 					return;
 				}
+				File outFile = fileAndFormat.file;
 				try
 				{
-					DenoptimIO.writeGraphsToFile(outFile.getAbsolutePath(),
-							dnGraphLibrary, false);
+					DenoptimIO.writeGraphsToFile(outFile,
+					        fileAndFormat.format, dnGraphLibrary);
 				}
 				catch (Exception ex)
 				{
@@ -751,6 +739,7 @@ public class GUIGraphHandler extends GUICardPanel
 		commandsPane.add(btnHelp);
 		
 		//TODO del (This is used only for devel phase of debug)
+		/*
 		try {
 			ArrayList<String> lines = DenoptimIO.readList("/Users/marco/butta/___params_w_template");
 			for (String l : lines)
@@ -763,7 +752,7 @@ public class GUIGraphHandler extends GUICardPanel
 			e1.printStackTrace();
 		}
 		appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
-		
+		*/
 	}
 	
 //-----------------------------------------------------------------------------
@@ -863,11 +852,6 @@ public class GUIGraphHandler extends GUICardPanel
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;
 		}
-		
-		//TODO-MF del
-		System.out.println("EXPANDING ON THESE:");
-		for (IdFragmentAndAP apid : srcAPs)
-		    System.out.println(" -> "+apid);
 		
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(srcAPs);
@@ -1140,6 +1124,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
 		//TODO-V3 change: this should be done elsewhere, maybe in DenoptimIO
+	    // make it use FileFormat
 		
 		String format="";
 		String ext = FilenameUtils.getExtension(file.getAbsolutePath());
@@ -1162,8 +1147,7 @@ public class GUIGraphHandler extends GUICardPanel
                 break;
 				
 			default:
-			    //TODO-V3: add JSON
-			    String[] options = {"Abandon", "TXT", "SDF", "SERIALIZED"};
+			    String[] options = {"Abandon", "TXT", "SDF", "JSON", "SERIALIZED"};
 				int res = JOptionPane.showOptionDialog(null,
 					"<html>Failed to detect file type from file's "
 					+ "extension.<br>"
@@ -1190,6 +1174,10 @@ public class GUIGraphHandler extends GUICardPanel
 						break;
 						
 					case 3:
+                        format="JSON";
+                        break;
+                        
+					case 4:
 						format="SER";
 						break;
 				}
@@ -1568,7 +1556,7 @@ public class GUIGraphHandler extends GUICardPanel
   		dnGraphLibrary.set(currGrphIdx, dnGraph);
   		
   		// WARNING: the dnGraph in the visualPanel should be in sync because any
-  		// changes to it has resulted in an update of the graphViewer.
+  		// changes to it has resulted in an updaate of the graphViewer.
   		// Still, it is possible to introduce code modifications that make it
   		// go out of sync.
   		// Here, we ASSUME the dhGraph displayed in the graphViewer component

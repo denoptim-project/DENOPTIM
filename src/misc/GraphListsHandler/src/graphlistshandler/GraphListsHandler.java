@@ -1,12 +1,12 @@
 package  graphlistshandler;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
+
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.GenUtils;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.utils.GenUtils;
 
 
 /**

@@ -20,14 +20,13 @@
 package denoptim.utils;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.interfaces.IAtom;

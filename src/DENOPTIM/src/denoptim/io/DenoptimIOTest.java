@@ -31,7 +31,6 @@ import java.util.Set;
 
 import javax.vecmath.Point3d;
 
-import denoptim.exception.DENOPTIMException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
@@ -39,15 +38,14 @@ import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
-import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for input/output

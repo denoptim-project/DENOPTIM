@@ -18,17 +18,13 @@
 
 package testoperator;
 
-import java.util.ArrayList;
-import java.io.File;
-
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.MutationType;
-import denoptim.utils.GraphConversionTool;
-import denoptim.io.DenoptimIO; 
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.exception.DENOPTIMException;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.MutationType;
 import denoptimga.DENOPTIMGraphOperations;
 
 /**

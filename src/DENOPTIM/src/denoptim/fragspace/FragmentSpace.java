@@ -19,19 +19,13 @@
 
 package denoptim.fragspace;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -46,9 +40,6 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.rings.RingClosureParameters;
-import denoptim.utils.GraphUtils;
 
 
 /**
@@ -382,7 +373,7 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     
-    //TODO-V3: adapt to templates. Move to IO
+    //TODO-V3: Move to IO
     
     private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
             ArrayList<IAtomContainer> iacs, BBType bbt) throws DENOPTIMException
@@ -416,17 +407,11 @@ public class FragmentSpace
         if (jsonGraph != null)
         {
             DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-            //TODO-MF del
-            System.out.println("Making Template from JSON STRING ");
-            //+jsonGraph.toString());
             DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
             t.setInnerGraph(g);
             v = t;
         } else if (jsonVertex != null)
         {
-            //TODO-MF del
-            System.out.println("Making an EmptyVertex from JSON STRING ");
-            
             EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
             v = ev;
         } else {

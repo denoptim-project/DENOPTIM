@@ -18,11 +18,10 @@
 
 package denoptim.molecule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import denoptim.molecule.DENOPTIMEdge.BondType;
-
-import java.io.Serializable;
 
 /**
  * This class represents the closure of a ring in a spamming tree

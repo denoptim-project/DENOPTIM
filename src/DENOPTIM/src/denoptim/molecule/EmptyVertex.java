@@ -25,17 +25,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMExclusionStrategy;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMVertexDeserializer;
-
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMGraph.DENOPTIMExclusionStrategy;
 
 /**
  * An empty vertex has the behaviours of a vertex, but has no molecular 
@@ -62,6 +60,8 @@ public class EmptyVertex extends DENOPTIMVertex
      * call them "symmetric" (though symmetry is a fuzzy concept here).
      */
     private ArrayList<SymmetricSet> lstSymAPs;
+    
+    //TODO-V3 add properties and make them visible in GUI
 
 
 //------------------------------------------------------------------------------

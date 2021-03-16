@@ -71,7 +71,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 
 public class CompatibilityMatrixForm extends JPanel {
 

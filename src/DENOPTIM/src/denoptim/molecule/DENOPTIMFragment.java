@@ -26,10 +26,6 @@ import java.util.Set;
 
 import javax.vecmath.Point3d;
 
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.AtomRef;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -39,6 +35,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMGraph.DENOPTIMVertexDeserializer;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**

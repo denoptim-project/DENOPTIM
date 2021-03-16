@@ -18,8 +18,8 @@
 
 package denoptim.molecule;
 
-import java.io.Serializable;
 import java.io.File;
+import java.io.Serializable;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;

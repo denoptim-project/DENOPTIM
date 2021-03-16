@@ -19,9 +19,9 @@
 
 package denoptim.utils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigDecimal;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;

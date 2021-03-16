@@ -19,20 +19,16 @@
 package denoptim.threedim;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
+import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.AxisAngle4d;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -43,20 +39,16 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.GenUtils;
 
 
 /**
@@ -464,7 +456,7 @@ public class TreeBuilder3D
         mol.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
         mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
-        if (graph.getMsg() != null)
+        if (graph.getMsg() != null && !graph.getMsg().toString().equals(""))
         {
             mol.setProperty(DENOPTIMConstants.GMSGTAG, graph.getMsg());
         }
@@ -535,19 +527,6 @@ public class TreeBuilder3D
         {
             return;
         }
-        
-        //TODO-V3 assumption that scaffold is a Fragment, which cannot hold true 
-        // in general, so this will have to change 
-        if (inVtx instanceof DENOPTIMFragment == false)
-        {
-            Exception e = new Exception("TODO: Upgrade code to new hierarchy!!!");
-            e.printStackTrace();
-            System.err.println("ERROR! TreeBuilder3D not ready to deal with "
-                    + "anything else than DENOPTIMFragments!!!");
-            System.exit(-1);
-        }
-        
-        //TODO-V3: any possibility that scaffold does not have an IAtomContainer?
         
         IAtomContainer inFragOri = inVtx.getIAtomContainer();
         

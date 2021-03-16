@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openscience.cdk.IImplementationSpecification;
-import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
-
-import denoptim.exception.DENOPTIMException;
 
 /**
  * This is a reference to a specific descriptor value. Not the numerical result,

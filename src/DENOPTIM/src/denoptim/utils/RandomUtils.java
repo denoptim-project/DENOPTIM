@@ -21,11 +21,8 @@ package denoptim.utils;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Collection;
-import java.util.Set;
 
 import org.apache.commons.math3.random.MersenneTwister;
-
-import denoptim.molecule.DENOPTIMVertex;
 
 /**
  * Toolbox for random number generation.
