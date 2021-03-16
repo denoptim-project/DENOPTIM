@@ -57,7 +57,7 @@ import denoptim.molecule.EmptyVertex;
  * @author Marco Foscato
  */
 
-public class VertexAsGraphViewPanel extends JSplitPane
+public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelection
 {
 	/**
 	 * Version UID

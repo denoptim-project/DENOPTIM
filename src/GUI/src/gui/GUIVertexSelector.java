@@ -220,28 +220,7 @@ public class GUIVertexSelector extends GUIModalDialog
                             return;
                         }
                     }
-                    if (result == null)
-                    {
-                        result = new ArrayList<ArrayList<Integer>>();
-                    }
-                    boolean alreadySelected = false;
-                    for (ArrayList<Integer> p : 
-                        ((ArrayList<ArrayList<Integer>>)result))
-                    {
-                        if ((p.get(0) == currVrtxIdx) 
-                                && (p.get(1) == currApIdx))
-                        {
-                            alreadySelected = true;
-                            break;
-                        }
-                    }
-                    if (!alreadySelected)
-                    {
-                        ArrayList<Integer> pair = new ArrayList<Integer>();
-                        pair.add(currVrtxIdx);
-                        pair.add(currApIdx);
-                        ((ArrayList<ArrayList<Integer>>)result).add(pair);
-                    }
+                    appendToResult(currVrtxIdx,currApIdx);
                 }
             });
 		} else {
@@ -278,9 +257,7 @@ public class GUIVertexSelector extends GUIModalDialog
     						return;
     					}
     				}
-    				result = new ArrayList<Integer>();
-				    ((ArrayList<Integer>)result).add(currVrtxIdx);
-                    ((ArrayList<Integer>)result).add(currApIdx);
+    				appendToResult(currVrtxIdx,currApIdx);
     				vertexViewer.dispose();
     				close();
     			}
@@ -293,6 +270,34 @@ public class GUIVertexSelector extends GUIModalDialog
 		updateVrtxListSpinner();	
 	}
 	
+//-----------------------------------------------------------------------------
+	
+    private void appendToResult(int vrtxId, int apId)
+    {
+        if (result == null)
+        {
+            result = new ArrayList<ArrayList<Integer>>();
+        }
+        boolean alreadySelected = false;
+        for (ArrayList<Integer> p : 
+            ((ArrayList<ArrayList<Integer>>)result))
+        {
+            if ((p.get(0) == vrtxId) 
+                    && (p.get(1) == apId))
+            {
+                alreadySelected = true;
+                break;
+            }
+        }
+        if (!alreadySelected)
+        {
+            ArrayList<Integer> pair = new ArrayList<Integer>();
+            pair.add(vrtxId);
+            pair.add(apId);
+            ((ArrayList<ArrayList<Integer>>)result).add(pair);
+        }
+    }
+
 //-----------------------------------------------------------------------------
 
 	/**

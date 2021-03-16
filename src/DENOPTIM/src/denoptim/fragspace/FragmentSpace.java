@@ -591,6 +591,24 @@ public class FragmentSpace
                 throw new DENOPTIMException(msg);
             }
             break;
+            
+        case UNDEFINED:
+            msg = "Attempting to take UNDEFINED type of building block from "
+                    + "fragment library.";
+            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+            if (bbIdx < fragmentLib.size())
+            {
+                originalVrtx = fragmentLib.get(bbIdx);
+            }
+            else
+            {
+                msg = "Mismatch between fragment bbIdx and size of the "
+                                + "library" + ". MolId: " + bbIdx 
+                                + " FragType: " + fTyp;
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                throw new DENOPTIMException(msg);
+            }
+            break;
 
         default:
             msg = "Unknown type of fragment '" + fTyp + "'.";

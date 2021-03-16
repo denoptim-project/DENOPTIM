@@ -806,7 +806,9 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			return;
 		}
-		int scaffFragId = ((Integer[]) selected)[0];
+		ArrayList<Integer> trgFragApId = ((ArrayList<ArrayList<Integer>>)selected)
+                .get(0);
+        int scaffFragId = trgFragApId.get(0);
 		
 		// Create the new graph
 		currGrphIdx = dnGraphLibrary.size();
@@ -861,6 +863,11 @@ public class GUIGraphHandler extends GUICardPanel
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;
 		}
+		
+		//TODO-MF del
+		System.out.println("EXPANDING ON THESE:");
+		for (IdFragmentAndAP apid : srcAPs)
+		    System.out.println(" -> "+apid);
 		
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(srcAPs);
@@ -924,7 +931,10 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			return;
 		}
-		int trgFragId = ((Integer[]) selected)[0];
+		ArrayList<Integer> trgFragApId = ((ArrayList<ArrayList<Integer>>)selected)
+		        .get(0);
+		int trgFragId = trgFragApId.get(0);;
+		int trgApId = trgFragApId.get(1);
 		if (res==1)
 		{
 			// When we are selecting among a subset we need to convert the
@@ -933,14 +943,13 @@ public class GUIGraphHandler extends GUICardPanel
 			
 			for (int candFragId : genToLocIDMap.keySet())
 			{
-				if (genToLocIDMap.get(candFragId)==trgFragId)
+				if (genToLocIDMap.get(candFragId) == trgFragApId.get(0))
 				{
 					trgFragId = candFragId;
 					break;
 				}
 			}
 		}
-		int trgApId = ((Integer[]) selected)[1];
 		
 		// Take the graph that will be extended
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
@@ -1021,10 +1030,10 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 			else
 			{
-			    DENOPTIMVertex iac = null;
+			    DENOPTIMVertex bb = null;
 				try
 				{
-					DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
+					bb = FragmentSpace.getVertexFromLibrary(
 					        BBType.FRAGMENT,molId);
 					bb.setProperty(PRESELPROP,apId);
 				}
@@ -1033,7 +1042,7 @@ public class GUIGraphHandler extends GUICardPanel
 					continue;
 				}
 				genToLocIDMap.put(molId,compatVrtxs.size());
-				compatVrtxs.add(iac);
+				compatVrtxs.add(bb);
 			}
 		}
 	}

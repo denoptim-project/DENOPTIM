@@ -120,6 +120,7 @@ public class VertexViewPanel extends JPanel
     private JPanel emptyViewerCard;
 	private FragmentViewPanel fragViewer;
 	private VertexAsGraphViewPanel graphNodeViewer;
+	private IVertexAPSelection activeViewer;
     protected final String EMPTYCARDNAME = "emptyCard";
     protected final String GRAPHVIEWERCARDNAME = "emptyVertesCard";
     protected final String MOLVIEWERCARDNAME = "fragViewerCard";
@@ -249,6 +250,7 @@ public class VertexViewPanel extends JPanel
         btnSwitchToNodeViewer.setEnabled(false);
 	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
 	            EMPTYCARDNAME);
+	    activeViewer = null;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -257,6 +259,7 @@ public class VertexViewPanel extends JPanel
 	{
 	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
 	            GRAPHVIEWERCARDNAME);
+	    activeViewer = graphNodeViewer;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -265,6 +268,7 @@ public class VertexViewPanel extends JPanel
     {
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 MOLVIEWERCARDNAME);
+        activeViewer = fragViewer;
     }
 
 //-----------------------------------------------------------------------------
@@ -432,12 +436,13 @@ public class VertexViewPanel extends JPanel
 //-----------------------------------------------------------------------------
 
     /**
-     * Identifies which attachment points are selected in the visualized table
+     * Identifies which attachment points are selected in the currently active 
+     * viewer.
      * @return the list of attachment points indexes
      */
     public ArrayList<Integer> getSelectedAPIDs()
     {
-        return fragViewer.getSelectedAPIDs();
+        return activeViewer.getSelectedAPIDs();
     }
 	
 //-----------------------------------------------------------------------------
@@ -446,7 +451,7 @@ public class VertexViewPanel extends JPanel
 	 * Identifies the atoms that are selected in the Jmol viewer
 	 * @return the list of selected atoms
 	 */
-    public ArrayList<IAtom> getAtomsSelectedFromJMol()
+    protected ArrayList<IAtom> getAtomsSelectedFromJMol()
     {
         return fragViewer.getAtomsSelectedFromJMol();
     }
@@ -457,7 +462,7 @@ public class VertexViewPanel extends JPanel
 	 * Allows to activate and deactivate the listener.
 	 * @param var use <code>true</code> to activate the listener
 	 */
-    public void activateTabEditsListener(boolean var)
+    protected void activateTabEditsListener(boolean var)
     {
         fragViewer.activateTabEditsListener(var);
     }
@@ -467,7 +472,7 @@ public class VertexViewPanel extends JPanel
     /*
      * This is needed to stop Jmol threads
      */
-	public void dispose() 
+	protected void dispose() 
 	{
 		fragViewer.dispose();
 		

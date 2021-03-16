@@ -76,7 +76,7 @@ import denoptim.utils.DENOPTIMMathUtils;
  * @author Marco Foscato
  */
 
-public class FragmentViewPanel extends JSplitPane
+public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 {
 	/**
 	 * Version UID

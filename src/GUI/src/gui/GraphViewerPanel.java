@@ -714,6 +714,10 @@ public class GraphViewerPanel extends JPanel
 			case SPRITE_APCLASS:
 				for (Node n : getSelectedNodes())
 				{
+				    if (n.getAttribute("ui.class").equals("ap"))
+			        {
+			            return;
+			        }
 					for (Edge e : graph.getEdgeSet())
 					{
 						if (e.getSourceNode() == n)
