@@ -3156,6 +3156,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
     }
 
+// 
+// List<DENOPTIMGraph> list_of_graphs;
+// Gson writer = DENOPTIMgson.getWriter();
+// String jsonOutput = writer.toJson(list_of_graphs);
+// 
 
 
 }
