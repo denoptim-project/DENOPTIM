@@ -7,7 +7,7 @@
 #
 # Use this script to run all the tests.
 
-# 
+#
 # Usage:
 #
 # ./<script_name>.sh
@@ -48,9 +48,9 @@ echo "Using DENOPTIM from $DENOPTIMJarFiles"
 ################################################################################
 
 
-############################################ 
+############################################
 # Function for running a Test
-############################################ 
+############################################
 
 function runTest() {
     testName="$1"
@@ -127,6 +127,11 @@ fi
 cd "$wDir"
 
 #
+# t96: crossover involving templates
+#
+runTest "t96"
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"
@@ -134,12 +139,12 @@ cd "$wDir"
 #
 # t98: under development - crossover involving templates
 #
-runTest "t98"
+#runTest "t98"
 
 #
 # t99: under development - Meant for testing of the graph template stuff in GA run
 #
-runTest "t99"
+#runTest "t99"
 
 echo "All done!"
 exit 0
