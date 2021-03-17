@@ -29,11 +29,12 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMExclusionStrategy;
+
+import denoptim.utils.DENOPTIMgson;
+
 
 /**
  * An empty vertex has the behaviours of a vertex, but has no molecular 
@@ -459,10 +460,7 @@ public class EmptyVertex extends DENOPTIMVertex
     public String toJson()
     {
         
-        Gson gson = new GsonBuilder()
-            .setExclusionStrategies(new DENOPTIMExclusionStrategy())
-            .setPrettyPrinting()
-            .create();
+        Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;
     }
@@ -479,9 +477,7 @@ public class EmptyVertex extends DENOPTIMVertex
     
     public static EmptyVertex fromJson(String json)
     {   
-        Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+        Gson gson = DENOPTIMgson.getReader();
         EmptyVertex ev = gson.fromJson(json, EmptyVertex.class);
         for (DENOPTIMAttachmentPoint ap : ev.getAttachmentPoints())
         {
