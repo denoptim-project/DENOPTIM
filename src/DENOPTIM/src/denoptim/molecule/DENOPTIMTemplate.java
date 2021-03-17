@@ -19,17 +19,16 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMVertexDeserializer;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
 /**
- * A template is a contract that defines subgraph features that can go from 
+ * A template is a contract that defines subgraph features that can go from
  * a list of attachment points, via a partially defined subgraph structure, to
  * a fully defined subgraph (i.e., graph structure + identify of each vertex).
  */
 
-// TODO: remove, later. 
+// TODO: remove, later.
 //  Template are variation on fragments that has a number of attachment points and an interior graph. The attachment
 //  points are constant and always available (i.e. uncapped), but the interior graph can vary.
 //  The constant attachment points makes it easy to control the chemical environment in which the Template is embedded

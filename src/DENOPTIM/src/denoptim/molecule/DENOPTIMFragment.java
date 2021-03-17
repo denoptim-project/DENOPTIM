@@ -35,25 +35,24 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMVertexDeserializer;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * Class representing a continuously connected portion of chemical object
  * holding attachment points.
- * 
+ *
  * @author Marco Foscato
  */
 
 public class DENOPTIMFragment extends DENOPTIMVertex
-{ 	
+{
     /**
 	 * Version UID
 	 */
 	private static final long serialVersionUID = 4415462924969433010L;
-	
+
     /**
-     * Index of the graph building block contained in the vertex. 
+     * Index of the graph building block contained in the vertex.
      * This field differentiates a fragment
      * from any other subclass of {@link DENOPTIMVertex}, and its name
      * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.

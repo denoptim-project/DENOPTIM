@@ -21,6 +21,16 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSerializationContext;
+
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
@@ -191,5 +201,30 @@ public class DENOPTIMRing implements Serializable
         return "DENOPTIMRing [verteces=" + verteces + "]";
     }
 
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
+
+
+  public static class DENOPTIMRingSerializer
+  implements JsonSerializer<DENOPTIMRing>
+  {
+    @Override
+    public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc,
+            JsonSerializationContext context)
+    {
+        JsonObject jsonObject = new JsonObject();
+        ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
+        for (int i=0; i<ring.getSize(); i++)
+        {
+            DENOPTIMVertex v = ring.getVertexAtPosition(i);
+            vertexIDs.add(v.getVertexId());
+        }
+        jsonObject.add("vertices",context.serialize(vertexIDs));
+        return jsonObject;
+    }
+  }
+
+//------------------------------------------------------------------------------
+
+
+
 }
