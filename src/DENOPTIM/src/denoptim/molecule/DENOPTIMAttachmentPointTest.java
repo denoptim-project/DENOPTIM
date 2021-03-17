@@ -212,7 +212,10 @@ public class DENOPTIMAttachmentPointTest
                 dummyVertex.getNumberOfAP()-1);
         
         DENOPTIMAttachmentPoint clone = orig.clone();
-        
+
+        /* This may not always work as hashing only guarantees that if
+        objectA == objectB then objectA.hashCode() == objectB.hashCode(). I.e
+        two objects with the same hash code need not be equal.*/
         assertEquals(clone.getAPClass().hashCode(),
                 orig.getAPClass().hashCode(),"Hashcode of cloned APClass");
     }

@@ -189,15 +189,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     //TODO-V3 Remove.
 
-    
+
     // WARNING! This is only meant to return a "scaffold" type
-    
     public static DENOPTIMTemplate getTestScaffoldTemplate() 
     {
-        if (FragmentSpaceParameters.useCyclicTemplate())
+        if (FragmentSpaceParameters.useCyclicTemplate()) {
             return getCyclicTemplate(BBType.SCAFFOLD);
-        else
+        } else {
             return getAcyclicTemplate(BBType.SCAFFOLD);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
-        // Adding fully defined vertexes (they point to an actual fragment
+        // Adding fully defined vertexes (they point to an actual fragment)
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
@@ -267,7 +267,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         */
         
         template.freezeTemplate();
-        
+
+        System.out.println("Inner acyclic graph: " + g + "\n");
+
         return template;
     }
     
@@ -793,8 +795,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                             list.add(outerAP);
                             apsPerAtom.put(i, list);
                         }
-                        // TODO: Remove
-                        // System.out.println("Fixed wrong atomposnumbering");
                     }
                 }
             }
@@ -941,6 +941,28 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         ap.setOwner(this);
         requiredAPs.add(ap);
+    }
+
+//------------------------------------------------------------------------------
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof DENOPTIMTemplate)) {
+            return false;
+        }
+        DENOPTIMTemplate o = (DENOPTIMTemplate) other;
+        boolean fieldsAreEqual = this.contractLevel == o.contractLevel
+                && this.buildingBlockType == o.buildingBlockType
+                && this.buildingBlockId == o.buildingBlockId
+                && this.requiredAPs.stream()
+                    .sorted(DENOPTIMAttachmentPoint::comparePropertiesTo)
+                    .equals(o.requiredAPs
+                            .stream()
+                            .sorted(DENOPTIMAttachmentPoint::comparePropertiesTo)
+                    );
+        return fieldsAreEqual
+                && this.getInnerGraph().sameAs(o.getInnerGraph(),
+                new StringBuilder());
     }
 
 //------------------------------------------------------------------------------

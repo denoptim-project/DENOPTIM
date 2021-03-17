@@ -82,7 +82,6 @@ public class GraphConversionTool
         for (int i=0; i<n; i++)
         {
             DENOPTIMVertex vertex = g.getVertexList().get(i);
-
             if (!vertex.containsAtoms())
             {
                 //TODO-V3 remove, eventually

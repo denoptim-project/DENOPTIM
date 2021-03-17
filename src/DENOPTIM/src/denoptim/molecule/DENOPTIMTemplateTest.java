@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,12 +33,13 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DENOPTIMTemplateTest
 {
+    final long SEED = 13;
+    Random rng = new Random(SEED);
     
 //------------------------------------------------------------------------------
     
@@ -133,7 +137,7 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testGetAttachmentPointsReturnsAPsWithTemplateAsOwner() {
+    public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
         try {
@@ -150,14 +154,14 @@ public class DENOPTIMTemplateTest
         for (int i = 0; i < totalAPCount; i++) {
             DENOPTIMVertex actualOwner = template.getAttachmentPoints().get(i)
                     .getOwner();
-            assertEquals(template, actualOwner);
+            assertSame(template, actualOwner);
         }
     }
 
 //------------------------------------------------------------------------------
 
     @Test
-    public void testGetAttachmentPointsReturnsCorrectNumberOfAPs() {
+    public void testGetAttachmentPoints_returnsCorrectNumberOfAPs() {
         // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
@@ -199,7 +203,7 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testSetInnerGraphThrowsIllegalArgExcIfGraphIncompatibleWithRequiredAPs()
+    public void testSetInnerGraph_throwsException_if_graphIncompatibleWithRequiredAPs()
             throws DENOPTIMException {
         int numberOfAPs = 2;
         List<Integer> atomConnections = Arrays.asList(1, 2);
@@ -289,7 +293,7 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testCallingAddAPAfterSetInnerGraphThrowsDENOPTIMExc() {
+    public void testAddAP_after_setInnerGraph_throwsException() {
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMGraph g = new DENOPTIMGraph();
         t.setInnerGraph(g);
@@ -299,31 +303,94 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testAtomPropertyVertexIdReturnsTemplateId() {
-        IAtom a = new Atom("C");
-        IAtomContainer c = new AtomContainer();
-        c.addAtom(a);
-        DENOPTIMVertex v = null;
+    public void testNestedTemplateCloning() {
         try {
-            v = new DENOPTIMFragment(c, BBType.NONE);
+            DENOPTIMTemplate t = getNestedTemplate();
+            DENOPTIMTemplate clone = t.clone();
+            assertEquals(t, clone);
         } catch (DENOPTIMException e) {
             fail("unexpected exception thrown");
+            e.printStackTrace();
         }
-        v.setVertexId(0);
-        DENOPTIMGraph g = new DENOPTIMGraph();
-        g.addVertex(v);
-        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
-        t.setVertexId(1);
-        t.setInnerGraph(g);
-
-        int expected = t.getVertexId();
-        int actual = t
-                .getInnerGraph()
-                .getVertexAtPosition(0)
-                .getIAtomContainer()
-                .getAtom(0)
-                .getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
-        assertEquals(expected, actual);
     }
 
+    /**
+     * Creating a nested template with the following structure:
+     *             |--------|
+     *  * - CH_2 - | * - OH |
+     *             |--------|
+     * The box containing the 'OH' represents the inner template
+     */
+    private DENOPTIMTemplate getNestedTemplate() throws DENOPTIMException {
+        DENOPTIMTemplate innerTemp = getOHTemplate();
+        DENOPTIMTemplate outerTemp = getCHTemplate();
+        outerTemp.getInnerGraph().addVertex(innerTemp);
+        DENOPTIMEdge e = new DENOPTIMEdge(
+                outerTemp
+                        .getInnerGraph()
+                        .getVertexAtPosition(0)
+                        .getAttachmentPoints()
+                        .get(0),
+                innerTemp
+                        .getAttachmentPoints()
+                        .get(0),
+                DENOPTIMEdge.BondType.SINGLE
+        );
+        outerTemp.getInnerGraph().addEdge(e);
+        return outerTemp;
+    }
+
+    private DENOPTIMTemplate getCHTemplate() throws DENOPTIMException {
+        IAtomContainer atomContainer = new AtomContainer();
+        atomContainer.addAtom(new Atom("C"));
+        atomContainer.addAtom(new Atom("H"));
+        atomContainer.addAtom(new Atom("H"));
+        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
+        atomContainer.addBond(0, 2, IBond.Order.SINGLE);
+
+        EmptyVertex dummy = new EmptyVertex();
+        dummy.addAP(0, 1, 1, new double[]{rng.nextDouble(), rng.nextDouble(),
+                rng.nextDouble()}, APClass.make("c", 0));
+        String APSDF = dummy.getAP(0).getSingleAPStringSDF(false);
+        atomContainer.setProperty(DENOPTIMConstants.APCVTAG, "0#" + APSDF);
+
+        DENOPTIMVertex v = new DENOPTIMFragment(2, atomContainer,
+                BBType.FRAGMENT);
+
+        // Check that vertex construction produces correct AP
+        assertEquals(0, v.getAP(0).comparePropertiesTo(dummy.getAP(0)));
+
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(v);
+
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t.setInnerGraph(g);
+        return t;
+    }
+
+    private DENOPTIMTemplate getOHTemplate() throws DENOPTIMException {
+        IAtomContainer atomContainer = new AtomContainer();
+        atomContainer.addAtom(new Atom("O"));
+        atomContainer.addAtom(new Atom("H"));
+        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
+
+        EmptyVertex dummy = new EmptyVertex();
+        dummy.addAP(0, 1, 1, new double[]{rng.nextDouble(), rng.nextDouble(),
+                rng.nextDouble()}, APClass.make("o", 0));
+        String APSDF = dummy.getAP(0).getSingleAPStringSDF(false);
+        atomContainer.setProperty(DENOPTIMConstants.APCVTAG, "0#" + APSDF);
+
+        DENOPTIMVertex v = new DENOPTIMFragment(1, atomContainer,
+                BBType.FRAGMENT);
+
+        // Check that vertex construction produces correct AP
+        assertEquals(0, v.getAP(0).comparePropertiesTo(dummy.getAP(0)));
+
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(v);
+
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t.setInnerGraph(g);
+        return t;
+    }
 }

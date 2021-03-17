@@ -3047,11 +3047,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         Gson gson = new GsonBuilder()
             .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
             // Custom deserializer to dispatch to the correct subclass of Vertex
-            .registerTypeAdapter(DENOPTIMVertex.class, 
+            .registerTypeAdapter(DENOPTIMVertex.class,
                   new DENOPTIMVertexDeserializer())
             // Custom deserializer takes care of converting ID-based components
             // to references to vertexes and APs
-            .registerTypeAdapter(DENOPTIMGraph.class, 
+            .registerTypeAdapter(DENOPTIMGraph.class,
                     new DENOPTIMGraphDeserializer())
             .setPrettyPrinting()
             .create();

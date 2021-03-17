@@ -1492,7 +1492,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads the molecules in a file. Expects filenames with commonly accepted
+     * Reads the molecules in a file. Accepts filenames with commonly accepted
      * extensions (i.e., .smi and .sdf). Unrecognized extensions will be
      * interpreted as links (i.e., pathnames) to SDF files.
      *
@@ -2059,7 +2059,7 @@ public class DenoptimIO
             }
         }
         if (lib.isEmpty()) {
-            throw new DENOPTIMException("Scaffold library has no entries.");
+            throw new DENOPTIMException("Library of type '" + kindStr + "' has no entries.");
         }
         return lib;
     }
