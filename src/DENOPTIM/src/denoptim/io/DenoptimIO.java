@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -106,6 +107,10 @@ import org.openscience.cdk.smiles.InvPair;
 import org.openscience.cdk.tools.FormatStringBuffer;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
@@ -120,6 +125,7 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
@@ -619,37 +625,6 @@ public class DenoptimIO
         }
     }
     
-//------------------------------------------------------------------------------
-
-    /**
-     * Read a DENOPTIMGraph from a JSON file containing only one graph
-     *
-     * @param fileName the pathname to the file to read as a JSON file
-     * @return the graph
-     * @throws DENOPTIMException
-     */
-    public static DENOPTIMGraph readGraphFromJSON(File file) 
-            throws DENOPTIMException {
-        DENOPTIMGraph graph = null;
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(file));
-            graph = DENOPTIMGraph.fromJson(br);
-        } catch (IOException ioe) {
-            throw new DENOPTIMException(ioe);
-        } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-            } catch (IOException ioe) {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-
-        return graph;
-    }
-
 //------------------------------------------------------------------------------
 
     /**
@@ -1960,9 +1935,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a JSON file.
-     * <b>WARNING: this reads only a single graph for now.</b>
-     *
+     * Reads a list of <code>DENOPTIMGraph</code>s from a JSON file.     *
      * @param fileName the pathname of the file to read
      * @return the list of graphs
      * @throws DENOPTIMException
@@ -1970,25 +1943,42 @@ public class DenoptimIO
     public static ArrayList<DENOPTIMGraph>  readDENOPTIMGraphsFromJSONFile(
             String fileName, boolean useFS) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
-        lst.add(readGraphFromJSON(new File(fileName)));
-        return lst;
-        
-        /*
-        Gson gson = new Gson();
+        ArrayList<DENOPTIMGraph> list_of_graphs = new ArrayList<DENOPTIMGraph>();
+        Gson reader = DENOPTIMgson.getReader();
 
-        ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
         try
         {
             br = new BufferedReader(new FileReader(fileName));
-            
-            //TODO...
-            
+            list_of_graphs = reader.fromJson(br, 
+                    new TypeToken<ArrayList<DENOPTIMGraph>>(){}.getType());
         }
         catch (FileNotFoundException fnfe)
         {
             throw new DENOPTIMException("File '" + fileName + "' not found.");
+        }
+        catch (JsonSyntaxException jse)
+        {
+            String msg = "Expected BEGIN_ARRAY but was BEGIN_OBJECT";
+            if (jse.getMessage().contains(msg))
+            {
+                // The file contains a single object, not a list. We try to read
+                // that single object as a DENOPTIMGraph
+                try 
+                {
+                    br.close();
+                    br = new BufferedReader(new FileReader(fileName));
+                }
+                catch (FileNotFoundException fnfe)
+                {
+                    //cannot happen
+                } catch (IOException ioe) 
+                {
+                    throw new DENOPTIMException(ioe);
+                }
+                DENOPTIMGraph g = reader.fromJson(br,DENOPTIMGraph.class);
+                list_of_graphs.add(g);
+            }
         }
         finally 
         {
@@ -2002,8 +1992,7 @@ public class DenoptimIO
             }
         }
 
-        return lst;
-        */
+        return list_of_graphs;
     }
     
 //------------------------------------------------------------------------------
@@ -2078,13 +2067,8 @@ public class DenoptimIO
     public static void writeGraphsToJSON(File file,
             ArrayList<DENOPTIMGraph> graphs) throws DENOPTIMException
     {
-        StringBuilder sb = new StringBuilder();
-        for (DENOPTIMGraph g : graphs) 
-        {
-            sb.append(g.toJson());
-            sb.append(NL);
-        }
-        writeData(file.getAbsolutePath(), sb.toString(), false);
+        Gson writer = DENOPTIMgson.getWriter();
+        writeData(file.getAbsolutePath(), writer.toJson(graphs), false);
     }
 
 //------------------------------------------------------------------------------

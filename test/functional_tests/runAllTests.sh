@@ -10,7 +10,11 @@
 #
 # Usage:
 #
-# ./runAllTests.sh
+# ./runAllTests.sh [TASTNAME]
+#
+# Optional:
+# TESTNAME is the name of a test to run.
+#
 
 #
 # Settings:
@@ -128,6 +132,13 @@ fi
 
 cd "$wDir"
 
+# Run a selected test
+if [ "$#" -eq 1 ]
+then
+    tName="$1"
+    runTest "$tName"
+    exit 0
+fi
 
 # Run tests
 

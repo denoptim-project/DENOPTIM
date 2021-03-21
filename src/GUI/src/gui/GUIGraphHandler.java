@@ -21,6 +21,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -186,6 +187,20 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private static final  IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
+	
+	private boolean painted;
+
+//-----------------------------------------------------------------------------
+	
+	@Override
+	public void paint(Graphics g) {
+	    super.paint(g);
+
+	    if (!painted) {
+	        painted = true;
+	        visualPanel.setDefaultDividerLocation();
+	    }
+	}
 	
 //-----------------------------------------------------------------------------
 	
