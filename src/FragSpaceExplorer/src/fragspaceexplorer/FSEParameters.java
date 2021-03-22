@@ -682,7 +682,7 @@ public class FSEParameters
             {
 				if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING))
 				{
-                    rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    rootGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
 								rootGraphsFile,true);
 				}
 				else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))

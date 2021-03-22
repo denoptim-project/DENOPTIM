@@ -21,6 +21,7 @@ package denoptim.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
@@ -208,4 +210,66 @@ public class DenoptimIOTest {
 		}
 		graph.addVertex(v);
 	}
+	
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testDetectFileFormat() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String pathName = tempDir.getAbsolutePath() + SEP + "graph.sdf";
+        File file = new File(pathName);
+        final File ffile = new File(pathName);
+        
+        DenoptimIO.writeData(pathName, "dummy text", false);
+        assertThrows(UndetectedFileFormatException.class, 
+                () -> DenoptimIO.detectFileFormat(ffile));
+        
+        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.APTAG 
+                + ">", false);
+        assertTrue(FileFormat.VRTXSDF == DenoptimIO.detectFileFormat(file),
+                "Vertex SDF");
+        
+        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.GRAPHTAG 
+                + ">", false);
+        assertTrue(FileFormat.GRAPHSDF == DenoptimIO.detectFileFormat(file),
+                "Graph SDF");
+        
+        pathName = tempDir.getAbsolutePath() + SEP + "filename";
+        file = new File(pathName);
+        
+        DenoptimIO.writeData(pathName, "FSE-SOMETING", false);
+        assertTrue(FileFormat.FSE_PARAM == DenoptimIO.detectFileFormat(file),
+                "FSE params");
+        
+        DenoptimIO.writeData(pathName, "GA-SOMETING", false);
+        assertTrue(FileFormat.GA_PARAM == DenoptimIO.detectFileFormat(file),
+                "GA params");
+        
+        DenoptimIO.writeData(pathName, "RCN SOMETING", false);
+        assertTrue(FileFormat.COMP_MAP == DenoptimIO.detectFileFormat(file),
+                "Compatibility Matrix (1)");
+        
+        DenoptimIO.writeData(pathName, "RBO SOMETING", false);
+        assertTrue(FileFormat.COMP_MAP == DenoptimIO.detectFileFormat(file),
+                "Compatibility Matrix (2)");
+        
+        DenoptimIO.writeData(pathName, "CAP SOMETING", false);
+        assertTrue(FileFormat.COMP_MAP == DenoptimIO.detectFileFormat(file),
+                "Compatibility Matrix (3)");
+        
+        String dirName = tempDir.getAbsolutePath() + SEP + "blabla1234";
+        String subDirName = dirName + SEP+DENOPTIMConstants.FSEIDXNAMEROOT+"0";
+        
+        DenoptimIO.createDirectory(dirName);
+        DenoptimIO.createDirectory(subDirName);
+        assertTrue(FileFormat.FSE_RUN == DenoptimIO.detectFileFormat(
+                new File(dirName)), "FSE output folder");
+        
+        dirName = tempDir.getAbsolutePath() + SEP + "blabla5678";
+        subDirName = dirName + SEP+DENOPTIMConstants.GAGENDIRNAMEROOT+"0";
+        DenoptimIO.createDirectory(dirName);
+        DenoptimIO.createDirectory(subDirName);
+        assertTrue(FileFormat.GA_RUN == DenoptimIO.detectFileFormat(
+                new File(dirName)), "GA output folder");
+    }
 }

@@ -483,7 +483,7 @@ public class GraphEdParameters
 	    {
 		case (STRINGFORMATLABEL):
 		{
-                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
                                                              inGraphsFile,true);
 		    break;
                 }

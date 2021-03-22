@@ -121,7 +121,9 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -1771,6 +1773,41 @@ public class DenoptimIO
         }
         return lst;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of <code>DENOPTIMGraph</code>s from file
+     *
+     * @param fileName the pathname of the file to read
+     * @param useFS    set to <code>true</code> when there is a defined
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential
+     * mismatch between fragment space and graph representation.
+     * @return the list of graphs
+     * @throws Exception 
+     */
+    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
+            File inFile, boolean useFS)
+            throws Exception 
+    {
+        FileFormat ff = detectFileFormat(inFile);
+        switch (ff) 
+        {
+            case GRAPHJSON:
+                return DenoptimIO.readDENOPTIMGraphsFromJSONFile(
+                        inFile.getAbsolutePath(), useFS);
+
+            case GRAPHSDF:
+                return DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                        inFile.getAbsolutePath(), useFS);
+                
+            default:
+                throw new Exception("Format '" + ff + "' could not be used to "
+                        + "read graphs from file '" + inFile + "'.");
+        }
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1795,7 +1832,7 @@ public class DenoptimIO
                 return DenoptimIO.readDENOPTIMGraphsFromJSONFile(fileName, useFS);
             
             case "TXT":
-                return DenoptimIO.readDENOPTIMGraphsFromFile(fileName, useFS);
+                return DenoptimIO.readDENOPTIMGraphsFromTxtFile(fileName, useFS);
 
             case "SDF":
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
@@ -1887,7 +1924,7 @@ public class DenoptimIO
      * @return the list of graphs
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
+    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromTxtFile(
             String fileName, boolean useFS) throws DENOPTIMException {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
@@ -1930,12 +1967,11 @@ public class DenoptimIO
         }
         return lstGraphs;
     }
-
     
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a JSON file.     *
+     * Reads a list of <code>DENOPTIMGraph</code>s from a JSON file.
      * @param fileName the pathname of the file to read
      * @return the list of graphs
      * @throws DENOPTIMException
@@ -2015,13 +2051,17 @@ public class DenoptimIO
         }
         switch (format)
         {
-            case JSON:
+            case GRAPHJSON:
                 writeGraphsToJSON(file, graphs);
                 break;
                 
-            case SDF:
+            case GRAPHSDF:
                 writeGraphsToSDF(file, graphs);
                 break;
+                
+            default:
+                throw new DENOPTIMException("Cannot read graphs from format '" 
+                        + format + "'.");
         }
     }
 
@@ -2144,7 +2184,8 @@ public class DenoptimIO
      * @return the list of fragments as atom containers.
      * @throws DENOPTIMException
      */
-    public static ArrayList<IAtomContainer> readInLibraryOfFragments(
+    
+    public static ArrayList<IAtomContainer> readDENOPTIMVertexFromSDFile(
             String fileName, String kindStr) throws DENOPTIMException {
         ArrayList<IAtomContainer> lib = new ArrayList<IAtomContainer>();
         int i = 0;
@@ -2165,6 +2206,72 @@ public class DenoptimIO
                     + "entries.");
         }
         return lib;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads vertexes from any suitable file format (.sdf, .json). If the file 
+     * contains {@link DENOPTIMGraph}s, 
+     * these are imported as {@link DENOPTIMTemplate}s.
+     * @param inFile the file to read.
+     * @param bbt the type of building block of the vertexes to import.
+     * @return the list of vertexes taken from the file.
+     * @throws Exception if the file cannot be understood as a collection of
+     * vertexes
+     */
+    
+    public static ArrayList<DENOPTIMVertex> readDENOPTIMVertexesFromFile(
+            File inFile, BBType bbt) throws Exception
+    {
+        ArrayList<DENOPTIMVertex> lstVrt = 
+                new ArrayList<DENOPTIMVertex>();
+        
+        FileFormat ff = DenoptimIO.detectFileFormat(inFile);
+        switch (ff)
+        {
+            case VRTXSDF:
+                ArrayList<IAtomContainer> lstIACs = 
+                    DenoptimIO.readDENOPTIMVertexFromSDFile(
+                            inFile.getAbsolutePath(), bbt.toString());
+                for (IAtomContainer iac : lstIACs)
+                {
+                    lstVrt.add(convertsIACToVertex(iac, bbt));
+                }
+                break;
+                
+            case VRTXJSON:
+                System.out.println("TODO: implement import of " + ff);
+                throw new Exception("Format '" + ff + "' could not be used to "
+                        + "read in vertexes from file '" + inFile + "'.");
+                    
+            case GRAPHSDF:
+                ArrayList<DENOPTIMGraph> lstGraphs = 
+                    readDENOPTIMGraphsFromSDFile(inFile.getAbsolutePath(),true);
+                for (DENOPTIMGraph g : lstGraphs)
+                {
+                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                    t.setInnerGraph(g);
+                    lstVrt.add(t);
+                }
+                break;
+                    
+            case GRAPHJSON:
+                ArrayList<DENOPTIMGraph> lstGraphs2 = 
+                readDENOPTIMGraphsFromJSONFile(inFile.getAbsolutePath(), true);
+                for (DENOPTIMGraph g : lstGraphs2)
+                {
+                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                    t.setInnerGraph(g);
+                    lstVrt.add(t);
+                }
+                break;
+                
+            default:
+                throw new Exception("Format '" + ff + "' could not be used to "
+                        + "read in vertexes from file '" + inFile + "'.");
+        }
+        return lstVrt;
     }
 
 //------------------------------------------------------------------------------
@@ -2196,6 +2303,327 @@ public class DenoptimIO
 			}
 		}
     	return newFolder;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Inspects a file/folder and tries to detect if the it is one of
+     * the data sources that is recognised by DENOPTIM.
+     * @param inFile the file to inspect
+     * @return a string informing on the detected file format, or null.
+     * @throws UndetectedFileFormatException when the format of the file could
+     * not be detected.
+     * @throws IOException when the the file could not be read properly.
+     */
+    
+    public static FileFormat detectFileFormat(File inFile) 
+            throws UndetectedFileFormatException, IOException 
+    {
+        FileFormat ff = null;
+    	String ext = FilenameUtils.getExtension(inFile.getAbsolutePath());
+    	// Folders are presumed to contain output kind of data
+    	if (inFile.isDirectory())
+    	{
+    		
+    		// This is to distinguish GS from FSE runs
+    		for(File folder : inFile.listFiles(new FileFilter() {
+    			
+    			@Override
+    			public boolean accept(File pathname) {
+    				if (pathname.isDirectory())
+    				{
+    					return true;
+    				}
+    				return false;
+    			}
+    		}))
+    		{
+    			if (folder.getName().startsWith(
+    					DENOPTIMConstants.FSEIDXNAMEROOT))
+    			{
+    				ff = FileFormat.FSE_RUN;
+    				return ff;
+    			}
+    			else if (folder.getName().startsWith(
+    					DENOPTIMConstants.GAGENDIRNAMEROOT))
+    			{
+    				ff = FileFormat.GA_RUN;
+    				return ff;
+    			}
+    		}
+    		
+    		throw new UndetectedFileFormatException(inFile);
+    	}
+    	
+    	// Files are first distinguished first by extension
+    	switch (ext.toUpperCase())
+    	{		
+    		case "SDF":
+    			//Either graphs or fragment
+    			ff = detectKindOfSDFFile(inFile.getAbsolutePath());
+    			break;
+    			
+    		case "JSON":
+    		    ff = detectKindOfJSONFile(inFile.getAbsolutePath());
+    		    break;
+    		
+    		case "par":
+    			//Parameters for any DENOPTIM module
+    			ff = detectKindOfParameterFile(inFile.getAbsolutePath());
+    		    break;
+    		
+    		case "":
+                //Parameters for any DENOPTIM module
+                ff = detectKindOfParameterFile(inFile.getAbsolutePath());
+                break;
+    		    
+    		default:
+    		    throw new UndetectedFileFormatException(inFile);
+    	}
+    	if (ff == null)
+        {
+            throw new UndetectedFileFormatException(inFile);
+        }
+    	return ff;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static FileFormat detectKindOfJSONFile(String fileName) 
+            throws IOException
+    {
+        Gson reader = DENOPTIMgson.getReader();
+
+        FileFormat ff = null;
+        
+        BufferedReader br = null;
+        try
+        {
+            br = new BufferedReader(new FileReader(fileName));
+            Object o = reader.fromJson(br,Object.class);
+            Object oneObj = null;
+            if (o instanceof ArrayList)
+            {
+                oneObj = ((ArrayList) o).get(0);
+            } else {
+                oneObj = o;
+            }
+            if (oneObj instanceof Map)
+            {
+                if (((Map)oneObj).keySet().contains("gVertices"))
+                {
+                    br.close();
+                    return FileFormat.GRAPHJSON;
+                } else {
+                    return FileFormat.VRTXJSON;
+                }
+            }
+        }
+        catch (IOException ioe)
+        {
+            throw new IOException("Unable to read file '"+fileName + "'", ioe);
+        }
+        finally
+        {
+            try
+            {
+                if (br != null)
+                {
+                    br.close();
+                    br = null;
+                }
+            }
+            catch (IOException ioe)
+            {
+                
+                throw new IOException("Unable to close file '" + fileName + "'",
+                        ioe);
+            }
+        }
+        
+        return ff;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into a text file and tries to understand if the file is a 
+     * collection of parameters for any specific DENOPTIM module.
+     * 
+     * @param fileName The pathname of the file to analyze
+     * @return a string that defined the kind of parameters
+     * @throws IOException 
+     * @throws Exception
+     */
+    public static FileFormat detectKindOfSDFFile(String fileName) 
+            throws IOException 
+    {
+        FileFormat[] ffs = {FileFormat.VRTXSDF,FileFormat.GRAPHSDF};
+        return detectKindFile(fileName, ffs);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into a text file and tries to understand is the file is a 
+     * collection of parameters for any specific DENOPTIM module.
+     * @param fileName The pathname of the file to analyze
+     * @return a the format of the parameter file or null.
+     * @throws IOException 
+     * @throws Exception
+     */
+    public static FileFormat detectKindOfParameterFile(String fileName) 
+            throws IOException
+    {
+    	FileFormat[] ffs = {FileFormat.GA_PARAM,FileFormat.FSE_PARAM,
+    	        FileFormat.COMP_MAP};
+    	return detectKindFile(fileName, ffs);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into a text file and tries to understand what format it is among 
+     * the given formats.
+     * 
+     * @param fileName The pathname of the file to analyze.
+     * @param ffs the file formats to consider.
+     * @return a format of parameters, or null.
+     * @throws Exception when something goes wrong handling the file
+     */
+    public static FileFormat detectKindFile(String fileName, FileFormat[] ffs) 
+            throws IOException 
+    {
+        Map<String,FileFormat> definingMap = 
+                new HashMap<String,FileFormat>();
+        String endOfSample = null;
+        for (FileFormat ff : ffs)
+        {
+           for (String regex : ff.getDefiningRegex())
+           {
+               definingMap.put(regex,ff);
+               if (ff.getSampleEndRegex() != null)
+               {
+                   endOfSample = ff.getSampleEndRegex();
+               }
+           }
+        }
+        
+        FileFormat ff = null;
+        String line;
+        BufferedReader br = null;
+        try
+        {
+            br = new BufferedReader(new FileReader(fileName));
+            lineReadingLoop:
+                while ((line = br.readLine()) != null)
+                {	            	
+                	if (endOfSample != null && line.matches(endOfSample))
+                	{
+                		break lineReadingLoop;
+                	}
+                	
+                    if ((line.trim()).length() == 0)
+                    {
+                        continue;
+                    }
+                    
+                    for (String keyRoot : definingMap.keySet())
+                    {
+                        if (line.matches(keyRoot))
+                        {
+                        	ff = definingMap.get(keyRoot);
+                        	break lineReadingLoop;
+                        }
+                    }
+                }
+        }
+        catch (IOException ioe)
+        {
+        	throw new IOException("Unable to read file '"+fileName + "'", ioe);
+        }
+        finally
+        {
+            try
+            {
+                if (br != null)
+                {
+                    br.close();
+                    br = null;
+                }
+            }
+            catch (IOException ioe)
+            {
+                
+            	throw new IOException("Unable to close file '" + fileName + "'",
+            			ioe);
+            }
+        }
+    	return ff;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a list of atom containers and converts it into a list of vertexes
+     * that are added to a given library.
+     * @param list of atom containers to import.
+     * @param bbt the type of building block the vertexes should be set to.
+     * @param library where to import the vertexes to.
+     */
+
+    public static void appendToVertexLibrary(ArrayList<IAtomContainer>list, 
+            BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        for(IAtomContainer iac : list)
+        {
+            DENOPTIMVertex v = null;
+            try
+            {
+                v = DenoptimIO.convertsIACToVertex(iac,bbt);
+            } catch (Throwable e)
+            {
+                e.printStackTrace();
+                System.err.println("ERROR! Could not import "+bbt+". Failed "
+                        + "conversion of IAtomContainer to "+bbt+".");
+                System.exit(-1);;
+            }
+            library.add(v);
+        }       
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Processes an atom containers and builds a vertex out of it.
+     * @param iac the  atom containers.
+     * @param bbt the type of building block
+     * @return the vertex.
+     * @throws DENOPTIMException if the atom container could not be converted 
+     * into a {@link DENOPTIMFragment}.
+     */
+    
+    public static DENOPTIMVertex convertsIACToVertex(IAtomContainer iac, 
+            BBType bbt) throws DENOPTIMException
+    {
+        DENOPTIMVertex v;
+        Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+        Object jsonVertex = iac.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
+        if (jsonGraph != null)
+        {
+            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+            DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
+            t.setInnerGraph(g);
+            v = t;
+        } else if (jsonVertex != null)
+        {
+            EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
+            v = ev;
+        } else {
+            v = new DENOPTIMFragment(iac,bbt);
+        }
+        return v;
     }
     
 //------------------------------------------------------------------------------

@@ -25,6 +25,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,8 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileAndFormat;
+import denoptim.io.FileFormat;
+import denoptim.io.UndetectedFileFormatException;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -1217,75 +1220,53 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
-		//TODO-V3 change: this should be done elsewhere, maybe in DenoptimIO
-	    // make it use FileFormat
-		
-		String format="";
-		String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-		switch (ext.toUpperCase())
+		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+		try
 		{
-			case ("SDF"):
-				format="SDF";
-				break;
-				
-			case ("TXT"):
-				format="TXT";
-				break;
-			
-			case ("SER"):
-				format="SER";
-				break;
-				
-            case ("JSON"):
-                format="JSON";
-                break;
-				
-			default:
-			    String[] options = {"Abandon", "TXT", "SDF", "JSON", "SERIALIZED"};
-				int res = JOptionPane.showOptionDialog(null,
-					"<html>Failed to detect file type from file's "
-					+ "extension.<br>"
-					+ "Please, tell me how to interpret file <br>"
-					+ "'" + file.getAbsolutePath() + "'<br>"
-					+ "or 'Abandon' to give up.</html>",
-					"Specify File Type",
-	                JOptionPane.DEFAULT_OPTION,
-	                JOptionPane.QUESTION_MESSAGE,
-	                UIManager.getIcon("OptionPane.warningIcon"),
-	                options,
-	                options[0]);
-				switch (res)
-				{
-					case 0:
-						return new ArrayList<DENOPTIMGraph>();
-						
-					case 1:
-						format = "TXT";
-						break;
-						
-					case 2:
-						format="SDF";
-						break;
-						
-					case 3:
-                        format="JSON";
+    		try 
+    		{
+    			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(file, 
+    			        hasFragSpace);	
+    		} 
+    		catch (UndetectedFileFormatException uff) 
+    		{
+                String[] options = {"Abandon", "SDF", "JSON"};
+                FileFormat[] ffs = {null,
+                        FileFormat.GRAPHSDF,
+                        FileFormat.GRAPHJSON};
+                int res = JOptionPane.showOptionDialog(null,
+                    "<html>Failed to detect file type from file's "
+                    + "extension.<br>"
+                    + "Please, tell me how to interpret file <br>"
+                    + "'" + file.getAbsolutePath() + "'<br>"
+                    + "or 'Abandon' to give up.</html>",
+                    "Specify File Type",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"),
+                    options,
+                    options[0]);
+                FileFormat ff = null;
+                switch (res)
+                {
+                    case 0:
+                        graphs = new ArrayList<DENOPTIMGraph>();
                         break;
                         
-					case 4:
-						format="SER";
-						break;
-				}
-				break;
-		}
-		
-		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
-		try 
-		{
-			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-					file.getAbsolutePath(), format, hasFragSpace);	
-		} 
+                    case 1:
+                        graphs = DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                                file.getAbsolutePath(), hasFragSpace);
+                        break;
+                        
+                    case 2:
+                        graphs = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
+                                file.getAbsolutePath(), hasFragSpace);
+                        break;
+                }
+    		} 
+    	}
 		catch (Exception e) 
-		{
+        {
 			e.printStackTrace();
 			String msg = "<html>Could not read graph from file <br> "
 					+ "'" + file.getAbsolutePath() 
@@ -1338,7 +1319,6 @@ public class GUIGraphHandler extends GUICardPanel
     	// status of the graph of an easy recovery, (see GSGraphSnapshot)
     	clearCurrentSystem();
     	
-    	//TODO-MF: this might not be needed
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
 		
 		if (molLibrary.get(currGrphIdx).getAtomCount() > 0)

@@ -36,10 +36,8 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
 
 
 /**
@@ -282,18 +280,18 @@ public class FragmentSpace
         {
             //TODO-V3 set buildingBlockId
             setCappingLibrary(convertsIACsToVertexes(
-                    DenoptimIO.readInLibraryOfFragments(capFile,
+                    DenoptimIO.readDENOPTIMVertexFromSDFile(capFile,
                     "capping group"),BBType.CAP));
         }
         
         //TODO-V3 set buildingBlockId
         fragmentLib = new ArrayList<DENOPTIMVertex>();
-        appendToVertexLibrary(DenoptimIO.readInLibraryOfFragments(
+        DenoptimIO.appendToVertexLibrary(DenoptimIO.readDENOPTIMVertexFromSDFile(
                 fragFile,"fragment"),BBType.FRAGMENT,fragmentLib);
         
         //TODO-V3 set buildingBlockId
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
-        appendToVertexLibrary(DenoptimIO.readInLibraryOfFragments(
+        DenoptimIO.appendToVertexLibrary(DenoptimIO.readDENOPTIMVertexFromSDFile(
                         scaffFile,"scaffold"),BBType.SCAFFOLD,scaffoldLib);
 
         //TODO-MF del (used to create SDF versions of empty fragments
@@ -381,43 +379,9 @@ public class FragmentSpace
         ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
         for (IAtomContainer iac : iacs)
         {
-            list.add(convertsIACToVertex(iac,bbt));
+            list.add(DenoptimIO.convertsIACToVertex(iac,bbt));
         }
         return list;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Processes an atom containers and builds a vertex out of it.
-     * @param iac the  atom containers.
-     * @param bbt the type of building block
-     * @return the vertex.
-     * @throws DENOPTIMException
-     */
-    
-    //TODO-V3: Move to IO
-    
-    private static DENOPTIMVertex convertsIACToVertex(IAtomContainer iac, 
-            BBType bbt) throws DENOPTIMException
-    {
-        DENOPTIMVertex v;
-        Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
-        Object jsonVertex = iac.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
-        if (jsonGraph != null)
-        {
-            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-            DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
-            t.setInnerGraph(g);
-            v = t;
-        } else if (jsonVertex != null)
-        {
-            EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
-            v = ev;
-        } else {
-            v = new DENOPTIMFragment(iac,bbt);
-        }
-        return v;
     }
     
 //------------------------------------------------------------------------------
@@ -1148,30 +1112,6 @@ public class FragmentSpace
         scaffoldLib = lib;
     }
     
-//------------------------------------------------------------------------------
-
-    //TODO-V3 mode to DenoptimIO
-    public static void appendToVertexLibrary(ArrayList<IAtomContainer>list, 
-            BBType bbt, ArrayList<DENOPTIMVertex> library)
-    {
-        for(IAtomContainer iac : list)
-        {
-            DENOPTIMVertex v = null;
-            try
-            {
-                v = convertsIACToVertex(iac,bbt);
-            } catch (Throwable e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                System.err.println("ERROR! Could not import "+bbt+". Failed "
-                        + "conversion of IAtomContainer to "+bbt+".");
-                System.exit(-1);;
-            }
-            library.add(v);
-        }       
-    }
-
 //------------------------------------------------------------------------------
 
     public static void setFragmentLibrary(ArrayList<DENOPTIMVertex> lib)
