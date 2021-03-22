@@ -19,6 +19,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.rings.PathSubGraph;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
@@ -130,6 +131,48 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         buildingBlockType = fType;
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Produces a pair of strings that identify the "path" between two given
+     * attachment points. The two strings represent one the reverse path of
+     * the other. So they identify the path when starting from each of the 
+     * two APs.
+     * @param apA
+     * @param apB
+     * @return a pair of strings that identify the "path" between two given
+     * attachment points.
+     */
+    
+    @Override
+    public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
+            DENOPTIMAttachmentPoint apB)
+    {
+        String a2b = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+                + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
+        String b2a = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+                + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
+        
+        String[] pair = {a2b,b2a};
+        return pair;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Produces a subgraph that represents the path between two given
+     * attachment points.
+     * @param apA
+     * @param apB
+     * @return a path that goes from apA to apB.
+     */
+
+    public PathSubGraph getPath(DENOPTIMAttachmentPoint apA,
+            DENOPTIMAttachmentPoint apB)
+    {
+        //TODO-V3
+        return null;
+    }
 
 //------------------------------------------------------------------------------
 

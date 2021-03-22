@@ -61,8 +61,10 @@ import denoptim.io.DenoptimIO;
 import denoptim.io.FileAndFormat;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -160,6 +162,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private JPanel pnlEditVrtxBtns;
 	private JButton btnAddVrtx;
 	private JButton btnDelSel;
+	private JButton btnAddChord; 
 	
 	private JPanel pnlShowLabels;
 	private JButton btnAddLabel;
@@ -427,8 +430,8 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Controls to alter the presently loaded graph (if any)
 		pnlEditVrtxBtns = new JPanel();
-		JLabel edtVertxsLab = new JLabel("Edit verteces:");
-		btnAddVrtx = new JButton("Add");
+		JLabel edtVertxsLab = new JLabel("Edit Graph:");
+		btnAddVrtx = new JButton("Add Vertex");
 		btnAddVrtx.setToolTipText("<html>Append a vertex to the selected "
 				+ "attachment point<html>");
 		btnAddVrtx.setEnabled(false);
@@ -474,7 +477,7 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		
-		btnDelSel = new JButton("Remove");
+		btnDelSel = new JButton("Remove Vertex");
 		btnDelSel.setToolTipText("<html>Removes the selected vertexes from "
 				+ "the system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!</html>");
@@ -528,6 +531,44 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		
+	    // Controls to add chord (ring closing edge)
+        btnAddChord = new JButton("Add Chord");
+        btnAddChord.setToolTipText("<html>Add a ring-closing edge between two "
+                + "selected vertexes.<html>");
+        btnAddChord.setEnabled(false);
+        btnAddChord.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {    
+                ArrayList<DENOPTIMVertex> selVrtxs = 
+                        visualPanel.getSelectedNodesInViewer();               
+                if (selVrtxs.size() != 2)
+                {
+                    JOptionPane.showMessageDialog(null,
+                            "<html>Number of selected vertexes: " 
+                            + selVrtxs.size() + " <br>"
+                            + "Please, drag the mouse and "
+                            + "select only two vertexes!<br> "
+                            + "Click again to unselect.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                addChordOnGraph(selVrtxs);
+                
+                // Update viewer
+                visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+                
+                // Protect edited system
+                unsavedChanges = true;
+                protectEditedSystem();
+
+                // The molecular representation is updated when we save changes
+                visualPanel.requireUpdateOfMolecularViewer();
+                updateMolViewer = true;
+            }
+        });
+        
+        
 		GroupLayout lyoEditVertxs = new GroupLayout(pnlEditVrtxBtns);
 		pnlEditVrtxBtns.setLayout(lyoEditVertxs);
 		lyoEditVertxs.setAutoCreateGaps(true);
@@ -535,14 +576,14 @@ public class GUIGraphHandler extends GUICardPanel
 		lyoEditVertxs.setHorizontalGroup(lyoEditVertxs.createParallelGroup(
 				GroupLayout.Alignment.CENTER)
 				.addComponent(edtVertxsLab)
-				.addGroup(lyoEditVertxs.createSequentialGroup()
-						.addComponent(btnAddVrtx)
-						.addComponent(btnDelSel)));
+				.addComponent(btnAddVrtx)
+				.addComponent(btnDelSel)
+				.addComponent(btnAddChord));
 		lyoEditVertxs.setVerticalGroup(lyoEditVertxs.createSequentialGroup()
 				.addComponent(edtVertxsLab)
-				.addGroup(lyoEditVertxs.createParallelGroup()
-						.addComponent(btnAddVrtx)
-						.addComponent(btnDelSel)));
+				.addComponent(btnAddVrtx)
+				.addComponent(btnDelSel)
+				.addComponent(btnAddChord));
 		graphCtrlPane.add(pnlEditVrtxBtns);
 		
 		graphCtrlPane.add(new JSeparator());
@@ -756,7 +797,10 @@ public class GUIGraphHandler extends GUICardPanel
 		//TODO del (This is used only for devel phase of debug)
 		/*
 		try {
-			ArrayList<String> lines = DenoptimIO.readList("/Users/marco/butta/___params_w_template");
+			ArrayList<String> lines = DenoptimIO.readList(
+			        //"/Users/marco/butta/___params_for_ring");
+		            "/Users/marco/butta/___params_w_template");
+            
 			for (String l : lines)
 			{
 			    FragmentSpaceParameters.interpretKeyword(l);
@@ -766,7 +810,8 @@ public class GUIGraphHandler extends GUICardPanel
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
-		appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
+		//appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
+		//appendGraphsFromFile(new File("/Users/marco/butta/___graph_closable.json"));
 		*/
 	}
 	
@@ -776,6 +821,7 @@ public class GUIGraphHandler extends GUICardPanel
 	{
 		btnAddVrtx.setEnabled(enable);
 		btnDelSel.setEnabled(enable);
+		btnAddChord.setEnabled(enable);
 		cmbLabel.setEnabled(enable);
 		btnAddLabel.setEnabled(enable);
 		btnDelLabel.setEnabled(enable);
@@ -845,6 +891,39 @@ public class GUIGraphHandler extends GUICardPanel
 		unsavedChanges = true;
 		updateMolViewer = true;
         protectEditedSystem();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Edits the currently loaded graph by adding a chord involging the two
+	 * selected vertexes.
+	 * @param rcvs the selected vertexes. Must be two vertexes.
+	 */
+	private void addChordOnGraph(ArrayList<DENOPTIMVertex> rcvs)
+	{
+        if (rcvs.size() != 2)
+        {
+            JOptionPane.showMessageDialog(null,
+                    "<html>Number of selected vertexes: " 
+                    + rcvs.size() + " <br>"
+                    + "Please, drag the mouse and "
+                    + "select only two vertexes!<br> "
+                    + "Click again to unselect.</html>",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
+        
+        try
+        {
+            dnGraph.addRing(rcvs.get(0), rcvs.get(1));
+        } catch (DENOPTIMException e)
+        {
+            BondType bt = BondType.UNDEFINED;
+            dnGraph.addRing(rcvs.get(0), rcvs.get(1), bt);
+        }
 	}
 	
 //-----------------------------------------------------------------------------
