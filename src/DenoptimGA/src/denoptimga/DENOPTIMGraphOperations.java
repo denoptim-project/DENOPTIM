@@ -35,9 +35,9 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
@@ -77,14 +77,14 @@ public class DENOPTIMGraphOperations
 
         for (int i=0; i<male.getVertexCount(); i++)
         {
-            BBType mtype = male.getVertexAtPosition(i).getFragmentType();
+            DENOPTIMVertex.BBType mtype = male.getVertexAtPosition(i).getBuildingBlockType();
             int mvid = male.getVertexAtPosition(i).getVertexId();
-            int mfragid = male.getVertexAtPosition(i).getMolId();
+            int mfragid = male.getVertexAtPosition(i).getBuildingBlockId();
 
             //System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
 
             // if the fragment is a capping group or the scaffold itself ignore
-            if (mtype == BBType.SCAFFOLD || mtype == BBType.CAP)
+            if (mtype == DENOPTIMVertex.BBType.SCAFFOLD || mtype == DENOPTIMVertex.BBType.CAP)
                 continue;
 
             // get edge toward parent vertex
@@ -94,14 +94,14 @@ public class DENOPTIMGraphOperations
 
             for (int j=0; j<female.getVertexCount(); j++)
             {
-                BBType ftype = female.getVertexAtPosition(j).getFragmentType();
+                DENOPTIMVertex.BBType ftype = female.getVertexAtPosition(j).getBuildingBlockType();
                 int fvid = female.getVertexAtPosition(j).getVertexId();
-                int ffragid = female.getVertexAtPosition(j).getMolId();
+                int ffragid = female.getVertexAtPosition(j).getBuildingBlockId();
                 
 
                 //System.out.println("Female Fragment ID: "+fvid+" type: "+ftype+" ffragid: "+ffragid);
 
-                if (ftype == BBType.SCAFFOLD || ftype == BBType.CAP)
+                if (ftype == DENOPTIMVertex.BBType.SCAFFOLD || ftype == DENOPTIMVertex.BBType.CAP)
                     continue;
 
                 // fragment ids should not match or we get the same molecule
@@ -508,7 +508,7 @@ public class DENOPTIMGraphOperations
         int fid = chosenFrgAndAp.getVertexMolId();
         int nvid = GraphUtils.getUniqueVertexIndex();
         DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(nvid, 
-                fid, BBType.FRAGMENT);
+                fid, DENOPTIMVertex.BBType.FRAGMENT);
         
         // update the level of the vertex based on its parent
         int lvl = curVertex.getLevel();
@@ -584,13 +584,13 @@ public class DENOPTIMGraphOperations
         DENOPTIMAttachmentPoint curDap = lstDaps.get(dapidx);
         
         // Initialize with an empty pointer
-        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, DENOPTIMVertex.BBType.FRAGMENT, -1, 
                 -1, -1);
         if (!FragmentSpace.useAPclassBasedApproach())
         {
             //TODO-V3 get rid of EAUtils and use fragment space
             int fid = EAUtils.selectRandomFragment();
-            res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
+            res = new IdFragmentAndAP(-1,fid,DENOPTIMVertex.BBType.FRAGMENT,-1,-1,-1);
         }
         else
         {
@@ -645,7 +645,7 @@ DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
             FragForClosabChains chosenFfCc = lscFfCc.get(chosenId);
             ArrayList<Integer> newFragIds = chosenFfCc.getFragIDs();
             int molIdNewFrag = newFragIds.get(0);
-            BBType typeNewFrag = BBType.parseInt(newFragIds.get(1));
+            DENOPTIMVertex.BBType typeNewFrag = DENOPTIMVertex.BBType.parseInt(newFragIds.get(1));
             int dapNewFrag = newFragIds.get(2);
 //TODO del
 if(debug)
@@ -795,7 +795,7 @@ if(debug)
             return lstChosenFfCc;            
         }
 
-        if (curVertex.getFragmentType() == BBType.SCAFFOLD)  
+        if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)  
         {
             for (ClosableChain cc : molGraph.getClosableChains())
             {
@@ -810,7 +810,7 @@ if (debug)
                 int posInCc = cc.involvesVertex(curVertex);
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
-                BBType nfty = BBType.UNDEFINED;
+                DENOPTIMVertex.BBType nfty = DENOPTIMVertex.BBType.UNDEFINED;
                 int nfap = -1;
 
                 if (cLink.getApIdToLeft() != dapidx && 
@@ -881,7 +881,7 @@ if(debug)
                 for (FragForClosabChains ffcc : lstChosenFfCc)
                 {
                     int fidA = ffcc.getFragIDs().get(0);
-                    BBType ftyA = BBType.parseInt(ffcc.getFragIDs().get(1));
+                    DENOPTIMVertex.BBType ftyA = DENOPTIMVertex.BBType.parseInt(ffcc.getFragIDs().get(1));
                     int fapA = ffcc.getFragIDs().get(2);
                     if (nfid==fidA && nfty==ftyA && nfap==fapA)
                     {
@@ -931,8 +931,8 @@ if(debug)
             DENOPTIMVertex parent = molGraph.getParent(curVertex);
             DENOPTIMEdge edge = molGraph.getEdgeWithParent(
                     curVertex.getVertexId());
-            int prntId = parent.getMolId();
-            BBType prntTyp = parent.getFragmentType();
+            int prntId = parent.getBuildingBlockId();
+            DENOPTIMVertex.BBType prntTyp = parent.getBuildingBlockType();
             int prntAp = edge.getSrcAPID();
             int chidAp = edge.getTrgAPID();
             for (ClosableChain cc : molGraph.getClosableChains())
@@ -959,7 +959,7 @@ if(debug)
 
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
-                BBType nfty = BBType.UNDEFINED;
+                DENOPTIMVertex.BBType nfty = DENOPTIMVertex.BBType.UNDEFINED;
                 int nfap = -1;
 
                 int posScaffInCc = cc.getTurningPoint();
@@ -972,7 +972,7 @@ if(debug)
                 {
                     ChainLink parentLink = cc.getLink(posInCc - 1);
                     int pLnkId = parentLink.getMolID();
-                    BBType pLnkTyp = parentLink.getFragType();
+                    DENOPTIMVertex.BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToRight();
 //TODO del
 if(debug)
@@ -1022,7 +1022,7 @@ if(debug)
                 {
                     ChainLink parentLink = cc.getLink(posInCc + 1);
                     int pLnkId = parentLink.getMolID();
-                    BBType pLnkTyp = parentLink.getFragType();
+                    DENOPTIMVertex.BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToLeft();
 //TODO del
 if(debug)
@@ -1079,7 +1079,7 @@ if(debug)
                 for (FragForClosabChains ffcc : lstChosenFfCc)
                 {
                     int fidA = ffcc.getFragIDs().get(0);
-                    BBType ftyA = BBType.parseInt(ffcc.getFragIDs().get(1));
+                    DENOPTIMVertex.BBType ftyA = DENOPTIMVertex.BBType.parseInt(ffcc.getFragIDs().get(1));
                     int fapA = ffcc.getFragIDs().get(2);
                     if (nfid==fidA && nfty==ftyA && nfap==fapA)
                     {

@@ -26,9 +26,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 
 
@@ -146,9 +146,9 @@ public class DENOPTIMGraphEdit {
                 molid = Integer.parseInt(strPrts[1]) - 1;
             }
             // type scaffold/fragment/capping group
-            BBType fragtype = BBType.UNDEFINED;
+            DENOPTIMVertex.BBType fragtype = DENOPTIMVertex.BBType.UNDEFINED;
             if (!strPrts[2].equals("*")) {
-                fragtype = BBType.parseInt(Integer.parseInt(strPrts[2]));
+                fragtype = DENOPTIMVertex.BBType.parseInt(Integer.parseInt(strPrts[2]));
             }
             // level
             int level = -2;

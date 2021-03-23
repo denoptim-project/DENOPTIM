@@ -22,8 +22,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * ClosableChain represents a chain of fragments (chain links) that
@@ -74,7 +74,7 @@ public class ClosableChain implements Cloneable, Serializable
             String[] clParts = clStr.trim().split("/");
             int molID = Integer.parseInt(clParts[0]);
             int ftype = Integer.parseInt(clParts[1]);
-            BBType bbt = BBType.parseInt(ftype);
+            DENOPTIMVertex.BBType bbt = DENOPTIMVertex.BBType.parseInt(ftype);
             String[] partsAps = clParts[2].split("ap");
             int apLeft = Integer.parseInt(partsAps[1]);
     	    int apRight = Integer.parseInt(partsAps[2]);
@@ -190,8 +190,8 @@ public class ClosableChain implements Cloneable, Serializable
         int result = -1;
         if (vert instanceof DENOPTIMFragment)
         {
-            int vertMolID = ((DENOPTIMFragment)vert).getMolId();
-            BBType vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
+            int vertMolID = ((DENOPTIMFragment)vert).getBuildingBlockId();
+            DENOPTIMVertex.BBType vertFrgTyp = ((DENOPTIMFragment)vert).getBuildingBlockType();
             for (int i=0; i<links.size(); i++)
             {
                 ChainLink cl = links.get(i);
@@ -225,8 +225,8 @@ public class ClosableChain implements Cloneable, Serializable
     	int result = -1;
         if (vert instanceof DENOPTIMFragment)
         {
-            int vertMolID = ((DENOPTIMFragment)vert).getMolId();
-            BBType vertFrgTyp = ((DENOPTIMFragment)vert).getFragmentType();
+            int vertMolID = ((DENOPTIMFragment)vert).getBuildingBlockId();
+            DENOPTIMVertex.BBType vertFrgTyp = ((DENOPTIMFragment)vert).getBuildingBlockType();
         	for (int i=0; i<links.size(); i++)
         	{
         	    ChainLink cl = links.get(i);

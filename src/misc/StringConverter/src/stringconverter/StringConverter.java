@@ -113,8 +113,8 @@ public class StringConverter
                 {
                     System.out.println(" -> "
                             +v.getVertexId()+" "+v.getClass().getName()
-                            +" BBType:"+v.getFragmentType()
-                            +" MolID:"+v.getMolId());
+                            +" BBType:"+v.getBuildingBlockType()
+                            +" MolID:"+v.getBuildingBlockId());
                     if (v instanceof DENOPTIMTemplate)
                     {
                         for (DENOPTIMVertex inner : ((DENOPTIMTemplate) v)
@@ -122,8 +122,8 @@ public class StringConverter
                         {
                             System.out.println("    -> " + inner.getVertexId()
                             +" "+inner.getClass().getName()
-                            +" BBType:"+inner.getFragmentType()
-                            +" MolID:"+inner.getMolId());
+                            +" BBType:"+inner.getBuildingBlockType()
+                            +" MolID:"+inner.getBuildingBlockId());
                             if (inner instanceof DENOPTIMTemplate)
                             {
                                 for (DENOPTIMVertex innerinner : 
@@ -134,9 +134,9 @@ public class StringConverter
                                             + innerinner.getVertexId()+" "
                                             + innerinner.getClass().getName() 
                                             + " BBType:" 
-                                            + innerinner.getFragmentType() 
+                                            + innerinner.getBuildingBlockType() 
                                             + " MolID:" 
-                                            + innerinner.getMolId());
+                                            + innerinner.getBuildingBlockId());
                                 }
                             }
                         }

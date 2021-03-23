@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
@@ -100,7 +100,7 @@ public class DENOPTIMTemplateTest
                 Arrays.asList(vRcvA, vA, vB, vC, vRcvC)));
         g.addRing(r);
         
-        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate t = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         //TODO-v3 add required APs and check they are cloned properly
         t.setInnerGraph(g);
         t.freezeTemplate();
@@ -406,6 +406,7 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
+
     public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
@@ -429,7 +430,8 @@ public class DENOPTIMTemplateTest
     public void testGetAttachmentPoints_returnsCorrectNumberOfAPs() {
         // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate template = 
+                new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         int requiredAPCount = 2;
         int atmPos = 0;
         int atmConns = 1;
@@ -464,7 +466,7 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testSetInnerGraph_throwsException_if_graphIncompatibleWithRequiredAPs()
+    public void testSetInnerGraph_throws_on_graph_incompatible_w_requiredAPs()
             throws DENOPTIMException {
         int numberOfAPs = 2;
         List<Integer> atomConnections = Arrays.asList(1, 2);
@@ -478,7 +480,8 @@ public class DENOPTIMTemplateTest
                 APClass.make("rule2", 1)
         );
 
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate template = 
+                new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         DENOPTIMVertex v = new EmptyVertex();
         for (int i = 0; i < numberOfAPs; i++) {
             template.addAP(-1, atomConnections.get(i),
@@ -501,11 +504,13 @@ public class DENOPTIMTemplateTest
     private void testSameAPClass(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
         try {
-            ap.setAPClass(innerGraph.getVertexAtPosition(0).getAP(0).getAPClass());
+            ap.setAPClass(
+                    innerGraph.getVertexAtPosition(0).getAP(0).getAPClass());
             assertThrows(IllegalArgumentException.class,
                     () -> t.setInnerGraph(innerGraph));
         } catch (DENOPTIMException e) {
-            fail("Expected " + IllegalArgumentException.class + ", but was " + e.getClass());
+            fail("Expected " + IllegalArgumentException.class + ", but was " 
+                    + e.getClass());
         }
     }
 

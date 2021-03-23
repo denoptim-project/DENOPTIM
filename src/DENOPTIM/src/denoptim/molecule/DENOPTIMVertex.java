@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -43,11 +42,11 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -75,6 +74,73 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Unique identifier associated with the vertex instance
      */
     private int vertexId;
+    
+    /**
+     * Index of this building block in the library of building blocks, or
+     * negative if this vertex is not part of a library.
+     */
+    protected int buildingBlockId = -99;
+    
+    /**
+     * The type of building block. This is used to easily distinguish among
+     * building blocks that can be used to start new graphs (i.e., the so-called
+     * scaffolds), those that can be use anywhere (i.e., fragments), and 
+     * building blocks that can be used to saturate open valences (i.e., the 
+     * capping groups).
+     */
+    
+    public enum BBType {
+        UNDEFINED, SCAFFOLD, FRAGMENT, CAP, NONE;
+        
+        private int i = -99;
+        
+        static {
+            NONE.i = -1;
+            SCAFFOLD.i = 0;
+            FRAGMENT.i = 1;
+            CAP.i = 2;
+        }
+        
+        /**
+         * Translates the integer into the enum
+         * @param i 0:scaffold, 1:fragment, 2:capping group
+         * @return the corresponding enum
+         */
+        public static BBType parseInt(int i) {
+            BBType bbt;
+            switch (i)
+            {
+                case 0:
+                    bbt = SCAFFOLD;
+                    break;
+                case 1:
+                    bbt = FRAGMENT;
+                    break;
+                case 2:
+                    bbt = CAP;
+                    break;
+                default:
+                    bbt = UNDEFINED;
+                    break;
+            }
+            return bbt;
+        }
+        
+        /**
+         * @return 0:scaffold, 1:fragment, 2:capping group
+         */
+        public int toOldInt()
+        {
+            return i;
+        }
+    }
+    
+    /*
+     * Building block type distinguished among types of building blocks:
+     * scaffolds, fragments, and capping. 
+     * Can be undefined, which is the default.
+     */
+    protected BBType buildingBlockType = DENOPTIMVertex.BBType.UNDEFINED;
 
     /*
      * Flag indicating that this as a ring closing vertex
@@ -154,7 +220,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param bbt the type of building block 0:scaffold, 1:fragment, 
      * 2:capping group
      */
-    public static DENOPTIMVertex newVertexFromLibrary(int bbId, BBType bbt)
+    public static DENOPTIMVertex newVertexFromLibrary(int bbId, DENOPTIMVertex.BBType bbt)
     {
         return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(),bbId,bbt);
     }
@@ -168,7 +234,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param bbt the type of building block
      */
     public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
-            BBType bbt)
+            DENOPTIMVertex.BBType bbt)
     {   
         // This is just to initialise the vertex. The actual type of vertex
         // returned by this method depends on the what we get from the
@@ -187,12 +253,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         v.setVertexId(vertexId);
         
-        if (v instanceof DENOPTIMFragment)
-        {
-            v.setAsRCV(v.getNumberOfAP() == 1 
+        v.setAsRCV(v.getNumberOfAP() == 1 
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
-        }
+        
         return v;
     }
 
@@ -218,7 +282,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     //TODO-V3: should be protected? Now it's public to allow refilling of AP list
     // as done in GraphConversionTool.getGraphFromString to recover at least
     // some of the entire list of APs of a vertex read-in from a string
-    // representation of a graph. Tha's obviously not ideal, so eventually
+    // representation of a graph. That's obviously not ideal, so eventually
     // we must get rid of it and move this back to protected.
     public abstract void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP);
     
@@ -243,6 +307,34 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         return vertexId;
     }
 
+//------------------------------------------------------------------------------
+
+    public int getBuildingBlockId()
+    {
+        return buildingBlockId;
+    }
+
+//------------------------------------------------------------------------------
+
+    public void setBuildingBlockId(int buildingBlockId)
+    {
+        this.buildingBlockId = buildingBlockId;
+    }
+
+//------------------------------------------------------------------------------
+
+    public DENOPTIMVertex.BBType getBuildingBlockType()
+    {
+        return buildingBlockType;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void setBuildingBlockType(DENOPTIMVertex.BBType buildingBlockType)
+    {
+        this.buildingBlockType = buildingBlockType;
+    }
+    
 //------------------------------------------------------------------------------
 
     protected abstract void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap);
@@ -479,31 +571,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         return apIdx;
     }
-    
-//------------------------------------------------------------------------------
-
-
-    //TODO-V3 remove this tmp stuff
-
-    public BBType getFragmentType()
-    {
-        //TODO-V3: delete
-        System.err.println("WARNING! Attempt to get fragType from vertex");
-        return BBType.UNDEFINED;
-    }
-
-//------------------------------------------------------------------------------
-
-    //TODO-V3 remove this tmp stuff? this is marked "deprecated" to discourage
-    // its use, but there is currently no better alternative than using 
-    // this pointer.
-    
-    @Deprecated
-    public int getMolId()
-    {
-        System.err.println("ERROR! Attempt to get molId from vertex");
-        return -999;
-    }
 
 //------------------------------------------------------------------------------
 
@@ -575,6 +642,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
     //TODO-V3 also this is tmp: will be replaced once AP owner will be available
 
+    @Deprecated
     public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
                                         int sourceAPIndex,
                                         int targetAPIndex) 
@@ -649,6 +717,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
 
     //TODO-V3 test this in the non-APClass based approach
+    @Deprecated
     public DENOPTIMEdge connectVertices(DENOPTIMVertex other)
     {
         ArrayList<Integer> apA = getFreeAPList();
@@ -954,11 +1023,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-
     //TODO-V3: consider removal. this is just a code stub written to test the
     // possibility of having a custom serializer.
-
+/*
     public static class DENOPTIMVertexSerializer
     implements JsonSerializer<DENOPTIMVertex> {
 
@@ -979,40 +1046,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             return jsonObject;
         }
     }
-
-//
-// public class DENOPTIMVertexSerializer implements JsonSerializer<DENOPTIMVertex> {
-//      //
-//      // @Override
-//      // public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, JsonSerializationContext context) {
-//      //     JsonObject jsonObject = new JsonObject();
-//      //     jsonObject.addProperty("Name", src.Name);
-//      //     jsonObject.add("Type", context.serialize(src.Type));
-//      //     jsonObject.add("ChildId", context.serialize(src.ChildId));  // recursion!
-//      //     return jsonObject;
-//      // }
-// }
-//
-// public class DENOPTIMVertexDeserializer implements JsonDeserializer<DENOPTIMVertex> {
-//      //
-//      // @Override
-//      // public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-//      //     throws JsonParseException {
-//      //     DENOPTIMVertex id = new DENOPTIMVertex();
-//      //     id.Name = json.getAsJsonObject().get("Name").getAsString();
-//      //     id.Type = context.deserialize(json.getAsJsonObject().get("Type"), StructType.class);
-//      //     JsonElement childJson = json.getAsJsonObject().get("ChildId");
-//      //     if (childJson != null) {
-//      //         id.ChildId = context.deserialize(childJson, DENOPTIMVertex.class);  // recursion!
-//      //         id.ChildId.ParentId = id;
-//      //     }
-//      //     return id;
-//      // }
-// }
-
-//------------------------------------------------------------------------------
-
-
+*/
 //------------------------------------------------------------------------------
 
     public static class DENOPTIMVertexDeserializer 
@@ -1059,7 +1093,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 return tmpl;
             }
             // Then, molecular fragments
-            else if (jsonObject.has("buildingBlockId"))
+            else if (jsonObject.has("fragmentType"))
             {
                 //TODO-V3 log or del
                 System.out.println("DESERIALIZE Fragment "
@@ -1088,12 +1122,16 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     try
                     {
                         // NB: this works well also with templates that are in the library
+                        // This is, de facto, using the old index-based way to get
+                        // the fragment. However, it is so far the only way to
+                        // rebuild a fragment with its molecular representation
                         fragWithMol = FragmentSpace.getVertexFromLibrary(
-                                frag.getFragmentType(), frag.getMolId());
+                                frag.getBuildingBlockType(), frag.getBuildingBlockId());
                     } catch (DENOPTIMException e)
                     {
                         throw new JsonParseException("Could not get "
-                                + frag.getFragmentType() + " from "
+                                + frag.getBuildingBlockType() + " " + frag.getBuildingBlockId()
+                                + " from "
                                 + "library. " + e.getMessage());
                     }
                     ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
@@ -1146,7 +1184,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     }
 
 //------------------------------------------------------------------------------
-    
+
     /**
      * Produces a pair of strings that identify the "path" between two given
      * attachment points. The two strings represent one the reverse path of
@@ -1160,13 +1198,51 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
             DENOPTIMAttachmentPoint apB)
     {
-        String a2b = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+        String a2b = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
-        String b2a = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+        String b2a = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
         
         String[] pair = {a2b,b2a};
         return pair;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Processes an atom containers and builds a vertex out of it.
+     * @param iac the  atom containers.
+     * @param bbt the type of building block
+     * @return the vertex.
+     * @throws DENOPTIMException if the atom container could not be converted 
+     * into a {@link DENOPTIMFragment}.
+     */
+    
+    public static DENOPTIMVertex convertIACToVertex(IAtomContainer iac, 
+            DENOPTIMVertex.BBType bbt) throws DENOPTIMException
+    {
+        DENOPTIMVertex v;
+        Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+        Object jsonVertex = iac.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
+        if (jsonGraph != null)
+        {
+            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+            DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
+            t.setInnerGraph(g);
+            v = t;
+        } else if (jsonVertex != null)
+        {
+            EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
+            v = ev;
+        } else {
+            v = new DENOPTIMFragment(iac,bbt);
+        }
+        
+        v.setAsRCV(v.getNumberOfAP() == 1 
+                && APClass.RCAAPCLASSSET.contains(
+                        v.getAttachmentPoints().get(0).getAPClass()));
+        
+        return v;
     }
     
 //------------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,11 +34,12 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * Class defining the fragment space
@@ -135,11 +137,16 @@ public class FragmentSpace
     private static boolean isValid = false;
 
     /**
+     * Unique identified for vertexes
+     */
+    public static AtomicInteger vrtxID = new AtomicInteger(0);
+    
+    /**
      * Index used to keep the order in a list of attachment points
      */
-    public static AtomicInteger apID = new AtomicInteger();
+    public static AtomicInteger apID = new AtomicInteger(0);
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Define all components of a fragment space that implements the attachment
@@ -163,7 +170,7 @@ public class FragmentSpace
                 new HashMap<APClass, Double>());
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Define all components of a fragment space that implements the attachment
@@ -213,7 +220,7 @@ public class FragmentSpace
         isValid = true;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Define all components of a fragment space that implements the attachment
@@ -236,7 +243,8 @@ public class FragmentSpace
             String capFile, String cpmFile, String rcpmFile,
             HashMap<APClass, Double> symCntrMap) throws DENOPTIMException
     {
-        HashMap<APClass, ArrayList<APClass>> cpMap = new HashMap<APClass, ArrayList<APClass>>();
+        HashMap<APClass, ArrayList<APClass>> cpMap = 
+                new HashMap<APClass, ArrayList<APClass>>();
         HashMap<String, BondType> boMap = new HashMap<String, BondType>();
         HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
@@ -255,7 +263,8 @@ public class FragmentSpace
 
         if (rcpmFile != null && rcpmFile.length() > 0)
         {
-            HashMap<APClass, ArrayList<APClass>> rcCpMap = new HashMap<APClass, ArrayList<APClass>>();
+            HashMap<APClass, ArrayList<APClass>> rcCpMap = 
+                    new HashMap<APClass, ArrayList<APClass>>();
             DenoptimIO.readRCCompatibilityMatrix(rcpmFile, rcCpMap);
             setRCCompatibilityMatrix(rcCpMap);
         }
@@ -266,20 +275,26 @@ public class FragmentSpace
         // template in there.
         if (capFile.length() > 0)
         {
-            //TODO-V3 set buildingBlockId
-            setCappingLibrary(convertsIACsToVertexes(
+            cappingLib = new ArrayList<DENOPTIMVertex>();
+            FragmentSpace.appendIACsAsVertexesToLibrary(
+                    DenoptimIO.readDENOPTIMVertexFromSDFile(
+                            capFile,"capping group"),BBType.CAP,cappingLib);
+            /*
+             //TODO del
+            setCappingLibrary(DenoptimIO.convertIACsToVertexes(
                     DenoptimIO.readDENOPTIMVertexFromSDFile(capFile,
                     "capping group"),BBType.CAP));
+                    */
         }
-
-        // TODO-V3 set buildingBlockId
+        
         fragmentLib = new ArrayList<DENOPTIMVertex>();
-        DenoptimIO.appendToVertexLibrary(DenoptimIO.readDENOPTIMVertexFromSDFile(
+        FragmentSpace.appendIACsAsVertexesToLibrary(
+                DenoptimIO.readDENOPTIMVertexFromSDFile(
                 fragFile,"fragment"),BBType.FRAGMENT,fragmentLib);
         
-        //TODO-V3 set buildingBlockId
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
-        DenoptimIO.appendToVertexLibrary(DenoptimIO.readDENOPTIMVertexFromSDFile(
+        FragmentSpace.appendIACsAsVertexesToLibrary(
+                DenoptimIO.readDENOPTIMVertexFromSDFile(
                         scaffFile,"scaffold"),BBType.SCAFFOLD,scaffoldLib);
 
         // TODO-MF del (used to create SDF versions of empty fragments
@@ -303,17 +318,26 @@ public class FragmentSpace
          */
 
         // TODO-V3: remove: tmp code just for devel phase
-         /*
+        /*
         if (FragmentSpaceParameters.useTemplates)
         {
             scaffoldLib = new ArrayList<>();
-            scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
-
-            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplate());
-
-            // fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
-            // fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
-
+            //scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
+            appendVertexesToLibrary(new ArrayList<DENOPTIMVertex>(
+                    Arrays.asList(DENOPTIMTemplate.getTestScaffoldTemplate())), 
+                    BBType.SCAFFOLD, scaffoldLib);
+            
+//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplate());
+//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
+//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
+            
+            appendVertexesToLibrary(new ArrayList<DENOPTIMVertex>(
+                    Arrays.asList(DENOPTIMTemplate.getTestFragmentTemplate(),
+                            DENOPTIMTemplate.getTestFragmentTemplateBis()
+                            , DENOPTIMTemplate.getTestFragmentTemplateTris()
+                            )), 
+                    BBType.FRAGMENT, fragmentLib);
+            
             System.err.println("WARNING! Running TEMP CODE: Replaced scaffold "
                     + "lib with single test template. Also appending one "
                     + "template to the library of fragments.");
@@ -330,20 +354,18 @@ public class FragmentSpace
                             + t.getInnerGraph());
                 }
             }
-
-            // TODO-MF del
-            // DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",
-            // scaffoldLib);
-            DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",
-                    fragmentLib);
-
-            // TODO del
+            
+            //TODO-MF del
+            DenoptimIO.writeVertexes("/tmp/scaffolds.sdf",scaffoldLib);
+            DenoptimIO.writeVertexes("/tmp/frags.sdf",fragmentLib);
+            
+            //TODO del
             System.out.println("WRITTEN!");
-
-            // TODO del
-            // ArrayList<DENOPTIMVertex> wEmpty = convertsIACsToVertexes(
-            // DenoptimIO.readInLibraryOfFragments("/tmp/empty_mols.sdf","fragment"),
-            // BBType.FRAGMENT);
+            
+          //TODO del
+            ArrayList<DENOPTIMVertex> wEmpty = convertsIACsToVertexes(
+                    DenoptimIO.readInLibraryOfFragments("/tmp/empty_mols.sdf","fragment"),
+                    BBType.FRAGMENT);
             System.out.println("READ-IN!");
 
         }
@@ -352,35 +374,10 @@ public class FragmentSpace
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
-     * Processes a list of atom containers and builds a list of vertexes.
-     * 
-     * @param iacs the list of atom containers.
-     * @return the list of vertexes.
-     * @throws DENOPTIMException
-     */
-
-    
-    //TODO-V3: Move to IO
-
-    private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
-            ArrayList<IAtomContainer> iacs, BBType bbt) throws DENOPTIMException
-    {
-        ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
-        for (IAtomContainer iac : iacs)
-        {
-            list.add(DenoptimIO.convertsIACToVertex(iac,bbt));
-        }
-        return list;
-    }
-
-    // ------------------------------------------------------------------------------
-
-    /**
-     * Checks for valid definition of this fragment space
-     * 
+     * Checks for valid definition of this fragment space.
      * @return <code>true</code> if this fragment space has been defined
      */
     public static boolean isDefined()
@@ -388,7 +385,7 @@ public class FragmentSpace
         return isValid;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Check usage of APClass-based approach, i.e., uses attachment points with
@@ -403,7 +400,7 @@ public class FragmentSpace
         return apClassBasedApproch;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Search for a specific AP on a specific fragment and finds out its class.
@@ -428,39 +425,32 @@ public class FragmentSpace
         return cls;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns a clone of the requested building block. The type of vertex
      * returned depends on the type stored in the library.
      * 
-     * @param fTyp  the type of building block. This basically selects the sub
-     *              library from which the building block is taken: 0 for
-     *              scaffold (i.e., building blocks that can be used to start a
-     *              new graph), 1 for standard building blocks (i.e., can be
-     *              used freely to grow or modify an existing graph), or 2 for
-     *              capping group (i.e., can be used only to saturate attachment
-     *              points that cannot remain unused in a finished graph).
-     * @param bbIdx the index (0-based) of the building block in the
-     *              corresponding library defied by the type of building block
-     *              'bbType'
+     * @param bbType the type of building block. This basically selects the 
+     * sub library from which the building block is taken: 0 for scaffold (i.e.,
+     * building blocks that can be used to start a new graph), 1 for
+     * standard building blocks (i.e., can be used freely to grow or modify an 
+     * existing graph), or 2 for capping group (i.e., can be used only to 
+     * saturate attachment points that cannot remain unused in a finished
+     * graph).
+     * @param bbIdx the index (0-based) of the building block in
+     * the corresponding library defied by the type of building 
+     * block 'bbType'
      * @return a clone of the chosen building block.
      * @throws DENOPTIMException when the given indexes cannot be used, for
-     *                           example, any of the indexes is out of range.
+     * example, any of the indexes is out of range.
      */
 
-    public static DENOPTIMVertex getVertexFromLibrary(BBType fTyp, int bbIdx)
-            throws DENOPTIMException
+    public static DENOPTIMVertex getVertexFromLibrary(
+            DENOPTIMVertex.BBType bbType, int bbIdx) throws DENOPTIMException
     {
-        // WARNING! This is were we first assign the bbTyp and bbIdx to
-        // a vertex 'taken' from the library. Note that 'taken' means that we
-        // get a slightly modified copy of the vertex. In particular, the
-        // objects stores in the library do not have a meaningful value for the
-        // two indexes, so after we make a deep copy of them we assign the
-        // indexes according to bbTyp and bbIdx.
-
         String msg = "";
-        switch (fTyp)
+        switch (bbType)
         {
             case SCAFFOLD:
                 if (scaffoldLib == null)
@@ -489,52 +479,53 @@ public class FragmentSpace
         }
 
         DENOPTIMVertex originalVrtx = null;
-        switch (fTyp)
+        switch (bbType)
         {
             case SCAFFOLD:
-                if (bbIdx < scaffoldLib.size())
+                if (bbIdx >-1 && bbIdx < scaffoldLib.size())
                 {
-                    originalVrtx = scaffoldLib.get(bbIdx);
+                        originalVrtx = scaffoldLib.get(bbIdx);        
                 }
                 else
                 {
-                    msg = "Mismatch between scaffold bbIdx and size of the library"
-                            + ". MolId: " + bbIdx + " FragType: " + fTyp;
+                    msg = "Mismatch between scaffold bbIdx and size of the "
+                            + "library" + ". MolId: " + bbIdx + " FragType: " 
+                            + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
-
+                
             case FRAGMENT:
-                if (bbIdx < fragmentLib.size())
+                if (bbIdx >-1 && bbIdx < fragmentLib.size())
                 {
                     originalVrtx = fragmentLib.get(bbIdx);
                 }
                 else
                 {
                     msg = "Mismatch between fragment bbIdx and size of the "
-                            + "library" + ". MolId: " + bbIdx
-                            + " FragType: " + fTyp;
+                                    + "library" + ". MolId: " + bbIdx 
+                                    + " FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
-
+                
             case CAP:
-                if (bbIdx < cappingLib.size())
+                if (bbIdx >-1 && bbIdx < cappingLib.size())
                 {
                     originalVrtx = cappingLib.get(bbIdx);
                 }
                 else
                 {
                     msg = "Mismatch between capping group bbIdx and size "
-                            + "of the library. MolId: " + bbIdx
-                            + " FragType: " + fTyp;
+                                    + "of the library. MolId: " + bbIdx 
+                                    + " FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
-
+                
             case UNDEFINED:
                 msg = "Attempting to take UNDEFINED type of building block from "
                         + "fragment library.";
@@ -546,61 +537,53 @@ public class FragmentSpace
                 else
                 {
                     msg = "Mismatch between fragment bbIdx and size of the "
-                            + "library" + ". MolId: " + bbIdx
-                            + " FragType: " + fTyp;
+                                    + "library" + ". MolId: " + bbIdx 
+                                    + " FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
-
+    
             default:
-                msg = "Unknown type of fragment '" + fTyp + "'.";
+                msg = "Unknown type of fragment '" + bbType + "'.";
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
         }
         DENOPTIMVertex clone = originalVrtx.clone();
 
-        // TODO-V3: is there a better way to do this in a type-agnostic way?
-        if (clone instanceof DENOPTIMFragment)
+        clone.setBuildingBlockId(bbIdx);
+        if (originalVrtx.getBuildingBlockId() != bbIdx)
         {
-            ((DENOPTIMFragment) clone).setMolId(bbIdx);
+            System.err.println("WARNING! Mismatch between building block ID ("
+                    + originalVrtx.getBuildingBlockId() + ") and position in "
+                    + "the list of building blocks (" + bbIdx + ") for type "
+                    + bbType + ".");
         }
-        // TODO-V3 keep it or trash it?
-        else if (clone instanceof DENOPTIMTemplate)
-        {
-            ((DENOPTIMTemplate) clone).setMolId(bbIdx);
-        } else
-        {
-            System.err.println("WARNING! Recovering a vertex that is neither an"
-                    + " instance of fragment nor a template. "
-                    + "Not setting bbType and bbIdx.");
-        }
-
         return clone;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static ArrayList<DENOPTIMVertex> getScaffoldLibrary()
     {
         return scaffoldLib;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static ArrayList<DENOPTIMVertex> getFragmentLibrary()
     {
         return fragmentLib;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static ArrayList<DENOPTIMVertex> getCappingLibrary()
     {
         return cappingLib;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @param capApCls the APClass of the attachment point on the capping group
@@ -616,8 +599,8 @@ public class FragmentSpace
             APClass apc = null;
             try
             {
-                apc = getVertexFromLibrary(BBType.CAP, i).getAttachmentPoints()
-                        .get(0).getAPClass();
+                apc = getVertexFromLibrary(DENOPTIMVertex.BBType.CAP, i)
+                        .getAttachmentPoints().get(0).getAPClass();
                 if (apc.equals(capApCls))
                 {
                     selected.add(i);
@@ -630,7 +613,7 @@ public class FragmentSpace
         return selected;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Load info from a compatibility matrix file. This method imports
@@ -653,7 +636,7 @@ public class FragmentSpace
                 cappingMap, forbiddenEndList);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Load info for ring closures compatibilities from a compatibility matrix
@@ -669,14 +652,14 @@ public class FragmentSpace
         DenoptimIO.readRCCompatibilityMatrix(inFile, rcCompatMap);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static HashMap<APClass, ArrayList<APClass>> getCompatibilityMatrix()
     {
         return compatMap;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * 
@@ -703,7 +686,7 @@ public class FragmentSpace
         return new ArrayList<APClass>();
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns the compatibility matrix for ring closing fragment-fragment
@@ -717,14 +700,14 @@ public class FragmentSpace
         return rcCompatMap;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static HashMap<String, BondType> getBondOrderMap()
     {
         return bondOrderMap;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns the bond order for the given APClass, if defined.
@@ -756,14 +739,14 @@ public class FragmentSpace
         }
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static HashMap<APClass, APClass> getCappingMap()
     {
         return cappingMap;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @param srcApClass the attachment point class of the attachment point to
@@ -776,14 +759,14 @@ public class FragmentSpace
         return cappingMap.get(srcApClass);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static Set<APClass> getForbiddenEndList()
     {
         return forbiddenEndList;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Return the set of APClasses that used in the compatibility matrix for the
@@ -799,7 +782,7 @@ public class FragmentSpace
         return FragmentSpace.getCompatibilityMatrix().keySet();
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Return the set of APClasses that are defined in the bond order map. Note
@@ -815,14 +798,14 @@ public class FragmentSpace
         return FragmentSpace.getBondOrderMap().keySet();
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static HashMap<Integer, ArrayList<Integer>> getMapOfFragsPerNumAps()
     {
         return fragPoolPerNumAP;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns the list of fragments with given number of APs
@@ -841,14 +824,14 @@ public class FragmentSpace
         return lst;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static HashMap<Integer, ArrayList<APClass>> getMapAPClassesPerFragment()
     {
         return apClassesPerFrag;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns the APclasses associated with a given fragment.
@@ -862,14 +845,14 @@ public class FragmentSpace
         return apClassesPerFrag.get(fragId);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static HashMap<APClass, ArrayList<ArrayList<Integer>>> getMapFragsAPsPerAPClass()
     {
         return fragsApsPerApClass;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns the list of attachment points with the given class. The returned
@@ -899,9 +882,33 @@ public class FragmentSpace
         }
         return lst;
     }
+    
+//------------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------------
+    /**
+     * Returns the list of attachment points with the given class. 
+     * @param apc the attachment point class to search.
+     * @return the list of matching attachment points.
+     */
 
+    public static ArrayList<DENOPTIMVertex> getVertexesWithAPClass(APClass apc)
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        
+        if (fragsApsPerApClass.containsKey(apc))
+        {
+            for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+            {
+                DENOPTIMVertex v = FragmentSpace.getFragmentLibrary()
+                        .get(idxs.get(0));
+                lst.add(v);
+            }
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+    
     /**
      * Searches for all building blocks that are compatible with the given list
      * of APs.
@@ -928,13 +935,11 @@ public class FragmentSpace
         ArrayList<DENOPTIMVertex> compatFrags = new ArrayList<DENOPTIMVertex>();
         for (Integer fid : compatFragIds)
         {
-            try
-            {
-                compatFrags.add(FragmentSpace
-                        .getVertexFromLibrary(BBType.FRAGMENT, fid));
-            } catch (DENOPTIMException e)
-            {
-                System.err.println("Exception while trying to get fragment '"
+            try {
+                compatFrags.add(FragmentSpace.getVertexFromLibrary(
+                            DENOPTIMVertex.BBType.FRAGMENT, fid));
+            } catch (DENOPTIMException e) {
+                System.err.println("Exception while trying to get fragment '" 
                         + fid + "'!");
                 e.printStackTrace();
             }
@@ -942,8 +947,60 @@ public class FragmentSpace
 
         return compatFrags;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for all attachment points that are compatible with the given 
+     * list of attachment points.
+     * @param srcAPs attachment points meant to results have to be compatible 
+     * with.
+     * @return a list of compatible attachment points found in the library of
+     * fragments.
+     */
+    public static ArrayList<DENOPTIMAttachmentPoint> getAPsCompatibleWithThese(
+                    ArrayList<DENOPTIMAttachmentPoint> srcAPs)
+    {
+        ArrayList<DENOPTIMAttachmentPoint> compAps = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        boolean first = true;
+        for (DENOPTIMAttachmentPoint ap : srcAPs)
+        { 
+            ArrayList<DENOPTIMAttachmentPoint> compForOne = 
+                    getAPsCompatibleWithClass(ap.getAPClass());
 
-    // ------------------------------------------------------------------------------
+            if (first)
+            {
+                compAps.addAll(compForOne);
+                first = false;
+                continue;
+            }
+            
+            ArrayList<DENOPTIMAttachmentPoint> toKeep = 
+                    new ArrayList<DENOPTIMAttachmentPoint>();
+            for (DENOPTIMAttachmentPoint candAp : compAps)
+            {
+                for (DENOPTIMAttachmentPoint newCand : compForOne)
+                {
+                    if (newCand == candAp)
+                    {
+                            toKeep.add(candAp);
+                            break;
+                    }
+                }
+            }
+            
+            compAps = toKeep;
+            
+            if (compAps.size()==0)
+            {
+                break;
+            }
+        }
+        return compAps;
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * Searches for all APs that are compatible with the given list of APs.
@@ -960,8 +1017,8 @@ public class FragmentSpace
         for (IdFragmentAndAP apId : srcAPs)
         {
             APClass srcApCls = getAPClassForFragment(apId);
-            ArrayList<IdFragmentAndAP> compForOne = getFragAPsCompatibleWithClass(
-                    srcApCls);
+            ArrayList<IdFragmentAndAP> compForOne = 
+                    getFragAPsCompatibleWithClass(srcApCls);
 
             if (first)
             {
@@ -970,7 +1027,8 @@ public class FragmentSpace
                 continue;
             }
 
-            ArrayList<IdFragmentAndAP> toKeep = new ArrayList<IdFragmentAndAP>();
+            ArrayList<IdFragmentAndAP> toKeep = 
+                    new ArrayList<IdFragmentAndAP>();
             for (IdFragmentAndAP candAp : compFrAps)
             {
                 for (IdFragmentAndAP newId : compForOne)
@@ -994,13 +1052,61 @@ public class FragmentSpace
         return compFrAps;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Returns the list of attachment points found in the fragment space and
      * that are compatible with a given AP class. Multiple APs can be found for
      * each fragment.
      * 
+     * @param aPC1 the AP class for which we want compatible APs.
+     */
+    
+    public static ArrayList<DENOPTIMAttachmentPoint> getAPsCompatibleWithClass(
+                    APClass aPC1)
+    {
+        ArrayList<DENOPTIMAttachmentPoint> compatAps = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        
+        // Take the compatible AP classes
+        ArrayList<APClass> compatApClasses = 
+             FragmentSpace.getCompatibleAPClasses(aPC1);
+        
+        // Find all APs with a compatible class
+        if (compatApClasses != null)
+        {
+            for (APClass klass : compatApClasses)
+            {
+                ArrayList<DENOPTIMVertex> vrtxs = getVertexesWithAPClass(klass);
+                for (DENOPTIMVertex v : vrtxs)
+                {
+                    for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                    {
+                        if (ap.getAPClass() == klass)
+                        {
+                            compatAps.add(ap);
+                        }
+                    }
+                }
+            }
+        }
+        
+        //TODO-V3: keep or trash?
+        if (compatAps.size()==0)
+        {
+            System.out.println("WARNING: No compatible AP found in the "
+                    + "fragment space for APClass '" + aPC1 + "'.");
+        }
+        
+        return compatAps;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the list of attachment points found in the fragment 
+     * space and that are compatible with a given AP class. 
+     * Multiple APs can be found for each fragment.
      * @param aPC1 the AP class for which we want compatible APs.
      */
 
@@ -1033,7 +1139,7 @@ public class FragmentSpace
         return compatFragAps;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Checks if the symmetry settings impose use of symmetry on attachment
@@ -1066,7 +1172,7 @@ public class FragmentSpace
         return res;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Checks if there is a constraint on the constitutional symmetry
@@ -1082,7 +1188,7 @@ public class FragmentSpace
         return symmConstraints.containsKey(apClass);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Return the constitutional symmetry constrain for the given APclass, or
@@ -1099,26 +1205,32 @@ public class FragmentSpace
         return symmConstraints.get(apClass);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setScaffoldLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-        scaffoldLib = lib;
+        scaffoldLib = new ArrayList<DENOPTIMVertex>();
+        FragmentSpace.appendVertexesToLibrary(lib, 
+                BBType.SCAFFOLD, scaffoldLib);
     }
 
     public static void setFragmentLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-        fragmentLib = lib;
+        fragmentLib = new ArrayList<DENOPTIMVertex>();
+        FragmentSpace.appendVertexesToLibrary(lib, 
+                BBType.FRAGMENT, fragmentLib);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setCappingLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-        cappingLib = lib;
+        cappingLib = new ArrayList<DENOPTIMVertex>();
+        FragmentSpace.appendVertexesToLibrary(lib, 
+                BBType.CAP, cappingLib);
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setCompatibilityMatrix(
             HashMap<APClass, ArrayList<APClass>> map)
@@ -1126,7 +1238,7 @@ public class FragmentSpace
         compatMap = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setRCCompatibilityMatrix(
             HashMap<APClass, ArrayList<APClass>> map)
@@ -1134,28 +1246,28 @@ public class FragmentSpace
         rcCompatMap = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setBondOrderMap(HashMap<String, BondType> map)
     {
         bondOrderMap = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setCappingMap(HashMap<APClass, APClass> map)
     {
         cappingMap = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setForbiddenEndList(Set<APClass> lst)
     {
         forbiddenEndList = lst;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setFragPoolPerNumAP(
             HashMap<Integer, ArrayList<Integer>> map)
@@ -1163,7 +1275,7 @@ public class FragmentSpace
         fragPoolPerNumAP = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setFragsApsPerApClass(
             HashMap<APClass, ArrayList<ArrayList<Integer>>> map)
@@ -1171,7 +1283,7 @@ public class FragmentSpace
         fragsApsPerApClass = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setAPClassesPerFrag(
             HashMap<Integer, ArrayList<APClass>> map)
@@ -1179,14 +1291,14 @@ public class FragmentSpace
         apClassesPerFrag = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public static void setSymmConstraints(HashMap<APClass, Double> map)
     {
         symmConstraints = map;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Clears all settings of this fragment space. All fields changed to
@@ -1209,6 +1321,85 @@ public class FragmentSpace
         isValid = false;
     }
 
-    // ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a list of atom containers and converts it into a list of vertexes
+     * that are added to a given library. 
+     * @param list of atom containers to import.
+     * @param bbt the type of building block the vertexes should be set to.
+     * @param library where to import the vertexes to.
+     */
+    
+    public static void appendIACsAsVertexesToLibrary(ArrayList<IAtomContainer>list, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        for(IAtomContainer iac : list)
+        {
+            DENOPTIMVertex v = null;
+            try
+            {
+                v = DENOPTIMVertex.convertIACToVertex(iac,bbt);
+            } catch (Throwable e)
+            {
+                e.printStackTrace();
+                System.err.println("ERROR! Could not import "+bbt+". Failed "
+                        + "conversion of IAtomContainer to "+bbt+".");
+                System.exit(-1);;
+            }
+            appendVertexToLibrary(v,bbt,library);
+        }
+        // NB: do not try to add all vertexes in one. If there are templates 
+        // that are built using vertexes that are imported in the same run of
+        // this method, then the building blocks must be added to the library
+        // before the template is added. The latter will, in fact, require
+        // to find the building blocks in the library.
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a list of vertexes and add them to a given library. Each vertex
+     * is assigned the building block type and ID. 
+     * do not try to add all vertexes in one. If there are templates 
+     * that are built using vertexes that are imported in the same run of
+     * this method, then the building blocks must be added to the library
+     * before the template is added. The latter will, in fact, require
+     * to find the building blocks in the library.
+     * 
+     * @param list of vertexes to import.
+     * @param bbt the type of building block the vertexes should be set to.
+     * @param library where to import the vertexes to.
+     */
+    
+    public static void appendVertexesToLibrary(ArrayList<DENOPTIMVertex> list, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        for (DENOPTIMVertex v : list)
+        {
+            appendVertexToLibrary(v,bbt,library);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a vertexes and add it to a given library. Each vertex
+     * is assigned the building block type and ID. 
+     * 
+     * @param v  vertex to import.
+     * @param bbt the type of building block the vertex should be set to.
+     * @param library where to import the vertex to.
+     */
+    
+    public static void appendVertexToLibrary(DENOPTIMVertex v, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        v.setBuildingBlockId(library.size());
+        v.setBuildingBlockType(bbt);
+        library.add(v);
+    }
+    
+//------------------------------------------------------------------------------
 
 }

@@ -321,9 +321,9 @@ public class GraphViewerPanel extends JPanel
             Node n = graph.addNode(vID);
             n.addAttribute("ui.label", vID);
             n.addAttribute("dnp.VrtId", vID);
-            n.setAttribute("dnp.molID", v.getMolId());
-            n.setAttribute("dnp.frgType", v.getFragmentType());
-            switch (v.getFragmentType())
+            n.setAttribute("dnp.molID", v.getBuildingBlockId());
+            n.setAttribute("dnp.frgType", v.getBuildingBlockType());
+            switch (v.getBuildingBlockType())
             {
                 case SCAFFOLD:
                     n.setAttribute("ui.class", "scaffold");

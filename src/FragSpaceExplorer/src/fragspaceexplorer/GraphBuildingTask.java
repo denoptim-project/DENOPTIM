@@ -34,9 +34,9 @@ import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.TreeBuilder3D;
@@ -234,7 +234,7 @@ public class GraphBuildingTask extends FitnessTask
             {
                 int sVId = srcAp.getVertexId();
                 int sFId = srcAp.getVertexMolId();
-                BBType sFTyp = srcAp.getVertexMolType();
+                DENOPTIMVertex.BBType sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
                 DENOPTIMVertex srcVrtx = dGraph.getVertexWithId(sVId);
                 
@@ -244,11 +244,11 @@ public class GraphBuildingTask extends FitnessTask
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
                 int tVId = trgAp.getVertexId();
                 int tFId = trgAp.getVertexMolId();
-                BBType tFTyp = trgAp.getVertexMolType(); 
+                DENOPTIMVertex.BBType tFTyp = trgAp.getVertexMolType(); 
                 int tApId = trgAp.getApId();
         
                 // type "NONE" is used to represent unused AP
-                if (tFTyp == BBType.NONE || tFTyp == BBType.UNDEFINED)
+                if (tFTyp == DENOPTIMVertex.BBType.NONE || tFTyp == DENOPTIMVertex.BBType.UNDEFINED)
                 {
                     continue;
                 }

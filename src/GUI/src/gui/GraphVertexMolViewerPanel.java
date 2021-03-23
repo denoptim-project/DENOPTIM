@@ -36,11 +36,12 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -295,18 +296,16 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * graph.
      */
 	
-//TODO-V3 too similar to clearing the molecular viewer...
-    public void requireUpdateOfMolecularViewer()
+    public void renderMolVieverToNeedUpdate()
     {
         molViewer.clearAll();
-        //updateMolViewer = true;
         bringCardToTopOfMolViewer(UPDATETOVIEW);
     }
 	
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Triggers the generation of the molecular representation of the loaded
+	 * Updates the molecular representation of the loaded
 	 * graph.
 	 */
 	public IAtomContainer updateMolevularViewer()
@@ -469,47 +468,36 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			    // and this triggers this exception, which we can ignore.
 			    return;
 			}
-			//TODO-MF cleanup
-			/*
-			try {
-				DENOPTIMVertex bb = FragmentSpace.getVertexFromLibrary(
-						v.getFragmentType(), v.getMolId());
-				*/
-			    DENOPTIMVertex bb = v.clone();
-				if (bb instanceof DENOPTIMFragment)
-				{
-				    removeNestedGraphViewer(); //Just is case we still have it
-				    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
-				    fragViewer.loadFragmentToViewer(frag);
-		            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
-				} else if (bb instanceof DENOPTIMTemplate) {
-				    DENOPTIMTemplate t = (DENOPTIMTemplate) bb;
-                    fragViewer.clearAll();
-                    fragViewerTmplViewerCard = 
-                            new GraphVertexMolViewerPanel();
-                    fragViewerCardHolder.add(fragViewerTmplViewerCard, 
-                            TMPLVIEWERCARDNAME);
-                    fragViewerTmplViewerCard.loadDnGraphToViewer(
-                            t.getInnerGraph(), false, hasFragSpace);
-                    fragViewerTmplViewerCard.updateMolevularViewer();
-				    bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
-				    fragViewerTmplViewerCard.setDividerLocation(defDivLoc);
-				} else if (bb instanceof EmptyVertex) {
-				    removeNestedGraphViewer(); //Just is case we still have it
-                    
-                    //TODO-V3
-                    System.out.println("WARNING: Visualization of "
-                            + "EmptyVertex is not implemented yet");
-                    
-                    fragViewer.clearAll();
-                    bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
-                }
-				/*
-			} catch (DENOPTIMException e) {
-				e.printStackTrace();
-				return;
-			}
-			*/
+
+		    DENOPTIMVertex bb = v.clone();
+			if (bb instanceof DENOPTIMFragment)
+			{
+			    removeNestedGraphViewer(); //Just is case we still have it
+			    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+			    fragViewer.loadFragmentToViewer(frag);
+	            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
+			} else if (bb instanceof DENOPTIMTemplate) {
+			    DENOPTIMTemplate t = (DENOPTIMTemplate) bb;
+                fragViewer.clearAll();
+                fragViewerTmplViewerCard = 
+                        new GraphVertexMolViewerPanel();
+                fragViewerCardHolder.add(fragViewerTmplViewerCard, 
+                        TMPLVIEWERCARDNAME);
+                fragViewerTmplViewerCard.loadDnGraphToViewer(
+                        t.getInnerGraph(), false, hasFragSpace);
+                fragViewerTmplViewerCard.updateMolevularViewer();
+			    bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
+			    fragViewerTmplViewerCard.setDividerLocation(defDivLoc);
+			} else if (bb instanceof EmptyVertex) {
+			    removeNestedGraphViewer(); //Just is case we still have it
+                
+                //TODO
+                System.out.println("WARNING: Visualization of "
+                        + "EmptyVertex is not implemented yet");
+                
+                fragViewer.clearAll();
+                bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
+            }
 		}
 	}
 	
@@ -558,12 +546,40 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 //-----------------------------------------------------------------------------
     
     /**
+     * Identifies which attachment points are selected in the graph viewer.
+     * @return the list selected attachment points.
+     */
+    
+    public ArrayList<DENOPTIMAttachmentPoint> getAPsSelectedInViewer()
+    {
+        ArrayList<DENOPTIMAttachmentPoint> aps = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (Node n : graphViewer.getSelectedNodes())
+        {
+            if (!n.getAttribute("ui.class").equals("ap"))
+            {
+                continue;
+            }
+            int vId = n.getAttribute("dnp.srcVrtId");
+            int apId = n.getAttribute("dnp.srcVrtApId");
+            
+            DENOPTIMVertex v = dnGraph.getVertexWithId(vId);
+            DENOPTIMAttachmentPoint ap = v.getAP(apId);
+            
+            aps.add(ap);
+        }
+        return aps;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
      * Identifies which APs are selected in the graph viewer.
      * @return the list of identifiers
      */
     
     //TODO-V3: with APs having an owner field, the IdFragmentAndAP is obsolete
-    
+    /*
     public ArrayList<IdFragmentAndAP> getAPsSelectedInViewer()
     {
         ArrayList<IdFragmentAndAP> allIDs = new ArrayList<IdFragmentAndAP>();
@@ -594,7 +610,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
         }
         return allIDs;
     }
-    
+    */
 //-----------------------------------------------------------------------------
     
     /**

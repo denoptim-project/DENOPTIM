@@ -46,14 +46,6 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-/**
- * Utility methods for input/output
- *
- * @author Vishwesh Venkatraman
- * @author Marco Foscato
- */
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -118,12 +110,11 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -131,6 +122,13 @@ import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
+
+/**
+ * Utility methods for input/output
+ *
+ * @author Vishwesh Venkatraman
+ * @author Marco Foscato
+ */
 
 public class DenoptimIO
 {
@@ -1145,7 +1143,7 @@ public class DenoptimIO
             for (IAtomContainer mol : DenoptimIO.readMoleculeData(
                     fragLib.getAbsolutePath())) {
                 DENOPTIMFragment frag = new DENOPTIMFragment(mol,
-                        BBType.UNDEFINED);
+                        DENOPTIMVertex.BBType.UNDEFINED);
                 for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints()) {
                     allCLasses.add(ap.getAPClass());
                 }
@@ -2222,7 +2220,7 @@ public class DenoptimIO
      */
     
     public static ArrayList<DENOPTIMVertex> readDENOPTIMVertexesFromFile(
-            File inFile, BBType bbt) throws Exception
+            File inFile, DENOPTIMVertex.BBType bbt) throws Exception
     {
         ArrayList<DENOPTIMVertex> lstVrt = 
                 new ArrayList<DENOPTIMVertex>();
@@ -2236,7 +2234,7 @@ public class DenoptimIO
                             inFile.getAbsolutePath(), bbt.toString());
                 for (IAtomContainer iac : lstIACs)
                 {
-                    lstVrt.add(convertsIACToVertex(iac, bbt));
+                    lstVrt.add(DENOPTIMVertex.convertIACToVertex(iac, bbt));
                 }
                 break;
                 
@@ -2566,64 +2564,21 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a list of atom containers and converts it into a list of vertexes
-     * that are added to a given library.
-     * @param list of atom containers to import.
-     * @param bbt the type of building block the vertexes should be set to.
-     * @param library where to import the vertexes to.
-     */
-
-    public static void appendToVertexLibrary(ArrayList<IAtomContainer>list, 
-            BBType bbt, ArrayList<DENOPTIMVertex> library)
-    {
-        for(IAtomContainer iac : list)
-        {
-            DENOPTIMVertex v = null;
-            try
-            {
-                v = DenoptimIO.convertsIACToVertex(iac,bbt);
-            } catch (Throwable e)
-            {
-                e.printStackTrace();
-                System.err.println("ERROR! Could not import "+bbt+". Failed "
-                        + "conversion of IAtomContainer to "+bbt+".");
-                System.exit(-1);;
-            }
-            library.add(v);
-        }       
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Processes an atom containers and builds a vertex out of it.
-     * @param iac the  atom containers.
-     * @param bbt the type of building block
-     * @return the vertex.
-     * @throws DENOPTIMException if the atom container could not be converted 
-     * into a {@link DENOPTIMFragment}.
+     * Processes a list of atom containers and builds a list of vertexes.
+     * @param iacs the list of atom containers.
+     * @return the list of vertexes.
+     * @throws DENOPTIMException
      */
     
-    public static DENOPTIMVertex convertsIACToVertex(IAtomContainer iac, 
-            BBType bbt) throws DENOPTIMException
+    public static ArrayList<DENOPTIMVertex> convertIACsToVertexes(
+            ArrayList<IAtomContainer> iacs, DENOPTIMVertex.BBType bbt) throws DENOPTIMException
     {
-        DENOPTIMVertex v;
-        Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
-        Object jsonVertex = iac.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
-        if (jsonGraph != null)
+        ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
+        for (IAtomContainer iac : iacs)
         {
-            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-            DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
-            t.setInnerGraph(g);
-            v = t;
-        } else if (jsonVertex != null)
-        {
-            EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
-            v = ev;
-        } else {
-            v = new DENOPTIMFragment(iac,bbt);
+            list.add(DENOPTIMVertex.convertIACToVertex(iac,bbt));
         }
-        return v;
+        return list;
     }
     
 //------------------------------------------------------------------------------
