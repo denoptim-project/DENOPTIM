@@ -87,7 +87,7 @@ public class DescriptorUtils
 		if (cdkJarPathName.equals(""))
 		{
 			//TODO change! this is very bad! 
-			cdkJarPathName = "lib/cdk-1.4.19.jar";
+			cdkJarPathName = "lib/cdk-2.3.jar";
 			String msg = "WARNING: Could not locate the CDK classes! "
 					+ " Trying to enforce use of " + cdkJarPathName;
 			Exception e = new Exception(msg);
@@ -167,6 +167,11 @@ public class DescriptorUtils
 							}
 						}
 					}
+					
+					//TODO-V3 this line is meant only to bypass bugus code
+					//DEBUGME
+					//isChosen = false;
+					
 					if (isChosen)
 					{
 						chosenOnesShortNames.add(simpleName);

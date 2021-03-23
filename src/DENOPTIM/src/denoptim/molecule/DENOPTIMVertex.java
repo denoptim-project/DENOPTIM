@@ -1145,7 +1145,30 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
     }
 
-
-
-
+//------------------------------------------------------------------------------
+    
+    /**
+     * Produces a pair of strings that identify the "path" between two given
+     * attachment points. The two strings represent one the reverse path of
+     * the other. So they identify the path when starting from each of the 
+     * two APs.
+     * @param apA
+     * @param apB
+     * @return a pair of strings that identify the "path" between two given
+     * attachment points.
+     */
+    public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
+            DENOPTIMAttachmentPoint apB)
+    {
+        String a2b = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+                + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
+        String b2a = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+                + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
+        
+        String[] pair = {a2b,b2a};
+        return pair;
+    }
+    
+//------------------------------------------------------------------------------
+    
 }

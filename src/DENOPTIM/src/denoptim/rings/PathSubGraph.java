@@ -146,16 +146,16 @@ public class PathSubGraph
         
         // Identify the path between vA and vB
         // Obtain path from vA to seed of the graph
-        List<DENOPTIMVertex> seedToVA = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMEdge> seedToVAEdges = new ArrayList<DENOPTIMEdge>();
-        seedToVA.add(vA);
+        List<DENOPTIMVertex> vAToSeed = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMEdge> vAToSeedEdges = new ArrayList<DENOPTIMEdge>();
+        vAToSeed.add(vA);
         DENOPTIMVertex currVert = vA;
         for (int i=-1; i<vA.getLevel(); i++)
         {
             DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();
-            seedToVAEdges.add(edgeToParent);
+            vAToSeedEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
-            seedToVA.add(parent);
+            vAToSeed.add(parent);
             currVert = parent;
             // This is the bugfix that allows to handle graphs with wrong level
             // reported in the fragments
@@ -166,16 +166,16 @@ public class PathSubGraph
         }
         
         // Obtain path from vB to seed of the graph
-        List<DENOPTIMVertex> seedToVB = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMEdge> seedToVBEdges = new ArrayList<DENOPTIMEdge>();
-        seedToVB.add(vB);
+        List<DENOPTIMVertex> vBToSeed = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMEdge> vBToSeedEdges = new ArrayList<DENOPTIMEdge>();
+        vBToSeed.add(vB);
         currVert = vB;
         for (int i=-1; i<vB.getLevel(); i++)
         {
             DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();
-            seedToVBEdges.add(edgeToParent);
+            vBToSeedEdges.add(edgeToParent);
             DENOPTIMVertex parent = molGraph.getParent(currVert);
-            seedToVB.add(parent);
+            vBToSeed.add(parent);
             currVert = parent;
             // This is the bugfix that allows to handle graphs with wrong level
             // reported in the fragments
@@ -185,32 +185,40 @@ public class PathSubGraph
             }
         }
 
-        // find XOR plus junction vertex
+        // find XOR plus junction vertex (turning point)
         vertPathVAVB = new ArrayList<DENOPTIMVertex>();
         edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
         turningPointVert = null;
-        for (int i=0; i<seedToVA.size(); i++)
+        for (int i=0; i<vAToSeed.size(); i++)
         {
-            if (seedToVB.contains(seedToVA.get(i)))
+            // We dig from vA towards the seed of the graph
+            DENOPTIMVertex v = vAToSeed.get(i);
+            
+            if (vBToSeed.contains(vAToSeed.get(i)))
             {
-                turningPointVert = seedToVA.get(i);
-                vertPathVAVB.add(seedToVA.get(i));
-                int idStart = seedToVB.indexOf(seedToVA.get(i))-1;
+                // We are at the turning point vertex: were the vA->seed path
+                // meets the vB->seed path
+                turningPointVert = vAToSeed.get(i);
+                vertPathVAVB.add(vAToSeed.get(i));
+                
+                int idStart = vBToSeed.indexOf(vAToSeed.get(i))-1;
+                
                 for (int j=idStart; j>-1; j--)
                 {
-                    vertPathVAVB.add(seedToVB.get(j));
-                    edgesPathVAVB.add(seedToVBEdges.get(j));
+                    // we climb towards vB
+                    vertPathVAVB.add(vBToSeed.get(j));
+                    edgesPathVAVB.add(vBToSeedEdges.get(j));
                 }
                 break;
             }
             else
             {
-                vertPathVAVB.add(seedToVA.get(i));
-                edgesPathVAVB.add(seedToVAEdges.get(i));
+                vertPathVAVB.add(vAToSeed.get(i));
+                edgesPathVAVB.add(vAToSeedEdges.get(i));
             }
         }
         
-        // Build the DENOPTIMGraph and string representations of this sub graph
+        // Build the DENOPTIMGraph and ID of this sub graph
         chainID = "";
         revChainID = "";
         DENOPTIMVertex vertBack;
@@ -232,29 +240,6 @@ public class PathSubGraph
             // and this will make the chainID be different for otherwise equal
             // chains. Thus first and last vertex are not seen in the chainID
             
-            //TODO-V3 chainID uses molId and fragType from DENOPTIMFragment
-            // Therefore, vertexes that are not instances of DENOPTIMFragment
-            // cannot yet be used.
-            // When we'll have APs with owner we'll be able to build the path
-            // following AP ownership and, thus, we should be able to get the
-            // path from the Template's graph (recursion?).
-            if (vertHere instanceof DENOPTIMFragment == false)
-            {
-                Exception e = new Exception("TODO: Upgrade code to include handling of Templates!!!");
-                e.printStackTrace();
-                System.err.println("ERROR! Current managment of chains cannot "
-                        + "handle vertexes that are NOT intances of "
-                        + "DENOPTIMFragment.");
-                System.exit(-1);
-            }
-            
-            DENOPTIMFragment vertFrgHere = (DENOPTIMFragment) vertHere;
-            
-            chainID = chainID + vertFrgHere.getMolId() + "/"
-                              + vertFrgHere.getFragmentType() + "/" + "ap";
-            String leftRevChainID = vertFrgHere.getMolId() + "/"
-                                  + vertFrgHere.getFragmentType() + "/" + "ap";
-
             int apIdBack2Here = -1;
             int apIdHere2Back = -1;
             int apIdHere2Frnt = -1;
@@ -284,17 +269,18 @@ public class PathSubGraph
                     apIdFrnt2Here = edgeToFrnt.getSrcAPID();
                 }
             }
-
-            chainID = chainID + apIdHere2Back + "ap" + apIdHere2Frnt + "_";
-            revChainID = leftRevChainID + apIdHere2Frnt + "ap"
-			     + apIdHere2Back + "_" + revChainID; 
+            
+            String[] ids = vertHere.getPathIDs(vertHere.getAP(apIdHere2Back),
+                    vertHere.getAP(apIdHere2Frnt));
+            chainID = chainID + ids[0];
+            revChainID = ids[1] + revChainID;
             
             // We must work with clones of the actual vertexes/edges
             DENOPTIMVertex cloneVertBack = vertBack.clone();
             DENOPTIMVertex cloneVertHere = vertHere.clone();
             DENOPTIMVertex cloneVertFrnt = vertFrnt.clone();
             
-            // Build the DENOPTIMGraph with edges directed from VA to VB
+            // Collect vertexes and make edges to build a graph from A to B
             if (i == 1) {
                 gVertices.add(cloneVertBack);
             }

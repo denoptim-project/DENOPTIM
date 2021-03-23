@@ -407,9 +407,9 @@ public class GraphListsHandlerParameters
             {
                 case (STRINGFORMATLABEL):
                 {
-                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
                             inGraphsFileA,true);
-                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
                             inGraphsFileB,true);
                     break;
                 }

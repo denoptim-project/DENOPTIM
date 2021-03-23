@@ -51,6 +51,9 @@ public class DENOPTIMgson
   Gson reader;
 
   Gson writer;
+  
+//------------------------------------------------------------------------------
+
 
   private DENOPTIMgson()
   {
@@ -85,6 +88,8 @@ public class DENOPTIMgson
       .create();
   }
 
+//------------------------------------------------------------------------------
+  
   private static DENOPTIMgson getInstance()
   {
     if (instance == null)
@@ -92,15 +97,19 @@ public class DENOPTIMgson
     return instance;
   }
 
+//------------------------------------------------------------------------------
+
   public static Gson getReader() {
     return getInstance().reader;
   }
+
+//------------------------------------------------------------------------------
 
   public static Gson getWriter() {
     return getInstance().writer;
   }
 
-  //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
       public static class DENOPTIMExclusionStrategy implements ExclusionStrategy
       {
@@ -136,7 +145,7 @@ public class DENOPTIMgson
           }
       }
 
-  //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
       public static class DENOPTIMExclusionStrategyNoAPMap implements ExclusionStrategy
       {
@@ -179,5 +188,6 @@ public class DENOPTIMgson
           }
       }
 
+//------------------------------------------------------------------------------
 
 }

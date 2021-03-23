@@ -463,8 +463,6 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    @Disabled("Disabled until we can find a way to prevent addAP from being " +
-            "called after setInnerGraph")
     @Test
     public void testSetInnerGraph_throwsException_if_graphIncompatibleWithRequiredAPs()
             throws DENOPTIMException {
@@ -551,6 +549,8 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
+    @Disabled("Disabled until we can find a way to prevent addAP from being " +
+            "called after setInnerGraph")
     @Test
     public void testAddAP_after_setInnerGraph_throwsException() {
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);

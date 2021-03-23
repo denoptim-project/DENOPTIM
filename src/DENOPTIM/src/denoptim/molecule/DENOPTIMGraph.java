@@ -23,6 +23,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,6 +61,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
+import denoptim.rings.PathSubGraph;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -522,6 +524,53 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void addRing(DENOPTIMRing m_ring)
     {
         gRings.add(m_ring);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Adds a chord between the given vertexes, thus adding a ring in this graph
+     * @param vI one of the ring-closing vertexes.
+     * @param vJ the other of the ring-closing vertexes.
+     * @throws DENOPTIMException if the two vertexes do not have consistent bond
+     * types to their parents and, therefore, we cannot infer the bond type of
+     * the chord.
+     */
+    public void addRing(DENOPTIMVertex vI, DENOPTIMVertex vJ) 
+            throws DENOPTIMException
+    {
+        BondType bndTypI = vI.getEdgeToParent().getBondType();
+        BondType bndTypJ = vJ.getEdgeToParent().getBondType();
+        if (bndTypI != bndTypJ)
+        {
+            String s = "Attempt to close rings is not compatible "
+            + "to the different bond type specified by the "
+            + "head and tail APs: (" + bndTypI + "!=" 
+            + bndTypJ + " for vertices " + vI + " " 
+            + vJ + ")";
+            throw new DENOPTIMException(s);
+        }
+        addRing(vI,vJ,bndTypI);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Adds a chord between the given vertexes, thus adding a ring in this 
+     * graph.
+     * @param vI one of the ring-closing vertexes.
+     * @param vJ the other of the ring-closing vertexes.
+     * @param bndTyp the bond type the chord corresponds to.
+     */
+    public void addRing(DENOPTIMVertex vI, DENOPTIMVertex vJ, 
+            BondType bndTyp)
+    {
+        PathSubGraph path = new PathSubGraph(vI,vJ,this);
+        ArrayList<DENOPTIMVertex> arrLst = new ArrayList<DENOPTIMVertex>();
+        arrLst.addAll(path.getVertecesPath());                    
+        DENOPTIMRing ring = new DENOPTIMRing(arrLst);
+        ring.setBondType(bndTyp);
+        this.addRing(ring);
     }
 
 //------------------------------------------------------------------------------
@@ -3155,7 +3204,5 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return graph;
         }
     }
-
-
 
 }

@@ -48,9 +48,11 @@ import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * A panel that collects three viewers: 
- * one for Graphs, 
- * one for vertex content, 
- * and one for molecular structures.
+ * <ul>
+ * <li>one for Graphs,</il>
+ * <li>one for vertex content,</il>
+ * <li>and one for molecular structures.</il>
+ * </ul>
  * 
  * @author Marco Foscato
  */
@@ -107,6 +109,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	protected final String TMPLVIEWERCARDNAME = "tmplViewwerCard";
 	protected GraphViewerPanel graphViewer;
 	
+	//Default divider location
+	private double defDivLoc = 0.5;
+	
 	private static final  IChemObjectBuilder builder = 
 	            SilentChemObjectBuilder.getInstance();
 	
@@ -129,7 +134,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	{
 		setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		setOneTouchExpandable(true);
-		setDividerLocation(0.3);
+		// WARNING: setting the divider location has to be node after the 
+		// split pane is visible
+		//setDividerLocation(defDivLoc);
 		setResizeWeight(0.5);
 		
 		// In the left part we have the mol and frag viewers
@@ -186,7 +193,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 				fragViewerCardHolder, NOFSCARDNAME);
 		
 		leftPane.setTopComponent(fragViewerPanel);
-		
 		
 		// The molecular viewer is embedded in a container structure that 
 		// is meant to show/hide the molViewer according to specific needs.
@@ -487,6 +493,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                             t.getInnerGraph(), false, hasFragSpace);
                     fragViewerTmplViewerCard.updateMolevularViewer();
 				    bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
+				    fragViewerTmplViewerCard.setDividerLocation(defDivLoc);
 				} else if (bb instanceof EmptyVertex) {
 				    removeNestedGraphViewer(); //Just is case we still have it
                     
@@ -504,6 +511,16 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			}
 			*/
 		}
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Moved the divider to the default location.
+	 */
+	public void setDefaultDividerLocation()
+	{
+	    setDividerLocation(defDivLoc);
 	}
 	
 //-----------------------------------------------------------------------------

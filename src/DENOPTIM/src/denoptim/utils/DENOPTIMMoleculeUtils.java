@@ -219,6 +219,12 @@ public class DENOPTIMMoleculeUtils
         ArrayList<DENOPTIMVertex> usedRcvs = graph.getUsedRCVertices();
         Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
                 DENOPTIMMoleculeUtils.getVertexToAtomIdMap(usedRcvs,mol);
+        if (vIdToAtmId.size() == 0)
+        {
+            // No used RCV to remove. Remove unused, and leave.
+            removeRCA(mol);
+            return;
+        }
         ArrayList<IAtom> atmsToRemove = new ArrayList<>();
         ArrayList<Boolean> doneVertices =
                 new ArrayList<>(Collections.nCopies(usedRcvs.size(),false));
@@ -490,9 +496,9 @@ public class DENOPTIMMoleculeUtils
     /**
      * Method to generate the map making in relation <code>DENOPTIMVertex</code>
      * ID and atom index in the <code>IAtomContainer</code> representation of 
-     * the chemical entity. Note that the S<code>IAtomContainer</code> must 
+     * the chemical entity. Note that the <code>IAtomContainer</code> must 
      * have been generated from the <code>DENOPTIMGraph</code> that contains the
-     * required e<code>DENOPTIMVertex</code>s.
+     * required <code>DENOPTIMVertex</code>s.
      * @param vertLst the list of <code>DENOPTIMVertex</code> to find
      * @param mol the molecular representation
      * @return the map of atom indexes per each <code>DENOPTIMVertex</code> ID

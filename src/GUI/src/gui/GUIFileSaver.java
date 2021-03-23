@@ -27,6 +27,7 @@ import javax.swing.filechooser.FileSystemView;
 
 import denoptim.io.FileAndFormat;
 import denoptim.io.FileFormat;
+import denoptim.io.FileFormat.DataKind;
 
 /**
  * GUI component to provide pathname where to save stuff.
@@ -59,7 +60,7 @@ public class GUIFileSaver
 			return null;
 		}
         FileAndFormat ff = new FileAndFormat(file,FileFormat.fromString(
-                fileChooser.getFileFilter().getDescription()));
+                fileChooser.getFileFilter().getDescription(), DataKind.GRAPH));
 		return ff;
 	}
 	

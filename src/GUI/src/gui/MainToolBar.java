@@ -44,6 +44,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.task.StaticTaskManager;
 
 
@@ -264,16 +266,24 @@ public class MainToolBar extends JMenuBar {
 			public void actionPerformed(ActionEvent e) {
 				File file = GUIFileOpener.pickFileOrFolder(open);
 				try {
-					openFile(file, GUIFileOpener.detectFileFormat(
+					openFile(file, DenoptimIO.detectFileFormat(
 							file));
 				} catch (Exception e1) {
 					if (file == null)
 					{
 						return;
 					}
-					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS", "GRAPHS", "CompatibilityMatrix",  
-							"GA-RUN", "FSE-RUN", "SERGRAPH"};
+					String[] options = {"Abandon", 
+					        "GA Parameters", 
+					        "FSE Parameters",
+					        "Compatibility Matrix",  
+							"GA Output", "FSE Output"};
+					FileFormat[] ffOpts = {null, 
+					        FileFormat.GA_PARAM, 
+					        FileFormat.FSE_PARAM,
+					        FileFormat.COMP_MAP,
+					        FileFormat.GA_RUN,
+					        FileFormat.FSE_RUN};
 					JComboBox<String> cmbFiletype = 
 							new JComboBox<String>(options);
 					cmbFiletype.setSelectedIndex(0);
@@ -297,7 +307,7 @@ public class MainToolBar extends JMenuBar {
 						{
 							return;
 						}
-						openFile(file,options[cmbFiletype.getSelectedIndex()]); 
+						openFile(file,ffOpts[cmbFiletype.getSelectedIndex()]); 
 					}
 				}
 			}
@@ -344,59 +354,61 @@ public class MainToolBar extends JMenuBar {
 	 * Process a file that has a recognized file format and loads a suitable 
 	 * GUI card to visualize the file content.
 	 * @param file the file to open
-	 * @param fFormat the DENOPTIM format of the file
+	 * @param fileFormat the DENOPTIM format of the file
 	 */
 	
-	private void openFile(File file, String fFormat) 
+	private void openFile(File file, FileFormat fileFormat) 
 	{
-		switch (fFormat)
+		switch (fileFormat)
 		{
-			case ("GA-PARAMS"):
+			case GA_PARAM:
 				GUIPrepareGARun gaParamsPanel = new GUIPrepareGARun(mainPanel);
 				mainPanel.add(gaParamsPanel);
 				gaParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;	
 				
-			case ("FSE-PARAMS"):
+			case FSE_PARAM:
 				GUIPrepareFSERun fseParamsPanel = 
 					new GUIPrepareFSERun(mainPanel);
 				mainPanel.add(fseParamsPanel);
 				fseParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;
 		
-			case ("FRAGMENTS"):
+			case VRTXSDF:
 				GUIVertexInspector fragPanel = 
 					new GUIVertexInspector(mainPanel);
 				mainPanel.add(fragPanel);
 				fragPanel.importVertexesFromFile(file,"SDF");
 				break;	
 				
-			case ("GRAPHS"):
+			case GRAPHSDF:
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanel);
 				graphPanel.importGraphsFromFile(file);
 				break;
 				
-			case ("CompatibilityMatrix"):
+			case COMP_MAP:
 				GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
 				mainPanel.add(cpmap);
 				cpmap.importCPMapFromFile(file);
 				break;
 				
+				/*
 			case ("SERGRAPH"):
 				GUIGraphHandler graphPanelSer = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanelSer);
 				graphPanelSer.importGraphsFromFile(file); //NB: deals with SER/SDF/TXT
 				break;
+				*/
 				
-			case ("GA-RUN"):
+			case GA_RUN:
 				GUIInspectGARun eiPanel = 
 					new GUIInspectGARun(mainPanel);
 				mainPanel.add(eiPanel);
 				eiPanel.importGARunData(file);
 				break;
 				
-			case ("FSE-RUN"):
+			case FSE_RUN:
 				GUIInspectFSERun fsei = new GUIInspectFSERun(mainPanel);
 				mainPanel.add(fsei);
 				fsei.importFSERunData(file);
@@ -404,7 +416,7 @@ public class MainToolBar extends JMenuBar {
 			
 			default:
 				JOptionPane.showMessageDialog(null,
-						"File format '" + fFormat + "' not recognized.",
+						"File format '" + fileFormat + "' not recognized.",
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));

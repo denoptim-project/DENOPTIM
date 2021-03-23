@@ -52,8 +52,8 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
@@ -199,7 +199,7 @@ public class GUIVertexInspector extends GUICardPanel
 		ctrlPane.add(navigPanel2);
 		
 		btnAddVrtx = new JButton("Add");
-		btnAddVrtx.setToolTipText("Append vertex taken from file.");
+		btnAddVrtx.setToolTipText("Append vertexes taken from a file.");
 		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = GUIFileOpener.pickFile(btnAddVrtx);
@@ -210,10 +210,8 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-	               FragmentSpace.appendToVertexLibrary(
-	                        DenoptimIO.readInLibraryOfFragments(
-	                                inFile.getAbsolutePath(),"fragment"),
-	                        BBType.FRAGMENT,vrtxLib);
+				    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
+	                                BBType.FRAGMENT);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -240,7 +238,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				if (vrtxLib.size() == 1)
 				{
-					importVertexesFromFile(inFile);
+				    importVertexes(vrtxLib);
 					return;
 				}
 				
@@ -267,7 +265,7 @@ public class GUIVertexInspector extends GUICardPanel
 				switch (res)
 				{
 					case 0:
-						importVertexesFromFile(inFile);
+					    importVertexes(vrtxLib);
 						break;
 						
 					case 1:
@@ -510,7 +508,34 @@ public class GUIVertexInspector extends GUICardPanel
 				{
 					return;
 				}
-				importVertexesFromFile(inFile);
+				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
+                try {
+                    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
+                                    BBType.FRAGMENT);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    JOptionPane.showMessageDialog(btnAddVrtx,
+                            "<html>Could not read building blocks from file"
+                            + "<br>'" + inFile + "'"
+                            + "<br>Hint on cause: " + e1.getMessage() 
+                            +"</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+
+                if (vrtxLib.size() == 0)
+                {
+                    JOptionPane.showMessageDialog(btnAddVrtx,
+                            "<html>No building blocks in file"
+                            + "<br>'" + inFile + "'</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+				importVertexes(vrtxLib);
 			}
 		});
 		commandsPane.add(btnOpenVrtxs);
@@ -683,27 +708,9 @@ public class GUIVertexInspector extends GUICardPanel
 	}
 	
 //-----------------------------------------------------------------------------
-
-	/**
-	 * Imports building blocks from a SDF file. 
-	 * This method expects to find vertexes
-	 * with DENOPTIM's format, i.e., with the 
-	 * <code>ATTACHMENT_POINT</code> and possibly the
-	 * <code>CLASS</code> tags.
-	 * @param file the file to open
-	 */
-	public void importVertexesFromFile(File file)
-	{	
-		importVertexesFromFile(file,"SDF");
-	}
-	
-//-----------------------------------------------------------------------------
 	
 	/**
-	 * Imports fragments from a SDF file. This method expects to find fragments
-	 * with DENOPTIM's format, i.e., with the 
-	 * <code>ATTACHMENT_POINT</code> and possibly the
-	 * <code>CLASS</code> tags.
+	 * Imports fragments from a file.
 	 * @param file the file to open
 	 * @param format the format
 	 */
@@ -711,56 +718,34 @@ public class GUIVertexInspector extends GUICardPanel
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
-		int firstOfNew = 0;
-		boolean libFromScrtch = false;
-		if (vertexesLibrary == null)
-		{
-			libFromScrtch = true;
-			vertexesLibrary = new ArrayList<DENOPTIMVertex>();
-		}
-		else
-		{
-			firstOfNew = vertexesLibrary.size();
-		}
-		
-		try 
-		{
-			// Import library of vertexes
-			boolean addedOne = false;
-			
-			ArrayList<IAtomContainer> lst = DenoptimIO.readInLibraryOfFragments(
-                    file.getAbsolutePath(),"fragment");
-			if (lst.size() > 0)
-			{
-			    FragmentSpace.appendToVertexLibrary(lst,BBType.UNDEFINED,
-			            vertexesLibrary);
-			    addedOne = true;
-			}
-			
-			// Display the first
-			if (libFromScrtch)
-			{
-				currVrtxIdx = 0;
-			}
-			else if (addedOne)
-			{
-				currVrtxIdx = firstOfNew;
-			}
-			loadCurrentVrtxIdxToViewer();
-			
-	        // Update the fragment spinner
-			updateVrtxListSpinner();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			JOptionPane.showMessageDialog(null,
-	                "<html>Could not read file '" + file.getAbsolutePath() 
-	                + "'!<br>Hint on cause: " + e.getMessage() + "</html>",
-	                "Error",
-	                JOptionPane.PLAIN_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
-		}
+		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
+        try {
+            vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(file, 
+                            BBType.FRAGMENT);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            JOptionPane.showMessageDialog(btnAddVrtx,
+                    "<html>Could not read building blocks from file"
+                    + "<br>'" + file + "'"
+                    + "<br>Hint on cause: " + e1.getMessage() 
+                    +"</html>",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
+
+        if (vrtxLib.size() == 0)
+        {
+            JOptionPane.showMessageDialog(btnAddVrtx,
+                    "<html>No building blocks in file"
+                    + "<br>'" + file + "'</html>",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
+        importVertexes(vrtxLib);
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	

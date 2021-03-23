@@ -390,6 +390,7 @@ public class GraphViewerPanel extends JPanel
             String trgIdx = Integer.toString(r.getTailVertex().getVertexId());
             Edge e = graph.addEdge(srcIdx+"-"+trgIdx, srcIdx, trgIdx,false);
             e.setAttribute("ui.class", "rc");
+            e.setAttribute("dnp.bondType", r.getBondType());
             
             //WARNING: graphs loaded without having a consistent definition of 
             // the fragment space will not have all the AP data (which should be 
@@ -720,6 +721,11 @@ public class GraphViewerPanel extends JPanel
 			        }
 					for (Edge e : graph.getEdgeSet())
 					{
+					    if (e.hasAttribute("ui.class") 
+					            && e.getAttribute("ui.class").equals("rc"))
+					    {
+					        continue;
+					    }
 						if (e.getSourceNode() == n)
 						{
 							addSrcApClassSprite(e);

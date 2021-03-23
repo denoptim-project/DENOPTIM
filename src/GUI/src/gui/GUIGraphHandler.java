@@ -21,9 +21,11 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,10 +60,14 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileAndFormat;
+import denoptim.io.FileFormat;
+import denoptim.io.UndetectedFileFormatException;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -159,6 +165,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private JPanel pnlEditVrtxBtns;
 	private JButton btnAddVrtx;
 	private JButton btnDelSel;
+	private JButton btnAddChord; 
 	
 	private JPanel pnlShowLabels;
 	private JButton btnAddLabel;
@@ -186,6 +193,20 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private static final  IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
+	
+	private boolean painted;
+
+//-----------------------------------------------------------------------------
+	
+	@Override
+	public void paint(Graphics g) {
+	    super.paint(g);
+
+	    if (!painted) {
+	        painted = true;
+	        visualPanel.setDefaultDividerLocation();
+	    }
+	}
 	
 //-----------------------------------------------------------------------------
 	
@@ -412,8 +433,8 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Controls to alter the presently loaded graph (if any)
 		pnlEditVrtxBtns = new JPanel();
-		JLabel edtVertxsLab = new JLabel("Edit verteces:");
-		btnAddVrtx = new JButton("Add");
+		JLabel edtVertxsLab = new JLabel("Edit Graph:");
+		btnAddVrtx = new JButton("Add Vertex");
 		btnAddVrtx.setToolTipText("<html>Append a vertex to the selected "
 				+ "attachment point<html>");
 		btnAddVrtx.setEnabled(false);
@@ -459,7 +480,7 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		
-		btnDelSel = new JButton("Remove");
+		btnDelSel = new JButton("Remove Vertex");
 		btnDelSel.setToolTipText("<html>Removes the selected vertexes from "
 				+ "the system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!</html>");
@@ -513,6 +534,44 @@ public class GUIGraphHandler extends GUICardPanel
 			}
 		});
 		
+	    // Controls to add chord (ring closing edge)
+        btnAddChord = new JButton("Add Chord");
+        btnAddChord.setToolTipText("<html>Add a ring-closing edge between two "
+                + "selected vertexes.<html>");
+        btnAddChord.setEnabled(false);
+        btnAddChord.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {    
+                ArrayList<DENOPTIMVertex> selVrtxs = 
+                        visualPanel.getSelectedNodesInViewer();               
+                if (selVrtxs.size() != 2)
+                {
+                    JOptionPane.showMessageDialog(null,
+                            "<html>Number of selected vertexes: " 
+                            + selVrtxs.size() + " <br>"
+                            + "Please, drag the mouse and "
+                            + "select only two vertexes!<br> "
+                            + "Click again to unselect.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                addChordOnGraph(selVrtxs);
+                
+                // Update viewer
+                visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+                
+                // Protect edited system
+                unsavedChanges = true;
+                protectEditedSystem();
+
+                // The molecular representation is updated when we save changes
+                visualPanel.requireUpdateOfMolecularViewer();
+                updateMolViewer = true;
+            }
+        });
+        
+        
 		GroupLayout lyoEditVertxs = new GroupLayout(pnlEditVrtxBtns);
 		pnlEditVrtxBtns.setLayout(lyoEditVertxs);
 		lyoEditVertxs.setAutoCreateGaps(true);
@@ -520,14 +579,14 @@ public class GUIGraphHandler extends GUICardPanel
 		lyoEditVertxs.setHorizontalGroup(lyoEditVertxs.createParallelGroup(
 				GroupLayout.Alignment.CENTER)
 				.addComponent(edtVertxsLab)
-				.addGroup(lyoEditVertxs.createSequentialGroup()
-						.addComponent(btnAddVrtx)
-						.addComponent(btnDelSel)));
+				.addComponent(btnAddVrtx)
+				.addComponent(btnDelSel)
+				.addComponent(btnAddChord));
 		lyoEditVertxs.setVerticalGroup(lyoEditVertxs.createSequentialGroup()
 				.addComponent(edtVertxsLab)
-				.addGroup(lyoEditVertxs.createParallelGroup()
-						.addComponent(btnAddVrtx)
-						.addComponent(btnDelSel)));
+				.addComponent(btnAddVrtx)
+				.addComponent(btnDelSel)
+				.addComponent(btnAddChord));
 		graphCtrlPane.add(pnlEditVrtxBtns);
 		
 		graphCtrlPane.add(new JSeparator());
@@ -741,7 +800,10 @@ public class GUIGraphHandler extends GUICardPanel
 		//TODO del (This is used only for devel phase of debug)
 		/*
 		try {
-			ArrayList<String> lines = DenoptimIO.readList("/Users/marco/butta/___params_w_template");
+			ArrayList<String> lines = DenoptimIO.readList(
+			        //"/Users/marco/butta/___params_for_ring");
+		            "/Users/marco/butta/___params_w_template");
+            
 			for (String l : lines)
 			{
 			    FragmentSpaceParameters.interpretKeyword(l);
@@ -751,7 +813,8 @@ public class GUIGraphHandler extends GUICardPanel
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
-		appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
+		//appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
+		//appendGraphsFromFile(new File("/Users/marco/butta/___graph_closable.json"));
 		*/
 	}
 	
@@ -761,6 +824,7 @@ public class GUIGraphHandler extends GUICardPanel
 	{
 		btnAddVrtx.setEnabled(enable);
 		btnDelSel.setEnabled(enable);
+		btnAddChord.setEnabled(enable);
 		cmbLabel.setEnabled(enable);
 		btnAddLabel.setEnabled(enable);
 		btnDelLabel.setEnabled(enable);
@@ -830,6 +894,39 @@ public class GUIGraphHandler extends GUICardPanel
 		unsavedChanges = true;
 		updateMolViewer = true;
         protectEditedSystem();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Edits the currently loaded graph by adding a chord involging the two
+	 * selected vertexes.
+	 * @param rcvs the selected vertexes. Must be two vertexes.
+	 */
+	private void addChordOnGraph(ArrayList<DENOPTIMVertex> rcvs)
+	{
+        if (rcvs.size() != 2)
+        {
+            JOptionPane.showMessageDialog(null,
+                    "<html>Number of selected vertexes: " 
+                    + rcvs.size() + " <br>"
+                    + "Please, drag the mouse and "
+                    + "select only two vertexes!<br> "
+                    + "Click again to unselect.</html>",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
+        
+        try
+        {
+            dnGraph.addRing(rcvs.get(0), rcvs.get(1));
+        } catch (DENOPTIMException e)
+        {
+            BondType bt = BondType.UNDEFINED;
+            dnGraph.addRing(rcvs.get(0), rcvs.get(1), bt);
+        }
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1123,75 +1220,53 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
 	{
-		//TODO-V3 change: this should be done elsewhere, maybe in DenoptimIO
-	    // make it use FileFormat
-		
-		String format="";
-		String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-		switch (ext.toUpperCase())
+		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+		try
 		{
-			case ("SDF"):
-				format="SDF";
-				break;
-				
-			case ("TXT"):
-				format="TXT";
-				break;
-			
-			case ("SER"):
-				format="SER";
-				break;
-				
-            case ("JSON"):
-                format="JSON";
-                break;
-				
-			default:
-			    String[] options = {"Abandon", "TXT", "SDF", "JSON", "SERIALIZED"};
-				int res = JOptionPane.showOptionDialog(null,
-					"<html>Failed to detect file type from file's "
-					+ "extension.<br>"
-					+ "Please, tell me how to interpret file <br>"
-					+ "'" + file.getAbsolutePath() + "'<br>"
-					+ "or 'Abandon' to give up.</html>",
-					"Specify File Type",
-	                JOptionPane.DEFAULT_OPTION,
-	                JOptionPane.QUESTION_MESSAGE,
-	                UIManager.getIcon("OptionPane.warningIcon"),
-	                options,
-	                options[0]);
-				switch (res)
-				{
-					case 0:
-						return new ArrayList<DENOPTIMGraph>();
-						
-					case 1:
-						format = "TXT";
-						break;
-						
-					case 2:
-						format="SDF";
-						break;
-						
-					case 3:
-                        format="JSON";
+    		try 
+    		{
+    			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(file, 
+    			        hasFragSpace);	
+    		} 
+    		catch (UndetectedFileFormatException uff) 
+    		{
+                String[] options = {"Abandon", "SDF", "JSON"};
+                FileFormat[] ffs = {null,
+                        FileFormat.GRAPHSDF,
+                        FileFormat.GRAPHJSON};
+                int res = JOptionPane.showOptionDialog(null,
+                    "<html>Failed to detect file type from file's "
+                    + "extension.<br>"
+                    + "Please, tell me how to interpret file <br>"
+                    + "'" + file.getAbsolutePath() + "'<br>"
+                    + "or 'Abandon' to give up.</html>",
+                    "Specify File Type",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"),
+                    options,
+                    options[0]);
+                FileFormat ff = null;
+                switch (res)
+                {
+                    case 0:
+                        graphs = new ArrayList<DENOPTIMGraph>();
                         break;
                         
-					case 4:
-						format="SER";
-						break;
-				}
-				break;
-		}
-		
-		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
-		try 
-		{
-			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-					file.getAbsolutePath(), format, hasFragSpace);	
-		} 
+                    case 1:
+                        graphs = DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                                file.getAbsolutePath(), hasFragSpace);
+                        break;
+                        
+                    case 2:
+                        graphs = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
+                                file.getAbsolutePath(), hasFragSpace);
+                        break;
+                }
+    		} 
+    	}
 		catch (Exception e) 
-		{
+        {
 			e.printStackTrace();
 			String msg = "<html>Could not read graph from file <br> "
 					+ "'" + file.getAbsolutePath() 
@@ -1244,7 +1319,6 @@ public class GUIGraphHandler extends GUICardPanel
     	// status of the graph of an easy recovery, (see GSGraphSnapshot)
     	clearCurrentSystem();
     	
-    	//TODO-MF: this might not be needed
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
 		
 		if (molLibrary.get(currGrphIdx).getAtomCount() > 0)

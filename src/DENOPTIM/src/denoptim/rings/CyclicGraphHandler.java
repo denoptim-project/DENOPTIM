@@ -210,7 +210,7 @@ public class CyclicGraphHandler
 
                     // Update ring sizes according to the newly added bond
                     rsm.addRingClosingBond(vI,vJ);
-                    rsm.setVertedAsDone(vJ);
+                    rsm.setVertexAsDone(vJ);
                     break;
                 }
                 else
@@ -221,7 +221,7 @@ public class CyclicGraphHandler
                     }
                 }
             }
-            rsm.setVertedAsDone(vI);
+            rsm.setVertexAsDone(vI);
         }
 
 
@@ -1197,7 +1197,7 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public void setVertedAsDone(DENOPTIMVertex v)
+        public void setVertexAsDone(DENOPTIMVertex v)
         {
             done.set(lstVert.indexOf(v),true);
         }
@@ -1642,7 +1642,7 @@ public class CyclicGraphHandler
      * @param subGraph the subgraph representing the path in the graph
      * @param mol the molecule corresponding to the graph. This
      * <code>IAtomContainer</code> is only used to provide the molecular
-     * contitution and does not require 3D coordinates.
+     * constitution and does not require 3D coordinates.
      * @return <code>true</code> is the path corresponds to a closable chain
      */
 
