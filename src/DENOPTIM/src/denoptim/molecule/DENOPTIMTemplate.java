@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -185,15 +186,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     //TODO-V3 Remove.
 
-    
+
     // WARNING! This is only meant to return a "scaffold" type
-    
     public static DENOPTIMTemplate getTestScaffoldTemplate() 
     {
-        if (FragmentSpaceParameters.useCyclicTemplate())
-            return getCyclicTemplate(DENOPTIMVertex.BBType.SCAFFOLD);
-        else
-            return getAcyclicTemplate(DENOPTIMVertex.BBType.SCAFFOLD);
+        if (FragmentSpaceParameters.useCyclicTemplate()) {
+            return getCyclicTemplate(BBType.SCAFFOLD);
+        } else {
+            return getAcyclicTemplate(BBType.SCAFFOLD);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -242,7 +243,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
-        // Adding fully defined vertexes (they point to an actual fragment
+        // Adding fully defined vertexes (they point to an actual fragment)
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
@@ -263,7 +264,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         */
         
         template.freezeTemplate();
-        
+
+        System.out.println("Inner acyclic graph: " + g + "\n");
+
         return template;
     }
     
@@ -784,8 +787,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                             list.add(outerAP);
                             apsPerAtom.put(i, list);
                         }
-                        // TODO: Remove
-                        // System.out.println("Fixed wrong atomposnumbering");
                     }
                 }
             }
@@ -937,6 +938,34 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         ap.setOwner(this);
         requiredAPs.add(ap);
+    }
+
+//------------------------------------------------------------------------------
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof DENOPTIMTemplate)) {
+            return false;
+        }
+        DENOPTIMTemplate o = (DENOPTIMTemplate) other;
+        if (this.contractLevel != o.contractLevel
+                || this.buildingBlockType != o.buildingBlockType
+                || this.buildingBlockId != o.buildingBlockId)
+        {
+            return false;
+        }
+
+        if (this.requiredAPs.size() == o.requiredAPs.size()) {
+            for (int i = 0; i < this.requiredAPs.size(); i++) {
+                if (this.requiredAPs.get(i).comparePropertiesTo(o.requiredAPs.get(0)) != 0) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return this.getInnerGraph().sameAs(o.getInnerGraph(),
+                new StringBuilder());
     }
 
 //------------------------------------------------------------------------------

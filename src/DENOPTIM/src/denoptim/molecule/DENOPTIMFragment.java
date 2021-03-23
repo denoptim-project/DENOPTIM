@@ -143,8 +143,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 throw new DENOPTIMException("Unable to deal with bonds "
                         + "involving more than two atoms.");
             }
-            int ia = mol.getAtomNumber(oBnd.getAtom(0));
-            int ib = mol.getAtomNumber(oBnd.getAtom(1));
+            int ia = mol.indexOf(oBnd.getAtom(0));
+            int ib = mol.indexOf(oBnd.getAtom(1));
             this.mol.addBond(ia,ib,oBnd.getOrder());
         }
         
@@ -350,7 +350,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             int valence) 
             throws DENOPTIMException
     {
-        int atmId = mol.getAtomNumber(srcAtm);
+        int atmId = mol.indexOf(srcAtm);
         this.addAP(atmId, valence, valence,
                 new double[] {vector.x, vector.y, vector.z}, apc);
         ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();

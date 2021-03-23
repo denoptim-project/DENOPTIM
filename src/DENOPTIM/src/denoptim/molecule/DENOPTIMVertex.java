@@ -79,7 +79,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Index of this building block in the library of building blocks, or
      * negative if this vertex is not part of a library.
      */
-    private int buildingBlockId = -99;
+    protected int buildingBlockId = -99;
     
     /**
      * The type of building block. This is used to easily distinguish among
@@ -140,7 +140,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * scaffolds, fragments, and capping. 
      * Can be undefined, which is the default.
      */
-    private BBType buildingBlockType = DENOPTIMVertex.BBType.UNDEFINED;
+    protected BBType buildingBlockType = DENOPTIMVertex.BBType.UNDEFINED;
 
     /*
      * Flag indicating that this as a ring closing vertex
@@ -492,10 +492,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     
     @Override
-    public DENOPTIMVertex clone()
-    {
-        return (DENOPTIMVertex) clone();
-    }
+    public abstract DENOPTIMVertex clone();
     
 //------------------------------------------------------------------------------
     

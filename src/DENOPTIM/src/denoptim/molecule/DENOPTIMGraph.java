@@ -906,7 +906,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     @Override
     public DENOPTIMGraph clone()
     {
-        // When cloning, the VertedID remains the same so we'll have two
+        // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
         ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
         Map<Integer,DENOPTIMVertex> vidsInClone =
