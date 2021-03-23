@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,13 @@ public class DescriptorUtils
 {	
 	private static final String FS = System.getProperty("file.separator");
 	private static final String NL = System.getProperty("line.separator");
+	
+	/**
+	 * List of descriptor names that are excluded from default import because
+	 * they have been shown to contain bugs.
+	 */
+	private static List<String> rejectedDescriptors = Arrays.asList(
+	        new String[]{"JPLogP"});
 	
 //------------------------------------------------------------------------------
 	
@@ -109,7 +117,8 @@ public class DescriptorUtils
 //------------------------------------------------------------------------------
 
 	/**
-	 * Searches for descriptor implementations.
+	 * Searches for descriptor implementations. This method excludes descriptors
+	 * that have been listed in {@link }.
 	 * @param requiredDescriptors list of descriptor short names that we want
 	 * to obtain. All the rest will be ignored. This parameter can be null, in 
 	 * which case we'll return all the descriptors.
@@ -139,11 +148,13 @@ public class DescriptorUtils
 			String className = classNames.get(i);
 			String[] descrNames = iDescs.get(i).getDescriptorNames();
 			String simpleName = iDescs.get(i).getClass().getSimpleName();
+			
 			if (descrNames != null)
 			{
 				for (int j=0; j<descrNames.length;j++)
-				{
+				{   
 					String descName = descrNames[j];
+					
 					if (unq.containsKey(descName))
 					{
 						String msg = "Descriptor '" + descName + "' in part of " 
@@ -168,9 +179,16 @@ public class DescriptorUtils
 						}
 					}
 					
-					//TODO-V3 this line is meant only to bypass bugus code
-					//DEBUGME
-					//isChosen = false;
+					// We reject selected descriptor implementations that might
+					// have shown to be unreliable
+					for (String rejectedDescName : rejectedDescriptors)
+					{
+					    if (descName.equals(rejectedDescName))
+                        {
+                            isChosen = false;
+                            break;
+                        }
+					}
 					
 					if (isChosen)
 					{
@@ -182,28 +200,15 @@ public class DescriptorUtils
 								descName, className,impl, j,
 								engine.getDictionaryType(implSpec),
 								engine.getDictionaryClass(implSpec),
-						//TODO-V3 to test upgrade to cdk2.3
                                 engine.getDictionaryDefinition(
                                         implSpec.getSpecificationReference()),
                                 engine.getDictionaryTitle(
                                         implSpec.getSpecificationReference()));
-						//TODO-V3 delete
-						/*
-								engine.getDictionaryDefinition(implSpec),
-								engine.getDictionaryTitle(implSpec));
-						*/
 						chosenOnes.add(d);
 					}
 				}
 			}
 		}
-
-		/*
-		String log = "Found " + classNames.size() + " descriptor classes."
-				+ " Will use " + chosenOnes.size() + "/" + unq.size() 
-				+ "descriptor values taken from " + chosenOnesShortNames;
-		DENOPTIMLogger.appLogger.info(log);
-		*/
 		
 		return chosenOnes;
 	}
