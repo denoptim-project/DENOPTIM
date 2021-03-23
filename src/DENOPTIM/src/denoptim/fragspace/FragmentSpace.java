@@ -303,7 +303,7 @@ public class FragmentSpace
          */
 
         // TODO-V3: remove: tmp code just for devel phase
-        // /*
+         /*
         if (FragmentSpaceParameters.useTemplates)
         {
             scaffoldLib = new ArrayList<>();
@@ -347,7 +347,7 @@ public class FragmentSpace
             System.out.println("READ-IN!");
 
         }
-        // */
+         */
 
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());
     }
