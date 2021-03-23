@@ -39,7 +39,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * Unit test for DENOPTIMFragment
@@ -150,7 +150,7 @@ public class DENOPTIMFragmentTest
         
         IAtomContainer iac = frg1.getIAtomContainer();
         
-        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac,BBType.UNDEFINED);
+        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.UNDEFINED);
         
         assertEquals(7,frg1.getNumberOfAP(),"#APs in frg1");
         assertEquals(7,frg2.getNumberOfAP(),"#APs in frg2");
@@ -202,7 +202,7 @@ public class DENOPTIMFragmentTest
         v.setVertexId(18);
         v.setLevel(26);
         v.setAsRCV(true);
-        v.setBuildingBlockType(BBType.SCAFFOLD);
+        v.setBuildingBlockType(DENOPTIMVertex.BBType.SCAFFOLD);
         
         DENOPTIMVertex c = v.clone();
         
@@ -222,8 +222,8 @@ public class DENOPTIMFragmentTest
         assertEquals(v.getLevel(), c.getLevel(), "Level");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
         assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");  
-        assertEquals(v.getFragmentType(),
-                ((DENOPTIMFragment)c).getFragmentType(), "Building bloc ktype");
+        assertEquals(v.getBuildingBlockType(),
+                ((DENOPTIMFragment)c).getBuildingBlockType(), "Building bloc ktype");
     }
     
 //------------------------------------------------------------------------------
@@ -234,19 +234,19 @@ public class DENOPTIMFragmentTest
     {
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         IAtomContainer iac = builder.newAtomContainer();
-        DENOPTIMFragment v = new DENOPTIMFragment(iac,BBType.FRAGMENT);
+        DENOPTIMFragment v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.FRAGMENT);
         assertEquals(1,v.getMutationSites().size(),
                 "Fragments return themselves as mutable sites.");
-        v = new DENOPTIMFragment(iac,BBType.SCAFFOLD);
+        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.SCAFFOLD);
         assertEquals(0,v.getMutationSites().size(),
                 "Scaffolds so not return any mutable site.");
-        v = new DENOPTIMFragment(iac,BBType.CAP);
+        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.CAP);
         assertEquals(0,v.getMutationSites().size(),
                 "Capping groups so not return any mutable site.");
-        v = new DENOPTIMFragment(iac,BBType.UNDEFINED);
+        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.UNDEFINED);
         assertEquals(1,v.getMutationSites().size(),
                 "Undefined building block return themselves as mutable sites.");
-        v = new DENOPTIMFragment(iac,BBType.NONE);
+        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.NONE);
         assertEquals(1,v.getMutationSites().size(),
                 "'None' building block return themselves as mutable sites.");
     }

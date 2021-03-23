@@ -18,7 +18,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.PathSubGraph;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -46,17 +46,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     private static final long serialVersionUID = 1L;
     
     /**
-     * Index of the graph building block contained in the vertex
-     */
-    private int buildingBlockId = -99; //Initialised to meaningless value
-    
-    /*
-     * Building block type distinguished among scaffolds, fragments, and capping
-     * groups, if defined.
-     */
-    private BBType buildingBlockType = BBType.UNDEFINED;
-
-    /**
      * Graph that is embedded in this vertex. This field differentiates a
      * template from any other subclass of {@link DENOPTIMVertex}, and its name
      * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
@@ -77,7 +66,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMTemplate(BBType bbType)
+    public DENOPTIMTemplate(DENOPTIMVertex.BBType bbType)
     {
         super();
         setBuildingBlockType(bbType);
@@ -91,44 +80,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     private static DENOPTIMTemplate getEmptyTemplate(List<DENOPTIMAttachmentPoint> exteriorAPs) 
     {
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
+        DENOPTIMTemplate template = new DENOPTIMTemplate(DENOPTIMVertex.BBType.UNDEFINED);
         return template;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @return the id of the molecule
-     */
-    public int getMolId()
-    {
-        return buildingBlockId;
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setMolId(int m_molId)
-    {
-        buildingBlockId = m_molId;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @return <code>true</code> if vertex is a fragment
-     */
-    public BBType getFragmentType()
-    {
-        return buildingBlockType;
-    }
-    
-//------------------------------------------------------------------------------
-
-    private void setBuildingBlockType(BBType fType)
-    {
-        buildingBlockType = fType;
     }
 
 //------------------------------------------------------------------------------
@@ -148,9 +101,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
             DENOPTIMAttachmentPoint apB)
     {
-        String a2b = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+        String a2b = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
-        String b2a = this.getMolId() + "/" + this.getFragmentType() + "/ap"
+        String b2a = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
         
         String[] pair = {a2b,b2a};
@@ -204,7 +157,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     public static DENOPTIMTemplate getTestTemplate(int contractLevel) 
     {
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
+        DENOPTIMTemplate template = new DENOPTIMTemplate(DENOPTIMVertex.BBType.UNDEFINED);
         DENOPTIMVertex vrtx = new EmptyVertex(0);
         DENOPTIMVertex vrtx2 = new EmptyVertex(1);
     
@@ -238,9 +191,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public static DENOPTIMTemplate getTestScaffoldTemplate() 
     {
         if (FragmentSpaceParameters.useCyclicTemplate())
-            return getCyclicTemplate(BBType.SCAFFOLD);
+            return getCyclicTemplate(DENOPTIMVertex.BBType.SCAFFOLD);
         else
-            return getAcyclicTemplate(BBType.SCAFFOLD);
+            return getAcyclicTemplate(DENOPTIMVertex.BBType.SCAFFOLD);
     }
     
 //------------------------------------------------------------------------------
@@ -253,9 +206,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public static DENOPTIMTemplate getTestFragmentTemplate() 
     {
         if (FragmentSpaceParameters.useCyclicTemplate())
-            return getCyclicTemplate(BBType.FRAGMENT);
+            return getCyclicTemplate(DENOPTIMVertex.BBType.FRAGMENT);
         else
-            return getAcyclicTemplate(BBType.FRAGMENT);
+            return getAcyclicTemplate(DENOPTIMVertex.BBType.FRAGMENT);
     }  
     
 //------------------------------------------------------------------------------
@@ -267,7 +220,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     public static DENOPTIMTemplate getTestFragmentTemplateBis() 
     {
-        return getCyclicTemplateBis(BBType.FRAGMENT);
+        return getCyclicTemplateBis(DENOPTIMVertex.BBType.FRAGMENT);
     }
     
 //------------------------------------------------------------------------------
@@ -279,21 +232,21 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     public static DENOPTIMTemplate getTestFragmentTemplateTris() 
     {
-        return getCyclicTemplateTris(BBType.FRAGMENT);
+        return getCyclicTemplateTris(DENOPTIMVertex.BBType.FRAGMENT);
     }
     
 //------------------------------------------------------------------------------
     
     //TODO-V3: this will be removed/replaced
-    private static DENOPTIMTemplate getAcyclicTemplate(BBType bbt)
+    private static DENOPTIMTemplate getAcyclicTemplate(DENOPTIMVertex.BBType bbt)
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
         // Adding fully defined vertexes (they point to an actual fragment
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 1, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 1, DENOPTIMVertex.BBType.FRAGMENT);
 
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vA);
@@ -318,7 +271,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     //TODO-V3: this will be removed/replaced
     
-    private static DENOPTIMTemplate getCyclicTemplate(BBType bbt) 
+    private static DENOPTIMTemplate getCyclicTemplate(DENOPTIMVertex.BBType bbt) 
     {
         // Here we build a graph with ring and two unused APs (the *):
         //
@@ -332,33 +285,33 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vC = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 4, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 5, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
 
         List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vC, vD, vRCV1,
                 vRCV2);
         
         DENOPTIMVertex vH1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH3 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH5 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH6 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
 
         List<DENOPTIMVertex> caps  = Arrays.asList(vH1, vH2, vH3, vH4, vH5,
                 vH6);
@@ -425,7 +378,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     //TODO-V3: this will be removed/replaced
     
-    private static DENOPTIMTemplate getCyclicTemplateBis(BBType bbt) 
+    private static DENOPTIMTemplate getCyclicTemplateBis(DENOPTIMVertex.BBType bbt) 
     {
         // Here we build a graph with ring and two unused APs (the *):
         //
@@ -439,26 +392,26 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 4, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 5, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
 
         List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
         
         DENOPTIMVertex vH1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH5 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
 
         List<DENOPTIMVertex> caps  = Arrays.asList(vH1, vH2, vH4, vH5);
 
@@ -503,7 +456,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     //TODO-V3: this will be removed/replaced
     
-    private static DENOPTIMTemplate getCyclicTemplateTris(BBType bbt) 
+    private static DENOPTIMTemplate getCyclicTemplateTris(DENOPTIMVertex.BBType bbt) 
     {
         // Here we build a graph with ring and two unused APs (the *):
         //
@@ -520,23 +473,23 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
         // NB: here we pick one of the templates we must have added to the library
         DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 8, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 8, DENOPTIMVertex.BBType.FRAGMENT);
         
         DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 4, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
         DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 5, BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
 
         List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
         
         DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
         DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, BBType.CAP);
+                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
 
         List<DENOPTIMVertex> caps  = Arrays.asList(vH2, vH4);
 
@@ -620,11 +573,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     public DENOPTIMTemplate clone()
     {
-        DENOPTIMTemplate c = new DENOPTIMTemplate(this.buildingBlockType);
+        DENOPTIMTemplate c = new DENOPTIMTemplate(this.getBuildingBlockType());
         
         c.setVertexId(this.getVertexId());
-        c.buildingBlockType = this.buildingBlockType;
-        c.buildingBlockId = this.buildingBlockId;
+        c.setBuildingBlockId(this.getBuildingBlockId());
         c.contractLevel = this.contractLevel;
 
         for (DENOPTIMAttachmentPoint oriAP : this.requiredAPs)
@@ -943,8 +895,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
         // I doubt templates will ever be used as capping groups, but
         // just in case, then they are not considered mutable sites
-        if (buildingBlockType == BBType.CAP
-                || buildingBlockType == BBType.SCAFFOLD)
+        if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
+                || getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
         {
             return set;
         }

@@ -145,7 +145,7 @@ class RNDEAUtils
         {
             DENOPTIMMolecule mol = pop.get(i);
             DENOPTIMGraph g = mol.getGraph();
-            int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
+            int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
         }
         sb.append("\n\n#####SCAFFOLD ANALYSIS#####\n");

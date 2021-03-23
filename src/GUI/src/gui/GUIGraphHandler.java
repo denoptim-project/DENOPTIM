@@ -63,12 +63,13 @@ import denoptim.io.FileAndFormat;
 import denoptim.io.FileFormat;
 import denoptim.io.UndetectedFileFormatException;
 import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
@@ -452,7 +453,7 @@ public class GUIGraphHandler extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				ArrayList<IdFragmentAndAP> selAps = 
+				ArrayList<DENOPTIMAttachmentPoint> selAps = 
 				        visualPanel.getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
@@ -475,7 +476,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        protectEditedSystem();
 
 				// The molecular representation is updated when we save changes
-		        visualPanel.requireUpdateOfMolecularViewer();
+		        visualPanel.renderMolVieverToNeedUpdate();
 		        updateMolViewer = true;
 			}
 		});
@@ -529,7 +530,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        protectEditedSystem();
 			
 		        // The molecular representation is updated when we save changes
-                visualPanel.requireUpdateOfMolecularViewer();
+                visualPanel.renderMolVieverToNeedUpdate();
                 updateMolViewer = true;
 			}
 		});
@@ -566,7 +567,7 @@ public class GUIGraphHandler extends GUICardPanel
                 protectEditedSystem();
 
                 // The molecular representation is updated when we save changes
-                visualPanel.requireUpdateOfMolecularViewer();
+                visualPanel.renderMolVieverToNeedUpdate();
                 updateMolViewer = true;
             }
         });
@@ -883,7 +884,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create the node
 		int scaffVrtId = 1;
 		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newVertexFromLibrary(
-		        scaffVrtId, scaffFragId, BBType.SCAFFOLD);
+		        scaffVrtId, scaffFragId, DENOPTIMVertex.BBType.SCAFFOLD);
 
 		scaffVertex.setLevel(-1); //NB: scaffold gets level -1
 		dnGraph.addVertex(scaffVertex);
@@ -935,12 +936,13 @@ public class GUIGraphHandler extends GUICardPanel
 	 * Extends the current graph by appending a node to a specific free AP on 
 	 * the growing graph. 
 	 * This method will prompt a question on which incoming fragment to append 
-	 * @param srcAPs list of identifiers for APs on the growing graph.
+	 * @param selAps attachment points on the growing graph.
 	 */
-	private void extendGraphFromFragSpace(ArrayList<IdFragmentAndAP> srcAPs)
+	private void extendGraphFromFragSpace(
+	        ArrayList<DENOPTIMAttachmentPoint> selAps)
 	{
 		// For extensions of existing graphs we need to know where to extend
-		if (srcAPs.size() == 0)
+		if (selAps.size() == 0)
 		{
 			JOptionPane.showMessageDialog(null,"No AP selected in the "
 					+ "graph.",
@@ -951,9 +953,9 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		// Create clones of fragments and put the into 'compatFrags'
-		collectFragAndAPsCompatibleWithSelectedAPs(srcAPs);
+		collectFragAndAPsCompatibleWithSelectedAPs(selAps);
 		
-		BBType trgFrgType = BBType.UNDEFINED;
+		DENOPTIMVertex.BBType trgFrgType = DENOPTIMVertex.BBType.UNDEFINED;
 		ArrayList<DENOPTIMVertex> vertxLib = new ArrayList<DENOPTIMVertex>();		
 		String[] options = new String[]{"Any Vertex",
 				"Compatible Vertexes ("+compatVrtxs.size()+")",
@@ -970,17 +972,18 @@ public class GUIGraphHandler extends GUICardPanel
 		switch (res)
 		{
 			case 0:
+			    ArrayList<DENOPTIMVertex> tmp = FragmentSpace.getFragmentLibrary();
 				vertxLib = new  ArrayList<DENOPTIMVertex>();
 		        for (DENOPTIMVertex bb : FragmentSpace.getFragmentLibrary())
 		        {
 		        	vertxLib.add(bb.clone());
 		        }
-				trgFrgType = BBType.FRAGMENT;
+				trgFrgType = DENOPTIMVertex.BBType.FRAGMENT;
 				break;
 				
 			case 1:
 				vertxLib = compatVrtxs;
-				trgFrgType = BBType.FRAGMENT;
+				trgFrgType = DENOPTIMVertex.BBType.FRAGMENT;
 				break;
 				
 			case 2:
@@ -989,7 +992,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		            vertxLib.add(bb.clone());
 		        }
-				trgFrgType = BBType.CAP;
+				trgFrgType = DENOPTIMVertex.BBType.CAP;
 				break;
 			default:
 				return;
@@ -1012,73 +1015,39 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			return;
 		}
-		ArrayList<Integer> trgFragApId = ((ArrayList<ArrayList<Integer>>)selected)
-		        .get(0);
-		int trgFragId = trgFragApId.get(0);;
-		int trgApId = trgFragApId.get(1);
-		if (res==1)
-		{
-			// When we are selecting among a subset we need to convert the
-			// trgFragId into a value that corresponds to the fragId in
-			// the global fragment library
-			
-			for (int candFragId : genToLocIDMap.keySet())
-			{
-				if (genToLocIDMap.get(candFragId) == trgFragApId.get(0))
-				{
-					trgFragId = candFragId;
-					break;
-				}
-			}
-		}
-		
-		// Take the graph that will be extended
-		dnGraph = dnGraphLibrary.get(currGrphIdx);
+		ArrayList<Integer> trgFragApId = 
+		        ((ArrayList<ArrayList<Integer>>)selected).get(0);
+		DENOPTIMVertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
 		
 		// Append the new nodes
-		for (int i=0; i<srcAPs.size(); i++)
+		for (int i=0; i<selAps.size(); i++)
 		{
-			IdFragmentAndAP ids = srcAPs.get(i);
-			int srcVertexId = ids.getVertexId();
-			int srcApId = ids.getApId();
+			DENOPTIMAttachmentPoint srcAp = selAps.get(i);
 			
-			int trgVrtId = dnGraph.getMaxVertexId()+1;
+			DENOPTIMVertex trgVertex = chosenVrtx.clone();
+			trgVertex.setVertexId(dnGraph.getMaxVertexId()+1);
 			
-			DENOPTIMVertex trgVertex = DENOPTIMVertex.newVertexFromLibrary(
-			       trgVrtId, trgFragId, trgFrgType);
-	
-			// Identify the source vertex/node and its AP
-			DENOPTIMVertex srcVertex = dnGraph.getVertexWithId(srcVertexId);
-				
-			APClass sCls = srcVertex.getAttachmentPoints().get(srcApId).getAPClass();
-			APClass tCls = trgVertex.getAttachmentPoints().get(trgApId).getAPClass();
-				
-			trgVertex.setLevel(srcVertex.getLevel() + 1);
-				
-			//NB: we ignore symmetry here
-	                
-	        DENOPTIMEdge edge = srcVertex.connectVertices(
-	        		trgVertex, srcApId, trgApId, sCls, tCls
-			);
-	
-	        if (edge == null)
+			DENOPTIMAttachmentPoint trgAp = trgVertex.getAP(trgFragApId.get(1));
+
+			try
+			{
+			    dnGraph.appendVertexOnAP(srcAp, trgAp);
+			} catch (DENOPTIMException e)
 	        {
-	        	JOptionPane.showMessageDialog(null,"Unable to make new edge.",
-	    	                "Error",
-	    	                JOptionPane.PLAIN_MESSAGE,
-	    	                UIManager.getIcon("OptionPane.errorIcon"));
+	        	JOptionPane.showMessageDialog(null,"Unable to make new edge. "
+	        	        + e.getMessage(),
+    	                "Error",
+    	                JOptionPane.PLAIN_MESSAGE,
+    	                UIManager.getIcon("OptionPane.errorIcon"));
 	    		return;
 	        }
-	
-	        dnGraph.addVertex(trgVertex);
-	        dnGraph.addEdge(edge);
 		}
 	}
 
 //-----------------------------------------------------------------------------
 	
 	private void collectFragAndAPsCompatibleWithSelectedAPs(
-			ArrayList<IdFragmentAndAP> srcAPs) 
+			ArrayList<DENOPTIMAttachmentPoint> srcAPs) 
 	{
 		compatVrtxs = new ArrayList<DENOPTIMVertex>();
 		
@@ -1089,8 +1058,8 @@ public class GUIGraphHandler extends GUICardPanel
 		// the selection GUI.
 		
     	// First we get all possible APs on any fragment
-    	ArrayList<IdFragmentAndAP> compatFragAps = 
-				FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
+    	ArrayList<DENOPTIMAttachmentPoint> compatAps = 
+				FragmentSpace.getAPsCompatibleWithThese(srcAPs);
     	
     	// then keep unique fragment identifiers, and store unique
 		genToLocIDMap = new HashMap<Integer,Integer>();
@@ -1098,31 +1067,23 @@ public class GUIGraphHandler extends GUICardPanel
 		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
 		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
-		for (IdFragmentAndAP frgApId : compatFragAps)
+		for (DENOPTIMAttachmentPoint ap : compatAps)
 		{
-			int molId = frgApId.getVertexMolId();
-			int apId = frgApId.getApId();
-			if (genToLocIDMap.keySet().contains(molId))
+		    int vId = ap.getOwner().hashCode();
+		    //TODO-V3 replace hash with Id
+			//int vId = ap.getOwner().getVertexId();
+			int apId = ap.getOwner().getIndexOfAP(ap);
+			if (genToLocIDMap.keySet().contains(vId))
 			{
-				DENOPTIMVertex vrtx = compatVrtxs.get(
-						genToLocIDMap.get(molId));
+				DENOPTIMVertex vrtx = compatVrtxs.get(genToLocIDMap.get(vId));
 				String prop = vrtx.getProperty(PRESELPROP).toString();
 				vrtx.setProperty(PRESELPROP,prop+PRESELPROPSEP+apId);
 			}
 			else
 			{
-			    DENOPTIMVertex bb = null;
-				try
-				{
-					bb = FragmentSpace.getVertexFromLibrary(
-					        BBType.FRAGMENT,molId);
-					bb.setProperty(PRESELPROP,apId);
-				}
-				catch (Throwable t)
-				{
-					continue;
-				}
-				genToLocIDMap.put(molId,compatVrtxs.size());
+			    DENOPTIMVertex bb = ap.getOwner().clone();
+				bb.setProperty(PRESELPROP,apId);
+				genToLocIDMap.put(vId,compatVrtxs.size());
 				compatVrtxs.add(bb);
 			}
 		}
@@ -1442,6 +1403,7 @@ public class GUIGraphHandler extends GUICardPanel
 						fsParsForm.possiblyReadParamsFromFSParFile();
 						makeFragSpace();
 					} catch (Exception e1) {
+					    e1.printStackTrace();
 						String msg = "<html>The given parameters did not "
 								+ "allow to "
 								+ "build a fragment space.<br>"

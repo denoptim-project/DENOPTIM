@@ -60,7 +60,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
@@ -489,7 +490,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		    // imported as part of the library of scaffolds/fragments/capping
 		    // groups, and in that moment the BBType is re-assigned.
 		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer(),
-		            BBType.FRAGMENT);
+		            DENOPTIMVertex.BBType.FRAGMENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -582,7 +583,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		DENOPTIMFragment fromViewer = new DENOPTIMFragment();
 		try {
 			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer(),
-			        BBType.FRAGMENT);
+			        DENOPTIMVertex.BBType.FRAGMENT);
 			putAPsFromTableIntoIAtomContainer(fromViewer);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
@@ -683,7 +684,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	public void loadPlainStructure(IAtomContainer mol)
 	{
 		try {
-			fragment = new DENOPTIMFragment(mol, BBType.UNDEFINED);
+			fragment = new DENOPTIMFragment(mol, DENOPTIMVertex.BBType.UNDEFINED);
 	        loadStructure();
 		} catch (DENOPTIMException e) {
 			//Should never happen

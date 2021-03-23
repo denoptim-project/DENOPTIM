@@ -27,7 +27,6 @@ import denoptim.molecule.DENOPTIMGraph.DENOPTIMGraphSerializer;
 import denoptim.molecule.DENOPTIMGraph.DENOPTIMGraphDeserializer;
 
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexSerializer;
 import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexDeserializer;
 
 import denoptim.molecule.DENOPTIMRing;

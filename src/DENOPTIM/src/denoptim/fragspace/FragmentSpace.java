@@ -20,6 +20,7 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,11 +34,12 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 
 /**
@@ -143,9 +145,14 @@ public class FragmentSpace
     private static boolean isValid = false;
     
     /**
+     * Unique identified for vertexes
+     */
+    public static AtomicInteger vrtxID = new AtomicInteger(0);
+    
+    /**
      * Index used to keep the order in a list of attachment points
      */
-    public static AtomicInteger apID = new AtomicInteger();
+    public static AtomicInteger apID = new AtomicInteger(0);
 
 //------------------------------------------------------------------------------
     
@@ -278,20 +285,26 @@ public class FragmentSpace
         // template in there.
         if (capFile.length() > 0)
         {
-            //TODO-V3 set buildingBlockId
-            setCappingLibrary(convertsIACsToVertexes(
+            cappingLib = new ArrayList<DENOPTIMVertex>();
+            FragmentSpace.appendIACsAsVertexesToLibrary(
+                    DenoptimIO.readDENOPTIMVertexFromSDFile(
+                            capFile,"capping group"),BBType.CAP,cappingLib);
+            /*
+             //TODO del
+            setCappingLibrary(DenoptimIO.convertIACsToVertexes(
                     DenoptimIO.readDENOPTIMVertexFromSDFile(capFile,
                     "capping group"),BBType.CAP));
+                    */
         }
         
-        //TODO-V3 set buildingBlockId
         fragmentLib = new ArrayList<DENOPTIMVertex>();
-        DenoptimIO.appendToVertexLibrary(DenoptimIO.readDENOPTIMVertexFromSDFile(
+        FragmentSpace.appendIACsAsVertexesToLibrary(
+                DenoptimIO.readDENOPTIMVertexFromSDFile(
                 fragFile,"fragment"),BBType.FRAGMENT,fragmentLib);
         
-        //TODO-V3 set buildingBlockId
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
-        DenoptimIO.appendToVertexLibrary(DenoptimIO.readDENOPTIMVertexFromSDFile(
+        FragmentSpace.appendIACsAsVertexesToLibrary(
+                DenoptimIO.readDENOPTIMVertexFromSDFile(
                         scaffFile,"scaffold"),BBType.SCAFFOLD,scaffoldLib);
 
         //TODO-MF del (used to create SDF versions of empty fragments
@@ -321,12 +334,21 @@ public class FragmentSpace
         if (FragmentSpaceParameters.useTemplates)
         {
             scaffoldLib = new ArrayList<>();
-            scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
+            //scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
+            appendVertexesToLibrary(new ArrayList<DENOPTIMVertex>(
+                    Arrays.asList(DENOPTIMTemplate.getTestScaffoldTemplate())), 
+                    BBType.SCAFFOLD, scaffoldLib);
             
-            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplate());
+//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplate());
+//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
+//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
             
-            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
-            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
+            appendVertexesToLibrary(new ArrayList<DENOPTIMVertex>(
+                    Arrays.asList(DENOPTIMTemplate.getTestFragmentTemplate(),
+                            DENOPTIMTemplate.getTestFragmentTemplateBis()
+                            , DENOPTIMTemplate.getTestFragmentTemplateTris()
+                            )), 
+                    BBType.FRAGMENT, fragmentLib);
             
             System.err.println("WARNING! Running TEMP CODE: Replaced scaffold "
                     + "lib with single test template. Also appending one "
@@ -344,13 +366,14 @@ public class FragmentSpace
             }
             
             //TODO-MF del
-            DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",scaffoldLib);
-            //DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",fragmentLib);
+            DenoptimIO.writeVertexes("/tmp/scaffolds.sdf",scaffoldLib);
+            DenoptimIO.writeVertexes("/tmp/frags.sdf",fragmentLib);
             
             //TODO del
             System.out.println("WRITTEN!");
             
           //TODO del
+            /*
             ArrayList<DENOPTIMVertex> wEmpty = convertsIACsToVertexes(
                     DenoptimIO.readInLibraryOfFragments("/tmp/empty_mols.sdf","fragment"),
                     BBType.FRAGMENT);
@@ -360,28 +383,6 @@ public class FragmentSpace
         */
         
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Processes a list of atom containers and builds a list of vertexes.
-     * @param iacs the list of atom containers.
-     * @return the list of vertexes.
-     * @throws DENOPTIMException
-     */
-    
-    //TODO-V3: Move to IO
-    
-    private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
-            ArrayList<IAtomContainer> iacs, BBType bbt) throws DENOPTIMException
-    {
-        ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();
-        for (IAtomContainer iac : iacs)
-        {
-            list.add(DenoptimIO.convertsIACToVertex(iac,bbt));
-        }
-        return list;
     }
     
 //------------------------------------------------------------------------------
@@ -440,7 +441,7 @@ public class FragmentSpace
      * Returns a clone of the requested building block. The type of vertex
      * returned depends on the type stored in the library.
      * 
-     * @param fTyp the type of building block. This basically selects the 
+     * @param bbType the type of building block. This basically selects the 
      * sub library from which the building block is taken: 0 for scaffold (i.e.,
      * building blocks that can be used to start a new graph), 1 for
      * standard building blocks (i.e., can be used freely to grow or modify an 
@@ -455,18 +456,11 @@ public class FragmentSpace
      * example, any of the indexes is out of range.  
      */
 
-    public static DENOPTIMVertex getVertexFromLibrary(BBType fTyp, int bbIdx) 
-                                                        throws DENOPTIMException
+    public static DENOPTIMVertex getVertexFromLibrary(
+            DENOPTIMVertex.BBType bbType, int bbIdx) throws DENOPTIMException
     {
-        // WARNING! This is were we first assign the bbTyp and bbIdx to
-        // a vertex 'taken' from the library. Note that 'taken' means that we 
-        // get a slightly modified copy of the vertex. In particular, the
-        // objects stores in the library do not have a meaningful value for the
-        // two indexes, so after we make a deep copy of them we assign the 
-        // indexes according to bbTyp and bbIdx.
-        
         String msg = "";
-        switch (fTyp)
+        switch (bbType)
         {
             case SCAFFOLD:
                 if (scaffoldLib == null)
@@ -495,24 +489,24 @@ public class FragmentSpace
         }
         
         DENOPTIMVertex originalVrtx = null;
-        switch (fTyp)
+        switch (bbType)
         {
         case SCAFFOLD:
-            if (bbIdx < scaffoldLib.size())
+            if (bbIdx >-1 && bbIdx < scaffoldLib.size())
             {
                     originalVrtx = scaffoldLib.get(bbIdx);        
             }
             else
             {
                 msg = "Mismatch between scaffold bbIdx and size of the library"
-                      + ". MolId: " + bbIdx + " FragType: " + fTyp;
+                      + ". MolId: " + bbIdx + " FragType: " + bbType;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
             break;
             
         case FRAGMENT:
-            if (bbIdx < fragmentLib.size())
+            if (bbIdx >-1 && bbIdx < fragmentLib.size())
             {
                 originalVrtx = fragmentLib.get(bbIdx);
             }
@@ -520,14 +514,14 @@ public class FragmentSpace
             {
                 msg = "Mismatch between fragment bbIdx and size of the "
                                 + "library" + ". MolId: " + bbIdx 
-                                + " FragType: " + fTyp;
+                                + " FragType: " + bbType;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
             break;
             
         case CAP:
-            if (bbIdx < cappingLib.size())
+            if (bbIdx >-1 && bbIdx < cappingLib.size())
             {
                 originalVrtx = cappingLib.get(bbIdx);
             }
@@ -535,7 +529,7 @@ public class FragmentSpace
             {
                 msg = "Mismatch between capping group bbIdx and size "
                                 + "of the library. MolId: " + bbIdx 
-                                + " FragType: " + fTyp;
+                                + " FragType: " + bbType;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
@@ -553,37 +547,27 @@ public class FragmentSpace
             {
                 msg = "Mismatch between fragment bbIdx and size of the "
                                 + "library" + ". MolId: " + bbIdx 
-                                + " FragType: " + fTyp;
+                                + " FragType: " + bbType;
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
             break;
 
         default:
-            msg = "Unknown type of fragment '" + fTyp + "'.";
+            msg = "Unknown type of fragment '" + bbType + "'.";
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
         
         DENOPTIMVertex clone = originalVrtx.clone();
-        
-        //TODO-V3: is there a better way to do this in a type-agnostic way?
-        if (clone instanceof DENOPTIMFragment)
+        clone.setBuildingBlockId(bbIdx);
+        if (originalVrtx.getBuildingBlockId() != bbIdx)
         {
-            ((DENOPTIMFragment) clone).setMolId(bbIdx);
+            System.err.println("WARNING! Mismatch between building block ID ("
+                    + originalVrtx.getBuildingBlockId() + ") and position in "
+                    + "the list of building blocks (" + bbIdx + ") for type "
+                    + bbType + ".");
         }
-        //TODO-V3 keep it or trash it?
-        else if (clone instanceof DENOPTIMTemplate)
-        {
-            ((DENOPTIMTemplate) clone).setMolId(bbIdx);
-        }
-        else 
-        {
-            System.err.println("WARNING! Recovering a vertex that is neither an"
-                    + " instance of fragment nor a template. "
-                    + "Not setting bbType and bbIdx.");
-        }
-                
         return clone;
     }
 
@@ -623,7 +607,7 @@ public class FragmentSpace
             APClass apc = null;
             try 
             {
-                apc = getVertexFromLibrary(BBType.CAP, i).getAttachmentPoints()
+                apc = getVertexFromLibrary(DENOPTIMVertex.BBType.CAP, i).getAttachmentPoints()
                         .get(0).getAPClass();
                 if (apc.equals(capApCls))
                 {
@@ -897,11 +881,35 @@ public class FragmentSpace
             {
                 IdFragmentAndAP apId = new IdFragmentAndAP(-1, //vertexId
                                                    idxs.get(0), //MolId,
-                                                   BBType.FRAGMENT,
+                                                   DENOPTIMVertex.BBType.FRAGMENT,
                                                    idxs.get(1), //ApId
                                                    -1, //noVSym
                                                    -1);//noAPSym
                 lst.add(apId);
+            }
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of attachment points with the given class. 
+     * @param apc the attachment point class to search.
+     * @return the list of matching attachment points.
+     */
+
+    public static ArrayList<DENOPTIMVertex> getVertexesWithAPClass(APClass apc)
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        
+        if (fragsApsPerApClass.containsKey(apc))
+        {
+            for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+            {
+                DENOPTIMVertex v = FragmentSpace.getFragmentLibrary()
+                        .get(idxs.get(0));
+                lst.add(v);
             }
         }
         return lst;
@@ -936,7 +944,7 @@ public class FragmentSpace
         {
             try {
                 compatFrags.add(FragmentSpace.getVertexFromLibrary(
-                            BBType.FRAGMENT, fid));
+                            DENOPTIMVertex.BBType.FRAGMENT, fid));
             } catch (DENOPTIMException e) {
                 System.err.println("Exception while trying to get fragment '" 
                         + fid + "'!");
@@ -945,6 +953,58 @@ public class FragmentSpace
         }
         
         return compatFrags;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for all attachment points that are compatible with the given 
+     * list of attachment points.
+     * @param srcAPs attachment points meant to results have to be compatible 
+     * with.
+     * @return a list of compatible attachment points found in the library of
+     * fragments.
+     */
+    public static ArrayList<DENOPTIMAttachmentPoint> getAPsCompatibleWithThese(
+                    ArrayList<DENOPTIMAttachmentPoint> srcAPs)
+    {
+        ArrayList<DENOPTIMAttachmentPoint> compAps = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        boolean first = true;
+        for (DENOPTIMAttachmentPoint ap : srcAPs)
+        { 
+            ArrayList<DENOPTIMAttachmentPoint> compForOne = 
+                    getAPsCompatibleWithClass(ap.getAPClass());
+
+            if (first)
+            {
+                compAps.addAll(compForOne);
+                first = false;
+                continue;
+            }
+            
+            ArrayList<DENOPTIMAttachmentPoint> toKeep = 
+                    new ArrayList<DENOPTIMAttachmentPoint>();
+            for (DENOPTIMAttachmentPoint candAp : compAps)
+            {
+                for (DENOPTIMAttachmentPoint newCand : compForOne)
+                {
+                    if (newCand == candAp)
+                    {
+                            toKeep.add(candAp);
+                            break;
+                    }
+                }
+            }
+            
+            compAps = toKeep;
+            
+            if (compAps.size()==0)
+            {
+                break;
+            }
+        }
+        return compAps;
     }
     
 //------------------------------------------------------------------------------
@@ -997,6 +1057,54 @@ public class FragmentSpace
         }
 
         return compFrAps;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the list of attachment points found in the fragment 
+     * space and that are compatible with a given AP class. 
+     * Multiple APs can be found for each fragment.
+     * @param aPC1 the AP class for which we want compatible APs.
+     */
+    
+    public static ArrayList<DENOPTIMAttachmentPoint> getAPsCompatibleWithClass(
+                    APClass aPC1)
+    {
+        ArrayList<DENOPTIMAttachmentPoint> compatAps = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        
+        // Take the compatible AP classes
+        ArrayList<APClass> compatApClasses = 
+             FragmentSpace.getCompatibleAPClasses(aPC1);
+        
+        // Find all APs with a compatible class
+        if (compatApClasses != null)
+        {
+            for (APClass klass : compatApClasses)
+            {
+                ArrayList<DENOPTIMVertex> vrtxs = getVertexesWithAPClass(klass);
+                for (DENOPTIMVertex v : vrtxs)
+                {
+                    for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                    {
+                        if (ap.getAPClass() == klass)
+                        {
+                            compatAps.add(ap);
+                        }
+                    }
+                }
+            }
+        }
+        
+        //TODO-V3: keep or trash?
+        if (compatAps.size()==0)
+        {
+            System.out.println("WARNING: No compatible AP found in the "
+                    + "fragment space for APClass '" + aPC1 + "'.");
+        }
+        
+        return compatAps;
     }
     
 //------------------------------------------------------------------------------
@@ -1109,21 +1217,27 @@ public class FragmentSpace
 
     public static void setScaffoldLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-        scaffoldLib = lib;
+        scaffoldLib = new ArrayList<DENOPTIMVertex>();
+        FragmentSpace.appendVertexesToLibrary(lib, 
+                BBType.SCAFFOLD, scaffoldLib);
     }
     
 //------------------------------------------------------------------------------
 
     public static void setFragmentLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-        fragmentLib = lib;
+        fragmentLib = new ArrayList<DENOPTIMVertex>();
+        FragmentSpace.appendVertexesToLibrary(lib, 
+                BBType.FRAGMENT, fragmentLib);
     }
 
 //------------------------------------------------------------------------------
 
     public static void setCappingLibrary(ArrayList<DENOPTIMVertex> lib)
     {
-        cappingLib = lib;
+        cappingLib = new ArrayList<DENOPTIMVertex>();
+        FragmentSpace.appendVertexesToLibrary(lib, 
+                BBType.CAP, cappingLib);
     }
 
 //------------------------------------------------------------------------------
@@ -1215,6 +1329,85 @@ public class FragmentSpace
         fragsApsPerApClass = null;
         symmConstraints = null;
         isValid = false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a list of atom containers and converts it into a list of vertexes
+     * that are added to a given library. 
+     * @param list of atom containers to import.
+     * @param bbt the type of building block the vertexes should be set to.
+     * @param library where to import the vertexes to.
+     */
+    
+    public static void appendIACsAsVertexesToLibrary(ArrayList<IAtomContainer>list, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        for(IAtomContainer iac : list)
+        {
+            DENOPTIMVertex v = null;
+            try
+            {
+                v = DENOPTIMVertex.convertIACToVertex(iac,bbt);
+            } catch (Throwable e)
+            {
+                e.printStackTrace();
+                System.err.println("ERROR! Could not import "+bbt+". Failed "
+                        + "conversion of IAtomContainer to "+bbt+".");
+                System.exit(-1);;
+            }
+            appendVertexToLibrary(v,bbt,library);
+        }
+        // NB: do not try to add all vertexes in one. If there are templates 
+        // that are built using vertexes that are imported in the same run of
+        // this method, then the building blocks must be added to the library
+        // before the template is added. The latter will, in fact, require
+        // to find the building blocks in the library.
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a list of vertexes and add them to a given library. Each vertex
+     * is assigned the building block type and ID. 
+     * do not try to add all vertexes in one. If there are templates 
+     * that are built using vertexes that are imported in the same run of
+     * this method, then the building blocks must be added to the library
+     * before the template is added. The latter will, in fact, require
+     * to find the building blocks in the library.
+     * 
+     * @param list of vertexes to import.
+     * @param bbt the type of building block the vertexes should be set to.
+     * @param library where to import the vertexes to.
+     */
+    
+    public static void appendVertexesToLibrary(ArrayList<DENOPTIMVertex> list, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        for (DENOPTIMVertex v : list)
+        {
+            appendVertexToLibrary(v,bbt,library);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes a vertexes and add it to a given library. Each vertex
+     * is assigned the building block type and ID. 
+     * 
+     * @param v  vertex to import.
+     * @param bbt the type of building block the vertex should be set to.
+     * @param library where to import the vertex to.
+     */
+    
+    public static void appendVertexToLibrary(DENOPTIMVertex v, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    {
+        v.setBuildingBlockId(library.size());
+        v.setBuildingBlockType(bbt);
+        library.add(v);
     }
     
 //------------------------------------------------------------------------------

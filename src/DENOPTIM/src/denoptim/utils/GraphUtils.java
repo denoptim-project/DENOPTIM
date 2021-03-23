@@ -27,9 +27,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.ClosableChain;
 
 
@@ -228,7 +228,7 @@ public class GraphUtils
                                                       DENOPTIMVertex curVertex,
                                                       int srcAPIdx, 
                                                       int fId, 
-                                                      BBType fTyp,
+                                                      DENOPTIMVertex.BBType fTyp,
                                                       int trgAPIdx) 
                                                       throws DENOPTIMException
     {

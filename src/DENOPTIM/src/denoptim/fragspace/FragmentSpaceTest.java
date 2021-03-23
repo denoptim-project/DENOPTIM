@@ -39,8 +39,8 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * Unit test for fragment space
@@ -64,7 +64,7 @@ public class FragmentSpaceTest
     private final String RULAPCC1 = "cap-1";
     private final String RULAPCC2 = "cap-2";
     
-    private final BBType BBTFRAG = BBType.FRAGMENT;
+    private final DENOPTIMVertex.BBType BBTFRAG = DENOPTIMVertex.BBType.FRAGMENT;
     
 	private APClass APCS;
 	private APClass APC1;

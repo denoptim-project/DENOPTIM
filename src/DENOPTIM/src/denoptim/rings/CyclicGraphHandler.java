@@ -47,10 +47,10 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
@@ -1782,7 +1782,7 @@ public class CyclicGraphHandler
             // check for orphan coordinating atoms:
             // they have RCAs but none of them is included in a rings
             if (vert.getLevel() == 0 
-                    && vertFrag.getFragmentType() == BBType.FRAGMENT)
+                    && vertFrag.getBuildingBlockType() == DENOPTIMVertex.BBType.FRAGMENT)
             {
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();

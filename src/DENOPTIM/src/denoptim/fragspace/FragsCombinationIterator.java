@@ -26,9 +26,9 @@ import java.util.NoSuchElementException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
 import denoptim.utils.GraphUtils;
 
@@ -123,8 +123,8 @@ public class FragsCombinationIterator
         {
             int vIdx = v.getVertexId();
             //TODO-V3 need to use something else
-            int vMolId = v.getMolId();
-            BBType vMolTyp = v.getFragmentType();
+            int vMolId = v.getBuildingBlockId();
+            DENOPTIMVertex.BBType vMolTyp = v.getBuildingBlockType();
            
             // deal with symmetric sets of vertices
             boolean keepThisVertex = true;
@@ -207,7 +207,7 @@ public class FragsCombinationIterator
         // Collect all possibilities (frags, caps, entry) for each free AP
         for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
-            BBType fTyp = candSrcAp.getVertexMolType();
+            DENOPTIMVertex.BBType fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
             DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
@@ -226,7 +226,7 @@ public class FragsCombinationIterator
                 int vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
                 		            compatApId.getVertexMolId(), //MolId,
-                                    BBType.FRAGMENT,
+                                    DENOPTIMVertex.BBType.FRAGMENT,
                                     compatApId.getApId(), //ApId
 							        -1, //noVSym
 							        -1);//noAPSym
@@ -251,7 +251,7 @@ public class FragsCombinationIterator
                     int vid = GraphUtils.getUniqueVertexIndex();
                     IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid,//vertxId
                                                                     i,//MolId,
-                                                                    BBType.CAP,
+                                                                    DENOPTIMVertex.BBType.CAP,
                                                                     0,//ApId
                                 								   -1,//noVSym
                                 								   -1);//noAPSym
@@ -576,8 +576,8 @@ public class FragsCombinationIterator
 
                             IdFragmentAndAP symSrcFrgAp = new IdFragmentAndAP(
                                                                        srcVrtId,
-                                                                   v.getMolId(),
-                                                            v.getFragmentType(),
+                                                                   v.getBuildingBlockId(),
+                                                            v.getBuildingBlockType(),
                                                                      symSrcApId,
 						      srcFrgAp.getVrtSymSetId(),
 							                    -1);
@@ -628,8 +628,8 @@ public class FragsCombinationIterator
                                 IdFragmentAndAP symSrcFrgAp = 
                                                            new IdFragmentAndAP(
                                                                     symSrcVrtID,
-                                                           symVertex.getMolId(),
-                                                    symVertex.getFragmentType(),
+                                                           symVertex.getBuildingBlockId(),
+                                                    symVertex.getBuildingBlockType(),
                                                              srcFrgAp.getApId(),
 						      srcFrgAp.getVrtSymSetId(),
 							                    -1);

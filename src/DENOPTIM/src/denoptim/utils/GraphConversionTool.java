@@ -37,10 +37,10 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
 
@@ -139,7 +139,6 @@ public class GraphConversionTool
                         ap1.getAtomPositionNumber());
                 int dap2_anum = atmSrcMap.get(v2.getVertexId()).get(
                         ap2.getAtomPositionNumber());
-                
                 if (edge.getBondType().hasCDKAnalogue())
                 {
                     mol.addBond(dap1_anum, dap2_anum, edge.getBondType().getCDKOrder());
@@ -149,7 +148,7 @@ public class GraphConversionTool
                 e.printStackTrace();
                 String msg = "Incorrect indices. Although this may be a bug, " +
                         "it is more likely an error in the atom specification. "
-                        + "Kindly check your input files."
+                        + "Kindly check your input files. "
                         + "Error occurred while dealing with edge " + edge
                         + " and vertexes " + v1 + " and " + v2 + ".";
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
@@ -297,7 +296,7 @@ public class GraphConversionTool
             // molid
             int molid = Integer.parseInt(s3[1]) - 1;
             // fragment/scaffold
-            BBType fragtype = BBType.parseInt(Integer.parseInt(s3[2]));
+            DENOPTIMVertex.BBType fragtype = DENOPTIMVertex.BBType.parseInt(Integer.parseInt(s3[2]));
             // level
             int level = Integer.parseInt(s3[3]);
 	            

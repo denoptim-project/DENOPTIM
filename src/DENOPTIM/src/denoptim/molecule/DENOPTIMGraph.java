@@ -58,7 +58,7 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.PathSubGraph;
@@ -1542,7 +1542,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getFragmentType() == BBType.CAP
+            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 toDel.add(vtx);
@@ -1573,7 +1573,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getFragmentType() == BBType.CAP
+            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 rvids.add(vtx.getVertexId());
@@ -2293,6 +2293,50 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     newSymSets, onAllSymmAPs);
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Append a vertex to this graph. Does not clone the incoming vertex.
+     * Does not project on symmetrically related vertexes or
+     * attachment points. No change in symmetric sets, apart from importing
+     * those sets that are already defined in the incoming vertex.
+     * @param srcAP the attachment point on the this graph.
+     * @param trgAP the attachment point on the incoming vertex.
+     * @throws DENOPTIMException 
+     */
+
+    public void appendVertexOnAP(DENOPTIMAttachmentPoint srcAP, 
+            DENOPTIMAttachmentPoint trgAP) throws DENOPTIMException 
+    {
+        if (!srcAP.isAvailable())
+        {
+            throw new DENOPTIMException("Attempt to use unavailable attachment "
+                    + "point " + srcAP + " on vertex " 
+                    + srcAP.getOwner().getVertexId());
+        }
+        if ( !trgAP.isAvailable())
+        {
+            throw new DENOPTIMException("Attempt to use unavailable attachment "
+                    + "point " + trgAP + " on vertex " 
+                    + trgAP.getOwner().getVertexId());
+        }
+        
+        BondType btSrc = FragmentSpace.getBondOrderForAPClass(
+                srcAP.getAPClass().getRule());
+        BondType btTrg = FragmentSpace.getBondOrderForAPClass(
+                trgAP.getAPClass().getRule());
+        BondType bndTyp = btSrc;
+        if (btSrc != btTrg)
+        {
+            bndTyp = BondType.UNDEFINED;
+        }
+
+        trgAP.getOwner().setLevel(srcAP.getOwner().getLevel() + 1);
+        this.addVertex(trgAP.getOwner());
+        DENOPTIMEdge edge = new DENOPTIMEdge(srcAP,trgAP, bndTyp);
+        addEdge(edge);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -2555,7 +2599,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         //Check condition fragment ID
         if (vQuery instanceof DENOPTIMFragment)
         {
-            int queryMolID = ((DENOPTIMFragment) vQuery).getMolId();
+            int queryMolID = ((DENOPTIMFragment) vQuery).getBuildingBlockId();
             if (queryMolID > -1) //-1 would be the wildcard
             {
                 ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
@@ -2569,7 +2613,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     {
                         continue;
                     }
-                    if (((DENOPTIMFragment) v).getMolId() == queryMolID)
+                    if (((DENOPTIMFragment) v).getBuildingBlockId() == queryMolID)
                     {
                         newLst.add(v);
                     }
@@ -2583,8 +2627,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition fragment type
-            BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getFragmentType();
-            if (queryFrgTyp != BBType.UNDEFINED)
+            DENOPTIMVertex.BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getBuildingBlockType();
+            if (queryFrgTyp != DENOPTIMVertex.BBType.UNDEFINED)
             {
                 if (verbosity > 2)
                 {
@@ -2597,7 +2641,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     {
                         continue;
                     }
-                    if (((DENOPTIMFragment) v).getFragmentType() == queryFrgTyp)
+                    if (((DENOPTIMFragment) v).getBuildingBlockType() == queryFrgTyp)
                     {
                         newLst.add(v);
                     }

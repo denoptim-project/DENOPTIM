@@ -20,7 +20,8 @@ package denoptim.fragspace;
 
 import java.io.Serializable;
 
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 
 /**
@@ -50,7 +51,7 @@ public class IdFragmentAndAP implements Serializable
     /**
      * the type of library containing the fragment. 
      */
-    private BBType molTyp = BBType.UNDEFINED;
+    private DENOPTIMVertex.BBType molTyp = DENOPTIMVertex.BBType.UNDEFINED;
 
     /**
      * the index of a specific attachment point.
@@ -75,7 +76,7 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public IdFragmentAndAP(int m_vId, int m_molId, BBType vMolTyp, int m_apId, 
+    public IdFragmentAndAP(int m_vId, int m_molId, DENOPTIMVertex.BBType vMolTyp, int m_apId, 
             int m_vSymSetId, int m_aSymSetId)
     {
         vId = m_vId;
@@ -102,7 +103,7 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public BBType getVertexMolType()
+    public DENOPTIMVertex.BBType getVertexMolType()
     {
         return molTyp;
     }

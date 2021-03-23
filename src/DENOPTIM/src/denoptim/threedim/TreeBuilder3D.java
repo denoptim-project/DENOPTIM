@@ -43,9 +43,9 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -513,7 +513,7 @@ public class TreeBuilder3D
         				cappingAPClass).get(0);
         		
         		DENOPTIMVertex capVrtx = FragmentSpace.getVertexFromLibrary(
-        		        BBType.CAP, capId);
+        		        DENOPTIMVertex.BBType.CAP, capId);
         		inVtx = capVrtx;
         	} else {
         		// No capping needed. Then we are done.

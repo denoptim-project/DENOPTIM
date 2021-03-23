@@ -49,11 +49,11 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
@@ -202,7 +202,7 @@ public class EAUtils
         {
             DENOPTIMMolecule mol = popln.get(i);
             DENOPTIMGraph g = mol.getGraph();
-            int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
+            int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
         }
 
@@ -645,7 +645,7 @@ public class EAUtils
 
         //TODO-V3: use a type-agnostic w.r.t vertex constructor
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, DENOPTIMVertex.BBType.SCAFFOLD);
 
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
@@ -784,7 +784,7 @@ public class EAUtils
             if (bbIdCap != -1)
             {
                 DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), bbIdCap, BBType.CAP);
+                        GraphUtils.getUniqueVertexIndex(), bbIdCap, DENOPTIMVertex.BBType.CAP);
                 
                 capVrtx.setLevel(lvl+1);
 
@@ -1032,7 +1032,7 @@ public class EAUtils
             DENOPTIMVertex curVertex = lstVert.get(i);
 
             // no capping of a capping group
-            if (curVertex.getFragmentType() == BBType.CAP)
+            if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
             {
                 //String msg = "Attempting to cap a capping group. Check your data.";
                 //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
@@ -1433,8 +1433,8 @@ public class EAUtils
                         {
                             String msg = "Forbidden free AP for Vertex: "
                                 + vtx.getVertexId()
-                                + " MolId: " + (vtx.getMolId() + 1)
-                                + " Ftype: " + vtx.getFragmentType()
+                                + " MolId: " + (vtx.getBuildingBlockId() + 1)
+                                + " Ftype: " + vtx.getBuildingBlockType()
                                 + "\n"+ molGraph+" \n "
                                 + " AP class: " + apClass;
                             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);

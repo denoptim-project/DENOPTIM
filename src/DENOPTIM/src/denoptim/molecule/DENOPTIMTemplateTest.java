@@ -32,7 +32,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
 
 /**
@@ -86,7 +86,7 @@ public class DENOPTIMTemplateTest
                 Arrays.asList(vRcvA, vA, vB, vC, vRcvC)));
         g.addRing(r);
         
-        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate t = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         //TODO-v3 add required APs and check they are cloned properly
         t.setInnerGraph(g);
         t.freezeTemplate();
@@ -128,7 +128,7 @@ public class DENOPTIMTemplateTest
 
     @Test
     public void testGetAttachmentPointsReturnsAPsWithTemplateAsOwner() {
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate template = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         EmptyVertex v = new EmptyVertex();
         template.addAP(0, 1, 1);
         v.addAP(0, 1, 1);
@@ -150,7 +150,7 @@ public class DENOPTIMTemplateTest
     public void testGetAttachmentPointsReturnsCorrectNumberOfAPs() {
         // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate template = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         int requiredAPCount = 2;
         int atmPos = 0;
         int atmConns = 1;
@@ -199,7 +199,7 @@ public class DENOPTIMTemplateTest
                 APClass.make("rule2", 1)
         );
 
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+        DENOPTIMTemplate template = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
         DENOPTIMVertex v = new EmptyVertex();
         for (int i = 0; i < numberOfAPs; i++) {
             template.addAP(-1, atomConnections.get(i),

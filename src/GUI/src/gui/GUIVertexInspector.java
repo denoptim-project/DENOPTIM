@@ -56,8 +56,8 @@ import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
@@ -211,7 +211,7 @@ public class GUIVertexInspector extends GUICardPanel
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
 				    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
-	                                BBType.FRAGMENT);
+	                                DENOPTIMVertex.BBType.FRAGMENT);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -511,7 +511,7 @@ public class GUIVertexInspector extends GUICardPanel
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
                     vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
-                                    BBType.FRAGMENT);
+                                    DENOPTIMVertex.BBType.FRAGMENT);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog(btnAddVrtx,
@@ -721,7 +721,7 @@ public class GUIVertexInspector extends GUICardPanel
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
             vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(file, 
-                            BBType.FRAGMENT);
+                            DENOPTIMVertex.BBType.FRAGMENT);
         } catch (Exception e1) {
             e1.printStackTrace();
             JOptionPane.showMessageDialog(btnAddVrtx,
