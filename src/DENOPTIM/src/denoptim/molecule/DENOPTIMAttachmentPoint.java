@@ -57,11 +57,14 @@ Comparable<DENOPTIMAttachmentPoint>
      */
     private int atomPositionNumber;
     
+    //TODO-V3 remove
     /**
      * the original number of connections of this atom
      */
     private int totalConnections; 
 
+
+    //TODO-V3 remove
     /**
      * the current free connections
      */
@@ -523,13 +526,13 @@ Comparable<DENOPTIMAttachmentPoint>
 //------------------------------------------------------------------------------
 
     /**
-     * Check availability of free connections
-     * @return <code>true</code> if the attachment point has free connections
+     * Check availability of this attachment point.
+     * @return <code>true</code> if the attachment point has no user
      */
 
     public boolean isAvailable()
     {
-        return freeConnections > 0;
+        return user == null;
     }
 
 //------------------------------------------------------------------------------

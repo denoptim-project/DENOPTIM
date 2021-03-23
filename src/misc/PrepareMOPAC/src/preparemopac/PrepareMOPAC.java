@@ -18,19 +18,19 @@
 
 package preparemopac;
 
-import denoptim.exception.DENOPTIMException;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import denoptim.io.DenoptimIO;
-import denoptim.task.ProcessHandler;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.task.ProcessHandler;
 
 
 

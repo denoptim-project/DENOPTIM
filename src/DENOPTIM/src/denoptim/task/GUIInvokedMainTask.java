@@ -28,7 +28,6 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.TaskUtils;
-import denoptimga.GAParameters;
 
 /**
  * Task that runs any of the main methods in the denoptim project, such as 

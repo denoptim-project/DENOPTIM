@@ -19,12 +19,26 @@
 
 package denoptim.molecule;
 
+import java.lang.reflect.Type;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.Set;
 import java.util.logging.Level;
-import java.io.Serializable;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -72,6 +86,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * if the level at which this vertex is in a graph
      */
     private int level = -99; //Initialised to meaningless value
+    
+    /**
+     * Map of customizable properties
+     */
+    private Map<Object, Object> properties;
 
     /**
      * List of mutations that we can perform on this vertex
@@ -381,10 +400,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     
     @Override
-    public DENOPTIMVertex clone()
-    {
-        return (DENOPTIMVertex) clone();
-    }
+    public abstract DENOPTIMVertex clone();
     
 //------------------------------------------------------------------------------
     
@@ -732,14 +748,14 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Add ap to the end of the list of this vertex's list of attachment points
      * @param ap attachment point to add to this vertex
      */
-    public void addAP(DENOPTIMAttachmentPoint ap) throws DENOPTIMException {
+    public void addAP(DENOPTIMAttachmentPoint ap) {
         ap.setOwner(this);
         getAttachmentPoints().add(ap);
     }
 
 //------------------------------------------------------------------------------
 
-    public void addAP() throws DENOPTIMException {
+    public void addAP() {
         addAP(0, 0, 0);
     }
 
@@ -752,7 +768,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param apConnections the number of free connections
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections) throws DENOPTIMException {
+                      int apConnections) {
         addAP(atomPositionNumber, atomConnections, apConnections,
                 new double[3]);
     }
@@ -771,9 +787,17 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      *               of the source atom). This must array have 3 entries.
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, double[] dirVec) throws  DENOPTIMException {
-        addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
-                APClass.make(""));
+                      int apConnections, double[] dirVec) {
+        try
+        {
+            addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
+                    APClass.make(""));
+        } catch (DENOPTIMException e)
+        {
+            // We should never reach this point because the make("") will
+            // result in an AP with class "noclass:0"
+            e.printStackTrace();
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -786,7 +810,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param apClass the APClass
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, APClass apClass) throws DENOPTIMException {
+                      int apConnections, APClass apClass) {
         addAP(atomPositionNumber, atomConnections, apConnections,
                 new double[3], apClass);
     }
@@ -803,7 +827,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param apClass the APClass
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, double[] dirVec, APClass apClass) throws DENOPTIMException {
+                      int apConnections, double[] dirVec, APClass apClass) {
         addAP(new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, atomConnections, apConnections, dirVec,
                 apClass));
@@ -906,5 +930,222 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     }
     
 //------------------------------------------------------------------------------
+    
+    public Object getProperty(Object description)
+    {
+        if (properties == null)
+        {
+            return null;
+        } else {
+            return properties.get(description);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperty(Object key, Object property)
+    {
+        if (properties == null)
+        {
+            properties = new HashMap<Object, Object>();
+        }
+        properties.put(key, property);
+    }
+
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+
+    //TODO-V3: consider removal. this is just a code stub written to test the
+    // possibility of having a custom serializer.
+
+    public static class DENOPTIMVertexSerializer
+    implements JsonSerializer<DENOPTIMVertex> {
+
+        @Override
+        public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc,
+                JsonSerializationContext context) {
+
+            JsonObject jsonObject = new JsonObject();
+            // src.owner creates a loop!
+            jsonObject.addProperty("vertexId", src.getVertexId());
+            jsonObject.addProperty("isRCV", src.isRCV());
+            jsonObject.addProperty("level", src.getLevel());
+            jsonObject.add("allowedMutatioTypes",
+                context.serialize(src.getMutationTypes()));
+
+
+            //JsonPrimitive jsonObject = new JsonPrimitive(src.vertexId);
+            return jsonObject;
+        }
+    }
+
+//
+// public class DENOPTIMVertexSerializer implements JsonSerializer<DENOPTIMVertex> {
+//      //
+//      // @Override
+//      // public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, JsonSerializationContext context) {
+//      //     JsonObject jsonObject = new JsonObject();
+//      //     jsonObject.addProperty("Name", src.Name);
+//      //     jsonObject.add("Type", context.serialize(src.Type));
+//      //     jsonObject.add("ChildId", context.serialize(src.ChildId));  // recursion!
+//      //     return jsonObject;
+//      // }
+// }
+//
+// public class DENOPTIMVertexDeserializer implements JsonDeserializer<DENOPTIMVertex> {
+//      //
+//      // @Override
+//      // public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+//      //     throws JsonParseException {
+//      //     DENOPTIMVertex id = new DENOPTIMVertex();
+//      //     id.Name = json.getAsJsonObject().get("Name").getAsString();
+//      //     id.Type = context.deserialize(json.getAsJsonObject().get("Type"), StructType.class);
+//      //     JsonElement childJson = json.getAsJsonObject().get("ChildId");
+//      //     if (childJson != null) {
+//      //         id.ChildId = context.deserialize(childJson, DENOPTIMVertex.class);  // recursion!
+//      //         id.ChildId.ParentId = id;
+//      //     }
+//      //     return id;
+//      // }
+// }
+
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+
+    public static class DENOPTIMVertexDeserializer 
+    implements JsonDeserializer<DENOPTIMVertex>
+    {
+        @Override
+        public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT,
+                JsonDeserializationContext context) throws JsonParseException
+        {
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            // Desiralization differs for the types of vertexes
+            // First, consider templates
+            if (jsonObject.has("innerGraph"))
+            {
+                //TODO-V3 log or del
+                System.out.println("DESERIALIZE Template "
+                        + jsonObject.get("vertexId"));
+
+                DENOPTIMTemplate tmpl = context.deserialize(jsonObject,
+                        DENOPTIMTemplate.class);
+
+                // Deserialize embedded graph. Such field is excluded by design
+                // because if not, the above tmpl = context.deserialize(...)
+                // call produces an inner graph with null AP pointers.
+
+                JsonObject innerGraphJson = jsonObject.getAsJsonObject(
+                        "innerGraph");
+                DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(
+                        innerGraphJson.toString());
+                tmpl.setInnerGraph(innerGraph);
+
+                // Is the following needed? I think so, because we need the IDs
+                // of outernAPs to be as defined in the json string.
+
+                //Recover innerToOuter APMap
+                Type type = new TypeToken<TreeMap<Integer,
+                        DENOPTIMAttachmentPoint>>(){}.getType();
+                TreeMap<Integer,DENOPTIMAttachmentPoint> map =
+                        context.deserialize(jsonObject.getAsJsonObject(
+                                "innerToOuterAPs"), type);
+                tmpl.updateInnerToOuter(map);
+
+                return tmpl;
+            }
+            // Then, molecular fragments
+            else if (jsonObject.has("buildingBlockId"))
+            {
+                //TODO-V3 log or del
+                System.out.println("DESERIALIZE Fragment "
+                        + jsonObject.get("vertexId"));
+
+                DENOPTIMVertex v = null;
+
+                //TODO-V3?: serialize AtomContainer2 somehow (as an SDF string?)
+
+                // The serialized fragment does NOT include its molecular
+                // representation, which cannot be serialized (so far...)
+                DENOPTIMFragment frag = context.deserialize(jsonObject,
+                        DENOPTIMFragment.class);
+                v = frag;
+
+                // The above has these issues:
+                // - mol in null
+                // - AP user/owner is null (fixed in graph deserializatrion)
+                // - APClass has wrong reference to new class (fixed below)
+
+                if (FragmentSpace.isDefined())
+                {
+                    // If a fragment space exists, we rebuild the fragment from the
+                    // library, and attach to it the serialized data
+                    DENOPTIMVertex fragWithMol;
+                    try
+                    {
+                        // NB: this works well also with templates that are in the library
+                        fragWithMol = FragmentSpace.getVertexFromLibrary(
+                                frag.getFragmentType(), frag.getMolId());
+                    } catch (DENOPTIMException e)
+                    {
+                        throw new JsonParseException("Could not get "
+                                + frag.getFragmentType() + " from "
+                                + "library. " + e.getMessage());
+                    }
+                    ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
+                    for (SymmetricSet ss : frag.getSymmetricAPSets())
+                    {
+                        cLstSymAPs.add(ss.clone());
+                    }
+                    fragWithMol.setMutationTypes(frag.getMutationTypes());
+                    fragWithMol.setSymmetricAPSets(cLstSymAPs);
+                    fragWithMol.setAsRCV(frag.isRCV());
+                    fragWithMol.setVertexId(frag.getVertexId());
+                    fragWithMol.setLevel(frag.getLevel());
+                    for (int iap=0; iap<frag.getNumberOfAP(); iap++)
+                    {
+                        DENOPTIMAttachmentPoint oriAP = frag.getAP(iap);
+                        DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
+                        newAP.setID(oriAP.getID());
+                    }
+                    v = fragWithMol;
+                }
+
+                // Fix the reference to unique APClass
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    try
+                    {
+                        //TODO: should this be done in an APClassDeserializer?
+                        ap.setAPClass(ap.getAPClass().toString());
+                    } catch (DENOPTIMException e1)
+                    {
+                        throw new JsonParseException(e1);
+                    }
+                }
+
+                // WARNING: other fields, such as 'owner' and AP 'user' are
+                // recovered upon deserializing the graph containing this vertex
+
+                return v;
+            }
+            // Finally, vertexes that are not "molecular" (empty vertex)
+            else
+            {
+                //TODO-V3 log or del
+                System.out.println("DESERIALIZE EmptyVertex "
+                        + jsonObject.get("vertexId"));
+                EmptyVertex ev = EmptyVertex.fromJson(jsonObject.toString());
+                return ev;
+            }
+        }
+    }
+
+
+
 
 }

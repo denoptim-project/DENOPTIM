@@ -20,28 +20,17 @@
 package denoptim.utils;
 
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ClosableChain;
-
-import java.util.logging.Level;
 
 
 /**

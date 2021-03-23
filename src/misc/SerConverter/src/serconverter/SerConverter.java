@@ -18,14 +18,13 @@
 
 package serconverter;
 
-import java.util.ArrayList;
 import java.io.File;
 
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMGraph;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
-import denoptim.io.DenoptimIO; 
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.exception.DENOPTIMException;
 
 /**
  * Conversion tool for serialized <code>DENOPTIMGraph</code>s orjects.

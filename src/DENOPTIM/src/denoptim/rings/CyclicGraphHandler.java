@@ -18,26 +18,26 @@
 
 package denoptim.rings;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.Bond;
-import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.graph.PathTools;
+import org.openscience.cdk.graph.matrix.TopologicalMatrix;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.graph.PathTools;
-import org.openscience.cdk.graph.matrix.TopologicalMatrix;
-
-import javax.vecmath.Point3d;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -46,19 +46,16 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.GenUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
 import denoptim.utils.RingClosingUtils;
-
-import java.util.logging.Level;
 
 
 /**

@@ -18,11 +18,8 @@
 
 package denoptim.rings;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.Serializable;
-
-import denoptim.molecule.DENOPTIMVertex;
+import java.util.ArrayList;
 
 /**
  * Serializable object to store/get a list of conformations that allow to close

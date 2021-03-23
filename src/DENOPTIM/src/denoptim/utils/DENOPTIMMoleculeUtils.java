@@ -19,72 +19,74 @@
 
 package denoptim.utils;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.Collections;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.awt.RenderingHints;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
-import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.IOException;
-
-import net.sf.jniinchi.INCHI_RET;
-
-import org.openscience.cdk.layout.StructureDiagramGenerator;
-import org.openscience.cdk.smiles.SmiFlavor;
-import org.openscience.cdk.smiles.SmilesGenerator;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.inchi.InChIGeneratorFactory;
-import org.openscience.cdk.inchi.InChIGenerator;
-import org.openscience.cdk.geometry.GeometryUtil;
-import org.openscience.cdk.graph.ConnectivityChecker;
-import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomRef;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.aromaticity.Kekulization;
 import org.openscience.cdk.config.IsotopeFactory;
 import org.openscience.cdk.config.Isotopes;
-import org.openscience.cdk.Atom;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.geometry.GeometryUtil;
+import org.openscience.cdk.graph.ConnectivityChecker;
+import org.openscience.cdk.inchi.InChIGenerator;
+import org.openscience.cdk.inchi.InChIGeneratorFactory;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IAtomType.Hybridization;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IElement;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
-import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.renderer.AtomContainerRenderer;
+import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.AtomContainerRenderer;
-import org.openscience.cdk.renderer.font.AWTFontManager;
-import org.openscience.cdk.interfaces.*;
-import org.openscience.cdk.interfaces.IAtomType.Hybridization;
-import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.smiles.SmiFlavor;
+import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMEdge.BondType;
+import net.sf.jniinchi.INCHI_RET;
 
 
 /**

@@ -18,40 +18,26 @@
 
 package setupbrics;
 
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.ChemObject;
-import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.AtomContainerSet;
-import org.openscience.cdk.interfaces.IAtomContainerSet;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
-import org.openscience.cdk.io.Mol2Reader;
-import org.openscience.cdk.io.SDFWriter;
-import org.openscience.cdk.io.MDLV2000Writer;
-import org.openscience.cdk.AtomContainerSet;
-import org.openscience.cdk.interfaces.IPseudoAtom;
-
-
-
-import java.util.StringTokenizer;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.vecmath.Point3d;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
-import java.util.List;
-import java.util.Iterator;
+
+import org.openscience.cdk.ChemFile;
+import org.openscience.cdk.ChemObject;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.MDLV2000Reader;
+import org.openscience.cdk.io.Mol2Reader;
+import org.openscience.cdk.io.SDFWriter;
+import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 

@@ -26,10 +26,6 @@ import java.util.Set;
 
 import javax.vecmath.Point3d;
 
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.AtomRef;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -44,19 +40,19 @@ import denoptim.utils.DENOPTIMMoleculeUtils;
 /**
  * Class representing a continuously connected portion of chemical object
  * holding attachment points.
- * 
+ *
  * @author Marco Foscato
  */
 
 public class DENOPTIMFragment extends DENOPTIMVertex
-{ 	
+{
     /**
 	 * Version UID
 	 */
 	private static final long serialVersionUID = 4415462924969433010L;
-	
+
     /**
-     * Index of the graph building block contained in the vertex. 
+     * Index of the graph building block contained in the vertex.
      * This field differentiates a fragment
      * from any other subclass of {@link DENOPTIMVertex}, and its name
      * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
@@ -206,8 +202,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 throw new DENOPTIMException("Unable to deal with bonds "
                         + "involving more than two atoms.");
             }
-            int ia = mol.getAtomNumber(oBnd.getAtom(0));
-            int ib = mol.getAtomNumber(oBnd.getAtom(1));
+            int ia = mol.indexOf(oBnd.getAtom(0));
+            int ib = mol.indexOf(oBnd.getAtom(1));
             this.mol.addBond(ia,ib,oBnd.getOrder());
         }
         
@@ -450,7 +446,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             int valence) 
             throws DENOPTIMException
     {
-        int atmId = mol.getAtomNumber(srcAtm);
+        int atmId = mol.indexOf(srcAtm);
         this.addAP(atmId, valence, valence,
                 new double[] {vector.x, vector.y, vector.z}, apc);
         ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();
@@ -911,6 +907,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
  
 //-----------------------------------------------------------------------------
 
+    @Override
     public Object getProperty(Object description)
     {
         return mol.getProperty(description);
@@ -918,6 +915,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //-----------------------------------------------------------------------------
     
+    @Override
     public void setProperty(Object description, Object property)
     {
         mol.setProperty(description, property);
@@ -929,7 +927,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         mol.setProperties(properties);
     }
-
     
 //------------------------------------------------------------------------------
     

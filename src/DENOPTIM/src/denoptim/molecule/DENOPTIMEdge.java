@@ -20,10 +20,19 @@ package denoptim.molecule;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSerializationContext;
+
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Order;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 
 /**
@@ -250,7 +259,7 @@ public class DENOPTIMEdge implements Serializable
         // convention. Eventually, we'll not need this anymore.
         private String oldString = "1";
 
-        private int valenceUsed = -1;
+        private int valenceUsed = 0;
 
         private IBond.Order bo = null;
 
@@ -306,7 +315,7 @@ public class DENOPTIMEdge implements Serializable
         {
             switch (i)
             {
-                case -1:
+                case 0:
                     return NONE;
                 case 1:
                     return SINGLE;
@@ -354,4 +363,26 @@ public class DENOPTIMEdge implements Serializable
             return valenceUsed;
         }
     }
+
+
+
+//------------------------------------------------------------------------------
+
+    public static class DENOPTIMEdgeSerializer 
+    implements JsonSerializer<DENOPTIMEdge>
+    {
+      @Override
+      public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc,
+              JsonSerializationContext context)
+      {
+          JsonObject jsonObject = new JsonObject();
+          jsonObject.addProperty("srcAPID", edge.getSrcAP().getID());
+          jsonObject.addProperty("trgAPID", edge.getTrgAP().getID());
+          jsonObject.add("bondType", context.serialize(edge.getBondType()));
+          return jsonObject;
+      }
+    }
+//------------------------------------------------------------------------------
+
+
 }

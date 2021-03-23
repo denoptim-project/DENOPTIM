@@ -1,11 +1,18 @@
 package denoptim.molecule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.Expose;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -16,16 +23,13 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
-
 /**
- * A template is a contract that defines subgraph features that can go from 
+ * A template is a contract that defines subgraph features that can go from
  * a list of attachment points, via a partially defined subgraph structure, to
  * a fully defined subgraph (i.e., graph structure + identify of each vertex).
  */
 
-// TODO: remove, later. 
+// TODO: remove, later.
 //  Template are variation on fragments that has a number of attachment points and an interior graph. The attachment
 //  points are constant and always available (i.e. uncapped), but the interior graph can vary.
 //  The constant attachment points makes it easy to control the chemical environment in which the Template is embedded
@@ -161,15 +165,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.UNDEFINED);
         DENOPTIMVertex vrtx = new EmptyVertex(0);
         DENOPTIMVertex vrtx2 = new EmptyVertex(1);
-        try {
-            vrtx.addAP(0, 1, 1);
-            vrtx.addAP(1, 1, 1);
+    
+        vrtx.addAP(0, 1, 1);
+        vrtx.addAP(1, 1, 1);
 
-            vrtx2.addAP(0, 1, 1);
-            vrtx2.addAP(1, 1, 1);
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-        }
+        vrtx2.addAP(0, 1, 1);
+        vrtx2.addAP(1, 1, 1);
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vrtx);
         g.addVertex(vrtx2);
@@ -588,13 +589,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         for (DENOPTIMAttachmentPoint oriAP : this.requiredAPs)
         {
-            try
-            {
-                c.addAP(oriAP.clone());
-            } catch (DENOPTIMException e)
-            {
-                e.printStackTrace();
-            }
+            c.addAP(oriAP.clone());
         }
         c.setInnerGraph(this.getInnerGraph().clone());
         
@@ -751,6 +746,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
+    //TODO-V3: test this. it fails for read-in templates!
+    
     @Override
     public boolean containsAtoms()
     {
@@ -881,11 +878,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    private DENOPTIMAttachmentPoint getInnerAPFromOuterAP(DENOPTIMAttachmentPoint outerAP) {
+    public DENOPTIMAttachmentPoint getInnerAPFromOuterAP(
+            DENOPTIMAttachmentPoint outerAP) {
         // Very inefficient solution
         for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry
-                : innerToOuterAPs.entrySet()) {
-            if (outerAP.equals(entry.getValue())) {
+                : innerToOuterAPs.entrySet()) 
+        {
+            if (outerAP == entry.getValue()) 
+            {
                 return entry.getKey();
             }
         }
@@ -932,12 +932,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     /**
      * Adds ap to the list of required APs on this template
      * @param ap attachment point to require from this template
+     * @throws DENOPTIMException 
      */
     @Override
-    public void addAP(DENOPTIMAttachmentPoint ap) throws DENOPTIMException {
+    public void addAP(DENOPTIMAttachmentPoint ap) {
         if (getInnerGraph() != null) {
-            throw new DENOPTIMException("cannot add more required APs after " +
+            System.err.println("cannot add more required APs after " +
                     "setting the inner graph");
+            return;
         }
         ap.setOwner(this);
         requiredAPs.add(ap);
@@ -951,17 +953,23 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return false;
         }
         DENOPTIMTemplate o = (DENOPTIMTemplate) other;
-        boolean fieldsAreEqual = this.contractLevel == o.contractLevel
-                && this.buildingBlockType == o.buildingBlockType
-                && this.buildingBlockId == o.buildingBlockId
-                && this.requiredAPs.stream()
-                    .sorted(DENOPTIMAttachmentPoint::comparePropertiesTo)
-                    .equals(o.requiredAPs
-                            .stream()
-                            .sorted(DENOPTIMAttachmentPoint::comparePropertiesTo)
-                    );
-        return fieldsAreEqual
-                && this.getInnerGraph().sameAs(o.getInnerGraph(),
+        if (this.contractLevel != o.contractLevel
+                || this.buildingBlockType != o.buildingBlockType
+                || this.buildingBlockId != o.buildingBlockId)
+        {
+            return false;
+        }
+
+        if (this.requiredAPs.size() == o.requiredAPs.size()) {
+            for (int i = 0; i < this.requiredAPs.size(); i++) {
+                if (this.requiredAPs.get(i).comparePropertiesTo(o.requiredAPs.get(0)) != 0) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return this.getInnerGraph().sameAs(o.getInnerGraph(),
                 new StringBuilder());
     }
 

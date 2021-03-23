@@ -2,7 +2,7 @@
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no> and
  *   Marco Foscato <marco.foscato@uib.no>
- * 
+ *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
  *   by the Free Software Foundation, either version 3 of the License, or
@@ -19,11 +19,36 @@
 
 package denoptim.molecule;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
+
+import org.openscience.cdk.graph.ConnectivityChecker;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -36,25 +61,14 @@ import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.*;
-
-import org.openscience.cdk.graph.ConnectivityChecker;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
+import denoptim.utils.DENOPTIMGraphEdit;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMVertexQuery;
+import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
+import denoptim.utils.ObjectPair;
+import denoptim.utils.RotationalSpaceUtils;
+import denoptim.utils.DENOPTIMgson;
 
 
 /**
@@ -68,45 +82,45 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Version UID
      */
     private static final long serialVersionUID = 8245921129778644804L;
-    
+
     /**
      * The vertices belonging to this graph.
      */
     ArrayList<DENOPTIMVertex> gVertices;
-    
+
     /**
      * The edges belonging to this graph.
      */
     ArrayList<DENOPTIMEdge> gEdges;
-    
+
     /**
      * The rings defined in this graph.
      */
     ArrayList<DENOPTIMRing> gRings;
-    
+
     /**
      * The potentially closable chains of vertices.
      */
     ArrayList<ClosableChain> closableChains;
-    
+
     /*
      * Unique graph id
      */
-    int graphId; 
+    int graphId;
 
     /*
-     * store the set of symmetric vertex ids at each level. This is only 
+     * store the set of symmetric vertex ids at each level. This is only
      * applicable for symmetric graphs
      */
     ArrayList<SymmetricSet> symVertices;
-    
+
     /**
      * A free-format string used to record simple properties in the graph. For
      * instance, whether this graph comes from a given initial population or
      * is generated anew from scratch, or from mutation/crossover.
      */
     String localMsg;
-    
+
 
     /**
      * Identifier for the format of string representations of a graph
@@ -193,7 +207,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return graphId;
     }
-    
+
 //------------------------------------------------------------------------------
 
     public void setMsg(String m_msg)
@@ -206,7 +220,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public String getMsg()
     {
         return localMsg;
-    }    
+    }
 
 //------------------------------------------------------------------------------
 
@@ -222,7 +236,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         boolean res = false;
         for (SymmetricSet ss : symVertices)
         {
-            if (ss.contains(v.getVertexId())) 
+            if (ss.contains(v.getVertexId()))
             {
                 res = true;
                 break;
@@ -230,9 +244,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return res;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Returns the number of symmetric sets of vertexes
      * @return the number of symmetric sets of vertexes
@@ -277,7 +291,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void addSymmetricSetOfVertices(SymmetricSet m_ss) 
+    public void addSymmetricSetOfVertices(SymmetricSet m_ss)
                                                         throws DENOPTIMException
     {
         for (SymmetricSet oldSS : symVertices)
@@ -287,7 +301,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 if (oldSS.contains(vid))
                 {
                     throw new DENOPTIMException("Adding " + m_ss + " while "
-                                                + "there is already " + oldSS 
+                                                + "there is already " + oldSS
                                                 + " that contains " + vid);
                 }
             }
@@ -350,9 +364,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return gRings;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     public ArrayList<DENOPTIMEdge> getEdgesWithSrc(DENOPTIMVertex v)
     {
     	ArrayList<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();
@@ -438,7 +452,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Search for ring closing vertices: vertices that contain only a 
+     * Search for ring closing vertices: vertices that contain only a
      * <code>RingClosingAttractor</code>
      * @return the list of ring closing vertices
      */
@@ -521,9 +535,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Remove a vertex from this graph. This method removes also edges and rings 
+     * Remove a vertex from this graph. This method removes also edges and rings
      * that involve the removed vertex. Symmetric sets of vertexes are corrected
-     * accordingly: they are removed if there is only one remaining vertex in  
+     * accordingly: they are removed if there is only one remaining vertex in
      * the set, of purged from the removed vertex.
      * @param m_vertex the vertex to remove.
      */
@@ -532,15 +546,15 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         //TODO-V3: deal with templates. They do not appear in the edges as
         // target Vertices, so the edges to templates will not be removed
         // once we remove the template vertex.
-        
+
         if (!gVertices.contains(m_vertex))
         {
         	return;
         }
-        
+
         m_vertex.resetGraphOwner();
         int vid = m_vertex.getVertexId();
-            
+
         // delete also any ring involving the removed vertex
         if (isVertexInRing(m_vertex))
         {
@@ -550,7 +564,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 removeRing(r);
             }
         }
-        
+
         // remove edges involving the removed vertex
         ArrayList<DENOPTIMEdge> eToDel = new ArrayList<>();
         for (int i=0; i<gEdges.size(); i++)
@@ -570,7 +584,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             this.removeEdge(e);
         }
-        
+
         // delete the removed vertex from symmetric sets, but leave other vrtxs
         ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : symVertices)
@@ -590,7 +604,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         symVertices.removeAll(ssToRemove);
-        
+
         // remove the vertex from the graph
         gVertices.remove(m_vertex);
     }
@@ -604,7 +618,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     }
 
 //------------------------------------------------------------------------------
-    
+
     /**
      * Check if the graph contains the specified vertex.
      * @param v the vertex.
@@ -646,7 +660,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Removes an edge and update the free valences of the attachment points 
+     * Removes an edge and update the free valences of the attachment points
      * that were originally involved in this edge
      * @param edge
      */
@@ -656,13 +670,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             DENOPTIMAttachmentPoint srcAP = edge.getSrcAP();
             DENOPTIMAttachmentPoint trgAP = edge.getTrgAP();
-            
+
             srcAP.updateFreeConnections(edge.getBondType().getValence());
             trgAP.updateFreeConnections(edge.getBondType().getValence());
-            
+
             srcAP.setUser(null);
             trgAP.setUser(null);
-            
+
             gEdges.remove(edge);
         }
     }
@@ -713,7 +727,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public String toString()
     {
         StringBuilder sb = new StringBuilder(512);
-        
+
         sb.append(graphId).append(" ");
 
         for (int i=0; i<gVertices.size(); i++)
@@ -739,21 +753,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             sb.append(symVertices.get(i).toString()).append(" ");
         }
-        
+
         return sb.toString();
     }
-    
-//------------------------------------------------------------------------------    
-    
+
+//------------------------------------------------------------------------------
+
     /**
-     * 
+     *
      * @param srcVert
      * @param dapidx the AP corresponding to the source fragment
      * @param dstVert
      * @return the AP index of the destination fragment
      */
-    
-    public int getBondingAPIndex(DENOPTIMVertex srcVert, int dapidx, 
+
+    public int getBondingAPIndex(DENOPTIMVertex srcVert, int dapidx,
                                     DENOPTIMVertex dstVert)
     {
         int n = getEdgeCount();
@@ -767,7 +781,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
             int dap_idx_v1 = edge.getSrcAPID();
 
-            if (srcVert.getVertexId() == v1_id && v2_id == dstVert.getVertexId() 
+            if (srcVert.getVertexId() == v1_id && v2_id == dstVert.getVertexId()
                                 && dap_idx_v1 == dapidx)
             {
                 return edge.getTrgAPID();
@@ -777,10 +791,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return -1;
     }
 
-//------------------------------------------------------------------------------  
-    
+//------------------------------------------------------------------------------
+
     /**
-     * @param vertex the vertex for which the first level of child vertices 
+     * @param vertex the vertex for which the first level of child vertices
      * need to be found.
      * @return list of child vertices.
      */
@@ -789,7 +803,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return vertex.getChilddren();
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -797,7 +811,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
      */
-    public void getChildrenTree(DENOPTIMVertex vertex, 
+    public void getChildrenTree(DENOPTIMVertex vertex,
             ArrayList<DENOPTIMVertex> children) {
         ArrayList<DENOPTIMVertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) {
@@ -810,9 +824,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
     }
-    
-//------------------------------------------------------------------------------  
-    
+
+//------------------------------------------------------------------------------
+
     /**
      * @param m_vid the vertex id for which the child vertices need to be found
      * @return Arraylist containing the vertex ids of the child vertices
@@ -836,17 +850,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns almost "deep-copy" of this graph. Only the APCLass members of 
+     * Returns almost "deep-copy" of this graph. Only the APCLass members of
      * member of this class should remain references to the original APClasses.
      * The vertex IDs are not changed, so you might want to renumber the graph.
      */
     @Override
     public DENOPTIMGraph clone()
-    {   
-        // When cloning, the VertedID remains the same so we'll have two 
+    {
+        // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
         ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
-        Map<Integer,DENOPTIMVertex> vidsInClone = 
+        Map<Integer,DENOPTIMVertex> vidsInClone =
                 new HashMap<Integer,DENOPTIMVertex>();
         for (DENOPTIMVertex vOrig : gVertices)
         {
@@ -854,29 +868,29 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             vClone.setLevel(vOrig.getLevel());
             cListVrtx.add(vClone);
             vidsInClone.put(vClone.getVertexId(),vClone);}
-        
+
         ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<>();
         for (DENOPTIMEdge e : gEdges)
         {
             int srcVrtxId = e.getSrcVertex();
             int srcApId = this.getVertexWithId(srcVrtxId).getIndexOfAP(
                     e.getSrcAP());
-            
+
             int trgVrtxId = e.getTrgVertex();
             int trgApId = this.getVertexWithId(trgVrtxId).getIndexOfAP(
                     e.getTrgAP());
-            
+
             DENOPTIMAttachmentPoint srcAPClone = vidsInClone.get(
                     srcVrtxId).getAP(srcApId);
             DENOPTIMAttachmentPoint trgAPClone = vidsInClone.get(
                     trgVrtxId).getAP(trgApId);
-            
-            cListEdges.add(new DENOPTIMEdge(srcAPClone, trgAPClone, 
+
+            cListEdges.add(new DENOPTIMEdge(srcAPClone, trgAPClone,
                     e.getBondType()));
         }
-        
+
         DENOPTIMGraph clone = new DENOPTIMGraph(cListVrtx, cListEdges);
-        
+
         // Copy the list but using the references to the cloned vertexes
         ArrayList<DENOPTIMRing> cListRings = new ArrayList<>();
         for (DENOPTIMRing ring : gRings)
@@ -891,7 +905,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             cListRings.add(cRing);
         }
         clone.setRings(cListRings);
-        
+
         // The chainLinks are made of primitives, so it's just fine
         ArrayList<ClosableChain> cListClosableChains =
                 new ArrayList<>();
@@ -900,7 +914,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             cListClosableChains.add(cc.clone());
         }
         clone.setCandidateClosableChains(cListClosableChains);
-        
+
         // Each "set" is a list of Integer, but SymmetricSet.clone takes care
         ArrayList<SymmetricSet> cSymVertices = new ArrayList<>();
         for (SymmetricSet ss : symVertices)
@@ -908,15 +922,15 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             cSymVertices.add(ss.clone());
         }
         clone.setSymmetricVertexSets(cSymVertices);
-        
+
         clone.setGraphId(graphId);
         clone.setMsg(localMsg);
-        
+
         return clone;
     }
-    
+
     //TODO-V3 delete. This was only meant to test the references to the edge with parent vertex
-    
+
     public void checkHashed(String fileName)
     {
 
@@ -929,20 +943,20 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             sb.append("Vertex "+v+NL);
             if (v.getEdgeToParent() == null)
                 continue;
-            
+
             int vh = v.getEdgeToParent().hashCode();
             sb.append("hash edge "+vh+NL);
             boolean found = false;
             for (DENOPTIMEdge e : gEdges)
             {
-                
+
                 if (e.hashCode() == vh)
                 {
                     found = true;
                     break;
                 }
             }
-            
+
             if (!found)
             {
                 System.out.println("M7: found mismatch");
@@ -952,12 +966,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 nogood = true;
             }
         }
-        
+
         for (DENOPTIMEdge ee : gEdges)
         {
             sb.append("all edge "+ee+" "+ee.hashCode()+NL);
         }
-        
+
         try
         {
             DenoptimIO.writeData(fileName, sb.toString(), false);
@@ -972,7 +986,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         System.out.println("Seems all good");
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -980,7 +994,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param vid
      * @return the edge whose target vertex has ID same as vid, or null
      */
-    
+
     public DENOPTIMEdge getEdgeWithParent(int vid)
     {
         DENOPTIMVertex v = getVertexWithId(vid);
@@ -1064,15 +1078,15 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public DENOPTIMVertex getParent(DENOPTIMVertex v)
     {
         DENOPTIMEdge edge = v.getEdgeToParent();
-        if (edge != null)  
+        if (edge != null)
         {
             return edge.getSrcAP().getOwner();
         }
         return null;
-    } 
-    
-//------------------------------------------------------------------------------    
-    
+    }
+
+//------------------------------------------------------------------------------
+
     //TODO-V3 is this really needed?
     public void cleanup()
     {
@@ -1100,9 +1114,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             symVertices.clear();
         }
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Compare this and another graph ignoring the vertex IDs. This method looks
      * into the structure of the graphs to determine if the two graphs have the
@@ -1112,42 +1126,42 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the two graphs represent the same system
      */
     public boolean sameAs(DENOPTIMGraph other, StringBuilder reason)
-    {	
+    {
     	if (this.getEdgeCount() != other.getEdgeCount())
     	{
     		reason.append("Different number of edges ("+this.getEdgeCount()+":"
     					+other.getEdgeCount()+")");
     		return false;
     	}
-    	
+
     	if (this.getVertexCount() != other.getVertexCount())
     	{
     		reason.append("Different number of vertexes ("+this.getVertexCount()+":"
     					+other.getVertexCount()+")");
     		return false;
     	}
-    	
+
     	if (this.getSymmetricSetCount() != other.getSymmetricSetCount())
     	{
     		reason.append("Different number of symmetric sets ("
-    					+ this.getSymmetricSetCount() + ":" 
+    					+ this.getSymmetricSetCount() + ":"
     					+ other.getSymmetricSetCount() + ")");
     		return false;
     	}
-    	
+
     	if (this.getRingCount() != other.getRingCount())
     	{
     		reason.append("Different number of Rings ("+this.getRingCount()+":"
     					+other.getRingCount()+")");
     		return false;
     	}
-    	
+
     	//Pairwise correspondence of vertexes
-    	Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap = 
+    	Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap =
     			new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
-    	
+
     	vertexMap.put(this.getVertexAtPosition(0),other.getVertexAtPosition(0));
-    	
+
     	//WARNING: assuming that vertex 0 is the root and there are no disconnections
     	try {
 			if (!compareGraphNodes(this.getVertexAtPosition(0), this,
@@ -1161,32 +1175,32 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 			reason.append("Exception");
 			return false;
 		}
-    	
+
     	//Check Symmetric sets
     	Iterator<SymmetricSet> ssIter = this.getSymSetsIterator();
     	while (ssIter.hasNext())
     	{
     		SymmetricSet ssT = ssIter.next();
     		int vIdT = ssT.get(0);
-    		
+
     		SymmetricSet ssO = other.getSymSetForVertexID(
     				vertexMap.get(this.getVertexWithId(vIdT)).getVertexId());
     		if (ssO.size() == 0)
     		{
-    			// ssO is empty because no SymmetricSet was found that 
-    			// contains the given vertexID. This means the two graphs 
+    			// ssO is empty because no SymmetricSet was found that
+    			// contains the given vertexID. This means the two graphs
     			// are different
     			reason.append("Symmetric set not found for vertex ("+vIdT+")");
     			return false;
     		}
-    		
+
     		if (ssT.size() != ssO.size())
     		{
     			reason.append("Different number of symmetric sets on verted " + vIdT
     						+ "("+ssT.size()+":"+ssO.size()+")");
     			return false;
     		}
-    		
+
     		for (int it=0; it<ssT.size(); it++)
     		{
     			int svIdT = ssT.get(it);
@@ -1199,13 +1213,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     			}
     		}
     	}
-    	
+
     	//Check Rings
     	for (DENOPTIMRing rT : this.getRings())
     	{
     		DENOPTIMVertex vhT = rT.getHeadVertex();
     		DENOPTIMVertex vtT = rT.getTailVertex();
-    		for (DENOPTIMRing rO : 
+    		for (DENOPTIMRing rO :
     			other.getRingsInvolvingVertex(vertexMap.get(vhT)))
     		{
 				if (rT.getSize() != rO.getSize())
@@ -1214,7 +1228,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 								+rO.getSize()+")");
 					continue;
 				}
-				
+
 				boolean either = false;
     			if (rO.getHeadVertex() == vertexMap.get(vhT)
     					&& rO.getTailVertex() == vertexMap.get(vtT))
@@ -1222,7 +1236,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     				either = true;
     				for (int i=1; i<rT.getSize(); i++)
     				{
-    					if (vertexMap.get(rT.getVertexAtPosition(i)) 
+    					if (vertexMap.get(rT.getVertexAtPosition(i))
     							!= rO.getVertexAtPosition(i))
     					{
     						reason.append("Rings differ (A) ("+rT+":"+rO+")");
@@ -1233,11 +1247,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     			else if (rO.getHeadVertex() == vertexMap.get(vtT)
     					&& rO.getTailVertex() == vertexMap.get(vhT))
     			{
-    				either = true;       			
+    				either = true;
     				for (int i=1; i<rT.getSize(); i++)
     				{
     					int j = rO.getSize()-i-1;
-    					if (vertexMap.get(rT.getVertexAtPosition(i)) 
+    					if (vertexMap.get(rT.getVertexAtPosition(i))
     							!= rO.getVertexAtPosition(j))
     					{
     						reason.append("Rings differ (B) ("+rT+":"+rO+")");
@@ -1255,9 +1269,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     	return true;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Compares this and another graph by spanning vertexes staring from the
      * given vertex and following the direction of edges.
@@ -1265,20 +1279,20 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param otherV
      * @param reason a string recording the reason for returning false
      * @return <code>true</code> if the graphs are same at this node
-     * @throws DENOPTIMException 
+     * @throws DENOPTIMException
      */
-    private static boolean compareGraphNodes(DENOPTIMVertex thisV, 
+    private static boolean compareGraphNodes(DENOPTIMVertex thisV,
     		DENOPTIMGraph thisG,
-    		DENOPTIMVertex otherV, 
+    		DENOPTIMVertex otherV,
     		DENOPTIMGraph otherG, Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap,
     		StringBuilder reason) throws DENOPTIMException
-    {    	
+    {
     	if (!thisV.sameAs(otherV, reason))
     	{
     		reason.append("Different vertex ("+thisV+":"+otherV+")");
     		return false;
     	}
-    	
+
     	ArrayList<DENOPTIMEdge> edgesFromThis = thisG.getEdgesWithSrc(thisV);
     	ArrayList<DENOPTIMEdge> edgesFromOther = otherG.getEdgesWithSrc(otherV);
     	if (edgesFromThis.size() != edgesFromOther.size())
@@ -1288,10 +1302,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     					+edgesFromOther.size()+")");
     		return false;
     	}
-    	
+
     	// pairwise correspondence between child vertexes
     	ArrayList<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
-    	
+
     	for (DENOPTIMEdge et : edgesFromThis)
     	{
     		boolean found = false;
@@ -1310,7 +1324,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     			reason.append ("Edge not found in other("+et+")");
     			return false;
     		}
-    		
+
     		//Check: this should never be true
     		if (vertexMap.keySet().contains(
     				thisG.getVertexWithId(et.getTrgVertex())))
@@ -1319,13 +1333,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		}
     		vertexMap.put(thisG.getVertexWithId(et.getTrgVertex()),
     				otherG.getVertexWithId(eo.getTrgVertex()));
-    		
+
     		DENOPTIMVertex[] pair = new DENOPTIMVertex[]{
     				thisG.getVertexWithId(et.getTrgVertex()),
     				otherG.getVertexWithId(eo.getTrgVertex())};
     		pairs.add(pair);
     	}
-    	
+
     	//Recursion on child vertexes
     	for (DENOPTIMVertex[] pair : pairs)
     	{
@@ -1338,21 +1352,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     			return false;
     		}
     	}
-    	
+
     	return true;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
-     * Returns <code>true</code> if this graph has any vertex that contains 
+     * Returns <code>true</code> if this graph has any vertex that contains
      * atoms.
-     * @return <code>true</code> if this graph has any vertex that contains 
+     * @return <code>true</code> if this graph has any vertex that contains
      * atoms.
      */
     public boolean containsAtoms()
     {
-        for (DENOPTIMVertex v : getVertexList()) 
+        for (DENOPTIMVertex v : getVertexList())
         {
             if (v.containsAtoms())
             {
@@ -1371,13 +1385,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public int getHeavyAtomsCount()
     {
         int n = 0;
-        for (DENOPTIMVertex v : getVertexList()) 
+        for (DENOPTIMVertex v : getVertexList())
         {
             n += v.getHeavyAtomsCount();
         }
         return n;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -1387,7 +1401,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+        ArrayList<DENOPTIMAttachmentPoint> lstAPs =
                 new ArrayList<DENOPTIMAttachmentPoint>();
         for (DENOPTIMVertex v : gVertices)
         {
@@ -1395,7 +1409,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return lstAPs;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -1405,7 +1419,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMAttachmentPoint> getAvailableAPs()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lstFreeAPs = 
+        ArrayList<DENOPTIMAttachmentPoint> lstFreeAPs =
                 new ArrayList<DENOPTIMAttachmentPoint>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
@@ -1416,9 +1430,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return lstFreeAPs;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Returns the attachment point with the given identifier, or null if no
      * AP is found with the given identifier.
@@ -1426,7 +1440,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return the attachment point with the given identifier, or null if no
      * AP is found with the given identifier.
      */
-    
+
     public DENOPTIMAttachmentPoint getAPWithId(int id)
     {
         DENOPTIMAttachmentPoint ap = null;
@@ -1462,7 +1476,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return false;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -1491,7 +1505,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             removeVertex(v);
         }
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -1528,7 +1542,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Extracts the subgraph of a graph G starting from a given seed vertex of 
+     * Extracts the subgraph of a graph G starting from a given seed vertex of
      * G.
      * Only the seed vertex and all child vertexes (and further successors)
      * are considered part of
@@ -1563,7 +1577,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             DENOPTIMEdge edge = edgesIterator.next();
             for (DENOPTIMVertex v : subGrpVrtxs)
             {
-                if (edge.getSrcAP().getOwner() == v 
+                if (edge.getSrcAP().getOwner() == v
                         || edge.getTrgAP().getOwner() == v)
                 {
                     // Copy edge to subgraph...
@@ -1839,7 +1853,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
             getVertexList().get(i).setVertexId(nvid);
         }
-        
+
         // Update the sets of symmetric vertex IDs
         Iterator<SymmetricSet> iter = getSymSetsIterator();
         while (iter.hasNext())
@@ -2102,7 +2116,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 FragmentSpace.getRCCompatibilityMatrix());
         ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
-        
+
         // Keep closable chains that are relevant for chelate formation
         if (RingClosureParameters.buildChelatesMode())
         {
@@ -2122,7 +2136,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             // clone root graph
             DENOPTIMGraph newGraph = this.clone();
-                
+
             Map<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
@@ -2249,7 +2263,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * that is to be connected to R
      * @param bndType the bond type between R and I
      * @param newSymSets of symmetric sets. This parameter is only used to keep
-     * track of the symmetric copies of I. Simply provide an empty data 
+     * track of the symmetric copies of I. Simply provide an empty data
      * structure.
      */
 
@@ -2257,8 +2271,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                 DENOPTIMGraph subGraph,
                                 DENOPTIMVertex childVertex, int childAPIdx,
                                 BondType bndType,
-                                Map<Integer,SymmetricSet> newSymSets) 
-                                        throws DENOPTIMException 
+                                Map<Integer,SymmetricSet> newSymSets)
+                                        throws DENOPTIMException
     {
 
         // Clone and renumber the subgraph to ensure uniqueness
@@ -2397,7 +2411,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                    BondType bndType,
                                    Map<Integer,SymmetricSet> newSymSets,
                                    boolean onAllSymmAPs)
-                                           throws DENOPTIMException 
+                                           throws DENOPTIMException
     {
 
         SymmetricSet symAPs = parentVertex.getSymmetricAPs(parentAPIdx);
@@ -2405,7 +2419,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             ArrayList<Integer> apLst = symAPs.getList();
             for (int idx : apLst) {
-                if (!parentVertex.getAttachmentPoints().get(idx).isAvailable()) 
+                if (!parentVertex.getAttachmentPoints().get(idx).isAvailable())
                 {
                     continue;
                 }
@@ -2431,16 +2445,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     public ArrayList<Integer> findVerticesIds(
             DENOPTIMVertexQuery query,
-            int verbosity) 
+            int verbosity)
     {
         ArrayList<Integer> matches = new ArrayList<>();
-        for (DENOPTIMVertex v : findVertices(query, verbosity)) 
+        for (DENOPTIMVertex v : findVertices(query, verbosity))
         {
             matches.add(v.getVertexId());
         }
         return matches;
     }
-    
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -2453,7 +2467,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public ArrayList<DENOPTIMVertex> findVertices(
             DENOPTIMVertexQuery dnQuery,
-            int verbosity) 
+            int verbosity)
     {
         DENOPTIMVertex vQuery = dnQuery.getVrtxQuery();
         DENOPTIMEdge eInQuery = dnQuery.getInEdgeQuery();
@@ -2470,7 +2484,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (vQuery.getVertexId() > -1) //-1 would be the wildcard
         {
             if (verbosity > 2)
-            { 
+            {
                 System.out.println("Keeping vertex ID: "+vQuery.getVertexId());
             }
             ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
@@ -2497,7 +2511,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
                 if (verbosity > 2)
-                { 
+                {
                     System.out.println("Keeping MolID: "+queryMolID);
                 }
                 for (DENOPTIMVertex v : matches)
@@ -2524,7 +2538,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             if (queryFrgTyp != BBType.UNDEFINED)
             {
                 if (verbosity > 2)
-                { 
+                {
                     System.out.println("Keeping FragType: "+queryFrgTyp);
                 }
                 ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
@@ -2844,8 +2858,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     public DENOPTIMGraph editGraph(ArrayList<DENOPTIMGraphEdit> edits,
-                                   boolean symmetry, int verbosity) 
-                                           throws DENOPTIMException 
+                                   boolean symmetry, int verbosity)
+                                           throws DENOPTIMException
     {
 
         //Make sure there is no clash with vertex IDs
@@ -2867,14 +2881,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMGraphEdit edit : edits)
         {
             String task = edit.getType();
-            
+
             if (verbosity > 1)
             {
                 System.out.println(" ");
                 System.out.println("Graph edit task: "+task);
                 System.out.println("Graph to be edited: "+modGraph);
             }
-            
+
             switch (task.toUpperCase())
             {
                 case (DENOPTIMGraphEdit.REPLACECHILD):
@@ -2951,7 +2965,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             query, verbosity);
                     for (int vid : matches)
                     {
-                        modGraph.removeBranchStartingAt(getVertexWithId(vid), 
+                        modGraph.removeBranchStartingAt(getVertexWithId(vid),
                                 symmetry);
                     }
                     break;
@@ -2960,7 +2974,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return modGraph;
     }
-    
+
 //------------------------------------------------------------------------------
 
     public Set<DENOPTIMVertex> getMutableSites()
@@ -2972,22 +2986,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return mutableSites;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
-     * Produces a string that represents this graph and that adheres to the 
+     * Produces a string that represents this graph and that adheres to the
      * JSON format.
      * @return the JSON format as a single string
-     * @throws DENOPTIMException if the graph contains non-unique vertex IDs or 
+     * @throws DENOPTIMException if the graph contains non-unique vertex IDs or
      * AP IDs. Uniqueness of identifiers is required to restore references upon
      * deserialization.
      */
-    
+
     public String toJson() throws DENOPTIMException
     {
-        
-        // Check for uniqueness of vertexIDs and APIDs within the 
+
+        // Check for uniqueness of vertexIDs and APIDs within the
         // graph (ignore nested graphs).
         Set<Integer> unqVrtxIDs = new HashSet<Integer>();
         Set<Integer> unqApIDs = new HashSet<Integer>();
@@ -2995,8 +3009,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             if (!unqVrtxIDs.add(v.getVertexId()))
             {
-                throw new DENOPTIMException("Duplicate vertex ID '" 
-                        + v.getVertexId() 
+                throw new DENOPTIMException("Duplicate vertex ID '"
+                        + v.getVertexId()
                         + "'. Cannot generate JSON string for graph: " + this);
             }
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
@@ -3008,34 +3022,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             + "Cannot generate JSON string for graph: " + this);
                 }           }
         }
-        
-        Gson gson = new GsonBuilder()
-            .registerTypeAdapter(DENOPTIMGraph.class, 
-                    new DENOPTIMGraphSerializer())
-            .setExclusionStrategies(new DENOPTIMExclusionStrategy())
-            // Custom serializer to make json string use AP's ID as key in the 
-            // map. If this is not used, then the key.toString() is used to 
-            // get a string representation of the key.
-            .registerTypeAdapter(APMap.class, 
-                    new APMapSerializer())
-            // Custom serializer that keeps only the IDs to vertexes and 
-            // APs defined in the list of  vertexes belonging to the graph. 
-            .registerTypeAdapter(DENOPTIMEdge.class, 
-                    new DENOPTIMEdgeSerializer())
-            // Custom serialized that keeps only the IDs to vertexes defined in 
-            // the list of vertexes belonging to the graph
-            .registerTypeAdapter(DENOPTIMRing.class, 
-                    new DENOPTIMRingSerializer())
-            //TODO-V3 add custom de/serialized for symmetric sets
-            .setPrettyPrinting()
-            .create();
 
+        Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Reads a JSON string and returns an instance of this class.
      * @param json the string to parse.
@@ -3043,33 +3037,37 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     public static DENOPTIMGraph fromJson(String json)
-    {   
-        Gson gson = new GsonBuilder()
-            .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
-            // Custom deserializer to dispatch to the correct subclass of Vertex
-            .registerTypeAdapter(DENOPTIMVertex.class,
-                  new DENOPTIMVertexDeserializer())
-            // Custom deserializer takes care of converting ID-based components
-            // to references to vertexes and APs
-            .registerTypeAdapter(DENOPTIMGraph.class,
-                    new DENOPTIMGraphDeserializer())
-            .setPrettyPrinting()
-            .create();
-
+    {
+        Gson gson = DENOPTIMgson.getReader();
         DENOPTIMGraph graph = gson.fromJson(json, DENOPTIMGraph.class);
         return graph;
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
+    /**
+     * Reads a JSON string and returns an instance of this class.
+     * @param json the string to parse.
+     * @return a new instance of this class.
+     */
+
+    public static DENOPTIMGraph fromJson(Reader reader)
+    {
+        Gson gson = DENOPTIMgson.getReader();
+        DENOPTIMGraph graph = gson.fromJson(reader, DENOPTIMGraph.class);
+        return graph;
+    }
+
+//------------------------------------------------------------------------------
+
     /**
      * We expect unique IDs for vertexes and attachment points.
      */
-    private static class DENOPTIMGraphSerializer 
-    implements JsonSerializer<DENOPTIMGraph> 
+    public static class DENOPTIMGraphSerializer
+    implements JsonSerializer<DENOPTIMGraph>
     {
         @Override
-        public JsonElement serialize(DENOPTIMGraph g, Type typeOfSrc, 
+        public JsonElement serialize(DENOPTIMGraph g, Type typeOfSrc,
                 JsonSerializationContext context) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("graphId", g.graphId);
@@ -3080,251 +3078,51 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return jsonObject;
         }
     }
-    
-//------------------------------------------------------------------------------
-    
-    public static class DENOPTIMExclusionStrategy implements ExclusionStrategy 
-    {
-        @Override
-        public boolean shouldSkipField(FieldAttributes field) {
-            // cannot serialize chemical representations: 
-            //     class org.openscience.cdk.Atom declares multiple JSON
-            //     fields named identifier
-            if (field.getDeclaringClass() == DENOPTIMFragment.class 
-                    && field.getName().equals("mol")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
-                    && field.getName().equals("owner")) {
-                return true;
-            }
 
-            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
-                    && field.getName().equals("user")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMVertex.class 
-                    && field.getName().equals("owner")) {
-                return true;
-            }
-            
-            return false;
-        }
 
-        @Override
-        public boolean shouldSkipClass(Class<?> clazz) { 
-            return false; 
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
-    private static class DENOPTIMExclusionStrategyNoAPMap implements ExclusionStrategy 
-    {
-        @Override
-        public boolean shouldSkipField(FieldAttributes field) {
-            // cannot serialize chemical representations: 
-            //     class org.openscience.cdk.Atom declares multiple JSON
-            //     fields named identifier
-            if (field.getDeclaringClass() == DENOPTIMFragment.class 
-                    && field.getName().equals("mol")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
-                    && field.getName().equals("owner")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class 
-                    && field.getName().equals("user")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMVertex.class 
-                    && field.getName().equals("owner")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMTemplate.class 
-                    && field.getName().equals("innerToOuterAPs")) {
-                return true;
-            }
-            if (field.getDeclaringClass() == DENOPTIMTemplate.class 
-                    && field.getName().equals("innerGraph")) {
-                return true;
-            }
-            
-            return false;
-        }
+    //------------------------------------------------------------------------------
 
-        @Override
-        public boolean shouldSkipClass(Class<?> clazz) { 
-            return false; 
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
-    //TODO-V3: consider removal. this is just a code stub written to test the 
-    // possibility of having a custom serializer.
-    
-    public static class DENOPTIMVertexSerializer 
-    implements JsonSerializer<DENOPTIMVertex> {
-
-        @Override
-        public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, 
-                JsonSerializationContext context) {
-                       
-            JsonObject jsonObject = new JsonObject();
-            // src.owner creates a loop!
-            jsonObject.addProperty("vertexId", src.getVertexId());
-            jsonObject.addProperty("isRCV", src.isRCV());
-            jsonObject.addProperty("level", src.getLevel());
-            jsonObject.add("allowedMutatioTypes",
-                context.serialize(src.getMutationTypes()));
-                
-
-            //JsonPrimitive jsonObject = new JsonPrimitive(src.vertexId);
-            return jsonObject;
-        }
-    }
-    
-// 
-// public class DENOPTIMVertexSerializer implements JsonSerializer<DENOPTIMVertex> {
-//      // 
-//      // @Override
-//      // public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc, JsonSerializationContext context) {
-//      //     JsonObject jsonObject = new JsonObject();
-//      //     jsonObject.addProperty("Name", src.Name);
-//      //     jsonObject.add("Type", context.serialize(src.Type));
-//      //     jsonObject.add("ChildId", context.serialize(src.ChildId));  // recursion!
-//      //     return jsonObject;
-//      // }
-// }
-// 
-// public class DENOPTIMVertexDeserializer implements JsonDeserializer<DENOPTIMVertex> {
-//      // 
-//      // @Override
-//      // public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-//      //     throws JsonParseException {
-//      //     DENOPTIMVertex id = new DENOPTIMVertex();
-//      //     id.Name = json.getAsJsonObject().get("Name").getAsString();
-//      //     id.Type = context.deserialize(json.getAsJsonObject().get("Type"), StructType.class);
-//      //     JsonElement childJson = json.getAsJsonObject().get("ChildId");
-//      //     if (childJson != null) {
-//      //         id.ChildId = context.deserialize(childJson, DENOPTIMVertex.class);  // recursion!
-//      //         id.ChildId.ParentId = id;
-//      //     }
-//      //     return id;
-//      // }
-// }
-
-//------------------------------------------------------------------------------
-    
-    private static class APMapSerializer 
-    implements JsonSerializer<APMap>
-    {   
-        @Override
-        public JsonElement serialize(APMap apmap, Type typeOfSrc, 
-                JsonSerializationContext context)
-        {
-            TreeMap<Integer,DENOPTIMAttachmentPoint> jsonableMap = new TreeMap<>();
-            for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry 
-                    : apmap.entrySet())
-            {
-                jsonableMap.put(entry.getKey().getID(), entry.getValue());
-            }
-            
-            return context.serialize(jsonableMap);
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
-    private static class DENOPTIMEdgeSerializer 
-    implements JsonSerializer<DENOPTIMEdge>
-    {   
-        @Override
-        public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc, 
-                JsonSerializationContext context)
-        {            
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("srcAPID", edge.getSrcAP().getID());
-            jsonObject.addProperty("trgAPID", edge.getTrgAP().getID());
-            jsonObject.add("bondType", context.serialize(edge.getBondType()));
-            return jsonObject;
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
-    private static class DENOPTIMRingSerializer 
-    implements JsonSerializer<DENOPTIMRing>
-    {
-        @Override
-        public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc, 
-                JsonSerializationContext context)
-        {
-            JsonObject jsonObject = new JsonObject();
-            ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
-            for (int i=0; i<ring.getSize(); i++)
-            {
-                DENOPTIMVertex v = ring.getVertexAtPosition(i);
-                vertexIDs.add(v.getVertexId());
-            }
-            jsonObject.add("vertices",context.serialize(vertexIDs));
-            return jsonObject;
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
-    private static class DENOPTIMGraphDeserializer 
+    public static class DENOPTIMGraphDeserializer
     implements JsonDeserializer<DENOPTIMGraph>
     {
         @Override
-        public DENOPTIMGraph deserialize(JsonElement json, Type typeOfT, 
+        public DENOPTIMGraph deserialize(JsonElement json, Type typeOfT,
                 JsonDeserializationContext context) throws JsonParseException
         {
             JsonObject jsonObject = json.getAsJsonObject();
-            
+
             // First, build a graph with a graph ID and a list of vertices
             JsonObject partialJsonObj = new JsonObject();
             partialJsonObj.add("graphId", jsonObject.get("graphId"));
             partialJsonObj.add("gVertices", jsonObject.get("gVertices"));
             // Eventually, also the sym sets will become references...
             partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
-            
+
             Gson gson = new GsonBuilder()
-                .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
-                .registerTypeAdapter(DENOPTIMVertex.class, 
-                      new DENOPTIMVertexDeserializer())
+                .setExclusionStrategies(new DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap())
+                .registerTypeAdapter(DENOPTIMVertex.class,
+                      new DENOPTIMVertex.DENOPTIMVertexDeserializer())
                 .setPrettyPrinting()
                 .create();
-           
+
             DENOPTIMGraph graph = gson.fromJson(partialJsonObj,
                     DENOPTIMGraph.class);
-            
-            // Refresh reference and connection counts in all APs
-            for (DENOPTIMVertex v : graph.gVertices)
+
+            // Refresh APs
+            for (DENOPTIMVertex v : graph.getVertexList())
             {
                 // Regenerate reference to fragment owner
                 v.setGraphOwner(graph);
-                
+
                 for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
                 {
                     // Regenerate reference to AP owner
                     ap.setOwner(v);
-                    //Regenerate reference to APClass
-                    try
-                    {
-                        ap.setAPClass(ap.getAPClass().toString());
-                    } catch (DENOPTIMException e1)
-                    {
-                        throw new JsonParseException(e1);
-                    }
                     // Reset connection count
                     ap.setFreeConnections(ap.getTotalConnections());
                 }
             }
-            
+
             // Then, recover those members that are heavily based on references:
             // edges, rings.
             JsonArray edgeArr = jsonObject.get("gEdges").getAsJsonArray();
@@ -3335,12 +3133,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         o.get("srcAPID").getAsInt());
                 DENOPTIMAttachmentPoint trgAP = graph.getAPWithId(
                         o.get("trgAPID").getAsInt());
-                
-                DENOPTIMEdge edge = new DENOPTIMEdge(srcAP, trgAP, 
+
+                DENOPTIMEdge edge = new DENOPTIMEdge(srcAP, trgAP,
                         context.deserialize(o.get("bondType"),BondType.class));
                 graph.addEdge(edge);
             }
-            
+
             // Now, recover the rings
             JsonArray ringArr = jsonObject.get("gRings").getAsJsonArray();
             for (JsonElement e : ringArr)
@@ -3353,109 +3151,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
                 graph.addRing(ring);
             }
-            
+
             return graph;
         }
     }
-    
-//------------------------------------------------------------------------------
-    
-    public static class DENOPTIMVertexDeserializer 
-    implements JsonDeserializer<DENOPTIMVertex> 
-    {
-        @Override
-        public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT, 
-                JsonDeserializationContext context) throws JsonParseException 
-        {
-            JsonObject jsonObject = json.getAsJsonObject();
 
-            if (jsonObject.has("innerGraph")) 
-            {
-                //TODO-V3 log or del
-                System.out.println("DESERIALIZE Template " 
-                        + jsonObject.get("vertexId"));
-                
-                DENOPTIMTemplate tmpl = context.deserialize(jsonObject, DENOPTIMTemplate.class);
-                
-                // Deserialize embedded graph. Such field is excluded by design because
-                // if not, the above tmpl = context.deserialize(...) call produces
-                // an inner graph with null AP pointers.
-                
-                JsonObject innerGraphJson = jsonObject.getAsJsonObject("innerGraph");
-                DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(innerGraphJson.toString());
-                tmpl.setInnerGraph(innerGraph);
-                
-                // Is the following need? I think so, because we need the IDs 
-                // of outernAPs to be as defined in the json string.
-                
-                //Recover innerToOuter APMap
-                Type type = new TypeToken<TreeMap<Integer,DENOPTIMAttachmentPoint>>(){}.getType();
-                TreeMap<Integer,DENOPTIMAttachmentPoint> map = context.deserialize(
-                        jsonObject.getAsJsonObject("innerToOuterAPs"), type);
-                tmpl.updateInnerToOuter(map);
-                
-                return tmpl;
-            }
-            else if (jsonObject.has("buildingBlockId")) 
-            {
-                //TODO-V3 log or del
-                System.out.println("DESERIALIZE Fragment " 
-                        + jsonObject.get("vertexId"));
-                
-                //TODO-V3: serialize AtomContainer2 somehow (as an SDF string?)
-                
-                // The serialized fragment does NOT include its molecular
-                // representation, which cannot be serialized (so far...)
-                DENOPTIMFragment frag = context.deserialize(jsonObject, 
-                        DENOPTIMFragment.class);
-                
-                // The solution, for now, is to rebuild the fragment from the 
-                // library, and attach to it the serialized data
-                DENOPTIMVertex fragWithMol;
-                try
-                {
-                    // NB: this works well also with templates that are in the library 
-                    fragWithMol = FragmentSpace.getVertexFromLibrary(
-                            frag.getFragmentType(), frag.getMolId());
-                } catch (DENOPTIMException e)
-                {
-                    throw new JsonParseException("Could not get "
-                            + frag.getFragmentType() + " from "
-                            + "library. " + e.getMessage());
-                }
-                ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
-                for (SymmetricSet ss : frag.getSymmetricAPSets())
-                {
-                    cLstSymAPs.add(ss.clone());
-                }
-                fragWithMol.setMutationTypes(frag.getMutationTypes());
-                fragWithMol.setSymmetricAPSets(cLstSymAPs);
-                fragWithMol.setAsRCV(frag.isRCV());
-                fragWithMol.setVertexId(frag.getVertexId());
-                fragWithMol.setLevel(frag.getLevel());
-                for (int iap=0; iap<frag.getNumberOfAP(); iap++)
-                {
-                    DENOPTIMAttachmentPoint oriAP = frag.getAP(iap);
-                    DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
-                    newAP.setID(oriAP.getID());
-                }
-                
-                // WARNING: other fields, such as 'owner' and AP 'user' are
-                // recovered upon deserializing the graph containing this vertex
-                
-                return fragWithMol;
-            }
-            else 
-            {
-                //TODO-V3 log or del
-                System.out.println("DESERIALIZE EmptyVertex " 
-                        + jsonObject.get("vertexId"));
-                EmptyVertex ev = EmptyVertex.fromJson(jsonObject.toString());
-                return ev;
-            }
-        }
-    }
 
-//------------------------------------------------------------------------------
-    
+
 }

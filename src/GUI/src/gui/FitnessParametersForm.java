@@ -210,7 +210,7 @@ public class FitnessParametersForm extends ParametersForm
         btnFPSource = new JButton("Browse");
         btnFPSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtFPSource,
+                GUIFileOpener.pickFileForTxtField(txtFPSource,
                 		btnFPSource);
            }
         });
@@ -307,7 +307,7 @@ public class FitnessParametersForm extends ParametersForm
         btnFitProviderSource = new JButton("Browse");
         btnFitProviderSource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(
+                GUIFileOpener.pickFileForTxtField(
                 		txtFitProviderSource, btnFitProviderSource);
            }
         });

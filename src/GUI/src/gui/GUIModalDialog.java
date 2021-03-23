@@ -49,19 +49,44 @@ public class GUIModalDialog extends JDialog
 	 */
 	protected JButton btnCanc;
 	
+	/**
+     * The button that can be used for anything action that does not close the 
+     * dialog.
+     */
+    protected JButton btnExtra;
+    
 	private JPanel pnlControls;
 	
 	/**
 	 * The result to be returned once the dialog is closed
 	 */
-	protected Object result;
+	protected Object result = null;
+	
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     */
+    public GUIModalDialog()
+    {
+        initialize(false);
+    }
 
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 	
 	/**
 	 * Constructor
+	 * @param useExtraButton set <code>true</code> to request three buttons
+	 * in the control panel.
 	 */
-	public GUIModalDialog()
+    public GUIModalDialog(boolean useExtraButton)
+    {
+        initialize(useExtraButton);
+    }
+    
+//------------------------------------------------------------------------------
+    
+	private void initialize(boolean useExtraButton)
 	{
 		this.setModal(true);
 		this.setLayout(new BorderLayout());
@@ -70,6 +95,13 @@ public class GUIModalDialog extends JDialog
 		
 		btnDone = new JButton("Done");
 		btnDone.setToolTipText("Processes data and closes dialog");
+		btnDone.addActionListener(new ActionListener() {
+	            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                close();
+            }
+        });
 		
 		btnCanc = new JButton("Cancel");
 		btnCanc.setToolTipText("Exit dialog.");
@@ -83,6 +115,11 @@ public class GUIModalDialog extends JDialog
 		});
 		
 		pnlControls = new JPanel();
+		if (useExtraButton)
+		{
+		    btnExtra = new JButton("Extra");
+            pnlControls.add(btnExtra);
+		}
 		pnlControls.add(btnDone);
 		pnlControls.add(btnCanc);
 		this.add(pnlControls, BorderLayout.SOUTH);

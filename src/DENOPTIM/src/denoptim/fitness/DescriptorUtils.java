@@ -8,22 +8,17 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.qsar.DescriptorEngine;
-import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
 
 public class DescriptorUtils
 {	

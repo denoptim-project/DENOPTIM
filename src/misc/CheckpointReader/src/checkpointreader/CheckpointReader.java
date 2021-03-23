@@ -18,9 +18,7 @@
 
 package checkpointreader;
 
-import denoptim.io.DenoptimIO; 
-import denoptim.exception.DENOPTIMException;
-
+import denoptim.io.DenoptimIO;
 import fragspaceexplorer.FSECheckPoint;
 import fragspaceexplorer.FSEUtils;
 

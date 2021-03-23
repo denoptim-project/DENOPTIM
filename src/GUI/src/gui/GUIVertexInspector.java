@@ -46,28 +46,30 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.vecmath.Point3d;
 
-import denoptim.utils.DENOPTIMMoleculeUtils;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 /**
- * A panel with a molecular viewer that understands DENOPTIM fragments
+ * A panel with a viewer capable of visualising DENOPTIM fragments
  * and allows to create and edit fragments.
  * The molecular viewer is provided by Jmol.
  * 
  * @author Marco Foscato
  */
 
-public class GUIFragmentInspector extends GUICardPanel
+public class GUIVertexInspector extends GUICardPanel
 {
 	/**
 	 * Version UID
@@ -77,44 +79,44 @@ public class GUIFragmentInspector extends GUICardPanel
 	/**
 	 * Unique identified for instances of this inspector
 	 */
-	public static AtomicInteger prepFragTabUID = new AtomicInteger(1);
+	public static AtomicInteger prepVrtxTabUID = new AtomicInteger(1);
 	
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<DENOPTIMFragment> fragmentLibrary =
-			new ArrayList<DENOPTIMFragment>();
+	private ArrayList<DENOPTIMVertex> vertexesLibrary =
+			new ArrayList<DENOPTIMVertex>();
 	
 	/**
-	 * The currently loaded fragment
+	 * The currently loaded vertex
 	 */
-	private DENOPTIMFragment fragment;
+	private DENOPTIMVertex vertex;
 	
 	/**
 	 * The index of the currently loaded fragment [0–(n-1)}
 	 */
-	private int currFrgIdx = 0;
+	private int currVrtxIdx = 0;
 	
 	/**
 	 * Flag signaling that loaded data has changes since last save
 	 */
 	private boolean unsavedChanges = false;
 	
-	private FragmentViewPanel fragmentViewer;
-	private JPanel fragCtrlPane;
-	private JPanel fragNavigPanel;
-	private JPanel fragNavigPanel2;
-	private JPanel fragNavigPanel3;
+	private VertexViewPanel vertexViewer;
+	private JPanel ctrlPane;
+	private JPanel navigPanel;
+	private JPanel navigPanel2;
+	private JPanel navigPanel3;
 	
-	private JButton btnAddFrag;
-	private JButton btnDelFrag;
+	private JButton btnAddVrtx;
+	private JButton btnDelVrtx;
 	
-	private JButton btnOpenFrags;
+	private JButton btnOpenVrtxs;
 	
-	private JSpinner fragNavigSpinner;
-	private JLabel totalFragsLabel;
-	private final FragSpinnerChangeEvent fragSpinnerListener = 
-			new FragSpinnerChangeEvent();
+	private JSpinner navigSpinner;
+	private JLabel totalVrtxsLabel;
+	private final VrtxSpinnerChangeEvent vrtxSpinnerListener = 
+			new VrtxSpinnerChangeEvent();
 	
 	private JPanel pnlImportStruct;
 	private JButton btnOpenMol;
@@ -135,9 +137,9 @@ public class GUIFragmentInspector extends GUICardPanel
 	/**
 	 * Constructor
 	 */
-	public GUIFragmentInspector(GUIMainPanel mainPanel)
+	public GUIVertexInspector(GUIMainPanel mainPanel)
 	{
-		super(mainPanel, "Fragment Inspector #" + prepFragTabUID.getAndIncrement());
+		super(mainPanel, "Vertex Inspector #" + prepVrtxTabUID.getAndIncrement());
 		super.setLayout(new BorderLayout());
 		initialize();
 	}
@@ -154,66 +156,68 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		// This card structure includes center, east and south panels:
 		// - (Center) molecular viewer and APs
-		// - (East) Fragment controls
+		// - (East) vertex controls
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
-		fragmentViewer = new FragmentViewPanel(this,true);
-		fragmentViewer.addPropertyChangeListener("APDATA", 
+		vertexViewer = new VertexViewPanel(this,true);
+		vertexViewer.addPropertyChangeListener("APDATA", 
 				new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				protectEditedSystem();				
 			}
 		});
-        this.add(fragmentViewer,BorderLayout.CENTER);
+        this.add(vertexViewer,BorderLayout.CENTER);
 		
 		// General panel on the right: it containing all controls
-        fragCtrlPane = new JPanel();
-        fragCtrlPane.setVisible(true);
-        fragCtrlPane.setLayout(new BoxLayout(fragCtrlPane, SwingConstants.VERTICAL));
-        fragCtrlPane.add(new JSeparator());
+        ctrlPane = new JPanel();
+        ctrlPane.setVisible(true);
+        ctrlPane.setLayout(new BoxLayout(ctrlPane, SwingConstants.VERTICAL));
+        ctrlPane.add(new JSeparator());
 		
         // NB: avoid GroupLayout because it interferes with Jmol viewer and causes exception
         
-        // Controls to navigate the list of fragments
-        fragNavigPanel = new JPanel();
-        fragNavigPanel2 = new JPanel();
-        fragNavigPanel3 = new JPanel();
-        JLabel navigationLabel1 = new JLabel("Fragment # ");
+        // Controls to navigate the list of vertexes
+        navigPanel = new JPanel();
+        navigPanel2 = new JPanel();
+        navigPanel3 = new JPanel();
+        JLabel navigationLabel1 = new JLabel("Vertex # ");
         JLabel navigationLabel2 = new JLabel("Current library size: ");
-        totalFragsLabel = new JLabel("0");
+        totalVrtxsLabel = new JLabel("0");
         
-		fragNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
-		fragNavigSpinner.setToolTipText("Move to fragment number # in the currently loaded library.");
-		fragNavigSpinner.setPreferredSize(new Dimension(75,20));
-		fragNavigSpinner.addChangeListener(fragSpinnerListener);
-        fragNavigPanel.add(navigationLabel1);
-		fragNavigPanel.add(fragNavigSpinner);
-		fragCtrlPane.add(fragNavigPanel);
+		navigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
+		navigSpinner.setToolTipText("Move to vertex number # in the currently loaded library.");
+		navigSpinner.setPreferredSize(new Dimension(75,20));
+		navigSpinner.addChangeListener(vrtxSpinnerListener);
+        navigPanel.add(navigationLabel1);
+		navigPanel.add(navigSpinner);
+		ctrlPane.add(navigPanel);
 		
-        fragNavigPanel2.add(navigationLabel2);
-        fragNavigPanel2.add(totalFragsLabel);
-		fragCtrlPane.add(fragNavigPanel2);
+        navigPanel2.add(navigationLabel2);
+        navigPanel2.add(totalVrtxsLabel);
+		ctrlPane.add(navigPanel2);
 		
-		btnAddFrag = new JButton("Add");
-		btnAddFrag.setToolTipText("Append fragment taken from file.");
-		btnAddFrag.addActionListener(new ActionListener() {
+		btnAddVrtx = new JButton("Add");
+		btnAddVrtx.setToolTipText("Append vertex taken from file.");
+		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnAddFrag);
+				File inFile = GUIFileOpener.pickFile(btnAddVrtx);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
 				}
 				
-				ArrayList<IAtomContainer> iacLib;
+				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-					iacLib = DenoptimIO.readMoleculeData(
-							inFile.getAbsolutePath());
+	               FragmentSpace.appendToVertexLibrary(
+	                        DenoptimIO.readInLibraryOfFragments(
+	                                inFile.getAbsolutePath(),"fragment"),
+	                        BBType.FRAGMENT,vrtxLib);
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					JOptionPane.showMessageDialog(btnAddFrag,
-			                "<html>Could not read fragments from file"
+					JOptionPane.showMessageDialog(btnAddVrtx,
+			                "<html>Could not read building blocks from file"
 			                + "<br>'" + inFile + "'"
 			                + "<br>Hint on cause: " + e1.getMessage() 
 			                +"</html>",
@@ -223,10 +227,10 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 
-				if (iacLib.size() == 0)
+				if (vrtxLib.size() == 0)
 				{
-					JOptionPane.showMessageDialog(btnAddFrag,
-			                "<html>No fragments in file"
+					JOptionPane.showMessageDialog(btnAddVrtx,
+			                "<html>No building blocks in file"
 			                + "<br>'" + inFile + "'</html>",
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
@@ -234,9 +238,9 @@ public class GUIFragmentInspector extends GUICardPanel
 					return;
 				}
 				
-				if (iacLib.size() == 1)
+				if (vrtxLib.size() == 1)
 				{
-					importFragmentsFromFile(inFile);
+					importVertexesFromFile(inFile);
 					return;
 				}
 				
@@ -244,11 +248,11 @@ public class GUIFragmentInspector extends GUICardPanel
 						"Selected",
 						"Cancel"};
 				String txt = "<html><body width='%1s'>Do you want to "
-						+ "append all fragments of only selected ones?"
+						+ "append all building blocks or only selected ones?"
 						+ "</html>";
-				int res = JOptionPane.showOptionDialog(btnAddFrag,
+				int res = JOptionPane.showOptionDialog(btnAddVrtx,
 		                String.format(txt,200),
-		                "Append Fragments",
+		                "Append Building Blocks",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
 		                UIManager.getIcon("OptionPane.warningIcon"),
@@ -263,51 +267,27 @@ public class GUIFragmentInspector extends GUICardPanel
 				switch (res)
 				{
 					case 0:
-						importFragmentsFromFile(inFile);
+						importVertexesFromFile(inFile);
 						break;
 						
-					case 1:						
-						ArrayList<IAtomContainer> selectedFrags = 
-								new ArrayList<IAtomContainer>();
-						int iFrg = -1;
-						while (true)
-						{
-							if (iFrg+1>=iacLib.size())
-							{
-								break;
-							}
-							GUIFragmentSelector fragSelector = 
-									new GUIFragmentSelector(iacLib,iFrg+1);
-							fragSelector.setRequireApSelection(false);
-							Object selected = fragSelector.showDialog();
+					case 1:
+						ArrayList<DENOPTIMVertex> selectedVrtxs = 
+								new ArrayList<DENOPTIMVertex>();
+						GUIVertexSelector vrtxSelector = 
+						        new GUIVertexSelector(vrtxLib,true);
+						vrtxSelector.setRequireApSelection(false);
+						Object selected = vrtxSelector.showDialog();
 
-							if (selected != null)
-							{
-								iFrg = ((Integer[]) selected)[0];
-								selectedFrags.add(iacLib.get(iFrg));
-							}
-							else
-							{
-								break;
-							}
+						if (selected != null)
+						{
+						    ArrayList<ArrayList<Integer>> selList = 
+						            (ArrayList<ArrayList<Integer>>) selected;
+						    for (ArrayList<Integer> pair : selList)
+						    {
+						        selectedVrtxs.add(vrtxLib.get(pair.get(0)));
+						    }
 						}
-						String tmpSDFFile = Utils.getTempFile(
-								"Denoptim_FragViewer_loadedMol.sdf");
-						try {
-							DenoptimIO.writeMoleculeSet(tmpSDFFile, selectedFrags);
-							importFragmentsFromFile(new File(tmpSDFFile));
-						} catch (DENOPTIMException e1) {
-							JOptionPane.showMessageDialog(btnAddFrag,
-					                "<html>Could not read import fragments.<br>"
-					                + "Error reading tmp file"
-					                + "<br>'" + inFile + "'"
-					                + "<br>Hint on cause: " + e1.getMessage() 
-					                +"</html>",
-					                "Error",
-					                JOptionPane.ERROR_MESSAGE,
-					                UIManager.getIcon("OptionPane.errorIcon"));
-							return;
-						}
+						importVertexes(selectedVrtxs);
 						break;
 					
 					default:
@@ -315,23 +295,25 @@ public class GUIFragmentInspector extends GUICardPanel
 				}
 			}
 		});
-		btnDelFrag = new JButton("Remove");
-		btnDelFrag.setToolTipText("Remove the present fragment from the library.");
-		btnDelFrag.addActionListener(new ActionListener() {
+		btnDelVrtx = new JButton("Remove");
+		btnDelVrtx.setToolTipText("Remove the present building block from the "
+		        + "library.");
+		btnDelVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					removeCurrentFragment();
+					removeCurrentVrtx();
 				} catch (DENOPTIMException e1) {
-					System.out.println("Esception while removing the current fragment:");
+					System.out.println("Esception while removing the current "
+					        + "building block:");
 					e1.printStackTrace();
 				}
 			}
 		});
-		fragNavigPanel3.add(btnAddFrag);
-		fragNavigPanel3.add(btnDelFrag);
-		fragCtrlPane.add(fragNavigPanel3);
+		navigPanel3.add(btnAddVrtx);
+		navigPanel3.add(btnDelVrtx);
+		ctrlPane.add(navigPanel3);
 		
-		fragCtrlPane.add(new JSeparator());
+		ctrlPane.add(new JSeparator());
 		
 		pnlImportStruct = new JPanel();
 		GroupLayout lyoImportStructure = new GroupLayout(pnlImportStruct);
@@ -341,7 +323,7 @@ public class GUIFragmentInspector extends GUICardPanel
 				+ " from file.");
 		btnOpenMol.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenMol);
+				File inFile = GUIFileOpener.pickFile(btnOpenMol);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -391,9 +373,9 @@ public class GUIFragmentInspector extends GUICardPanel
                         .addGroup(lyoImportStructure.createParallelGroup()
 	                                .addComponent(btnOpenMol)
 	                                .addComponent(btnOpenSMILES)));       
-        fragCtrlPane.add(pnlImportStruct);
+        ctrlPane.add(pnlImportStruct);
         
-		fragCtrlPane.add(new JSeparator());
+		ctrlPane.add(new JSeparator());
 		
 		pnlAtmToAP = new JPanel();
 		btnAtmToAP = new JButton("Atom to AP");
@@ -403,10 +385,10 @@ public class GUIFragmentInspector extends GUICardPanel
 			    + "<br><b>WARNING:</b> this action cannot be undone!<html>");
 		btnAtmToAP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fragment = fragmentViewer.getLoadedStructure();
+				vertex = vertexViewer.getLoadedStructure();
 				
 				ArrayList<IAtom> selectedAtms = 
-						fragmentViewer.getAtomsSelectedFromJMol();
+				        vertexViewer.getAtomsSelectedFromJMol();
 				
 				if (selectedAtms.size() == 0)
 				{
@@ -451,20 +433,16 @@ public class GUIFragmentInspector extends GUICardPanel
 					}
 					
 					removeAtoms(selectedAtms);
+
+					vertexViewer.loadVertexToViewer(vertex);
 					
-					// Use the APs stored in the atoms
-					fragment.updateAPs();
-					
-					fragmentViewer.loadFragmentToViewer(fragment);
-					
-			        // Protect the temporary "fragment" obj
 			        unsavedChanges = true;
 			        protectEditedSystem();
 				}
 			}
 		});
 		pnlAtmToAP.add(btnAtmToAP);
-		fragCtrlPane.add(pnlAtmToAP);
+		ctrlPane.add(pnlAtmToAP);
 		
 		pnlDelSel = new JPanel();
 		btnDelSel = new JButton("Remove Atoms");
@@ -474,7 +452,7 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<IAtom> selectedAtms = 
-						fragmentViewer.getAtomsSelectedFromJMol();
+				        vertexViewer.getAtomsSelectedFromJMol();
 				
 				if (selectedAtms.size() == 0)
 				{
@@ -490,73 +468,67 @@ public class GUIFragmentInspector extends GUICardPanel
 				{					
 					removeAtoms(selectedAtms);
 					
-					fragment.updateAPs();
+					vertexViewer.loadVertexToViewer(vertex);
 					
-					fragmentViewer.loadFragmentToViewer(fragment);
-					
-			        // Protect the temporary "fragment" obj
 			        unsavedChanges = true;
 			        protectEditedSystem();
 				}
 			}
 		});
 		pnlDelSel.add(btnDelSel);
-		fragCtrlPane.add(pnlDelSel);
+		ctrlPane.add(pnlDelSel);
 		
-		fragCtrlPane.add(new JSeparator());
+		ctrlPane.add(new JSeparator());
 		
         pnlSaveEdits = new JPanel();
         btnSaveEdits = new JButton("Save Changes");
         //btnSaveEdits.setForeground(Color.RED);
         btnSaveEdits.setEnabled(true);
-        btnSaveEdits.setToolTipText("<html>Save the current fragment replacing"
-        		+ " <br>the original fragment in the loaded library.</html>");
+        btnSaveEdits.setToolTipText("<html>Save the current system replacing"
+        		+ " <br>the original one in the loaded library.</html>");
         btnSaveEdits.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                 	saveUnsavedChanges();
                 }
         });
         pnlSaveEdits.add(btnSaveEdits);
-        fragCtrlPane.add(pnlSaveEdits);
-		this.add(fragCtrlPane,BorderLayout.EAST);
+        ctrlPane.add(pnlSaveEdits);
+		this.add(ctrlPane,BorderLayout.EAST);
 		
 		
 		// Panel with buttons to the bottom of the frame
 		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenFrags = new JButton("Load Library of Fragments");
-		btnOpenFrags.setToolTipText("Reads fragments or structures from "
+		btnOpenVrtxs = new JButton("Load Library of Building Blocks");
+		btnOpenVrtxs.setToolTipText("Reads building blocks or structures from "
 				+ "file.");
-		btnOpenFrags.addActionListener(new ActionListener() {
+		btnOpenVrtxs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnOpenFrags);
+				File inFile = GUIFileOpener.pickFile(btnOpenVrtxs);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
 				}
-				importFragmentsFromFile(inFile);
+				importVertexesFromFile(inFile);
 			}
 		});
-		commandsPane.add(btnOpenFrags);
+		commandsPane.add(btnOpenVrtxs);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Fragments");
-		btnSaveFrags.setToolTipText("Write all fragments to a file.");
-		btnSaveFrags.addActionListener(new ActionListener() {
+		JButton btnSaveVrtxs = new JButton("Save Library of Building Blocks");
+		btnSaveVrtxs.setToolTipText("Write all building blocks to a file.");
+		btnSaveVrtxs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
+				File outFile = GUIFileOpener.pickFileForSaving(
+				        btnSaveVrtxs);
 				if (outFile == null)
 				{
 					return;
 				}
 				try
 				{
-					for (DENOPTIMFragment f : fragmentLibrary)
-					{
-						f.projectAPsToProperties();
-					}
-				    DenoptimIO.writeFragmentSet(outFile.getAbsolutePath(),
-				    		fragmentLibrary);
+				    DenoptimIO.writeVertexes(outFile.getAbsolutePath(),
+				    		vertexesLibrary);
 				}
 				catch (Exception ex)
 				{
@@ -569,16 +541,16 @@ public class GUIFragmentInspector extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-						fragmentLibrary.size(), 1));
+				navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
+						vertexesLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
 			}
 		});
-		commandsPane.add(btnSaveFrags);
+		commandsPane.add(btnSaveVrtxs);
 
 		JButton btnCanc = new JButton("Close Tab");
-		btnCanc.setToolTipText("Closes this fragment inspector tab.");
+		btnCanc.setToolTipText("Closes this tab.");
 		btnCanc.addActionListener(new removeCardActionListener(this));
 		commandsPane.add(btnCanc);
 		
@@ -588,8 +560,9 @@ public class GUIFragmentInspector extends GUICardPanel
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String txt = "<html><body width='%1s'>"
-						+ "<p>This tab allows to create, inspect, and edit"
-						+ " three-dimensional molecular fragments.</p>"
+						+ "<p>This tab allows to create, inspect, and edit "
+						+ "building blocks and "
+						+ "three-dimensional molecular fragments.</p>"
 						+ "<p>New fragments can be created starting from any "
 						+ "chemical structure that can be loaded from file or "
 						+ "generated from SMILES (SMILES-to-3D conversion "
@@ -641,16 +614,20 @@ public class GUIFragmentInspector extends GUICardPanel
 			mol.setProperty(DENOPTIMConstants.APTAG,null);
 			mol.setProperty(DENOPTIMConstants.APCVTAG,null);
 			
-			fragment = new DENOPTIMFragment(mol,BBType.UNDEFINED);
+			// NB: here we let the vertexViewer create a fragment object that we
+			// then put into the local library. This to make sure that the 
+			// references to atoms selected in the viewer are referring to
+			// members of the "vertex" object
+			vertexViewer.loadPlainStructure(mol);
+			vertex = vertexViewer.getLoadedStructure();
 
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
 			// The currently viewed fragment (if any) is always part of the lib
-			fragmentLibrary.add(fragment); 
-			currFrgIdx = fragmentLibrary.size()-1;
-			
-			loadCurrentAsPlainStructure();
-			updateFragListSpinner();
+			vertexesLibrary.add(vertex); 
+			currVrtxIdx = vertexesLibrary.size()-1;
+
+			updateVrtxListSpinner();
 			unsavedChanges = true;
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -683,22 +660,22 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		// Load the structure using CACTUS service or CDK builder
 		try {
-			fragmentViewer.loadSMILES(smiles);
+		    vertexViewer.loadSMILES(smiles);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			return;
 		}
 		
-		fragment = fragmentViewer.getLoadedStructure();
+		vertex = vertexViewer.getLoadedStructure();
 		
 		// The system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty:
 		// The currently viewed fragment (if any) is always part of the library
-	    fragmentLibrary.add(fragment);
-		currFrgIdx = fragmentLibrary.size()-1;
+	    vertexesLibrary.add(vertex);
+		currVrtxIdx = vertexesLibrary.size()-1;
 		
 		// finalize GUI status
-		updateFragListSpinner();
+		updateVrtxListSpinner();
 		unsavedChanges = true;
         btnSaveEdits.setEnabled(true);
 		
@@ -708,15 +685,16 @@ public class GUIFragmentInspector extends GUICardPanel
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Imports fragments from a SDF file. This method expects to find fragments
+	 * Imports building blocks from a SDF file. 
+	 * This method expects to find vertexes
 	 * with DENOPTIM's format, i.e., with the 
 	 * <code>ATTACHMENT_POINT</code> and possibly the
 	 * <code>CLASS</code> tags.
 	 * @param file the file to open
 	 */
-	public void importFragmentsFromFile(File file)
+	public void importVertexesFromFile(File file)
 	{	
-		importFragmentsFromFile(file,"SDF");
+		importVertexesFromFile(file,"SDF");
 	}
 	
 //-----------------------------------------------------------------------------
@@ -729,53 +707,56 @@ public class GUIFragmentInspector extends GUICardPanel
 	 * @param file the file to open
 	 * @param format the format
 	 */
-	public void importFragmentsFromFile(File file, String format)
+	public void importVertexesFromFile(File file, String format)
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		int firstOfNew = 0;
 		boolean libFromScrtch = false;
-		if (fragmentLibrary == null)
+		if (vertexesLibrary == null)
 		{
 			libFromScrtch = true;
-			fragmentLibrary = new ArrayList<DENOPTIMFragment>();
+			vertexesLibrary = new ArrayList<DENOPTIMVertex>();
 		}
 		else
 		{
-			firstOfNew = fragmentLibrary.size();
+			firstOfNew = vertexesLibrary.size();
 		}
 		
 		try 
 		{
-			// Import library of fragments
+			// Import library of vertexes
 			boolean addedOne = false;
-			for (IAtomContainer iac : DenoptimIO.readMoleculeData(
-												file.getAbsolutePath(),format))
+			
+			ArrayList<IAtomContainer> lst = DenoptimIO.readInLibraryOfFragments(
+                    file.getAbsolutePath(),"fragment");
+			if (lst.size() > 0)
 			{
-			    fragmentLibrary.add(new DENOPTIMFragment(iac,BBType.UNDEFINED));
+			    FragmentSpace.appendToVertexLibrary(lst,BBType.UNDEFINED,
+			            vertexesLibrary);
 			    addedOne = true;
 			}
 			
 			// Display the first
 			if (libFromScrtch)
 			{
-				currFrgIdx = 0;
+				currVrtxIdx = 0;
 			}
 			else if (addedOne)
 			{
-				currFrgIdx = firstOfNew;
+				currVrtxIdx = firstOfNew;
 			}
-			loadCurrentFragIdxToViewer();
+			loadCurrentVrtxIdxToViewer();
 			
 	        // Update the fragment spinner
-			updateFragListSpinner();
+			updateVrtxListSpinner();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			JOptionPane.showMessageDialog(null,
 	                "<html>Could not read file '" + file.getAbsolutePath() 
-	                + "'!<br>Hint of cause: " + e.getCause() + "</html>",
+	                + "'!<br>Hint on cause: " + e.getMessage() + "</html>",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -784,17 +765,58 @@ public class GUIFragmentInspector extends GUICardPanel
 	}
 	
 //-----------------------------------------------------------------------------
+    
+    /**
+     * Imports vertexes.
+     * @param list the list of vertexes to import
+     */
+    public void importVertexes(ArrayList<DENOPTIMVertex> list)
+    {   
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
+        int firstOfNew = 0;
+        boolean libFromScrtch = false;
+        if (vertexesLibrary == null)
+        {
+            libFromScrtch = true;
+            vertexesLibrary = new ArrayList<DENOPTIMVertex>();
+        }
+        else
+        {
+            firstOfNew = vertexesLibrary.size();
+        }
+        
+        boolean addedOne = false;
+        if (list.size() > 0)
+        {
+            vertexesLibrary.addAll(list);
+            addedOne = true;
+            
+            // Display the first
+            if (libFromScrtch)
+            {
+                currVrtxIdx = 0;
+            }
+            else if (addedOne)
+            {
+                currVrtxIdx = firstOfNew;
+            }
+            loadCurrentVrtxIdxToViewer();
+            
+            // Update the fragment spinner
+            updateVrtxListSpinner();
+        } else {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            JOptionPane.showMessageDialog(null,
+                    "<html>No vertexes to import from the given list.</html>",
+                    "Error",
+                    JOptionPane.PLAIN_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+        }
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+    
 	
-	/**
-	 * Puts currently loaded structure in the Jmol viewer.
-	 * This assumes that the structure is already added to the list of 
-	 * IAtomContainers and that the currFrgIdx filed is properly set.
-	 */
-	private void loadCurrentAsPlainStructure()
-	{
-		fragmentViewer.loadPlainStructure(fragment.getIAtomContainer());
-	}
-
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -804,12 +826,12 @@ public class GUIFragmentInspector extends GUICardPanel
 	 * Jmol is not aware of AP-related information, so this also launches
 	 * the generation of the graphical objects representing the APs.
 	 */
-	private void loadCurrentFragIdxToViewer()
+	private void loadCurrentVrtxIdxToViewer()
 	{
-		if (fragmentLibrary == null)
+		if (vertexesLibrary == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "No list of fragments loaded.",
+	                "No list of builsing blocks loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -818,8 +840,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		
 		clearCurrentSystem();
 
-		fragment = fragmentLibrary.get(currFrgIdx);
-		fragmentViewer.loadFragmentToViewer(fragment);
+		vertex = vertexesLibrary.get(currVrtxIdx);
+		vertexViewer.loadVertexToViewer(vertex);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -827,53 +849,54 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void clearCurrentSystem()
 	{
 		// Get rid of currently loaded mol
-		fragment = null;
+		vertex = null;
 		
 		// Clear viewer?
 		// No, it clears upon loading of a new system.
 		// The exception (i.e., removal of the last fragment) is dealt with by
 		// submitting "zap" only in that occasion.
 		
-		// Remove tmp storage of APs
-		fragmentViewer.mapAPs = null;
-		
-		// Remove table of APs
-		fragmentViewer.clearAPTable();
+		vertexViewer.clearCurrentSystem();
 	}
 
 //-----------------------------------------------------------------------------
 
-	private void updateFragListSpinner()
+	private void updateVrtxListSpinner()
 	{		
-		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-				fragmentLibrary.size(), 1));
-		totalFragsLabel.setText(Integer.toString(fragmentLibrary.size()));
+		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
+				vertexesLibrary.size(), 1));
+		totalVrtxsLabel.setText(Integer.toString(vertexesLibrary.size()));
 	}
     
 //-----------------------------------------------------------------------------
     
     /**
      * Removes an atom and replaces it with an attachment point.
-     * @param apClass the attachment point class of the new fragment
+     * @param apClass the attachment point class of the new AP
      * @param trgAtm
      * @return <code>true</code> if the conversion was successful
      */
     private boolean convertAtomToAP(IAtom trgAtm, String apClass)
     {
+        if (!(vertex instanceof DENOPTIMFragment))
+        {
+            return false;
+        }
+        DENOPTIMFragment frag = (DENOPTIMFragment) vertex;
     	// Accept ONLY if the atom has one and only one connected neighbour
-    	if (fragment.getConnectedAtomsCount(trgAtm) != 1)
+    	if (frag.getConnectedAtomsCount(trgAtm) != 1)
     	{
     		String str = "";
-    		for (IAtom atm : fragment.getConnectedAtomsList(trgAtm))
+    		for (IAtom atm : frag.getConnectedAtomsList(trgAtm))
     		{
     			str = str + " " + atm.getSymbol() 
-    	                + (fragment.getAtomNumber(atm));
+    	                + (frag.getAtomNumber(atm));
     		}
     		System.out.println("Connected atoms: "+str);
     		
 			JOptionPane.showMessageDialog(null,
 	                "<html>Atom "+ trgAtm.getSymbol() 
-	                + (fragment.getAtomNumber(trgAtm)) 
+	                + (frag.getAtomNumber(trgAtm)) 
 	                + " has zero or more than one neighbour.<br>I can only "
 	                + "transform atoms"
 	                + " that have one and only one neighbour.</html>",
@@ -883,7 +906,7 @@ public class GUIFragmentInspector extends GUICardPanel
     		return false;
     	}
     	
-    	IAtom srcAtm = fragment.getConnectedAtomsList(trgAtm).get(0);
+    	IAtom srcAtm = frag.getConnectedAtomsList(trgAtm).get(0);
     	
     	Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
     	Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
@@ -892,7 +915,7 @@ public class GUIFragmentInspector extends GUICardPanel
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
     	vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
     	try {
-			fragment.addAP(srcAtm, APClass.make(apClass), vector);
+    	    frag.addAP(srcAtm, APClass.make(apClass), vector);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -910,10 +933,15 @@ public class GUIFragmentInspector extends GUICardPanel
 
     private void removeAtoms(ArrayList<IAtom> atmsToDels)
     {
+        if (!(vertex instanceof DENOPTIMFragment))
+        {
+            return;
+        }
+        DENOPTIMFragment frag = (DENOPTIMFragment) vertex;
     	ArrayList<IBond> bnsToDel = new ArrayList<IBond>();
     	for (IAtom atm : atmsToDels)
     	{
-	    	for (IBond bnd : fragment.bonds())
+	    	for (IBond bnd : frag.bonds())
 	    	{
 	    		if (bnd.contains(atm))
 	    		{
@@ -923,23 +951,22 @@ public class GUIFragmentInspector extends GUICardPanel
     	}
     	for (IBond bnd : bnsToDel)
     	{
-    		fragment.removeBond(bnd);
+    	    frag.removeBond(bnd);
     	}
     	for (IAtom atm : atmsToDels)
     	{
-    		fragment.removeAtomAndConnectedElectronContainers(atm);
+    	    frag.removeAtomAndConnectedElectronContainers(atm);
     	}
-    	
-    	
+    	frag.updateAPs();
     }
 	
 //-----------------------------------------------------------------------------
 	
-	private class FragSpinnerChangeEvent implements ChangeListener
+	private class VrtxSpinnerChangeEvent implements ChangeListener
 	{
 		private boolean inEnabled = true;
 		
-		public FragSpinnerChangeEvent()
+		public VrtxSpinnerChangeEvent()
 		{}
 		
 		/**
@@ -963,8 +990,8 @@ public class GUIFragmentInspector extends GUICardPanel
         	activateTabEditsListener(false);
         	
         	//NB here we convert from 1-based index in GUI to 0-based index
-        	currFrgIdx = ((Integer) fragNavigSpinner.getValue()).intValue() - 1;
-        	loadCurrentFragIdxToViewer();
+        	currVrtxIdx = ((Integer) navigSpinner.getValue()).intValue() - 1;
+        	loadCurrentVrtxIdxToViewer();
         	
         	activateTabEditsListener(true);
         }
@@ -975,20 +1002,20 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void deprotectEditedSystem()
 	{
 		//btnSaveEdits.setEnabled(false);
-		btnAddFrag.setEnabled(true);
-		btnOpenFrags.setEnabled(true);
+		btnAddVrtx.setEnabled(true);
+		btnOpenVrtxs.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
 		btnDelSel.setEnabled(true);
 		btnAtmToAP.setEnabled(true);
 		
-		((DefaultEditor) fragNavigSpinner.getEditor())
+		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setEditable(true); 
-		((DefaultEditor) fragNavigSpinner.getEditor())
+		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setForeground(Color.BLACK);
-		fragmentViewer.deprotectEdits();
+		vertexViewer.deprotectEdits();
 		
-		fragSpinnerListener.setEnabled(true);
+		vrtxSpinnerListener.setEnabled(true);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -996,39 +1023,39 @@ public class GUIFragmentInspector extends GUICardPanel
 	private void protectEditedSystem()
 	{
 		btnSaveEdits.setEnabled(true);
-		btnAddFrag.setEnabled(false);
-		btnOpenFrags.setEnabled(false);
+		btnAddVrtx.setEnabled(false);
+		btnOpenVrtxs.setEnabled(false);
 		btnOpenSMILES.setEnabled(false); 
 		btnOpenMol.setEnabled(false);
 		btnDelSel.setEnabled(false);
 		btnAtmToAP.setEnabled(false);
 		
-		fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 
-				currFrgIdx+1, currFrgIdx+1, 1));
-		((DefaultEditor) fragNavigSpinner.getEditor())
+		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 
+				currVrtxIdx+1, currVrtxIdx+1, 1));
+		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setEditable(false); 
-		((DefaultEditor) fragNavigSpinner.getEditor())
+		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setForeground(Color.GRAY);
 		
-		fragSpinnerListener.setEnabled(false);
+		vrtxSpinnerListener.setEnabled(false);
 	}
 	
 //-----------------------------------------------------------------------------
 
     private void activateTabEditsListener(boolean var)
     {
-		fragmentViewer.activateTabEditsListener(var);
+        vertexViewer.activateTabEditsListener(var);
     }
     
 //-----------------------------------------------------------------------------
     
-    private void removeCurrentFragment() throws DENOPTIMException
+    private void removeCurrentVrtx() throws DENOPTIMException
     {
-    	if (fragmentViewer.hasUnsavedAPEdits())
+    	if (vertexViewer.hasUnsavedAPEdits())
     	{
 			String[] options = new String[]{"Yes","No"};
 			int res = JOptionPane.showOptionDialog(null,
-	                "<html>Removing unsaved fragment?",
+	                "<html>Removing unsaved vertex?",
 	                "Warning",
 	                JOptionPane.DEFAULT_OPTION,
 	                JOptionPane.QUESTION_MESSAGE,
@@ -1041,39 +1068,37 @@ public class GUIFragmentInspector extends GUICardPanel
 			}
     	}
 
-    	// Takes care of "fragment" and AP info in GUI components
     	clearCurrentSystem();
     	
     	// Actual removal from the library
-    	if (fragmentLibrary.size()>0)
+    	if (vertexesLibrary.size()>0)
     	{
-    		fragmentLibrary.remove(currFrgIdx);
-    		int libSize = fragmentLibrary.size();
+    		vertexesLibrary.remove(currVrtxIdx);
+    		int libSize = vertexesLibrary.size();
     		
-    		if (currFrgIdx>=0 && currFrgIdx<libSize)
+    		if (currVrtxIdx>=0 && currVrtxIdx<libSize)
     		{
     			//we keep currFrgIdx as it will correspond to the next item
     		}
     		else
     		{
-    			currFrgIdx = currFrgIdx-1;
+    			currVrtxIdx = currVrtxIdx-1;
     		}
     		
-    		if (currFrgIdx==-1 || fragmentLibrary.size()==0)
+    		if (currVrtxIdx==-1 || vertexesLibrary.size()==0)
 			{
-				fragmentViewer.clearMolecularViewer();
-				currFrgIdx = 0;
-				fragNavigSpinner.setModel(new SpinnerNumberModel(0,0,0,1));
-				totalFragsLabel.setText(Integer.toString(0));
+    		    vertexViewer.clearMolecularViewer();
+				currVrtxIdx = 0;
+				navigSpinner.setModel(new SpinnerNumberModel(0,0,0,1));
+				totalVrtxsLabel.setText(Integer.toString(0));
 				deprotectEditedSystem();
     		}
     		else
     		{
-	    		// We use the currFrgIdx to load another fragment
-		    	loadCurrentFragIdxToViewer();
-		    	updateFragListSpinner();
-		    	fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-						fragmentLibrary.size(), 1));
+		    	loadCurrentVrtxIdxToViewer();
+		    	updateVrtxListSpinner();
+		    	navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
+						vertexesLibrary.size(), 1));
 		        deprotectEditedSystem();
     		}
     	}
@@ -1085,14 +1110,14 @@ public class GUIFragmentInspector extends GUICardPanel
   	{
   		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
   		
-  		if (fragmentViewer.hasUnsavedAPEdits())
+  		if (vertexViewer.hasUnsavedAPEdits())
   		{
 	  		// Import changes from AP table into molecular representation
-	        for (int i=0; i<fragmentViewer.apTabModel.getRowCount(); i++) 
+	        for (int i=0; i<vertexViewer.apTabModel.getRowCount(); i++) 
 	        {	        	
-	        	int apId = ((Integer) fragmentViewer.apTabModel.getValueAt(i, 0))
+	        	int apId = ((Integer) vertexViewer.apTabModel.getValueAt(i, 0))
 	        			.intValue();
-	        	String currApClass = fragmentViewer.apTabModel.getValueAt(i, 1)
+	        	String currApClass = vertexViewer.apTabModel.getValueAt(i, 1)
 	        			.toString();
 	        	
 	        	// Make sure the new class has a proper syntax
@@ -1102,14 +1127,14 @@ public class GUIFragmentInspector extends GUICardPanel
 					currApClass = "dafaultAPClass:0";
 				}
 	        	
-	        	if (fragmentViewer.mapAPs.containsKey(apId))
+	        	if (vertexViewer.mapAPs.containsKey(apId))
 	        	{
 	        		String origApClass = 
-	        				fragmentViewer.mapAPs.get(apId).getAPClass().toString();
+	        		        vertexViewer.mapAPs.get(apId).getAPClass().toString();
 	        		if (!origApClass.equals(currApClass))
 	        		{
 	        			try {
-	        				fragmentViewer.mapAPs.get(apId).setAPClass(currApClass);
+	        			    vertexViewer.mapAPs.get(apId).setAPClass(currApClass);
 						} catch (DENOPTIMException e) {
 							// We made sure the class is valid, so this
 							// should never happen, though one never knows
@@ -1140,21 +1165,21 @@ public class GUIFragmentInspector extends GUICardPanel
 	  	}
   		
   		// Retrieve chemical object from the viewer, if edited, otherwise
-  		// we get what is already in 'fragment'
-  		fragment = fragmentViewer.getLoadedStructure();
-  		if (fragmentLibrary.size()==0 
-  				&& (fragment==null || fragment.getNumberOfAP()==0))
+  		// we get what is already in 'vertex'
+  		vertex = vertexViewer.getLoadedStructure();
+  		if (vertexesLibrary.size()==0 
+  				&& (vertex==null || vertex.getNumberOfAP()==0))
   		{
   			//Nothing to same
   	        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   			return;
   		}
-  		fragmentLibrary.set(currFrgIdx,fragment);
+  		vertexesLibrary.set(currVrtxIdx,vertex);
         
         // Reload fragment from library to refresh table and viewer
     	activateTabEditsListener(false);
     	try {
-    	    loadCurrentFragIdxToViewer();
+    	    loadCurrentVrtxIdxToViewer();
     	} catch (Throwable t) {
 			//This can happen if the viewer has been started but is empty
     		// E.G:, if the cactvs server is down).
@@ -1162,8 +1187,8 @@ public class GUIFragmentInspector extends GUICardPanel
 		}
   		// Release constraints
     	activateTabEditsListener(true);
-    	fragNavigSpinner.setModel(new SpinnerNumberModel(currFrgIdx+1, 1, 
-				fragmentLibrary.size(), 1));
+    	navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
+				vertexesLibrary.size(), 1));
         deprotectEditedSystem();
   		
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1300,7 +1325,7 @@ public class GUIFragmentInspector extends GUICardPanel
 	 */
 	public void dispose() 
 	{
-		fragmentViewer.dispose();
+	    vertexViewer.dispose();
 	}
 		
 //-----------------------------------------------------------------------------

@@ -19,19 +19,13 @@
 
 package denoptim.fragspace;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -46,9 +40,6 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.rings.RingClosureParameters;
-import denoptim.utils.GraphUtils;
 
 /**
  * Class defining the fragment space
@@ -165,8 +156,6 @@ public class FragmentSpace
      *                   cap free attachment points (i.e., the capping groups).
      * @param cpmFile    pathname to the compatibility matrix, bond type
      *                   mapping, capping, and forbidden ends rules.
-     * @param rspmFile   the APClass compatibility matrix for ring closures.
-     * @param symCntrMap the map of symmetry constraints
      * @throws DENOPTIMException
      */
     public static void defineFragmentSpace(String scaffFile, String fragFile,
@@ -241,7 +230,7 @@ public class FragmentSpace
      *                   cap free attachment points (i.e., the capping groups).
      * @param cpmFile    pathname to the compatibility matrix, bond type
      *                   mapping, capping, and forbidden ends rules.
-     * @param rspmFile   the APClass compatibility matrix for ring closures.
+     * @param rcpmFile   the APClass compatibility matrix for ring closures.
      * @param symCntrMap the map of symmetry constraints
      * @throws DENOPTIMException
      */
@@ -377,7 +366,8 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
 
-    // TODO-V3: adapt to templates. Move to IO
+    
+    //TODO-V3: Move to IO
 
     private static ArrayList<DENOPTIMVertex> convertsIACsToVertexes(
             ArrayList<IAtomContainer> iacs, BBType bbt) throws DENOPTIMException
@@ -394,8 +384,8 @@ public class FragmentSpace
 
     /**
      * Processes an atom containers and builds a vertex out of it.
-     * 
-     * @param iac the atom containers.
+     * @param iac the  atom containers.
+     * @param bbt the type of building block
      * @return the vertex.
      * @throws DENOPTIMException
      */
@@ -411,17 +401,11 @@ public class FragmentSpace
         if (jsonGraph != null)
         {
             DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-            // TODO-MF del
-            System.out.println("Making Template from JSON STRING ");
-            // +jsonGraph.toString());
             DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
             t.setInnerGraph(g);
             v = t;
         } else if (jsonVertex != null)
         {
-            // TODO-MF del
-            System.out.println("Making an EmptyVertex from JSON STRING ");
-
             EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
             v = ev;
         } else
@@ -463,7 +447,7 @@ public class FragmentSpace
     /**
      * Search for a specific AP on a specific fragment and finds out its class.
      * 
-     * @param the identified of a specific attachment point.
+     * @param apId the identified of a specific attachment point.
      * @return the AP class or null
      */
 
@@ -550,7 +534,8 @@ public class FragmentSpace
                 if (bbIdx < scaffoldLib.size())
                 {
                     originalVrtx = scaffoldLib.get(bbIdx);
-                } else
+                }
+                else
                 {
                     msg = "Mismatch between scaffold bbIdx and size of the library"
                             + ". MolId: " + bbIdx + " FragType: " + fTyp;
@@ -563,11 +548,12 @@ public class FragmentSpace
                 if (bbIdx < fragmentLib.size())
                 {
                     originalVrtx = fragmentLib.get(bbIdx);
-                } else
+                }
+                else
                 {
                     msg = "Mismatch between fragment bbIdx and size of the "
-                            + "library" + ". MolId: " + bbIdx + " FragType: "
-                            + fTyp;
+                            + "library" + ". MolId: " + bbIdx
+                            + " FragType: " + fTyp;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -577,11 +563,30 @@ public class FragmentSpace
                 if (bbIdx < cappingLib.size())
                 {
                     originalVrtx = cappingLib.get(bbIdx);
-                } else
+                }
+                else
                 {
                     msg = "Mismatch between capping group bbIdx and size "
-                            + "of the library. MolId: " + bbIdx + " FragType: "
-                            + fTyp;
+                            + "of the library. MolId: " + bbIdx
+                            + " FragType: " + fTyp;
+                    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                    throw new DENOPTIMException(msg);
+                }
+                break;
+
+            case UNDEFINED:
+                msg = "Attempting to take UNDEFINED type of building block from "
+                        + "fragment library.";
+                DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                if (bbIdx < fragmentLib.size())
+                {
+                    originalVrtx = fragmentLib.get(bbIdx);
+                }
+                else
+                {
+                    msg = "Mismatch between fragment bbIdx and size of the "
+                            + "library" + ". MolId: " + bbIdx
+                            + " FragType: " + fTyp;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -592,7 +597,6 @@ public class FragmentSpace
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
         }
-
         DENOPTIMVertex clone = originalVrtx.clone();
 
         // TODO-V3: is there a better way to do this in a type-agnostic way?
@@ -1141,9 +1145,8 @@ public class FragmentSpace
         scaffoldLib = lib;
     }
 
-    // ------------------------------------------------------------------------------
-
-    public static void appendToVertexLibrary(ArrayList<IAtomContainer> list,
+    //TODO-V3 mode to DenoptimIO
+    public static void appendToVertexLibrary(ArrayList<IAtomContainer>list,
             BBType bbt, ArrayList<DENOPTIMVertex> library)
     {
         for (IAtomContainer iac : list)

@@ -26,11 +26,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 
 /**
@@ -105,7 +101,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
 		btnLoadCPMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnLoadCPMap);
+				File inFile = GUIFileOpener.pickFile(btnLoadCPMap);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -121,7 +117,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "all classes in the current tab.</html>",300));
 		btnImportAPClasses.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Set<File> files = DenoptimGUIFileOpener.pickManyFiles(
+				Set<File> files = GUIFileOpener.pickManyFiles(
 						btnImportAPClasses);
 				if (files == null || files.size() == 0)
 				{
@@ -163,7 +159,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "<li>Definition of forbidden ends.</li></ul></html>",250));
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
+				File outFile = GUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null || cpMapHandler == null)
 				{
 					return;

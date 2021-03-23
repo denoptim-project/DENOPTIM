@@ -29,12 +29,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -44,7 +42,7 @@ import denoptim.constants.DENOPTIMConstants;
  * File opener for DENOPTIM GUI
  */
 
-public class DenoptimGUIFileOpener 
+public class GUIFileOpener 
 {
 	protected static JFileChooser fileChooser = new JFileChooser(
 			FileSystemView.getFileSystemView().getHomeDirectory()); 
@@ -100,6 +98,8 @@ public class DenoptimGUIFileOpener
 	
 	public static File pickFile(Component parent) 
 	{
+	    fileChooser.resetChoosableFileFilters();
+        fileChooser.setAcceptAllFileFilterUsed(true);
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		File file = null;
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
@@ -108,6 +108,28 @@ public class DenoptimGUIFileOpener
 		}
 		return file;
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    public static File pickFileWithGraph(Component parent) 
+    {
+        fileChooser.resetChoosableFileFilters();
+        fileChooser.setAcceptAllFileFilterUsed(true);
+        FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
+                "JSON", "json");
+        fileChooser.addChoosableFileFilter(jsonFilter);
+        FileNameExtensionFilter sdfFilter = new FileNameExtensionFilter(
+                "SDF", "sdf");
+        fileChooser.addChoosableFileFilter(sdfFilter);
+        fileChooser.setAcceptAllFileFilterUsed(true);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        File file = null;
+        if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
+        {
+            file = fileChooser.getSelectedFile();
+        }
+        return file;
+    }
 		
 //-----------------------------------------------------------------------------
 		

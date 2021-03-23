@@ -18,10 +18,10 @@
 
 package denoptim.task;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * See http://www.javaworld.com/jw-12-2000/jw-1229-traps.html?page=4

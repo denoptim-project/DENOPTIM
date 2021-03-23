@@ -18,10 +18,9 @@
 
 package denoptim.utils;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.isomorphism.Pattern;

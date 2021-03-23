@@ -19,6 +19,33 @@
 
 package denoptim.io;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 /**
  * Utility methods for input/output
  *
@@ -28,103 +55,73 @@ package denoptim.io;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.io.FileNotFoundException;
-import java.io.InvalidClassException;
-import java.io.FileReader;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.FileOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
+import java.util.logging.Level;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
 import javax.vecmath.Point3d;
 
-import java.util.Properties;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import javax.imageio.ImageIO;
-
-import java.awt.geom.Rectangle2D;
-import java.awt.RenderingHints;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Map;
-
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.AtomContainerSet;
+import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
-import org.openscience.cdk.io.SDFWriter;
-import org.openscience.cdk.io.Mol2Writer;
-import org.openscience.cdk.io.XYZWriter;
-import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.AtomContainerSet;
-import org.openscience.cdk.interfaces.IAtomContainerSet;
-import org.openscience.cdk.tools.FormatStringBuffer;
-import org.openscience.cdk.io.MDLV2000Writer;
-import org.openscience.cdk.io.listener.PropertiesListener;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.GeometryTools;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.MDLV2000Reader;
+import org.openscience.cdk.io.MDLV2000Writer;
+import org.openscience.cdk.io.Mol2Writer;
+import org.openscience.cdk.io.SDFWriter;
+import org.openscience.cdk.io.XYZWriter;
+import org.openscience.cdk.io.listener.PropertiesListener;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
+import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.InvPair;
+import org.openscience.cdk.tools.FormatStringBuffer;
+import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
+import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.threedim.TreeBuilder3D;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
-
-import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.smiles.InvPair;
-
-import java.util.logging.Level;
 
 
 public class DenoptimIO
@@ -139,6 +136,9 @@ public class DenoptimIO
     private static final ArrayList<String> cdkInternalProperties
             = new ArrayList<>(Arrays.asList(new String[]
             {InvPair.CANONICAL_LABEL, InvPair.INVARIANCE_PAIR}));
+    
+    private static final IChemObjectBuilder builder = 
+            SilentChemObjectBuilder.getInstance();
 
 //------------------------------------------------------------------------------
 
@@ -183,7 +183,7 @@ public class DenoptimIO
             				+ "file. <br>"
 		            		+ "Pleae check your input. Is it really a list of "
 		            		+ "links? "
-		            		+ "<br>If not, make sure it has a standard"
+		            		+ "<br>If not, make sure it has a standard "
 		            		+ "extension (e.g., .smi, .sdf)</html>",e);
 				}
             }
@@ -314,7 +314,7 @@ public class DenoptimIO
                 {
                     molSet.addAtomContainer(v.getIAtomContainer());
                 } else {
-                    IAtomContainer iac = new AtomContainer();
+                    IAtomContainer iac = builder.newAtomContainer();
                     try {
                         iac = v.getIAtomContainer();
                     } catch (Throwable t)
@@ -324,7 +324,7 @@ public class DenoptimIO
                                 + "writing of non-molecular "
                                 + "building blocks in SDF files. " 
                                 + t.getMessage());
-                        iac = new AtomContainer();
+                        iac = builder.newAtomContainer();
                     }
                     molSet.addAtomContainer(iac);
                 }
@@ -632,13 +632,9 @@ public class DenoptimIO
             throws DENOPTIMException {
         DENOPTIMGraph graph = null;
         BufferedReader br = null;
-        String json = "";
         try {
             br = new BufferedReader(new FileReader(file));
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                json = json + line;
-            }
+            graph = DENOPTIMGraph.fromJson(br);
         } catch (IOException ioe) {
             throw new DENOPTIMException(ioe);
         } finally {
@@ -650,13 +646,6 @@ public class DenoptimIO
                 throw new DENOPTIMException(ioe);
             }
         }
-
-        if (json.equals("")) {
-            throw new DENOPTIMException("No data found in file: " 
-                    + file.getAbsolutePath());
-        }
-        
-        graph = DENOPTIMGraph.fromJson(json);
 
         return graph;
     }
@@ -1827,12 +1816,15 @@ public class DenoptimIO
             String fileName, String format, boolean useFS)
             throws DENOPTIMException {
         switch (format) {
+            case "JSON":
+                return DenoptimIO.readDENOPTIMGraphsFromJSONFile(fileName, useFS);
+            
             case "TXT":
                 return DenoptimIO.readDENOPTIMGraphsFromFile(fileName, useFS);
 
             case "SDF":
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
-
+                
             case "SER":
                 return DenoptimIO.readDENOPTIMGraphsFromSerFile(fileName);
         }
@@ -1873,20 +1865,34 @@ public class DenoptimIO
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
             String fileName, boolean useFS)
-            throws DENOPTIMException {
+            throws DENOPTIMException 
+    {
+        if (!useFS)
+        {
+            System.err.println("WARNING! Reading graphs without a "
+                    + "defined fragment space!");
+        }
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
         int i = 0;
         for (IAtomContainer mol : mols) {
             i++;
-            Object prop = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
-            if (prop == null) {
+            // Something very similar is done also in DENOPTIMMolecule
+            DENOPTIMGraph g = null;
+            Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+            Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
+            if (graphEnc == null && json == null) {
                 throw new DENOPTIMException("Attempt to load graph form "
-                        + "SDF that lacks a '" + DENOPTIMConstants.GRAPHTAG
-                        + "' tag. Check molecule " + i);
+                        + "SDF that has neither '" + DENOPTIMConstants.GRAPHTAG
+                        + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG 
+                        + "' tag. Check molecule " + i + " in the SDF file.");
+            } else if (json != null) {
+                String js = json.toString();
+                g = DENOPTIMGraph.fromJson(js);
+            } else {
+                g = GraphConversionTool.getGraphFromString(
+                        graphEnc.toString().trim(), useFS);
             }
-            DENOPTIMGraph g = GraphConversionTool.getGraphFromString(
-                    prop.toString().trim(), useFS);
             lstGraphs.add(g);
         }
         return lstGraphs;
@@ -1950,24 +1956,135 @@ public class DenoptimIO
         return lstGraphs;
     }
 
+    
 //------------------------------------------------------------------------------
 
     /**
-     * Writes the string representation of the graphs to file.
+     * Reads a list of <code>DENOPTIMGraph</code>s from a JSON file.
+     * <b>WARNING: this reads only a single graph for now.</b>
      *
-     * @param fileName the file where to print
-     * @param graphs   the list of graphs to print
-     * @param append   use <code>true</code> to append
+     * @param fileName the pathname of the file to read
+     * @return the list of graphs
      * @throws DENOPTIMException
      */
-    public static void writeGraphsToFile(String fileName,
-                                         ArrayList<DENOPTIMGraph> graphs, boolean append)
-            throws DENOPTIMException {
-        StringBuilder sb = new StringBuilder();
-        for (DENOPTIMGraph g : graphs) {
-            sb.append(g.toString()).append(NL);
+    public static ArrayList<DENOPTIMGraph>  readDENOPTIMGraphsFromJSONFile(
+            String fileName, boolean useFS) throws DENOPTIMException 
+    {
+        ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
+        lst.add(readGraphFromJSON(new File(fileName)));
+        return lst;
+        
+        /*
+        Gson gson = new Gson();
+
+        ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
+        BufferedReader br = null;
+        try
+        {
+            br = new BufferedReader(new FileReader(fileName));
+            
+            //TODO...
+            
         }
-        writeData(fileName, sb.toString(), append);
+        catch (FileNotFoundException fnfe)
+        {
+            throw new DENOPTIMException("File '" + fileName + "' not found.");
+        }
+        finally 
+        {
+            try {
+                if (br != null)
+                {
+                    br.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+
+        return lst;
+        */
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graphs to file.
+     *
+     * @param file the file where to print
+     * @param format how to print graphs on file
+     * @param graphs the list of graphs to print
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToFile(File file, FileFormat format,
+            ArrayList<DENOPTIMGraph> graphs)
+            throws DENOPTIMException 
+    {
+        if (FilenameUtils.getExtension(file.getName()).equals(""))
+        {
+            file = new File(file.getAbsoluteFile()+"."+format.getExtension());
+        }
+        switch (format)
+        {
+            case JSON:
+                writeGraphsToJSON(file, graphs);
+                break;
+                
+            case SDF:
+                writeGraphsToSDF(file, graphs);
+                break;
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graphs to SDF file.
+     *
+     * @param file the file where to print
+     * @param graphs the list of graphs to print
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToSDF(File file,
+            ArrayList<DENOPTIMGraph> graphs) throws DENOPTIMException
+    {
+        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        for (DENOPTIMGraph g : graphs) 
+        {
+            TreeBuilder3D tb = new TreeBuilder3D();
+            IAtomContainer iac = builder.newAtomContainer();
+            try {
+                iac = tb.convertGraphTo3DAtomContainer(g);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                System.out.println("Couldn't make 3D-tree representation: "
+                        + t.getMessage());
+                //molLibrary.set(currGrphIdx, builder.newAtomContainer());
+            }
+            lst.add(iac);
+        }
+        writeMoleculeSet(file.getAbsolutePath(), lst);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graphs to JSON file.
+     *
+     * @param file the file where to print
+     * @param graphs the list of graphs to print
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToJSON(File file,
+            ArrayList<DENOPTIMGraph> graphs) throws DENOPTIMException
+    {
+        StringBuilder sb = new StringBuilder();
+        for (DENOPTIMGraph g : graphs) 
+        {
+            sb.append(g.toJson());
+            sb.append(NL);
+        }
+        writeData(file.getAbsolutePath(), sb.toString(), false);
     }
 
 //------------------------------------------------------------------------------
@@ -1980,8 +2097,8 @@ public class DenoptimIO
      * @param append   use <code>true</code> to append
      * @throws DENOPTIMException
      */
-    public static void writeGraphToFile(String fileName, DENOPTIMGraph graph,
-                                        boolean append) throws DENOPTIMException {
+    public static void writeGraphToFile(String fileName, DENOPTIMGraph graph, 
+            boolean append) throws DENOPTIMException {
         writeData(fileName, graph.toString(), append);
     }
 
@@ -2053,13 +2170,15 @@ public class DenoptimIO
             if (ap == null) {
                 DENOPTIMLogger.appLogger.log(Level.WARNING,
                         "No attachment point information for " + kindStr + " "
-                                + i + " in file '" + fileName + "'. I'm ignoring it!");
+                                + i + " in file '" + fileName 
+                                + "'. I'm ignoring it!");
             } else {
                 lib.add(mol);
             }
         }
         if (lib.isEmpty()) {
-            throw new DENOPTIMException("Library of type '" + kindStr + "' has no entries.");
+            throw new DENOPTIMException("Library of vertexes has no valid "
+                    + "entries.");
         }
         return lib;
     }

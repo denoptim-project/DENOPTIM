@@ -65,9 +65,9 @@ public class GUICardPanel extends JPanel
 		{
 			res = ((GUIPrepare) this).hasUnsavedChanges();
 		}
-		else if (this instanceof GUIFragmentInspector)
+		else if (this instanceof GUIVertexInspector)
 		{
-			res = ((GUIFragmentInspector) this).hasUnsavedChanges();
+			res = ((GUIVertexInspector) this).hasUnsavedChanges();
 		}
 		
 		return res;

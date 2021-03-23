@@ -18,8 +18,8 @@
 
 package denoptim.molecule;
 
-import java.io.Serializable;
 import java.io.File;
+import java.io.Serializable;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -230,11 +230,24 @@ Serializable, Cloneable
         				+ "DENOPTIMMolecule.", e);
         	}
         }
+        
         try
         {
-            this.graph = GraphConversionTool.getGraphFromString(
-            		iac.getProperty(DENOPTIMConstants.GRAPHTAG).toString(),
-            		useFragSpace);
+            //Something very similar is done also in DenoptimIO
+            Object graphEnc = iac.getProperty(DENOPTIMConstants.GRAPHTAG);
+            Object json = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+            if (graphEnc == null && json == null) {
+                throw new DENOPTIMException("Attempt to load graph to "
+                        + "DENOPTIMMolecule but the IAtomContainer "
+                        + "has neither '" + DENOPTIMConstants.GRAPHTAG
+                        + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG);
+            } else if (json != null) {
+                String js = json.toString();
+                this.graph = DENOPTIMGraph.fromJson(js);
+            } else {
+                this.graph = GraphConversionTool.getGraphFromString(
+                        graphEnc.toString().trim(), useFragSpace);
+            }
         } catch (Exception e) {
         	throw new DENOPTIMException("Could not read Graph to make "
         			+ "DENOPTIMMolecule.", e);

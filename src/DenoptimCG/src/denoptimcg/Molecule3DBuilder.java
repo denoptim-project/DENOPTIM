@@ -28,7 +28,6 @@ import java.util.Set;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.graph.PathTools;
 import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;

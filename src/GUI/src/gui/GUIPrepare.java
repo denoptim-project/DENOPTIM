@@ -19,11 +19,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,20 +27,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.task.DenoptimGATask;
-import denoptim.task.DummyTask;
 import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.GUIInvokedMainTask;
 import denoptim.task.StaticTaskManager;
-import denoptim.task.Task;
 
 /**
  * Class representing the general structure of a form including a specific
@@ -108,7 +99,7 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>and imports parameters into the form.</html>");
 		btnLoadParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnLoadParams);
+				File inFile = GUIFileOpener.pickFile(btnLoadParams);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -134,7 +125,7 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveParams);
+				File outFile = GUIFileOpener.pickFileForSaving(btnSaveParams);
 				printAllParamsToFile(outFile);
 			}
 		});

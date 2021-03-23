@@ -20,7 +20,6 @@ package denoptim.threedim;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,10 +36,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;

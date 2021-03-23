@@ -20,20 +20,16 @@ package gui;
 
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -44,9 +40,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
-import denoptim.utils.DENOPTIMMoleculeUtils;
 import org.jmol.viewer.Viewer;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
@@ -68,6 +62,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 /**
@@ -76,7 +71,7 @@ import denoptim.utils.DENOPTIMMathUtils;
  * @author Marco Foscato
  */
 
-public class FragmentViewPanel extends JSplitPane
+public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 {
 	/**
 	 * Version UID
@@ -129,6 +124,7 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 */
 	public FragmentViewPanel(JComponent parent, boolean editableTable)
@@ -141,6 +137,7 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
@@ -679,22 +676,19 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Loads a structure in the Jmol viewer.
 	 * @param mol the structure to load
+	 * @return the atom container created to visualize the molecular content.
+	 * This is needed for operations involving the identification by means of 
+	 * reference to the atoms selected/present in the viewer.
 	 */
 	public void loadPlainStructure(IAtomContainer mol)
 	{
-		if (mol instanceof DENOPTIMFragment)
-		{
-			fragment = (DENOPTIMFragment) mol;
-		} else {
-			try {
-				fragment = new DENOPTIMFragment(mol, BBType.FRAGMENT);
-			} catch (DENOPTIMException e) {
-				//Should never happen
-				e.printStackTrace();
-			}
+		try {
+			fragment = new DENOPTIMFragment(mol, BBType.UNDEFINED);
+	        loadStructure();
+		} catch (DENOPTIMException e) {
+			//Should never happen
+			e.printStackTrace();
 		}
-		
-		loadStructure();
 	}
 		
 //-----------------------------------------------------------------------------
@@ -709,7 +703,8 @@ public class FragmentViewPanel extends JSplitPane
 		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "<html>No structure loaded.<br>This is most likely a bug!"
+	                "<html>No structure loaded.<br>This is most likely a bug "
+			        + "in FragmentViewPanel. "
 	                + "Please report it to the development team.</html>",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -745,17 +740,11 @@ public class FragmentViewPanel extends JSplitPane
 	 * @param frag the fragment to visualize
 	 */
 	public void loadFragmentToViewer(DENOPTIMFragment frag)
-	{		
-		clearAPTable();
-		
-		this.fragment = frag;
-			
-		loadStructure();
-		
-		updateAPsMapAndTable();
-        
-        updateAPsInJmolViewer();
-        
+	{	
+		this.fragment = frag;			
+		loadStructure();		
+		updateAPsMapAndTable();        
+        updateAPsInJmolViewer();        
         preSelectAPs();
 	}
 	
@@ -791,8 +780,8 @@ public class FragmentViewPanel extends JSplitPane
 	
 	private void preSelectAPs()
 	{
-		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
-		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
 		if (fragment.getProperty(PRESELPROP) == null)
 		{
@@ -842,11 +831,13 @@ public class FragmentViewPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Clears the molecular viewer
+	 * Clears the molecular viewer. This operation is slow! 
+	 * It usually a second or two.
 	 */
 	public void clearMolecularViewer()
 	{
-		jmolPanel.viewer.evalString("zap");
+		//TODO-V3: evaluate reducing to the minimum the need to run this: it is a slow command!
+	    jmolPanel.viewer.evalString("zap");
 	}
 
 //-----------------------------------------------------------------------------

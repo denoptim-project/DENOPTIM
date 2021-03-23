@@ -22,8 +22,6 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import signature.SymmetryClass;
-
 /**
  * Class representing a list of IDs pointing to instances that are related by
  * some conventional criterion that is referred as the "symmetry". 

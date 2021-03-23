@@ -18,26 +18,24 @@
 
 package denoptim.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.graph.SpanningTree;
-import org.openscience.cdk.silent.RingSet;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.isomorphism.Mappings;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-
-import java.io.IOException;
-import java.util.logging.Level;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IRingSet;
+import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.silent.RingSet;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;

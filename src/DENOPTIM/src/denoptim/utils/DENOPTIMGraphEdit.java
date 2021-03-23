@@ -18,19 +18,18 @@
 
 package denoptim.utils;
 
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.*;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment.BBType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 
 
 /**
