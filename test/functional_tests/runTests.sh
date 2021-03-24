@@ -10,10 +10,11 @@
 #
 # Usage:
 #
-# ./runAllTests.sh [TASTNAME]
+# ./runTests.sh [-t TASTNAME] [-r]
 #
-# Optional:
-# TESTNAME is the name of a test to run.
+# Options:
+# -t TESTNAME  runs only test TESTNAME.
+# -r           remove previously existing workspace.
 #
 
 #
@@ -44,14 +45,6 @@ then
     export DENOPTIMJarFiles="$DENOPTIM_HOME/build/dist"
 fi
 echo "Using DENOPTIM from $DENOPTIMJarFiles"
-
-
-
-################################################################################
-#                                                                              #
-#                    No need to change things below this line                  #
-#                                                                              #
-################################################################################
 
 
 ############################################
@@ -95,6 +88,22 @@ function runTest() {
 # Main
 ############################################
 
+# Process arguments
+chosenTest=""
+overwrite=1
+args=($@)
+for ((i=0; i<$#; i++))
+do
+    arg=${args[$i]}
+    case "$arg" in
+        "-r") overwrite=0 ;;
+        "-t") if [ $((i+1)) -lt $# ];
+              then
+                  chosenTest=${args[$((i+1))]}
+              fi;;
+    esac
+done
+
 # Detect the version of SED
 if man sed | grep -q "BSD"
 then
@@ -116,10 +125,15 @@ export DENOPTIMslaveCores=4
 # Make working directory
 if [ -d "$wDir" ]
 then
-    echo " "
-    echo "ERROR! Old $wDir exists already! Remove it to run new tests."
-    echo " "
-    exit
+    if [ $overwrite -eq 0 ]
+    then
+        rm -fr "$wDir"
+    else
+        echo " "
+        echo "ERROR! Old $wDir exists already! Remove it to run new tests."
+        echo " "
+        exit
+    fi
 fi
 mkdir "$wDir"
 if [ ! -d "$wDir" ]
@@ -133,10 +147,9 @@ fi
 cd "$wDir"
 
 # Run a selected test
-if [ "$#" -eq 1 ]
+if [[ "$chosenTest" == t* ]]
 then
-    tName="$1"
-    runTest "$tName"
+    runTest "$chosenTest"
     exit 0
 fi
 
