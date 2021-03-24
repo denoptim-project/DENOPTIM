@@ -1152,24 +1152,51 @@ public class GUIGraphHandler extends GUICardPanel
 
 	private void appendGraphsFromFile(File file)
 	{
+	    // Reading graphs is format-agnostic
 		ArrayList<DENOPTIMGraph> graphs = readGraphsFromFile(file);
+		
+		// Try to read or make molecular representations
+		ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+        FileFormat ff = null;
+        try
+        {
+            ff = DenoptimIO.detectFileFormat(file);
+        } catch (Exception e1)
+        {
+            // we'll ignore the format specific tasks
+        }
+        switch (ff)
+        {
+            case GRAPHSDF:
+                try {
+                    molLibrary.addAll(DenoptimIO.readMoleculeData(
+                            file.getAbsolutePath()));
+                } catch (DENOPTIMException e) {
+                    System.err.println("WARNING: Could not read molecular "
+                            + "representation from " + file);
+                    for (int i=0; i<graphs.size(); i++)
+                    {
+                        molLibrary.add(builder.newAtomContainer());
+                    }
+                }
+                break;
+                
+            default:
+                // Add empty place holders
+                for (int i=0; i<graphs.size(); i++)
+                {
+                    molLibrary.add(builder.newAtomContainer());
+                }   
+                break;    
+        }
+		
 		int oldSize = dnGraphLibrary.size();
 		if (graphs.size() > 0)
 		{
 			dnGraphLibrary.addAll(graphs);
+			molLibrary.addAll(mols);
 			
-			try {
-				molLibrary.addAll(DenoptimIO.readMoleculeData(
-						file.getAbsolutePath()));
-			} catch (DENOPTIMException e) {
-				System.out.println("WARNING: Could not read molecular representation from " + file);
-				for (int i=0; i<graphs.size(); i++)
-				{
-					molLibrary.add(builder.newAtomContainer());
-				}
-			}
-			
-			// Display the first of the imported ones
+			// WE choose to display the first of the imported ones
 			currGrphIdx = oldSize;
 			
 			loadCurrentGraphIdxToViewer(false);
