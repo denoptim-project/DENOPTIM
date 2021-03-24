@@ -91,6 +91,8 @@ public class VertexViewPanel extends JPanel
 	    
 	private boolean editableAPTable = false;
 	
+	private boolean ignoreMolViewer = false;
+	
 	private JComponent parent;
 	
 
@@ -233,6 +235,7 @@ public class VertexViewPanel extends JPanel
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 MOLVIEWERCARDNAME);
         activeViewer = fragViewer;
+        ignoreMolViewer = false;
     }
 
 //-----------------------------------------------------------------------------
@@ -257,18 +260,26 @@ public class VertexViewPanel extends JPanel
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Returns the chemical representation of the currently loaded chemical
-	 * object. In case of mismatch between the system loaded into the Jmol
+	 * Returns the currently loaded vertex.
+	 * In case of mismatch between the system loaded into the Jmol
 	 * viewer and the one in the local memory, we take that from Jmol and
 	 * made it be The 'current fragment'. Previously set references to the
 	 * previous 'current fragment' will make no sense anymore.
 	 * @return the chemical representation of what is currently visualised.
 	 * Can be empty and null.
 	 */
-	public DENOPTIMFragment getLoadedStructure()
+	public DENOPTIMVertex getLoadedStructure()
 	{
-	    switchToMolecularViewer();
-	    return fragViewer.getLoadedStructure();
+	    DENOPTIMVertex v = null;
+	    if (vertex == null || vertex instanceof DENOPTIMFragment)
+	    {
+	        // ignoreMolViewer TODO
+	        v = fragViewer.getLoadedStructure();
+	        switchToMolecularViewer();
+	    } else {
+	        v = vertex;
+	    }
+	    return v;
 	}
 
 //-----------------------------------------------------------------------------
@@ -295,6 +306,7 @@ public class VertexViewPanel extends JPanel
      */
     public void loadVertexToViewer(DENOPTIMVertex v)
     {
+        vertex = v;
         if (v instanceof DENOPTIMFragment) {
             labTitle.setText("Fragment");
             DENOPTIMFragment frag = (DENOPTIMFragment) v;
@@ -328,6 +340,7 @@ public class VertexViewPanel extends JPanel
         btnSwitchToNodeViewer.setEnabled(false);
         graphNodeViewer.loadVertexToViewer(ev);
         switchToGraphNodeViewer();
+        ignoreMolViewer = true;
     }
     
 //-----------------------------------------------------------------------------
@@ -364,13 +377,17 @@ public class VertexViewPanel extends JPanel
     {       
         if (tmpl.containsAtoms())
         {
+            // TODO-V3+: take the mol repr.
             DENOPTIMFragment frag = new DENOPTIMFragment();
             loadFragmentToViewer(frag);
             btnSwitchToMolViewer.setEnabled(true);
             btnSwitchToNodeViewer.setEnabled(true);
+        } else {
+            fragViewer.clearAll();
         }
         graphNodeViewer.loadVertexToViewer(tmpl);
         switchToGraphNodeViewer();
+        ignoreMolViewer = true;
     }
     
 //-----------------------------------------------------------------------------
@@ -380,9 +397,13 @@ public class VertexViewPanel extends JPanel
 	 */
 	public void clearCurrentSystem()
 	{
+	    vertex = null;
 	    fragViewer.mapAPs = null;
 		fragViewer.clearAPTable();
 		switchToEmptyCard();
+		// NB: avoid it very slow! Mol viewer gets update upon loading a new mol
+		// clearMolecularViewer();
+		ignoreMolViewer = true;
 	}
 	
 //-----------------------------------------------------------------------------

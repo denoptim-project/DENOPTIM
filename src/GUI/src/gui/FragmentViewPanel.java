@@ -316,9 +316,12 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 				DefaultChemObjectBuilder.getInstance());
 		mol = sp.parseSmiles(smiles);
 		
+		// This seems to be needed in the opposite order since cdk-2.3
+		/*
 	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
 	    		mol.getBuilder());
 	    adder.addImplicitHydrogens(mol);
+		*/
 		
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(
 				mol.getBuilder());
@@ -327,6 +330,10 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	        IAtomType type = matcher.findMatchingAtomType(mol, atom);
 	        AtomTypeManipulator.configure(atom, type);
 	    }
+	    
+	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
+                mol.getBuilder());
+        adder.addImplicitHydrogens(mol);
 	    
 	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(mol);
 
@@ -586,7 +593,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			        DENOPTIMVertex.BBType.FRAGMENT);
 			putAPsFromTableIntoIAtomContainer(fromViewer);
 		} catch (DENOPTIMException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			return fragment;
 		}
 		

@@ -330,6 +330,9 @@ public class DenoptimIO
                                 + "writing of non-molecular "
                                 + "building blocks in SDF files. " 
                                 + t.getMessage());
+                    }
+                    if (iac == null)
+                    {
                         iac = builder.newAtomContainer();
                     }
                     molSet.addAtomContainer(iac);
@@ -1499,7 +1502,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<IAtomContainer> readMoleculeData(String fileName,
-                                                             String format) throws DENOPTIMException {
+            String format) throws DENOPTIMException {
         ArrayList<IAtomContainer> mols;
         switch (format) {
             case "SDF":

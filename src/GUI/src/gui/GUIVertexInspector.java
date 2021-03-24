@@ -816,7 +816,7 @@ public class GUIVertexInspector extends GUICardPanel
 		if (vertexesLibrary == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "No list of builsing blocks loaded.",
+	                "No list of building blocks loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -827,6 +827,14 @@ public class GUIVertexInspector extends GUICardPanel
 
 		vertex = vertexesLibrary.get(currVrtxIdx);
 		vertexViewer.loadVertexToViewer(vertex);
+		if (vertex instanceof DENOPTIMFragment == false)
+		{
+	        btnDelSel.setEnabled(false);
+	        btnAtmToAP.setEnabled(false);
+		} else {
+	        btnDelSel.setEnabled(true);
+	        btnAtmToAP.setEnabled(true);
+		}
 	}
 	
 //-----------------------------------------------------------------------------
@@ -835,12 +843,6 @@ public class GUIVertexInspector extends GUICardPanel
 	{
 		// Get rid of currently loaded mol
 		vertex = null;
-		
-		// Clear viewer?
-		// No, it clears upon loading of a new system.
-		// The exception (i.e., removal of the last fragment) is dealt with by
-		// submitting "zap" only in that occasion.
-		
 		vertexViewer.clearCurrentSystem();
 	}
 
@@ -991,8 +993,14 @@ public class GUIVertexInspector extends GUICardPanel
 		btnOpenVrtxs.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
-		btnDelSel.setEnabled(true);
-		btnAtmToAP.setEnabled(true);
+        if (vertex instanceof DENOPTIMFragment == false)
+        {
+            btnDelSel.setEnabled(false);
+            btnAtmToAP.setEnabled(false);
+        } else {
+            btnDelSel.setEnabled(true);
+            btnAtmToAP.setEnabled(true);
+        }
 		
 		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setEditable(true); 

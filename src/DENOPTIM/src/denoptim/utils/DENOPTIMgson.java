@@ -110,39 +110,39 @@ public class DENOPTIMgson
 
 //------------------------------------------------------------------------------
 
-      public static class DENOPTIMExclusionStrategy implements ExclusionStrategy
-      {
-          @Override
-          public boolean shouldSkipField(FieldAttributes field) {
-              // cannot serialize chemical representations:
-              //     class org.openscience.cdk.Atom declares multiple JSON
-              //     fields named identifier
-              if (field.getDeclaringClass() == DENOPTIMFragment.class
-                      && field.getName().equals("mol")) {
-                  return true;
-              }
-              if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
-                      && field.getName().equals("owner")) {
-                  return true;
-              }
-
-              if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
-                      && field.getName().equals("user")) {
-                  return true;
-              }
-              if (field.getDeclaringClass() == DENOPTIMVertex.class
-                      && field.getName().equals("owner")) {
-                  return true;
-              }
-
-              return false;
+  public static class DENOPTIMExclusionStrategy implements ExclusionStrategy
+  {
+      @Override
+      public boolean shouldSkipField(FieldAttributes field) {
+          // cannot serialize chemical representations:
+          //     class org.openscience.cdk.Atom declares multiple JSON
+          //     fields named identifier
+          if (field.getDeclaringClass() == DENOPTIMFragment.class
+                  && field.getName().equals("mol")) {
+              return true;
+          }
+          if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
+                  && field.getName().equals("owner")) {
+              return true;
           }
 
-          @Override
-          public boolean shouldSkipClass(Class<?> clazz) {
-              return false;
+          if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
+                  && field.getName().equals("user")) {
+              return true;
           }
+          if (field.getDeclaringClass() == DENOPTIMVertex.class
+                  && field.getName().equals("owner")) {
+              return true;
+          }
+
+          return false;
       }
+
+      @Override
+      public boolean shouldSkipClass(Class<?> clazz) {
+          return false;
+      }
+  }
 
 //------------------------------------------------------------------------------
 
