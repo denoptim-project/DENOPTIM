@@ -23,6 +23,8 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -63,15 +65,9 @@ public class VertexViewPanel extends JPanel
 	private DENOPTIMVertex vertex;
 	
 	/**
-	 * Temporary list of attachment points of the current fragment
-	 */
-	protected Map<Integer,DENOPTIMAttachmentPoint> mapAPs = null;
-	
-	/**
 	 * Flag signalling that data about APs has been changed in the GUI
 	 */
 	public boolean alteredAPData = false;
-	protected DefaultTableModel apTabModel;
 	
 	private JPanel titlePanel;
 	
@@ -91,7 +87,11 @@ public class VertexViewPanel extends JPanel
 	    
 	private boolean editableAPTable = false;
 	
-	private boolean ignoreMolViewer = false;
+	/**
+	 * Flag enabling/disabling the capability to switch between mol- and 
+	 * graph-based viewer
+	 */
+	private boolean switchbleByVertexType = true;
 	
 	private JComponent parent;
 	
@@ -176,12 +176,31 @@ public class VertexViewPanel extends JPanel
         emptyViewerCard.setToolTipText("Vertexes are displayed here.");
         centralPanel.add(emptyViewerCard, EMPTYCARDNAME);
         
-        graphNodeViewer = new VertexAsGraphViewPanel(this, editableAPTable, 300);
+        graphNodeViewer = new VertexAsGraphViewPanel(this, editableAPTable,300);
+        graphNodeViewer.addPropertyChangeListener(
+                IVertexAPSelection.APDATACHANGEEVENT, 
+                new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                alteredAPData = true;
+                firePropertyChange(IVertexAPSelection.APDATACHANGEEVENT, false, 
+                        true);          
+            }
+        });
         centralPanel.add(graphNodeViewer, GRAPHVIEWERCARDNAME);
 	        
-        fragViewer = new FragmentViewPanel(false);
+        fragViewer = new FragmentViewPanel(editableAPTable);
+        fragViewer.addPropertyChangeListener(
+                IVertexAPSelection.APDATACHANGEEVENT, 
+                new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                alteredAPData = true;
+                firePropertyChange(IVertexAPSelection.APDATACHANGEEVENT, false, 
+                        true);          
+            }
+        });
         centralPanel.add(fragViewer, MOLVIEWERCARDNAME);
-        apTabModel = fragViewer.apTabModel;
         
         switchToEmptyCard();
 	}
@@ -205,7 +224,30 @@ public class VertexViewPanel extends JPanel
 	 */
 	public void deprotectEdits()
 	{
+	    fragViewer.deprotectEdits();
+	    graphNodeViewer.deprotectEdits();
 		alteredAPData = false;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Enable/disable switch-able view. Does not overwrite the control set upon
+	 * loading a vertex 
+	 */
+	public void setSwitchable(boolean switchable)
+	{
+	    if (switchbleByVertexType)
+	    {
+    	    if (switchable)
+    	    {
+    	        btnSwitchToMolViewer.setEnabled(true);
+    	        btnSwitchToNodeViewer.setEnabled(true);
+    	    } else {
+    	        btnSwitchToMolViewer.setEnabled(false);
+    	        btnSwitchToNodeViewer.setEnabled(false);
+    	    }
+	    }
 	}
 	
 //-----------------------------------------------------------------------------
@@ -235,7 +277,6 @@ public class VertexViewPanel extends JPanel
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 MOLVIEWERCARDNAME);
         activeViewer = fragViewer;
-        ignoreMolViewer = false;
     }
 
 //-----------------------------------------------------------------------------
@@ -273,7 +314,6 @@ public class VertexViewPanel extends JPanel
 	    DENOPTIMVertex v = null;
 	    if (vertex == null || vertex instanceof DENOPTIMFragment)
 	    {
-	        // ignoreMolViewer TODO
 	        v = fragViewer.getLoadedStructure();
 	        switchToMolecularViewer();
 	    } else {
@@ -340,7 +380,7 @@ public class VertexViewPanel extends JPanel
         btnSwitchToNodeViewer.setEnabled(false);
         graphNodeViewer.loadVertexToViewer(ev);
         switchToGraphNodeViewer();
-        ignoreMolViewer = true;
+        switchbleByVertexType = false;
     }
     
 //-----------------------------------------------------------------------------
@@ -359,6 +399,7 @@ public class VertexViewPanel extends JPanel
         btnSwitchToMolViewer.setEnabled(true);
         btnSwitchToNodeViewer.setEnabled(true);
         graphNodeViewer.loadVertexToViewer(frag);
+        switchbleByVertexType = true;
 		switchToMolecularViewer();
 	}
 
@@ -377,17 +418,27 @@ public class VertexViewPanel extends JPanel
     {       
         if (tmpl.containsAtoms())
         {
-            // TODO-V3+: take the mol repr.
+            // TODO: take molecular model from read in data, if available
+            
+            // here we want to avoid converting graph to molecule, so if we have
+            // the molecular model from having read the template from SDF, then
+            // good we can display it, otherwise, no molecule should be shown.
+            
+            /*
             DENOPTIMFragment frag = new DENOPTIMFragment();
             loadFragmentToViewer(frag);
             btnSwitchToMolViewer.setEnabled(true);
             btnSwitchToNodeViewer.setEnabled(true);
+            */
         } else {
             fragViewer.clearAll();
         }
         graphNodeViewer.loadVertexToViewer(tmpl);
         switchToGraphNodeViewer();
-        ignoreMolViewer = true;
+        // These will have to change if we allow displaying molecular models for 
+        // templates
+        switchbleByVertexType = false;
+        graphNodeViewer.setVertexSpecificEditableAPTable(false);
     }
     
 //-----------------------------------------------------------------------------
@@ -398,12 +449,13 @@ public class VertexViewPanel extends JPanel
 	public void clearCurrentSystem()
 	{
 	    vertex = null;
+	    graphNodeViewer.mapAPs = null;
+	    graphNodeViewer.clearAPTable();
 	    fragViewer.mapAPs = null;
 		fragViewer.clearAPTable();
 		switchToEmptyCard();
 		// NB: avoid it very slow! Mol viewer gets update upon loading a new mol
 		// clearMolecularViewer();
-		ignoreMolViewer = true;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -416,6 +468,27 @@ public class VertexViewPanel extends JPanel
     {
         //TODO-V3: evaluate reducing to the minimum the need to run this: it is a slow command!
         fragViewer.clearMolecularViewer();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Returns the map of attachment points in the currently active viewer.
+     * @return the map of attachment points in the currently active viewer.
+     */
+    public Map<Integer,DENOPTIMAttachmentPoint> getActiveMapAPs()
+    {
+        return activeViewer.getMapOfAPsInTable();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the table model of the currently active viewer
+     */
+    public DefaultTableModel getAPTableModel()
+    {
+        return activeViewer.getAPTableModel();
     }
     
 //-----------------------------------------------------------------------------
@@ -460,7 +533,6 @@ public class VertexViewPanel extends JPanel
 	protected void dispose() 
 	{
 		fragViewer.dispose();
-		
 	}
   	
 //-----------------------------------------------------------------------------

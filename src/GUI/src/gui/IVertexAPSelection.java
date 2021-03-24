@@ -1,6 +1,11 @@
 package gui;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import javax.swing.table.DefaultTableModel;
+
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 
 /**
  * Interface for all vertex viewers that intend to allow selection of attachment
@@ -8,7 +13,12 @@ import java.util.ArrayList;
  */
 public interface IVertexAPSelection
 {
-
+    public final String APDATACHANGEEVENT = "APDATA";
+    
     public ArrayList<Integer> getSelectedAPIDs();
 
+    public Map<Integer,DENOPTIMAttachmentPoint> getMapOfAPsInTable();
+
+    public DefaultTableModel getAPTableModel();
+    
 }
