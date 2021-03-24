@@ -22,24 +22,37 @@ exec 2>&1
 "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/TestOperator.jar" "$paramFile"
 exec 1>&6 6>&-
 
-# Check outcome
-# echo " "
-# echo "WARNING: We do not yet check the outcome of this test run."
-# echo " "
 
-# Adapted from https://unix.stackexchange.com/questions/112132/how-can-i-grep-patterns-across-multiple-lines
-# Original code: sed -n '/foo/{:start /bar/!{N;b start};/your_regex/p}' your_file
-# sed -n /`<file2`/p file1 > /tmp/testing.txt
+# Checking outcome
+actualMale=$(head -n 12 male_xo.sdf | tail -n 9)
+expectedMale=$(cat expected_output/male_sdf.txt)
+isDifferentMale=$(diff --brief $expectedMale $actualMale)
 
-# expectedMale="$wrkDir/t96/expected_output/male.sdf"
-# expectedFemail="$wrkDir/t96/expected_output/female.sdf"
-# cd /tmp/dnTestTemplate/t96
-# actualMale="/tmp/dnTestTemplate/t96/male_xo.sdf"
-# actualFemale="/tmp/dnTestTemplate/t96/female_xo.sdf"
-# cmp --silent $expectedMale $actualMale || echo "expected male "
+actualFemale=$(head -n 12 female_xo.sdf | tail -n 9)
+expectedFemale=$(cat expected_output/female_sdf.txt)
+isDifferentFemale=$(diff --brief $expectedFemale $actualFemale)
 
-# Check if /tmp/dnTestTemplate/male_xo.sdf contains string in expected_output/male.txt
+if [$isDifferentMale != ""]
+then
+  echo " "
+  echo "Test 't96' NOT PASSED (symptom: unexpected result from crossover)"
+  echo "Expected male:"
+  echo $expectedMale
+  echo " "
+  echo "But was:"
+  echo $actualMale
 
+  exit -1
+elif [$isDifferentFemale != ""]
+  echo " "
+  echo "Test 't96' NOT PASSED (symptom: unexpected result from crossover)"
+  echo "Expected female:"
+  echo $expectedFemale
+  echo " "
+  echo "But was:"
+  echo $actualFemale
 
+  exit -1
+fi
 
 exit 0

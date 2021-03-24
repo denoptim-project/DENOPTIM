@@ -3,17 +3,17 @@
 #
 
 # Definition of the Fragment Space
-FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
-FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
-FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
-FS-compMatrixFile=OTF_WDIR/CPMap.par
-FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
-FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
+FS-scaffoldLibFile=./data/lib_scaff.sdf
+FS-fragmentLibFile=./data/lib_frags.sdf
+FS-cappingFragmentLibFile=./data/lib_cap.sdf
+FS-compMatrixFile=./data/CPMap.par
+FS-rcCompMatrixFile=./data/RC-CPMap.par
+FS-RotBondsDefFile=./data/rotatableBonds
 
 FS-USETEMPLATES=for now, we only check the existence of this parameter, but its argument not used
 
-TESTGENOPS-inpFileMale=OTF_WDIR/male.sdf
-TESTGENOPS-inpFileFemale=OTF_WDIR/female.sdf
+TESTGENOPS-inpFileMale=./data/male.sdf
+TESTGENOPS-inpFileFemale=./data/female.sdf
 TESTGENOPS-outFileMale=male_xo.sdf
 TESTGENOPS-outFileFemale=female_xo.sdf
 TESTGENOPS-VERTEXMALE=1

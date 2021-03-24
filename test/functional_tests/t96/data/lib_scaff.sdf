@@ -1,13 +1,172 @@
-C
-CDK     0225201600
+Scaffold
+  CDK     03232121583D
 
- 1  0  0  0  0  0  0  0  0  0999 V2000
-    0.9639    0.1717    0.9108 C   0  0  0  0  0  0  0  0  0  0  0  0
+  3  2  0  0  0  0  0  0  0  0999 V2000
+    0.4588    0.8243    0.3287 C   0  0  0  0  0  5  0  0  0  0  0  0
+    0.9651    0.2219    0.8263 C   0  0  0  0  0  5  0  0  0  0  0  0
+    0.4497    0.2681    0.7587 H   0  0  0  0  0  0  0  0  0  0  0  0
+  2  3  1  0  0  0  0
+  1  2  1  0  0  0  0
 M  END
+
+> <GraphJson>
+{
+  "graphId": 0,
+  "gVertices": [
+    {
+      "lstAPs": [
+        {
+          "id": 21,
+          "atomPositionNumber": 0,
+          "totalConnections": 1,
+          "freeConnections": 0,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.0672,
+            0.1681,
+            0.1149
+          ]
+        },
+        {
+          "id": 22,
+          "atomPositionNumber": 0,
+          "totalConnections": 1,
+          "freeConnections": 1,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.8575,
+            0.6599,
+            0.2044
+          ]
+        },
+        {
+          "id": 23,
+          "atomPositionNumber": 0,
+          "totalConnections": 1,
+          "freeConnections": 1,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.216,
+            0.5785,
+            0.0755
+          ]
+        }
+      ],
+      "lstSymAPs": [
+        {
+          "symIds": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "fragmentType": "Molecular_fragment",
+      "vertexId": 3,
+      "buildingBlockId": 0,
+      "buildingBlockType": "FRAGMENT",
+      "isRCV": false,
+      "level": -99,
+      "allowedMutationTypes": [
+        "EXTEND",
+        "DELETE",
+        "CHANGEBRANCH"
+      ]
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 24,
+          "atomPositionNumber": 0,
+          "totalConnections": 1,
+          "freeConnections": 1,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.2162,
+            0.0266,
+            0.2183
+          ]
+        },
+        {
+          "id": 25,
+          "atomPositionNumber": 0,
+          "totalConnections": 1,
+          "freeConnections": 0,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.2269,
+            0.1099,
+            0.1229
+          ]
+        },
+        {
+          "id": 26,
+          "atomPositionNumber": 0,
+          "totalConnections": 1,
+          "freeConnections": 1,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.1134,
+            0.9177,
+            0.5083
+          ]
+        }
+      ],
+      "lstSymAPs": [
+        {
+          "symIds": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "fragmentType": "Molecular_fragment",
+      "vertexId": 4,
+      "buildingBlockId": 1,
+      "buildingBlockType": "FRAGMENT",
+      "isRCV": false,
+      "level": -99,
+      "allowedMutationTypes": [
+        "EXTEND",
+        "DELETE",
+        "CHANGEBRANCH"
+      ]
+    }
+  ],
+  "gEdges": [
+    {
+      "srcAPID": 21,
+      "trgAPID": 25,
+      "bondType": "SINGLE"
+    }
+  ],
+  "gRings": [],
+  "symVertices": []
+}
+
 > <CLASS>
-1#c:0,c:0,c:0,c:0
+1#c:0:0.8575%0.6599%0.2044,c:0:0.2160%0.5785%0.0755 2#c:0:0.2162%0.0266%0.2183,c:0:0.1134%0.9177%0.5083
 
 > <ATTACHMENT_POINT>
-1:1 1:1 1:1 1:1
+1:1 1:1 2:1 2:1
 
 $$$$
