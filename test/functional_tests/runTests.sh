@@ -10,7 +10,7 @@
 #
 # Usage:
 #
-# ./runTests.sh [-t TASTNAME] [-r]
+# ./runTests.sh [-t TESTNAME] [-r]
 #
 # Options:
 # -t TESTNAME  runs only test TESTNAME.
@@ -20,7 +20,7 @@
 #
 # Settings:
 #
- 
+
 # Path to TINKER executables
 # Currently required only by t1 that will be skipped if the following is empty.
 export tinkerPathDENOPTIM=""

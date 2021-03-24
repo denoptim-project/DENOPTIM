@@ -26,14 +26,13 @@ exec 1>&6 6>&-
 # Checking outcome
 actualMale=$(head -n 12 male_xo.sdf | tail -n 9)
 expectedMale=$(cat expected_output/male_sdf.txt)
-isDifferentMale=$(diff --brief $expectedMale $actualMale)
+isDifferentMale=$(cmp -s $expectedMale $actualMale)
 
 actualFemale=$(head -n 12 female_xo.sdf | tail -n 9)
 expectedFemale=$(cat expected_output/female_sdf.txt)
-isDifferentFemale=$(diff --brief $expectedFemale $actualFemale)
+isDifferentFemale=$(cmp -s $expectedFemale $actualFemale)
 
-if [$isDifferentMale != ""]
-then
+if cmp -s "$expectedMale" "$actualMale" ; then
   echo " "
   echo "Test 't96' NOT PASSED (symptom: unexpected result from crossover)"
   echo "Expected male:"
@@ -41,9 +40,8 @@ then
   echo " "
   echo "But was:"
   echo $actualMale
-
   exit -1
-elif [$isDifferentFemale != ""]
+elif cmp -s "$expectedFemale" "$actualFemale" ; then 
   echo " "
   echo "Test 't96' NOT PASSED (symptom: unexpected result from crossover)"
   echo "Expected female:"
@@ -51,8 +49,9 @@ elif [$isDifferentFemale != ""]
   echo " "
   echo "But was:"
   echo $actualFemale
-
   exit -1
 fi
+
+echo "Test 't96' PASSED"
 
 exit 0
