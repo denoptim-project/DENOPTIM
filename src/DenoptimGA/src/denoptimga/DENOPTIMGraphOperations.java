@@ -303,18 +303,24 @@ public class DENOPTIMGraphOperations
 
         ArrayList<DENOPTIMAttachmentPoint> lstDaps = 
                                                 curVertex.getAttachmentPoints();
-        for (int apId=0; apId<lstDaps.size(); apId++)
+        Set<DENOPTIMAttachmentPoint> toDoAPs = 
+                new HashSet<DENOPTIMAttachmentPoint>();
+        toDoAPs.addAll(lstDaps);
+        for (int apIdx=0; apIdx<lstDaps.size(); apIdx++)
         {
+            DENOPTIMAttachmentPoint ap = 
+                    RandomUtils.randomlyChooseOne(toDoAPs);
+            toDoAPs.remove(ap);
+            
             if (debug)
             {
-                System.err.println("Evaluating growth on AP-" + apId + " of "
-                        + "vertex "+ curVrtId);
+                System.err.println("Evaluating growth on #" + apIdx + " AP of "
+                        + "vertex "+ curVrtId 
+                        + " (AP: " + ap.getIndexInOwner() + ")");
             }
 
-            DENOPTIMAttachmentPoint curDap = lstDaps.get(apId);
-
             // is it possible to extend on this AP?
-            if (!curDap.isAvailable())
+            if (!ap.isAvailable())
             {
                 if (debug)
                 {
@@ -324,11 +330,13 @@ public class DENOPTIMGraphOperations
             }
 
             // Do we want to extend the graph at this AP?
-            double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl);
+            double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl)
+                    * EAUtils.getCrowdingProbability(ap);
             boolean fgrow =  RandomUtils.nextBoolean(growthProb);
             if (debug)
             {
-                System.err.println("Growth probab. on this AP:" + growthProb);
+                System.err.println("Growth probability on this AP:" 
+                        + growthProb);
             }
             if (!fgrow)
             {
@@ -347,7 +355,7 @@ public class DENOPTIMGraphOperations
             {
                 boolean successful = attachFragmentInClosableChain(
                                                                  curVertex, 
-                                                                 apId, 
+                                                                 apIdx, 
                                                                  molGraph, 
                                                                  addedVertices);
                 if (successful)
@@ -357,7 +365,7 @@ public class DENOPTIMGraphOperations
             }
 
             // find a compatible combination of fragment and AP
-            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, apId);
+            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, apIdx);
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
             {
@@ -369,11 +377,11 @@ public class DENOPTIMGraphOperations
             }
 
             // Decide on symmetric substitution within this vertex...
-            boolean cpOnSymAPs = applySymmetry(curDap.getAPClass());
+            boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
             SymmetricSet symAPs = new SymmetricSet();
             if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
             {
-                symAPs = curVertex.getSymmetricAPs(apId);
+                symAPs = curVertex.getSymmetricAPs(apIdx);
 				if (symAPs != null)
 				{
                     if (debug)
@@ -385,12 +393,12 @@ public class DENOPTIMGraphOperations
 				else
 				{
 				    symAPs = new SymmetricSet();
-				    symAPs.add(apId);
+				    symAPs.add(apIdx);
 				}
             }
             else
             {
-                symAPs.add(apId);
+                symAPs.add(apIdx);
             }
 
             // ...and inherit symmetry from previous levels

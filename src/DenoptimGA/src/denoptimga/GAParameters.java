@@ -151,6 +151,31 @@ public class GAParameters
      * of type 'SIGMA': level at which p=50% (can be  a float)
      */
     protected static double growthSigmaMiddle = 2.5;
+    
+    /**
+     * Definition of the crowding probability function. By default, the 
+     * probability of using an AP that is hosted on an atom that already has an 
+     * used AP is 100%.
+     */
+    protected static int crowdingProbabilityScheme = 3;
+ 
+    /**
+     * Parameter controlling the crowding probability function of types
+     * 'EXP_DIFF' and 'TANH'
+     */
+    protected static double crowdingMultiplier = 0.5;
+ 
+    /** 
+     * Parameters controlling the crowding probability function
+     * of type 'SIGMA': steepness of the function where p=50%
+     */
+    protected static double crowdingSigmaSteepness = 1.0;
+
+    /** 
+     * Parameters controlling the crowding probability function
+     * of type 'SIGMA': level at which p=50% (can be  a float)
+     */
+    protected static double crowdingSigmaMiddle = 2.5;
 
     /**
      * The probability at which mutation is performed
@@ -319,6 +344,34 @@ public class GAParameters
         return replacementStrategy;
     }
 
+//------------------------------------------------------------------------------
+
+    protected static double getCrowdingFactorSteepSigma()
+    {
+        return crowdingSigmaSteepness;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getCrowdingFactorMiddleSigma()
+    {
+        return crowdingSigmaMiddle;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getCrowdingMultiplier()
+    {
+        return crowdingMultiplier;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static int getCrowdingProbabilityScheme()
+    {
+        return crowdingProbabilityScheme;
+    }
+    
 //------------------------------------------------------------------------------
 
     protected static double getGrowthFactorSteepSigma()

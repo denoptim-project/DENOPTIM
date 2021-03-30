@@ -49,6 +49,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
@@ -1402,6 +1403,82 @@ public class EAUtils
         return getGrowthProbabilityAtLevel(level, scheme, lambda, sigmaOne, 
                 sigmaTwo);
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the probability of using and attachment point rooted on
+     * an atom that is holding other attachment points which have already been
+     * used.
+     * @param ap the attachment point candidate to be used.
+     * @return probability of adding a new building block on the given 
+     * attachment point.
+     */
+    public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap)
+    {
+        int scheme = GAParameters.getCrowdingProbabilityScheme();
+        double lambda =GAParameters.getCrowdingMultiplier();
+        double sigmaOne = GAParameters.getCrowdingFactorSteepSigma();
+        double sigmaTwo = GAParameters.getCrowdingFactorMiddleSigma();
+        return getCrowdingProbability(ap, scheme, lambda, sigmaOne, sigmaTwo);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the probability of using and attachment point rooted on
+     * an atom that is holding other attachment points that have already been
+     * used.
+     * @param ap the attachment point candidate to be used.
+     * @param scheme the chosen shape of the probability function.
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
+     * @return probability of adding a new building block on the given 
+     * attachment point.
+     */
+    public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap, 
+            int scheme,
+            double lambda, double sigmaOne, double sigmaTwo)
+    {
+        double prob = 1.0;
+        
+        //Applies only to molecular fragments
+        if (ap.getOwner() instanceof DENOPTIMFragment == false)
+        {
+            return prob;
+        }
+        
+        int crowdness = 0;
+        for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())
+        {
+            if (oap.getAtomPositionNumber() == ap.getAtomPositionNumber()
+                    && !oap.isAvailable())
+            {
+                crowdness = crowdness + 1;
+            }
+        }
+        
+        if (scheme == 0)
+        {
+            double f = Math.exp(-1.0 * crowdness * lambda);
+            prob = 1 - ((1-f)/(1+f));
+        }
+        else if (scheme == 1)
+        {
+            prob = 1.0 - Math.tanh(lambda * crowdness);
+        }
+        else if (scheme == 2)
+        {
+            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * (crowdness - sigmaTwo)));
+        }
+        else if (scheme == 3)
+        {
+            prob = 1.0;
+        }
+        
+        return prob;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1472,6 +1549,6 @@ public class EAUtils
             lstInchi.add(str);
         lst.clear();
     }
-  
+    
 //------------------------------------------------------------------------------    
 }

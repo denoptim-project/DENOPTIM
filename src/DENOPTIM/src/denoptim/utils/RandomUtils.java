@@ -73,7 +73,8 @@ public class RandomUtils
 //------------------------------------------------------------------------------
     
     /**
-     * Chooses one member among the given collection.
+     * Chooses one member among the given collection. Works on either ordered
+     * an unordered collections.
      */
     
     public static <T> T randomlyChooseOne(Collection<T> c)

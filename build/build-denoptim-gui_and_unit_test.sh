@@ -12,4 +12,4 @@ java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM
 
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.io.DenoptimIOTest
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptimga.EAUtilsTest

@@ -869,4 +869,19 @@ Comparable<DENOPTIMAttachmentPoint>
 
 //-----------------------------------------------------------------------------
 
+    /**
+     * @return the current index of this AP in the list of APs of the owner, or
+     * -1 if the owner is null.
+     */
+    public int getIndexInOwner()
+    {
+        if (owner == null)
+        {
+            return -1;
+        }
+        return owner.getIndexOfAP(this);
+    }
+
+//-----------------------------------------------------------------------------
+
 }

@@ -5,17 +5,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.Bond;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 
 
@@ -735,11 +741,96 @@ public class DENOPTIMGraphTest {
 		assertEquals(2, graph.getMutableSites().size(),
 				"Size of mutation size list in case of free template");
 	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Build a graph meant to be used in unit tests. The returned graph has
+	 * the following structure:
+	 * <pre>
+	 *        (free)
+	 *        ap2
+	 *       /
+	 * [C1-C0-ap0]-[ap0-O-ap1]-[ap0-H]
+	 *  |    \
+	 *  ap3   ap1
+	 *  |       \
+	 * (free)    [ap0-H]</pre>
+	 * 
+	 * @return a new instance of the test graph.
+	 */
+	public static DENOPTIMGraph makeTestGraphA() 
+	{
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+    
+        // If we cannot make the test graph, something is deeeeeply wrong and
+        // a bugfix is needed.
+        try {
+            IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+            IAtomContainer iac1 = builder.newAtomContainer();
+            IAtom ia1 = new Atom("C");
+            IAtom ia2 = new Atom("C");
+            iac1.addAtom(ia1);
+            iac1.addAtom(ia2);
+            iac1.addBond(new Bond(ia1, ia2, IBond.Order.SINGLE));
+            
+            DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, 
+                    DENOPTIMVertex.BBType.SCAFFOLD);
+            v1.addAP(0, 1, 1);
+            v1.addAP(0, 1, 1);
+            v1.addAP(0, 1, 1);
+            v1.addAP(1, 1, 1);
+        
+            IAtomContainer iac2 = builder.newAtomContainer();
+            iac2.addAtom(new Atom("O"));
+            DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, 
+                    DENOPTIMVertex.BBType.FRAGMENT);
+            v2.addAP(0, 1, 1);
+            v2.addAP(0, 1, 1);
+        
+            IAtomContainer iac3 = builder.newAtomContainer();
+            iac3.addAtom(new Atom("H"));
+            DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, 
+                    DENOPTIMVertex.BBType.CAP);
+            v3.addAP(0, 1, 1);
+        
+            IAtomContainer iac4 = builder.newAtomContainer();
+            iac4.addAtom(new Atom("H"));
+            DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, 
+                    DENOPTIMVertex.BBType.CAP);
+            v4.addAP(0, 1, 1);
+        
+            graph.addVertex(v1);
+            graph.addVertex(v2);
+            graph.addVertex(v3);
+            graph.addVertex(v4);
+            graph.addEdge(new DENOPTIMEdge(v1.getAP(0), v2.getAP(0)));
+            graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v3.getAP(0)));
+            graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v4.getAP(0)));
+            
+            // Use this just to verify identify of the graph
+            /*
+                System.out.println("WRITING TEST GRAPH A");
+                DenoptimIO.writeGraphsToFile(new File("/tmp/test_graph_A"), 
+                        FileFormat.GRAPHJSON, 
+                        new ArrayList<DENOPTIMGraph>(Arrays.asList(graph)));
+            */
+        } catch (Throwable t)
+        {
+            System.err.println("FATAL ERROR! Could not make test graph (A). "
+                    + "Please, report this to the development team.");
+            System.exit(-1);
+        }
+        
+        return graph;
+	}
 
 //------------------------------------------------------------------------------
 
 	@Test
 	public void testRemoveCapping() throws Exception {
+	    
+	    //TODO: use getEstGraph() method to make the test graphs
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 
 		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
