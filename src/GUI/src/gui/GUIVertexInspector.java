@@ -214,8 +214,8 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-				    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
-	                                DENOPTIMVertex.BBType.FRAGMENT);
+				    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+				            BBType.FRAGMENT, vrtxLib, true);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -514,8 +514,8 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
-                    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
-                                    DENOPTIMVertex.BBType.FRAGMENT);
+                    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+                            BBType.FRAGMENT, vrtxLib, true);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog(btnAddVrtx,
@@ -728,8 +728,8 @@ public class GUIVertexInspector extends GUICardPanel
 		
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
-            vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(file, 
-                            DENOPTIMVertex.BBType.FRAGMENT);
+            DenoptimIO.appendVertexesFromFileToLibrary(file, BBType.FRAGMENT, 
+                    vrtxLib, true);
         } catch (Exception e1) {
             e1.printStackTrace();
             JOptionPane.showMessageDialog(btnAddVrtx,

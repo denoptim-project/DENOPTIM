@@ -19,6 +19,8 @@
 
 package denoptim.fragspace;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -276,26 +279,41 @@ public class FragmentSpace
         if (capFile.length() > 0)
         {
             cappingLib = new ArrayList<DENOPTIMVertex>();
-            FragmentSpace.appendIACsAsVertexesToLibrary(
-                    DenoptimIO.readDENOPTIMVertexFromSDFile(
-                            capFile,"capping group"),BBType.CAP,cappingLib);
-            /*
-             //TODO del
-            setCappingLibrary(DenoptimIO.convertIACsToVertexes(
-                    DenoptimIO.readDENOPTIMVertexFromSDFile(capFile,
-                    "capping group"),BBType.CAP));
-                    */
+            try
+            {
+                DenoptimIO.appendVertexesFromFileToLibrary(new File(capFile), 
+                        BBType.CAP, cappingLib, true);
+            } catch (IllegalArgumentException | UndetectedFileFormatException
+                    | IOException | DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Cound not read library of capping "
+                        + "groups from file '" + capFile + "'.", e);
+            }
         }
         
         fragmentLib = new ArrayList<DENOPTIMVertex>();
-        FragmentSpace.appendIACsAsVertexesToLibrary(
-                DenoptimIO.readDENOPTIMVertexFromSDFile(
-                fragFile,"fragment"),BBType.FRAGMENT,fragmentLib);
+        try
+        {
+            DenoptimIO.appendVertexesFromFileToLibrary(new File(fragFile), 
+                    BBType.FRAGMENT, fragmentLib, true);
+        } catch (IllegalArgumentException | UndetectedFileFormatException
+                | IOException | DENOPTIMException e)
+        {
+            throw new DENOPTIMException("Cound not read library of fragments "
+                    + "from file '" + fragFile + "'.", e);
+        }
         
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
-        FragmentSpace.appendIACsAsVertexesToLibrary(
-                DenoptimIO.readDENOPTIMVertexFromSDFile(
-                        scaffFile,"scaffold"),BBType.SCAFFOLD,scaffoldLib);
+        try
+        {
+            DenoptimIO.appendVertexesFromFileToLibrary(new File(scaffFile), 
+                    BBType.SCAFFOLD, scaffoldLib, true);
+        } catch (IllegalArgumentException | UndetectedFileFormatException
+                | IOException | DENOPTIMException e)
+        {
+            throw new DENOPTIMException("Cound not read library of scaffolds "
+                    + "from file '" + fragFile + "'.", e);
+        }
 
         // TODO-MF del (used to create SDF versions of empty fragments
         /*

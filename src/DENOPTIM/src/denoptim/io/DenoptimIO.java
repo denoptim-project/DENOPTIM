@@ -105,6 +105,7 @@ import com.google.gson.reflect.TypeToken;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -1815,31 +1816,31 @@ public class DenoptimIO
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from file
      *
-     * @param fileName the pathname of the file to read
+     * @param file the pathname of the file to read
      * @param format   the file format to expect
      * @param useFS    set to <code>true</code> when there is a defined
-     *                 fragment space that contains the fragments used to build the graphs.
-     *                 Otherwise, use <code>false</code>. This will create only as many APs as
-     *                 needed to satisfy the graph representation, thus creating a potential
-     *                 mismatch between fragment space and graph representation.
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential
+     * mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-            String fileName, String format, boolean useFS)
+            String file, String format, boolean useFS)
             throws DENOPTIMException {
         switch (format) {
             case "JSON":
-                return DenoptimIO.readDENOPTIMGraphsFromJSONFile(fileName, useFS);
+                return DenoptimIO.readDENOPTIMGraphsFromJSONFile(file,useFS);
             
             case "TXT":
-                return DenoptimIO.readDENOPTIMGraphsFromTxtFile(fileName, useFS);
+                return DenoptimIO.readDENOPTIMGraphsFromTxtFile(file,useFS);
 
             case "SDF":
-                return DenoptimIO.readDENOPTIMGraphsFromSDFile(fileName, useFS);
+                return DenoptimIO.readDENOPTIMGraphsFromSDFile(file,useFS);
                 
             case "SER":
-                return DenoptimIO.readDENOPTIMGraphsFromSerFile(fileName);
+                return DenoptimIO.readDENOPTIMGraphsFromSerFile(file);
         }
         return new ArrayList<DENOPTIMGraph>();
     }
@@ -1869,10 +1870,10 @@ public class DenoptimIO
      *
      * @param fileName the pathname of the file to read
      * @param useFS    set to <code>true</code> when there is a defined
-     *                 fragment space that contains the fragments used to build the graphs.
-     *                 Otherwise, use <code>false</code>. This will create only as many APs as
-     *                 needed to satisfy the graph representation, thus creating a potential
-     *                 mismatch between fragment space and graph representation.
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential
+     * mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
@@ -1890,25 +1891,48 @@ public class DenoptimIO
         int i = 0;
         for (IAtomContainer mol : mols) {
             i++;
-            // Something very similar is done also in DENOPTIMMolecule
-            DENOPTIMGraph g = null;
-            Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
-            Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
-            if (graphEnc == null && json == null) {
-                throw new DENOPTIMException("Attempt to load graph form "
-                        + "SDF that has neither '" + DENOPTIMConstants.GRAPHTAG
-                        + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG 
-                        + "' tag. Check molecule " + i + " in the SDF file.");
-            } else if (json != null) {
-                String js = json.toString();
-                g = DENOPTIMGraph.fromJson(js);
-            } else {
-                g = GraphConversionTool.getGraphFromString(
-                        graphEnc.toString().trim(), useFS);
-            }
+            DENOPTIMGraph g = readGraphfromSDFileIAC(mol,i,useFS);
             lstGraphs.add(g);
         }
         return lstGraphs;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts an atom container read in from an SDF file into a graph, if 
+     * possible. Otherwise, throws an exception.
+     * @param mol the atom container coming from SDF representation
+     * @param molId identified used only for logging purposed
+     * @param useFS set to <code>true</code> when there is a defined
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential
+     * mismatch between fragment space and graph representation.
+     * @return the corresponding graph or null.
+     * @throws DENOPTIMException is the atom container cannot be converted due
+     * to lack of the proper SDF tags, or failure in the conversion.
+     */
+    public static DENOPTIMGraph readGraphfromSDFileIAC(IAtomContainer mol, 
+            int molId, boolean useFS) throws DENOPTIMException
+    {
+     // Something very similar is done also in DENOPTIMMolecule
+        DENOPTIMGraph g = null;
+        Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+        Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
+        if (graphEnc == null && json == null) {
+            throw new DENOPTIMException("Attempt to load graph form "
+                    + "SDF that has neither '" + DENOPTIMConstants.GRAPHTAG
+                    + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG 
+                    + "' tag. Check molecule " + molId + " in the SDF file.");
+        } else if (json != null) {
+            String js = json.toString();
+            g = DENOPTIMGraph.fromJson(js);
+        } else {
+            g = GraphConversionTool.getGraphFromString(
+                    graphEnc.toString().trim(), useFS);
+        }
+        return g;
     }
 
 //------------------------------------------------------------------------------
@@ -2173,108 +2197,107 @@ public class DenoptimIO
         }
         return res;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Reads a library of fragments from SDF file and checks that every fragment
-     * has the AP tag.
-     *
-     * @param fileName name of the SDF file
-     * @param kindStr  the kind of fragment to be read. Used for logging.
-     * @return the list of fragments as atom containers.
-     * @throws DENOPTIMException
-     */
-    
-    public static ArrayList<IAtomContainer> readDENOPTIMVertexFromSDFile(
-            String fileName, String kindStr) throws DENOPTIMException {
-        ArrayList<IAtomContainer> lib = new ArrayList<IAtomContainer>();
-        int i = 0;
-        for (IAtomContainer mol : readMoleculeData(fileName)) {
-            i++;
-            Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
-            if (ap == null) {
-                DENOPTIMLogger.appLogger.log(Level.WARNING,
-                        "No attachment point information for " + kindStr + " "
-                                + i + " in file '" + fileName 
-                                + "'. I'm ignoring it!");
-            } else {
-                lib.add(mol);
-            }
-        }
-        if (lib.isEmpty()) {
-            throw new DENOPTIMException("Library of vertexes has no valid "
-                    + "entries.");
-        }
-        return lib;
-    }
     
 //------------------------------------------------------------------------------
     
     /**
-     * Reads vertexes from any suitable file format (.sdf, .json). If the file 
-     * contains {@link DENOPTIMGraph}s, 
-     * these are imported as {@link DENOPTIMTemplate}s.
-     * @param inFile the file to read.
-     * @param bbt the type of building block of the vertexes to import.
-     * @return the list of vertexes taken from the file.
-     * @throws Exception if the file cannot be understood as a collection of
-     * vertexes
+     * Appends vertexes taken from a file onto a given library. This method will
+     * interpret {@link DENOPTIMGraph}s with available attachment points
+     * as {@link DENOPTIMTemplate}s. Moreover, the vertexes can
+     * be interdependent, meaning that vertex #n can contain references to 
+     * vertex #m with m lower then n. Such interdependency is acceptable only 
+     * for SDF-based files (not yet JSON).
+     *  
+     * @param file the file we want to read.
+     * @param bbt the type of building blocks assigned to each new vertex.
+     * @param library the library on which new vertexes are appended.
+     * @param setBBId if <code>true</code> re-sets the building block it to be 
+     * consistent with the destination library.
+     * @throws IOException 
+     * @throws UndetectedFileFormatException 
+     * @throws DENOPTIMException 
+     * @throws IllegalArgumentException 
+     * @throws Exception
      */
-    
-    public static ArrayList<DENOPTIMVertex> readDENOPTIMVertexesFromFile(
-            File inFile, DENOPTIMVertex.BBType bbt) throws Exception
+    public static void appendVertexesFromFileToLibrary(File file,
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library, 
+            boolean setBBId) throws UndetectedFileFormatException, IOException, 
+    IllegalArgumentException, DENOPTIMException
     {
-        ArrayList<DENOPTIMVertex> lstVrt = 
-                new ArrayList<DENOPTIMVertex>();
-        
-        FileFormat ff = DenoptimIO.detectFileFormat(inFile);
+        FileFormat ff = DenoptimIO.detectFileFormat(file);
         switch (ff)
         {
             case VRTXSDF:
-                ArrayList<IAtomContainer> lstIACs = 
-                    DenoptimIO.readDENOPTIMVertexFromSDFile(
-                            inFile.getAbsolutePath(), bbt.toString());
-                for (IAtomContainer iac : lstIACs)
+                int i=0;
+                for (IAtomContainer mol : readSDFFile(file.getAbsolutePath())) 
                 {
-                    lstVrt.add(DENOPTIMVertex.convertIACToVertex(iac, bbt));
+                    i++;
+                    DENOPTIMVertex v = null;
+                    Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
+                    if (ap == null) {
+                        if (FragmentSpace.isDefined())
+                        {
+                            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                            t.setInnerGraph(readGraphfromSDFileIAC(mol,i,true));
+                            v = t;
+                        } else {
+                            DENOPTIMLogger.appLogger.log(Level.WARNING,
+                                "No attachment point information for " + bbt + " "
+                                        + i + " in file '" + file 
+                                        + "'. No fragment space defined that could be "
+                                        + "used to interprete the SDF file ocntent. "
+                                        + "I'm ignoring " + bbt + " " + i);
+                            continue;
+                        }
+                    } else {
+                        v = DENOPTIMVertex.convertIACToVertex(mol,bbt);
+                    }
+                    if (setBBId)
+                    {
+                        FragmentSpace.appendVertexToLibrary(v,bbt,library);
+                    } else {
+                        library.add(v);
+                    }
                 }
                 break;
                 
             case VRTXJSON:
                 System.out.println("TODO: implement import of " + ff);
-                throw new Exception("Format '" + ff + "' could not be used to "
-                        + "read in vertexes from file '" + inFile + "'.");
+                throw new DENOPTIMException("Format '" + ff 
+                        + "' could not be used to "
+                        + "read in vertexes from file '" + file + "'.");
                     
             case GRAPHSDF:
+                //TODO: change this. Not compatible to reading a list of graphs
+                // where graph #n contains graph #(n-1) as a template
                 ArrayList<DENOPTIMGraph> lstGraphs = 
-                    readDENOPTIMGraphsFromSDFile(inFile.getAbsolutePath(),true);
+                    readDENOPTIMGraphsFromSDFile(file.getAbsolutePath(),true);
                 for (DENOPTIMGraph g : lstGraphs)
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
                     t.setInnerGraph(g);
-                    lstVrt.add(t);
+                    library.add(t);
                 }
                 break;
                     
             case GRAPHJSON:
                 ArrayList<DENOPTIMGraph> lstGraphs2 = 
-                readDENOPTIMGraphsFromJSONFile(inFile.getAbsolutePath(), true);
+                readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath(), true);
                 for (DENOPTIMGraph g : lstGraphs2)
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
                     t.setInnerGraph(g);
-                    lstVrt.add(t);
+                    library.add(t);
                 }
                 break;
                 
             default:
-                throw new Exception("Format '" + ff + "' could not be used to "
-                        + "read in vertexes from file '" + inFile + "'.");
+                throw new DENOPTIMException("Format '" + ff 
+                        + "' could not be used to "
+                        + "read in vertexes from file '" + file + "'.");
         }
-        return lstVrt;
     }
-
+    
 //------------------------------------------------------------------------------
     
     public static File getAvailableFileName(File parent, String baseName)
