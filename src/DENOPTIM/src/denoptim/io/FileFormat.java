@@ -23,7 +23,9 @@ public enum FileFormat {
     static {
         GRAPHSDF.extension = "sdf";
         GRAPHSDF.definingRegex = new HashSet<String>(Arrays.asList(
-                "^> *<" + DENOPTIMConstants.GRAPHTAG + ">.*"));
+                "^> *<" + DENOPTIMConstants.GRAPHTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
+                ));
         GRAPHSDF.endOfSampleRegex = "\\$\\$\\$\\$";
         
         GRAPHJSON.extension = "json";

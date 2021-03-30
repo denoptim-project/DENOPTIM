@@ -304,5 +304,10 @@ runTest "t18"
 #
 runTest "t19"
 
+#
+# t20: crossover with templates
+#
+runTest 't20'
+
 echo "All done!"
 exit 0
