@@ -488,9 +488,9 @@ public class FragmentSpace
                 }
                 else
                 {
-                    msg = "Mismatch between scaffold bbIdx and size of the "
-                            + "library" + ". MolId: " + bbIdx + " FragType: " 
-                            + bbType;
+                    msg = "Mismatch between scaffold bbIdx (" + bbIdx 
+                            + ") and size of the library (" + scaffoldLib.size()
+                            + "). FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -503,9 +503,9 @@ public class FragmentSpace
                 }
                 else
                 {
-                    msg = "Mismatch between fragment bbIdx and size of the "
-                                    + "library" + ". MolId: " + bbIdx 
-                                    + " FragType: " + bbType;
+                    msg = "Mismatch between fragment bbIdx (" + bbIdx 
+                            + ") and size of the library (" + fragmentLib.size()
+                            + "). FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -518,9 +518,9 @@ public class FragmentSpace
                 }
                 else
                 {
-                    msg = "Mismatch between capping group bbIdx and size "
-                                    + "of the library. MolId: " + bbIdx 
-                                    + " FragType: " + bbType;
+                    msg = "Mismatch between capping group bbIdx " + bbIdx 
+                            + ") and size of the library (" + cappingLib.size()
+                            + "). FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
@@ -536,9 +536,9 @@ public class FragmentSpace
                 }
                 else
                 {
-                    msg = "Mismatch between fragment bbIdx and size of the "
-                                    + "library" + ". MolId: " + bbIdx 
-                                    + " FragType: " + bbType;
+                    msg = "Mismatch between fragment bbIdx (" + bbIdx 
+                            + ") and size of the library (" + fragmentLib.size()
+                            + "). FragType: " + bbType;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }

@@ -838,14 +838,46 @@ public class GUIGraphHandler extends GUICardPanel
 	 */
 	private void startGraphFromFragSpace()
 	{
-		ArrayList<DENOPTIMVertex> vrtxLib = new  ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex bb : FragmentSpace.getScaffoldLibrary())
+	    BBType rootType = BBType.SCAFFOLD;
+	    String[] options = new String[]{"Scaffold", "Fragment", "Cancel"};
+	    String msg = "<html><body width='%1s'>"
+	            + "Please choose the type of building block used to start "
+                + "building the graph. Use a scaffold if the graph is meant to "
+                + "represent a necessary portion of a candidate entity.</html>";
+        int res = JOptionPane.showOptionDialog(null,String.format(msg,350),
+                "Specify type of initial building block",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                UIManager.getIcon("OptionPane.warningIcon"),
+                options,
+                options[2]);
+        
+        ArrayList<DENOPTIMVertex> vrtxLib = new  ArrayList<DENOPTIMVertex>();
+        switch (res)
         {
-        	vrtxLib.add(bb.clone());
+            case 0:
+                rootType = BBType.SCAFFOLD;
+                for (DENOPTIMVertex bb : FragmentSpace.getScaffoldLibrary())
+                {
+                    vrtxLib.add(bb.clone());
+                }
+                break;
+                
+            case 1:
+                rootType = BBType.FRAGMENT;
+                for (DENOPTIMVertex bb : FragmentSpace.getFragmentLibrary())
+                {
+                    vrtxLib.add(bb.clone());
+                }
+                break;
+                
+            case 2:
+                return;
         }
-		if (vrtxLib.size() == 0)
+        if (vrtxLib.size() == 0)
 		{
-			JOptionPane.showMessageDialog(null,"No fragments in the library",
+			JOptionPane.showMessageDialog(null,"No building blocks of the "
+			        + "choosen type.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -860,7 +892,9 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			return;
 		}
-		ArrayList<Integer> trgFragApId = ((ArrayList<ArrayList<Integer>>)selected)
+		
+		@SuppressWarnings("unchecked")
+        ArrayList<Integer> trgFragApId = ((ArrayList<ArrayList<Integer>>)selected)
                 .get(0);
         int scaffFragId = trgFragApId.get(0);
 		
@@ -869,7 +903,7 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraph = new DENOPTIMGraph();
 		dnGraph.setGraphId(graphUID.getAndIncrement());
 		
-		// Add new graph and corresponding mol representation
+		// Add new graph and corresponding mol representation (must exist)
 		dnGraphLibrary.add(dnGraph);
 		//NB: we add an empty molecular representation to keep the list
 		// of graphs and that of mol.rep. in sync
@@ -882,12 +916,12 @@ public class GUIGraphHandler extends GUICardPanel
 		updateGraphListSpinner();
 		
 		// Create the node
-		int scaffVrtId = 1;
-		DENOPTIMVertex scaffVertex = DENOPTIMVertex.newVertexFromLibrary(
-		        scaffVrtId, scaffFragId, DENOPTIMVertex.BBType.SCAFFOLD);
+		int firstBBId = 1;
+		DENOPTIMVertex firstVertex = DENOPTIMVertex.newVertexFromLibrary(
+		        firstBBId, scaffFragId, rootType);
 
-		scaffVertex.setLevel(-1); //NB: scaffold gets level -1
-		dnGraph.addVertex(scaffVertex);
+		firstVertex.setLevel(-1);
+		dnGraph.addVertex(firstVertex);
 		
 		// Put the graph to the viewer
         visualPanel.loadDnGraphToViewer(dnGraph,false,hasFragSpace);
