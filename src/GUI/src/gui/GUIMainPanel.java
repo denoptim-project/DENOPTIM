@@ -39,7 +39,7 @@ public class GUIMainPanel extends JPanel
 	/**
 	 * Reference to the main tool bar of the GUI
 	 */
-	private MainToolBar toolBar;
+    MainToolBar toolBar;
 	
 //-----------------------------------------------------------------------------
 	

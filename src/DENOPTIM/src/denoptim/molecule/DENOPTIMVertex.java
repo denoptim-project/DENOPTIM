@@ -219,8 +219,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param bbId 0-based index of building block in the library
      * @param bbt the type of building block 0:scaffold, 1:fragment, 
      * 2:capping group
+     * @throws DENOPTIMException 
      */
-    public static DENOPTIMVertex newVertexFromLibrary(int bbId, DENOPTIMVertex.BBType bbt)
+    public static DENOPTIMVertex newVertexFromLibrary(int bbId, 
+            DENOPTIMVertex.BBType bbt) throws DENOPTIMException
     {
         return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(),bbId,bbt);
     }
@@ -232,25 +234,15 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
      * @param bbt the type of building block
+     * @throws DENOPTIMException 
      */
     public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
-            DENOPTIMVertex.BBType bbt)
+            DENOPTIMVertex.BBType bbt) throws DENOPTIMException
     {   
-        // This is just to initialise the vertex. The actual type of vertex
+        // The actual type of vertex
         // returned by this method depends on the what we get from the
         // FragmentSpace.getVertexFromLibrary call
-        DENOPTIMVertex v = new EmptyVertex();
-        try
-        {
-            //NB: this returns a clone of the vertex stored in the library
-            v = FragmentSpace.getVertexFromLibrary(bbt,bbId);
-        } catch (DENOPTIMException e)
-        {
-            e.printStackTrace();
-            String msg = "Fatal error! Cannot continue. " + e.getMessage();
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            System.exit(0);
-        }
+        DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(bbt,bbId);
         v.setVertexId(vertexId);
         
         v.setAsRCV(v.getNumberOfAP() == 1 

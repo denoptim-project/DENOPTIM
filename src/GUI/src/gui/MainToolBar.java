@@ -44,6 +44,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
 import denoptim.task.StaticTaskManager;
@@ -55,7 +56,8 @@ import denoptim.task.StaticTaskManager;
  * @author Marco Foscato
  */
 
-public class MainToolBar extends JMenuBar {
+public class MainToolBar extends JMenuBar implements ILoadFragSpace
+{
 	
 	/**
 	 * Version
@@ -76,6 +78,11 @@ public class MainToolBar extends JMenuBar {
 	 * The menu listing the active panels in the deck of cards
 	 */	 
 	private JMenu activeTabsMenu;
+	
+	/**
+     * The fragment space menu
+     */  
+    private JMenu fragSpaceMenu;
 	
 	/**
 	 * List of the active panels in the deck of cards
@@ -317,6 +324,25 @@ public class MainToolBar extends JMenuBar {
 		activeTabsMenu = new JMenu("Active Tabs");
 		this.add(activeTabsMenu);
 		
+		fragSpaceMenu = new JMenu("Building Block Space");
+		JMenuItem loadSpace = new JMenuItem("Load Space of Building Blocks");
+		loadSpace.setToolTipText(String.format("<html><body width='%1s'>"
+		        + "Use this to load or define a space of building blocks, "
+		        + "i.e., a combination of building blocks "
+		        + "and rules on how we can connect those building blocks. ",
+		        350));
+		loadSpace.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (cancelDueToConflictWithPreviouslyLoadedData())
+                {
+                    return;
+                }
+                loadFragmentSpace();
+            }
+        });
+		fragSpaceMenu.add(loadSpace);
+		this.add(fragSpaceMenu);
+		
 		JMenu menuHelp = new JMenu("Help");
 		this.add(menuHelp);
 		
@@ -347,6 +373,115 @@ public class MainToolBar extends JMenuBar {
 		StaticTaskManager.queueStatusBar.setValue(1);
 		this.add(StaticTaskManager.queueStatusBar);
 	}
+
+//-----------------------------------------------------------------------------
+	
+	private void loadFragmentSpace()
+	{
+	    FSParamsDialog fsParams = new FSParamsDialog(this);
+        fsParams.pack();
+        fsParams.setVisible(true);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+    /**
+     * Changes the GUI appearance compatibly to no loaded fragment space
+     */
+    public void renderForLackOfFragSpace() 
+    {
+        for (GUICardPanel panel : activeTabsAndRefs.keySet())
+        {
+            if (panel instanceof GUIGraphHandler)
+            {
+                ((GUIGraphHandler)panel).renderThisForLackOfFragSpace();
+            }
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Changes the GUI appearance and activated buttons that depend on the
+     * fragment space being loaded
+     */
+    public void renderForPresenceOfFragSpace()
+    {
+        for (GUICardPanel panel : activeTabsAndRefs.keySet())
+        {
+            if (panel instanceof GUIGraphHandler)
+            {
+                ((GUIGraphHandler)panel).renderThisForPresenceOfFragSpace();
+            }
+        }
+    }
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Check if there is any potential source of conflict between currently 
+	 * open/loaded data and the possibility of changing fragment space. If there
+	 * are conflicts, we bring up a warning that allows the user to cancel or
+	 * impose the change of fragment space.
+	 * @return <code>true</code> if we have decided not to load a fragment space
+	 * after all.
+	 */
+    private boolean cancelDueToConflictWithPreviouslyLoadedData()
+    {
+        String msg = "<html><body width='%1s'>"
+                + "<b>WARNING</b>: you are introducing a "
+                + "potential source of mistmatch between "
+                + "the IDs of the building block used in graphs "
+                + "and the currently loaded"
+                + "space of building block.<br>In particular:<br>"
+                + "<ul>";
+        boolean showWarning = false;
+
+        boolean foundGraphs = false;
+        for (GUICardPanel panel : activeTabsAndRefs.keySet())
+        {
+            if (panel instanceof GUIGraphHandler)
+            {
+                if (((GUIGraphHandler)panel).dnGraphLibrary.size() != 0)
+                {
+                    foundGraphs = true;
+                }
+            }
+        }
+        if (foundGraphs)
+        {
+            msg = msg 
+                    + "<li>One or more graphs are already loaded.</li>";
+            showWarning = true;
+        }
+        if (FragmentSpace.isDefined())
+        {
+            msg = msg + "<li>A space of building block is alredy loaded.</li>";
+            showWarning = true;
+        }
+        if (showWarning)
+        {
+            msg = msg + "</ul>"
+                    + "<p>Changing the space might affect any of these "
+                    + "currently loaded data.</p> <p> </p>"
+                    + "Do you want to change the building blocks "
+                    + "space? </html>";
+            String[] options = new String[]{"Yes", "No"};
+            int res = JOptionPane.showOptionDialog(null,
+                    String.format(msg,350),                     
+                    "Change Space?",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"),
+                    options,
+                    options[1]);
+            if (res == 1)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 	
 //-----------------------------------------------------------------------------
 

@@ -56,7 +56,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileAndFormat;
@@ -70,7 +69,6 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
@@ -81,7 +79,7 @@ import denoptim.utils.DENOPTIMMoleculeUtils;
  * @author Marco Foscato
  */
 
-public class GUIGraphHandler extends GUICardPanel
+public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 {
 	/**
 	 * Version UID
@@ -97,7 +95,7 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * The currently loaded list of graphs
 	 */
-	private ArrayList<DENOPTIMGraph> dnGraphLibrary =
+	protected ArrayList<DENOPTIMGraph> dnGraphLibrary =
 			new ArrayList<DENOPTIMGraph>();
 	
 	/**
@@ -361,11 +359,11 @@ public class GUIGraphHandler extends GUICardPanel
 		txtFragSpace.setHorizontalAlignment(JTextField.CENTER);
 		if (!hasFragSpace)
 		{
-			renderForLackOfFragSpace();
+			renderThisForLackOfFragSpace();
 		}
 		else
 		{
-			renderForPresenceOfFragSpace();
+			renderThisForPresenceOfFragSpace();
 		}
 		txtFragSpace.setEditable(false);
 		
@@ -378,9 +376,12 @@ public class GUIGraphHandler extends GUICardPanel
 				String msg = "<html><body width='%1s'>"
 						+ "<b>WARNING</b>: you are introducing a "
 						+ "potential source of mistmatch between "
-						+ "the fragments IDs used in graphs and the "
-						+ "fragment space.<br>In particular:<br>"
+						+ "the IDs of the building block used in graphs "
+						+ "and the loaded"
+						+ "space of building blocks.<br>In particular:<br>"
 						+ "<ul>";
+				
+				//NB: we do the same in MainToolBar.java
 				
 				if (dnGraphLibrary.size() != 0)
 				{
@@ -390,14 +391,15 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				if (hasFragSpace)
 				{
-					msg = msg + "<li>A fragment space is alredy loaded.</li>";
+					msg = msg + "<li>A space of building blocks is alredy "
+					        + "loaded.</li>";
 					showWarning = true;
 				}
 				if (showWarning)
 				{
 					msg = msg + "</ul>"
 							+ ""
-			                + "Are you sure you want to load a fragment "
+			                + "Do you want to change the building block "
 			                + "space? </html>";
 					String[] options = new String[]{"Yes", "No"};
 					int res = JOptionPane.showOptionDialog(null,
@@ -810,7 +812,7 @@ public class GUIGraphHandler extends GUICardPanel
 			    FragmentSpaceParameters.interpretKeyword(l);
 			}
 			FragmentSpaceParameters.processParameters();
-			renderForPresenceOfFragSpace();
+			renderThisForPresenceOfFragSpace();
 		} catch (DENOPTIMException e1) {
 			e1.printStackTrace();
 		}
@@ -917,8 +919,20 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Create the node
 		int firstBBId = 1;
-		DENOPTIMVertex firstVertex = DENOPTIMVertex.newVertexFromLibrary(
-		        firstBBId, scaffFragId, rootType);
+		DENOPTIMVertex firstVertex = null;
+        try
+        {
+            firstVertex = DENOPTIMVertex.newVertexFromLibrary(
+                    firstBBId, scaffFragId, rootType);
+        } catch (DENOPTIMException e)
+        {
+            JOptionPane.showMessageDialog(null,"Could not retrieve the "
+                    + "requested building blocks. " + e.getMessage(),
+                    "Error",
+                    JOptionPane.PLAIN_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
 
 		firstVertex.setLevel(-1);
 		dnGraph.addVertex(firstVertex);
@@ -934,7 +948,7 @@ public class GUIGraphHandler extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Edits the currently loaded graph by adding a chord involging the two
+	 * Edits the currently loaded graph by adding a chord involving the two
 	 * selected vertexes.
 	 * @param rcvs the selected vertexes. Must be two vertexes.
 	 */
@@ -1128,13 +1142,9 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Changes the GUI appearance compatibly to no loaded fragment space
 	 */
-	protected void renderForLackOfFragSpace() 
+	public void renderForLackOfFragSpace() 
 	{
-		hasFragSpace = false;
-		txtFragSpace.setText("No fragment space");
-		txtFragSpace.setToolTipText(loadFSToolTip);
-		txtFragSpace.setBackground(Color.ORANGE);
-		visualPanel.bringCardToTopOfVertexViewer(visualPanel.NOFSCARDNAME);
+	    mainPanel.toolBar.renderForLackOfFragSpace();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1143,17 +1153,41 @@ public class GUIGraphHandler extends GUICardPanel
      * Changes the GUI appearance and activated buttons that depend on the
      * fragment space being loaded
      */
-	protected void renderForPresenceOfFragSpace() 
+	public void renderForPresenceOfFragSpace() 
 	{
-		hasFragSpace = true;
-		txtFragSpace.setText("Fragment space loaded");
-		txtFragSpace.setToolTipText("<html>A fragment space has been loaded "
-				+ "previously<br>and is ready to use. You can change the "
-				+ "fragment space<br> by loading another one, but be aware "
-				+ "of any dependency from<br>currently loaded graphs.</html>");
-		txtFragSpace.setBackground(Color.decode("#4cc253"));
+	    mainPanel.toolBar.renderForPresenceOfFragSpace();
 	}
 	
+//-----------------------------------------------------------------------------
+
+    /**
+     * Changes the GUI appearance compatibly to no loaded fragment space
+     */
+    void renderThisForLackOfFragSpace() 
+    {
+        hasFragSpace = false;
+        txtFragSpace.setText("No fragment space");
+        txtFragSpace.setToolTipText(loadFSToolTip);
+        txtFragSpace.setBackground(Color.ORANGE);
+        visualPanel.bringCardToTopOfVertexViewer(visualPanel.NOFSCARDNAME);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Changes the GUI appearance and activated buttons that depend on the
+     * fragment space being loaded
+     */
+    void renderThisForPresenceOfFragSpace() 
+    {
+        hasFragSpace = true;
+        txtFragSpace.setText("Fragment space loaded");
+        txtFragSpace.setToolTipText("<html>A fragment space has been loaded "
+                + "previously<br>and is ready to use. You can change the "
+                + "fragment space<br> by loading another one, but be aware "
+                + "of any dependency from<br>currently loaded graphs.</html>");
+        txtFragSpace.setBackground(Color.decode("#4cc253"));
+    }
 //-----------------------------------------------------------------------------
 
 	/**
@@ -1418,7 +1452,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private void loadFragmentSpace()
 	{
 		// Define the fragment space via a new dialog
-		FSParams fsParams = new FSParams(this);
+		FSParamsDialog fsParams = new FSParamsDialog(this);
         fsParams.pack();
         fsParams.setVisible(true);
         visualPanel.resetFragViewerCardDeck();
@@ -1426,139 +1460,6 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private class FSParams extends GUIModalDialog
-    {
-		/**
-         * Version ID
-         */
-        private static final long serialVersionUID = 1L;
-
-        private FSParametersForm fsParsForm;
-		
-		private GUIGraphHandler parent;
-		
-	//-------------------------------------------------------------------------
-		
-		/**
-		 * Constructor
-		 */
-		public FSParams(GUIGraphHandler parentPanel)
-		{
-			super();
-			this.parent = parentPanel;
-			
-			fsParsForm = new FSParametersForm(this.getSize());
-			addToCentralPane(fsParsForm);
-			
-			btnDone.setText("Create Fragment Space");
-			btnDone.setToolTipText("<html>Uses the parameters defined "
-					+ "above to"
-					+ "<br> build a fragment space and make it available to"
-					+ "<br>the graph handler.</html>");
-			
-			btnDone.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {					
-					try {
-						fsParsForm.possiblyReadParamsFromFSParFile();
-						makeFragSpace();
-					} catch (Exception e1) {
-					    e1.printStackTrace();
-						String msg = "<html>The given parameters did not "
-								+ "allow to "
-								+ "build a fragment space.<br>"
-								+ "Possible cause of this problem: " 
-								+ "<br>";
-								
-						if (e1.getCause() != null)
-						{
-							msg = msg + e1.getCause();
-						}
-						if (e1.getMessage() != null)
-						{
-							msg = msg + " " + e1.getMessage();
-						}
-						msg = msg + "<br>Please alter the "
-								+ "settings and try again.</html>";
-								
-						JOptionPane.showMessageDialog(btnDone, msg,
-				                "Error",
-				                JOptionPane.ERROR_MESSAGE,
-				                UIManager.getIcon("OptionPane.errorIcon"));
-						
-						parent.renderForLackOfFragSpace();
-						return;
-					}
-					parent.renderForPresenceOfFragSpace();
-					close();
-				}
-			});
-			
-			this.btnCanc.setToolTipText("Exit without creating a fragment "
-					+ "space.");
-		}
-		
-	//-------------------------------------------------------------------------
-		
-		/**
-		 * Reads all the parameters, calls the interpreters, and eventually
-		 * creates the static FragmentSpace object.
-		 * @throws Exception
-		 */
-		private void makeFragSpace() throws Exception
-		{
-			if (fsParsForm.txtPar1.getText().trim().equals(""))
-			{
-				throw new DENOPTIMException("No library of fragments");
-			}
-			
-			StringBuilder sbPars = new StringBuilder();
-			fsParsForm.putParametersToString(sbPars);
-			
-			String[] lines = sbPars.toString().split(
-					System.getProperty("line.separator"));
-			for (String line : lines)
-			{
-				if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-				if (line.startsWith("#"))
-                {
-                    continue;
-                }
-				if (line.toUpperCase().startsWith("FS-"))
-                {
-                    FragmentSpaceParameters.interpretKeyword(line);
-                    continue;
-                }
-                if (line.toUpperCase().startsWith("RC-"))
-                {
-                    RingClosureParameters.interpretKeyword(line);
-                    continue;
-                }
-			}
-			
-			// This creates the static FragmentSpace object
-			if (FragmentSpaceParameters.fsParamsInUse())
-	        {
-	            FragmentSpaceParameters.checkParameters();
-	            FragmentSpaceParameters.processParameters();
-	        }
-	        if (RingClosureParameters.rcParamsInUse())
-	        {
-	            RingClosureParameters.checkParameters();
-	            RingClosureParameters.processParameters();
-	        }
-		}
-		
-	//-------------------------------------------------------------------------
-
-    }
-	
-//-----------------------------------------------------------------------------
-
 	private void deprotectEditedSystem()
 	{
 		btnSaveEdits.setEnabled(false);
