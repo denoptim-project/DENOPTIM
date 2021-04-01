@@ -842,42 +842,34 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return <code>true</code> if the two vertexes represent the same graph
      * node even if the vertex IDs are different.
      */
-    @Override
-    public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
-    {
-        if (other instanceof DENOPTIMFragment)
-            return sameAs((DENOPTIMFragment) other, reason);
-        else
-            return false;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Compares this and another fragment ignoring vertex IDs.
-     * @param other
-     * @param reason string builder used to build the message clarifying the 
-     * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
-     * node even if the vertex IDs are different.
-     */
     public boolean sameAs(DENOPTIMFragment other, StringBuilder reason)
     {
-        if (this.getBuildingBlockType() != other.getBuildingBlockType())
+        if (this.containsAtoms() && other.containsAtoms())
         {
-            reason.append("Different fragment type ("+this.getBuildingBlockType()+":"
-                    +other.getBuildingBlockType()+"); ");
-            return false;
+            IAtomContainer tMol = this.getIAtomContainer();
+            IAtomContainer oMol = other.getIAtomContainer();
+            if (tMol.getAtomCount() != oMol.getAtomCount())
+            {
+                reason.append("Different atom count (" 
+                        + tMol.getAtomCount()+":"
+                        + oMol.getAtomCount()+"); ");
+            }
+            if (tMol.getBondCount() != oMol.getBondCount())
+            {
+                reason.append("Different bond count (" 
+                        + tMol.getBondCount()+":"
+                        + oMol.getBondCount()+"); ");
+            }
+            /*
+            //TODO: use fragment comparator from GM3DFragmenter
+            for (int i=0; i<tMol.getAtomCount(); i++)
+            {
+                IAtom tAtm = tMol.getAtom(i);
+                IAtom oAtm = oMol.getAtom(i);
+            }
+            */
         }
-        
-        if (this.getBuildingBlockId() != other.getBuildingBlockId())
-        {
-            reason.append("Different molID ("+this.getBuildingBlockId()+":"
-                    +other.getBuildingBlockId()+"); ");
-            return false;
-        }
-        
-        return super.sameAs(((DENOPTIMVertex)other), reason);
+        return sameVertexFeatures(other, reason);
     }
   
 //------------------------------------------------------------------------------

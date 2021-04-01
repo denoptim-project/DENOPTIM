@@ -585,29 +585,29 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Remove a vertex from this graph. This method removes also edges and rings
-     * that involve the removed vertex. Symmetric sets of vertexes are corrected
+     * that involve the given vertex. Symmetric sets of vertexes are corrected
      * accordingly: they are removed if there is only one remaining vertex in
      * the set, of purged from the removed vertex.
-     * @param m_vertex the vertex to remove.
+     * @param vertex the vertex to remove.
      */
-    public void removeVertex(DENOPTIMVertex m_vertex)
+    public void removeVertex(DENOPTIMVertex vertex)
     {
         //TODO-V3: deal with templates. They do not appear in the edges as
         // target Vertices, so the edges to templates will not be removed
         // once we remove the template vertex.
 
-        if (!gVertices.contains(m_vertex))
+        if (!gVertices.contains(vertex))
         {
         	return;
         }
 
-        m_vertex.resetGraphOwner();
-        int vid = m_vertex.getVertexId();
+        vertex.resetGraphOwner();
+        int vid = vertex.getVertexId();
 
         // delete also any ring involving the removed vertex
-        if (isVertexInRing(m_vertex))
+        if (isVertexInRing(vertex))
         {
-            ArrayList<DENOPTIMRing> rToRm = getRingsInvolvingVertex(m_vertex);
+            ArrayList<DENOPTIMRing> rToRm = getRingsInvolvingVertex(vertex);
             for (DENOPTIMRing r : rToRm)
             {
                 removeRing(r);
@@ -655,7 +655,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         symVertices.removeAll(ssToRemove);
 
         // remove the vertex from the graph
-        gVertices.remove(m_vertex);
+        gVertices.remove(vertex);
     }
 
 //------------------------------------------------------------------------------
@@ -1805,7 +1805,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         int pvid = removeEdgeWithParent(v);
         if (pvid == -1)
         {
-            String msg = "Program Bug detected trying to delete vertex "
+            String msg = "Program bug detected trying to delete vertex "
                     + v + " from graph '" + this + "'. "
                     + "Unable to locate parent edge.";
             throw new DENOPTIMException(msg);
@@ -3096,6 +3096,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // Check for uniqueness of vertexIDs and APIDs within the
         // graph (ignore nested graphs).
+        boolean regenerateAP = false;
         Set<Integer> unqVrtxIDs = new HashSet<Integer>();
         Set<Integer> unqApIDs = new HashSet<Integer>();
         for (DENOPTIMVertex v : gVertices)
@@ -3110,10 +3111,24 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 if (!unqApIDs.add(ap.getID()))
                 {
+                    regenerateAP = true;
+                    /*
                     throw new DENOPTIMException("Duplicate attachment point ID "
                             + "'" + ap.getID() + "'. "
                             + "Cannot generate JSON string for graph: " + this);
-                }           }
+                            */
+                }
+            }
+        }
+        if (regenerateAP)
+        {
+            for (DENOPTIMVertex v : gVertices)
+            {
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    ap.setID(FragmentSpace.apID.getAndIncrement());
+                }
+            }
         }
 
         Gson gson = DENOPTIMgson.getWriter();

@@ -497,40 +497,94 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * node even if the vertex IDs are different.
      */
     public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
+    {
+        if (this.getClass() == other.getClass())
+        {
+            if (this instanceof DENOPTIMFragment)
+            {
+                return ((DENOPTIMFragment) this).sameAs(
+                        (DENOPTIMFragment) other, reason);
+            } else if (this instanceof EmptyVertex) {
+                if (this instanceof EmptyVertex)
+                {
+                    return ((EmptyVertex) this).sameAs(
+                            (EmptyVertex) other, reason);
+                }
+            } else if (this instanceof DENOPTIMTemplate) {
+                if (this instanceof DENOPTIMTemplate)
+                {
+                    return ((DENOPTIMTemplate) this).sameAs(
+                            (DENOPTIMTemplate) other, reason);
+                }
+            } else {
+                System.err.println("WARNING: Unimplemented sameAs method for "
+                        + "vertex subtype '" + this.getClass().getName() + "'");
+            }
+        } 
+        return sameVertexFeatures(other, reason);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another vertex ignoring vertex IDs.
+     * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two vertexes represent the same graph
+     * node even if the vertex IDs are different.
+     */
+    public boolean sameVertexFeatures(DENOPTIMVertex other, 
+            StringBuilder reason)
     {	
-    	if (this.getFreeAPCount() != other.getFreeAPCount())
-    	{
-    		reason.append("Different number of free APs ("
-    				+this.getFreeAPCount()+":"
-					+other.getFreeAPCount()+"); ");
-    		return false;
-    	}
-    	
-    	if (this.getNumberOfAP() != other.getNumberOfAP())
-    	{
-    		reason.append("Different number of APs ("
-    				+this.getNumberOfAP()+":"
-					+other.getNumberOfAP()+"); ");
-    		return false;
-    	}
-    	
-    	for (DENOPTIMAttachmentPoint apT : this.getAttachmentPoints())
-    	{
-    		boolean found = false;
-    		for (DENOPTIMAttachmentPoint apO : other.getAttachmentPoints())
-        	{
-		    	if (apT.equals(apO))
-		    	{
-		    		found = true;
-		    		break;
-		    	}
-        	}
-    		if (!found)
-    		{
-    			reason.append("No corresponding AP for "+apT);
-    			return false;
-    		}
-    	}
+        if (this.getBuildingBlockType() != other.getBuildingBlockType())
+        {
+            reason.append("Different building block type ("
+                    + this.getBuildingBlockType()+":"
+                    + other.getBuildingBlockType()+"); ");
+            return false;
+        }
+        
+        if (this.getBuildingBlockId() != other.getBuildingBlockId())
+        {
+            reason.append("Different molID ("+this.getBuildingBlockId()+":"
+                    + other.getBuildingBlockId()+"); ");
+            return false;
+        }
+        
+        if (this.getFreeAPCount() != other.getFreeAPCount())
+        {
+            reason.append("Different number of free APs ("
+                    +this.getFreeAPCount()+":"
+                    +other.getFreeAPCount()+"); ");
+            return false;
+        }
+        
+        if (this.getNumberOfAP() != other.getNumberOfAP())
+        {
+            reason.append("Different number of APs ("
+                    +this.getNumberOfAP()+":"
+                    +other.getNumberOfAP()+"); ");
+            return false;
+        }
+        
+        for (DENOPTIMAttachmentPoint apT : this.getAttachmentPoints())
+        {
+            boolean found = false;
+            for (DENOPTIMAttachmentPoint apO : other.getAttachmentPoints())
+            {
+                if (apT.equals(apO))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                reason.append("No corresponding AP for "+apT);
+                return false;
+            }
+        }
     	
     	return true;
     }

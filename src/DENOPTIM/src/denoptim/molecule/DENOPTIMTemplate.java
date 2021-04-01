@@ -1011,7 +1011,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
 
 //------------------------------------------------------------------------------
-
+/*
+ 
+ REMOVED: 
+ It violates Object.equals contract "equal objects must have equal hash codes".
+ 
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof DENOPTIMTemplate)) {
@@ -1027,7 +1031,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         if (this.requiredAPs.size() == o.requiredAPs.size()) {
             for (int i = 0; i < this.requiredAPs.size(); i++) {
-                if (this.requiredAPs.get(i).comparePropertiesTo(o.requiredAPs.get(0)) != 0) {
+                if (this.requiredAPs.get(i).comparePropertiesTo(
+                        o.requiredAPs.get(0)) != 0) {
                     return false;
                 }
             }
@@ -1036,6 +1041,55 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         return this.getInnerGraph().sameAs(o.getInnerGraph(),
                 new StringBuilder());
+    }
+    */
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another template ignoring vertex IDs.
+     * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two templates have the same content 
+     * even if the vertex IDs are different.
+     */
+    public boolean sameAs(DENOPTIMTemplate other, StringBuilder reason)
+    {   
+        if (this.contractLevel != other.contractLevel)
+        {
+            reason.append("Different contract level (" 
+                    + this.getBuildingBlockId()+":"
+                    + other.getBuildingBlockId()+"); ");
+            return false;
+        }
+
+        if (this.requiredAPs.size() == other.requiredAPs.size()) 
+        {
+            for (DENOPTIMAttachmentPoint tAP : this.requiredAPs)
+            {
+                for (DENOPTIMAttachmentPoint oAP : other.requiredAPs)
+                {
+                    if (tAP.comparePropertiesTo(oAP) != 0) 
+                    {
+                        reason.append("No required AP corresponding to "+tAP);
+                        return false;
+                    }
+                }
+            }
+        } else {
+            reason.append("Different size of required APs(" 
+                    + this.requiredAPs.size()+":"
+                    + other.requiredAPs.size()+"); ");
+            return false;
+        }
+        
+        if (!this.getInnerGraph().sameAs(other.getInnerGraph(),reason))
+        {
+            return false;
+        }
+        
+        return sameVertexFeatures(other, reason);
     }
 
 //------------------------------------------------------------------------------

@@ -645,6 +645,8 @@ Comparable<DENOPTIMAttachmentPoint>
     
 //------------------------------------------------------------------------------
 
+    //TODO: clarify if this is really an equals or if it is  sameAs method
+    
     public boolean equals(DENOPTIMAttachmentPoint other)
     {
         if (this.getAtomPositionNumber() != other.getAtomPositionNumber())

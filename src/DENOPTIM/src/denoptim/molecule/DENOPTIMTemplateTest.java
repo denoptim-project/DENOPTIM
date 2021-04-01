@@ -138,7 +138,7 @@ public class DENOPTIMTemplateTest
                 cloIG.getRings().get(0).getSize(),"InnerGraph ring count");
     }
 
-    //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     @Test
     public void testNestedTemplateCloning() {
@@ -148,12 +148,14 @@ public class DENOPTIMTemplateTest
             DENOPTIMTemplate t = getNestedTemplate();
 
             DENOPTIMTemplate clone = t.clone();
-            assertEquals(t, clone);
+            assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
             fail("unexpected exception thrown");
             e.printStackTrace();
         }
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Creating a template that contains another template with the following
@@ -187,6 +189,8 @@ public class DENOPTIMTemplateTest
         return outerTemp;
     }
 
+//------------------------------------------------------------------------------
+
     private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -218,6 +222,8 @@ public class DENOPTIMTemplateTest
         return v;
     }
 
+//------------------------------------------------------------------------------
+    
     private DENOPTIMVertex getOHFragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"O", "H"};
@@ -266,7 +272,7 @@ public class DENOPTIMTemplateTest
         try {
             DENOPTIMTemplate t = getNestedTemplateAPI();
             DENOPTIMTemplate clone = t.clone();
-            assertEquals(t, clone);
+            assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
             fail("unexpected exception thrown");
             e.printStackTrace();
