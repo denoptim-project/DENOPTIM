@@ -319,6 +319,11 @@ runTest 't20'
 runTest 't21'
 
 #
+# t22: extend-mutation on template
+#
+runTest 't22'
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"
