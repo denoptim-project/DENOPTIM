@@ -314,6 +314,11 @@ runTest "t19"
 runTest 't20'
 
 #
+# t21: delete-mutation on template
+#
+runTest 't21'
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"
