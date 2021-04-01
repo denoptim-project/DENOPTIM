@@ -2,7 +2,7 @@
 # Parameters for DENOPTIM
 #
 TESTGENOPS-OP=MUTATION
-TESTGENOPS-inpFile=OTF_WDIR/graph.sdf
+TESTGENOPS-inpFile=graph.sdf
 TESTGENOPS-outFile=graph_mut.sdf
 TESTGENOPS-MutationTarget=623
 #TESTGENOPS-MutationType=DELETE
@@ -16,9 +16,6 @@ FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
 FS-compMatrixFile=OTF_WDIR/CPMap.par
 FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
 FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
-
-FS-USETEMPLATES=for now, we only check the existence of this parameter, but its argument is not used
-FS-USECYCLICTEMPLATE=again, this is only for testing
 
 # Parameters controlling handling of cyclic graphs
 #RC-CLOSERINGS=yes, we do!

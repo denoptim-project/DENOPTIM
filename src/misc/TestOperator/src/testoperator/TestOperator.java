@@ -81,10 +81,15 @@ public class TestOperator
     
     private static void runMutation() throws DENOPTIMException
     {
-        DENOPTIMGraph g = 
-                GraphConversionTool.getGraphFromString(DenoptimIO.readSDFFile(
-                                       TestOperatorParameters.inpFileM).get(0)
-                                         .getProperty("GraphENC").toString());
+        DENOPTIMGraph g = null;
+        try
+        {
+            g = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    new File(TestOperatorParameters.inpFileM), true).get(0);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     
         System.out.println("Initial graphs: ");
         System.out.println(g);

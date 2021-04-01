@@ -218,7 +218,7 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
-    //TODO-V3 distinguish between 
+    //TODO-V3+ distinguish between 
     // 1) removing a vertex and the branch starting on it
     // 2) removing a vertex and try to glue the child branch to the parent one
     
