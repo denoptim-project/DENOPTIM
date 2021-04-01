@@ -105,7 +105,10 @@ public class TestOperator
             System.exit(-1);
         }
     
-        DENOPTIMGraphOperations.performMutation(v,mt);
+        // NB: last boolean asks to ignore the growth probability
+        DENOPTIMGraphOperations.performMutation(v,mt,true,
+                TestOperatorParameters.idNewVrt,
+                TestOperatorParameters.idNewAP);
 
         System.out.println("Result of mutation:");
         System.out.println(g);

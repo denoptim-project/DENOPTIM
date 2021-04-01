@@ -3096,6 +3096,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // Check for uniqueness of vertexIDs and APIDs within the
         // graph (ignore nested graphs).
+        boolean regenerateVrtxID = false;
         boolean regenerateAP = false;
         Set<Integer> unqVrtxIDs = new HashSet<Integer>();
         Set<Integer> unqApIDs = new HashSet<Integer>();
@@ -3103,15 +3104,19 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             if (!unqVrtxIDs.add(v.getVertexId()))
             {
+                regenerateVrtxID = true;
+                /*
                 throw new DENOPTIMException("Duplicate vertex ID '"
                         + v.getVertexId()
                         + "'. Cannot generate JSON string for graph: " + this);
+                        */
             }
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (!unqApIDs.add(ap.getID()))
                 {
                     regenerateAP = true;
+                    break;
                     /*
                     throw new DENOPTIMException("Duplicate attachment point ID "
                             + "'" + ap.getID() + "'. "
@@ -3119,6 +3124,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             */
                 }
             }
+        }
+        if (regenerateVrtxID)
+        {
+            this.renumberGraphVertices();
         }
         if (regenerateAP)
         {

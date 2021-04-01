@@ -74,6 +74,19 @@ public class TestOperatorParameters
     protected static MutationType mutationType;
     
     /**
+     * The given vertex index. Used whenever a vertex id has to be given. For
+     * example, when specifying how to mutate a graph.
+     */
+    protected static int idNewVrt = -1;
+    
+    /**
+     * The given attachment point index. 
+     * Used whenever a vertex id has to be given. 
+     * For example, when specifying how to mutate a graph.
+     */
+    protected static int idNewAP = -1;
+    
+    /**
      * Input File male
      */
     protected static String inpFileM;
@@ -241,6 +254,12 @@ public class TestOperatorParameters
                 break;
             case "TESTGENOPS-MUTATIONTYPE=":
                 mutationType = MutationType.valueOf(value);
+                break;
+            case "TESTGENOPS-NEWVERTEXMOLID=":
+                idNewVrt = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-NEWAPID=":
+                idNewAP = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-WORKDIR=":
                 workDir = value;

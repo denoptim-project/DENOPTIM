@@ -47,9 +47,7 @@ import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
 
 /**
- *
- * @author Vishwesh Venkatraman
- * @author Marco Foscato
+ * Collection of operators meant to alter graphs and associated utilities.
  */
 
 public class DENOPTIMGraphOperations
@@ -77,14 +75,14 @@ public class DENOPTIMGraphOperations
 
         for (int i=0; i<male.getVertexCount(); i++)
         {
-            DENOPTIMVertex.BBType mtype = male.getVertexAtPosition(i).getBuildingBlockType();
+            BBType mtype = male.getVertexAtPosition(i).getBuildingBlockType();
             int mvid = male.getVertexAtPosition(i).getVertexId();
             int mfragid = male.getVertexAtPosition(i).getBuildingBlockId();
 
             //System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
 
             // if the fragment is a capping group or the scaffold itself ignore
-            if (mtype == DENOPTIMVertex.BBType.SCAFFOLD || mtype == DENOPTIMVertex.BBType.CAP)
+            if (mtype == BBType.SCAFFOLD || mtype == BBType.CAP)
                 continue;
 
             // get edge toward parent vertex
@@ -94,14 +92,14 @@ public class DENOPTIMGraphOperations
 
             for (int j=0; j<female.getVertexCount(); j++)
             {
-                DENOPTIMVertex.BBType ftype = female.getVertexAtPosition(j).getBuildingBlockType();
+                BBType ftype = female.getVertexAtPosition(j).getBuildingBlockType();
                 int fvid = female.getVertexAtPosition(j).getVertexId();
                 int ffragid = female.getVertexAtPosition(j).getBuildingBlockId();
                 
 
                 //System.out.println("Female Fragment ID: "+fvid+" type: "+ftype+" ffragid: "+ffragid);
 
-                if (ftype == DENOPTIMVertex.BBType.SCAFFOLD || ftype == DENOPTIMVertex.BBType.CAP)
+                if (ftype == BBType.SCAFFOLD || ftype == BBType.CAP)
                     continue;
 
                 // fragment ids should not match or we get the same molecule
@@ -276,6 +274,44 @@ public class DENOPTIMGraphOperations
                                          boolean symmetryOnAp) 
                                                         throws DENOPTIMException
     {   
+        return extendGraph(molGraph,curVertex,extend,symmetryOnAp,false,-1,-1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * function that will keep extending the graph. The
+     * probability of addition depends on the growth probability scheme.
+     *
+     * @param molGraph molecular graph
+     * @param curVertex vertex to which further fragments will be appended
+     * @param extend if <code>true</code>, then the graph will be grown further 
+     * (recursive mode)
+     * @param symmetryOnAps if <code>true</code>, then symmetry will be applied
+     * on the APs, no matter what. This is mostly needed to retain symmetry 
+     * when performing mutations on the root vertex of a symmetric graph.
+     * @param force set to <code>true</code> to ignore growth probability.
+     * @param chooseVertxId if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index.
+     * @param chooseApId if greater than or equals to zero, 
+     * sets the choice of the AP to the 
+     * given index.
+     * @throws exception.DENOPTIMException
+     * @return <code>true</code> if the graph has been modified
+     */
+     
+  //TODO-V3: with the vertex owner in place the parameter molGraph becomes redundant: remove molGraph parameter
+  
+    protected static boolean extendGraph(DENOPTIMGraph molGraph,
+                                         DENOPTIMVertex curVertex, 
+                                         boolean extend, 
+                                         boolean symmetryOnAp,
+                                         boolean force,
+                                         int chooseVertxId,
+                                         int chooseApId) 
+                                                        throws DENOPTIMException
+    {  
         // return true if the append has been successful
         boolean status = false;
 
@@ -329,22 +365,25 @@ public class DENOPTIMGraphOperations
                 continue;
             }
 
-            // Do we want to extend the graph at this AP?
-            double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl)
-                    * EAUtils.getCrowdingProbability(ap);
-            boolean fgrow =  RandomUtils.nextBoolean(growthProb);
-            if (debug)
+            if (!force)
             {
-                System.err.println("Growth probability on this AP:" 
-                        + growthProb);
-            }
-            if (!fgrow)
-            {
+                // Decide whether we want to extend the graph at this AP?
+                double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl)
+                        * EAUtils.getCrowdingProbability(ap);
+                boolean fgrow =  RandomUtils.nextBoolean(growthProb);
                 if (debug)
                 {
-                    System.err.println("Decided not to grow on this AP!");
+                    System.err.println("Growth probability on this AP:" 
+                            + growthProb);
                 }
-                continue;
+                if (!fgrow)
+                {
+                    if (debug)
+                    {
+                        System.err.println("Decided not to grow on this AP!");
+                    }
+                    continue;
+                }
             }
 
             // Apply closability bias in selection of next fragment
@@ -365,7 +404,8 @@ public class DENOPTIMGraphOperations
             }
 
             // find a compatible combination of fragment and AP
-            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, apIdx);
+            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, apIdx,
+                    chooseVertxId, chooseApId);
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
             {
@@ -516,7 +556,7 @@ public class DENOPTIMGraphOperations
         int fid = chosenFrgAndAp.getVertexMolId();
         int nvid = GraphUtils.getUniqueVertexIndex();
         DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(nvid, 
-                fid, DENOPTIMVertex.BBType.FRAGMENT);
+                fid, BBType.FRAGMENT);
         
         // update the level of the vertex based on its parent
         int lvl = curVertex.getLevel();
@@ -569,7 +609,7 @@ public class DENOPTIMGraphOperations
 
         return -1;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -583,22 +623,47 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
-
     protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
                                            int dapidx) throws DENOPTIMException
+    {
+        return getFrgApForSrcAp(curVertex, dapidx, -1, -1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Select a compatible fragment for the given attachment point.
+     * Compatibility can either be class based or based on the free connections
+     * @param curVertex the source graph vertex
+     * @param dapidx the attachment point index on the src vertex
+     * @param chooseVertxId if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index.
+     * @param chooseApId if greater than or equals to zero, 
+     * sets the choice of the AP to the 
+     * given index.
+     * @return the vector of indeces identifying the molId (fragment index) 
+     * os a fragment with a compatible attachment point, and the index of such 
+     * attachment point.
+     * @throws DENOPTIMException
+     */
+
+    protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
+            int dapidx, int chooseVertxId, int chooseApId) 
+                    throws DENOPTIMException
     {
         ArrayList<DENOPTIMAttachmentPoint> lstDaps =
                                               curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint curDap = lstDaps.get(dapidx);
         
         // Initialize with an empty pointer
-        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, DENOPTIMVertex.BBType.FRAGMENT, -1, 
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
                 -1, -1);
         if (!FragmentSpace.useAPclassBasedApproach())
         {
             //TODO-V3 get rid of EAUtils and use fragment space
             int fid = EAUtils.selectRandomFragment();
-            res = new IdFragmentAndAP(-1,fid,DENOPTIMVertex.BBType.FRAGMENT,-1,-1,-1);
+            res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
         }
         else
         {
@@ -607,7 +672,14 @@ public class DENOPTIMGraphOperations
                     curDap.getAPClass());
             if (candidates.size() > 0)
             {
-                res = RandomUtils.randomlyChooseOne(candidates);
+                if (chooseVertxId>-1 && chooseApId>-1)
+                {
+                    // We have asked to force the selection
+                    res = new IdFragmentAndAP(-1,chooseVertxId,BBType.FRAGMENT,
+                            chooseApId,-1,-1);
+                } else {
+                    res = RandomUtils.randomlyChooseOne(candidates);
+                }
             }
         }
         return res;
@@ -653,7 +725,7 @@ DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
             FragForClosabChains chosenFfCc = lscFfCc.get(chosenId);
             ArrayList<Integer> newFragIds = chosenFfCc.getFragIDs();
             int molIdNewFrag = newFragIds.get(0);
-            DENOPTIMVertex.BBType typeNewFrag = DENOPTIMVertex.BBType.parseInt(newFragIds.get(1));
+            BBType typeNewFrag = BBType.parseInt(newFragIds.get(1));
             int dapNewFrag = newFragIds.get(2);
 //TODO del
 if(debug)
@@ -803,7 +875,7 @@ if(debug)
             return lstChosenFfCc;            
         }
 
-        if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)  
+        if (curVertex.getBuildingBlockType() == BBType.SCAFFOLD)  
         {
             for (ClosableChain cc : molGraph.getClosableChains())
             {
@@ -818,7 +890,7 @@ if (debug)
                 int posInCc = cc.involvesVertex(curVertex);
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
-                DENOPTIMVertex.BBType nfty = DENOPTIMVertex.BBType.UNDEFINED;
+                BBType nfty = BBType.UNDEFINED;
                 int nfap = -1;
 
                 if (cLink.getApIdToLeft() != dapidx && 
@@ -889,7 +961,7 @@ if(debug)
                 for (FragForClosabChains ffcc : lstChosenFfCc)
                 {
                     int fidA = ffcc.getFragIDs().get(0);
-                    DENOPTIMVertex.BBType ftyA = DENOPTIMVertex.BBType.parseInt(ffcc.getFragIDs().get(1));
+                    BBType ftyA = BBType.parseInt(ffcc.getFragIDs().get(1));
                     int fapA = ffcc.getFragIDs().get(2);
                     if (nfid==fidA && nfty==ftyA && nfap==fapA)
                     {
@@ -940,7 +1012,7 @@ if(debug)
             DENOPTIMEdge edge = molGraph.getEdgeWithParent(
                     curVertex.getVertexId());
             int prntId = parent.getBuildingBlockId();
-            DENOPTIMVertex.BBType prntTyp = parent.getBuildingBlockType();
+            BBType prntTyp = parent.getBuildingBlockType();
             int prntAp = edge.getSrcAPID();
             int chidAp = edge.getTrgAPID();
             for (ClosableChain cc : molGraph.getClosableChains())
@@ -967,7 +1039,7 @@ if(debug)
 
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
-                DENOPTIMVertex.BBType nfty = DENOPTIMVertex.BBType.UNDEFINED;
+                BBType nfty = BBType.UNDEFINED;
                 int nfap = -1;
 
                 int posScaffInCc = cc.getTurningPoint();
@@ -980,7 +1052,7 @@ if(debug)
                 {
                     ChainLink parentLink = cc.getLink(posInCc - 1);
                     int pLnkId = parentLink.getMolID();
-                    DENOPTIMVertex.BBType pLnkTyp = parentLink.getFragType();
+                    BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToRight();
 //TODO del
 if(debug)
@@ -1030,7 +1102,7 @@ if(debug)
                 {
                     ChainLink parentLink = cc.getLink(posInCc + 1);
                     int pLnkId = parentLink.getMolID();
-                    DENOPTIMVertex.BBType pLnkTyp = parentLink.getFragType();
+                    BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToLeft();
 //TODO del
 if(debug)
@@ -1087,7 +1159,7 @@ if(debug)
                 for (FragForClosabChains ffcc : lstChosenFfCc)
                 {
                     int fidA = ffcc.getFragIDs().get(0);
-                    DENOPTIMVertex.BBType ftyA = DENOPTIMVertex.BBType.parseInt(ffcc.getFragIDs().get(1));
+                    BBType ftyA = BBType.parseInt(ffcc.getFragIDs().get(1));
                     int fapA = ffcc.getFragIDs().get(2);
                     if (nfid==fidA && nfty==ftyA && nfap==fapA)
                     {
@@ -1473,6 +1545,7 @@ if(debug)
         return performMutation(vertex, mType);
     }
     
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -1489,7 +1562,35 @@ if(debug)
     
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType) throws DENOPTIMException
-    {   
+    {  
+        return performMutation(vertex, mType, false, -1 ,-1);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Mutates the given vertex according to the given mutation type, if
+     * possible. Vertex that do not belong to any graph or that do not
+     * allow the requested kind of mutation, are not mutated.
+     * The graph that owns the vertex ill be altered and
+     * the original structure and content of the graph will be lost. 
+     * @param vertex the vertex to mutate.
+     * @param mType the type of mutation to perform.
+     * @param force set to <code>true</code> to ignore growth probability. 
+     * @param chooseVertxId if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index.
+     * @param chooseApId if greater than or equals to zero, 
+     * sets the choice of the AP to the 
+     * given index.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMVertex vertex, 
+            MutationType mType, boolean force, int chooseVertxId, 
+            int chooseApId) throws DENOPTIMException
+    {  
         // Deal with nonsensical calls
         if (vertex.getGraphOwner() == null)
         {
@@ -1510,13 +1611,14 @@ if(debug)
         switch (mType) 
         {
             case CHANGEBRANCH:
+                //TODO-V3 should allow "force" here?
                 done = substituteFragment(vertex);
                 break;
                 
             case EXTEND:
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex.getGraphOwner(), vertex, 
-                        false, false);
+                        false, false, force, chooseVertxId, chooseApId);
                 break;
                 
             case DELETE:
