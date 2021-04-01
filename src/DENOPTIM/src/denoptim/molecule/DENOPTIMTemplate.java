@@ -752,6 +752,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
 
+    //TODO-V3: add documentation. In particular define whether we return inner of outer APs
+    
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {

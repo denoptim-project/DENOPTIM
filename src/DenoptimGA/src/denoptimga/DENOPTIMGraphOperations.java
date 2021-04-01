@@ -161,13 +161,13 @@ public class DENOPTIMGraphOperations
         }
         return false;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
      * Substitutes a vertex. Deletes the given vertex from the graph that owns
      * it, and removes any child vertex (i.e., reachable from the given vertex
-     * by a directed path). Then it tries to extent the graph from the the
+     * by a directed path). Then it tries to extent the graph from the
      * parent vertex (i.e., the one that was originally holding the given 
      * vertex). Moreover, additional extension may occur on
      * any available attachment point of the parent vertex.
@@ -179,31 +179,59 @@ public class DENOPTIMGraphOperations
     protected static boolean substituteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
     {
+        return substituteFragment(vertex, false, -1, -1);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Substitutes a vertex. Deletes the given vertex from the graph that owns
+     * it, and removes any child vertex (i.e., reachable from the given vertex
+     * by a directed path). Then it tries to extent the graph from the
+     * parent vertex (i.e., the one that was originally holding the given 
+     * vertex). Moreover, additional extension may occur on
+     * any available attachment point of the parent vertex.
+     * @param vertex to mutate (the given vertex).
+     * @param force set to <code>true</code> to ignore growth probability.
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index.
+     * @param chosenApId if greater than or equals to zero, 
+     * sets the choice of the AP to the 
+     * given index.
+     * @return <code>true</code> if substitution is successful
+     * @throws DENOPTIMException
+     */
+
+    protected static boolean substituteFragment(DENOPTIMVertex vertex,
+            boolean force, int chosenVrtxIdx, int chosenApId)
+                                                    throws DENOPTIMException
+    {
         int vid = vertex.getVertexId();
-        DENOPTIMGraph graph = vertex.getGraphOwner();
+        DENOPTIMGraph g = vertex.getGraphOwner();
 
         // first get the edge with the parent
-        DENOPTIMEdge e = graph.getEdgeWithParent(vid);
+        DENOPTIMEdge e = g.getEdgeWithParent(vid);
         if (e == null)
         {
             String msg = "Program Bug in substituteFragment: Unable to locate "
-                    + "parent edge for vertex "+vertex+" in graph "+graph;
+                    + "parent edge for vertex "+vertex+" in graph "+g;
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
         // vertex id of the parent
         int pvid = e.getSrcVertex();
-        DENOPTIMVertex pvertex = graph.getVertexWithId(pvid);
+        DENOPTIMVertex v = g.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
-        boolean symmetry = graph.hasSymmetryInvolvingVertex(vertex);
+        boolean symmetry = g.hasSymmetryInvolvingVertex(vertex);
         
         // delete the vertex and its children and all its symmetric partners
         deleteFragment(vertex);
         
         // extend the graph at this vertex but without recursion
-        return extendGraph(graph, pvertex, false, symmetry);
+        return extendGraph(g,v,false,symmetry,force,chosenVrtxIdx,chosenApId);
     }
 
 //------------------------------------------------------------------------------
@@ -291,10 +319,10 @@ public class DENOPTIMGraphOperations
      * on the APs, no matter what. This is mostly needed to retain symmetry 
      * when performing mutations on the root vertex of a symmetric graph.
      * @param force set to <code>true</code> to ignore growth probability.
-     * @param chooseVertxId if greater than or equals to zero, 
+     * @param chosenVrtxIdx if greater than or equals to zero, 
      * sets the choice of the vertex to the 
      * given index.
-     * @param chooseApId if greater than or equals to zero, 
+     * @param chosenApId if greater than or equals to zero, 
      * sets the choice of the AP to the 
      * given index.
      * @throws exception.DENOPTIMException
@@ -308,8 +336,8 @@ public class DENOPTIMGraphOperations
                                          boolean extend, 
                                          boolean symmetryOnAp,
                                          boolean force,
-                                         int chooseVertxId,
-                                         int chooseApId) 
+                                         int chosenVrtxIdx,
+                                         int chosenApId) 
                                                         throws DENOPTIMException
     {  
         // return true if the append has been successful
@@ -342,15 +370,20 @@ public class DENOPTIMGraphOperations
         Set<DENOPTIMAttachmentPoint> toDoAPs = 
                 new HashSet<DENOPTIMAttachmentPoint>();
         toDoAPs.addAll(lstDaps);
-        for (int apIdx=0; apIdx<lstDaps.size(); apIdx++)
+        for (int i=0; i<lstDaps.size(); i++)
         {
+            // WARNING: randomisation decouples 'i' from the index of the AP
+            // in the vertex's list of APs! So 'i' is just the i-th attempt on
+            // the curVertex.
+            
             DENOPTIMAttachmentPoint ap = 
                     RandomUtils.randomlyChooseOne(toDoAPs);
             toDoAPs.remove(ap);
             
             if (debug)
             {
-                System.err.println("Evaluating growth on #" + apIdx + " AP of "
+                System.err.println("Evaluating growth: attempt #" + i 
+                        + " AP of "
                         + "vertex "+ curVrtId 
                         + " (AP: " + ap.getIndexInOwner() + ")");
             }
@@ -394,7 +427,7 @@ public class DENOPTIMGraphOperations
             {
                 boolean successful = attachFragmentInClosableChain(
                                                                  curVertex, 
-                                                                 apIdx, 
+                                                                 curVertex.getIndexOfAP(ap), 
                                                                  molGraph, 
                                                                  addedVertices);
                 if (successful)
@@ -404,8 +437,8 @@ public class DENOPTIMGraphOperations
             }
 
             // find a compatible combination of fragment and AP
-            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, apIdx,
-                    chooseVertxId, chooseApId);
+            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, 
+                    curVertex.getIndexOfAP(ap), chosenVrtxIdx, chosenApId);
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
             {
@@ -421,7 +454,7 @@ public class DENOPTIMGraphOperations
             SymmetricSet symAPs = new SymmetricSet();
             if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
             {
-                symAPs = curVertex.getSymmetricAPs(apIdx);
+                symAPs = curVertex.getSymmetricAPs(curVertex.getIndexOfAP(ap));
 				if (symAPs != null)
 				{
                     if (debug)
@@ -433,12 +466,12 @@ public class DENOPTIMGraphOperations
 				else
 				{
 				    symAPs = new SymmetricSet();
-				    symAPs.add(apIdx);
+				    symAPs.add(curVertex.getIndexOfAP(ap));
 				}
             }
             else
             {
-                symAPs.add(apIdx);
+                symAPs.add(curVertex.getIndexOfAP(ap));
             }
 
             // ...and inherit symmetry from previous levels
@@ -463,14 +496,18 @@ public class DENOPTIMGraphOperations
             for (Integer parVrtId : symVerts.getList())
             {
                 DENOPTIMVertex parVrt = molGraph.getVertexWithId(parVrtId);
+                
                 String typ = "single";
                 if (cpOnSymAPs || cpOnSymVrts)
                 {
                     typ = "symmetric";
                 }
+                
                 for (int si=0; si<symAPs.size(); si++)
                 {
                     int symApId = symAPs.get(si);
+                    DENOPTIMAttachmentPoint symAP = parVrt.getAttachmentPoints().get(symApId);
+                    
                     if (!parVrt.getAttachmentPoints().get(
                                                         symApId).isAvailable())
                     {
@@ -554,7 +591,13 @@ public class DENOPTIMGraphOperations
     {
         // Define the new vertex
         int fid = chosenFrgAndAp.getVertexMolId();
+        int maxVIdInGrph = molGraph.getMaxVertexId();
         int nvid = GraphUtils.getUniqueVertexIndex();
+        if (nvid <= molGraph.getMaxVertexId())
+        {
+            GraphUtils.resetUniqueVertexCounter(maxVIdInGrph+1);
+            nvid = GraphUtils.getUniqueVertexIndex();
+        }
         DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(nvid, 
                 fid, BBType.FRAGMENT);
         
@@ -636,10 +679,10 @@ public class DENOPTIMGraphOperations
      * Compatibility can either be class based or based on the free connections
      * @param curVertex the source graph vertex
      * @param dapidx the attachment point index on the src vertex
-     * @param chooseVertxId if greater than or equals to zero, 
+     * @param chosenVrtxIdx if greater than or equals to zero, 
      * sets the choice of the vertex to the 
      * given index.
-     * @param chooseApId if greater than or equals to zero, 
+     * @param chosenApId if greater than or equals to zero, 
      * sets the choice of the AP to the 
      * given index.
      * @return the vector of indeces identifying the molId (fragment index) 
@@ -649,7 +692,7 @@ public class DENOPTIMGraphOperations
      */
 
     protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
-            int dapidx, int chooseVertxId, int chooseApId) 
+            int dapidx, int chosenVrtxIdx, int chosenApId) 
                     throws DENOPTIMException
     {
         ArrayList<DENOPTIMAttachmentPoint> lstDaps =
@@ -672,11 +715,11 @@ public class DENOPTIMGraphOperations
                     curDap.getAPClass());
             if (candidates.size() > 0)
             {
-                if (chooseVertxId>-1 && chooseApId>-1)
+                if (chosenVrtxIdx>-1 && chosenApId>-1)
                 {
                     // We have asked to force the selection
-                    res = new IdFragmentAndAP(-1,chooseVertxId,BBType.FRAGMENT,
-                            chooseApId,-1,-1);
+                    res = new IdFragmentAndAP(-1,chosenVrtxIdx,BBType.FRAGMENT,
+                            chosenApId,-1,-1);
                 } else {
                     res = RandomUtils.randomlyChooseOne(candidates);
                 }
@@ -1577,10 +1620,10 @@ if(debug)
      * @param vertex the vertex to mutate.
      * @param mType the type of mutation to perform.
      * @param force set to <code>true</code> to ignore growth probability. 
-     * @param chooseVertxId if greater than or equals to zero, 
+     * @param chosenVrtxIdx if greater than or equals to zero, 
      * sets the choice of the vertex to the 
      * given index.
-     * @param chooseApId if greater than or equals to zero, 
+     * @param chosenApId if greater than or equals to zero, 
      * sets the choice of the AP to the 
      * given index.
      * @return <code>true</code> if the mutation is successful.
@@ -1588,8 +1631,8 @@ if(debug)
      */
     
     public static boolean performMutation(DENOPTIMVertex vertex, 
-            MutationType mType, boolean force, int chooseVertxId, 
-            int chooseApId) throws DENOPTIMException
+            MutationType mType, boolean force, int chosenVrtxIdx, 
+            int chosenApId) throws DENOPTIMException
     {  
         // Deal with nonsensical calls
         if (vertex.getGraphOwner() == null)
@@ -1611,14 +1654,14 @@ if(debug)
         switch (mType) 
         {
             case CHANGEBRANCH:
-                //TODO-V3 should allow "force" here?
-                done = substituteFragment(vertex);
+                done = substituteFragment(vertex, force, chosenVrtxIdx, 
+                        chosenApId);
                 break;
                 
             case EXTEND:
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex.getGraphOwner(), vertex, 
-                        false, false, force, chooseVertxId, chooseApId);
+                        false, false, force, chosenVrtxIdx, chosenApId);
                 break;
                 
             case DELETE:

@@ -1113,6 +1113,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * @return the maximum value of vertex Id found in this graph.
+     */
     public int getMaxVertexId()
     {
         int mval = Integer.MIN_VALUE;

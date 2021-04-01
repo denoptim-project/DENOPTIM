@@ -38,7 +38,7 @@ do
         nEl=$(head -n "$nEnd" "$xoResult" | grep -c " $el   ")
         nElRef=$(head -n "$nEndRef" "expected_output/$xoResult" | grep -c " $el   ")
         if [ "$nEl" -ne "$nElRef" ]; then
-            echo "Test 't20' NOT PASSED (symptom: wrong number of $el atoms in $xoResult"
+            echo "Test 't20' NOT PASSED (symptom: wrong number of $el atoms in $xoResult: $nEl, should be $nElRef)"
             exit -1
         fi
         nChecks=$((nChecks+1))

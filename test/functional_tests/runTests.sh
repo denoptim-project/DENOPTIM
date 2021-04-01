@@ -324,6 +324,11 @@ runTest 't21'
 runTest 't22'
 
 #
+# t23: substitution-mutation on template
+#
+runTest 't23'
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"

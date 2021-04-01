@@ -43,7 +43,7 @@ do
     nEl=$(head -n "$nEnd" "graph_mut.sdf" | grep -c " $el ")
     nElRef=$(head -n "$nEndRef" "expected_output/graph_mut.sdf" | grep -c " $el ")
     if [ "$nEl" -ne "$nElRef" ]; then
-        echo "Test 't22' NOT PASSED (symptom: wrong number of $el atoms in graph_mut.sdf"
+        echo "Test 't22' NOT PASSED (symptom: wrong number of $el atoms in graph_mut.sdf: $nEl, should be $nElRef)"
         exit -1
     fi
     nChecks=$((nChecks+1))
