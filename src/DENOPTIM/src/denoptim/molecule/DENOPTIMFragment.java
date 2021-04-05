@@ -147,7 +147,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             int ib = mol.indexOf(oBnd.getAtom(1));
             this.mol.addBond(ia,ib,oBnd.getOrder());
         }
-        
+
+
         Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
         if (prop != null)
         {
@@ -308,7 +309,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             throws DENOPTIMException
     {
         IAtom srcAtm = mol.getAtom(srcAtmId);
-        addAP(srcAtm, apc, vector, valence);
+        addAPOnAtom(srcAtm, apc, vector, valence);
     }
     
 //-----------------------------------------------------------------------------
@@ -325,10 +326,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
 
-    public void addAP(IAtom srcAtm, APClass apc, Point3d vector) 
+    public void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector)
             throws DENOPTIMException
     {
-        addAP(srcAtm,apc,vector,-1);
+        addAPOnAtom(srcAtm,apc,vector,-1);
     }
     
 //-----------------------------------------------------------------------------
@@ -346,8 +347,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
 
-    public void addAP(IAtom srcAtm, APClass apc, Point3d vector, 
-            int valence) 
+    private void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector,
+                             int valence)
             throws DENOPTIMException
     {
         int atmId = mol.indexOf(srcAtm);

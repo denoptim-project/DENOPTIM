@@ -202,9 +202,12 @@ public class DENOPTIMTemplateTest
                 BBType.FRAGMENT);
         double precision = 10*10*10*10;
         for (int i = 0; i < 2; i++) {
+
             APClass apClass = APClass.make("c", 0);
+
             FragmentSpace.getBondOrderMap().put(apClass.getRule(),
                     DENOPTIMEdge.BondType.SINGLE);
+
             v.addAP(
                     0,
                     apClass,
@@ -333,16 +336,6 @@ public class DENOPTIMTemplateTest
         arguments which have different semantics. We need to unify the
         semantics and syntax of these methods before v can have type
         Vertex.
-
-        --Issue 3--
-        This constructor takes a copy of the atomContainer (which is probably
-        the right thing to do), but then Fragment has a method addAP(IAtom
-        srcAtom,…) which compares based on reference, i.e. the same IAtom
-        that is part of the atomContainer cannot be passed as argument to
-        this method. Instead one would have to retrieve the IAtom by calling
-        Fragment.getAtom(…) and pass this as an argument instead.
-        This is cumbersome and confusing and should be substituted for a
-        method that takes the srcAtm as an int instead.
 
         --Issue 4--
         Using tags on the atomContainer's IAtoms defeats the purpose of

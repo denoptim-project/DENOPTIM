@@ -155,13 +155,13 @@ public class DenoptimIOTest {
 		atmH.setPoint3d(new Point3d(0.0, 1.0, 1.0));
 		frag.addAtom(atmC);
 		frag.addAtom(atmH);
-		frag.addAP(atmC, APClass.make("classAtmC:5"), 
+		frag.addAPOnAtom(atmC, APClass.make("classAtmC:5"),
 		        new Point3d(1.0, 0.0, 0.0));
-		frag.addAP(atmC, APClass.make("classAtmC:5"), 
+		frag.addAPOnAtom(atmC, APClass.make("classAtmC:5"),
 		        new Point3d(1.0, 1.0, 0.0));
-		frag.addAP(atmC, APClass.make("otherClass:0"), 
+		frag.addAPOnAtom(atmC, APClass.make("otherClass:0"),
 		        new Point3d(-1.0, 0.0, 0.0));
-		frag.addAP(atmH, APClass.make("classAtmH:1"), 
+		frag.addAPOnAtom(atmH, APClass.make("classAtmH:1"),
 		        new Point3d(1.0, 2.0, 2.0));
 		frag.projectAPsToProperties();
 
@@ -172,13 +172,13 @@ public class DenoptimIOTest {
 		atmH.setPoint3d(new Point3d(0.0, 1.0, 1.0));
 		frag2.addAtom(atmO);
 		frag2.addAtom(atmH2);
-		frag2.addAP(atmO, APClass.make("apClassO:5"), 
+		frag2.addAPOnAtom(atmO, APClass.make("apClassO:5"),
 		        new Point3d(1.0, 0.0, 0.0));
-		frag2.addAP(atmO, APClass.make("apClassO:6"), 
+		frag2.addAPOnAtom(atmO, APClass.make("apClassO:6"),
 		        new Point3d(1.0, 1.0, 0.0));
-		frag2.addAP(atmO, APClass.make("apClassObis:0"), 
+		frag2.addAPOnAtom(atmO, APClass.make("apClassObis:0"),
 		        new Point3d(-1.0, 0.0, 0.0));
-		frag2.addAP(atmH2, APClass.make("classAtmH:1"), 
+		frag2.addAPOnAtom(atmH2, APClass.make("classAtmH:1"),
 		        new Point3d(1.0, 2.0, 2.0));
 		frag2.projectAPsToProperties();
 
