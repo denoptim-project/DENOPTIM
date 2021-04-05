@@ -61,6 +61,8 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
+import static denoptim.molecule.DENOPTIMVertex.*;
+
 
 /**
  * A panel with a viewer capable of visualising DENOPTIM fragments
