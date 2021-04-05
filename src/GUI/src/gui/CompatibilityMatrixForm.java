@@ -485,10 +485,19 @@ public class CompatibilityMatrixForm extends JPanel {
             		{
 	            		if (((CompatibilityRuleLine) lineComponent).isSelected)
 	            		{
-	            			compatMap.remove(lineComponent.getName());
-	            			allAPClsInCPMap.remove(lineComponent.getName());
-	            			panelCPRules.remove(lineComponent);
+	            		    try
+	            		    {
+    	            			compatMap.remove(APClass.make(
+    	            			        lineComponent.getName()));
+    	            			allAPClsInCPMap.remove(APClass.make(
+    	            			        lineComponent.getName()));
+    	            			panelCPRules.remove(lineComponent);
 	            			i++;
+	            		    } catch (DENOPTIMException e1)
+	            		    {
+	            		        //This should never happen
+	            		        e1.printStackTrace();
+	            		    }
 	            		}
             		}
             	}
@@ -1087,8 +1096,18 @@ public class CompatibilityMatrixForm extends JPanel {
                         Arrays.sort(selectedRowIds);
                         for (int i=(selectedRowIds.length-1); i>-1; i--)
                         {
-                        	String apc = (String) tableCapping.getValueAt(
-                        			selectedRowIds[i], 0);
+                            Object o = tableCapping.getValueAt(
+                                    selectedRowIds[i], 0);
+                            APClass apc = null;
+                            try
+                            {
+                                apc = APClass.make(tableCapping.getValueAt(
+                                		selectedRowIds[i], 0).toString());
+                            } catch (DENOPTIMException e1)
+                            {
+                                //Nothing to do: this should never happen here
+                                e1.printStackTrace();
+                            }
                             cappingMap.remove(apc);
                             tabModCapping.removeRow(selectedRowIds[i]);
                         }
@@ -2195,7 +2214,7 @@ public class CompatibilityMatrixForm extends JPanel {
 
 		public void propertyChange(PropertyChangeEvent evt) 
 		{
-			String trgAPClass = (String) evt.getNewValue();
+			APClass trgAPClass = (APClass) evt.getNewValue();
 			compatMap.get(srcAPClass).remove(trgAPClass);
 			updateAPClassCompatibilitiesList();
 		}

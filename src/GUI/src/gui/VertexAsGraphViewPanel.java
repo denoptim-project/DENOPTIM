@@ -76,7 +76,11 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	protected DefaultTableModel apTabModel;
 	protected JTable apTable;
 	
+	// This is a global property of this instance
 	private boolean editableAPTable = false;
+	// this is vertex-specific, it does not overwrite editableAPTable, which is
+	// more general. The overall editablility is given by general && local.
+	private boolean vertexSpecificAPTabEditable = true;
 	
 	private final String NL = System.getProperty("line.separator");
 	
@@ -148,7 +152,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 				}
 				else
 			    {
-					return editableAPTable;
+					return editableAPTable && vertexSpecificAPTabEditable;
 			    }
 		    }
 		};
@@ -169,9 +173,17 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	}
 	
 //-----------------------------------------------------------------------------
+	
+	public void setVertexSpecificEditableAPTable(boolean editable)
+	{
+	    vertexSpecificAPTabEditable = editable;
+	}
+	
+//-----------------------------------------------------------------------------
     
     public void loadVertexToViewer(DENOPTIMVertex v)
     {
+        setVertexSpecificEditableAPTable(true);
         clearAPTable();
         vertex = v;
         loadVertexStructure();
@@ -353,7 +365,8 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
             		&& e.getType() == TableModelEvent.UPDATE)
             {
                 alteredAPData = true;
-                firePropertyChange("APDATA", false, true);
+                firePropertyChange(IVertexAPSelection.APDATACHANGEEVENT, false, 
+                        true);
             }
 		}
         
@@ -390,6 +403,22 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	{
 		graphViewer.dispose();
 	}
+
+//-----------------------------------------------------------------------------
+	   
+    @Override
+    public Map<Integer, DENOPTIMAttachmentPoint> getMapOfAPsInTable()
+    {
+        return mapAPs;
+    }
+
+//-----------------------------------------------------------------------------
+
+    @Override
+    public DefaultTableModel getAPTableModel()
+    {
+        return apTabModel;
+    }
   	
 //-----------------------------------------------------------------------------
 

@@ -244,10 +244,27 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
         // Adding fully defined vertexes (they point to an actual fragment)
-        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 1, DENOPTIMVertex.BBType.FRAGMENT);
+        DENOPTIMVertex vA = null;
+        try
+        {
+            vA = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+        } catch (DENOPTIMException e1)
+        {
+            // This entire method will be removed sp, no fuss dealing with exception
+            e1.printStackTrace();
+        }
+        DENOPTIMVertex vB = null;
+        try
+        {
+            vB = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 1, DENOPTIMVertex.BBType.FRAGMENT);
+        } catch (DENOPTIMException e)
+        {
+         // This entire method will be removed sp, no fuss dealing with exception
+            
+            e.printStackTrace();
+        }
 
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vA);
@@ -285,37 +302,58 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         //     vRCV1...(chord)....vRCV2 
         //
         
+        
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
-        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vC = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
+        DENOPTIMVertex vA = null;
+        DENOPTIMVertex vB = null;
+        DENOPTIMVertex vC = null;
+        DENOPTIMVertex vD = null;
+        DENOPTIMVertex vRCV1 = null;
+        DENOPTIMVertex vRCV2 = null;
+        List<DENOPTIMVertex> frags = null;
+        DENOPTIMVertex vH1 = null;
+        DENOPTIMVertex vH2 = null;
+        DENOPTIMVertex vH3 = null;
+        DENOPTIMVertex vH4 = null;
+        DENOPTIMVertex vH5 = null;
+        DENOPTIMVertex vH6 = null;
+        try
+        {
+            vA = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vB = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vC = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vD = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
+            vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
 
-        List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vC, vD, vRCV1,
-                vRCV2);
+            frags = Arrays.asList(vA, vB, vC, vD, vRCV1,
+                    vRCV2);
+            
+            vH1 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH2 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH3 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH4 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH5 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH6 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+        } catch (DENOPTIMException e1)
+        {
+            //this entire method will soon be removed, so notthing to do here
+            e1.printStackTrace();
+        }
         
-        DENOPTIMVertex vH1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH3 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH5 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH6 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-
         List<DENOPTIMVertex> caps  = Arrays.asList(vH1, vH2, vH3, vH4, vH5,
                 vH6);
 
@@ -394,27 +432,44 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
-        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
+        DENOPTIMVertex vA = null;
+        DENOPTIMVertex vB = null;
+        DENOPTIMVertex vD = null;
+        DENOPTIMVertex vRCV1 = null;
+        DENOPTIMVertex vRCV2 = null;
+        List<DENOPTIMVertex> frags = null;
+        DENOPTIMVertex vH1 = null;
+        DENOPTIMVertex vH2 = null;
+        DENOPTIMVertex vH4 = null;
+        DENOPTIMVertex vH5 = null;
+        try
+        {
+            vA = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vB = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vD = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
+            vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
 
-        List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
-        
-        DENOPTIMVertex vH1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH5 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
+            
+            vH1 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH2 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH4 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH5 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+        } catch (DENOPTIMException e1)
+        {
+          //this entire method will soon be removed, so notthing to do here
+            e1.printStackTrace();
+        }
 
         List<DENOPTIMVertex> caps  = Arrays.asList(vH1, vH2, vH4, vH5);
 
@@ -475,24 +530,39 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
         // NB: here we pick one of the templates we must have added to the library
-        DENOPTIMVertex vA = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 8, DENOPTIMVertex.BBType.FRAGMENT);
-        
-        DENOPTIMVertex vB = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vD = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
-        DENOPTIMVertex vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
+        DENOPTIMVertex vA = null;
+        DENOPTIMVertex vB = null;
+        DENOPTIMVertex vD = null;
+        DENOPTIMVertex vRCV1 = null;
+        DENOPTIMVertex vRCV2 = null;
+        List<DENOPTIMVertex> frags = null;
+        DENOPTIMVertex vH2 = null;
+        DENOPTIMVertex vH4 = null;
+        try
+        {
+            vA = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 8, DENOPTIMVertex.BBType.FRAGMENT);
+            
+            vB = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vD = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.FRAGMENT);
+            vRCV1 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 4, DENOPTIMVertex.BBType.FRAGMENT);
+            vRCV2 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 5, DENOPTIMVertex.BBType.FRAGMENT);
 
-        List<DENOPTIMVertex> frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
-        
-        DENOPTIMVertex vH2 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
-        DENOPTIMVertex vH4 = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            frags = Arrays.asList(vA, vB, vD, vRCV1, vRCV2);
+            
+            vH2 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+            vH4 = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 0, DENOPTIMVertex.BBType.CAP);
+        } catch (DENOPTIMException e1)
+        {
+          //this entire method will soon be removed, so notthing to do here
+            e1.printStackTrace();
+        }
 
         List<DENOPTIMVertex> caps  = Arrays.asList(vH2, vH4);
 
@@ -682,6 +752,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
 
+    //TODO-V3: add documentation. In particular define whether we return inner of outer APs
+    
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
@@ -941,7 +1013,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
 
 //------------------------------------------------------------------------------
-
+/*
+ 
+ REMOVED: 
+ It violates Object.equals contract "equal objects must have equal hash codes".
+ 
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof DENOPTIMTemplate)) {
@@ -957,7 +1033,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         if (this.requiredAPs.size() == o.requiredAPs.size()) {
             for (int i = 0; i < this.requiredAPs.size(); i++) {
-                if (this.requiredAPs.get(i).comparePropertiesTo(o.requiredAPs.get(0)) != 0) {
+                if (this.requiredAPs.get(i).comparePropertiesTo(
+                        o.requiredAPs.get(0)) != 0) {
                     return false;
                 }
             }
@@ -966,6 +1043,55 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         return this.getInnerGraph().sameAs(o.getInnerGraph(),
                 new StringBuilder());
+    }
+    */
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another template ignoring vertex IDs.
+     * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two templates have the same content 
+     * even if the vertex IDs are different.
+     */
+    public boolean sameAs(DENOPTIMTemplate other, StringBuilder reason)
+    {   
+        if (this.contractLevel != other.contractLevel)
+        {
+            reason.append("Different contract level (" 
+                    + this.getBuildingBlockId()+":"
+                    + other.getBuildingBlockId()+"); ");
+            return false;
+        }
+
+        if (this.requiredAPs.size() == other.requiredAPs.size()) 
+        {
+            for (DENOPTIMAttachmentPoint tAP : this.requiredAPs)
+            {
+                for (DENOPTIMAttachmentPoint oAP : other.requiredAPs)
+                {
+                    if (tAP.comparePropertiesTo(oAP) != 0) 
+                    {
+                        reason.append("No required AP corresponding to "+tAP);
+                        return false;
+                    }
+                }
+            }
+        } else {
+            reason.append("Different size of required APs(" 
+                    + this.requiredAPs.size()+":"
+                    + other.requiredAPs.size()+"); ");
+            return false;
+        }
+        
+        if (!this.getInnerGraph().sameAs(other.getInnerGraph(),reason))
+        {
+            return false;
+        }
+        
+        return sameVertexFeatures(other, reason);
     }
 
 //------------------------------------------------------------------------------

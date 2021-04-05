@@ -28,6 +28,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -44,6 +45,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Point3d;
 
 import org.openscience.cdk.interfaces.IAtom;
@@ -54,6 +56,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -153,14 +156,15 @@ public class GUIVertexInspector extends GUICardPanel
 		this.setLayout(new BorderLayout()); 
 		
 		// This card structure includes center, east and south panels:
-		// - (Center) molecular viewer and APs
+		// - (Center) molecular/graph viewer and APs
 		// - (East) vertex controls
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
 		vertexViewer = new VertexViewPanel(this,true);
-		vertexViewer.addPropertyChangeListener("APDATA", 
-				new PropertyChangeListener() {
+		vertexViewer.addPropertyChangeListener(
+		        IVertexAPSelection.APDATACHANGEEVENT, 
+		        new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				protectEditedSystem();				
@@ -208,8 +212,8 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-				    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
-	                                DENOPTIMVertex.BBType.FRAGMENT);
+				    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+				            BBType.FRAGMENT, vrtxLib, true);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -508,8 +512,8 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
-                    vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(inFile, 
-                                    DENOPTIMVertex.BBType.FRAGMENT);
+                    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+                            BBType.FRAGMENT, vrtxLib, true);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog(btnAddVrtx,
@@ -652,6 +656,8 @@ public class GUIVertexInspector extends GUICardPanel
 
 			updateVrtxListSpinner();
 			unsavedChanges = true;
+	        btnDelSel.setEnabled(true);
+	        btnAtmToAP.setEnabled(true);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			e.printStackTrace();
@@ -700,6 +706,8 @@ public class GUIVertexInspector extends GUICardPanel
 		// finalize GUI status
 		updateVrtxListSpinner();
 		unsavedChanges = true;
+		btnDelSel.setEnabled(true);
+        btnAtmToAP.setEnabled(true);
         btnSaveEdits.setEnabled(true);
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -718,8 +726,8 @@ public class GUIVertexInspector extends GUICardPanel
 		
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
-            vrtxLib = DenoptimIO.readDENOPTIMVertexesFromFile(file, 
-                            DENOPTIMVertex.BBType.FRAGMENT);
+            DenoptimIO.appendVertexesFromFileToLibrary(file, BBType.FRAGMENT, 
+                    vrtxLib, true);
         } catch (Exception e1) {
             e1.printStackTrace();
             JOptionPane.showMessageDialog(btnAddVrtx,
@@ -825,7 +833,7 @@ public class GUIVertexInspector extends GUICardPanel
 
 		vertex = vertexesLibrary.get(currVrtxIdx);
 		vertexViewer.loadVertexToViewer(vertex);
-		if (vertex instanceof DENOPTIMFragment == false)
+		if (vertex == null || vertex instanceof DENOPTIMFragment == false)
 		{
 	        btnDelSel.setEnabled(false);
 	        btnAtmToAP.setEnabled(false);
@@ -991,7 +999,7 @@ public class GUIVertexInspector extends GUICardPanel
 		btnOpenVrtxs.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
-        if (vertex instanceof DENOPTIMFragment == false)
+        if (vertex == null || vertex instanceof DENOPTIMFragment == false)
         {
             btnDelSel.setEnabled(false);
             btnAtmToAP.setEnabled(false);
@@ -1005,6 +1013,7 @@ public class GUIVertexInspector extends GUICardPanel
 		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setForeground(Color.BLACK);
 		vertexViewer.deprotectEdits();
+		vertexViewer.setSwitchable(true);
 		
 		vrtxSpinnerListener.setEnabled(true);
 	}
@@ -1027,6 +1036,8 @@ public class GUIVertexInspector extends GUICardPanel
 			.getTextField().setEditable(false); 
 		((DefaultEditor) navigSpinner.getEditor())
 			.getTextField().setForeground(Color.GRAY);
+		
+		vertexViewer.setSwitchable(false);
 		
 		vrtxSpinnerListener.setEnabled(false);
 	}
@@ -1103,13 +1114,12 @@ public class GUIVertexInspector extends GUICardPanel
   		
   		if (vertexViewer.hasUnsavedAPEdits())
   		{
+  		    DefaultTableModel tabModel = vertexViewer.getAPTableModel();
 	  		// Import changes from AP table into molecular representation
-	        for (int i=0; i<vertexViewer.apTabModel.getRowCount(); i++) 
+	        for (int i=0; i<tabModel.getRowCount(); i++) 
 	        {	        	
-	        	int apId = ((Integer) vertexViewer.apTabModel.getValueAt(i, 0))
-	        			.intValue();
-	        	String currApClass = vertexViewer.apTabModel.getValueAt(i, 1)
-	        			.toString();
+	        	int apId = ((Integer) tabModel.getValueAt(i, 0)).intValue();
+	        	String currApClass = tabModel.getValueAt(i, 1).toString();
 	        	
 	        	// Make sure the new class has a proper syntax
 	        	try {
@@ -1118,14 +1128,16 @@ public class GUIVertexInspector extends GUICardPanel
 					currApClass = "dafaultAPClass:0";
 				}
 	        	
-	        	if (vertexViewer.mapAPs.containsKey(apId))
+	        	Map<Integer, DENOPTIMAttachmentPoint> mapAPs = 
+	        	        vertexViewer.getActiveMapAPs();
+	        	
+	        	if (mapAPs.containsKey(apId))
 	        	{
-	        		String origApClass = 
-	        		        vertexViewer.mapAPs.get(apId).getAPClass().toString();
+	        		String origApClass = mapAPs.get(apId).getAPClass().toString();
 	        		if (!origApClass.equals(currApClass))
 	        		{
 	        			try {
-	        			    vertexViewer.mapAPs.get(apId).setAPClass(currApClass);
+	        			    mapAPs.get(apId).setAPClass(currApClass);
 						} catch (DENOPTIMException e) {
 							// We made sure the class is valid, so this
 							// should never happen, though one never knows

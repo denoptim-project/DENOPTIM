@@ -23,8 +23,7 @@ import java.text.NumberFormat;
 
 
 /**
- * General utilities like pause()
- * @author Vishwesh Venkatraman
+ * General utilities
  */
 public class GenUtils
 {
@@ -120,7 +119,8 @@ public class GenUtils
         sb.append(format.format(maxMemory / 1024));
         sb.append("\n");
         sb.append("Total free memory: ");
-        sb.append(format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024));
+        sb.append(format.format((freeMemory + (maxMemory - allocatedMemory)) 
+                / 1024));
         sb.append("\n");
         
         System.out.println(sb.toString());
@@ -182,7 +182,7 @@ public class GenUtils
         
         return result;
     }
-
+    
 //------------------------------------------------------------------------------
    
 }

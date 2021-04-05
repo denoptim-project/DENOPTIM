@@ -234,6 +234,11 @@ public class DenoptimIOTest {
         assertTrue(FileFormat.GRAPHSDF == DenoptimIO.detectFileFormat(file),
                 "Graph SDF");
         
+        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.GRAPHJSONTAG 
+                + ">", false);
+        assertTrue(FileFormat.GRAPHSDF == DenoptimIO.detectFileFormat(file),
+                "Graph SDF");
+        
         pathName = tempDir.getAbsolutePath() + SEP + "filename";
         file = new File(pathName);
         

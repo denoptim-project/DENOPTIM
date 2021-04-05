@@ -198,7 +198,7 @@ public class GraphConversionTool
 
         // Store graph as property
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
-        //TODO-V3 get JSON
+        mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
         if (g.getMsg() != null)
         {

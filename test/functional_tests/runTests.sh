@@ -66,6 +66,10 @@ function runTest() {
 
     #prepare the files
     cd "$testDir"
+    if [ ! -d $DENOPTIM_HOME/test/functional_tests/$testName ]; then
+        echo "ERROR: Test could not be run because folder '$DENOPTIM_HOME/test/functional_tests/$testName' does not exist"
+        exit -1
+    fi
     cp -r "$DENOPTIM_HOME/test/functional_tests/$testName/"* .
 
     #Run the test
@@ -303,6 +307,36 @@ runTest "t18"
 # t19: concersion of graph's string representations (with templates and empty vertexes)
 #
 runTest "t19"
+
+#
+# t20: crossover with templates
+#
+runTest 't20'
+
+#
+# t21: delete-mutation on template
+#
+runTest 't21'
+
+#
+# t22: extend-mutation on template
+#
+runTest 't22'
+
+#
+# t23: substitution-mutation on template
+#
+runTest 't23'
+
+#
+# t97: under development - mutation involving templates
+#
+#runTest "t97"
+
+#
+# t99: under development - Meant for testing of the graph template stuff in GA run
+#
+#runTest "t99"
 
 echo "All done!"
 exit 0

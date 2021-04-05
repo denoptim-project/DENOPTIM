@@ -88,8 +88,9 @@ public class GraphUtils
 //------------------------------------------------------------------------------
 
     /**
-     * @Deprecated
+     * @Deprecated should not be needed
      */
+    @Deprecated
     public static void updateVertexCounter(int num)
     {
         vertexCounter.set(num);

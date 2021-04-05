@@ -18,6 +18,8 @@
 
 package testoperator;
 
+import java.io.File;
+
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
@@ -79,10 +81,15 @@ public class TestOperator
     
     private static void runMutation() throws DENOPTIMException
     {
-        DENOPTIMGraph g = 
-                GraphConversionTool.getGraphFromString(DenoptimIO.readSDFFile(
-                                       TestOperatorParameters.inpFileM).get(0)
-                                         .getProperty("GraphENC").toString());
+        DENOPTIMGraph g = null;
+        try
+        {
+            g = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    new File(TestOperatorParameters.inpFileM), true).get(0);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     
         System.out.println("Initial graphs: ");
         System.out.println(g);
@@ -98,7 +105,10 @@ public class TestOperator
             System.exit(-1);
         }
     
-        DENOPTIMGraphOperations.performMutation(v,mt);
+        // NB: last boolean asks to ignore the growth probability
+        DENOPTIMGraphOperations.performMutation(v,mt,true,
+                TestOperatorParameters.idNewVrt,
+                TestOperatorParameters.idNewAP);
 
         System.out.println("Result of mutation:");
         System.out.println(g);
@@ -112,16 +122,19 @@ public class TestOperator
     
     private static void runXOver() throws DENOPTIMException
     {
+        DENOPTIMGraph male = null;
+        DENOPTIMGraph female = null;
+        try
+        {
+            male = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    new File(TestOperatorParameters.inpFileM), true).get(0);
+            female = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    new File(TestOperatorParameters.inpFileF), true).get(0);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         
-        DENOPTIMGraph male = 
-                GraphConversionTool.getGraphFromString(DenoptimIO.readSDFFile(
-                                       TestOperatorParameters.inpFileM).get(0)
-                                         .getProperty("GraphENC").toString());
-        DENOPTIMGraph female = 
-                GraphConversionTool.getGraphFromString(DenoptimIO.readSDFFile(
-                                       TestOperatorParameters.inpFileF).get(0)
-                                         .getProperty("GraphENC").toString());
-
         for (DENOPTIMVertex v : male.getVertexList()) {
             System.out.println("Vertex with id: " + v.getVertexId() + "is " +
                     "class " + v.getClass().getName());

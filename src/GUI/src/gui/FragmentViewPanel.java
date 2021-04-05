@@ -142,7 +142,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
-	public FragmentViewPanel(JComponent parent, boolean editableTable, int dividerPosition)
+	public FragmentViewPanel(JComponent parent, boolean editableTable, 
+	        int dividerPosition)
 	{
 		this.parent = parent;
 		editableAPTable = editableTable;
@@ -210,7 +211,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	
 	/**
 	 * Overrides the flag signaling unsaved edits to saying that there are no
-	 * altered data.
+	 * altered data. Use this after processing/saving the changes.
 	 */
 	public void deprotectEdits()
 	{
@@ -986,7 +987,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
             		&& e.getType() == TableModelEvent.UPDATE)
             {
                 alteredAPData = true;
-                firePropertyChange("APDATA", false, true);
+                firePropertyChange(IVertexAPSelection.APDATACHANGEEVENT, false, 
+                        true);
             }
 		}
         
@@ -1026,6 +1028,22 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	{
 		jmolPanel.dispose();
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    @Override
+    public Map<Integer, DENOPTIMAttachmentPoint> getMapOfAPsInTable()
+    {
+        return mapAPs;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    @Override
+    public DefaultTableModel getAPTableModel()
+    {
+        return apTabModel;
+    }
   	
 //-----------------------------------------------------------------------------
 

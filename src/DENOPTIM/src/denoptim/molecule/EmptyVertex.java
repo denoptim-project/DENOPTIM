@@ -61,9 +61,6 @@ public class EmptyVertex extends DENOPTIMVertex
      * call them "symmetric" (though symmetry is a fuzzy concept here).
      */
     private ArrayList<SymmetricSet> lstSymAPs;
-    
-    //TODO-V3 add properties and make them visible in GUI
-
 
 //------------------------------------------------------------------------------
 
@@ -280,45 +277,9 @@ public class EmptyVertex extends DENOPTIMVertex
      * node even if the vertex IDs are different.
      */
 
-    @Override
-    public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
+    public boolean sameAs(EmptyVertex other, StringBuilder reason)
     {
-        if (this.getFreeAPCount() != other.getFreeAPCount())
-        {
-            reason.append("Different number of free APs ("
-                    +this.getFreeAPCount()+":"
-                    +other.getFreeAPCount()+"); ");
-            return false;
-        }
-
-        if (this.getNumberOfAP() != other.getNumberOfAP())
-        {
-            reason.append("Different number of APs ("
-                    +this.lstAPs.size()+":"
-                    +other.getNumberOfAP()+"); ");
-            return false;
-        }
-
-
-        for (DENOPTIMAttachmentPoint apT : this.lstAPs)
-        {
-            boolean found = false;
-            for (DENOPTIMAttachmentPoint apO : other.getAttachmentPoints())
-            {
-                if (apT.equals(apO))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                reason.append("No corresponding AP for "+apT);
-                return false;
-            }
-        }
-
-        return true;
+        return sameVertexFeatures(other, reason);
     }
 
 //------------------------------------------------------------------------------
@@ -331,8 +292,8 @@ public class EmptyVertex extends DENOPTIMVertex
      */
 
     public ArrayList<Integer> getCompatibleClassAPIndex(
-            String cmpReac
-    ) {
+            String cmpReac) 
+    {
         ArrayList<DENOPTIMAttachmentPoint> apLst = getAttachmentPoints();
         ArrayList<Integer> apIdx = new ArrayList<>();
         for (int i = 0; i < apLst.size(); i++)

@@ -645,6 +645,8 @@ Comparable<DENOPTIMAttachmentPoint>
     
 //------------------------------------------------------------------------------
 
+    //TODO: clarify if this is really an equals or if it is  sameAs method
+    
     public boolean equals(DENOPTIMAttachmentPoint other)
     {
         if (this.getAtomPositionNumber() != other.getAtomPositionNumber())
@@ -865,6 +867,21 @@ Comparable<DENOPTIMAttachmentPoint>
 
     public void setTotalConnections(int totalConnections) {
         this.totalConnections = totalConnections;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the current index of this AP in the list of APs of the owner, or
+     * -1 if the owner is null.
+     */
+    public int getIndexInOwner()
+    {
+        if (owner == null)
+        {
+            return -1;
+        }
+        return owner.getIndexOfAP(this);
     }
 
 //-----------------------------------------------------------------------------
