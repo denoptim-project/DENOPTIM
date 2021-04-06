@@ -1084,7 +1084,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         Note: We limit ourselves to the following
         1. The inner graph consists of exactly 1 fragment
         2. We substitute n fragments for n fragments
-        2. We only request Mutation type CHANGEBRANCH
+        2. We only request Mutation type CHANGEBRANCH and DELETE
         3. We ignore symmetry
         4. We ignore rings
 
@@ -1093,10 +1093,19 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         pass).
          */
 
-        if (type == MutationType.DELETE || type == MutationType.EXTEND) {
+        boolean conditionNotSupported =
+                (type == MutationType.DELETE && getInnerGraph().getVertexCount() > 1)
+                        || type == MutationType.EXTEND;
+        if (conditionNotSupported) {
             throw new UnsupportedOperationException("Mutation type " +
                     type.toString() + " currently unsupported");
         }
+
+        if (type == MutationType.DELETE
+                && getInnerGraph().getVertexCount() <= 1) {
+            return false;
+        }
+
         for (DENOPTIMVertex v : FragmentSpace.getFragmentLibrary()) {
             if (v instanceof DENOPTIMFragment) {
                 DENOPTIMFragment f = (DENOPTIMFragment) v;

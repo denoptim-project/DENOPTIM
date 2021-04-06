@@ -157,7 +157,7 @@ public class DENOPTIMTemplateTest
             DENOPTIMTemplate clone = t.clone();
             assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
-            fail("unexpected exception thrown");
+            fail("Unexpected exception thrown.");
             e.printStackTrace();
         }
     }
@@ -280,7 +280,7 @@ public class DENOPTIMTemplateTest
             DENOPTIMTemplate clone = t.clone();
             assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
-            fail("unexpected exception thrown");
+            fail("Unexpected exception thrown.");
             e.printStackTrace();
         }
     }
@@ -597,7 +597,7 @@ public class DENOPTIMTemplateTest
             assertFalse(mutated);
             assertEquals(g, t.getInnerGraph());
         } catch (DENOPTIMException e) {
-            fail("unexpected exception thrown");
+            fail("Unexpected exception thrown.");
             e.printStackTrace();
         }
     }
@@ -642,7 +642,7 @@ public class DENOPTIMTemplateTest
                     new StringBuilder()));
             assertTrue(expected.sameAs(actual, new StringBuilder()));
         } catch (Exception e) {
-            fail("unexpected exception thrown");
+            fail("Unexpected exception thrown.");
             e.printStackTrace();
         }
     }
@@ -680,5 +680,24 @@ public class DENOPTIMTemplateTest
         );
 
         return v;
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testDelete_noChangeIfOnlyOneFragmentInInnerGraph() {
+        try {
+            DENOPTIMTemplate t = getCH2Template();
+            DENOPTIMGraph expected = t.getInnerGraph();
+
+            boolean changed = t.mutate(MutationType.DELETE);
+
+            assertFalse(changed);
+            assertTrue(expected.sameAs(t.getInnerGraph(), new StringBuilder()));
+        } catch (Exception e) {
+            fail("Unexpected exception thrown.");
+            e.printStackTrace();
+        }
+
     }
 }
