@@ -28,6 +28,8 @@ import java.util.*;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.MutationType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +58,13 @@ public class DENOPTIMTemplateTest
     final long SEED = 13;
     Random rng = new Random(SEED);
     IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
+
+    @BeforeEach
+    public void setUp() {
+        HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
+        FragmentSpace.setBondOrderMap(map);
+        FragmentSpace.setFragmentLibrary(new ArrayList<>());
+    }
     
 //------------------------------------------------------------------------------
     
@@ -143,10 +152,7 @@ public class DENOPTIMTemplateTest
     @Test
     public void testNestedTemplateCloning() {
         try {
-            HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
-            FragmentSpace.setBondOrderMap(map);
             DENOPTIMTemplate t = getNestedTemplate();
-
             DENOPTIMTemplate clone = t.clone();
             assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
@@ -189,8 +195,6 @@ public class DENOPTIMTemplateTest
         return outerTemp;
     }
 
-//------------------------------------------------------------------------------
-
     private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -225,8 +229,6 @@ public class DENOPTIMTemplateTest
         return v;
     }
 
-//------------------------------------------------------------------------------
-    
     private DENOPTIMVertex getOHFragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"O", "H"};
@@ -282,6 +284,8 @@ public class DENOPTIMTemplateTest
         }
     }
 
+//------------------------------------------------------------------------------
+
     /**
      * Creating a template that contains another template with the following
      * structure:
@@ -313,6 +317,8 @@ public class DENOPTIMTemplateTest
 
         return outerTemp;
     }
+
+//------------------------------------------------------------------------------
 
     private DENOPTIMVertex getCH2FragmentAPI() throws DENOPTIMException {
         /*
@@ -379,6 +385,8 @@ public class DENOPTIMTemplateTest
         return v;
     }
 
+//------------------------------------------------------------------------------
+
     /* See notes in getCH2FragmentAPI() for change suggestions */
     private DENOPTIMVertex getOHFragmentAPI() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
@@ -405,7 +413,6 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-
     public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
@@ -500,6 +507,8 @@ public class DENOPTIMTemplateTest
         testSameAPClass(template, innerGraph);
     }
 
+//------------------------------------------------------------------------------
+
     private void testSameAPClass(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
         try {
@@ -513,6 +522,8 @@ public class DENOPTIMTemplateTest
         }
     }
 
+//------------------------------------------------------------------------------
+
     private void testSameDirVec(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
         double[] correctDirVec = ap.getDirectionVector();
@@ -520,6 +531,8 @@ public class DENOPTIMTemplateTest
         assertThrows(IllegalArgumentException.class,
                 () -> t.setInnerGraph(innerGraph));
     }
+
+//------------------------------------------------------------------------------
 
     private void testSameApConnections(DENOPTIMTemplate t,
                                        DENOPTIMGraph innerGraph) {
@@ -530,6 +543,8 @@ public class DENOPTIMTemplateTest
                 () -> t.setInnerGraph(innerGraph));
     }
 
+//------------------------------------------------------------------------------
+
     private void testSameAtomConnections(DENOPTIMTemplate t,
                                          DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
@@ -538,6 +553,8 @@ public class DENOPTIMTemplateTest
         assertThrows(IllegalArgumentException.class,
                 () -> t.setInnerGraph(innerGraph));
     }
+
+//------------------------------------------------------------------------------
 
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
                                             int expNumberOfAPs) {
@@ -562,4 +579,42 @@ public class DENOPTIMTemplateTest
         t.setInnerGraph(g);
         assertThrows(DENOPTIMException.class, () -> t.addAP(0, 1, 1));
     }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testChangeBranch_noChangeIfNoSuitableFragmentsAvailable() {
+        try {
+            DENOPTIMTemplate t = getCH2Template();
+            DENOPTIMGraph g = t.getInnerGraph();
+            FragmentSpace.getFragmentLibrary().add(getOHFragment());
+            boolean mutated = t.mutate(MutationType.CHANGEBRANCH);
+
+            assertFalse(mutated);
+            assertEquals(g, t.getInnerGraph());
+        } catch (DENOPTIMException e) {
+            fail("unexpected exception thrown");
+            e.printStackTrace();
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a Template with a single fragment. The template has one required
+     * AP.
+     */
+    private DENOPTIMTemplate getCH2Template() throws DENOPTIMException {
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        DENOPTIMVertex ch2Frag = getCH2Fragment();
+        g.addVertex(ch2Frag);
+
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t.addAP(ch2Frag.getAP(0));
+        t.setInnerGraph(g);
+        return t;
+    }
+
+//------------------------------------------------------------------------------
+
 }

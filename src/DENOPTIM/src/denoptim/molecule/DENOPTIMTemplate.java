@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -106,9 +107,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
         String b2a = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
-        
-        String[] pair = {a2b,b2a};
-        return pair;
+
+        return new String[]{a2b,b2a};
     }
     
 //------------------------------------------------------------------------------
@@ -742,9 +742,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         outerAPs.sort(c);
         requiredAPs.sort(c);
         int matchesLeft = requiredAPs.size();
-        for (int i = 0; matchesLeft != 0 && outerAPs.size() - i >= matchesLeft && i < outerAPs.size(); i++) {
-            if (c.compare(outerAPs.get(i), requiredAPs.get(i)) == 0) {
+        for (int i = 0, j = 0; matchesLeft != 0 && outerAPs.size() - i >= matchesLeft && i < outerAPs.size(); i++) {
+            if (c.compare(outerAPs.get(i), requiredAPs.get(j)) == 0) {
                 matchesLeft--;
+                j++;
             }
         }
         return matchesLeft == 0;
@@ -1092,6 +1093,19 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         
         return sameVertexFeatures(other, reason);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * mutate will try to execute the requested mutation type on the inner
+     * graph of the this template using available fragments from the fragment
+     * pool.
+     * @param type Mutation type
+     * @return True if a change occurred.
+     */
+    public boolean mutate(MutationType type) {
+        return false;
     }
 
 //------------------------------------------------------------------------------
