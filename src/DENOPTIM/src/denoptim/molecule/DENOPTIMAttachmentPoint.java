@@ -550,7 +550,7 @@ Comparable<DENOPTIMAttachmentPoint>
 
     /**
      * Compares this and another attachment points based on their unique 
-     * identifier. This is done to retail the order of attachment points when
+     * identifier. This is done to retain the order of attachment points when
      * regenerating AP lists multiple times.
      * @param other the attachment point to compare this with.
      * @return an integer that can be used by a comparator

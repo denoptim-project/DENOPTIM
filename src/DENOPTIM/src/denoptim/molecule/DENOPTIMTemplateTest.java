@@ -1,5 +1,6 @@
 package denoptim.molecule;
 
+import static denoptim.molecule.DENOPTIMVertex.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -109,7 +110,7 @@ public class DENOPTIMTemplateTest
                 Arrays.asList(vRcvA, vA, vB, vC, vRcvC)));
         g.addRing(r);
         
-        DENOPTIMTemplate t = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         //TODO-v3 add required APs and check they are cloned properly
         t.setInnerGraph(g);
         t.freezeTemplate();
@@ -437,7 +438,7 @@ public class DENOPTIMTemplateTest
         // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
         DENOPTIMTemplate template = 
-                new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
+                new DENOPTIMTemplate(BBType.NONE);
         int requiredAPCount = 2;
         int atmPos = 0;
         int atmConns = 1;
@@ -487,7 +488,7 @@ public class DENOPTIMTemplateTest
         );
 
         DENOPTIMTemplate template = 
-                new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
+                new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMVertex v = new EmptyVertex();
         for (int i = 0; i < numberOfAPs; i++) {
             template.addAP(-1, atomConnections.get(i),
@@ -501,9 +502,12 @@ public class DENOPTIMTemplateTest
         innerGraph.addVertex(v);
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
-        testSameAtomConnections(template, innerGraph);
-        testSameApConnections(template, innerGraph);
-        testSameDirVec(template, innerGraph);
+
+        // These two shouldn't really be part of the comparison between APs.
+//        testSameAtomConnections(template, innerGraph);
+//        testSameApConnections(template, innerGraph);
+
+//        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
 
@@ -516,7 +520,7 @@ public class DENOPTIMTemplateTest
                     innerGraph.getVertexAtPosition(0).getAP(0).getAPClass());
             assertThrows(IllegalArgumentException.class,
                     () -> t.setInnerGraph(innerGraph));
-        } catch (DENOPTIMException e) {
+        } catch (Exception e) {
             fail("Expected " + IllegalArgumentException.class + ", but was " 
                     + e.getClass());
         }
@@ -617,4 +621,64 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
+    @Test
+    public void testChangeBranch_changeIfSuitableFragmentsAvailable() {
+        try {
+            DENOPTIMVertex ch3 = getCH3Fragment();
+            FragmentSpace.getFragmentLibrary().add(ch3);
+            DENOPTIMTemplate t = getCH2Template();
+
+            DENOPTIMGraph graphBeforeMutation = t.getInnerGraph();
+
+            DENOPTIMGraph expected = new DENOPTIMGraph();
+            expected.addVertex(ch3);
+
+            boolean mutated = t.mutate(MutationType.CHANGEBRANCH);
+
+            DENOPTIMGraph actual = t.getInnerGraph();
+
+            assertTrue(mutated);
+            assertFalse(graphBeforeMutation.sameAs(actual,
+                    new StringBuilder()));
+            assertTrue(expected.sameAs(actual, new StringBuilder()));
+        } catch (Exception e) {
+            fail("unexpected exception thrown");
+            e.printStackTrace();
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMVertex getCH3Fragment() throws DENOPTIMException {
+        IAtomContainer atomContainer = chemBuilder.newAtomContainer();
+        String[] elements = new String[]{"C", "H", "H", "H"};
+        for (String e : elements) {
+            IAtom atom = chemBuilder.newAtom();
+            atom.setSymbol(e);
+            atomContainer.addAtom(atom);
+        }
+        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
+        atomContainer.addBond(0, 2, IBond.Order.SINGLE);
+        atomContainer.addBond(0, 3, IBond.Order.SINGLE);
+
+        DENOPTIMFragment v = new DENOPTIMFragment(3, atomContainer,
+                BBType.FRAGMENT);
+
+        APClass apClass = APClass.make("c", 0);
+        FragmentSpace.getBondOrderMap().put(apClass.getRule(),
+                DENOPTIMEdge.BondType.SINGLE);
+        double precision = 10*10*10*10;
+
+        v.addAP(
+                0,
+                apClass,
+                new Point3d(
+                        (double) (Math.round(rng.nextDouble() * precision)) / precision,
+                        (double) (Math.round(rng.nextDouble() * precision)) / precision,
+                        (double) (Math.round(rng.nextDouble() * precision)) / precision),
+                1
+        );
+
+        return v;
+    }
 }
