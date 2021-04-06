@@ -1093,9 +1093,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         pass).
          */
 
-        boolean conditionNotSupported =
-                (type == MutationType.DELETE && getInnerGraph().getVertexCount() > 1)
-                        || type == MutationType.EXTEND;
+        boolean conditionNotSupported = getInnerGraph().getVertexCount() > 1;
         if (conditionNotSupported) {
             throw new UnsupportedOperationException("Mutation type " +
                     type.toString() + " currently unsupported");

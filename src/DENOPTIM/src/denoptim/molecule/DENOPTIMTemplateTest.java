@@ -65,6 +65,7 @@ public class DENOPTIMTemplateTest
         HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
         FragmentSpace.setBondOrderMap(map);
         FragmentSpace.setFragmentLibrary(new ArrayList<>());
+        FragmentSpace.setCompatibilityMatrix(new HashMap<>());
     }
     
 //------------------------------------------------------------------------------
@@ -699,5 +700,23 @@ public class DENOPTIMTemplateTest
             e.printStackTrace();
         }
 
+    }
+
+//------------------------------------------------------------------------------
+    @Test
+    public void testExtend_noChangeIfNoCompatibleFragmentsAvailable() {
+        try {
+            FragmentSpace.getFragmentLibrary().add(getOHFragment());
+            DENOPTIMTemplate t = getCH2Template();
+            DENOPTIMGraph expected = t.getInnerGraph();
+
+            boolean changed = t.mutate(MutationType.EXTEND);
+
+            assertFalse(changed);
+            assertTrue(expected.sameAs(t.getInnerGraph(), new StringBuilder()));
+        } catch (Exception e) {
+            fail("Unexpected exception thrown.");
+            e.printStackTrace();
+        }
     }
 }
