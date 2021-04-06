@@ -1,5 +1,6 @@
 package denoptim.molecule;
 
+import static denoptim.molecule.DENOPTIMVertex.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +29,8 @@ import java.util.*;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.MutationType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +59,14 @@ public class DENOPTIMTemplateTest
     final long SEED = 13;
     Random rng = new Random(SEED);
     IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
+
+    @BeforeEach
+    public void setUp() {
+        HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
+        FragmentSpace.setBondOrderMap(map);
+        FragmentSpace.setFragmentLibrary(new ArrayList<>());
+        FragmentSpace.setCompatibilityMatrix(new HashMap<>());
+    }
     
 //------------------------------------------------------------------------------
     
@@ -100,7 +111,7 @@ public class DENOPTIMTemplateTest
                 Arrays.asList(vRcvA, vA, vB, vC, vRcvC)));
         g.addRing(r);
         
-        DENOPTIMTemplate t = new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         //TODO-v3 add required APs and check they are cloned properly
         t.setInnerGraph(g);
         t.freezeTemplate();
@@ -143,14 +154,11 @@ public class DENOPTIMTemplateTest
     @Test
     public void testNestedTemplateCloning() {
         try {
-            HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
-            FragmentSpace.setBondOrderMap(map);
             DENOPTIMTemplate t = getNestedTemplate();
-
             DENOPTIMTemplate clone = t.clone();
             assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
-            fail("unexpected exception thrown");
+            fail("Unexpected exception thrown.");
             e.printStackTrace();
         }
     }
@@ -189,8 +197,6 @@ public class DENOPTIMTemplateTest
         return outerTemp;
     }
 
-//------------------------------------------------------------------------------
-
     private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -206,9 +212,12 @@ public class DENOPTIMTemplateTest
                 BBType.FRAGMENT);
         double precision = 10*10*10*10;
         for (int i = 0; i < 2; i++) {
+
             APClass apClass = APClass.make("c", 0);
+
             FragmentSpace.getBondOrderMap().put(apClass.getRule(),
                     DENOPTIMEdge.BondType.SINGLE);
+
             v.addAP(
                     0,
                     apClass,
@@ -222,8 +231,6 @@ public class DENOPTIMTemplateTest
         return v;
     }
 
-//------------------------------------------------------------------------------
-    
     private DENOPTIMVertex getOHFragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"O", "H"};
@@ -274,10 +281,12 @@ public class DENOPTIMTemplateTest
             DENOPTIMTemplate clone = t.clone();
             assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
-            fail("unexpected exception thrown");
+            fail("Unexpected exception thrown.");
             e.printStackTrace();
         }
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Creating a template that contains another template with the following
@@ -311,6 +320,8 @@ public class DENOPTIMTemplateTest
         return outerTemp;
     }
 
+//------------------------------------------------------------------------------
+
     private DENOPTIMVertex getCH2FragmentAPI() throws DENOPTIMException {
         /*
         --Issue 1--
@@ -339,16 +350,6 @@ public class DENOPTIMTemplateTest
         arguments which have different semantics. We need to unify the
         semantics and syntax of these methods before v can have type
         Vertex.
-
-        --Issue 3--
-        This constructor takes a copy of the atomContainer (which is probably
-        the right thing to do), but then Fragment has a method addAP(IAtom
-        srcAtom,…) which compares based on reference, i.e. the same IAtom
-        that is part of the atomContainer cannot be passed as argument to
-        this method. Instead one would have to retrieve the IAtom by calling
-        Fragment.getAtom(…) and pass this as an argument instead.
-        This is cumbersome and confusing and should be substituted for a
-        method that takes the srcAtm as an int instead.
 
         --Issue 4--
         Using tags on the atomContainer's IAtoms defeats the purpose of
@@ -386,6 +387,8 @@ public class DENOPTIMTemplateTest
         return v;
     }
 
+//------------------------------------------------------------------------------
+
     /* See notes in getCH2FragmentAPI() for change suggestions */
     private DENOPTIMVertex getOHFragmentAPI() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
@@ -412,7 +415,6 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-
     public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
@@ -437,7 +439,7 @@ public class DENOPTIMTemplateTest
         // Einar: Prevents nullpointer exception later
         RandomUtils.initialiseRNG(13);
         DENOPTIMTemplate template = 
-                new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
+                new DENOPTIMTemplate(BBType.NONE);
         int requiredAPCount = 2;
         int atmPos = 0;
         int atmConns = 1;
@@ -487,7 +489,7 @@ public class DENOPTIMTemplateTest
         );
 
         DENOPTIMTemplate template = 
-                new DENOPTIMTemplate(DENOPTIMVertex.BBType.NONE);
+                new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMVertex v = new EmptyVertex();
         for (int i = 0; i < numberOfAPs; i++) {
             template.addAP(-1, atomConnections.get(i),
@@ -501,11 +503,16 @@ public class DENOPTIMTemplateTest
         innerGraph.addVertex(v);
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
-        testSameAtomConnections(template, innerGraph);
-        testSameApConnections(template, innerGraph);
-        testSameDirVec(template, innerGraph);
+
+        // These two shouldn't really be part of the comparison between APs.
+//        testSameAtomConnections(template, innerGraph);
+//        testSameApConnections(template, innerGraph);
+
+//        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
+
+//------------------------------------------------------------------------------
 
     private void testSameAPClass(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
@@ -514,11 +521,13 @@ public class DENOPTIMTemplateTest
                     innerGraph.getVertexAtPosition(0).getAP(0).getAPClass());
             assertThrows(IllegalArgumentException.class,
                     () -> t.setInnerGraph(innerGraph));
-        } catch (DENOPTIMException e) {
+        } catch (Exception e) {
             fail("Expected " + IllegalArgumentException.class + ", but was " 
                     + e.getClass());
         }
     }
+
+//------------------------------------------------------------------------------
 
     private void testSameDirVec(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
@@ -527,6 +536,8 @@ public class DENOPTIMTemplateTest
         assertThrows(IllegalArgumentException.class,
                 () -> t.setInnerGraph(innerGraph));
     }
+
+//------------------------------------------------------------------------------
 
     private void testSameApConnections(DENOPTIMTemplate t,
                                        DENOPTIMGraph innerGraph) {
@@ -537,6 +548,8 @@ public class DENOPTIMTemplateTest
                 () -> t.setInnerGraph(innerGraph));
     }
 
+//------------------------------------------------------------------------------
+
     private void testSameAtomConnections(DENOPTIMTemplate t,
                                          DENOPTIMGraph innerGraph) {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
@@ -545,6 +558,8 @@ public class DENOPTIMTemplateTest
         assertThrows(IllegalArgumentException.class,
                 () -> t.setInnerGraph(innerGraph));
     }
+
+//------------------------------------------------------------------------------
 
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
                                             int expNumberOfAPs) {
@@ -568,5 +583,140 @@ public class DENOPTIMTemplateTest
         DENOPTIMGraph g = new DENOPTIMGraph();
         t.setInnerGraph(g);
         assertThrows(DENOPTIMException.class, () -> t.addAP(0, 1, 1));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testChangeBranch_noChangeIfNoSuitableFragmentsAvailable() {
+        try {
+            DENOPTIMTemplate t = getCH2Template();
+            DENOPTIMGraph g = t.getInnerGraph();
+            FragmentSpace.getFragmentLibrary().add(getOHFragment());
+            boolean mutated = t.mutate(MutationType.CHANGEBRANCH);
+
+            assertFalse(mutated);
+            assertEquals(g, t.getInnerGraph());
+        } catch (DENOPTIMException e) {
+            fail("Unexpected exception thrown.");
+            e.printStackTrace();
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a Template with a single fragment. The template has one required
+     * AP.
+     */
+    private DENOPTIMTemplate getCH2Template() throws DENOPTIMException {
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        DENOPTIMVertex ch2Frag = getCH2Fragment();
+        g.addVertex(ch2Frag);
+
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t.addAP(ch2Frag.getAP(0));
+        t.setInnerGraph(g);
+        return t;
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testChangeBranch_changeIfSuitableFragmentsAvailable() {
+        try {
+            DENOPTIMVertex ch3 = getCH3Fragment();
+            FragmentSpace.getFragmentLibrary().add(ch3);
+            DENOPTIMTemplate t = getCH2Template();
+
+            DENOPTIMGraph graphBeforeMutation = t.getInnerGraph();
+
+            DENOPTIMGraph expected = new DENOPTIMGraph();
+            expected.addVertex(ch3);
+
+            boolean mutated = t.mutate(MutationType.CHANGEBRANCH);
+
+            DENOPTIMGraph actual = t.getInnerGraph();
+
+            assertTrue(mutated);
+            assertFalse(graphBeforeMutation.sameAs(actual,
+                    new StringBuilder()));
+            assertTrue(expected.sameAs(actual, new StringBuilder()));
+        } catch (Exception e) {
+            fail("Unexpected exception thrown.");
+            e.printStackTrace();
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMVertex getCH3Fragment() throws DENOPTIMException {
+        IAtomContainer atomContainer = chemBuilder.newAtomContainer();
+        String[] elements = new String[]{"C", "H", "H", "H"};
+        for (String e : elements) {
+            IAtom atom = chemBuilder.newAtom();
+            atom.setSymbol(e);
+            atomContainer.addAtom(atom);
+        }
+        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
+        atomContainer.addBond(0, 2, IBond.Order.SINGLE);
+        atomContainer.addBond(0, 3, IBond.Order.SINGLE);
+
+        DENOPTIMFragment v = new DENOPTIMFragment(3, atomContainer,
+                BBType.FRAGMENT);
+
+        APClass apClass = APClass.make("c", 0);
+        FragmentSpace.getBondOrderMap().put(apClass.getRule(),
+                DENOPTIMEdge.BondType.SINGLE);
+        double precision = 10*10*10*10;
+
+        v.addAP(
+                0,
+                apClass,
+                new Point3d(
+                        (double) (Math.round(rng.nextDouble() * precision)) / precision,
+                        (double) (Math.round(rng.nextDouble() * precision)) / precision,
+                        (double) (Math.round(rng.nextDouble() * precision)) / precision),
+                1
+        );
+
+        return v;
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testDelete_noChangeIfOnlyOneFragmentInInnerGraph() {
+        try {
+            DENOPTIMTemplate t = getCH2Template();
+            DENOPTIMGraph expected = t.getInnerGraph();
+
+            boolean changed = t.mutate(MutationType.DELETE);
+
+            assertFalse(changed);
+            assertTrue(expected.sameAs(t.getInnerGraph(), new StringBuilder()));
+        } catch (Exception e) {
+            fail("Unexpected exception thrown.");
+            e.printStackTrace();
+        }
+
+    }
+
+//------------------------------------------------------------------------------
+    @Test
+    public void testExtend_noChangeIfNoCompatibleFragmentsAvailable() {
+        try {
+            FragmentSpace.getFragmentLibrary().add(getOHFragment());
+            DENOPTIMTemplate t = getCH2Template();
+            DENOPTIMGraph expected = t.getInnerGraph();
+
+            boolean changed = t.mutate(MutationType.EXTEND);
+
+            assertFalse(changed);
+            assertTrue(expected.sameAs(t.getInnerGraph(), new StringBuilder()));
+        } catch (Exception e) {
+            fail("Unexpected exception thrown.");
+            e.printStackTrace();
+        }
     }
 }

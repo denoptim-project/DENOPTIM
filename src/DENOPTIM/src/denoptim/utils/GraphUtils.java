@@ -45,8 +45,6 @@ public class GraphUtils
     private static AtomicInteger graphCounter = new AtomicInteger(1);
     private static AtomicInteger molCounter = new AtomicInteger(1);
 
-    private static boolean debug = false;
-
 //------------------------------------------------------------------------------
 
     /**

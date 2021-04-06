@@ -55,13 +55,13 @@ import org.openscience.cdk.interfaces.IBond;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+
+import static denoptim.molecule.DENOPTIMVertex.*;
 
 
 /**
@@ -910,7 +910,7 @@ public class GUIVertexInspector extends GUICardPanel
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
     	vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
     	try {
-    	    frag.addAP(srcAtm, APClass.make(apClass), vector);
+    	    frag.addAPOnAtom(srcAtm, APClass.make(apClass), vector);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,

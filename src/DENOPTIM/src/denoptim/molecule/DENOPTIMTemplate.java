@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
+import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -19,7 +19,6 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.PathSubGraph;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -106,9 +105,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
         String b2a = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
-        
-        String[] pair = {a2b,b2a};
-        return pair;
+
+        return new String[]{a2b,b2a};
     }
     
 //------------------------------------------------------------------------------
@@ -704,47 +702,26 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
     
     private boolean isValidInnerGraph(DENOPTIMGraph g) {
-        ArrayList<DENOPTIMAttachmentPoint> outerAPs = g.getAvailableAPs();
-        if (outerAPs.size() < requiredAPs.size()) {
+        List<DENOPTIMAttachmentPoint> innerAPs = g.getAvailableAPs();
+        if (innerAPs.size() < getRequiredAPs().size()) {
             return false;
         }
-        /* Compares total connections, free connections, direction vector
-        coordinates, and APClass, in that order.
-         */
-        Comparator<DENOPTIMAttachmentPoint> c = (ap1, ap2) -> {
-            int diffTotConn =
-                    ap1.getTotalConnections() - ap2.getTotalConnections();
-            if (diffTotConn != 0) {
-                return diffTotConn;
-            }
-            int diffFreeConn =
-                    ap1.getFreeConnections() - ap2.getFreeConnections();
-            if (diffFreeConn != 0) {
-                return diffFreeConn;
-            }
-            double[] dirVec1 = ap1.getDirectionVector();
-            double[] dirVec2 = ap2.getDirectionVector();
-            if (dirVec1 != null && dirVec2 != null) {
-                for (int i = 0; i < dirVec1.length; i++) {
-                    double diffDirVec = dirVec1[i] - dirVec2[i];
-                    if (diffDirVec < 0) {
-                        return -1;
-                    } else if (diffDirVec > 0) {
-                        return 1;
-                    }
-                }
-            }
-            return ap1.getAPClass().compareTo(ap2.getAPClass());
-        };
 
-        //TODO-V3: is sorting needed?
-        
-        outerAPs.sort(c);
-        requiredAPs.sort(c);
-        int matchesLeft = requiredAPs.size();
-        for (int i = 0; matchesLeft != 0 && outerAPs.size() - i >= matchesLeft && i < outerAPs.size(); i++) {
-            if (c.compare(outerAPs.get(i), requiredAPs.get(i)) == 0) {
+        /* TODO-V3: is sorting needed?
+        * Answer from Einar: Let n be the number of attachment points on the
+        * graph. If we don't sort then this takes O(n²). If we sort then
+        * O(nlog(n)) + O(n) = O(nlog(n)).
+        */
+        Comparator<DENOPTIMAttachmentPoint> apClassComparator
+                = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass);
+        innerAPs.sort(apClassComparator);
+        List<DENOPTIMAttachmentPoint> reqAPs = getRequiredAPs();
+        reqAPs.sort(apClassComparator);
+        int matchesLeft = reqAPs.size();
+        for (int i = 0, j = 0; matchesLeft > 0 && i < innerAPs.size(); i++) {
+            if (apClassComparator.compare(innerAPs.get(i), reqAPs.get(j)) == 0) {
                 matchesLeft--;
+                j++;
             }
         }
         return matchesLeft == 0;
@@ -1092,6 +1069,93 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         
         return sameVertexFeatures(other, reason);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Executes the requested mutation type on the inner graph of this
+     * template using available fragments from the fragment space.
+     * @param type Mutation type
+     * @return True if a change occurred.
+     */
+    public boolean mutate(MutationType type) {
+        /*
+        Note: We limit ourselves to the following
+        1. The inner graph consists of exactly 1 fragment
+        2. We substitute n fragments for n fragments
+        2. We only request Mutation type CHANGEBRANCH and DELETE
+        3. We ignore symmetry
+        4. We ignore rings
+
+        These limitations will be removed once we add more unit tests and
+        this note should be updated accordingly as unit tests are added (and
+        pass).
+         */
+
+        boolean conditionNotSupported = getInnerGraph().getVertexCount() > 1;
+        if (conditionNotSupported) {
+            throw new UnsupportedOperationException("Mutation type " +
+                    type.toString() + " currently unsupported");
+        }
+
+        if (type == MutationType.DELETE
+                && getInnerGraph().getVertexCount() <= 1) {
+            return false;
+        }
+
+        for (DENOPTIMVertex v : FragmentSpace.getFragmentLibrary()) {
+            if (v instanceof DENOPTIMFragment) {
+                DENOPTIMFragment f = (DENOPTIMFragment) v;
+                int matches = countRequiredAPs(f);
+                if (matches == requiredAPs.size()) {
+                    DENOPTIMGraph g = new DENOPTIMGraph();
+                    g.addVertex(f);
+                    this.setInnerGraph(g);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Counts the number of required APs that match with the APs on a
+     * fragment. Two APs match if they have the same APClass and direction
+     * vector.
+     * @param f Fragment to match against
+     * @return The number of required APs present on fragment argument.
+     */
+    private int countRequiredAPs(DENOPTIMFragment f) {
+        List<DENOPTIMAttachmentPoint> reqAPs = getRequiredAPs();
+        ArrayList<DENOPTIMAttachmentPoint> fragAPs =
+                f.getAttachmentPoints();
+
+        Comparator<DENOPTIMAttachmentPoint> apClassComparator
+                = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass);
+
+        // TODO: 06.04.2021 make sure list of APs is always sorted
+        fragAPs.sort(apClassComparator);
+
+        // TODO: 06.04.2021 make sure requiredAPs is always sorted
+        reqAPs.sort(apClassComparator);
+
+        int matchesLeft = reqAPs.size();
+        for (int i = 0, j = 0; matchesLeft > 0 && i < fragAPs.size(); i++) {
+            if (apClassComparator.compare(fragAPs.get(i), reqAPs.get(j)) == 0) {
+                matchesLeft--;
+                j++;
+            }
+        }
+        return requiredAPs.size() - matchesLeft;
+    }
+
+//------------------------------------------------------------------------------
+
+    private List<DENOPTIMAttachmentPoint> getRequiredAPs() {
+        return requiredAPs;
     }
 
 //------------------------------------------------------------------------------

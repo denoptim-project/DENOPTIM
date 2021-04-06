@@ -128,13 +128,13 @@ public class DENOPTIMVertexTest
         ((DENOPTIMFragment) v).addBond(new Bond(a1, a2));
         ((DENOPTIMFragment) v).addBond(new Bond(a2, a3));
         String APCLASS = APRULE + DENOPTIMConstants.SEPARATORAPPROPSCL +"0";
-        ((DENOPTIMFragment) v).addAP(a3, APClass.make(APCLASS), new Point3d(
+        ((DENOPTIMFragment) v).addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(
                 new double[]{0.0, 2.2, 3.3}));
-        ((DENOPTIMFragment) v).addAP(a3, APClass.make(APCLASS), new Point3d(
+        ((DENOPTIMFragment) v).addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(
                 new double[]{0.0, 0.0, 3.3}));
-        ((DENOPTIMFragment) v).addAP(a3, APClass.make(APCLASS), new Point3d(
+        ((DENOPTIMFragment) v).addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(
                 new double[]{0.0, 0.0, 1.1}));
-        ((DENOPTIMFragment) v).addAP(a1, APClass.make(APCLASS), new Point3d(
+        ((DENOPTIMFragment) v).addAPOnAtom(a1, APClass.make(APCLASS), new Point3d(
                 new double[]{3.0, 0.0, 3.3}));
         v.setLevel(62);
         
