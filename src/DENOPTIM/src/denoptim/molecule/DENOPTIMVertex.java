@@ -493,7 +493,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
+     * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
     public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
@@ -531,7 +531,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
+     * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
     public boolean sameVertexFeatures(DENOPTIMVertex other, 
@@ -1104,7 +1104,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         {
             JsonObject jsonObject = json.getAsJsonObject();
 
-            // Desiralization differs for the types of vertexes
+            // Desiralization differs for the types of vertices
             // First, consider templates
             if (jsonObject.has("innerGraph"))
             {
@@ -1223,7 +1223,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
                 return v;
             }
-            // Finally, vertexes that are not "molecular" (empty vertex)
+            // Finally, vertices that are not "molecular" (empty vertex)
             else
             {
                 //TODO-V3 log or del

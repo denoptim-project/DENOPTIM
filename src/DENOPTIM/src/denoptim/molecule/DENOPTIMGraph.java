@@ -246,8 +246,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the number of symmetric sets of vertexes
-     * @return the number of symmetric sets of vertexes
+     * Returns the number of symmetric sets of vertices
+     * @return the number of symmetric sets of vertices
      */
     public int getSymmetricSetCount()
     {
@@ -525,10 +525,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Adds a chord between the given vertexes, thus adding a ring in this graph
-     * @param vI one of the ring-closing vertexes.
-     * @param vJ the other of the ring-closing vertexes.
-     * @throws DENOPTIMException if the two vertexes do not have consistent bond
+     * Adds a chord between the given vertices, thus adding a ring in this graph
+     * @param vI one of the ring-closing vertices.
+     * @param vJ the other of the ring-closing vertices.
+     * @throws DENOPTIMException if the two vertices do not have consistent bond
      * types to their parents and, therefore, we cannot infer the bond type of
      * the chord.
      */
@@ -552,10 +552,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Adds a chord between the given vertexes, thus adding a ring in this 
+     * Adds a chord between the given vertices, thus adding a ring in this
      * graph.
-     * @param vI one of the ring-closing vertexes.
-     * @param vJ the other of the ring-closing vertexes.
+     * @param vI one of the ring-closing vertices.
+     * @param vJ the other of the ring-closing vertices.
      * @param bndTyp the bond type the chord corresponds to.
      */
     public void addRing(DENOPTIMVertex vI, DENOPTIMVertex vJ, 
@@ -581,7 +581,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Remove a vertex from this graph. This method removes also edges and rings
-     * that involve the given vertex. Symmetric sets of vertexes are corrected
+     * that involve the given vertex. Symmetric sets of vertices are corrected
      * accordingly: they are removed if there is only one remaining vertex in
      * the set, of purged from the removed vertex.
      * @param vertex the vertex to remove.
@@ -936,7 +936,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         DENOPTIMGraph clone = new DENOPTIMGraph(cListVrtx, cListEdges);
 
-        // Copy the list but using the references to the cloned vertexes
+        // Copy the list but using the references to the cloned vertices
         ArrayList<DENOPTIMRing> cListRings = new ArrayList<>();
         for (DENOPTIMRing ring : gRings)
         {
@@ -1184,7 +1184,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     	if (this.getVertexCount() != other.getVertexCount())
     	{
-    		reason.append("Different number of vertexes ("+this.getVertexCount()+":"
+    		reason.append("Different number of vertices ("+this.getVertexCount()+":"
     					+other.getVertexCount()+")");
     		return false;
     	}
@@ -1204,7 +1204,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		return false;
     	}
 
-    	//Pairwise correspondence of vertexes
+    	//Pairwise correspondence of vertices
     	Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap =
     			new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
 
@@ -1321,7 +1321,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Compares this and another graph by spanning vertexes staring from the
+     * Compares this and another graph by spanning vertices starting from the
      * given vertex and following the direction of edges.
      * @param thisV
      * @param otherV
@@ -1351,7 +1351,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		return false;
     	}
 
-    	// pairwise correspondence between child vertexes
+    	// pairwise correspondence between child vertices
     	ArrayList<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
 
     	for (DENOPTIMEdge et : edgesFromThis)
@@ -1388,7 +1388,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		pairs.add(pair);
     	}
 
-    	//Recursion on child vertexes
+    	//Recursion on child vertices
     	for (DENOPTIMVertex[] pair : pairs)
     	{
     		DENOPTIMVertex v = pair[0];
@@ -1592,7 +1592,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Extracts the subgraph of a graph G starting from a given seed vertex of
      * G.
-     * Only the seed vertex and all child vertexes (and further successors)
+     * Only the seed vertex and all child vertices (and further successors)
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
@@ -1752,7 +1752,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param vid the vertexID of the root of the branch. We'll remove also
      * this vertex.
      * @param symmetry use <code>true</code> to enforce deletion of all
-     * symmetric vertexes.
+     * symmetric vertices.
      * @return <code>true</code> if operation is successful.
      * @throws DENOPTIMException
      */
@@ -2297,7 +2297,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Append a vertex to this graph. Does not clone the incoming vertex.
-     * Does not project on symmetrically related vertexes or
+     * Does not project on symmetrically related vertices or
      * attachment points. No change in symmetric sets, apart from importing
      * those sets that are already defined in the incoming vertex.
      * @param srcAP the attachment point on the this graph.
@@ -2342,7 +2342,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Append a subgraph (I) to this graph (R) specifying
      * which vertex and attachment point to use for the connection.
-     * Does not project on symmetrically related vertexes or
+     * Does not project on symmetrically related vertices or
      * attachment points. No change in symmetric sets, apart from importing
      * those sets that are already defined in the subgraph.
      * @param parentVertex the vertex of R on which a copy
@@ -2369,7 +2369,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // Clone and renumber the subgraph to ensure uniqueness
         DENOPTIMGraph sgClone = subGraph.clone();
-        // The clones have the same vertex IDs before renumbering vertexes
+        // The clones have the same vertex IDs before renumbering vertices
         DENOPTIMVertex cvClone = sgClone.getVertexWithId(
                 childVertex.getVertexId());
         sgClone.renumberGraphVertices();
@@ -2386,7 +2386,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
             addVertex(sgClone.getVertexList().get(i));
 
-            // also need to tmp store pointers to symmetric vertexes
+            // also need to tmp store pointers to symmetric vertices
             // Why is this working on subGraph and not on sgClone?
             // Since we are only checking is there is symmetry, there should be
             // no difference between doing it on sgClone or subGraph.
@@ -3177,7 +3177,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * We expect unique IDs for vertexes and attachment points.
+     * We expect unique IDs for vertices and attachment points.
      */
     public static class DENOPTIMGraphSerializer
     implements JsonSerializer<DENOPTIMGraph>

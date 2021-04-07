@@ -38,7 +38,7 @@ import denoptim.molecule.DENOPTIMVertex;
 /**
  * A modal dialog with a viewer that understands the different types of 
  * DENOPTIM vertex 
- * and allows to select vertexes and, if needed, attachment points.
+ * and allows to select vertices and, if needed, attachment points.
  * 
  * @author Marco Foscato
  */
@@ -51,7 +51,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	private static final long serialVersionUID = 912850110991449553L;
 	
 	/**
-	 * The currently loaded list of vertexes
+	 * The currently loaded list of vertices
 	 */
 	private ArrayList<DENOPTIMVertex> vertexLibrary =
 			new ArrayList<DENOPTIMVertex>();
@@ -153,7 +153,7 @@ public class GUIVertexSelector extends GUIModalDialog
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
 		
-		// Controls for navigating the vertexes list
+		// Controls for navigating the vertices list
         ctrlPane = new JPanel();
         ctrlPane.setVisible(true);
 		
@@ -307,7 +307,7 @@ public class GUIVertexSelector extends GUIModalDialog
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Loads the vertexes corresponding to the field index.
+	 * Loads the vertices corresponding to the field index.
 	 * The molecular data is loaded in the Jmol viewer,
 	 * and the attachment point (AP) information in the the list of APs.
 	 * Jmol is not aware of AP-related information, so this also launches
@@ -318,7 +318,7 @@ public class GUIVertexSelector extends GUIModalDialog
 		if (vertexLibrary == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "No list of vertexes loaded.",
+	                "No list of vertices loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));

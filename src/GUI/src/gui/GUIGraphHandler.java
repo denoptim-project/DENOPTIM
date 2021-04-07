@@ -175,8 +175,8 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	private JButton btnSaveEdits;
 	
 	/**
-	 * Subset of vertexes for compatible building block selecting GUI.
-	 * These vertexes are clones of those in the loaded library,
+	 * Subset of vertices for compatible building block selecting GUI.
+	 * These vertices are clones of those in the loaded library,
 	 * and are annotate with fragmentID and AP pointers meant to 
 	 * facilitate a quick selection of compatible connections.
 	 */
@@ -231,7 +231,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		this.setLayout(new BorderLayout()); 
 		
 		// This card structure includes center, east and south panels:
-		// - (Center) where graphs/vertexes/molecules are visualised
+		// - (Center) where graphs/vertices/molecules are visualised
 		// - (East) graph controls
 		// - (South) general controls (load, save, close)
 		
@@ -484,7 +484,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		});
 		
 		btnDelSel = new JButton("Remove Vertex");
-		btnDelSel.setToolTipText("<html>Removes the selected vertexes from "
+		btnDelSel.setToolTipText("<html>Removes the selected vertices from "
 				+ "the system.<br><br><b>WARNING:</b> this action cannot be "
 				+ "undone!</html>");
 		btnDelSel.setEnabled(false);
@@ -496,7 +496,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				{
 					JOptionPane.showMessageDialog(null,
 							"<html>No vertex selected! Drag the "
-			                + "mouse to select vertexes."
+			                + "mouse to select vertices."
 					        + "<br>Click on background to unselect.</html>",
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
@@ -540,7 +540,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	    // Controls to add chord (ring closing edge)
         btnAddChord = new JButton("Add Chord");
         btnAddChord.setToolTipText("<html>Add a ring-closing edge between two "
-                + "selected vertexes.<html>");
+                + "selected vertices.<html>");
         btnAddChord.setEnabled(false);
         btnAddChord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {    
@@ -549,10 +549,10 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 if (selVrtxs.size() != 2)
                 {
                     JOptionPane.showMessageDialog(null,
-                            "<html>Number of selected vertexes: " 
+                            "<html>Number of selected vertices: "
                             + selVrtxs.size() + " <br>"
                             + "Please, drag the mouse and "
-                            + "select only two vertexes!<br> "
+                            + "select only two vertices!<br> "
                             + "Click again to unselect.</html>",
                             "Error",
                             JOptionPane.ERROR_MESSAGE,
@@ -764,7 +764,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 						+ " The color code identified the type of fragment "
 						+ "contained in a node:<ul>"
 						+ "<li>red for the scaffold,</li>"
-						+ "<li>orange for ring-closing vertexes,</li>"
+						+ "<li>orange for ring-closing vertices,</li>"
 						+ "<li>green for capping groups,</li>"
 						+ "<li>blue for standard fragments.</li>"
 						+ "</ul></p>"
@@ -949,18 +949,18 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	
 	/**
 	 * Edits the currently loaded graph by adding a chord involving the two
-	 * selected vertexes.
-	 * @param rcvs the selected vertexes. Must be two vertexes.
+	 * selected vertices.
+	 * @param rcvs the selected vertices. Must be two vertices.
 	 */
 	private void addChordOnGraph(ArrayList<DENOPTIMVertex> rcvs)
 	{
         if (rcvs.size() != 2)
         {
             JOptionPane.showMessageDialog(null,
-                    "<html>Number of selected vertexes: " 
+                    "<html>Number of selected vertices: "
                     + rcvs.size() + " <br>"
                     + "Please, drag the mouse and "
-                    + "select only two vertexes!<br> "
+                    + "select only two vertices!<br> "
                     + "Click again to unselect.</html>",
                     "Error",
                     JOptionPane.ERROR_MESSAGE,
@@ -1009,7 +1009,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				"Compatible Vertexes ("+compatVrtxs.size()+")",
 				"Capping group"};
 		int res = JOptionPane.showOptionDialog(null,
-                "<html>Choose a subset of possible vertexes:</html>",
+                "<html>Choose a subset of possible vertices:</html>",
                 "Choose Vertex Subset",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,

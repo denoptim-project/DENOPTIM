@@ -304,7 +304,8 @@ runTest "t17"
 runTest "t18"
 
 #
-# t19: concersion of graph's string representations (with templates and empty vertexes)
+# t19: conversion of graph's string representations (with templates and empty
+# vertices)
 #
 runTest "t19"
 

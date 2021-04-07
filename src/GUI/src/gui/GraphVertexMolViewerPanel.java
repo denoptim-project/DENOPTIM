@@ -614,7 +614,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 //-----------------------------------------------------------------------------
     
     /**
-     * Identifies which vertexes are selected in the graph viewer.
+     * Identifies which vertices are selected in the graph viewer.
      * @return the list of identifiers
      */
     public ArrayList<DENOPTIMVertex> getSelectedNodesInViewer()

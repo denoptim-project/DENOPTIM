@@ -46,7 +46,7 @@ import denoptim.molecule.EmptyVertex;
 
 
 /**
- * A panel for visualising vertexes. This is a deck of cards that brings up a 
+ * A panel for visualising vertices. This is a deck of cards that brings up a
  * specific card depending on the type of vertex to visualize.
  * 
  * @author Marco Foscato

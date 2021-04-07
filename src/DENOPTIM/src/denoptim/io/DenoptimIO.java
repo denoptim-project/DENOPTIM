@@ -306,17 +306,17 @@ public class DenoptimIO
      * Writes vertices to SDF file.
      *
      * @param pathName The pathname where to write
-     * @param vertexes The list of vertexes to write
+     * @param vertices The list of vertices to write
      * @throws DENOPTIMException
      */
     
     public static void writeVertexes(String pathName, 
-            ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException {
+            ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException {
         SDFWriter sdfWriter = null;
         try {
             IAtomContainerSet molSet = new AtomContainerSet();
-            for (int idx = 0; idx < vertexes.size(); idx++) {
-                DENOPTIMVertex v = vertexes.get(idx);
+            for (int idx = 0; idx < vertices.size(); idx++) {
+                DENOPTIMVertex v = vertices.get(idx);
                 if (v.containsAtoms())
                 {
                     molSet.addAtomContainer(v.getIAtomContainer());
@@ -2201,16 +2201,16 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
     
     /**
-     * Appends vertexes taken from a file onto a given library. This method will
+     * Appends vertices taken from a file onto a given library. This method will
      * interpret {@link DENOPTIMGraph}s with available attachment points
-     * as {@link DENOPTIMTemplate}s. Moreover, the vertexes can
+     * as {@link DENOPTIMTemplate}s. Moreover, the vertices can
      * be interdependent, meaning that vertex #n can contain references to 
      * vertex #m with m lower then n. Such interdependency is acceptable only 
      * for SDF-based files (not yet JSON).
      *  
      * @param file the file we want to read.
      * @param bbt the type of building blocks assigned to each new vertex.
-     * @param library the library on which new vertexes are appended.
+     * @param library the library on which new vertices are appended.
      * @param setBBId if <code>true</code> re-sets the building block it to be 
      * consistent with the destination library.
      * @throws IOException 
@@ -2265,7 +2265,7 @@ public class DenoptimIO
                 System.out.println("TODO: implement import of " + ff);
                 throw new DENOPTIMException("Format '" + ff 
                         + "' could not be used to "
-                        + "read in vertexes from file '" + file + "'.");
+                        + "read in vertices from file '" + file + "'.");
                     
             case GRAPHSDF:
                 //TODO: change this. Not compatible to reading a list of graphs
@@ -2294,7 +2294,7 @@ public class DenoptimIO
             default:
                 throw new DENOPTIMException("Format '" + ff 
                         + "' could not be used to "
-                        + "read in vertexes from file '" + file + "'.");
+                        + "read in vertices from file '" + file + "'.");
         }
     }
     
@@ -2590,13 +2590,13 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Processes a list of atom containers and builds a list of vertexes.
+     * Processes a list of atom containers and builds a list of vertices.
      * @param iacs the list of atom containers.
-     * @return the list of vertexes.
+     * @return the list of vertices.
      * @throws DENOPTIMException
      */
     
-    public static ArrayList<DENOPTIMVertex> convertIACsToVertexes(
+    public static ArrayList<DENOPTIMVertex> convertIACsToVertices(
             ArrayList<IAtomContainer> iacs, DENOPTIMVertex.BBType bbt) throws DENOPTIMException
     {
         ArrayList<DENOPTIMVertex> list = new ArrayList<DENOPTIMVertex>();

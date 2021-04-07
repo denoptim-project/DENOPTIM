@@ -140,7 +140,7 @@ public class FragmentSpace
     private static boolean isValid = false;
 
     /**
-     * Unique identified for vertexes
+     * Unique identified for vertices
      */
     public static AtomicInteger vrtxID = new AtomicInteger(0);
     
@@ -1342,11 +1342,11 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a list of atom containers and converts it into a list of vertexes
+     * Takes a list of atom containers and converts it into a list of vertices
      * that are added to a given library. 
      * @param list of atom containers to import.
-     * @param bbt the type of building block the vertexes should be set to.
-     * @param library where to import the vertexes to.
+     * @param bbt the type of building block the vertices should be set to.
+     * @param library where to import the vertices to.
      */
     
     public static void appendIACsAsVertexesToLibrary(ArrayList<IAtomContainer>list, 
@@ -1367,8 +1367,8 @@ public class FragmentSpace
             }
             appendVertexToLibrary(v,bbt,library);
         }
-        // NB: do not try to add all vertexes in one. If there are templates 
-        // that are built using vertexes that are imported in the same run of
+        // NB: do not try to add all vertices in one. If there are templates
+        // that are built using vertices that are imported in the same run of
         // this method, then the building blocks must be added to the library
         // before the template is added. The latter will, in fact, require
         // to find the building blocks in the library.
@@ -1377,17 +1377,17 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a list of vertexes and add them to a given library. Each vertex
+     * Takes a list of vertices and add them to a given library. Each vertex
      * is assigned the building block type and ID. 
-     * do not try to add all vertexes in one. If there are templates 
-     * that are built using vertexes that are imported in the same run of
+     * do not try to add all vertices in one. If there are templates
+     * that are built using vertices that are imported in the same run of
      * this method, then the building blocks must be added to the library
      * before the template is added. The latter will, in fact, require
      * to find the building blocks in the library.
      * 
-     * @param list of vertexes to import.
-     * @param bbt the type of building block the vertexes should be set to.
-     * @param library where to import the vertexes to.
+     * @param list of vertices to import.
+     * @param bbt the type of building block the vertices should be set to.
+     * @param library where to import the vertices to.
      */
     
     public static void appendVertexesToLibrary(ArrayList<DENOPTIMVertex> list, 
@@ -1402,7 +1402,7 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a vertexes and add it to a given library. Each vertex
+     * Takes a vertices and add it to a given library. Each vertex
      * is assigned the building block type and ID. 
      * 
      * @param v  vertex to import.
