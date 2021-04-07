@@ -167,50 +167,8 @@ public class DENOPTIM3DMoleculeBuilder
     }
 
 //------------------------------------------------------------------------------
-    
-    /**
-     * For the bond connecting the 2 atoms, identify the AP with respect to
-     * the second atom (the first neighbour) and return the associated AP 
-     * index
-     *
-     * @param icidxA first atom position
-     * @param icidxB second atom position
-     * @param lstIcAp
-     * @param other select the other AP index if <code>true</code>
-     * @return the matching AP index
-     * @throws DENOPTIMException
-     */
-    private int getAPIndex(int icidxA, int icidxB, ArrayList<ICAPVec> lstIcAp, 
-                                boolean other) throws DENOPTIMException
-    {
-        int nidx = -1;
-        for (ICAPVec icv : lstIcAp)
-        {
-            if (icv.getFirstIC() == icidxA && icv.getSecondIC() == icidxB)
-            {
-                nidx = icv.getFirstAP();
-                if (other)
-                    nidx = icv.getSecondAP();
-                break;
-            }
-//            else if (icv.getFirstIC() == icidxB && icv.getSecondIC() == icidxA)
-//            {
-//                nidx = icv.getSecondAP();
-//                if (other)
-//                    nidx = icv.getFirstAP();
-//                break;
-//            }
-        }
 
-        if (nidx == -1)
-        {
-            String err = "ERROR! incorrect AP index!";
-            throw new DENOPTIMException(err);
-        }
-        return nidx;
-    }
-
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
 
     /**
      * Given the graph representation of the molecular constitution,
