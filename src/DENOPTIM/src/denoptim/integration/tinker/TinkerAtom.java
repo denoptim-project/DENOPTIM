@@ -93,9 +93,9 @@ public class TinkerAtom implements Serializable, Cloneable
     
 //------------------------------------------------------------------------------
 
-    public void setAtomNeighbours(int[] m_nb)
+    public void setAtomNeighbours(int[] atmNb)
     {
-        this.atmNb = m_nb;
+        this.atmNb = atmNb;
     }
 
 //------------------------------------------------------------------------------
@@ -107,9 +107,9 @@ public class TinkerAtom implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setDistAngle(double[] m_ang)
+    public void setDistAngle(double[] distAngles)
     {
-        this.distAngles = m_ang;
+        this.distAngles = distAngles;
     }    
 
 //------------------------------------------------------------------------------
@@ -154,12 +154,12 @@ public class TinkerAtom implements Serializable, Cloneable
      /**
       * <p>setXYZ</p>
       *
-      * @param m_xyz an array of double.
+      * @param xyz an array of double.
       */
 
-    public void setXYZ(double m_xyz[])
+    public void setXYZ(double[] xyz)
     {
-         this.xyz = m_xyz;
+         this.xyz = xyz;
     }
 
 //------------------------------------------------------------------------------
@@ -202,9 +202,9 @@ public class TinkerAtom implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-     public void setXYZIndex(int m_idx)
+     public void setXYZIndex(int xyzIndex)
      {
-         this.xyzIndex = m_idx;
+         this.xyzIndex = xyzIndex;
      }
 
 
