@@ -20,12 +20,10 @@
 package denoptimga;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -180,25 +178,30 @@ public class OffspringEvaluationTask extends FitnessTask
             {
                 numTry--;
             }
-            Map<DENOPTIMTemplate, BBType> patterns =
-                    DENOPTIMGraphOperations.extractPatterns(GraphPattern.RING);
-        	patterns = DENOPTIMGraphOperations
-                    .filterIsomorphicPatterns(patterns);
-        	for (Map.Entry<DENOPTIMTemplate, BBType> e :
-                    patterns.entrySet()) {
-                BBType bbType = e.getValue();
-                DENOPTIMTemplate pattern = e.getKey();
-                if (bbType == BBType.SCAFFOLD) {
-                    FragmentSpace.appendVertexToLibrary(pattern,
-                            bbType, FragmentSpace.getScaffoldLibrary());
-                } else {
-                    FragmentSpace.appendVertexToLibrary(pattern,
-                            bbType, FragmentSpace.getFragmentLibrary());
-                }
-            }
+            addPatternsToFragmentLibrary();
         }
         completed = true;
         return result;
+    }
+
+//------------------------------------------------------------------------------
+
+    private void addPatternsToFragmentLibrary() {
+        GraphPattern pattern = GraphPattern.RING;
+        Map<DENOPTIMTemplate, BBType> subgraphs =
+                DENOPTIMGraphOperations.extractPatterns(curPopln, pattern);
+        DENOPTIMGraphOperations.filterIsomorphicPatterns(subgraphs, pattern);
+        for (Map.Entry<DENOPTIMTemplate, BBType> e : subgraphs.entrySet()) {
+            BBType bbType = e.getValue();
+            DENOPTIMTemplate subgraph = e.getKey();
+            if (bbType == BBType.SCAFFOLD) {
+                FragmentSpace.appendVertexToLibrary(subgraph, bbType,
+                        FragmentSpace.getScaffoldLibrary());
+            } else {
+                FragmentSpace.appendVertexToLibrary(subgraph, bbType,
+                        FragmentSpace.getFragmentLibrary());
+            }
+        }
     }
 
 //------------------------------------------------------------------------------

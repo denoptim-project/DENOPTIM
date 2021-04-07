@@ -830,34 +830,40 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Removes from this map any template that is isomorphic to
+     * Removes in-place from the argument map any template that is isomorphic to
      * any template in its respective fragment space library (inferred from
      * BBType).
-     * @param patterns
-     * @return
+     * The GraphPattern is used by the function to speed up the comparisons
+     * between templates. The pattern must be the same pattern as the
+     * templates adhere to for this function to return the correct result.
+     * @param templates list of templates to filter
+     * @param p the pattern of the templates.
      */
-    public static Map<DENOPTIMTemplate, BBType> filterIsomorphicPatterns(
-            Map<DENOPTIMTemplate, BBType> patterns) {
+    public static void filterIsomorphicPatterns(
+            Map<DENOPTIMTemplate, BBType> templates, GraphPattern p) {
         // TODO: 06.04.2021 Implement
         // Make isIsomorphic method in DENOPTIMGraph.
-        return patterns;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @param p
-     * @return
+     * Takes a list of molecules and extracts subgraphs stored as Templates
+     * that match the provided pattern.
+     * @param mols list of molecules.
+     * @param p pattern to match against.
+     * @return The subgraphs matching the provided pattern.
      */
-    public static Map<DENOPTIMTemplate, BBType> extractPatterns(GraphPattern p) {
+    public static Map<DENOPTIMTemplate, BBType> extractPatterns(
+            ArrayList<DENOPTIMMolecule> mols, GraphPattern p)
+    {
         return null;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Private class representig a selected closable chain of fragments
+     * Private class representing a selected closable chain of fragments
      */
 
     private static class FragForClosabChains
