@@ -329,7 +329,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    protected abstract void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap);
+    protected abstract void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs);
 
 //------------------------------------------------------------------------------
 

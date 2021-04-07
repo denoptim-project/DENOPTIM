@@ -918,9 +918,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> lstSymAPs)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
-        this.lstSymAPs = lstSymAPs;
+        this.lstSymAPs = sAPs;
     }
     
 //------------------------------------------------------------------------------

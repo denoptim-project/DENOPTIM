@@ -163,7 +163,7 @@ public class TreeBuilder3D
      * the atom belongs.
      * Calling this method cleans all the fields (see method 'clean').
      * 
-     * @param m_graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
      * @return the <code>AtomContainer</code> representation
      * @throws DENOPTIMException
      */
@@ -171,10 +171,10 @@ public class TreeBuilder3D
     //TODO-V3: should probably merge this with GraphConversionTool.convertGraphToMolecule
     // with a flag that controls whether we rototranslate the building blocks or not
     
-    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph m_graph)
+    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph)
                                                         throws DENOPTIMException
     {
-    	return convertGraphTo3DAtomContainer(m_graph,false);
+    	return convertGraphTo3DAtomContainer(graph,false);
     }
     	
 //------------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public class TreeBuilder3D
      * the atom belongs.
      * Calling this method cleans all the fields (see method 'clean').
      * 
-     * @param m_graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
      * @param removeRCAs when <code>true</code> this method will remove 
      * RCAs and add bonds to close the rings
      * defined by the DENOPTIMRings in the graph (does not alter the graph)
@@ -201,16 +201,16 @@ public class TreeBuilder3D
     //TODO: should probably merge this with GraphConversionTool.convertGraphToMolecule
     // with a flag that controls whether we rototranslate the building blocks or not
     
-    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph m_graph,
+    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph,
     		boolean removeRCAs) throws DENOPTIMException
     {
         // Clean all
         this.clean();
         
-        this.graph = m_graph;
+        this.graph = graph;
         
         // Add the first vertex in the graph (i.e., the root of the tree)
-        DENOPTIMVertex rootVrtx = graph.getVertexList().get(0);
+        DENOPTIMVertex rootVrtx = this.graph.getVertexList().get(0);
         int idRootVrtx = rootVrtx.getVertexId();
         
         //TODO-V3 assumption that scaffold has atoms in it, but this id not true 
@@ -267,9 +267,9 @@ public class TreeBuilder3D
         apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
 
         // Recursion on all branches on the tree (i.e., all incident edges)
-        for (int iEdge : graph.getIndexOfEdgesWithChild(idRootVrtx))
+        for (int iEdge : this.graph.getIndexOfEdgesWithChild(idRootVrtx))
         {
-            DENOPTIMEdge edge = graph.getEdgeAtPosition(iEdge);
+            DENOPTIMEdge edge = this.graph.getEdgeAtPosition(iEdge);
 
             // Get the AP from the current vertex to the next
             DENOPTIMAttachmentPoint apSrc = apsOnThisFrag.get(
@@ -385,7 +385,7 @@ public class TreeBuilder3D
         	// This is where we make the rings-closing bonds.
         	// Unused RCAs were already replaced by capping groups (or removed
         	// if no capping needed), So this will deal only with used RCAs.
-        	DENOPTIMMoleculeUtils.removeRCA(mol,graph);
+        	DENOPTIMMoleculeUtils.removeRCA(mol, this.graph);
         }
         
         if (debug)
@@ -453,12 +453,12 @@ public class TreeBuilder3D
             }
         }
         
-        mol.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
-        mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
-        mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
-        if (graph.getMsg() != null && !graph.getMsg().toString().equals(""))
+        mol.setProperty(DENOPTIMConstants.GCODETAG, this.graph.getGraphId());
+        mol.setProperty(DENOPTIMConstants.GRAPHTAG, this.graph.toString());
+        mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, this.graph.toJson());
+        if (this.graph.getMsg() != null && !this.graph.getMsg().toString().equals(""))
         {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG, graph.getMsg());
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, this.graph.getMsg());
         }
         this.conversionCompleted = true;
 

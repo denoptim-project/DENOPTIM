@@ -99,13 +99,13 @@ public class GraphBuildingTask extends FitnessTask
      * Constructor
      */
  
-    public GraphBuildingTask(DENOPTIMGraph m_molGraph, 
+    public GraphBuildingTask(DENOPTIMGraph molGraph,
     		FragsCombination fragsToAdd, int level, String workDir, 
     		int verbosity) throws DENOPTIMException
     {
-        super(m_molGraph.clone());
+        super(molGraph.clone());
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-        rootId = m_molGraph.getGraphId();
+        rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();
         this.workDir = workDir;
         this.fragsToAdd = fragsToAdd;

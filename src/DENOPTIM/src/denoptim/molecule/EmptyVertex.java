@@ -121,9 +121,9 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public void setSymmetricAP(ArrayList<SymmetricSet> m_Sap)
+    public void setSymmetricAP(ArrayList<SymmetricSet> sAPs)
     {
-        lstSymAPs = m_Sap;
+        lstSymAPs = sAPs;
     }
 
 //------------------------------------------------------------------------------
@@ -479,9 +479,9 @@ public class EmptyVertex extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
 
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> lstSymAPs)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
-        this.lstSymAPs = lstSymAPs;
+        this.lstSymAPs = sAPs;
     }
 
 //-----------------------------------------------------------------------------

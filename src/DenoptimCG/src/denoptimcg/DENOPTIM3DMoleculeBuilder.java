@@ -67,12 +67,12 @@ public class DENOPTIM3DMoleculeBuilder
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIM3DMoleculeBuilder(String m_molName, DENOPTIMGraph m_molGraph,
-            String m_dir)
+    public DENOPTIM3DMoleculeBuilder(String molName, DENOPTIMGraph molGraph,
+            String dir)
     {
-        molName = m_molName;
-        workDir = m_dir;
-        molGraph = m_molGraph;
+        this.molName = molName;
+        workDir = dir;
+        this.molGraph = molGraph;
     }
 
 //------------------------------------------------------------------------------

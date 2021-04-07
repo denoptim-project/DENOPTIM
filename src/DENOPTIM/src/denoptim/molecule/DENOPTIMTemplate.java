@@ -757,7 +757,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     // on a template is define a symmetry constrain rather than set the sets of 
     // symmetric vertices
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
         // TODO Auto-generated method stub
         
