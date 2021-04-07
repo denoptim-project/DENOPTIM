@@ -1,14 +1,7 @@
 package denoptim.molecule;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
 import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
@@ -626,17 +619,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
 
 //------------------------------------------------------------------------------
-
-    /**
-     * Returns the list of attachment points
-     * @return the list of APs
-     */
-    public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
-    {
-        return innerGraph.getAvailableAPs();
-    }
-
-//------------------------------------------------------------------------------
     
     /**
      * Returns a deep copy of this template
@@ -1081,12 +1063,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     public boolean mutate(MutationType type) {
         /*
-        Note: We limit ourselves to the following
-        1. The inner graph consists of exactly 1 fragment
-        2. We substitute n fragments for n fragments
-        2. We only request Mutation type CHANGEBRANCH and DELETE
-        3. We ignore symmetry
-        4. We ignore rings
+        Note: We limit ourselves to the following situation
+        - The inner graph consists of exactly 1 fragment.
+        - The template is not connected to any other vertices.
+        - We ignore symmetry.
+        - We ignore rings.
+        - We disallow the production of nested templates.
 
         These limitations will be removed once we add more unit tests and
         this note should be updated accordingly as unit tests are added (and
@@ -1099,21 +1081,32 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     type.toString() + " currently unsupported");
         }
 
+        /* Use the DENOPTIMGraphOperations class */
+
         if (type == MutationType.DELETE
                 && getInnerGraph().getVertexCount() <= 1) {
             return false;
-        }
-
-        for (DENOPTIMVertex v : FragmentSpace.getFragmentLibrary()) {
-            if (v instanceof DENOPTIMFragment) {
-                DENOPTIMFragment f = (DENOPTIMFragment) v;
-                int matches = countRequiredAPs(f);
-                if (matches == requiredAPs.size()) {
-                    DENOPTIMGraph g = new DENOPTIMGraph();
-                    g.addVertex(f);
-                    this.setInnerGraph(g);
-                    return true;
+        } else if (type == MutationType.CHANGEBRANCH) {
+            for (DENOPTIMVertex v : FragmentSpace.getFragmentLibrary()) {
+                if (v instanceof DENOPTIMFragment) {
+                    DENOPTIMFragment f = (DENOPTIMFragment) v;
+                    int matches = countRequiredAPs(f);
+                    if (matches == requiredAPs.size()) {
+                        DENOPTIMGraph g = new DENOPTIMGraph();
+                        g.addVertex(f);
+                        this.setInnerGraph(g);
+                        return true;
+                    }
                 }
+            }
+        } else if (type == MutationType.EXTEND) {
+            List<DENOPTIMAttachmentPoint> compAPs = FragmentSpace
+                    .getAPsCompatibleWithThese(getAttachmentPoints());
+            if (compAPs.size() > 0) {
+                Random rand = new Random();
+                DENOPTIMAttachmentPoint connectTo = compAPs.get(rand.nextInt(
+                        compAPs.size()));
+
             }
         }
         return false;

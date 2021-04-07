@@ -21,9 +21,11 @@ package denoptimga;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import denoptim.molecule.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
@@ -31,14 +33,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.RingClosureParameters;
@@ -829,6 +825,22 @@ if(debug)
         }
 
         return res;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Removes from this map any template that is isomorphic to
+     * any template in its respective fragment space library (inferred from
+     * BBType).
+     * @param patterns
+     * @return
+     */
+    public static Map<DENOPTIMTemplate, BBType> filterIsomorphicPatterns(
+            Map<DENOPTIMTemplate, BBType> patterns) {
+        // TODO: 06.04.2021 Implement
+        // Make isIsomorphic method in DENOPTIMGraph.
+        return patterns;
     }
 
 //------------------------------------------------------------------------------
@@ -1682,5 +1694,7 @@ if(debug)
     }
 
 //------------------------------------------------------------------------------
+
+
 
 }

@@ -20,8 +20,12 @@
 package denoptimga;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
+import denoptim.molecule.DENOPTIMTemplate;
+import denoptim.molecule.DENOPTIMVertex;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -34,6 +38,8 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.TreeBuilder3D;
+
+import static denoptim.molecule.DENOPTIMVertex.*;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a
@@ -175,6 +181,24 @@ public class OffspringEvaluationTask extends FitnessTask
             synchronized (numtry)
             {
                 numtry--;
+            }
+            Map<DENOPTIMTemplate, BBType> patterns =
+                    DENOPTIMGraphOperations.extractPatterns(DENOPTIMPattern.RING);
+        	patterns = DENOPTIMGraphOperations
+                    .filterIsomorphicPatterns(patterns);
+        	for (Map.Entry<DENOPTIMTemplate, BBType> e :
+                    patterns.entrySet()) {
+                BBType bbType = e.getValue();
+                DENOPTIMTemplate pattern = e.getKey();
+                switch (bbType) {
+                    case SCAFFOLD:
+                        FragmentSpace.appendVertexToLibrary(pattern,
+                                bbType, FragmentSpace.getScaffoldLibrary());
+                        break;
+                    default:
+                        FragmentSpace.appendVertexToLibrary(pattern,
+                                bbType, FragmentSpace.getFragmentLibrary());
+                }
             }
         }
         completed = true;

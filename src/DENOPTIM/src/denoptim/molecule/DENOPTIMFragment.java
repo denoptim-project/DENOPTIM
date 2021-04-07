@@ -51,7 +51,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	 */
 	private static final long serialVersionUID = 1L;
 
-    /*
+    /**
      * attachment points on this vertex
      */
     private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
