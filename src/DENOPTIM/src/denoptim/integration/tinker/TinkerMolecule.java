@@ -33,7 +33,7 @@ public class TinkerMolecule implements Serializable, Cloneable
     private ArrayList<TinkerAtom> lstAtoms;
     ArrayList<int[]> zdel;
     ArrayList<int[]> zadd;
-    String molname;
+    String molName;
 
     private boolean debug = false;
 
@@ -45,18 +45,18 @@ public class TinkerMolecule implements Serializable, Cloneable
 	lstAtoms = new ArrayList<TinkerAtom>();
 	zdel = new ArrayList<int[]>();
 	zadd = new ArrayList<int[]>();
-	molname = "";
+	molName = "";
     }
 
 //------------------------------------------------------------------------------
 
-    public TinkerMolecule(String m_name, ArrayList<int[]> m_zadd,
-                            ArrayList<int[]> m_zdel, ArrayList<TinkerAtom> m_atoms)
+    public TinkerMolecule(String molName, ArrayList<int[]> zadd,
+                            ArrayList<int[]> zdel, ArrayList<TinkerAtom> lstAtoms)
     {
-        lstAtoms = m_atoms;
-        molname = m_name;
-        zdel = m_zdel;
-        zadd = m_zadd;
+        this.lstAtoms = lstAtoms;
+        this.molName = molName;
+        this.zdel = zdel;
+        this.zadd = zadd;
     }
 
 //------------------------------------------------------------------------------
@@ -65,15 +65,15 @@ public class TinkerMolecule implements Serializable, Cloneable
      * Identify the list of connected atoms (only first neighbours are 
      * considered) to the atom at the specified 
      * position
-     * @param m_pos
+     * @param pos
      * @return list of connected atoms 
      */
 
-    public ArrayList<Integer> getConnectedAtoms(int m_pos)
+    public ArrayList<Integer> getConnectedAtoms(int pos)
     {
         ArrayList<Integer> lst = new ArrayList<>();
 
-        TinkerAtom tatm = getAtom(m_pos);
+        TinkerAtom tatm = getAtom(pos);
         int[] d = tatm.getAtomNeighbours();
         if (d[0] != 0)
             lst.add(Integer.valueOf(d[0])); 
@@ -82,12 +82,12 @@ public class TinkerMolecule implements Serializable, Cloneable
         for (int i = 0; i<numberOfAtoms; i++)
         {
             tatm = lstAtoms.get(i);
-            if (tatm.getXYZIndex() == m_pos)
+            if (tatm.getXYZIndex() == pos)
             {
                 continue;
             }
             d = tatm.getAtomNeighbours();
-            if (d[0] == m_pos)
+            if (d[0] == pos)
             {
                 lst.add(Integer.valueOf(tatm.getXYZIndex()));
             }
@@ -117,24 +117,24 @@ public class TinkerMolecule implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setName(String m_name)
+    public void setName(String molName)
     {
-        this.molname = m_name;
+        this.molName = molName;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setAtoms(ArrayList<TinkerAtom> m_atoms)
+    public void setAtoms(ArrayList<TinkerAtom> lstAtoms)
     {
-        this.lstAtoms = m_atoms;
+        this.lstAtoms = lstAtoms;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setBondPairs(ArrayList<int[]> m_zdel, ArrayList<int[]> m_zadd)
+    public void setBondPairs(ArrayList<int[]> zdel, ArrayList<int[]> zadd)
     {
-        this.zdel = m_zdel;
-        this.zadd = m_zadd;
+        this.zdel = zdel;
+        this.zadd = zadd;
     }
 
 //------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ public class TinkerMolecule implements Serializable, Cloneable
 
     public String getName()
     {
-        return this.molname;
+        return this.molName;
     }
 
 //------------------------------------------------------------------------------
@@ -175,17 +175,17 @@ public class TinkerMolecule implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the atom which has the XYZ index set to m_pos
-     * @param m_pos
+     * Returns the atom which has the XYZ index set to pos
+     * @param pos
      * @return the TinkerAtom at the specified position
      */
 
-    public TinkerAtom getAtom(int m_pos)
+    public TinkerAtom getAtom(int pos)
     {
         for (int i=0; i<lstAtoms.size(); i++)
         {
             TinkerAtom atm = lstAtoms.get(i);
-            if (atm.getXYZIndex() == m_pos)
+            if (atm.getXYZIndex() == pos)
             {
                 return atm;
             }
@@ -211,7 +211,7 @@ public class TinkerMolecule implements Serializable, Cloneable
      */
     public TinkerMolecule deepCopy()
     {
-	String nMolName = this.molname;
+	String nMolName = this.molName;
 	ArrayList<TinkerAtom> atms = new ArrayList<TinkerAtom>();
 	for (int ia=0; ia<this.lstAtoms.size(); ia++)
 	{
@@ -345,7 +345,7 @@ public class TinkerMolecule implements Serializable, Cloneable
         int numatoms = lstAtoms.size();
         // write out the number of atoms and the title
         String line = "";
-        line = String.format("%6d  %s%n", numatoms, molname);
+        line = String.format("%6d  %s%n", numatoms, molName);
         System.err.print(line);
 
         for (int i = 0; i<numatoms; i++)

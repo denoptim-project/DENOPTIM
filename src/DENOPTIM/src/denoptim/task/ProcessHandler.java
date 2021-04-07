@@ -51,10 +51,10 @@ public class ProcessHandler
 
 //------------------------------------------------------------------------------
 
-    public ProcessHandler(String m_str, String m_id)
+    public ProcessHandler(String cmdStr, String id)
     {
-        cmdStr = m_str;
-        id = m_id;
+        this.cmdStr = cmdStr;
+        this.id = id;
     }
 
 //------------------------------------------------------------------------------

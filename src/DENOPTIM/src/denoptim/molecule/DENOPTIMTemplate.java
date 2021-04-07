@@ -234,7 +234,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(bbt);
         
-        // Adding fully defined vertexes (they point to an actual fragment)
+        // Adding fully defined vertices (they point to an actual fragment)
         DENOPTIMVertex vA = null;
         try
         {
@@ -739,7 +739,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     // on a template is define a symmetry constrain rather than set the sets of 
     // symmetric vertices
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
         // TODO Auto-generated method stub
         
@@ -752,9 +752,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         //TODO-V3: this cannot yet be done on a template because the 
         // SymmetricSet class holds only one set of integer identifiers that 
-        // can be used to identify symmetric things like vertexes in a graph,
+        // can be used to identify symmetric things like vertices in a graph,
         // or APs belonging to the SAME vertex. However, the symmetric APs on 
-        // a template can belong to different vertexes, meaning that 
+        // a template can belong to different vertices, meaning that
         // identifying these APs with indexes requires at least two sets of
         // indexes (one for the vertex, one for the AP).
         // For the moment, we cannot return a sensible ArrayList<SymmetricSet>

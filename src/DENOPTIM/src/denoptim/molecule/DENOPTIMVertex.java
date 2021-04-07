@@ -329,7 +329,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    protected abstract void setSymmetricAPSets(ArrayList<SymmetricSet> m_Sap);
+    protected abstract void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs);
 
 //------------------------------------------------------------------------------
 
@@ -340,17 +340,17 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * For the given attachment point index locate the symmetric partners
      * i.e. those with similar environments and class types.
-     * @param m_dapidx inded of the attachment point which we want to get
+     * @param apIdx index of the attachment point which we want to get
      * the symmetrically related partners of.
      * @return the list of attachment point IDs, which include 
-     * <code>m_dapidx</code> or <code>null</code> if no partners present
+     * <code>apIdx</code> or <code>null</code> if no partners present
      */
 
-    public SymmetricSet getSymmetricAPs(int m_dapidx)
+    public SymmetricSet getSymmetricAPs(int apIdx)
     {
         for (SymmetricSet symmetricSet : getSymmetricAPSets()) 
         {
-            if (symmetricSet.contains(m_dapidx)) 
+            if (symmetricSet.contains(apIdx))
             {
                 return symmetricSet;
             }
@@ -413,9 +413,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void setLevel(int m_level)
+    public void setLevel(int level)
     {
-        level = m_level;
+        this.level = level;
     }
 
 //------------------------------------------------------------------------------
@@ -493,7 +493,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
+     * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
     public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
@@ -531,7 +531,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
+     * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
     public boolean sameVertexFeatures(DENOPTIMVertex other, 
@@ -1104,7 +1104,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         {
             JsonObject jsonObject = json.getAsJsonObject();
 
-            // Desiralization differs for the types of vertexes
+            // Desiralization differs for the types of vertices
             // First, consider templates
             if (jsonObject.has("innerGraph"))
             {
@@ -1223,7 +1223,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
                 return v;
             }
-            // Finally, vertexes that are not "molecular" (empty vertex)
+            // Finally, vertices that are not "molecular" (empty vertex)
             else
             {
                 //TODO-V3 log or del

@@ -40,7 +40,6 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
 
@@ -149,7 +148,7 @@ public class GraphConversionTool
                         "it is more likely an error in the atom specification. "
                         + "Kindly check your input files. "
                         + "Error occurred while dealing with edge " + edge
-                        + " and vertexes " + v1 + " and " + v2 + ".";
+                        + " and vertices " + v1 + " and " + v2 + ".";
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }
@@ -200,9 +199,9 @@ public class GraphConversionTool
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
-        if (g.getMsg() != null)
+        if (g.getLocalMsg() != null)
         {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getMsg());
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getLocalMsg());
         }
 
         return mol;
@@ -487,18 +486,18 @@ public class GraphConversionTool
     private static class DENOPTIMVertexAtom
     {
         private int vertexId;
-        private final HashMap<Integer, Integer> anum_map;
+        private final HashMap<Integer, Integer> atmNumMap;
 
-        public DENOPTIMVertexAtom(int m_vertexId,
-                                            HashMap<Integer, Integer> m_anum_map)
+        public DENOPTIMVertexAtom(int vertexId,
+                                  HashMap<Integer, Integer> atmNumMap)
         {
-            vertexId = m_vertexId;
-            anum_map = m_anum_map;
+            this.vertexId = vertexId;
+            this.atmNumMap = atmNumMap;
         }
         
         public int lookupMatchingAtomNumber(int anum)
         {
-            return anum_map.getOrDefault(anum, -1);
+            return atmNumMap.getOrDefault(anum, -1);
         }
         
         public int getVertexId()

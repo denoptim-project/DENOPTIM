@@ -24,8 +24,8 @@ package denoptimcg;
  */
 public class APAtomHolder
 {
-    private int atm_num;
-    private int ap_idx;
+    private int atmNum;
+    private int apIdx;
     private double[] dirVec;
 
 //------------------------------------------------------------------------------
@@ -37,11 +37,11 @@ public class APAtomHolder
 
 //------------------------------------------------------------------------------
 
-    public APAtomHolder(int m_atm_num, int m_ap_idx, double[] m_vec)
+    public APAtomHolder(int atmNum, int apIdx, double[] dirVec)
     {
-        atm_num = m_atm_num;
-        ap_idx = m_ap_idx;
-        dirVec = m_vec;
+        this.atmNum = atmNum;
+        this.apIdx = apIdx;
+        this.dirVec = dirVec;
     }
 
 //------------------------------------------------------------------------------
@@ -55,14 +55,14 @@ public class APAtomHolder
 
     protected int getAtomNumber()
     {
-        return atm_num;
+        return atmNum;
     }
 
 //------------------------------------------------------------------------------
 
     protected int getAPIndex()
     {
-        return ap_idx;
+        return apIdx;
     }
 
 //------------------------------------------------------------------------------

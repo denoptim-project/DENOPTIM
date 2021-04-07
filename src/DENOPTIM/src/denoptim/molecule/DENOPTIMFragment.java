@@ -840,7 +840,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
+     * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
     public boolean sameAs(DENOPTIMFragment other, StringBuilder reason)
@@ -918,9 +918,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> lstSymAPs)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
-        this.lstSymAPs = lstSymAPs;
+        this.lstSymAPs = sAPs;
     }
     
 //------------------------------------------------------------------------------

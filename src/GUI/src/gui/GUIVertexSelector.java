@@ -38,7 +38,7 @@ import denoptim.molecule.DENOPTIMVertex;
 /**
  * A modal dialog with a viewer that understands the different types of 
  * DENOPTIM vertex 
- * and allows to select vertexes and, if needed, attachment points.
+ * and allows to select vertices and, if needed, attachment points.
  * 
  * @author Marco Foscato
  */
@@ -51,7 +51,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	private static final long serialVersionUID = 912850110991449553L;
 	
 	/**
-	 * The currently loaded list of vertexes
+	 * The currently loaded list of vertices
 	 */
 	private ArrayList<DENOPTIMVertex> vertexLibrary =
 			new ArrayList<DENOPTIMVertex>();
@@ -77,7 +77,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	private JPanel navigPanel2;
 	
 	private JSpinner navigSpinner;
-	private JLabel totalVertexesLabel;
+	private JLabel totalVerticesLabel;
 	private final VrtxSpinnerChangeEvent vrtxSpinnerListener = 
 			new VrtxSpinnerChangeEvent();
 	
@@ -153,7 +153,7 @@ public class GUIVertexSelector extends GUIModalDialog
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
 		
-		// Controls for navigating the vertexes list
+		// Controls for navigating the vertices list
         ctrlPane = new JPanel();
         ctrlPane.setVisible(true);
 		
@@ -163,7 +163,7 @@ public class GUIVertexSelector extends GUIModalDialog
         navigPanel2 = new JPanel();
         JLabel navigationLabel1 = new JLabel("vertex # ");
         JLabel navigationLabel2 = new JLabel("Current library size: ");
-        totalVertexesLabel = new JLabel("0");
+        totalVerticesLabel = new JLabel("0");
         
 		navigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
 		navigSpinner.setToolTipText("Move to vertex number # in the currently "
@@ -175,7 +175,7 @@ public class GUIVertexSelector extends GUIModalDialog
 		ctrlPane.add(navigPanel);
 		
         navigPanel2.add(navigationLabel2);
-        navigPanel2.add(totalVertexesLabel);
+        navigPanel2.add(totalVerticesLabel);
 		ctrlPane.add(navigPanel2);
 		addToNorthPane(ctrlPane);
 		
@@ -307,7 +307,7 @@ public class GUIVertexSelector extends GUIModalDialog
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Loads the vertexes corresponding to the field index.
+	 * Loads the vertices corresponding to the field index.
 	 * The molecular data is loaded in the Jmol viewer,
 	 * and the attachment point (AP) information in the the list of APs.
 	 * Jmol is not aware of AP-related information, so this also launches
@@ -318,7 +318,7 @@ public class GUIVertexSelector extends GUIModalDialog
 		if (vertexLibrary == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "No list of vertexes loaded.",
+	                "No list of vertices loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -336,7 +336,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	{		
 		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
 				vertexLibrary.size(), 1));
-		totalVertexesLabel.setText(Integer.toString(vertexLibrary.size()));
+		totalVerticesLabel.setText(Integer.toString(vertexLibrary.size()));
 	}
 	
 //-----------------------------------------------------------------------------
