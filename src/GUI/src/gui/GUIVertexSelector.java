@@ -77,7 +77,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	private JPanel navigPanel2;
 	
 	private JSpinner navigSpinner;
-	private JLabel totalVertexesLabel;
+	private JLabel totalVerticesLabel;
 	private final VrtxSpinnerChangeEvent vrtxSpinnerListener = 
 			new VrtxSpinnerChangeEvent();
 	
@@ -163,7 +163,7 @@ public class GUIVertexSelector extends GUIModalDialog
         navigPanel2 = new JPanel();
         JLabel navigationLabel1 = new JLabel("vertex # ");
         JLabel navigationLabel2 = new JLabel("Current library size: ");
-        totalVertexesLabel = new JLabel("0");
+        totalVerticesLabel = new JLabel("0");
         
 		navigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
 		navigSpinner.setToolTipText("Move to vertex number # in the currently "
@@ -175,7 +175,7 @@ public class GUIVertexSelector extends GUIModalDialog
 		ctrlPane.add(navigPanel);
 		
         navigPanel2.add(navigationLabel2);
-        navigPanel2.add(totalVertexesLabel);
+        navigPanel2.add(totalVerticesLabel);
 		ctrlPane.add(navigPanel2);
 		addToNorthPane(ctrlPane);
 		
@@ -336,7 +336,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	{		
 		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
 				vertexLibrary.size(), 1));
-		totalVertexesLabel.setText(Integer.toString(vertexLibrary.size()));
+		totalVerticesLabel.setText(Integer.toString(vertexLibrary.size()));
 	}
 	
 //-----------------------------------------------------------------------------

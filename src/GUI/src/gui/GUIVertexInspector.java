@@ -214,7 +214,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-				    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+				    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
 				            BBType.FRAGMENT, vrtxLib, true);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -242,7 +242,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				if (vrtxLib.size() == 1)
 				{
-				    importVertexes(vrtxLib);
+				    importVertices(vrtxLib);
 					return;
 				}
 				
@@ -269,7 +269,7 @@ public class GUIVertexInspector extends GUICardPanel
 				switch (res)
 				{
 					case 0:
-					    importVertexes(vrtxLib);
+					    importVertices(vrtxLib);
 						break;
 						
 					case 1:
@@ -289,7 +289,7 @@ public class GUIVertexInspector extends GUICardPanel
 						        selectedVrtxs.add(vrtxLib.get(pair.get(0)));
 						    }
 						}
-						importVertexes(selectedVrtxs);
+						importVertices(selectedVrtxs);
 						break;
 					
 					default:
@@ -514,7 +514,7 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
-                    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+                    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
                             BBType.FRAGMENT, vrtxLib, true);
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -539,7 +539,7 @@ public class GUIVertexInspector extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
-				importVertexes(vrtxLib);
+				importVertices(vrtxLib);
 			}
 		});
 		commandsPane.add(btnOpenVrtxs);
@@ -556,7 +556,7 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				try
 				{
-				    DenoptimIO.writeVertexes(outFile.getAbsolutePath(),
+				    DenoptimIO.writeVertices(outFile.getAbsolutePath(),
 							verticesLibrary);
 				}
 				catch (Exception ex)
@@ -722,13 +722,13 @@ public class GUIVertexInspector extends GUICardPanel
 	 * @param file the file to open
 	 * @param format the format
 	 */
-	public void importVertexesFromFile(File file, String format)
+	public void importVerticesFromFile(File file, String format)
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
-            DenoptimIO.appendVertexesFromFileToLibrary(file, BBType.FRAGMENT, 
+            DenoptimIO.appendVerticesFromFileToLibrary(file, BBType.FRAGMENT,
                     vrtxLib, true);
         } catch (Exception e1) {
             e1.printStackTrace();
@@ -753,7 +753,7 @@ public class GUIVertexInspector extends GUICardPanel
                     UIManager.getIcon("OptionPane.errorIcon"));
             return;
         }
-        importVertexes(vrtxLib);
+        importVertices(vrtxLib);
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
@@ -763,7 +763,7 @@ public class GUIVertexInspector extends GUICardPanel
      * Imports vertices.
      * @param list the list of vertices to import
      */
-    public void importVertexes(ArrayList<DENOPTIMVertex> list)
+    public void importVertices(ArrayList<DENOPTIMVertex> list)
     {   
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         

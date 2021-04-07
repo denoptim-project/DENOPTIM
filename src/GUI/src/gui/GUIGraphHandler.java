@@ -1006,7 +1006,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		DENOPTIMVertex.BBType trgFrgType = DENOPTIMVertex.BBType.UNDEFINED;
 		ArrayList<DENOPTIMVertex> vertxLib = new ArrayList<DENOPTIMVertex>();		
 		String[] options = new String[]{"Any Vertex",
-				"Compatible Vertexes ("+compatVrtxs.size()+")",
+				"Compatible Vertices ("+compatVrtxs.size()+")",
 				"Capping group"};
 		int res = JOptionPane.showOptionDialog(null,
                 "<html>Choose a subset of possible vertices:</html>",

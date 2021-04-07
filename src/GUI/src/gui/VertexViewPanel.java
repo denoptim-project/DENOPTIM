@@ -173,7 +173,7 @@ public class VertexViewPanel extends JPanel
         this.add(titlePanel, BorderLayout.NORTH);
         
         emptyViewerCard = new JPanel();
-        emptyViewerCard.setToolTipText("Vertexes are displayed here.");
+        emptyViewerCard.setToolTipText("Vertices are displayed here.");
         centralPanel.add(emptyViewerCard, EMPTYCARDNAME);
         
         graphNodeViewer = new VertexAsGraphViewPanel(this, editableAPTable,300);

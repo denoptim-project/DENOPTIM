@@ -310,8 +310,8 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     
-    public static void writeVertexes(String pathName, 
-            ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException {
+    public static void writeVertices(String pathName,
+                                     ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException {
         SDFWriter sdfWriter = null;
         try {
             IAtomContainerSet molSet = new AtomContainerSet();
@@ -2219,9 +2219,9 @@ public class DenoptimIO
      * @throws IllegalArgumentException 
      * @throws Exception
      */
-    public static void appendVertexesFromFileToLibrary(File file,
-            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library, 
-            boolean setBBId) throws UndetectedFileFormatException, IOException, 
+    public static void appendVerticesFromFileToLibrary(File file,
+                                                       DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
+                                                       boolean setBBId) throws UndetectedFileFormatException, IOException,
     IllegalArgumentException, DENOPTIMException
     {
         FileFormat ff = DenoptimIO.detectFileFormat(file);

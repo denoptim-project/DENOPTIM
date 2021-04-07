@@ -22,7 +22,6 @@ package denoptim.fragspace;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,8 +38,6 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 
@@ -281,7 +278,7 @@ public class FragmentSpace
             cappingLib = new ArrayList<DENOPTIMVertex>();
             try
             {
-                DenoptimIO.appendVertexesFromFileToLibrary(new File(capFile), 
+                DenoptimIO.appendVerticesFromFileToLibrary(new File(capFile),
                         BBType.CAP, cappingLib, true);
             } catch (IllegalArgumentException | UndetectedFileFormatException
                     | IOException | DENOPTIMException e)
@@ -294,7 +291,7 @@ public class FragmentSpace
         fragmentLib = new ArrayList<DENOPTIMVertex>();
         try
         {
-            DenoptimIO.appendVertexesFromFileToLibrary(new File(fragFile), 
+            DenoptimIO.appendVerticesFromFileToLibrary(new File(fragFile),
                     BBType.FRAGMENT, fragmentLib, true);
         } catch (IllegalArgumentException | UndetectedFileFormatException
                 | IOException | DENOPTIMException e)
@@ -306,7 +303,7 @@ public class FragmentSpace
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
         try
         {
-            DenoptimIO.appendVertexesFromFileToLibrary(new File(scaffFile), 
+            DenoptimIO.appendVerticesFromFileToLibrary(new File(scaffFile),
                     BBType.SCAFFOLD, scaffoldLib, true);
         } catch (IllegalArgumentException | UndetectedFileFormatException
                 | IOException | DENOPTIMException e)
@@ -332,7 +329,7 @@ public class FragmentSpace
          * 
          * fragmentLib.add(ev); fragmentLib.add(ev2);
          * 
-         * DenoptimIO.writeVertexes("/tmp/frags_and_templates.sdf",fragmentLib);
+         * DenoptimIO.writeVertices("/tmp/frags_and_templates.sdf",fragmentLib);
          */
 
         // TODO-V3: remove: tmp code just for devel phase
@@ -341,7 +338,7 @@ public class FragmentSpace
         {
             scaffoldLib = new ArrayList<>();
             //scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
-            appendVertexesToLibrary(new ArrayList<DENOPTIMVertex>(
+            appendVerticesToLibrary(new ArrayList<DENOPTIMVertex>(
                     Arrays.asList(DENOPTIMTemplate.getTestScaffoldTemplate())), 
                     BBType.SCAFFOLD, scaffoldLib);
             
@@ -349,7 +346,7 @@ public class FragmentSpace
 //            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
 //            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
             
-            appendVertexesToLibrary(new ArrayList<DENOPTIMVertex>(
+            appendVerticesToLibrary(new ArrayList<DENOPTIMVertex>(
                     Arrays.asList(DENOPTIMTemplate.getTestFragmentTemplate(),
                             DENOPTIMTemplate.getTestFragmentTemplateBis()
                             , DENOPTIMTemplate.getTestFragmentTemplateTris()
@@ -374,8 +371,8 @@ public class FragmentSpace
             }
             
             //TODO-MF del
-            DenoptimIO.writeVertexes("/tmp/scaffolds.sdf",scaffoldLib);
-            DenoptimIO.writeVertexes("/tmp/frags.sdf",fragmentLib);
+            DenoptimIO.writeVertices("/tmp/scaffolds.sdf",scaffoldLib);
+            DenoptimIO.writeVertices("/tmp/frags.sdf",fragmentLib);
             
             //TODO del
             System.out.println("WRITTEN!");
@@ -909,7 +906,7 @@ public class FragmentSpace
      * @return the list of matching attachment points.
      */
 
-    public static ArrayList<DENOPTIMVertex> getVertexesWithAPClass(APClass apc)
+    public static ArrayList<DENOPTIMVertex> getVerticesWithAPClass(APClass apc)
     {
         ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
         
@@ -1095,7 +1092,7 @@ public class FragmentSpace
         {
             for (APClass klass : compatApClasses)
             {
-                ArrayList<DENOPTIMVertex> vrtxs = getVertexesWithAPClass(klass);
+                ArrayList<DENOPTIMVertex> vrtxs = getVerticesWithAPClass(klass);
                 for (DENOPTIMVertex v : vrtxs)
                 {
                     for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
@@ -1228,14 +1225,14 @@ public class FragmentSpace
     public static void setScaffoldLibrary(ArrayList<DENOPTIMVertex> lib)
     {
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
-        FragmentSpace.appendVertexesToLibrary(lib, 
+        FragmentSpace.appendVerticesToLibrary(lib,
                 BBType.SCAFFOLD, scaffoldLib);
     }
 
     public static void setFragmentLibrary(ArrayList<DENOPTIMVertex> lib)
     {
         fragmentLib = new ArrayList<DENOPTIMVertex>();
-        FragmentSpace.appendVertexesToLibrary(lib, 
+        FragmentSpace.appendVerticesToLibrary(lib,
                 BBType.FRAGMENT, fragmentLib);
     }
 
@@ -1244,7 +1241,7 @@ public class FragmentSpace
     public static void setCappingLibrary(ArrayList<DENOPTIMVertex> lib)
     {
         cappingLib = new ArrayList<DENOPTIMVertex>();
-        FragmentSpace.appendVertexesToLibrary(lib, 
+        FragmentSpace.appendVerticesToLibrary(lib,
                 BBType.CAP, cappingLib);
     }
 
@@ -1349,8 +1346,9 @@ public class FragmentSpace
      * @param library where to import the vertices to.
      */
     
-    public static void appendIACsAsVertexesToLibrary(ArrayList<IAtomContainer>list, 
-            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    public static void appendIACsAsVerticesToLibrary(
+            ArrayList<IAtomContainer>list, DENOPTIMVertex.BBType bbt,
+            ArrayList<DENOPTIMVertex> library)
     {
         for(IAtomContainer iac : list)
         {
@@ -1390,8 +1388,8 @@ public class FragmentSpace
      * @param library where to import the vertices to.
      */
     
-    public static void appendVertexesToLibrary(ArrayList<DENOPTIMVertex> list, 
-            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    public static void appendVerticesToLibrary(ArrayList<DENOPTIMVertex> list,
+                                               DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
     {
         for (DENOPTIMVertex v : list)
         {
