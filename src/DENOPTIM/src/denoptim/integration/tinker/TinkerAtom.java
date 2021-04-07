@@ -217,9 +217,9 @@ public class TinkerAtom implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-     public void setAtomString(String m_str)
+     public void setAtomString(String atomStr)
      {
-          this.atomStr = m_str;
+          this.atomStr = atomStr;
      }
 
 //------------------------------------------------------------------------------
@@ -231,16 +231,16 @@ public class TinkerAtom implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
      
-     public void setAtomType(int m_ffatomtype)
+     public void setAtomType(int ffAtomType)
      {
-          this.ffAtomType = m_ffatomtype;
+          this.ffAtomType = ffAtomType;
      }
 
 //------------------------------------------------------------------------------
      
-     public void setVertexId(int m_vid)
+     public void setVertexId(int vtxId)
      {
-         this.vtxId = m_vid;
+         this.vtxId = vtxId;
      }     
      
 //------------------------------------------------------------------------------     

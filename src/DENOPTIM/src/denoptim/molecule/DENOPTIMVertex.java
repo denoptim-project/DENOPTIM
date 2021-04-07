@@ -340,17 +340,17 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * For the given attachment point index locate the symmetric partners
      * i.e. those with similar environments and class types.
-     * @param m_dapidx inded of the attachment point which we want to get
+     * @param apIdx index of the attachment point which we want to get
      * the symmetrically related partners of.
      * @return the list of attachment point IDs, which include 
-     * <code>m_dapidx</code> or <code>null</code> if no partners present
+     * <code>apIdx</code> or <code>null</code> if no partners present
      */
 
-    public SymmetricSet getSymmetricAPs(int m_dapidx)
+    public SymmetricSet getSymmetricAPs(int apIdx)
     {
         for (SymmetricSet symmetricSet : getSymmetricAPSets()) 
         {
-            if (symmetricSet.contains(m_dapidx)) 
+            if (symmetricSet.contains(apIdx))
             {
                 return symmetricSet;
             }
@@ -413,9 +413,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void setLevel(int m_level)
+    public void setLevel(int level)
     {
-        level = m_level;
+        this.level = level;
     }
 
 //------------------------------------------------------------------------------
