@@ -846,6 +846,17 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
+     *
+     * @param p
+     * @return
+     */
+    public static Map<DENOPTIMTemplate, BBType> extractPatterns(GraphPattern p) {
+        return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Private class representig a selected closable chain of fragments
      */
 

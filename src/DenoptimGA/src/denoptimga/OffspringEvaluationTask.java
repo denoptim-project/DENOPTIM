@@ -183,21 +183,19 @@ public class OffspringEvaluationTask extends FitnessTask
                 numtry--;
             }
             Map<DENOPTIMTemplate, BBType> patterns =
-                    DENOPTIMGraphOperations.extractPatterns(DENOPTIMPattern.RING);
+                    DENOPTIMGraphOperations.extractPatterns(GraphPattern.RING);
         	patterns = DENOPTIMGraphOperations
                     .filterIsomorphicPatterns(patterns);
         	for (Map.Entry<DENOPTIMTemplate, BBType> e :
                     patterns.entrySet()) {
                 BBType bbType = e.getValue();
                 DENOPTIMTemplate pattern = e.getKey();
-                switch (bbType) {
-                    case SCAFFOLD:
-                        FragmentSpace.appendVertexToLibrary(pattern,
-                                bbType, FragmentSpace.getScaffoldLibrary());
-                        break;
-                    default:
-                        FragmentSpace.appendVertexToLibrary(pattern,
-                                bbType, FragmentSpace.getFragmentLibrary());
+                if (bbType == BBType.SCAFFOLD) {
+                    FragmentSpace.appendVertexToLibrary(pattern,
+                            bbType, FragmentSpace.getScaffoldLibrary());
+                } else {
+                    FragmentSpace.appendVertexToLibrary(pattern,
+                            bbType, FragmentSpace.getFragmentLibrary());
                 }
             }
         }
