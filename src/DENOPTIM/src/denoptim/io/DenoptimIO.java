@@ -303,7 +303,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Writes vertexes to SDF file.
+     * Writes vertices to SDF file.
      *
      * @param pathName The pathname where to write
      * @param vertexes The list of vertexes to write

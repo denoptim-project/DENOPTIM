@@ -148,7 +148,7 @@ public class GraphConversionTool
                         "it is more likely an error in the atom specification. "
                         + "Kindly check your input files. "
                         + "Error occurred while dealing with edge " + edge
-                        + " and vertexes " + v1 + " and " + v2 + ".";
+                        + " and vertices " + v1 + " and " + v2 + ".";
                 DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
             }

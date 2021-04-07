@@ -10,15 +10,15 @@
    vertex ID, while it should point to a specific fragment in the library.)
 ** DENOPTIMGraphEdit has a similar need: point to an undefined vertex that 
    contains a specific fragment from the fragment space.
-** GraphUtils.findVertices too has the need to detect vertexes that CAN be 
+** GraphUtils.findVertices too has the need to detect vertices that CAN be
    fragments and CAN have a specific molID+fragTyp pair
 ** FragsCombinationIterator
 ** see IdFragmentAndAP 
 ** also utils like EAUtils.selectClassBasedFragment are heavily driven by the 
-   ID-based referencing to vertexes in the fragment library and to their APs
+   ID-based referencing to vertices in the fragment library and to their APs
 
 * About identifiers in general: can be avoided as long as we work with 
-  references? The moment we export/store/import graphs and vertexes, we need 
+  references? The moment we export/store/import graphs and vertices, we need
   a txt-based representation that either 
   * points to an existing library (as originally done in denoptim), or 
   * embeds ALL the data needed to define the building blocks.
@@ -36,7 +36,7 @@
   This, unless we have access to the actual library of fragments used to 
   build that graph. 
 
-* check comparison vertexes.
+* check comparison vertices.
 
 * when converting graph to molecule 3D, get 3D molecular representation of 
   vertex, if any, or skip if none is available. 

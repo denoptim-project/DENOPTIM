@@ -289,50 +289,50 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void addSymmetricSetOfVertices(SymmetricSet m_ss)
+    public void addSymmetricSetOfVertices(SymmetricSet symSet)
                                                         throws DENOPTIMException
     {
         for (SymmetricSet oldSS : symVertices)
         {
-            for (Integer vid : m_ss.getList())
+            for (Integer vid : symSet.getList())
             {
                 if (oldSS.contains(vid))
                 {
-                    throw new DENOPTIMException("Adding " + m_ss + " while "
+                    throw new DENOPTIMException("Adding " + symSet + " while "
                                                 + "there is already " + oldSS
                                                 + " that contains " + vid);
                 }
             }
         }
-        symVertices.add(m_ss);
+        symVertices.add(symSet);
     }
 
 //------------------------------------------------------------------------------
 
-    public void setVertexList(ArrayList<DENOPTIMVertex> m_vertices)
+    public void setVertexList(ArrayList<DENOPTIMVertex> vertices)
     {
-        gVertices = m_vertices;
+        gVertices = vertices;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setEdgeList(ArrayList<DENOPTIMEdge> m_edges)
+    public void setEdgeList(ArrayList<DENOPTIMEdge> edges)
     {
-        gEdges = m_edges;
+        gEdges = edges;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setRings(ArrayList<DENOPTIMRing> m_rings)
+    public void setRings(ArrayList<DENOPTIMRing> rings)
     {
-        gRings = m_rings;
+        gRings = rings;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setCandidateClosableChains(ArrayList<ClosableChain> m_closableChains)
+    public void setCandidateClosableChains(ArrayList<ClosableChain> closableChains)
     {
-        closableChains = m_closableChains;
+        this.closableChains = closableChains;
     }
 
 //------------------------------------------------------------------------------
@@ -510,16 +510,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void addEdge(DENOPTIMEdge m_edge)
+    public void addEdge(DENOPTIMEdge edge)
     {
-        gEdges.add(m_edge);
+        gEdges.add(edge);
     }
 
 //------------------------------------------------------------------------------
 
-    public void addRing(DENOPTIMRing m_ring)
+    public void addRing(DENOPTIMRing ring)
     {
-        gRings.add(m_ring);
+        gRings.add(ring);
     }
     
 //------------------------------------------------------------------------------
@@ -571,10 +571,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void addVertex(DENOPTIMVertex m_vertex)
+    public void addVertex(DENOPTIMVertex vertex)
     {
-        m_vertex.setGraphOwner(this);
-        gVertices.add(m_vertex);
+        vertex.setGraphOwner(this);
+        gVertices.add(vertex);
     }
 
 //------------------------------------------------------------------------------
@@ -656,10 +656,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getVertexAtPosition(int m_pos)
+    public DENOPTIMVertex getVertexAtPosition(int pos)
     {
-        return ((m_pos >= gVertices.size()) || m_pos < 0) ? null :
-                gVertices.get(m_pos);
+        return ((pos >= gVertices.size()) || pos < 0) ? null :
+                gVertices.get(pos);
     }
 
 //------------------------------------------------------------------------------
@@ -676,10 +676,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getVertexWithId(int m_vertexId)
+    public DENOPTIMVertex getVertexWithId(int vid)
     {
         DENOPTIMVertex v = null;
-        int idx = getIndexOfVertex(m_vertexId);
+        int idx = getIndexOfVertex(vid);
         if (idx != -1)
             v = gVertices.get(idx);
         return v;
@@ -687,13 +687,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public int getIndexOfVertex(int m_vertexId)
+    public int getIndexOfVertex(int vid)
     {
         int idx = -1;
         for (int i=0; i<gVertices.size(); i++)
         {
             DENOPTIMVertex v = gVertices.get(i);
-            if (v.getVertexId() == m_vertexId)
+            if (v.getVertexId() == vid)
             {
                 idx = i;
                 break;
@@ -728,21 +728,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void removeRing(DENOPTIMRing m_ring)
+    public void removeRing(DENOPTIMRing ring)
     {
-        if (gRings.contains(m_ring))
+        if (gRings.contains(ring))
         {
-            gRings.remove(m_ring);
+            gRings.remove(ring);
         }
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMEdge getEdgeAtPosition(int m_pos)
+    public DENOPTIMEdge getEdgeAtPosition(int pos)
     {
-        if ((m_pos >= gEdges.size()) || m_pos < 0)
+        if ((pos >= gEdges.size()) || pos < 0)
             return null;
-        return gEdges.get(m_pos);
+        return gEdges.get(pos);
     }
 
 //------------------------------------------------------------------------------
@@ -873,18 +873,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * @param m_vid the vertex id for which the child vertices need to be found
+     * @param vid the vertex id for which the child vertices need to be found
      * @return Arraylist containing the vertex ids of the child vertices
      */
 
-    public ArrayList<Integer> getChildVertices(int m_vid)
+    public ArrayList<Integer> getChildVertices(int vid)
     {
         ArrayList<Integer> lst = new ArrayList<>();
-        DENOPTIMVertex v = getVertexWithId(m_vid);
+        DENOPTIMVertex v = getVertexWithId(vid);
         for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
         {
             DENOPTIMEdge e = ap.getEdgeUser();
-            if (e != null && e.getTrgVertex()!=m_vid)
+            if (e != null && e.getTrgVertex()!=vid)
             {
                 lst.add(e.getTrgVertex());
             }
@@ -1054,18 +1054,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      *
-     * @param m_vid
-     * @return the indeces of all edges whose source vertex is same as m_vid
+     * @param vid
+     * @return the indices of all edges whose source vertex is same as vid
      */
 
-    public ArrayList<Integer> getIndexOfEdgesWithChild(int m_vid)
+    public ArrayList<Integer> getIndexOfEdgesWithChild(int vid)
     {
         ArrayList<Integer> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
             DENOPTIMEdge edge = getEdgeAtPosition(j);
 
-            if (edge.getSrcVertex() == m_vid)
+            if (edge.getSrcVertex() == vid)
             {
                 lstEdges.add(j);
             }
@@ -1077,18 +1077,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      *
-     * @param m_vid
-     * @return the edge whose source vertex is same as m_vid
+     * @param vid
+     * @return the edge whose source vertex is same as vid
      */
 
-    public ArrayList<DENOPTIMEdge> getEdgesWithChild(int m_vid)
+    public ArrayList<DENOPTIMEdge> getEdgesWithChild(int vid)
     {
         ArrayList<DENOPTIMEdge> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
             DENOPTIMEdge edge = getEdgeAtPosition(j);
 
-            if (edge.getSrcVertex() == m_vid)
+            if (edge.getSrcVertex() == vid)
             {
                 lstEdges.add(edge);
             }
