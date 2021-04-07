@@ -23,15 +23,12 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.openscience.cdk.graph.ConnectivityChecker;
@@ -58,7 +55,6 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.PathSubGraph;
@@ -132,13 +128,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> m_vertices,
-                            ArrayList<DENOPTIMEdge> m_edges)
+    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
+                            ArrayList<DENOPTIMEdge> gEdges)
     {
-        gVertices = m_vertices;
-        for (DENOPTIMVertex v : gVertices)
+        this.gVertices = gVertices;
+        for (DENOPTIMVertex v : this.gVertices)
             v.setGraphOwner(this);
-        gEdges = m_edges;
+        this.gEdges = gEdges;
         gRings = new ArrayList<>();
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
@@ -147,12 +143,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> m_vertices,
-                            ArrayList<DENOPTIMEdge> m_edges,
-                            ArrayList<DENOPTIMRing> m_rings)
+    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
+                            ArrayList<DENOPTIMEdge> gEdges,
+                            ArrayList<DENOPTIMRing> gRings)
     {
-        this(m_vertices, m_edges);
-        gRings = m_rings;
+        this(gVertices, gEdges);
+        this.gRings = gRings;
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
         localMsg = "";
@@ -160,27 +156,27 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> m_vertices,
-                            ArrayList<DENOPTIMEdge> m_edges,
-                            ArrayList<DENOPTIMRing> m_rings,
-                            ArrayList<SymmetricSet> m_symVerts)
+    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
+                            ArrayList<DENOPTIMEdge> gEdges,
+                            ArrayList<DENOPTIMRing> gRings,
+                            ArrayList<SymmetricSet> symVertices)
     {
-        this(m_vertices, m_edges, m_rings);
+        this(gVertices, gEdges, gRings);
         closableChains = new ArrayList<>();
-        symVertices = m_symVerts;
+        this.symVertices = symVertices;
         localMsg = "";
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> m_vertices,
-                            ArrayList<DENOPTIMEdge> m_edges,
-                            ArrayList<DENOPTIMRing> m_rings,
-                            ArrayList<ClosableChain> m_closableChains,
-                            ArrayList<SymmetricSet> m_symVerts)
+    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
+                            ArrayList<DENOPTIMEdge> gEdges,
+                            ArrayList<DENOPTIMRing> gRings,
+                            ArrayList<ClosableChain> closableChains,
+                            ArrayList<SymmetricSet> symVertices)
     {
-        this(m_vertices, m_edges, m_rings, m_symVerts);
-        closableChains = m_closableChains;
+        this(gVertices, gEdges, gRings, symVertices);
+        this.closableChains = closableChains;
         localMsg = "";
     }
 
@@ -198,9 +194,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setGraphId(int m_id)
+    public void setGraphId(int id)
     {
-        graphId = m_id;
+        graphId = id;
     }
 
 //------------------------------------------------------------------------------
@@ -212,14 +208,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setMsg(String m_msg)
+    public void setLocalMsg(String msg)
     {
-        localMsg = m_msg;
+        localMsg = msg;
     }
 
 //------------------------------------------------------------------------------
 
-    public String getMsg()
+    public String getLocalMsg()
     {
         return localMsg;
     }
@@ -285,10 +281,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setSymmetricVertexSets(ArrayList<SymmetricSet> m_mp)
+    public void setSymmetricVertexSets(ArrayList<SymmetricSet> symVertices)
     {
-        symVertices.clear();
-        symVertices.addAll(m_mp);
+        this.symVertices.clear();
+        this.symVertices.addAll(symVertices);
     }
 
 //------------------------------------------------------------------------------
@@ -973,7 +969,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         clone.setSymmetricVertexSets(cSymVertices);
 
         clone.setGraphId(graphId);
-        clone.setMsg(localMsg);
+        clone.setLocalMsg(localMsg);
 
         return clone;
     }

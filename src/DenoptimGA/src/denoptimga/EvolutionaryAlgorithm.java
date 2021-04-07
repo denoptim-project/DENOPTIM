@@ -311,9 +311,9 @@ public class EvolutionaryAlgorithm
                         EAUtils.addCappingGroup(graph2);
                         Xop = 1;
 
-                        graph1.setMsg("Xover: " + molid1 + "|" + gid1 +
+                        graph1.setLocalMsg("Xover: " + molid1 + "|" + gid1 +
                                             "=" + molid2 + "|" + gid2);
-                        graph2.setMsg("Xover: " + molid1 + "|" + gid1 +
+                        graph2.setLocalMsg("Xover: " + molid1 + "|" + gid1 +
                                             "=" + molid2 + "|" + gid2);
                     }
                     else
@@ -364,7 +364,7 @@ public class EvolutionaryAlgorithm
                     {
                         graph3.setGraphId(GraphUtils.getUniqueGraphIndex());
                         Mop = 1;
-                        graph3.setMsg("Mutation: " + molid3 + "|" + gid3);
+                        graph3.setLocalMsg("Mutation: " + molid3 + "|" + gid3);
                     }
                     EAUtils.addCappingGroup(graph3);
                 }
@@ -382,7 +382,7 @@ public class EvolutionaryAlgorithm
                 if (graph4 != null)
                 {
                     Bop = 1;
-                    graph4.setMsg("NEW");
+                    graph4.setLocalMsg("NEW");
                 }
             }
 

@@ -42,7 +42,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.GraphUtils;
 
 
@@ -809,7 +808,7 @@ public class CombinatorialExplorerByLayer
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
-        molGraph.setMsg("NEW");
+        molGraph.setLocalMsg("NEW");
         
         return molGraph;
     }

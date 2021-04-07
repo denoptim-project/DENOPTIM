@@ -54,7 +54,6 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
@@ -514,7 +513,7 @@ public class EAUtils
 
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 graph.setGraphId(gctr);
-                graph.setMsg("NEW");
+                graph.setLocalMsg("NEW");
                 mol.setProperty("GCODE", gctr);
                 mol.setProperty(CDKConstants.TITLE, molName);
                 mol.setProperty("GraphENC", graph.toString());
@@ -666,7 +665,7 @@ public class EAUtils
         
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
-        molGraph.setMsg("NEW");
+        molGraph.setLocalMsg("NEW");
 
 //TODO this works only for scaffolds at the moment. make the preference for 
 // fragments that lead to known closable chains operate also when fragments are

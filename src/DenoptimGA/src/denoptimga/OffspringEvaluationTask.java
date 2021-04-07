@@ -132,9 +132,9 @@ public class OffspringEvaluationTask extends FitnessTask
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
         		result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
-        if (dGraph.getMsg() != null)
+        if (dGraph.getLocalMsg() != null)
         {
-        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getMsg());
+        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
         }
         
         // Run the fitness provider, whatever that is

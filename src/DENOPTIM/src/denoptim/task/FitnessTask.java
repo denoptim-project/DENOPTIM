@@ -329,9 +329,9 @@ public abstract class FitnessTask extends Task
             processedMol.setProperty("GCODE", dGraph.getGraphId());                
             processedMol.setProperty("SMILES", result.getSmiles());
             processedMol.setProperty("GraphENC", dGraph.toString());
-            if (dGraph.getMsg() != null && !dGraph.getMsg().equals(""))
+            if (dGraph.getLocalMsg() != null && !dGraph.getLocalMsg().equals(""))
             {
-                processedMol.setProperty("GraphMsg", dGraph.getMsg());
+                processedMol.setProperty("GraphMsg", dGraph.getLocalMsg());
             }
             
             // Update molecular representation of this object

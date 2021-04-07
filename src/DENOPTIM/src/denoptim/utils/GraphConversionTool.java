@@ -199,9 +199,9 @@ public class GraphConversionTool
         mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
-        if (g.getMsg() != null)
+        if (g.getLocalMsg() != null)
         {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getMsg());
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getLocalMsg());
         }
 
         return mol;

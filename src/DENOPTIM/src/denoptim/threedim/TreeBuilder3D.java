@@ -45,7 +45,6 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -456,9 +455,9 @@ public class TreeBuilder3D
         mol.setProperty(DENOPTIMConstants.GCODETAG, this.graph.getGraphId());
         mol.setProperty(DENOPTIMConstants.GRAPHTAG, this.graph.toString());
         mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, this.graph.toJson());
-        if (this.graph.getMsg() != null && !this.graph.getMsg().toString().equals(""))
+        if (this.graph.getLocalMsg() != null && !this.graph.getLocalMsg().toString().equals(""))
         {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG, this.graph.getMsg());
+            mol.setProperty(DENOPTIMConstants.GMSGTAG, this.graph.getLocalMsg());
         }
         this.conversionCompleted = true;
 
