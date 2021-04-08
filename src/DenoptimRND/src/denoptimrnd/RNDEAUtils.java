@@ -337,7 +337,7 @@ class RNDEAUtils
                 String molName = "M" + GenUtils.getPaddedString(8, ctr);
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 graph.setGraphId(gctr);
-                graph.setMsg("NEW");
+                graph.setLocalMsg("NEW");
                 mol.setProperty("GCODE", gctr);
                 mol.setProperty(CDKConstants.TITLE, molName);
                 mol.setProperty("GraphENC", graph.toString());

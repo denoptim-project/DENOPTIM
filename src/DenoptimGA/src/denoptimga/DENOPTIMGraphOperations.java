@@ -1570,7 +1570,7 @@ if(debug)
     public static boolean performMutation(DENOPTIMGraph graph)
                                                     throws DENOPTIMException
     {  
-        // Get vertexes that can be mutated: they can be part of subgraphs 
+        // Get vertices that can be mutated: they can be part of subgraphs
         // embedded in templates
         Set<DENOPTIMVertex> mutable = graph.getMutableSites();
         if (mutable.size() == 0)

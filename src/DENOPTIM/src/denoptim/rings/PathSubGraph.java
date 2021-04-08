@@ -275,12 +275,12 @@ public class PathSubGraph
             chainID = chainID + ids[0];
             revChainID = ids[1] + revChainID;
             
-            // We must work with clones of the actual vertexes/edges
+            // We must work with clones of the actual vertices/edges
             DENOPTIMVertex cloneVertBack = vertBack.clone();
             DENOPTIMVertex cloneVertHere = vertHere.clone();
             DENOPTIMVertex cloneVertFrnt = vertFrnt.clone();
             
-            // Collect vertexes and make edges to build a graph from A to B
+            // Collect vertices and make edges to build a graph from A to B
             if (i == 1) {
                 gVertices.add(cloneVertBack);
             }

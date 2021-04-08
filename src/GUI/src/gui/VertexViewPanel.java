@@ -46,7 +46,7 @@ import denoptim.molecule.EmptyVertex;
 
 
 /**
- * A panel for visualising vertexes. This is a deck of cards that brings up a 
+ * A panel for visualising vertices. This is a deck of cards that brings up a
  * specific card depending on the type of vertex to visualize.
  * 
  * @author Marco Foscato
@@ -173,7 +173,7 @@ public class VertexViewPanel extends JPanel
         this.add(titlePanel, BorderLayout.NORTH);
         
         emptyViewerCard = new JPanel();
-        emptyViewerCard.setToolTipText("Vertexes are displayed here.");
+        emptyViewerCard.setToolTipText("Vertices are displayed here.");
         centralPanel.add(emptyViewerCard, EMPTYCARDNAME);
         
         graphNodeViewer = new VertexAsGraphViewPanel(this, editableAPTable,300);

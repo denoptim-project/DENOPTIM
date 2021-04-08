@@ -22,9 +22,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -43,7 +40,7 @@ public class DENOPTIMRing implements Serializable
     /**
      * List of <code>DENOPTIMVertex</code> involved in the ring. 
      */
-    private ArrayList<DENOPTIMVertex> verteces;
+    private ArrayList<DENOPTIMVertex> vertices;
 
     /**
      * Bond type (i.e., bond order) to be used between head and tail vertices
@@ -54,14 +51,14 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMRing()
     {
-        verteces = new ArrayList<DENOPTIMVertex>();
+        vertices = new ArrayList<DENOPTIMVertex>();
     }
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMRing(ArrayList<DENOPTIMVertex> m_verteces)
+    public DENOPTIMRing(ArrayList<DENOPTIMVertex> vertices)
     {
-        verteces = m_verteces;
+        this.vertices = vertices;
     }
     
 //------------------------------------------------------------------------------
@@ -72,7 +69,7 @@ public class DENOPTIMRing implements Serializable
 
     public void addVertex(DENOPTIMVertex v)
     {
-        verteces.add(v);
+        vertices.add(v);
     }
     
 //------------------------------------------------------------------------------
@@ -84,7 +81,7 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMVertex getHeadVertex()
     {
-        return verteces.get(0);
+        return vertices.get(0);
     }
 
 //------------------------------------------------------------------------------
@@ -96,7 +93,7 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMVertex getTailVertex()
     {
-        return verteces.get(verteces.size() - 1);
+        return vertices.get(vertices.size() - 1);
     }
 
 //------------------------------------------------------------------------------
@@ -108,11 +105,11 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMVertex getVertexAtPosition(int i)
     {
-	if (i>=verteces.size() || i<0)
+	if (i>= vertices.size() || i<0)
 	{
 	    return null;
 	}
-        return verteces.get(i);
+        return vertices.get(i);
     }
 
 //------------------------------------------------------------------------------
@@ -124,7 +121,7 @@ public class DENOPTIMRing implements Serializable
 
     public int getSize()
     {
-        return verteces.size();
+        return vertices.size();
     }
 
 //------------------------------------------------------------------------------
@@ -162,7 +159,7 @@ public class DENOPTIMRing implements Serializable
 
     public boolean contains(DENOPTIMVertex v)
     {
-        return verteces.contains(v);
+        return vertices.contains(v);
     }
 
 //------------------------------------------------------------------------------
@@ -178,7 +175,7 @@ public class DENOPTIMRing implements Serializable
     public boolean containsID(int vid)
     {
 	boolean result = false;
-	for (DENOPTIMVertex v : verteces)
+	for (DENOPTIMVertex v : vertices)
 	{
 	    if (v.getVertexId() == vid)
 	    {
@@ -198,7 +195,7 @@ public class DENOPTIMRing implements Serializable
     @Override
     public String toString()
     {
-        return "DENOPTIMRing [verteces=" + verteces + "]";
+        return "DENOPTIMRing [verteces=" + vertices + "]";
     }
 
 //------------------------------------------------------------------------------

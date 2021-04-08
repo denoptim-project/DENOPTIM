@@ -865,13 +865,13 @@ public class DENOPTIMGraphTest {
 		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v4.getAP(0)));
 
 		assertEquals(4, graph.getVertexCount(),
-				"#vertexes in graph before removal");
+				"#vertices in graph before removal");
 		assertTrue(graph == v4.getGraphOwner());
 
 		graph.removeCappingGroupsOn(v2);
 
 		assertEquals(3, graph.getVertexCount(),
-				"#vertexes in graph before removal");
+				"#vertices in graph before removal");
 		assertFalse(graph.containsVertex(v4),
 				"Capping is still contained");
 		assertTrue(null == v4.getGraphOwner(),
@@ -911,14 +911,14 @@ public class DENOPTIMGraphTest {
 		graph2.addEdge(new DENOPTIMEdge(v22.getAP(1), v24.getAP(0)));
 
 		assertEquals(4, graph2.getVertexCount(),
-				"#vertexes in graph before removal (B)");
+				"#vertices in graph before removal (B)");
 		assertTrue(graph2 == v23.getGraphOwner());
 		assertTrue(graph2 == v24.getGraphOwner());
 
 		graph2.removeCappingGroups();
 
 		assertEquals(2, graph2.getVertexCount(),
-				"#vertexes in graph before removal (B)");
+				"#vertices in graph before removal (B)");
 		assertFalse(graph.containsVertex(v24),
 				"Capping is still contained (B)");
 		assertFalse(graph.containsVertex(v23),

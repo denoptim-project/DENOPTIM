@@ -121,9 +121,9 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public void setSymmetricAP(ArrayList<SymmetricSet> m_Sap)
+    public void setSymmetricAP(ArrayList<SymmetricSet> sAPs)
     {
-        lstSymAPs = m_Sap;
+        lstSymAPs = sAPs;
     }
 
 //------------------------------------------------------------------------------
@@ -138,18 +138,18 @@ public class EmptyVertex extends DENOPTIMVertex
     /**
      * For the given attachment point index locate the symmetric partners
      * i.e. those with similar environments and class types.
-     * @param m_dapidx inded of the attachment point which we want to get
+     * @param apIdx index of the attachment point which we want to get
      * the symmetrically related partners of.
      * @return the list of attachment point IDs, which include
-     * <code>m_dapidx</code> or <code>null</code> if no partners present
+     * <code>apIdx</code> or <code>null</code> if no partners present
      */
 
     @Override
-    public SymmetricSet getSymmetricAPs(int m_dapidx)
+    public SymmetricSet getSymmetricAPs(int apIdx)
     {
         for (SymmetricSet symmetricSet : lstSymAPs)
         {
-            if (symmetricSet.contains(m_dapidx))
+            if (symmetricSet.contains(apIdx))
             {
                 return symmetricSet;
             }
@@ -273,7 +273,7 @@ public class EmptyVertex extends DENOPTIMVertex
      * @param other
      * @param reason string builder used to build the message clarifying the
      * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two vertexes represent the same graph
+     * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
 
@@ -479,9 +479,9 @@ public class EmptyVertex extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
 
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> lstSymAPs)
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
-        this.lstSymAPs = lstSymAPs;
+        this.lstSymAPs = sAPs;
     }
 
 //-----------------------------------------------------------------------------

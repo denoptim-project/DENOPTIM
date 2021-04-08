@@ -87,7 +87,7 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<DENOPTIMVertex> vertexesLibrary =
+	private ArrayList<DENOPTIMVertex> verticesLibrary =
 			new ArrayList<DENOPTIMVertex>();
 	
 	/**
@@ -182,7 +182,7 @@ public class GUIVertexInspector extends GUICardPanel
 		
         // NB: avoid GroupLayout because it interferes with Jmol viewer and causes exception
         
-        // Controls to navigate the list of vertexes
+        // Controls to navigate the list of vertices
         navigPanel = new JPanel();
         navigPanel2 = new JPanel();
         navigPanel3 = new JPanel();
@@ -203,7 +203,7 @@ public class GUIVertexInspector extends GUICardPanel
 		ctrlPane.add(navigPanel2);
 		
 		btnAddVrtx = new JButton("Add");
-		btnAddVrtx.setToolTipText("Append vertexes taken from a file.");
+		btnAddVrtx.setToolTipText("Append vertices taken from a file.");
 		btnAddVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File inFile = GUIFileOpener.pickFile(btnAddVrtx);
@@ -214,7 +214,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-				    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+				    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
 				            BBType.FRAGMENT, vrtxLib, true);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -242,7 +242,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				if (vrtxLib.size() == 1)
 				{
-				    importVertexes(vrtxLib);
+				    importVertices(vrtxLib);
 					return;
 				}
 				
@@ -269,7 +269,7 @@ public class GUIVertexInspector extends GUICardPanel
 				switch (res)
 				{
 					case 0:
-					    importVertexes(vrtxLib);
+					    importVertices(vrtxLib);
 						break;
 						
 					case 1:
@@ -289,7 +289,7 @@ public class GUIVertexInspector extends GUICardPanel
 						        selectedVrtxs.add(vrtxLib.get(pair.get(0)));
 						    }
 						}
-						importVertexes(selectedVrtxs);
+						importVertices(selectedVrtxs);
 						break;
 					
 					default:
@@ -514,7 +514,7 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
-                    DenoptimIO.appendVertexesFromFileToLibrary(inFile, 
+                    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
                             BBType.FRAGMENT, vrtxLib, true);
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -539,7 +539,7 @@ public class GUIVertexInspector extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
-				importVertexes(vrtxLib);
+				importVertices(vrtxLib);
 			}
 		});
 		commandsPane.add(btnOpenVrtxs);
@@ -556,8 +556,8 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				try
 				{
-				    DenoptimIO.writeVertexes(outFile.getAbsolutePath(),
-				    		vertexesLibrary);
+				    DenoptimIO.writeVertices(outFile.getAbsolutePath(),
+							verticesLibrary);
 				}
 				catch (Exception ex)
 				{
@@ -571,7 +571,7 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 				navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
-						vertexesLibrary.size(), 1));
+						verticesLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
 			}
@@ -653,8 +653,8 @@ public class GUIVertexInspector extends GUICardPanel
 			// the system is not a fragment but, this is done for consistency:
 			// when we have a molecule loaded the list is not empty
 			// The currently viewed fragment (if any) is always part of the lib
-			vertexesLibrary.add(vertex); 
-			currVrtxIdx = vertexesLibrary.size()-1;
+			verticesLibrary.add(vertex);
+			currVrtxIdx = verticesLibrary.size()-1;
 
 			updateVrtxListSpinner();
 			unsavedChanges = true;
@@ -702,8 +702,8 @@ public class GUIVertexInspector extends GUICardPanel
 		// The system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty:
 		// The currently viewed fragment (if any) is always part of the library
-	    vertexesLibrary.add(vertex);
-		currVrtxIdx = vertexesLibrary.size()-1;
+	    verticesLibrary.add(vertex);
+		currVrtxIdx = verticesLibrary.size()-1;
 		
 		// finalize GUI status
 		updateVrtxListSpinner();
@@ -722,13 +722,13 @@ public class GUIVertexInspector extends GUICardPanel
 	 * @param file the file to open
 	 * @param format the format
 	 */
-	public void importVertexesFromFile(File file, String format)
+	public void importVerticesFromFile(File file, String format)
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
-            DenoptimIO.appendVertexesFromFileToLibrary(file, BBType.FRAGMENT, 
+            DenoptimIO.appendVerticesFromFileToLibrary(file, BBType.FRAGMENT,
                     vrtxLib, true);
         } catch (Exception e1) {
             e1.printStackTrace();
@@ -753,36 +753,36 @@ public class GUIVertexInspector extends GUICardPanel
                     UIManager.getIcon("OptionPane.errorIcon"));
             return;
         }
-        importVertexes(vrtxLib);
+        importVertices(vrtxLib);
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------
     
     /**
-     * Imports vertexes.
-     * @param list the list of vertexes to import
+     * Imports vertices.
+     * @param list the list of vertices to import
      */
-    public void importVertexes(ArrayList<DENOPTIMVertex> list)
+    public void importVertices(ArrayList<DENOPTIMVertex> list)
     {   
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
         int firstOfNew = 0;
         boolean libFromScrtch = false;
-        if (vertexesLibrary == null)
+        if (verticesLibrary == null)
         {
             libFromScrtch = true;
-            vertexesLibrary = new ArrayList<DENOPTIMVertex>();
+            verticesLibrary = new ArrayList<DENOPTIMVertex>();
         }
         else
         {
-            firstOfNew = vertexesLibrary.size();
+            firstOfNew = verticesLibrary.size();
         }
         
         boolean addedOne = false;
         if (list.size() > 0)
         {
-            vertexesLibrary.addAll(list);
+            verticesLibrary.addAll(list);
             addedOne = true;
             
             // Display the first
@@ -801,7 +801,7 @@ public class GUIVertexInspector extends GUICardPanel
         } else {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             JOptionPane.showMessageDialog(null,
-                    "<html>No vertexes to import from the given list.</html>",
+                    "<html>No vertices to import from the given list.</html>",
                     "Error",
                     JOptionPane.PLAIN_MESSAGE,
                     UIManager.getIcon("OptionPane.errorIcon"));
@@ -821,7 +821,7 @@ public class GUIVertexInspector extends GUICardPanel
 	 */
 	private void loadCurrentVrtxIdxToViewer()
 	{
-		if (vertexesLibrary == null)
+		if (verticesLibrary == null)
 		{
 			JOptionPane.showMessageDialog(null,
 	                "No list of building blocks loaded.",
@@ -833,7 +833,7 @@ public class GUIVertexInspector extends GUICardPanel
 		
 		clearCurrentSystem();
 
-		vertex = vertexesLibrary.get(currVrtxIdx);
+		vertex = verticesLibrary.get(currVrtxIdx);
 		vertexViewer.loadVertexToViewer(vertex);
 		if (vertex == null || vertex instanceof DENOPTIMFragment == false)
 		{
@@ -859,8 +859,8 @@ public class GUIVertexInspector extends GUICardPanel
 	private void updateVrtxListSpinner()
 	{		
 		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
-				vertexesLibrary.size(), 1));
-		totalVrtxsLabel.setText(Integer.toString(vertexesLibrary.size()));
+				verticesLibrary.size(), 1));
+		totalVrtxsLabel.setText(Integer.toString(verticesLibrary.size()));
 	}
     
 //-----------------------------------------------------------------------------
@@ -1075,10 +1075,10 @@ public class GUIVertexInspector extends GUICardPanel
     	clearCurrentSystem();
     	
     	// Actual removal from the library
-    	if (vertexesLibrary.size()>0)
+    	if (verticesLibrary.size()>0)
     	{
-    		vertexesLibrary.remove(currVrtxIdx);
-    		int libSize = vertexesLibrary.size();
+    		verticesLibrary.remove(currVrtxIdx);
+    		int libSize = verticesLibrary.size();
     		
     		if (currVrtxIdx>=0 && currVrtxIdx<libSize)
     		{
@@ -1089,7 +1089,7 @@ public class GUIVertexInspector extends GUICardPanel
     			currVrtxIdx = currVrtxIdx-1;
     		}
     		
-    		if (currVrtxIdx==-1 || vertexesLibrary.size()==0)
+    		if (currVrtxIdx==-1 || verticesLibrary.size()==0)
 			{
     		    vertexViewer.clearMolecularViewer();
 				currVrtxIdx = 0;
@@ -1102,7 +1102,7 @@ public class GUIVertexInspector extends GUICardPanel
 		    	loadCurrentVrtxIdxToViewer();
 		    	updateVrtxListSpinner();
 		    	navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
-						vertexesLibrary.size(), 1));
+						verticesLibrary.size(), 1));
 		        deprotectEditedSystem();
     		}
     	}
@@ -1172,14 +1172,14 @@ public class GUIVertexInspector extends GUICardPanel
   		// Retrieve chemical object from the viewer, if edited, otherwise
   		// we get what is already in 'vertex'
   		vertex = vertexViewer.getLoadedStructure();
-  		if (vertexesLibrary.size()==0 
+  		if (verticesLibrary.size()==0
   				&& (vertex==null || vertex.getNumberOfAP()==0))
   		{
   			//Nothing to same
   	        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   			return;
   		}
-  		vertexesLibrary.set(currVrtxIdx,vertex);
+  		verticesLibrary.set(currVrtxIdx,vertex);
         
         // Reload fragment from library to refresh table and viewer
     	activateTabEditsListener(false);
@@ -1193,7 +1193,7 @@ public class GUIVertexInspector extends GUICardPanel
   		// Release constraints
     	activateTabEditsListener(true);
     	navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 1, 
-				vertexesLibrary.size(), 1));
+				verticesLibrary.size(), 1));
         deprotectEditedSystem();
   		
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

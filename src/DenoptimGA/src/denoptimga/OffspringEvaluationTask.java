@@ -44,7 +44,7 @@ public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
     private volatile ArrayList<DENOPTIMMolecule> curPopln;
-    private volatile Integer numtry;
+    private volatile Integer numTry;
     
     /**
      * Tool for generating 3D models assembling 3D building blocks.
@@ -55,39 +55,37 @@ public class OffspringEvaluationTask extends FitnessTask
     
     /**
      * 
-     * @param m_molName
-     * @param m_molGraph
-     * @param m_inchi
-     * @param m_smiles
-     * @param m_dir
-     * @param m_Id
-     * @param m_popln reference to the current population. Can be null, in which
+     * @param molName
+     * @param molGraph
+     * @param inchi
+     * @param smiles
+     * @param workDir
+     * @param popln reference to the current population. Can be null, in which
      * case this task will not add its entity to any population.
-     * @param m_try
-     * @param m_fileUID
+     * @param numTry
+     * @param fileUID
      */
-    public OffspringEvaluationTask(String m_molName, DENOPTIMGraph m_molGraph, 
-    		String inchi,
-            String smiles, IAtomContainer m_iac, String m_dir,
-            ArrayList<DENOPTIMMolecule> m_popln, Integer m_try, String m_fileUID)
+    public OffspringEvaluationTask(String molName, DENOPTIMGraph molGraph,
+    		String inchi, String smiles, IAtomContainer iac, String workDir,
+            ArrayList<DENOPTIMMolecule> popln, Integer numTry, String fileUID)
     {
-    	super(m_molGraph);
-        molName = m_molName;
-        workDir = m_dir;
-        fitProvMol = m_iac;
-        curPopln = m_popln;
-        numtry = m_try;
+    	super(molGraph);
+        this.molName = molName;
+        this.workDir = workDir;
+        fitProvMol = iac;
+        curPopln = popln;
+        this.numTry = numTry;
         
-        result.setName(molName);
+        result.setName(this.molName);
         result.setUID(inchi);
         result.setSmiles(smiles);
         
         // Define pathnames to files used/produced by fitness provider
         //TODO use constants
-        fitProvOutFile = workDir + SEP + molName + "_FIT.sdf";
-        fitProvInputFile = workDir + SEP + molName + "_I.sdf";
-        fitProvPNGFile = workDir + SEP + molName + ".png";
-        fitProvUIDFile = m_fileUID;
+        fitProvOutFile = this.workDir + SEP + this.molName + "_FIT.sdf";
+        fitProvInputFile = this.workDir + SEP + this.molName + "_I.sdf";
+        fitProvPNGFile = this.workDir + SEP + this.molName + ".png";
+        fitProvUIDFile = fileUID;
     }
 
 //------------------------------------------------------------------------------
@@ -134,9 +132,9 @@ public class OffspringEvaluationTask extends FitnessTask
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
         		result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
-        if (dGraph.getMsg() != null)
+        if (dGraph.getLocalMsg() != null)
         {
-        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getMsg());
+        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
         }
         
         // Run the fitness provider, whatever that is
@@ -155,9 +153,9 @@ public class OffspringEvaluationTask extends FitnessTask
 
         if (result.getError() == null)
         {
-            synchronized (numtry)
+            synchronized (numTry)
             {
-                numtry++;
+                numTry++;
             }
         }
 
@@ -172,9 +170,9 @@ public class OffspringEvaluationTask extends FitnessTask
 	                curPopln.add(result);
 	            }
         	}
-            synchronized (numtry)
+            synchronized (numTry)
             {
-                numtry--;
+                numTry--;
             }
         }
         completed = true;

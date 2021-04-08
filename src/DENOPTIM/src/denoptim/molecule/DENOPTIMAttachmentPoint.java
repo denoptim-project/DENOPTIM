@@ -413,11 +413,11 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Set the index of the source atom in the list of atoms of the fragment.
      * The index should reflect 0-based enumeration.
-     * @param m_atomPostionNumber the index
+     * @param atomPositionNumber the index
      */
-    public void setAtomPositionNumber(int m_atomPostionNumber)
+    public void setAtomPositionNumber(int atomPositionNumber)
     {
-        atomPositionNumber = m_atomPostionNumber;
+        this.atomPositionNumber = atomPositionNumber;
     }
 
 //------------------------------------------------------------------------------
@@ -427,11 +427,11 @@ Comparable<DENOPTIMAttachmentPoint>
      * to the number of unsaturated valences that can still be used on this 
      * attachment point. This is useful for attachment points that do not follow
      * the APClass-based formalism.
-     * @param m_freeConnections
+     * @param freeConnections
      */
-    public void setFreeConnections(int m_freeConnections)
+    public void setFreeConnections(int freeConnections)
     {
-        freeConnections = m_freeConnections;
+        this.freeConnections = freeConnections;
     }
     
 //------------------------------------------------------------------------------
@@ -439,15 +439,15 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Sets the end of the 3D vector defining the direction of the AP in 3D.
      * Note that the source of this vector is the source atom, and that the 
-     * entries of <code>m_dirVec</code> are referred to the same origin as
+     * entries of <code>dirVec</code> are referred to the same origin as
      * the coordinates of the source atom.
-     * @param m_dirVec the coordinates of the 3D point defining the end of the 
+     * @param dirVec the coordinates of the 3D point defining the end of the
      * direction vector
      */
-    public void setDirectionVector(double[] m_dirVec)
+    public void setDirectionVector(double[] dirVec)
     {
-        dirVec = new double[3];
-        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);  
+        this.dirVec = new double[3];
+        System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
     }
 
 //------------------------------------------------------------------------------

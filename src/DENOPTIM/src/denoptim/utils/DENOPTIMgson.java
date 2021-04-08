@@ -65,11 +65,11 @@ public class DENOPTIMgson
       // map. If this is not used, then the key.toString() is used to
       // get a string representation of the key.
       .registerTypeAdapter(APMap.class, new APMapSerializer())
-      // Custom serializer that keeps only the IDs to vertexes and
-      // APs defined in the list of  vertexes belonging to the graph.
+      // Custom serializer that keeps only the IDs to vertices and
+      // APs defined in the list of  vertices belonging to the graph.
       .registerTypeAdapter(DENOPTIMEdge.class, new DENOPTIMEdgeSerializer())
-      // Custom serialized that keeps only the IDs to vertexes defined in
-      // the list of vertexes belonging to the graph
+      // Custom serialized that keeps only the IDs to vertices defined in
+      // the list of vertices belonging to the graph
       .registerTypeAdapter(DENOPTIMRing.class, new DENOPTIMRingSerializer())
       //TODO-V3 add custom de/serialized for symmetric sets
       .setPrettyPrinting()
@@ -81,7 +81,7 @@ public class DENOPTIMgson
       // Custom deserializer to dispatch to the correct subclass of Vertex
       .registerTypeAdapter(DENOPTIMVertex.class, new DENOPTIMVertexDeserializer())
       // Custom deserializer takes care of converting ID-based components
-      // to references to vertexes and APs
+      // to references to vertices and APs
       .registerTypeAdapter(DENOPTIMGraph.class, new DENOPTIMGraphDeserializer())
       .setPrettyPrinting()
       .create();

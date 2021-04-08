@@ -29,12 +29,12 @@ public class TinkerAtom implements Serializable, Cloneable
     /*
      * tinker assigned atom type
      */
-    private int ffatomtype; 
+    private int ffAtomType;
     
     /*
      * tinker assigned atom string
      */
-    private String atomstr;
+    private String atomStr;
     
     /*
      * the original 3d coordinates from which the IC representation is calculated
@@ -49,14 +49,14 @@ public class TinkerAtom implements Serializable, Cloneable
     /*
      * store for distance, bond angle and the dihedral or third angle
      */
-    private double[] dist_angles;
+    private double[] distAngles;
     
     
     /*
      * atom neighbours, the first 3 members are the neighbours, the 4 position 
      * is reserved for the chiral definition (0/1/-1)
      */
-    private int[] atm_nb; 
+    private int[] atmNb;
     
     /*
      * the vertex id with which the IC fragment is associated with
@@ -72,51 +72,51 @@ public class TinkerAtom implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public TinkerAtom(int m_idx, String m_astr, int m_ffatomtype,
-                        double[] m_xyz, int[] m_nb, double[] m_ang)
+    public TinkerAtom(int xyzIndex, String atomStr, int ffAtomType,
+                      double[] xyz, int[] atmNb, double[] distAngles)
     {
-        atomstr = m_astr;
-        ffatomtype = m_ffatomtype;
-        xyzIndex = m_idx;        
-        atm_nb = new int[4];
-        dist_angles = new double[3];
-        xyz = new double[3];
+        this.atomStr = atomStr;
+        this.ffAtomType = ffAtomType;
+        this.xyzIndex = xyzIndex;
+        this.atmNb = new int[4];
+        this.distAngles = new double[3];
+        this.xyz = new double[3];
         
         for (int i=0; i<3; i++)
         {
-            xyz[i] = m_xyz[i];
-            dist_angles[i] = m_ang[i];            
+            this.xyz[i] = xyz[i];
+            this.distAngles[i] = distAngles[i];
         }
-        System.arraycopy(m_nb, 0, atm_nb, 0, 4);
+        System.arraycopy(atmNb, 0, this.atmNb, 0, 4);
     }
     
     
 //------------------------------------------------------------------------------
 
-    public void setAtomNeighbours(int[] m_nb)
+    public void setAtomNeighbours(int[] atmNb)
     {
-        this.atm_nb = m_nb;
+        this.atmNb = atmNb;
     }
 
 //------------------------------------------------------------------------------
 
     public int[] getAtomNeighbours()
     {
-        return this.atm_nb;
+        return this.atmNb;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setDistAngle(double[] m_ang)
+    public void setDistAngle(double[] distAngles)
     {
-        this.dist_angles = m_ang;
+        this.distAngles = distAngles;
     }    
 
 //------------------------------------------------------------------------------
 
     public double[] getDistAngle()
     {
-        return this.dist_angles;
+        return this.distAngles;
     }
 
 //------------------------------------------------------------------------------
@@ -154,12 +154,12 @@ public class TinkerAtom implements Serializable, Cloneable
      /**
       * <p>setXYZ</p>
       *
-      * @param m_xyz an array of double.
+      * @param xyz an array of double.
       */
 
-    public void setXYZ(double m_xyz[])
+    public void setXYZ(double[] xyz)
     {
-         this.xyz = m_xyz;
+         this.xyz = xyz;
     }
 
 //------------------------------------------------------------------------------
@@ -202,9 +202,9 @@ public class TinkerAtom implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-     public void setXYZIndex(int m_idx)
+     public void setXYZIndex(int xyzIndex)
      {
-         this.xyzIndex = m_idx;
+         this.xyzIndex = xyzIndex;
      }
 
 
@@ -212,35 +212,35 @@ public class TinkerAtom implements Serializable, Cloneable
 
      public String getAtomString()
      {
-         return this.atomstr;
+         return this.atomStr;
      }
 
 //------------------------------------------------------------------------------
 
-     public void setAtomString(String m_str)
+     public void setAtomString(String atomStr)
      {
-          this.atomstr = m_str;
+          this.atomStr = atomStr;
      }
 
 //------------------------------------------------------------------------------
 
      public int getAtomType()
      {
-         return this.ffatomtype;
+         return this.ffAtomType;
      }
 
 //------------------------------------------------------------------------------
      
-     public void setAtomType(int m_ffatomtype)
+     public void setAtomType(int ffAtomType)
      {
-          this.ffatomtype = m_ffatomtype;
+          this.ffAtomType = ffAtomType;
      }
 
 //------------------------------------------------------------------------------
      
-     public void setVertexId(int m_vid)
+     public void setVertexId(int vtxId)
      {
-         this.vtxId = m_vid;
+         this.vtxId = vtxId;
      }     
      
 //------------------------------------------------------------------------------     
@@ -263,8 +263,8 @@ public class TinkerAtom implements Serializable, Cloneable
      */
     public boolean usesProperTorsion()
     {
-	if ((this.atm_nb[0] != 0) && (this.atm_nb[1] != 0) && 
-              (this.atm_nb[2] != 0) && (this.atm_nb[3] == 0))
+	if ((this.atmNb[0] != 0) && (this.atmNb[1] != 0) &&
+              (this.atmNb[2] != 0) && (this.atmNb[3] == 0))
 	{
 	    return true;
 	}
@@ -277,16 +277,16 @@ public class TinkerAtom implements Serializable, Cloneable
     @Override
     public String toString()
     {
-	String s = "TinkerAtom (ff: " + ffatomtype +
-				" str: "+ atomstr +
+	String s = "TinkerAtom (ff: " + ffAtomType +
+				" str: "+ atomStr +
 				" xyz: [" + xyz[0] + "; " + xyz[1] +
 				"; " + xyz[2] + "] " +
 				" id: " + xyzIndex +
-				" distAng: [" + dist_angles[0] + 
-				"; " + dist_angles[1] + "; " + dist_angles[2] +
+				" distAng: [" + distAngles[0] +
+				"; " + distAngles[1] + "; " + distAngles[2] +
 				"] " +
-				" nb: [" + atm_nb[0] + "; " + atm_nb[1] +
-				"; " + atm_nb[2] + "; " + atm_nb[3] + "] " +
+				" nb: [" + atmNb[0] + "; " + atmNb[1] +
+				"; " + atmNb[2] + "; " + atmNb[3] + "] " +
 				" vtx: " +vtxId + ")";
 	return s;
     }

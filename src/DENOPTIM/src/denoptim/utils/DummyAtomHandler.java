@@ -54,9 +54,9 @@ public class DummyAtomHandler
     
 //------------------------------------------------------------------------------
     
-    public DummyAtomHandler(String m_elm)
+    public DummyAtomHandler(String elm)
     {
-        elm = m_elm;
+        this.elm = elm;
     }    
 
 //------------------------------------------------------------------------------

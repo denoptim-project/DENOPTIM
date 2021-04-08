@@ -42,10 +42,10 @@ public class ObjectPair implements Serializable
 
 //------------------------------------------------------------------------------    
     
-    public ObjectPair(Object m_o1, Object m_o2) 
+    public ObjectPair(Object o1, Object o2)
     { 
-        o1 = m_o1; 
-        o2 = m_o2; 
+        this.o1 = o1;
+        this.o2 = o2;
     }
 
 //------------------------------------------------------------------------------

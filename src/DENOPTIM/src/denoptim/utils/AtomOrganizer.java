@@ -74,9 +74,9 @@ public class AtomOrganizer
     }
 
 //------------------------------------------------------------------------------
-    public void setScheme(int m_scheme)
+    public void setScheme(int scheme)
     {
-        this.scheme = m_scheme;
+        this.scheme = scheme;
     }
 
 //------------------------------------------------------------------------------

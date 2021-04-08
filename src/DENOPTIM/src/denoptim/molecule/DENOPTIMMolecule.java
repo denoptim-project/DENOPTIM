@@ -118,28 +118,28 @@ Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     //TODO-V3: reorder to make consistent
-    public DENOPTIMMolecule(DENOPTIMGraph m_molGraph, String m_molUID, 
-                            String m_molSmiles, double m_molFitness)
+    public DENOPTIMMolecule(DENOPTIMGraph graph, String uid,
+                            String smiles, double fitness)
     {
-        graph = m_molGraph;
-        uid = m_molUID;
-        smiles = m_molSmiles;
-        fitness = m_molFitness;
+        this.graph = graph;
+        this.uid = uid;
+        this.smiles = smiles;
+        this.fitness = fitness;
         hasFitness = true;
    }
 
 //------------------------------------------------------------------------------
 	
     //TODO-V3: reorder to make consistent
-    public DENOPTIMMolecule(String m_molFile, DENOPTIMGraph m_molGraph, 
-                            String m_molUID, String m_molSmiles, 
-                            double m_molFitness)
+    public DENOPTIMMolecule(String sdfFile, DENOPTIMGraph graph,
+                            String uid, String smiles,
+                            double fitness)
     {
-        graph = m_molGraph;
-        uid = m_molUID;
-        smiles = m_molSmiles;
-        fitness = m_molFitness;
-        sdfFile = m_molFile;
+        this.graph = graph;
+        this.uid = uid;
+        this.smiles = smiles;
+        this.fitness = fitness;
+        this.sdfFile = sdfFile;
         hasFitness = true;
     }
 //------------------------------------------------------------------------------

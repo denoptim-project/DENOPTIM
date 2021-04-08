@@ -108,7 +108,7 @@ public class StringConverter
             
             if (StringConverterParameters.verbosity > 1)
             {
-                System.out.println("Vertexes in input graph:");
+                System.out.println("Vertices in input graph:");
                 for (DENOPTIMVertex v : g.getVertexList())
                 {
                     System.out.println(" -> "

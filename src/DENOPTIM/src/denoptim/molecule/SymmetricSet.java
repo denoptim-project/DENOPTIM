@@ -86,12 +86,12 @@ public class SymmetricSet implements Serializable,Cloneable
     
     /**
      * Checks whether the given identifiers is contained in this set.
-     * @param m_val the identifiers to look for.
+     * @param val the identifiers to look for.
      * @return <code>true</code> if the identifiers is contained in this set.
      */
-    public boolean contains(Integer m_val)
+    public boolean contains(Integer val)
     {
-        return symIds.contains(m_val);
+        return symIds.contains(val);
     }
 
 //------------------------------------------------------------------------------
