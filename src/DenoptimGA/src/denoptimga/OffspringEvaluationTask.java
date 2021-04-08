@@ -20,6 +20,7 @@
 package denoptimga;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -196,13 +197,13 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     private void addRingSystemsToFragmentLibrary() {
         GraphPattern pattern = GraphPattern.RING;
-        List<DENOPTIMMolecule> candidatesWithFitness = curPopln
+        List<DENOPTIMGraph> subgraphs = curPopln
                 .stream()
                 .filter(DENOPTIMMolecule::hasFitness)
+                .map(DENOPTIMMolecule::getGraph)
+                .map(g -> extractPattern(g, pattern))
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-
-        List<DENOPTIMGraph> subgraphs = extractPatterns(
-                candidatesWithFitness, pattern);
 
         for (DENOPTIMGraph g : subgraphs) {
             BBType type = hasScaffoldVertex(g) ? BBType.SCAFFOLD :

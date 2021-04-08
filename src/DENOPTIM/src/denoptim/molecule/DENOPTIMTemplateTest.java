@@ -721,6 +721,7 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
+    @Disabled("Disabled until implemented")
     @Test
     public void testExtend_changeIfCompatibleFragmentAvailable() {
         try {

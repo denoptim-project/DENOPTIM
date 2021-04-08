@@ -848,20 +848,18 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a list of molecules and extracts subgraphs represented by Templates
-     * that match the provided pattern. The subgraph is classified as a
-     * FRAGMENT unless it contains a vertex from the scaffold library, in
-     * which case the subgraph is classified as a scaffold too.
-     * @param mols list of molecules.
-     * @param p pattern to match against.
+     * Extracts subgraphs from the graph parameter that match the provided
+     * pattern.
+     * @param graph graph to extract pattern from.
+     * @param pattern to match against.
      * @return The subgraphs matching the provided pattern.
      */
-    public static List<DENOPTIMGraph> extractPatterns(
-            List<DENOPTIMMolecule> mols, GraphPattern p)
+    public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
+                                                     GraphPattern pattern)
     {
-        if (p != GraphPattern.RING) {
-            throw new IllegalArgumentException("Graph pattern " + p + " not " +
-                    "supported.");
+        if (pattern != GraphPattern.RING) {
+            throw new IllegalArgumentException("Graph pattern " + pattern +
+                    " not supported.");
         }
         return new ArrayList<>();
     }
@@ -1380,7 +1378,7 @@ if(debug)
      */
 
     public static boolean performCrossover(DENOPTIMGraph male, int mvid,
-                        DENOPTIMGraph female, int fvid, boolean debug) 
+                        DENOPTIMGraph female, int fvid, boolean debug)
                                 throws DENOPTIMException
     {
         //TODO-V3 massive use of pointers (i.e., integers pointing to a position 
