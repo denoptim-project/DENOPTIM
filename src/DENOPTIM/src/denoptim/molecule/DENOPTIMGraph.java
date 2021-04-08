@@ -1173,7 +1173,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Compare this and another graph ignoring the vertex IDs. This method looks
      * into the structure of the graphs to determine if the two graphs have the
      * same spanning tree, same symmetric sets, and same rings set, despite
-     * having different vertex IDs.
+     * having different vertex IDs. Does not check for alternative permutations
+     * nor alternatives spanning trees so it returns <code>false</code> for 
+     * isomorphic graphs that are represented by different spanning trees.
      * @param other the other graph to be compared with this graph
      * @return <code>true</code> if the two graphs represent the same system
      */

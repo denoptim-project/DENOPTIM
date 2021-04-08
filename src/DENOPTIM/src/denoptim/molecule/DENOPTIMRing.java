@@ -34,7 +34,7 @@ import com.google.gson.JsonSerializationContext;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
- * This class represents the closure of a ring in a spamming tree
+ * This class represents the closure of a ring in a spanning tree
  *
  * @author Marco Foscato
  */

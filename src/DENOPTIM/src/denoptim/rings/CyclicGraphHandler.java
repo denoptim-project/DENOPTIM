@@ -1414,7 +1414,7 @@ public class CyclicGraphHandler
      * @param subGraph the subgraph representing the path in the graph
      * @param mol the molecule corresponding to the graph. This
      * <code>IAtomContainer</code> is only used to provide the molecular
-     * contitution and does not require 3D coordinates.
+     * constitution and does not require 3D coordinates.
      * @return <code>true</code> is the path corresponds to a closable chain
      */
 
