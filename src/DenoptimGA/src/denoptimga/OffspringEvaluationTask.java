@@ -20,10 +20,12 @@
 package denoptimga;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import denoptim.molecule.DENOPTIMTemplate;
+import denoptim.molecule.DENOPTIMVertex;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -38,6 +40,7 @@ import denoptim.task.FitnessTask;
 import denoptim.threedim.TreeBuilder3D;
 
 import static denoptim.molecule.DENOPTIMVertex.*;
+import static denoptimga.DENOPTIMGraphOperations.*;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a
@@ -178,7 +181,8 @@ public class OffspringEvaluationTask extends FitnessTask
             {
                 numTry--;
             }
-            addPatternsToFragmentLibrary();
+
+            addRingSystemsToFragmentLibrary();
         }
         completed = true;
         return result;
@@ -186,22 +190,51 @@ public class OffspringEvaluationTask extends FitnessTask
 
 //------------------------------------------------------------------------------
 
-    private void addPatternsToFragmentLibrary() {
+    /**
+     * Extracts a system of one or more fused rings and adds them to the
+     * fragment space if not already present.
+     */
+    private void addRingSystemsToFragmentLibrary() {
         GraphPattern pattern = GraphPattern.RING;
-        Map<DENOPTIMTemplate, BBType> subgraphs =
-                DENOPTIMGraphOperations.extractPatterns(curPopln, pattern);
-        DENOPTIMGraphOperations.filterIsomorphicPatterns(subgraphs, pattern);
-        for (Map.Entry<DENOPTIMTemplate, BBType> e : subgraphs.entrySet()) {
-            BBType bbType = e.getValue();
-            DENOPTIMTemplate subgraph = e.getKey();
-            if (bbType == BBType.SCAFFOLD) {
-                FragmentSpace.appendVertexToLibrary(subgraph, bbType,
-                        FragmentSpace.getScaffoldLibrary());
-            } else {
-                FragmentSpace.appendVertexToLibrary(subgraph, bbType,
-                        FragmentSpace.getFragmentLibrary());
+        List<DENOPTIMMolecule> candidatesWithFitness = curPopln
+                .stream()
+                .filter(DENOPTIMMolecule::hasFitness)
+                .collect(Collectors.toList());
+
+        List<DENOPTIMGraph> subgraphs = extractPatterns(
+                candidatesWithFitness, pattern);
+
+        for (DENOPTIMGraph g : subgraphs) {
+            BBType type = hasScaffoldVertex(g) ? BBType.SCAFFOLD :
+                    BBType.FRAGMENT;
+
+            if (!hasIsomorph(g, type, pattern)) {
+                DENOPTIMTemplate t = new DENOPTIMTemplate(type);
+                t.setInnerGraph(g);
+
+                ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
+                        FragmentSpace.getFragmentLibrary() :
+                        FragmentSpace.getScaffoldLibrary();
+
+                FragmentSpace.appendVertexToLibrary(t, type, library);
             }
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if the graph contains a scaffold vertex.
+     * @param g graph to check.
+     * @return true if there is a scaffold vertex.
+     */
+    private boolean hasScaffoldVertex(DENOPTIMGraph g) {
+        for (DENOPTIMVertex v : g.getVertexList()) {
+            if (v.getBuildingBlockType() == BBType.SCAFFOLD) {
+                return true;
+            }
+        }
+        return false;
     }
 
 //------------------------------------------------------------------------------

@@ -19,10 +19,7 @@
 
 package denoptimga;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 import denoptim.molecule.*;
@@ -830,34 +827,43 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Removes in-place from the argument map any template that is isomorphic to
-     * any template in its respective fragment space library (inferred from
-     * BBType).
-     * The GraphPattern is used by the function to speed up the comparisons
-     * between templates. The pattern must be the same pattern as the
-     * templates adhere to for this function to return the correct result.
-     * @param templates list of templates to filter
-     * @param p the pattern of the templates.
+     * Checks if a graph is isomorphic to another template's inner graph in its
+     * appropriate fragment space library (inferred from BBType).
+     *
+     * The GraphPattern parameter is used by the function to speed up the
+     * comparisons between graph by making certain assumptions. The pattern
+     * must therefore be the same pattern as the graph adheres to to filter
+     * correctly.
+     * @param graph to check if has an isomorph in the fragment space.
+     * @param type specifying which fragment space library to check for
+     *             isomorphs in.
+     * @param pattern the pattern of the graph.
      */
-    public static void filterIsomorphicPatterns(
-            Map<DENOPTIMTemplate, BBType> templates, GraphPattern p) {
+    public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type,
+                                   GraphPattern pattern) {
         // TODO: 06.04.2021 Implement
-        // Make isIsomorphic method in DENOPTIMGraph.
+        return false;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a list of molecules and extracts subgraphs stored as Templates
-     * that match the provided pattern.
+     * Takes a list of molecules and extracts subgraphs represented by Templates
+     * that match the provided pattern. The subgraph is classified as a
+     * FRAGMENT unless it contains a vertex from the scaffold library, in
+     * which case the subgraph is classified as a scaffold too.
      * @param mols list of molecules.
      * @param p pattern to match against.
      * @return The subgraphs matching the provided pattern.
      */
-    public static Map<DENOPTIMTemplate, BBType> extractPatterns(
-            ArrayList<DENOPTIMMolecule> mols, GraphPattern p)
+    public static List<DENOPTIMGraph> extractPatterns(
+            List<DENOPTIMMolecule> mols, GraphPattern p)
     {
-        return null;
+        if (p != GraphPattern.RING) {
+            throw new IllegalArgumentException("Graph pattern " + p + " not " +
+                    "supported.");
+        }
+        return new ArrayList<>();
     }
 
 //------------------------------------------------------------------------------
