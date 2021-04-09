@@ -110,7 +110,7 @@ public class DENOPTIMVertexTest
         DENOPTIMVertex c = v.clone();
         
         assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
-        assertEquals(v.getNumberOfAP(), c.getNumberOfAP(), "Number of APS");
+        assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
         assertEquals(v.getSymmetricAPSets().size(), 
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
         assertEquals(v.getLevel(), c.getLevel(), "Level");
@@ -141,7 +141,7 @@ public class DENOPTIMVertexTest
         c = v.clone();
         
         assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
-        assertEquals(v.getNumberOfAP(), c.getNumberOfAP(), "Number of APS");
+        assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
         assertEquals(v.getSymmetricAPSets().size(), 
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
         assertEquals(v.getLevel(), c.getLevel(), "Level");

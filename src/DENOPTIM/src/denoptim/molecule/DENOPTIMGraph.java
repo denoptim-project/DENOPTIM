@@ -119,7 +119,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     String localMsg;
 
-
     /**
      * Identifier for the format of string representations of a graph
      */
@@ -1329,7 +1328,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the graphs are same at this node
      * @throws DENOPTIMException
      */
-    private static boolean compareGraphNodes(DENOPTIMVertex thisV,
+    public static boolean compareGraphNodes(DENOPTIMVertex thisV,
     		DENOPTIMGraph thisG,
     		DENOPTIMVertex otherV,
     		DENOPTIMGraph otherG, Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap,
@@ -1369,7 +1368,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		}
     		if (!found)
     		{
-    			reason.append ("Edge not found in other("+et+")");
+    			reason.append("Edge not found in other("+et+")");
     			return false;
     		}
 
@@ -3026,7 +3025,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             modGraph.removeBranchStartingAt(cv,symmetry);
                             int wantedTrgApId = e.getTrgAPID();
                             int trgApLstSize = inGraph.getVertexWithId(
-                                    e.getTrgVertex()).getNumberOfAP();
+                                    e.getTrgVertex()).getNumberOfAPs();
                             if (wantedTrgApId >= trgApLstSize)
                             {
                                 String msg = "Request to use AP number "

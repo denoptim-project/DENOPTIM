@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static denoptim.molecule.DENOPTIMVertex.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -28,14 +29,20 @@ public class DENOPTIMGraphOperationsTest
     public void testExtractPattern_singleRingSystem() {
         try {
             DENOPTIMVertex v1 = new EmptyVertex(0);
-            DENOPTIMVertex rcv1 = new EmptyVertex(1);
-            DENOPTIMVertex rcv2 = new EmptyVertex(2);
+            v1.setBuildingBlockType(BBType.SCAFFOLD);
+            v1.setLevel(-1);
+            DENOPTIMVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
+                    new ArrayList<>(), true);
+            rcv1.setBuildingBlockType(BBType.FRAGMENT);
+            DENOPTIMVertex rcv2 = new EmptyVertex(2, new ArrayList<>(),
+                    new ArrayList<>(), true);
+            rcv2.setBuildingBlockType(BBType.FRAGMENT);
 
             APClass apClass = APClass.make("rule", 0);
 
             List<DENOPTIMVertex> vertices = Arrays.asList(v1, rcv1, rcv2);
             for (DENOPTIMVertex v : vertices) {
-                v.setBuildingBlockType(DENOPTIMVertex.BBType.FRAGMENT);
+                v.setBuildingBlockType(BBType.FRAGMENT);
                 v.addAP(-1, 1, 1, apClass);
             }
             // Need an additional AP on v1
@@ -58,7 +65,22 @@ public class DENOPTIMGraphOperationsTest
             assertEquals(1, subgraphs.size());
             DENOPTIMGraph actual = subgraphs.get(0);
             DENOPTIMGraph expected = g;
-            assertTrue(expected.sameAs(actual, new StringBuilder()));
+            DENOPTIMVertex scaffold = null;
+            for (DENOPTIMVertex v : actual.getVertexList()) {
+                // Only the scaffold isn't an RCV in this test
+                if (!v.isRCV()) {
+                    scaffold = v;
+                    break;
+                }
+            }
+
+            assertEquals(expected.getVertexCount(), actual.getVertexCount());
+            assertEquals(expected.getEdgeCount(), actual.getEdgeCount());
+
+            Map<DENOPTIMVertex, DENOPTIMVertex> map = new HashMap<>();
+            map.put(v1, scaffold);
+            assertTrue(DENOPTIMGraph.compareGraphNodes(v1, expected,
+                    scaffold, actual, map, new StringBuilder()));
         } catch (Exception e) {
             e.printStackTrace();
             fail("Unexpected exception thrown.");

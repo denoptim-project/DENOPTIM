@@ -21,8 +21,10 @@ package denoptimga;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import denoptim.molecule.*;
+import denoptim.rings.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
@@ -32,9 +34,6 @@ import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.rings.ChainLink;
-import denoptim.rings.ClosableChain;
-import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -283,7 +282,7 @@ public class DENOPTIMGraphOperations
      * @param symmetryOnAps if <code>true</code>, then symmetry will be applied
      * on the APs, no matter what. This is mostly needed to retain symmetry 
      * when performing mutations on the root vertex of a symmetric graph.
-     * @throws exception.DENOPTIMException
+     * @throws DENOPTIMException
      * @return <code>true</code> if the graph has been modified
      */
      
@@ -292,10 +291,10 @@ public class DENOPTIMGraphOperations
     protected static boolean extendGraph(DENOPTIMGraph molGraph,
                                          DENOPTIMVertex curVertex, 
                                          boolean extend, 
-                                         boolean symmetryOnAp) 
+                                         boolean symmetryOnAps)
                                                         throws DENOPTIMException
     {   
-        return extendGraph(molGraph,curVertex,extend,symmetryOnAp,false,-1,-1);
+        return extendGraph(molGraph,curVertex,extend,symmetryOnAps,false,-1,-1);
     }
     
 //------------------------------------------------------------------------------
@@ -318,7 +317,7 @@ public class DENOPTIMGraphOperations
      * @param chosenApId if greater than or equals to zero, 
      * sets the choice of the AP to the 
      * given index.
-     * @throws exception.DENOPTIMException
+     * @throws DENOPTIMException
      * @return <code>true</code> if the graph has been modified
      */
      
@@ -327,7 +326,7 @@ public class DENOPTIMGraphOperations
     protected static boolean extendGraph(DENOPTIMGraph molGraph,
                                          DENOPTIMVertex curVertex, 
                                          boolean extend, 
-                                         boolean symmetryOnAp,
+                                         boolean symmetryOnAps,
                                          boolean force,
                                          int chosenVrtxIdx,
                                          int chosenApId) 
@@ -445,7 +444,7 @@ public class DENOPTIMGraphOperations
             // Decide on symmetric substitution within this vertex...
             boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
             SymmetricSet symAPs = new SymmetricSet();
-            if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
+            if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAps))
             {
                 symAPs = curVertex.getSymmetricAPs(curVertex.getIndexOfAP(ap));
 				if (symAPs != null)
@@ -555,7 +554,7 @@ public class DENOPTIMGraphOperations
             {
                 int vid = addedVertices.get(i);
                 DENOPTIMVertex fragVertex = molGraph.getVertexWithId(vid);
-                extendGraph(molGraph, fragVertex, extend, symmetryOnAp);
+                extendGraph(molGraph, fragVertex, extend, symmetryOnAps);
             }
         }
 
@@ -861,7 +860,64 @@ if(debug)
             throw new IllegalArgumentException("Graph pattern " + pattern +
                     " not supported.");
         }
-        return new ArrayList<>();
+        List<DENOPTIMGraph> subgraphs = graph
+                .getRings()
+                .stream()
+                .map(r -> new PathSubGraph(r.getHeadVertex(),
+                        r.getTailVertex(), graph))
+                .map(PathSubGraph::getGraph)
+                .map(DENOPTIMGraph::clone)
+                .peek(DENOPTIMGraph::renumberGraphVertices)
+                .collect(Collectors.toList());
+        for (int i = 0; i < subgraphs.size(); i++) {
+            subgraphs.set(i, fixEdgeDirections(subgraphs.get(i)));
+        }
+        return subgraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Flips edges in the graph so that the scaffold is the only source vertex.
+     * @param graph to fix edges of.
+     * @return same graph with scaffold as the only source vertex.
+     */
+    private static DENOPTIMGraph fixEdgeDirections(DENOPTIMGraph graph) {
+        for (DENOPTIMVertex v : graph.getVertexList()) {
+            if (v.getLevel() == -1) {
+                fixEdgeDirections(v, new HashSet<>());
+            }
+        }
+        return graph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Recursive utility method for fixEdgeDirections(DENOPTIMGraph graph).
+     * @param v current vertex
+     */
+    private static void fixEdgeDirections(DENOPTIMVertex v,
+                                          Set<Integer> visited) {
+        visited.add(v.getVertexId());
+        int visitedVertexEncounters = 0;
+        for (int i = 0; i < v.getNumberOfAPs(); i++) {
+            DENOPTIMEdge edge = v.getAP(i).getEdgeUser();
+            boolean srcIsVisited = visited.contains(edge.getSrcVertex());
+
+            visitedVertexEncounters += srcIsVisited ? 1 : 0;
+            if (visitedVertexEncounters >= 2) {
+                throw new IllegalArgumentException("Invalid graph. Contains a" +
+                        " cycle.");
+            }
+
+            boolean edgeIsWrongWay = edge.getTrgVertex() == v.getVertexId()
+                    && !srcIsVisited;
+            if (edgeIsWrongWay) {
+                edge.flipEdge();
+            }
+            fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+        }
     }
 
 //------------------------------------------------------------------------------

@@ -28,12 +28,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
-import java.util.logging.Level;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
-import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonParseException;
@@ -45,7 +42,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
@@ -245,7 +241,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(bbt,bbId);
         v.setVertexId(vertexId);
         
-        v.setAsRCV(v.getNumberOfAP() == 1 
+        v.setAsRCV(v.getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
         
@@ -360,7 +356,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public int getNumberOfAP()
+    public int getNumberOfAPs()
     {
         return getAttachmentPoints().size();
     }
@@ -560,11 +556,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             return false;
         }
         
-        if (this.getNumberOfAP() != other.getNumberOfAP())
+        if (this.getNumberOfAPs() != other.getNumberOfAPs())
         {
             reason.append("Different number of APs ("
-                    +this.getNumberOfAP()+":"
-                    +other.getNumberOfAP()+"); ");
+                    +this.getNumberOfAPs()+":"
+                    +other.getNumberOfAPs()+"); ");
             return false;
         }
         
@@ -1190,7 +1186,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     fragWithMol.setAsRCV(frag.isRCV());
                     fragWithMol.setVertexId(frag.getVertexId());
                     fragWithMol.setLevel(frag.getLevel());
-                    for (int iap=0; iap<frag.getNumberOfAP(); iap++)
+                    for (int iap = 0; iap<frag.getNumberOfAPs(); iap++)
                     {
                         DENOPTIMAttachmentPoint oriAP = frag.getAP(iap);
                         DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
@@ -1290,7 +1286,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             v = new DENOPTIMFragment(iac,bbt);
         }
         
-        v.setAsRCV(v.getNumberOfAP() == 1 
+        v.setAsRCV(v.getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
         

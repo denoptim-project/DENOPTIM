@@ -243,7 +243,7 @@ public class TreeBuilder3D
         // Store copy of APs
         ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag =
                 new ArrayList<>();
-        for (int i=0; i<rootVrtx.getNumberOfAP(); i++)
+        for (int i = 0; i<rootVrtx.getNumberOfAPs(); i++)
         {
             DENOPTIMAttachmentPoint ap = rootVrtx.getAttachmentPoints().get(i);
             // For first vertex the atomPositionNumber remains the same
@@ -558,7 +558,7 @@ public class TreeBuilder3D
 
         // Get all APs on the incoming fragment (we need to rototranslate them)
         ArrayList<Point3d> allApsAsPt3D = new ArrayList<Point3d>();
-        for (int iap=0; iap<inVtx.getNumberOfAP(); iap++)
+        for (int iap = 0; iap<inVtx.getNumberOfAPs(); iap++)
         {
             DENOPTIMAttachmentPoint ap = inVtx.getAttachmentPoints().get(iap);
             Point3d pt = new Point3d(ap.getDirectionVector());
@@ -759,7 +759,7 @@ public class TreeBuilder3D
 
         // Store copies of APs with the new orientation (rototranslated)
         ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag = new ArrayList<>();
-        for (int i=0; i<inVtx.getNumberOfAP(); i++)
+        for (int i = 0; i<inVtx.getNumberOfAPs(); i++)
         {
             DENOPTIMAttachmentPoint oriAP = inVtx.getAttachmentPoints().get(i);
             // For vertices other than the first AtomPositionNumber in mol

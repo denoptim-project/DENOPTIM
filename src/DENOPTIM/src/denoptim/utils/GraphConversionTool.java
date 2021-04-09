@@ -356,8 +356,8 @@ public class GraphConversionTool
                             // needed to allow formation of the edge.
                             // Currently we cannot know the index of the src
                             // atom, so we simply put this index to 0.
-                            for (int k=vertex.getNumberOfAP(); k<(srcAPID+1); 
-                                    k++)
+                            for (int k = vertex.getNumberOfAPs(); k<(srcAPID+1);
+                                 k++)
                             {
                                 vertex.addAP(0,1,1);
                             }
@@ -375,8 +375,8 @@ public class GraphConversionTool
                             // needed to allow formation of the edge.
                             // Currently we cannot know the index of the src
                             // atom, so we simply put this index to 0.
-                            for (int k=vertex.getNumberOfAP(); k<(trgAPID+1); 
-                                    k++)
+                            for (int k = vertex.getNumberOfAPs(); k<(trgAPID+1);
+                                 k++)
                             {
                                 vertex.addAP(0,1,1);
                             }

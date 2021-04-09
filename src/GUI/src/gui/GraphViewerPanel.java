@@ -352,7 +352,7 @@ public class GraphViewerPanel extends JPanel
             
             // Create representation of free APs
             
-            for (int i=0; i<v.getNumberOfAP(); i++)
+            for (int i = 0; i<v.getNumberOfAPs(); i++)
             {
                 DENOPTIMAttachmentPoint ap = v.getAttachmentPoints().get(i);
                 if (ap.isAvailable())

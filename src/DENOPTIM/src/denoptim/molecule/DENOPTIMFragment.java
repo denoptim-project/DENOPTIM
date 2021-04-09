@@ -159,7 +159,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 getAttachmentPoints());
         setSymmetricAPSets(simAP);
         
-        this.setAsRCV(getNumberOfAP() == 1 
+        this.setAsRCV(getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         getAttachmentPoints().get(0).getAPClass()));
     }

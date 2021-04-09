@@ -52,7 +52,7 @@ public class PathSubGraph
 {
     /**
      * The graph representation of this path. Neither
-     * <code>DENOPTIMVertex</code> and <code>DENOPTIMEdge</code>
+     * <code>DENOPTIMVertex</code> nor <code>DENOPTIMEdge</code>
      * belong to the original <code>DENOPTIMGraph</code>.
      */
     private DENOPTIMGraph graph;
@@ -81,7 +81,7 @@ public class PathSubGraph
     private DENOPTIMVertex turningPointVert;
 
     /**
-     * The list of verteces involved
+     * The list of vertices involved
      */
     private List<DENOPTIMVertex> vertPathVAVB;
 
@@ -101,7 +101,7 @@ public class PathSubGraph
     private List<IAtom> atomsPathVAVB;
 
     /**
-     * The list of bonds in the sortest path
+     * The list of bonds in the shortest path
      * Note that the <code>IBond</code>s are those of the entire molecule
      * not of the <code>IAtomContainer</code> representing only this path.
      */
@@ -758,6 +758,11 @@ public class PathSubGraph
        }
        return sb.toString();
     }
-     
+
+    public DENOPTIMGraph getGraph() {
+        return graph;
+    }
+
 //-----------------------------------------------------------------------------
+
 }

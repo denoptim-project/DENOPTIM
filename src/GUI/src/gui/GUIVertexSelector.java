@@ -198,7 +198,7 @@ public class GUIVertexSelector extends GUIModalDialog
                     }
                     else
                     {
-                        if (vertex.getNumberOfAP()==1)
+                        if (vertex.getNumberOfAPs()==1)
                         {
                             currApIdx=0;
                         }
@@ -235,7 +235,7 @@ public class GUIVertexSelector extends GUIModalDialog
     				}
     				else
     				{
-    					if (vertex.getNumberOfAP()==1)
+    					if (vertex.getNumberOfAPs()==1)
     					{
     						currApIdx=0;
     					}

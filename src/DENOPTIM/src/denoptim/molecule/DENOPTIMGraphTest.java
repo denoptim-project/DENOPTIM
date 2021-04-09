@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,9 +19,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 
 
 /**
@@ -708,7 +704,7 @@ public class DENOPTIMGraphTest {
 		    int hashVG = vg.hashCode();
 		    int hashVC = vc.hashCode();
             
-		    for (int iap=0; iap<vg.getNumberOfAP(); iap++)
+		    for (int iap = 0; iap<vg.getNumberOfAPs(); iap++)
 		    {
 		        assertEquals(vg.getAP(iap).getOwner().hashCode(), hashVG, 
 		                "Reference to vertex owner in ap " + iap + " vertex " 

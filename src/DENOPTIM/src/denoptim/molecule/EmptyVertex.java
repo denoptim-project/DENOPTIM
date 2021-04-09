@@ -159,7 +159,7 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public int getNumberOfAP()
+    public int getNumberOfAPs()
     {
         return lstAPs.size();
     }
@@ -250,6 +250,7 @@ public class EmptyVertex extends DENOPTIMVertex
         EmptyVertex c = new EmptyVertex(getVertexId());
         c.setLevel(this.getLevel());
         c.setAsRCV(this.isRCV());
+        c.setBuildingBlockType(this.getBuildingBlockType());
         
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {

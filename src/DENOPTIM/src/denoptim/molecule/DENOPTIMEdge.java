@@ -249,6 +249,22 @@ public class DENOPTIMEdge implements Serializable
 //------------------------------------------------------------------------------
 
     /**
+     * Exchanges source and target vertices and respective APs of this edge.
+     */
+    public void flipEdge() {
+        DENOPTIMAttachmentPoint newTrgAP = getSrcAP();
+        DENOPTIMAttachmentPoint newSrcAP = getTrgAP();
+        DENOPTIMVertex newTrgVertex = newTrgAP.getOwner();
+        DENOPTIMVertex newSrcVertex = newSrcAP.getOwner();
+        srcAP = newSrcAP;
+        trgAP = newTrgAP;
+        setSrcVertex(newSrcVertex.getVertexId());
+        setTrgVertex(newTrgVertex.getVertexId());
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Possible chemical bond types an edge can represent.
      */
     public enum BondType {

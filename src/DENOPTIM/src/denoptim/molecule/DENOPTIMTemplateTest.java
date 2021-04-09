@@ -389,31 +389,6 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    /* See notes in getCH2FragmentAPI() for change suggestions */
-    private DENOPTIMVertex getOHFragmentAPI() throws DENOPTIMException {
-        IAtomContainer atomContainer = chemBuilder.newAtomContainer();
-        String[] elements = new String[]{"O", "H"};
-        for (String e : elements) {
-            IAtom atom = chemBuilder.newAtom();
-            atom.setSymbol(e);
-            atomContainer.addAtom(atom);
-        }
-
-        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
-
-        DENOPTIMFragment v = new DENOPTIMFragment(1, atomContainer,
-                BBType.FRAGMENT);
-        int srcAtom = 0;
-        int totConnections = 1;
-        Point3d dirVec = new Point3d(rng.nextDouble(), rng.nextDouble(),
-                rng.nextDouble());
-        APClass apClass = APClass.make("o", 0);
-//            v.addAP(srcAtom, totConnections, dirVec, apClass);
-        return v;
-    }
-
-//------------------------------------------------------------------------------
-
     @Test
     public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
@@ -503,11 +478,8 @@ public class DENOPTIMTemplateTest
         innerGraph.addVertex(v);
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
-
-        // These two shouldn't really be part of the comparison between APs.
-//        testSameAtomConnections(template, innerGraph);
-//        testSameApConnections(template, innerGraph);
-
+        // Unsure if inner APs should be required to have the same direction
+        // vectors as required APs.
 //        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
@@ -539,28 +511,6 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    private void testSameApConnections(DENOPTIMTemplate t,
-                                       DENOPTIMGraph innerGraph) {
-        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
-        int correctApConnections = ap.getFreeConnections();
-        ap.setFreeConnections(correctApConnections + 1);
-        assertThrows(IllegalArgumentException.class,
-                () -> t.setInnerGraph(innerGraph));
-    }
-
-//------------------------------------------------------------------------------
-
-    private void testSameAtomConnections(DENOPTIMTemplate t,
-                                         DENOPTIMGraph innerGraph) {
-        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
-        int correctAtomConnections = ap.getTotalConnections();
-        ap.setTotalConnections(correctAtomConnections + 1);
-        assertThrows(IllegalArgumentException.class,
-                () -> t.setInnerGraph(innerGraph));
-    }
-
-//------------------------------------------------------------------------------
-
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
                                             int expNumberOfAPs) {
         DENOPTIMVertex v = new EmptyVertex();
@@ -582,7 +532,7 @@ public class DENOPTIMTemplateTest
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMGraph g = new DENOPTIMGraph();
         t.setInnerGraph(g);
-        assertThrows(DENOPTIMException.class, () -> t.addAP(0, 1, 1));
+        assertThrows(IllegalArgumentException.class, () -> t.addAP(0, 1, 1));
     }
 
 //------------------------------------------------------------------------------
@@ -599,7 +549,6 @@ public class DENOPTIMTemplateTest
             assertEquals(g, t.getInnerGraph());
         } catch (DENOPTIMException e) {
             fail("Unexpected exception thrown.");
-
         }
     }
 
