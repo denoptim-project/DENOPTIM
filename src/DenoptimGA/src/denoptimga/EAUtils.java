@@ -680,7 +680,7 @@ public class EAUtils
                                 + " scaffold: " + molGraph.toString());
         }
 
-        DENOPTIMGraphOperations.extendGraph(molGraph, scafVertex, true, false);
+        DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
 
         if (DEBUG)
         {
