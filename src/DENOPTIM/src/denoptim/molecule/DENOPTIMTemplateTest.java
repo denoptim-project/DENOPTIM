@@ -353,10 +353,6 @@ public class DENOPTIMTemplateTest
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
 
-        // These two shouldn't really be part of the comparison between APs.
-//        testSameAtomConnections(template, innerGraph);
-//        testSameApConnections(template, innerGraph);
-
 //        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
@@ -388,28 +384,6 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    private void testSameApConnections(DENOPTIMTemplate t,
-                                       DENOPTIMGraph innerGraph) {
-        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
-        int correctApConnections = ap.getFreeConnections();
-        ap.setFreeConnections(correctApConnections + 1);
-        assertThrows(IllegalArgumentException.class,
-                () -> t.setInnerGraph(innerGraph));
-    }
-
-//------------------------------------------------------------------------------
-
-    private void testSameAtomConnections(DENOPTIMTemplate t,
-                                         DENOPTIMGraph innerGraph) {
-        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
-        int correctAtomConnections = ap.getTotalConnections();
-        ap.setTotalConnections(correctAtomConnections + 1);
-        assertThrows(IllegalArgumentException.class,
-                () -> t.setInnerGraph(innerGraph));
-    }
-
-//------------------------------------------------------------------------------
-
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
                                             int expNumberOfAPs) {
         DENOPTIMVertex v = new EmptyVertex();
@@ -424,14 +398,12 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    @Disabled("Disabled until we can find a way to prevent addAP from being " +
-            "called after setInnerGraph")
     @Test
     public void testAddAP_after_setInnerGraph_throwsException() {
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMGraph g = new DENOPTIMGraph();
         t.setInnerGraph(g);
-        assertThrows(DENOPTIMException.class, () -> t.addAP(0, 1, 1));
+        assertThrows(IllegalArgumentException.class, () -> t.addAP(0, 1, 1));
     }
 
 //------------------------------------------------------------------------------
