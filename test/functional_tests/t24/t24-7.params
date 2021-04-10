@@ -1,0 +1,14 @@
+#
+# Parameters for DENOPTIM
+#
+Isomorphism-inpGraphA=graph6.sdf 
+# graph6 and graph7 differ by which APs are used in vertex 1, so they are not isomorphic
+Isomorphism-inpGraphB=graph7.sdf
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds

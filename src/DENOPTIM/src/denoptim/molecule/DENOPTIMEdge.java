@@ -34,6 +34,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Order;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.GenUtils;
 
 /**
  * This class represents the edge between two vertices.
@@ -220,6 +221,67 @@ public class DENOPTIMEdge implements Serializable
     	}
     	return true;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another edge ignoring the directionality of both, i.e.,
+     * as if both edges were undirected. Ranking and comparison is based on an
+     * invariant lexicographic string that combines, for each side of the edge, 
+     * the following information:
+     * <ol>
+     * <li>type of the building block reached,</li>
+     * <li>the ID of the building block,</li>
+     * <li>the index of the attachment point.</li>
+     * </ol>
+     * Only for edges that link equivalent building blocks via the corresponding
+     * APs (i.e., edges belonging to the same invariant class), the bond type
+     * is considered as the final comparison criterion.
+     * 
+     * @param other edge to compare with this.
+     * @return a negative integer, zero, or a positive integer as this object is
+     * less than, equal to, or greater than the specified object.
+     */
+    public int compareAsUndirected(DENOPTIMEdge other)
+    {
+        DENOPTIMVertex tvA = srcAP.getOwner();
+        DENOPTIMVertex tvB = trgAP.getOwner();
+        DENOPTIMVertex ovA = other.srcAP.getOwner();
+        DENOPTIMVertex ovB = other.trgAP.getOwner();
+        
+        String invariantTA = tvA.getBuildingBlockType().toOldInt() +
+                GenUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
+                GenUtils.getPaddedString(4,srcAP.getIndexInOwner());
+        
+        String invariantTB = tvB.getBuildingBlockType().toOldInt() +
+                GenUtils.getPaddedString(6,tvB.getBuildingBlockId()) +
+                GenUtils.getPaddedString(4,trgAP.getIndexInOwner());
+        
+        String invariantOA = ovA.getBuildingBlockType().toOldInt() +
+                GenUtils.getPaddedString(6,ovA.getBuildingBlockId()) +
+                GenUtils.getPaddedString(4,other.srcAP.getIndexInOwner());
+        
+        String invariantOB = ovB.getBuildingBlockType().toOldInt() +
+                GenUtils.getPaddedString(6,ovB.getBuildingBlockId()) +
+                GenUtils.getPaddedString(4,other.trgAP.getIndexInOwner());
+                
+        String invariantThis = invariantTA + invariantTB;
+        if (invariantTA.compareTo(invariantTB) > 0)
+            invariantThis = invariantTB + invariantTA;
+        
+        String invariantOther = invariantOA + invariantOB;
+        if (invariantOA.compareTo(invariantOB) > 0)
+            invariantOther = invariantOB + invariantOA;
+        
+        int resultIgnoringBondType = invariantThis.compareTo(invariantOther);
+        
+        if (resultIgnoringBondType == 0)
+        {
+            return this.getBondType().compareTo(other.getBondType());
+        } else {
+            return resultIgnoringBondType;
+        }
+    }
 
 //------------------------------------------------------------------------------
 
@@ -363,26 +425,24 @@ public class DENOPTIMEdge implements Serializable
             return valenceUsed;
         }
     }
-
-
-
+    
 //------------------------------------------------------------------------------
 
     public static class DENOPTIMEdgeSerializer 
     implements JsonSerializer<DENOPTIMEdge>
     {
-      @Override
-      public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc,
+        @Override
+        public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc,
               JsonSerializationContext context)
-      {
-          JsonObject jsonObject = new JsonObject();
-          jsonObject.addProperty("srcAPID", edge.getSrcAP().getID());
-          jsonObject.addProperty("trgAPID", edge.getTrgAP().getID());
-          jsonObject.add("bondType", context.serialize(edge.getBondType()));
-          return jsonObject;
-      }
+        {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("srcAPID", edge.getSrcAP().getID());
+            jsonObject.addProperty("trgAPID", edge.getTrgAP().getID());
+            jsonObject.add("bondType", context.serialize(edge.getBondType()));
+            return jsonObject;
+        }
     }
-//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
 
 }

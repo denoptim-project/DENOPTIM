@@ -23,6 +23,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -1162,6 +1166,87 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             symVertices.clear();
         }
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if this graph is "DENOPTIM-isomorphic" to the other one given. 
+     * "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of  
+     * <a href="https://mathworld.wolfram.com/IsomorphicGraphs.html">
+     * graph isomorphism</a>
+     * that differs from the most common meaning of isomorphism in graph theory.
+     * In general, DENOPTIMGraphs are considered undirected when evaluating
+     * DENOPTIM-isomorphism. Next, 
+     * since a DENOPTIMGraph is effectively 
+     * a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
+     * with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
+     * any DENOPTIMGraph G={ST_i,FC_i} that contains one or more cycles 
+     * can be represented in multiple
+     * ways, G={ST_j,FC_j} or G={ST_k,FC_k}, that differ by the position of the
+     * chord/s and by the corresponding pair of ring-closing vertexes between
+     * which each chord is defined.
+     * The DENOPTIM-isomorphism for two DENOPTIMGraphs G1 and G2 
+     * is given by the common graph theory isomorphism between 
+     * two undirected graphs U1 and U2 build respectively from G1 and G2 
+     * with the convention defined in 
+     * {@link GraphConversionTool#getJGraphFromGraph(DENOPTIMGraph)}.
+     * Finally,
+     * <ul>
+     * <li>vertexes are compared excluding their vertex ID, i.e., 
+     * {@link DENOPTIMVertex#sameAs()}</li>
+     * <li>edges are considered undirected and compared considering the 
+     * {@link BondType} and the 
+     * identity of the attachment points connected thereby.</li>
+     * </ul>
+     * 
+     * This method makes use of the Vento-Foggia VF2 algorithm (see 
+     * <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>) as provided by
+     * JGraphT library in {@link VF2GraphIsomorphismInspector}.
+     * 
+     * @param other the graph to be compared with this.
+     * @return <code>true</code> is this graph is isomorphic to the other.
+     */
+    public boolean isIsomorphicTo(DENOPTIMGraph other)
+    {
+        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG = 
+                GraphConversionTool.getJGraphFromGraph(this);
+        
+        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG = 
+                GraphConversionTool.getJGraphFromGraph(other);
+        
+        Comparator<DENOPTIMVertex> vComp = 
+                new Comparator<DENOPTIMVertex>() {
+                    @Override
+                    public int compare(DENOPTIMVertex v1, DENOPTIMVertex v2) {
+                        // Vertex.sameAs returns boolean, so we need to produce 
+                        // an int to allow comparison.
+                        StringBuilder sb = new StringBuilder();
+                        if (v1.sameAs(v2, sb))
+                        {
+                            return 0;
+                        } else {
+                            return Integer.compare(
+                                    v1.getBuildingBlockId(), 
+                                    v2.getBuildingBlockId());
+                        }
+                    }
+                }; 
+        
+        Comparator<UndirectedEdgeRelation> eComp =
+                new Comparator<UndirectedEdgeRelation>() {
+                    @Override
+                    public int compare(UndirectedEdgeRelation o1,
+                            UndirectedEdgeRelation o2)
+                    {
+                        return o1.compare(o2);
+                    }
+                };
+        
+        VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdgeRelation> vf2 =
+                new VF2GraphIsomorphismInspector<>(thisG, otherG, vComp, eComp);
+        
+        return vf2.isomorphismExists();
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1212,7 +1297,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     	vertexMap.put(this.getVertexAtPosition(0),other.getVertexAtPosition(0));
 
-    	//WARNING: assuming that vertex 0 is the root and there are no disconnections
+    	//WARNING: assuming that the first vertex in the vertex list is the root
+    	// and also that there are no disconnections. Both assumptions are
+    	// reasonable for graphs.
     	try {
 			if (!compareGraphNodes(this.getVertexAtPosition(0), this,
 											other.getVertexAtPosition(0), other,
@@ -1323,31 +1410,33 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Compares this and another graph by spanning vertices starting from the
+     * Compares graphs by spanning vertices starting from the
      * given vertex and following the direction of edges.
-     * @param thisV
-     * @param otherV
-     * @param reason a string recording the reason for returning false
-     * @return <code>true</code> if the graphs are same at this node
+     * @param seedOnA initial vertex on the first graph.
+     * @param gA the first graph.
+     * @param seedOnB initial vertex on the second graph.
+     * @param gB the second graph.
+     * @param vertexMap vertex mapping.
+     * @param reason a string recording the reason for returning false.
+     * @return <code>true</code> if the graphs are same at this node.
      * @throws DENOPTIMException
      */
-    private static boolean compareGraphNodes(DENOPTIMVertex thisV,
-    		DENOPTIMGraph thisG,
-    		DENOPTIMVertex otherV,
-    		DENOPTIMGraph otherG, Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap,
-    		StringBuilder reason) throws DENOPTIMException
+    private static boolean compareGraphNodes(DENOPTIMVertex seedOnA,
+    		DENOPTIMGraph gA, DENOPTIMVertex seedOnB, DENOPTIMGraph gB, 
+    		Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap, StringBuilder reason) 
+    		        throws DENOPTIMException
     {
-    	if (!thisV.sameAs(otherV, reason))
+    	if (!seedOnA.sameAs(seedOnB, reason))
     	{
-    		reason.append("Different vertex ("+thisV+":"+otherV+")");
+    		reason.append("Different vertex ("+seedOnA+":"+seedOnB+")");
     		return false;
     	}
 
-    	ArrayList<DENOPTIMEdge> edgesFromThis = thisG.getEdgesWithSrc(thisV);
-    	ArrayList<DENOPTIMEdge> edgesFromOther = otherG.getEdgesWithSrc(otherV);
+    	ArrayList<DENOPTIMEdge> edgesFromThis = gA.getEdgesWithSrc(seedOnA);
+    	ArrayList<DENOPTIMEdge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
     	if (edgesFromThis.size() != edgesFromOther.size())
     	{
-    		reason.append("Different number of edged from vertex "+thisV+" ("
+    		reason.append("Different number of edged from vertex "+seedOnA+" ("
     					+edgesFromThis.size()+":"
     					+edgesFromOther.size()+")");
     		return false;
@@ -1377,16 +1466,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     		//Check: this should never be true
     		if (vertexMap.keySet().contains(
-    				thisG.getVertexWithId(et.getTrgVertex())))
+    				gA.getVertexWithId(et.getTrgVertex())))
     		{
     			throw new DENOPTIMException("More than one attempt to set vertex map.");
     		}
-    		vertexMap.put(thisG.getVertexWithId(et.getTrgVertex()),
-    				otherG.getVertexWithId(eo.getTrgVertex()));
+    		vertexMap.put(gA.getVertexWithId(et.getTrgVertex()),
+    				gB.getVertexWithId(eo.getTrgVertex()));
 
     		DENOPTIMVertex[] pair = new DENOPTIMVertex[]{
-    				thisG.getVertexWithId(et.getTrgVertex()),
-    				otherG.getVertexWithId(eo.getTrgVertex())};
+    				gA.getVertexWithId(et.getTrgVertex()),
+    				gB.getVertexWithId(eo.getTrgVertex())};
     		pairs.add(pair);
     	}
 
@@ -1395,7 +1484,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		DENOPTIMVertex v = pair[0];
     		DENOPTIMVertex o = pair[1];
-    		boolean localRes = compareGraphNodes(v, thisG, o, otherG,vertexMap,
+    		boolean localRes = compareGraphNodes(v, gA, o, gB,vertexMap,
     				reason);
     		if (!localRes)
     		{
@@ -3267,6 +3356,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 {
                     ring.addVertex(graph.getVertexWithId(re.getAsInt()));
                 }
+                ring.setBondType(context.deserialize(o.get("bndTyp"),
+                        BondType.class));
                 graph.addRing(ring);
             }
 

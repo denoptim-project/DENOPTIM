@@ -22,9 +22,12 @@ package denoptim.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
@@ -42,6 +45,7 @@ import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.UndirectedEdgeRelation;
 
 
 /**
@@ -472,6 +476,66 @@ public class GraphConversionTool
         
         g.setGraphId(gcode);
         
+        return g;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts a DENOPTIMGraph into a JGraphT {@link SimpleGraph}. Note that
+     * the conversion does not produce a 1:1 list of vertexes and edges. 
+     * Instead,
+     * <ul>
+     * <li>used pairs of RCVs are removed and the attachment points to
+     * which they were bound are considered to be connected by an edge.</li>
+     * <li>all edges are considered undirected.</li>
+     * </ul>
+     * @param dg
+     * @return
+     */
+    public static SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> 
+    getJGraphFromGraph(DENOPTIMGraph dg)
+    {
+        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> g = 
+                        new SimpleGraph<>(UndirectedEdgeRelation.class);
+        Map<DENOPTIMVertex,Integer> vis = new HashMap<DENOPTIMVertex,Integer>();
+        int i = 0;
+        for (DENOPTIMVertex v : dg.getVertexList())
+        {
+            vis.put(v, i);
+            i += 1;
+            if (v.isRCV())
+            {
+                if (!dg.isVertexInRing(v))
+                {
+                    g.addVertex(v);
+                }
+            } else {
+                g.addVertex(v);
+            }
+        }
+
+        for (DENOPTIMEdge e : dg.getEdgeList())
+        {
+            DENOPTIMVertex vA = e.getSrcAP().getOwner();
+            DENOPTIMVertex vB = e.getTrgAP().getOwner();
+            if (!vA.isRCV() && !vB.isRCV())
+            {
+                g.addEdge(vA, vB, new UndirectedEdgeRelation(e.getSrcAP(), 
+                        e.getTrgAP(), e.getBondType()));
+            }
+        }
+        
+        for (DENOPTIMRing r : dg.getRings())
+        {
+            DENOPTIMVertex vA = r.getHeadVertex();
+            DENOPTIMVertex vB = r.getTailVertex();
+            DENOPTIMVertex pA = vA.getParent();
+            DENOPTIMVertex pB = vB.getParent();
+            g.addEdge(pA, pB, new UndirectedEdgeRelation(
+                    vA.getEdgeToParent().getSrcAP(), 
+                    vB.getEdgeToParent().getSrcAP(), r.getBondType()));
+        }
         return g;
     }
     

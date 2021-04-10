@@ -94,7 +94,13 @@ public class GenUtils
 
 //------------------------------------------------------------------------------
 
-    // returns a padded string with zeroes for the count,
+    /**
+     * returns the padded string with zeroes placed to the left of 'number' up to
+     * reach the desired number of digits.
+     * @param count the total number of digits.
+     * @param number the number to be formatted.
+     * @return the padded string.
+     */
     public static String getPaddedString(int count, int number)
     {
         return String.format("%0" + count + "d", number);
