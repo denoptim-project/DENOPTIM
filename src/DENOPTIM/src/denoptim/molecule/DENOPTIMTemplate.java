@@ -514,47 +514,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public void addAP(DENOPTIMAttachmentPoint ap) {
         if (getInnerGraph() != null) {
-            System.err.println("cannot add more required APs after " +
-                    "setting the inner graph");
-            return;
+            throw new IllegalArgumentException("cannot add more required APs " +
+                    "after setting the inner graph");
         }
         ap.setOwner(this);
         requiredAPs.add(ap);
     }
-
-//------------------------------------------------------------------------------
-/*
- 
- REMOVED: 
- It violates Object.equals contract "equal objects must have equal hash codes".
- 
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof DENOPTIMTemplate)) {
-            return false;
-        }
-        DENOPTIMTemplate o = (DENOPTIMTemplate) other;
-        if (this.contractLevel != o.contractLevel
-                || this.buildingBlockType != o.buildingBlockType
-                || this.buildingBlockId != o.buildingBlockId)
-        {
-            return false;
-        }
-
-        if (this.requiredAPs.size() == o.requiredAPs.size()) {
-            for (int i = 0; i < this.requiredAPs.size(); i++) {
-                if (this.requiredAPs.get(i).comparePropertiesTo(
-                        o.requiredAPs.get(0)) != 0) {
-                    return false;
-                }
-            }
-        } else {
-            return false;
-        }
-        return this.getInnerGraph().sameAs(o.getInnerGraph(),
-                new StringBuilder());
-    }
-    */
 
 //------------------------------------------------------------------------------
     

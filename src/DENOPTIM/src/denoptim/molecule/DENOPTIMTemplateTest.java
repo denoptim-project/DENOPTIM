@@ -27,7 +27,6 @@ import java.util.*;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.utils.MutationType;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +36,6 @@ import org.junit.jupiter.api.Test;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -197,6 +194,8 @@ public class DENOPTIMTemplateTest
         return outerTemp;
     }
 
+//------------------------------------------------------------------------------
+
     private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -231,6 +230,8 @@ public class DENOPTIMTemplateTest
         return v;
     }
 
+//------------------------------------------------------------------------------
+
     private DENOPTIMVertex getOHFragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"O", "H"};
@@ -257,158 +258,6 @@ public class DENOPTIMTemplateTest
                         (double) (Math.round(rng.nextDouble() * precision)) / precision),
                 1
         );
-        return v;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * This test tests nested template cloning, constructing Fragments and
-     * Templates the way it "should" be done (personal opinion of Einar
-     * Kjellback).
-     * Until we decide to refactor the API we ignore this test. To test nested
-     * template cloning in the meantime one can run this test's sister class,
-     * the testNestedTemplateCloning-test, which can be found in this unit test
-     * class.
-     * In lines where the sibling tests differ I have commented what the
-     * issues and bugs will appear using this test's API.
-     */
-    @Disabled("Disabled until we decide to refactor Fragment and Vertex")
-    @Test
-    public void testNestedTemplateCloningAPI() {
-        try {
-            DENOPTIMTemplate t = getNestedTemplateAPI();
-            DENOPTIMTemplate clone = t.clone();
-            assertTrue(t.sameAs(clone, new StringBuilder()));
-        } catch (DENOPTIMException e) {
-            fail("Unexpected exception thrown.");
-            e.printStackTrace();
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Creating a template that contains another template with the following
-     * structure:
-     * |-----------------------|
-     * |            |--------| |
-     * | * - CH_2 - | * - OH | |
-     * |            |--------| |
-     * |-----------------------|
-     * The box containing the 'OH' represents the nested template and the
-     * outermost box represents the outermost template.
-     */
-    private DENOPTIMTemplate getNestedTemplateAPI() throws DENOPTIMException {
-        /* Constructing innermost template */
-        DENOPTIMVertex ohFrag = getOHFragmentAPI();
-        DENOPTIMGraph g = new DENOPTIMGraph();
-        g.addVertex(ohFrag);
-        DENOPTIMTemplate nestedTemp = new DENOPTIMTemplate(BBType.FRAGMENT);
-        nestedTemp.setInnerGraph(g);
-
-        /* Constructing outermost template */
-        DENOPTIMVertex ch2Frag = getCH2FragmentAPI();
-        g = new DENOPTIMGraph();
-        g.addVertex(ch2Frag);
-        g.addVertex(nestedTemp);
-        DENOPTIMEdge e = ch2Frag.connectVertices(nestedTemp);
-        g.addEdge(e);
-        DENOPTIMTemplate outerTemp = new DENOPTIMTemplate(BBType.FRAGMENT);
-        outerTemp.setInnerGraph(g);
-
-        return outerTemp;
-    }
-
-//------------------------------------------------------------------------------
-
-    private DENOPTIMVertex getCH2FragmentAPI() throws DENOPTIMException {
-        /*
-        --Issue 1--
-        There are two ways of building a fragment:
-            1. Construct the IAtomContainer outside the fragment and inject
-               it as a dependency to the Fragment.
-            2. Inject an empty IAtomContainer and then build it from within
-               the Fragment using identical methods as you would find them on
-               IAtomContainer.
-        I propose we only allow the first pattern to be used. We should
-        therefore remove all methods from Fragment which modify the
-        atomContainer. */
-        IAtomContainer atomContainer = chemBuilder.newAtomContainer();
-        String[] elements = new String[]{"C", "H", "H"};
-        for (String e : elements) {
-            IAtom atom = chemBuilder.newAtom();
-            atom.setSymbol(e);
-            atomContainer.addAtom(atom);
-        }
-        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
-        atomContainer.addBond(0, 2, IBond.Order.SINGLE);
-
-        /*
-        --Issue 2--
-        Fragment and Vertex have different addAP(…) methods with different
-        arguments which have different semantics. We need to unify the
-        semantics and syntax of these methods before v can have type
-        Vertex.
-
-        --Issue 4--
-        Using tags on the atomContainer's IAtoms defeats the purpose of
-        having a Fragment class. Why have Fragment when we can just store
-        information about the Fragment in its IAtomContainer as tags? We
-        should commit to storing information about a fragment either in the
-        Fragment class field variables or as a number of tags on an
-        IAtomContainer. */
-        DENOPTIMVertex v = new DENOPTIMFragment(2, atomContainer,
-                BBType.FRAGMENT);
-
-        for (int i = 0; i < 2; i++) {
-            int srcAtom = 0;
-            int totConnections = 1;
-            /*
-            --Issue 5--
-            Cloning an AP rounds the coordinates of the directions vector to
-            the four most significant digits. This happens because cloning is
-            done by converting the SDF string representation of the original
-            AP to a clone. */
-            Point3d dirVec = new Point3d(rng.nextDouble(), rng.nextDouble(),
-                    rng.nextDouble());
-            APClass apClass = APClass.make("c", 0);
-            /*
-            --Issue 6--
-            In the sister test we put the APClass into FragmentSpace
-            .bondOrderMap and map it to BondType.SINGLE. APs should not
-            have to make references to the FragmentSpace to work.
-             */
-
-            /* Method does not exist. See notes above about different
-            addAP() constructors on Vertex and Fragment */
-//            v.addAP(srcAtom, totConnections, dirVec, apClass);
-        }
-        return v;
-    }
-
-//------------------------------------------------------------------------------
-
-    /* See notes in getCH2FragmentAPI() for change suggestions */
-    private DENOPTIMVertex getOHFragmentAPI() throws DENOPTIMException {
-        IAtomContainer atomContainer = chemBuilder.newAtomContainer();
-        String[] elements = new String[]{"O", "H"};
-        for (String e : elements) {
-            IAtom atom = chemBuilder.newAtom();
-            atom.setSymbol(e);
-            atomContainer.addAtom(atom);
-        }
-
-        atomContainer.addBond(0, 1, IBond.Order.SINGLE);
-
-        DENOPTIMFragment v = new DENOPTIMFragment(1, atomContainer,
-                BBType.FRAGMENT);
-        int srcAtom = 0;
-        int totConnections = 1;
-        Point3d dirVec = new Point3d(rng.nextDouble(), rng.nextDouble(),
-                rng.nextDouble());
-        APClass apClass = APClass.make("o", 0);
-//            v.addAP(srcAtom, totConnections, dirVec, apClass);
         return v;
     }
 
@@ -504,10 +353,6 @@ public class DENOPTIMTemplateTest
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
 
-        // These two shouldn't really be part of the comparison between APs.
-//        testSameAtomConnections(template, innerGraph);
-//        testSameApConnections(template, innerGraph);
-
 //        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
@@ -539,28 +384,6 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    private void testSameApConnections(DENOPTIMTemplate t,
-                                       DENOPTIMGraph innerGraph) {
-        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
-        int correctApConnections = ap.getFreeConnections();
-        ap.setFreeConnections(correctApConnections + 1);
-        assertThrows(IllegalArgumentException.class,
-                () -> t.setInnerGraph(innerGraph));
-    }
-
-//------------------------------------------------------------------------------
-
-    private void testSameAtomConnections(DENOPTIMTemplate t,
-                                         DENOPTIMGraph innerGraph) {
-        DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(0);
-        int correctAtomConnections = ap.getTotalConnections();
-        ap.setTotalConnections(correctAtomConnections + 1);
-        assertThrows(IllegalArgumentException.class,
-                () -> t.setInnerGraph(innerGraph));
-    }
-
-//------------------------------------------------------------------------------
-
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
                                             int expNumberOfAPs) {
         DENOPTIMVertex v = new EmptyVertex();
@@ -575,14 +398,12 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    @Disabled("Disabled until we can find a way to prevent addAP from being " +
-            "called after setInnerGraph")
     @Test
     public void testAddAP_after_setInnerGraph_throwsException() {
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMGraph g = new DENOPTIMGraph();
         t.setInnerGraph(g);
-        assertThrows(DENOPTIMException.class, () -> t.addAP(0, 1, 1));
+        assertThrows(IllegalArgumentException.class, () -> t.addAP(0, 1, 1));
     }
 
 //------------------------------------------------------------------------------
