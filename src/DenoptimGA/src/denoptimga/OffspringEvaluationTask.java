@@ -99,10 +99,7 @@ public class OffspringEvaluationTask extends FitnessTask
         // blocks (not aligned, nor roto-translated)
         if (FitnessParameters.make3dTree())
         {
-        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(
-        			FragmentSpace.getScaffoldLibrary(),
-        			FragmentSpace.getFragmentLibrary(),
-        			FragmentSpace.getCappingLibrary());
+        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
         	
             try {
                 DENOPTIMGraph gWithNoRCVs = dGraph.clone();

@@ -334,24 +334,17 @@ public class PathSubGraph
      * Creates the molecular representation, list of atoms and bonds involved
      * in the path between the head and tail.
      * @param mol the full molecule
-     * @param libScaff the library of scaffolds
-     * @param libFrag the library of fragments
-     * @param libCap the library of capping groups
      * @param make3D if <code>true</code> makes the method generate the 3D
      * coordinates of the chain of fragments by rototranslation of the
      * 3D fragments so that to align the APvectors
      * @throws DENOPTIMException
      */
 
-    public void makeMolecularRepresentation(IAtomContainer mol,
-                                            ArrayList<DENOPTIMVertex> libScaff,
-                                            ArrayList<DENOPTIMVertex> libFrag,
-                                            ArrayList<DENOPTIMVertex> libCap,
-                                            boolean make3D)
+    public void makeMolecularRepresentation(IAtomContainer mol, boolean make3D)
                                                        throws DENOPTIMException
     {
         // Build molecular representation 
-        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(libScaff,libFrag,libCap);
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
         // and get the information on APs
         /*

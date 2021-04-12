@@ -41,6 +41,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -74,19 +75,6 @@ import denoptim.utils.RingClosingUtils;
 public class CyclicGraphHandler
 {
     /**
-     * Reference to libraries of fragments
-     */
-    
-    private ArrayList<DENOPTIMVertex> libScaff;
-    private ArrayList<DENOPTIMVertex> libFrag;
-    private ArrayList<DENOPTIMVertex> libCap;
-
-    /**
-     * AP-class compatibility matrix for ring closures
-     */
-    private HashMap<APClass, ArrayList<APClass>> rcCPMap;
-
-    /**
      * variables needed by recursive methods
      */
     private int recCount = 0;
@@ -106,16 +94,7 @@ public class CyclicGraphHandler
      * @param libCap the library of capping groups
      */
 
-    public CyclicGraphHandler(ArrayList<DENOPTIMVertex> libScaff,
-                               ArrayList<DENOPTIMVertex> libFrag,
-                               ArrayList<DENOPTIMVertex> libCap,
-                               HashMap<APClass, ArrayList<APClass>> hashMap)
-    {
-        this.libScaff = libScaff;
-        this.libFrag = libFrag;
-        this.libCap = libCap;
-        this.rcCPMap = hashMap;
-    }
+    public CyclicGraphHandler() {}
     
 //-----------------------------------------------------------------------------
 
@@ -1337,7 +1316,7 @@ public class CyclicGraphHandler
         APClass parentAPClsJ = edgeJ.getSrcAPClass();
         
         // exclude if no entry in RC-Compatibility map
-        if (!rcCPMap.containsKey(parentAPClsI))
+        if (!FragmentSpace.getRCCompatibilityMatrix().containsKey(parentAPClsI))
         {
             if (verbosity > 1)
             {
@@ -1346,10 +1325,11 @@ public class CyclicGraphHandler
             }
             return false;
         }
-        ArrayList<APClass> compatClassesI = rcCPMap.get(parentAPClsI);
+        ArrayList<APClass> compatClassesI = FragmentSpace
+                .getRCCompatibilityMatrix().get(parentAPClsI);
 
         // exclude if no entry in RC-Compatibility map
-        if (!rcCPMap.containsKey(parentAPClsJ))
+        if (!FragmentSpace.getRCCompatibilityMatrix().containsKey(parentAPClsJ))
         {
             if (verbosity > 1)
             {
@@ -1358,7 +1338,8 @@ public class CyclicGraphHandler
             }
             return false;
         }
-        ArrayList<APClass> compatClassesJ = rcCPMap.get(parentAPClsJ);
+        ArrayList<APClass> compatClassesJ = FragmentSpace
+                .getRCCompatibilityMatrix().get(parentAPClsJ);
 
         // exclude loops included within a single vertex 
         if (vI == vJ)
@@ -1668,22 +1649,14 @@ public class CyclicGraphHandler
             if (RingClosureParameters.checkInterdependentChains() && 
                                   RingClosureParameters.doExhaustiveConfSrch())
             {
-                subGraph.makeMolecularRepresentation(mol,
-                                                     libScaff,
-                                                     libFrag,
-                                                     libCap,
-                                                     false);
+                subGraph.makeMolecularRepresentation(mol,false);
                 subGraph.setRCC(rcc);        
             }
         }
         else
         {
             // Need to generate 3D molecular representation
-            subGraph.makeMolecularRepresentation(mol,
-                                                 libScaff,
-                                                 libFrag,
-                                                 libCap,
-                                                 true);
+            subGraph.makeMolecularRepresentation(mol, true);
             List<IAtom> atomsPath = subGraph.getAtomPath();
             List<IBond> bondsPath = subGraph.getBondPath();
 

@@ -896,11 +896,7 @@ public class EAUtils
                                                                    true, true);
         
         // get the set of possible RCA combinations = ring closures
-        CyclicGraphHandler cgh = new CyclicGraphHandler(
-                                      FragmentSpace.getScaffoldLibrary(),
-                                      FragmentSpace.getFragmentLibrary(),
-                                      FragmentSpace.getCappingLibrary(),
-                                      FragmentSpace.getRCCompatibilityMatrix());
+        CyclicGraphHandler cgh = new CyclicGraphHandler();
 
 //TODO decide to make optional
         boolean onlyRandomCombOfRings = true;
