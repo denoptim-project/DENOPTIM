@@ -1322,6 +1322,32 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Compares this and another graph by spanning vertices starting from the
      * given vertex and following the direction of edges.
+     * @param thisV starting vertex of first graph
+     * @param thisG first graph
+     * @param otherV starting vertex of second graph
+     * @param otherG second graph
+     * @param reason a string recording the reason for returning false
+     * @return <code>true</code> if the graphs are same at this node
+     * @throws DENOPTIMException
+     */
+    public static boolean compareGraphNodes(DENOPTIMVertex thisV,
+                                            DENOPTIMGraph thisG,
+                                            DENOPTIMVertex otherV,
+                                            DENOPTIMGraph otherG,
+                                            StringBuilder reason) throws DENOPTIMException
+    {
+        Map<DENOPTIMVertex, DENOPTIMVertex> map = new HashMap<>();
+        map.put(thisV, otherV);
+        return compareGraphNodes(thisV, thisG, otherV, otherG, map, reason);
+    }
+
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Compares this and another graph by spanning vertices starting from the
+     * given vertex and following the direction of edges.
      * @param thisV
      * @param otherV
      * @param reason a string recording the reason for returning false
