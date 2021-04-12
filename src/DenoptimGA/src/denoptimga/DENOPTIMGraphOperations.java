@@ -903,7 +903,9 @@ if(debug)
         int visitedVertexEncounters = 0;
         for (int i = 0; i < v.getNumberOfAPs(); i++) {
             DENOPTIMEdge edge = v.getAP(i).getEdgeUser();
-            boolean srcIsVisited = visited.contains(edge.getSrcVertex());
+            int srcVertex = edge.getSrcVertex();
+            boolean srcIsVisited =
+                    srcVertex != v.getVertexId() && visited.contains(srcVertex);
 
             visitedVertexEncounters += srcIsVisited ? 1 : 0;
             if (visitedVertexEncounters >= 2) {
@@ -916,7 +918,9 @@ if(debug)
             if (edgeIsWrongWay) {
                 edge.flipEdge();
             }
-            fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+            if (!srcIsVisited) {
+                fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+            }
         }
     }
 
