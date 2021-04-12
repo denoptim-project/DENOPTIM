@@ -123,6 +123,7 @@ public abstract class FitnessTask extends Task
     	{
         	// Just in case we do not have any molecular representation already
     	    try {
+    	        //TODO-V3 use 3dtree bui9lder
 				fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
 						true);
 			} catch (DENOPTIMException e) {

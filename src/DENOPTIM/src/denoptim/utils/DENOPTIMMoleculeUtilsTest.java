@@ -28,6 +28,9 @@ import javax.vecmath.Point3d;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 /**
  * Unit test for DENOPTIMMoleculeUtils
@@ -37,11 +40,11 @@ import org.openscience.cdk.interfaces.IAtom;
 
 public class DENOPTIMMoleculeUtilsTest
 {
-	
+    private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+    
     @Test
     public void testGetPoint3d() throws Exception
     {
-    	
     	IAtom a = new Atom();
     	assertTrue(areCloseEnough(getPoint3d(a).x,0.0));
     	assertTrue(areCloseEnough(getPoint3d(a).y,0.0));
@@ -60,6 +63,8 @@ public class DENOPTIMMoleculeUtilsTest
     	assertFalse(areCloseEnough(1.00001, 1.00002));
     }
     
+//------------------------------------------------------------------------------
+
     private boolean areCloseEnough(double a, double b)
     {
     	double delta = 0.0000001;
@@ -67,4 +72,21 @@ public class DENOPTIMMoleculeUtilsTest
     }
     
 //------------------------------------------------------------------------------
+
+    @Test
+    public void testCalculateCentroid() throws Exception
+    {
+        IAtomContainer mol = builder.newAtomContainer();
+        mol.addAtom(new Atom("H", new Point3d(1.2,-2.9,2.5)));
+        mol.addAtom(new Atom("H", new Point3d(2.3,-4.8,4.2)));
+        mol.addAtom(new Atom("H", new Point3d(4.5,2.6,-5.4)));
+        
+        Point3d c = DENOPTIMMoleculeUtils.calculateCentroid(mol);
+        assertTrue(areCloseEnough(2.6666666,c.x), "Wrong value in X");
+        assertTrue(areCloseEnough(-1.7,c.y), "Wrong value in Y");
+        assertTrue(areCloseEnough(0.4333333,c.z), "Wrong value in Z");
+    }
+    
+//------------------------------------------------------------------------------
+
 }

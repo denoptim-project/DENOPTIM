@@ -37,7 +37,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 
 
 /**
@@ -145,6 +145,7 @@ public class PathSubGraph
         this.vB = vB;
         
         // Identify the path between vA and vB
+        
         // Obtain path from vA to seed of the graph
         List<DENOPTIMVertex> vAToSeed = new ArrayList<DENOPTIMVertex>();
         List<DENOPTIMEdge> vAToSeedEdges = new ArrayList<DENOPTIMEdge>();
@@ -350,24 +351,26 @@ public class PathSubGraph
                                                        throws DENOPTIMException
     {
         // Build molecular representation 
-        TreeBuilder3D tb = new TreeBuilder3D(libScaff,libFrag,libCap);
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(libScaff,libFrag,libCap);
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
         // and get the information on APs
+        /*
         Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
                                                         tb.getApsPerVertexId();
         Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
                                                             tb.getApsPerEdge();
+        */
         Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom =
                                                             tb.getApsPerAtom();
         Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
                                                             tb.getApsPerBond();
 
-	if (debug)
-	{
-	    String f = "pathSubGraph.sdf";
-	    System.out.println("Find SDF representation of path in: " + f);
-	    DenoptimIO.writeMolecule(f,iacPathVAVB,false);
-	}
+    	if (debug)
+    	{
+    	    String f = "pathSubGraph.sdf";
+    	    System.out.println("Find SDF representation of path in: " + f);
+    	    DenoptimIO.writeMolecule(f,iacPathVAVB,false);
+    	}
 
         // Get shortest atom path between the two ends of the chain
         atomsPathVAVB = new ArrayList<IAtom>();

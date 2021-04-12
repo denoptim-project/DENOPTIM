@@ -369,6 +369,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the list of edges that depart from the given vertex, i.e., edges
+     * where the srcAP is owned by the given vertex.
+     * @param v the given vertex.
+     * @return the list of edges departing from the given vertex.
+     */
     public ArrayList<DENOPTIMEdge> getEdgesWithSrc(DENOPTIMVertex v)
     {
     	ArrayList<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();

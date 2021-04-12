@@ -37,15 +37,18 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.molecule.UndirectedEdgeRelation;
+import denoptim.threedim.ThreeDimTreeBuilder;
 
 
 /**
@@ -66,12 +69,10 @@ public class GraphConversionTool
      * @param closeRings if <code>true</code> imposes to make ring closing
      * bonds as specified by the <code>DENOPTIMRing</code>s in the graph.
      * @return CDK representation of the molecular graph
+     * @deprecated Use {@link ThreeDimTreeBuilder#convertGraphTo3DAtomContainer(DENOPTIMGraph, boolean)}
      */
-
-	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
-    // with a flag that controls whether we rototranslate the building blocks
-    // or not
 	
+    @Deprecated
     public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
                                    boolean closeRings) throws DENOPTIMException
     {  
@@ -91,7 +92,6 @@ public class GraphConversionTool
             DENOPTIMVertex vertex = g.getVertexList().get(i);
             if (!vertex.containsAtoms())
             {
-                //TODO-V3 remove, eventually
                 System.out.println("WARNING! THIS VERTEX has NO ATOMS");
                 continue;
             }
@@ -209,6 +209,38 @@ public class GraphConversionTool
         }
 
         return mol;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Removes unused ring-closing vertexes. 
+     * If the resulting free AP needs to be capped, then the proper
+     * capping group is places where each ring-closing vertex once stood.
+     * @param g the graph to modify.
+     * @throws DENOPTIMException 
+     */
+    public static void removeUnusedRCVs(DENOPTIMGraph g) 
+            throws DENOPTIMException
+    {
+        for (DENOPTIMVertex v : g.getRCVertices())
+        {
+            if (g.getRingsInvolvingVertex(v).size()==0)
+            {
+                APClass cappAPClass = FragmentSpace.getAPClassOfCappingVertex(
+                        v.getAllAPClasses().get(0));
+                DENOPTIMAttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
+                g.removeVertex(v);
+                if (cappAPClass != null)
+                {
+                    int capId = FragmentSpace.getCappingGroupsWithAPClass(
+                            cappAPClass).get(0);
+                    DENOPTIMVertex capVrt = DENOPTIMVertex.newVertexFromLibrary(
+                            capId,BBType.CAP);
+                    g.appendVertexOnAP(apOnG, capVrt.getAP(0));
+                }
+            }
+        }
     }
 
 //------------------------------------------------------------------------------

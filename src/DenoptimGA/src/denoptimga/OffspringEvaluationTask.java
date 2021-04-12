@@ -33,7 +33,8 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.task.FitnessTask;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.GraphConversionTool;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a
@@ -49,7 +50,7 @@ public class OffspringEvaluationTask extends FitnessTask
     /**
      * Tool for generating 3D models assembling 3D building blocks.
      */
-    private TreeBuilder3D tb3d;
+    private ThreeDimTreeBuilder tb3d;
     
 //------------------------------------------------------------------------------
     
@@ -98,12 +99,14 @@ public class OffspringEvaluationTask extends FitnessTask
         // blocks (not aligned, nor roto-translated)
         if (FitnessParameters.make3dTree())
         {
-        	TreeBuilder3D tb3d = new TreeBuilder3D(
+        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(
         			FragmentSpace.getScaffoldLibrary(),
         			FragmentSpace.getFragmentLibrary(),
         			FragmentSpace.getCappingLibrary());
         	
             try {
+                DENOPTIMGraph gWithNoRCVs = dGraph.clone();
+                GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
             	// TODO-V3
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree
@@ -118,7 +121,8 @@ public class OffspringEvaluationTask extends FitnessTask
             	// we need the get it back. Thus, for the moment I do not see
             	// a reason for keeping the Dus in the molecular representation,
             	// but potential down stream effects have to be evaluated.
-                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
+                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(
+                        gWithNoRCVs,true);
                 fitProvMol = mol;
         	} catch (Throwable t) {
         		//we have it already from before

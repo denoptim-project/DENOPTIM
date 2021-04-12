@@ -39,7 +39,7 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
 import denoptim.task.FitnessTask;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
@@ -91,7 +91,7 @@ public class GraphBuildingTask extends FitnessTask
     /**
      * Tool for generating 3D models assembling 3D building blocks.
      */
-    private TreeBuilder3D tb3d;
+    private ThreeDimTreeBuilder tb3d;
 
 //------------------------------------------------------------------------------
    
@@ -222,7 +222,7 @@ public class GraphBuildingTask extends FitnessTask
             // Initialize the 3d model builder
             if (FitnessParameters.make3dTree())
             {
-            	tb3d = new TreeBuilder3D(FragmentSpace.getScaffoldLibrary(),
+            	tb3d = new ThreeDimTreeBuilder(FragmentSpace.getScaffoldLibrary(),
             			FragmentSpace.getFragmentLibrary(),
             			FragmentSpace.getCappingLibrary());
             }
@@ -387,19 +387,24 @@ public class GraphBuildingTask extends FitnessTask
                         {
                             // Prepare molecular representation
                         	IAtomContainer mol;
+                        	DENOPTIMGraph gWithNoRCVs = g.clone();
+                        	GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
                         	if (FitnessParameters.make3dTree())
                         	{
 	                        	try {
-	                                mol = tb3d.convertGraphTo3DAtomContainer(g,true);
+	                                mol = tb3d.convertGraphTo3DAtomContainer(
+	                                        gWithNoRCVs,true);
 	                        	} catch (Throwable t) {
 	                        		mol = GraphConversionTool
-	                        				.convertGraphToMolecule(g, true);
-	                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
+	                        				.convertGraphToMolecule(gWithNoRCVs, true);
+	                        		DENOPTIMMoleculeUtils.removeRCA(mol,
+	                        		        gWithNoRCVs);
 	                        	}
                         	} else {
                         		mol = GraphConversionTool
-                        				.convertGraphToMolecule(g, true);
-                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
+                        				.convertGraphToMolecule(gWithNoRCVs, true);
+                        		DENOPTIMMoleculeUtils.removeRCA(mol,
+                        		        gWithNoRCVs);
                         	}
                             
                             // Level that generated this graph
@@ -458,12 +463,15 @@ public class GraphBuildingTask extends FitnessTask
                 	if (FitnessParameters.make3dTree())
                 	{
                 		IAtomContainer mol;
+                        DENOPTIMGraph gWithNoRCVs = dGraph.clone();
+                        GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
                     	try {
-                            mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
+                            mol = tb3d.convertGraphTo3DAtomContainer(
+                                    gWithNoRCVs,true);
                     	} catch (Throwable t) {
                     		mol = GraphConversionTool
-                    				.convertGraphToMolecule(dGraph, true);
-                        	DENOPTIMMoleculeUtils.removeRCA(mol,dGraph);
+                    				.convertGraphToMolecule(gWithNoRCVs, true);
+                        	DENOPTIMMoleculeUtils.removeRCA(mol,gWithNoRCVs);
                     	}
                         res[2] = mol;
                 	}

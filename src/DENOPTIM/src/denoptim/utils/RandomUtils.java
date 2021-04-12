@@ -30,21 +30,21 @@ import org.apache.commons.math3.random.MersenneTwister;
 
 public class RandomUtils
 {
-    private static long RNDSEED = 0L;
-    private static MersenneTwister MTRAND = null;
+    private static long rndSeed = 0L;
+    private static MersenneTwister mt = null;
 
 //------------------------------------------------------------------------------
 
     private static void setSeed(long value)
     {
-        RNDSEED = value;
+        rndSeed = value;
     }
 
 //------------------------------------------------------------------------------
 
     public static long getSeed()
     {
-        return RNDSEED;
+        return rndSeed;
     }
     
 //------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ public class RandomUtils
     public static void initialiseRNG()
     {
         initialiseSeed();
-        MTRAND = new MersenneTwister(RNDSEED);
+        mt = new MersenneTwister(rndSeed);
     }
     
 //------------------------------------------------------------------------------
@@ -60,14 +60,18 @@ public class RandomUtils
     public static void initialiseRNG(long seed)
     {
         setSeed(seed);
-        MTRAND = new MersenneTwister(RNDSEED);
+        mt = new MersenneTwister(rndSeed);
     }
     
 //------------------------------------------------------------------------------
 
     public static MersenneTwister getRNG()
     {
-        return MTRAND;
+        if (mt == null)
+        {
+            initialiseRNG();
+        }
+        return mt;
     }
     
 //------------------------------------------------------------------------------
@@ -79,7 +83,7 @@ public class RandomUtils
     
     public static <T> T randomlyChooseOne(Collection<T> c)
     {
-        int chosen = MTRAND.nextInt(c.size());
+        int chosen = mt.nextInt(c.size());
         int i=0;
         T chosenObj = null;
         for (T o : c)
@@ -100,7 +104,7 @@ public class RandomUtils
         SecureRandom sec = new SecureRandom();
         byte[] sbuf = sec.generateSeed(8);
         ByteBuffer bb = ByteBuffer.wrap(sbuf);
-        RNDSEED = bb.getLong();
+        rndSeed = bb.getLong();
     }
 
 //------------------------------------------------------------------------------
@@ -111,7 +115,7 @@ public class RandomUtils
             return false;
         else if (prob == 1.0)
             return true;
-        return MTRAND.nextDouble() < prob;
+        return mt.nextDouble() < prob;
     }
 
 //------------------------------------------------------------------------------

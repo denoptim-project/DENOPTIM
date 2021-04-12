@@ -116,7 +116,7 @@ import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
@@ -2105,7 +2105,7 @@ public class DenoptimIO
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (DENOPTIMGraph g : graphs) 
         {
-            TreeBuilder3D tb = new TreeBuilder3D();
+            ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
             IAtomContainer iac = builder.newAtomContainer();
             try {
                 iac = tb.convertGraphTo3DAtomContainer(g);

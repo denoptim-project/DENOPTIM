@@ -785,6 +785,24 @@ public class DENOPTIMMoleculeUtils
         }       
         return s;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the centroid of the given molecule.
+     * @param mol
+     * @return the centroid.
+     */
+    public static Point3d calculateCentroid(IAtomContainer mol)
+    {
+        Point3d c = new Point3d(0,0,0);
+        for (IAtom atm : mol.atoms())
+        {
+            c.add(getPoint3d(atm));
+        }
+        c.scale(1.0 / ((double) mol.getAtomCount()));
+        return c;
+    }
 
 //------------------------------------------------------------------------------
 
