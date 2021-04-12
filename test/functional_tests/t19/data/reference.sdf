@@ -1,121 +1,106 @@
 
-  CDK     03232118063D
+  CDK     04122118353D
 
- 53 52  0  0  0  0  0  0  0  0999 V2000
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    1.2492   -0.2378    0.0000 C   0  0  0  0  0  7  0  0  0  0  0  0
-    0.0000    0.6455    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-   -1.2492   -0.2378    0.0000 C   0  0  0  0  0  7  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  8  0  0  0  0  0  0
-    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.2028   -2.4929    1.1479 H   0  0  0  0  0  2  0  0  0  0  0  0
-  1  5  1  0  0  0  0 
+ 45 48  0  0  0  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0500   -1.2390   -0.8962 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.3290   -2.0269   -0.6062 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.1317   -1.3132    0.4833 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.3125   -0.9855    0.0132 H   0  0  0  0  0  0  0  0  0  0  0  0
+    2.0508   -2.1074   -1.6995 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0159   -3.2347   -0.1987 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0402   -0.8689   -2.1554 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0384    1.0788   -0.7467 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.0732   -0.0486    0.7542 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.2725   -0.4201    0.7647 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.3212    1.0523    0.3521 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.7683    1.4518    0.0573 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2238   -1.2292   -0.1192 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9748   -0.9701   -1.3816 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.0486   -2.5101    0.1074 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.4641   -0.9015    0.1584 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.0964    1.0494   -1.1482 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.6377   -0.5350    2.0202 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.1480    1.7956    1.3268 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.4095    1.2296   -0.7238 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.5648    0.8917    0.9374 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8853    2.7572    0.1298 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.4554   -0.9972   -1.3461 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.0506   -1.4284   -0.5439 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5048   -1.6983    0.3763 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5059   -0.5284    1.9043 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.4470   -2.4479    0.0016 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8984   -1.1168   -1.9574 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.6050   -3.5476    1.0928 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.7335   -0.1062   -1.9683 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0383    1.2477   -0.8725 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5729   -0.2923    0.3216 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.0950   -3.2475   -1.9419 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0064   -1.3379   -0.9477 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.1737    0.6732   -2.8684 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0518   -1.1585    0.5258 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.3452   -1.7873   -0.0931 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.3103    0.1185   -1.1413 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1901   -1.3021   -0.2219 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.8848   -0.4335    0.3417 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.3225   -2.4315   -0.4915 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.1753   -1.1651    1.9378 H   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3259    0.3335    1.7536 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8949   -2.0953   -1.1569 H   0  0  0  0  0  0  0  0  0  0  0  0
   1  2  1  0  0  0  0 
   2  3  1  0  0  0  0 
   3  4  1  0  0  0  0 
-  4  6  1  0  0  0  0 
-  1  7  1  0  0  0  0 
+  4  5  1  0  0  0  0 
+  3  6  1  0  0  0  0 
+  3  7  1  0  0  0  0 
   2  8  1  0  0  0  0 
-  3  9  1  0  0  0  0 
-  4 10  1  0  0  0  0 
-  1 11  1  0  0  0  0 
-  3 12  1  0  0  0  0 
- 13 14  1  0  0  0  0 
+  1  9  1  0  0  0  0 
+  1 10  1  0  0  0  0 
+  1  4  1  0  0  0  0 
+ 11 12  1  0  0  0  0 
+ 12 13  1  0  0  0  0 
+  4 11  1  0  0  0  0 
+ 11 14  1  0  0  0  0 
  14 15  1  0  0  0  0 
- 18 22  1  0  0  0  0 
- 18 19  1  0  0  0  0 
- 19 20  1  0  0  0  0 
- 20 21  1  0  0  0  0 
- 21 23  1  0  0  0  0 
- 18 24  1  0  0  0  0 
- 19 25  1  0  0  0  0 
- 20 26  1  0  0  0  0 
- 21 27  1  0  0  0  0 
- 18 28  1  0  0  0  0 
- 20 29  1  0  0  0  0 
- 38 41  1  0  0  0  0 
- 38 39  1  0  0  0  0 
- 39 40  1  0  0  0  0 
- 40 42  1  0  0  0  0 
- 38 43  1  0  0  0  0 
- 39 44  1  0  0  0  0 
- 40 45  1  0  0  0  0 
- 38 46  1  0  0  0  0 
- 40 49  1  0  0  0  0 
- 39 47  1  0  0  0  0 
- 47 48  1  0  0  0  0 
- 48 50  1  0  0  0  0 
- 47 51  1  0  0  0  0 
- 48 52  1  0  0  0  0 
-  4 13  1  0  0  0  0 
- 13 16  1  0  0  0  0 
- 15 17  1  0  0  0  0 
-  2 21  1  0  0  0  0 
- 13 30  1  0  0  0  0 
- 14 31  1  0  0  0  0 
- 14 32  1  0  0  0  0 
- 15 33  1  0  0  0  0 
- 15 34  1  0  0  0  0 
- 16 35  1  0  0  0  0 
- 16 36  1  0  0  0  0 
- 16 37  1  0  0  0  0 
- 19 47  1  0  0  0  0 
- 48 53  1  0  0  0  0 
+ 14 16  1  0  0  0  0 
+ 14 17  1  0  0  0  0 
+ 13 18  1  0  0  0  0 
+ 11 19  1  0  0  0  0 
+ 12 20  1  0  0  0  0 
+ 12 21  1  0  0  0  0 
+ 13 22  1  0  0  0  0 
+ 13 23  1  0  0  0  0 
+ 24 25  1  0  0  0  0 
+ 25 26  1  0  0  0  0 
+ 26 27  1  0  0  0  0 
+ 27 28  1  0  0  0  0 
+ 26 29  1  0  0  0  0 
+ 26 30  1  0  0  0  0 
+ 25 31  1  0  0  0  0 
+ 24 32  1  0  0  0  0 
+ 24 33  1  0  0  0  0 
+ 24 27  1  0  0  0  0 
+  2 27  1  0  0  0  0 
+ 34 35  1  0  0  0  0 
+ 35 36  1  0  0  0  0 
+ 36 37  1  0  0  0  0 
+ 35 38  1  0  0  0  0 
+ 34 39  1  0  0  0  0 
+ 34 40  1  0  0  0  0 
+ 34 36  1  0  0  0  0 
+ 35 41  1  0  0  0  0 
+ 41 42  1  0  0  0  0 
+ 42 43  1  0  0  0  0 
+ 41 44  1  0  0  0  0 
+ 36 42  1  0  0  0  0 
+ 25 41  1  0  0  0  0 
+ 42 45  1  0  0  0  0 
 M  END
 > <GCODE>
 30
 
 > <GraphENC>
 30 597_ABS_VERTEX,598_4_1_0,600_1_1_1,601_7_1_1,623_ABS_VERTEX,624_1_2_1,625_1_2_1,626_1_2_1,627_1_2_1,628_1_2_1,629_1_2_2,630_1_2_2,631_1_2_2,633_ABS_VERTEX,632_1_2_2, 597_1_598_1_1_c:0_c:0,598_2_600_0_1_c:0_c:0,598_7_601_0_1_c:0_hyd:1,597_0_623_1_1_c:0_c:0,598_0_624_0_1_c:0_hyd:1,598_3_625_0_1_c:0_hyd:1,598_4_626_0_1_c:0_hyd:1,598_5_627_0_1_c:0_hyd:1,598_6_628_0_1_c:0_hyd:1,600_1_629_0_1_c:0_hyd:1,600_2_630_0_1_c:0_hyd:1,600_3_631_0_1_c:0_hyd:1,623_0_633_0_1_c:0_c:0,633_1_632_0_1_c:0_hyd:1, 
-
-> <GraphMsg>
-
 
 > <GraphJson>
 {
@@ -130,6 +115,7 @@ M  END
               {
                 "id": 132,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -145,6 +131,7 @@ M  END
               {
                 "id": 133,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -160,6 +147,7 @@ M  END
               {
                 "id": 134,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -175,6 +163,7 @@ M  END
               {
                 "id": 135,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -205,9 +194,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -215,6 +204,7 @@ M  END
               {
                 "id": 136,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -230,6 +220,7 @@ M  END
               {
                 "id": 137,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -245,6 +236,7 @@ M  END
               {
                 "id": 138,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -260,6 +252,7 @@ M  END
               {
                 "id": 139,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -290,9 +283,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -300,6 +293,7 @@ M  END
               {
                 "id": 140,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -315,6 +309,7 @@ M  END
               {
                 "id": 141,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -330,6 +325,7 @@ M  END
               {
                 "id": 142,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -345,6 +341,7 @@ M  END
               {
                 "id": 143,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -375,9 +372,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -385,6 +382,7 @@ M  END
               {
                 "id": 144,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -400,6 +398,7 @@ M  END
               {
                 "id": 145,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -415,6 +414,7 @@ M  END
               {
                 "id": 146,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -430,6 +430,7 @@ M  END
               {
                 "id": 147,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -460,9 +461,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -470,6 +471,7 @@ M  END
               {
                 "id": 148,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -491,9 +493,9 @@ M  END
             "isRCV": true,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -501,6 +503,7 @@ M  END
               {
                 "id": 149,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -522,9 +525,9 @@ M  END
             "isRCV": true,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -532,6 +535,7 @@ M  END
               {
                 "id": 150,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -553,9 +557,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -563,6 +567,7 @@ M  END
               {
                 "id": 151,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -584,9 +589,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -594,6 +599,7 @@ M  END
               {
                 "id": 152,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -615,9 +621,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -625,6 +631,7 @@ M  END
               {
                 "id": 153,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -646,9 +653,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -656,6 +663,7 @@ M  END
               {
                 "id": 154,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -677,9 +685,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -687,6 +695,7 @@ M  END
               {
                 "id": 155,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -708,9 +717,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           }
         ],
@@ -780,7 +789,8 @@ M  END
               15,
               16,
               18
-            ]
+            ],
+            "bndTyp": "SINGLE"
           }
         ],
         "symVertices": []
@@ -791,6 +801,7 @@ M  END
         "138": {
           "id": 156,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -806,6 +817,7 @@ M  END
         "146": {
           "id": 157,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -825,9 +837,9 @@ M  END
       "isRCV": false,
       "level": -1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -835,6 +847,7 @@ M  END
         {
           "id": 158,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -850,6 +863,7 @@ M  END
         {
           "id": 159,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -865,6 +879,7 @@ M  END
         {
           "id": 160,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -880,6 +895,7 @@ M  END
         {
           "id": 161,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -895,6 +911,7 @@ M  END
         {
           "id": 162,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -910,6 +927,7 @@ M  END
         {
           "id": 163,
           "atomPositionNumber": 2,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -925,6 +943,7 @@ M  END
         {
           "id": 164,
           "atomPositionNumber": 2,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -940,6 +959,7 @@ M  END
         {
           "id": 165,
           "atomPositionNumber": 2,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -978,9 +998,9 @@ M  END
       "isRCV": false,
       "level": 0,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -988,6 +1008,7 @@ M  END
         {
           "id": 166,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1003,6 +1024,7 @@ M  END
         {
           "id": 167,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1018,6 +1040,7 @@ M  END
         {
           "id": 168,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1033,6 +1056,7 @@ M  END
         {
           "id": 169,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1063,9 +1087,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1073,6 +1097,7 @@ M  END
         {
           "id": 170,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1094,9 +1119,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1108,6 +1133,7 @@ M  END
               {
                 "id": 171,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1123,6 +1149,7 @@ M  END
               {
                 "id": 172,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1138,6 +1165,7 @@ M  END
               {
                 "id": 173,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1153,6 +1181,7 @@ M  END
               {
                 "id": 174,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1183,9 +1212,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1193,6 +1222,7 @@ M  END
               {
                 "id": 175,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1208,6 +1238,7 @@ M  END
               {
                 "id": 176,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1223,6 +1254,7 @@ M  END
               {
                 "id": 177,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -1238,6 +1270,7 @@ M  END
               {
                 "id": 178,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1268,9 +1301,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1278,6 +1311,7 @@ M  END
               {
                 "id": 179,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1293,6 +1327,7 @@ M  END
               {
                 "id": 180,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1308,6 +1343,7 @@ M  END
               {
                 "id": 181,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1323,6 +1359,7 @@ M  END
               {
                 "id": 182,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1353,9 +1390,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1363,6 +1400,7 @@ M  END
               {
                 "id": 183,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1378,6 +1416,7 @@ M  END
               {
                 "id": 184,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1393,6 +1432,7 @@ M  END
               {
                 "id": 185,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -1408,6 +1448,7 @@ M  END
               {
                 "id": 186,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1438,9 +1479,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1448,6 +1489,7 @@ M  END
               {
                 "id": 187,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1469,9 +1511,9 @@ M  END
             "isRCV": true,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1479,6 +1521,7 @@ M  END
               {
                 "id": 188,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1500,9 +1543,9 @@ M  END
             "isRCV": true,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1510,6 +1553,7 @@ M  END
               {
                 "id": 189,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1531,9 +1575,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1541,6 +1585,7 @@ M  END
               {
                 "id": 190,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1562,9 +1607,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1572,6 +1617,7 @@ M  END
               {
                 "id": 191,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1593,9 +1639,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1603,6 +1649,7 @@ M  END
               {
                 "id": 192,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1624,9 +1671,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1634,6 +1681,7 @@ M  END
               {
                 "id": 193,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1655,9 +1703,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -1665,6 +1713,7 @@ M  END
               {
                 "id": 194,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -1686,9 +1735,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           }
         ],
@@ -1758,7 +1807,8 @@ M  END
               39,
               40,
               42
-            ]
+            ],
+            "bndTyp": "SINGLE"
           }
         ],
         "symVertices": []
@@ -1769,6 +1819,7 @@ M  END
         "177": {
           "id": 195,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1784,6 +1835,7 @@ M  END
         "185": {
           "id": 196,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1803,9 +1855,9 @@ M  END
       "isRCV": false,
       "level": 0,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1813,6 +1865,7 @@ M  END
         {
           "id": 197,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1834,9 +1887,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1844,6 +1897,7 @@ M  END
         {
           "id": 198,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1865,9 +1919,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1875,6 +1929,7 @@ M  END
         {
           "id": 199,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1896,9 +1951,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1906,6 +1961,7 @@ M  END
         {
           "id": 200,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1927,9 +1983,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1937,6 +1993,7 @@ M  END
         {
           "id": 201,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1958,9 +2015,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1968,6 +2025,7 @@ M  END
         {
           "id": 202,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1989,9 +2047,9 @@ M  END
       "isRCV": false,
       "level": 2,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -1999,6 +2057,7 @@ M  END
         {
           "id": 203,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -2020,9 +2079,9 @@ M  END
       "isRCV": false,
       "level": 2,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -2030,6 +2089,7 @@ M  END
         {
           "id": 204,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -2051,9 +2111,9 @@ M  END
       "isRCV": false,
       "level": 2,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -2069,6 +2129,7 @@ M  END
                     {
                       "id": 205,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2084,6 +2145,7 @@ M  END
                     {
                       "id": 206,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2099,6 +2161,7 @@ M  END
                     {
                       "id": 207,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2114,6 +2177,7 @@ M  END
                     {
                       "id": 208,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2144,9 +2208,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2154,6 +2218,7 @@ M  END
                     {
                       "id": 209,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2169,6 +2234,7 @@ M  END
                     {
                       "id": 210,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2184,6 +2250,7 @@ M  END
                     {
                       "id": 211,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 1,
                       "apClass": {
@@ -2199,6 +2266,7 @@ M  END
                     {
                       "id": 212,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2229,9 +2297,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2239,6 +2307,7 @@ M  END
                     {
                       "id": 213,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2254,6 +2323,7 @@ M  END
                     {
                       "id": 214,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2269,6 +2339,7 @@ M  END
                     {
                       "id": 215,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 1,
                       "apClass": {
@@ -2284,6 +2355,7 @@ M  END
                     {
                       "id": 216,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2314,9 +2386,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2324,6 +2396,7 @@ M  END
                     {
                       "id": 217,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2345,9 +2418,9 @@ M  END
                   "isRCV": true,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2355,6 +2428,7 @@ M  END
                     {
                       "id": 218,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2376,9 +2450,9 @@ M  END
                   "isRCV": true,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2386,6 +2460,7 @@ M  END
                     {
                       "id": 219,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2407,9 +2482,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2417,6 +2492,7 @@ M  END
                     {
                       "id": 220,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2438,9 +2514,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2448,6 +2524,7 @@ M  END
                     {
                       "id": 221,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2469,9 +2546,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 },
                 {
@@ -2479,6 +2556,7 @@ M  END
                     {
                       "id": 222,
                       "atomPositionNumber": 0,
+                      "atomPositionNumberInMol": 0,
                       "totalConnections": 1,
                       "freeConnections": 0,
                       "apClass": {
@@ -2500,9 +2578,9 @@ M  END
                   "isRCV": false,
                   "level": -99,
                   "allowedMutationTypes": [
-                    "EXTEND",
                     "CHANGEBRANCH",
-                    "DELETE"
+                    "DELETE",
+                    "EXTEND"
                   ]
                 }
               ],
@@ -2556,7 +2634,8 @@ M  END
                     59,
                     60,
                     62
-                  ]
+                  ],
+                  "bndTyp": "SINGLE"
                 }
               ],
               "symVertices": []
@@ -2567,6 +2646,7 @@ M  END
               "211": {
                 "id": 223,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2582,6 +2662,7 @@ M  END
               "215": {
                 "id": 224,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2601,9 +2682,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -2611,6 +2692,7 @@ M  END
               {
                 "id": 225,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2626,6 +2708,7 @@ M  END
               {
                 "id": 226,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2641,6 +2724,7 @@ M  END
               {
                 "id": 227,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -2656,6 +2740,7 @@ M  END
               {
                 "id": 228,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2686,9 +2771,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -2696,6 +2781,7 @@ M  END
               {
                 "id": 229,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2711,6 +2797,7 @@ M  END
               {
                 "id": 230,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2726,6 +2813,7 @@ M  END
               {
                 "id": 231,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -2741,6 +2829,7 @@ M  END
               {
                 "id": 232,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2771,9 +2860,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -2781,6 +2870,7 @@ M  END
               {
                 "id": 233,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2802,9 +2892,9 @@ M  END
             "isRCV": true,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -2812,6 +2902,7 @@ M  END
               {
                 "id": 234,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2833,9 +2924,9 @@ M  END
             "isRCV": true,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -2843,6 +2934,7 @@ M  END
               {
                 "id": 235,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2864,9 +2956,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           },
           {
@@ -2874,6 +2966,7 @@ M  END
               {
                 "id": 236,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -2895,9 +2988,9 @@ M  END
             "isRCV": false,
             "level": -99,
             "allowedMutationTypes": [
-              "EXTEND",
               "CHANGEBRANCH",
-              "DELETE"
+              "DELETE",
+              "EXTEND"
             ]
           }
         ],
@@ -2941,7 +3034,8 @@ M  END
               75,
               76,
               78
-            ]
+            ],
+            "bndTyp": "SINGLE"
           }
         ],
         "symVertices": []
@@ -2952,6 +3046,7 @@ M  END
         "227": {
           "id": 237,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -2967,6 +3062,7 @@ M  END
         "231": {
           "id": 238,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -2986,9 +3082,9 @@ M  END
       "isRCV": false,
       "level": 1,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     },
     {
@@ -2996,6 +3092,7 @@ M  END
         {
           "id": 239,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -3017,9 +3114,9 @@ M  END
       "isRCV": false,
       "level": 2,
       "allowedMutationTypes": [
-        "EXTEND",
         "CHANGEBRANCH",
-        "DELETE"
+        "DELETE",
+        "EXTEND"
       ]
     }
   ],

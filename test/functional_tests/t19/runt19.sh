@@ -55,9 +55,9 @@ then
 fi
 
 naref=$(head -n 4 reference.sdf | tail -n 1 | awk '{print $1}')
-nbref=$(head -n 4 reference.sdf | tail -n 1 | awk '{print $1}')
+nbref=$(head -n 4 reference.sdf | tail -n 1 | awk '{print $2}')
 na=$(head -n 4 final.sdf | tail -n 1 | awk '{print $1}')
-nb=$(head -n 4 final.sdf | tail -n 1 | awk '{print $1}')
+nb=$(head -n 4 final.sdf | tail -n 1 | awk '{print $2}')
 
 if [[ "$na" != "$naref" ]] ; then
     echo "Test 't19' NOT PASSED (symptom: wrong number of atoms)."

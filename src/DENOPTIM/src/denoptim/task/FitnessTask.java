@@ -39,6 +39,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.TaskUtils;
@@ -121,15 +122,8 @@ public abstract class FitnessTask extends Task
         result.setSDFFile(fitProvOutFile);
         if (fitProvMol == null)
     	{
-        	// Just in case we do not have any molecular representation already
-    	    try {
-    	        //TODO-V3 use 3dtree bui9lder
-				fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
-						true);
-			} catch (DENOPTIMException e) {
-				throw new DENOPTIMException("Failed conversion of graph to "
-						+ "chemical representation",e);
-			}
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+            IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
     	}
         
         if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||

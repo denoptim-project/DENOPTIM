@@ -18,8 +18,10 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.PathSubGraph;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
@@ -340,8 +342,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         //  for-loop. Suggestion: make an outerToInnerAPMap.
         try
         {
-            IAtomContainer iac = GraphConversionTool
-                    .convertGraphToMolecule(innerGraph, true);
+            //TODO-V3 we might need to remove unused RCVs from inner graph.
+            // Such RCVs cannot be used outside the template.
+            ThreeDimTreeBuilder t3b = new ThreeDimTreeBuilder();
+            IAtomContainer iac = t3b.convertGraphTo3DAtomContainer(
+                    innerGraph, true);
             
             // We have to ensure outer APs has same atom position as inner APs
             // And we collects the outer APs per atom at the same time

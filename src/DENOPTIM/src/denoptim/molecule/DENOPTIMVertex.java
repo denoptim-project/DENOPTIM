@@ -1262,7 +1262,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Processes an atom containers and builds a vertex out of it.
+     * Processes an atom container and builds a vertex out of it.
      * @param iac the  atom containers.
      * @param bbt the type of building block
      * @return the vertex.

@@ -2220,8 +2220,8 @@ public class DenoptimIO
      * @throws Exception
      */
     public static void appendVerticesFromFileToLibrary(File file,
-                                                       DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
-                                                       boolean setBBId) throws UndetectedFileFormatException, IOException,
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
+            boolean setBBId) throws UndetectedFileFormatException, IOException,
     IllegalArgumentException, DENOPTIMException
     {
         FileFormat ff = DenoptimIO.detectFileFormat(file);
@@ -2276,7 +2276,12 @@ public class DenoptimIO
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
                     t.setInnerGraph(g);
-                    library.add(t);
+                    if (setBBId)
+                    {
+                        FragmentSpace.appendVertexToLibrary(t,bbt,library);
+                    } else {
+                        library.add(t);
+                    }
                 }
                 break;
                     
@@ -2287,7 +2292,12 @@ public class DenoptimIO
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
                     t.setInnerGraph(g);
-                    library.add(t);
+                    if (setBBId)
+                    {
+                        FragmentSpace.appendVertexToLibrary(t,bbt,library);
+                    } else {
+                        library.add(t);
+                    }
                 }
                 break;
                 

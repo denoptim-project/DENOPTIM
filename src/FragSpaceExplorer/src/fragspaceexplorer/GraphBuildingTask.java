@@ -220,11 +220,10 @@ public class GraphBuildingTask extends FitnessTask
             }
             
             // Initialize the 3d model builder
-            if (FitnessParameters.make3dTree())
+            tb3d = new ThreeDimTreeBuilder();
+            if (!FitnessParameters.make3dTree())
             {
-            	tb3d = new ThreeDimTreeBuilder(FragmentSpace.getScaffoldLibrary(),
-            			FragmentSpace.getFragmentLibrary(),
-            			FragmentSpace.getCappingLibrary());
+            	tb3d.setAlidnBBsIn3D(false);
             }
 
             // Extend graph as requested
@@ -386,26 +385,11 @@ public class GraphBuildingTask extends FitnessTask
                         try 
                         {
                             // Prepare molecular representation
-                        	IAtomContainer mol;
                         	DENOPTIMGraph gWithNoRCVs = g.clone();
                         	GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
-                        	if (FitnessParameters.make3dTree())
-                        	{
-	                        	try {
-	                                mol = tb3d.convertGraphTo3DAtomContainer(
-	                                        gWithNoRCVs,true);
-	                        	} catch (Throwable t) {
-	                        		mol = GraphConversionTool
-	                        				.convertGraphToMolecule(gWithNoRCVs, true);
-	                        		DENOPTIMMoleculeUtils.removeRCA(mol,
-	                        		        gWithNoRCVs);
-	                        	}
-                        	} else {
-                        		mol = GraphConversionTool
-                        				.convertGraphToMolecule(gWithNoRCVs, true);
-                        		DENOPTIMMoleculeUtils.removeRCA(mol,
-                        		        gWithNoRCVs);
-                        	}
+                        	IAtomContainer mol = 
+                        	        tb3d.convertGraphTo3DAtomContainer(
+	                                    gWithNoRCVs,true);
                             
                             // Level that generated this graph
                             altRes[4] = level;
@@ -455,24 +439,18 @@ public class GraphBuildingTask extends FitnessTask
                     nSubTasks = 1;
 
                     // Store graph
-                    FSEUtils.storeGraphOfLevel(dGraph.clone(),level,rootId,nextIds);
+                    DENOPTIMGraph gClone = dGraph.clone();
+                    FSEUtils.storeGraphOfLevel(gClone,level,rootId,nextIds);
                     
                     // Optionally improve the molecular representation, which
                     // is otherwise only given by the collection of building
                     // blocks (not aligned, nor roto-translated)
                 	if (FitnessParameters.make3dTree())
                 	{
-                		IAtomContainer mol;
-                        DENOPTIMGraph gWithNoRCVs = dGraph.clone();
-                        GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
-                    	try {
-                            mol = tb3d.convertGraphTo3DAtomContainer(
-                                    gWithNoRCVs,true);
-                    	} catch (Throwable t) {
-                    		mol = GraphConversionTool
-                    				.convertGraphToMolecule(gWithNoRCVs, true);
-                        	DENOPTIMMoleculeUtils.removeRCA(mol,gWithNoRCVs);
-                    	}
+                        GraphConversionTool.removeUnusedRCVs(gClone);
+                        IAtomContainer mol = 
+                                tb3d.convertGraphTo3DAtomContainer(
+                                        gClone,true);
                         res[2] = mol;
                 	}
                    

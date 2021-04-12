@@ -205,7 +205,7 @@ public class ThreeDimTreeBuilder
      * 
      * This method does not remove ring-closing attractors. You can remove them
      * by calling {@link ThreeDimTreeBuilder#convertGraphTo3DAtomContainer(
-     * DENOPTIMGraph, boolean)}
+     * DENOPTIMGraph, boolean)} (with a <code>true</code> 2nd argument)
      * instead of this method.
      * 
      * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
@@ -306,7 +306,7 @@ public class ThreeDimTreeBuilder
             }
         }
         apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
-
+        
         // Recursion on all branches of the tree (i.e., all incident edges)
         for (DENOPTIMEdge edge : graph.getEdgesWithSrc(rootVrtx))
         {
@@ -550,7 +550,7 @@ public class ThreeDimTreeBuilder
     private void append3DFragmentsViaEdges(int idSrcAtmA, Point3d srcApA, 
                      Point3d trgApA, DENOPTIMEdge edge, boolean removeUsedRCAs) 
                     		 throws DENOPTIMException
-    {
+    {   
         if (debug)
         {
             System.err.println("Appending 3D fragment via edge: "+edge);

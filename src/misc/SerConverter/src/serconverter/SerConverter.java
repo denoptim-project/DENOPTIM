@@ -20,9 +20,12 @@ package serconverter;
 
 import java.io.File;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
@@ -62,9 +65,10 @@ public class SerConverter
 		    DenoptimIO.writeData(SerConvParameters.outFile,str,false);
 		    break;
 		case "SDF":
-		    DenoptimIO.writeMolecule(SerConvParameters.outFile, 
-		         GraphConversionTool.convertGraphToMolecule(graph,true),
-									 false);
+
+	        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+	        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph,true);
+		    DenoptimIO.writeMolecule(SerConvParameters.outFile, mol, false);
 		    break;
 	    }
         }

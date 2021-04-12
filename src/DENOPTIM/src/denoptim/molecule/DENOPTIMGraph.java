@@ -63,6 +63,7 @@ import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.PathSubGraph;
 import denoptim.rings.RingClosureParameters;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMVertexQuery;
@@ -957,6 +958,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 cRing.addVertex(
                         clone.getVertexWithId(origVrtx.getVertexId()));
             }
+            cRing.setBondType(ring.getBondType());
             cListRings.add(cRing);
         }
         clone.setRings(cListRings);
@@ -2055,8 +2057,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             throws DENOPTIMException
     {
         // calculate the molecule representation
-        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(this,
-                true);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        t3d.setAlidnBBsIn3D(false);
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,true);
         if (mol == null)
         {
             String msg ="Evaluation of graph: graph-to-mol returned null!"
@@ -2245,8 +2248,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return lstGraphs;
 
         // get a atoms/bonds molecular representation (no 3D needed)
-        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(this,
-                false);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        t3d.setAlidnBBsIn3D(false);
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,false);
 
         // Set rotatable property as property of IBond
         RotationalSpaceUtils.defineRotatableBonds(mol,
