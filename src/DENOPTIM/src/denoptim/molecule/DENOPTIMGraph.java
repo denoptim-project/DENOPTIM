@@ -1333,15 +1333,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public static boolean compareGraphNodes(DENOPTIMVertex thisV,
                                             DENOPTIMGraph thisG,
                                             DENOPTIMVertex otherV,
-                                            DENOPTIMGraph otherG,
-                                            StringBuilder reason) throws DENOPTIMException
+                                            DENOPTIMGraph otherG) throws DENOPTIMException
     {
         Map<DENOPTIMVertex, DENOPTIMVertex> map = new HashMap<>();
         map.put(thisV, otherV);
-        return compareGraphNodes(thisV, thisG, otherV, otherG, map, reason);
+        return compareGraphNodes(thisV, thisG, otherV, otherG, map,
+                new StringBuilder());
     }
-
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 
@@ -1954,8 +1952,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         List<DENOPTIMVertex> lstVert = getVertexList();
         int levRoot = lstVert.get(0).getLevel();
         int correction = lvl - levRoot;
-        for (DENOPTIMVertex denoptimVertex : lstVert) {
-            denoptimVertex.setLevel(denoptimVertex.getLevel() + correction);
+        for (DENOPTIMVertex v : lstVert) {
+            v.setLevel(v.getLevel() + correction);
         }
     }
 
@@ -3297,4 +3295,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Update the graph so that the argument is at the scaffold level i.e. is
+     * the source of this graph. The other graph's vertices will have levels
+     * updated accordingly.
+     * @param v vertex to set as scaffold
+     */
+    public static void setScaffold(DENOPTIMVertex v) {
+
+    }
+
+//------------------------------------------------------------------------------
 }
