@@ -870,6 +870,12 @@ if(debug)
                 .peek(DENOPTIMGraph::renumberGraphVertices)
                 .collect(Collectors.toList());
         for (int i = 0; i < subgraphs.size(); i++) {
+            DENOPTIMVertex scaffold = graph
+                    .getVertexList()
+                    .stream()
+                    .min((v1, v2) -> v1.getLevel() - v2.getLevel())
+                    .orElse(graph.getVertexAtPosition(0)); // Shouldn't happen
+            subgraphs.get(i).setScaffold(scaffold);
             subgraphs.set(i, fixEdgeDirections(subgraphs.get(i)));
         }
         return subgraphs;

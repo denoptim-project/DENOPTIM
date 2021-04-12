@@ -196,7 +196,12 @@ public class OffspringEvaluationTask extends FitnessTask
      * fragment space if not already present.
      */
     private void addRingSystemsToFragmentLibrary() {
+        if (curPopln == null) {
+            return;
+        }
+
         GraphPattern pattern = GraphPattern.RING;
+
         List<DENOPTIMGraph> subgraphs = curPopln
                 .stream()
                 .filter(DENOPTIMMolecule::hasFitness)
