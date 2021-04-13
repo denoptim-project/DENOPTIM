@@ -1017,7 +1017,7 @@ public class ParallelEvolutionaryAlgorithm
             if (molPopulation.size() > GAParameters.getPopulationSize())
             {
                 // sort the population
-                Collections.sort(molPopulation, Collections.reverseOrder());
+                molPopulation.sort(Collections.reverseOrder());
                 int k = molPopulation.size();
                 
                 // trim the population to the desired size
@@ -1166,7 +1166,7 @@ public class ParallelEvolutionaryAlgorithm
         molPopulation.trimToSize();
 
         // sort population by fitness
-        Collections.sort(molPopulation, Collections.reverseOrder());
+        molPopulation.sort(Collections.reverseOrder());
     }
 
 //------------------------------------------------------------------------------

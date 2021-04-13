@@ -20,10 +20,13 @@ package testoperator;
 
 import java.io.File;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.MutationType;
@@ -114,8 +117,9 @@ public class TestOperator
         System.out.println(g);
         System.out.println(" ");
     
-        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, 
-                 GraphConversionTool.convertGraphToMolecule(g,true),false);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(g, true);
+        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, iac, false);
     }
     
 //------------------------------------------------------------------------------
@@ -181,10 +185,11 @@ public class TestOperator
         System.out.println("FEMALE: "+female);
         System.out.println(" ");
     
-        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, 
-                 GraphConversionTool.convertGraphToMolecule(male,true),false);
-        DenoptimIO.writeMolecule(TestOperatorParameters.outFileF, 
-               GraphConversionTool.convertGraphToMolecule(female,true),false);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male,true);
+        IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female,true);
+        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, iacM, false);
+        DenoptimIO.writeMolecule(TestOperatorParameters.outFileF, iacF, false);
     }
 
 //------------------------------------------------------------------------------

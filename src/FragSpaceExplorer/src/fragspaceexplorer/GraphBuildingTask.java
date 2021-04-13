@@ -39,7 +39,7 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
 import denoptim.task.FitnessTask;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
@@ -91,7 +91,7 @@ public class GraphBuildingTask extends FitnessTask
     /**
      * Tool for generating 3D models assembling 3D building blocks.
      */
-    private TreeBuilder3D tb3d;
+    private ThreeDimTreeBuilder tb3d;
 
 //------------------------------------------------------------------------------
    
@@ -220,11 +220,10 @@ public class GraphBuildingTask extends FitnessTask
             }
             
             // Initialize the 3d model builder
-            if (FitnessParameters.make3dTree())
+            tb3d = new ThreeDimTreeBuilder();
+            if (!FitnessParameters.make3dTree())
             {
-            	tb3d = new TreeBuilder3D(FragmentSpace.getScaffoldLibrary(),
-            			FragmentSpace.getFragmentLibrary(),
-            			FragmentSpace.getCappingLibrary());
+            	tb3d.setAlidnBBsIn3D(false);
             }
 
             // Extend graph as requested
@@ -386,21 +385,11 @@ public class GraphBuildingTask extends FitnessTask
                         try 
                         {
                             // Prepare molecular representation
-                        	IAtomContainer mol;
-                        	if (FitnessParameters.make3dTree())
-                        	{
-	                        	try {
-	                                mol = tb3d.convertGraphTo3DAtomContainer(g,true);
-	                        	} catch (Throwable t) {
-	                        		mol = GraphConversionTool
-	                        				.convertGraphToMolecule(g, true);
-	                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
-	                        	}
-                        	} else {
-                        		mol = GraphConversionTool
-                        				.convertGraphToMolecule(g, true);
-                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
-                        	}
+                        	DENOPTIMGraph gWithNoRCVs = g.clone();
+                        	GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
+                        	IAtomContainer mol = 
+                        	        tb3d.convertGraphTo3DAtomContainer(
+	                                    gWithNoRCVs,true);
                             
                             // Level that generated this graph
                             altRes[4] = level;
@@ -450,21 +439,18 @@ public class GraphBuildingTask extends FitnessTask
                     nSubTasks = 1;
 
                     // Store graph
-                    FSEUtils.storeGraphOfLevel(dGraph.clone(),level,rootId,nextIds);
+                    DENOPTIMGraph gClone = dGraph.clone();
+                    FSEUtils.storeGraphOfLevel(gClone,level,rootId,nextIds);
                     
                     // Optionally improve the molecular representation, which
                     // is otherwise only given by the collection of building
                     // blocks (not aligned, nor roto-translated)
                 	if (FitnessParameters.make3dTree())
                 	{
-                		IAtomContainer mol;
-                    	try {
-                            mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
-                    	} catch (Throwable t) {
-                    		mol = GraphConversionTool
-                    				.convertGraphToMolecule(dGraph, true);
-                        	DENOPTIMMoleculeUtils.removeRCA(mol,dGraph);
-                    	}
+                        GraphConversionTool.removeUnusedRCVs(gClone);
+                        IAtomContainer mol = 
+                                tb3d.convertGraphTo3DAtomContainer(
+                                        gClone,true);
                         res[2] = mol;
                 	}
                    

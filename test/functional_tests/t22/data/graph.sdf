@@ -1223,7 +1223,8 @@ M  END
         11,
         16,
         18
-      ]
+      ],
+      "bndTyp": "SINGLE"
     }
   ],
   "symVertices": []

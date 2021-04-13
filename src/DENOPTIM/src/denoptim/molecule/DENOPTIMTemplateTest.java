@@ -27,7 +27,6 @@ import java.util.*;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.utils.MutationType;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +36,6 @@ import org.junit.jupiter.api.Test;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -197,6 +194,8 @@ public class DENOPTIMTemplateTest
         return outerTemp;
     }
 
+//------------------------------------------------------------------------------
+
     private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -230,6 +229,8 @@ public class DENOPTIMTemplateTest
         }
         return v;
     }
+
+//------------------------------------------------------------------------------
 
     private DENOPTIMVertex getOHFragment() throws DENOPTIMException {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
@@ -398,8 +399,6 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    @Disabled("Disabled until we can find a way to prevent addAP from being " +
-            "called after setInnerGraph")
     @Test
     public void testAddAP_after_setInnerGraph_throwsException() {
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);

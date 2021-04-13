@@ -25,9 +25,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.vecmath.Point3d;
+
+import org.openscience.cdk.interfaces.IAtom;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * Each attachment point is annotated by the number (position) of the atom
@@ -56,6 +61,12 @@ Comparable<DENOPTIMAttachmentPoint>
      * The index of the source atom in the atom list of the fragment (0-based)
      */
     private int atomPositionNumber;
+    
+    /**
+     * The index of the source atom in the atom list of the entire molecule 
+     * (0-based)
+     */
+    private int atomPositionNumberInMol;
     
     //TODO-V3 remove
     /**
@@ -219,6 +230,7 @@ Comparable<DENOPTIMAttachmentPoint>
     
 //-----------------------------------------------------------------------------
     
+    @Deprecated
     private void processMapString(String str) throws DENOPTIMException
     {
         if (str.contains("{") || str.contains("}")
@@ -419,6 +431,32 @@ Comparable<DENOPTIMAttachmentPoint>
     {
         this.atomPositionNumber = atomPositionNumber;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * The index of the source atom in the atom list of the entire molecule. 
+     * The index is reported considering 0-based enumeration.
+     * @return the index of the source atom in the atom list of the entire
+     * molecule
+     */
+    public int getAtomPositionNumberInMol()
+    {
+        return atomPositionNumberInMol;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Set the index of the source atom in the list of atoms of the entire 
+     * molecule.
+     * The index should reflect 0-based enumeration.
+     * @param atomPositionNumberInMol the index
+     */
+    public void setAtomPositionNumberInMol(int atomPositionNumberInMol)
+    {
+        this.atomPositionNumberInMol = atomPositionNumberInMol;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -511,7 +549,53 @@ Comparable<DENOPTIMAttachmentPoint>
     {
         return dirVec;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * If at all possible (the owner must be an atom containing building block),
+     * returns source atom on which this AP is rooted.
+     * 
+     * @return the src atom or null.
+     */
+    public IAtom getSrcAtom()
+    {
+        if (owner != null 
+                && (owner instanceof DENOPTIMFragment 
+                    || owner instanceof DENOPTIMTemplate)
+                && owner.containsAtoms())
+        {
+            return owner.getIAtomContainer().getAtom(this.atomPositionNumber);
+        } else {
+            return null;
+        }
+    }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * If at all possible (the owner must be an atom containing building block),
+     * returns the 2D/3D coordinated of the src atom on which this AP is rooted.
+     * 
+     * @return the tupla defining the 2D/3D coordinated of the src atom or null.
+     */
+    public double[] getSrcAtomCoords()
+    {
+        IAtom srcAtm = getSrcAtom();
+        if (srcAtm != null)
+        {
+            Point3d p3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
+            if (srcAtm.getPoint3d() != null)
+            {
+                return new double[] {p3d.x,p3d.y,p3d.z}; 
+            } else {
+                return new double[] {p3d.x,p3d.y};
+            }
+        } else {
+            return null;
+        }
+    }
+    
 //------------------------------------------------------------------------------
 
     /**

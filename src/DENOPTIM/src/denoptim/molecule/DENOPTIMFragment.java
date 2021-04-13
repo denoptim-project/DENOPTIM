@@ -35,6 +35,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
@@ -132,7 +133,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         
         for (IAtom oAtm : mol.atoms())
         {
-            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm);
+            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm,true,true);
             this.mol.addAtom(nAtm);
         }
         

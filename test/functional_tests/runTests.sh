@@ -330,6 +330,11 @@ runTest 't22'
 runTest 't23'
 
 #
+# t24: graph isomorphism (includes multiple tests)
+#
+runTest 't24'
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"

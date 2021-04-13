@@ -25,6 +25,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
@@ -106,10 +107,11 @@ public class GraphEditor
                     }
                     case ("SDF"):
                     {
-                        IAtomContainer newMol = 
-                           GraphConversionTool.convertGraphToMolecule(modGraph,
-                                                                          true);
-                        if (GraphEdParameters.getInFormat().equals("SDF"))
+
+                        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+                        IAtomContainer newMol = t3d
+                                .convertGraphTo3DAtomContainer(modGraph,true);
+                         if (GraphEdParameters.getInFormat().equals("SDF"))
                         {
                             IAtomContainer oldMol = 
                                                  GraphEdParameters.getInpMol(i);

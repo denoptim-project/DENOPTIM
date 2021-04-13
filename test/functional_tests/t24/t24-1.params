@@ -1,0 +1,14 @@
+#
+# Parameters for DENOPTIM
+#
+Isomorphism-inpGraphA=graph2.sdf
+# graph3.sdf is built to be isomorphic with graph2.sdf (moving a chord)
+Isomorphism-inpGraphB=graph3.sdf 
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds

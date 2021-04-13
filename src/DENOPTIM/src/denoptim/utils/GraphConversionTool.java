@@ -22,9 +22,12 @@ package denoptim.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
@@ -34,14 +37,18 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.UndirectedEdgeRelation;
+import denoptim.threedim.ThreeDimTreeBuilder;
 
 
 /**
@@ -53,158 +60,37 @@ import denoptim.molecule.SymmetricSet;
 
 public class GraphConversionTool
 {
-
+    
 //------------------------------------------------------------------------------
-
+    
     /**
-     * Generate the CDK atom-bond representation from the graph
-     * @param g the molecular graph
-     * @param closeRings if <code>true</code> imposes to make ring closing
-     * bonds as specified by the <code>DENOPTIMRing</code>s in the graph.
-     * @return CDK representation of the molecular graph
+     * Removes unused ring-closing vertexes. 
+     * If the resulting free AP needs to be capped, then the proper
+     * capping group is places where each ring-closing vertex once stood.
+     * @param g the graph to modify.
+     * @throws DENOPTIMException 
      */
-
-	//TODO: should probably merge this with ThreeBuilder3D.convertGraphto4DAtomContainer
-    // with a flag that controls whether we rototranslate the building blocks
-    // or not
-	
-    public static IAtomContainer convertGraphToMolecule(DENOPTIMGraph g, 
-                                   boolean closeRings) throws DENOPTIMException
-    {  
-        TreeMap<Integer,TreeMap<Integer,Integer>> atmSrcMap = 
-                new TreeMap<Integer,TreeMap<Integer,Integer>>();
-
-        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-        IAtomContainer mol = builder.newAtomContainer();
-
-        int molAtomCounter = 0;
-
-        // loop through the vertices
-        int n = g.getVertexCount();
-
-        for (int i=0; i<n; i++)
+    public static void removeUnusedRCVs(DENOPTIMGraph g) 
+            throws DENOPTIMException
+    {
+        for (DENOPTIMVertex v : g.getRCVertices())
         {
-            DENOPTIMVertex vertex = g.getVertexList().get(i);
-            if (!vertex.containsAtoms())
+            if (g.getRingsInvolvingVertex(v).size()==0)
             {
-                //TODO-V3 remove, eventually
-                System.out.println("WARNING! THIS VERTEX has NO ATOMS");
-                continue;
-            }
-
-            // Here we get atoms that are labelled with the original vertex ID
-            IAtomContainer iac = vertex.getIAtomContainer();
-
-            // Project original atom position in atom position in global list
-            for(IAtom atom : iac.atoms())
-            {
-                int vid = atom.getProperty(
-                        DENOPTIMConstants.ATMPROPVERTEXID);
-                int iatm = atom.getProperty(
-                        DENOPTIMConstants.ATMPROPORIGINALATMID);
-                if (atmSrcMap.containsKey(vid))
+                APClass cappAPClass = FragmentSpace.getAPClassOfCappingVertex(
+                        v.getAllAPClasses().get(0));
+                DENOPTIMAttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
+                g.removeVertex(v);
+                if (cappAPClass != null)
                 {
-                    //
-                    atmSrcMap.get(vid).put(iatm, molAtomCounter);
-                } else {
-                    TreeMap<Integer,Integer> atmPositionInVrtxAndInMol =
-                            new TreeMap<Integer,Integer>();
-                    atmPositionInVrtxAndInMol.put(iatm, molAtomCounter);
-                    atmSrcMap.put(vid, atmPositionInVrtxAndInMol);
-                }
-
-                molAtomCounter++;
-            }
-
-            mol.add(iac);
-        }
-
-        // loop through the edges
-        n = g.getEdgeCount();
-        for (int i=0; i<n; i++)
-        {
-            DENOPTIMEdge edge = g.getEdgeList().get(i);
-
-            DENOPTIMAttachmentPoint ap1 = edge.getSrcAP();
-            DENOPTIMAttachmentPoint ap2 = edge.getTrgAP();
-
-            DENOPTIMVertex v1 = ap1.getOwner();
-            DENOPTIMVertex v2 = ap2.getOwner();
-            
-            try
-            {
-                int dap1_anum = atmSrcMap.get(v1.getVertexId()).get(
-                        ap1.getAtomPositionNumber());
-                int dap2_anum = atmSrcMap.get(v2.getVertexId()).get(
-                        ap2.getAtomPositionNumber());
-                if (edge.getBondType().hasCDKAnalogue())
-                {
-                    mol.addBond(dap1_anum, dap2_anum, edge.getBondType().getCDKOrder());
-                }
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-                String msg = "Incorrect indices. Although this may be a bug, " +
-                        "it is more likely an error in the atom specification. "
-                        + "Kindly check your input files. "
-                        + "Error occurred while dealing with edge " + edge
-                        + " and vertices " + v1 + " and " + v2 + ".";
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
-            }
-        }
-       
-        // loop through the rings
-        if (closeRings)
-        {
-            for (int i=0; i<g.getRings().size(); i++)
-            {
-                DENOPTIMRing r = g.getRings().get(i);
-                DENOPTIMVertex vH = r.getHeadVertex();
-                DENOPTIMVertex vT = r.getTailVertex();
-                int vH_id = vH.getVertexId();
-                int vT_id = vT.getVertexId();
-
-                // ASSUMPTION: Ring closing vertex contains only one atom
-                // that is the RingClosingAttractor (RCA)
-
-                int idH = atmSrcMap.get(vH_id).get(0);
-                int idT = atmSrcMap.get(vT_id).get(0);
-
-                List<IAtom> cH = mol.getConnectedAtomsList(mol.getAtom(idH)); 
-                List<IAtom> cT = mol.getConnectedAtomsList(mol.getAtom(idT));
-
-                // Check connectivity of RCAs
-                if (cH.size() != 1 || cT.size() != 1)
-                {
-                    String s = "Unable to make convert graph to molecule. " 
-                               + "Head or tail vertex in ring " + r 
-                               + " does not terminate with RCA. "
-                               + "Check graph "+ g;
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE, s);
-                    throw new DENOPTIMException(s);
-                }
-        
-                int idSrcH = mol.getAtomNumber(cH.get(0));
-                int idSrcT = mol.getAtomNumber(cT.get(0));
-
-                if (r.getBondType().hasCDKAnalogue())
-                {
-                    mol.addBond(idSrcH, idSrcT, r.getBondType().getCDKOrder());
+                    int capId = FragmentSpace.getCappingGroupsWithAPClass(
+                            cappAPClass).get(0);
+                    DENOPTIMVertex capVrt = DENOPTIMVertex.newVertexFromLibrary(
+                            capId,BBType.CAP);
+                    g.appendVertexOnAP(apOnG, capVrt.getAP(0));
                 }
             }
         }
-
-        // Store graph as property
-        mol.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
-        mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
-        mol.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
-        if (g.getLocalMsg() != null)
-        {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG, g.getLocalMsg());
-        }
-
-        return mol;
     }
 
 //------------------------------------------------------------------------------
@@ -472,6 +358,66 @@ public class GraphConversionTool
         
         g.setGraphId(gcode);
         
+        return g;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts a DENOPTIMGraph into a JGraphT {@link SimpleGraph}. Note that
+     * the conversion does not produce a 1:1 list of vertexes and edges. 
+     * Instead,
+     * <ul>
+     * <li>used pairs of RCVs are removed and the attachment points to
+     * which they were bound are considered to be connected by an edge.</li>
+     * <li>all edges are considered undirected.</li>
+     * </ul>
+     * @param dg
+     * @return
+     */
+    public static SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> 
+    getJGraphFromGraph(DENOPTIMGraph dg)
+    {
+        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> g = 
+                        new SimpleGraph<>(UndirectedEdgeRelation.class);
+        Map<DENOPTIMVertex,Integer> vis = new HashMap<DENOPTIMVertex,Integer>();
+        int i = 0;
+        for (DENOPTIMVertex v : dg.getVertexList())
+        {
+            vis.put(v, i);
+            i += 1;
+            if (v.isRCV())
+            {
+                if (!dg.isVertexInRing(v))
+                {
+                    g.addVertex(v);
+                }
+            } else {
+                g.addVertex(v);
+            }
+        }
+
+        for (DENOPTIMEdge e : dg.getEdgeList())
+        {
+            DENOPTIMVertex vA = e.getSrcAP().getOwner();
+            DENOPTIMVertex vB = e.getTrgAP().getOwner();
+            if (!vA.isRCV() && !vB.isRCV())
+            {
+                g.addEdge(vA, vB, new UndirectedEdgeRelation(e.getSrcAP(), 
+                        e.getTrgAP(), e.getBondType()));
+            }
+        }
+        
+        for (DENOPTIMRing r : dg.getRings())
+        {
+            DENOPTIMVertex vA = r.getHeadVertex();
+            DENOPTIMVertex vB = r.getTailVertex();
+            DENOPTIMVertex pA = vA.getParent();
+            DENOPTIMVertex pB = vB.getParent();
+            g.addEdge(pA, pB, new UndirectedEdgeRelation(
+                    vA.getEdgeToParent().getSrcAP(), 
+                    vB.getEdgeToParent().getSrcAP(), r.getBondType()));
+        }
         return g;
     }
     

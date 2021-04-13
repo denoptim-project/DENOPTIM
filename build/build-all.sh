@@ -110,6 +110,15 @@ if [ "$?" != "0" ]; then
     exit -1
 fi
 
+echo
+echo "build-isomorphism.sh"
+bash build-isomorphism.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-isomorphism.sh."
+    exit -1
+fi
+
 
 echo
 

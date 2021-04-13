@@ -691,12 +691,37 @@ public class DENOPTIMMoleculeUtils
     /**
      * Method that constructs an atom that reflect the same atom given as 
      * parameter in terms of element symbol (or label, for pseudoatoms),
-     * and Cartesian coordinates, and most of the other attributes. 
-     * This is basically a cloning method.
-     * @param oAtm
+     * and Cartesian coordinates, and most of the other attributes.
+     * This method copies valence and implicit H count, in addition to most of
+     * the fields accessible via IAtom. Use 
+     * {@link #makeSameAtomAs(IAtom, boolean, boolean)} to have the option to
+     * exclude valence and implicit H count.
+     * This is basically a cloning method that ignores some fields.
+     * @param oAtm the original
      * @return the copy of the original
      */
     public static IAtom makeSameAtomAs(IAtom oAtm)
+    {
+        return makeSameAtomAs(oAtm, false, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method that constructs an atom that reflect the same atom given as 
+     * parameter in terms of element symbol (or label, for pseudoatoms),
+     * and Cartesian coordinates, and most of the other attributes unless 
+     * otherwise specified by the flags.
+     * This is basically a cloning method that ignores some fields.
+     * @param oAtm the original
+     * @param ignoreValence if <code>true</code> the returned atom will have 
+     * null valence
+     * @param ignoreImplicitH if <code>true</code> the returned atom will have 
+     * null implicit hydrogen count.
+     * @return the copy of the original
+     */
+    public static IAtom makeSameAtomAs(IAtom oAtm, boolean ignoreValence,
+            boolean ignoreImplicitH)
     {
         IAtom nAtm = null;
         String s = getSymbolOrLabel(oAtm);
@@ -721,7 +746,7 @@ public class DENOPTIMMoleculeUtils
             nAtm.setBondOrderSum(oAtm.getBondOrderSum());
         if (oAtm.getCharge() != null)
             nAtm.setCharge(oAtm.getCharge());
-        if (oAtm.getValency() != null)
+        if (oAtm.getValency() != null && !ignoreValence)
             nAtm.setValency(oAtm.getValency());
         if (oAtm.getExactMass() != null)
             nAtm.setExactMass(oAtm.getExactMass());
@@ -734,7 +759,7 @@ public class DENOPTIMMoleculeUtils
         if (oAtm.getHybridization() != null)
             nAtm.setHybridization(Hybridization.valueOf(
                     oAtm.getHybridization().toString()));
-        if (oAtm.getImplicitHydrogenCount() != null)
+        if (oAtm.getImplicitHydrogenCount() != null && !ignoreImplicitH)
             nAtm.setImplicitHydrogenCount(oAtm.getImplicitHydrogenCount());
         if (oAtm.getStereoParity() != null)
             nAtm.setStereoParity(oAtm.getStereoParity());
@@ -784,6 +809,24 @@ public class DENOPTIMMoleculeUtils
             }
         }       
         return s;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the centroid of the given molecule.
+     * @param mol
+     * @return the centroid.
+     */
+    public static Point3d calculateCentroid(IAtomContainer mol)
+    {
+        Point3d c = new Point3d(0,0,0);
+        for (IAtom atm : mol.atoms())
+        {
+            c.add(getPoint3d(atm));
+        }
+        c.scale(1.0 / ((double) mol.getAtomCount()));
+        return c;
     }
 
 //------------------------------------------------------------------------------

@@ -116,7 +116,7 @@ import denoptim.molecule.DENOPTIMMolecule;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
@@ -2105,7 +2105,7 @@ public class DenoptimIO
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (DENOPTIMGraph g : graphs) 
         {
-            TreeBuilder3D tb = new TreeBuilder3D();
+            ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
             IAtomContainer iac = builder.newAtomContainer();
             try {
                 iac = tb.convertGraphTo3DAtomContainer(g);
@@ -2220,8 +2220,8 @@ public class DenoptimIO
      * @throws Exception
      */
     public static void appendVerticesFromFileToLibrary(File file,
-                                                       DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
-                                                       boolean setBBId) throws UndetectedFileFormatException, IOException,
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
+            boolean setBBId) throws UndetectedFileFormatException, IOException,
     IllegalArgumentException, DENOPTIMException
     {
         FileFormat ff = DenoptimIO.detectFileFormat(file);
@@ -2276,7 +2276,12 @@ public class DenoptimIO
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
                     t.setInnerGraph(g);
-                    library.add(t);
+                    if (setBBId)
+                    {
+                        FragmentSpace.appendVertexToLibrary(t,bbt,library);
+                    } else {
+                        library.add(t);
+                    }
                 }
                 break;
                     
@@ -2287,7 +2292,12 @@ public class DenoptimIO
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
                     t.setInnerGraph(g);
-                    library.add(t);
+                    if (setBBId)
+                    {
+                        FragmentSpace.appendVertexToLibrary(t,bbt,library);
+                    } else {
+                        library.add(t);
+                    }
                 }
                 break;
                 

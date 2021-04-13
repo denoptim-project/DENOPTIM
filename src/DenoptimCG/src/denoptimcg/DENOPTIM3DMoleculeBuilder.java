@@ -34,7 +34,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.AtomOrganizer;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GenUtils;
@@ -278,12 +278,12 @@ public class DENOPTIM3DMoleculeBuilder
     public Molecule3DBuilder build3DTree() throws DENOPTIMException
     {
         // Create 3D tree-like structure from DENOPTIMGraph
-        TreeBuilder3D tb = new TreeBuilder3D();
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
         IAtomContainer initMol = tb.convertGraphTo3DAtomContainer(molGraph);
 
         // NOTE: the two following data structures might turn out useful in the
         // future, although now they are not needed
-
+/*
         // Create map of rototranslated APs per each vertex ID
         Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
                                                          tb.getApsPerVertexId();
@@ -297,7 +297,7 @@ public class DENOPTIM3DMoleculeBuilder
             System.out.println("apsPerVertexId: "+apsPerVertexId);
             System.out.println("apsPerEdge: "+apsPerEdge);
         }
-
+*/
         // Reorder atoms
         AtomOrganizer oa = new AtomOrganizer();
         oa.setScheme(CGParameters.getAtomOrderingScheme());
@@ -309,6 +309,8 @@ public class DENOPTIM3DMoleculeBuilder
             System.out.println("oldToNewMap: "+oldToNewMap.get(seedAtm));
         }
 
+        /*
+        COMMENTED out because apsPerVertexId is not used
         // Update list of AP on reordered atom container
         for (int vid : apsPerVertexId.keySet())
         {
@@ -332,6 +334,7 @@ public class DENOPTIM3DMoleculeBuilder
                 }
             }
         }
+        */
 
         // Collect rotatable bonds defined by fragment-fragment connections
         ArrayList<ObjectPair> rotBonds = 
@@ -344,7 +347,7 @@ public class DENOPTIM3DMoleculeBuilder
             {
                 System.out.println("Reordered IAtomContainer: 'iacToIC.sdf'");
                 DenoptimIO.writeMolecule("iacToIC.sdf",reorderedMol,false);
-		GenUtils.pause();
+                GenUtils.pause();
             }
         }
 

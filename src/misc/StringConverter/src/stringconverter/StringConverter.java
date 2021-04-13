@@ -9,6 +9,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMGraph.StringFormat;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GenUtils;
@@ -170,7 +171,8 @@ public class StringConverter
                 IAtomContainer iac = null;
                 try 
                 {
-                    iac = GraphConversionTool.convertGraphToMolecule(g,true);
+                    ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+                    iac = t3d.convertGraphTo3DAtomContainer(g,false);
                 } catch (DENOPTIMException e) {
                     throw new DENOPTIMException("Failed conversion of graph to "
                             + "chemical representation.",e);

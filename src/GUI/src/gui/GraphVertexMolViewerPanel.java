@@ -43,7 +43,7 @@ import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
@@ -330,7 +330,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
             IAtomContainer mol = builder.newAtomContainer();
             if (hasFragSpace)
             {
-                TreeBuilder3D tb = new TreeBuilder3D();
+                ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
                 try {
                     mol = tb.convertGraphTo3DAtomContainer(
                             dnGraph);

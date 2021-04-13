@@ -1,75 +1,75 @@
 
-  CDK     04012117443D
+  CDK     04122118493D
 
- 33 32  0  0  0  0  0  0  0  0999 V2000
-    0.0000    0.0000    0.0550 N   0  0  0  0  0  4  0  0  0  0  0  0
-    0.0000    0.0000    0.0557 P   0  0  0  0  0  4  0  0  0  0  0  0
-    0.0000    0.0000    0.0557 P   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.1838   -2.5036    1.1646 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.1838   -2.5036    1.1646 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.1838   -2.5036    1.1646 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.0000    0.0000    0.0557 P   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  7  0  0  0  0  0  0
-    0.0000   -0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.8900   -0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
+ 31 31  0  0  0  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0550 N   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0154   -1.1557   -0.3181 P   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2496   -1.8643    0.1486 P   0  0  0  0  0  0  0  0  0  0  0  0
+    0.2289   -0.3614   -0.2964 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0269    0.3964    0.4442 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.2473   -0.1168   -1.2459 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.6166   -3.7016    0.1569 P   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.2891   -1.0584   -0.2939 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.1796   -1.9360    0.1512 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.1106   -0.1575    0.1716 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.6607   -4.9558    0.1404 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.6928   -5.2846    0.2622 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.2730   -5.3205   -0.8108 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.9513   -3.4504   -0.8772 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.0626   -4.2688   -1.5886 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.3140   -2.5261   -1.3270 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9393   -2.3093    1.2802 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9337   -3.3990    1.2531 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0519   -1.9475    1.5536 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8715    0.4879   -0.2674 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.3480   -0.1001   -1.0518 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.6135    1.4726   -0.6573 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5693    0.5998    0.5858 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.8582    0.5109   -0.2674 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.4521   -0.1432   -0.9058 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.4500    0.8092    0.5979 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5589    1.4119   -0.8385 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.8034    0.2467   -0.5087 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9930    0.4158   -1.5687 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.7513    0.2067    0.0281 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.1863    1.0746   -0.1072 H   0  0  0  0  0  0  0  0  0  0  0  0
   1  2  1  0  0  0  0 
   4  5  1  0  0  0  0 
   4  6  1  0  0  0  0 
   3  4  1  0  0  0  0 
+  2  4  1  0  0  0  0 
+  8  9  1  0  0  0  0 
+  8 10  1  0  0  0  0 
   7  8  1  0  0  0  0 
-  7  9  1  0  0  0  0 
- 10 11  1  0  0  0  0 
- 10 12  1  0  0  0  0 
- 13 14  1  0  0  0  0 
- 13 15  1  0  0  0  0 
+  3  8  1  0  0  0  0 
+ 11 12  1  0  0  0  0 
+ 11 13  1  0  0  0  0 
+  7 11  1  0  0  0  0 
+ 14 15  1  0  0  0  0 
+ 14 16  1  0  0  0  0 
+  7 14  1  0  0  0  0 
+ 17 18  1  0  0  0  0 
+ 17 19  1  0  0  0  0 
+  3 17  1  0  0  0  0 
  20 21  1  0  0  0  0 
  20 22  1  0  0  0  0 
- 19 20  1  0  0  0  0 
- 23 24  1  0  0  0  0 
- 23 25  1  0  0  0  0 
- 26 27  1  0  0  0  0 
- 26 28  1  0  0  0  0 
- 31 32  1  0  0  0  0 
- 31 33  1  0  0  0  0 
- 32  4  1  0  0  0  0 
- 31  7  1  0  0  0  0 
- 31 10  1  0  0  0  0 
- 32 13  1  0  0  0  0 
-  7 16  1  0  0  0  0 
- 10 17  1  0  0  0  0 
- 13 18  1  0  0  0  0 
-  3 20  1  0  0  0  0 
- 19 23  1  0  0  0  0 
-  3 26  1  0  0  0  0 
- 23 29  1  0  0  0  0 
- 26 30  1  0  0  0  0 
- 19 31  1  0  0  0  0 
+  1 20  1  0  0  0  0 
+ 20 23  1  0  0  0  0 
+ 24 25  1  0  0  0  0 
+ 24 26  1  0  0  0  0 
+  1 24  1  0  0  0  0 
+ 24 27  1  0  0  0  0 
+ 28 29  1  0  0  0  0 
+ 28 30  1  0  0  0  0 
+  2 28  1  0  0  0  0 
+ 28 31  1  0  0  0  0 
+ 11 17  1  0  0  0  0 
 M  END
 > <GCODE>
 2
+
+> <GraphENC>
+2 1_ABS_VERTEX,2_ABS_VERTEX,3_3_1_0,4_3_1_0,5_3_1_0,8_1_2_1,9_1_2_1,10_1_2_1,11_ABS_VERTEX,13_3_1_2,16_3_1_1,17_6_1_3,18_7_1_2,19_3_1_2, 1_2_2_2_1_p:0_c:0,1_0_3_0_1_n:0_c:0,1_1_4_0_1_n:0_c:0,1_3_5_0_1_p:0_c:0,3_1_8_0_1_c:0_hyd:1,4_1_9_0_1_c:0_hyd:1,5_1_10_0_1_c:0_hyd:1,2_1_11_2_1_p:0_c:0,11_1_13_0_1_p:0_c:0,2_0_16_0_1_p:0_c:0,13_1_17_0_1_c:0_ATplus:0,16_1_18_0_1_c:0_ATminus:0,11_0_19_0_1_p:0_c:0, DENOPTIMRing [verteces=[17_6_1_3, 13_3_1_2, 11_ABS_VERTEX, 16_3_1_1, 18_7_1_2]] 
 
 > <GraphJson>
 {
@@ -84,6 +84,7 @@ M  END
               {
                 "id": 305,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -99,6 +100,7 @@ M  END
               {
                 "id": 306,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -114,6 +116,7 @@ M  END
               {
                 "id": 307,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -153,6 +156,7 @@ M  END
               {
                 "id": 308,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -160,14 +164,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -0.0803,
-                  -1.2717,
-                  -0.571
+                  1.0028921080425781,
+                  -1.1598291458230687,
+                  -1.3078255673097123
                 ]
               },
               {
                 "id": 309,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -175,14 +180,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  1.1415,
-                  0.5663,
-                  -0.571
+                  0.002607207008447154,
+                  0.1955608944382885,
+                  0.11814329473582909
                 ]
               },
               {
                 "id": 310,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -190,9 +196,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -1.0612,
-                  0.7054,
-                  -0.571
+                  -1.1948177186044482,
+                  -1.1950879834543289,
+                  -1.108031793062385
                 ]
               }
             ],
@@ -234,6 +240,7 @@ M  END
         "306": {
           "id": 427,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -249,6 +256,7 @@ M  END
         "307": {
           "id": 428,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -264,6 +272,7 @@ M  END
         "308": {
           "id": 429,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 1,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -279,6 +288,7 @@ M  END
         "310": {
           "id": 430,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 1,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -292,7 +302,7 @@ M  END
           ]
         }
       },
-      "vertexId": 2,
+      "vertexId": 1,
       "buildingBlockId": 1,
       "buildingBlockType": "SCAFFOLD",
       "isRCV": false,
@@ -312,6 +322,7 @@ M  END
               {
                 "id": 335,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -327,6 +338,7 @@ M  END
               {
                 "id": 336,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -342,6 +354,7 @@ M  END
               {
                 "id": 337,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -381,6 +394,7 @@ M  END
               {
                 "id": 338,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -388,14 +402,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -0.89,
-                  0.0,
-                  0.6293
+                  -0.3369372987495004,
+                  -0.9365662591929482,
+                  -0.12607911451057635
                 ]
               },
               {
                 "id": 339,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -403,9 +418,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  0.89,
-                  0.0,
-                  0.6293
+                  0.7815821185041482,
+                  -2.1363390143230276,
+                  -0.8173530466634797
                 ]
               }
             ],
@@ -446,6 +461,7 @@ M  END
         "335": {
           "id": 431,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 2,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -453,14 +469,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.0803,
-            -1.2717,
-            -0.571
+            -0.8984656982464168,
+            -2.367843526468663,
+            1.42902649566224
           ]
         },
         "337": {
           "id": 432,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 2,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -468,14 +485,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -1.0612,
-            0.7054,
-            -0.571
+            -2.6670451513291726,
+            -1.8263667806139388,
+            0.2248592017067529
           ]
         },
         "339": {
           "id": 433,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 3,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -483,13 +501,13 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -0.36015680945014406,
+            -1.8486670819763988,
+            -0.42572481643523197
           ]
         }
       },
-      "vertexId": 3,
+      "vertexId": 2,
       "buildingBlockId": 4,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
@@ -505,6 +523,7 @@ M  END
         {
           "id": 434,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 21,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -512,14 +531,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -0.0336023950429974,
+            -0.018812368438560587,
+            0.06743196379440183
           ]
         },
         {
           "id": 435,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 21,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -527,9 +547,64 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            1.5580530021781458,
+            0.5979871300954598,
+            0.5720025486534343
+          ]
+        }
+      ],
+      "lstSymAPs": [
+        {
+          "symIds": [
+            0,
+            1
+          ]
+        }
+      ],
+      "fragmentType": "Molecular_fragment",
+      "vertexId": 3,
+      "buildingBlockId": 2,
+      "buildingBlockType": "FRAGMENT",
+      "isRCV": false,
+      "level": 0,
+      "allowedMutationTypes": [
+        "EXTEND",
+        "CHANGEBRANCH",
+        "DELETE"
+      ]
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 436,
+          "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 25,
+          "totalConnections": 1,
+          "freeConnections": 0,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            0.03310303069220693,
+            -0.019706955127877804,
+            0.06743720702288705
+          ]
+        },
+        {
+          "id": 437,
+          "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 25,
+          "totalConnections": 1,
+          "freeConnections": 0,
+          "apClass": {
+            "rule": "c",
+            "subClass": 0
+          },
+          "dirVec": [
+            -0.5637811821558997,
+            1.3973379547336138,
+            -0.829286250843769
           ]
         }
       ],
@@ -556,8 +631,9 @@ M  END
     {
       "lstAPs": [
         {
-          "id": 436,
+          "id": 438,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 29,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -565,14 +641,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -0.2731669886263457,
+            -0.6969594643435231,
+            -0.3804656683133648
           ]
         },
         {
-          "id": 437,
+          "id": 439,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 29,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -580,9 +657,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -0.19632376383329242,
+            1.061255220853202,
+            -0.11367691374903668
           ]
         }
       ],
@@ -609,61 +686,9 @@ M  END
     {
       "lstAPs": [
         {
-          "id": 438,
-          "atomPositionNumber": 0,
-          "totalConnections": 1,
-          "freeConnections": 0,
-          "apClass": {
-            "rule": "c",
-            "subClass": 0
-          },
-          "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
-          ]
-        },
-        {
-          "id": 439,
-          "atomPositionNumber": 0,
-          "totalConnections": 1,
-          "freeConnections": 0,
-          "apClass": {
-            "rule": "c",
-            "subClass": 0
-          },
-          "dirVec": [
-            0.89,
-            0.0,
-            0.6293
-          ]
-        }
-      ],
-      "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
-      ],
-      "fragmentType": "Molecular_fragment",
-      "vertexId": 6,
-      "buildingBlockId": 2,
-      "buildingBlockType": "FRAGMENT",
-      "isRCV": false,
-      "level": 0,
-      "allowedMutationTypes": [
-        "EXTEND",
-        "CHANGEBRANCH",
-        "DELETE"
-      ]
-    },
-    {
-      "lstAPs": [
-        {
           "id": 440,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 24,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -671,40 +696,9 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
-          ]
-        }
-      ],
-      "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
-      "vertexId": 7,
-      "buildingBlockId": 0,
-      "buildingBlockType": "CAP",
-      "isRCV": false,
-      "level": 1,
-      "allowedMutationTypes": [
-        "EXTEND",
-        "CHANGEBRANCH",
-        "DELETE"
-      ]
-    },
-    {
-      "lstAPs": [
-        {
-          "id": 441,
-          "atomPositionNumber": 0,
-          "totalConnections": 1,
-          "freeConnections": 0,
-          "apClass": {
-            "rule": "hyd",
-            "subClass": 1
-          },
-          "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
+            0.860212903038214,
+            0.4861023224947669,
+            -0.28123544618641955
           ]
         }
       ],
@@ -724,8 +718,9 @@ M  END
     {
       "lstAPs": [
         {
-          "id": 442,
+          "id": 441,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 28,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -733,15 +728,47 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
+            -0.8630444408818421,
+            0.4963306725074313,
+            -0.258198280974042
           ]
         }
       ],
       "lstSymAPs": [],
       "fragmentType": "Molecular_fragment",
       "vertexId": 9,
+      "buildingBlockId": 0,
+      "buildingBlockType": "CAP",
+      "isRCV": false,
+      "level": 1,
+      "allowedMutationTypes": [
+        "EXTEND",
+        "CHANGEBRANCH",
+        "DELETE"
+      ]
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 442,
+          "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 32,
+          "totalConnections": 1,
+          "freeConnections": 0,
+          "apClass": {
+            "rule": "hyd",
+            "subClass": 1
+          },
+          "dirVec": [
+            -0.813423512094712,
+            0.23330417377077728,
+            -0.5151729340389246
+          ]
+        }
+      ],
+      "lstSymAPs": [],
+      "fragmentType": "Molecular_fragment",
+      "vertexId": 10,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
       "isRCV": false,
@@ -761,6 +788,7 @@ M  END
               {
                 "id": 534,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -776,6 +804,7 @@ M  END
               {
                 "id": 535,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -791,6 +820,7 @@ M  END
               {
                 "id": 536,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -830,6 +860,7 @@ M  END
               {
                 "id": 537,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -837,14 +868,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -0.89,
-                  0.0,
-                  0.6293
+                  -1.1859587332274666,
+                  -2.076894666499567,
+                  -0.120222607913759
                 ]
               },
               {
                 "id": 538,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -852,9 +884,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  0.89,
-                  0.0,
-                  0.6293
+                  0.3964405333990293,
+                  -1.430932423704822,
+                  0.37691453801632846
                 ]
               }
             ],
@@ -895,6 +927,7 @@ M  END
         "534": {
           "id": 443,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 6,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -902,14 +935,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.0803,
-            -1.2717,
-            -0.571
+            -1.8638386844514208,
+            -3.4173918101175538,
+            -1.013174452890039
           ]
         },
         "536": {
           "id": 444,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 6,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -917,14 +951,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -1.0612,
-            0.7054,
-            -0.571
+            -2.666521246181361,
+            -5.120646536754002,
+            0.13822176965251337
           ]
         },
         "538": {
           "id": 445,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 7,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -932,13 +967,13 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -2.981226921866659,
+            -2.7746067398234517,
+            0.5157774594646545
           ]
         }
       },
-      "vertexId": 10,
+      "vertexId": 11,
       "buildingBlockId": 4,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
@@ -954,6 +989,7 @@ M  END
         {
           "id": 449,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 10,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -961,14 +997,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -2.6224036617425117,
+            -3.866510755737291,
+            0.15469562374570078
           ]
         },
         {
           "id": 450,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 10,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -976,9 +1013,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -2.054752906709483,
+            -5.351405695585768,
+            0.9554825104532814
           ]
         }
       ],
@@ -991,7 +1028,7 @@ M  END
         }
       ],
       "fragmentType": "Molecular_fragment",
-      "vertexId": 11,
+      "vertexId": 13,
       "buildingBlockId": 2,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
@@ -1007,6 +1044,7 @@ M  END
         {
           "id": 452,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 17,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1014,14 +1052,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -1.2087748477436326,
+            -1.922793080863694,
+            0.29735355639963623
           ]
         },
         {
           "id": 453,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 17,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1029,9 +1068,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -1.6665660678917409,
+            -1.9679987880525476,
+            2.016883620921005
           ]
         }
       ],
@@ -1044,7 +1083,7 @@ M  END
         }
       ],
       "fragmentType": "Molecular_fragment",
-      "vertexId": 12,
+      "vertexId": 16,
       "buildingBlockId": 2,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
@@ -1060,6 +1099,7 @@ M  END
         {
           "id": 454,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 13,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1067,15 +1107,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.0087,
-            -0.007,
-            -0.0079
+            -2.054752906709483,
+            -5.351405695585768,
+            0.9554825104532814
           ]
         }
       ],
       "lstSymAPs": [],
       "fragmentType": "Molecular_fragment",
-      "vertexId": 13,
+      "vertexId": 17,
       "buildingBlockId": 5,
       "buildingBlockType": "FRAGMENT",
       "isRCV": true,
@@ -1091,6 +1131,7 @@ M  END
         {
           "id": 455,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 20,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1098,15 +1139,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.0109,
-            -0.0071,
-            0.0026
+            -1.6665660678917409,
+            -1.9679987880525476,
+            2.016883620921005
           ]
         }
       ],
       "lstSymAPs": [],
       "fragmentType": "Molecular_fragment",
-      "vertexId": 14,
+      "vertexId": 18,
       "buildingBlockId": 6,
       "buildingBlockType": "FRAGMENT",
       "isRCV": true,
@@ -1122,6 +1163,7 @@ M  END
         {
           "id": 81,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 14,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1129,14 +1171,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -2.529134623931594,
+            -3.6685900343754447,
+            0.020907784601256585
           ]
         },
         {
           "id": 82,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 14,
           "totalConnections": 1,
           "freeConnections": 1,
           "apClass": {
@@ -1144,9 +1187,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -0.8994710143402662,
+            -3.3381626353743634,
+            -0.6142412164710476
           ]
         }
       ],
@@ -1159,15 +1202,15 @@ M  END
         }
       ],
       "fragmentType": "Molecular_fragment",
-      "vertexId": 15,
+      "vertexId": 19,
       "buildingBlockId": 2,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
       "level": 2,
       "allowedMutationTypes": [
-        "EXTEND",
+        "DELETE",
         "CHANGEBRANCH",
-        "DELETE"
+        "EXTEND"
       ]
     }
   ],
@@ -1241,21 +1284,16 @@ M  END
   "gRings": [
     {
       "vertices": [
+        17,
         13,
         11,
-        10,
-        12,
-        14
-      ]
+        16,
+        18
+      ],
+      "bndTyp": "SINGLE"
     }
   ],
   "symVertices": []
 }
-
-> <GraphENC>
-2 2_ABS_VERTEX,3_ABS_VERTEX,4_3_1_0,5_3_1_0,6_3_1_0,7_1_2_1,8_1_2_1,9_1_2_1,10_ABS_VERTEX,11_3_1_2,12_3_1_1,13_6_1_3,14_7_1_2,15_3_1_2, 2_2_3_2_1_p:0_c:0,2_0_4_0_1_n:0_c:0,2_1_5_0_1_n:0_c:0,2_3_6_0_1_p:0_c:0,4_1_7_0_1_c:0_hyd:1,5_1_8_0_1_c:0_hyd:1,6_1_9_0_1_c:0_hyd:1,3_1_10_2_1_p:0_c:0,10_1_11_0_1_p:0_c:0,3_0_12_0_1_p:0_c:0,11_1_13_0_1_c:0_ATplus:0,12_1_14_0_1_c:0_ATminus:0,10_0_15_0_1_p:0_c:0, DENOPTIMRing [verteces=[13_6_1_3, 11_3_1_2, 10_ABS_VERTEX, 12_3_1_1, 14_7_1_2]] 
-
-> <GraphMsg>
-
 
 $$$$

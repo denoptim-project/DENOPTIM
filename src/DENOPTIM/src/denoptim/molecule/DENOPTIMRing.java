@@ -31,7 +31,7 @@ import com.google.gson.JsonSerializationContext;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
- * This class represents the closure of a ring in a spamming tree
+ * This class represents the closure of a ring in a spanning tree
  *
  * @author Marco Foscato
  */
@@ -200,25 +200,25 @@ public class DENOPTIMRing implements Serializable
 
 //------------------------------------------------------------------------------
 
-
-  public static class DENOPTIMRingSerializer
-  implements JsonSerializer<DENOPTIMRing>
-  {
-    @Override
-    public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc,
-            JsonSerializationContext context)
+    public static class DENOPTIMRingSerializer
+    implements JsonSerializer<DENOPTIMRing>
     {
-        JsonObject jsonObject = new JsonObject();
-        ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
-        for (int i=0; i<ring.getSize(); i++)
+        @Override
+        public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc,
+              JsonSerializationContext context)
         {
-            DENOPTIMVertex v = ring.getVertexAtPosition(i);
-            vertexIDs.add(v.getVertexId());
+            JsonObject jsonObject = new JsonObject();
+            ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
+            for (int i=0; i<ring.getSize(); i++)
+            {
+                DENOPTIMVertex v = ring.getVertexAtPosition(i);
+                vertexIDs.add(v.getVertexId());
+            }
+            jsonObject.add("vertices",context.serialize(vertexIDs));
+            jsonObject.add("bndTyp",context.serialize(ring.getBondType()));
+            return jsonObject;
         }
-        jsonObject.add("vertices",context.serialize(vertexIDs));
-        return jsonObject;
     }
-  }
 
 //------------------------------------------------------------------------------
 

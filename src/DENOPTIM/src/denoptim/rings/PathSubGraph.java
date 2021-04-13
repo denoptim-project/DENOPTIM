@@ -37,7 +37,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 
 
 /**
@@ -145,6 +145,7 @@ public class PathSubGraph
         this.vB = vB;
         
         // Identify the path between vA and vB
+        
         // Obtain path from vA to seed of the graph
         List<DENOPTIMVertex> vAToSeed = new ArrayList<DENOPTIMVertex>();
         List<DENOPTIMEdge> vAToSeedEdges = new ArrayList<DENOPTIMEdge>();
@@ -333,41 +334,36 @@ public class PathSubGraph
      * Creates the molecular representation, list of atoms and bonds involved
      * in the path between the head and tail.
      * @param mol the full molecule
-     * @param libScaff the library of scaffolds
-     * @param libFrag the library of fragments
-     * @param libCap the library of capping groups
      * @param make3D if <code>true</code> makes the method generate the 3D
      * coordinates of the chain of fragments by rototranslation of the
      * 3D fragments so that to align the APvectors
      * @throws DENOPTIMException
      */
 
-    public void makeMolecularRepresentation(IAtomContainer mol,
-                                            ArrayList<DENOPTIMVertex> libScaff,
-                                            ArrayList<DENOPTIMVertex> libFrag,
-                                            ArrayList<DENOPTIMVertex> libCap,
-                                            boolean make3D)
+    public void makeMolecularRepresentation(IAtomContainer mol, boolean make3D)
                                                        throws DENOPTIMException
     {
         // Build molecular representation 
-        TreeBuilder3D tb = new TreeBuilder3D(libScaff,libFrag,libCap);
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
         // and get the information on APs
+        /*
         Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
                                                         tb.getApsPerVertexId();
         Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
                                                             tb.getApsPerEdge();
+        */
         Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom =
                                                             tb.getApsPerAtom();
         Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
                                                             tb.getApsPerBond();
 
-	if (debug)
-	{
-	    String f = "pathSubGraph.sdf";
-	    System.out.println("Find SDF representation of path in: " + f);
-	    DenoptimIO.writeMolecule(f,iacPathVAVB,false);
-	}
+    	if (debug)
+    	{
+    	    String f = "pathSubGraph.sdf";
+    	    System.out.println("Find SDF representation of path in: " + f);
+    	    DenoptimIO.writeMolecule(f,iacPathVAVB,false);
+    	}
 
         // Get shortest atom path between the two ends of the chain
         atomsPathVAVB = new ArrayList<IAtom>();

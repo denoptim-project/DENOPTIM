@@ -57,6 +57,7 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -680,7 +681,7 @@ public class EAUtils
                                 + " scaffold: " + molGraph.toString());
         }
 
-        DENOPTIMGraphOperations.extendGraph(molGraph, scafVertex, true, false);
+        DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
 
         if (DEBUG)
         {
@@ -884,9 +885,10 @@ public class EAUtils
             return true;
 
         // get a atoms/bonds molecular representation (no 3D needed)
-        IAtomContainer mol = 
-            GraphConversionTool.convertGraphToMolecule(molGraph, false);
-
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        t3d.setAlidnBBsIn3D(false);
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,false);
+        
         // Set rotatability property as property of IBond
         ArrayList<ObjectPair> rotBonds = 
                                  RotationalSpaceUtils.defineRotatableBonds(mol,
@@ -894,11 +896,7 @@ public class EAUtils
                                                                    true, true);
         
         // get the set of possible RCA combinations = ring closures
-        CyclicGraphHandler cgh = new CyclicGraphHandler(
-                                      FragmentSpace.getScaffoldLibrary(),
-                                      FragmentSpace.getFragmentLibrary(),
-                                      FragmentSpace.getCappingLibrary(),
-                                      FragmentSpace.getRCCompatibilityMatrix());
+        CyclicGraphHandler cgh = new CyclicGraphHandler();
 
 //TODO decide to make optional
         boolean onlyRandomCombOfRings = true;
@@ -1159,8 +1157,9 @@ public class EAUtils
         }
 
         // calculate the molecule representation
-        IAtomContainer mol = GraphConversionTool.convertGraphToMolecule(
-                molGraph, true);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        t3d.setAlidnBBsIn3D(false);
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
 
         if (mol == null)
         { 
