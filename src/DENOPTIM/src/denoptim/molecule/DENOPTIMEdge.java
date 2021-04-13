@@ -142,12 +142,25 @@ public class DENOPTIMEdge implements Serializable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * @deprecated use of this method is discouraged.
+     * @param vid new vertex id
+     */
     //TODO-M7 del
+    @Deprecated
     public void setSrcVertex(int vid)
     {
         srcAP.getOwner().setVertexId(vid);
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * @deprecated use of this method is discouraged.
+     * @param vid new vertex id
+     */
+    //TODO-M7 del
+    @Deprecated
     public void setTrgVertex(int vid)
     {
         trgAP.getOwner().setVertexId(vid);
@@ -315,13 +328,8 @@ public class DENOPTIMEdge implements Serializable
      */
     public void flipEdge() {
         DENOPTIMAttachmentPoint newTrgAP = getSrcAP();
-        DENOPTIMAttachmentPoint newSrcAP = getTrgAP();
-        DENOPTIMVertex newTrgVertex = newTrgAP.getOwner();
-        DENOPTIMVertex newSrcVertex = newSrcAP.getOwner();
-        srcAP = newSrcAP;
+        srcAP = getTrgAP();
         trgAP = newTrgAP;
-        setSrcVertex(newSrcVertex.getVertexId());
-        setTrgVertex(newTrgVertex.getVertexId());
     }
 
 //------------------------------------------------------------------------------
