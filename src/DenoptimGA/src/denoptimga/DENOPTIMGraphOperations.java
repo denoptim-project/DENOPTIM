@@ -857,23 +857,24 @@ if(debug)
             throw new IllegalArgumentException("Graph pattern " + pattern +
                     " not supported.");
         }
-        List<DENOPTIMGraph> subgraphs = graph
-                .getRings()
-                .stream()
-                .map(r -> new PathSubGraph(r.getHeadVertex(),
-                        r.getTailVertex(), graph))
-                .map(PathSubGraph::getGraph)
-                .map(DENOPTIMGraph::clone)
-                .peek(DENOPTIMGraph::renumberGraphVertices)
-                .collect(Collectors.toList());
-        for (int i = 0; i < subgraphs.size(); i++) {
-            DENOPTIMVertex scaffold = graph
+        List<DENOPTIMGraph> subgraphs = new ArrayList<>();
+        for (DENOPTIMRing r : graph.getRings()) {
+            PathSubGraph subgraphAsPath = new PathSubGraph(r.getHeadVertex(),
+                    r.getTailVertex(), graph);
+
+            DENOPTIMGraph subgraph = subgraphAsPath.getGraph().clone();
+            subgraph.renumberGraphVertices();
+            subgraph.addRing(r);
+
+            DENOPTIMVertex scaffold = subgraph
                     .getVertexList()
                     .stream()
-                    .min((v1, v2) -> v1.getLevel() - v2.getLevel())
-                    .orElse(graph.getVertexAtPosition(0)); // Shouldn't happen
-            subgraphs.get(i).setScaffold(scaffold);
-            subgraphs.set(i, fixEdgeDirections(subgraphs.get(i)));
+                    .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
+                    .get(); // Shouldn't happen
+
+            DENOPTIMGraph.setScaffold(scaffold);
+            fixEdgeDirections(subgraph);
+            subgraphs.add(subgraph);
         }
         return subgraphs;
     }
@@ -883,15 +884,13 @@ if(debug)
     /**
      * Flips edges in the graph so that the scaffold is the only source vertex.
      * @param graph to fix edges of.
-     * @return same graph with scaffold as the only source vertex.
      */
-    private static DENOPTIMGraph fixEdgeDirections(DENOPTIMGraph graph) {
+    private static void fixEdgeDirections(DENOPTIMGraph graph) {
         for (DENOPTIMVertex v : graph.getVertexList()) {
             if (v.getLevel() == -1) {
                 fixEdgeDirections(v, new HashSet<>());
             }
         }
-        return graph;
     }
 
 //------------------------------------------------------------------------------
@@ -905,24 +904,27 @@ if(debug)
         visited.add(v.getVertexId());
         int visitedVertexEncounters = 0;
         for (int i = 0; i < v.getNumberOfAPs(); i++) {
-            DENOPTIMEdge edge = v.getAP(i).getEdgeUser();
-            int srcVertex = edge.getSrcVertex();
-            boolean srcIsVisited =
-                    srcVertex != v.getVertexId() && visited.contains(srcVertex);
+            DENOPTIMAttachmentPoint ap = v.getAP(i);
+            DENOPTIMEdge edge = ap.getEdgeUser();
+            if (edge != null) {
+                int srcVertex = edge.getSrcVertex();
+                boolean srcIsVisited =
+                        srcVertex != v.getVertexId() && visited.contains(srcVertex);
 
-            visitedVertexEncounters += srcIsVisited ? 1 : 0;
-            if (visitedVertexEncounters >= 2) {
-                throw new IllegalArgumentException("Invalid graph. Contains a" +
-                        " cycle.");
-            }
+                visitedVertexEncounters += srcIsVisited ? 1 : 0;
+                if (visitedVertexEncounters >= 2) {
+                    throw new IllegalArgumentException("Invalid graph. Contains a" +
+                            " cycle.");
+                }
 
-            boolean edgeIsWrongWay = edge.getTrgVertex() == v.getVertexId()
-                    && !srcIsVisited;
-            if (edgeIsWrongWay) {
-                edge.flipEdge();
-            }
-            if (!srcIsVisited) {
-                fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+                boolean edgeIsWrongWay = edge.getTrgVertex() == v.getVertexId()
+                        && !srcIsVisited;
+                if (edgeIsWrongWay) {
+                    edge.flipEdge();
+                }
+                if (!srcIsVisited) {
+                    fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+                }
             }
         }
     }

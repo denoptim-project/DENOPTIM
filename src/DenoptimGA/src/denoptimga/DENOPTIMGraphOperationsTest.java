@@ -36,6 +36,7 @@ public class DENOPTIMGraphOperationsTest {
 
             assertEquals(expected.getVertexCount(), actual.getVertexCount());
             assertEquals(expected.getEdgeCount(), actual.getEdgeCount());
+            assertEquals(1, actual.getRingCount());
 
             assertTrue(DENOPTIMGraph.compareGraphNodes(getScaffold(expected),
                     expected, getScaffold(actual), actual));
@@ -71,21 +72,24 @@ public class DENOPTIMGraphOperationsTest {
      * RCV -(chord)- RCV
      */
     @Test
-    public void testExtractPattern_ringOnScaffold() {
+    public void testExtractPattern_ringWithArm() {
         try {
-            DENOPTIMVertex scaffold = new EmptyVertex();
-            scaffold.addAP(-1, 1, 1);
-            scaffold.setLevel(-1);
+            DENOPTIMVertex arm = new EmptyVertex();
+            arm.addAP(-1, 1, 1);
+            arm.setLevel(-1);
             DENOPTIMGraph g = new DENOPTIMGraph();
-            g.addVertex(scaffold);
+            g.addVertex(arm);
+            g.renumberGraphVertices();
 
             DENOPTIMGraph ring = getSingleRingGraph();
             DENOPTIMVertex ringScaffold = getScaffold(ring);
             ringScaffold.addAP(-1, 1, 1);
 
-            g.appendGraphOnGraph(scaffold, 0, ring, ringScaffold,
+            g.appendGraphOnAP(arm, 0, ring, ringScaffold,
                     ringScaffold.getNumberOfAPs() - 1,
-                    DENOPTIMEdge.BondType.SINGLE, new HashMap<>(), false);
+                    DENOPTIMEdge.BondType.SINGLE, new HashMap<>());
+
+            DENOPTIMGraph.setScaffold(arm);
 
             g.renumberGraphVertices();
 
@@ -98,7 +102,8 @@ public class DENOPTIMGraphOperationsTest {
 
             assertEquals(g.getEdgeCount() - 1, actual.getEdgeCount());
             assertEquals(g.getVertexCount() - 1, actual.getVertexCount());
-            assertTrue(DENOPTIMGraph.compareGraphNodes(ringScaffold, g,
+            assertEquals(1, actual.getRingCount());
+            assertTrue(DENOPTIMGraph.compareGraphNodes(ringScaffold, ring,
                     getScaffold(actual), actual));
 
         } catch (Throwable t) {
@@ -126,15 +131,17 @@ public class DENOPTIMGraphOperationsTest {
             DENOPTIMVertex rcv2 = new EmptyVertex(2, new ArrayList<>(),
                     new ArrayList<>(), true);
 
-            APClass apClass = APClass.make("rule", 0);
+//            APClass apClass = APClass.make("rule", 0);
 
             List<DENOPTIMVertex> vertices = Arrays.asList(v1, rcv1, rcv2);
             for (DENOPTIMVertex v : vertices) {
                 v.setBuildingBlockType(BBType.FRAGMENT);
-                v.addAP(-1, 1, 1, apClass);
+//                v.addAP(-1, 1, 1, apClass);
+                v.addAP(-1, 1, 1);
             }
             // Need an additional AP on v1
-            v1.addAP(-1, 1, 1, apClass);
+//            v1.addAP(-1, 1, 1, apClass);
+            v1.addAP(-1, 1, 1);
 
             DENOPTIMGraph g = new DENOPTIMGraph();
             g.addVertex(v1);

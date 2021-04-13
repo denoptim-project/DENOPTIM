@@ -22,15 +22,10 @@ package denoptim.molecule;
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.SimpleGraph;
@@ -1206,51 +1201,37 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * </ul>
      * 
      * This method makes use of the Vento-Foggia VF2 algorithm (see 
-     * <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>) as provided by
-     * JGraphT library in {@link VF2GraphIsomorphismInspector}.
+     * <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>)
+     * as provided by JGraphT library in {@link VF2GraphIsomorphismInspector}.
      * 
      * @param other the graph to be compared with this.
      * @return <code>true</code> is this graph is isomorphic to the other.
      */
-    public boolean isIsomorphicTo(DENOPTIMGraph other)
-    {
+    public boolean isIsomorphicTo(DENOPTIMGraph other) {
         SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG =
                 GraphConversionTool.getJGraphFromGraph(this);
-        
+
         SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG =
                 GraphConversionTool.getJGraphFromGraph(other);
-        
-        Comparator<DENOPTIMVertex> vComp = 
-                new Comparator<DENOPTIMVertex>() {
-                    @Override
-                    public int compare(DENOPTIMVertex v1, DENOPTIMVertex v2) {
-                        // Vertex.sameAs returns boolean, so we need to produce 
-                        // an int to allow comparison.
-                        StringBuilder sb = new StringBuilder();
-                        if (v1.sameAs(v2, sb))
-                        {
-                            return 0;
-                        } else {
-                            return Integer.compare(
-                                    v1.getBuildingBlockId(), 
-                                    v2.getBuildingBlockId());
-                        }
-                    }
-                }; 
-        
+
+        Comparator<DENOPTIMVertex> vComp = (v1, v2) -> {
+            // Vertex.sameAs returns boolean, so we need to produce
+            // an int to allow comparison.
+            StringBuilder sb = new StringBuilder();
+            if (v1.sameAs(v2, sb)) {
+                return 0;
+            } else {
+                return Integer.compare(v1.getBuildingBlockId(),
+                        v2.getBuildingBlockId());
+            }
+        };
+
         Comparator<UndirectedEdgeRelation> eComp =
-                new Comparator<UndirectedEdgeRelation>() {
-                    @Override
-                    public int compare(UndirectedEdgeRelation o1,
-                            UndirectedEdgeRelation o2)
-                    {
-                        return o1.compare(o2);
-                    }
-                };
-        
+                UndirectedEdgeRelation::compare;
+
         VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdgeRelation> vf2 =
                 new VF2GraphIsomorphismInspector<>(thisG, otherG, vComp, eComp);
-        
+
         return vf2.isomorphismExists();
     }
 
@@ -2622,7 +2603,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                    boolean onAllSymmAPs)
                                            throws DENOPTIMException
     {
-
         SymmetricSet symAPs = parentVertex.getSymmetricAPs(parentAPIdx);
         if (symAPs != null && onAllSymmAPs)
         {
@@ -3394,13 +3374,46 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Update the graph so that the argument is at the scaffold level i.e. is
-     * the source of this graph. The other graph's vertices will have levels
-     * updated accordingly.
+     * Update the graph so that the vertex argument is at the scaffold level
+     * i.e. is the source of this graph. The other graph's vertices will have
+     * levels updated that corresponds to the layers of a breadth-first search
+     * starting from this vertex.
      * @param v vertex to set as scaffold
      */
     public static void setScaffold(DENOPTIMVertex v) {
+        Set<Integer> visited = new HashSet<>();
+        int level = -1;
+        Queue<DENOPTIMVertex> currLevel = new ArrayDeque<>();
+        Queue<DENOPTIMVertex> nextLevel = new ArrayDeque<>();
+        currLevel.add(v);
 
+        while (!currLevel.isEmpty()) {
+            DENOPTIMVertex currVertex = currLevel.poll();
+            int currId = currVertex.getVertexId();
+            if (!visited.contains(currId)) {
+                visited.add(currId);
+                currVertex.setLevel(level);
+
+                Iterable<DENOPTIMVertex> neighbors = currVertex
+                        .getAttachmentPoints()
+                        .stream()
+                        .map(DENOPTIMAttachmentPoint::getEdgeUser)
+                        .filter(e -> e != null)
+                        .map(e -> e.getSrcVertex() == currId ?
+                                e.getTrgAP() : e.getSrcAP())
+                        .map(DENOPTIMAttachmentPoint::getOwner)
+                        .collect(Collectors.toList());
+                for (DENOPTIMVertex adj : neighbors) {
+                    nextLevel.add(adj);
+                }
+            }
+
+            if (currLevel.isEmpty()) {
+                currLevel = nextLevel;
+                nextLevel = new ArrayDeque<>();
+                level++;
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
