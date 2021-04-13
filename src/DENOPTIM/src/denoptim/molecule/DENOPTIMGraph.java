@@ -1445,7 +1445,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	ArrayList<DENOPTIMEdge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
     	if (edgesFromThis.size() != edgesFromOther.size())
     	{
-    		reason.append("Different number of edged from vertex "+seedOnA+" ("
+    		reason.append("Different number of edges from vertex "+seedOnA+" ("
     					+edgesFromThis.size()+":"
     					+edgesFromOther.size()+")");
     		return false;

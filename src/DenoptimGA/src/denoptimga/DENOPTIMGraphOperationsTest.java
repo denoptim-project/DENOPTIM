@@ -1,10 +1,7 @@
 package denoptimga;
 
-import com.google.common.base.Suppliers;
-import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.*;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.beam.Graph;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -25,7 +22,7 @@ public class DENOPTIMGraphOperationsTest {
     @Test
     public void testExtractPattern_singleRingSystem() {
         try {
-            DENOPTIMGraph g = getSingleRingGraph();
+            DENOPTIMGraph g = getThreeCycle();
 
             List<DENOPTIMGraph> subgraphs = DENOPTIMGraphOperations
                     .extractPattern(g, GraphPattern.RING);
@@ -46,13 +43,11 @@ public class DENOPTIMGraphOperationsTest {
         }
     }
 
-
-
 //------------------------------------------------------------------------------
 
     @Test
     public void testExtractPattern_returnsEmptyListIfNoRings() {
-        DENOPTIMGraph g = getSingleRingGraph();
+        DENOPTIMGraph g = getThreeCycle();
         g.removeRing(g.getRings().get(0));
         List<DENOPTIMGraph> subgraphs =
                 DENOPTIMGraphOperations.extractPattern(g, GraphPattern.RING);
@@ -62,36 +57,10 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    /**
-     * Graph where ring does not contain the scaffold vertex of the original
-     * graph. Graph looks like
-     *         V
-     *         |
-     *    /--- V ----\
-     *   /            \
-     * RCV -(chord)- RCV
-     */
     @Test
     public void testExtractPattern_ringWithArm() {
         try {
-            DENOPTIMVertex arm = new EmptyVertex();
-            arm.addAP(-1, 1, 1);
-            arm.setLevel(-1);
-            DENOPTIMGraph g = new DENOPTIMGraph();
-            g.addVertex(arm);
-            g.renumberGraphVertices();
-
-            DENOPTIMGraph ring = getSingleRingGraph();
-            DENOPTIMVertex ringScaffold = getScaffold(ring);
-            ringScaffold.addAP(-1, 1, 1);
-
-            g.appendGraphOnAP(arm, 0, ring, ringScaffold,
-                    ringScaffold.getNumberOfAPs() - 1,
-                    DENOPTIMEdge.BondType.SINGLE, new HashMap<>());
-
-            DENOPTIMGraph.setScaffold(arm);
-
-            g.renumberGraphVertices();
+            DENOPTIMGraph g = getThreeCycleWithArm();
 
             List<DENOPTIMGraph> subgraphs =
                     DENOPTIMGraphOperations.extractPattern(g,GraphPattern.RING);
@@ -103,9 +72,10 @@ public class DENOPTIMGraphOperationsTest {
             assertEquals(g.getEdgeCount() - 1, actual.getEdgeCount());
             assertEquals(g.getVertexCount() - 1, actual.getVertexCount());
             assertEquals(1, actual.getRingCount());
-            assertTrue(DENOPTIMGraph.compareGraphNodes(ringScaffold, ring,
-                    getScaffold(actual), actual));
 
+            DENOPTIMGraph expected = getExpectedResult();
+            assertTrue(DENOPTIMGraph.compareGraphNodes(getScaffold(expected),
+                    expected, getScaffold(actual), actual));
         } catch (Throwable t) {
             t.printStackTrace();
             fail("Unexpected exception thrown.");
@@ -115,14 +85,38 @@ public class DENOPTIMGraphOperationsTest {
 //------------------------------------------------------------------------------
 
     /**
-     * Returns a graph that looks like this:
+     * Returns the expected result from calling extractPattern on single ring
+     * with arm.
+     */
+    private DENOPTIMGraph getExpectedResult() throws Throwable {
+        DENOPTIMGraph expected = getThreeCycleWithArm();
+        expected.renumberGraphVertices();
+        DENOPTIMVertex oldScaffold = getScaffold(expected);
+        DENOPTIMAttachmentPoint toRemove = oldScaffold.getAP(0)
+                .getEdgeUser().getTrgAP();
+        expected.removeVertex(oldScaffold);
+        DENOPTIMGraph.setScaffold(toRemove.getOwner());
+        return expected;
+    }
+
+//------------------------------------------------------------------------------
+
+//    @Test
+//    public void testExtractPattern_twoSeparatedRings() {
+//
+//    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a 3-cycle:
      *    /--- V ---\
      *   /           \
      * RCV -(chord)- RCV
      *
      * @return the graph above
      */
-    private DENOPTIMGraph getSingleRingGraph() {
+    private DENOPTIMGraph getThreeCycle() {
         try {
             DENOPTIMVertex v1 = new EmptyVertex(0);
             v1.setLevel(-1);
@@ -157,6 +151,67 @@ public class DENOPTIMGraphOperationsTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Graph which is a ring with an arm jutting out. The arm is the scaffold.
+     * The graph looks like:
+     *         V
+     *         |
+     *    /--- V ----\
+     *   /            \
+     * RCV -(chord)- RCV
+     */
+    private DENOPTIMGraph getThreeCycleWithArm() throws Throwable {
+        DENOPTIMVertex arm = new EmptyVertex();
+        arm.addAP(-1, 1, 1);
+        arm.setLevel(-1);
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(arm);
+        g.renumberGraphVertices();
+
+        DENOPTIMGraph ring = getThreeCycle();
+        DENOPTIMVertex ringScaffold = getScaffold(ring);
+        ringScaffold.addAP(-1, 1, 1);
+
+        g.appendGraphOnAP(arm, 0, ring, ringScaffold,
+                ringScaffold.getNumberOfAPs() - 1,
+                DENOPTIMEdge.BondType.SINGLE, new HashMap<>());
+
+        DENOPTIMGraph.setScaffold(arm);
+
+        g.renumberGraphVertices();
+        return g;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Graph which is a ring with an arm jutting out. S marks the scaffold
+     * vertex. The graph looks like:
+     *         S
+     *         |
+     *    /--- V ----\
+     *   /            \
+     * RCV -(chord)- RCV
+     */
+    private DENOPTIMGraph getSeparatedCycles() {
+        return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a 4-cycle. S marks the scaffold vertex:
+     *  S ----------- V
+     *  |             |
+     * RCV -(chord)- RCV
+     */
+    private DENOPTIMGraph getFourCycle() {
+//        DENOPTIMVertex scaff = new
         return null;
     }
 
