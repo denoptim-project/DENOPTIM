@@ -2,6 +2,7 @@ package denoptim.molecule;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
@@ -619,20 +620,21 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     /**
      * Counts the number of required APs that match with the APs on a
-     * fragment. Two APs match if they have the same APClass and direction
-     * vector.
+     * fragment. Two APs match if they have the same APClass.
      * @param f Fragment to match against
      * @return The number of required APs present on fragment argument.
      */
     private int countRequiredAPs(DENOPTIMFragment f) {
         List<DENOPTIMAttachmentPoint> reqAPs = getRequiredAPs();
-        ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                f.getAttachmentPoints();
+        List<DENOPTIMAttachmentPoint> fragAPs = f
+                .getAttachmentPoints()
+                .stream()
+                .map(DENOPTIMAttachmentPoint::clone)
+                .collect(Collectors.toList());
 
         Comparator<DENOPTIMAttachmentPoint> apClassComparator
                 = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass);
 
-        // TODO: 06.04.2021 make sure list of APs is always sorted
         fragAPs.sort(apClassComparator);
 
         // TODO: 06.04.2021 make sure requiredAPs is always sorted
