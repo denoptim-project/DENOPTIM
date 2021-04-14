@@ -34,7 +34,6 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
@@ -193,8 +192,6 @@ public class PathSubGraph
         for (int i=0; i<vAToSeed.size(); i++)
         {
             // We dig from vA towards the seed of the graph
-            DENOPTIMVertex v = vAToSeed.get(i);
-            
             if (vBToSeed.contains(vAToSeed.get(i)))
             {
                 // We are at the turning point vertex: were the vA->seed path
@@ -284,6 +281,11 @@ public class PathSubGraph
             // Collect vertices and make edges to build a graph from A to B
             if (i == 1) {
                 gVertices.add(cloneVertBack);
+            } else if (i > 1)
+            {
+                // Need to collect the reference to the vertex defined in the 
+                // previous cycle. 
+                cloneVertBack = gVertices.get(gVertices.size()-1);
             }
             gVertices.add(cloneVertHere);
             gEdges.add(new DENOPTIMEdge(cloneVertBack.getAP(apIdBack2Here),
@@ -418,12 +420,12 @@ public class PathSubGraph
             IAtom a = pathInFullMol.get(ia);
             if (ia == 0 || ia == pathInFullMol.size()-1)
             {
-                atmNumStr = atmNumStr + "RCA-" + (mol.getAtomNumber(a)+1)+"_";
+                atmNumStr = atmNumStr + "RCA-" + (mol.indexOf(a)+1)+"_";
             }
             else
             {
                 atmNumStr = atmNumStr + a.getSymbol() + "-"
-                                            + (mol.getAtomNumber(a) + 1) + "_";
+                                            + (mol.indexOf(a) + 1) + "_";
             }
         }
         if (debug)
@@ -499,7 +501,7 @@ public class PathSubGraph
                     {
                         continue;
                     }
-                    int atmID = iacPathVAVB.getAtomNumber(nbrOfA1);
+                    int atmID = iacPathVAVB.indexOf(nbrOfA1);
                     if (atmID < lowIDs)
                     {
                         lowIDs = atmID;
@@ -539,7 +541,7 @@ public class PathSubGraph
                     {
                         continue;
                     }
-                    int atmID = iacPathVAVB.getAtomNumber(nbrOfA2);
+                    int atmID = iacPathVAVB.indexOf(nbrOfA2);
                     if (atmID < lowIDs)
                     {
                         lowIDs = atmID;
