@@ -11,4 +11,4 @@ echo "Starting JUnit tests..."
 java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -p denoptim
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.utils.DENOPTIMMoleculeUtilsTest
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.molecule.DENOPTIMTemplateTest

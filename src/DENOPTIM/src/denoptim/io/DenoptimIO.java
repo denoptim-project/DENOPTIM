@@ -2360,7 +2360,7 @@ public class DenoptimIO
     	if (inFile.isDirectory())
     	{
     		
-    		// This is to distinguish GS from FSE runs
+    		// This is to distinguish GA from FSE runs
     		for(File folder : inFile.listFiles(new FileFilter() {
     			
     			@Override
@@ -2531,6 +2531,8 @@ public class DenoptimIO
     {
         Map<String,FileFormat> definingMap = 
                 new HashMap<String,FileFormat>();
+        Map<String,List<FileFormat>> negatingRegex = 
+                new HashMap<String,List<FileFormat>>();
         String endOfSample = null;
         for (FileFormat ff : ffs)
         {
@@ -2542,11 +2544,23 @@ public class DenoptimIO
                    endOfSample = ff.getSampleEndRegex();
                }
            }
+           for (String regex : ff.getNegatingRegex())
+           {
+               if (negatingRegex.containsKey(regex))
+               {
+                   negatingRegex.get(regex).add(ff);
+               } else {
+                   List<FileFormat> lst = new ArrayList<FileFormat>();
+                   lst.add(ff);
+                   negatingRegex.put(regex, lst);
+               }
+           }
         }
         
         FileFormat ff = null;
         String line;
         BufferedReader br = null;
+        Set<FileFormat> negatedFFs = new HashSet<FileFormat>();
         try
         {
             br = new BufferedReader(new FileReader(fileName));
@@ -2563,12 +2577,24 @@ public class DenoptimIO
                         continue;
                     }
                     
+                    for (String key : negatingRegex.keySet())
+                    {
+                        if (line.matches(key))
+                        {
+                            negatedFFs.addAll(negatingRegex.get(key));
+                            if (negatingRegex.get(key).contains(ff))
+                            {
+                                ff = null;
+                            }
+                        }
+                    }
+                    
                     for (String keyRoot : definingMap.keySet())
                     {
-                        if (line.matches(keyRoot))
+                        if (!negatedFFs.contains(definingMap.get(keyRoot))
+                                && line.matches(keyRoot))
                         {
                         	ff = definingMap.get(keyRoot);
-                        	break lineReadingLoop;
                         }
                     }
                 }

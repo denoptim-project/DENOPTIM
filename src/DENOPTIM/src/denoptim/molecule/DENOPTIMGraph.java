@@ -353,6 +353,37 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return gVertices;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Identifies and return the vertex from which the spanning tree originates.
+     * This is typically the first vertex in the list, but it is possible to
+     * programmatically build graphs that do not follow this convention. 
+     * Therefore, here we test if the first vertex is a seed (i.e., it only has
+     * departing edges) and, if not, we search for the closest seed.
+     * <b>WARNING</b>: the graph is assumed to be an healthy spanning tree, in 
+     * that it has only one seed that is reachable from any vertex by a 
+     * inverse directed path.
+     * The result is unpredictable for disconnected graphs or unhealthy
+     * spanning trees.
+     * 
+     * @return the seed/root of the spanning tree
+     */
+    public DENOPTIMVertex getSourceVertex()
+    {
+        DENOPTIMVertex v0 = getVertexAtPosition(0);
+        for (DENOPTIMEdge e : this.getEdgeList())
+        {
+            if (e.getTrgAP().getOwner() == v0)
+            {
+                ArrayList<DENOPTIMVertex> parentTree = new ArrayList<>();
+                getParentTree(v0,parentTree);
+                return parentTree.get(parentTree.size()-1);
+            }
+        }
+        return v0;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -381,7 +412,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	ArrayList<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();
     	for (DENOPTIMEdge e : this.getEdgeList())
     	{
-    		if (e.getSrcVertex() == v.getVertexId())
+    		if (e.getSrcAP().getOwner() == v)
     		{
     			edges.add(e);
     		}
@@ -821,8 +852,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param dapidx the AP corresponding to the source fragment
      * @param dstVert
      * @return the AP index of the destination fragment
+     * @deprecated this depends on vertedID rather than reference
      */
 
+    @Deprecated
     public int getBondingAPIndex(DENOPTIMVertex srcVert, int dapidx,
                                     DENOPTIMVertex dstVert)
     {
@@ -880,14 +913,53 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Traverse the graph until it identified the source of the directed path
+     * reachable from the given vertex recursively.
+     * @param vertex the child vertex from which we start traversing the graph.
+     * @param parentTree list containing the references to all the parents
+     * recursively visited so far.
+     */
+    public void getParentTree(DENOPTIMVertex vertex,
+            ArrayList<DENOPTIMVertex> parentTree) 
+    {
+        DENOPTIMVertex parent = getParent(vertex);
+        if (parent == null) {
+            return;
+        }
+        if (parentTree.contains(parent))
+        {
+            // Cyclic graphs are not allowed!
+            throw new IllegalArgumentException();
+        }
+        parentTree.add(parent);
+        getParentTree(parent, parentTree);
+    }
+    
+//------------------------------------------------------------------------------
+
+    public DENOPTIMVertex getParent(DENOPTIMVertex v)
+    {
+        DENOPTIMEdge edge = v.getEdgeToParent();
+        if (edge != null)
+        {
+            return edge.getSrcAP().getOwner();
+        }
+        return null;
+    }
 
 //------------------------------------------------------------------------------
 
     /**
      * @param vid the vertex id for which the child vertices need to be found
      * @return Arraylist containing the vertex ids of the child vertices
+     * @deprecated depends on vertedID
      */
 
+    @Deprecated
     public ArrayList<Integer> getChildVertices(int vid)
     {
         ArrayList<Integer> lst = new ArrayList<>();
@@ -1131,18 +1203,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             mval = Math.max(mval, v.getVertexId());
         }
         return mval;
-    }
-
-//------------------------------------------------------------------------------
-
-    public DENOPTIMVertex getParent(DENOPTIMVertex v)
-    {
-        DENOPTIMEdge edge = v.getEdgeToParent();
-        if (edge != null)
-        {
-            return edge.getSrcAP().getOwner();
-        }
-        return null;
     }
 
 //------------------------------------------------------------------------------

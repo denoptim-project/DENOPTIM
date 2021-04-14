@@ -406,12 +406,7 @@ public class VertexViewPanel extends JPanel
 //-----------------------------------------------------------------------------
     
     /**
-     * Loads the given template to this viewer. The style of the depiction, 
-     * which is plotted by different viewers, depends on the content of the
-     * template. If the template contains a molecular representation, then a 
-     * molecular viewer will be used. Otherwise a single-node graph will be 
-     * used to represent a template with a partially defined content, but a
-     * given set of attachment points.
+     * Loads the given template to this viewer.
      * @param tmpl the template to visualize
      */
     private void loadTemplateToViewer(DENOPTIMTemplate tmpl)
@@ -422,7 +417,7 @@ public class VertexViewPanel extends JPanel
             
             // here we want to avoid converting graph to molecule, so if we have
             // the molecular model from having read the template from SDF, then
-            // good we can display it, otherwise, no molecule should be shown.
+            // good, we can display it, otherwise, no molecule should be shown.
             
             /*
             DENOPTIMFragment frag = new DENOPTIMFragment();

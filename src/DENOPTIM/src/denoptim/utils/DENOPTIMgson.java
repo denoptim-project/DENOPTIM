@@ -134,6 +134,10 @@ public class DENOPTIMgson
                   && field.getName().equals("owner")) {
               return true;
           }
+          if (field.getDeclaringClass() == DENOPTIMTemplate.class
+                  && field.getName().equals("mol")) {
+              return true;
+          }
 
           return false;
       }
@@ -175,6 +179,10 @@ public class DENOPTIMgson
               }
               if (field.getDeclaringClass() == DENOPTIMTemplate.class
                       && field.getName().equals("innerGraph")) {
+                  return true;
+              }
+              if (field.getDeclaringClass() == DENOPTIMTemplate.class
+                      && field.getName().equals("mol")) {
                   return true;
               }
 

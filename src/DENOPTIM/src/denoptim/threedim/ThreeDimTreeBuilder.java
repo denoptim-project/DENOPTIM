@@ -259,13 +259,15 @@ public class ThreeDimTreeBuilder
         
         this.graph = graph;
         
-        // Add the first vertex in the graph (i.e., the root of the tree)
-        DENOPTIMVertex rootVrtx = this.graph.getVertexList().get(0);
+        // WARNING: assumption that the graph is an healthy spanning tree, as
+        // it should always be in DENOPTIM.
+        DENOPTIMVertex rootVrtx = this.graph.getSourceVertex();
         int idRootVrtx = rootVrtx.getVertexId();
         
+        IAtomContainer iacRootVrtx = null;
         if (rootVrtx.containsAtoms())
         {
-            IAtomContainer iacRootVrtx = rootVrtx.getIAtomContainer();
+            iacRootVrtx = rootVrtx.getIAtomContainer();
         
             if (iacRootVrtx == null)
             {
@@ -291,7 +293,7 @@ public class ThreeDimTreeBuilder
             apsOnThisFrag.add(ap);
             if (rootVrtx.containsAtoms())
             {
-                IAtom srcAtm = ap.getSrcAtom();
+                IAtom srcAtm = iacRootVrtx.getAtom(ap.getAtomPositionNumber());
                 if (apsPerAtom.containsKey(srcAtm))
                 {
                     apsPerAtom.get(srcAtm).add(ap);
@@ -323,8 +325,8 @@ public class ThreeDimTreeBuilder
             if (rootVrtx.containsAtoms())
             {
                 Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
-                Point3d srcPtApSrc = new Point3d(
-                        DENOPTIMMoleculeUtils.getPoint3d(apSrc.getSrcAtom()));
+                Point3d srcPtApSrc = new Point3d(iacRootVrtx.getAtom(
+                        apSrc.getAtomPositionNumber()).getPoint3d());
             
                 // Append next building block on AP-vector - start recursion
                 append3DFragmentsViaEdges(apSrc.getAtomPositionNumber(),
@@ -431,7 +433,12 @@ public class ThreeDimTreeBuilder
             // (or removed, if no capping needed), by changing the graph with
             // GraphConversionTool.removeUnusedRCVs
             // So, this will deal only with used RCAs.
-        	DENOPTIMMoleculeUtils.removeRCA(mol, this.graph);
+            
+            // WARNING: since we are changing the atom list, we need to make
+            // sure we retail consistency between the changing atom list of
+            // the atom indexes stored in the APs, and in particular, the 
+            // index returned by getAtomPositionNumberInMol.
+        	DENOPTIMMoleculeUtils.removeUsedRCA(mol, this.graph);
         }
         
         if (debug)
@@ -570,9 +577,10 @@ public class ThreeDimTreeBuilder
         }
         
         int preNumAtms = mol.getAtomCount();
+        IAtomContainer inFrag = null;
         if (inVtx.containsAtoms())
         {
-            IAtomContainer inFrag = inVtx.getIAtomContainer();
+            inFrag = inVtx.getIAtomContainer();
             
             if (inFrag == null)
             {
@@ -602,7 +610,8 @@ public class ThreeDimTreeBuilder
                 // parent vertex, which is the growing molecule (i.e., ApA)
                 // and that on the incoming building block (i.e., ApB).
                 Point3d trgApB = new Point3d(apB.getDirectionVector());
-                Point3d srcApB = new Point3d(apB.getSrcAtomCoords());
+                Point3d srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
+                        inFrag.getAtom(apB.getAtomPositionNumber())));
         
                 // Translate atoms and APs of incoming building block so that 
                 // trgApB is on srcApA
@@ -620,7 +629,8 @@ public class ThreeDimTreeBuilder
                     ap.setDirectionVector(new double[] {pt.x, pt.y, pt.z});
                 }
                 trgApB = new Point3d(apB.getDirectionVector());
-                srcApB = new Point3d(apB.getSrcAtomCoords());
+                srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
+                        inFrag.getAtom(apB.getAtomPositionNumber())));
         
                 //Get Vectors ApA and ApB (NOTE: inverse versus of ApB!!!)
                 Vector3d vectApA = new Vector3d();
@@ -688,7 +698,8 @@ public class ThreeDimTreeBuilder
         
                     // Update points defining AP vector
                     trgApB = new Point3d(apB.getDirectionVector());
-                    srcApB = new Point3d(apB.getSrcAtomCoords());
+                    srcApB = new Point3d(inFrag.getAtom(
+                            apB.getAtomPositionNumber()).getPoint3d());
                 }
                 else
                 {
@@ -718,30 +729,6 @@ public class ThreeDimTreeBuilder
                             edge.getTrgAP().getOwner().isRCV())
                     {
                         edgeToRCA = true;
-                    }
-                    //TODO-V3 remove this: it is only to test consistency
-                    try
-                    {
-                        boolean edgeToRCAOld = false;
-                        for (String atyp : DENOPTIMConstants.RCATYPEMAP.keySet())
-                        {
-                            if ((apB.getSrcAtom().getSymbol().equals(atyp)) ||
-                                   (mol.getAtom(idSrcAtmA).getSymbol().equals(
-                                           atyp)))
-                            {
-                                edgeToRCAOld = true;
-                                break;
-                            }
-                        }
-                        if ((edgeToRCAOld && !edgeToRCA) 
-                            || (!edgeToRCAOld && edgeToRCA))
-                        {
-                            throw new DENOPTIMException("Inconsistent detetion of edge to RCA");
-                        }
-                    } catch (Throwable t)
-                    {
-                        // This happens because either end of the edge does not 
-                        // contain atoms
                     }
                 }
         
@@ -817,7 +804,8 @@ public class ThreeDimTreeBuilder
         BondType bndTyp = edge.getBondType();
         if (bndTyp.hasCDKAnalogue() && idSrcAtmA>-1 && inVtx.containsAtoms())
         {
-            IBond bnd = new Bond(mol.getAtom(idSrcAtmA),apB.getSrcAtom(), 
+            IBond bnd = new Bond(mol.getAtom(idSrcAtmA),
+                    inFrag.getAtom(apB.getAtomPositionNumber()), 
                     bndTyp.getCDKOrder());
             mol.addBond(bnd);
             
@@ -840,7 +828,6 @@ public class ThreeDimTreeBuilder
             
             if (inVtx.containsAtoms())
             {
-                // IAtom srcAtm = ap.getSrcAtom(); should be equivalent
                 IAtom srcAtm = mol.getAtom(ap.getAtomPositionNumberInMol());
                 if (apsPerAtom.containsKey(srcAtm))
                 {
@@ -872,8 +859,9 @@ public class ThreeDimTreeBuilder
                 // Get two points defining the src AP vector in 3D
                 Point3d trgNextApA = new Point3d(
                         nextEdge.getSrcAP().getDirectionVector());
-                Point3d srcNextApA = new Point3d(
-                        nextEdge.getSrcAP().getSrcAtom().getPoint3d());
+                Point3d srcNextApA = new Point3d(inFrag.getAtom(
+                        nextEdge.getSrcAP().getAtomPositionNumber())
+                        .getPoint3d());
     
                 // Append fragment on AP-vector and start recursion
                 append3DFragmentsViaEdges(

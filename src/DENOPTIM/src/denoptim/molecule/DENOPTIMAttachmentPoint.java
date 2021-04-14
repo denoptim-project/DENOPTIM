@@ -519,9 +519,11 @@ Comparable<DENOPTIMAttachmentPoint>
      * Returns the APRule component of the given APClass
      * @param apc the APClass to parse
      * @return the APRule
+     * @deprecated use {@link #getAPClass()}
      */
     
     //TODO-V3 move to APClass class
+    @Deprecated
     public static String getAPRule(String apc)
     {
         return apc.split(DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
@@ -553,11 +555,10 @@ Comparable<DENOPTIMAttachmentPoint>
 //------------------------------------------------------------------------------
     
     /**
-     * If at all possible (the owner must be an atom containing building block),
-     * returns source atom on which this AP is rooted.
-     * 
-     * @return the src atom or null.
+     * @deprecated do not use: this was a test
      */
+    //TODO-V3 del
+    @Deprecated
     public IAtom getSrcAtom()
     {
         if (owner != null 
@@ -574,11 +575,10 @@ Comparable<DENOPTIMAttachmentPoint>
 //------------------------------------------------------------------------------
     
     /**
-     * If at all possible (the owner must be an atom containing building block),
-     * returns the 2D/3D coordinated of the src atom on which this AP is rooted.
-     * 
-     * @return the tupla defining the 2D/3D coordinated of the src atom or null.
+     * @deprecated do not use: this was a way to show a problem, i.e., recursive calling of getIAtomContainer in template
      */
+    //TODO-V3 del
+    @Deprecated
     public double[] getSrcAtomCoords()
     {
         IAtom srcAtm = getSrcAtom();

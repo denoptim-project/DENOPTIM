@@ -971,7 +971,7 @@ public class EAUtils
         }
 
         // Update the IAtomContainer representation
-        DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
+        DENOPTIMMoleculeUtils.removeUsedRCA(mol,molGraph);
         res[2] = mol;
 
         // Update the SMILES representation

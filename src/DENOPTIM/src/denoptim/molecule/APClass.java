@@ -107,7 +107,10 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor for a fully defined APClass
+     * Constructor for a fully defined APClass. 
+     * Checks if there is already a instance with the given members, if not it 
+     * created one. In either case, returns the reference to that instance of 
+     * APClass.
      * @throws DENOPTIMException 
      */
     public static APClass make(String rule, int subClass) 
