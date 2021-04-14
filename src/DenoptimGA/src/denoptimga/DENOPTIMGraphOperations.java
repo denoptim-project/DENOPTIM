@@ -870,7 +870,7 @@ if(debug)
                     .getVertexList()
                     .stream()
                     .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
-                    .get(); // Shouldn't happen
+                    .get();
 
             DENOPTIMGraph.setScaffold(scaffold);
             fixEdgeDirections(subgraph);
