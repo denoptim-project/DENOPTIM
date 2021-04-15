@@ -38,7 +38,7 @@ import denoptim.fitness.FitnessProvider;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
@@ -68,7 +68,7 @@ public abstract class FitnessTask extends Task
     /**
      * The data structure holding the results of this task
      */
-    protected DENOPTIMMolecule result = new DENOPTIMMolecule();
+    protected Candidate result = new Candidate();
     
     /**
      * The file where we store the input to the fitness provider.
@@ -116,7 +116,7 @@ public abstract class FitnessTask extends Task
      * @return the object with data obtained from the fitness provider.
      * @throws DENOPTIMException
      */
-    protected DENOPTIMMolecule runFitnessProvider() throws DENOPTIMException
+    protected Candidate runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
         result.setSDFFile(fitProvOutFile);

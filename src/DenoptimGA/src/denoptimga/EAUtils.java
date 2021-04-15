@@ -51,7 +51,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.rings.CyclicGraphHandler;
@@ -108,7 +108,7 @@ public class EAUtils
      */
 
     protected static void outputPopulationDetails
-                            (ArrayList<DENOPTIMMolecule> popln, String filename)
+                            (ArrayList<Candidate> popln, String filename)
                                                         throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
@@ -126,7 +126,7 @@ public class EAUtils
 
         for (int i=0; i<GAParameters.getPopulationSize(); i++)
         {
-            DENOPTIMMolecule mol = popln.get(i);
+            Candidate mol = popln.get(i);
             if (mol != null)
             {
                 String mname = new File(mol.getSDFFile()).getName();
@@ -153,7 +153,7 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> popln)
+    private static String getSummaryStatistics(ArrayList<Candidate> popln)
     {
         double[] fitness = getFitnesses(popln);
         double sdev = DENOPTIMStatUtils.stddev(fitness, true);
@@ -201,7 +201,7 @@ public class EAUtils
 
         for (int i=0; i<GAParameters.getPopulationSize(); i++)
         {
-            DENOPTIMMolecule mol = popln.get(i);
+            Candidate mol = popln.get(i);
             DENOPTIMGraph g = mol.getGraph();
             int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
@@ -229,7 +229,7 @@ public class EAUtils
     
     //TODO-V3 merge this with the selectParents to get a selectParents(population,how_many_do_you_want)
 
-    protected static int selectSingleParent(ArrayList<DENOPTIMMolecule> popln)
+    protected static int selectSingleParent(ArrayList<Candidate> popln)
     {
         int selmate = -1;
         int stype = GAParameters.getSelectionStrategyType();
@@ -267,7 +267,7 @@ public class EAUtils
      * @return array of parents for crossover.
      */
 
-    protected static int[] selectParents(ArrayList<DENOPTIMMolecule> molPopulation)
+    protected static int[] selectParents(ArrayList<Candidate> molPopulation)
     {
         int[] mates = null;
 
@@ -316,7 +316,7 @@ public class EAUtils
      * @return indices of the parents that have at least 1 compatible Xover point
      */
 
-    protected static int[] performFBCC(ArrayList<DENOPTIMMolecule> molPopulation)
+    protected static int[] performFBCC(ArrayList<Candidate> molPopulation)
     {
         int[] selection = new int[2];
         selection[0] = -1;
@@ -385,7 +385,7 @@ public class EAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(ArrayList<DENOPTIMMolecule> popln,
+    protected static void outputFinalResults(ArrayList<Candidate> popln,
                             String destDir) throws DENOPTIMException
     {
         String genOutfile = destDir + System.getProperty("file.separator") +
@@ -427,7 +427,7 @@ public class EAUtils
      * @throws DENOPTIMException
      */
     protected static void getPopulationFromFile(String filename,
-            ArrayList<DENOPTIMMolecule> molPopulation, HashSet<String> lstInchi,
+            ArrayList<Candidate> molPopulation, HashSet<String> lstInchi,
             String genDir) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> mols;
@@ -520,8 +520,9 @@ public class EAUtils
                 mol.setProperty("GraphENC", graph.toString());
                 mol.setProperty("GraphMsg", "From Initial Population File");
 
-                DENOPTIMMolecule pmol =
-                    new DENOPTIMMolecule(graph, molinchi, molsmiles, fitness);
+                Candidate pmol = new Candidate(molName, graph, fitness, 
+                        molinchi, molsmiles);
+                
                 DenoptimIO.writeMolecule(molfile, mol, false);
                 pmol.setSDFFile(molfile);
                 pmol.setImageFile(null);
@@ -575,10 +576,10 @@ public class EAUtils
      * @param popln
      */
 
-    protected static void setVertexCounterValue(ArrayList<DENOPTIMMolecule> popln)
+    protected static void setVertexCounterValue(ArrayList<Candidate> popln)
     {
         int val = Integer.MIN_VALUE;
-        for (DENOPTIMMolecule popln1 : popln)
+        for (Candidate popln1 : popln)
         {
             DENOPTIMGraph g = popln1.getGraph();
             val = Math.max(val, g.getMaxVertexId());
@@ -644,7 +645,6 @@ public class EAUtils
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold();
 
-        //TODO-V3: use a type-agnostic w.r.t vertex constructor
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, DENOPTIMVertex.BBType.SCAFFOLD);
 
@@ -659,7 +659,7 @@ public class EAUtils
         scafVertex.setSymmetricAP(simAP);
         */
         
-        //TODO: did we pick a template? Then, we'll have to deal with it.
+        //TODO-V3: did we pick a template? Then, if it is we'll have to deal with it.
         // as we can pick a template in other graph operations, the dealing of the template
         // should be a public method or something that can be called from elsewhere
         
@@ -1062,13 +1062,13 @@ public class EAUtils
      * @return <code>true</code> if found
      */
 
-    protected static boolean containsMolecule(ArrayList<DENOPTIMMolecule> mols,
+    protected static boolean containsMolecule(ArrayList<Candidate> mols,
                                                                 String molcode)
     {
         if(mols.isEmpty())
             return false;
 
-        for (DENOPTIMMolecule mol : mols)
+        for (Candidate mol : mols)
         {
             if (mol.getUID().compareToIgnoreCase(molcode) == 0)
             {
@@ -1086,7 +1086,7 @@ public class EAUtils
      * @return array of fitness values
      */
 
-    protected static double[] getFitnesses(ArrayList<DENOPTIMMolecule> mols)
+    protected static double[] getFitnesses(ArrayList<Candidate> mols)
     {
         int k = mols.size();
         double[] arr = new double[k];
@@ -1107,7 +1107,7 @@ public class EAUtils
      * values exceeds 0.0001
      */
 
-    protected static double getPopulationSD(ArrayList<DENOPTIMMolecule> molPopulation)
+    protected static double getPopulationSD(ArrayList<Candidate> molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
         return DENOPTIMStatUtils.stddev(fitvals, true);
@@ -1123,7 +1123,7 @@ public class EAUtils
      */
 
     protected static ArrayList<String> getInchiCodes
-                                    (ArrayList<DENOPTIMMolecule> molPopulation)
+                                    (ArrayList<Candidate> molPopulation)
     {
         int k = molPopulation.size();
         ArrayList<String> arr = new ArrayList<>();

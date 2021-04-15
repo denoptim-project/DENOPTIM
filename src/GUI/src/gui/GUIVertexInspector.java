@@ -1275,7 +1275,7 @@ public class GUIVertexInspector extends GUICardPanel
   	 * @param currApRule the current value of the APRule, or empty string
   	 * @param mustReply set to <code>true</code> to prevent escaping the question
   	 * @return 
-  	 * @throws DENOPTIMException 
+  	 * @throws DENOPTIMException is the used did not choose a valid value.
   	 */
 	public static String ensureGoodAPRuleString(String currApRule, 
 			String title, boolean mustReply) throws DENOPTIMException 

@@ -546,8 +546,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    		DENOPTIMConstants.SEPARATORAPPROPAPS);
 			    
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0],
-                                "SDF");
+			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0]);
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
@@ -559,14 +558,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 					DENOPTIMAttachmentPoint apMany = 
 							new DENOPTIMAttachmentPoint(this, atmID+1
 									+ DENOPTIMConstants.SEPARATORAPPROPAAP
-									+ moreAPonThisAtm[j], "SDF");
+									+ moreAPonThisAtm[j]);
 					allAPs.add(apMany);
 			    }
 			} 
 			else 
 			{
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(this, onThisAtm,"SDF");
+			    		new DENOPTIMAttachmentPoint(this, onThisAtm);
 			    allAPs.add(ap);
 			}
 	    }

@@ -630,10 +630,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     public void removeVertex(DENOPTIMVertex vertex)
     {
-        //TODO-V3: deal with templates. They do not appear in the edges as
-        // target Vertices, so the edges to templates will not be removed
-        // once we remove the template vertex.
-
         if (!gVertices.contains(vertex))
         {
         	return;
@@ -1057,65 +1053,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         return clone;
     }
-
-    //TODO-V3 delete. This was only meant to test the references to the edge with parent vertex
-
-    public void checkHashed(String fileName)
-    {
-
-        System.out.println("Writing "+fileName+" for graph "+getGraphId());
-        boolean nogood = false;
-        String NL = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-        for (DENOPTIMVertex v : gVertices)
-        {
-            sb.append("Vertex "+v+NL);
-            if (v.getEdgeToParent() == null)
-                continue;
-
-            int vh = v.getEdgeToParent().hashCode();
-            sb.append("hash edge "+vh+NL);
-            boolean found = false;
-            for (DENOPTIMEdge e : gEdges)
-            {
-
-                if (e.hashCode() == vh)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                System.out.println("M7: found mismatch");
-                System.out.println("FromVertex "+v+" hash is: "+vh);
-                for (DENOPTIMEdge ee : gEdges)
-                    System.out.println("   -> "+ee+" "+ee.hashCode());
-                nogood = true;
-            }
-        }
-
-        for (DENOPTIMEdge ee : gEdges)
-        {
-            sb.append("all edge "+ee+" "+ee.hashCode()+NL);
-        }
-
-        try
-        {
-            DenoptimIO.writeData(fileName, sb.toString(), false);
-        } catch (DENOPTIMException e)
-        {
-            e.printStackTrace();
-        }
-        if (nogood)
-        {
-            System.out.println("NO GOOD");
-            System.exit(0);
-        }
-        System.out.println("Seems all good");
-    }
-
+ 
 //------------------------------------------------------------------------------
 
     /**
@@ -1207,18 +1145,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 is this really needed?
+    /**
+     * Wipes the data in this graph
+     */
     public void cleanup()
     {
         if (gVertices != null)
         {
-            if (!gVertices.isEmpty())
-            {
-                for (DENOPTIMVertex vtx : gVertices) {
-                    if (vtx != null)
-                        vtx.cleanup();
-                }
-            }
             gVertices.clear();
         }
         if (gEdges != null)
@@ -1232,6 +1165,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (symVertices != null)
         {
             symVertices.clear();
+        }
+        if (closableChains != null)
+        {
+            closableChains.clear();
         }
     }
     
@@ -2007,10 +1944,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 DENOPTIMEdge e = getEdgeList().get(j);
                 if (e.getSrcVertex() == vid) {
-                    e.setSrcVertex(nvid);
+                    e.getSrcAP().getOwner().setVertexId(nvid);
                 }
                 if (e.getTrgVertex() == vid) {
-                    e.setTrgVertex(nvid);
+                    e.getTrgAP().getOwner().setVertexId(nvid);
                 }
             }
         }

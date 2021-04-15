@@ -568,7 +568,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             {
                 for (DENOPTIMAttachmentPoint oAP : other.requiredAPs)
                 {
-                    if (tAP.comparePropertiesTo(oAP) != 0) 
+                    if (!tAP.sameAs(oAP)) 
                     {
                         reason.append("No required AP corresponding to "+tAP);
                         return false;

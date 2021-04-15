@@ -135,7 +135,6 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      */
     private static APClass getUnique(String rule, int subClass)
     {
-
         APClass newApc = new APClass();
         synchronized (uniqueAPClassesLock)
         {

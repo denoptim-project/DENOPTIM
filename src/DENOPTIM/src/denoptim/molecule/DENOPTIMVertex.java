@@ -147,7 +147,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     private boolean isRCV;
     
-    //TODO-V3 remove: get it from the graph
+    //TODO-V3 remove: get it from the graph. It is a property of a vertex in a 
+    // graph, not of a vertex in itself. Also, how is the level counted when
+    // we are after (or inside) a template?
     /*
      * if the level at which this vertex is in a graph
      */
@@ -573,7 +575,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             boolean found = false;
             for (DENOPTIMAttachmentPoint apO : other.getAttachmentPoints())
             {
-                if (apT.equals(apO))
+                if (apT.sameAs(apO))
                 {
                     found = true;
                     break;
@@ -893,6 +895,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     //TODO-V3. This method creates an empty APClass, which is not supposed to
     // exist. It must be possible to define an AP without an APClass!
     // This has to change!
+    // Alternatively, the 'unset' APClass is assumed by default and made
+    // incompatible with all and itself (to prevent undesired usage).
+    
     /**
      * Constructor
      * @param atomPositionNumber the index of the source atom (0-based)
@@ -1069,32 +1074,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3: consider removal. this is just a code stub written to test the
-    // possibility of having a custom serializer.
-/*
-    public static class DENOPTIMVertexSerializer
-    implements JsonSerializer<DENOPTIMVertex> {
-
-        @Override
-        public JsonElement serialize(DENOPTIMVertex src, Type typeOfSrc,
-                JsonSerializationContext context) {
-
-            JsonObject jsonObject = new JsonObject();
-            // src.owner creates a loop!
-            jsonObject.addProperty("vertexId", src.getVertexId());
-            jsonObject.addProperty("isRCV", src.isRCV());
-            jsonObject.addProperty("level", src.getLevel());
-            jsonObject.add("allowedMutatioTypes",
-                context.serialize(src.getMutationTypes()));
-
-
-            //JsonPrimitive jsonObject = new JsonPrimitive(src.vertexId);
-            return jsonObject;
-        }
-    }
-*/
-//------------------------------------------------------------------------------
-
     public static class DENOPTIMVertexDeserializer 
     implements JsonDeserializer<DENOPTIMVertex>
     {
@@ -1104,14 +1083,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         {
             JsonObject jsonObject = json.getAsJsonObject();
 
-            // Desiralization differs for the types of vertices
+            // Deseralization differs for the types of vertices
             // First, consider templates
             if (jsonObject.has("innerGraph"))
             {
-                //TODO-V3 log or del
-                System.out.println("DESERIALIZE Template "
-                        + jsonObject.get("vertexId"));
-
                 DENOPTIMTemplate tmpl = context.deserialize(jsonObject,
                         DENOPTIMTemplate.class);
 
@@ -1125,8 +1100,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                         innerGraphJson.toString());
                 tmpl.setInnerGraph(innerGraph);
 
-                // Is the following needed? I think so, because we need the IDs
-                // of outernAPs to be as defined in the json string.
+                // The IDs of outernAPs to be as defined in the json string.
 
                 //Recover innerToOuter APMap
                 Type type = new TypeToken<TreeMap<Integer,
@@ -1141,13 +1115,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             // Then, molecular fragments
             else if (jsonObject.has("fragmentType"))
             {
-                //TODO-V3 log or del
-                System.out.println("DESERIALIZE Fragment "
-                        + jsonObject.get("vertexId"));
-
                 DENOPTIMVertex v = null;
 
                 //TODO-V3?: serialize AtomContainer2 somehow (as an SDF string?)
+                // Perhaps, an ideia is to place a json version of the atom
+                // container only if the json string is meant to go in a .json file
+                // but not is it goes in an SDF file
 
                 // The serialized fragment does NOT include its molecular
                 // representation, which cannot be serialized (so far...)
@@ -1226,9 +1199,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             // Finally, vertices that are not "molecular" (empty vertex)
             else
             {
-                //TODO-V3 log or del
-                System.out.println("DESERIALIZE EmptyVertex "
-                        + jsonObject.get("vertexId"));
                 EmptyVertex ev = EmptyVertex.fromJson(jsonObject.toString());
                 return ev;
             }

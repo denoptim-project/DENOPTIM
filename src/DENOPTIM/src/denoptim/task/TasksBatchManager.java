@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 
 
 /**
@@ -49,7 +49,7 @@ public class TasksBatchManager
      * @throws DENOPTIMException
      */
 
-    public static ArrayList<DENOPTIMMolecule>
+    public static ArrayList<Candidate>
             executeTasks(final ArrayList<Task> tasks, int numOfProcessors)
                                                         throws DENOPTIMException
     {
@@ -114,14 +114,14 @@ public class TasksBatchManager
         });
 
 
-        ArrayList<DENOPTIMMolecule> results = new ArrayList<>();
+        ArrayList<Candidate> results = new ArrayList<>();
 
         try
         {
             for (int i=0; i<tasks.size(); i++)
             {
-                DENOPTIMMolecule taskResult =
-                                    (DENOPTIMMolecule) cservice.take().get();
+                Candidate taskResult =
+                                    (Candidate) cservice.take().get();
                 if (!taskResult.getUID().equals("UNDEFINED"))
                 {
                     results.add(taskResult);

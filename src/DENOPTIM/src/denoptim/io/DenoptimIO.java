@@ -112,7 +112,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -1443,13 +1443,13 @@ public class DenoptimIO
      * @throws DENOPTIMException is something goes wrong while reading the file
      *                           or interpreting its content
      */
-    public static ArrayList<DENOPTIMMolecule> readDENOPTIMMolecules(File file, 
+    public static ArrayList<Candidate> readDENOPTIMMolecules(File file, 
             boolean useFragSpace) throws DENOPTIMException {
         String filename = file.getAbsolutePath();
-        ArrayList<DENOPTIMMolecule> mols = new ArrayList<>();
+        ArrayList<Candidate> mols = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
         for (IAtomContainer iac : iacs) {
-            DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
+            Candidate mol = new Candidate(iac, useFragSpace);
             mol.setSDFFile(filename);
             mols.add(mol);
         }

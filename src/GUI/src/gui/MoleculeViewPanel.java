@@ -50,7 +50,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 
 
 /**
@@ -69,7 +69,7 @@ public class MoleculeViewPanel extends JSplitPane
 	/**
 	 * The currently loaded item
 	 */
-	private DENOPTIMMolecule item;
+	private Candidate item;
 	
 	/**
 	 * Flag controlling behavior in case of partial data 
@@ -322,7 +322,7 @@ public class MoleculeViewPanel extends JSplitPane
                     // so far, there is no case where the fully defined graph 
                     // is needed. We only need its string representation.
 					
-					item = new DENOPTIMMolecule(DenoptimIO.readMoleculeData(
+					item = new Candidate(DenoptimIO.readMoleculeData(
 							file.getAbsolutePath()).get(0),false,true);
 				} catch (DENOPTIMException e1) {
 					e1.printStackTrace();

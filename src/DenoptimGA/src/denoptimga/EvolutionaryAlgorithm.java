@@ -34,7 +34,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
@@ -87,7 +87,7 @@ public class EvolutionaryAlgorithm
         }
 
         // placeholder for the molecules
-        ArrayList<DENOPTIMMolecule> molPopulation = new ArrayList<>();
+        ArrayList<Candidate> molPopulation = new ArrayList<>();
         
         // then, get the molecules from the initial population file 
         String inifile = GAParameters.getInitialPopulationFile();
@@ -210,7 +210,7 @@ public class EvolutionaryAlgorithm
      * the population is updated with fitter structures
      * @throws DENOPTIMException
      */
-    private boolean evolvePopulation(ArrayList<DENOPTIMMolecule> molPopulation,
+    private boolean evolvePopulation(ArrayList<Candidate> molPopulation,
                                 String genDir) throws DENOPTIMException
     {
         // temporary store for inchi codes
@@ -223,11 +223,11 @@ public class EvolutionaryAlgorithm
 
         // keep a clone of the current population for the parents to be
         // chosen from.
-        ArrayList<DENOPTIMMolecule> clone_popln;
+        ArrayList<Candidate> clone_popln;
         synchronized (molPopulation)
         {
-            clone_popln = new ArrayList<DENOPTIMMolecule>();
-            for (DENOPTIMMolecule m : molPopulation)
+            clone_popln = new ArrayList<Candidate>();
+            for (Candidate m : molPopulation)
             {
                 clone_popln.add(m.clone());
             }
@@ -439,7 +439,7 @@ public class EvolutionaryAlgorithm
                     }
                     else if (addTask(tasks, molPopulation.size(), graph4, res, genDir, newPopSize, numTries))
                     {
-                        ArrayList<DENOPTIMMolecule> results =
+                        ArrayList<Candidate> results =
                                 TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
@@ -506,7 +506,7 @@ public class EvolutionaryAlgorithm
                     }
                     else if (addTask(tasks, molPopulation.size(), graph1, res1, genDir, newPopSize, numTries))
                     {
-                        ArrayList<DENOPTIMMolecule> results =
+                        ArrayList<Candidate> results =
                                 TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
@@ -571,7 +571,7 @@ public class EvolutionaryAlgorithm
                     }
                     else if (addTask(tasks, molPopulation.size(), graph2, res2, genDir, newPopSize, numTries))
                     {
-                        ArrayList<DENOPTIMMolecule> results =
+                        ArrayList<Candidate> results =
                                 TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
@@ -640,7 +640,7 @@ public class EvolutionaryAlgorithm
                     }
                     else if (addTask(tasks, molPopulation.size(), graph3, res3, genDir, newPopSize, numTries))
                     {
-                        ArrayList<DENOPTIMMolecule> results =
+                        ArrayList<Candidate> results =
                                 TasksBatchManager.executeTasks(tasks,
                                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
@@ -688,7 +688,7 @@ public class EvolutionaryAlgorithm
         // produced. If yes, return true
         boolean updated = false;
         
-        for (DENOPTIMMolecule mol : molPopulation)
+        for (Candidate mol : molPopulation)
         {
             if (!codes.contains(mol.getUID()))
             {
@@ -755,7 +755,7 @@ public class EvolutionaryAlgorithm
      * @throws DENOPTIMException
      */
 
-    private void initializePopulation(ArrayList<DENOPTIMMolecule> molPopulation,
+    private void initializePopulation(ArrayList<Candidate> molPopulation,
                                         String genDir) throws DENOPTIMException
     {
         final int MAX_TRIES = GAParameters.getPopulationSize() * 
@@ -876,7 +876,7 @@ GenUtils.pause();
                 // decrement tries
                 numTries += tasks.size();
 
-                ArrayList<DENOPTIMMolecule> results =
+                ArrayList<Candidate> results =
                         TasksBatchManager.executeTasks(tasks,
                                             GAParameters.getNumberOfCPU());
                 tasks.clear();
@@ -912,9 +912,9 @@ GenUtils.pause();
 
 //------------------------------------------------------------------------------
     
-    private void cleanup(ArrayList<DENOPTIMMolecule> popln)
+    private void cleanup(ArrayList<Candidate> popln)
     {
-        for (DENOPTIMMolecule mol:popln)
+        for (Candidate mol:popln)
             mol.cleanup();
         popln.clear();
     }

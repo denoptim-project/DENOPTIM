@@ -31,7 +31,7 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
@@ -44,7 +44,7 @@ import denoptim.utils.GraphConversionTool;
 public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
-    private volatile ArrayList<DENOPTIMMolecule> curPopln;
+    private volatile ArrayList<Candidate> curPopln;
     private volatile Integer numTry;
     
     /**
@@ -68,7 +68,7 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     public OffspringEvaluationTask(String molName, DENOPTIMGraph molGraph,
     		String inchi, String smiles, IAtomContainer iac, String workDir,
-            ArrayList<DENOPTIMMolecule> popln, Integer numTry, String fileUID)
+            ArrayList<Candidate> popln, Integer numTry, String fileUID)
     {
     	super(molGraph);
         this.molName = molName;

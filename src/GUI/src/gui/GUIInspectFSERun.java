@@ -72,7 +72,7 @@ import org.jfree.data.xy.XYDataset;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 
 
 /**
@@ -104,14 +104,14 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 	private JComboBox<String> cmbPlotType;
 	
-	private ArrayList<DENOPTIMMolecule> allItems;
+	private ArrayList<Candidate> allItems;
 	private int molsWithFitness = 0;
 	private int minLevel = 1;
 	private int maxLevel = -1;
 	private JLabel lblTotItems;
 	
-	private Map<Integer,DENOPTIMMolecule> mapCandsInByLevel;
-	private ArrayList<DENOPTIMMolecule> sorted;
+	private Map<Integer,Candidate> mapCandsInByLevel;
+	private ArrayList<Candidate> sorted;
 	
 	// WARNING: integer key in the map is is just a 
 	// locally generated unique 
@@ -315,7 +315,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		
 		System.out.println("Importing data from '" + folder + "'... ");
 		
-		allItems = new ArrayList<DENOPTIMMolecule>();
+		allItems = new ArrayList<Candidate>();
 		boolean skippFurtherErrors = false;
 		for (File molFile : folder.listFiles(new FileFilter() {
 			
@@ -333,7 +333,7 @@ public class GUIInspectFSERun extends GUICardPanel
 			}
 		}))
 		{			
-			DENOPTIMMolecule mol = new DENOPTIMMolecule();
+			Candidate mol = new Candidate();
 			try {
 				mol = DenoptimIO.readDENOPTIMMolecules(
 						molFile,false).get(0);
@@ -402,11 +402,11 @@ public class GUIInspectFSERun extends GUICardPanel
 		
 		// Process data and organize them into series for the plot
         double[][] candsWithFitnessDataPerLevel = new double[2][molsWithFitness];
-        mapCandsInByLevel = new HashMap<Integer,DENOPTIMMolecule>();
+        mapCandsInByLevel = new HashMap<Integer,Candidate>();
 		int j= -1;
         for (int i=0; i<allItems.size(); i++)
         {
-        	DENOPTIMMolecule mol = allItems.get(i);
+        	Candidate mol = allItems.get(i);
         	if (!mol.hasFitness())
         	{
         		continue;
@@ -423,10 +423,10 @@ public class GUIInspectFSERun extends GUICardPanel
         	candsWithFitnessDataPerLevel[1][j] = mol.getFitness();
         }
         
-        sorted = new ArrayList<DENOPTIMMolecule>();
+        sorted = new ArrayList<Candidate>();
         sorted.addAll(mapCandsInByLevel.values());
-        sorted.sort(new Comparator<DENOPTIMMolecule>() {
-			public int compare(DENOPTIMMolecule a, DENOPTIMMolecule b) {
+        sorted.sort(new Comparator<Candidate>() {
+			public int compare(Candidate a, Candidate b) {
 				return Double.compare(a.getFitness(),
 						b.getFitness());
 			}
@@ -435,7 +435,7 @@ public class GUIInspectFSERun extends GUICardPanel
         double[][] candsWithFitnessDataSorted = new double[2][molsWithFitness];
         for (int i=0; i<molsWithFitness; i++)
         {
-        	DENOPTIMMolecule mol = sorted.get(i);
+        	Candidate mol = sorted.get(i);
         	candsWithFitnessDataSorted[0][i] = i;
         	candsWithFitnessDataSorted[1][i] = mol.getFitness();
         }
@@ -602,7 +602,7 @@ public class GUIInspectFSERun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						DENOPTIMMolecule mol = mapCandsInByLevel.get(itemId);
+						Candidate mol = mapCandsInByLevel.get(itemId);
 						renderViewWithSelectedItem(mol);
 					}
 					//do we do anything if we select other series? not now...
@@ -628,7 +628,7 @@ public class GUIInspectFSERun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						DENOPTIMMolecule mol = sorted.get(itemId);
+						Candidate mol = sorted.get(itemId);
 						renderViewWithSelectedItem(mol);
 					}
 				}
@@ -653,7 +653,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void renderViewWithSelectedItem(DENOPTIMMolecule mol)
+	private void renderViewWithSelectedItem(Candidate mol)
 	{	
 		// NB: we just change the series of selected items
 		// The charts are updated automatically

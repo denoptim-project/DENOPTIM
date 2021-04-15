@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,8 +19,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 
 
@@ -775,7 +772,7 @@ public class DENOPTIMGraphTest {
             iac1.addBond(new Bond(ia1, ia2, IBond.Order.SINGLE));
             
             DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, 
-                    DENOPTIMVertex.BBType.SCAFFOLD);
+                    BBType.SCAFFOLD);
             v1.addAP(0, 1, 1);
             v1.addAP(0, 1, 1);
             v1.addAP(0, 1, 1);
@@ -784,20 +781,20 @@ public class DENOPTIMGraphTest {
             IAtomContainer iac2 = builder.newAtomContainer();
             iac2.addAtom(new Atom("O"));
             DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, 
-                    DENOPTIMVertex.BBType.FRAGMENT);
+                    BBType.FRAGMENT);
             v2.addAP(0, 1, 1);
             v2.addAP(0, 1, 1);
         
             IAtomContainer iac3 = builder.newAtomContainer();
             iac3.addAtom(new Atom("H"));
             DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, 
-                    DENOPTIMVertex.BBType.CAP);
+                    BBType.CAP);
             v3.addAP(0, 1, 1);
         
             IAtomContainer iac4 = builder.newAtomContainer();
             iac4.addAtom(new Atom("H"));
             DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, 
-                    DENOPTIMVertex.BBType.CAP);
+                    BBType.CAP);
             v4.addAP(0, 1, 1);
         
             graph.addVertex(v1);
@@ -830,30 +827,29 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testRemoveCapping() throws Exception {
 	    
-	    //TODO: use getEstGraph() method to make the test graphs
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 
 		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 		IAtomContainer iac1 = builder.newAtomContainer();
 		iac1.addAtom(new Atom("C"));
-		DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, DENOPTIMVertex.BBType.SCAFFOLD);
+		DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
 		v1.addAP(1, 1, 1);
 		v1.addAP(1, 1, 1);
 
 		IAtomContainer iac2 = builder.newAtomContainer();
 		iac2.addAtom(new Atom("O"));
-		DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, DENOPTIMVertex.BBType.FRAGMENT);
+		DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
 		v2.addAP(1, 1, 1);
 		v2.addAP(1, 1, 1);
 
 		IAtomContainer iac3 = builder.newAtomContainer();
 		iac3.addAtom(new Atom("H"));
-		DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, DENOPTIMVertex.BBType.CAP);
+		DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
 		v3.addAP(1, 1, 1);
 
 		IAtomContainer iac4 = builder.newAtomContainer();
 		iac4.addAtom(new Atom("H"));
-		DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, DENOPTIMVertex.BBType.CAP);
+		DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
 		v4.addAP(1, 1, 1);
 
 		graph.addVertex(v1);
@@ -882,24 +878,24 @@ public class DENOPTIMGraphTest {
 
 		IAtomContainer iac12 = builder.newAtomContainer();
 		iac12.addAtom(new Atom("C"));
-		DENOPTIMVertex v21 = new DENOPTIMFragment(21, iac12, DENOPTIMVertex.BBType.SCAFFOLD);
+		DENOPTIMVertex v21 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
 		v21.addAP(0, 1, 1);
 		v21.addAP(0, 1, 1);
 
 		IAtomContainer iac22 = builder.newAtomContainer();
 		iac22.addAtom(new Atom("O"));
-		DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, DENOPTIMVertex.BBType.FRAGMENT);
+		DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
 		v22.addAP(0, 1, 1);
 		v22.addAP(0, 1, 1);
 
 		IAtomContainer iac23 = builder.newAtomContainer();
 		iac23.addAtom(new Atom("H"));
-		DENOPTIMVertex v23 = new DENOPTIMFragment(23, iac23, DENOPTIMVertex.BBType.CAP);
+		DENOPTIMVertex v23 = new DENOPTIMFragment(23, iac23, BBType.CAP);
 		v23.addAP(0, 1, 1);
 
 		IAtomContainer iac24 = builder.newAtomContainer();
 		iac24.addAtom(new Atom("H"));
-		DENOPTIMVertex v24 = new DENOPTIMFragment(24, iac24, DENOPTIMVertex.BBType.CAP);
+		DENOPTIMVertex v24 = new DENOPTIMFragment(24, iac24, BBType.CAP);
 		v24.addAP(0, 1, 1);
 
 		graph2.addVertex(v21);
