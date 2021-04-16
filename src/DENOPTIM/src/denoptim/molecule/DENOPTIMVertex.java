@@ -1118,7 +1118,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 DENOPTIMVertex v = null;
 
                 //TODO-V3?: serialize AtomContainer2 somehow (as an SDF string?)
-                // Perhaps, an ideia is to place a json version of the atom
+                // Perhaps, an idea is to place a json version of the atom
                 // container only if the json string is meant to go in a .json file
                 // but not is it goes in an SDF file
 
@@ -1184,6 +1184,15 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     try
                     {
                         //TODO: should this be done in an APClassDeserializer?
+                        //TODO del
+                        APClass apc = APClass.make(ap.getAPClass().toString());
+                        if (ap.getAPClass().hashCode() != apc.hashCode())
+                        {
+
+                            System.out.println("DESER APC: "+ap.getAPClass().hashCode()+" "+apc.hashCode());
+                            System.exit(-1);
+                        }
+
                         ap.setAPClass(ap.getAPClass().toString());
                     } catch (DENOPTIMException e1)
                     {

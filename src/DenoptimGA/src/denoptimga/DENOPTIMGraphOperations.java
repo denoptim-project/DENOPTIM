@@ -431,7 +431,7 @@ public class DENOPTIMGraphOperations
                     continue;
                 }
             }
-
+            
             // find a compatible combination of fragment and AP
             IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVrtx, 
                     apId, chosenVrtxIdx, chosenApId);
@@ -695,7 +695,7 @@ public class DENOPTIMGraphOperations
         ArrayList<DENOPTIMAttachmentPoint> lstDaps =
                                               curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint curDap = lstDaps.get(dapidx);
-        
+
         // Initialize with an empty pointer
         IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
                 -1, -1);
@@ -894,7 +894,7 @@ if(debug)
     /**
      * Method to select fragments that increase the likeliness of generating
      * closable chains.
-     * TODO: only works for scaffold. neet to make it working for any type
+     * TODO: only works for scaffold. need to make it working for any type
      * of fragment
      */
 

@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
@@ -42,8 +41,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -56,9 +53,10 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexDeserializer;
+import denoptim.molecule.APClass.APClassDeserializer;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.PathSubGraph;
@@ -72,6 +70,7 @@ import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
+import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 
 
 /**
@@ -3305,13 +3304,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             JsonObject partialJsonObj = new JsonObject();
             partialJsonObj.add("graphId", jsonObject.get("graphId"));
             partialJsonObj.add("gVertices", jsonObject.get("gVertices"));
-            // Eventually, also the sym sets will become references...
+            // Eventually, also the sym sets will become references... so
+            // also for symVertices we'll have to go through the list and
+            // rebuild the references.
             partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
 
             Gson gson = new GsonBuilder()
-                .setExclusionStrategies(new DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap())
+                .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
                 .registerTypeAdapter(DENOPTIMVertex.class,
-                      new DENOPTIMVertex.DENOPTIMVertexDeserializer())
+                      new DENOPTIMVertexDeserializer())
+                .registerTypeAdapter(APClass.class, new APClassDeserializer())
                 .setPrettyPrinting()
                 .create();
 

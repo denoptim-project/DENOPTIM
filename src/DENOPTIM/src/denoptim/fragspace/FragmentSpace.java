@@ -677,26 +677,16 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * 
-     * @param aPC1
+     * Returns a list of APClasses compatible with the given APClass. The
+     * compatibility among classes is defined by the compatibility matrix
+     * @param apc
      * @return the list of compatible APClasses. Can be empty but not null.
      */
-    public static ArrayList<APClass> getCompatibleAPClasses(APClass aPC1)
-    {
-        if (compatMap.containsKey(aPC1))
+    public static ArrayList<APClass> getCompatibleAPClasses(APClass apc)
+    {   
+        if (compatMap!= null && compatMap.containsKey(apc))
         {
-            return compatMap.get(aPC1);
-        } else
-        {
-            // TODO-V3: now we need to do this because we cannot ensure that all
-            // instances of a specific APClass refer to the same object
-            for (APClass k : compatMap.keySet())
-            {
-                if (k.equals(aPC1))
-                {
-                    return compatMap.get(k);
-                }
-            }
+            return compatMap.get(apc);
         }
         return new ArrayList<APClass>();
     }

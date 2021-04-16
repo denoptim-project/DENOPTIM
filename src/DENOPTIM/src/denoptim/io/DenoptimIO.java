@@ -1378,13 +1378,6 @@ public class DenoptimIO
                     }
                     
                     APClass srcAPC = APClass.make(str[1]);
-                    /*
-                    ArrayList<APClass> trgAPCs = new ArrayList<APClass>();
-                    for (String s : str[2].split(","))
-                    {
-                        trgAPCs.add(APClass.make(s.trim()));
-                    }
-*/
 
                     String strRcn[] = str[2].split(",");
                     for (int i = 0; i < strRcn.length; i++) {
@@ -1916,7 +1909,7 @@ public class DenoptimIO
     public static DENOPTIMGraph readGraphfromSDFileIAC(IAtomContainer mol, 
             int molId, boolean useFS) throws DENOPTIMException
     {
-     // Something very similar is done also in DENOPTIMMolecule
+        // Something very similar is done also in Candidate
         DENOPTIMGraph g = null;
         Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
         Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
