@@ -1131,7 +1131,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 // The above has these issues:
                 // - mol in null
                 // - AP user/owner is null (fixed in graph deserializatrion)
-                // - APClass has wrong reference to new class (fixed below)
 
                 if (FragmentSpace.isDefined())
                 {
@@ -1176,28 +1175,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                             + "molecular representation. To avoid this, first "
                             + "define the fragment space, and then work with "
                             + "templates.");
-                }
-
-                // Fix the reference to unique APClass
-                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
-                {
-                    try
-                    {
-                        //TODO: should this be done in an APClassDeserializer?
-                        //TODO del
-                        APClass apc = APClass.make(ap.getAPClass().toString());
-                        if (ap.getAPClass().hashCode() != apc.hashCode())
-                        {
-
-                            System.out.println("DESER APC: "+ap.getAPClass().hashCode()+" "+apc.hashCode());
-                            System.exit(-1);
-                        }
-
-                        ap.setAPClass(ap.getAPClass().toString());
-                    } catch (DENOPTIMException e1)
-                    {
-                        throw new JsonParseException(e1);
-                    }
                 }
 
                 // WARNING: other fields, such as 'owner' and AP 'user' are

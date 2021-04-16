@@ -312,80 +312,6 @@ public class FragmentSpace
                     + "from file '" + fragFile + "'.", e);
         }
 
-        // TODO-MF del (used to create SDF versions of empty fragments
-        /*
-         * EmptyVertex ev = new EmptyVertex(999);
-         * ev.addAP(-1,1,1,APClass.make("EmptyAP", 0));
-         * ev.addAP(-1,1,1,APClass.make("EmptyAP", 0));
-         * ev.addAP(-1,1,1,APClass.make("EmptyAP", 1));
-         * ev.addAP(-1,1,1,APClass.make("EmptyAP", 2)); ArrayList<SymmetricSet>
-         * lst = new ArrayList<SymmetricSet>(); SymmetricSet ss = new
-         * SymmetricSet(new ArrayList<Integer>(Arrays.asList(0,1)));
-         * lst.add(ss); ev.setSymmetricAP(lst);
-         * 
-         * EmptyVertex ev2 = new EmptyVertex(12345);
-         * ev2.addAP(-1,1,1,APClass.make("EmptyAP", 0));
-         * ev2.addAP(-2,1,1,APClass.make("EmptyAP", 0));
-         * 
-         * fragmentLib.add(ev); fragmentLib.add(ev2);
-         * 
-         * DenoptimIO.writeVertices("/tmp/frags_and_templates.sdf",fragmentLib);
-         */
-
-        // TODO-V3: remove: tmp code just for devel phase
-        /*
-        if (FragmentSpaceParameters.useTemplates)
-        {
-            scaffoldLib = new ArrayList<>();
-            //scaffoldLib.add(DENOPTIMTemplate.getTestScaffoldTemplate());
-            appendVerticesToLibrary(new ArrayList<DENOPTIMVertex>(
-                    Arrays.asList(DENOPTIMTemplate.getTestScaffoldTemplate())), 
-                    BBType.SCAFFOLD, scaffoldLib);
-            
-//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplate());
-//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateBis());
-//            fragmentLib.add(DENOPTIMTemplate.getTestFragmentTemplateTris());
-            
-            appendVerticesToLibrary(new ArrayList<DENOPTIMVertex>(
-                    Arrays.asList(DENOPTIMTemplate.getTestFragmentTemplate(),
-                            DENOPTIMTemplate.getTestFragmentTemplateBis()
-                            , DENOPTIMTemplate.getTestFragmentTemplateTris()
-                            )), 
-                    BBType.FRAGMENT, fragmentLib);
-            
-            System.err.println("WARNING! Running TEMP CODE: Replaced scaffold "
-                    + "lib with single test template. Also appending one "
-                    + "template to the library of fragments.");
-
-            for (int i = 0; i < FragmentSpace.getFragmentLibrary().size(); i++)
-            {
-                DENOPTIMVertex v = FragmentSpace.getFragmentLibrary().get(i);
-                System.err.println(" " + i + ": " + v.getClass().getName());
-                if (v instanceof DENOPTIMTemplate)
-                {
-                    DENOPTIMTemplate t = (DENOPTIMTemplate) v;
-                    System.err.println("    Template ("
-                            + t.getInnerGraph().getVertexCount() + " frags):"
-                            + t.getInnerGraph());
-                }
-            }
-            
-            //TODO-MF del
-            DenoptimIO.writeVertices("/tmp/scaffolds.sdf",scaffoldLib);
-            DenoptimIO.writeVertices("/tmp/frags.sdf",fragmentLib);
-            
-            //TODO del
-            System.out.println("WRITTEN!");
-            
-          //TODO del
-            ArrayList<DENOPTIMVertex> wEmpty = convertsIACsToVertexes(
-                    DenoptimIO.readInLibraryOfFragments("/tmp/empty_mols.sdf","fragment"),
-                    BBType.FRAGMENT);
-            System.out.println("READ-IN!");
-
-        }
-         */
-
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());
     }
 
@@ -1096,11 +1022,11 @@ public class FragmentSpace
             }
         }
         
-        //TODO-V3: keep or trash?
         if (compatAps.size()==0)
         {
-            System.out.println("WARNING: No compatible AP found in the "
-                    + "fragment space for APClass '" + aPC1 + "'.");
+            DENOPTIMLogger.appLogger.log(Level.WARNING,"WARNING: No compatible "
+                    + "AP found in the fragment space for APClass '" 
+                    + aPC1 + "'.");
         }
         
         return compatAps;
@@ -1132,13 +1058,6 @@ public class FragmentSpace
                 compatFragAps
                         .addAll(FragmentSpace.getFragsWithAPClass(compClass));
             }
-        }
-
-        // TODO-V3: keep or trash?
-        if (compatFragAps.size() == 0)
-        {
-            System.out.println("WARNING: No compatible AP found in the "
-                    + "fragment space for APClass '" + aPC1 + "'.");
         }
 
         return compatFragAps;
