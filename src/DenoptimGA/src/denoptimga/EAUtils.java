@@ -772,45 +772,27 @@ public class EAUtils
                                 int dapIdx) throws DENOPTIMException
     {
         int lvl = curVertex.getLevel();
+        
+        DENOPTIMAttachmentPoint srcAP = curVertex.getAttachmentPoints()
+                .get(dapIdx);
 
-        APClass apcSrc =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
-        // locate the capping group for this rcn
+        APClass apcSrc = srcAP.getAPClass();
         APClass apcCap = getCappingGroup(apcSrc);
         
         if (apcCap != null)
         {
-
             int bbIdCap = getCappingFragment(apcCap);
 
             if (bbIdCap != -1)
             {
+                int capVertexId = GraphUtils.getUniqueVertexIndex();
                 DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), bbIdCap, DENOPTIMVertex.BBType.CAP);
+                        capVertexId, bbIdCap, 
+                        DENOPTIMVertex.BBType.CAP);
                 
-                capVrtx.setLevel(lvl+1);
-
-                //Get the index of the AP of the capping group to use
-                //(always the first and only AP)
-                DENOPTIMEdge edge = curVertex.connectVertices(
-                        capVrtx, dapIdx, 0, apcSrc, apcCap
-                );
-
-                if (edge != null)
-                {
-                    // add the fragment as a vertex
-                    molGraph.addVertex(capVrtx);
-
-                    molGraph.addEdge(edge);
-
-                    return capVrtx.getVertexId();
-                }
-                else
-                {
-                    String msg = "Unable to connect capping group "
-                                     + capVrtx + " to graph" + molGraph;
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
-                    throw new DENOPTIMException(msg);
-                }
+                molGraph.appendVertexOnAP(srcAP, capVrtx.getAP(0));
+                
+                return capVertexId;
             }
             else
             {

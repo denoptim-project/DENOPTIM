@@ -100,19 +100,10 @@ public class DENOPTIMTemplateTest
         
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vA);
-        g.addVertex(vB);
-        g.addVertex(vC);
-        g.addVertex(vRcvA);
-        g.addVertex(vRcvC);
-        
-        DENOPTIMEdge eAB = vA.connectVertices(vB, 0, 1);
-        DENOPTIMEdge eBC = vB.connectVertices(vC, 0, 1);
-        DENOPTIMEdge eARcvA = vA.connectVertices(vRcvA, 1, 0);
-        DENOPTIMEdge eCRcvC = vC.connectVertices(vRcvC, 0, 0);
-        g.addEdge(eAB);
-        g.addEdge(eBC);
-        g.addEdge(eARcvA);
-        g.addEdge(eCRcvC);
+        g.appendVertexOnAP(vA.getAP(0), vB.getAP(1));
+        g.appendVertexOnAP(vB.getAP(0), vC.getAP(1));
+        g.appendVertexOnAP(vA.getAP(1), vRcvA.getAP(0));
+        g.appendVertexOnAP(vC.getAP(0), vRcvC.getAP(0));
         
         DENOPTIMRing r = new DENOPTIMRing(new ArrayList<DENOPTIMVertex>(
                 Arrays.asList(vRcvA, vA, vB, vC, vRcvC)));
@@ -125,7 +116,8 @@ public class DENOPTIMTemplateTest
         
         DENOPTIMTemplate c = t.clone();
         
-        assertEquals(t.getFreeAPCount(),c.getFreeAPCount(),"Different #free APs");
+        assertEquals(t.getFreeAPCount(),c.getFreeAPCount(),
+                "Different #free APs");
         for (int i=0; i<t.getFreeAPCount(); i++)
         {
             DENOPTIMAttachmentPoint oriAP = t.getAP(i);
@@ -140,7 +132,8 @@ public class DENOPTIMTemplateTest
         
         DENOPTIMGraph oriIG = t.getInnerGraph();
         DENOPTIMGraph cloIG = c.getInnerGraph();
-        assertTrue(oriIG.hashCode() != cloIG.hashCode(),"InnerGraph graph hash");
+        assertTrue(oriIG.hashCode() != cloIG.hashCode(),
+                "InnerGraph graph hash");
         assertEquals(oriIG.getVertexCount(),
                 cloIG.getVertexCount(),"InnerGraph vertex count");
         for (int i=0; i<oriIG.getVertexCount(); i++)
@@ -195,9 +188,8 @@ public class DENOPTIMTemplateTest
         DENOPTIMVertex ch2Frag = getCH2Fragment();
         g = new DENOPTIMGraph();
         g.addVertex(ch2Frag);
-        g.addVertex(nestedTemp);
-        DENOPTIMEdge e = ch2Frag.connectVertices(nestedTemp);
-        g.addEdge(e);
+        g.appendVertexOnAP(ch2Frag.getAP(0), nestedTemp.getAP(0));
+        
         DENOPTIMTemplate outerTemp = new DENOPTIMTemplate(BBType.FRAGMENT);
         outerTemp.setInnerGraph(g);
 
@@ -393,9 +385,9 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testGetAttachmentPoints_returnsCorrectNumberOfAPs() {
-        // Einar: Prevents nullpointer exception later
-        RandomUtils.initialiseRNG(13);
+    public void testGetAttachmentPoints_returnsCorrectNumberOfAPs() 
+            throws DENOPTIMException 
+    {
         DENOPTIMTemplate template = 
                 new DENOPTIMTemplate(BBType.NONE);
         int requiredAPCount = 2;
@@ -415,10 +407,9 @@ public class DENOPTIMTemplateTest
         for (int i = 0; i < v2APCount; i++) {
             v2.addAP(atmPos, atmConns, apConns);
         }
-        v1.connectVertices(v2);
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v1);
-        innerGraph.addVertex(v2);
+        innerGraph.appendVertexOnAP(v1.getAP(0), v2.getAP(0));
         template.setInnerGraph(innerGraph);
 
 //        System.err.println(innerGraph.getAvailableAPs().toString());

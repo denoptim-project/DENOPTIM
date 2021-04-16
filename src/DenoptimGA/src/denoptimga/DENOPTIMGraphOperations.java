@@ -486,6 +486,12 @@ public class DENOPTIMGraphOperations
             {
                 symVerts.add(curVrtId);
             }
+            
+            int maxVIdInGrph = molGraph.getMaxVertexId();
+            if (GraphUtils.getUniqueVertexIndex() <= maxVIdInGrph)
+            {
+                GraphUtils.resetUniqueVertexCounter(maxVIdInGrph+1);
+            }
 
             // loop on all symmetric vertices, but can be only one.
             SymmetricSet newSymSetOfVertices = new SymmetricSet();
@@ -505,36 +511,22 @@ public class DENOPTIMGraphOperations
                     DENOPTIMAttachmentPoint symAP = parVrt.getAttachmentPoints()
                             .get(symApId);
                     
-                    if (!parVrt.getAttachmentPoints().get(
-                                                        symApId).isAvailable())
+                    if (!symAP.isAvailable())
                     {
                         continue;
                     }
 
                     // Finally add the fragment on a symmetric AP
-                    int newVrtId = attachNewFragmentAtAP(molGraph, parVrt,
-                                                        symApId,chosenFrgAndAp);
-                    if (newVrtId != -1)
-                    {
-                        if (debug)
-                        {
-                            System.err.println("Added fragment " + newVrtId 
-                                    + " on " + typ + " AP-" + symApId 
-                                    + " of vertex " + parVrtId);
-                        }
-                    }
-                    else
-                    {
-                        String msg = "BUG: Unsuccesfull fragment add on "
-                                        + typ + " AP. Please, report this bug. "
-                                        + "Growing graph: " + molGraph 
-                                        + System.getProperty("line.separator") 
-                                        + "Vertex/AP on growing graph: " 
-                                        + chosenFrgAndAp;
-                        DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                        throw new DENOPTIMException(msg);
-                    }
-
+                    int newVrtId = GraphUtils.getUniqueVertexIndex();
+                    DENOPTIMVertex fragVertex = 
+                            DENOPTIMVertex.newVertexFromLibrary(newVrtId, 
+                                    chosenFrgAndAp.getVertexMolId(), 
+                                    BBType.FRAGMENT);
+                    DENOPTIMAttachmentPoint trgAP = fragVertex.getAP(
+                            chosenFrgAndAp.getApId());
+                    
+                    molGraph.appendVertexOnAP(symAP, trgAP);
+                    
                     addedVertices.add(newVrtId);
                     newSymSetOfVertices.add(newVrtId);
                 }
@@ -568,87 +560,6 @@ public class DENOPTIMGraphOperations
 
         return status;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Attaches the specified fragment to the vertex
-     * @param molGraph
-     * @param curVertex the vertex to which a fragment is to be attached
-     * @param dapIdx index of the AP at which the fragment is to be attached
-     * @param chosenFrgAndAp index identifying the incoming fragment
-     * @return the id of the new vertex created
-     * @throws DENOPTIMException
-     */
-    
-    protected static int attachNewFragmentAtAP
-                              (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex,
-                                    int dapIdx, IdFragmentAndAP chosenFrgAndAp)
-                                                        throws DENOPTIMException
-    {
-        // Define the new vertex
-        int fid = chosenFrgAndAp.getVertexMolId();
-        int maxVIdInGrph = molGraph.getMaxVertexId();
-        int nvid = GraphUtils.getUniqueVertexIndex();
-        if (nvid <= molGraph.getMaxVertexId())
-        {
-            GraphUtils.resetUniqueVertexCounter(maxVIdInGrph+1);
-            nvid = GraphUtils.getUniqueVertexIndex();
-        }
-        DENOPTIMVertex fragVertex = DENOPTIMVertex.newVertexFromLibrary(nvid, 
-                fid, BBType.FRAGMENT);
-        
-        // update the level of the vertex based on its parent
-        int lvl = curVertex.getLevel();
-        fragVertex.setLevel(lvl+1);
-        
-        //TODO-V3: check that symmetry is indeed defined in the vertex upon creation
-        
-        /*
-        DENOPTIMVertex mol = FragmentSpace.getFragmentLibrary().get(fid);
-        ArrayList<SymmetricSet> simAP = mol.getSymmetricAPsSets();
-        fragVertex.setSymmetricAP(simAP);
-        */
-        
-        // get source: where the new fragment is going to be attached
-        ArrayList<DENOPTIMAttachmentPoint> lstDaps =
-                                                curVertex.getAttachmentPoints();
-        DENOPTIMAttachmentPoint curDap = lstDaps.get(dapIdx);
-
-        // make new edge connecting the current vertex with the new one
-        DENOPTIMEdge edge;
-        if (!FragmentSpace.useAPclassBasedApproach())
-        {
-            // connect a randomly selected AP of this fragment
-            // to the current vertex
-            edge = curVertex.connectVertices(fragVertex);
-        }
-        else
-        {
-            int fapidx = chosenFrgAndAp.getApId();
-            APClass srcAPC = curDap.getAPClass();
-            APClass trgAPC = fragVertex.getAttachmentPoints().get(fapidx).getAPClass();
-
-            edge = curVertex.connectVertices(
-                    fragVertex,
-                    dapIdx,
-                    fapidx,
-                    srcAPC,
-                    trgAPC);
-        }
-
-        if (edge != null)
-        {
-            // add the fragment as a vertex
-            molGraph.addVertex(fragVertex);
-
-            molGraph.addEdge(edge);
-
-            return fragVertex.getVertexId();
-        }
-
-        return -1;
-    }
     
 //------------------------------------------------------------------------------
 
@@ -657,8 +568,8 @@ public class DENOPTIMGraphOperations
      * Compatibility can either be class based or based on the free connections
      * @param curVertex the source graph vertex
      * @param dapidx the attachment point index on the src vertex
-     * @return the vector of indeces identifying the molId (fragment index) 
-     * os a fragment with a compatible attachment point, and the index of such 
+     * @return the vector of indexes identifying the molId (fragment index) 
+     * of a fragment with a compatible attachment point, and the index of such 
      * attachment point.
      * @throws DENOPTIMException
      */
@@ -783,12 +694,15 @@ if(debug)
 //TODO del
 if(debug)
     System.out.println("Before attach: "+molGraph);
-                int newvid = GraphUtils.attachNewFragmentAtAPWithAP(molGraph,
-                                                                  curVertex,
-                                                                   dapidx,
-                                                                   molIdNewFrag,
-                                                                   typeNewFrag,
-                                                                   dapNewFrag);
+
+                
+                int newvid = GraphUtils.getUniqueVertexIndex();
+                DENOPTIMVertex newVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                        newvid, molIdNewFrag, typeNewFrag);
+                
+                molGraph.appendVertexOnAP(curVertex.getAP(dapidx), 
+                        newVrtx.getAP(dapNewFrag));
+                
 //TODO del
 if(debug)
     System.out.println("After attach: "+molGraph);

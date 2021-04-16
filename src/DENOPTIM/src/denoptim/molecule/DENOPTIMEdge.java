@@ -313,7 +313,6 @@ public class DENOPTIMEdge implements Serializable
             TRIPLE.valenceUsed = 3;
             QUADRUPLE.valenceUsed = 4;
 
-            //TODO-V3 del
             SINGLE.oldString = "1";
             DOUBLE.oldString = "2";
             TRIPLE.oldString = "3";

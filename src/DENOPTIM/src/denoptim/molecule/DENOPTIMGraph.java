@@ -2389,7 +2389,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Append a vertex to this graph. Does not clone the incoming vertex.
+     * Append a vertex to this graph: adds the new vertex to the list of 
+     * vertexes belonging to the graph, and adds the resulting edge to the graph.
+     * Does not clone the incoming vertex.
      * Does not project on symmetrically related vertices or
      * attachment points. No change in symmetric sets, apart from importing
      * those sets that are already defined in the incoming vertex.

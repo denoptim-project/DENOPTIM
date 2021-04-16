@@ -369,26 +369,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    /**
-     *
-     * @return list of attachment points that have free valences
-     */
-
-    //TODO-V3 get rid of this. Use references
-    @Deprecated
-    public ArrayList<Integer> getFreeAPList()
-    {
-        ArrayList<Integer> lstAvailableAP = new ArrayList<>();
-        for (int i=0; i<getAttachmentPoints().size(); i++)
-        {
-            if (getAttachmentPoints().get(i).isAvailable())
-                lstAvailableAP.add(i);
-        }
-        return lstAvailableAP;
-    }
-
-//------------------------------------------------------------------------------
-
     public int getFreeAPCount()
     {
         int n = 0;
@@ -453,15 +433,21 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 this should never be called to make string representation of graph
-    // So, do we keep this method?
+    /**
+     * Produces a human readable, short string to represent the vertex by its
+     * vertex ID, building block ID (1-based), building block type, and level
+     * in the graph (if any). This is the old syntax used up to version 2 for
+     * reporting a vertex in the string representation of a graph. Such notation
+     * cannot hold all the information needed to define a template, and is,
+     * therefore, obsolete. Use JSON format to serialize a graph that may
+     * contain templates.
+     */
     
     @Override
     public String toString()
     {
-        return vertexId + "_ABS_VERTEX";
-        //return vertexId + "_" + (buildingBlockId + 1) + "_" +
-        //        buildingBlockType + "_" + recursiveLevel;
+        return vertexId  + (buildingBlockId + 1) + "_" 
+                + buildingBlockType.toOldInt() + "_" + level;
     }
 
 //------------------------------------------------------------------------------
@@ -680,130 +666,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    /**
-     * Connects this vertex to target by an edge based on reaction type.
-     * @param target target vertex
-     * @param sourceAPIndex index of Attachment point in source vertex
-     * @param targetAPIndex index of Attachment point in target vertex
-     * @return DENOPTIMEdge
-     */
-    
-    //TODO-V3 also this is tmp: will be replaced once AP owner will be available
-
-    @Deprecated
-    public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
-                                        int sourceAPIndex,
-                                        int targetAPIndex) 
-    {
-        DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
-                .get(sourceAPIndex);
-        
-        DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
-                .get(targetAPIndex);
-        
-        return new DENOPTIMEdge(sourceAP,targetAP);
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Connects this vertex to target by an edge based on reaction type.
-     * @param target target vertex
-     * @param sourceAPIndex index of Attachment point in source vertex
-     * @param targetAPIndex index of Attachment point in target vertex
-     * @param srcAPC the reaction scheme at the source
-     * @param trgAPC the reaction scheme at the target
-     * @return DENOPTIMEdge
-     */
-    
-    //TODO-V3 get rid of this once edge constructor will not need all these details
-    //TODO-M6 should be able to get rid of it
-    @Deprecated
-    public DENOPTIMEdge connectVertices(DENOPTIMVertex target,
-                                        int sourceAPIndex,
-                                        int targetAPIndex,
-                                        APClass srcAPC,
-                                        APClass trgAPC
-    ) {
-        //System.err.println("Connecting vertices RCN");
-        DENOPTIMAttachmentPoint sourceAP = getAttachmentPoints()
-                .get(sourceAPIndex);
-        DENOPTIMAttachmentPoint targetAP = target.getAttachmentPoints()
-                .get(targetAPIndex);
-
-        if (sourceAP.isAvailable() && targetAP.isAvailable())
-        {
-            String rname = trgAPC.getRule();
-
-            // look up the reaction bond order table
-            BondType bndTyp = FragmentSpace.getBondOrderForAPClass(rname);
-
-            // create a new edge (this also updated AP valence count)
-            DENOPTIMEdge edge = new DENOPTIMEdge(sourceAP, targetAP, bndTyp);
-
-            return edge;
-        } else {
-            System.err.println("ERROR! Attempt to make edge using unavailable "
-                    + "APs!"
-                    + System.getProperty("line.separator")
-                    + "Vertex: "+getVertexId()
-                    +" AP-A(available:"+sourceAP.isAvailable()+"): "+sourceAP
-                    + System.getProperty("line.separator")
-                    + "Vertex: "+target.getVertexId()
-                    +" AP-B(available:"+targetAP.isAvailable()+"): "+targetAP);
-        }
-        return null;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * connects this vertex to other using any randomly chosen pair of 
-     * attachment points.
-     * @param other vertex.
-     * @return edge connecting the vertices.
-     */
-
-    //TODO-V3 test this in the non-APClass based approach
-    @Deprecated
-    public DENOPTIMEdge connectVertices(DENOPTIMVertex other)
-    {
-        ArrayList<Integer> apA = getFreeAPList();
-        ArrayList<Integer> apB = other.getFreeAPList();
-
-        if (apA.isEmpty() || apB.isEmpty())
-            return null;
-
-        // select random APs - these are the indices in the list
-        MersenneTwister rng = RandomUtils.getRNG();
-
-        // int iA = apA.get(GAParameters.getRNG().nextInt(apA.size()));
-        // int iB = apB.get(GAParameters.getRNG().nextInt(apB.size()));
-        int iA = apA.get(rng.nextInt(apA.size()));
-        int iB = apB.get(rng.nextInt(apB.size()));
-
-        DENOPTIMAttachmentPoint dap_A = getAttachmentPoints().get(iA);
-        DENOPTIMAttachmentPoint dap_B = other.getAttachmentPoints().get(iB);
-
-        //TODO-V3 test this if block
-        
-        int chosenBO = 1;
-        if (dap_A.getFreeConnections()>1 && dap_B.getFreeConnections()>1)
-        {
-            int maxBO = Math.max(dap_A.getFreeConnections(), 
-                    dap_B.getFreeConnections());
-            chosenBO = rng.nextInt(maxBO-1) + 1;
-        }
-        
-        // create a new edge
-        DENOPTIMEdge edge = new DENOPTIMEdge(getAP(iA), other.getAP(iB),
-                BondType.parseInt(chosenBO));
-        
-        return edge;
-    }
-
-//------------------------------------------------------------------------------
-
     public void resetGraphOwner()
     {
         this.owner = null;
@@ -872,6 +734,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Adds an attachment point with a dummy APClass and dummy properties.
+     * This is used only for testing purposes.
+     */
     public void addAP() {
         addAP(0, 0, 0);
     }
@@ -879,7 +745,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor
+     * Adds an attachment point with a dummy APClass.
      * @param atomPositionNumber the index of the source atom (0-based)
      * @param atomConnections the total number of connections
      * @param apConnections the number of free connections
@@ -892,14 +758,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3. This method creates an empty APClass, which is not supposed to
-    // exist. It must be possible to define an AP without an APClass!
-    // This has to change!
-    // Alternatively, the 'unset' APClass is assumed by default and made
-    // incompatible with all and itself (to prevent undesired usage).
-    
     /**
-     * Constructor
+     * Adds an attachment point with a dummy APClass.
      * @param atomPositionNumber the index of the source atom (0-based)
      * @param atomConnections the total number of connections
      * @param apConnections the number of free connections
@@ -923,7 +783,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor
+     * Adds an attachment point.
      * @param atomPositionNumber the index of the source atom (0-based)
      * @param atomConnections the total number of connections
      * @param apConnections the number of free connections
