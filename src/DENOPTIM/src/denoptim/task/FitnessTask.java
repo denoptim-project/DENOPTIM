@@ -73,18 +73,21 @@ public abstract class FitnessTask extends Task
     /**
      * The file where we store the input to the fitness provider.
      */
-    protected String fitProvInputFile = "noName.sdf";
+    protected String fitProvInputFile = "noName"
+            + DENOPTIMConstants.FITFILENAMEEXTIN;
     
     /**
      * The file where we store the final output from the fitness provider.
      */
-    protected String fitProvOutFile = "noName.sdf";
+    protected String fitProvOutFile = "noName" 
+            + DENOPTIMConstants.FITFILENAMEEXTOUT;
     
     /**
      * The file where we store the a graphical representation of the candidate 
      * (i.e., a picture).
      */
-    protected String fitProvPNGFile = "noName.png";
+    protected String fitProvPNGFile = "noName"
+            + DENOPTIMConstants.CANDIDATE2DEXTENSION;
     
     /**
      * The file where we store the list of unique identifiers or previously 
@@ -127,7 +130,8 @@ public abstract class FitnessTask extends Task
     	}
         
         if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
-        		fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG).toString().equals(""))
+        		fitProvMol.getProperty(
+        		        DENOPTIMConstants.GMSGTAG).toString().equals(""))
         {
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }

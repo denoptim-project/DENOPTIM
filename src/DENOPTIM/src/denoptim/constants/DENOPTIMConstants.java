@@ -175,6 +175,11 @@ public final class DENOPTIMConstants
     public static final String FITFILENAMEEXTOUT = "_out.sdf";
     
     /**
+     * Extension of output file with 2D picture of candidate
+     */
+    public static final String CANDIDATE2DEXTENSION = ".png";    
+    
+    /**
      * Label used to point at text based graph format
      */
     public static final String GRAPHFORMATSTRING = "STRING";

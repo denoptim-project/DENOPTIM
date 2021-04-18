@@ -63,7 +63,7 @@ then
     exit 1
 fi
 
-n=0;n=$(grep -i -l Zagreb "$wrkDir"/RUN*/*/*FIT.sdf | wc -l | awk '{print $1}')
+n=0;n=$(grep -i -l Zagreb "$wrkDir"/RUN*/*/*_out.sdf | wc -l | awk '{print $1}')
 if [ 15 -gt $n ]
 then
     echo " "
@@ -71,7 +71,7 @@ then
     exit 1
 fi
 
-n=0;n=$(grep -l FITNESS "$wrkDir"/RUN*/*/*FIT.sdf | wc -l | awk '{print $1}')
+n=0;n=$(grep -l FITNESS "$wrkDir"/RUN*/*/*_out.sdf | wc -l | awk '{print $1}')
 if [ 15 -gt $n ]
 then
     echo " "

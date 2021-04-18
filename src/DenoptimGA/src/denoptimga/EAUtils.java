@@ -618,10 +618,9 @@ public class EAUtils
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
         
-        //TODO-V3: did we pick a template? Then, if it is we'll have to deal with it.
-        // as we can pick a template in other graph operations, the dealing of the template
-        // should be a public method or something that can be called from elsewhere
-        
+        //TODO-V3: did we pick a template? Then, we'll have to deal with it:
+        // meaning, if the template has a fully finished content, it just behaves as
+        // a normal vertex, otherwise it has to be filled with content.
         
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
@@ -838,7 +837,6 @@ public class EAUtils
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();
 
-//TODO decide to make optional
         boolean onlyRandomCombOfRings = true;
         if (onlyRandomCombOfRings)
         {
@@ -1203,8 +1201,6 @@ public class EAUtils
                 return null;
             }
         }
-
-//TODO make room for more optional filtering criteria?
         
         if (RingClosureParameters.allowRingClosures())
         {

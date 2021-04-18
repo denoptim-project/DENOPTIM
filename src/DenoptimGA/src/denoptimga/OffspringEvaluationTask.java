@@ -82,10 +82,12 @@ public class OffspringEvaluationTask extends FitnessTask
         result.setSmiles(smiles);
         
         // Define pathnames to files used/produced by fitness provider
-        //TODO use constants
-        fitProvOutFile = this.workDir + SEP + this.molName + "_FIT.sdf";
-        fitProvInputFile = this.workDir + SEP + this.molName + "_I.sdf";
-        fitProvPNGFile = this.workDir + SEP + this.molName + ".png";
+        fitProvOutFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvInputFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTIN;
+        fitProvPNGFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.CANDIDATE2DEXTENSION;
         fitProvUIDFile = fileUID;
     }
 
@@ -104,11 +106,10 @@ public class OffspringEvaluationTask extends FitnessTask
             try {
                 DENOPTIMGraph gWithNoRCVs = dGraph.clone();
                 GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
-            	// TODO-V3
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree
             	// 2) remove RCAs
-            	// 3) remove dummy in multy hapto
+            	// 3) remove dummy in multi-hapto
             	// 4) remove dummy in linearities
             	// All this should be done within the TreeBuilder3D and 
             	// controlled by flags. Obviously, if we remove all these 
