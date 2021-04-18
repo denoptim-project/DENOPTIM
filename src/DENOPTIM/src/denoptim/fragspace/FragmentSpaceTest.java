@@ -25,9 +25,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import javax.vecmath.Point3d;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
@@ -37,8 +39,12 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.SymmetricSet;
+import denoptim.utils.GraphUtils;
 import denoptim.molecule.DENOPTIMVertex;
 
 /**
@@ -49,33 +55,46 @@ import denoptim.molecule.DENOPTIMVertex;
 
 public class FragmentSpaceTest
 {
-    private final String SEP = System.getProperty("file.separator");
+    private static final String SEP = System.getProperty("file.separator");
 
     @TempDir 
-    File tempDir;
+    static File tempDir;
     
-	private final String APSUBRULE = "0";
+	private static final String APSUBRULE = "0";
 
-    private final String RULAPCS = "apc-S";
-    private final String RULAPC1 = "apc-1";
-    private final String RULAPC2 = "apc-2";
-    private final String RULAPC3 = "apc-3";
-    private final String RULAPCC1 = "cap-1";
-    private final String RULAPCC2 = "cap-2";
+    private static final String RULAPCS = "apc-S";
+    private static final String RULAPC1 = "apc-1";
+    private static final String RULAPC2 = "apc-2";
+    private static final String RULAPC3 = "apc-3";
+    private static final String RULAPC4 = "apc-4";
+    private static final String RULAPC5 = "apc-5";
+    private static final String RULAPC6 = "apc-6";
+    private static final String RULAPCC1 = "cap-1";
+    private static final String RULAPCC2 = "cap-2";
     
-    private final DENOPTIMVertex.BBType BBTFRAG = DENOPTIMVertex.BBType.FRAGMENT;
+    private static final BBType BBTFRAG = BBType.FRAGMENT;
     
-	private APClass APCS;
-	private APClass APC1;
-	private APClass APC2;
-	private APClass APC3;
-	private APClass APCC1;
-	private APClass APCC2;
+	private static APClass APCS;
+	private static APClass APC1;
+	private static APClass APC2;
+	private static APClass APC3;
+    private static APClass APC4;
+    private static APClass APC5;
+    private static APClass APC6;
+	private static APClass APCC1;
+	private static APClass APCC2;
 
 //------------------------------------------------------------------------------
+	/*
+	 * Ideally this could be run once before all tests of this class. However,
+	 * attempts to use @BeforeAll have shown that the static FragmentSpace does 
+	 * not remain defined after for all tests. As a workaround, the definition
+	 * of the fragment space is run @BeforeEach test.
+	 */
+	@BeforeEach
 	private void buildFragmentSpace() throws DENOPTIMException
 	{
-	    assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+	    assertTrue(tempDir.isDirectory(),"Should be a directory ");
 	    
         try
         {
@@ -87,6 +106,12 @@ public class FragmentSpaceTest
                 + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
             APC3 = APClass.make(RULAPC3
                 + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC4 = APClass.make(RULAPC4
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC5 = APClass.make(RULAPC5
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC6 = APClass.make(RULAPC6
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
             APCC1 = APClass.make(RULAPCC1
                 + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
             APCC2 = APClass.make(RULAPCC2
@@ -101,6 +126,9 @@ public class FragmentSpaceTest
         boMap.put(RULAPC1,BondType.SINGLE);
         boMap.put(RULAPC2,BondType.SINGLE);
         boMap.put(RULAPC3,BondType.SINGLE);
+        boMap.put(RULAPC4,BondType.SINGLE);
+        boMap.put(RULAPC5,BondType.SINGLE);
+        boMap.put(RULAPC6,BondType.DOUBLE);
         boMap.put(RULAPCC1,BondType.SINGLE);
         boMap.put(RULAPCC2,BondType.SINGLE);
         
@@ -145,53 +173,72 @@ public class FragmentSpaceTest
         frg3.projectAPsToProperties();
         fragLib.add(frg3);
         
+        DENOPTIMFragment frg8 = new DENOPTIMFragment();
+        Atom a81 = new Atom("C", new Point3d(new double[]{0.0, 1.1, -2.2}));
+        Atom a82 = new Atom("C", new Point3d(new double[]{1.0, 1.1, -2.2}));
+        Atom a83 = new Atom("C", new Point3d(new double[]{2.0, 1.1, -2.2}));
+        frg8.addAtom(a81);
+        frg8.addAtom(a82);
+        frg8.addAtom(a83);
+        frg8.addBond(new Bond(a81, a82));
+        frg8.addBond(new Bond(a82, a83));
+        frg8.addAPOnAtom(a83, APC4, new Point3d(new double[]{0.0, 2.2, -3.3}));
+        frg8.addAPOnAtom(a83, APC4, new Point3d(new double[]{0.0, 0.0, -3.3}));
+        frg8.addAPOnAtom(a83, APC6, new Point3d(new double[]{0.0, 0.0, -1.1}));
+        frg8.addAPOnAtom(a82, APC5, new Point3d(new double[]{1.0, 0.1, -2.2}));
+        frg8.addAPOnAtom(a82, APC5, new Point3d(new double[]{1.0, 0.1, -1.2}));
+        frg8.addAPOnAtom(a82, APC5, new Point3d(new double[]{1.0, 2.1, -2.2}));
+        frg8.addAPOnAtom(a81, APC5, new Point3d(new double[]{3.0, 0.0, -3.3}));
+        frg8.projectAPsToProperties();
+        fragLib.add(frg8);
+        
         String fragLibFile = rootName + "frags.sdf";
         DenoptimIO.writeFragmentSet(fragLibFile, fragLib);
         
     	ArrayList<DENOPTIMFragment> scaffLib = new ArrayList<DENOPTIMFragment>();
-        DENOPTIMFragment frg4 = new DENOPTIMFragment();
+        DENOPTIMFragment scaf0 = new DENOPTIMFragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a43 = new Atom("Ru", new Point3d(new double[]{2.0, 1.1, 2.2}));
-        frg4.addAtom(a41);
-        frg4.addAtom(a42);
-        frg4.addAtom(a43);
-        frg4.addBond(new Bond(a41, a42));
-        frg4.addBond(new Bond(a42, a43));
-        frg4.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg4.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        frg4.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        frg4.addAPOnAtom(a41, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
-        frg4.projectAPsToProperties();
+        scaf0.addAtom(a41);
+        scaf0.addAtom(a42);
+        scaf0.addAtom(a43);
+        scaf0.addBond(new Bond(a41, a42));
+        scaf0.addBond(new Bond(a42, a43));
+        scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        scaf0.addAPOnAtom(a41, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        scaf0.projectAPsToProperties();
         // NB: in the sorted list the last AP is first!
-        scaffLib.add(frg4);
+        scaffLib.add(scaf0);
         
-        DENOPTIMFragment frg5 = new DENOPTIMFragment();
+        DENOPTIMFragment scaf1 = new DENOPTIMFragment();
         Atom a51 = new Atom("Zn", new Point3d(new double[]{5.0, 1.1, 2.2}));
-        frg5.addAtom(a51);
-        frg5.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
-        frg5.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
-        frg5.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
-        frg5.projectAPsToProperties();
-        scaffLib.add(frg5);
+        scaf1.addAtom(a51);
+        scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
+        scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
+        scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
+        scaf1.projectAPsToProperties();
+        scaffLib.add(scaf1);
         
         String scaffLibFile = rootName + "scaff.sdf";
         DenoptimIO.writeFragmentSet(scaffLibFile, scaffLib);
         
         ArrayList<DENOPTIMFragment> cappLib = new ArrayList<DENOPTIMFragment>();
-        DENOPTIMFragment frg6 = new DENOPTIMFragment();
+        DENOPTIMFragment cap1 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
-        frg6.addAtom(a61);
-        frg6.addAPOnAtom(a61, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
-        frg6.projectAPsToProperties();
-        cappLib.add(frg6);
+        cap1.addAtom(a61);
+        cap1.addAPOnAtom(a61, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
+        cap1.projectAPsToProperties();
+        cappLib.add(cap1);
         
-        DENOPTIMFragment frg7 = new DENOPTIMFragment();
+        DENOPTIMFragment cap2 = new DENOPTIMFragment();
         Atom a71 = new Atom("Cl", new Point3d(new double[]{10.0, 1.1, 2.2}));
-        frg7.addAtom(a71);
-        frg7.addAPOnAtom(a71, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
-        frg7.projectAPsToProperties();
-        cappLib.add(frg7);
+        cap2.addAtom(a71);
+        cap2.addAPOnAtom(a71, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
+        cap2.projectAPsToProperties();
+        cappLib.add(cap2);
 
         String capLibFile = rootName + "caps.sdf";
         DenoptimIO.writeFragmentSet(capLibFile, cappLib);
@@ -231,12 +278,35 @@ public class FragmentSpaceTest
     	        cpmFile);
 	}
 	
+//-----------------------------------------------------------------------------        
+    
+    @Test
+    public void testSymmetry() throws Exception
+    {
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+        DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(),3,BBType.FRAGMENT);
+        
+        assertEquals(2,v.getSymmetricAPSets().size(),
+                "Number of symmetric sets of APs");
+        
+        Map<APClass,Integer> expectedCount = new HashMap<APClass,Integer>();
+        expectedCount.put(APC4, 2);
+        expectedCount.put(APC5, 3);
+        for (SymmetricSet ss : v.getSymmetricAPSets())
+        {
+            APClass apc = v.getAP(ss.get(0)).getAPClass();
+            assertEquals(expectedCount.get(apc),ss.size(), 
+                    "Number of APs in symmetric set for APClass "+apc);
+        }
+    }
+	
 //-----------------------------------------------------------------------------    	
 	
     @Test
     public void testGetFragsWithAPClass() throws Exception
     {
-    	buildFragmentSpace();
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	ArrayList<IdFragmentAndAP> l = FragmentSpace.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
     	
@@ -274,8 +344,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithClass() throws Exception
     {
-    	buildFragmentSpace();
-    	
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	ArrayList<IdFragmentAndAP> lst = 
     			FragmentSpace.getFragAPsCompatibleWithClass(APC1);
     	
@@ -315,7 +384,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithTheseAPs() throws Exception
     {
-    	buildFragmentSpace();
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
@@ -372,7 +441,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragmentsCompatibleWithTheseAPs() throws Exception
     {
-    	buildFragmentSpace();
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();

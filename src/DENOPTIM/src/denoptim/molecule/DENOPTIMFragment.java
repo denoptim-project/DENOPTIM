@@ -69,7 +69,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	private IAtomContainer mol;
 	
 	/**
-	 * Field distinguishing type DENOPTIMFragment from other types of vertrexes.
+	 * Field distinguishing type DENOPTIMFragment from other types of vertexes.
 	 * The existence of this field triggers interpretation of the JSON string
 	 * as a DENOPTIMFragment.
 	 */
@@ -191,7 +191,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //------------------------------------------------------------------------------
     
-    public static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
+    private static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
             IAtomContainer mol,
             ArrayList<DENOPTIMAttachmentPoint> daps)
     {
@@ -265,9 +265,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
             return false;
 
-
         // check connected atoms
-        if (mol.getConnectedAtomsCount(atm1)!=mol.getConnectedAtomsCount(atm2))
+        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
             return false;
 
         List<IAtom> la1 = mol.getConnectedAtomsList(atm2);

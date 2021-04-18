@@ -271,14 +271,6 @@ public class GraphBuildingTask extends FitnessTask
                 
                 dGraph.appendVertexOnAP(srcVrtx.getAP(sApId), 
                         trgVrtx.getAP(tApId));
-                
-                //TODO-V3: check that symmetry is inherited from the original 
-                // vertex stored in the library of building blocks.
-                /*
-                ArrayList<SymmetricSet> symAPs =
-                        mol.getSymmetricAPsSets();
-                trgVrtx.setSymmetricAP(symAPs);
-                */
             }
 
             // Append new symmetric sets

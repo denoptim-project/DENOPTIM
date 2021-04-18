@@ -144,8 +144,6 @@ public class DENOPTIMFragmentTest
         frg1.addAPOnAtom(a3, APClass.make(APRULE+APCSEP+"4"),
                 new Point3d(new double[]{-4.0, -2.5, 3.3}));
         frg1.projectAPsToProperties();
-
-        //System.out.println("Initial Symm set: "+orig.getSymmetricAPSets());
         
         IAtomContainer iac = frg1.getIAtomContainer();
         

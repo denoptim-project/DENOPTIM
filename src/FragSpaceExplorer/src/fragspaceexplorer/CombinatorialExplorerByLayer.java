@@ -791,20 +791,10 @@ public class CombinatorialExplorerByLayer
         DENOPTIMGraph molGraph = new DENOPTIMGraph();
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
-        //TODO-V3: use a vertex constructor that is type-agnostic
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(),scafIdx,DENOPTIMVertex.BBType.SCAFFOLD);
 
-        // as in DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);
-
-        //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
-        
-        /*
-        ArrayList<SymmetricSet> symAPs =
-                mol.getSymmetricAPsSets();
-        scafVertex.setSymmetricAP(symAPs);
-        */
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
