@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -251,37 +252,46 @@ public class EvolutionaryAlgorithm
             Mop = -1;
             Bop = -1;
 
-            //System.err.println("Selected parents: " + i1 + " " + i2);
-
-            // Do CROSSOVER if probabilistically true
             if (RandomUtils.nextBoolean(GAParameters.getCrossoverProbability()))
-            //if (GenUtils.nextBoolean(GAParameters.getRNG(), GAParameters.getCrossoverProbability()))
             {
                 int numatt = 0;
-                int i1 = -1, i2 = -1;
+                Candidate male = null, female = null;
+                int mvid = -1, fvid = -1;
                 boolean foundPars = false;
-
                 while (numatt < MAX_EVOLVE_ATTEMPTS)
                 {
-                    int parents[] = EAUtils.selectParents(clone_popln);
-                    if (parents[0] == -1 || parents[1] == -1)
+                    if (FragmentSpace.useAPclassBasedApproach())
                     {
-                        DENOPTIMLogger.appLogger.info("Failed to identify compatible parents for crossover/mutation.");
-                        numatt++;
-                        continue;
+                        DENOPTIMVertex[] pair = EAUtils.performFBCC(
+                                clone_popln);
+                        if (pair == null)
+                        {
+                            DENOPTIMLogger.appLogger.info("Failed to identify "
+                                    + "compatible parents for crossover.");
+                            numatt++;
+                            continue;
+                        }
+                        male = pair[0].getGraphOwner().getCandidateOwner();
+                        female = pair[1].getGraphOwner().getCandidateOwner();
+                        mvid = pair[0].getGraphOwner().indexOf(pair[0]);
+                        fvid = pair[1].getGraphOwner().indexOf(pair[1]);
+                    } else {
+                        int parents[] = EAUtils.selectBasedOnFitness(
+                                clone_popln, 2);
+                        if (parents[0] == -1 || parents[1] == -1)
+                        {
+                            DENOPTIMLogger.appLogger.info("Failed to identify "
+                                    + "parents for crossover.");
+                            numatt++;
+                            continue;
+                        }
+                        male = clone_popln.get(parents[0]);
+                        female = clone_popln.get(parents[1]);
+                        mvid = EAUtils.selectNonScaffoldNonCapVertex(
+                                male.getGraph());
+                        fvid = EAUtils.selectNonScaffoldNonCapVertex(
+                                female.getGraph());
                     }
-
-                    // perform crossover
-                    if (parents[0] == parents[1])
-                    {
-                        DENOPTIMLogger.appLogger.info("Crossover has indentical partners.");
-                        numatt++;
-                        continue;
-                    }
-
-                    numatt = 0;
-                    i1 = parents[0];
-                    i2 = parents[1];
                     foundPars = true;
                     break;
                 }
@@ -290,20 +300,25 @@ public class EvolutionaryAlgorithm
                 if (foundPars)
                 {
                     String molid1 = FilenameUtils.getBaseName(
-                            clone_popln.get(i1).getSDFFile());
+                            male.getSDFFile());
                     String molid2 = FilenameUtils.getBaseName(
-                            clone_popln.get(i2).getSDFFile());
+                            female.getSDFFile());
 
-                    int gid1 = clone_popln.get(i1).getGraph().getGraphId();
-                    int gid2 = clone_popln.get(i2).getGraph().getGraphId();
+                    int gid1 = male.getGraph().getGraphId();
+                    int gid2 = female.getGraph().getGraphId();
                     
-                    // clone the parents
-                    graph1 = clone_popln.get(i1).getGraph().clone();
-                    graph2 = clone_popln.get(i2).getGraph().clone();
+                    graph1 = male.getGraph().clone();
+                    graph2 = female.getGraph().clone();
+                    
+                    graph1.renumberGraphVertices();
+                    graph2.renumberGraphVertices();
 
                     f0 += 2;
 
-                    if (DENOPTIMGraphOperations.performCrossover(graph1, graph2))
+                    if (DENOPTIMGraphOperations.performCrossover(graph1, 
+                            graph1.getVertexAtPosition(mvid).getVertexId(),
+                            graph2,
+                            graph2.getVertexAtPosition(fvid).getVertexId()))
                     {
                         graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
                         graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -341,7 +356,7 @@ public class EvolutionaryAlgorithm
                 boolean foundPars = false;
                 while (numatt < MAX_EVOLVE_ATTEMPTS)
                 {
-                    i3 = EAUtils.selectSingleParent(clone_popln);
+                    i3 = EAUtils.selectBasedOnFitness(clone_popln,1)[0];
                     if (i3 == -1)
                     {
                         DENOPTIMLogger.appLogger.info("Invalid parent selection.");

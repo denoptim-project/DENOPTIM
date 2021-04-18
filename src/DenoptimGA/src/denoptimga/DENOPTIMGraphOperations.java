@@ -21,6 +21,7 @@ package denoptimga;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -59,78 +60,55 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Identify pair of vertices that are suitable for crossover: 
+     * Identify pair of vertices that are suitable for crossover. The criterion
+     * for allowing crossover between two graph branches is defined by 
+     * {@link #isCrossoverPossible(DENOPTIMEdge, DENOPTIMEdge)}. In addition,
+     * the pair of seed vertexes (i.e., the first vertex of each branch to be 
+     * moved) must not represent the same building block. Scaffolds are also 
+     * excluded.
      * @param male <code>DENOPTIMGraph</code> of one member (the male) of the
-     * parents
+     * parents.
      * @param female <code>DENOPTIMGraph</code> of one member (the female) of
-     * the parents
-     * @return a pair of vertex ids (male and female) that will be the crossover
-     * points
+     * the parents.
+     * @return the list of pairs of vertex (Pairs ordered as 
+     * <code>male:female</code>) that can be used as crossover points.
      */
 
-    protected static RMap locateCompatibleXOverPoints(DENOPTIMGraph male,
-                                                    DENOPTIMGraph female)
+    protected static List<DENOPTIMVertex[]> locateCompatibleXOverPoints(
+            DENOPTIMGraph male, DENOPTIMGraph female)
     {
-        ArrayList<RMap> xpairs = new ArrayList<>();
+        List<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
 
-        for (int i=0; i<male.getVertexCount(); i++)
+        for (DENOPTIMEdge eMale : male.getEdgeList())
         {
-            BBType mtype = male.getVertexAtPosition(i).getBuildingBlockType();
-            int mvid = male.getVertexAtPosition(i).getVertexId();
-            int mfragid = male.getVertexAtPosition(i).getBuildingBlockId();
-
-            // WARNING: this prevents operating "inside" the scaffold when
-            // the scaffold is a template.
-            
-            // Ignore vertexes that are capping groups or scaffolds
-            if (mtype == BBType.SCAFFOLD || mtype == BBType.CAP)
+            DENOPTIMVertex vMale = eMale.getTrgAP().getOwner();
+            // We don't do genetic operations on capping vertexes
+            if (vMale.getBuildingBlockType() == BBType.CAP)
                 continue;
-
-            // get edge toward parent vertex
-            // get the edge where the vertex in question is the destination vertex
-            // or end vertex. the source vertex then will be the crossover point
-            DENOPTIMEdge medge = male.getEdgeWithParent(mvid);
-
-            for (int j=0; j<female.getVertexCount(); j++)
+            
+            for (DENOPTIMEdge eFemale : female.getEdgeList())
             {
-                BBType ftype = female.getVertexAtPosition(j).getBuildingBlockType();
-                int fvid = female.getVertexAtPosition(j).getVertexId();
-                int ffragid = female.getVertexAtPosition(j).getBuildingBlockId();
+                DENOPTIMVertex vFemale = eFemale.getTrgAP().getOwner();
+                // We don't do genetic operations on capping vertexes
+                if (vFemale.getBuildingBlockType() == BBType.CAP)
+                    continue;
                 
-
-                //System.out.println("Female Fragment ID: "+fvid+" type: "+ftype+" ffragid: "+ffragid);
-
-                if (ftype == BBType.SCAFFOLD || ftype == BBType.CAP)
+                // Exclude pairs where the vertexes are the same building block
+                // NB: since scaffolds cannot be at the target end of an edge 
+                // and capping groups have been excluded, here we have only
+                // standard building blocks (i.e., BBType.FRAGMENT).
+                if (vMale.getBuildingBlockId() == vFemale.getBuildingBlockId())
                     continue;
-
-                // fragment ids should not match or we get the same molecule
-                if (mfragid == ffragid)
-                    continue;
-
-                // get edge toward parent vertex
-                DENOPTIMEdge fedge = female.getEdgeWithParent(fvid);
                 
                 //Check condition for considering this combination
-                if (isCrossoverPossible(medge, fedge))
+                if (isCrossoverPossible(eMale, eFemale))
                 {
-                    // add the pair of vertex (one for the male, one for the female)
-                    RMap rp = new RMap(mvid, fvid);
-                    xpairs.add(rp);
+                    DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vMale,vFemale};
+                    pairs.add(pair);
                 }
             }
         }
-
-        if (xpairs.isEmpty())
-            return null;
-        else if (xpairs.size() == 1)
-            return xpairs.get(0);
-        else
-        {
-            MersenneTwister mtrand = RandomUtils.getRNG();
-            //int idx = GAParameters.getRNG().nextInt(xpairs.size());
-            int idx = mtrand.nextInt(xpairs.size());
-            return xpairs.get(idx);
-        }
+        return pairs;
     }
     
 //------------------------------------------------------------------------------
@@ -1164,67 +1142,6 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Selects proper vertices and performs crossover between two graphs
-     * @param male the first Graph
-     * @param female the second Graph
-     * @return <code>true</code> if a new graph has been successfully produced
-     * @throws DENOPTIMException 
-     */
-
-    public static boolean performCrossover(DENOPTIMGraph male,
-                                DENOPTIMGraph female) throws DENOPTIMException
-    {
-        // This is done to maintain a unique vertex-id mapping
-        male.renumberGraphVertices();
-        female.renumberGraphVertices();
-
-        if(debug)
-        {
-            System.err.println("DBUG: performCrossover " + male.getGraphId() +
-                                                " " + female.getGraphId());
-            System.err.println("DBUG: MALE(renum): " + male);
-            System.err.println("DBUG: FEMALE(renum): " + female);
-        }
-
-        // select vertices for crossover
-        int mvid, fvid;
-        if (FragmentSpace.useAPclassBasedApproach())
-        {
-            // remove the capping groups
-            male.removeCappingGroups();
-            female.removeCappingGroups();
-            
-            // select vertices with compatible parent class
-            RMap rp = locateCompatibleXOverPoints(male, female);
-            //System.err.println("XOVER POINTS " + rp.toString());
-            
-            mvid = rp.getId1();
-            fvid = rp.getId2();
-        }
-        else
-        {
-            MersenneTwister rng = RandomUtils.getRNG();
-            // select randomly
-            //int k1 = GAParameters.getRNG().nextInt(male.getVertexCount());
-            //int k2 = GAParameters.getRNG().nextInt(female.getVertexCount());
-            
-            int k1 = rng.nextInt(male.getVertexCount());
-            int k2 = rng.nextInt(female.getVertexCount());
-
-            if (k1 == 0)
-                k1 = k1 + 1; // not selecting the first vertex
-            if (k2 == 0)
-                k2 = k2 + 1; // not selecting the first vertex
-            mvid = male.getVertexAtPosition(k1).getVertexId();
-            fvid = female.getVertexAtPosition(k2).getVertexId();
-        }
-
-        return performCrossover(male,mvid,female,fvid);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Performs crossover between two graphs on a given pair of vertexIDs
      * @param male the first Graph
      * @param female the second Graph
@@ -1258,10 +1175,7 @@ if(debug)
     public static boolean performCrossover(DENOPTIMGraph male, int mvid,
                         DENOPTIMGraph female, int fvid, boolean debug) 
                                 throws DENOPTIMException
-    {
-        //TODO-V3 massive use of pointers (i.e., integers pointing to a position 
-        // in a list of things) should be replaced with use of references
-        
+    {   
         if(debug)
         {
             System.err.println("Crossover on vertices " + mvid + " " + fvid);
@@ -1273,7 +1187,7 @@ if(debug)
         DENOPTIMVertex mvert = male.getVertexWithId(mvid);
         DENOPTIMVertex fvert = female.getVertexWithId(fvid);
         
-        return performCrossover(male, mvert,female,fvert, debug);
+        return performCrossover(male, mvert, female, fvert, debug);
     }
 
 //------------------------------------------------------------------------------

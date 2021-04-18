@@ -123,6 +123,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     String localMsg;
 
+    /**
+     * Reference to the candidate entity owning this graph
+     */
+    Candidate candidate;
 
     /**
      * Identifier for the format of string representations of a graph
@@ -194,6 +198,29 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
         localMsg = "";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Sets the reference to the candidate item that is defined by this graph.
+     * @param candidate the candidate owner.
+     */
+    public void setCandidateOwner(Candidate candidate)
+    {
+        this.candidate = candidate;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the reference of the candidate item that is defined by this 
+     * graph.
+     * @return the reference to the owner.
+     */
+    public Candidate getCandidateOwner()
+    {
+        return candidate;
     }
 
 //------------------------------------------------------------------------------
@@ -710,6 +737,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return gVertices.contains(v);
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the index of a vertex in the list of vertices of this graph.
+     * @param v the vertex to search
+     * @return the index of the vertex in the list of vertices.
+     */
+    public int indexOf(DENOPTIMVertex v)
+    {
+        return gVertices.indexOf(v);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -724,6 +763,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    //TODO-V3 rename to mean it works on ID
     public int getIndexOfVertex(int vid)
     {
         int idx = -1;
