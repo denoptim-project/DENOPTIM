@@ -588,8 +588,6 @@ public class EAUtils
         else
         {
             MersenneTwister rng = RandomUtils.getRNG();
-            //return GAParameters.getRNG().nextInt(
-            //                    FragmentSpace.getFragmentLibrary().size());
             return rng.nextInt(FragmentSpace.getFragmentLibrary().size());
 
         }

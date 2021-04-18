@@ -169,44 +169,6 @@ public class GraphUtils
         return molCounter.getAndIncrement();
     }
 
-//------------------------------------------------------------------------------
-
-    /**
-     * Collect the list of closable paths involving the given scaffold
-     * @param scaf
-     * @param libraryOfRCCs
-     * @return getClosableVertexChainsFromDB
-     * @throws denoptim.exception.DENOPTIMException 
-     */
-
-//TODO del if not used. Should be replaced by a more efficient approach
-// using the map of ClosableChains per fragment MolID/type
-
-    public static ArrayList<ClosableChain> getClosableVertexChainsFromDB(
-                        DENOPTIMVertex scaf,
-                        HashMap<String,ArrayList<String>> libraryOfRCCs)
-                                                throws DENOPTIMException
-//                String rccIndexFile,
-//                String rccRootFolder) throws DENOPTIMException
-    {
-        ArrayList<ClosableChain> clbChains = new ArrayList<>();
-
-        for (String chainId : libraryOfRCCs.keySet())
-        {
-            String closability = libraryOfRCCs.get(chainId).get(1);
-            if (closability.equals("T"))
-            {
-                ClosableChain cc = new ClosableChain(chainId);
-                int pos = cc.involvesVertex(scaf);
-                if (pos != -1)
-                {
-                    clbChains.add(cc);
-                }
-            }
-        }
-
-        return clbChains;
-    }
-
 //-----------------------------------------------------------------------------
+
 }

@@ -397,8 +397,6 @@ public class DENOPTIMGraphOperations
             }
 
             // Apply closability bias in selection of next fragment
-//TODO-V3+: copy also DENOPTIMRing into growing graph or use denoptim.molecule.DENOPTIMTemplate
-// which is yet to be developed.
             if (RingClosureParameters.allowRingClosures() && 
                       RingClosureParameters.selectFragmentsFromClosableChains())
             {
@@ -590,7 +588,6 @@ public class DENOPTIMGraphOperations
                 -1, -1);
         if (!FragmentSpace.useAPclassBasedApproach())
         {
-            //TODO-V3 get rid of EAUtils and use fragment space
             int fid = EAUtils.selectRandomFragment();
             res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
         }
@@ -623,12 +620,6 @@ public class DENOPTIMGraphOperations
                                                ArrayList<Integer> addedVertices)
                                                         throws DENOPTIMException
     {
-
-//TODO evaluate this
-/*
-DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
-*/
-
         boolean res = false;
 
         // Get candidate fragments
@@ -656,24 +647,8 @@ DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
             int molIdNewFrag = newFragIds.get(0);
             BBType typeNewFrag = BBType.parseInt(newFragIds.get(1));
             int dapNewFrag = newFragIds.get(2);
-//TODO del
-if(debug)
-{
-    System.out.println("Closable Chains involving frag/AP: "+newFragIds);
-    int iii = 0;
-    for (ClosableChain cc : chosenFfCc.getCompatibleCC())
-    {
-        iii++;
-    System.out.println(iii+"  "+cc);
-    }
-}
             if (molIdNewFrag != -1)
             {
-//TODO del
-if(debug)
-    System.out.println("Before attach: "+molGraph);
-
-                
                 int newvid = GraphUtils.getUniqueVertexIndex();
                 DENOPTIMVertex newVrtx = DENOPTIMVertex.newVertexFromLibrary(
                         newvid, molIdNewFrag, typeNewFrag);
@@ -681,30 +656,16 @@ if(debug)
                 molGraph.appendVertexOnAP(curVertex.getAP(dapidx), 
                         newVrtx.getAP(dapNewFrag));
                 
-//TODO del
-if(debug)
-    System.out.println("After attach: "+molGraph);
-
                 if (newvid != -1)
                 {
                     addedVertices.add(newvid);
-
-//TODO del
-if(debug)
-    System.out.println("Before update: "+molGraph.getClosableChains().size());
                     // update list of candidate closable chains
                     molGraph.getClosableChains().removeAll(
                             chosenFfCc.getIncompatibleCC());
-//TODO del
-if(debug)
-    System.out.println("After update: "+molGraph.getClosableChains().size());
-
                     if (applySymmetry(curVertex.getAttachmentPoints().get(
                             dapidx).getAPClass()))
                     {
-//TODO
 //TODO: implement symmetric substitution with closability bias
-//TODO
                     }
                     res = true;
                 }
@@ -785,9 +746,7 @@ if(debug)
 
     /**
      * Method to select fragments that increase the likeliness of generating
-     * closable chains.
-     * TODO: only works for scaffold. need to make it working for any type
-     * of fragment
+     * closable chains. Only works for scaffold.
      */
 
     protected static ArrayList<FragForClosabChains> getFragmentForClosableChain(
@@ -811,14 +770,6 @@ if(debug)
         {
             for (ClosableChain cc : molGraph.getClosableChains())
             {
-//TODO del 
-if (debug)
-{
-    System.out.println(" ");
-    System.out.println("dapidx:"+dapidx+" curVertex"+curVertex);
-    System.out.println("ClosableChain: " + cc);
-}
-
                 int posInCc = cc.involvesVertex(curVertex);
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
@@ -829,21 +780,13 @@ if (debug)
                     cLink.getApIdToRight() != dapidx)
                 {
                     // Chain does not involve AP dapidx
-//TODO del
-if(debug)
-    System.out.println("HERE: dapidx:"+dapidx+" curVertex"+curVertex+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
                     continue;
-
                 }
 
                 if (cLink.getApIdToRight() == dapidx)
                 {
                     if (cc.getSize() > (posInCc+1))
                     {
-//TODO del
-if(debug)
-    System.out.println("A: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is NOT the rightmost chain link
                         ChainLink nextChainLink = cc.getLink(posInCc+1);
                         nfid = nextChainLink.getMolID();
@@ -852,10 +795,6 @@ if(debug)
                     }
                     else
                     {
-//TODO del
-if(debug)
-    System.out.println("B: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is the rightmost chain link
                         // closability bias suggest NO fragment
                     }
@@ -864,10 +803,6 @@ if(debug)
                 {
                     if ((posInCc-1) >= 0)
                     {
-//TODO del
-if(debug)
-    System.out.println("C: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is NOT the leftmost chain link
                         ChainLink nextChainLink = cc.getLink(posInCc-1);
                         nfid = nextChainLink.getMolID();
@@ -876,10 +811,6 @@ if(debug)
                     }
                     else
                     {
-//TODO del
-if(debug)
-    System.out.println("D: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is the leftmost chain link
                         // closability bias suggest NO fragment
                     }
@@ -923,19 +854,6 @@ if(debug)
                     newChosenCc.addCompatibleCC(cc);
                     lstChosenFfCc.add(newChosenCc);
                 }
-
-//TODO del 
-if(debug)
-{
-    System.out.println("eligibleFrgId: "+eligibleFrgId);
-    System.out.println("lstChosenFfCc.size: "+lstChosenFfCc.size());
-    int iiii = 0;
-    for (FragForClosabChains ffcc : lstChosenFfCc)
-    {
-      iiii++;
-      System.out.println(iiii+" "+ffcc.getFragIDs()+" "+ffcc.getCompatibleCC().size()+ " "+ffcc.getIncompatibleCC().size());
-    }
-}
             }
         }
         else
@@ -949,23 +867,12 @@ if(debug)
             int chidAp = edge.getTrgAPID();
             for (ClosableChain cc : molGraph.getClosableChains())
             {
-//TODO del 
-if(debug)
-{
-    System.out.println(" ");
-    System.out.println("dapidx:"+dapidx+" curVertex"+curVertex);
-    System.out.println("2-ClosableChain: " + cc);
-}
                 int posInCc = cc.involvesVertexAndAP(curVertex, dapidx, chidAp);
 
                 if (posInCc == -1)
                 {
                     // closable chain does not span this combination
                     // of vertex and APs
-//TODO del
-if(debug)
-    System.out.println("2-HERE: dapidx:"+dapidx+" curVertex"+curVertex+" chidAp:"+chidAp);
-
                     continue;
                 }
 
@@ -975,32 +882,17 @@ if(debug)
                 int nfap = -1;
 
                 int posScaffInCc = cc.getTurningPoint();
-
-//TODO del
-if(debug)
-    System.out.println("posInCc: "+posInCc+" posScaffInCc: "+posScaffInCc);
-
                 if (posInCc > posScaffInCc)
                 {
                     ChainLink parentLink = cc.getLink(posInCc - 1);
                     int pLnkId = parentLink.getMolID();
                     BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToRight();
-//TODO del
-if(debug)
-{
-    System.out.println("SCAFF is LEFT");
-    System.out.println("parent leftside: "+parentLink); 
-}
                     if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
                         cLink.getApIdToLeft() == chidAp)
                     {
                         if (cc.getSize() > (posInCc+1))
                         {
-//TODO del
-if(debug)
-    System.out.println("2A: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                             ChainLink nextChainLink = cc.getLink(posInCc + 1);
                             nfid = nextChainLink.getMolID();
                             nfty = nextChainLink.getFragType();
@@ -1008,10 +900,6 @@ if(debug)
                         }
                         else
                         {
-//TODO del
-if(debug)
-    System.out.println("2B: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                             // cLink is the rightmost chain link
                             // closability bias suggests NO fragment
                         }
@@ -1019,14 +907,6 @@ if(debug)
                     else
                     {
                         // different parent link
-//TODO del
-if(debug)
-{
-    System.out.println("01: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-    System.out.println("prntId: "+prntId+", prntTyp:"+prntTyp+", prntAp:"+prntAp+", chidAp:"+chidAp);
-    System.out.println("pLnkId: "+pLnkId+", pLnkTyp:"+pLnkTyp+", pLnkAp:"+pLnkAp+", cLink.getApIdToLeft():"+cLink.getApIdToLeft());
-    System.out.println("DIFFERENT PARENT LINK");
-}
                         continue;
                     }
                 }
@@ -1036,20 +916,11 @@ if(debug)
                     int pLnkId = parentLink.getMolID();
                     BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToLeft();
-//TODO del
-if(debug)
-{
-    System.out.println("SCAFF is RIGHT");
-    System.out.println("parent rightside: "+parentLink);
-}
                     if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
                         cLink.getApIdToRight() == chidAp)
                     {
                         if ((posInCc-1) >= 0)
                         {
-//TODO del
-if(debug)
-    System.out.println("2C: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
                             ChainLink nextChainLink = cc.getLink(posInCc - 1);
                             nfid = nextChainLink.getMolID();
                             nfty = nextChainLink.getFragType();
@@ -1057,10 +928,6 @@ if(debug)
                         }
                         else
                         {
-//TODO del
-if(debug)
-    System.out.println("2D: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                             // cLink is the leftmost chain link
                             // closability bias suggest NO fragment
                         }
@@ -1068,14 +935,6 @@ if(debug)
                     else
                     {
                         // different parent link
-//TODO del
-if(debug)
-{
-    System.out.println("02: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-    System.out.println("prntId: "+prntId+", prntTyp:"+prntTyp+", prntAp:"+prntAp+", chidAp:"+chidAp);
-    System.out.println("pLnkId: "+pLnkId+", pLnkTyp:"+pLnkTyp+", pLnkAp:"+pLnkAp+", cLink.getApIdToRight():"+cLink.getApIdToRight());
-    System.out.println("DIFFERENT PARENT LINK");
-}
                         continue;
 
                     }
@@ -1121,18 +980,6 @@ if(debug)
                     newChosenCc.addCompatibleCC(cc);
                     lstChosenFfCc.add(newChosenCc);
                 }
-//TODO del 
-if(debug)
-{
-    System.out.println("eligibleFrgId: "+eligibleFrgId);
-    System.out.println("lstChosenFfCc.size: "+lstChosenFfCc.size());
-    int iiii = 0;
-    for (FragForClosabChains ffcc : lstChosenFfCc)
-    {
-      iiii++;
-      System.out.println(iiii+" "+ffcc.getFragIDs()+" "+ffcc.getCompatibleCC().size()+ " "+ffcc.getIncompatibleCC().size());
-    }
-}
             }
         }
 
@@ -1193,7 +1040,8 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Performs crossover between two graphs on a given pair of vertexIDs
+     * Performs crossover between two graphs on a given pair of vertexes. 
+     * This method does changes the given graphs, so 
      * @param male the first Graph
      * @param female the second Graph
      * @param mvert the root vertex of the branch of male to exchange
@@ -1317,8 +1165,8 @@ if(debug)
             System.out.println("DBUG: MALE sites for FEMALE subGraph:");
             for (int i=0; i<symParVertM.size(); i++)
             {
-                System.out.println("     v:"  + symParVertM.get(i) + 
-                                                   " ap:"+symmParAPidxM.get(i));
+                System.out.println("     v:"  + symParVertM.get(i) 
+                    + " ap:"+symmParAPidxM.get(i));
             }
             System.out.println("DBUG: FEMALE sites for MALE subGraph:");
             for (int i=0; i<symParVertF.size(); i++)

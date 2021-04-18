@@ -208,8 +208,6 @@ public class FitnessProvider
         				value, descName, iac);
         		valuesMap.put(descName, val);
                 iac.setProperty(descName,val);
-                //TODO-V3 remove? why was this here. Commenting it out make t2b pass
-                //iac.getProperties().remove(descSpec);
         	} else if (desc instanceof IAtomicDescriptor) {
         		for (String varName : descriptor.getVariableNames())
         		{

@@ -123,7 +123,7 @@ public class FragsCombinationIterator
         for (DENOPTIMVertex v : this.rootGraph.getVertexList())
         {
             int vIdx = v.getVertexId();
-            //TODO-V3 need to use something else
+
             int vMolId = v.getBuildingBlockId();
             DENOPTIMVertex.BBType vMolTyp = v.getBuildingBlockType();
            

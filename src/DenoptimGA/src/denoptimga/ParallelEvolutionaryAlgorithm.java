@@ -971,8 +971,11 @@ public class ParallelEvolutionaryAlgorithm
         sb.setLength(0);
 
         // sort the population
-        Collections.sort(molPopulation, Collections.reverseOrder());
-
+        synchronized (molPopulation)
+        {
+            Collections.sort(molPopulation, Collections.reverseOrder());
+        }
+        
         if (GAParameters.getReplacementStrategy() == 1)
         {
             synchronized(molPopulation)

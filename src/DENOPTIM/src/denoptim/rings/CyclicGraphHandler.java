@@ -1723,8 +1723,8 @@ public class CyclicGraphHandler
 
     /**
      * Evaluates the combination of a DENOPTIMGraph and a set of DENOPTIMRings
-     * and decides whether it's a proper candidate for the generation of 
-     * chelating ligands
+     * and decides whether it's a proper candidate for the generation of a
+     * chelating ligand.
      * @return <code>true</code> it this system is a good candidate
      */
 
@@ -1759,8 +1759,8 @@ public class CyclicGraphHandler
             {
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
-//TODO-V3: change. hard coded class of ligand
-                if (!apClassToScaffold.toString().equals("MAmine:1"))
+                if (RingClosureParameters.metalCoordinatingAPClasses
+                        .contains(apClassToScaffold))
                 {
                     continue;
                 }
