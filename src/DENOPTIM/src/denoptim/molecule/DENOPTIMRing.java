@@ -37,6 +37,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
  */
 public class DENOPTIMRing implements Serializable 
 {
+
     /**
      * List of <code>DENOPTIMVertex</code> involved in the ring. 
      */
@@ -196,6 +197,12 @@ public class DENOPTIMRing implements Serializable
     public String toString()
     {
         return "DENOPTIMRing [verteces=" + vertices + "]";
+    }
+
+//------------------------------------------------------------------------------
+
+    public ArrayList<DENOPTIMVertex> getVertices() {
+        return vertices;
     }
 
 //------------------------------------------------------------------------------

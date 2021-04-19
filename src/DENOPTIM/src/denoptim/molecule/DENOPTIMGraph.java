@@ -3376,11 +3376,15 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Update the graph so that the vertex argument is at the scaffold level
      * i.e. is the source of this graph. The other graph's vertices will have
-     * levels updated that corresponds to the layers of a breadth-first search
-     * starting from this vertex.
+     * levels updated that corresponds to the layers of a breadth-first
+     * search (BFS) starting from this vertex. The vertex list of this graph
+     * will also be reordered in a way that corresponds to the BFS.
+     *
      * @param v vertex to set as scaffold
      */
     public static void setScaffold(DENOPTIMVertex v) {
+        ArrayList<DENOPTIMVertex> newVertexList = new ArrayList<>();
+
         Set<Integer> visited = new HashSet<>();
         int level = -1;
         Queue<DENOPTIMVertex> currLevel = new ArrayDeque<>();
@@ -3389,9 +3393,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         while (!currLevel.isEmpty()) {
             DENOPTIMVertex currVertex = currLevel.poll();
+
             int currId = currVertex.getVertexId();
             if (!visited.contains(currId)) {
                 visited.add(currId);
+
+                newVertexList.add(currVertex);
+
                 currVertex.setLevel(level);
 
                 Iterable<DENOPTIMVertex> neighbors = currVertex
@@ -3414,6 +3422,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 level++;
             }
         }
+
+        v.getGraphOwner().setVertexList(newVertexList);
     }
 
 //------------------------------------------------------------------------------

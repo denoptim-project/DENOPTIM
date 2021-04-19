@@ -851,32 +851,97 @@ if(debug)
      * @return The subgraphs matching the provided pattern.
      */
     public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
-                                                     GraphPattern pattern)
-    {
+                                                     GraphPattern pattern) {
         if (pattern != GraphPattern.RING) {
             throw new IllegalArgumentException("Graph pattern " + pattern +
                     " not supported.");
         }
+
+        List<Set<DENOPTIMVertex>> disjointMultiCycleVertices = graph
+                .getRings()
+                .stream()
+                .map(DENOPTIMRing::getVertices)
+                .map(HashSet::new)
+                .collect(Collectors.toList());
+
+        unionOfIntersectingSets(disjointMultiCycleVertices);
+
         List<DENOPTIMGraph> subgraphs = new ArrayList<>();
-        for (DENOPTIMRing r : graph.getRings()) {
-            PathSubGraph subgraphAsPath = new PathSubGraph(r.getHeadVertex(),
-                    r.getTailVertex(), graph);
-
-            DENOPTIMGraph subgraph = subgraphAsPath.getGraph().clone();
-            subgraph.renumberGraphVertices();
-            subgraph.addRing(r);
-
-            DENOPTIMVertex scaffold = subgraph
-                    .getVertexList()
-                    .stream()
-                    .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
-                    .get();
-
-            DENOPTIMGraph.setScaffold(scaffold);
-            fixEdgeDirections(subgraph);
-            subgraphs.add(subgraph);
+        for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
+            subgraphs.add(extractSubgraph(graph, fusedRing));
         }
+
+        for (DENOPTIMGraph g : subgraphs) {
+            g.renumberGraphVertices();
+            fixGraph(g);
+        }
+
         return subgraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the subgraph in the graph defined on the a set of vertices.
+     * The graph is cloned before the subgraph is extracted.
+     * @param graph To extract subgraph from.
+     * @param definedOn Set of vertices in the graph that the subgraph is
+     *                  defined on.
+     * @return Subgraph of graph defined on set of vertices.
+     */
+    private static DENOPTIMGraph extractSubgraph(DENOPTIMGraph graph,
+                                                 Set<DENOPTIMVertex> definedOn) {
+        Set<DENOPTIMVertex> complement = new HashSet<>(
+                graph.getVertexList());
+        complement.removeAll(definedOn);
+
+        DENOPTIMGraph subgraph = graph.clone();
+        for (DENOPTIMVertex v : complement) {
+            subgraph.removeVertex(v);
+        }
+        return subgraph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the vertex at the lowest level as the scaffold, changes the  
+     * directions of edges so that the scaffold is the source, and changes 
+     * the levels of the graph's other vertices to be consistent with the new
+     * scaffold.
+     * @param g Graph to fix.
+     */
+    private static void fixGraph(DENOPTIMGraph g) {
+        DENOPTIMVertex newScaffold = g
+                .getVertexList()
+                .stream()
+                .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
+                .get();
+        DENOPTIMGraph.setScaffold(newScaffold);
+
+        fixEdgeDirections(g);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes the union of any two sets in this list that intersect. Performs
+     * operations in-place.
+     * @param l List to merge sets of
+     */
+    private static <T> void unionOfIntersectingSets(List<Set<T>> l) {
+        for (int i = 0; i < l.size() - 1; i++) {
+            Set<T> collA = l.get(i);
+            for (int j = i + 1; j < l.size(); ) {
+                Set<T> collB = l.get(j);
+                if (Collections.disjoint(collA, collB)) {
+                    j++;
+                } else {
+                    collA.addAll(collB);
+                    l.remove(j);
+                }
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -886,10 +951,16 @@ if(debug)
      * @param graph to fix edges of.
      */
     private static void fixEdgeDirections(DENOPTIMGraph graph) {
+        boolean foundScaffold = false;
         for (DENOPTIMVertex v : graph.getVertexList()) {
-            if (v.getLevel() == -1) {
+            foundScaffold = v.getLevel() == -1;
+            if (foundScaffold) {
                 fixEdgeDirections(v, new HashSet<>());
+                break;
             }
+        }
+        if (!foundScaffold) {
+            throw new IllegalArgumentException("Vertex at level -1 not found");
         }
     }
 
