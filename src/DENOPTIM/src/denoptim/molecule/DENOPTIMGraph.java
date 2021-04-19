@@ -36,8 +36,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -50,9 +48,10 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexDeserializer;
+import denoptim.molecule.APClass.APClassDeserializer;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.PathSubGraph;
@@ -66,6 +65,7 @@ import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
+import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 
 
 /**
@@ -117,6 +117,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * is generated anew from scratch, or from mutation/crossover.
      */
     String localMsg;
+
+    /**
+     * Reference to the candidate entity owning this graph
+     */
+    Candidate candidate;
 
     /**
      * Identifier for the format of string representations of a graph
@@ -188,6 +193,29 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
         localMsg = "";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Sets the reference to the candidate item that is defined by this graph.
+     * @param candidate the candidate owner.
+     */
+    public void setCandidateOwner(Candidate candidate)
+    {
+        this.candidate = candidate;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the reference of the candidate item that is defined by this 
+     * graph.
+     * @return the reference to the owner.
+     */
+    public Candidate getCandidateOwner()
+    {
+        return candidate;
     }
 
 //------------------------------------------------------------------------------
@@ -346,6 +374,37 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return gVertices;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Identifies and return the vertex from which the spanning tree originates.
+     * This is typically the first vertex in the list, but it is possible to
+     * programmatically build graphs that do not follow this convention. 
+     * Therefore, here we test if the first vertex is a seed (i.e., it only has
+     * departing edges) and, if not, we search for the closest seed.
+     * <b>WARNING</b>: the graph is assumed to be an healthy spanning tree, in 
+     * that it has only one seed that is reachable from any vertex by a 
+     * inverse directed path.
+     * The result is unpredictable for disconnected graphs or unhealthy
+     * spanning trees.
+     * 
+     * @return the seed/root of the spanning tree
+     */
+    public DENOPTIMVertex getSourceVertex()
+    {
+        DENOPTIMVertex v0 = getVertexAtPosition(0);
+        for (DENOPTIMEdge e : this.getEdgeList())
+        {
+            if (e.getTrgAP().getOwner() == v0)
+            {
+                ArrayList<DENOPTIMVertex> parentTree = new ArrayList<>();
+                getParentTree(v0,parentTree);
+                return parentTree.get(parentTree.size()-1);
+            }
+        }
+        return v0;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -374,7 +433,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	ArrayList<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();
     	for (DENOPTIMEdge e : this.getEdgeList())
     	{
-    		if (e.getSrcVertex() == v.getVertexId())
+    		if (e.getSrcAP().getOwner() == v)
     		{
     			edges.add(e);
     		}
@@ -592,10 +651,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     public void removeVertex(DENOPTIMVertex vertex)
     {
-        //TODO-V3: deal with templates. They do not appear in the edges as
-        // target Vertices, so the edges to templates will not be removed
-        // once we remove the template vertex.
-
         if (!gVertices.contains(vertex))
         {
         	return;
@@ -677,6 +732,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         return gVertices.contains(v);
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the index of a vertex in the list of vertices of this graph.
+     * @param v the vertex to search
+     * @return the index of the vertex in the list of vertices.
+     */
+    public int indexOf(DENOPTIMVertex v)
+    {
+        return gVertices.indexOf(v);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -691,6 +758,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    //TODO-V3 rename to mean it works on ID
     public int getIndexOfVertex(int vid)
     {
         int idx = -1;
@@ -814,8 +882,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param dapidx the AP corresponding to the source fragment
      * @param dstVert
      * @return the AP index of the destination fragment
+     * @deprecated this depends on vertedID rather than reference
      */
 
+    @Deprecated
     public int getBondingAPIndex(DENOPTIMVertex srcVert, int dapidx,
                                     DENOPTIMVertex dstVert)
     {
@@ -873,14 +943,53 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Traverse the graph until it identified the source of the directed path
+     * reachable from the given vertex recursively.
+     * @param vertex the child vertex from which we start traversing the graph.
+     * @param parentTree list containing the references to all the parents
+     * recursively visited so far.
+     */
+    public void getParentTree(DENOPTIMVertex vertex,
+            ArrayList<DENOPTIMVertex> parentTree) 
+    {
+        DENOPTIMVertex parent = getParent(vertex);
+        if (parent == null) {
+            return;
+        }
+        if (parentTree.contains(parent))
+        {
+            // Cyclic graphs are not allowed!
+            throw new IllegalArgumentException();
+        }
+        parentTree.add(parent);
+        getParentTree(parent, parentTree);
+    }
+    
+//------------------------------------------------------------------------------
+
+    public DENOPTIMVertex getParent(DENOPTIMVertex v)
+    {
+        DENOPTIMEdge edge = v.getEdgeToParent();
+        if (edge != null)
+        {
+            return edge.getSrcAP().getOwner();
+        }
+        return null;
+    }
 
 //------------------------------------------------------------------------------
 
     /**
      * @param vid the vertex id for which the child vertices need to be found
      * @return Arraylist containing the vertex ids of the child vertices
+     * @deprecated depends on vertedID
      */
 
+    @Deprecated
     public ArrayList<Integer> getChildVertices(int vid)
     {
         ArrayList<Integer> lst = new ArrayList<>();
@@ -978,65 +1087,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         return clone;
     }
-
-    //TODO-V3 delete. This was only meant to test the references to the edge with parent vertex
-
-    public void checkHashed(String fileName)
-    {
-
-        System.out.println("Writing "+fileName+" for graph "+getGraphId());
-        boolean nogood = false;
-        String NL = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-        for (DENOPTIMVertex v : gVertices)
-        {
-            sb.append("Vertex "+v+NL);
-            if (v.getEdgeToParent() == null)
-                continue;
-
-            int vh = v.getEdgeToParent().hashCode();
-            sb.append("hash edge "+vh+NL);
-            boolean found = false;
-            for (DENOPTIMEdge e : gEdges)
-            {
-
-                if (e.hashCode() == vh)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                System.out.println("M7: found mismatch");
-                System.out.println("FromVertex "+v+" hash is: "+vh);
-                for (DENOPTIMEdge ee : gEdges)
-                    System.out.println("   -> "+ee+" "+ee.hashCode());
-                nogood = true;
-            }
-        }
-
-        for (DENOPTIMEdge ee : gEdges)
-        {
-            sb.append("all edge "+ee+" "+ee.hashCode()+NL);
-        }
-
-        try
-        {
-            DenoptimIO.writeData(fileName, sb.toString(), false);
-        } catch (DENOPTIMException e)
-        {
-            e.printStackTrace();
-        }
-        if (nogood)
-        {
-            System.out.println("NO GOOD");
-            System.exit(0);
-        }
-        System.out.println("Seems all good");
-    }
-
+ 
 //------------------------------------------------------------------------------
 
     /**
@@ -1128,30 +1179,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getParent(DENOPTIMVertex v)
-    {
-        DENOPTIMEdge edge = v.getEdgeToParent();
-        if (edge != null)
-        {
-            return edge.getSrcAP().getOwner();
-        }
-        return null;
-    }
-
-//------------------------------------------------------------------------------
-
-    //TODO-V3 is this really needed?
+    /**
+     * Wipes the data in this graph
+     */
     public void cleanup()
     {
         if (gVertices != null)
         {
-            if (!gVertices.isEmpty())
-            {
-                for (DENOPTIMVertex vtx : gVertices) {
-                    if (vtx != null)
-                        vtx.cleanup();
-                }
-            }
             gVertices.clear();
         }
         if (gEdges != null)
@@ -1165,6 +1199,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (symVertices != null)
         {
             symVertices.clear();
+        }
+        if (closableChains != null)
+        {
+            closableChains.clear();
         }
     }
     
@@ -1948,10 +1986,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 DENOPTIMEdge e = getEdgeList().get(j);
                 if (e.getSrcVertex() == vid) {
-                    e.setSrcVertex(nvid);
+                    e.getSrcAP().getOwner().setVertexId(nvid);
                 }
                 if (e.getTrgVertex() == vid) {
-                    e.setTrgVertex(nvid);
+                    e.getTrgAP().getOwner().setVertexId(nvid);
                 }
             }
         }
@@ -2394,7 +2432,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Append a vertex to this graph. Does not clone the incoming vertex.
+     * Append a vertex to this graph: adds the new vertex to the list of 
+     * vertexes belonging to the graph, and adds the resulting edge to the graph.
+     * Does not clone the incoming vertex.
      * Does not project on symmetrically related vertices or
      * attachment points. No change in symmetric sets, apart from importing
      * those sets that are already defined in the incoming vertex.
@@ -3308,13 +3348,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             JsonObject partialJsonObj = new JsonObject();
             partialJsonObj.add("graphId", jsonObject.get("graphId"));
             partialJsonObj.add("gVertices", jsonObject.get("gVertices"));
-            // Eventually, also the sym sets will become references...
+            // Eventually, also the sym sets will become references... so
+            // also for symVertices we'll have to go through the list and
+            // rebuild the references.
             partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
 
             Gson gson = new GsonBuilder()
-                .setExclusionStrategies(new DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap())
+                .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
                 .registerTypeAdapter(DENOPTIMVertex.class,
-                      new DENOPTIMVertex.DENOPTIMVertexDeserializer())
+                      new DENOPTIMVertexDeserializer())
+                .registerTypeAdapter(APClass.class, new APClassDeserializer())
                 .setPrettyPrinting()
                 .create();
 

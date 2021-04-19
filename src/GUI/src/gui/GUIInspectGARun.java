@@ -70,7 +70,7 @@ import org.jfree.data.xy.XYDataset;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.utils.GenUtils;
 
 
@@ -102,10 +102,10 @@ public class GUIInspectGARun extends GUICardPanel
 	
 	private File srcFolder;
 	
-	private ArrayList<DENOPTIMMolecule> allIndividuals;
+	private ArrayList<Candidate> allIndividuals;
 	private int molsWithFitness = 0;
 	private JLabel lblTotItems;
-	private Map<Integer,DENOPTIMMolecule> candsWithFitnessMap;
+	private Map<Integer,Candidate> candsWithFitnessMap;
 	
 	// WARNING: itemId in the map is "j" and is just a 
 	// locally generated unique 
@@ -323,7 +323,7 @@ public class GUIInspectGARun extends GUICardPanel
 		System.out.println("Importing data from '" + srcFolder + "'...");
 		
 		Map<Integer,double[]> popProperties = new HashMap<Integer,double[]>();
-		allIndividuals = new ArrayList<DENOPTIMMolecule>();
+		allIndividuals = new ArrayList<Candidate>();
 		for (File genFolder : file.listFiles(new FileFilter() {
 			
 			@Override
@@ -389,7 +389,7 @@ public class GUIInspectGARun extends GUICardPanel
 				}
 			}))
 			{
-				DENOPTIMMolecule one;
+				Candidate one;
 				try {
 					one = DenoptimIO.readDENOPTIMMolecules(
 							fitFile,false).get(0);
@@ -418,11 +418,11 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		// Process data and organize then into series for the plot 
         double[][] candsWithFitnessData = new double[2][molsWithFitness];
-        candsWithFitnessMap = new HashMap<Integer,DENOPTIMMolecule>();
+        candsWithFitnessMap = new HashMap<Integer,Candidate>();
         int j = -1;
         for (int i=0; i<allIndividuals.size(); i++)
         {
-        	DENOPTIMMolecule mol = allIndividuals.get(i);
+        	Candidate mol = allIndividuals.get(i);
         	if (!mol.hasFitness())
         	{
         		continue;
@@ -615,7 +615,7 @@ public class GUIInspectGARun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						DENOPTIMMolecule mol = candsWithFitnessMap.get(itemId);
+						Candidate mol = candsWithFitnessMap.get(itemId);
 						renderViewWithSelectedItem(mol);
 					}
 					//do we do anything if we select other series? not now...
@@ -634,7 +634,7 @@ public class GUIInspectGARun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void renderViewWithSelectedItem(DENOPTIMMolecule mol)
+	private void renderViewWithSelectedItem(Candidate mol)
 	{
 		// Update series of selected (chart is updated automatically)
         double[][] selectedCandsData = new double[2][1]; //NB: for now allow only one

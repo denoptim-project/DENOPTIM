@@ -14,8 +14,22 @@ public enum FileFormat {
         
     private String extension = "";
     
+    /**
+     * Collection of regex that, if matched, suggests assigning the format to a
+     * specific FileFormat.
+     */
     private Set<String> definingRegex = new HashSet<String>();
     
+    /**
+     * Collection of regex that, if matched, prevents assigning the format to a
+     * specific FileFormat.
+     */
+    private Set<String> negatingRegex = new HashSet<String>();
+    
+    /**
+     * Regex used to identify the end of the sampled text used to determine the
+     * format of a file.
+     */
     private String endOfSampleRegex = null;
     
     private Boolean isFolder = false;
@@ -28,28 +42,44 @@ public enum FileFormat {
                 ));
         GRAPHSDF.endOfSampleRegex = "\\$\\$\\$\\$";
         
+        //------------------------------------
+        
         GRAPHJSON.extension = "json";
         
+        //------------------------------------
+        
         VRTXJSON.extension = "json";
+
+        //------------------------------------
         
         VRTXSDF.extension = "sdf";
         VRTXSDF.definingRegex = new HashSet<String>(Arrays.asList(
                 "^> *<" + DENOPTIMConstants.APTAG+">.*"));
         VRTXSDF.endOfSampleRegex = "\\$\\$\\$\\$";
+
+        //------------------------------------
         
         FSE_RUN.extension = "";
         FSE_RUN.isFolder = true;
+
+        //------------------------------------
         
         GA_RUN.extension = "";
         GA_RUN.isFolder = true;
+
+        //------------------------------------
         
         GA_PARAM.extension = "";
         GA_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
                 "^GA-.*"));
+
+        //------------------------------------
         
         FSE_PARAM.extension = "";
         FSE_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
                 "^FSE-.*"));
+
+        //------------------------------------
         
         COMP_MAP.extension = "";
         COMP_MAP.definingRegex = new HashSet<String>(Arrays.asList(
@@ -59,6 +89,16 @@ public enum FileFormat {
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
         COMP_MAP}
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets the FileFormat from file extension and kind of data.
+     * @param extension the extension of the file (i.e., in 
+     * <code>blabla.ext</code> the extension is <code>ext</code>).
+     * @param kind the kind of data contained in the file.
+     * @return the file format corresponding to the given extension and kind 
+     * of data.
+     */
     public static FileFormat fromString(String extension, DataKind kind) {
         FileFormat ff = null;
         switch (extension.toUpperCase())
@@ -109,6 +149,8 @@ public enum FileFormat {
         }
         return ff;
     }
+    
+//------------------------------------------------------------------------------
 
     /**
      * @return <code>true</code> if the file is supposed to be a folder
@@ -117,6 +159,8 @@ public enum FileFormat {
     {
         return isFolder;
     }
+    
+//------------------------------------------------------------------------------
     
     /**
      * In identifying a text file we read as many lines as possible until we 
@@ -129,6 +173,8 @@ public enum FileFormat {
         return endOfSampleRegex;
     }
     
+//------------------------------------------------------------------------------
+    
     /**
      * Returns the list of regex strings that allow identification of a file.
      * @return
@@ -138,8 +184,24 @@ public enum FileFormat {
         return definingRegex;
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of regex strings that exclude a file format.
+     * @return
+     */
+    public Set<String> getNegatingRegex()
+    {
+        return negatingRegex;
+    }
+    
+//------------------------------------------------------------------------------
+    
     public String getExtension()
     {
         return extension;
     }
+    
+//------------------------------------------------------------------------------
+
 }

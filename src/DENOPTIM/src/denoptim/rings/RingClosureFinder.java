@@ -93,7 +93,8 @@ public class RingClosureFinder
                                 + " Please, Report this bug to the author.");
             System.exit(1);
         }
-        if (sz > RingClosureParameters.getMaxNumberRotatableBonds())
+        //NB: the '+2' comes from the 'bonds' to RCAs: 2 per fundamental ring
+        if (sz > RingClosureParameters.getMaxNumberRotatableBonds()+2)
         {
             if (verbosity > 0)
             {

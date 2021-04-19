@@ -334,7 +334,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                 try {
                     mol = tb.convertGraphTo3DAtomContainer(
                             dnGraph);
-                    DENOPTIMMoleculeUtils.removeRCA(mol,dnGraph);
+                    DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
                 } catch (Throwable t) {
                     t.printStackTrace();
                     System.out.println("Couldn't make 3D-tree representation: "

@@ -1,5 +1,7 @@
 package denoptim.molecule;
 
+import java.lang.reflect.Type;
+
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Marco Foscato <marco.foscato@uib.no>
@@ -29,6 +31,10 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
@@ -417,8 +423,6 @@ public class EmptyVertex extends DENOPTIMVertex
      * @return the JSON format as a single string
      */
     
-    //TODO-V3 use relocated json builder... when available
-    
     public String toJson()
     {
         
@@ -434,8 +438,6 @@ public class EmptyVertex extends DENOPTIMVertex
      * @param json the string to parse.
      * @return a new instance of this class.
      */
-
-    //TODO-V3 use relocated json builder... when available
     
     public static EmptyVertex fromJson(String json)
     {   

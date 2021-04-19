@@ -40,7 +40,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
@@ -189,7 +189,7 @@ public class ParallelEvolutionaryAlgorithm
         }
 
         // placeholder for the molecules
-        ArrayList<DENOPTIMMolecule> molPopulation = new ArrayList<>();
+        ArrayList<Candidate> molPopulation = new ArrayList<>();
 
         // then, get the molecules from the initial population file 
         String inifile = GAParameters.getInitialPopulationFile();
@@ -346,7 +346,7 @@ public class ParallelEvolutionaryAlgorithm
      * the population is updated with fitter structures
      * @throws DENOPTIMException
      */
-    private boolean evolvePopulation(ArrayList<DENOPTIMMolecule> molPopulation,
+    private boolean evolvePopulation(ArrayList<Candidate> molPopulation,
                                 String genDir) throws DENOPTIMException
     {
         // temporary store for inchi codes
@@ -354,11 +354,11 @@ public class ParallelEvolutionaryAlgorithm
 
         // keep a clone of the current population for the parents to be
         // chosen from
-        ArrayList<DENOPTIMMolecule> clone_popln;
+        ArrayList<Candidate> clone_popln;
         synchronized (molPopulation)
         {
-            clone_popln = new ArrayList<DENOPTIMMolecule>();
-            for (DENOPTIMMolecule m : molPopulation)
+            clone_popln = new ArrayList<Candidate>();
+            for (Candidate m : molPopulation)
             {
                 clone_popln.add(m.clone());
             }
@@ -428,37 +428,43 @@ public class ParallelEvolutionaryAlgorithm
                         GAParameters.getCrossoverProbability()))
                 {
                     int numatt = 0;
-                    int i1 = -1, i2 = -1;
+                    Candidate male = null, female = null;
+                    int mvid = -1, fvid = -1;
                     boolean foundPars = false;
-
-                    //TODO-V3 this while block seems to be needed only to 
-                    // account for the fact that it might be impossible to find 
-                    // compatible parents. So, if the selectParents is made able
-                    // to detect whether it is NOT possible to select compatible 
-                    // parents, this block becomes useless and can be removed
-                    
                     while (numatt < MAX_EVOLVE_ATTEMPTS)
                     {
-                        int parents[] = EAUtils.selectParents(clone_popln);
-                        if (parents[0] == -1 || parents[1] == -1)
+                        if (FragmentSpace.useAPclassBasedApproach())
                         {
-                            DENOPTIMLogger.appLogger.info("Failed to identify "
-                                    + "compatible parents for crossover/mutation.");
-                            numatt++;
-                            continue;
+                            DENOPTIMVertex[] pair = EAUtils.performFBCC(
+                                    clone_popln);
+                            if (pair == null)
+                            {
+                                DENOPTIMLogger.appLogger.info("Failed to identify "
+                                        + "compatible parents for crossover.");
+                                numatt++;
+                                continue;
+                            }
+                            male = pair[0].getGraphOwner().getCandidateOwner();
+                            female = pair[1].getGraphOwner().getCandidateOwner();
+                            mvid = pair[0].getGraphOwner().indexOf(pair[0]);
+                            fvid = pair[1].getGraphOwner().indexOf(pair[1]);
+                        } else {
+                            int parents[] = EAUtils.selectBasedOnFitness(
+                                    clone_popln, 2);
+                            if (parents[0] == -1 || parents[1] == -1)
+                            {
+                                DENOPTIMLogger.appLogger.info("Failed to identify "
+                                        + "parents for crossover.");
+                                numatt++;
+                                continue;
+                            }
+                            male = clone_popln.get(parents[0]);
+                            female = clone_popln.get(parents[1]);
+                            mvid = EAUtils.selectNonScaffoldNonCapVertex(
+                                    male.getGraph());
+                            fvid = EAUtils.selectNonScaffoldNonCapVertex(
+                                    female.getGraph());
                         }
-
-                        if (parents[0] == parents[1])
-                        {
-                            DENOPTIMLogger.appLogger.info("Crossover has "
-                                    + "indentical partners.");
-                            numatt++;
-                            continue;
-                        }
-
-                        numatt = 0;
-                        i1 = parents[0];
-                        i2 = parents[1];
                         foundPars = true;
                         break;
                     }
@@ -466,26 +472,32 @@ public class ParallelEvolutionaryAlgorithm
                     if (foundPars)
                     {
                         String molid1 = FilenameUtils.getBaseName(
-                                clone_popln.get(i1).getSDFFile());
+                                male.getSDFFile());
                         String molid2 = FilenameUtils.getBaseName(
-                                clone_popln.get(i2).getSDFFile());
+                                female.getSDFFile());
 
-                        int gid1 = clone_popln.get(i1).getGraph().getGraphId();
-                        int gid2 = clone_popln.get(i2).getGraph().getGraphId();
+                        int gid1 = male.getGraph().getGraphId();
+                        int gid2 = female.getGraph().getGraphId();
+                        
+                        graph1 = male.getGraph().clone();
+                        graph2 = female.getGraph().clone();
+                        
+                        graph1.renumberGraphVertices();
+                        graph2.renumberGraphVertices();
 
-                        graph1 = clone_popln.get(i1).getGraph().clone();
-                        graph2 = clone_popln.get(i2).getGraph().clone();
-                          
                         f0 += 2;
 
-                        if (DENOPTIMGraphOperations.performCrossover(graph1, graph2))
+                        if (DENOPTIMGraphOperations.performCrossover(graph1, 
+                                graph1.getVertexAtPosition(mvid).getVertexId(),
+                                graph2,
+                                graph2.getVertexAtPosition(fvid).getVertexId()))
                         {
                             graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
                             graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
                             EAUtils.addCappingGroup(graph1);
                             EAUtils.addCappingGroup(graph2);
                             Xop = 1;
-
+                            
                             graph1.setLocalMsg("Xover: " + molid1 + "|" + gid1 +
                                                 "=" + molid2 + "|" + gid2);
                             graph2.setLocalMsg("Xover: " + molid1 + "|" + gid1 +
@@ -514,12 +526,11 @@ public class ParallelEvolutionaryAlgorithm
                     boolean foundPars = false;
                     while (numatt < MAX_EVOLVE_ATTEMPTS)
                     {
-                        i3 = EAUtils.selectSingleParent(clone_popln);
+                        i3 = EAUtils.selectBasedOnFitness(clone_popln,1)[0];
                         if (i3 == -1)
                         {
-                            //TODO-V3 this should never be possible
-                            DENOPTIMLogger.appLogger.info("Invalid parent "
-                                    + "selection.");
+                            DENOPTIMLogger.appLogger.info("Invalid mutable "
+                                    + "candidate selection.");
                             numatt++;
                             continue;
                         }
@@ -960,8 +971,11 @@ public class ParallelEvolutionaryAlgorithm
         sb.setLength(0);
 
         // sort the population
-        Collections.sort(molPopulation, Collections.reverseOrder());
-
+        synchronized (molPopulation)
+        {
+            Collections.sort(molPopulation, Collections.reverseOrder());
+        }
+        
         if (GAParameters.getReplacementStrategy() == 1)
         {
             synchronized(molPopulation)
@@ -1001,33 +1015,40 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
-    private void initializePopulation(ArrayList<DENOPTIMMolecule> molPopulation,
+    private void initializePopulation(ArrayList<Candidate> population,
                 String genDir) throws DENOPTIMException
     {
         final int MAX_TRIES = GAParameters.getPopulationSize() * 
                                               GAParameters.getMaxTriesFactor();
 
-        if (molPopulation.size() == GAParameters.getPopulationSize())
+        if (population.size() == GAParameters.getPopulationSize())
         {
-            Collections.sort(molPopulation, Collections.reverseOrder());
+            synchronized (population)
+            {
+                Collections.sort(population, Collections.reverseOrder());
+            }
             return;
         }
         else if (GAParameters.getReplacementStrategy() == 1)
         {
-            if (molPopulation.size() > GAParameters.getPopulationSize())
+            if (population.size() > GAParameters.getPopulationSize())
             {
                 // sort the population
-                molPopulation.sort(Collections.reverseOrder());
-                int k = molPopulation.size();
-                
-                // trim the population to the desired size
-                for (int l=GAParameters.getPopulationSize(); l<k; l++)
+                synchronized (population)
                 {
-                    molPopulation.get(l).cleanup();
+                    Collections.sort(population, Collections.reverseOrder());
+                    int k = population.size();
+                    
+                    // trim the population to the desired size
+                    for (int l=GAParameters.getPopulationSize(); l<k; l++)
+                    {
+                        population.get(l).cleanup();
+                    }
+    
+                    // trim the population to the desired size
+                    population.subList(
+                            GAParameters.getPopulationSize(),k).clear();
                 }
-
-                // trim the population to the desired size
-                molPopulation.subList(GAParameters.getPopulationSize(), k).clear();
             }
         }
 
@@ -1055,11 +1076,9 @@ public class ParallelEvolutionaryAlgorithm
                     }
                 }
 
-                synchronized (molPopulation)
+                synchronized (population)
                 {
-                    //System.err.println("PSIZE: " + molPopulation.size());
-                    if (molPopulation.size() == GAParameters.getPopulationSize() ||
-                            molPopulation.size() > GAParameters.getPopulationSize())
+                    if (population.size() >= GAParameters.getPopulationSize())
                     {
                         break;
                     }
@@ -1068,8 +1087,6 @@ public class ParallelEvolutionaryAlgorithm
 
                 // generate a random graph
                 DENOPTIMGraph molGraph = EAUtils.buildGraph();
-//                System.err.println("My graph: " + molGraph.toString());
-
                 if (molGraph == null)
                 {
                     synchronized(numTries)
@@ -1133,7 +1150,7 @@ public class ParallelEvolutionaryAlgorithm
 
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         molName, molGraph, inchi, smiles, cmol, 
-                        genDir, molPopulation, numTries,
+                        genDir, population, numTries,
                         GAParameters.getUIDFileOut());
                 submitted.add(task);
                 futures.add(tcons.submit(task));
@@ -1163,10 +1180,11 @@ public class ParallelEvolutionaryAlgorithm
                             numTries + " attempts.");
         }
 
-        molPopulation.trimToSize();
-
-        // sort population by fitness
-        molPopulation.sort(Collections.reverseOrder());
+        synchronized (population)
+        {
+            population.trimToSize();
+            Collections.sort(population, Collections.reverseOrder());
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -1212,9 +1230,9 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
-    private void cleanup(ArrayList<DENOPTIMMolecule> popln)
+    private void cleanup(ArrayList<Candidate> popln)
     {
-        for (DENOPTIMMolecule mol:popln)
+        for (Candidate mol:popln)
             mol.cleanup();
         popln.clear();
     }

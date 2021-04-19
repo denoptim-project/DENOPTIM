@@ -1,26 +1,9 @@
 package denoptim.utils;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-
-import java.util.Set;
-
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
-
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMGraph.DENOPTIMGraphSerializer;
@@ -34,7 +17,8 @@ import denoptim.molecule.DENOPTIMRing.DENOPTIMRingSerializer;
 
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.DENOPTIMEdgeSerializer;
-
+import denoptim.molecule.APClass;
+import denoptim.molecule.APClass.APClassDeserializer;
 import denoptim.molecule.APMap;
 import denoptim.molecule.APMap.APMapSerializer;
 
@@ -83,8 +67,16 @@ public class DENOPTIMgson
       // Custom deserializer takes care of converting ID-based components
       // to references to vertices and APs
       .registerTypeAdapter(DENOPTIMGraph.class, new DENOPTIMGraphDeserializer())
+      .registerTypeAdapter(APClass.class, new APClassDeserializer())
       .setPrettyPrinting()
       .create();
+    
+    /*
+     * WARNING:
+     * If you have to add a Type adapter in the reader, you should consider
+     * doping it also in the GSON reader defined in DENOPTIMVertexDeserializer.
+     */
+    
   }
 
 //------------------------------------------------------------------------------
@@ -134,6 +126,10 @@ public class DENOPTIMgson
                   && field.getName().equals("owner")) {
               return true;
           }
+          if (field.getDeclaringClass() == DENOPTIMTemplate.class
+                  && field.getName().equals("mol")) {
+              return true;
+          }
 
           return false;
       }
@@ -175,6 +171,10 @@ public class DENOPTIMgson
               }
               if (field.getDeclaringClass() == DENOPTIMTemplate.class
                       && field.getName().equals("innerGraph")) {
+                  return true;
+              }
+              if (field.getDeclaringClass() == DENOPTIMTemplate.class
+                      && field.getName().equals("mol")) {
                   return true;
               }
 

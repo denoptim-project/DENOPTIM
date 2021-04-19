@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.random.MersenneTwister;
 
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 
 
 /**
@@ -49,7 +49,7 @@ public class SelectionHelper
      */
 
     protected static int[] performTournamentSelection(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+                                    ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int k = molPopulation.size();
@@ -94,7 +94,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population
      */
     protected static int[] performRandomSelection(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+                                    ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int[] selection = new int[sz];
@@ -117,7 +117,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population
      */
     protected static int[] performSUS(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+                                    ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int k = molPopulation.size();
@@ -175,7 +175,7 @@ public class SelectionHelper
      */
 
     protected static int[] performRWS(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+                                    ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int k = molPopulation.size();

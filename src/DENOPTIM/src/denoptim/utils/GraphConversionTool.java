@@ -43,12 +43,14 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.molecule.UndirectedEdgeRelation;
 import denoptim.threedim.ThreeDimTreeBuilder;
+import scala.deprecated;
 
 
 /**
@@ -131,13 +133,15 @@ public class GraphConversionTool
      * the string-representation of the graph.
      * @return the Graph representation that can be used by DENOPTIM
      * @throws denoptim.exception.DENOPTIMException
+     * @deprecated this method reads the old string representation, which cannot
+     * represent all possible states of a {@link DENOPTIMTemplate}. 
+     * Use JSON string instead.
      */
 
+    @Deprecated
     public static DENOPTIMGraph getGraphFromString(String strGraph, 
 				    boolean useMolInfo) throws DENOPTIMException
-    {
-        //TODO-V3 string representation will probably change, so this will require heavy changes
-        
+    {  
     	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
         String[] s1 = strGraph.split("\\s+");
         int gcode = Integer.parseInt(s1[0]);
@@ -184,7 +188,6 @@ public class GraphConversionTool
             // level
             int level = Integer.parseInt(s3[3]);
 	            
-            //TODO-V3: this is where a type-agnostic constructor should be used
             DENOPTIMVertex dv;
             if (FragmentSpace.isDefined())
             {
@@ -196,11 +199,6 @@ public class GraphConversionTool
                 dv =  new EmptyVertex(vid);
             }
             dv.setLevel(level);
-
-            
-            //TODO-V3:check the symmetry on the vertex is properly imported
-            // NB: now, we cannot record which APs are symmetric from the string
-		    // representation of a graph without the library of fragments.
 
             vertices.add(dv);
         }

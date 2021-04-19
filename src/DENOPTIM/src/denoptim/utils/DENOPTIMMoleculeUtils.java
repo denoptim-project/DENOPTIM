@@ -82,6 +82,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
@@ -173,7 +174,7 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Replace <code>PseudoAtom</code>s representing ring closing attractors
+     * Replace any <code>PseudoAtom</code>s representing ring closing attractors
      * with H. No change in coordinates.
      * @param mol Molecule to replace <code>PseudoAtom</code>s of.
      */
@@ -204,15 +205,14 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Replace unused ring closing attractors (RCA) with H atoms and 
-     * remove used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
+     * Replace used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
      * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 
      * @throws DENOPTIMException if
      */
 
-    public static void removeRCA(IAtomContainer mol, DENOPTIMGraph graph)
+    public static void removeUsedRCA(IAtomContainer mol, DENOPTIMGraph graph)
             throws DENOPTIMException {
 
         // add ring-closing bonds
@@ -221,8 +221,7 @@ public class DENOPTIMMoleculeUtils
                 DENOPTIMMoleculeUtils.getVertexToAtomIdMap(usedRcvs,mol);
         if (vIdToAtmId.size() == 0)
         {
-            // No used RCV to remove. Remove unused, and leave.
-            removeRCA(mol);
+            // No used RCV to remove.
             return;
         }
         ArrayList<IAtom> atmsToRemove = new ArrayList<>();
@@ -266,15 +265,39 @@ public class DENOPTIMMoleculeUtils
             doneVertices.set(usedRcvs.indexOf(vH),true);
             doneVertices.set(usedRcvs.indexOf(vT),true);
 	    }
+        
+        // Adapt atom indexes in APs to the upcoming change of atom list
+        ArrayList<Integer> removedIds = new ArrayList<Integer>();
+        for (IAtom a : atmsToRemove)
+        {
+            removedIds.add(mol.indexOf(a));
+        }
+        Collections.sort(removedIds);
+        for (DENOPTIMVertex v : graph.getVertexList())
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                int apSrcId = ap.getAtomPositionNumberInMol();
+                int countOfAtmsBEforeSrc = 0;
+                for (Integer removingId : removedIds)
+                {
+                    if (removingId < apSrcId)
+                    {
+                        countOfAtmsBEforeSrc++; 
+                    } else if (removingId > apSrcId)
+                    {
+                        break;
+                    }
+                }
+                ap.setAtomPositionNumberInMol(apSrcId-countOfAtmsBEforeSrc);
+            }
+        }
 
         // remove used RCAs
         for (IAtom a : atmsToRemove)
         {
             mol.removeAtom(a);
         }
-
-        // convert remaining PseudoAtoms to H
-        removeRCA(mol);
     }
 
 //------------------------------------------------------------------------------
@@ -473,7 +496,6 @@ public class DENOPTIMMoleculeUtils
 
 //------------------------------------------------------------------------------
 
-
     /**
      * The heavy atom count
      * @param mol Molecule to count heavy atoms in
@@ -486,6 +508,26 @@ public class DENOPTIMMoleculeUtils
         for (int f = 0; f < mol.getAtomCount(); f++)
         {
             if (!mol.getAtom(f).getSymbol().equals("H"))
+                n++;
+        }
+        return n;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Count atoms with the given elemental symbol.
+     * @param mol Molecule to count atoms in.
+     * @param symbol the elemental symbol to look for.
+     * @return the total number of those elements.
+     */
+
+    public static int countAtomsOfElement(IAtomContainer mol, String symbol)
+    {
+        int n = 0;
+        for (IAtom atm : mol.atoms())
+        {
+            if (atm.getSymbol().equals(symbol))
                 n++;
         }
         return n;

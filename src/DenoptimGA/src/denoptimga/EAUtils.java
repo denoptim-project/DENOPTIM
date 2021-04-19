@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -51,9 +53,10 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
@@ -108,7 +111,7 @@ public class EAUtils
      */
 
     protected static void outputPopulationDetails
-                            (ArrayList<DENOPTIMMolecule> popln, String filename)
+                            (ArrayList<Candidate> popln, String filename)
                                                         throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
@@ -126,7 +129,7 @@ public class EAUtils
 
         for (int i=0; i<GAParameters.getPopulationSize(); i++)
         {
-            DENOPTIMMolecule mol = popln.get(i);
+            Candidate mol = popln.get(i);
             if (mol != null)
             {
                 String mname = new File(mol.getSDFFile()).getName();
@@ -153,7 +156,7 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> popln)
+    private static String getSummaryStatistics(ArrayList<Candidate> popln)
     {
         double[] fitness = getFitnesses(popln);
         double sdev = DENOPTIMStatUtils.stddev(fitness, true);
@@ -201,7 +204,7 @@ public class EAUtils
 
         for (int i=0; i<GAParameters.getPopulationSize(); i++)
         {
-            DENOPTIMMolecule mol = popln.get(i);
+            Candidate mol = popln.get(i);
             DENOPTIMGraph g = mol.getGraph();
             int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
@@ -222,158 +225,116 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Selects a single parent using the scheme specified.
-     * @param popln
-     * @return the index of the parent
+     * Selects a number of members from the given population. 
+     * The selection method is what specified by the
+     * configuration of the genetic algorithm ({@link GAParameters}).
+     * @param population the list of candidates to chose from.
+     * @param number how many candidate to pick.
+     * @return indexes of the selected members of the given population.
      */
-    
-    //TODO-V3 merge this with the selectParents to get a selectParents(population,how_many_do_you_want)
 
-    protected static int selectSingleParent(ArrayList<DENOPTIMMolecule> popln)
+    protected static int[] selectBasedOnFitness(ArrayList<Candidate> population, 
+            int number)
     {
-        int selmate = -1;
-        int stype = GAParameters.getSelectionStrategyType();
-
+        int[] mates = new int[number];
+        for (int i=0; i<number; i++)
+        {
+            mates[i] = -1;
+        }
         MersenneTwister rng = RandomUtils.getRNG();
-
-        int[] mates = null;
-
-        switch (stype)
+        switch (GAParameters.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection(rng, popln, 2);
+            mates = SelectionHelper.performTournamentSelection
+                                            (rng, population, number);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(rng, popln, 2);
+            mates = SelectionHelper.performRWS
+                                            (rng, population, number);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(rng, popln, 2);
+            mates = SelectionHelper.performSUS
+                                            (rng, population, number);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(rng, popln, 2);
+            mates = SelectionHelper.performRandomSelection
+                                            (rng, population, number);
             break;
         }
-
-        selmate = mates[rng.nextInt(2)];
-
-        return selmate;
+        return mates;
     }
     
 //------------------------------------------------------------------------------
-
+    
     /**
-     * Selects two parents for crossover.
-     * @param molPopulation the population of candidates.
-     * @return array of parents for crossover.
+     * Chose randomly a vertex that is neither scaffold or capping group.
      */
-
-    protected static int[] selectParents(ArrayList<DENOPTIMMolecule> molPopulation)
+    protected static int selectNonScaffoldNonCapVertex(DENOPTIMGraph g)
     {
-        int[] mates = null;
-
-        MersenneTwister rng = RandomUtils.getRNG();
-        
-        //TODO-V3 make this work on a subset of population members chosen
-        // according to APClass compatibility, thus getting rid of the 
-        // if statement.
-
-        if (!FragmentSpace.useAPclassBasedApproach())
-        {
-            switch (GAParameters.getSelectionStrategyType())
-            {
-            case 1:
-                mates = SelectionHelper.performTournamentSelection
-                                                (rng, molPopulation, 2);
-                break;
-            case 2:
-                mates = SelectionHelper.performRWS
-                                                (rng, molPopulation, 2);
-                break;
-            case 3:
-                mates = SelectionHelper.performSUS
-                                                (rng, molPopulation, 2);
-                break;
-            case 4:
-                mates = SelectionHelper.performRandomSelection
-                                                (rng, molPopulation, 2);
-                break;
-            }
-        }
-        else
-        {
-            // select compatible parents
-            mates = EAUtils.performFBCC(molPopulation);
-        }
-
-        return mates;
-    }    
+        Set<DENOPTIMVertex> candidates = new HashSet<>(g.getVertexList());
+        candidates.removeIf(v ->
+                v.getBuildingBlockType() == BBType.SCAFFOLD
+                || v.getBuildingBlockType() == BBType.CAP);
+        return g.indexOf(RandomUtils.randomlyChooseOne(candidates));
+    }
               
 //------------------------------------------------------------------------------
 
     /**
-     * perform fitness based class compatible selection of parents
-     * @param molPopulation list of molecules
-     * @return indices of the parents that have at least 1 compatible Xover point
+     * Perform fitness-based, class-compatible selection of parents for 
+     * crossover.
+     * @param pop list of candidates among which to choose.
+     * @return returns the pair of vertexes where crossover can be performed,
+     * or null if no possibility was found.
      */
 
-    protected static int[] performFBCC(ArrayList<DENOPTIMMolecule> molPopulation)
+    protected static DENOPTIMVertex[] performFBCC(ArrayList<Candidate> pop)
     {
-        int[] selection = new int[2];
-        selection[0] = -1;
-        selection[1] = -1;
-
         // first select 1st parent through whatever scheme is applied
-        int p1 = selectSingleParent(molPopulation);
-        
-        if (p1 != -1)
+        int p1 = selectBasedOnFitness(pop, 1)[0];
+        if (p1 == -1)
         {
-            selection[0] = p1;
-
-            // loop through the rest of the population, break when a member shares
-            // at least 1 compatible point
-            // since the population is sorted by fitness, this routine will pick 
-            // the fitter parent, although the first parent may be less fit
-
-            DENOPTIMGraph g1 = molPopulation.get(p1).getGraph();
-
-            ArrayList<Integer> indices = new ArrayList<>();
-
-            for (int i=0; i<molPopulation.size(); i++)
-            {
-                if (i == p1)
-                    continue;
-                DENOPTIMGraph g2 = molPopulation.get(i).getGraph();
-                RMap rp = DENOPTIMGraphOperations.locateCompatibleXOverPoints(g1, g2);
-                if (rp != null)
-                {
-                    indices.add(i);
-                }
-            }
-
-            if (indices.isEmpty())
-            {
-                selection[0] = -1;
-                selection[1] = -1;
-                return selection;
-            }
-        
-            switch (indices.size()) 
-            {
-                case 1:
-                    selection[1] = indices.get(0);
-                    break;
-                case 2:
-                    // select the fitter of the 2
-                    selection[1] = indices.get(0);
-                    break;
-                default:
-                    MersenneTwister rng = RandomUtils.getRNG();
-                    selection[1] = indices.get(rng.nextInt(indices.size()));
-                    break;
-            }
-            indices.clear();
+            return null;
         }
-        return selection;
+
+        Candidate c1 = pop.get(p1);
+        DENOPTIMGraph g1 = c1.getGraph();
+        g1.setCandidateOwner(c1);
+        
+        // Filter population to keep only members that can do 
+        // crossover with g1 (and keep track of where each candidate can do
+        // crossover with g1)
+        Map<Candidate,List<DENOPTIMVertex[]>> subPop = 
+                new HashMap<Candidate, List<DENOPTIMVertex[]>>();
+        for (int i=0; i<pop.size(); i++)
+        {
+            if (i == p1)
+                continue;
+
+            Candidate c2 = pop.get(i);
+            DENOPTIMGraph g2 = pop.get(i).getGraph();
+            g2.setCandidateOwner(c2);
+            
+            if (g1.isIsomorphicTo(g2))
+                continue;
+            
+            List<DENOPTIMVertex[]> xoPairs = DENOPTIMGraphOperations
+                    .locateCompatibleXOverPoints(g1, g2);
+            if (xoPairs.size() > 0)
+            {
+                subPop.put(pop.get(i), xoPairs);
+            }
+        }
+        
+        if (subPop.size() == 0)
+            return null;
+        
+        ArrayList<Candidate> keys = new ArrayList<Candidate>(subPop.keySet());
+        int chosen = selectBasedOnFitness(keys,1)[0];
+        if (chosen < 0)
+            return null;
+        
+        return RandomUtils.randomlyChooseOne(subPop.get(keys.get(chosen)));
     }
 
 //------------------------------------------------------------------------------
@@ -385,7 +346,7 @@ public class EAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(ArrayList<DENOPTIMMolecule> popln,
+    protected static void outputFinalResults(ArrayList<Candidate> popln,
                             String destDir) throws DENOPTIMException
     {
         String genOutfile = destDir + System.getProperty("file.separator") +
@@ -427,7 +388,7 @@ public class EAUtils
      * @throws DENOPTIMException
      */
     protected static void getPopulationFromFile(String filename,
-            ArrayList<DENOPTIMMolecule> molPopulation, HashSet<String> lstInchi,
+            ArrayList<Candidate> molPopulation, HashSet<String> lstInchi,
             String genDir) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> mols;
@@ -520,8 +481,9 @@ public class EAUtils
                 mol.setProperty("GraphENC", graph.toString());
                 mol.setProperty("GraphMsg", "From Initial Population File");
 
-                DENOPTIMMolecule pmol =
-                    new DENOPTIMMolecule(graph, molinchi, molsmiles, fitness);
+                Candidate pmol = new Candidate(molName, graph, fitness, 
+                        molinchi, molsmiles);
+                
                 DenoptimIO.writeMolecule(molfile, mol, false);
                 pmol.setSDFFile(molfile);
                 pmol.setImageFile(null);
@@ -575,10 +537,10 @@ public class EAUtils
      * @param popln
      */
 
-    protected static void setVertexCounterValue(ArrayList<DENOPTIMMolecule> popln)
+    protected static void setVertexCounterValue(ArrayList<Candidate> popln)
     {
         int val = Integer.MIN_VALUE;
-        for (DENOPTIMMolecule popln1 : popln)
+        for (Candidate popln1 : popln)
         {
             DENOPTIMGraph g = popln1.getGraph();
             val = Math.max(val, g.getMaxVertexId());
@@ -620,8 +582,6 @@ public class EAUtils
         else
         {
             MersenneTwister rng = RandomUtils.getRNG();
-            //return GAParameters.getRNG().nextInt(
-            //                    FragmentSpace.getFragmentLibrary().size());
             return rng.nextInt(FragmentSpace.getFragmentLibrary().size());
 
         }
@@ -644,25 +604,15 @@ public class EAUtils
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold();
 
-        //TODO-V3: use a type-agnostic w.r.t vertex constructor
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, DENOPTIMVertex.BBType.SCAFFOLD);
 
         // we set the level to -1, as the base
         scafVertex.setLevel(-1);
         
-        //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
-        
-        /*
-        DENOPTIMVertex mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
-        ArrayList<SymmetricSet> simAP = mol.getSymmetricAPsSets();
-        scafVertex.setSymmetricAP(simAP);
-        */
-        
-        //TODO: did we pick a template? Then, we'll have to deal with it.
-        // as we can pick a template in other graph operations, the dealing of the template
-        // should be a public method or something that can be called from elsewhere
-        
+        //TODO-V3: did we pick a template? Then, we'll have to deal with it:
+        // meaning, if the template has a fully finished content, it just behaves as
+        // a normal vertex, otherwise it has to be filled with content.
         
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
@@ -722,10 +672,9 @@ public class EAUtils
         ArrayList<Integer> reacFrags = getCompatibleCappingFragments(rcnCap);
 
         int fapidx = -1;
-//TODO make random selection!?
         if (reacFrags.size() > 0)
         {
-            fapidx = reacFrags.get(0);
+            fapidx = RandomUtils.randomlyChooseOne(reacFrags);
         }
 
         return fapidx;
@@ -772,45 +721,27 @@ public class EAUtils
                                 int dapIdx) throws DENOPTIMException
     {
         int lvl = curVertex.getLevel();
+        
+        DENOPTIMAttachmentPoint srcAP = curVertex.getAttachmentPoints()
+                .get(dapIdx);
 
-        APClass apcSrc =  curVertex.getAttachmentPoints().get(dapIdx).getAPClass();
-        // locate the capping group for this rcn
+        APClass apcSrc = srcAP.getAPClass();
         APClass apcCap = getCappingGroup(apcSrc);
         
         if (apcCap != null)
         {
-
             int bbIdCap = getCappingFragment(apcCap);
 
             if (bbIdCap != -1)
             {
+                int capVertexId = GraphUtils.getUniqueVertexIndex();
                 DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                        GraphUtils.getUniqueVertexIndex(), bbIdCap, DENOPTIMVertex.BBType.CAP);
+                        capVertexId, bbIdCap, 
+                        DENOPTIMVertex.BBType.CAP);
                 
-                capVrtx.setLevel(lvl+1);
-
-                //Get the index of the AP of the capping group to use
-                //(always the first and only AP)
-                DENOPTIMEdge edge = curVertex.connectVertices(
-                        capVrtx, dapIdx, 0, apcSrc, apcCap
-                );
-
-                if (edge != null)
-                {
-                    // add the fragment as a vertex
-                    molGraph.addVertex(capVrtx);
-
-                    molGraph.addEdge(edge);
-
-                    return capVrtx.getVertexId();
-                }
-                else
-                {
-                    String msg = "Unable to connect capping group "
-                                     + capVrtx + " to graph" + molGraph;
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
-                    throw new DENOPTIMException(msg);
-                }
+                molGraph.appendVertexOnAP(srcAP, capVrtx.getAP(0));
+                
+                return capVertexId;
             }
             else
             {
@@ -898,7 +829,6 @@ public class EAUtils
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();
 
-//TODO decide to make optional
         boolean onlyRandomCombOfRings = true;
         if (onlyRandomCombOfRings)
         {
@@ -971,7 +901,7 @@ public class EAUtils
         }
 
         // Update the IAtomContainer representation
-        DENOPTIMMoleculeUtils.removeRCA(mol,molGraph);
+        DENOPTIMMoleculeUtils.removeUsedRCA(mol,molGraph);
         res[2] = mol;
 
         // Update the SMILES representation
@@ -1062,13 +992,13 @@ public class EAUtils
      * @return <code>true</code> if found
      */
 
-    protected static boolean containsMolecule(ArrayList<DENOPTIMMolecule> mols,
+    protected static boolean containsMolecule(ArrayList<Candidate> mols,
                                                                 String molcode)
     {
         if(mols.isEmpty())
             return false;
 
-        for (DENOPTIMMolecule mol : mols)
+        for (Candidate mol : mols)
         {
             if (mol.getUID().compareToIgnoreCase(molcode) == 0)
             {
@@ -1086,7 +1016,7 @@ public class EAUtils
      * @return array of fitness values
      */
 
-    protected static double[] getFitnesses(ArrayList<DENOPTIMMolecule> mols)
+    protected static double[] getFitnesses(ArrayList<Candidate> mols)
     {
         int k = mols.size();
         double[] arr = new double[k];
@@ -1107,7 +1037,7 @@ public class EAUtils
      * values exceeds 0.0001
      */
 
-    protected static double getPopulationSD(ArrayList<DENOPTIMMolecule> molPopulation)
+    protected static double getPopulationSD(ArrayList<Candidate> molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
         return DENOPTIMStatUtils.stddev(fitvals, true);
@@ -1123,7 +1053,7 @@ public class EAUtils
      */
 
     protected static ArrayList<String> getInchiCodes
-                                    (ArrayList<DENOPTIMMolecule> molPopulation)
+                                    (ArrayList<Candidate> molPopulation)
     {
         int k = molPopulation.size();
         ArrayList<String> arr = new ArrayList<>();
@@ -1263,8 +1193,6 @@ public class EAUtils
                 return null;
             }
         }
-
-//TODO make room for more optional filtering criteria?
         
         if (RingClosureParameters.allowRingClosures())
         {
@@ -1500,40 +1428,20 @@ public class EAUtils
                 if (dp.isAvailable())
                 {
                     APClass apClass = dp.getAPClass();
-                    //TODO-V3 remove loop once we can ensure all APClass instances
-                    // refer to the unique ones
-                    for (APClass fe : classOfForbEnds)
-                    {
-                        if (fe.equals(apClass))
-                        {
-                            String msg = "Forbidden free AP for Vertex: "
-                                + vtx.getVertexId()
-                                + " MolId: " + (vtx.getBuildingBlockId() + 1)
-                                + " Ftype: " + vtx.getBuildingBlockType()
-                                + "\n"+ molGraph+" \n "
-                                + " AP class: " + apClass;
-                            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-                            return true;
-                        }
-                    }
-                    /*
                     if (classOfForbEnds.contains(apClass))
                     {
-                        found = true;
                         String msg = "Forbidden free AP for Vertex: "
                             + vtx.getVertexId()
-                            + " MolId: " + (vtx.getMolId() + 1)
-                            + " Ftype: " + vtx.getFragmentType()
-                            + NL+ molGraph + NL
+                            + " MolId: " + (vtx.getBuildingBlockId() + 1)
+                            + " Ftype: " + vtx.getBuildingBlockType()
+                            + "\n"+ molGraph+" \n "
                             + " AP class: " + apClass;
                         DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-                        break;
+                        return true;
                     }
-                    */
                 }
             }
         }
-
         return false;
     }
 

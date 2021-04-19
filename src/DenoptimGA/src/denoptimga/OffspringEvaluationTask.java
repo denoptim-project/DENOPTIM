@@ -36,7 +36,7 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
@@ -52,7 +52,7 @@ import static denoptimga.DENOPTIMGraphOperations.*;
 public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
-    private volatile ArrayList<DENOPTIMMolecule> curPopln;
+    private volatile ArrayList<Candidate> curPopln;
     private volatile Integer numTry;
     
     /**
@@ -76,7 +76,7 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     public OffspringEvaluationTask(String molName, DENOPTIMGraph molGraph,
     		String inchi, String smiles, IAtomContainer iac, String workDir,
-            ArrayList<DENOPTIMMolecule> popln, Integer numTry, String fileUID)
+            ArrayList<Candidate> popln, Integer numTry, String fileUID)
     {
     	super(molGraph);
         this.molName = molName;
@@ -90,10 +90,12 @@ public class OffspringEvaluationTask extends FitnessTask
         result.setSmiles(smiles);
         
         // Define pathnames to files used/produced by fitness provider
-        //TODO use constants
-        fitProvOutFile = this.workDir + SEP + this.molName + "_FIT.sdf";
-        fitProvInputFile = this.workDir + SEP + this.molName + "_I.sdf";
-        fitProvPNGFile = this.workDir + SEP + this.molName + ".png";
+        fitProvOutFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvInputFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTIN;
+        fitProvPNGFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.CANDIDATE2DEXTENSION;
         fitProvUIDFile = fileUID;
     }
 
@@ -112,11 +114,10 @@ public class OffspringEvaluationTask extends FitnessTask
             try {
                 DENOPTIMGraph gWithNoRCVs = dGraph.clone();
                 GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
-            	// TODO-V3
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree
             	// 2) remove RCAs
-            	// 3) remove dummy in multy hapto
+            	// 3) remove dummy in multi-hapto
             	// 4) remove dummy in linearities
             	// All this should be done within the TreeBuilder3D and 
             	// controlled by flags. Obviously, if we remove all these 
@@ -205,8 +206,8 @@ public class OffspringEvaluationTask extends FitnessTask
 
         List<DENOPTIMGraph> subgraphs = curPopln
                 .stream()
-                .filter(DENOPTIMMolecule::hasFitness)
-                .map(DENOPTIMMolecule::getGraph)
+                .filter(Candidate::hasFitness)
+                .map(Candidate::getGraph)
                 .map(g -> extractPattern(g, pattern))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());

@@ -112,7 +112,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -1378,13 +1378,6 @@ public class DenoptimIO
                     }
                     
                     APClass srcAPC = APClass.make(str[1]);
-                    /*
-                    ArrayList<APClass> trgAPCs = new ArrayList<APClass>();
-                    for (String s : str[2].split(","))
-                    {
-                        trgAPCs.add(APClass.make(s.trim()));
-                    }
-*/
 
                     String strRcn[] = str[2].split(",");
                     for (int i = 0; i < strRcn.length; i++) {
@@ -1443,13 +1436,13 @@ public class DenoptimIO
      * @throws DENOPTIMException is something goes wrong while reading the file
      *                           or interpreting its content
      */
-    public static ArrayList<DENOPTIMMolecule> readDENOPTIMMolecules(File file, 
+    public static ArrayList<Candidate> readDENOPTIMMolecules(File file, 
             boolean useFragSpace) throws DENOPTIMException {
         String filename = file.getAbsolutePath();
-        ArrayList<DENOPTIMMolecule> mols = new ArrayList<>();
+        ArrayList<Candidate> mols = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
         for (IAtomContainer iac : iacs) {
-            DENOPTIMMolecule mol = new DENOPTIMMolecule(iac, useFragSpace);
+            Candidate mol = new Candidate(iac, useFragSpace);
             mol.setSDFFile(filename);
             mols.add(mol);
         }
@@ -1916,7 +1909,7 @@ public class DenoptimIO
     public static DENOPTIMGraph readGraphfromSDFileIAC(IAtomContainer mol, 
             int molId, boolean useFS) throws DENOPTIMException
     {
-     // Something very similar is done also in DENOPTIMMolecule
+        // Something very similar is done also in Candidate
         DENOPTIMGraph g = null;
         Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
         Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
@@ -2360,7 +2353,7 @@ public class DenoptimIO
     	if (inFile.isDirectory())
     	{
     		
-    		// This is to distinguish GS from FSE runs
+    		// This is to distinguish GA from FSE runs
     		for(File folder : inFile.listFiles(new FileFilter() {
     			
     			@Override
@@ -2531,6 +2524,8 @@ public class DenoptimIO
     {
         Map<String,FileFormat> definingMap = 
                 new HashMap<String,FileFormat>();
+        Map<String,List<FileFormat>> negatingRegex = 
+                new HashMap<String,List<FileFormat>>();
         String endOfSample = null;
         for (FileFormat ff : ffs)
         {
@@ -2542,11 +2537,23 @@ public class DenoptimIO
                    endOfSample = ff.getSampleEndRegex();
                }
            }
+           for (String regex : ff.getNegatingRegex())
+           {
+               if (negatingRegex.containsKey(regex))
+               {
+                   negatingRegex.get(regex).add(ff);
+               } else {
+                   List<FileFormat> lst = new ArrayList<FileFormat>();
+                   lst.add(ff);
+                   negatingRegex.put(regex, lst);
+               }
+           }
         }
         
         FileFormat ff = null;
         String line;
         BufferedReader br = null;
+        Set<FileFormat> negatedFFs = new HashSet<FileFormat>();
         try
         {
             br = new BufferedReader(new FileReader(fileName));
@@ -2563,12 +2570,24 @@ public class DenoptimIO
                         continue;
                     }
                     
+                    for (String key : negatingRegex.keySet())
+                    {
+                        if (line.matches(key))
+                        {
+                            negatedFFs.addAll(negatingRegex.get(key));
+                            if (negatingRegex.get(key).contains(ff))
+                            {
+                                ff = null;
+                            }
+                        }
+                    }
+                    
                     for (String keyRoot : definingMap.keySet())
                     {
-                        if (line.matches(keyRoot))
+                        if (!negatedFFs.contains(definingMap.get(keyRoot))
+                                && line.matches(keyRoot))
                         {
                         	ff = definingMap.get(keyRoot);
-                        	break lineReadingLoop;
                         }
                     }
                 }

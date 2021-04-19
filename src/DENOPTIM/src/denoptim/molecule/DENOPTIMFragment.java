@@ -71,7 +71,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	private IAtomContainer mol;
 	
 	/**
-	 * Field distinguishing type DENOPTIMFragment from other types of vertrexes.
+	 * Field distinguishing type DENOPTIMFragment from other types of vertexes.
 	 * The existence of this field triggers interpretation of the JSON string
 	 * as a DENOPTIMFragment.
 	 */
@@ -202,7 +202,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //------------------------------------------------------------------------------
     
-    public static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
+    private static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
             IAtomContainer mol,
             ArrayList<DENOPTIMAttachmentPoint> daps)
     {
@@ -276,9 +276,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
             return false;
 
-
         // check connected atoms
-        if (mol.getConnectedAtomsCount(atm1)!=mol.getConnectedAtomsCount(atm2))
+        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
             return false;
 
         List<IAtom> la1 = mol.getConnectedAtomsList(atm2);
@@ -557,8 +556,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    		DENOPTIMConstants.SEPARATORAPPROPAPS);
 			    
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0],
-                                "SDF");
+			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0]);
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
@@ -570,14 +568,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 					DENOPTIMAttachmentPoint apMany = 
 							new DENOPTIMAttachmentPoint(this, atmID+1
 									+ DENOPTIMConstants.SEPARATORAPPROPAAP
-									+ moreAPonThisAtm[j], "SDF");
+									+ moreAPonThisAtm[j]);
 					allAPs.add(apMany);
 			    }
 			} 
 			else 
 			{
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(this, onThisAtm,"SDF");
+			    		new DENOPTIMAttachmentPoint(this, onThisAtm);
 			    allAPs.add(ap);
 			}
 	    }

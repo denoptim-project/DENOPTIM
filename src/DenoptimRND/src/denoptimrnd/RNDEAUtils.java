@@ -37,7 +37,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -67,7 +67,7 @@ class RNDEAUtils
      */
 
     protected static void outputPopulationDetails
-                            (ArrayList<DENOPTIMMolecule> pop, String filename)
+                            (ArrayList<Candidate> pop, String filename)
                                                         throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
@@ -75,7 +75,7 @@ class RNDEAUtils
 
         for (int i=0; i<pop.size(); i++)
         {
-            DENOPTIMMolecule mol = pop.get(i);
+            Candidate mol = pop.get(i);
             if (mol != null)
             {
                 sb.append(String.format("%-20s", 
@@ -97,7 +97,7 @@ class RNDEAUtils
 
 //------------------------------------------------------------------------------
 
-    private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> pop)
+    private static String getSummaryStatistics(ArrayList<Candidate> pop)
     {
         double[] fitness = getFitnesses(pop);
         String res = "";
@@ -143,7 +143,7 @@ class RNDEAUtils
         }
         for (int i=0; i<RNDParameters.getPopulationSize(); i++)
         {
-            DENOPTIMMolecule mol = pop.get(i);
+            Candidate mol = pop.get(i);
             DENOPTIMGraph g = mol.getGraph();
             int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
@@ -170,7 +170,7 @@ class RNDEAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(ArrayList<DENOPTIMMolecule> pop,
+    protected static void outputFinalResults(ArrayList<Candidate> pop,
                             String destDir) throws DENOPTIMException
     {
         String genOutfile = destDir + System.getProperty("file.separator") +
@@ -208,7 +208,7 @@ class RNDEAUtils
      * @return array of fitness values
      */
 
-    protected static double[] getFitnesses(ArrayList<DENOPTIMMolecule> mols)
+    protected static double[] getFitnesses(ArrayList<Candidate> mols)
     {
         int k = mols.size();
         double[] arr = new double[k];
@@ -229,7 +229,7 @@ class RNDEAUtils
      */
 
     protected static ArrayList<String> getInchiCodes
-                                    (ArrayList<DENOPTIMMolecule> molPopulation)
+                                    (ArrayList<Candidate> molPopulation)
     {
         int k = molPopulation.size();
         ArrayList<String> arr = new ArrayList<>();
@@ -245,12 +245,13 @@ class RNDEAUtils
 
     /**
      * Import the molecular population from a file.
-     * @param fileName the pathname to the file ti read
+     * @param fileName the pathname to the file to read
      * @return the list of population members 
      * @throws DENOPTIMException
+     * @Deprecated use DenoptimIO
      */
-
-    protected static ArrayList<DENOPTIMMolecule> readGraphsWithFitnessFromFile(
+    @Deprecated
+    protected static ArrayList<Candidate> readGraphsWithFitnessFromFile(
                                        String fileName) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> mols;
@@ -267,7 +268,7 @@ class RNDEAUtils
         String fsep = System.getProperty("file.separator");
 
         Set<String> lstUIDs = new HashSet();
-        ArrayList<DENOPTIMMolecule> members = new ArrayList<DENOPTIMMolecule>();
+        ArrayList<Candidate> members = new ArrayList<Candidate>();
         for (int i=0; i<mols.size(); i++)
         {
             DENOPTIMGraph graph = null;
@@ -343,8 +344,9 @@ class RNDEAUtils
                 mol.setProperty("GraphENC", graph.toString());
                 mol.setProperty("GraphMsg", "From Initial Population File");
 
-                DENOPTIMMolecule pmol =
-                    new DENOPTIMMolecule(graph, molinchi, molsmiles, fitness);
+                Candidate pmol = new Candidate(molName, graph, fitness, 
+                        molinchi, molsmiles);
+                
                 pmol.setImageFile(null);
                 members.add(pmol);
             }

@@ -347,10 +347,10 @@ public class CompatibilityMatrixForm extends JPanel {
 	    		        	                        "OptionPane.errorIcon"));
 	    		        			return;
 	                			}
-								trgCPClasses.add(APClass.make(newAPC));
-								allAPClasses.add(APClass.make(newAPC));
-								allAPRules.add(DENOPTIMAttachmentPoint.getAPRule(
-								                newAPC));
+	                			APClass cls = APClass.make(newAPC);
+								trgCPClasses.add(cls);
+								allAPClasses.add(cls);
+								allAPRules.add(cls.getRule());
 							} catch (DENOPTIMException e1) {
 								continue;
 							} 
@@ -753,7 +753,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	    		        			return;
 	                			}
 	                			srcAPRules.add(newAPR);
-								allAPRules.add(DENOPTIMAttachmentPoint.getOnlyRule(newAPR));
+								allAPRules.add(newAPR);
 							} catch (DENOPTIMException e1) {
 								continue;
 							}

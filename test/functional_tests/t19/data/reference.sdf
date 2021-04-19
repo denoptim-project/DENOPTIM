@@ -1,5 +1,5 @@
 
-  CDK     04122118353D
+  CDK     04142111183D
 
  45 48  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -12,41 +12,41 @@
     0.0402   -0.8689   -2.1554 H   0  0  0  0  0  0  0  0  0  0  0  0
    -0.0384    1.0788   -0.7467 H   0  0  0  0  0  0  0  0  0  0  0  0
    -1.0732   -0.0486    0.7542 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.2725   -0.4201    0.7647 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.3212    1.0523    0.3521 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.7683    1.4518    0.0573 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.2238   -1.2292   -0.1192 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.9748   -0.9701   -1.3816 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.0486   -2.5101    0.1074 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.4641   -0.9015    0.1584 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.0964    1.0494   -1.1482 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.6377   -0.5350    2.0202 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.1480    1.7956    1.3268 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.4095    1.2296   -0.7238 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.5648    0.8917    0.9374 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.8853    2.7572    0.1298 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.4554   -0.9972   -1.3461 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.0506   -1.4284   -0.5439 C   0  0  0  0  0  0  0  0  0  0  0  0
-    1.5048   -1.6983    0.3763 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.5059   -0.5284    1.9043 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.4470   -2.4479    0.0016 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8984   -1.1168   -1.9574 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.6050   -3.5476    1.0928 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.7335   -0.1062   -1.9683 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0383    1.2477   -0.8725 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.5729   -0.2923    0.3216 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.0950   -3.2475   -1.9419 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.0064   -1.3379   -0.9477 C   0  0  0  0  0  0  0  0  0  0  0  0
-    0.1737    0.6732   -2.8684 C   0  0  0  0  0  0  0  0  0  0  0  0
-    1.0518   -1.1585    0.5258 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.3452   -1.7873   -0.0931 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.3103    0.1185   -1.1413 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.1901   -1.3021   -0.2219 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.8848   -0.4335    0.3417 C   0  0  0  0  0  0  0  0  0  0  0  0
-    3.3225   -2.4315   -0.4915 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.1753   -1.1651    1.9378 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.3259    0.3335    1.7536 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8949   -2.0953   -1.1569 H   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3019   -2.2454    1.6847 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0900   -2.1125    2.6090 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0094   -3.3366    3.5234 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.4150   -3.6910    1.1965 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.7548   -4.4662    2.1997 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2585   -4.0816    0.7140 H   0  0  0  0  0  0  0  0  0  0  0  0
+    3.3285   -3.7653    0.2571 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.4660   -4.3363    2.8691 H   0  0  0  0  0  0  0  0  0  0  0  0
+    3.3907   -1.9189    2.3410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2131   -1.0286    3.3389 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0037   -2.0323    1.8878 H   0  0  0  0  0  0  0  0  0  0  0  0
+    2.2172   -3.6728    3.9119 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.2757   -3.0507    4.5735 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.0845   -2.5666    1.7230 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2504   -3.7650    1.2656 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.7004   -3.4980   -0.1369 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1677   -2.1216   -0.6145 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8740   -2.2561   -1.7126 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1394   -4.4196   -0.9619 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.6115   -3.5280   -0.1053 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.0040   -4.8394    1.2428 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.3151   -2.9557    1.9618 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.5642   -2.0639    2.8182 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5854   -1.5827    2.7453 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.1471   -2.9214    3.3425 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1520   -3.3566    4.4110 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5394   -3.4742    5.5658 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0403   -2.7901    3.8863 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.3514   -0.6858    2.9474 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.7853   -1.7235    1.4557 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0879   -3.9779    2.2374 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.1914   -5.3722    2.8588 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.9577   -5.6941    3.4052 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0488   -3.8707    1.5900 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.4924   -6.2455    1.9262 H   0  0  0  0  0  0  0  0  0  0  0  0
   1  2  1  0  0  0  0 
   2  3  1  0  0  0  0 
   3  4  1  0  0  0  0 
@@ -195,8 +195,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -284,8 +284,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -373,8 +373,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -462,8 +462,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -494,8 +494,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -526,8 +526,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -558,8 +558,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -590,8 +590,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -622,8 +622,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -654,8 +654,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -686,8 +686,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -718,8 +718,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           }
         ],
@@ -838,8 +838,8 @@ M  END
       "level": -1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -999,8 +999,8 @@ M  END
       "level": 0,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1088,8 +1088,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1120,8 +1120,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1213,8 +1213,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1302,8 +1302,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1391,8 +1391,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1480,8 +1480,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1512,8 +1512,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1544,8 +1544,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1576,8 +1576,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1608,8 +1608,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1640,8 +1640,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1672,8 +1672,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1704,8 +1704,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -1736,8 +1736,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           }
         ],
@@ -1856,8 +1856,8 @@ M  END
       "level": 0,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1888,8 +1888,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1920,8 +1920,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1952,8 +1952,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -1984,8 +1984,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -2016,8 +2016,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -2048,8 +2048,8 @@ M  END
       "level": 2,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -2080,8 +2080,8 @@ M  END
       "level": 2,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -2112,8 +2112,8 @@ M  END
       "level": 2,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -2209,8 +2209,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2298,8 +2298,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2387,8 +2387,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2419,8 +2419,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2451,8 +2451,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2483,8 +2483,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2515,8 +2515,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2547,8 +2547,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 },
                 {
@@ -2579,8 +2579,8 @@ M  END
                   "level": -99,
                   "allowedMutationTypes": [
                     "CHANGEBRANCH",
-                    "DELETE",
-                    "EXTEND"
+                    "EXTEND",
+                    "DELETE"
                   ]
                 }
               ],
@@ -2683,8 +2683,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -2772,8 +2772,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -2861,8 +2861,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -2893,8 +2893,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -2925,8 +2925,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -2957,8 +2957,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           },
           {
@@ -2989,8 +2989,8 @@ M  END
             "level": -99,
             "allowedMutationTypes": [
               "CHANGEBRANCH",
-              "DELETE",
-              "EXTEND"
+              "EXTEND",
+              "DELETE"
             ]
           }
         ],
@@ -3083,8 +3083,8 @@ M  END
       "level": 1,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     },
     {
@@ -3115,8 +3115,8 @@ M  END
       "level": 2,
       "allowedMutationTypes": [
         "CHANGEBRANCH",
-        "DELETE",
-        "EXTEND"
+        "EXTEND",
+        "DELETE"
       ]
     }
   ],

@@ -23,7 +23,7 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-ls "$wrkDir/RUN*/Gen*/*FIT.sdf" | while read f 
+ls "$wrkDir/RUN*/Gen*/*out.sdf" | while read f 
 do 
     hasNull=$(grep -A1 "GraphENC" "$f" | grep -q "null") 
     if [[ $? == 0 ]] 

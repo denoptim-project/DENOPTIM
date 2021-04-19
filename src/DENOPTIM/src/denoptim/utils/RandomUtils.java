@@ -83,6 +83,9 @@ public class RandomUtils
     
     public static <T> T randomlyChooseOne(Collection<T> c)
     {
+        if (mt == null) {
+            initialiseRNG();
+        }
         int chosen = mt.nextInt(c.size());
         int i=0;
         T chosenObj = null;

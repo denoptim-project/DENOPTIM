@@ -175,6 +175,16 @@ public final class DENOPTIMConstants
     public static final String FITFILENAMEEXTOUT = "_out.sdf";
     
     /**
+     * Extension of output file with 2D picture of candidate
+     */
+    public static final String CANDIDATE2DEXTENSION = ".png";    
+    
+    /**
+     * Postfix used to mark a file that cannot be read.
+     */
+    public static final String UNREADABLEFILEPOSTFIX = "_UNREADABLE";
+    
+    /**
      * Label used to point at text based graph format
      */
     public static final String GRAPHFORMATSTRING = "STRING";

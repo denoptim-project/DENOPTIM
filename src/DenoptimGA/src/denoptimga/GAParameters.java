@@ -234,7 +234,13 @@ public class GAParameters
     protected static int print_level = 0;
     
 //------------------------------------------------------------------------------
-    
+
+    /**
+     * Restores the default values of the most important parameters. 
+     * Given that this is a static collection of parameters, running subsequent
+     * experiments from the GUI ends up reusing parameters from the previous
+     * run. This method allows to clean-up old values.
+     */
     public static void resetParameters() 
     {
     	dataDir = System.getProperty("user.dir");

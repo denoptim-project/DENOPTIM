@@ -112,16 +112,6 @@ public class FragmentSpaceParameters
      */
     protected static HashMap<APClass, Double> symmConstraintsMap = 
 						  new HashMap<APClass, Double>();
-    
-    /**
-     * Flag signalling the use of graph templates
-     */
-    protected static boolean useTemplates = false;
-    
-    /**
-     * TMP flag selecting type of test template
-     */
-    protected static boolean useCyclicTemplate = false;
 
     /**
      * Verbosity level
@@ -203,19 +193,6 @@ public class FragmentSpaceParameters
     public static String getRotSpaceDefFile()
     {
         return rotBndsFile;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    //TODO-V3 tmp code
-    public static boolean hasTemplates()
-    {
-        return useTemplates;
-    }
-    //TODO-V3 tmp code
-    public static boolean useCyclicTemplate()
-    {
-        return useCyclicTemplate;
     }
 
 //------------------------------------------------------------------------------
@@ -308,16 +285,6 @@ public class FragmentSpaceParameters
         case "FS-ENFORCESYMMETRY":
     	    enforceSymmetry = true;
     	    break;
-    	    
-    	//TODO-V3: this is temporary stuff needed to test templates
-        case "FS-USETEMPLATES=":
-            useTemplates = true;
-            break;
-        case "FS-USECYCLICTEMPLATE=":
-            useTemplates = true;
-            useCyclicTemplate = true;
-            break;
-            
             
     	case "FS-CONSTRAINSYMMETRY=":
     	    symmetryConstraints = true;

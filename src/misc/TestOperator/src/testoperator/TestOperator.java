@@ -24,6 +24,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
@@ -107,7 +108,7 @@ public class TestOperator
             System.out.println("VertexID '" +vid +  "' not found in graph "+g);
             System.exit(-1);
         }
-    
+            
         // NB: last boolean asks to ignore the growth probability
         DENOPTIMGraphOperations.performMutation(v,mt,true,
                 TestOperatorParameters.idNewVrt,

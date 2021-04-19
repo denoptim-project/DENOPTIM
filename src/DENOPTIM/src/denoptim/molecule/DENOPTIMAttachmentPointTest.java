@@ -65,14 +65,12 @@ public class DENOPTIMAttachmentPointTest
     	
     	String str2 = ap.getSingleAPStringSDF(true);
     	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
-				, str2,
-				"SDF");
+				, str2);
     	
     	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
     			+ ap.getSingleAPStringSDF(false);
     	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
-				, str3,
-				"SDF");
+				, str3);
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));
@@ -89,13 +87,12 @@ public class DENOPTIMAttachmentPointTest
 
     	String str2 = ap.getSingleAPStringSDF(true);
     	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
-				, str2,"SDF");
+				, str2);
     	
     	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
     			+ ap.getSingleAPStringSDF(false);
     	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
-				, str3,
-				"SDF");
+				, str3);
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));
@@ -142,7 +139,7 @@ public class DENOPTIMAttachmentPointTest
 //-----------------------------------------------------------------------------
     
     @Test
-    public void testEquals()
+    public void testSameAs()
     {
 		dummyVertex.addAP(1, 2, 1);
 		dummyVertex.addAP(1, 2, 1);
@@ -150,28 +147,26 @@ public class DENOPTIMAttachmentPointTest
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
     	assertEquals(-1,apA.compareTo(apB),"Comparison driven by ID.");
-    	assertTrue(apA.equals(apB),"Equals ignores ID.");
-    	assertEquals(0,apA.comparePropertiesTo(apB),
-    	        "Property-based comparison.");
+    	assertTrue(apA.sameAs(apB),"SameAs ignores ID.");
     }
     
 //-----------------------------------------------------------------------------
     
     @Test
-    public void testEquals_DiffSrcAtm()
+    public void testSameAs_DiffSrcAtm()
     {
 		dummyVertex.addAP(1, 2, 1);
 		dummyVertex.addAP(2, 2, 1);
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
-    	assertFalse(apA.equals(apB));
+    	assertFalse(apA.sameAs(apB));
     }
 
 //-----------------------------------------------------------------------------
     
     @Test
-    public void testEquals_SameAPClass() throws Exception
+    public void testSameAs_SameAPClass() throws Exception
     {
 		APClass apClass = APClass.make("classA:0");
 		dummyVertex.addAP(1, 2, 1, apClass);
@@ -179,20 +174,20 @@ public class DENOPTIMAttachmentPointTest
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
-    	assertTrue(apA.equals(apB));
+    	assertTrue(apA.sameAs(apB));
     }
     
 //-----------------------------------------------------------------------------
     
     @Test
-    public void testEquals_DiffAPClass() throws Exception
+    public void testSameAs_DiffAPClass() throws Exception
     {
     	dummyVertex.addAP(1, 2, 1, APClass.make("classA:0"));
     	dummyVertex.addAP(1, 2, 1, APClass.make("classB:0"));
 
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
-		assertFalse(apA.equals(apB));
+		assertFalse(apA.sameAs(apB));
     }
     
 //-----------------------------------------------------------------------------

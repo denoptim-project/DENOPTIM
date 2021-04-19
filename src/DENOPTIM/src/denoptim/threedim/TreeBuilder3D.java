@@ -384,7 +384,7 @@ public class TreeBuilder3D
         	// This is where we make the rings-closing bonds.
         	// Unused RCAs were already replaced by capping groups (or removed
         	// if no capping needed), So this will deal only with used RCAs.
-        	DENOPTIMMoleculeUtils.removeRCA(mol, this.graph);
+        	DENOPTIMMoleculeUtils.removeRCA(mol);
         }
         
         if (debug)

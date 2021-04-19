@@ -38,7 +38,7 @@ import denoptim.fitness.FitnessProvider;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
@@ -68,23 +68,26 @@ public abstract class FitnessTask extends Task
     /**
      * The data structure holding the results of this task
      */
-    protected DENOPTIMMolecule result = new DENOPTIMMolecule();
+    protected Candidate result = new Candidate();
     
     /**
      * The file where we store the input to the fitness provider.
      */
-    protected String fitProvInputFile = "noName.sdf";
+    protected String fitProvInputFile = "noName"
+            + DENOPTIMConstants.FITFILENAMEEXTIN;
     
     /**
      * The file where we store the final output from the fitness provider.
      */
-    protected String fitProvOutFile = "noName.sdf";
+    protected String fitProvOutFile = "noName" 
+            + DENOPTIMConstants.FITFILENAMEEXTOUT;
     
     /**
      * The file where we store the a graphical representation of the candidate 
      * (i.e., a picture).
      */
-    protected String fitProvPNGFile = "noName.png";
+    protected String fitProvPNGFile = "noName"
+            + DENOPTIMConstants.CANDIDATE2DEXTENSION;
     
     /**
      * The file where we store the list of unique identifiers or previously 
@@ -116,7 +119,7 @@ public abstract class FitnessTask extends Task
      * @return the object with data obtained from the fitness provider.
      * @throws DENOPTIMException
      */
-    protected DENOPTIMMolecule runFitnessProvider() throws DENOPTIMException
+    protected Candidate runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
         result.setSDFFile(fitProvOutFile);
@@ -127,7 +130,8 @@ public abstract class FitnessTask extends Task
     	}
         
         if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
-        		fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG).toString().equals(""))
+        		fitProvMol.getProperty(
+        		        DENOPTIMConstants.GMSGTAG).toString().equals(""))
         {
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }
@@ -246,8 +250,8 @@ public abstract class FitnessTask extends Task
             		+ "). Check " + result.getName() + ".";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
             
-            //TODO-V3 use constant
-            String fileBkp = fitProvOutFile + "_Unreadble";
+            String fileBkp = fitProvOutFile 
+                    + DENOPTIMConstants.UNREADABLEFILEPOSTFIX;
             try {
 				FileUtils.copyFile(new File(fitProvOutFile), new File(fileBkp));
 			} catch (IOException e) {

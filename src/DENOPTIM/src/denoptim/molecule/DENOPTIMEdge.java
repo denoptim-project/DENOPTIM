@@ -43,6 +43,11 @@ import denoptim.utils.GenUtils;
 public class DENOPTIMEdge implements Serializable
 {
     /**
+     * Version UID
+     */
+    private static final long serialVersionUID = 3L;
+
+    /**
      * Attachment point at source end
      */
     private DENOPTIMAttachmentPoint srcAP;
@@ -139,32 +144,7 @@ public class DENOPTIMEdge implements Serializable
     {
         return trgAP.getOwner().getVertexId();
     }
-    
-//------------------------------------------------------------------------------
 
-    /**
-     * @deprecated use of this method is discouraged.
-     * @param vid new vertex id
-     */
-    //TODO-M7 del
-    @Deprecated
-    public void setSrcVertex(int vid)
-    {
-        srcAP.getOwner().setVertexId(vid);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @deprecated use of this method is discouraged.
-     * @param vid new vertex id
-     */
-    //TODO-M7 del
-    @Deprecated
-    public void setTrgVertex(int vid)
-    {
-        trgAP.getOwner().setVertexId(vid);
-    }
 //------------------------------------------------------------------------------
     
     public APClass getSrcAPClass()
@@ -197,39 +177,22 @@ public class DENOPTIMEdge implements Serializable
      * even if the vertex IDs are different.
      */
     
-//TODO-M7: use sameAs for APs
     public boolean sameAs(DENOPTIMEdge other, StringBuilder reason)
     {
-    	if (this.getSrcAPID() != other.getSrcAPID())
-    	{
-    		reason.append("Different source atom ("+this.getSrcAPID()+":"
-    						+other.getSrcAPID()+"); ");
+        if (!this.getSrcAP().sameAs(other.getSrcAP(), reason))
+        {
+    		reason.append("Different source AP.");
     		return false;
     	}
-    	if (this.getTrgAPID() != other.getTrgAPID())
-    	{
-    		reason.append("Different target atom ("+this.getTrgAPID()+":"
-					+other.getTrgAPID()+"); ");
-    		return false;
-    	}
-    	if (!this.getSrcAPClass().equals(other.getSrcAPClass()))
-    	{
-    		reason.append("Different source APClass ("
-    				+this.getSrcAPClass()+":"
-					+other.getSrcAPClass()+"); ");
-    		return false;
-    	}
-    	if (!this.getTrgAPClass().equals(other.getTrgAPClass()))
-    	{
-    		reason.append("Different target APClass ("
-    				+this.getTrgAPClass()+":"
-					+other.getTrgAPClass()+"); ");
-    		return false;
-    	}
-    	if (this.getBondType() != (other.getBondType()))
+        if (!this.getTrgAP().sameAs(other.getTrgAP(), reason))
+        {
+            reason.append("Different target AP.");
+            return false;
+        }
+        if (this.getBondType() != (other.getBondType()))
     	{
     		reason.append("Different bond type ("+this.getBondType()+":"
-					+other.getBondType()+"); ");
+					+other.getBondType()+");");
     		return false;
     	}
     	return true;
@@ -361,7 +324,6 @@ public class DENOPTIMEdge implements Serializable
             TRIPLE.valenceUsed = 3;
             QUADRUPLE.valenceUsed = 4;
 
-            //TODO-V3 del
             SINGLE.oldString = "1";
             DOUBLE.oldString = "2";
             TRIPLE.oldString = "3";

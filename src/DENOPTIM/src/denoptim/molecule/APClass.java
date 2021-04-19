@@ -1,9 +1,18 @@
 package denoptim.molecule;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -76,8 +85,8 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     /**
      * Constructor for an empty APClass
      */
-    public APClass() {
-    }
+    public APClass() 
+    {}
 
 //------------------------------------------------------------------------------
 
@@ -88,7 +97,7 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     public static APClass make(String ruleAndSunClass) throws DENOPTIMException 
     { 
         //TODO-V3 this is needed only because at present we need an APClass 
-        // object to define edges. Eventually get rid of this dependency
+        // object to define edges. Eventually get rid of this
         if (ruleAndSunClass.equals(""))
             ruleAndSunClass = "noclass:0";
         
@@ -107,7 +116,10 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor for a fully defined APClass
+     * Constructor for a fully defined APClass. 
+     * Checks if there is already a instance with the given members, if not it 
+     * created one. In either case, returns the reference to that instance of 
+     * APClass.
      * @throws DENOPTIMException 
      */
     public static APClass make(String rule, int subClass) 
@@ -132,7 +144,6 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      */
     private static APClass getUnique(String rule, int subClass)
     {
-
         APClass newApc = new APClass();
         synchronized (uniqueAPClassesLock)
         {
@@ -281,23 +292,7 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      */
     public boolean isCPMapCompatibleWith(APClass other)
     {
-        //TODO-V3 when we'll use a unique list of APClasses this will become 
-        // more light, but now we cannot assume that the APClasses in the CPMap
-        // and those on APs refer to the same instances. So, we cannot use 
-        // the .contains() method on the CPMap entry.
-        
-        ArrayList<APClass> listOfCompat = FragmentSpace.getCompatibleAPClasses(this);
-        if (listOfCompat != null)
-        {
-            for (APClass compatApc : listOfCompat)
-            {
-                if (other.equals(compatApc))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return FragmentSpace.getCompatibleAPClasses(this).contains(other);
     }
 
 //------------------------------------------------------------------------------
@@ -317,7 +312,8 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     
     /**
      * WARNING: this method does NOT clone! It just returns the reference to 
-     * this. We keep this method to avoid any attempt to cloning an APClass.
+     * this. We have this method to avoid any attempt to actual cloning of an 
+     * APClass.
      */
     @Override
     public APClass clone() {
@@ -332,10 +328,31 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
             return false;
         }
         APClass c = (APClass) o;
-        return this.rule.equals(c.rule) && this.subClass == c.subClass;
+        return this.hashCode() == o.hashCode();
+    }
+    
+//------------------------------------------------------------------------------
+
+    //NB: JSON serializer is currently not needed because the static and final
+    // fields are ignored by GSON serializer
+    
+//------------------------------------------------------------------------------
+
+    public static class APClassDeserializer 
+    implements JsonDeserializer<APClass>
+    {
+        @Override
+        public APClass deserialize(JsonElement json, Type typeOfT,
+                JsonDeserializationContext context) throws JsonParseException
+        {
+            JsonObject jo = json.getAsJsonObject();
+            APClass apc = getUnique(jo.get("rule").getAsString(),
+                    jo.get("subClass").getAsInt());
+            return apc;
+        }
     }
 
 //------------------------------------------------------------------------------
-    
+
 }
     

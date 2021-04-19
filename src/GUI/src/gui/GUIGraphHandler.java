@@ -1570,7 +1570,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
   			    {
       				try
                     {
-                        DENOPTIMMoleculeUtils.removeRCA(mol,dnGraph);
+                        DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
                         molLibrary.set(currGrphIdx, mol);
                         mol.setProperty(DENOPTIMConstants.GMSGTAG,
                                 "ManuallyBuilt");

@@ -151,9 +151,12 @@ public class FSEParameters
     
 //-----------------------------------------------------------------------------
 
-    //TODO-V3 with a static collection of parameters, running subsequent
-    // experiments from the GUI ends up reusing parameters from the previous
-    // run. so we need a way to clean-up old values
+    /**
+     * Restores the default values of the most important parameters. 
+     * Given that this is a static collection of parameters, running subsequent
+     * experiments from the GUI ends up reusing parameters from the previous
+     * run. This method allows to clean-up old values.
+     */
     public static void resetParameters()
     {
         fseParamsInUse = false;

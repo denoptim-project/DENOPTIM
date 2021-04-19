@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -122,7 +123,7 @@ public class FragsCombinationIterator
         for (DENOPTIMVertex v : this.rootGraph.getVertexList())
         {
             int vIdx = v.getVertexId();
-            //TODO-V3 need to use something else
+
             int vMolId = v.getBuildingBlockId();
             DENOPTIMVertex.BBType vMolTyp = v.getBuildingBlockType();
            
@@ -158,8 +159,12 @@ public class FragsCombinationIterator
                 continue;
             }
 
-            for (Integer apIdx : v.getFreeAPList())
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
             {
+                if (!ap.isAvailable())
+                    continue;
+                
+                int apIdx = v.getIndexOfAP(ap);
                 // deal with symmetric sets of APs on this vertex
                 boolean keepThisAP = true;
                 if ((FragmentSpaceParameters.enforceSymmetry() ||

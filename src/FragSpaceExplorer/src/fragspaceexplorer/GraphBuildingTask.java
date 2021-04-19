@@ -247,7 +247,8 @@ public class GraphBuildingTask extends FitnessTask
                 int tApId = trgAp.getApId();
         
                 // type "NONE" is used to represent unused AP
-                if (tFTyp == DENOPTIMVertex.BBType.NONE || tFTyp == DENOPTIMVertex.BBType.UNDEFINED)
+                if (tFTyp == DENOPTIMVertex.BBType.NONE 
+                        || tFTyp == DENOPTIMVertex.BBType.UNDEFINED)
                 {
                     continue;
                 }
@@ -265,29 +266,11 @@ public class GraphBuildingTask extends FitnessTask
                     newSymSets.put(tSymSetID,ss);
                 }
     
-                //TODO-V3: use a type-agnostic w.r.t vertex constructor
-                DENOPTIMVertex trgVrtx = DENOPTIMVertex.newVertexFromLibrary(tVId, tFId, tFTyp);
+                DENOPTIMVertex trgVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                        tVId, tFId, tFTyp);
                 
-                //TODO-V3: check that symmetry is inherited from the original vertex stored in the library of building blocks.
-                /*
-                ArrayList<SymmetricSet> symAPs =
-                        mol.getSymmetricAPsSets();
-                trgVrtx.setSymmetricAP(symAPs);
-                */
-
-                trgVrtx.setLevel(srcVrtx.getLevel() + 1);
-                
-                DENOPTIMEdge edge = srcVrtx.connectVertices(
-                        trgVrtx, sApId, tApId);
-                if (edge == null)
-                {
-                    msg = "Unable to make new edge.";
-                    DENOPTIMLogger.appLogger.severe(msg);
-                    throw new DENOPTIMException(msg);
-                }
-    
-                dGraph.addVertex(trgVrtx);
-                dGraph.addEdge(edge);
+                dGraph.appendVertexOnAP(srcVrtx.getAP(sApId), 
+                        trgVrtx.getAP(tApId));
             }
 
             // Append new symmetric sets

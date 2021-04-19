@@ -30,13 +30,11 @@ import denoptim.utils.GraphConversionTool;
 
 
 /**
- * A molecular object with additional data and tags. Additional data includes
- * the DENOPTIM graph representation, fitness/error, and possibly other stuff.
+ * A candidate is the combination of a denoptim graph with molecular 
+ * representation and may include also fitness/error, and possibly other stuff.
  */
 
-//TODO-V3 rename to Candidate
-
-public class DENOPTIMMolecule implements Comparable<DENOPTIMMolecule>, 
+public class Candidate implements Comparable<Candidate>, 
 Serializable, Cloneable
 {
     /**
@@ -107,19 +105,17 @@ Serializable, Cloneable
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMMolecule()
+    public Candidate()
     {
         uid = "UNDEFINED";
         smiles = "UNDEFINED";
-        fitness = 0; //This is stupid... only needed by compareTo. TODO: change!
         hasFitness = false;
     }
     
 //------------------------------------------------------------------------------
     
-    //TODO-V3: reorder to make consistent
-    public DENOPTIMMolecule(DENOPTIMGraph graph, String uid,
-                            String smiles, double fitness)
+    public Candidate(String name, DENOPTIMGraph graph, double fitness,
+            String uid, String smiles)
     {
         this.graph = graph;
         this.uid = uid;
@@ -129,24 +125,10 @@ Serializable, Cloneable
    }
 
 //------------------------------------------------------------------------------
-	
-    //TODO-V3: reorder to make consistent
-    public DENOPTIMMolecule(String sdfFile, DENOPTIMGraph graph,
-                            String uid, String smiles,
-                            double fitness)
-    {
-        this.graph = graph;
-        this.uid = uid;
-        this.smiles = smiles;
-        this.fitness = fitness;
-        this.sdfFile = sdfFile;
-        hasFitness = true;
-    }
-//------------------------------------------------------------------------------
 
-    public DENOPTIMMolecule(String name, DENOPTIMGraph graph, String uid, 
-              String smiles, String molFile, String imgFile,
-              String comment, int generationId, int level)
+    private Candidate(String name, DENOPTIMGraph graph,
+            String uid, String smiles, String molFile, String imgFile,
+            String comment, int generationId, int level)
     {
         this.name = name;
         this.graph = graph;
@@ -161,7 +143,7 @@ Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace) 
+    public Candidate(IAtomContainer iac, boolean useFragSpace) 
     		throws DENOPTIMException
     {
     	this(iac, useFragSpace, false);
@@ -169,13 +151,12 @@ Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMMolecule(IAtomContainer iac, boolean useFragSpace, 
+    public Candidate(IAtomContainer iac, boolean useFragSpace, 
     		boolean allowNoUID) throws DENOPTIMException
     {
     	// Initialize, then we try to take info from IAtomContainer
         this.uid = "UNDEFINED";
         this.smiles = "UNDEFINED";
-        this.fitness = 0; //This is stupid... only needed by compareTo. TODO: change!
         this.hasFitness = false;
 		
 		this.name = "noname";
@@ -434,14 +415,24 @@ Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    // The compareTo method compares the receiving object with the specified 
-    // object and returns a negative integer, 0, or a positive integer depending 
-    // on whether the receiving object is less than, equal to, or greater than 
-    // the specified object.
+    /**
+     * @returns a negative integer, 0, or a positive integer depending 
+     * on whether this object is less than, equal to, or greater than 
+     * the other object given as argument.
+     */
 
     @Override
-    public int compareTo(DENOPTIMMolecule other)
+    public int compareTo(Candidate other)
     {
+        if (!hasFitness && !other.hasFitness)
+        {
+            return 0;
+        } else if (!hasFitness && other.hasFitness) {
+            return -1;
+        } else if (hasFitness && !other.hasFitness) {
+            return 1;
+        }
+        
         if (this.fitness > other.fitness)
             return 1;
         else if (this.fitness < other.fitness)
@@ -476,10 +467,10 @@ Serializable, Cloneable
 
 //------------------------------------------------------------------------------        
 
-    public DENOPTIMMolecule clone()
+    public Candidate clone()
     {
-        DENOPTIMMolecule c = new DENOPTIMMolecule(name, graph.clone(), uid,
-                smiles, sdfFile, imgFile, comment, generationId,level);
+        Candidate c = new Candidate(name, graph.clone(), uid,
+                smiles, sdfFile, imgFile, comment, generationId, level);
         if (hasFitness)
         {
             c.setFitness(fitness);
