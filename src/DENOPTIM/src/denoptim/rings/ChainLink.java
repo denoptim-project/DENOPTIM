@@ -25,7 +25,7 @@ import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * ChainLink represents a vertex in a closable chain.
- * This data structure stores information as to the corrersponding
+ * This data structure stores information as to the corresponding
  * molecule ID in the library of fragments, the type of fragment 
  * and the identify of the AP linking to the chain link before and after
  *

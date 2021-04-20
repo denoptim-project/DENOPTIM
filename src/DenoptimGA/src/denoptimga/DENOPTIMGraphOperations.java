@@ -684,7 +684,7 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Private class representig a selected closable chain of fragments
+     * Private class representing a selected closable chain of fragments
      */
 
     private static class FragForClosabChains
