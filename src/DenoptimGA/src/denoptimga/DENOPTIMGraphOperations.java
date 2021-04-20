@@ -689,8 +689,18 @@ public class DENOPTIMGraphOperations
      */
     public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type,
                                    GraphPattern pattern) {
-        // TODO: 06.04.2021 Implement
-        return false;
+        if (pattern != GraphPattern.RING) {
+            throw new IllegalArgumentException("Only " + GraphPattern.RING +
+                    " is supported.");
+        }
+        return (type == BBType.SCAFFOLD ?
+                FragmentSpace.getScaffoldLibrary() :
+                FragmentSpace.getFragmentLibrary())
+                .stream()
+                .filter(v -> v instanceof DENOPTIMTemplate)
+                .map(t -> (DENOPTIMTemplate) t)
+                .map(DENOPTIMTemplate::getInnerGraph)
+                .anyMatch(graph::isIsomorphicTo);
     }
 
 //------------------------------------------------------------------------------
