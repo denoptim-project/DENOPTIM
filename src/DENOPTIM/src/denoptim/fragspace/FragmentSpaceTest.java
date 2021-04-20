@@ -127,7 +127,6 @@ public class FragmentSpaceTest
         frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
         frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
         frg4.addAP(0, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
-        // NB: in the sorted list the last AP is first!
         IAtomContainer f4 = new AtomContainer(frg4);
         scaffLib.add(f4);
         
@@ -201,7 +200,7 @@ public class FragmentSpaceTest
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
     	
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,3,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
@@ -242,7 +241,7 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,3,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
@@ -288,7 +287,7 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,3,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);

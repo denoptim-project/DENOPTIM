@@ -149,7 +149,7 @@ public class DENOPTIMAttachmentPointTest
     	DENOPTIMAttachmentPoint apA = new DENOPTIMAttachmentPoint(1, 2, 1);
     	DENOPTIMAttachmentPoint apB = new DENOPTIMAttachmentPoint(1, 2, 1);
     	
-    	assertEquals(apA.compareTo(apB),0);
+    	assertEquals(-1,apA.compareTo(apB));
     	assertTrue(apA.equals(apB));
     }
     

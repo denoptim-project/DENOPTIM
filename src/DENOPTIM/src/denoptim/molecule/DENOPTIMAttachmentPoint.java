@@ -42,13 +42,19 @@ import denoptim.fragspace.FragmentSpace;
  */
 
 
-public class DENOPTIMAttachmentPoint implements Serializable
+public class DENOPTIMAttachmentPoint implements Serializable,
+Comparable<DENOPTIMAttachmentPoint>
 {
 	/**
 	 * Version UID
 	 */
 	private static final long serialVersionUID = -3680248393705286640L;
 
+    /**
+     * Index used to keep the order in a list of attachment points
+     */
+    private int id;
+    
 	/**
 	 * The index of the source atom in the atom list of the fragment (0-based)
 	 */
@@ -97,6 +103,7 @@ public class DENOPTIMAttachmentPoint implements Serializable
         atomConnections = 0;
         apConnections = 0;
         apClass = "";
+        id = FragmentSpace.apID.getAndIncrement();
     }
 
 //------------------------------------------------------------------------------
@@ -114,6 +121,7 @@ public class DENOPTIMAttachmentPoint implements Serializable
         atomConnections = m_atomConnections;
         apConnections = m_apConnections;
         apClass = "";
+        id = FragmentSpace.apID.getAndIncrement();
     }
     
 //------------------------------------------------------------------------------
@@ -135,7 +143,8 @@ public class DENOPTIMAttachmentPoint implements Serializable
         apClass = "";
         
         dirVec = new double[3];
-        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);        
+        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);
+        id = FragmentSpace.apID.getAndIncrement();
     }
     
 //------------------------------------------------------------------------------
@@ -167,6 +176,7 @@ public class DENOPTIMAttachmentPoint implements Serializable
     			throw new DENOPTIMException("Unknown format for string "
     					+ "representation of DENOPTIMAttachmentPoint");
     	}
+    	id = FragmentSpace.apID.getAndIncrement();
     }
 //-----------------------------------------------------------------------------
 	
@@ -285,6 +295,17 @@ public class DENOPTIMAttachmentPoint implements Serializable
 			throw new DENOPTIMException("Cannot construct AP from string '" 
 						+ str + "'");
 	    }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a unique integer that is used to sort list of attachment points.
+     * This index follows the order in which attachment points were generated.
+     */
+    public int getID()
+    {
+        return id;
     }
 
 //------------------------------------------------------------------------------
@@ -544,7 +565,22 @@ public class DENOPTIMAttachmentPoint implements Serializable
      * @param other
      * @return an integer that can be used by a comparator.
      */
+    @Override
     public int compareTo(DENOPTIMAttachmentPoint other)
+    {
+        return Integer.compare(this.getID(), other.getID());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and given attachment point. This method defines how
+     * DENOPTIMAttachmentPoint are sorted not by natural order, but by 
+     * consistency of properties.
+     * @param other
+     * @return an integer that can be used by a comparator.
+     */
+    public int comparePropertiesTo(DENOPTIMAttachmentPoint other)
     {
         final int BEFORE = -1;
         final int EQUAL = 0;

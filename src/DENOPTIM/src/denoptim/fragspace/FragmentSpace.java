@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -130,6 +131,11 @@ public class FragmentSpace
      * Flag signaling that this fragment space was built and validated
      */
     private static boolean isValid = false;
+    
+    /**
+     * Index used to keep the order in a list of attachment points
+     */
+    public static AtomicInteger apID = new AtomicInteger(0);
     
 //------------------------------------------------------------------------------
     
