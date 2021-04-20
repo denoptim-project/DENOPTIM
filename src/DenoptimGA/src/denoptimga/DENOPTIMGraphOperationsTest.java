@@ -179,7 +179,7 @@ public class DENOPTIMGraphOperationsTest {
         g.renumberGraphVertices();
         DENOPTIMGraph.setScaffold(vertices.get(0));
         addRings(vertices, g);
-        Set<DENOPTIMGraph> expectedSubgraphs = getExpectedSubgraphs(vertices, g);
+        Set<DENOPTIMGraph> expectedSubgraphs = getExpectedSubgraphs(g);
         return new ExtractPatternCase(g, 2, expectedSubgraphs);
     }
 
@@ -226,10 +226,11 @@ public class DENOPTIMGraphOperationsTest {
 
     private void addRings(List<DENOPTIMVertex> vertices, DENOPTIMGraph g) {
         List<List<DENOPTIMVertex>> ringVertices = Stream.of(
-                Arrays.asList(0, 2, 3, 4),
-                Arrays.asList(5, 2, 3, 4),
-                Arrays.asList(10, 12, 11),
-                Arrays.asList(9, 8, 11))
+                Arrays.asList(0, 1, 3, 5),
+                Arrays.asList(4, 1, 3, 6),
+                Arrays.asList(6, 3, 5),
+                Arrays.asList(9, 8, 10),
+                Arrays.asList(10, 11, 12))
                 .map(indices -> indices
                         .stream()
                         .map(vertices::get)
@@ -248,19 +249,22 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    private Set<DENOPTIMGraph> getExpectedSubgraphs(
-            List<DENOPTIMVertex> vertices, DENOPTIMGraph g)
-    {
-        Set<DENOPTIMGraph> expectedSubgraphs = new HashSet<>();
-
+    private Set<DENOPTIMGraph> getExpectedSubgraphs(DENOPTIMGraph graph) {
         List<Set<Integer>> keepVertices = Stream.of(
                 Stream.of(0, 1, 3, 4, 5, 6),
                 Stream.of(8, 9, 10, 11, 12))
                 .map(indices -> indices.collect(Collectors.toSet()))
                 .collect(Collectors.toList());
 
+        List<List<Integer>> vertexLevels = Arrays.asList(
+                Arrays.asList(-1, 0, 1, 1, 2, 2),
+                Arrays.asList(-1, 0, 0, 1, 2)
+        );
+
+        List<DENOPTIMGraph> expectedSubgraphs = new ArrayList<>(2);
         for (Set<Integer> keepVertex : keepVertices) {
-            DENOPTIMGraph expSubgraph = g.clone();
+            DENOPTIMGraph expSubgraph = graph.clone();
+            List<DENOPTIMVertex> vertices = expSubgraph.getVertexList();
             Set<DENOPTIMVertex> removeVertices = IntStream
                     .range(0, vertices.size())
                     .filter(i -> !keepVertex.contains(i))
@@ -272,7 +276,17 @@ public class DENOPTIMGraphOperationsTest {
             }
             expectedSubgraphs.add(expSubgraph);
         }
-        return expectedSubgraphs;
+
+        for (int i = 0; i < expectedSubgraphs.size(); i++) {
+            DENOPTIMGraph g = expectedSubgraphs.get(i);
+            List<Integer> levels = vertexLevels.get(i);
+            for (int j = 0; j < g.getVertexCount(); j++) {
+                int l = levels.get(j);
+                g.getVertexAtPosition(j).setLevel(l);
+            }
+        }
+
+        return new HashSet<>(expectedSubgraphs);
     }
 
 //------------------------------------------------------------------------------

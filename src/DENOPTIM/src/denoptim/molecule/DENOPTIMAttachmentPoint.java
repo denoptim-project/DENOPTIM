@@ -616,13 +616,13 @@ Comparable<DENOPTIMAttachmentPoint>
         
         if (this.getTotalConnections() != other.getTotalConnections())
         {
-            reason.append("Different total numebr of connections APs;");
+            reason.append("Different total number of connections APs;");
             return false;
         }
 
         if (this.getFreeConnections() != other.getFreeConnections())
         {
-            reason.append("Different numebr of free connections APs;");
+            reason.append("Different number of free connections APs;");
             return false;
         }
         

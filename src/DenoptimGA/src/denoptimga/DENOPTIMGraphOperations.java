@@ -743,11 +743,16 @@ public class DENOPTIMGraphOperations
      */
     private static DENOPTIMGraph extractSubgraph(DENOPTIMGraph graph,
                                                  Set<DENOPTIMVertex> definedOn) {
-        Set<DENOPTIMVertex> complement = new HashSet<>(
-                graph.getVertexList());
-        complement.removeAll(definedOn);
-
         DENOPTIMGraph subgraph = graph.clone();
+
+        Set<DENOPTIMVertex> complement = subgraph
+                .getVertexList()
+                .stream()
+                .filter(u -> definedOn
+                        .stream()
+                        .allMatch(v -> v.getVertexId() != u.getVertexId())
+                ).collect(Collectors.toSet());
+
         for (DENOPTIMVertex v : complement) {
             subgraph.removeVertex(v);
         }
