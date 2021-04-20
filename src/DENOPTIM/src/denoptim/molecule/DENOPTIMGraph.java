@@ -1358,7 +1358,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     		if (ssT.size() != ssO.size())
     		{
-    			reason.append("Different number of symmetric sets on verted " + vIdT
+    			reason.append("Different number of symmetric sets on vertex " + vIdT
     						+ "("+ssT.size()+":"+ssO.size()+")");
     			return false;
     		}
@@ -1381,55 +1381,57 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		DENOPTIMVertex vhT = rT.getHeadVertex();
     		DENOPTIMVertex vtT = rT.getTailVertex();
-    		for (DENOPTIMRing rO :
-    			other.getRingsInvolvingVertex(vertexMap.get(vhT)))
-    		{
-				if (rT.getSize() != rO.getSize())
-				{
-					reason.append("Different ring size ("+rT.getSize()+":"
-								+rO.getSize()+")");
-					continue;
-				}
-
-				boolean either = false;
-    			if (rO.getHeadVertex() == vertexMap.get(vhT)
-    					&& rO.getTailVertex() == vertexMap.get(vtT))
-    			{
-    				either = true;
-    				for (int i=1; i<rT.getSize(); i++)
-    				{
-    					if (vertexMap.get(rT.getVertexAtPosition(i))
-    							!= rO.getVertexAtPosition(i))
-    					{
-    						reason.append("Rings differ (A) ("+rT+":"+rO+")");
-    						return false;
-    					}
-    				}
-    			}
-    			else if (rO.getHeadVertex() == vertexMap.get(vtT)
-    					&& rO.getTailVertex() == vertexMap.get(vhT))
-    			{
-    				either = true;
-    				for (int i=1; i<rT.getSize(); i++)
-    				{
-    					int j = rO.getSize()-i-1;
-    					if (vertexMap.get(rT.getVertexAtPosition(i))
-    							!= rO.getVertexAtPosition(j))
-    					{
-    						reason.append("Rings differ (B) ("+rT+":"+rO+")");
-    						return false;
-    					}
-    				}
-    			}
-    			if (!either)
-    			{
-    				reason.append("Rings differ (C) ("+rT+":"+rO+")");
-    				return false;
-    			}
-    		}
+    		boolean hasRing = other
+                    .getRingsInvolvingVertex(vertexMap.get(vhT))
+                    .stream()
+                    .anyMatch(rO -> sameAsRings(reason, vertexMap, rT, vhT,
+                            vtT, rO));
+    		if (!hasRing) {
+    		    return false;
+            }
     	}
 
     	return true;
+    }
+
+//------------------------------------------------------------------------------
+
+    private boolean sameAsRings(StringBuilder reason, Map<DENOPTIMVertex,
+            DENOPTIMVertex> vertexMap, DENOPTIMRing rT, DENOPTIMVertex vhT,
+                                DENOPTIMVertex vtT, DENOPTIMRing rO) {
+        if (rT.getSize() != rO.getSize()) {
+            reason.append("Different ring size (").append(rT.getSize())
+                    .append(":").append(rO.getSize()).append(")");
+            return false;
+        }
+
+        if (rO.getHeadVertex() == vertexMap.get(vhT)
+                && rO.getTailVertex() == vertexMap.get(vtT)) {
+            for (int i = 1; i < rT.getSize(); i++) {
+                if (vertexMap.get(rT.getVertexAtPosition(i))
+                        != rO.getVertexAtPosition(i)) {
+                    reason.append("Rings differ (A) (").append(rT).append(":")
+                            .append(rO).append(")");
+                    return false;
+                }
+            }
+        } else if (rO.getHeadVertex() == vertexMap.get(vtT)
+                && rO.getTailVertex() == vertexMap.get(vhT)) {
+            for (int i = 1; i < rT.getSize(); i++) {
+                int j = rO.getSize() - i - 1;
+                if (vertexMap.get(rT.getVertexAtPosition(i))
+                        != rO.getVertexAtPosition(j)) {
+                    reason.append("Rings differ (B) (").append(rT).append(":")
+                            .append(rO).append(")");
+                    return false;
+                }
+            }
+        } else {
+            reason.append("Rings differ (C) (").append(rT).append(":")
+                    .append(rO).append(")");
+            return false;
+        }
+        return true;
     }
 
 //------------------------------------------------------------------------------
