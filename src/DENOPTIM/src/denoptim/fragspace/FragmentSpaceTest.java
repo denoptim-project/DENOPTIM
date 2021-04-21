@@ -462,7 +462,7 @@ public class FragmentSpaceTest
 
     /**
      * Check that the following graph's fused ring gets added to the fragment
-     * space. Dots are chords
+     * library. Dots are chords
      *   ↑         ↑
      * ← C1 - C2 - C3 →
      *   .  / |    ↓
@@ -474,7 +474,7 @@ public class FragmentSpaceTest
         try {
             TestCase testCase = getTestCase();
 
-            ArrayList<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+            List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
             fragLib.clear(); // Workaround. See @BeforeEach in this class.
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
@@ -483,6 +483,36 @@ public class FragmentSpaceTest
             DENOPTIMVertex actual = fragLib.get(0);
             assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
         } catch (Exception e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks that a graph with a fused ring containing a scaffold vertex is
+     * added to the scaffold library.
+     */
+    @Test
+    public void testFusedRingAddedToScaffoldLibrary() {
+        try {
+            TestCase testCase = getTestCase();
+            testCase.graph.getVertexList().get(0)
+                    .setBuildingBlockType(BBType.SCAFFOLD);
+            testCase.expected.setBuildingBlockType(BBType.SCAFFOLD);
+            testCase.expected.getInnerGraph().getVertexList().get(0)
+                    .setBuildingBlockType(BBType.SCAFFOLD);
+
+            List<DENOPTIMVertex> scaffLib = FragmentSpace.getScaffoldLibrary();
+            scaffLib.clear();
+
+            FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
+
+            assertEquals(1, scaffLib.size());
+            DENOPTIMVertex actual = scaffLib.get(0);
+            assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
+        } catch (DENOPTIMException e) {
             e.printStackTrace();
             fail("Unexpected exception thrown.");
         }
