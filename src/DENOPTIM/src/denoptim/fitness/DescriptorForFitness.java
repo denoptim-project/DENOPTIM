@@ -55,7 +55,7 @@ public class DescriptorForFitness
 	/**
 	 * The type of descriptor as define in the descriptor dictionary.
 	 */
-	protected String dictType;
+	protected String dictType = null;
 	
 	/**
 	 * The class(es) of descriptor as define in the descriptor dictionary.
@@ -97,7 +97,7 @@ public class DescriptorForFitness
 		//this.implementation does have to stay null
 		this.resultId = resultId;
 		this.smarts = smarts;
-		this.dictType = dictType;
+		//this.dictType = dictType;
 		this.dictClasses = dictClasses;
 		this.dictTitle = dictTitle;
 	}
@@ -108,7 +108,7 @@ public class DescriptorForFitness
 			String[] dictClasses, String dictDefinition, String dictTitle)
 	{
 		this(shortName, className, implementation, resultId);
-		this.dictType = dictType;
+		//this.dictType = dictType;
 		this.dictClasses = dictClasses;
 		this.dictDefinition = dictDefinition;
 		this.dictTitle = dictTitle;
@@ -148,12 +148,12 @@ public class DescriptorForFitness
 	}
 	
 //------------------------------------------------------------------------------
-
+/*
 	public String getDictType()
 	{
 		return dictType;
 	}
-	
+*/	
 //------------------------------------------------------------------------------
 
 	public String getDictTitle()
@@ -207,7 +207,7 @@ public class DescriptorForFitness
 		String NL = System.getProperty("line.separator");
 		StringBuilder sb = new StringBuilder();
 		sb.append("Titile: ").append(dictTitle).append(NL);
-		sb.append("Type: ").append(dictType).append(NL);
+		//sb.append("Type: ").append(dictType).append(NL);
 		sb.append("Definition: ").append(dictDefinition).append(NL);
 		sb.append("Classes: ");
 		if (dictClasses != null)

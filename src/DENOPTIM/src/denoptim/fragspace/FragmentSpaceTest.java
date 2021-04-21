@@ -210,7 +210,6 @@ public class FragmentSpaceTest
         scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
         scaf0.addAPOnAtom(a41, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
         scaf0.projectAPsToProperties();
-        // NB: in the sorted list the last AP is first!
         scaffLib.add(scaf0);
         
         DENOPTIMFragment scaf1 = new DENOPTIMFragment();

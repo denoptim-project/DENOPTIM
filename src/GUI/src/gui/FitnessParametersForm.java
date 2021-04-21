@@ -370,7 +370,7 @@ public class FitnessParametersForm extends ParametersForm
         		+ "</ol></html>";
         
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-        		"CDK Descriptors");
+        		"Descriptors");
         DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
         JTree descTree = new JTree(treeModel);
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
@@ -444,84 +444,107 @@ public class FitnessParametersForm extends ParametersForm
 		});
         JScrollPane descTreeScrollPane = new JScrollPane(descTree);
         
-        //Populate the tree
-        List<DescriptorForFitness> allDescs = null;
-        try {
-        	allDescs = DescriptorUtils.findAllDescriptorImplementations(null);
-		} catch (DENOPTIMException e1) {
-			System.out.println("No descriptor implementation found!");
-			e1.printStackTrace();
-		}
-        // First identify the main klasses (first layer)
-        Map<String,DescriptorTreeNode> mainClassificationNodes = 
-        		new HashMap<String,DescriptorTreeNode>();
-        for (DescriptorForFitness dff : allDescs)
-        {	
-        	String[] klasses = new String[]{"Unclassified"};
-        	if (dff.getDictClasses()!=null)
-        	{
-        		klasses = dff.getDictClasses();
-        	}
-        	for (String kls : klasses)
-        	{
-        		if (!mainClassificationNodes.containsKey(kls))
-        		{
-        			DescriptorTreeNode klassNode = new DescriptorTreeNode(kls);
-        			rootNode.add(klassNode);
-        			mainClassificationNodes.put(kls, klassNode);
-        		}
-        	}
-        }
-        
-        // Then populate each class
-        for (String klass : mainClassificationNodes.keySet())
+        String[] sources = new String[] {"CDK", "DENOPTIM"};
+        for (String source : sources)
         {
-        	DescriptorTreeNode klassNode = mainClassificationNodes.get(klass);
-        	Map<String,DescriptorTreeNode> descriptorNodes = 
-        			new HashMap<String,DescriptorTreeNode>();
-	        for (DescriptorForFitness dff : allDescs)
-	        {
-	        	//TODO: check if getting the dictionary from DictionaryDatabase
-	        	// allows to get also the description in addition to definition
-	        	
-	        	// Decide if this descriptor goes under the present klass
-	        	List<String> klasses = new ArrayList<String>();
-	        	if (dff.getDictClasses() == null)
-	        	{
-	        		if (!klass.equals("Unclassified"))
-	        		{
-	        			continue;
-	        		} else {
-	        			klasses.add(klass);
-	        		}
-	        	} else {
-	        		klasses = new ArrayList<String>(
-		        			Arrays.asList(dff.getDictClasses()));
-	        	}
-	        	if (!klasses.contains(klass))
-	        	{
-	        		continue;
-	        	}
-	        	
-	        	// Identify parent node: either a klassNore or a descriptorNode
-        		DescriptorTreeNode parentNode = klassNode;
-        		if (dff.getImplementation().getDescriptorNames().length > 1)
-        		{
-	        		String descriptorName = dff.getImplementation().getClass()
-	        				.getSimpleName();
-	        		if (!descriptorNodes.containsKey(descriptorName))
-	        		{
-	        			DescriptorTreeNode descNode = new DescriptorTreeNode(descriptorName,dff);
-	        			parentNode.add(descNode);
-	        			descriptorNodes.put(descriptorName, descNode);
-	        		}
-	        		parentNode = descriptorNodes.get(descriptorName);
-        		}
-        		
-        		// Finally make the node for the present desc-to-fitness
-        		DescriptorTreeNode dtn = new DescriptorTreeNode(dff);
-        		parentNode.add(dtn);
-	        }
+            DescriptorTreeNode sourceNode = new DescriptorTreeNode(source);
+            rootNode.add(sourceNode);
+            
+            List<DescriptorForFitness> allDescs = null;
+            try {
+                switch (source)
+                {
+                    case "CDK":
+                        allDescs = DescriptorUtils.findAllCDKDescriptors(
+                                null);
+                        break;
+                    case "DENOPTIM":
+                        allDescs = DescriptorUtils.findAllDENOPTIMDescriptors(
+                                null);
+                        break;
+                }
+            } catch (DENOPTIMException e1) {
+                System.out.println("No descriptor implementation found in "
+                        + "source '" + source + "'!");
+                e1.printStackTrace();
+                continue;
+            }
+        
+            // First identify the main klasses (first layer)
+            Map<String,DescriptorTreeNode> mainClassificationNodes = 
+            		new HashMap<String,DescriptorTreeNode>();
+            for (DescriptorForFitness dff : allDescs)
+            {	
+            	String[] klasses = new String[]{"Unclassified"};
+            	if (dff.getDictClasses()!=null)
+            	{
+            		klasses = dff.getDictClasses();
+            	}
+            	for (String kls : klasses)
+            	{
+            		if (!mainClassificationNodes.containsKey(kls))
+            		{
+            			DescriptorTreeNode klassNode = new DescriptorTreeNode(
+            			        kls);
+            			sourceNode.add(klassNode);
+            			mainClassificationNodes.put(kls, klassNode);
+            		}
+            	}
+            }
+        
+            // Then populate each class
+            for (String klass : mainClassificationNodes.keySet())
+            {
+            	DescriptorTreeNode klassNode = mainClassificationNodes.get(
+            	        klass);
+            	Map<String,DescriptorTreeNode> descriptorNodes = 
+            			new HashMap<String,DescriptorTreeNode>();
+    	        for (DescriptorForFitness dff : allDescs)
+    	        {
+    	        	//TODO: check if getting the dictionary from 
+    	            // DictionaryDatabase allows to get also the description in 
+    	            // addition to definition
+    	        	
+    	        	// Decide if this descriptor goes under the present klass
+    	        	List<String> klasses = new ArrayList<String>();
+    	        	if (dff.getDictClasses() == null)
+    	        	{
+    	        		if (!klass.equals("Unclassified"))
+    	        		{
+    	        			continue;
+    	        		} else {
+    	        			klasses.add(klass);
+    	        		}
+    	        	} else {
+    	        		klasses = new ArrayList<String>(
+    		        			Arrays.asList(dff.getDictClasses()));
+    	        	}
+    	        	if (!klasses.contains(klass))
+    	        	{
+    	        		continue;
+    	        	}
+    	        	
+    	        	// Identify parent node: either a klassNode or a descriptorNode
+            		DescriptorTreeNode parentNode = klassNode;
+            		if (dff.getImplementation().getDescriptorNames().length > 1)
+            		{
+    	        		String descriptorName = dff.getImplementation().getClass()
+    	        				.getSimpleName();
+    	        		if (!descriptorNodes.containsKey(descriptorName))
+    	        		{
+    	        			DescriptorTreeNode descNode = 
+    	        			        new DescriptorTreeNode(descriptorName,dff);
+    	        			parentNode.add(descNode);
+    	        			descriptorNodes.put(descriptorName, descNode);
+    	        		}
+    	        		parentNode = descriptorNodes.get(descriptorName);
+            		}
+            		
+            		// Finally make the node for the present desc-to-fitness
+            		DescriptorTreeNode dtn = new DescriptorTreeNode(dff);
+            		parentNode.add(dtn);
+    	        }
+            }
         }
         
         Dimension ddLabelsSize = new Dimension(100,30);
