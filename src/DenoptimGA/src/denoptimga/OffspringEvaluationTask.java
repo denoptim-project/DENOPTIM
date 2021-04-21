@@ -187,59 +187,11 @@ public class OffspringEvaluationTask extends FitnessTask
                 numTry--;
             }
 
-            addRingSystemsToFragmentLibrary();
+            FragmentSpace.addRingSystemsToFragmentLibrary(result.getGraph());
         }
         completed = true;
         return result;
     }
 
 //------------------------------------------------------------------------------
-
-    /**
-     * Extracts a system of one or more fused rings and adds them to the
-     * fragment space if not already present.
-     */
-    private void addRingSystemsToFragmentLibrary() {
-        final GraphPattern PATTERN = GraphPattern.RING;
-
-        List<DENOPTIMGraph> subgraphs = Stream.of(result.getGraph())
-                .map(g -> extractPattern(g, PATTERN))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-
-        for (DENOPTIMGraph g : subgraphs) {
-            BBType type = hasScaffoldTypeVertex(g) ? BBType.SCAFFOLD :
-                    BBType.FRAGMENT;
-
-            if (!hasIsomorph(g, type, PATTERN)) {
-                DENOPTIMTemplate t = new DENOPTIMTemplate(type);
-                t.setInnerGraph(g);
-
-                ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
-                        FragmentSpace.getFragmentLibrary() :
-                        FragmentSpace.getScaffoldLibrary();
-
-                FragmentSpace.appendVertexToLibrary(t, type, library);
-            }
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Checks if the graph contains a scaffold vertex.
-     * @param g graph to check.
-     * @return true if there is a scaffold vertex.
-     */
-    private boolean hasScaffoldTypeVertex(DENOPTIMGraph g) {
-        for (DENOPTIMVertex v : g.getVertexList()) {
-            if (v.getBuildingBlockType() == BBType.SCAFFOLD) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-//------------------------------------------------------------------------------
-
 }

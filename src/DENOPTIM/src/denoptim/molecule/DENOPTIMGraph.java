@@ -67,6 +67,8 @@ import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 
+import static denoptim.molecule.DENOPTIMVertex.*;
+
 
 /**
  * Container for the list of vertices and the edges that connect them
@@ -1681,7 +1683,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
+            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 toDel.add(vtx);
@@ -1712,7 +1714,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
+            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 rvids.add(vtx.getVertexId());
@@ -2765,8 +2767,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition fragment type
-            DENOPTIMVertex.BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getBuildingBlockType();
-            if (queryFrgTyp != DENOPTIMVertex.BBType.UNDEFINED)
+            BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getBuildingBlockType();
+            if (queryFrgTyp != BBType.UNDEFINED)
             {
                 if (verbosity > 2)
                 {
@@ -3472,4 +3474,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     }
 
 //------------------------------------------------------------------------------
+
+    /**
+     * Checks if this graph contains a scaffold vertex.
+     * @return true if there is a scaffold vertex.
+     */
+    public boolean hasScaffoldTypeVertex() {
+        return getVertexList()
+                .stream()
+                .anyMatch(v -> v.getBuildingBlockType() == BBType.SCAFFOLD);
+    }
 }

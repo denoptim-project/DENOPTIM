@@ -18,34 +18,36 @@ package denoptim.fragspace;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.vecmath.Point3d;
 
+import denoptim.fitness.FitnessParameters;
+import denoptim.molecule.*;
+import denoptimga.OffspringEvaluationTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.SymmetricSet;
 import denoptim.utils.GraphUtils;
-import denoptim.molecule.DENOPTIMVertex;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Unit test for fragment space
@@ -59,6 +61,8 @@ public class FragmentSpaceTest
 
     @TempDir 
     static File tempDir;
+
+    private final Random rng = new Random();
     
 	private static final String APSUBRULE = "0";
 
@@ -439,7 +443,7 @@ public class FragmentSpaceTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testGetFragmentsCompatibleWithTheseAPs() throws Exception
+    public void testGetFragmentsCompatibleWithTheseAPs()
     {
         assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
@@ -455,7 +459,131 @@ public class FragmentSpaceTest
     	
     	FragmentSpace.clearAll();	
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
+    /**
+     * Check that the following graph's fused ring gets added to the fragment
+     * space. Dots are chords
+     *   ↑         ↑
+     * ← C1 - C2 - C3 →
+     *   .  / |    ↓
+     *   C4 . C5 →
+     *   ↓    ↓
+     */
+    @Test
+    public void testFusedRingAddedToFragmentLibrary() {
+        try {
+            TestCase testCase = getTestCase();
+
+            ArrayList<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+            assertEquals(0, fragLib.size());
+
+            FragmentSpace.addRingSystemsToFragmentLibrary(testCase.graph);
+
+            assertEquals(1, fragLib.size());
+            DENOPTIMVertex actual = fragLib.get(0);
+            assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    private TestCase getTestCase() throws DENOPTIMException {
+        List<DENOPTIMVertex> carbons = IntStream
+                .range(0, 4)
+                .mapToObj(i -> getCarbonVertex())
+                .collect(Collectors.toList());
+
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        DENOPTIMVertex c1 = carbons.get(0), c2 = carbons.get(1),
+                c4 = carbons.get(2), c5 = carbons.get(3);
+        DENOPTIMVertex c3 = getCarbonVertex();
+
+        g.addVertex(c1);
+        g.appendVertexOnAP(c1.getAP(0), c2.getAP(0));
+        g.appendVertexOnAP(c2.getAP(1), c3.getAP(0));
+        g.appendVertexOnAP(c2.getAP(2), c5.getAP(0));
+        g.appendVertexOnAP(c2.getAP(3), c4.getAP(0));
+
+        DENOPTIMRing r124 = new DENOPTIMRing(Arrays.asList(c1, c2, c4));
+        DENOPTIMRing r425 = new DENOPTIMRing(Arrays.asList(c4, c2, c5));
+        g.addRing(r124);
+        g.addRing(r425);
+
+        g.renumberGraphVertices();
+
+        DENOPTIMTemplate t = getExpectedTemplate(g, c3);
+
+        return new TestCase(g, t);
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMTemplate getExpectedTemplate(DENOPTIMGraph g,
+                                                 DENOPTIMVertex c3) {
+        DENOPTIMGraph innerGraph = g.clone();
+        innerGraph.renumberGraphVertices();
+        DENOPTIMVertex c3Inner = innerGraph.getVertexAtPosition(g
+                .getIndexOfVertex(c3.getVertexId()));
+        innerGraph.removeVertex(c3Inner);
+
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t.setInnerGraph(innerGraph);
+        return t;
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMFragment getCarbonVertex() {
+        try {
+            IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
+            IAtom carbon = builder.newAtom();
+            carbon.setSymbol("C");
+            IAtomContainer mol = builder.newAtomContainer();
+            mol.addAtom(carbon);
+            DENOPTIMFragment v = new DENOPTIMFragment(-1, mol,
+                    BBType.FRAGMENT, true);
+            for (int i = 0; i < 4; i++) {
+                v.addAP(0, APC1, getRandomVector(), 1);
+            }
+            FragmentSpace.getBondOrderMap().put(APC1.getRule(),
+                    DENOPTIMEdge.BondType.SINGLE);
+            return v;
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+        return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    private Point3d getRandomVector() {
+        int precision = 10 * 10 * 10 * 10;
+
+        Supplier<Double> randomCoord = () ->
+                (double) (Math.round(rng.nextDouble() * (double) precision)) /
+                        ((double) precision);
+
+        return new Point3d(randomCoord.get(), randomCoord.get(),
+                randomCoord.get());
+    }
+
+//------------------------------------------------------------------------------
+
+    private static final class TestCase {
+        final DENOPTIMGraph graph;
+        final DENOPTIMTemplate expected;
+
+        TestCase(DENOPTIMGraph g, DENOPTIMTemplate expected) {
+            this.graph = g;
+            this.expected = expected;
+        }
+    }
+
+//------------------------------------------------------------------------------
 }
