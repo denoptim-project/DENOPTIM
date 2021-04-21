@@ -489,17 +489,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 return ((DENOPTIMFragment) this).sameAs(
                         (DENOPTIMFragment) other, reason);
             } else if (this instanceof EmptyVertex) {
-                if (this instanceof EmptyVertex)
-                {
-                    return ((EmptyVertex) this).sameAs(
-                            (EmptyVertex) other, reason);
-                }
+                return ((EmptyVertex) this).sameAs(
+                        (EmptyVertex) other, reason);
             } else if (this instanceof DENOPTIMTemplate) {
-                if (this instanceof DENOPTIMTemplate)
-                {
-                    return ((DENOPTIMTemplate) this).sameAs(
-                            (DENOPTIMTemplate) other, reason);
-                }
+                return ((DENOPTIMTemplate) this).sameAs(
+                        (DENOPTIMTemplate) other, reason);
             } else {
                 System.err.println("WARNING: Unimplemented sameAs method for "
                         + "vertex subtype '" + this.getClass().getName() + "'");
