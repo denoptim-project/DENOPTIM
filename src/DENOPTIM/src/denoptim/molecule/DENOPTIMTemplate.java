@@ -115,24 +115,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
     
 //------------------------------------------------------------------------------
-    
-    /**
-     * Produces a subgraph that represents the path between two given
-     * attachment points.
-     * @param apA
-     * @param apB
-     * @return a path that goes from apA to apB.
-     */
-
-    public PathSubGraph getPath(DENOPTIMAttachmentPoint apA,
-            DENOPTIMAttachmentPoint apB)
-    {
-        //TODO-V3: just use the PathSubGraph constructor. 
-        // But is this needed in template?
-        return null;
-    }
-    
-//------------------------------------------------------------------------------
 
     /**
      * Method meant for devel phase only.
@@ -211,7 +193,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             throws IllegalArgumentException 
     {
         mol = null;
-        // if (!compatibleWithOldInnerGraph(innerGraph))
         if (!isValidInnerGraph(innerGraph)) {
             throw new IllegalArgumentException("inner graph does not have all" +
                     " required APs");
@@ -496,21 +477,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return set;
         }
 
-        switch (contractLevel)
-        { 
-            case 2:
-            {
-                set.add(this);
-                break;
-            }
-            
-            default:
-            {
-                for (DENOPTIMVertex v : innerGraph.gVertices)
-                {
-                    set.addAll(v.getMutationSites());
-                }
-                break;
+        if (contractLevel == 2) {
+            set.add(this);
+        } else {
+            for (DENOPTIMVertex v : innerGraph.gVertices) {
+                set.addAll(v.getMutationSites());
             }
         }
         return set;

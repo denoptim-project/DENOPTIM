@@ -86,7 +86,7 @@ public class FitnessProvider
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		
-		// Now we instatiate new instances of the descriptors implementations
+		// Now we instantiate new instances of the descriptors implementations
 		engine = new DescriptorEngine(classnames,null);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();
 		for (int i=0; i<this.descriptors.size(); i++)

@@ -20,10 +20,12 @@
 package denoptimga;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
@@ -52,7 +54,7 @@ import static denoptimga.DENOPTIMGraphOperations.*;
 public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
-    private volatile ArrayList<Candidate> curPopln;
+    private volatile List<Candidate> curPopln;
     private volatile Integer numTry;
     
     /**
@@ -76,7 +78,7 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     public OffspringEvaluationTask(String molName, DENOPTIMGraph molGraph,
     		String inchi, String smiles, IAtomContainer iac, String workDir,
-            ArrayList<Candidate> popln, Integer numTry, String fileUID)
+            List<Candidate> popln, Integer numTry, String fileUID)
     {
     	super(molGraph);
         this.molName = molName;
@@ -198,25 +200,18 @@ public class OffspringEvaluationTask extends FitnessTask
      * fragment space if not already present.
      */
     private void addRingSystemsToFragmentLibrary() {
-        if (curPopln == null) {
-            return;
-        }
+        final GraphPattern PATTERN = GraphPattern.RING;
 
-        GraphPattern pattern = GraphPattern.RING;
-
-        List<DENOPTIMGraph> subgraphs = curPopln
-                .stream()
-                .filter(Candidate::hasFitness)
-                .map(Candidate::getGraph)
-                .map(g -> extractPattern(g, pattern))
+        List<DENOPTIMGraph> subgraphs = Stream.of(result.getGraph())
+                .map(g -> extractPattern(g, PATTERN))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
         for (DENOPTIMGraph g : subgraphs) {
-            BBType type = hasScaffoldVertex(g) ? BBType.SCAFFOLD :
+            BBType type = hasScaffoldTypeVertex(g) ? BBType.SCAFFOLD :
                     BBType.FRAGMENT;
 
-            if (!hasIsomorph(g, type, pattern)) {
+            if (!hasIsomorph(g, type, PATTERN)) {
                 DENOPTIMTemplate t = new DENOPTIMTemplate(type);
                 t.setInnerGraph(g);
 
@@ -236,7 +231,7 @@ public class OffspringEvaluationTask extends FitnessTask
      * @param g graph to check.
      * @return true if there is a scaffold vertex.
      */
-    private boolean hasScaffoldVertex(DENOPTIMGraph g) {
+    private boolean hasScaffoldTypeVertex(DENOPTIMGraph g) {
         for (DENOPTIMVertex v : g.getVertexList()) {
             if (v.getBuildingBlockType() == BBType.SCAFFOLD) {
                 return true;

@@ -135,7 +135,7 @@ public abstract class FitnessTask extends Task
         {
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }
-        
+
         // Run fitness provider
         if (FitnessParameters.useExternalFitness()) {
             // Write file with input data to fitness provider
