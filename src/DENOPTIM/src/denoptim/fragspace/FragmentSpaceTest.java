@@ -475,7 +475,7 @@ public class FragmentSpaceTest
             TestCase testCase = getTestCase();
 
             ArrayList<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
-            assertEquals(0, fragLib.size());
+            fragLib.clear(); // Workaround. See @BeforeEach in this class.
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
@@ -531,6 +531,7 @@ public class FragmentSpaceTest
 
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
         t.setInnerGraph(innerGraph);
+        t.setBuildingBlockId(0);
         return t;
     }
 
