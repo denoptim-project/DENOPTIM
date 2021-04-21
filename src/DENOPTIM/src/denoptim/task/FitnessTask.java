@@ -136,13 +136,12 @@ public abstract class FitnessTask extends Task
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }
         
-        // Write file with input data to fitness provider
-        DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
-        
         // Run fitness provider
-        if (FitnessParameters.useExternalFitness())
-        {
-	        if (!runExternalFitness())
+        if (FitnessParameters.useExternalFitness()) {
+            // Write file with input data to fitness provider
+            DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
+
+            if (!runExternalFitness())
 	        {
 	            return result;
 	        }
