@@ -1332,7 +1332,7 @@ public class FragmentSpace
      * Extracts a system of one or more fused rings and adds them to the
      * fragment space if not already present.
      */
-    public static void addRingSystemsToFragmentLibrary(DENOPTIMGraph graph) {
+    public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) {
         final GraphPattern PATTERN = GraphPattern.RING;
 
         List<DENOPTIMGraph> subgraphs = Stream

@@ -26,9 +26,7 @@ import java.util.stream.IntStream;
 
 import javax.vecmath.Point3d;
 
-import denoptim.fitness.FitnessParameters;
 import denoptim.molecule.*;
-import denoptimga.OffspringEvaluationTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -479,7 +477,7 @@ public class FragmentSpaceTest
             ArrayList<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
             assertEquals(0, fragLib.size());
 
-            FragmentSpace.addRingSystemsToFragmentLibrary(testCase.graph);
+            FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             assertEquals(1, fragLib.size());
             DENOPTIMVertex actual = fragLib.get(0);

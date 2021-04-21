@@ -19,16 +19,9 @@
 
 package denoptimga;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -42,9 +35,6 @@ import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
-
-import static denoptim.molecule.DENOPTIMVertex.*;
-import static denoptimga.DENOPTIMGraphOperations.*;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a
@@ -187,7 +177,7 @@ public class OffspringEvaluationTask extends FitnessTask
                 numTry--;
             }
 
-            FragmentSpace.addRingSystemsToFragmentLibrary(result.getGraph());
+            FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph());
         }
         completed = true;
         return result;
