@@ -88,8 +88,13 @@ public class EAUtils
     /**
      * Format for decimal fitness numbers that overwrites Locale to en_US
      */
-    protected static DecimalFormat df = (DecimalFormat)
-    		NumberFormat.getNumberInstance(enUsLocale);
+    private static DecimalFormat df = initialiseFormatter();
+    private static DecimalFormat initialiseFormatter() {
+    	DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(
+    			enUsLocale);
+    	df.setGroupingUsed(false);
+    	return df;
+    }
     
     // for each fragment store the reactions associated with it
     protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
@@ -98,7 +103,7 @@ public class EAUtils
     
     // flag for debugging
     private static final boolean DEBUG = false;
-
+    
 //------------------------------------------------------------------------------
 
     /**
