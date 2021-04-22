@@ -32,9 +32,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -520,25 +522,62 @@ public class FragmentSpaceTest
 
 //------------------------------------------------------------------------------
 
-    private TestCase getTestCase() throws DENOPTIMException {
-        List<DENOPTIMVertex> carbons = IntStream
-                .range(0, 4)
-                .mapToObj(i -> getCarbonVertex())
-                .collect(Collectors.toList());
+    @Test
+    public void testFusedRingOnlyAddedOnce() {
+        try {
+            TestCase testCase = getTestCase();
+            final int TRY_ADDING = 10;
+            List<DENOPTIMGraph> sameGraphs = IntStream
+                    .range(0, TRY_ADDING)
+                    .mapToObj(i -> testCase.graph.clone())
+                    .peek(DENOPTIMGraph::renumberGraphVertices)
+                    .collect(Collectors.toList());
 
+            List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+            fragLib.clear();
+
+            for (DENOPTIMGraph g : sameGraphs) {
+                FragmentSpace.addFusedRingsToFragmentLibrary(g);
+            }
+
+            assertEquals(1, fragLib.size());
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+    }
+
+//------------------------------------------------------------------------------
+    /**
+     *   ↑         ↑
+     * ← C1 - C2 - C3 →
+     *   .  / |    ↓
+     *   C4 . C5 →
+     *   ↓    ↓
+     */
+    private TestCase getTestCase() throws DENOPTIMException {
         DENOPTIMGraph g = new DENOPTIMGraph();
-        DENOPTIMVertex c1 = carbons.get(0), c2 = carbons.get(1),
-                c4 = carbons.get(2), c5 = carbons.get(3);
-        DENOPTIMVertex c3 = getCarbonVertex();
+        DENOPTIMVertex c1 = getCarbonVertex(), c2 = getCarbonVertex(),
+                c3 = getCarbonVertex(), c4 = getCarbonVertex(),
+                c5 = getCarbonVertex();
+
+        DENOPTIMVertex rcv14 = getRCV(), rcv41 = getRCV(), rcv45 = getRCV(),
+                rcv54 = getRCV();
 
         g.addVertex(c1);
         g.appendVertexOnAP(c1.getAP(0), c2.getAP(0));
+        g.appendVertexOnAP(c1.getAP(1), rcv14.getAP(0));
         g.appendVertexOnAP(c2.getAP(1), c3.getAP(0));
         g.appendVertexOnAP(c2.getAP(2), c5.getAP(0));
         g.appendVertexOnAP(c2.getAP(3), c4.getAP(0));
+        g.appendVertexOnAP(c4.getAP(1), rcv41.getAP(0));
+        g.appendVertexOnAP(c4.getAP(2), rcv45.getAP(0));
+        g.appendVertexOnAP(c5.getAP(1), rcv54.getAP(0));
 
-        DENOPTIMRing r124 = new DENOPTIMRing(Arrays.asList(c1, c2, c4));
-        DENOPTIMRing r425 = new DENOPTIMRing(Arrays.asList(c4, c2, c5));
+        DENOPTIMRing r124 = new DENOPTIMRing(Arrays.asList(rcv14, c1, c2, c4,
+                rcv41));
+        DENOPTIMRing r425 = new DENOPTIMRing(Arrays.asList(rcv45, c4, c2, c5,
+                rcv54));
         g.addRing(r124);
         g.addRing(r425);
 
@@ -575,7 +614,7 @@ public class FragmentSpaceTest
             IAtomContainer mol = builder.newAtomContainer();
             mol.addAtom(carbon);
             DENOPTIMFragment v = new DENOPTIMFragment(-1, mol,
-                    BBType.FRAGMENT, true);
+                    BBType.FRAGMENT);
             for (int i = 0; i < 4; i++) {
                 v.addAP(0, APC1, getRandomVector(), 1);
             }
@@ -587,6 +626,20 @@ public class FragmentSpaceTest
             fail("Unexpected exception thrown.");
         }
         return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMVertex getRCV() throws DENOPTIMException {
+        IChemObjectBuilder builder = DefaultChemObjectBuilder
+                .getInstance();
+        IAtomContainer dummyMol = builder.newAtomContainer();
+        IAtom dummyAtom = builder.newAtom();
+        dummyMol.addAtom(dummyAtom);
+        DENOPTIMFragment rcv = new DENOPTIMFragment(-1, dummyMol, BBType.FRAGMENT
+                , true);
+        rcv.addAP(0, APC1, getRandomVector(), 1);
+        return rcv;
     }
 
 //------------------------------------------------------------------------------

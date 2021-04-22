@@ -685,14 +685,10 @@ public class DENOPTIMGraphOperations
      * @param graph to check if has an isomorph in the fragment space.
      * @param type specifying which fragment space library to check for
      *             isomorphs in.
-     * @param pattern the pattern of the graph.
+     * @return true if there is an isomorph template in the library of the
+     * specified type.
      */
-    public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type,
-                                   GraphPattern pattern) {
-        if (pattern != GraphPattern.RING) {
-            throw new IllegalArgumentException("Only " + GraphPattern.RING +
-                    " is supported.");
-        }
+    public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type) {
         return (type == BBType.SCAFFOLD ?
                 FragmentSpace.getScaffoldLibrary() :
                 FragmentSpace.getFragmentLibrary())
@@ -801,13 +797,13 @@ public class DENOPTIMGraphOperations
      */
     private static <T> void unionOfIntersectingSets(List<Set<T>> l) {
         for (int i = 0; i < l.size() - 1; i++) {
-            Set<T> collA = l.get(i);
+            Set<T> setA = l.get(i);
             for (int j = i + 1; j < l.size(); ) {
-                Set<T> collB = l.get(j);
-                if (Collections.disjoint(collA, collB)) {
+                Set<T> setB = l.get(j);
+                if (Collections.disjoint(setA, setB)) {
                     j++;
                 } else {
-                    collA.addAll(collB);
+                    setA.addAll(setB);
                     l.remove(j);
                 }
             }

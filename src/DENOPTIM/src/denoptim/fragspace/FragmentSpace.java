@@ -1335,16 +1335,13 @@ public class FragmentSpace
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) {
         final GraphPattern PATTERN = GraphPattern.RING;
 
-        List<DENOPTIMGraph> subgraphs = Stream
-                .of(extractPattern(graph, PATTERN))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        List<DENOPTIMGraph> subgraphs = extractPattern(graph, PATTERN);
 
         for (DENOPTIMGraph g : subgraphs) {
             BBType type = g.hasScaffoldTypeVertex() ? BBType.SCAFFOLD :
                     BBType.FRAGMENT;
 
-            if (!hasIsomorph(g, type, PATTERN)) {
+            if (!hasIsomorph(g, type)) {
                 DENOPTIMTemplate t = new DENOPTIMTemplate(type);
                 t.setInnerGraph(g);
 
@@ -1358,6 +1355,4 @@ public class FragmentSpace
     }
 
 //------------------------------------------------------------------------------
-
-
 }

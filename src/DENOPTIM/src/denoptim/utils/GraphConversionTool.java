@@ -373,7 +373,7 @@ public class GraphConversionTool
      * @param dg
      * @return
      */
-    public static SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> 
+    public static SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation>
     getJGraphFromGraph(DENOPTIMGraph dg)
     {
         SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> g = 
@@ -412,6 +412,7 @@ public class GraphConversionTool
             DENOPTIMVertex vB = r.getTailVertex();
             DENOPTIMVertex pA = vA.getParent();
             DENOPTIMVertex pB = vB.getParent();
+
             g.addEdge(pA, pB, new UndirectedEdgeRelation(
                     vA.getEdgeToParent().getSrcAP(), 
                     vB.getEdgeToParent().getSrcAP(), r.getBondType()));
