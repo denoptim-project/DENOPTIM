@@ -28,8 +28,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -57,6 +59,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.openscience.cdk.fingerprint.BitSetFingerprint;
 import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
@@ -137,11 +140,27 @@ public class FitnessParametersForm extends ParametersForm
     JLabel lblDDValueDefinition;
     JLabel lblDDValueDescripton;
     JLabel lblDDValueClasses;
+    JPanel pnlDDValueParams;
     JLabel lblDDValueParams;
+    JButton btnDDValueParams;
+    private int numberOfParams;
     JLabel lblDDValueSource;
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
         
+    private static  Map<String,String> additionalDocForParameters;
+    static {
+        additionalDocForParameters = new HashMap<String,String>();
+        String key = BitSetFingerprint.class.getName();
+        additionalDocForParameters.put(key,
+                "<p>The <code>" + key + "</code> parameter can generated "
+                + "when interpreting the descriptor into the fitnes provider. "
+                + "To this end, use the prefix '<code>FILE:</code>' to "
+                + "provide a pathname to an SDF file from which the "
+                + "reference molecule can be fetched, and its fingerprint "
+                + "calculated and finally used as parameter to configure "
+                + "this descriptor.</p>");
+    }       
         
     String NL = System.getProperty("line.separator");
     
@@ -417,6 +436,7 @@ public class FitnessParametersForm extends ParametersForm
 				Object[] params = iDesc.getParameters();
 				//NB: some classes return null to avoid adding a way to alter
 				// the default parameters.
+				ArrayList<Object> paramsTypes = new ArrayList<Object>();
 				if (params == null)
 				{
 					parStr = "Undeclared parameters. See source code.";
@@ -431,7 +451,27 @@ public class FitnessParametersForm extends ParametersForm
 								+ iDesc.getParameterType(parNames[ip])
 								.getClass().getSimpleName() + ") "
 								+ params[ip];
+						paramsTypes.add(iDesc.getParameterType(parNames[ip]));
 					}
+				}
+				if (paramsTypes.size() == 0)
+				{
+                    btnDDValueParams.setEnabled(false);
+                    btnDDValueParams.setVisible(false);
+                    numberOfParams = 0;
+				} else {
+				    parStr = parStr + "<p> </p>";
+				    btnDDValueParams.setEnabled(true);
+				    btnDDValueParams.setVisible(true);
+				    numberOfParams = paramsTypes.size();
+				}
+				for (Object parTypeExample : paramsTypes)
+				{
+				    String key = parTypeExample.getClass().getName();
+                    if (additionalDocForParameters.containsKey(key))
+                    {
+                        parStr = parStr + additionalDocForParameters.get(key);
+                    }
 				}
 				parStr = "<html><body width='%1s'>" + parStr + "</body></html>";
 				lblDDValueParams.setText(String.format(parStr, dValLength));
@@ -568,8 +608,39 @@ public class FitnessParametersForm extends ParametersForm
         lblDDValueDefinition = new JLabel();
         lblDDValueDescripton = new JLabel();
         lblDDValueClasses = new JLabel();
+        pnlDDValueParams = new JPanel();
         lblDDValueParams = new JLabel();
+        btnDDValueParams = new JButton("Set parameters");
+        btnDDValueParams.setEnabled(false);
+        btnDDValueParams.setVisible(false);
         lblDDValueSource = new JLabel();
+        
+        btnDDValueParams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                ParametrizedDescriptorDefinition dialog = 
+                        new ParametrizedDescriptorDefinition(numberOfParams);
+                Object[] res = (Object[]) dialog.showDialog();
+                if (res!=null)
+                {
+                    tabMoreEqMod.addRow(res);
+                }
+            }
+        });
+        
+        GroupLayout lyoDescParamsPanel = new GroupLayout(pnlDDValueParams);
+        pnlDDValueParams.setLayout(lyoDescParamsPanel);
+        lyoDescParamsPanel.setAutoCreateGaps(true);
+        lyoDescParamsPanel.setAutoCreateContainerGaps(true);
+        lyoDescParamsPanel.setHorizontalGroup(
+                lyoDescParamsPanel.createParallelGroup()
+                    .addComponent(lblDDValueParams)
+                    .addComponent(btnDDValueParams));
+        lyoDescParamsPanel.setVerticalGroup(
+                lyoDescParamsPanel.createSequentialGroup()
+                    .addComponent(lblDDValueParams)
+                    .addComponent(btnDDValueParams));
         
         descDefinitionPane = new JPanel();
         GroupLayout lyoDescDefPanel = new GroupLayout(descDefinitionPane);
@@ -592,7 +663,7 @@ public class FitnessParametersForm extends ParametersForm
                     		.addComponent(lblDDValueClasses)
                     		.addComponent(lblDDValueDefinition)
                     		//.addComponent(lblDDValueDescripton)
-                    		.addComponent(lblDDValueParams)
+                    		.addComponent(pnlDDValueParams)
                     		.addComponent(lblDDValueSource)
                     		));
         lyoDescDefPanel.setVerticalGroup(lyoDescDefPanel.createSequentialGroup()
@@ -613,7 +684,7 @@ public class FitnessParametersForm extends ParametersForm
         //        		.addComponent(lblDDValueDescripton))
                 .addGroup(lyoDescDefPanel.createParallelGroup()
                 		.addComponent(lblDDParams)
-                		.addComponent(lblDDValueParams))
+                		.addComponent(pnlDDValueParams))
                 .addGroup(lyoDescDefPanel.createParallelGroup()
                 		.addComponent(lblDDSource)
                 		.addComponent(lblDDValueSource))
@@ -659,12 +730,17 @@ public class FitnessParametersForm extends ParametersForm
 
         mapKeyFieldToValueField.put(keyMoreEq.toUpperCase(), 
         		tabMoreEqMod);
+        
 
-        JButton btnMoreEq = new JButton("Add atom-specific variable");
-        btnMoreEq.addActionListener(new ActionListener() {
+        tabMoreEqScrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
+        lineMoreEq.add(tabMoreEqScrollPane);
+
+        JButton btnAtomSpec = new JButton("Add atom-specific variable");
+        btnAtomSpec.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ExpressionDefDialog dialog = new ExpressionDefDialog();
+				AtomSpecExpressionDefinition dialog = 
+				        new AtomSpecExpressionDefinition();
 				Object[] res = (Object[]) dialog.showDialog();
 				if (res!=null)
 				{
@@ -672,10 +748,9 @@ public class FitnessParametersForm extends ParametersForm
 				}
 			}
 		});
-        tabMoreEqScrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
-        btnMoreEq.setAlignmentY(Component.TOP_ALIGNMENT);
-        lineMoreEq.add(tabMoreEqScrollPane);
-        lineMoreEq.add(btnMoreEq);
+        btnAtomSpec.setAlignmentY(Component.TOP_ALIGNMENT);
+        
+        lineMoreEq.add(btnAtomSpec);
         localBlock4.add(lineMoreEq);
         
 
@@ -933,9 +1008,106 @@ public class FitnessParametersForm extends ParametersForm
     
 //------------------------------------------------------------------------------
     
-    private class ExpressionDefDialog extends GUIModalDialog
+    private class ParametrizedDescriptorDefinition extends GUIModalDialog
     {
-    	public ExpressionDefDialog()
+        public ParametrizedDescriptorDefinition(int tabSize)
+        {
+            super();
+            this.setBounds(150, 150, 500, 200);
+            this.setTitle("Define parametrized descriptor variable");
+            
+            Dimension sizeNameFields = new Dimension(200,preferredHeight);
+            Dimension sizeNameLbls = new Dimension(120,preferredHeight);
+            
+            JPanel rowOne = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel lblVarName = new JLabel("Variable name: ");
+            lblVarName.setPreferredSize(sizeNameLbls);
+            lblVarName.setToolTipText("<html>This is the string representing "
+                    + "a user-defined variable <br> in the expression of the "
+                    + "fitness.</html>");
+            JTextField txtVarName = new JTextField();
+            txtVarName.setPreferredSize(sizeNameFields);
+            rowOne.add(lblVarName);
+            rowOne.add(txtVarName);
+            
+            JPanel rowTwo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel lblDescName = new JLabel("Descriptor name: ");
+            lblDescName.setPreferredSize(sizeNameLbls);
+            lblDescName.setToolTipText("<html>This is the pre-defined short "
+                    + "name "
+                    + "reported <br>in "
+                    + "the collection of descriptors.</html>");
+            JTextField txtDescName = new JTextField();
+            txtDescName.setPreferredSize(sizeNameFields);
+            rowTwo.add(lblDescName);
+            rowTwo.add(txtDescName);
+            
+            JPanel rowThree = new JPanel();
+            rowThree.setLayout(new BorderLayout());
+            JLabel lblParams = new JLabel("Parameters:");
+            String paramToolTip = "<html>The parameters provided in the "
+                    + "order defined in the description <br> "
+                    + "of the descriptor.</html>";
+            lblParams.setToolTipText(paramToolTip);
+            
+            JTable tabParams;
+            DefaultTableModel tabParamsMod = new DefaultTableModel();
+            tabParamsMod.setColumnCount(1);
+            tabParamsMod.setRowCount(tabSize);
+            tabParams = new JTable(tabParamsMod);
+            tabParams.setToolTipText(paramToolTip);
+            tabParams.putClientProperty("terminateEditOnFocusLost", true);
+            tabParams.getColumnModel().getColumn(0).setMinWidth(150);
+            tabParams.setGridColor(Color.LIGHT_GRAY);
+            JScrollPane txtParamScrollPane = new JScrollPane(tabParams);
+            tabParams.setTableHeader(null);
+            
+            rowThree.add(lblParams,BorderLayout.WEST);
+            rowThree.add(txtParamScrollPane,BorderLayout.CENTER);
+            JPanel firstTwo = new JPanel();
+            firstTwo.setLayout(new BoxLayout(firstTwo, 
+                    SwingConstants.VERTICAL));
+            firstTwo.add(rowOne);
+            firstTwo.add(rowTwo);
+            addToNorthPane(firstTwo);
+            addToCentralPane(rowThree);
+            this.btnDone.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (txtVarName.getText().equals("")
+                            && txtDescName.getText().equals(""))
+                    {
+                        result = null;
+                    } else {
+                        String line = "${parametrized('" + txtVarName.getText() 
+                                + "','" + txtDescName.getText() + "','";
+                        for (int i=0; i<tabSize; i++)
+                        {
+                            line = line + tabParamsMod.getValueAt(i,0);
+                            if (i<(tabSize-1))
+                                line = line  + "','";
+                        }
+                        line = line + "')}";
+                        result = new Object[] {txtVarName.getText(),line};
+                    }
+                    close();
+                }
+            });
+            this.btnCanc.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    result = null;
+                    close();
+                }
+            });
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private class AtomSpecExpressionDefinition extends GUIModalDialog
+    {
+    	public AtomSpecExpressionDefinition()
     	{
     		super();
     		this.setBounds(150, 150, 500, 200);

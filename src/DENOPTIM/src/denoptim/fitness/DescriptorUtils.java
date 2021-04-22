@@ -94,10 +94,17 @@ public class DescriptorUtils
                         parentFolder = new File(myClassPath.getParent());
                     }
                 }
+                
+                FileFilter fileFilter = new WildcardFileFilter(jarFileWildQuery);
+                File[] cands = parentFolder.listFiles(fileFilter);
+                if (cands.length == 1)
+                {
+                    jarPathName = cands[0].getAbsolutePath();
+                }
+                
                 File libFolder = new File(parentFolder.getAbsolutePath() 
                         + FS + "lib");
-                FileFilter fileFilter = new WildcardFileFilter(jarFileWildQuery);
-                File[] cands = libFolder.listFiles(fileFilter);
+                cands = libFolder.listFiles(fileFilter);
                 if (cands.length == 1)
                 {
                     jarPathName = cands[0].getAbsolutePath();
@@ -145,6 +152,7 @@ public class DescriptorUtils
         {
             e.printStackTrace();
         }
+        
         return classNames;
 	}
 
@@ -152,14 +160,16 @@ public class DescriptorUtils
     
     public static List<String> getClassNamesToDenoptimDescriptors()
     {
-        return getAllClassNamesInPackage("denoptim.fitness.descriptors",null);
+        return getAllClassNamesInPackage("denoptim.fitness.descriptors",
+                "DENOPTIM*.jar");
     }
 	
 //------------------------------------------------------------------------------
 	
 	public static List<String> getClassNamesToCDKDescriptors()
 	{
-	    return getAllClassNamesInPackage("org.openscience.cdk.qsar.descriptors","cdk*.jar");
+	    return getAllClassNamesInPackage("org.openscience.cdk.qsar.descriptors",
+	            "cdk*.jar");
 	}
 	
 //------------------------------------------------------------------------------
