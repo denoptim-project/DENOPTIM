@@ -4,15 +4,20 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.fingerprint.BitSetFingerprint;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.fingerprint.Fingerprinter;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.ICountFingerprint;
+import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.AbstractMolecularDescriptor;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.DescriptorValue;
+import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.DoubleResultType;
@@ -32,13 +37,14 @@ import denoptim.fitness.IDenoptimDescriptor;
  */
 
 public class TanimotoMolSimilarity extends AbstractMolecularDescriptor 
-implements IMolecularDescriptor, IDenoptimDescriptor 
+implements IMolecularDescriptor, IDenoptimDescriptor
 {
-    private static ILoggingTool logger = LoggingToolFactory.createLoggingTool(
-            TanimotoMolSimilarity.class);
+    //private static ILoggingTool logger = LoggingToolFactory.createLoggingTool(
+    //        TanimotoMolSimilarity.class);
     private IBitFingerprint referenceFingerprint;
+    private IFingerprinter fingerprinter;
     private static final String[] PARAMNAMES = new String[] {
-            "referenceFingerprint"};
+            "referenceFingerprint","fingerprinterImplementation"};
 
     private static final String[] NAMES  = {"TanimotoSimilarity"};
 
@@ -82,7 +88,9 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     {
         if (name.equals(PARAMNAMES[0]))
         {
-            return new BitSetFingerprint();
+            return IBitFingerprint.class;
+        } else if (name.equals(PARAMNAMES[1])) {
+            return IFingerprinter.class;
         } else {
             throw new IllegalArgumentException("No parameter for name: "+name);
         }
@@ -99,7 +107,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     @Override
     public void setParameters(Object[] params) throws CDKException
     {
-        if (params.length > 1)
+        if (params.length != 2)
         {
             throw new IllegalArgumentException("TanimotoMolSimilarity only "
                     + "expects one parameter");
@@ -107,9 +115,15 @@ implements IMolecularDescriptor, IDenoptimDescriptor
         if (!(params[0] instanceof IBitFingerprint))
         {
             throw new IllegalArgumentException("Expected parameter of type " 
-                    + getParameterType(PARAMNAMES[0]));
+                    + getParameterType(PARAMNAMES[0]).getClass().getName());
+        }
+        if (!(params[1] instanceof IFingerprinter))
+        {
+            throw new IllegalArgumentException("Expected parameter of type " 
+                    + getParameterType(PARAMNAMES[1]).getClass().getName());
         }
         referenceFingerprint = (IBitFingerprint) params[0];
+        fingerprinter = (IFingerprinter) params[1];
     }
 
 //------------------------------------------------------------------------------
@@ -118,8 +132,9 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     @Override
     public Object[] getParameters()
     {
-        Object[] params = new Object[1];
+        Object[] params = new Object[2];
         params[0] = referenceFingerprint;
+        params[1] = fingerprinter;
         return params;
     }
 
@@ -139,15 +154,24 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     public DescriptorValue calculate(IAtomContainer mol)
     {
         DoubleResult result;
-        Fingerprinter fpMaker = new Fingerprinter();
+        if (referenceFingerprint==null)
+        {
+            throw new IllegalStateException("Reference fingerprint not set. "
+                    + "Cannot calculate Tanimoto similarity.");
+        }
+        if (fingerprinter==null)
+        {
+            throw new IllegalStateException("Fingerprinter not set. "
+                    + "Cannot calculate Tanimoto similarity.");
+        }
+        
         try
         {
             result = new DoubleResult(Tanimoto.calculate(referenceFingerprint, 
-                    fpMaker.getBitFingerprint(mol)));
+                    fingerprinter.getBitFingerprint(mol)));
         } catch (CDKException e)
         {
             result = new DoubleResult(Double.NaN);
-            
         }
         
         return new DescriptorValue(getSpecification(),
@@ -183,10 +207,11 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     {
         return "The Tanimoto Molecular Similarity is calculated between the "
                 + "a reference fingerprint given upon definition of the "
-                + "descriptor (see parameter), and a molecule given as "
+                + "descriptor (see parameters), and a molecule given as "
                 + "argument when calculating the value of the descriptor. "
-                + "Fingerprint are obtained as "
-                + "<code>Fingerprinter.getBitFingerprint(mol)</code>";
+                + "Fingerprint are obtained from the defined "
+                + "<code>IFingerprinter</code> (see parameters) as "
+                + "<code>IFingerprinter.getBitFingerprint(mol)</code>";
     }
 
 //------------------------------------------------------------------------------

@@ -71,9 +71,10 @@ public class FitnessParameters
     private static String fitnessExpression = "";
     
     /**
-     * List of definitions for atom/Bond specific descriptors
+     * List of custom variable definitions. For instance, atom/bond specific 
+     * descriptors, and custom parametrised descriptors.
      */
-	private static List<String> atmBndSpecDescExpressions = 
+	private static List<String> customVarDescExpressions = 
 			new ArrayList<String>();
 
     /**
@@ -81,14 +82,14 @@ public class FitnessParameters
      * variable that take values from the results of that descriptors
      * calculation.
      */
-	private static Map<String,ArrayList<String>> atmBndSpecDescToVars = 
+	private static Map<String,ArrayList<String>> customVarDescToVars = 
 			new HashMap<String,ArrayList<String>>();
 	
     /**
      * Map defining relation between variable names and atom/Bond specific 
-     * descriptor calcualtion.
+     * descriptor calculation.
      */
-	private static Map<String,ArrayList<String>> atmBndSpecDescSMARTS = 
+	private static Map<String,ArrayList<String>> customVarDescSMARTS = 
 			new HashMap<String,ArrayList<String>>();
     
     /**
@@ -128,9 +129,9 @@ public class FitnessParameters
     	externalExe = "";
     	interpreterExternalExe = "bash";
     	fitnessExpression = "";
-    	atmBndSpecDescExpressions = new ArrayList<String>();
-    	atmBndSpecDescToVars = new HashMap<String,ArrayList<String>>();
-    	atmBndSpecDescSMARTS = new HashMap<String,ArrayList<String>>();
+    	customVarDescExpressions = new ArrayList<String>();
+    	customVarDescToVars = new HashMap<String,ArrayList<String>>();
+    	customVarDescSMARTS = new HashMap<String,ArrayList<String>>();
     	descriptors = null;
     	descriptorsGeneratingVariables = null;
     	makePictures = false;
@@ -268,7 +269,7 @@ public class FitnessParameters
             break;
             
         case "FP-DESCRIPTORSPECS=":
-        	atmBndSpecDescExpressions.add(value);
+        	customVarDescExpressions.add(value);
         	break;
             
         case "FP-MAKEPICTURES":
@@ -336,7 +337,7 @@ public class FitnessParameters
 			//NB this is not really an evaluation because the variableResolver
 			// and function map only parse the data they get from the 
 			// ExpressionEvaluator
-			for (String descriptorDefinition : atmBndSpecDescExpressions)
+			for (String descriptorDefinition : customVarDescExpressions)
 			{
 				extractor.evaluate(descriptorDefinition, Double.class, 
 						collector, funcsMap);
@@ -350,15 +351,15 @@ public class FitnessParameters
 		descriptors = DescriptorUtils.findAllDescriptorImplementations(
 				descriptorsGeneratingVariables);
 		
-		// Add specifications to atom/bond specific descriptors
+		// Add specifications to customized descriptors
 		for (DescriptorForFitness dff : descriptors)
 		{
 			String descName = dff.getShortName();
-			if (atmBndSpecDescToVars.keySet().contains(descName))
+			if (customVarDescToVars.keySet().contains(descName))
 			{
-				for (String varName : atmBndSpecDescToVars.get(descName))
+				for (String varName : customVarDescToVars.get(descName))
 				{
-					ArrayList<String> smarts = atmBndSpecDescSMARTS.get(varName);
+					ArrayList<String> smarts = customVarDescSMARTS.get(varName);
 					dff.varNames.add(varName);
 					dff.smarts.put(varName, smarts);
 				}
@@ -399,15 +400,15 @@ public class FitnessParameters
 		ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
 				smartsIdentifier.split("\\s+")));
 		
-		if (atmBndSpecDescToVars.keySet().contains(descName))
+		if (customVarDescToVars.keySet().contains(descName))
 		{
-			atmBndSpecDescToVars.get(descName).add(varName);
+			customVarDescToVars.get(descName).add(varName);
 		} else {
 			ArrayList<String> lst = new ArrayList<String>();
 			lst.add(varName);
-			atmBndSpecDescToVars.put(descName, lst);
+			customVarDescToVars.put(descName, lst);
 		}
-		atmBndSpecDescSMARTS.put(varName, smarts);
+		customVarDescSMARTS.put(varName, smarts);
 		return 0.0; //just a dummy number to fulfil the executor expectations
 	}
 	

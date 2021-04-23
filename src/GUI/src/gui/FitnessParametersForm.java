@@ -60,6 +60,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.openscience.cdk.fingerprint.BitSetFingerprint;
+import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
@@ -148,18 +150,27 @@ public class FitnessParametersForm extends ParametersForm
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
         
-    private static  Map<String,String> additionalDocForParameters;
+    private static  Map<Class<?>,String> additionalDocForParameters;
     static {
-        additionalDocForParameters = new HashMap<String,String>();
-        String key = BitSetFingerprint.class.getName();
+        additionalDocForParameters = new HashMap<Class<?>,String>();
+        Class<?> key = IBitFingerprint.class;
         additionalDocForParameters.put(key,
-                "<p>The <code>" + key + "</code> parameter can generated "
-                + "when interpreting the descriptor into the fitnes provider. "
+                "<p>The <code>" + key.getSimpleName() + "</code> parameter can "
+                + "generated "
+                + "when importing the descriptor into the fitness provider. "
                 + "To this end, use the prefix '<code>FILE:</code>' to "
                 + "provide a pathname to an SDF file from which the "
                 + "reference molecule can be fetched, and its fingerprint "
                 + "calculated and finally used as parameter to configure "
                 + "this descriptor.</p>");
+        key = IFingerprinter.class;
+        additionalDocForParameters.put(key,
+                "<p>The <code>" + key.getSimpleName() 
+                + "</code> parameter should be specified "
+                + "as the simple name of the desired implementation. For "
+                + "example <code>PubchemFingerprinter</code>. See "
+                + "CDK documentation on IFingerprinter for available "
+                + "implementations.</p>");
     }       
         
     String NL = System.getProperty("line.separator");
@@ -447,11 +458,17 @@ public class FitnessParametersForm extends ParametersForm
 						{
 							parStr = parStr + "<br>";
 						}
+						Object parTyp = iDesc.getParameterType(parNames[ip]);
+						
+						String parTypStr = parTyp.getClass().getSimpleName();
+						if (parTyp instanceof Class<?>)
+						{
+						    parTypStr = ((Class<?>) iDesc.getParameterType(
+                                    parNames[ip])).getSimpleName();
+						}
 						parStr = parStr + parNames[ip] + " = (" 
-								+ iDesc.getParameterType(parNames[ip])
-								.getClass().getSimpleName() + ") "
-								+ params[ip];
-						paramsTypes.add(iDesc.getParameterType(parNames[ip]));
+						        + parTypStr + ") " + params[ip];
+						paramsTypes.add(parTyp);
 					}
 				}
 				if (paramsTypes.size() == 0)
@@ -460,17 +477,16 @@ public class FitnessParametersForm extends ParametersForm
                     btnDDValueParams.setVisible(false);
                     numberOfParams = 0;
 				} else {
-				    parStr = parStr + "<p> </p>";
 				    btnDDValueParams.setEnabled(true);
 				    btnDDValueParams.setVisible(true);
 				    numberOfParams = paramsTypes.size();
 				}
 				for (Object parTypeExample : paramsTypes)
 				{
-				    String key = parTypeExample.getClass().getName();
-                    if (additionalDocForParameters.containsKey(key))
+				    String s = additionalDocForParameters.get(parTypeExample);
+                    if (s != null)
                     {
-                        parStr = parStr + additionalDocForParameters.get(key);
+                        parStr = parStr + "<p> </p>" + s;
                     }
 				}
 				parStr = "<html><body width='%1s'>" + parStr + "</body></html>";

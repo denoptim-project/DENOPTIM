@@ -27,12 +27,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorEngine;
 import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
+
+import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 
 /**
  * Unit test for internal fitness provider.
@@ -67,7 +72,7 @@ public class FitnessProviderTest
     		descriptors.add(dv);
     	}
     	    	
-    	FitnessProvider fp = new FitnessProvider(descriptors,"no eq neede");
+    	FitnessProvider fp = new FitnessProvider(descriptors,"no eq needed");
     	
     	assertEquals(2, fp.engine.getDescriptorInstances().size(),
     			"Number of descriptors from custom list");
@@ -114,7 +119,7 @@ public class FitnessProviderTest
         
         // The descriptors values must be already in the mol properties map
         Map<Object, Object> props = mol.getProperties();
-        // 6 ptops: title, descpSpec, descSpec, Zagreb val, nAtom val, fitness
+        // 6 properties: title, descpSpec, descSpec, Zagreb val, nAtom val, fitness
         assertEquals(6,props.size(),"Number of properties in processed mol");
         List<Object> keys = new ArrayList<Object>();
         for (Object k : props.keySet()) 
@@ -138,6 +143,52 @@ public class FitnessProviderTest
         double trsh = 0.001;
         assertTrue(Math.abs(22.0 - fitness) < trsh, 
         		"Fitness value should be 22.0 but is " + fitness);
+    }
+ 
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testGetFitnessWithParametrizedDescriptors() throws Exception
+    {
+        // Construct a descriptor implementation
+        List<String> classNames = new ArrayList<String>();
+        classNames.add("denoptim.fitness.descriptors.TanimotoMolSimilarity");
+        DescriptorEngine engine = new DescriptorEngine(classNames,null);
+        List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
+        IDescriptor iDesc = new TanimotoMolSimilarity();
+        
+        //Customise parameters used to calculate descriptors
+        SmilesParser sp = new SmilesParser(
+                SilentChemObjectBuilder.getInstance());
+        IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
+        PubchemFingerprinter fpMaker = new PubchemFingerprinter(
+            DefaultChemObjectBuilder.getInstance());
+        IBitFingerprint fpRef = fpMaker.getBitFingerprint(ref);
+        Object[] params = {fpRef, fpMaker};
+        iDesc.setParameters(params);
+        
+        //Configure fitness provider
+        DescriptorForFitness dff = new DescriptorForFitness(
+                iDesc.getDescriptorNames()[0],
+                iDesc.getClass().getName(), iDesc, 0);
+        List<DescriptorForFitness> descriptors = 
+                new ArrayList<DescriptorForFitness>();
+        descriptors.add(dff);
+        String expression = "${" + descriptors.get(0).shortName + "}";
+        FitnessProvider fp = new FitnessProvider(descriptors,expression);
+        
+        //Construct a molecule to be evaluated by the fitness provider
+        IAtomContainer mol =  sp.parseSmiles("COc1ccccc1");
+        
+        //Calculate fitness
+        double fitness = fp.getFitness(mol);
+        
+        //Get the result and check it
+        Object propObj = mol.getProperty("FITNESS");
+        assertTrue(propObj!=null,"Fitness is not null.");
+        double trsh = 0.001;
+        assertTrue(Math.abs(0.6 - fitness) < trsh, 
+                "Fitness value should be 0.6 but is " + fitness);
     }
  
 //------------------------------------------------------------------------------

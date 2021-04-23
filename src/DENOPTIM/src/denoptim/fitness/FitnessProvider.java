@@ -10,7 +10,12 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.VariableResolver;
 
 import org.apache.commons.el.ExpressionEvaluatorImpl;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.IImplementationSpecification;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -27,9 +32,11 @@ import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IDescriptorResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DummyAtomHandler;
@@ -65,10 +72,20 @@ public class FitnessProvider
 
 	/**
 	 * Constructs an instance that will calculated the fitness according to
-	 * the given parameters.
+	 * the given parameters. Note that the descriptors implementation instances
+	 * are not the same (not same hash) than those that will be used to compute 
+	 * the descriptor values. This to make the descriptor calculations
+	 * thread-safe. Any parameter that is set to the descriptors argument is
+	 * copied into the new instances of the descriptor implementations.
+	 * @param descriptors the list of descriptors to calculate in order to 
+	 * calculate the fitness value
+	 * @param expression the string defining in expression-language format
+	 * the mathematical formulation used to calculate the fitness from the 
+	 * descriptor values.
 	 */
 	
-	public FitnessProvider(List<DescriptorForFitness> descriptors, String expression)
+	public FitnessProvider(List<DescriptorForFitness> descriptors, 
+	        String expression)
 	{
 		this.expression = expression;
 	
@@ -86,12 +103,21 @@ public class FitnessProvider
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		
-		// Now we instatiate new instances of the descriptors implementations
+		// Now we instantiate new instances of the descriptors implementations
 		engine = new DescriptorEngine(classnames,null);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();
 		for (int i=0; i<this.descriptors.size(); i++)
 		{
 			this.descriptors.get(i).implementation = newInstances.get(i);
+			try
+            {
+                this.descriptors.get(i).implementation.setParameters(
+                        descriptors.get(i).implementation.getParameters());
+            } catch (CDKException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 		}
         List<IImplementationSpecification> newSpecs = 
         		engine.getDescriptorSpecifications();
@@ -124,6 +150,7 @@ public class FitnessProvider
 		// Preparation of the chemical representation
 		
 		// TODO-V3 add possibility to submit external molecular modeling task
+		// this could be done by a Modeller class
 		
 		// Cleanup: remove dummy atoms
 		DummyAtomHandler dah = new DummyAtomHandler(
@@ -138,7 +165,8 @@ public class FitnessProvider
 		// plain human readable strings.
 		engine.process(iac);
 		
-		if (debug) System.out.println("Descriptor instances: "+engine.getDescriptorInstances().size());
+		if (debug) System.out.println("Descriptor instances: " 
+		        + engine.getDescriptorInstances().size());
 		
 		// Collect numerical values needed to calculate the fitness
 		HashMap<String,Double> valuesMap = new HashMap<String,Double>();
@@ -148,7 +176,8 @@ public class FitnessProvider
         	IDescriptor desc = engine.getDescriptorInstances().get(i);
         	
         	String descName = descriptor.shortName;
-        	if (debug) System.out.println("Working on descriptor '"+descName+"'");
+        	if (debug) System.out.println("Working on descriptor '" 
+        	        + descName + "'");
         	
         	IImplementationSpecification descSpec = 
         			engine.getDescriptorSpecifications().get(i);
@@ -157,7 +186,8 @@ public class FitnessProvider
         	Map<String, String> smarts = new HashMap<String, String>();
         	for (String varName : descriptor.getVariableNames())
         	{
-        		if (debug) System.out.println("Processing varName = '"+varName+"'");
+        		if (debug) System.out.println("Processing varName = '" 
+        		        + varName + "'");
         		if (descriptor.smarts.containsKey(varName))
         		{
         			if (descriptor.smarts.get(varName).size()!=1)
@@ -194,7 +224,8 @@ public class FitnessProvider
 	            allMatches = msq.getAllMatches();
         	}
         	
-        	if (debug) System.out.println("Getting value from descriptor "+i+" "+descName);
+        	if (debug) System.out.println("Getting value from descriptor " + i 
+        	        + " " + descName);
         	
         	//Molecular/Atomic/bond descriptors are stored accordingly
         	DescriptorValue value = null;
@@ -220,7 +251,8 @@ public class FitnessProvider
         				valuesMap.put(varName, 0.0);
         				continue;
         			}
-        			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
+        			if (debug) System.out.println("AtomIDs contributing to " 
+        			        + varName + ":" + hits);
         			if (hits.count() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
@@ -249,7 +281,8 @@ public class FitnessProvider
 		                    iac.setProperty(varName+"_"+valCounter,val);
                     	}
                     }
-                    if (debug) System.out.println("Values contributing to "+varName+": "+vals);
+                    if (debug) System.out.println("Values contributing to " 
+                            + varName + ": " + vals);
                     double overallValue = DENOPTIMMathUtils.mean(vals);
                     valuesMap.put(varName, overallValue);
                     iac.setProperty(varName,overallValue);
@@ -266,7 +299,8 @@ public class FitnessProvider
         				valuesMap.put(varName, 0.0);
         				continue;
         			}
-        			if (debug) System.out.println("AtomIDs contributing to "+varName+":"+hits);
+        			if (debug) System.out.println("AtomIDs contributing to " 
+        			        + varName + ":" + hits);
         			if (hits.count() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
@@ -294,7 +328,8 @@ public class FitnessProvider
 		        		valCounter++;
 	                    iac.setProperty(varName+"_"+valCounter,val);
                     }
-                    if (debug) System.out.println("Values contributing to "+varName+": "+vals);
+                    if (debug) System.out.println("Values contributing to " 
+                            + varName + ": "+vals);
                     double overallValue = DENOPTIMMathUtils.mean(vals);
                     valuesMap.put(varName, overallValue);
                     iac.setProperty(varName,overallValue);
@@ -344,7 +379,8 @@ public class FitnessProvider
 	 * value for fitness calculation in the appropriate map.
 	 * @throws Exception 
 	 */
-	private double processValue(String descName, DescriptorForFitness descriptor,
+	private double processValue(String descName, 
+	        DescriptorForFitness descriptor,
 			IDescriptor implementation, 
 			IImplementationSpecification descSpec, DescriptorValue value,
 			String varName, IAtomContainer iac) throws Exception 

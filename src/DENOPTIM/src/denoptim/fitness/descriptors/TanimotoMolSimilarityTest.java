@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.fingerprint.Fingerprinter;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -39,16 +40,17 @@ public class TanimotoMolSimilarityTest
 	{
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
         IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
-        Fingerprinter fpMaker = new Fingerprinter();
+        PubchemFingerprinter fpMaker = new PubchemFingerprinter(
+                DefaultChemObjectBuilder.getInstance());
         IBitFingerprint fpRef = fpMaker.getBitFingerprint(ref);
         
-        Object[] params = {fpRef};
+        Object[] params = {fpRef, fpMaker};
         descriptor.setParameters(params);
         
         IAtomContainer mol1 = sp.parseSmiles("COc1ccccc1");
         double value = ((DoubleResult) descriptor.calculate(mol1).getValue())
                 .doubleValue();
-        assertTrue(closeEnough(0.32758,value), "Tanimoto similarity with mol1: "
+        assertTrue(closeEnough(0.6,value), "Tanimoto similarity with mol1: "
                 + value);
 
         IAtomContainer mol2 = sp.parseSmiles("P");
