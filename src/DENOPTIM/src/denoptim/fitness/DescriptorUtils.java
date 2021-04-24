@@ -193,7 +193,7 @@ public class DescriptorUtils
      * @throws DENOPTIMException
      */
     public static List<DescriptorForFitness> findAllCDKDescriptors(
-            List<String> requiredDescriptors) throws DENOPTIMException
+            Set<String> requiredDescriptors) throws DENOPTIMException
     {
         List<String> classNames = new ArrayList<String>();
         classNames.addAll(getClassNamesToCDKDescriptors());
@@ -213,7 +213,7 @@ public class DescriptorUtils
      * @throws DENOPTIMException
      */
     public static List<DescriptorForFitness> findAllDENOPTIMDescriptors(
-            List<String> requiredDescriptors) throws DENOPTIMException
+            Set<String> requiredDescriptors) throws DENOPTIMException
     {
         List<String> classNames = new ArrayList<String>();
         classNames.addAll(getClassNamesToDenoptimDescriptors());
@@ -233,7 +233,7 @@ public class DescriptorUtils
 	 * @throws DENOPTIMException
 	 */
 	public static List<DescriptorForFitness> findAllDescriptorImplementations(
-			List<String> requiredDescriptors) throws DENOPTIMException
+			Set<String> requiredDescriptors) throws DENOPTIMException
 	{
 		List<String> classNames = new ArrayList<String>();
 		classNames.addAll(getClassNamesToCDKDescriptors());
@@ -254,7 +254,7 @@ public class DescriptorUtils
      * @throws DENOPTIMException
      */
     public static List<DescriptorForFitness> findDescriptorImplementations(
-            List<String> requiredDescriptors, List<String> classNames) 
+            Set<String> requiredDescriptors, List<String> classNames) 
                     throws DENOPTIMException
     {	
 		//We use the engine to get the instances of descriptors calculators
@@ -349,7 +349,6 @@ public class DescriptorUtils
 				}
 			}
 		}
-		
 		return chosenOnes;
 	}
 	

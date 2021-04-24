@@ -22,14 +22,19 @@ package denoptim.fitness;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.DescriptorEngine;
@@ -37,7 +42,9 @@ import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.fitness.descriptors.TanimotoMolSimilarity;
+import denoptim.io.DenoptimIO;
 
 /**
  * Unit test for internal fitness provider.
@@ -47,7 +54,19 @@ import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 
 public class FitnessProviderTest
 {
-	
+    private SmilesParser sp;
+    private static final String SEP = System.getProperty("file.separator");
+    
+    @TempDir 
+    static File tempDir;
+    
+    @BeforeEach
+    private void setUp()
+    {
+        assertTrue(tempDir.isDirectory(),"Should be a directory ");
+        sp = new SmilesParser(SilentChemObjectBuilder.getInstance());
+    }
+    
 //------------------------------------------------------------------------------
 	
     @Test
@@ -85,8 +104,6 @@ public class FitnessProviderTest
     {
     	IAtomContainer mol = null;
     	try {
-    	     SmilesParser sp = new SmilesParser(
-    	    		 SilentChemObjectBuilder.getInstance());
     	     mol  = sp.parseSmiles("C(C)CO");
     	 } catch (InvalidSmilesException e) {
     	     System.err.println(e.getMessage());
@@ -102,17 +119,18 @@ public class FitnessProviderTest
     	
     	List<DescriptorForFitness> descriptors = 
     	        new ArrayList<DescriptorForFitness>();
+    	String[] varNames = new String[] {"desc0", "desc1"};
     	for (int i=0; i<iDescs.size(); i++)
     	{
     		IDescriptor iDesc = iDescs.get(i);
-    		DescriptorForFitness dv = new DescriptorForFitness(
+    		DescriptorForFitness dff = new DescriptorForFitness(
     		        iDesc.getDescriptorNames()[0],
     				classNames.get(i), iDesc, 0);
-    		descriptors.add(dv);
+    		dff.varNames.add(varNames[i]);
+    		descriptors.add(dff);
     	}
-    	    	
-    	String expression = "${" + descriptors.get(0).shortName 
-        		+" + " + descriptors.get(1).shortName + "}";
+    	
+    	String expression = "${" + varNames[0] + " + " + varNames[1] + "}";
     	
     	FitnessProvider fp = new FitnessProvider(descriptors,expression);
     	double fitness = fp.getFitness(mol);
@@ -126,15 +144,13 @@ public class FitnessProviderTest
         {
         	keys.add(k);
         }
-        String snFirts = descriptors.get(0).getShortName();
-        String snSecond = descriptors.get(1).getShortName();
-        if (props.get(snFirts).toString().equals("10.0"))
+        if (props.get(varNames[0]).toString().equals("10.0"))
         {
-        	assertEquals("12.0",props.get(snSecond).toString(), 
+        	assertEquals("12.0",props.get(varNames[1]).toString(), 
         			"Unexpected descriptor value (A)");
-        } else if (props.get(snSecond).toString().equals("10.0"))
+        } else if (props.get(varNames[1]).toString().equals("10.0"))
         {
-        	assertEquals("10.0",props.get(snFirts).toString(), 
+        	assertEquals("10.0",props.get(varNames[0]).toString(), 
         			"Unexpected descriptor value (B)");
         } else {
         	assertTrue(false, "Unexpected descriptor value (C)");
@@ -148,7 +164,7 @@ public class FitnessProviderTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testGetFitnessWithParametrizedDescriptors() throws Exception
+    public void testGetFitnessWithCustomDescriptors() throws Exception
     {
         // Construct a descriptor implementation
         List<String> classNames = new ArrayList<String>();
@@ -158,23 +174,24 @@ public class FitnessProviderTest
         IDescriptor iDesc = new TanimotoMolSimilarity();
         
         //Customise parameters used to calculate descriptors
-        SmilesParser sp = new SmilesParser(
-                SilentChemObjectBuilder.getInstance());
         IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
         PubchemFingerprinter fpMaker = new PubchemFingerprinter(
             DefaultChemObjectBuilder.getInstance());
         IBitFingerprint fpRef = fpMaker.getBitFingerprint(ref);
-        Object[] params = {fpRef, fpMaker};
+        Object[] params = {fpMaker, fpRef};
         iDesc.setParameters(params);
+        
+        String myVarName = "myVar";
         
         //Configure fitness provider
         DescriptorForFitness dff = new DescriptorForFitness(
                 iDesc.getDescriptorNames()[0],
                 iDesc.getClass().getName(), iDesc, 0);
+        dff.varNames.add(myVarName);
         List<DescriptorForFitness> descriptors = 
                 new ArrayList<DescriptorForFitness>();
         descriptors.add(dff);
-        String expression = "${" + descriptors.get(0).shortName + "}";
+        String expression = "${" + myVarName + "}";
         FitnessProvider fp = new FitnessProvider(descriptors,expression);
         
         //Construct a molecule to be evaluated by the fitness provider
@@ -184,13 +201,114 @@ public class FitnessProviderTest
         double fitness = fp.getFitness(mol);
         
         //Get the result and check it
-        Object propObj = mol.getProperty("FITNESS");
+        Object propObj = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
         assertTrue(propObj!=null,"Fitness is not null.");
         double trsh = 0.001;
+        assertTrue(Math.abs(((double) propObj) - fitness) < trsh, 
+                "Fitness value should be 0.6 but is " + fitness);
         assertTrue(Math.abs(0.6 - fitness) < trsh, 
                 "Fitness value should be 0.6 but is " + fitness);
     }
+        
+//------------------------------------------------------------------------------
+
+    /**
+     * This test is reproducing most of what done in 
+     * {@link FitnessParametersTest#testProcessExpressions()} so if both fail
+     * the problem is most likely in {@link FitnessParameters}.
+     */
+    @Test
+    public void testGetFitnessWithParametrizedDescriptors() throws Exception
+    {
+        String fileName = tempDir.getAbsolutePath() + SEP + "ref.sdf";
+        IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
+        DenoptimIO.writeMolecule(fileName, ref, false);
+        
+        FitnessParameters.resetParameters();
+        String[] lines = new String[] {
+                "FP-Equation=${taniSym + taniBis + 0.02 * Zagreb - aHyb_1 +"
+                + " aHyb_2}",
+                "FP-DescriptorSpecs=${atomSpecific('aHyb_1','aHyb','[$([C])]')}",
+                "FP-DescriptorSpecs=${atomSpecific('aHyb_2','aHyb','[$([O])]')}",
+                "FP-DescriptorSpecs=${parametrized('taniSym',"
+                    + "'TanimotoSimilarity','PubchemFingerprinter, " 
+                    + "FILE:" + fileName + "')}",
+                "FP-DescriptorSpecs=${parametrized('taniBis',"
+                    + "'TanimotoSimilarity','GraphOnlyFingerprinter, "
+                    + "FILE:" + fileName + "')}"};
+        for (int i=0; i<lines.length; i++)
+        {
+            String line = lines[i];
+            FitnessParameters.interpretKeyword(line);
+        }
+        FitnessParameters.processParameters();
+        
+        FitnessProvider fp = new FitnessProvider(
+                FitnessParameters.getDescriptors(),
+                FitnessParameters.getFitnessExpression());
+        
+        IAtomContainer mol = sp.parseSmiles("COc1ccccc1");
+        
+        fp.getFitness(mol);
+        
+        String[] expectedProps = new String[] {DENOPTIMConstants.FITNESSTAG,"Zagreb","taniBis",
+                "taniSym","aHyb_1","aHyb_2"};
+        double[] expectedValue = new double[] {
+                2.5689610, // fitness
+                34.000000, // Zagreb
+                0.4318000, // taniBis
+                0.6000000, // taniSym
+                2.1428571, // aHyb_1
+                3.0000000 // aHyb_2
+        };
+        for (int i=0; i<expectedProps.length; i++)
+        {
+            Object p = mol.getProperty(expectedProps[i]);
+            double value = Double.parseDouble(p.toString());
+            assertTrue(closeEnough(expectedValue[i], value),
+                    "Value of property '" + expectedProps[i] + "' should be "
+                            + expectedValue[i] + " but is " + value);
+        }
+        
+        // Cleanup static fields
+        FitnessParameters.resetParameters();
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testGetConstantFitness() throws Exception
+    {
+        FitnessParameters.resetParameters();
+        FitnessParameters.interpretKeyword("FP-Equation=${1.23456}");
+        FitnessParameters.processParameters();
+        
+        FitnessProvider fp = new FitnessProvider(
+                FitnessParameters.getDescriptors(),
+                FitnessParameters.getFitnessExpression());
+        
+        IAtomContainer mol = sp.parseSmiles("COc1ccccc1");
+        
+        fp.getFitness(mol);
+        
+        Object prop = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
+        assertTrue(prop != null, "Fitness property found in molecule");
+        assertTrue(closeEnough(1.23456, Double.parseDouble(prop.toString())),
+                "Numerical result (" + Double.parseDouble(prop.toString()) 
+                    + ") is correct");
+        // Cleanup static fields
+        FitnessParameters.resetParameters();
+    }
  
+//------------------------------------------------------------------------------
+    
+    private boolean closeEnough(double expected, double actual)
+    {
+        double threshold = 0.0001;
+        double delta = Math.abs(expected-actual);
+        return delta < threshold;
+    }
+    
 //------------------------------------------------------------------------------
 
 }

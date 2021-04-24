@@ -15,12 +15,14 @@ import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.qsar.DescriptorEngine;
+import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IAtomPairDescriptor;
 import org.openscience.cdk.qsar.IAtomicDescriptor;
@@ -90,11 +92,12 @@ public class FitnessProvider
 		this.expression = expression;
 	
 		// We cannot use the list<DescriptorsForFitness> parameter directly
+		// because they are not thread safe.
 		// otherwise we hit concurrent modification exception because multiple
 		// threads will run the exact same instance of the implementation
 		this.descriptors = new ArrayList<DescriptorForFitness>();
 
-		// Take classnames from the parameter, and make new instances of DFF
+		// Make new instances of DFF
 		ArrayList<String> classnames = new ArrayList<String>();
 		for (int i=0; i<descriptors.size(); i++)
 		{
@@ -103,9 +106,10 @@ public class FitnessProvider
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		
-		// Now we instantiate new instances of the descriptors implementations
+		// Instantiate new instances of the descriptors implementations
 		engine = new DescriptorEngine(classnames,null);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();
+		
 		for (int i=0; i<this.descriptors.size(); i++)
 		{
 			this.descriptors.get(i).implementation = newInstances.get(i);
@@ -115,14 +119,14 @@ public class FitnessProvider
                         descriptors.get(i).implementation.getParameters());
             } catch (CDKException e)
             {
-                // TODO Auto-generated catch block
+                // This should never happen
                 e.printStackTrace();
             }
 		}
-        List<IImplementationSpecification> newSpecs = 
-        		engine.getDescriptorSpecifications();
+		
 		engine.setDescriptorInstances(newInstances);
-	    engine.setDescriptorSpecifications(newSpecs);
+	    engine.setDescriptorSpecifications(engine.initializeSpecifications(
+	            newInstances));
 	}
 	
 //------------------------------------------------------------------------------
@@ -186,7 +190,7 @@ public class FitnessProvider
         	Map<String, String> smarts = new HashMap<String, String>();
         	for (String varName : descriptor.getVariableNames())
         	{
-        		if (debug) System.out.println("Processing varName = '" 
+        		if (debug) System.out.println("-Processing varName = '" 
         		        + varName + "'");
         		if (descriptor.smarts.containsKey(varName))
         		{
@@ -224,21 +228,21 @@ public class FitnessProvider
 	            allMatches = msq.getAllMatches();
         	}
         	
-        	if (debug) System.out.println("Getting value from descriptor " + i 
-        	        + " " + descName);
+        	if (debug) System.out.println("Collecting value of variables "
+        	        + "derived from descriptor #" + i + ": " + descName);
         	
         	//Molecular/Atomic/bond descriptors are stored accordingly
         	DescriptorValue value = null;
         	if (desc instanceof IMolecularDescriptor)
         	{
-        		// The value might be an array, but the DescriptorForFitness
-        		// knows which entry to take, and for each entry the descName
-        		// is unique. Thus, no loop here.
-        		value = (DescriptorValue) iac.getProperty(descSpec);
-        		double val = processValue(descName, descriptor, desc, descSpec, 
-        				value, descName, iac);
-        		valuesMap.put(descName, val);
-                iac.setProperty(descName,val);
+        	    for (String varName : descriptor.getVariableNames())
+        	    {
+            		value = (DescriptorValue) iac.getProperty(descSpec);
+            		double val = processValue(descName, descriptor, desc, 
+            		        descSpec, value, varName, iac);
+            		valuesMap.put(varName, val);
+                    iac.setProperty(varName,val);
+        	    }
         	} else if (desc instanceof IAtomicDescriptor) {
         		for (String varName : descriptor.getVariableNames())
         		{
@@ -251,7 +255,7 @@ public class FitnessProvider
         				valuesMap.put(varName, 0.0);
         				continue;
         			}
-        			if (debug) System.out.println("AtomIDs contributing to " 
+        			if (debug) System.out.println("-AtomIDs contributing to " 
         			        + varName + ":" + hits);
         			if (hits.count() > 1)
         			{
@@ -281,7 +285,7 @@ public class FitnessProvider
 		                    iac.setProperty(varName+"_"+valCounter,val);
                     	}
                     }
-                    if (debug) System.out.println("Values contributing to " 
+                    if (debug) System.out.println("-Values contributing to " 
                             + varName + ": " + vals);
                     double overallValue = DENOPTIMMathUtils.mean(vals);
                     valuesMap.put(varName, overallValue);
@@ -299,7 +303,7 @@ public class FitnessProvider
         				valuesMap.put(varName, 0.0);
         				continue;
         			}
-        			if (debug) System.out.println("AtomIDs contributing to " 
+        			if (debug) System.out.println("-AtomIDs contributing to " 
         			        + varName + ":" + hits);
         			if (hits.count() > 1)
         			{
@@ -328,7 +332,7 @@ public class FitnessProvider
 		        		valCounter++;
 	                    iac.setProperty(varName+"_"+valCounter,val);
                     }
-                    if (debug) System.out.println("Values contributing to " 
+                    if (debug) System.out.println("-Values contributing to " 
                             + varName + ": "+vals);
                     double overallValue = DENOPTIMMathUtils.mean(vals);
                     valuesMap.put(varName, overallValue);
@@ -366,6 +370,7 @@ public class FitnessProvider
 		
 		double fitness = (double) evaluator.evaluate(expression, Double.class, 
 				resolver, null);
+		
 		iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
 		return fitness;
 	}
@@ -423,7 +428,8 @@ public class FitnessProvider
             {
                 list.add(String.valueOf(a.get(j)));
             }
-            iac.setProperty(implementation.getClass().getName(),list);
+            iac.setProperty(implementation.getClass().getName() + "#" + varName,
+                    list);
         } else if (result instanceof IntegerArrayResult) 
         {
         	IntegerArrayResult array = (IntegerArrayResult) result;
@@ -441,7 +447,8 @@ public class FitnessProvider
             {
                 list.add(String.valueOf(array.get(j)));
             }
-            iac.setProperty(implementation.getClass().getName(),list);
+            iac.setProperty(implementation.getClass().getName()+ "#" + varName,
+                    list);
         }
        
         return valueToFitness;

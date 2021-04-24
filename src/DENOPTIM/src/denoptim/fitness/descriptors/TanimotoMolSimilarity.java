@@ -44,7 +44,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     private IBitFingerprint referenceFingerprint;
     private IFingerprinter fingerprinter;
     private static final String[] PARAMNAMES = new String[] {
-            "referenceFingerprint","fingerprinterImplementation"};
+            "fingerprinterImplementation","referenceFingerprint"};
 
     private static final String[] NAMES  = {"TanimotoSimilarity"};
 
@@ -58,15 +58,25 @@ implements IMolecularDescriptor, IDenoptimDescriptor
 //------------------------------------------------------------------------------
       
     /**
-     * Get the specification attribute of Tanimoto molecular similarity.
+     * Get the specification attribute of Tanimoto molecular similarity. Given 
+     * the dependency on the fingerpringer and reference fingerprint, the
+     * implementation identifier is made dependent on those two parameters. 
+     * Consequently resetting the parameter with two new instances of the 
+     * fingerpringer and reference fingerprint (even is effectively equal) will
+     * result in two different DescriptorSpecification objects.
      * @return the specification of this descriptor.
      */
     @Override
     public DescriptorSpecification getSpecification()
     {
-        //TODO
+        String paramID = ""; 
+        if (fingerprinter!=null && referenceFingerprint!=null)
+        {
+            paramID = "" + fingerprinter.hashCode() 
+            + referenceFingerprint.hashCode();
+        }
         return new DescriptorSpecification("Denoptim source code", 
-                this.getClass().getName(), "DENOPTIM project");
+                this.getClass().getName(), paramID, "DENOPTIM project");
     }
 
 //------------------------------------------------------------------------------
@@ -86,10 +96,10 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     @Override
     public Object getParameterType(String name)
     {
-        if (name.equals(PARAMNAMES[0]))
+        if (name.equals(PARAMNAMES[1]))
         {
             return IBitFingerprint.class;
-        } else if (name.equals(PARAMNAMES[1])) {
+        } else if (name.equals(PARAMNAMES[0])) {
             return IFingerprinter.class;
         } else {
             throw new IllegalArgumentException("No parameter for name: "+name);
@@ -100,7 +110,8 @@ implements IMolecularDescriptor, IDenoptimDescriptor
 
     /**
      * Set the parameters attribute of TanimotoMolSimilarity object.
-     * The descriptor takes one parameter, i.e., the fingerprint against witch 
+     * The descriptor takes two parameters: the fingerprinter used to generate 
+     * the fingerprints, and the fingerprint against which 
      * we want to calculate similarity.
      * @param params the array of parameters
      */
@@ -112,18 +123,18 @@ implements IMolecularDescriptor, IDenoptimDescriptor
             throw new IllegalArgumentException("TanimotoMolSimilarity only "
                     + "expects one parameter");
         }
-        if (!(params[0] instanceof IBitFingerprint))
+        if (!(params[1] instanceof IBitFingerprint))
         {
-            throw new IllegalArgumentException("Expected parameter of type " 
-                    + getParameterType(PARAMNAMES[0]).getClass().getName());
+            throw new IllegalArgumentException("Parameter does not implemet "
+                    + "IBitFingerprint.");
         }
-        if (!(params[1] instanceof IFingerprinter))
+        if (!(params[0] instanceof IFingerprinter))
         {
-            throw new IllegalArgumentException("Expected parameter of type " 
-                    + getParameterType(PARAMNAMES[1]).getClass().getName());
+            throw new IllegalArgumentException("Parameter does not implement "
+                    + "IFingerprinter. ");
         }
-        referenceFingerprint = (IBitFingerprint) params[0];
-        fingerprinter = (IFingerprinter) params[1];
+        referenceFingerprint = (IBitFingerprint) params[1];
+        fingerprinter = (IFingerprinter) params[0];
     }
 
 //------------------------------------------------------------------------------
@@ -133,8 +144,8 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     public Object[] getParameters()
     {
         Object[] params = new Object[2];
-        params[0] = referenceFingerprint;
-        params[1] = fingerprinter;
+        params[1] = referenceFingerprint;
+        params[0] = fingerprinter;
         return params;
     }
 

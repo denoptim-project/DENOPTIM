@@ -1,12 +1,17 @@
 package denoptim.fitness;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.IImplementationSpecification;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
+
+import denoptim.exception.DENOPTIMException;
 
 /**
  * This is a reference to a specific descriptor value. Not the numerical result,
@@ -72,13 +77,18 @@ public class DescriptorForFitness
 	 */
 	protected String dictTitle;
 	
+    /**
+     * Utility for constructing CDK objects
+     */
+    private static IChemObjectBuilder cdkBuilder = 
+            DefaultChemObjectBuilder.getInstance();
+	
 //------------------------------------------------------------------------------
 
 	public DescriptorForFitness(String shortName, String className, 
 			IDescriptor implementation, int resultId)
 	{
 		this.shortName = shortName;
-		this.varNames.add(shortName);
 		this.className = className;
 		this.implementation = implementation;
 		this.resultId = resultId;
@@ -225,20 +235,87 @@ public class DescriptorForFitness
 //------------------------------------------------------------------------------
 	
 	/**
-	 * This is a sort of clooning that builds a new DescriptorForFitness with 
-	 * the fields on this one, but a null implementation. The latter will
-	 * have to be instatiated elsewhere.
-	 * @return
+	 * This is a sort of deep cloning that returns a new DescriptorForFitness 
+	 * with the same field content of this one (i.e., deep cloning), 
+	 * but a null implementation. The latter will have to be instantiated 
+	 * elsewhere.
+	 * @return a deep clone with null descriptor implementation
 	 */
 
 	public DescriptorForFitness cloneAllButImpl() 
 	{
-		// NB: this private constructor by-passes the implementation!
-		DescriptorForFitness newDff = new DescriptorForFitness(shortName, 
+	    List<String> varNames = new ArrayList<String>();
+	    for (String v : this.varNames)
+	    {
+	        varNames.add(v);
+	    }
+	    
+	    Map<String, ArrayList<String>> smarts = 
+	            new HashMap<String, ArrayList<String>>();
+	    for (String key : this.smarts.keySet())
+	    {
+	        ArrayList<String> lst = new ArrayList<String>();
+	        for (String s : this.smarts.get(key))
+	        {
+	            lst.add(s);
+	        }
+	        smarts.put(key, lst);
+	    }
+
+		return new DescriptorForFitness(shortName, 
 				className, resultId, varNames, smarts, dictType, dictClasses, 
 				dictDefinition, dictTitle);
-		return newDff;
 	}
+
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Copy this descriptor and created an independent instance of the
+	 * underlying descriptor implementation.
+	 * @throws DENOPTIMException
+	 */
+	public DescriptorForFitness makeCopy() throws DENOPTIMException
+	{
+	    DescriptorForFitness clone = this.cloneAllButImpl();
+        clone.implementation = newDescriptorImplementation(this);
+        return clone;
+	}
+	
+//------------------------------------------------------------------------------
+	
+    private static IDescriptor newDescriptorImplementation(
+            DescriptorForFitness oldParent) throws DENOPTIMException
+    {
+        String className = oldParent.getImplementation().getClass().getName();
+        IDescriptor descriptor = null;
+        try
+        {
+            Class<?> cl = Class.forName(className);
+            for (Constructor<?> constructor : cl.getConstructors()) 
+            {
+                Class<?>[] params = constructor.getParameterTypes();
+                if (params.length == 0) 
+                {
+                    descriptor = (IDescriptor) constructor.newInstance();
+                } else if (params[0].equals(IChemObjectBuilder.class))
+                {
+                    //NB potential source of ambiguity on the builder class
+                    descriptor = (IDescriptor) constructor.newInstance(cdkBuilder);
+                }
+            }
+        } catch (Throwable t)
+        {
+            throw new DENOPTIMException("Could not make new instance of '" 
+                    + className + "'.", t);
+        }
+        if (descriptor == null)
+        {
+            throw new DENOPTIMException("Could not make new instance of '" 
+                    + className + "'. No suitable constructor found.");
+        }
+        descriptor.initialise(cdkBuilder);
+        return descriptor;
+    }
 
 //------------------------------------------------------------------------------
 	
