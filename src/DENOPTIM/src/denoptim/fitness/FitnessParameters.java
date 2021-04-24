@@ -87,50 +87,21 @@ public class FitnessParameters
      */
     private static String fitnessExpression = "";
     
+    
+    /**
+     * List of custom variable definitions read from input. 
+     * These lines are the definition of atom/bond specific 
+     * descriptors, and custom parametrised descriptors.
+     */
+	private static List<String> customVarDescExpressions = 
+			new ArrayList<String>();
+    
     /**
      * List of variables used in the calculation of the fitness. 
      * For instance, atom/bond specific descriptors, and customly parametrised 
      * descriptors.
      */
-    private static ArrayList<Variable> variables = new ArrayList<Variable>();
-    
-    /**
-     * List of custom variable definitions. For instance, atom/bond specific 
-     * descriptors, and custom parametrised descriptors.
-     */
-	private static List<String> customVarDescExpressions = 
-			new ArrayList<String>();
-
-    /**
-     * Map defining relation between descriptors names (the shortNames) and 
-     * variable that take values from the results of that descriptors
-     * calculation.
-     */
-	private static Map<String,ArrayList<String>> customVarDescToVars = 
-			new HashMap<String,ArrayList<String>>();
-	
-    /**
-     * Map defining relation between variable names and atom/Bond specific 
-     * descriptor calculation.The keys are the names of the variables, not the
-     * names of the descriptors.
-     */
-	private static Map<String,ArrayList<String>> customVarDescSMARTS = 
-			new HashMap<String,ArrayList<String>>();
-	
-	/**
-	 * Map defining the custom parameters used in the calculation of any
-	 * customised descriptor. The keys are the names of the variables, not the
-	 * names of the descriptors.
-	 */
-	private static Map<String,String[]> customVarDescParameters =
-	        new HashMap<String,String[]>();
-	        
-	/**
-	 * Map of descriptors requested to have multiple implementations each with
-	 * different parameters to variable names requiring customised parameters.
-	 */
-	private static Map<String,ArrayList<String>> descriptorsWithMultipleParametrizations =
-	        new HashMap<String,ArrayList<String>>();
+    private static List<Variable> variables = new ArrayList<Variable>();
     
     /**
      * The list of descriptors needed to calculate the fitness with internal 
@@ -138,11 +109,6 @@ public class FitnessParameters
      */
     private static List<DescriptorForFitness> descriptors = 
             new ArrayList<DescriptorForFitness>();
-    
-    /**
-     * List of descriptor's short names
-     */
-    private static List<String> descriptorsGeneratingVariables;
     
     /**
      * Flag controlling production of png graphics for each candidate
@@ -176,11 +142,8 @@ public class FitnessParameters
     	interpreterExternalExe = "bash";
     	fitnessExpression = "";
     	customVarDescExpressions = new ArrayList<String>();
-    	customVarDescToVars = new HashMap<String,ArrayList<String>>();
-    	customVarDescSMARTS = new HashMap<String,ArrayList<String>>();
     	descriptors = new ArrayList<DescriptorForFitness>();
     	variables = new ArrayList<Variable>();
-    	descriptorsGeneratingVariables = null;
     	makePictures = false;
     	make3DTrees = true;
     }
@@ -342,7 +305,7 @@ public class FitnessParameters
      * expression using descriptors (i.e., values
      * that will eventually be calculated by IDescriptor implementations) 
      * and variables (i.e., values that are derived from descriptors according 
-     * to customisable expressions that aim at cutomize the parameters used
+     * to customisable expressions that aims at cutomise the parameters used
      * to calculated the descriptor value, or make the descriptor atom/bond
      * specific). Since
      * the value obtained from the calculation of each single descriptor can be 
@@ -357,17 +320,13 @@ public class FitnessParameters
 	private static void parseFitnessExpressionToDefineDescriptors() 
 	        throws DENOPTIMException
 	{
-		// Parse expression of the fitness to get the names of all descriptors
-	    // and variables
+		// Parse expression of the fitness to get the names of all variables
 		ExpressionEvaluatorImpl extractor = new ExpressionEvaluatorImpl();
-		descriptorsGeneratingVariables = new ArrayList<String>();
+		Set<String> variableNames = new HashSet<String>();
         VariableResolver collectAll = new VariableResolver() {
 			@Override
 			public Double resolveVariable(String varName) throws ELException {
-				if (!descriptorsGeneratingVariables.contains(varName))
-				{
-					descriptorsGeneratingVariables.add(varName);
-				}
+				variableNames.add(varName);
 				return 1.0;
 			}
 		};
@@ -385,9 +344,19 @@ public class FitnessParameters
 			throw new DENOPTIMException("ERROR: unable to parse fitness "
 					+ "expression.",e);
 		}
+		// Make all Variables (mostly empty of info, for now)
+		for (String varName : variableNames)
+		{
+		    Variable v = new Variable(varName);
+		    //WARNING: we first write the varName as descName, and then we 
+		    // overwrite it with the function mapper.
+		    v.setDescriptorName(varName);
+		    variables.add(v);
+		}
 		
-		// Dummy variable resolver. This is needed to fulfill requirements of 
-		// extractor, but nothing is done here.
+		// Dummy variable resolver. This is needed to fulfil the requirements of 
+		// extractor, but it does nothing.
+		//TODO try to use null
         VariableResolver dummyResolver = new VariableResolver() {
             @Override
             public Double resolveVariable(String varName) throws ELException {
@@ -402,6 +371,7 @@ public class FitnessParameters
             @Override
             public Method resolveFunction(String nameSpace, String methodName) {
                 try {
+                    //TODO make the methods part of a private inner class
                     return FitnessParameters.class.getMethod(methodName, 
                             String.class, String.class, String.class);
                 } catch (NoSuchMethodException e) {
@@ -432,22 +402,29 @@ public class FitnessParameters
 		
 		// Also the descriptors that are simply called by name are transformed 
 		// into variables
+		/*
 		for (String s : descriptorsGeneratingVariables)
 		{
 		    variables.add(new Variable(s,s));
 		}
-	
+	*/
         // Collect the descriptor implementations that are needed. Note that
 		// one descriptor implementation can be used by more than one variable,
 		// and the same descriptor implementation (though differently
 		// configured) might be requested by different variables. The latter
 		// situation is not effective here, because the configuration of the
-		// implementations is defines later. Therefore, we get one 
-		// descriptor implementation for all it potentially different
+		// implementations is defined later. Therefore, we get one 
+		// descriptor implementation for all its potentially different
 		// configurations.
 		Set<String> descriptorImplementationNames = new HashSet<String>();
 		for (Variable v : variables)
 		{
+		    //TODO del
+		    /*
+		    System.out.println("V: "+v.getName()+ " "+v.getDescriptorName());
+		    System.out.println("   smarts: "+v.smarts);
+		    System.out.println("   params: "+v.params);
+		    */
 		    descriptorImplementationNames.add(v.getDescriptorName());
 		}
 		List<DescriptorForFitness> rawDescriptors = 
@@ -484,23 +461,11 @@ public class FitnessParameters
 		        // implementation of the descriptor.
 		        if (standardDescriptors.containsKey(rawDff.getShortName()))
 		        {
-		            standardDescriptors.get(rawDff.getShortName()).varNames
-                        .add(varName);
-                    if (v.smarts != null)
-                    {
-                        standardDescriptors.get(rawDff.getShortName()).smarts
-                            .put(varName, v.smarts);
-                    }
+		            standardDescriptors.get(rawDff.getShortName())
+		                .addDependentVariable(v);
 		        } else {
     		        DescriptorForFitness dff = rawDff.makeCopy();
-    		        if (!dff.varNames.contains(varName))
-    		        {
-    		            dff.varNames.add(varName);
-    		        }
-    		        if (v.smarts != null)
-    		        {
-    		            dff.smarts.put(varName, v.smarts);
-    		        }
+    		        dff.addDependentVariable(v);
     		        descriptors.add(dff);
     		        standardDescriptors.put(rawDff.getShortName(),dff);
 		        }
@@ -508,7 +473,8 @@ public class FitnessParameters
 		        // This variable requires a customised descriptor configuration
 		        // So, here a brand new descriptor is made and configured
                 DescriptorForFitness dff = rawDff.makeCopy();
-                dff.varNames.add(varName);
+                dff.addDependentVariable(v);
+                
                 IDescriptor impl = dff.implementation;
                 String[] parNames = impl.getParameterNames();
                 if (parNames.length != v.params.length)
@@ -519,6 +485,9 @@ public class FitnessParameters
                             + varName + "'. Found " + v.params.length + " but "
                             + "the descriptor requires " + parNames.length+".");
                 }
+                
+                // Here we configure the descriptor implementation according
+                // to the parameters parsed from the field of the Variable 
                 Object[] params = new Object[parNames.length];
                 for (int j=0; j<parNames.length; j++)
                 {
@@ -530,8 +499,7 @@ public class FitnessParameters
                                 + "the type of a parameter.");
                     }
                     Object p = null;
-                    if (parType instanceof Integer)
-                    {
+                    if (parType instanceof Integer){
                         p = Integer.parseInt(v.params[j]);
                     } else if (parType instanceof Double) {
                         p = Double.parseDouble(v.params[j]);
@@ -585,12 +553,8 @@ public class FitnessParameters
                             + "in FitnessParameters. Please, "
                             + "report this to the develoment team.",e);
                 }
-                if (v.smarts != null)
-                    dff.smarts.put(varName, v.smarts);
                 descriptors.add(dff);
-                standardDescriptors.put(rawDff.getShortName(),dff);
 		    }
-		    
         }
 	}
 	
@@ -682,26 +646,16 @@ public class FitnessParameters
 	public static Double atomSpecific(String varName, String descName, 
 			String smartsIdentifier)
 	{
-		descriptorsGeneratingVariables.remove(varName);
-		
 		ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
 				smartsIdentifier.split("\\s+")));
-		
-		//TODO keep only management Variables and remove this
-		if (customVarDescToVars.keySet().contains(descName))
+		for (Variable v : variables)
 		{
-			customVarDescToVars.get(descName).add(varName);
-		} else {
-			ArrayList<String> lst = new ArrayList<String>();
-			lst.add(varName);
-			customVarDescToVars.put(descName, lst);
+		    if (v.getName().equals(varName))
+		    {
+		        v.setDescriptorName(descName);
+		        v.setSMARTS(smarts);
+		    }
 		}
-		customVarDescSMARTS.put(varName, smarts);
-		
-		
-		Variable v = new Variable(varName, descName);
-		v.setSMARTS(smarts);
-		variables.add(v);
 		
 		return 0.0; //just a dummy number to fulfil the executor expectations
 	}
@@ -719,24 +673,15 @@ public class FitnessParameters
     public static Double parametrized(String varName, String descName, 
             String paramsStr)
     {
-        descriptorsGeneratingVariables.remove(varName);
-        
-        
-        //TODO del - keep management of Variables
-        if (customVarDescToVars.keySet().contains(descName))
-        {
-            customVarDescToVars.get(descName).add(varName);
-        } else {
-            ArrayList<String> lst = new ArrayList<String>();
-            lst.add(varName);
-            customVarDescToVars.put(descName, lst);
-        }
-        
         String[] params = paramsStr.split(", +");
-        customVarDescParameters.put(varName,params); //TODO del
-        Variable v = new Variable(varName, descName);
-        v.setDescriptorParameters(params);
-        variables.add(v);
+        for (Variable v : variables)
+        {
+            if (v.getName().equals(varName))
+            {
+                v.setDescriptorName(descName);
+                v.setDescriptorParameters(params);
+            }
+        }
         
         return 0.0; //just a dummy number to fulfil the executor expectations
     }

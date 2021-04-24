@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,7 +81,8 @@ public class FitnessParametersTest
         
         FitnessParameters.resetParameters();
         String[] lines = new String[] {
-                "FP-Equation=${taniSym + 3.3 * Zagreb - aHyb_1 + aHyb_2}",
+                "FP-Equation=${taniSym + taniBis + 3.3 * Zagreb - aHyb_1 + "
+                + "aHyb_2}",
                 "FP-DescriptorSpecs=${atomSpecific('aHyb_1','aHyb','[$([C])]')}",
                 "FP-DescriptorSpecs=${atomSpecific('aHyb_2','aHyb','[$([N])]')}",
                 "FP-DescriptorSpecs=${parametrized('taniSym',"
@@ -117,25 +119,61 @@ public class FitnessParametersTest
                     "Number of " + expectedNames[i] + " implementations");
         }
 
-        List<List<String>> expectedVarNames = new ArrayList<List<String>>();
-        expectedVarNames.add(new ArrayList<>(Arrays.asList(
+        Map<String,List<String>> expectedVarNames = new HashMap<String,List<String>>();
+        expectedVarNames.put("aHyb", new ArrayList<>(Arrays.asList(
                 "aHyb_1","aHyb_2")));
-        expectedVarNames.add(new ArrayList<>(Arrays.asList("taniSym")));
-        expectedVarNames.add(new ArrayList<>(Arrays.asList("taniBis")));
-        expectedVarNames.add(new ArrayList<>(Arrays.asList("Zagreb")));
+        expectedVarNames.put("TanimotoSimilarity", new ArrayList<>(
+                Arrays.asList("taniSym")));
+        expectedVarNames.put("TanimotoSimilarity", new ArrayList<>(
+                Arrays.asList("taniBis")));
+        expectedVarNames.put("Zagreb", new ArrayList<>(Arrays.asList("Zagreb")));
         List<DescriptorForFitness> descriptors = 
                 FitnessParameters.getDescriptors();
+        assertEquals(4,descriptors.size(), "Number of descriptors for fitness");
+        boolean foundA = false;
+        boolean foundB = false;
         for (int i=0; i<descriptors.size(); i++)
         {
             DescriptorForFitness d = descriptors.get(i);
             String descName = d.getShortName();
-            List<String> varNames = d.getVariableNames();
-            assertEquals(expectedVarNames.get(i).size(), varNames.size(), 
-                    "Number of variable names for #"+i+" "+descName);
-            for (int j=0; j<varNames.size(); j++)
+            List<Variable> variables = d.getVariables();
+            
+            switch(descName)
             {
-                assertEquals(expectedVarNames.get(i).get(j), varNames.get(j),
-                        "Variable name #"+j);
+                case "aHyb":
+                    assertEquals(2,variables.size(),
+                            "Number of variable names for #"+i+" "+descName);
+                    boolean foundOne = false;
+                    boolean foundTwo = false;
+                    for (Variable actual : variables)
+                    {
+                        if ("aHyb_1".equals(actual.getName()))
+                            foundOne = true;
+                        if ("aHyb_2".equals(actual.getName()))
+                            foundTwo = true;
+                    }
+                    assertTrue(foundOne, "Found fitst variable");
+                    assertTrue(foundTwo, "Found second variable");
+                    break;
+                    
+                case "Zagreb":
+                    assertEquals(1,variables.size(),
+                            "Number of variable names for #"+i+" "+descName);
+                    assertEquals("Zagreb",variables.get(0).getName(),
+                            "Name of variable for #"+i);
+                    break;
+                    
+                case "TanimotoSimilarity":
+                    assertEquals(1,variables.size(),
+                            "Number of variable names for #"+i+" "+descName);
+                    if ("taniSym".equals(variables.get(0).getName()))
+                        foundA = true;
+                    if ("taniBis".equals(variables.get(0).getName()))
+                        foundB = true;
+                    break;
+                
+                default:
+                    fail("Unexpected descriptor name "+descName);
             }
         }
         

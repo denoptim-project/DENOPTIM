@@ -126,7 +126,7 @@ public class FitnessProviderTest
     		DescriptorForFitness dff = new DescriptorForFitness(
     		        iDesc.getDescriptorNames()[0],
     				classNames.get(i), iDesc, 0);
-    		dff.varNames.add(varNames[i]);
+    		dff.addDependentVariable(new Variable(varNames[i]));
     		descriptors.add(dff);
     	}
     	
@@ -187,7 +187,7 @@ public class FitnessProviderTest
         DescriptorForFitness dff = new DescriptorForFitness(
                 iDesc.getDescriptorNames()[0],
                 iDesc.getClass().getName(), iDesc, 0);
-        dff.varNames.add(myVarName);
+        dff.addDependentVariable(new Variable (myVarName));
         List<DescriptorForFitness> descriptors = 
                 new ArrayList<DescriptorForFitness>();
         descriptors.add(dff);

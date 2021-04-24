@@ -328,16 +328,12 @@ public class DescriptorUtils
 						            (IDenoptimDescriptor) impl;
 						    d = new DescriptorForFitness(
 	                                descName, className,impl, j,
-	                                //engine.getDictionaryType(implSpec),
-	                                null,
 	                                dnpDescImpl.getDictionaryClass(),
 	                                dnpDescImpl.getDictionaryDefinition(),
 	                                dnpDescImpl.getDictionaryTitle());
 						} else {
 						    d = new DescriptorForFitness(
 								descName, className,impl, j,
-								//engine.getDictionaryType(implSpec),
-								null,
 								engine.getDictionaryClass(implSpec),
                                 engine.getDictionaryDefinition(
                                         implSpec.getSpecificationReference()),
