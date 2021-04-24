@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMGraph;
@@ -61,10 +62,11 @@ public class DenoptimCG
             // read the input molecule
             IAtomContainer mol = DenoptimIO.readSingleSDFFile(
                     CGParameters.getInputSDFFile());
-            if (mol.getProperty("GraphENC") != null)
+            if (mol.getProperty(DENOPTIMConstants.GRAPHTAG) != null)
             {
             
-                String graphStr = mol.getProperty("GraphENC").toString();
+                String graphStr = mol.getProperty(
+                        DENOPTIMConstants.GRAPHTAG).toString();
                 System.err.println("Imported graph: " + graphStr);
         		GraphConversionTool gct = new GraphConversionTool();
         		DENOPTIMGraph grph = gct.getGraphFromString(graphStr);

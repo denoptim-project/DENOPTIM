@@ -244,7 +244,7 @@ public class RingClosureTool
             {
 		String err = "#RingClosureTool: uncomplete closure ("
 				+ newRingClosed + "/" + rcaComb.size() + ")";
-		rcMol.getIAtomContainer().setProperty("MOL_ERROR",err);
+		rcMol.getIAtomContainer().setProperty(DENOPTIMConstants.MOLERRORTAG,err);
 	    }
             rcMols.add(rcMol);
 /*

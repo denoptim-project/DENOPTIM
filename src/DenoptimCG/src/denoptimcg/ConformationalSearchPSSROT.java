@@ -20,6 +20,7 @@ package denoptimcg;
 
 import java.util.ArrayList;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
@@ -93,7 +94,7 @@ public class ConformationalSearchPSSROT
         for (int i=0; i<mols.size(); i++)
         {
 	    Object molErroProp = mols.get(i).getIAtomContainer().getProperty(
-								   "MOL_ERROR");
+								   DENOPTIMConstants.MOLERRORTAG);
 	    if (molErroProp == null)
 	    {
 		if (verbosity > 1)

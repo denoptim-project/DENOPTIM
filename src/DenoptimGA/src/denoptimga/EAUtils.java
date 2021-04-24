@@ -418,7 +418,7 @@ public class EAUtils
             String molsmiles = null, molinchi = null, molfile = null;
 
             IAtomContainer mol = mols.get(i);
-            Object apProperty = mol.getProperty("GraphENC");
+            Object apProperty = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
             if (apProperty != null)
             {
                 graph = GraphConversionTool.getGraphFromString(apProperty.toString().trim());
@@ -431,7 +431,7 @@ public class EAUtils
                         "Molecule does not have the DENOPTIMGraph encoding.");
             }
 
-            apProperty = mol.getProperty("FITNESS");
+            apProperty = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
             if (apProperty != null)
             {
                 fitness = Double.parseDouble(apProperty.toString());
@@ -444,7 +444,7 @@ public class EAUtils
                             "Molecule does not have the associated fitness.");
             }
 
-            apProperty = mol.getProperty("SMILES");
+            apProperty = mol.getProperty(DENOPTIMConstants.SMILESTAG);
             if (apProperty != null)
             {
                 molsmiles = apProperty.toString().trim();
@@ -454,14 +454,14 @@ public class EAUtils
                 molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
             }
 
-            apProperty = mol.getProperty("InChi");
+            apProperty = mol.getProperty(DENOPTIMConstants.INCHIKEYTAG);
             if (apProperty != null)
             {
                 molinchi = apProperty.toString();
             }
-            if (mol.getProperty("UID") != null)
+            if (mol.getProperty(DENOPTIMConstants.UNIQUEIDTAG) != null)
             {
-                molinchi = mol.getProperty("UID").toString();
+                molinchi = mol.getProperty(DENOPTIMConstants.UNIQUEIDTAG).toString();
             }
             else
             {
@@ -477,15 +477,17 @@ public class EAUtils
             {
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
                 String molName = "M" + GenUtils.getPaddedString(8, ctr);
-                molfile = genDir + fsep + molName + "_FIT.sdf";
+                molfile = genDir + fsep + molName + 
+                        DENOPTIMConstants.FITFILENAMEEXTOUT;
 
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 graph.setGraphId(gctr);
                 graph.setLocalMsg("NEW");
-                mol.setProperty("GCODE", gctr);
+                mol.setProperty(DENOPTIMConstants.GCODETAG, gctr);
                 mol.setProperty(CDKConstants.TITLE, molName);
-                mol.setProperty("GraphENC", graph.toString());
-                mol.setProperty("GraphMsg", "From Initial Population File");
+                mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
+                mol.setProperty(DENOPTIMConstants.GMSGTAG, 
+                        "From Initial Population File");
 
                 Candidate pmol = new Candidate(molName, graph, fitness, 
                         molinchi, molsmiles);
@@ -589,7 +591,6 @@ public class EAUtils
         {
             MersenneTwister rng = RandomUtils.getRNG();
             return rng.nextInt(FragmentSpace.getFragmentLibrary().size());
-
         }
     }
 

@@ -127,8 +127,8 @@ public class OffspringEvaluationTask extends FitnessTask
         	}
         }
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
-        fitProvMol.setProperty("SMILES", result.getSmiles());
-        fitProvMol.setProperty("InChi", result.getUID());
+        fitProvMol.setProperty(DENOPTIMConstants.SMILESTAG, result.getSmiles());
+        fitProvMol.setProperty(DENOPTIMConstants.INCHIKEYTAG, result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, 
         		dGraph.getGraphId());
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 

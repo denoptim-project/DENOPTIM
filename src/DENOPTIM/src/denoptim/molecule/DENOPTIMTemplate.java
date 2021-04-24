@@ -426,7 +426,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 {
                     DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
         
-                    //Build SDF property "CLASS"
+                    //Build SDF property DENOPTIMConstants.APCVTAG
                     String stingAPP = ""; //String Attachment Point Property
                     if (firstCL)
                     {
@@ -440,7 +440,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     }
                     propAPClass = propAPClass + stingAPP;
         
-                    //Build SDF property "ATTACHMENT_POINT"
+                    //Build SDF property DENOPTIMConstants.APTAG
                     String sBO = FragmentSpace.getBondOrderForAPClass(
                             ap.getAPClass().toString()).toOldString();
                     String stBnd = " " + atmID +":"+sBO;

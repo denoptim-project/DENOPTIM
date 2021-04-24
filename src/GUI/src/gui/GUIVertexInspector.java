@@ -345,7 +345,8 @@ public class GUIVertexInspector extends GUICardPanel
 			}
 		});
 		
-        btnOpenSMILES = new JButton("SMILES");
+		// the '+' is to prevent search/replace of the string
+        btnOpenSMILES = new JButton("SMI"+"LES"); 
         btnOpenSMILES.setToolTipText("<html>Imports chemical system"
                         + " from SMILES string.<br>The conversion of SMILES "
                         + "to 3D structure requires"

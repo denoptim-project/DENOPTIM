@@ -68,6 +68,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.Candidate;
@@ -375,13 +376,13 @@ public class GUIInspectGARun extends GUICardPanel
 						Double.NaN, Double.NaN, Double.NaN, Double.NaN});
 			}
 			
-			
 			// Read DENOPTIMMolecules
 			for (File fitFile : genFolder.listFiles(new FileFilter() {
 				
 				@Override
 				public boolean accept(File pathname) {
-					if (pathname.getName().endsWith("FIT.sdf"))
+					if (pathname.getName().endsWith(
+					       DENOPTIMConstants.FITFILENAMEEXTOUT))
 					{
 						return true;
 					}

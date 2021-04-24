@@ -265,9 +265,9 @@ public abstract class FitnessTask extends Task
             processedMol = new AtomContainer();
             processedMol.addAtom(new Atom("H"));
             processedMol.setProperty(CDKConstants.TITLE, result.getName());
-            processedMol.setProperty("MOL_ERROR", err);
-            processedMol.setProperty("GCODE", dGraph.getGraphId());
-            processedMol.setProperty("GraphENC", dGraph.toString());
+            processedMol.setProperty(DENOPTIMConstants.MOLERRORTAG, err);
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.getGraphId());
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
             DenoptimIO.writeMolecule(fitProvOutFile, processedMol, false);
 
             result.setError(err);
@@ -325,12 +325,12 @@ public abstract class FitnessTask extends Task
                 throw new DENOPTIMException(msg);
             }
 
-            processedMol.setProperty("GCODE", dGraph.getGraphId());                
-            processedMol.setProperty("SMILES", result.getSmiles());
-            processedMol.setProperty("GraphENC", dGraph.toString());
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.getGraphId());                
+            processedMol.setProperty(DENOPTIMConstants.SMILESTAG, result.getSmiles());
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
             if (dGraph.getLocalMsg() != null && !dGraph.getLocalMsg().equals(""))
             {
-                processedMol.setProperty("GraphMsg", dGraph.getLocalMsg());
+                processedMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
             }
             
             // Update molecular representation of this object

@@ -478,9 +478,9 @@ public class GraphBuildingTask extends FitnessTask
         fitProvMol = (IAtomContainer) res[2];
         String parentGraphId = res[3].toString().trim();
         String level = res[4].toString().trim();
-        fitProvMol.setProperty("InChi", molinchi);
-        fitProvMol.setProperty("UID", molinchi);
-        fitProvMol.setProperty("SMILES", molsmiles);
+        fitProvMol.setProperty(DENOPTIMConstants.INCHIKEYTAG, molinchi);
+        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, molinchi);
+        fitProvMol.setProperty(DENOPTIMConstants.SMILESTAG, molsmiles);
         fitProvMol.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 

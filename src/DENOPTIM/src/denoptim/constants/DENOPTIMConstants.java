@@ -256,6 +256,11 @@ public final class DENOPTIMConstants
     public static final String UNIQUEIDTAG = "UID";
     
     /**
+     * SDF tag containing the unique identifier of a candidate
+     */
+    public static final String INCHIKEYTAG = "InChi";
+    
+    /**
      * SDF tag defining the ID of a parent graph (used in FSE)
      */
     public static final String PARENTGRAPHTAG = "ParentGraph";  
