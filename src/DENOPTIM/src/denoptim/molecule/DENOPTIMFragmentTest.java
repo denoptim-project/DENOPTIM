@@ -100,7 +100,7 @@ public class DENOPTIMFragmentTest
     	frg2.setProperty(DENOPTIMConstants.APCVTAG, clsStr);
     	frg2.projectPropertyToAP();
     	
-    	assertEquals(frg1.getNumberOfAP(),frg2.getNumberOfAP(),"Equality of #AP");
+    	assertEquals(frg1.getNumberOfAPs(),frg2.getNumberOfAPs(),"Equality of #AP");
     	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0),
     	        "Equality of #AP-on-atom");
     }
@@ -149,8 +149,8 @@ public class DENOPTIMFragmentTest
         
         DENOPTIMFragment frg2 = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.UNDEFINED);
         
-        assertEquals(7,frg1.getNumberOfAP(),"#APs in frg1");
-        assertEquals(7,frg2.getNumberOfAP(),"#APs in frg2");
+        assertEquals(7,frg1.getNumberOfAPs(),"#APs in frg1");
+        assertEquals(7,frg2.getNumberOfAPs(),"#APs in frg2");
         assertEquals(3,frg1.getAPCountOnAtom(0),"#APs in frg1 atm0");
         assertEquals(3,frg2.getAPCountOnAtom(0),"#APs in frg2 atm0");
         assertEquals(3,frg1.getAPCountOnAtom(2),"#APs in frg1 atm2");
@@ -203,7 +203,7 @@ public class DENOPTIMFragmentTest
         
         DENOPTIMVertex c = v.clone();
         
-        assertEquals(4,((DENOPTIMFragment) c).getNumberOfAP(),"Number of APs");
+        assertEquals(4,((DENOPTIMFragment) c).getNumberOfAPs(),"Number of APs");
         assertEquals(1,((DENOPTIMFragment) c).getAPCountOnAtom(0),
                 "Size APs on atm0");
         assertEquals(3,((DENOPTIMFragment) c).getAPCountOnAtom(2),
@@ -213,7 +213,7 @@ public class DENOPTIMFragmentTest
         assertEquals(3,c.getSymmetricAPSets().get(0).size(), 
                 "Number of symmetric APs in set");
         assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
-        assertEquals(v.getNumberOfAP(), c.getNumberOfAP(), "Number of APS");
+        assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
         assertEquals(v.getSymmetricAPSets().size(), 
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
         assertEquals(v.getLevel(), c.getLevel(), "Level");

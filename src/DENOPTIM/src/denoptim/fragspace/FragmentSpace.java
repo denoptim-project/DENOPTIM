@@ -21,13 +21,14 @@ package denoptim.fragspace;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import denoptim.molecule.*;
+import denoptimga.GraphPattern;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -35,11 +36,11 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+
+import static denoptimga.DENOPTIMGraphOperations.extractPattern;
+import static denoptimga.DENOPTIMGraphOperations.hasIsomorph;
 
 /**
  * Class defining the fragment space
@@ -1327,4 +1328,31 @@ public class FragmentSpace
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Extracts a system of one or more fused rings and adds them to the
+     * fragment space if not already present.
+     */
+    public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) {
+        final GraphPattern PATTERN = GraphPattern.RING;
+
+        List<DENOPTIMGraph> subgraphs = extractPattern(graph, PATTERN);
+
+        for (DENOPTIMGraph g : subgraphs) {
+            BBType type = g.hasScaffoldTypeVertex() ? BBType.SCAFFOLD :
+                    BBType.FRAGMENT;
+
+            if (!hasIsomorph(g, type)) {
+                DENOPTIMTemplate t = new DENOPTIMTemplate(type);
+                t.setInnerGraph(g);
+
+                ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
+                        FragmentSpace.getFragmentLibrary() :
+                        FragmentSpace.getScaffoldLibrary();
+
+                FragmentSpace.appendVertexToLibrary(t, type, library);
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
 }

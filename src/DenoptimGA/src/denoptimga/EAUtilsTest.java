@@ -1,12 +1,9 @@
 package denoptimga;
 
+import denoptim.molecule.*;
 import org.junit.jupiter.api.Test;
 
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMGraphTest;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.EmptyVertex;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -92,7 +89,8 @@ public class EAUtilsTest
         for (int i=0; i<5; i++)
         {
             int chosen = EAUtils.selectNonScaffoldNonCapVertex(g);
-            assertEquals(expected, chosen, "Index of the only chosable vertex");
+            assertEquals(expected, chosen, "Index of the only choosable " +
+                    "vertex");
         }
     }
     

@@ -705,7 +705,7 @@ public class DENOPTIMGraphTest {
 		    int hashVG = vg.hashCode();
 		    int hashVC = vc.hashCode();
             
-		    for (int iap=0; iap<vg.getNumberOfAP(); iap++)
+		    for (int iap = 0; iap<vg.getNumberOfAPs(); iap++)
 		    {
 		        assertEquals(vg.getAP(iap).getOwner().hashCode(), hashVG, 
 		                "Reference to vertex owner in ap " + iap + " vertex " 

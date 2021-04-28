@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,10 +39,11 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
  */
 public class DENOPTIMRing implements Serializable 
 {
+
     /**
      * List of <code>DENOPTIMVertex</code> involved in the ring. 
      */
-    private ArrayList<DENOPTIMVertex> vertices;
+    private List<DENOPTIMVertex> vertices;
 
     /**
      * Bond type (i.e., bond order) to be used between head and tail vertices
@@ -51,12 +54,12 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMRing()
     {
-        vertices = new ArrayList<DENOPTIMVertex>();
+        vertices = new ArrayList<>();
     }
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMRing(ArrayList<DENOPTIMVertex> vertices)
+    public DENOPTIMRing(List<DENOPTIMVertex> vertices)
     {
         this.vertices = vertices;
     }
@@ -193,9 +196,14 @@ public class DENOPTIMRing implements Serializable
      */
 
     @Override
-    public String toString()
-    {
-        return "DENOPTIMRing [verteces=" + vertices + "]";
+    public String toString() {
+        return "DENOPTIMRing [vertices=" + vertices + "]";
+    }
+
+//------------------------------------------------------------------------------
+
+    public List<DENOPTIMVertex> getVertices() {
+        return Collections.unmodifiableList(vertices);
     }
 
 //------------------------------------------------------------------------------

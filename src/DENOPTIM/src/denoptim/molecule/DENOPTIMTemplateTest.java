@@ -33,6 +33,7 @@ import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.MutationType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -159,7 +160,7 @@ public class DENOPTIMTemplateTest
             assertTrue(t.sameAs(clone, new StringBuilder()));
         } catch (DENOPTIMException e) {
             fail("Unexpected exception thrown.");
-            e.printStackTrace();
+
         }
     }
 
@@ -452,7 +453,8 @@ public class DENOPTIMTemplateTest
         innerGraph.addVertex(v);
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
-
+        // Unsure if inner APs should be required to have the same direction
+        // vectors as required APs.
 //        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
@@ -520,7 +522,6 @@ public class DENOPTIMTemplateTest
             assertEquals(g, t.getInnerGraph());
         } catch (DENOPTIMException e) {
             fail("Unexpected exception thrown.");
-            e.printStackTrace();
         }
     }
 
@@ -565,7 +566,6 @@ public class DENOPTIMTemplateTest
             assertTrue(expected.sameAs(actual, new StringBuilder()));
         } catch (Exception e) {
             fail("Unexpected exception thrown.");
-            e.printStackTrace();
         }
     }
 
@@ -583,13 +583,13 @@ public class DENOPTIMTemplateTest
             assertTrue(expected.sameAs(t.getInnerGraph(), new StringBuilder()));
         } catch (Exception e) {
             fail("Unexpected exception thrown.");
-            e.printStackTrace();
+
         }
 
     }
 
 //------------------------------------------------------------------------------
-   
+
     @Test
     public void testExtend_noChangeIfNoCompatibleFragmentsAvailable() {
         try {
@@ -603,7 +603,50 @@ public class DENOPTIMTemplateTest
             assertTrue(expected.sameAs(t.getInnerGraph(), new StringBuilder()));
         } catch (Exception e) {
             fail("Unexpected exception thrown.");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    @Disabled("Disabled until implemented")
+    @Test
+    public void testExtend_changeIfCompatibleFragmentAvailable() {
+        try {
+            DENOPTIMVertex oh = getOHFragment();
+            DENOPTIMVertex ch3 = getCH3Fragment();
+            HashMap<APClass, ArrayList<APClass>> compMatrix = new HashMap<>();
+
+            APClass ohClass = oh.getAP(0).getAPClass();
+            APClass ch2Class = ch3.getAP(0).getAPClass();
+
+            compMatrix.put(ohClass,
+                    new ArrayList<>(Collections.singleton(ch2Class)));
+            compMatrix.put(ch2Class,
+                    new ArrayList<>(Collections.singleton(ohClass)));
+
+            FragmentSpace.setCompatibilityMatrix(compMatrix);
+            FragmentSpace.getFragmentLibrary().add(oh);
+
+            DENOPTIMGraph graphBeforeMutation = new DENOPTIMGraph();
+            graphBeforeMutation.addVertex(ch3);
+
+            DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+            t.setInnerGraph(graphBeforeMutation);
+
+            boolean changed = t.mutate(MutationType.EXTEND);
+
+            DENOPTIMGraph expected = new DENOPTIMGraph();
+            expected.addVertex(ch3);
+            expected.appendVertexOnAP(ch3.getAP(0), oh.getAP(0));
+
+            DENOPTIMGraph actual = t.getInnerGraph();
+
+            assertTrue(changed);
+            assertFalse(graphBeforeMutation.sameAs(actual, new StringBuilder()));
+            assertTrue(expected.sameAs(actual, new StringBuilder()));
+        } catch (Exception e) {
             e.printStackTrace();
+            fail("Unexpected exception thrown.");
         }
     }
     

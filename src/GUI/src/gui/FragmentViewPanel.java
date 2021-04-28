@@ -61,7 +61,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
@@ -651,7 +650,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			return;
 		}
 		
-		if (mol.getNumberOfAP() == mapAPs.size())
+		if (mol.getNumberOfAPs() == mapAPs.size())
 		{
 			return;
 		}

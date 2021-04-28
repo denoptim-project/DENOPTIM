@@ -271,16 +271,10 @@ public class EAUtils
      */
     protected static int selectNonScaffoldNonCapVertex(DENOPTIMGraph g)
     {
-        Set<DENOPTIMVertex> candidates = new HashSet<DENOPTIMVertex>();
-        candidates.addAll(g.getVertexList());
-        for (Iterator<DENOPTIMVertex> i = candidates.iterator(); i.hasNext();) 
-        {
-            DENOPTIMVertex v = i.next();
-            if (v.getBuildingBlockType() == BBType.SCAFFOLD
-                    || v.getBuildingBlockType() == BBType.CAP) {
-                i.remove();
-            }
-        }
+        Set<DENOPTIMVertex> candidates = new HashSet<>(g.getVertexList());
+        candidates.removeIf(v ->
+                v.getBuildingBlockType() == BBType.SCAFFOLD
+                || v.getBuildingBlockType() == BBType.CAP);
         return g.indexOf(RandomUtils.randomlyChooseOne(candidates));
     }
               

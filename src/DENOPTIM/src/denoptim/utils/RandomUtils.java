@@ -83,7 +83,7 @@ public class RandomUtils
     
     public static <T> T randomlyChooseOne(Collection<T> c)
     {
-        int chosen = mt.nextInt(c.size());
+        int chosen = getRNG().nextInt(c.size());
         int i=0;
         T chosenObj = null;
         for (T o : c)

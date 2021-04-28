@@ -22,15 +22,10 @@ package denoptim.molecule;
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.SimpleGraph;
@@ -71,6 +66,8 @@ import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
+
+import static denoptim.molecule.DENOPTIMVertex.*;
 
 
 /**
@@ -1244,51 +1241,37 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * </ul>
      * 
      * This method makes use of the Vento-Foggia VF2 algorithm (see 
-     * <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>) as provided by
-     * JGraphT library in {@link VF2GraphIsomorphismInspector}.
+     * <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>)
+     * as provided by JGraphT library in {@link VF2GraphIsomorphismInspector}.
      * 
      * @param other the graph to be compared with this.
      * @return <code>true</code> is this graph is isomorphic to the other.
      */
-    public boolean isIsomorphicTo(DENOPTIMGraph other)
-    {
-        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG = 
+    public boolean isIsomorphicTo(DENOPTIMGraph other) {
+        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG =
                 GraphConversionTool.getJGraphFromGraph(this);
-        
-        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG = 
+
+        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG =
                 GraphConversionTool.getJGraphFromGraph(other);
-        
-        Comparator<DENOPTIMVertex> vComp = 
-                new Comparator<DENOPTIMVertex>() {
-                    @Override
-                    public int compare(DENOPTIMVertex v1, DENOPTIMVertex v2) {
-                        // Vertex.sameAs returns boolean, so we need to produce 
-                        // an int to allow comparison.
-                        StringBuilder sb = new StringBuilder();
-                        if (v1.sameAs(v2, sb))
-                        {
-                            return 0;
-                        } else {
-                            return Integer.compare(
-                                    v1.getBuildingBlockId(), 
-                                    v2.getBuildingBlockId());
-                        }
-                    }
-                }; 
-        
+
+        Comparator<DENOPTIMVertex> vComp = (v1, v2) -> {
+            // Vertex.sameAs returns boolean, so we need to produce
+            // an int to allow comparison.
+            StringBuilder sb = new StringBuilder();
+            if (v1.sameAs(v2, sb)) {
+                return 0;
+            } else {
+                return Integer.compare(v1.getBuildingBlockId(),
+                        v2.getBuildingBlockId());
+            }
+        };
+
         Comparator<UndirectedEdgeRelation> eComp =
-                new Comparator<UndirectedEdgeRelation>() {
-                    @Override
-                    public int compare(UndirectedEdgeRelation o1,
-                            UndirectedEdgeRelation o2)
-                    {
-                        return o1.compare(o2);
-                    }
-                };
-        
+                UndirectedEdgeRelation::compare;
+
         VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdgeRelation> vf2 =
                 new VF2GraphIsomorphismInspector<>(thisG, otherG, vComp, eComp);
-        
+
         return vf2.isomorphismExists();
     }
 
@@ -1377,7 +1360,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     		if (ssT.size() != ssO.size())
     		{
-    			reason.append("Different number of symmetric sets on verted " + vIdT
+    			reason.append("Different number of symmetric sets on vertex " + vIdT
     						+ "("+ssT.size()+":"+ssO.size()+")");
     			return false;
     		}
@@ -1400,52 +1383,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		DENOPTIMVertex vhT = rT.getHeadVertex();
     		DENOPTIMVertex vtT = rT.getTailVertex();
-    		for (DENOPTIMRing rO :
-    			other.getRingsInvolvingVertex(vertexMap.get(vhT)))
-    		{
-				if (rT.getSize() != rO.getSize())
-				{
-					reason.append("Different ring size ("+rT.getSize()+":"
-								+rO.getSize()+")");
-					continue;
-				}
-
-				boolean either = false;
-    			if (rO.getHeadVertex() == vertexMap.get(vhT)
-    					&& rO.getTailVertex() == vertexMap.get(vtT))
-    			{
-    				either = true;
-    				for (int i=1; i<rT.getSize(); i++)
-    				{
-    					if (vertexMap.get(rT.getVertexAtPosition(i))
-    							!= rO.getVertexAtPosition(i))
-    					{
-    						reason.append("Rings differ (A) ("+rT+":"+rO+")");
-    						return false;
-    					}
-    				}
-    			}
-    			else if (rO.getHeadVertex() == vertexMap.get(vtT)
-    					&& rO.getTailVertex() == vertexMap.get(vhT))
-    			{
-    				either = true;
-    				for (int i=1; i<rT.getSize(); i++)
-    				{
-    					int j = rO.getSize()-i-1;
-    					if (vertexMap.get(rT.getVertexAtPosition(i))
-    							!= rO.getVertexAtPosition(j))
-    					{
-    						reason.append("Rings differ (B) ("+rT+":"+rO+")");
-    						return false;
-    					}
-    				}
-    			}
-    			if (!either)
-    			{
-    				reason.append("Rings differ (C) ("+rT+":"+rO+")");
-    				return false;
-    			}
-    		}
+    		boolean hasRing = other
+                    .getRingsInvolvingVertex(vertexMap.get(vhT))
+                    .stream()
+                    .anyMatch(rO -> sameAsRings(reason, vertexMap, rT, vhT,
+                            vtT, rO));
+    		if (!hasRing) {
+    		    return false;
+            }
     	}
 
     	return true;
@@ -1453,8 +1398,70 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    private boolean sameAsRings(StringBuilder reason, Map<DENOPTIMVertex,
+            DENOPTIMVertex> vertexMap, DENOPTIMRing rT, DENOPTIMVertex vhT,
+                                DENOPTIMVertex vtT, DENOPTIMRing rO) {
+        if (rT.getSize() != rO.getSize()) {
+            reason.append("Different ring size (").append(rT.getSize())
+                    .append(":").append(rO.getSize()).append(")");
+            return false;
+        }
+
+        if (rO.getHeadVertex() == vertexMap.get(vhT)
+                && rO.getTailVertex() == vertexMap.get(vtT)) {
+            for (int i = 1; i < rT.getSize(); i++) {
+                if (vertexMap.get(rT.getVertexAtPosition(i))
+                        != rO.getVertexAtPosition(i)) {
+                    reason.append("Rings differ (A) (").append(rT).append(":")
+                            .append(rO).append(")");
+                    return false;
+                }
+            }
+        } else if (rO.getHeadVertex() == vertexMap.get(vtT)
+                && rO.getTailVertex() == vertexMap.get(vhT)) {
+            for (int i = 1; i < rT.getSize(); i++) {
+                int j = rO.getSize() - i - 1;
+                if (vertexMap.get(rT.getVertexAtPosition(i))
+                        != rO.getVertexAtPosition(j)) {
+                    reason.append("Rings differ (B) (").append(rT).append(":")
+                            .append(rO).append(")");
+                    return false;
+                }
+            }
+        } else {
+            reason.append("Rings differ (C) (").append(rT).append(":")
+                    .append(rO).append(")");
+            return false;
+        }
+        return true;
+    }
+
+//------------------------------------------------------------------------------
+
     /**
      * Compares graphs by spanning vertices starting from the
+     * given vertex and following the direction of edges.
+     * @param thisV starting vertex of first graph
+     * @param thisG first graph
+     * @param otherV starting vertex of second graph
+     * @param otherG second graph
+     * @return <code>true</code> if the graphs are same at this node
+     * @throws DENOPTIMException
+     */
+    public static boolean compareGraphNodes(DENOPTIMVertex thisV,
+                                            DENOPTIMGraph thisG,
+                                            DENOPTIMVertex otherV,
+                                            DENOPTIMGraph otherG) throws DENOPTIMException
+    {
+        Map<DENOPTIMVertex, DENOPTIMVertex> map = new HashMap<>();
+        map.put(thisV, otherV);
+        return compareGraphNodes(thisV, thisG, otherV, otherG, map,
+                new StringBuilder());
+    }
+
+//------------------------------------------------------------------------------
+
+    /** Compares graphs by spanning vertices starting from the
      * given vertex and following the direction of edges.
      * @param seedOnA initial vertex on the first graph.
      * @param gA the first graph.
@@ -1480,7 +1487,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	ArrayList<DENOPTIMEdge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
     	if (edgesFromThis.size() != edgesFromOther.size())
     	{
-    		reason.append("Different number of edged from vertex "+seedOnA+" ("
+    		reason.append("Different number of edges from vertex "+seedOnA+" ("
     					+edgesFromThis.size()+":"
     					+edgesFromOther.size()+")");
     		return false;
@@ -1504,7 +1511,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		}
     		if (!found)
     		{
-    			reason.append ("Edge not found in other("+et+")");
+    			reason.append("Edge not found in other("+et+")");
     			return false;
     		}
 
@@ -1676,7 +1683,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
+            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 toDel.add(vtx);
@@ -1707,7 +1714,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
+            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 rvids.add(vtx.getVertexId());
@@ -2064,8 +2071,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         List<DENOPTIMVertex> lstVert = getVertexList();
         int levRoot = lstVert.get(0).getLevel();
         int correction = lvl - levRoot;
-        for (DENOPTIMVertex denoptimVertex : lstVert) {
-            denoptimVertex.setLevel(denoptimVertex.getLevel() + correction);
+        for (DENOPTIMVertex v : lstVert) {
+            v.setLevel(v.getLevel() + correction);
         }
     }
 
@@ -2640,7 +2647,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                    boolean onAllSymmAPs)
                                            throws DENOPTIMException
     {
-
         SymmetricSet symAPs = parentVertex.getSymmetricAPs(parentAPIdx);
         if (symAPs != null && onAllSymmAPs)
         {
@@ -2761,8 +2767,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition fragment type
-            DENOPTIMVertex.BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getBuildingBlockType();
-            if (queryFrgTyp != DENOPTIMVertex.BBType.UNDEFINED)
+            BBType queryFrgTyp = ((DENOPTIMFragment) vQuery).getBuildingBlockType();
+            if (queryFrgTyp != BBType.UNDEFINED)
             {
                 if (verbosity > 2)
                 {
@@ -3161,7 +3167,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             modGraph.removeBranchStartingAt(cv,symmetry);
                             int wantedTrgApId = e.getTrgAPID();
                             int trgApLstSize = inGraph.getVertexWithId(
-                                    e.getTrgVertex()).getNumberOfAP();
+                                    e.getTrgVertex()).getNumberOfAPs();
                             if (wantedTrgApId >= trgApLstSize)
                             {
                                 String msg = "Request to use AP number "
@@ -3412,4 +3418,70 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Update the graph so that the vertex argument is at the scaffold level
+     * i.e. is the source of this graph. The other graph's vertices will have
+     * levels updated that corresponds to the layers of a breadth-first
+     * search (BFS) starting from this vertex. The vertex list of this graph
+     * will also be reordered in a way that corresponds to the BFS.
+     *
+     * @param v vertex to set as scaffold
+     */
+    public static void setScaffold(DENOPTIMVertex v) {
+        ArrayList<DENOPTIMVertex> newVertexList = new ArrayList<>();
+
+        Set<Integer> visited = new HashSet<>();
+        int level = -1;
+        Queue<DENOPTIMVertex> currLevel = new ArrayDeque<>();
+        Queue<DENOPTIMVertex> nextLevel = new ArrayDeque<>();
+        currLevel.add(v);
+
+        while (!currLevel.isEmpty()) {
+            DENOPTIMVertex currVertex = currLevel.poll();
+
+            int currId = currVertex.getVertexId();
+            if (!visited.contains(currId)) {
+                visited.add(currId);
+
+                newVertexList.add(currVertex);
+
+                currVertex.setLevel(level);
+
+                Iterable<DENOPTIMVertex> neighbors = currVertex
+                        .getAttachmentPoints()
+                        .stream()
+                        .map(DENOPTIMAttachmentPoint::getEdgeUser)
+                        .filter(e -> e != null)
+                        .map(e -> e.getSrcVertex() == currId ?
+                                e.getTrgAP() : e.getSrcAP())
+                        .map(DENOPTIMAttachmentPoint::getOwner)
+                        .collect(Collectors.toList());
+                for (DENOPTIMVertex adj : neighbors) {
+                    nextLevel.add(adj);
+                }
+            }
+
+            if (currLevel.isEmpty()) {
+                currLevel = nextLevel;
+                nextLevel = new ArrayDeque<>();
+                level++;
+            }
+        }
+
+        v.getGraphOwner().setVertexList(newVertexList);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if this graph contains a scaffold vertex.
+     * @return true if there is a scaffold vertex.
+     */
+    public boolean hasScaffoldTypeVertex() {
+        return getVertexList()
+                .stream()
+                .anyMatch(v -> v.getBuildingBlockType() == BBType.SCAFFOLD);
+    }
 }

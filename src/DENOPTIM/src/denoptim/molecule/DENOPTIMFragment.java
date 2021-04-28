@@ -38,6 +38,8 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
+import static denoptim.molecule.DENOPTIMVertex.*;
+
 /**
  * Class representing a continuously connected portion of chemical object
  * holding attachment points.
@@ -52,7 +54,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	 */
 	private static final long serialVersionUID = 1L;
 
-    /*
+    /**
      * attachment points on this vertex
      */
     private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
@@ -118,7 +120,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(int vertexId, IAtomContainer mol, DENOPTIMVertex.BBType bbt)
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
         super (vertexId);
@@ -160,11 +162,20 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 getAttachmentPoints());
         setSymmetricAPSets(simAP);
         
-        this.setAsRCV(getNumberOfAP() == 1 
+        this.setAsRCV(getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         getAttachmentPoints().get(0).getAPClass()));
     }
-    
+
+//------------------------------------------------------------------------------
+
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt,
+                            boolean isRCV)
+            throws DENOPTIMException {
+        this(vertexId, mol, bbt);
+        this.setAsRCV(isRCV);
+    }
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -175,7 +186,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(IAtomContainer mol, DENOPTIMVertex.BBType bbt) 
+    public DENOPTIMFragment(IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {    	
     	this(-1,mol,bbt);

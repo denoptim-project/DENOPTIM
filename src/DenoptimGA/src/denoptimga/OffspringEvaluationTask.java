@@ -19,7 +19,7 @@
 
 package denoptimga;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
@@ -44,7 +44,7 @@ import denoptim.utils.GraphConversionTool;
 public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
-    private volatile ArrayList<Candidate> curPopln;
+    private volatile List<Candidate> curPopln;
     private volatile Integer numTry;
     
     /**
@@ -68,7 +68,7 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     public OffspringEvaluationTask(String molName, DENOPTIMGraph molGraph,
     		String inchi, String smiles, IAtomContainer iac, String workDir,
-            ArrayList<Candidate> popln, Integer numTry, String fileUID)
+            List<Candidate> popln, Integer numTry, String fileUID)
     {
     	super(molGraph);
         this.molName = molName;
@@ -178,11 +178,12 @@ public class OffspringEvaluationTask extends FitnessTask
             {
                 numTry--;
             }
+
+            FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph());
         }
         completed = true;
         return result;
     }
 
 //------------------------------------------------------------------------------
-
 }

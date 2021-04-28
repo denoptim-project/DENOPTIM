@@ -27,8 +27,8 @@ import java.util.ArrayList;
  * Fragment ID and Attachment point ID are used to identify the chain.
  * Each closable conformation is recorded as the ordered vector of dihedral 
  * angles calculated from the reference points is the chain. Note that the
- * angles do NOT necessarily refer to the torsion in the chain, infact they
- * constitue a standardized representation of the conformation of a bond
+ * angles do NOT necessarily refer to the torsion in the chain, in fact they
+ * constitute a standardized representation of the conformation of a bond
  * and can be used to compare different chains that involve the same bond.
  * For instance, interdependent non-same chains of atoms. The definition of 
  * the standard reference points for the calculation of the dihedral angles 

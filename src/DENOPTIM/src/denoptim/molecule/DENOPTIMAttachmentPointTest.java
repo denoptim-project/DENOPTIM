@@ -197,7 +197,7 @@ public class DENOPTIMAttachmentPointTest
     {
         dummyVertex.addAP(1, 2, 1, APClass.make(APCLASS));
         DENOPTIMAttachmentPoint orig = dummyVertex.getAP(
-                dummyVertex.getNumberOfAP()-1);
+                dummyVertex.getNumberOfAPs()-1);
         
         DENOPTIMAttachmentPoint clone = orig.clone();
 

@@ -19,12 +19,12 @@
 
 package denoptimga;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
+import denoptim.molecule.*;
+import denoptim.rings.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
@@ -32,17 +32,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.SymmetricSet;
-import denoptim.rings.ChainLink;
-import denoptim.rings.ClosableChain;
-import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -270,16 +261,16 @@ public class DENOPTIMGraphOperations
      * @param symmetryOnAps if <code>true</code>, then symmetry will be applied
      * on the APs, no matter what. This is mostly needed to retain symmetry 
      * when performing mutations on the root vertex of a symmetric graph.
-     * @throws exception.DENOPTIMException
+     * @throws DENOPTIMException
      * @return <code>true</code> if the graph has been modified
      */
      
     protected static boolean extendGraph(DENOPTIMVertex curVertex, 
                                          boolean extend, 
-                                         boolean symmetryOnAp) 
+                                         boolean symmetryOnAps)
                                                         throws DENOPTIMException
-    {   
-        return extendGraph(curVertex,extend,symmetryOnAp,false,-1,-1);
+    {
+        return extendGraph(curVertex,extend,symmetryOnAps,false,-1,-1);
     }
     
 //------------------------------------------------------------------------------
@@ -299,17 +290,16 @@ public class DENOPTIMGraphOperations
      * sets the choice of the vertex to the 
      * given index. This selection applies only to the first extension, not to
      * further recursions.
-     * @param chosenApId if greater than or equals to zero, 
-     * sets the choice of the AP to the 
-     * given index. This selection applies only to the first extension, not to
-     * further recursions.
-     * @throws exception.DENOPTIMException
+     * @param chosenApId if greater than or equals to zero, sets the choice
+     *                   of the AP to the given index. This selection applies
+     *                   only to the first extension, not to further recursions.
+     * @throws DENOPTIMException
      * @return <code>true</code> if the graph has been modified
      */
 
     protected static boolean extendGraph(DENOPTIMVertex curVrtx, 
                                          boolean extend, 
-                                         boolean symmetryOnAp,
+                                         boolean symmetryOnAps,
                                          boolean force,
                                          int chosenVrtxIdx,
                                          int chosenApId) 
@@ -424,7 +414,7 @@ public class DENOPTIMGraphOperations
             // Decide on symmetric substitution within this vertex...
             boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
             SymmetricSet symAPs = new SymmetricSet();
-            if (curVrtx.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
+            if (curVrtx.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAps))
             {
                 symAPs = curVrtx.getSymmetricAPs(apId);
 				if (symAPs != null)
@@ -526,8 +516,9 @@ public class DENOPTIMGraphOperations
             for (int i=0; i<addedVertices.size(); i++)
             {
                 int vid = addedVertices.get(i);
+                DENOPTIMVertex fragVertex = molGraph.getVertexWithId(vid);
                 DENOPTIMVertex v = molGraph.getVertexWithId(vid);
-                extendGraph(v, extend, symmetryOnAp);
+                extendGraph(v, extend, symmetryOnAps);
             }
         }
 
@@ -679,6 +670,200 @@ public class DENOPTIMGraphOperations
         }
 
         return res;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if a graph is isomorphic to another template's inner graph in its
+     * appropriate fragment space library (inferred from BBType).
+     *
+     * The GraphPattern parameter is used by the function to speed up the
+     * comparisons between graph by making certain assumptions. The pattern
+     * must therefore be the same pattern as the graph adheres to to filter
+     * correctly.
+     * @param graph to check if has an isomorph in the fragment space.
+     * @param type specifying which fragment space library to check for
+     *             isomorphs in.
+     * @return true if there is an isomorph template in the library of the
+     * specified type.
+     */
+    public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type) {
+        return (type == BBType.SCAFFOLD ?
+                FragmentSpace.getScaffoldLibrary() :
+                FragmentSpace.getFragmentLibrary())
+                .stream()
+                .filter(v -> v instanceof DENOPTIMTemplate)
+                .map(t -> (DENOPTIMTemplate) t)
+                .map(DENOPTIMTemplate::getInnerGraph)
+                .anyMatch(graph::isIsomorphicTo);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Extracts subgraphs from the graph parameter that match the provided
+     * pattern.
+     * @param graph graph to extract pattern from.
+     * @param pattern to match against.
+     * @return The subgraphs matching the provided pattern.
+     */
+    public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
+                                                     GraphPattern pattern) {
+        if (pattern != GraphPattern.RING) {
+            throw new IllegalArgumentException("Graph pattern " + pattern +
+                    " not supported.");
+        }
+
+        List<Set<DENOPTIMVertex>> disjointMultiCycleVertices = graph
+                .getRings()
+                .stream()
+                .map(DENOPTIMRing::getVertices)
+                .map(HashSet::new)
+                .collect(Collectors.toList());
+
+        unionOfIntersectingSets(disjointMultiCycleVertices);
+
+        List<DENOPTIMGraph> subgraphs = new ArrayList<>();
+        for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
+            subgraphs.add(extractSubgraph(graph, fusedRing));
+        }
+
+        for (DENOPTIMGraph g : subgraphs) {
+            g.renumberGraphVertices();
+            fixGraph(g);
+        }
+
+        return subgraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the subgraph in the graph defined on the a set of vertices.
+     * The graph is cloned before the subgraph is extracted.
+     * @param graph To extract subgraph from.
+     * @param definedOn Set of vertices in the graph that the subgraph is
+     *                  defined on.
+     * @return Subgraph of graph defined on set of vertices.
+     */
+    private static DENOPTIMGraph extractSubgraph(DENOPTIMGraph graph,
+                                                 Set<DENOPTIMVertex> definedOn) {
+        DENOPTIMGraph subgraph = graph.clone();
+
+        Set<DENOPTIMVertex> complement = subgraph
+                .getVertexList()
+                .stream()
+                .filter(u -> definedOn
+                        .stream()
+                        .allMatch(v -> v.getVertexId() != u.getVertexId())
+                ).collect(Collectors.toSet());
+
+        for (DENOPTIMVertex v : complement) {
+            subgraph.removeVertex(v);
+        }
+        return subgraph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the vertex at the lowest level as the scaffold, changes the  
+     * directions of edges so that the scaffold is the source, and changes 
+     * the levels of the graph's other vertices to be consistent with the new
+     * scaffold.
+     * @param g Graph to fix.
+     */
+    private static void fixGraph(DENOPTIMGraph g) {
+        DENOPTIMVertex newScaffold = g
+                .getVertexList()
+                .stream()
+                .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
+                .orElse(null);
+        if (newScaffold == null) {
+            return;
+        }
+        DENOPTIMGraph.setScaffold(newScaffold);
+
+        fixEdgeDirections(g);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes the union of any two sets in this list that intersect. Performs
+     * operations in-place.
+     * @param l List to merge sets of
+     */
+    private static <T> void unionOfIntersectingSets(List<Set<T>> l) {
+        for (int i = 0; i < l.size() - 1; i++) {
+            Set<T> setA = l.get(i);
+            for (int j = i + 1; j < l.size(); ) {
+                Set<T> setB = l.get(j);
+                if (Collections.disjoint(setA, setB)) {
+                    j++;
+                } else {
+                    setA.addAll(setB);
+                    l.remove(j);
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Flips edges in the graph so that the scaffold is the only source vertex.
+     * @param graph to fix edges of.
+     */
+    private static void fixEdgeDirections(DENOPTIMGraph graph) {
+        boolean foundScaffold = false;
+        for (DENOPTIMVertex v : graph.getVertexList()) {
+            foundScaffold = v.getLevel() == -1;
+            if (foundScaffold) {
+                fixEdgeDirections(v, new HashSet<>());
+                break;
+            }
+        }
+        if (!foundScaffold) {
+            throw new IllegalArgumentException("Vertex at level -1 not found");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Recursive utility method for fixEdgeDirections(DENOPTIMGraph graph).
+     * @param v current vertex
+     */
+    private static void fixEdgeDirections(DENOPTIMVertex v,
+                                          Set<Integer> visited) {
+        visited.add(v.getVertexId());
+        int visitedVertexEncounters = 0;
+        for (int i = 0; i < v.getNumberOfAPs(); i++) {
+            DENOPTIMAttachmentPoint ap = v.getAP(i);
+            DENOPTIMEdge edge = ap.getEdgeUser();
+            if (edge != null) {
+                int srcVertex = edge.getSrcVertex();
+                boolean srcIsVisited =
+                        srcVertex != v.getVertexId() && visited.contains(srcVertex);
+
+                visitedVertexEncounters += srcIsVisited ? 1 : 0;
+                if (visitedVertexEncounters >= 2) {
+                    throw new IllegalArgumentException("Invalid graph. Contains a" +
+                            " cycle.");
+                }
+
+                boolean edgeIsWrongWay = edge.getTrgVertex() == v.getVertexId()
+                        && !srcIsVisited;
+                if (edgeIsWrongWay) {
+                    edge.flipEdge();
+                }
+                if (!srcIsVisited) {
+                    fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+                }
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -1020,7 +1205,7 @@ public class DENOPTIMGraphOperations
      */
 
     public static boolean performCrossover(DENOPTIMGraph male, int mvid,
-                        DENOPTIMGraph female, int fvid, boolean debug) 
+                        DENOPTIMGraph female, int fvid, boolean debug)
                                 throws DENOPTIMException
     {   
         if(debug)
@@ -1379,5 +1564,7 @@ public class DENOPTIMGraphOperations
     }
 
 //------------------------------------------------------------------------------
+
+
 
 }

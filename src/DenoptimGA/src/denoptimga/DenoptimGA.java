@@ -81,7 +81,6 @@ public class DenoptimGA
                 pGA = new ParallelEvolutionaryAlgorithm();
                 pGA.runGA();
             }
-
         }
         catch (Throwable t)
         {
@@ -89,9 +88,9 @@ public class DenoptimGA
             {
                 pGA.stopRun();
             }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
             GenUtils.printExceptionChain(t);
-            throw new DENOPTIMException("Error in DenootimGA run.", t);
+            throw new DENOPTIMException("Error in DenoptimGA run.", t);
         }
 
         // normal completion: do NOT call System exit(0) as we might be calling

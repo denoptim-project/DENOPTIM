@@ -1,5 +1,8 @@
 package denoptim.molecule;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,24 +115,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
     
 //------------------------------------------------------------------------------
-    
-    /**
-     * Produces a subgraph that represents the path between two given
-     * attachment points.
-     * @param apA
-     * @param apB
-     * @return a path that goes from apA to apB.
-     */
-
-    public PathSubGraph getPath(DENOPTIMAttachmentPoint apA,
-            DENOPTIMAttachmentPoint apB)
-    {
-        //TODO-V3: just use the PathSubGraph constructor. 
-        // But is this needed in template?
-        return null;
-    }
-    
-//------------------------------------------------------------------------------
 
     /**
      * Method meant for devel phase only.
@@ -172,17 +157,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
 
 //------------------------------------------------------------------------------
-
-    /**
-     * Returns the list of attachment points
-     * @return the list of APs
-     */
-    public ArrayList<DENOPTIMAttachmentPoint> getAPs() 
-    {
-        return innerGraph.getAvailableAPs();
-    }
-
-//------------------------------------------------------------------------------
     
     /**
      * Returns a deep copy of this template
@@ -219,7 +193,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             throws IllegalArgumentException 
     {
         mol = null;
-        // if (!compatibleWithOldInnerGraph(innerGraph))
         if (!isValidInnerGraph(innerGraph)) {
             throw new IllegalArgumentException("inner graph does not have all" +
                     " required APs");
@@ -504,21 +477,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return set;
         }
 
-        switch (contractLevel)
-        { 
-            case 2:
-            {
-                set.add(this);
-                break;
-            }
-            
-            default:
-            {
-                for (DENOPTIMVertex v : innerGraph.gVertices)
-                {
-                    set.addAll(v.getMutationSites());
-                }
-                break;
+        if (contractLevel == 2) {
+            set.add(this);
+        } else {
+            for (DENOPTIMVertex v : innerGraph.gVertices) {
+                set.addAll(v.getMutationSites());
             }
         }
         return set;
@@ -602,12 +565,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         mol = null;
         
         /*
-        Note: We limit ourselves to the following
-        1. The inner graph consists of exactly 1 fragment
-        2. We substitute n fragments for n fragments
-        2. We only request Mutation type CHANGEBRANCH and DELETE
-        3. We ignore symmetry
-        4. We ignore rings
+        Note: We limit ourselves to the following situation
+        - The inner graph consists of exactly 1 fragment.
+        - The template is not connected to any other vertices.
+        - We ignore symmetry.
+        - We ignore rings.
+        - We disallow the production of nested templates.
 
         These limitations will be removed once we add more unit tests and
         this note should be updated accordingly as unit tests are added (and
@@ -620,21 +583,32 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     type.toString() + " currently unsupported");
         }
 
+        /* Use the DENOPTIMGraphOperations class */
+
         if (type == MutationType.DELETE
                 && getInnerGraph().getVertexCount() <= 1) {
             return false;
-        }
-
-        for (DENOPTIMVertex v : FragmentSpace.getFragmentLibrary()) {
-            if (v instanceof DENOPTIMFragment) {
-                DENOPTIMFragment f = (DENOPTIMFragment) v;
-                int matches = countRequiredAPs(f);
-                if (matches == requiredAPs.size()) {
-                    DENOPTIMGraph g = new DENOPTIMGraph();
-                    g.addVertex(f);
-                    this.setInnerGraph(g);
-                    return true;
+        } else if (type == MutationType.CHANGEBRANCH) {
+            for (DENOPTIMVertex v : FragmentSpace.getFragmentLibrary()) {
+                if (v instanceof DENOPTIMFragment) {
+                    DENOPTIMFragment f = (DENOPTIMFragment) v;
+                    int matches = countRequiredAPs(f);
+                    if (matches == requiredAPs.size()) {
+                        DENOPTIMGraph g = new DENOPTIMGraph();
+                        g.addVertex(f);
+                        this.setInnerGraph(g);
+                        return true;
+                    }
                 }
+            }
+        } else if (type == MutationType.EXTEND) {
+            List<DENOPTIMAttachmentPoint> compAPs = FragmentSpace
+                    .getAPsCompatibleWithThese(getAttachmentPoints());
+            if (compAPs.size() > 0) {
+                Random rand = new Random();
+                DENOPTIMAttachmentPoint connectTo = compAPs.get(rand.nextInt(
+                        compAPs.size()));
+
             }
         }
         return false;
@@ -644,20 +618,21 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     /**
      * Counts the number of required APs that match with the APs on a
-     * fragment. Two APs match if they have the same APClass and direction
-     * vector.
+     * fragment. Two APs match if they have the same APClass.
      * @param f Fragment to match against
      * @return The number of required APs present on fragment argument.
      */
     private int countRequiredAPs(DENOPTIMFragment f) {
         List<DENOPTIMAttachmentPoint> reqAPs = getRequiredAPs();
-        ArrayList<DENOPTIMAttachmentPoint> fragAPs =
-                f.getAttachmentPoints();
+        List<DENOPTIMAttachmentPoint> fragAPs = f
+                .getAttachmentPoints()
+                .stream()
+                .map(DENOPTIMAttachmentPoint::clone)
+                .collect(Collectors.toList());
 
         Comparator<DENOPTIMAttachmentPoint> apClassComparator
                 = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass);
 
-        // TODO: 06.04.2021 make sure list of APs is always sorted
         fragAPs.sort(apClassComparator);
 
         // TODO: 06.04.2021 make sure requiredAPs is always sorted

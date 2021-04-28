@@ -106,7 +106,6 @@ public class FitnessProvider
 			//TODO-V3 consider using dff.makeCopy()
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
-		
 		// Instantiate new instances of the descriptors implementations
 		engine = new DescriptorEngine(classnames,null);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();

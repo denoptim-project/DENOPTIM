@@ -1174,7 +1174,7 @@ public class GUIVertexInspector extends GUICardPanel
   		// we get what is already in 'vertex'
   		vertex = vertexViewer.getLoadedStructure();
   		if (verticesLibrary.size()==0
-  				&& (vertex==null || vertex.getNumberOfAP()==0))
+  				&& (vertex==null || vertex.getNumberOfAPs()==0))
   		{
   			//Nothing to same
   	        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
