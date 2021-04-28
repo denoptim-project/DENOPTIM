@@ -1275,7 +1275,7 @@ public class EAUtils
         res[1] = molsmiles; // smiles
         //res[2] = mol2D; // 2d coordinates
         res[2] = mol;
-
+        
         return res;
     }
 

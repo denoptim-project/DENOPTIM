@@ -398,8 +398,8 @@ public class GraphBuildingTask extends FitnessTask
                             {
                                 pr.setFirst("UNDEFINED_INCHI");
                             }
-                            altRes[0] = pr.getFirst(); 
-                      
+                            altRes[0] = pr.getFirst();
+                            
                             // Store graph
                             FSEUtils.storeGraphOfLevel(g.clone(),level,rootId,nextIds);
                             graphId = gId;

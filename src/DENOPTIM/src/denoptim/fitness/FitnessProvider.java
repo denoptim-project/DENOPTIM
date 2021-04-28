@@ -103,7 +103,7 @@ public class FitnessProvider
 		{
 			DescriptorForFitness dff = descriptors.get(i);
 			classnames.add(dff.getClassName());
-			//TODO consider using dff.makeCopy()
+			//TODO-V3 consider using dff.makeCopy()
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		

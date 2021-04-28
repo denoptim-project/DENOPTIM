@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix3d;
@@ -41,6 +42,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
@@ -51,6 +53,7 @@ import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
 
 
@@ -252,7 +255,50 @@ public class ThreeDimTreeBuilder
      */
 
     public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph,
-            boolean removeUsedRCAs) throws DENOPTIMException
+            boolean removeUsedRCAs) 
+                    throws DENOPTIMException
+    {
+        return convertGraphTo3DAtomContainer(graph,removeUsedRCAs,true);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Created a three-dimensional molecular representation from a given 
+     * DENOPTIMGraph. The conversion creates also two maps to retrace the 
+     * attachment points within the final 3D structure both based on 
+     * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.
+     * To retrieve this information see methods 
+     * {@link ThreeDimTreeBuilder#getApsPerVertexId()},
+     * {@link ThreeDimTreeBuilder#getApsPerAtom()} and
+     * {@link ThreeDimTreeBuilder#getApsPerEdge()}. 
+     * In addition each atom is blended with the unique index
+     * of the DENOPTIMVertex corresponding to the molecular fragment to which
+     * the atom belongs.
+     * Calling this method cleans all the fields from previously existing data
+     * (see method {@link ThreeDimTreeBuilder#clean()}).
+     * 
+     * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param removeUsedRCAs when <code>true</code> this method will remove 
+     * used RCAs (the content of ring-closing vertexes, RCVs) 
+     * and add bonds to close the rings
+     * defined by the DENOPTIMRings in the graph (does not alter the graph).
+     * Does not change unused RCVs. Unused RCVs should have been already 
+     * replaced by capping groups (or removed, if no capping needed), 
+     * with the 
+     * {@link GraphConversionTool#removeUnusedRCVs(DENOPTIMGraph)}
+     * method.
+     * @param setCDKRequirements when <code>true</code> this method will ensure
+     * that the CDK requirements for IAtomContainers are all met. Namely,
+     * no bond order is 'undefined' and that intrinsic hydrogen is zero for all
+     * atoms (i.e., internal convention in DENOPTIM: all atoms are explicit).
+     * @return the <code>AtomContainer</code> representation
+     * @throws DENOPTIMException
+     */
+
+    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph,
+            boolean removeUsedRCAs, boolean setCDKRequirements) 
+                    throws DENOPTIMException
     {
         // Clean all and makes this.mol = builder.newAtomContainer();
         this.clean();
@@ -439,6 +485,12 @@ public class ThreeDimTreeBuilder
             // the atom indexes stored in the APs, and in particular, the 
             // index returned by getAtomPositionNumberInMol.
         	DENOPTIMMoleculeUtils.removeUsedRCA(mol, this.graph);
+        }
+        
+        if (setCDKRequirements)
+        {
+            DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+            DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(mol);
         }
         
         if (debug)

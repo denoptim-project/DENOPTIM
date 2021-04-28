@@ -111,13 +111,15 @@ public class OffspringEvaluationTask extends FitnessTask
             	// 2) remove RCAs
             	// 3) remove dummy in multi-hapto
             	// 4) remove dummy in linearities
+                // 5) set atom properties that are expected by CDK classes (for
+                //    example, the number of implicit atoms).
             	// All this should be done within the TreeBuilder3D and 
             	// controlled by flags. Obviously, if we remove all these 
             	// functional dummy atoms, then we cannot use them anymore,
             	// So: is are there cases where we need to keep them?
             	// We can always rebuild the 3d-tree (with Dummy atoms) if
             	// we need the get it back. Thus, for the moment I do not see
-            	// a reason for keeping the Dus in the molecular representation,
+            	// a reason for keeping Du in the molecular representation,
             	// but potential down stream effects have to be evaluated.
                 IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(
                         gWithNoRCVs,true);

@@ -5,11 +5,11 @@
 # Fitness provider
 FP-INTERPRETER=bash
 FP-SOURCE=data/fitness_provider_fromDB.sh
-
+GA-RANDOMSEED=1234567890
 # Parameters for the genetic algorithm
 GA-InitPoplnFile=data/initPopulation.sdf
 GA-numParallelTasks=5
-GA-parallelization=ASYNCHRONOUS
+#GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25
 GA-numChildren=5
 GA-numGenerations=20

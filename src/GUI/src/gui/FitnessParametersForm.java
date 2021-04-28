@@ -1097,11 +1097,12 @@ public class FitnessParametersForm extends ParametersForm
                     } else {
                         String line = "${parametrized('" + txtVarName.getText() 
                                 + "','" + txtDescName.getText() + "','";
+                        //NB: all params are collected into a single string!
                         for (int i=0; i<tabSize; i++)
                         {
                             line = line + tabParamsMod.getValueAt(i,0);
                             if (i<(tabSize-1))
-                                line = line  + "','";
+                                line = line  + ", ";
                         }
                         line = line + "')}";
                         result = new Object[] {txtVarName.getText(),line};

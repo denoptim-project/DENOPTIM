@@ -1030,7 +1030,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     }
                     v = fragWithMol;
                 } else {
-                    System.err.println("WARNING: undefunded fragment space. "
+                    System.err.println("WARNING: undefined fragment space. "
                             + "Templates will contain fragments with no "
                             + "molecular representation. To avoid this, first "
                             + "define the fragment space, and then work with "

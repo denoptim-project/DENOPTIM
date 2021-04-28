@@ -363,10 +363,14 @@ public class FitnessParameters
                 return 1.0;
             }
         };
-        // This map allows ExpressionEvaluator to find the methods 
-        // implemented here in FitnessParameter class and that are used to 
-        // parse the expression string.
-        // An example of such method is 'atomSpecific' or 'parametrized'
+        /**
+         * This map allows ExpressionEvaluator to find the methods 
+         * implemented here in FitnessParameter class and that are used to 
+         * parse the expression string.
+         * Currently, such methods are 
+         * {@link FitnessParameters#atomSpecific} and  
+         * {@link FitnessParameters#parametrized}.
+         */
         FunctionMapper funcsMap = new FunctionMapper() {
             @Override
             public Method resolveFunction(String nameSpace, String methodName) {
@@ -419,12 +423,6 @@ public class FitnessParameters
 		Set<String> descriptorImplementationNames = new HashSet<String>();
 		for (Variable v : variables)
 		{
-		    //TODO del
-		    /*
-		    System.out.println("V: "+v.getName()+ " "+v.getDescriptorName());
-		    System.out.println("   smarts: "+v.smarts);
-		    System.out.println("   params: "+v.params);
-		    */
 		    descriptorImplementationNames.add(v.getDescriptorName());
 		}
 		List<DescriptorForFitness> rawDescriptors = 
@@ -452,9 +450,14 @@ public class FitnessParameters
                     .findAny()
                     .orElse(null);
             if (rawDff==null)
-                throw new DENOPTIMException("Exepected lack of a match in the "
-                        + "list of descriptors. This should never happen.");
-		    
+                throw new DENOPTIMException("Looking for descriptor '" 
+                        + descName + "' that should be used to produce "
+                        + "variable '" + varName
+                        + "', but no match found in the list of descriptor "
+                        + "implementations. "
+                        + "Check the name of the descriptor you are trying to "
+                        + "use.");
+		   
 		    if (v.params == null)
 		    {   
 		        // No custom parameter, so we take (or make) a standard
@@ -673,6 +676,7 @@ public class FitnessParameters
     public static Double parametrized(String varName, String descName, 
             String paramsStr)
     {
+        //TODO-V3: unify treatment of third argument. It should be a String[]
         String[] params = paramsStr.split(", +");
         for (Variable v : variables)
         {
