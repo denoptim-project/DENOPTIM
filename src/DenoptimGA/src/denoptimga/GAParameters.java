@@ -35,6 +35,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Version;
 import denoptim.rings.RingClosureParameters;
@@ -875,6 +876,7 @@ public class GAParameters
             dataDir = cdataDir + fileSep + str;
             success = DenoptimIO.createDirectory(dataDir);
         }
+        DenoptimIO.addToRecentFiles(dataDir, FileFormat.GA_RUN);
     }
 
 //------------------------------------------------------------------------------

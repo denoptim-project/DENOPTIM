@@ -537,9 +537,11 @@ public class EAUtils
     /**
      * Set the Vertex counter value
      * @param popln
+     * @throws DENOPTIMException 
      */
 
-    protected static void setVertexCounterValue(ArrayList<Candidate> popln)
+    protected static void setVertexCounterValue(ArrayList<Candidate> popln) 
+            throws DENOPTIMException
     {
         int val = Integer.MIN_VALUE;
         for (Candidate popln1 : popln)
@@ -547,7 +549,7 @@ public class EAUtils
             DENOPTIMGraph g = popln1.getGraph();
             val = Math.max(val, g.getMaxVertexId());
         }
-        GraphUtils.updateVertexCounter(val);
+        GraphUtils.ensureVertexIDConsistency(val);
     }
 
 //------------------------------------------------------------------------------

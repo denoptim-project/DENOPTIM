@@ -33,6 +33,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
@@ -648,6 +649,7 @@ public class FSEParameters
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);
         }
+        DenoptimIO.addToRecentFiles(workDir, FileFormat.FSE_RUN);
 		if (dbRootDir.equals(".") || dbRootDir.equals(""))
 		{
 		    dbRootDir = workDir;

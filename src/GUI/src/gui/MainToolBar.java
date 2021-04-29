@@ -31,8 +31,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
@@ -43,10 +48,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.StaticTaskManager;
 
 
@@ -73,6 +83,11 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 	 * Main File menu
 	 */
 	private JMenu menuFile;
+	
+	/**
+	 * Menu with list of recent files
+	 */
+	private JMenu openRecent;
 
 	/**
 	 * The menu listing the active panels in the deck of cards
@@ -321,6 +336,21 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		});
 		menuFile.add(open);
 		
+	    openRecent = new JMenu("Open Recent");
+	    menuFile.add(openRecent);
+	    menuFile.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) 
+            {
+                updateOpenRecentMenu();
+            }
+            @Override
+            public void menuDeselected(MenuEvent e) {}
+            @Override
+            public void menuCanceled(MenuEvent e) {}
+        });
+	    
+		
 		activeTabsMenu = new JMenu("Active Tabs");
 		this.add(activeTabsMenu);
 		
@@ -373,6 +403,47 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		StaticTaskManager.queueStatusBar.setValue(1);
 		this.add(StaticTaskManager.queueStatusBar);
 	}
+
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Updated the the list of recent files in the "open Recent" menu
+	 */
+    private void updateOpenRecentMenu()
+    {
+        openRecent.removeAll();
+        Map<File,FileFormat> recentFiles = DenoptimIO.readRecentFilesMap();
+        int s = recentFiles.size();
+        if (recentFiles.size() == 0)
+        {
+            openRecent.setEnabled(false);
+        } else {
+            openRecent.setEnabled(true);
+        }
+        for (Entry<File, FileFormat> e : recentFiles.entrySet())
+        {
+            RecentFileItem item = new RecentFileItem(e.getKey(), e.getValue());
+            item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    openFile(item.file, item.ff); 
+                }
+            });
+            openRecent.add(item);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private class RecentFileItem extends JMenuItem {
+        protected FileFormat ff;
+        protected File file;
+        public RecentFileItem(File file, FileFormat ff)
+        {
+            super(file.getAbsolutePath());
+            this.file = file;
+            this.ff = ff;
+        }
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -486,7 +557,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Process a file that has a recognized file format and loads a suitable 
+	 * Process a file that has a recognised file format and loads a suitable 
 	 * GUI card to visualize the file content.
 	 * @param file the file to open
 	 * @param fileFormat the DENOPTIM format of the file
@@ -521,6 +592,13 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				mainPanel.add(graphPanel);
 				graphPanel.importGraphsFromFile(file);
 				break;
+				
+			case GRAPHJSON:
+                GUIGraphHandler graphPanel2 = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel2);
+                graphPanel2.importGraphsFromFile(file);
+                break;
+                
 				
 			case COMP_MAP:
 				GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);

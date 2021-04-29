@@ -55,6 +55,7 @@ import org.openscience.cdk.interfaces.IBond;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
@@ -555,6 +556,9 @@ public class GUIVertexInspector extends GUICardPanel
 				{
 					return;
 				}
+				//The format is given by the DenoptimIO.writeVertices method
+				//TODO: consider using other formats, e.g., VRTXJSON.
+				FileFormat ff = FileFormat.VRTXSDF;
 				try
 				{
 				    DenoptimIO.writeVertices(outFile.getAbsolutePath(),
@@ -575,6 +579,7 @@ public class GUIVertexInspector extends GUICardPanel
 						verticesLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
+				DenoptimIO.addToRecentFiles(outFile, ff);
 			}
 		});
 		commandsPane.add(btnSaveVrtxs);

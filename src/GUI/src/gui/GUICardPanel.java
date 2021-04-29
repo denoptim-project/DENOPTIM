@@ -20,10 +20,14 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+
+import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 
 /**
  * Class of GUI panels meant to occupy one card in the deck-of-cards layout
@@ -129,4 +133,7 @@ public class GUICardPanel extends JPanel
 			}
 		}
 	}
+
+//-----------------------------------------------------------------------------
+
 }

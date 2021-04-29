@@ -721,7 +721,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				File outFile = fileAndFormat.file;
 				try
 				{
-					DenoptimIO.writeGraphsToFile(outFile,
+					outFile = DenoptimIO.writeGraphsToFile(outFile,
 					        fileAndFormat.format, dnGraphLibrary);
 				}
 				catch (Exception ex)
@@ -735,6 +735,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				}
 				deprotectEditedSystem();
 				unsavedChanges = false;
+				DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
 			}
 		});
 		commandsPane.add(btnSaveFrags);

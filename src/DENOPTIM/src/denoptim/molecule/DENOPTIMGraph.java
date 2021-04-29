@@ -3097,17 +3097,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         //Make sure there is no clash with vertex IDs
         int maxId = getMaxVertexId();
-        if (GraphUtils.vertexCounter.get() <= maxId)
-        {
-            try
-            {
-                GraphUtils.resetUniqueVertexCounter(maxId+1);
-            }
-            catch (Throwable t)
-            {
-                maxId = GraphUtils.vertexCounter.getAndIncrement();
-            }
-        }
+        GraphUtils.ensureVertexIDConsistency(maxId);
 
         DENOPTIMGraph modGraph = this.clone();
 

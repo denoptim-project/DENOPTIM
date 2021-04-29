@@ -19,12 +19,16 @@
 
 package denoptim.constants;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 
 /**
@@ -43,6 +47,44 @@ public final class DENOPTIMConstants
      */
     public static final String FSEP = System.getProperty("file.separator");
 
+    /**
+     * Global configuration folder
+     */
+    public static final File GLOBALCONFIG = ensureConfigFolderExists();
+    private static File ensureConfigFolderExists()
+    {
+        File configFolder = new File(
+                System.getProperty("user.home") + FSEP + ".denoptim");
+        try
+        {
+            if (!configFolder.exists())
+            {
+                boolean wasMade = DenoptimIO.createDirectory(
+                        configFolder.getAbsolutePath());
+                if (!wasMade)
+                {
+                    throw new DENOPTIMException("ERROR: could not make "
+                            + "configuration folder '" 
+                            + configFolder.getAbsolutePath() + "'");
+                }
+            }
+        } catch (Throwable t)
+        {
+            t.printStackTrace();
+            System.out.println("ERROR: unable to make configuration folder '"  
+                    + configFolder.getAbsolutePath() + "'");
+            System.err.println("ERROR: unable to make configuration folder '"  
+                    + configFolder.getAbsolutePath() + "'");
+            System.exit(-1);
+        }
+        return configFolder;
+    }
+    
+    /**
+     * List of recent files
+     */
+    public static final File RECENTFILESLIST = new File(
+            GLOBALCONFIG.getAbsoluteFile() + FSEP + "recent_files_list");
  
     public static final Map<String, Integer> VALENCE_MAP = createMap();
     private static Map<String, Integer> createMap()

@@ -247,7 +247,7 @@ public class GUI
 		}
 		else
 		{
-			//System.exit(0); //this will wait for synch locks to the released
+			//System.exit(0); //this will wait for synch locks to be released,
 			// but here we want to really stop the JVM and kill all threads.
 			Runtime.getRuntime().halt(0);
 		}

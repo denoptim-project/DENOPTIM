@@ -28,6 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
+
 
 /**
  * A panel for handling of compatibility matrix.
@@ -166,6 +169,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				}
 				cpMapHandler.writeCopatibilityMatrixFile(outFile);
 				unsavedChanges = false;
+				DenoptimIO.addToRecentFiles(outFile, FileFormat.COMP_MAP);
 			}
 		});
 		commandsPane.add(btnSaveFrags);

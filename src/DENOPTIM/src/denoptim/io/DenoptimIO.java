@@ -53,11 +53,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.zip.CRC32;
@@ -986,10 +989,29 @@ public class DenoptimIO
      * Read list of data as text
      *
      * @param fileName
+     * @param ignoreEmpty if <code>true</code> the method is allowed to return
+     * an empty list if the file exists and is empty
      * @return list of data
      * @throws DENOPTIMException
      */
-    public static ArrayList<String> readList(String fileName) throws DENOPTIMException {
+    public static ArrayList<String> readList(String fileName) 
+            throws DENOPTIMException {
+        return readList(fileName, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read list of data as text
+     *
+     * @param fileName
+     * @param allowEmpty if <code>true</code> the method is allowed to return
+     * an empty list if the file exists and is empty
+     * @return list of data
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<String> readList(String fileName, 
+            boolean allowEmpty) throws DENOPTIMException {
         ArrayList<String> lst = new ArrayList<>();
         BufferedReader br = null;
         String line = null;
@@ -1013,7 +1035,7 @@ public class DenoptimIO
             }
         }
 
-        if (lst.isEmpty()) {
+        if (lst.isEmpty() && !allowEmpty) {
             throw new DENOPTIMException("No data found in file: " + fileName);
         }
 
@@ -2059,7 +2081,7 @@ public class DenoptimIO
      * @param graphs the list of graphs to print
      * @throws DENOPTIMException
      */
-    public static void writeGraphsToFile(File file, FileFormat format,
+    public static File writeGraphsToFile(File file, FileFormat format,
             ArrayList<DENOPTIMGraph> graphs)
             throws DENOPTIMException 
     {
@@ -2081,6 +2103,7 @@ public class DenoptimIO
                 throw new DENOPTIMException("Cannot read graphs from format '" 
                         + format + "'.");
         }
+        return file;
     }
 
 //------------------------------------------------------------------------------
@@ -2634,6 +2657,105 @@ public class DenoptimIO
             list.add(DENOPTIMVertex.convertIACToVertex(iac,bbt));
         }
         return list;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads the file defined in {@link DENOPTIMConstants#RECENTFILESLIST} and
+     * makes a map that contains the pathname and the format of each recent 
+     * file. Ignores any entry that is present in the file but cannot be found 
+     * in the system.
+     * @return the recent files map
+     */
+    public static Map<File, FileFormat> readRecentFilesMap()
+    {
+        Map<File, FileFormat> map = new LinkedHashMap<File, FileFormat>();
+        if (!DENOPTIMConstants.RECENTFILESLIST.exists())
+        {
+            return map;
+        }
+        try
+        {
+            for (String line : DenoptimIO.readList(
+                    DENOPTIMConstants.RECENTFILESLIST.getAbsolutePath(), true))
+            {
+                line = line.trim();
+                String[] parts = line.split("\\s+");
+                String ffStr = parts[0];
+                FileFormat ff = null;
+                try
+                {
+                    ff = FileFormat.valueOf(FileFormat.class, ffStr);
+                } catch (Exception e)
+                {
+                    throw new DENOPTIMException("Unable to convert '" + ffStr
+                            + "' to a known file format.");
+                }
+                String fileName = line.substring(ffStr.length()).trim();
+                if (DenoptimIO.checkExists(fileName))
+                {
+                    map.put(new File(fileName), ff);
+                }
+            }
+        } catch (DENOPTIMException e)
+        {
+            DENOPTIMLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
+                    + "fetch list of recent files.", e);
+            map = new HashMap<File, FileFormat>();
+        }
+        return map;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Appends an entry to the list of recent files.
+     * @param fileName the file to record.
+     * @param ff the declared format of file.
+     */
+    public static void addToRecentFiles(String fileName, FileFormat ff)
+    {
+        addToRecentFiles(new File(fileName), ff);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Appends an entry to the list of recent files. If the  current list is 
+     * reaching the max length, then this method will append the new entry and 
+     * remove the oldest one.
+     * @param file the file to record.
+     * @param ff the declared format of file.
+     */
+    public static void addToRecentFiles(File file, FileFormat ff)
+    {
+        String text = "";
+        Map<File, FileFormat> existingEntries = readRecentFilesMap();
+        int maxSize = 20;
+        int toIgnore = existingEntries.size() + 1 - maxSize;
+        int ignored = 0;
+        for (Entry<File, FileFormat> e : existingEntries.entrySet())
+        {
+            if (ignored < toIgnore)
+            {
+                ignored++;
+                continue;
+            }
+            text = text + e.getValue() + " " + e.getKey()
+                + DENOPTIMConstants.EOL;
+        }
+        text = text + ff + " " + file.getAbsolutePath();
+        try
+        {
+            DenoptimIO.writeData(
+                    DENOPTIMConstants.RECENTFILESLIST.getAbsolutePath(), text, 
+                    false);
+        } catch (DENOPTIMException e)
+        {
+            DENOPTIMLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
+                    + "write list of recent files.", e);
+        }
     }
     
 //------------------------------------------------------------------------------

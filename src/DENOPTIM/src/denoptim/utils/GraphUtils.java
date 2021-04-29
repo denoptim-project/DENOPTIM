@@ -46,6 +46,25 @@ public class GraphUtils
     private static AtomicInteger molCounter = new AtomicInteger(1);
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Method used to ensure consistency between internal atomic integer and 
+     * vertex id from imported graphs. The latter can be greater than the first, 
+     * thus requiring a reset of the atomic integer to a new, larger than 
+     * before, value.
+     * @param g
+     * @throws DENOPTIMException
+     */
+    public static synchronized void ensureVertexIDConsistency(int maxVIdInGrph) 
+            throws DENOPTIMException
+    {   
+        if (GraphUtils.getUniqueVertexIndex() <= maxVIdInGrph)
+        {
+            GraphUtils.resetUniqueVertexCounter(maxVIdInGrph+1);
+        }
+    }
+
+//------------------------------------------------------------------------------
 
     /**
      * Reset the unique vertex counter to the given value. In order to keep the
@@ -58,7 +77,7 @@ public class GraphUtils
      * value of the index.
      */
 
-    public static void resetUniqueVertexCounter(int val)
+    public static synchronized void resetUniqueVertexCounter(int val)
                                                         throws DENOPTIMException
     {
         if (vertexCounter.get() >= val)
@@ -86,17 +105,6 @@ public class GraphUtils
 //------------------------------------------------------------------------------
 
     /**
-     * @Deprecated should not be needed
-     */
-    @Deprecated
-    public static void updateVertexCounter(int num)
-    {
-        vertexCounter.set(num);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Reset the unique graph counter to the given value. In order to keep the
      * uniqueness on the index, this method accepts only reset values
      * that are higher that the current one. Attempts to reset to lower values
@@ -107,7 +115,8 @@ public class GraphUtils
      * value of the index.
      */
 
-    public static void resetUniqueGraphCounter(int val) throws DENOPTIMException
+    public static synchronized void resetUniqueGraphCounter(int val) 
+            throws DENOPTIMException
     {
         if (graphCounter.get() >= val)
         {
@@ -144,7 +153,7 @@ public class GraphUtils
      * value of the index.
      */
 
-    public static void resetUniqueMoleculeCounter(int val) 
+    public static synchronized void resetUniqueMoleculeCounter(int val) 
                                                         throws DENOPTIMException
     {
         if (molCounter.get() >= val)

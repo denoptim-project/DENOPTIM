@@ -335,18 +335,6 @@ public class CompatibilityMatrixForm extends JPanel {
 								String newAPC = GUIVertexInspector
 										.ensureGoodAPClassString("",
 										"Define new compatible APClass", false);
-	                			if (!newAPC.equals(srcAPClass) 
-	                					&& allAPClasses.contains(newAPC))
-	                			{
-	                				JOptionPane.showMessageDialog(null,
-	    		        					"<html>Class '<code>" + newAPC
-	    		        					+"</code>' is not new!</html>",
-	    		        	                "Error",
-	    		        	                JOptionPane.WARNING_MESSAGE,
-	    		        	                UIManager.getIcon(
-	    		        	                        "OptionPane.errorIcon"));
-	    		        			return;
-	                			}
 	                			APClass cls = APClass.make(newAPC);
 								trgCPClasses.add(cls);
 								allAPClasses.add(cls);
@@ -1668,7 +1656,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		} catch (DENOPTIMException e) {
 			JOptionPane.showMessageDialog(null,
 					"<html>Could not read compatibility matrix data from "
-					+ "file<br>'" + inFile + "'</html>",
+					+ "file<br>'" + inFile + "': " + e.getMessage() + "</html>",
 	                "Error",
 	                JOptionPane.WARNING_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));

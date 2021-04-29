@@ -453,11 +453,7 @@ public class DENOPTIMGraphOperations
                 symVerts.add(curVrtId);
             }
             
-            int maxVIdInGrph = molGraph.getMaxVertexId();
-            if (GraphUtils.getUniqueVertexIndex() <= maxVIdInGrph)
-            {
-                GraphUtils.resetUniqueVertexCounter(maxVIdInGrph+1);
-            }
+            GraphUtils.ensureVertexIDConsistency(molGraph.getMaxVertexId());
 
             // loop on all symmetric vertices, but can be only one.
             SymmetricSet newSymSetOfVertices = new SymmetricSet();

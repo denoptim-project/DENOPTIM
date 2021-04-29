@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.task.DenoptimGATask;
 import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.GUIInvokedMainTask;
@@ -127,6 +128,7 @@ public class GUIPrepare extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				File outFile = GUIFileOpener.pickFileForSaving(btnSaveParams);
 				printAllParamsToFile(outFile);
+				DenoptimIO.addToRecentFiles(outFile, getFileFormat("PARAMS"));
 			}
 		});
 		commandsPane.add(btnSaveParams);
@@ -160,6 +162,7 @@ public class GUIPrepare extends GUICardPanel
 						+ "the experiment will be terminated as well.</p><br>";
 				msg = msg + StaticTaskManager.getQueueSnapshot();
 				msg = msg + "<p>Continue?</p></body></html>";
+				//TODO: add capability of running in the background
 				String[] options = new String[]{"Yes", "Cancel"};
 				int res = JOptionPane.showOptionDialog(null,
 						String.format(msg, 450),
@@ -195,9 +198,11 @@ public class GUIPrepare extends GUICardPanel
 				                    JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						
 						JOptionPane.showMessageDialog(null,
 								"<html>Experiment submitted!<br>"
-								+ "See under " + location+"</html>",
+    								+ "See under " + location+"<br>"
+    								+ "or 'File -&gt; Open Recent'</html>",
 			                    "Submitted",
 			                    JOptionPane.INFORMATION_MESSAGE);
 						break;
@@ -302,6 +307,43 @@ public class GUIPrepare extends GUICardPanel
 		}
 		return baseName;
 	}
+	
+//------------------------------------------------------------------------------
+	
+    private FileFormat getFileFormat(String string)
+    {
+        
+        if (this instanceof GUIPrepareGARun)
+        {
+            switch(string)
+            {
+                case "PARAMS":
+                    return FileFormat.GA_PARAM;
+                case "RUN":
+                    return FileFormat.GA_RUN;
+                default:
+                    throw new IllegalArgumentException("BUG: GUIPrepare* must "
+                            + "declare what kind of recent file to store. "
+                            + "Current declaration is not valid. Report this "
+                            + "to the development team.");
+            }
+        } else if (this instanceof GUIPrepareFSERun)
+        {
+            switch(string)
+            {
+                case "PARAMS":
+                    return FileFormat.FSE_PARAM;
+                case "RUN":
+                    return FileFormat.FSE_PARAM;
+                default:
+                    throw new IllegalArgumentException("BUG: GUIPrepare* must "
+                            + "declare what kind of recent file to store. "
+                            + "Current declaration is not valid. Report this "
+                            + "to the development team.");
+            }
+        }
+        return null;
+    }
 	
 //------------------------------------------------------------------------------
 	
