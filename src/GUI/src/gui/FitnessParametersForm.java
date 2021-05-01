@@ -998,7 +998,7 @@ public class FitnessParametersForm extends ParametersForm
     public void putParametersToString(StringBuilder sb) throws Exception
     {
     	sb.append(NL);
-        sb.append("# Fitness Provider - paramerers").append(NL);
+        sb.append("# Fitness Provider - parameters").append(NL);
         if (rdbIntOrExt.isSelected())
         {
 	        sb.append(getStringIfNotEmpty(keyFitProviderSource,

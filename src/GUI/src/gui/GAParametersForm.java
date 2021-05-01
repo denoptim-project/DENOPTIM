@@ -1028,7 +1028,7 @@ public class GAParametersForm extends ParametersForm
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
-    	sb.append("# Genetic Algorithm - paramerers").append(NL);
+    	sb.append("# Genetic Algorithm - parameters").append(NL);
     	
         if (rdbSrcOrNew.isSelected())
         {
