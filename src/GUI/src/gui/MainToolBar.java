@@ -380,7 +380,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		usrManual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		    	try {
-		    		String url = "http://htmlpreview.github.com/?https://"
+		    		String url = "http://htmlpreview.github.io/?https://"
 		    				+ "github.com/denoptim-project/DENOPTIM/blob/"
 		    				+ "master/doc/user_manual.html";
                     Desktop.getDesktop().browse(new URI(url));
