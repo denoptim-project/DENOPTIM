@@ -53,17 +53,21 @@ import denoptim.utils.TaskUtils;
  */
 public class ParallelEvolutionaryAlgorithm
 {
+	final ExternalCmdsListener cmdListener;
     final List<Future<Object>> futures;
     final ArrayList<OffspringEvaluationTask> submitted;
     final ThreadPoolExecutor tcons;
 
     private Throwable ex;
+    
+    private boolean stopped = false;
    
     private final String fsep = System.getProperty("file.separator");
  
-    public ParallelEvolutionaryAlgorithm()
+    public ParallelEvolutionaryAlgorithm(ExternalCmdsListener cmdListener)
     {
-        futures = new ArrayList<>();
+    	this.cmdListener = cmdListener;
+    	futures = new ArrayList<>();
         submitted = new ArrayList<>();
 
         tcons = new ThreadPoolExecutor(GAParameters.getNumberOfCPU(),
@@ -121,7 +125,6 @@ public class ParallelEvolutionaryAlgorithm
                 }
             }
         });
-
     }
 
 //------------------------------------------------------------------------------
@@ -130,6 +133,7 @@ public class ParallelEvolutionaryAlgorithm
     {
         cleanup(tcons, futures, submitted);
         tcons.shutdown();
+        stopped = true;
     }
 
 //------------------------------------------------------------------------------
@@ -157,6 +161,8 @@ public class ParallelEvolutionaryAlgorithm
 
     public void runGA() throws DENOPTIMException
     {
+    	cmdListener.setReferenceToRunningAlgorithm(this);
+    	
         StopWatch watch = new StopWatch();
              watch.start();
 
@@ -236,6 +242,11 @@ public class ParallelEvolutionaryAlgorithm
 
         while (curGen <= GAParameters.getNumberOfGenerations())
         {
+        	if (stopped)
+        	{
+        		break;
+        	}
+        	
             DENOPTIMLogger.appLogger.log(Level.INFO,
                                         "Starting Generation {0}\n", curGen);
 
@@ -310,15 +321,14 @@ public class ParallelEvolutionaryAlgorithm
         }
 
 
-
         // sort the population
         Collections.sort(molPopulation, Collections.reverseOrder());
-        if (GAParameters.getReplacementStrategy() == 1)
+        
+        // trim the population to the desired size
+        if (GAParameters.getReplacementStrategy() == 1
+        		&& molPopulation.size()>GAParameters.getPopulationSize())
         {
-
             int k = molPopulation.size();
-
-            // trim the population to the desired size
             molPopulation.subList(GAParameters.getPopulationSize(), k).clear();
         }
 
@@ -388,6 +398,11 @@ public class ParallelEvolutionaryAlgorithm
         {
             while (true)
             {
+            	if (stopped)
+            	{
+            		break;
+            	}
+            	
                 if (checkForException())
                 {
                     stopRun();
@@ -1037,6 +1052,11 @@ public class ParallelEvolutionaryAlgorithm
         {
             while (true)
             {
+            	if (stopped)
+            	{
+            		break;
+            	}
+            	
                 if (checkForException())
                 {
                     stopRun();

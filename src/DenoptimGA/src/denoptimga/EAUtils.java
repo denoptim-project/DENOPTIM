@@ -119,7 +119,7 @@ public class EAUtils
     {
         StringBuilder sb = new StringBuilder(512);
 
-                //Headers
+        //Headers
         sb.append(String.format("%-20s", "#Name "));
         sb.append(String.format("%-20s", "GraphId "));
         sb.append(String.format("%-30s", "UID "));
@@ -130,7 +130,7 @@ public class EAUtils
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
         df.setMinimumFractionDigits(GAParameters.getPrecisionLevel());
 
-        for (int i=0; i<GAParameters.getPopulationSize(); i++)
+        for (int i=0; i<popln.size(); i++)
         {
             DENOPTIMMolecule mol = popln.get(i);
             if (mol != null)
@@ -204,7 +204,7 @@ public class EAUtils
             scf_cntr.put(i, 0);
         }
 
-        for (int i=0; i<GAParameters.getPopulationSize(); i++)
+        for (int i=0; i<popln.size(); i++)
         {
             DENOPTIMMolecule mol = popln.get(i);
             DENOPTIMGraph g = mol.getMoleculeGraph();
@@ -500,7 +500,7 @@ public class EAUtils
 
         try
         {
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
+            for (int i=0; i<popln.size(); i++)
             {
                 String sdfile = popln.get(i).getMoleculeFile();
                 String imgfile = popln.get(i).getImageFile();

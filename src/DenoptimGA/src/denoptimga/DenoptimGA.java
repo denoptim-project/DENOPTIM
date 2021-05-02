@@ -18,12 +18,22 @@
 
 package denoptimga;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GenUtils;
-import fragspaceexplorer.FSEParameters;
 
 /**
  *
@@ -31,6 +41,13 @@ import fragspaceexplorer.FSEParameters;
  */
 public class DenoptimGA
 {
+	/*
+	 * Runs the thread with the listener that accepts instructions from outside.
+	 */
+	//TODO: this is static for now, but will have to become thread-specific
+	private static ExecutorService executor;
+	
+	private static Future<?> futureWatchers;
 
 //------------------------------------------------------------------------------
 
@@ -65,6 +82,7 @@ public class DenoptimGA
         }
         EvolutionaryAlgorithm evoGA;
         ParallelEvolutionaryAlgorithm pGA = null;
+        ExternalCmdsListener ecl = null;
         try
         {	
             GAParameters.readParameterFile(configFile);
@@ -72,14 +90,21 @@ public class DenoptimGA
             GAParameters.processParameters();
             GAParameters.printParameters();
             
+            ecl = new ExternalCmdsListener(
+            		Paths.get(GAParameters.interfaceDir));
+            executor = Executors.newSingleThreadExecutor();
+            futureWatchers = executor.submit(ecl);
+            executor.shutdown();
+            
             if (GAParameters.parallelizationScheme == 1)
             {
                 evoGA = new EvolutionaryAlgorithm();
+                //TODO add ecl, or wait until the two classes have been merged
                 evoGA.runGA();
             }
             else
             {
-                pGA = new ParallelEvolutionaryAlgorithm();
+                pGA = new ParallelEvolutionaryAlgorithm(ecl);
                 pGA.runGA();
             }
 
@@ -90,14 +115,37 @@ public class DenoptimGA
             {
                 pGA.stopRun();
             }
+            stopExternalCmdListener(ecl);
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
             GenUtils.printExceptionChain(t);
             throw new DENOPTIMException("Error in DenootimGA run.", t);
         }
 
+        stopExternalCmdListener(ecl);
         // normal completion: do NOT call System exit(0) as we might be calling
         // this main from another thread, which would be killed as well.
     }
+
+//------------------------------------------------------------------------------
+    
+	private static void stopExternalCmdListener(ExternalCmdsListener ecl) 
+	{
+        if (executor != null)
+        {
+            try {
+				executor.awaitTermination(2, TimeUnit.SECONDS);
+				ecl.closeWatcher();
+                futureWatchers.cancel(true);
+                executor.awaitTermination(1, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				// we'll kill it anyway
+			} catch (IOException e) {
+				// we'll kill it anyway
+			}
+            executor.shutdownNow();
+            executor = null;
+        }
+	}
     
 //------------------------------------------------------------------------------        
 

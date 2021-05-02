@@ -52,6 +52,13 @@ public class GAParameters
      * Pathname to the working directory for the current run
      */
     protected static String dataDir = System.getProperty("user.dir");
+    
+    /**
+     * Pathname to the interface directory for the current run. This is the
+     * pathname that is watched for external instructions
+     */
+    protected static String interfaceDir = dataDir 
+    		+ System.getProperty("file.separator") + "interface";
 
     /**
      * Pathname of user defined parameters
@@ -815,6 +822,12 @@ public class GAParameters
             String str = "RUN" + sdf.format(new Date());
             dataDir = cdataDir + fileSep + str;
             success = DenoptimIO.createDirectory(dataDir);
+        }
+        interfaceDir = dataDir + fileSep + "interface";
+        if (!DenoptimIO.createDirectory(interfaceDir))
+        {
+        	throw new DENOPTIMException("ERROR! Unable to make interface "
+        			+ "folder");
         }
     }
 
