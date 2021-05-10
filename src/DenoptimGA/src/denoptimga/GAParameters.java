@@ -591,7 +591,7 @@ public class GAParameters
                     continue;
                 }
 
-                if (line.toUpperCase().startsWith("GA-SORTBYINCREASINGFITNESS="))
+                if (line.toUpperCase().startsWith("GA-SORTBYINCREASINGFITNESS"))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)

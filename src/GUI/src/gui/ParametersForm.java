@@ -234,7 +234,8 @@ public class ParametersForm extends JPanel implements IParametersForm
     	StringBuilder sb = new StringBuilder();
     	if (btn.isSelected())
     	{
-    		sb.append(key).append("=").append("SELECTED_by_GUI").append(NL);
+    		//sb.append(key).append("=").append("SELECTED_by_GUI").append(NL);
+    		sb.append(key).append(NL);
     	}
     	return sb.toString();
     }

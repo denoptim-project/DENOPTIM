@@ -720,15 +720,15 @@ public class RingClosureParameters
             rccIndex = value;
             break;
         case "RC-RCCFOLDER=":
-	    serializeRCCs = true;
+        	serializeRCCs = true;
             rccFolder = value;
             break;
         case "RC-EXHAUSTIVECONFSEARCH":
-	    exhaustiveConfSrch = true;
-	    break;
+        	exhaustiveConfSrch = true;
+        	break;
         case "RC-CHECKINTERDEPENDENTCHAINS":
-	    checkInterdepPaths = true;
-	    break;
+        	checkInterdepPaths = true;
+        	break;
         default:
             msg = "Keyword '" + key + "' is not a known ring closure-"
                                       + "related keyword. Check input files.";
