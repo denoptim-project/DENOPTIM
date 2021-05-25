@@ -459,6 +459,9 @@ Serializable, Cloneable
 
 //------------------------------------------------------------------------------    
     
+    /**
+     * Clear the graph describing this candidate
+     */
     public void cleanup()
     {
         if (graph != null)
