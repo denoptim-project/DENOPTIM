@@ -344,9 +344,9 @@ public class CombinatorialExplorerByLayer
                   + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
             
-            if (DenoptimIO.checkExists(FSEParameters.getDBRoot()))
+            if (!DenoptimIO.checkExists(FSEUtils.getNameOfStorageDir(level)))
             {
-            	msg = "ERROR! Folder '" + FSEParameters.getDBRoot() 
+            	msg = "ERROR! Folder '" + FSEUtils.getNameOfStorageDir(level) 
             			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
             			+ "provide the pathname to the existing folder where "
             			+ "the previously generated graphs are located.";
