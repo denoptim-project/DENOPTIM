@@ -517,7 +517,7 @@ public class FragmentSpace
 
     public static ArrayList<String> getCompatibleAPClasses(String query)
     {
-	return compatMap.get(query);
+    	return compatMap.get(query);
     } 
 
 //------------------------------------------------------------------------------
@@ -833,9 +833,14 @@ public class FragmentSpace
 		ArrayList<String> compatMapRow = 
 		     FragmentSpace.getCompatibleAPClasses(srcApCls);
 		
+		if (compatMapRow == null)
+		{
+			return compatFragAps;
+		}
+		
 		// Ensure uniqueness
-		//TODO: all this would be much easier with the use of the APClass
 		ArrayList<String> compatApClasses = new ArrayList<String>();
+		//TODO: all this would be much easier with the use of the APClass
 		for (String c : compatMapRow)
 		{
 			if (!compatApClasses.contains(c))
