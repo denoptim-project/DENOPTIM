@@ -128,7 +128,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Identifier for the format of string representations of a graph
      */
-    public enum StringFormat {JSON, GraphENC}
+    public enum StringFormat {JSON, GRAPHENC}
 
 
 //------------------------------------------------------------------------------

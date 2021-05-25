@@ -62,7 +62,7 @@ public class StringConverter
                 ArrayList<String> lines = DenoptimIO.readList(inpFileName);
                 switch (inpFormat) 
                 {
-                    case GraphENC:
+                    case GRAPHENC:
                         if (lines.size() > 1) 
                         {
                             System.out.println("ERROR! "
@@ -97,7 +97,7 @@ public class StringConverter
             DENOPTIMGraph g = null;
             switch (inpFormat) 
             {
-                case GraphENC:
+                case GRAPHENC:
                     g = GraphConversionTool.getGraphFromString(input);
                     break;
                     
@@ -156,7 +156,7 @@ public class StringConverter
             String output = "";
             switch (outFormat) 
             {
-                case GraphENC:
+                case GRAPHENC:
                     output = g.toString();
                     break;
                     

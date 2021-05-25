@@ -36,7 +36,7 @@ public class StringConverterParameters
     /**
      * Input file format
      */
-    protected static StringFormat inpFormat = StringFormat.GraphENC;
+    protected static StringFormat inpFormat = StringFormat.GRAPHENC;
 
     /**
      * Output file 
