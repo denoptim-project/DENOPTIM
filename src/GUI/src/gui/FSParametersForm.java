@@ -1330,7 +1330,7 @@ public class FSParametersForm extends ParametersForm
     {
     	possiblyReadParamsFromFSParFile();
     	
-        sb.append("# Fragment Space - paramerers").append(NL);
+        sb.append("# Fragment Space - parameters").append(NL);
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(getStringIfNotEmpty(keyPar2,txtPar2));
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));

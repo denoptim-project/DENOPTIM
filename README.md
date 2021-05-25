@@ -23,7 +23,7 @@ where <code>&lt;program.jar&gt;</code> is the JAR file of the program you what t
 Complete examples of DENOPTIM experiments running the genetic algorithm or the virtual screening tool can be found under the test folder at [test/PtCOLX2](./test/PtCOLX2) and [test/PtCOLX2_FSE](./test/PtCOLX2_FSE) respectively.
 
 ## User Manual
-The complete user manual is available under the <code>doc</code> folder and is accessible [on line](http://htmlpreview.github.com/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
+The complete user manual is available under the <code>doc</code> folder and is accessible [on line](http://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html)
 
 ## Content of the source code folder tree
 

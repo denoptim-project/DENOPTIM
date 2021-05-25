@@ -560,7 +560,7 @@ public class FSEParametersForm extends ParametersForm
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
-    	sb.append("# FragSpaceExplorer - paramerers").append(NL);
+    	sb.append("# FragSpaceExplorer - parameters").append(NL);
     	
         if (rdbSrcOrNew.isSelected())
         {
