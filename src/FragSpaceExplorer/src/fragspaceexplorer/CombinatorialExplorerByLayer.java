@@ -341,10 +341,18 @@ public class CombinatorialExplorerByLayer
                   + ".txt')."
                   + DENOPTIMConstants.EOL
                   + "Now reading '" + DENOPTIMConstants.SERGFILENAMEEXT + "' "
-                  + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'. "
-                  + "The path to this folder can be controlled by using " 
-                  + "'FSE-DBROOTFOLDER'.";
+                  + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+            
+            if (DenoptimIO.checkExists(FSEUtils.getNameOfStorageDir(level)))
+            {
+            	msg = "ERROR! Folder '" + FSEUtils.getNameOfStorageDir(level) 
+            			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
+            			+ "provide the pathname to the existing folder where "
+            			+ "the previously generated graphs are located.";
+                DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+            	throw new DENOPTIMException(msg);
+            }
 
             Collection<File> lst = FileUtils.listFiles(
             		new File(FSEUtils.getNameOfStorageDir(level)),
