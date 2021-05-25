@@ -289,6 +289,9 @@ public class FragmentSpaceParameters
         case "FS-ENFORCESYMMETRY":
 		    enforceSymmetry = true;
 		    break;
+        case "FS-ENFORCESYMMETRY=":
+		    enforceSymmetry = true;
+		    break;
 	case "FS-CONSTRAINSYMMETRY=":
 	    symmetryConstraints = true;
 	    try
