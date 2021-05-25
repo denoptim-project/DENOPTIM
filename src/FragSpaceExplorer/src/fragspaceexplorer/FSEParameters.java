@@ -459,6 +459,7 @@ public class FSEParameters
             }
             break;
 		case "FSE-DBROOTFOLDER=":
+			//NB: this key 'FSE-DBROOTFOLDER' is hard coded also in CombinatorialExplorerByLayer
 		    dbRootDir = value;
 		    break;
         case "FSE-NUMOFPROCESSORS=":

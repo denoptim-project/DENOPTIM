@@ -338,7 +338,12 @@ public class CombinatorialExplorerByLayer
                   + chk.getLatestSafelyCompletedGraphId()
                   + ". You can find them in the "
                   + "index file ('" + DENOPTIMConstants.FSEIDXNAMEROOT + level
-                  + ".txt'). ";
+                  + ".txt')."
+                  + DENOPTIMConstants.EOL
+                  + "Now reading '" + DENOPTIMConstants.SERGFILENAMEEXT + "' "
+                  + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'. "
+                  + "The path to this folder can be controlled by using " 
+                  + "'FSE-DBROOTFOLDER'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
 
             Collection<File> lst = FileUtils.listFiles(
