@@ -1979,8 +1979,10 @@ MF: TO BE TESTED
             if (lstRcn == null)
             {
                 String msg = "No matching class found for " + rcn;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
+                DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                //throw new DENOPTIMException(msg);
+                
+                return new IdFragmentAndAP(-1,fid,1,apid,-1,-1);
             }
 
             if(lstRcn.size() == 1)
