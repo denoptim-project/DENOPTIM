@@ -53,17 +53,21 @@ import denoptim.utils.TaskUtils;
  */
 public class ParallelEvolutionaryAlgorithm
 {
+	final ExternalCmdsListener cmdListener;
     final List<Future<Object>> futures;
     final ArrayList<OffspringEvaluationTask> submitted;
     final ThreadPoolExecutor tcons;
 
     private Throwable ex;
+    
+    private boolean stopped = false;
    
     private final String fsep = System.getProperty("file.separator");
  
-    public ParallelEvolutionaryAlgorithm()
+    public ParallelEvolutionaryAlgorithm(ExternalCmdsListener cmdListener)
     {
-        futures = new ArrayList<>();
+    	this.cmdListener = cmdListener;
+    	futures = new ArrayList<>();
         submitted = new ArrayList<>();
 
         tcons = new ThreadPoolExecutor(GAParameters.getNumberOfCPU(),
@@ -130,6 +134,7 @@ public class ParallelEvolutionaryAlgorithm
     {
         cleanup(tcons, futures, submitted);
         tcons.shutdown();
+        //TODO-M2stopped = true;
     }
 
 //------------------------------------------------------------------------------
@@ -157,6 +162,8 @@ public class ParallelEvolutionaryAlgorithm
 
     public void runGA() throws DENOPTIMException
     {
+    	cmdListener.setReferenceToRunningAlgorithm(this);
+    	
         StopWatch watch = new StopWatch();
              watch.start();
 
@@ -236,6 +243,13 @@ public class ParallelEvolutionaryAlgorithm
 
         while (curGen <= GAParameters.getNumberOfGenerations())
         {
+        	//TODO-M2
+        	/*
+        	if (stopped)
+        	{
+        		break;
+        	}*/
+        	
             DENOPTIMLogger.appLogger.log(Level.INFO,
                                         "Starting Generation {0}\n", curGen);
 
@@ -388,6 +402,14 @@ public class ParallelEvolutionaryAlgorithm
         {
             while (true)
             {
+            	//TODO-M2
+            	/*
+            	if (stopped)
+            	{
+            		break;
+            	}
+            	*/
+            	
                 if (checkForException())
                 {
                     stopRun();
@@ -1037,6 +1059,14 @@ public class ParallelEvolutionaryAlgorithm
         {
             while (true)
             {
+            	//TODO-M2
+            	/*
+            	if (stopped)
+            	{
+            		break;
+            	}
+            	*/
+            	
                 if (checkForException())
                 {
                     stopRun();
