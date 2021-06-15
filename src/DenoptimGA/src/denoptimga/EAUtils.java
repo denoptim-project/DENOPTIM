@@ -545,6 +545,12 @@ public class EAUtils
         {
             mols = DenoptimIO.readLinksToMols(filename);
         }
+        if (mols.size() == 0)
+        {
+        	String msg = "Found 0 candidates in file " + filename;
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            throw new DENOPTIMException(msg);
+        }
 
         String fsep = System.getProperty("file.separator");
 
@@ -639,9 +645,10 @@ public class EAUtils
 
         if (molPopulation.isEmpty())
         {
-            DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                                        "No data found in file {0}", filename);
-            throw new DENOPTIMException("No data found in file " + filename);
+        	String msg = "Population is still empty after having processes "
+        			+ mols.size() + " candidates from file " + filename;
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            throw new DENOPTIMException(msg);
         }
 
         setVertexCounterValue(molPopulation);

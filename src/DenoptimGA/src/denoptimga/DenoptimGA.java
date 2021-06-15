@@ -98,8 +98,7 @@ public class DenoptimGA
             
             if (GAParameters.parallelizationScheme == 1)
             {
-                evoGA = new EvolutionaryAlgorithm();
-                //TODO add ecl, or wait until the two classes have been merged
+                evoGA = new EvolutionaryAlgorithm(ecl);
                 evoGA.runGA();
             }
             else

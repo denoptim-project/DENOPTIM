@@ -35,7 +35,7 @@ public class ExternalCmdsListener implements Runnable
 	private final Path pathname;
     private final WatchService watcher;
     private final WatchKey key;
-    
+    private EvolutionaryAlgorithm ea;
     private ParallelEvolutionaryAlgorithm pea;
     
 //------------------------------------------------------------------------------
@@ -124,10 +124,19 @@ public class ExternalCmdsListener implements Runnable
 		{
 			if (line.startsWith("STOP_GA"))
 			{
+				//TODO-M del
+				System.out.println("STIPPING request from file "+file);
 				DENOPTIMLogger.appLogger.log(Level.SEVERE, "GA run will be "
 						+ "stopped upon external request from '"  
 		        		+ file.getAbsolutePath() + "'.");
-				pea.stopRun();
+				if (ea != null)
+				{
+					ea.stopRun();
+				}	
+				if (pea != null)
+				{
+					pea.stopRun();
+				}
 			}
 			//TODO: add removal on one population member and its downstream relatives
 		}
@@ -141,10 +150,17 @@ public class ExternalCmdsListener implements Runnable
     }
     
 //------------------------------------------------------------------------------
-    
+    //TODO, make interface for algorithms or eait untim parallel and normal evolutionaty algorithms have been merged
     public void setReferenceToRunningAlgorithm(ParallelEvolutionaryAlgorithm pea)
     {
     	this.pea = pea;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public void setReferenceToRunningEAlgorithm(EvolutionaryAlgorithm ea)
+    {
+    	this.ea = ea;
     }
     
 //------------------------------------------------------------------------------

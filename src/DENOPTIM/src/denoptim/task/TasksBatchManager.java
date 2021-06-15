@@ -38,6 +38,10 @@ import denoptim.molecule.DENOPTIMMolecule;
  */
 public class TasksBatchManager
 {
+	private static ArrayList<Task> taskList;
+	private static ExecutorService eservice;
+	private static CompletionService<Object> cservice;
+	private static List<Future<Object>> futures;
 
 //------------------------------------------------------------------------------
 
@@ -53,6 +57,7 @@ public class TasksBatchManager
             executeTasks(final ArrayList<Task> tasks, int numOfProcessors)
                                                         throws DENOPTIMException
     {
+    	taskList = tasks;
         int numOfJobs = tasks.size();
 
         int n = Math.min(numOfJobs, numOfProcessors);
@@ -62,10 +67,9 @@ public class TasksBatchManager
         // the ExecutorService is created with as many threads in the pool as
         // available processors.
         
-        final ExecutorService eservice = Executors.newFixedThreadPool(n);
-        CompletionService<Object> cservice = new ExecutorCompletionService<>(eservice);
-
-        final List<Future<Object>> futures = new ArrayList<>();
+        eservice = Executors.newFixedThreadPool(n);
+        cservice = new ExecutorCompletionService<>(eservice);
+        futures = new ArrayList<>();
 
         for (int i=0; i<numOfJobs; i++)
         {
@@ -120,6 +124,10 @@ public class TasksBatchManager
         {
             for (int i=0; i<tasks.size(); i++)
             {
+            	if (cservice.take().isCancelled())
+            	{
+            		continue;
+            	}
                 DENOPTIMMolecule taskResult =
                                     (DENOPTIMMolecule) cservice.take().get();
                 if (!taskResult.getMoleculeUID().equals("UNDEFINED"))
@@ -152,6 +160,35 @@ public class TasksBatchManager
 
         return results;
     }
+
+//------------------------------------------------------------------------------
+    
+	public static void stop() 
+	{
+         try
+         {
+    		 eservice.shutdown(); // Disable new tasks from being submitted
+             for (Task tsk : taskList)
+             {
+                 tsk.stopTask();
+             }
+        	 for (Future<Object> f : futures)
+             {
+                 f.cancel(true);
+             }
+        	 
+             // Wait a while for existing tasks to terminate
+             if (!eservice.awaitTermination(5, TimeUnit.SECONDS))
+             {
+                 eservice.shutdownNow(); // Cancel currently executing tasks
+             }
+         }
+         catch (InterruptedException ie)
+         {   
+             // (Re-)Cancel if current thread also interrupted
+             eservice.shutdownNow();
+         }
+	}
 
 //------------------------------------------------------------------------------
 

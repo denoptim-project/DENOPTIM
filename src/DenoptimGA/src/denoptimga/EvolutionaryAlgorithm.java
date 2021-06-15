@@ -21,6 +21,9 @@ package denoptimga;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FilenameUtils;
@@ -50,13 +53,25 @@ import denoptim.utils.TaskUtils;
  * @author Vishwesh Venkatraman
  */
 
-
 public class EvolutionaryAlgorithm
-{
+{   
+	final ExternalCmdsListener cmdListener;
+    private boolean stopped = false;
     private final String fsep = System.getProperty("file.separator");
+ 
+//------------------------------------------------------------------------------
+
+    public EvolutionaryAlgorithm(ExternalCmdsListener cmdListener)
+    {
+    	this.cmdListener = cmdListener;
+    }
+
+//------------------------------------------------------------------------------
 
     public void runGA() throws DENOPTIMException
     {
+    	cmdListener.setReferenceToRunningEAlgorithm(this);
+    	
         StopWatch watch = new StopWatch();
              watch.start();
         
@@ -133,6 +148,11 @@ public class EvolutionaryAlgorithm
 
         while (curGen <= GAParameters.getNumberOfGenerations())
         {
+        	if (stopped)
+        	{
+        		break;
+        	}
+        	
             DENOPTIMLogger.appLogger.log(Level.INFO,
                                         "Starting Generation {0}\n", curGen);
 
@@ -143,7 +163,6 @@ public class EvolutionaryAlgorithm
             sb.setLength(0);
                     
             DenoptimIO.createDirectory(genDir);
-
 
             // create a new generation
             // update the population, by replacing weakest members
@@ -244,6 +263,11 @@ public class EvolutionaryAlgorithm
 
         while (molPopulation.size() < n)
         {
+        	if (stopped)
+        	{
+        		break;
+        	}
+        	
             DENOPTIMGraph graph1 = null, graph2 = null, graph3 = null,
                     graph4 = null;
             Xop = -1;
@@ -797,6 +821,11 @@ public class EvolutionaryAlgorithm
 
         while (molPopulation.size() < GAParameters.getPopulationSize())
         {
+        	if (stopped)
+        	{
+        		break;
+        	}
+        	
             if (numTries == MAX_TRIES)
                 break;
 
@@ -913,6 +942,14 @@ GenUtils.pause();
 
         // sort population by fitness
         Collections.sort(molPopulation, Collections.reverseOrder());
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void stopRun()
+    {
+    	TasksBatchManager.stop();
+        stopped = true;
     }
 
 //------------------------------------------------------------------------------
