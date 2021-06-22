@@ -145,7 +145,8 @@ public class FitnessParametersForm extends ParametersForm
     JPanel pnlDDValueParams;
     JLabel lblDDValueParams;
     JButton btnDDValueParams;
-    private int numberOfParams;
+    private String descNameToTune = "";
+    private String[] paramsToTune;
     JLabel lblDDValueSource;
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
@@ -471,15 +472,16 @@ public class FitnessParametersForm extends ParametersForm
 						paramsTypes.add(parTyp);
 					}
 				}
+                descNameToTune = dff.getShortName();
 				if (paramsTypes.size() == 0)
 				{
                     btnDDValueParams.setEnabled(false);
                     btnDDValueParams.setVisible(false);
-                    numberOfParams = 0;
+                    paramsToTune = new String[0];
 				} else {
 				    btnDDValueParams.setEnabled(true);
 				    btnDDValueParams.setVisible(true);
-				    numberOfParams = paramsTypes.size();
+				    paramsToTune = parNames;
 				}
 				for (Object parTypeExample : paramsTypes)
 				{
@@ -636,7 +638,8 @@ public class FitnessParametersForm extends ParametersForm
             public void actionPerformed(ActionEvent e)
             {
                 ParametrizedDescriptorDefinition dialog = 
-                        new ParametrizedDescriptorDefinition(numberOfParams);
+                        new ParametrizedDescriptorDefinition(descNameToTune,
+                                paramsToTune);
                 Object[] res = (Object[]) dialog.showDialog();
                 if (res!=null)
                 {
@@ -1025,8 +1028,8 @@ public class FitnessParametersForm extends ParametersForm
 //------------------------------------------------------------------------------
     
     private class ParametrizedDescriptorDefinition extends GUIModalDialog
-    {
-        public ParametrizedDescriptorDefinition(int tabSize)
+    {   
+        public ParametrizedDescriptorDefinition(String descName, String[] paramNames)
         {
             super();
             this.setBounds(150, 150, 500, 200);
@@ -1053,7 +1056,7 @@ public class FitnessParametersForm extends ParametersForm
                     + "name "
                     + "reported <br>in "
                     + "the collection of descriptors.</html>");
-            JTextField txtDescName = new JTextField();
+            JTextField txtDescName = new JTextField(descName);
             txtDescName.setPreferredSize(sizeNameFields);
             rowTwo.add(lblDescName);
             rowTwo.add(txtDescName);
@@ -1063,12 +1066,14 @@ public class FitnessParametersForm extends ParametersForm
             JLabel lblParams = new JLabel("Parameters:");
             String paramToolTip = "<html>The parameters provided in the "
                     + "order defined in the description <br> "
-                    + "of the descriptor.</html>";
+                    + "of the descriptor. Only the parameter value is needed, "
+                    + "not its name.</html>";
             lblParams.setToolTipText(paramToolTip);
             
             JTable tabParams;
             DefaultTableModel tabParamsMod = new DefaultTableModel();
             tabParamsMod.setColumnCount(1);
+            int tabSize = paramNames.length;
             tabParamsMod.setRowCount(tabSize);
             tabParams = new JTable(tabParamsMod);
             tabParams.setToolTipText(paramToolTip);
@@ -1100,7 +1105,19 @@ public class FitnessParametersForm extends ParametersForm
                         //NB: all params are collected into a single string!
                         for (int i=0; i<tabSize; i++)
                         {
-                            line = line + tabParamsMod.getValueAt(i,0);
+                            String s = tabParamsMod.getValueAt(i,0).toString()
+                                    .trim();
+                            if (s.contains(paramNames[i]))
+                            {
+                                s = s.replaceFirst(paramNames[i],"");
+                                s = s.trim();
+                                if (s.startsWith("="))
+                                {
+                                    s = s.replaceFirst("=","");
+                                    s = s.trim();
+                                }
+                            }
+                            line = line + s;
                             if (i<(tabSize-1))
                                 line = line  + ", ";
                         }
