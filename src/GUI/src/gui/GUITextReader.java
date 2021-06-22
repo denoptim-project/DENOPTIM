@@ -79,6 +79,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.Candidate;
+import gui.GUICardPanel.removeCardActionListener;
 
 
 /**
@@ -136,6 +137,14 @@ public class GUITextReader extends GUICardPanel
 		border.setTitleJustification(TitledBorder.CENTER);
 		txtPane.setBorder(border);
         this.add(txtPane,BorderLayout.CENTER);
+        
+
+        ButtonsBar commandsPane = new ButtonsBar();
+        this.add(commandsPane, BorderLayout.SOUTH);
+        JButton btnCanc = new JButton("Close Tab");
+        btnCanc.setToolTipText("Closes this FSERun Inspector.");
+        btnCanc.addActionListener(new removeCardActionListener(this));
+        commandsPane.add(btnCanc);
 	}
     
 //-----------------------------------------------------------------------------
