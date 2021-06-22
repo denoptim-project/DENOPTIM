@@ -10,7 +10,8 @@ public enum FileFormat {
     
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
-    GA_PARAM, FSE_PARAM, COMP_MAP;
+    GA_PARAM, FSE_PARAM, COMP_MAP,
+    TXT;
         
     private String extension = "";
     
@@ -84,6 +85,10 @@ public enum FileFormat {
         COMP_MAP.extension = "";
         COMP_MAP.definingRegex = new HashSet<String>(Arrays.asList(
                 "^RCN .*", "^RBO .*", "^CAP .*"));
+        
+        //------------------------------------
+        
+        TXT.extension = "";
     }
     
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,

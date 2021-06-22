@@ -989,8 +989,6 @@ public class DenoptimIO
      * Read list of data as text
      *
      * @param fileName
-     * @param ignoreEmpty if <code>true</code> the method is allowed to return
-     * an empty list if the file exists and is empty
      * @return list of data
      * @throws DENOPTIMException
      */
@@ -1040,6 +1038,39 @@ public class DenoptimIO
         }
 
         return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read text from file.
+     *
+     * @param fileName
+     * @return the text
+     * @throws DENOPTIMException
+     */
+    public static String readText(String fileName) throws DENOPTIMException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = null;
+        String line = null;
+        try {
+            br = new BufferedReader(new FileReader(fileName));
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append(NL);
+            }
+        } catch (IOException ioe) {
+            throw new DENOPTIMException(ioe);
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+
+        return sb.toString();
     }
 
 //------------------------------------------------------------------------------

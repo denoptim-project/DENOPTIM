@@ -1,10 +1,5 @@
 package denoptim.fitness.descriptors;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.fingerprint.BitSetFingerprint;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
@@ -217,7 +212,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     public String getDictionaryDefinition()
     {
         return "The Tanimoto Molecular Similarity is calculated between the "
-                + "a reference fingerprint given upon definition of the "
+                + "reference fingerprint given upon definition of the "
                 + "descriptor (see parameters), and a molecule given as "
                 + "argument when calculating the value of the descriptor. "
                 + "Fingerprint are obtained from the defined "

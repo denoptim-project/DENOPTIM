@@ -626,6 +626,12 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				mainPanel.add(fsei);
 				fsei.importFSERunData(file);
 				break;
+				
+            case TXT:
+                GUITextReader txt = new GUITextReader(mainPanel);
+                mainPanel.add(txt);
+                txt.displayContent(file);
+                break;
 			
 			default:
 				JOptionPane.showMessageDialog(null,

@@ -156,7 +156,7 @@ public class FitnessParametersForm extends ParametersForm
         Class<?> key = IBitFingerprint.class;
         additionalDocForParameters.put(key,
                 "<p>The <code>" + key.getSimpleName() + "</code> parameter can "
-                + "generated "
+                + "be generated "
                 + "when importing the descriptor into the fitness provider. "
                 + "To this end, use the prefix '<code>FILE:</code>' to "
                 + "provide a pathname to an SDF file from which the "
