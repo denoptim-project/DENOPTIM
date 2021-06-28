@@ -30,6 +30,7 @@ import org.openscience.cdk.isomorphism.mcss.RMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -410,6 +411,22 @@ public class DENOPTIMGraphOperations
                 }
                 continue;
             }
+            
+            // Stop if graph is already too big
+            DENOPTIMVertex incomingVertex = 
+                    DENOPTIMVertex.newVertexFromLibrary(-1, 
+                            chosenFrgAndAp.getVertexMolId(), 
+                            BBType.FRAGMENT);
+            if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
+                    incomingVertex.getHeavyAtomsCount()) > 
+                        FragmentSpaceParameters.getMaxHeavyAtom())
+            {
+                if (debug)
+                {
+                    System.err.println("Graph is growing too large. Skipping AP.");
+                }
+                continue;
+            }
 
             // Decide on symmetric substitution within this vertex...
             boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
@@ -451,6 +468,18 @@ public class DENOPTIMGraphOperations
             else
             {
                 symVerts.add(curVrtId);
+            }
+            
+            // Consider size after application of symmetry
+            if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
+                    incomingVertex.getHeavyAtomsCount()*symVerts.size()*symAPs.size()) > 
+                        FragmentSpaceParameters.getMaxHeavyAtom())
+            {
+                if (debug)
+                {
+                    System.err.println("Graph is growing too large. Skipping AP.");
+                }
+                continue;
             }
             
             GraphUtils.ensureVertexIDConsistency(molGraph.getMaxVertexId());

@@ -1107,12 +1107,10 @@ public class EAUtils
         boolean isConnected = ConnectivityChecker.isConnected(mol);
         if (!isConnected)
         {
-            String msg = "Evaluation of graph: Not all connected" 
+            String msg = "Evaluation of graph: molecular representation has "
+                    + "multiple components. See graph " 
                                                         + molGraph.toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-            molGraph.cleanup();
-            mol.removeAllElements();
-            return null;
+            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
         }
 
         // hopefully the null shouldn't happen if all goes well

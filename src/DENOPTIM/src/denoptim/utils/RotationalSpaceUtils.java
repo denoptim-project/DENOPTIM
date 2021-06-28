@@ -72,7 +72,9 @@ public class RotationalSpaceUtils
      * 
      * @param mol the molecular structure
      * @param defRotBndsFile name of a text file with a list of SMARTS queries
-     * that defines which bonds are considered rotatable bonds
+     * that defines which bonds are considered rotatable bonds. This can be 
+     * an empty string, in which case, only inter-fragment connections will be 
+     * rotatable.
      * @param addIterfragBonds if <code>true</code> includes all inter-fragment 
      * connections
      * @param excludeRings if <code>true</code> cyclic bonds will be excluded
@@ -107,72 +109,75 @@ public class RotationalSpaceUtils
         }
         DENOPTIMMoleculeUtils.removeRCA(locMol);
 
-        // Get definition of rotational space as list of SMARTS queries
-        Map<String,String> listQueries = getRotationalSpaceDefinition(
-                                                               defRotBndsFile);
-
-        // Get bonds matching one of the definitions of rotatable bonds
-        ManySMARTSQuery msq = new ManySMARTSQuery(locMol,listQueries);
-        if (msq.hasProblems())
+        
+        if (!defRotBndsFile.equals(""))
         {
-            String msg = "WARNING! Attempt to match rotatable bonds returned "
-                         + "an error! Selecting only fragment-fragment "
-			 + "bonds. Details: " + msq.getMessage();
-            
-            //TODO-M9
-            msq.getProblem().printStackTrace();
-            
-            DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
-            return rotatableBonds;
-        }
-
-        //Transform list of indeces while excluding rings
-        for (String name : listQueries.keySet())
-        {
-            //Skip if no match
-            if (msq.getNumMatchesOfQuery(name) == 0)
+            // Get definition of rotational space as list of SMARTS queries
+            Map<String,String> listQueries = getRotationalSpaceDefinition(
+                                                                   defRotBndsFile);
+    
+            // Get bonds matching one of the definitions of rotatable bonds
+            ManySMARTSQuery msq = new ManySMARTSQuery(locMol,listQueries);
+            if (msq.hasProblems())
             {
-                continue;
-            }
-
-            //Put all matches in one list
-            Mappings matches = msq.getMatchesOfSMARTS(name);
-            for (int[] singleMatch : matches)
-            {
-                //Check assumption on number of atoms involved in each bond
-                if (singleMatch.length != 2)
-                {
-                    String msg = "DENOPTIM can only deal with bonds involving "
-                                + "2 atoms. Check bond " + singleMatch;
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                    throw new DENOPTIMException(msg);
-                }
-
-		//NOTE the index refers to the IAtomContainer locMol that is a
-		//clone of mol and hase the same atom order. Thus we use the
-		//atom idenx to identify atoms in mol rather than locMol.
+                String msg = "WARNING! Attempt to match rotatable bonds returned "
+                             + "an error! Selecting only fragment-fragment "
+    			 + "bonds. Details: " + msq.getMessage();
                 
-                int idAtmA = singleMatch[0];
-                int idAtmB = singleMatch[1];
-
-                // Compare with bonds already in the list
-                boolean alreadyThere = false;
-                for (ObjectPair op : rotatableBonds)
+                //TODO-M9
+                msq.getProblem().printStackTrace();
+                
+                DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+            } else {
+                //Transform list of indeces
+                for (String name : listQueries.keySet())
                 {
-                    int a1 = ((Integer)op.getFirst()).intValue();
-                    int a2 = ((Integer)op.getSecond()).intValue();
-                    if (((a1 == idAtmA) && (a2 == idAtmB)) ||
-                        ((a2 == idAtmA) && (a1 == idAtmB)))
+                    //Skip if no match
+                    if (msq.getNumMatchesOfQuery(name) == 0)
                     {
-                        alreadyThere = true;
-                        break;
+                        continue;
                     }
-                }
-                if (!alreadyThere)
-                {
-                    ObjectPair newRotBnd = new ObjectPair(new Integer(idAtmA),
-                                                          new Integer(idAtmB));
-                    rotatableBonds.add(newRotBnd);
+        
+                    //Put all matches in one list
+                    Mappings matches = msq.getMatchesOfSMARTS(name);
+                    for (int[] singleMatch : matches)
+                    {
+                        //Check assumption on number of atoms involved in each bond
+                        if (singleMatch.length != 2)
+                        {
+                            String msg = "DENOPTIM can only deal with bonds involving "
+                                        + "2 atoms. Check bond " + singleMatch;
+                            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                            throw new DENOPTIMException(msg);
+                        }
+        
+        		//NOTE the index refers to the IAtomContainer locMol that is a
+        		//clone of mol and has the same atom order. Thus we use the
+        		//atom idenx to identify atoms in mol rather than locMol.
+                        
+                        int idAtmA = singleMatch[0];
+                        int idAtmB = singleMatch[1];
+        
+                        // Compare with bonds already in the list
+                        boolean alreadyThere = false;
+                        for (ObjectPair op : rotatableBonds)
+                        {
+                            int a1 = ((Integer)op.getFirst()).intValue();
+                            int a2 = ((Integer)op.getSecond()).intValue();
+                            if (((a1 == idAtmA) && (a2 == idAtmB)) ||
+                                ((a2 == idAtmA) && (a1 == idAtmB)))
+                            {
+                                alreadyThere = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyThere)
+                        {
+                            ObjectPair newRotBnd = new ObjectPair(new Integer(idAtmA),
+                                                                  new Integer(idAtmB));
+                            rotatableBonds.add(newRotBnd);
+                        }
+                    }
                 }
             }
         }
