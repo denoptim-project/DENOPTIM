@@ -35,6 +35,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
 import denoptim.task.DenoptimGATask;
+import denoptim.task.FitnessProviderTestTask;
+import denoptim.task.FitnessTask;
 import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.GUIInvokedMainTask;
 import denoptim.task.StaticTaskManager;
@@ -288,25 +290,6 @@ public class GUIPrepare extends GUICardPanel
 		});
 		commandsPane.add(btnHelp);
 	}
-
-//------------------------------------------------------------------------------
-
-	/**
-	 * This will get the dafault name of the JAR file with "Main" class defined
-	 * for the kind of task we are submitting: DenoptimGA or FragSpaceEsplorer.
-	 */
-	private String getNameOfCorrespondingJAR()
-	{
-		String baseName = "some_name.jar";
-		if (this instanceof GUIPrepareGARun)
-		{
-			baseName = "DenoptimGA";
-		} else if (this instanceof GUIPrepareFSERun)
-		{
-			baseName = "FragSpaceExplorer";
-		}
-		return baseName;
-	}
 	
 //------------------------------------------------------------------------------
 	
@@ -322,7 +305,8 @@ public class GUIPrepare extends GUICardPanel
                 case "RUN":
                     return FileFormat.GA_RUN;
                 default:
-                    throw new IllegalArgumentException("BUG: GUIPrepare* must "
+                    throw new IllegalArgumentException("BUG: GUIPrepare"
+                            + "subclasses must "
                             + "declare what kind of recent file to store. "
                             + "Current declaration is not valid. Report this "
                             + "to the development team.");
@@ -336,7 +320,23 @@ public class GUIPrepare extends GUICardPanel
                 case "RUN":
                     return FileFormat.FSE_PARAM;
                 default:
-                    throw new IllegalArgumentException("BUG: GUIPrepare* must "
+                    throw new IllegalArgumentException("BUG: GUIPrepare"
+                            + "subclasses must "
+                            + "declare what kind of recent file to store. "
+                            + "Current declaration is not valid. Report this "
+                            + "to the development team.");
+            }
+        } else if (this instanceof GUITestFitnessProvider)
+        {
+            switch(string)
+            {
+                case "PARAMS":
+                    return FileFormat.FSE_PARAM;
+                case "RUN":
+                    return FileFormat.FSE_PARAM;
+                default:
+                    throw new IllegalArgumentException("BUG: GUIPrepare"
+                            + "subclasses must "
                             + "declare what kind of recent file to store. "
                             + "Current declaration is not valid. Report this "
                             + "to the development team.");
@@ -356,7 +356,10 @@ public class GUIPrepare extends GUICardPanel
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			baseName = "FSE";
-		}
+		} else if (this instanceof GUITestFitnessProvider)
+        {
+            baseName = "FP";
+        }
 		return baseName;
 	}
 	
@@ -442,6 +445,9 @@ public class GUIPrepare extends GUICardPanel
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			task = new FragSpaceExplorerTask();
+		} else if (this instanceof GUITestFitnessProvider)
+		{
+		    task = new FitnessProviderTestTask();
 		}
 		return task;
 	}

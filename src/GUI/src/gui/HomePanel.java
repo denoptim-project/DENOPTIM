@@ -161,6 +161,13 @@ public class HomePanel extends GUICardPanel
                 inspector.importFSERunData(file);
             }
         });
+        
+        JButton btnTestFitness = new JButton("Test Fitness Provider");
+        btnTestFitness.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.add(new GUITestFitnessProvider(mainPanel));
+            }
+        });
  
 		
 		//Credits panel
@@ -217,6 +224,8 @@ public class HomePanel extends GUICardPanel
         				.addComponent(btnNewGA)
         				.addComponent(btnNewVirtualScreening))
         		.addGroup(lyoCentralPanel.createSequentialGroup()
+                        .addComponent(btnTestFitness))
+        		.addGroup(lyoCentralPanel.createSequentialGroup()
         				.addComponent(btnReadGAOutput)
         				.addComponent(btnReadFSEOutput))
         		.addComponent(labEmpty));
@@ -230,32 +239,11 @@ public class HomePanel extends GUICardPanel
         				.addComponent(btnNewGA)
         				.addComponent(btnNewVirtualScreening))
         		.addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(btnTestFitness))
+        		.addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
         				.addComponent(btnReadGAOutput)
         				.addComponent(btnReadFSEOutput))
                 .addComponent(labEmpty));
-		
-
-		//TODO del: only for devel
-		/*
-		GUIInspectGARun eiPanel = 
-				new GUIInspectGARun(mainPanel);
-			mainPanel.add(eiPanel);
-			eiPanel.importGARunData(new java.io.File("/tmp/denoptim_PtCO/RUN21122019104034"));
-		*/
-		
-		//TODO del: only for devel
-		/*
-		GUIInspectFSERun inspector = new GUIInspectFSERun(mainPanel);
-		mainPanel.add(inspector);
-		inspector.importFSERunData(new File("/tmp/denoptim_FSE/FSE19122019014853"));
-		*/
-		
-		//TODO del: only for devel
-		/*
-		GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
-		mainPanel.add(cpmap);
-		cpmap.importCPMapFromFile(new File("/tmp/CPMap.par"));
-		*/
 		
 	}
 }

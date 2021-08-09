@@ -86,7 +86,8 @@ public class DescriptorUtils
                 File parentFolder = new File(System.getProperty("user.dir"));
                 if (pathName.endsWith("DenoptimGA.jar") 
                         || pathName.endsWith("FragSpaceExplorer.jar")
-                        || pathName.endsWith("GUI.jar"))
+                        || pathName.endsWith("GUI.jar")
+                        || pathName.endsWith("FitnessRunner.jar"))
                 {
                     File myClassPath = new File(pathName);
                     if (pathName.contains(FS))
@@ -104,10 +105,13 @@ public class DescriptorUtils
                 
                 File libFolder = new File(parentFolder.getAbsolutePath() 
                         + FS + "lib");
-                cands = libFolder.listFiles(fileFilter);
-                if (cands.length == 1)
+                if (libFolder.exists())
                 {
-                    jarPathName = cands[0].getAbsolutePath();
+                    cands = libFolder.listFiles(fileFilter);
+                    if (cands.length == 1)
+                    {
+                        jarPathName = cands[0].getAbsolutePath();
+                    }
                 }
             }
         }

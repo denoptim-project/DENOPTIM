@@ -146,7 +146,7 @@ public abstract class FitnessTask extends Task
 	            return result;
 	        }
         } else {
-        	// NB: the internal fitness provider removed dummy atoms before 
+        	// NB: the internal fitness provider removes dummy atoms before 
             // calculating CDK descriptors, so the 'fitProvMol' changes
         	if (!runInternalFitness())
 	        {

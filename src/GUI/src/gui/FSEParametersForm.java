@@ -51,7 +51,7 @@ public class FSEParametersForm extends ParametersForm
     /**
 	 * Version
 	 */
-	private static final long serialVersionUID = 5067352357196631445L;
+	private static final long serialVersionUID = 1L;
 	
     /**
      * Map connecting the parameter keyword and the field

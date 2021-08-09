@@ -34,7 +34,7 @@ public class GUIPrepareGARun extends GUIPrepare
 	/**
 	 * Version UID
 	 */
-	private static final long serialVersionUID = -2208699600683389219L;
+	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Unique identified for instances of this form

@@ -34,7 +34,7 @@ public class GUIPrepareFSERun extends GUIPrepare
 	/**
 	 * Version UID
 	 */
-	private static final long serialVersionUID = 2579606720045728971L;
+	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Unique identified for instances of this form
