@@ -61,7 +61,7 @@ public class FRParameters
     /**
      * File where the results of the fitness evaluation will be printed
      */
-    private static File outFile = null;
+    private static File outFile = new File("output.sdf");
     
     /**
      * Verbosity level
@@ -82,7 +82,7 @@ public class FRParameters
         frParamsInUse = false;
         workDir = System.getProperty("user.dir");
         inpFile = null;
-        outFile = null;
+        outFile = new File("output.sdf");
         verbosity = 0;
         
         FitnessParameters.resetParameters();        
@@ -197,6 +197,16 @@ public class FRParameters
 
         option = null;
         line = null;
+        
+        //NB: this is needed to use the workDir value without requiring a
+        // specific order in the input parameters, and because we might be
+        // asked to write in the "current directory" but what is actually meant
+        // is to write in the workDir
+        if (outFile != null && !outFile.isAbsolute())
+        {
+            outFile = new File(workDir + System.getProperty("file.separator")
+            + outFile.getPath());
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -296,10 +306,12 @@ public class FRParameters
     	    msg = "File with input data not found. Check " + inpFile;
                 throw new DENOPTIMException(msg);
     	}
-    	
+        
         if (outFile != null && outFile.exists())
         {
-            msg = "File meant for output results exists and we do not overwrite.";
+            msg = "File meant for output ("
+                    + outFile.getAbsolutePath()
+                    + ")already exists and we do not overwrite.";
             throw new DENOPTIMException(msg);
         }
 

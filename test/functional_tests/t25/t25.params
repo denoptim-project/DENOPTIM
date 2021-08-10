@@ -1,6 +1,10 @@
-FR-input=t25_in.sdf
-FR-output=t25_out.sdf
 
-FP-No3dTreeModel
+# Fitness Runner - parameters
+FR-Input=t25_in.sdf
+FR-Output=t25_out.sdf
+
+
+# Fitness Provider - parameters
 FP-Equation=${taniToGoal}
 FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:goal.sdf')}
+FP-No3dTreeModel

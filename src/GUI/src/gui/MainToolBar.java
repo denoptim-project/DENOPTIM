@@ -298,11 +298,14 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 					String[] options = {"Abandon", 
 					        "GA Parameters", 
 					        "FSE Parameters",
+                            "FR Parameters",
 					        "Compatibility Matrix",  
-							"GA Output", "FSE Output"};
+							"GA Output", 
+							"FSE Output"};
 					FileFormat[] ffOpts = {null, 
 					        FileFormat.GA_PARAM, 
 					        FileFormat.FSE_PARAM,
+                            FileFormat.FR_PARAM,
 					        FileFormat.COMP_MAP,
 					        FileFormat.GA_RUN,
 					        FileFormat.FSE_RUN};
@@ -579,6 +582,13 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				mainPanel.add(fseParamsPanel);
 				fseParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;
+				
+           case FR_PARAM:
+                GUIPrepareFitnessRunner frParamsPanel = 
+                    new GUIPrepareFitnessRunner(mainPanel);
+                mainPanel.add(frParamsPanel);
+                frParamsPanel.importParametersFromDenoptimParamsFile(file);
+                break;
 		
 			case VRTXSDF:
 				GUIVertexInspector fragPanel = 

@@ -342,6 +342,10 @@ public class ParametersForm extends JPanel implements IParametersForm
     public void importParametersFromDenoptimParamsFile(String fileName) 
     		throws Exception
     {
+        System.err.println("WARNING: runnin empty method "
+                + "'importParametersFromDenoptimParamsFile'. "
+                + "A subclass is not overwriting it. "
+                + "Report this bug to the development team.");
     }
     
 //-----------------------------------------------------------------------------
@@ -460,7 +464,11 @@ public class ParametersForm extends JPanel implements IParametersForm
   	@Override
 	public void importSingleParameter(String key, String value) 
 			throws Exception 
-  	{	
+  	{
+  	  System.err.println("WARNING: runnin empty method "
+              + "'importSingleParameter'. "
+              + "A subclass is not overwriting it. "
+              + "Report this bug to the development team.");
 	}
 
 //-----------------------------------------------------------------------------

@@ -35,7 +35,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
 import denoptim.task.DenoptimGATask;
-import denoptim.task.FitnessProviderTestTask;
+import denoptim.task.FitnessRunnerTask;
 import denoptim.task.FitnessTask;
 import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.GUIInvokedMainTask;
@@ -326,7 +326,7 @@ public class GUIPrepare extends GUICardPanel
                             + "Current declaration is not valid. Report this "
                             + "to the development team.");
             }
-        } else if (this instanceof GUITestFitnessProvider)
+        } else if (this instanceof GUIPrepareFitnessRunner)
         {
             switch(string)
             {
@@ -356,9 +356,9 @@ public class GUIPrepare extends GUICardPanel
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			baseName = "FSE";
-		} else if (this instanceof GUITestFitnessProvider)
+		} else if (this instanceof GUIPrepareFitnessRunner)
         {
-            baseName = "FP";
+            baseName = "FR";
         }
 		return baseName;
 	}
@@ -445,9 +445,9 @@ public class GUIPrepare extends GUICardPanel
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			task = new FragSpaceExplorerTask();
-		} else if (this instanceof GUITestFitnessProvider)
+		} else if (this instanceof GUIPrepareFitnessRunner)
 		{
-		    task = new FitnessProviderTestTask();
+		    task = new FitnessRunnerTask();
 		}
 		return task;
 	}

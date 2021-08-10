@@ -66,6 +66,7 @@ public abstract class GUIInvokedMainTask extends Task
     public Object call()
     {
     	String implName = this.getClass().getSimpleName();
+    	
     	//TODO log or del
     	System.out.println("Calling " + implName +" ("
     			+ " id="+id+", configFile="

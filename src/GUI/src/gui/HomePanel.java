@@ -165,7 +165,7 @@ public class HomePanel extends GUICardPanel
         JButton btnTestFitness = new JButton("Test Fitness Provider");
         btnTestFitness.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mainPanel.add(new GUITestFitnessProvider(mainPanel));
+                mainPanel.add(new GUIPrepareFitnessRunner(mainPanel));
             }
         });
  

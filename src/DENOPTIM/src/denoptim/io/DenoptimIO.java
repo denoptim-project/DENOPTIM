@@ -2470,10 +2470,15 @@ public class DenoptimIO
     		    ff = detectKindOfJSONFile(inFile.getAbsolutePath());
     		    break;
     		
-    		case "par":
+    		case "PAR":
     			//Parameters for any DENOPTIM module
     			ff = detectKindOfParameterFile(inFile.getAbsolutePath());
     		    break;
+    		    
+            case "PARAMS":
+                //Parameters for any DENOPTIM module
+                ff = detectKindOfParameterFile(inFile.getAbsolutePath());
+                break;
     		
     		case "":
                 //Parameters for any DENOPTIM module
@@ -2578,7 +2583,10 @@ public class DenoptimIO
     public static FileFormat detectKindOfParameterFile(String fileName) 
             throws IOException
     {
-    	FileFormat[] ffs = {FileFormat.GA_PARAM,FileFormat.FSE_PARAM,
+    	FileFormat[] ffs = {
+    	        FileFormat.GA_PARAM,
+    	        FileFormat.FSE_PARAM,
+    	        FileFormat.FR_PARAM,
     	        FileFormat.COMP_MAP};
     	return detectKindFile(fileName, ffs);
     }

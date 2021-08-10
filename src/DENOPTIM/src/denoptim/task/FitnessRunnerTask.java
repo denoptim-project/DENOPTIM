@@ -20,21 +20,21 @@
 package denoptim.task;
 
 import denoptim.exception.DENOPTIMException;
-import fragspaceexplorer.FragSpaceExplorer;
+import fitnessrunner.FitnessRunner;
 
 /**
  * Task that runs the fitness provider main method from within
  * the GUI. 
  */
 
-public class FitnessProviderTestTask extends GUIInvokedMainTask
+public class FitnessRunnerTask extends GUIInvokedMainTask
 {
 
 //------------------------------------------------------------------------------ 
 
 	@Override
 	protected void mainCaller(String[] args) throws DENOPTIMException {
-		FragSpaceExplorer.main(args);
+		FitnessRunner.main(args);
 	}
     
 //------------------------------------------------------------------------------

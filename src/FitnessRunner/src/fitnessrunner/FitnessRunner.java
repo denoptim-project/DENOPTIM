@@ -25,6 +25,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.task.FitnessTask;
+import denoptim.utils.GenUtils;
 import denoptimga.DenoptimGA;
 import fragspaceexplorer.FSEParameters;
 
@@ -96,7 +97,8 @@ public class FitnessRunner
     	        runner.stopRun();
     	    }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
-            System.exit(-1);
+            GenUtils.printExceptionChain(t);
+            throw new DENOPTIMException("Error in FitnessRunner run.", t);
         }
         
         // normal completion: do NOT call System exit(0) as we might be calling

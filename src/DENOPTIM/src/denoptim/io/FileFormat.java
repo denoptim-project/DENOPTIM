@@ -10,7 +10,7 @@ public enum FileFormat {
     
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
-    GA_PARAM, FSE_PARAM, COMP_MAP,
+    GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP,
     TXT;
         
     private String extension = "";
@@ -79,6 +79,12 @@ public enum FileFormat {
         FSE_PARAM.extension = "";
         FSE_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
                 "^FSE-.*"));
+        
+        //------------------------------------
+        
+        FR_PARAM.extension = "";
+        FR_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^FR-.*"));
 
         //------------------------------------
         
@@ -92,7 +98,7 @@ public enum FileFormat {
     }
     
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
-        COMP_MAP}
+        FR_PARAM, COMP_MAP}
     
 //------------------------------------------------------------------------------
 
@@ -145,6 +151,9 @@ public enum FileFormat {
                         break;
                     case FSE_PARAM:
                         ff = FSE_PARAM;
+                        break;
+                    case FR_PARAM:
+                        ff = FR_PARAM;
                         break;
                     case COMP_MAP:
                         ff = COMP_MAP;
