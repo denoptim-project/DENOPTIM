@@ -1,4 +1,0 @@
-FR-input=in.sdf
-FR-output=out.sdf
-FP-Equation=${taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/Users/marco/tools/DENOPTIM_graphTemplate/test/diamonds/goal.sdf')}

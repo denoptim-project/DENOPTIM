@@ -1472,7 +1472,7 @@ public class DenoptimIO
             throw new DENOPTIMException(err + " " + fileName);
         }
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -1481,25 +1481,46 @@ public class DenoptimIO
      * either a fitness value or a mol_error defining why this candidate could
      * not be evaluated.
      *
-     * @param file         the SDF file to read
+     * @param file         the SDF file to read.
      * @param useFragSpace use <code>true</code> if a fragment space is defined
-     *                     and we can use it to interpret the graph finding a full meaning for the
-     *                     nodes in the graph.
-     * @return the list of candidates
+     * and we can use it to interpret the graph finding a full meaning for the
+     * nodes in the graph.
+     * @return the list of candidates.
      * @throws DENOPTIMException is something goes wrong while reading the file
      *                           or interpreting its content
      */
     public static ArrayList<Candidate> readDENOPTIMMolecules(File file, 
             boolean useFragSpace) throws DENOPTIMException {
+        return readDENOPTIMMolecules(file, useFragSpace, false);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads SDF files that represent one or more tested or to be tested 
+     * candidates. 
+     *
+     * @param file the SDF file to read.
+     * @param useFragSpace use <code>true</code> if a fragment space is defined
+     * and we can use it to interpret the graph finding a full meaning for the
+     * nodes in the graph.
+     * @param allowNoUID use <code>true</code> if candidates should be allowed 
+     * to have no unique identifier.
+     * @return the list of candidates.
+     * @throws DENOPTIMException is something goes wrong while reading the file
+     *                           or interpreting its content
+     */
+    
+    public static ArrayList<Candidate> readDENOPTIMMolecules(File file, 
+            boolean useFragSpace, boolean allowNoUID) throws DENOPTIMException {
         String filename = file.getAbsolutePath();
         ArrayList<Candidate> mols = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
         for (IAtomContainer iac : iacs) {
-            Candidate mol = new Candidate(iac, useFragSpace);
+            Candidate mol = new Candidate(iac, useFragSpace, allowNoUID);
             mol.setSDFFile(filename);
             mols.add(mol);
         }
-
         return mols;
     }
 
@@ -1507,7 +1528,7 @@ public class DenoptimIO
 
     /**
      * Reads the molecules in a file. Accepts filenames with commonly accepted
-     * extensions (i.e., .smi and .sdf). Unrecognized extensions will be
+     * extensions (i.e., .smi and .sdf). Unrecognised extensions will be
      * interpreted as links (i.e., pathnames) to SDF files.
      *
      * @param fileName the pathname of the file to read.

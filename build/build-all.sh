@@ -119,6 +119,14 @@ if [ "$?" != "0" ]; then
     exit -1
 fi
 
+echo "build-fitnessrunner.sh"
+bash build-fitnessrunner.sh
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-fitnessrunner.sh."
+    exit -1
+fi
+echo
+
 
 echo
 

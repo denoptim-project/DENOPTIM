@@ -54,7 +54,8 @@ public class FitnessRunner
         		+ "[workDir]");
     }
 
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------ 
+    
     /**
      * @param args the command line arguments
      * @throws DENOPTIMException 
@@ -77,7 +78,7 @@ public class FitnessRunner
             FRParameters.workDir = args[1];
         }
         
-        FPRunner runner = new FPRunner();
+        FPRunner runner = null;
         try
         {
         	FRParameters.readParameterFile(configFile);

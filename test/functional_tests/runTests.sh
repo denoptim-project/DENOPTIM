@@ -334,7 +334,10 @@ runTest 't23'
 #
 runTest 't24'
 
-#TODO t25
+#
+# t25: standalone fitness evaluation runner
+#
+runTest 't25'
 
 #
 # t97: under development - mutation involving templates

@@ -19,6 +19,7 @@
 package fitnessrunner;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -53,19 +54,14 @@ public class FRParameters
     protected static String workDir = System.getProperty("user.dir");
 
     /**
-     * Log file
-     */
-    private static String logFile = "fr.log";
-
-    /**
      * File with input for fitness provider
      */
-    private static String inpFile = null;
+    private static File inpFile = null;
     
     /**
      * File where the results of the fitness evaluation will be printed
      */
-    private static String outFile = null;
+    private static File outFile = null;
     
     /**
      * Verbosity level
@@ -85,9 +81,8 @@ public class FRParameters
     {
         frParamsInUse = false;
         workDir = System.getProperty("user.dir");
-        logFile = "fr.log";
-        inpFile = "";
-        outFile = "";
+        inpFile = null;
+        outFile = null;
         verbosity = 0;
         
         FitnessParameters.resetParameters();        
@@ -106,24 +101,17 @@ public class FRParameters
     {
         return workDir;
     }
-
-//-----------------------------------------------------------------------------
-
-    public static String getLogFileName()
-    {
-        return logFile;
-    }
    
 //-----------------------------------------------------------------------------
 
-    public static String getInputFileName()
+    public static File getInputFile()
     {
         return inpFile;
     }
     
 //-----------------------------------------------------------------------------
 
-    public static String getOutputFileName()
+    public static File getOutputFile()
     {
         return outFile;
     }
@@ -167,7 +155,7 @@ public class FRParameters
                     interpretKeyword(line);
                     continue;
                 }
-/*
+
                 if (line.toUpperCase().startsWith("FS-"))
                 {
                     FragmentSpaceParameters.interpretKeyword(line);
@@ -179,7 +167,7 @@ public class FRParameters
                     RingClosureParameters.interpretKeyword(line);
                     continue;
                 }
- */               
+               
                 if (line.toUpperCase().startsWith("FP-"))
                 {
                     FitnessParameters.interpretKeyword(line);
@@ -258,10 +246,10 @@ public class FRParameters
             workDir = value;
             break;
 		case "FR-INPUT=":
-		    inpFile = value;
+		    inpFile = new File(value);
 		    break;
         case "FR-OUTPUT=":
-            outFile = value;
+            outFile = new File(value);
             break;
         case "FR-VERBOSITY=":
             try
@@ -303,11 +291,17 @@ public class FRParameters
     	   throw new DENOPTIMException(msg);
     	}
 
-    	if (inpFile != null && !DenoptimIO.checkExists(inpFile))
+    	if (inpFile != null && !inpFile.exists())
     	{
     	    msg = "File with input data not found. Check " + inpFile;
                 throw new DENOPTIMException(msg);
     	}
+    	
+        if (outFile != null && outFile.exists())
+        {
+            msg = "File meant for output results exists and we do not overwrite.";
+            throw new DENOPTIMException(msg);
+        }
 
         if (FragmentSpaceParameters.fsParamsInUse())
         {
@@ -329,28 +323,7 @@ public class FRParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-		String curDir = workDir;
-        String fileSep = System.getProperty("file.separator");
-        boolean success = false;
-        while (!success)
-        {
-            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
-            String str = "FR" + sdf.format(new Date());
-            workDir = curDir + fileSep + str;
-            success = DenoptimIO.createDirectory(workDir);
-        }
         DenoptimIO.addToRecentFiles(outFile, FileFormat.GRAPHSDF);
-
-		logFile = workDir + ".log";
-
-        try
-        {
-            DENOPTIMLogger.getInstance().setupLogger(logFile);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
 
         if (FragmentSpaceParameters.fsParamsInUse())
         {
@@ -367,7 +340,6 @@ public class FRParameters
             FitnessParameters.processParameters();
         }
         
-        System.err.println("Program log file: " + logFile);
         System.err.println("Output files associated with the current run are " +
                                 "located in " + workDir);
     }

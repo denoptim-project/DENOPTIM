@@ -1,4 +1,6 @@
-FR-input=in.sdf
-FR-output=out.sdf
+FR-input=t25_in.sdf
+FR-output=t25_out.sdf
+
+FP-No3dTreeModel
 FP-Equation=${taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:../goal.sdf')}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:goal.sdf')}

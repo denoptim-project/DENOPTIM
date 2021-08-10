@@ -27,20 +27,30 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
 import org.apache.commons.lang3.time.StopWatch;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.Candidate;
+import denoptim.molecule.DENOPTIMGraph;
 import denoptim.task.FitnessTask;
 import denoptimga.DenoptimGA;
+import fragspaceexplorer.FragSpaceExplorer;
 
 
 /**
  * Runs a fitness provider task as defined in the static parameters. This class
  * is meant to execute fitness provider tasks from the GUI or the CLI in a
  * stand-alone fashion, i.e., without running {@link DenoptimGA} or 
- * {@link FitnessRunner}.
+ * {@link FragSpaceExplorer}.
  *
  * @author Marco Foscato
  */
@@ -61,8 +71,6 @@ public class FPRunner
      * Asynchronous tasks manager 
      */
     final ThreadPoolExecutor tpe;
-
-    private int verbosity = 0;
 
     private Throwable thrownByTask;
 
@@ -125,12 +133,9 @@ public class FPRunner
                 }
                 catch (InterruptedException ex)
                 {
-                    if (verbosity > 1)
-                    {
-                        ex.printStackTrace();
-                        String msg = "EXCEPTION in rejectedExecution.";
-                        DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-                    }
+                    ex.printStackTrace();
+                    String msg = "EXCEPTION in rejectedExecution.";
+                    DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
                 }
             }
         });
@@ -175,38 +180,34 @@ public class FPRunner
 //------------------------------------------------------------------------------
 
     /**
-     * Run the combinatorial exploration 
+     * Create and run the fitness task.
+     * @throws Exception 
      */
 
-    public void run() throws DENOPTIMException
+    public void run() throws Exception
     {
         String msg = "";
         StopWatch watch = new StopWatch();
         watch.start();
+        
+        //WARNING: assumption of SDF format and single entry!
+        
+        DENOPTIMGraph graph = DenoptimIO.readDENOPTIMGraphsFromFile(
+                FRParameters.getInputFile(), FragmentSpace.isDefined()).get(0);
+        IAtomContainer iac = DenoptimIO.readSDFFile(
+                FRParameters.getInputFile().getAbsolutePath()).get(0);
 
         tpe.prestartAllCoreThreads();
   
-        
-        //TODO here do stuff....
-        System.out.println("HERE GOES THE JUICE...");
-        /*
-        GraphBuildingTask task = new GraphBuildingTask(
-        rootGraph, fragsToAdd, level,
-        FSEParameters.getWorkDirectory(),
-        FSEParameters.getVerbosity());
-
-        ArrayList<Integer> nextIds = fcf.getNextIds();
-        task.setNextIds(nextIds);
+        FitnessEvaluationTask task = new FitnessEvaluationTask(graph, iac, 
+                FRParameters.getWorkDirectory(), 
+                FRParameters.getOutputFile().getAbsolutePath());
 
         submitted.add(task);
         futures.add(tpe.submit(task));
-         */
-        
             
-        // shutdown thread pool
         tpe.shutdown();
 
-        // closing messages
         watch.stop();
         msg = "Overall time: " + watch.toString() + ". " 
             + DENOPTIMConstants.EOL
