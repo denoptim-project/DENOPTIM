@@ -500,7 +500,7 @@ from scratch.</p>
 genetic operators used. Currently, these schemes are restricted to a
 single point in a graph. In addition, the vertex corresponding to the scaffold
 is not subject to crossover or mutation, i.e.,
-only vertices attached to the scaffold partake in the genetic
+only vertexes attached to the scaffold partake in the genetic
 exchange. In addition, for symmetric graphs, addition or removal of a
 vertex can be propagated across all points related
 by symmetry. Where APclasses are involved,
@@ -542,15 +542,16 @@ crossover points are chosen according to the rules defined in the compatibility 
 
 <h3 class="western"><a name="Toc44001_808352928"></a>Substitution Probability</h3>
 
-<p>In order to prevent the generation of very large molecules, 
-the probability of appending a fragment to a free AP
-is typically chosen to decrease with the
-distance of the free AP from the root of the graph. 
-This distance is the so-called <i>level</i>, and refers to the fragment
-holding the free AP (Figure 4).
-For the levels L<sub>&gt;0</sub>
-the probability is lowered according to any one of the following
-schemes:</p>
+<p>The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP.
+The substitution probability (<i>P</i>) results from the product of two components: the growth probability (<i>P<sub>g</sub></i>), and the crowding probability (<i>P<sub>c</sub></i>).
+The growth probability (<i>P<sub>g</sub></i>) is meant to limit the growth of a graph by providing a way to reduce the likeliness of adding vertexes in long chains that stretch far from the root vertex. The distance between the root vertex and any other vertex is called <i>level</i> (Figure 4).
+
+<figure> 
+	<img src="figures/graph_levels.png" alt="figures/graph_levels.png" width="429" border="0"/>
+	<figcaption><i>Figure 4: identification of levels in a graph. Each label L<sub>x</sub> identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L<sub>-1</sub>), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L<sub>0</sub>), and so on.</i></figcaption>
+</figure>
+
+The <b>growth probability</b> can be controlled by one of the following schemes:</p>
 
 <ul>
 	<li><b>EXP_DIFF</b>:
@@ -560,20 +561,20 @@ schemes:</p>
 	is the level of the free AP.<br>
 	<img src="figures/exp_diff.png" alt="figures/exp_diff.png" width="131" height="45"/></li>
 	<li><b>TANH</b>:
-        Given a growth multiplier factor <i>&lambda;</i>,
+    Given a growth multiplier factor <i>&lambda;</i>,
 	the probability of addition is
 	determined by <br>
 	<img src="figures/tanh.png" alt="figures/tanh.png" width="138" height="21"/></li>
 	<li><b>SIGMA</b>:
 	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the level of the point where the probability is 50%), and calculates the probability as <br>
 	<img src="figures/sigma.png" alt="figures/sigma.png" width="174" height="41"/></li>
-	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels). Use with caution.</li>
+	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels).</li>
 </ul>
 
-<figure> 
-	<img src="figures/subs_prob.png" alt="figures/subs_prob.png" width="350" border="0"/>
-	<figcaption><i>Figure 4: Level based probability for attaching fragments.</i></figcaption>
-</figure>
+<p>The <b>crowding probability</b> is meant to reduce the likeliness of adding incident edges to a vertex that is already using one or more APs rooted on the same source atom that holds the AP for which we are evaluating the substitution probability. Practically, for a free AP (<i>AP<sub>i</sub></i>) we define the <i>crowdedness</i> (<i>C<sub>AP<sub>i</sub></sub></i>) as the number of non-free APs that are rooted on the same source atom holding <i>AP<sub>i</sub></i>.</p>
+<p>For example, we consider vertex 3 in Figure 4 (i.e., the blue square at the center of the figure), and assume that the molecular representation of this vertex consists of a single atom holding four attachment points. To calculate the crowdedness of <i>AP<sub>2</sub></i> (i.e., the yellow circle located below the blue square representing vertex 3) we count the number of APs that i) share the same source atom of <i>AP<sub>2</sub></i>, and ii) are used to form edges with vertexes that are not capping groups. While condition <i>i</i> is satisfied by all four APs of the vertex, only two APs satisfy condition <i>ii</i>. The crowdedness of <i>AP<sub>2</sub></i> is thus <i>C<sub>AP<sub>2</sub></sub> = 2</i>.</p>
+<p>The crowding probability for <i>AP<sub>i</sub></i> is then calculated using the crowdedness <i>C<sub>AP<sub>i</sub></sub></i> according to any of the schemes presented above (<b>EXP_DIFF</b>, <b>TANH</b>, <b>SIGMA</b>, <b>UNRESTRICTED</b>) using <i>C<sub>AP<sub>i</sub></sub></i> in place of <i>L</i>.</p>
+
 
 <h3 class="western"><a name="Toc40900_1191730726"></a>GA Selection Strategies</h3>
 
@@ -1238,6 +1239,42 @@ without providing that specific keyword in the input file.</p>
 		</td>
 		<td width="60%"><p>Specifies the value of
 			parameter &sigma;<sub></sub>2 used in growth
+			probability scheme <code>SIGMA</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-CrowdProbScheme</code></p>
+		</td>
+		<td width="60%"><p>Specifies the crowding
+			probability scheme. Acceptable values are: 
+			<code>EXP_DIFF</code>,
+			<code>TANH</code>,
+			<code>SIGMA</code>,
+			and <code>UNRESTRICTED</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-CrowdMultiplier</code></p>
+		</td>
+		<td width="60%"><p>Specifies the value of the
+			factor &lambda; used in crowding
+			probability schemes <code>EXP_DIFF</code>, and
+			<code>TANH</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-CrowdSigmaSteepness</code></p>
+		</td>
+		<td width="60%"><p>Specifies the value of
+			parameter &sigma;<sub></sub>1 used in crowding
+			probability scheme <code>SIGMA</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-CrowdSigmaMiddle</code></p>
+		</td>
+		<td width="60%"><p>Specifies the value of
+			parameter &sigma;<sub></sub>2 used in crowding
 			probability scheme <code>SIGMA</code>.</p>
 		</td>
 	</tr>

@@ -202,7 +202,7 @@ public class GAParameters
      * Crossover parents selection strategy: string
      */
     protected static String strXoverSelectionMode =
-                                                "STOCHASTIC UNIVERSAL SAMPLING";
+            "STOCHASTIC UNIVERSAL SAMPLING";
 
     /**
      * The seed value for random number generation
@@ -692,6 +692,39 @@ public class GAParameters
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     growthProbabilityScheme = convertGrowthProbabilityScheme(option);
+                }
+                
+                if (line.toUpperCase().startsWith("GA-CROWDMULTIPLIER="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        crowdingMultiplier = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-CROWDSIGMASTEEPNESS="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        crowdingSigmaSteepness = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-CROWDSIGMAMIDDLE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        crowdingSigmaMiddle = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-CROWDPROBSCHEME="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    crowdingProbabilityScheme = convertGrowthProbabilityScheme(option);
                 }
 
                 if (line.toUpperCase().startsWith("GA-NUMGENERATIONS="))

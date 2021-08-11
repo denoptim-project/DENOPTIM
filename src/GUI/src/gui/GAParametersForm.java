@@ -174,6 +174,38 @@ public class GAParametersForm extends ParametersForm
     JPanel linePar14;
     JLabel lblPar14;
     JSpinner spnPar14;
+    
+    DefaultXYDataset crowdProbData;
+    JFreeChart graphCrowdProbJFChart;
+    JPanel graphCrowdProbJFChartChartPanel;
+    JPanel graphCrowdProbJFChartCtrlPanel;
+    JPanel graphCrowdProbSpinnerPane;
+    Double minLevelCrowdProbPlot = 0.0;
+    Double maxLevelCrowdProbPlot = 6.0;
+    
+    JPanel localBlockCrowd3;
+    JPanel localBlockCrowd4;
+    JPanel localBlockCrowdGraph;
+
+    String keyParCrowd1 = "GA-CrowdProbScheme";
+    JPanel lineParCrowd1;
+    JLabel lblParCrowd1;
+    JComboBox<String> cmbParCrowd1;
+
+    String keyParCrowd2 = "GA-CrowdMultiplier";
+    JPanel lineParCrowd2;
+    JLabel lblParCrowd2;
+    JSpinner spnParCrowd2;
+
+    String keyParCrowd3 = "GA-CrowdSigmaSteepness";
+    JPanel lineParCrowd3;
+    JLabel lblParCrowd3;
+    JSpinner spnParCrowd3;
+
+    String keyParCrowd4 = "GA-CrowdSigmaMiddle";
+    JPanel lineParCrowd4;
+    JLabel lblParCrowd4;
+    JSpinner spnParCrowd4;
 
     String keyPar15 = "GA-XOverSelectionMode";
     JPanel linePar15;
@@ -261,6 +293,17 @@ public class GAParametersForm extends ParametersForm
         
         localBlockGraph = new JPanel();
         localBlockGraph.setVisible(true);
+        
+        localBlockCrowd3 = new JPanel();
+        localBlockCrowd3.setVisible(false);
+        localBlockCrowd3.setLayout(new BoxLayout(localBlockCrowd3, SwingConstants.VERTICAL));
+        
+        localBlockCrowd4 = new JPanel();
+        localBlockCrowd4.setVisible(false);
+        localBlockCrowd4.setLayout(new BoxLayout(localBlockCrowd4, SwingConstants.VERTICAL));
+        
+        localBlockCrowdGraph = new JPanel();
+        localBlockCrowdGraph.setVisible(false);
         
         advOptsBlock = new JPanel();
         advOptsBlock.setVisible(false);
@@ -398,6 +441,8 @@ public class GAParametersForm extends ParametersForm
         linePar9.add(lblPar9);
         linePar9.add(txtPar9);
         localBlock2.add(linePar9);
+        
+        localBlock2.add(new JSeparator());
         
         String toolTipPar12 = "<html>Specifies the value of the factor used in"
         		+ " growth probability schemes <code>EXP_DIFF</code> and "
@@ -559,6 +604,182 @@ public class GAParametersForm extends ParametersForm
         localBlock2.add(localBlock3);
         localBlock2.add(localBlock4);
         localBlock2.add(localBlockGraph);
+        
+        localBlock2.add(new JSeparator());
+        
+        String toolTipParCrowd2 = "<html>Specifies the value of the factor used in"
+                + " crowding probability schemes <code>EXP_DIFF</code> and "
+                + "<code>TANH</code></html>";
+        lineParCrowd2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParCrowd2 = new JLabel("<html>Crowding probability - parameter "
+                + "<code>&lambda;</code><html>", SwingConstants.LEFT);
+        lblParCrowd2.setPreferredSize(fileLabelSize);
+        lblParCrowd2.setToolTipText(toolTipParCrowd2);
+        spnParCrowd2 = new JSpinner(new SpinnerNumberModel(1.0, 0.0, null, 0.1));
+        spnParCrowd2.setToolTipText(toolTipParCrowd2);
+        spnParCrowd2.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyParCrowd2.toUpperCase(),spnParCrowd2);
+        lineParCrowd2.add(lblParCrowd2);
+        lineParCrowd2.add(spnParCrowd2);
+        localBlockCrowd3.add(lineParCrowd2);
+        
+        String toolTipParCrowd3 = "<html>Specifies the value of parameter "
+                + "&sigma;<sub>1</sub> used for crowding probability scheme"
+                + " <code>SIGMA</code>.<br>It corresponds to the steepness of"
+                + " the function where <i>P(level) = 50%</i></html>";
+        lineParCrowd3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParCrowd3 = new JLabel("<html>Crowding probability - parameter "
+                + "<code>&sigma;</code><sub>1</sub>:</html>", SwingConstants.LEFT);
+        lblParCrowd3.setPreferredSize(fileLabelSize);
+        lblParCrowd3.setToolTipText(toolTipParCrowd3);
+        spnParCrowd3 = new JSpinner(new SpinnerNumberModel(1.0, null, null, 0.1));
+        spnParCrowd3.setToolTipText(toolTipParCrowd3);
+        spnParCrowd3.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyParCrowd3.toUpperCase(),spnParCrowd3);
+        lineParCrowd3.add(lblParCrowd3);
+        lineParCrowd3.add(spnParCrowd3);
+        localBlockCrowd4.add(lineParCrowd3);
+        
+        String toolTipParCrowd4 = "<html>Specifies the value of parameter "
+                + "&sigma;<sub>2</sub> used in crowding probability scheme "
+                + "<code>SIGMA</code>.<br>It corresponds to the level "
+                + "where <i>P(level) = 50%</i></html>";
+        lineParCrowd4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParCrowd4 = new JLabel("<html>Crowding probability - parameter "
+                + "<code>&sigma;</code><sub>2</sub>:<html>", SwingConstants.LEFT);
+        lblParCrowd4.setPreferredSize(fileLabelSize);
+        lblParCrowd4.setToolTipText(toolTipParCrowd4);
+        spnParCrowd4 = new JSpinner(new SpinnerNumberModel(3.5, null, null, 0.1));
+        spnParCrowd4.setToolTipText(toolTipParCrowd4);
+        spnParCrowd4.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyParCrowd4.toUpperCase(),spnParCrowd4);
+        lineParCrowd4.add(lblParCrowd4);
+        lineParCrowd4.add(spnParCrowd4);
+        localBlockCrowd4.add(lineParCrowd4);
+        
+        String toolTipParCrowd1 = "Specifies the crowding probability scheme";
+        lineParCrowd1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParCrowd1 = new JLabel("Crowding probability function:", 
+                SwingConstants.LEFT);
+        lblParCrowd1.setPreferredSize(fileLabelSize);
+        lblParCrowd1.setToolTipText(toolTipParCrowd1);
+        cmbParCrowd1 = new JComboBox<String>(new String[] {
+                "EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
+        cmbParCrowd1.setSelectedIndex(3);
+        cmbParCrowd1.setToolTipText(toolTipParCrowd1);
+        cmbParCrowd1.addActionListener(cmbFieldChange);
+        mapKeyFieldToValueField.put(keyParCrowd1.toUpperCase(),cmbParCrowd1);
+        
+        // NB: we need to create the graph before setting the action listeners
+        //     that will eventually edit the data plotted.
+        createCrowdProbGraph();
+        
+        graphCrowdProbJFChartCtrlPanel = new JPanel(new BorderLayout());
+        graphCrowdProbJFChartCtrlPanel.setMaximumSize(new Dimension(100,100));
+        graphCrowdProbSpinnerPane = new JPanel(new GridLayout(0,2));
+        final JSpinner spnMaxLevCrowd = new JSpinner(new SpinnerNumberModel(
+                maxLevelCrowdProbPlot.intValue(), 1, null, 1));
+        spnMaxLevCrowd.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent event)
+            {
+                int maxLev = ((Integer) spnMaxLevCrowd.getValue()).intValue();                
+                ((XYPlot) graphCrowdProbJFChart.getPlot())
+                    .getDomainAxis().setRange(minLevelCrowdProbPlot, maxLev);
+            }
+        }); 
+        graphCrowdProbSpinnerPane.add(new JLabel("X-axis max: "));
+        graphCrowdProbSpinnerPane.add(spnMaxLevCrowd);
+        graphCrowdProbJFChartCtrlPanel.add(graphCrowdProbSpinnerPane, BorderLayout.NORTH);
+        
+        GroupLayout grpLyoCrowdProb = new GroupLayout(localBlockCrowdGraph);
+        localBlockCrowdGraph.setLayout(grpLyoCrowdProb);
+        grpLyoCrowdProb.setAutoCreateGaps(true);
+        grpLyoCrowdProb.setAutoCreateContainerGaps(true);
+        grpLyoCrowdProb.setHorizontalGroup(grpLyoCrowdProb.createSequentialGroup()
+            .addComponent(graphCrowdProbJFChartChartPanel)
+            .addComponent(graphCrowdProbJFChartCtrlPanel));
+        grpLyoCrowdProb.setVerticalGroup(grpLyoCrowdProb.createParallelGroup(
+                GroupLayout.Alignment.CENTER)
+            .addComponent(graphCrowdProbJFChartChartPanel)
+            .addComponent(graphCrowdProbJFChartCtrlPanel));
+        
+        // NB: The listeners must be defined here because we first have to 
+        //     built all the pieces (plot + parameters) and then define how
+        //     things change upon change of the parameters/controllers.
+
+        spnParCrowd2.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+                updateCrowdProbDataset();
+            }
+        });
+        spnParCrowd3.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+                updateCrowdProbDataset();
+            }
+        });
+        spnParCrowd4.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+                updateCrowdProbDataset();
+            }
+        });
+        
+        cmbParCrowd1.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                String scheme = cmbParCrowd1.getSelectedItem().toString();
+                switch (scheme)
+                {
+                    case "EXP_DIFF":
+                        updateCrowdProbDataset();
+                        localBlockCrowd3.setVisible(true);
+                        localBlockCrowd4.setVisible(false);
+                        localBlockCrowdGraph.setVisible(true);
+                        break;
+                        
+                    case "TANH":
+                        updateCrowdProbDataset();
+                        localBlockCrowd3.setVisible(true);
+                        localBlockCrowd4.setVisible(false);  
+                        localBlockCrowdGraph.setVisible(true);
+                        break;
+                        
+                    case "SIGMA":
+                        updateCrowdProbDataset();
+                        localBlockCrowd3.setVisible(false);
+                        localBlockCrowd4.setVisible(true);
+                        localBlockCrowdGraph.setVisible(true);
+                        break;
+                        
+                    case "UNRESTRICTED":
+                        updateCrowdProbDataset();
+                        localBlockCrowd3.setVisible(false);
+                        localBlockCrowd4.setVisible(false);
+                        localBlockCrowdGraph.setVisible(true);
+                        break;
+                        
+                    default:
+                        localBlockCrowd3.setVisible(false);
+                        localBlockCrowd4.setVisible(false); 
+                        localBlockCrowdGraph.setVisible(false);
+                        break;
+                }
+            }
+        });
+        lineParCrowd1.add(lblParCrowd1);
+        lineParCrowd1.add(cmbParCrowd1);
+        localBlock2.add(lineParCrowd1);
+        localBlock2.add(localBlockCrowd3);
+        localBlock2.add(localBlockCrowd4);
+        localBlock2.add(localBlockCrowdGraph);
+        
+        localBlock2.add(new JSeparator());
 
         String toolTipPar15 = "<html>Specifies the strategy for selecting crossover partners.<ul>" 
         		+ "<li><code>RANDOM</code>: unbiased selection.</li>" 
@@ -919,6 +1140,107 @@ public class GAParametersForm extends ParametersForm
         plot.getRangeAxis().setLabelFont(font3);
     }
 	
+    
+//-----------------------------------------------------------------------------
+
+    private void updateCrowdProbDataset() 
+    {
+        createCrowdProbDataset();
+        ((XYPlot) graphCrowdProbJFChart.getPlot()).setDataset(crowdProbData);   
+    }
+        
+//-----------------------------------------------------------------------------
+
+    private void createCrowdProbDataset() 
+    {   
+        crowdProbData = new DefaultXYDataset();
+        
+        ArrayList<Double> y = new ArrayList<Double>();
+        try
+        {
+            int scheme = GAParameters.convertGrowthProbabilityScheme(
+                    cmbParCrowd1.getSelectedItem().toString());
+            double l = (Double) spnParCrowd2.getValue();
+            double s1 = (Double) spnParCrowd3.getValue();
+            double s2 = (Double) spnParCrowd4.getValue();
+            
+            for (int crowdedness=0; crowdedness<100; crowdedness++)
+            {
+                double prob = EAUtils.getCrowdingProbabilityForCrowdedness(
+                        crowdedness, scheme, l, s1, s2);
+                y.add(prob);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "<html>Exception occurred while reading croding proability "
+                    + "scheme.<br>"
+                    + "Please, report this to the DENOPTIM team.</html>",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+        }
+
+        double[][] data = new double[2][y.size()];
+        for (int crowdedness=0; crowdedness<100; crowdedness++)
+        {
+            data[0][crowdedness] = new Double(crowdedness);
+            data[1][crowdedness] = y.get(crowdedness);
+        }
+        
+        crowdProbData.addSeries("Crowding Probability", data);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    private void createCrowdProbGraph() 
+    {
+        createCrowdProbDataset();
+        createCrowdProbChart();
+        graphCrowdProbJFChartChartPanel = new ChartPanel(graphCrowdProbJFChart);
+        graphCrowdProbJFChartChartPanel.setMaximumSize(new Dimension(400,200));
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private void createCrowdProbChart()
+    {
+        graphCrowdProbJFChart = ChartFactory.createXYLineChart(
+            null,                         // plot title
+            "Crowdedness",                // x axis label
+            "Probability",                // y axis label
+            crowdProbData,                 // data
+            PlotOrientation.VERTICAL,  
+            false,                        // include legend
+            false,                        // tooltips
+            false                         // urls
+        );
+
+        XYPlot plot = (XYPlot) graphCrowdProbJFChart.getPlot();
+        
+        // axis ranges
+        plot.getDomainAxis().setRange(minLevelCrowdProbPlot, maxLevelCrowdProbPlot);
+        plot.getRangeAxis().setRange(0.0, 1.0);
+        
+        // axis ticks interval 
+        //NB: this if commented out because it blocks automated selection of tick units
+        // and therefore it allows ticks overlap when range is large
+        //((NumberAxis) plot.getDomainAxis()).setTickUnit(new NumberTickUnit(1.0));
+
+        // series line thickness
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0, Color.BLUE);
+        renderer.setSeriesStroke(0, new BasicStroke(2.0f));
+        plot.setRenderer(renderer);
+        
+        // font of axis label
+        Font font3 = new Font("Dialog", Font.PLAIN, 12); 
+        plot.getDomainAxis().setLabelFont(font3);
+        plot.getRangeAxis().setLabelFont(font3);
+    }
+    
 //-----------------------------------------------------------------------------
 
 	/**
@@ -1052,6 +1374,10 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringForKVLine(keyPar12,spnPar12));
         sb.append(getStringForKVLine(keyPar13,spnPar13));
         sb.append(getStringForKVLine(keyPar14,spnPar14));
+        sb.append(keyParCrowd1).append("=").append(cmbParCrowd1.getSelectedItem()).append(NL);
+        sb.append(getStringForKVLine(keyParCrowd2,spnParCrowd2));
+        sb.append(getStringForKVLine(keyParCrowd3,spnParCrowd3));
+        sb.append(getStringForKVLine(keyParCrowd4,spnParCrowd4));
         sb.append(keyPar15).append("=").append(cmbPar15.getSelectedItem()).append(NL);
         sb.append(getStringIfNotEmpty(keyPar16,txtPar16));
         sb.append(getStringIfNotEmpty(keyPar17,txtPar17));

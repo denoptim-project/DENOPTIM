@@ -1367,13 +1367,11 @@ public class EAUtils
     public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap, 
             int scheme,
             double lambda, double sigmaOne, double sigmaTwo)
-    {
-        double prob = 1.0;
-        
+    {   
         //Applies only to molecular fragments
         if (ap.getOwner() instanceof DENOPTIMFragment == false)
         {
-            return prob;
+            return 1.0;
         }
         
         int crowdness = 0;
@@ -1385,19 +1383,38 @@ public class EAUtils
                 crowdness = crowdness + 1;
             }
         }
-        
+        return getCrowdingProbabilityForCrowdedness(crowdness, scheme, lambda,
+                sigmaOne, sigmaTwo);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the crowding probability for a given level of crowdedness.
+     * @param crowdedness the level of crowdedness
+     * @param scheme the chosen shape of the probability function.
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
+     * @return the crowding probability.
+     */
+    public static double getCrowdingProbabilityForCrowdedness(int crowdedness, 
+            int scheme,
+            double lambda, double sigmaOne, double sigmaTwo)
+    {
+        double prob = 1.0;
         if (scheme == 0)
         {
-            double f = Math.exp(-1.0 * crowdness * lambda);
+            double f = Math.exp(-1.0 * crowdedness * lambda);
             prob = 1 - ((1-f)/(1+f));
         }
         else if (scheme == 1)
         {
-            prob = 1.0 - Math.tanh(lambda * crowdness);
+            prob = 1.0 - Math.tanh(lambda * crowdedness);
         }
         else if (scheme == 2)
         {
-            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * (crowdness - sigmaTwo)));
+            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * (crowdedness - sigmaTwo)));
         }
         else if (scheme == 3)
         {
