@@ -19,6 +19,7 @@
 
 package denoptimga;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -252,8 +254,8 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * function that will keep extending the graph. The
-     * probability of addition depends on the growth probability scheme.
+     * function that will keep extending the graph according to the 
+     * growth/substitution probability.
      *
      * @param molGraph molecular graph
      * @param curVertex vertex to which further fragments will be appended
@@ -369,13 +371,15 @@ public class DENOPTIMGraphOperations
             if (!force)
             {
                 // Decide whether we want to extend the graph at this AP?
-                double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl)
-                        * EAUtils.getCrowdingProbability(ap);
-                boolean fgrow =  RandomUtils.nextBoolean(growthProb);
+                double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl);
+                double crowdingProp = EAUtils.getCrowdingProbability(ap);
+                double extendGraphProb = growthProb * crowdingProp;
+                boolean fgrow =  RandomUtils.nextBoolean(extendGraphProb);
                 if (debug)
                 {
                     System.err.println("Growth probability on this AP:" 
-                            + growthProb);
+                            + extendGraphProb + " (growth: "+growthProb+", "
+                                    + "crowding: "+crowdingProp+")");
                 }
                 if (!fgrow)
                 {
@@ -529,6 +533,15 @@ public class DENOPTIMGraphOperations
                 molGraph.addSymmetricSetOfVertices(newSymSetOfVertices);
             }
         } // end loop over APs
+        
+        if (debug)
+        {
+            String filename = "/tmp/"+grphId+"_growth.sdf";
+            System.err.println("Writing growing graph to "+filename);
+            ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
+            lst.add(molGraph);
+            DenoptimIO.writeGraphsToSDF(new File(filename), lst, true);
+        }
 
         if (extend)
         {

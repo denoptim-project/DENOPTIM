@@ -389,6 +389,20 @@ public class DenoptimIO
             }
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the 2D/3D representation of the molecule to multi-SD file.
+     *
+     * @param fileName The file to be written to
+     * @param mols     The molecules to be written
+     * @throws DENOPTIMException
+     */
+    public static void writeMoleculeSet(String fileName,
+            ArrayList<IAtomContainer> mols) throws DENOPTIMException {
+        writeMoleculeSet(fileName,mols, false);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -397,18 +411,18 @@ public class DenoptimIO
      *
      * @param fileName The file to be written to
      * @param mols     The molecules to be written
+     * @param append use <code>true</code> to append to the file
      * @throws DENOPTIMException
      */
     public static void writeMoleculeSet(String fileName,
-                                        ArrayList<IAtomContainer> mols)
-            throws DENOPTIMException {
+            ArrayList<IAtomContainer> mols, boolean append) throws DENOPTIMException {
         SDFWriter sdfWriter = null;
         try {
             IAtomContainerSet molSet = new AtomContainerSet();
             for (int idx = 0; idx < mols.size(); idx++) {
                 molSet.addAtomContainer(mols.get(idx));
             }
-            sdfWriter = new SDFWriter(new FileWriter(new File(fileName)));
+            sdfWriter = new SDFWriter(new FileWriter(new File(fileName),append));
             sdfWriter.write(molSet);
         } catch (CDKException | IOException cdke) {
             throw new DENOPTIMException(cdke);
@@ -2157,7 +2171,7 @@ public class DenoptimIO
         }
         return file;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -2169,6 +2183,22 @@ public class DenoptimIO
      */
     public static void writeGraphsToSDF(File file,
             ArrayList<DENOPTIMGraph> graphs) throws DENOPTIMException
+    {
+        writeGraphsToSDF(file, graphs, false);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graphs to SDF file.
+     *
+     * @param file the file where to print
+     * @param graphs the list of graphs to print
+     * @param append use <code>true</code> to append to the file
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToSDF(File file,
+            ArrayList<DENOPTIMGraph> graphs, boolean append) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (DENOPTIMGraph g : graphs) 
@@ -2185,7 +2215,7 @@ public class DenoptimIO
             }
             lst.add(iac);
         }
-        writeMoleculeSet(file.getAbsolutePath(), lst);
+        writeMoleculeSet(file.getAbsolutePath(), lst, append);
     }
 
 //------------------------------------------------------------------------------

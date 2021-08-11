@@ -603,7 +603,7 @@ public class EAUtils
     {
         DENOPTIMGraph molGraph = new DENOPTIMGraph();
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-
+        
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold();
 
@@ -632,6 +632,8 @@ public class EAUtils
             System.err.println(" ");
             System.err.println("START GRAPH: " + molGraph.getGraphId() 
                                 + " scaffold: " + molGraph.toString());
+            String filename = "/tmp/" + molGraph.getGraphId() + "_growth.sdf";
+            DenoptimIO.deleteFile(filename);
         }
 
         DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
