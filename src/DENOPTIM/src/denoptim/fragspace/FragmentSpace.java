@@ -1343,6 +1343,12 @@ public class FragmentSpace
                         BBType.FRAGMENT;
 
             if (!hasIsomorph(g, type)) {
+                
+                //TODO: we should try to transform the template into its isomorphic
+                // with highest symmetry, and define the symmetric sets. This
+                // Enhancement would facilitate the creation of symmetric graphs 
+                // from templates generated on the fly.
+                
                 DENOPTIMTemplate t = new DENOPTIMTemplate(type);
                 t.setInnerGraph(g);
 
@@ -1357,7 +1363,7 @@ public class FragmentSpace
                             FragmentSpaceParameters.getPathnameToAppendedScaffolds();
                 try
                 {
-                    DenoptimIO.writeGraphToSDF(new File(destFileName), graph, true);
+                    DenoptimIO.writeGraphToSDF(new File(destFileName), g, true);
                 } catch (DENOPTIMException e)
                 {
                     e.printStackTrace();
