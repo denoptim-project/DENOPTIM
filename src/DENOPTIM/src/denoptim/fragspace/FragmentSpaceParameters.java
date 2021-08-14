@@ -18,6 +18,7 @@
 
 package denoptim.fragspace;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
@@ -193,6 +194,22 @@ public class FragmentSpaceParameters
     public static String getRotSpaceDefFile()
     {
         return rotBndsFile;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathnameToAppendedFragments()
+    {
+        File libFile = new File(fragmentLibFile);
+        return libFile.getAbsolutePath() + "_addedFragments.sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathnameToAppendedScaffolds()
+    {
+        File libFile = new File(scaffoldLibFile);
+        return libFile.getAbsolutePath() + "_addedScaffolds.sdf";
     }
 
 //------------------------------------------------------------------------------

@@ -2190,6 +2190,24 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
+     * Writes the graph to SDF file.
+     *
+     * @param file the file where to print
+     * @param graph the of graph to print
+     * @param append use <code>true</code> to append to the file
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphToSDF(File file, DENOPTIMGraph graph,
+            boolean append) throws DENOPTIMException
+    {
+        ArrayList<DENOPTIMGraph> lst = new ArrayList<>(1);
+        lst.add(graph);
+        writeGraphsToSDF(file, lst, append);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Writes the graphs to SDF file.
      *
      * @param file the file where to print

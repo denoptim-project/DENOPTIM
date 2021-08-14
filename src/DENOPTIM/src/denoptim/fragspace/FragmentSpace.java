@@ -1338,8 +1338,9 @@ public class FragmentSpace
         List<DENOPTIMGraph> subgraphs = extractPattern(graph, PATTERN);
 
         for (DENOPTIMGraph g : subgraphs) {
-            BBType type = g.hasScaffoldTypeVertex() ? BBType.SCAFFOLD :
-                    BBType.FRAGMENT;
+            BBType type = g.hasScaffoldTypeVertex() ? 
+                    BBType.SCAFFOLD :
+                        BBType.FRAGMENT;
 
             if (!hasIsomorph(g, type)) {
                 DENOPTIMTemplate t = new DENOPTIMTemplate(type);
@@ -1347,9 +1348,23 @@ public class FragmentSpace
 
                 ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
                         FragmentSpace.getFragmentLibrary() :
-                        FragmentSpace.getScaffoldLibrary();
+                            FragmentSpace.getScaffoldLibrary();
 
                 FragmentSpace.appendVertexToLibrary(t, type, library);
+                
+                String destFileName = type == BBType.FRAGMENT ?
+                        FragmentSpaceParameters.getPathnameToAppendedFragments() :
+                            FragmentSpaceParameters.getPathnameToAppendedScaffolds();
+                try
+                {
+                    DenoptimIO.writeGraphToSDF(new File(destFileName), graph, true);
+                } catch (DENOPTIMException e)
+                {
+                    e.printStackTrace();
+                    System.out.println("WARNING: failed to write newly "
+                            + "generated " + type + " to file '" + destFileName 
+                            + "'.");
+                }
             }
         }
     }
