@@ -18,6 +18,7 @@
 
 package denoptim.rings;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -1086,7 +1088,7 @@ public class CyclicGraphHandler
             {
                 System.out.println("Ring size-biased list of RCVs:" + wLst);
             }
-
+            
             return wLst;
         }
 

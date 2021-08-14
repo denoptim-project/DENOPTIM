@@ -642,7 +642,7 @@ public class EAUtils
         {
             System.err.println("AFTER EXTENSION: " + molGraph.toString());
         }
-
+        
         if (molGraph.getVertexCount() > 1)
         {
 
@@ -654,10 +654,9 @@ public class EAUtils
                 System.err.println("AFTER CAPPING: " + molGraph.toString());
                 //GenUtils.pause();
             }
-
+            
             return molGraph;
         }
-
         return null;
     }
 
@@ -711,92 +710,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Add a capping group fragment to the vertex at the specified
-     * attachment point index.
-     * @param molGraph
-     * @param curVertex
-     * @param dapIdx
-     * @return id of the vertex added; -1 if capping is not required
-     * @throws DENOPTIMException when capping is required but not found, or 
-     * when we could not attach the capping group for whatever reason.
-     */
-
-    protected static int attachCappingFragmentAtPosition
-                            (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex,
-                                int dapIdx) throws DENOPTIMException
-    {
-        int lvl = curVertex.getLevel();
-        
-        DENOPTIMAttachmentPoint srcAP = curVertex.getAttachmentPoints()
-                .get(dapIdx);
-
-        APClass apcSrc = srcAP.getAPClass();
-        APClass apcCap = getCappingGroup(apcSrc);
-        
-        if (apcCap != null)
-        {
-            int bbIdCap = getCappingFragment(apcCap);
-
-            if (bbIdCap != -1)
-            {
-                int capVertexId = GraphUtils.getUniqueVertexIndex();
-                DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                        capVertexId, bbIdCap, 
-                        DENOPTIMVertex.BBType.CAP);
-                
-                molGraph.appendVertexOnAP(srcAP, capVrtx.getAP(0));
-                
-                return capVertexId;
-            }
-            else
-            {
-                String msg = "Capping is required but no proper capping "
-                                + "fragment found with APCalss " + apcCap;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
-                throw new DENOPTIMException(msg);
-            }
-        }
-
-        return -1;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @param srcAPC
-     * @throws DENOPTIMException
-     * @return For the given reaction return the corresponding capping group
-     */
-
-    protected static APClass getCappingGroup(APClass srcAPC) 
-            throws DENOPTIMException
-    {
-        APClass capAPC = null;
-        
-        if (FragmentSpace.getCappingMap().containsKey(srcAPC))
-        {
-            capAPC = FragmentSpace.getCappingMap().get(srcAPC);
-            if (capAPC == null)
-            {
-                String msg = "Failure in reading APClass of capping group for "
-                                 + srcAPC;
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                throw new DENOPTIMException(msg);
-            }
-        }
-        else
-        {
-            String msg = "CPMap does not require capping for " + srcAPC;
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-        }
-
-        return capAPC;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Evaluates the possibility of closing rings in a given graph and if
      * any ring can be closed, it chooses one of the combinations of ring 
      * closures
@@ -834,6 +747,7 @@ public class EAUtils
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();
 
+        //TODO: remove hard-coded variable that exclude considering combination of rings
         boolean onlyRandomCombOfRings = true;
         if (onlyRandomCombOfRings)
         {
@@ -964,7 +878,9 @@ public class EAUtils
             // check if the vertex has a free valence
             DENOPTIMVertex curVertex = lstVert.get(i);
 
-            // no capping of a capping group
+            // no capping of a capping group. Since capping groups are expected
+            // to have only one AP, there should never be a capping group with 
+            // a free AP.
             if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
             {
                 //String msg = "Attempting to cap a capping group. Check your data.";
@@ -981,8 +897,27 @@ public class EAUtils
 
                 if (curDap.isAvailable())
                 {
-                    //Add capping group if required by capping map
-                    attachCappingFragmentAtPosition(molGraph, curVertex, j);
+                    APClass apcCap = FragmentSpace.getAPClassOfCappingVertex(
+                            curDap.getAPClass());
+                    if (apcCap != null)
+                    {
+                        int bbIdCap = getCappingFragment(apcCap);
+
+                        if (bbIdCap != -1)
+                        {
+                            DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                                    GraphUtils.getUniqueVertexIndex(), bbIdCap, 
+                                    DENOPTIMVertex.BBType.CAP);
+                            molGraph.appendVertexOnAP(curDap, capVrtx.getAP(0));
+                        }
+                        else
+                        {
+                            String msg = "Capping is required but no proper capping "
+                                            + "fragment found with APCalss " + apcCap;
+                            DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+                            throw new DENOPTIMException(msg);
+                        }
+                    }
                 }
             }
         }

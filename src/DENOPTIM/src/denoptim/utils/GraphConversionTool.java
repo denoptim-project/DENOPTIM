@@ -19,6 +19,7 @@
 
 package denoptim.utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -36,6 +38,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -50,6 +53,7 @@ import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.SymmetricSet;
 import denoptim.molecule.UndirectedEdgeRelation;
 import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptimga.EAUtils;
 import scala.deprecated;
 
 
@@ -68,7 +72,7 @@ public class GraphConversionTool
     /**
      * Removes unused ring-closing vertexes. 
      * If the resulting free AP needs to be capped, then the proper
-     * capping group is places where each ring-closing vertex once stood.
+     * capping group is places where a ring-closing vertex once stood.
      * @param g the graph to modify.
      * @throws DENOPTIMException 
      */
@@ -79,10 +83,12 @@ public class GraphConversionTool
         {
             if (g.getRingsInvolvingVertex(v).size()==0)
             {
-                APClass cappAPClass = FragmentSpace.getAPClassOfCappingVertex(
-                        v.getAllAPClasses().get(0));
                 DENOPTIMAttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
                 g.removeVertex(v);
+                
+                APClass cappAPClass = FragmentSpace.getAPClassOfCappingVertex(
+                        apOnG.getAPClass());
+                
                 if (cappAPClass != null)
                 {
                     int capId = FragmentSpace.getCappingGroupsWithAPClass(
@@ -373,11 +379,13 @@ public class GraphConversionTool
      * @param dg
      * @return
      */
-    public static SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation>
+    public static DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation>
     getJGraphFromGraph(DENOPTIMGraph dg)
     {
-        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> g = 
-                        new SimpleGraph<>(UndirectedEdgeRelation.class);
+        //TODO: consider using DefaultUndirectedGraph to allow for loops
+        // (i.e., rings involving only three vertexes: one proper vertex, and two RCVs)
+        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> g = 
+                        new DefaultUndirectedGraph<>(UndirectedEdgeRelation.class);
         Map<DENOPTIMVertex,Integer> vis = new HashMap<DENOPTIMVertex,Integer>();
         int i = 0;
         for (DENOPTIMVertex v : dg.getVertexList())
@@ -413,9 +421,34 @@ public class GraphConversionTool
             DENOPTIMVertex pA = vA.getParent();
             DENOPTIMVertex pB = vB.getParent();
 
-            g.addEdge(pA, pB, new UndirectedEdgeRelation(
-                    vA.getEdgeToParent().getSrcAP(), 
-                    vB.getEdgeToParent().getSrcAP(), r.getBondType()));
+            //TODO del try/catch
+            //try
+            //{
+                g.addEdge(pA, pB, new UndirectedEdgeRelation(
+                        vA.getEdgeToParent().getSrcAP(), 
+                        vB.getEdgeToParent().getSrcAP(), r.getBondType()));
+            /*
+            } catch (Throwable t) {
+                t.printStackTrace();
+                System.out.println("HERE: graph "+dg.getGraphId()+" FAILES seemengly due to LOOP.");
+                System.out.println("pA: "+pA);
+                System.out.println("pB: "+pB);
+                System.out.println("vA: "+vA);
+                System.out.println("vB: "+vB);
+                String filename = "/tmp/"+dg.getGraphId()+"failed.sdf";
+                
+                try
+                {
+                    ArrayList<DENOPTIMGraph> lst = new ArrayList<>();
+                    lst.add(dg);
+                    DenoptimIO.writeGraphsToSDF(new File(filename), lst, false);
+                } catch (DENOPTIMException e1)
+                {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+            */
         }
         return g;
     }

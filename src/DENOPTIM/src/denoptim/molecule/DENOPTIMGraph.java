@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
+import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
@@ -1248,10 +1249,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> is this graph is isomorphic to the other.
      */
     public boolean isIsomorphicTo(DENOPTIMGraph other) {
-        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG =
+        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG =
                 GraphConversionTool.getJGraphFromGraph(this);
 
-        SimpleGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG =
+        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG =
                 GraphConversionTool.getJGraphFromGraph(other);
 
         Comparator<DENOPTIMVertex> vComp = (v1, v2) -> {

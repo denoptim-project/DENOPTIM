@@ -32,6 +32,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
