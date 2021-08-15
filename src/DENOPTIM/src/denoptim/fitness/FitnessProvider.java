@@ -45,7 +45,7 @@ import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ManySMARTSQuery;
 
 /**
- * DENOPTIM's (internal) fitness provider class calculates CDK descriptors for a 
+ * DENOPTIM's (internal) fitness provider class calculates descriptors for a 
  * given chemical thing, and combines the descriptors to calculate a single
  * numerical results (i.e., the fitness) according to an equation.
  * 
@@ -92,7 +92,7 @@ public class FitnessProvider
 		this.expression = expression;
 	
 		// We cannot use the list<DescriptorsForFitness> parameter directly
-		// because they are not thread safe.
+		// because they are not thread-safe.
 		// otherwise we hit concurrent modification exception because multiple
 		// threads will run the exact same instance of the implementation
 		this.descriptors = new ArrayList<DescriptorForFitness>();

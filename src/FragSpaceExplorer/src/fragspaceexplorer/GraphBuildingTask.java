@@ -369,7 +369,8 @@ public class GraphBuildingTask extends FitnessTask
                         {
                             // Prepare molecular representation
                         	DENOPTIMGraph gWithNoRCVs = g.clone();
-                        	GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
+                        	//NB: this replaces unused RCVs with capping groups
+                        	GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
                         	IAtomContainer mol = 
                         	        tb3d.convertGraphTo3DAtomContainer(
 	                                    gWithNoRCVs,true);
@@ -430,7 +431,8 @@ public class GraphBuildingTask extends FitnessTask
                     // blocks (not aligned, nor roto-translated)
                 	if (FitnessParameters.make3dTree())
                 	{
-                        GraphConversionTool.removeUnusedRCVs(gClone);
+                	    //NB: this replaces unused RCVs with capping groups
+                        GraphConversionTool.replaceUnusedRCVsWithCapps(gClone);
                         IAtomContainer mol = 
                                 tb3d.convertGraphTo3DAtomContainer(
                                         gClone,true);

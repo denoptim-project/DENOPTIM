@@ -248,7 +248,7 @@ public class ThreeDimTreeBuilder
      * Does not change unused RCVs. Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
-     * {@link GraphConversionTool#removeUnusedRCVs(DENOPTIMGraph)}
+     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DENOPTIMGraph)}
      * method.
      * @return the <code>AtomContainer</code> representation
      * @throws DENOPTIMException
@@ -286,7 +286,7 @@ public class ThreeDimTreeBuilder
      * Does not change unused RCVs. Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
-     * {@link GraphConversionTool#removeUnusedRCVs(DENOPTIMGraph)}
+     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DENOPTIMGraph)}
      * method.
      * @param setCDKRequirements when <code>true</code> this method will ensure
      * that the CDK requirements for IAtomContainers are all met. Namely,
@@ -601,7 +601,7 @@ public class ThreeDimTreeBuilder
      * Does not change unused RCVs.  Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
-     * {@link GraphConversionTool#removeUnusedRCVs(DENOPTIMGraph)}
+     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DENOPTIMGraph)}
      * method.
      * @throws DENOPTIMException
      */

@@ -178,7 +178,7 @@ public class FitnessProviderTest
         PubchemFingerprinter fpMaker = new PubchemFingerprinter(
             DefaultChemObjectBuilder.getInstance());
         IBitFingerprint fpRef = fpMaker.getBitFingerprint(ref);
-        Object[] params = {fpMaker, fpRef};
+        Object[] params = {"PubchemFingerprinter", fpRef};
         iDesc.setParameters(params);
         
         String myVarName = "myVar";

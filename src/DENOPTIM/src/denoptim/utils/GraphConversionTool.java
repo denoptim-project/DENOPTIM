@@ -76,7 +76,7 @@ public class GraphConversionTool
      * @param g the graph to modify.
      * @throws DENOPTIMException 
      */
-    public static void removeUnusedRCVs(DENOPTIMGraph g) 
+    public static void replaceUnusedRCVsWithCapps(DENOPTIMGraph g) 
             throws DENOPTIMException
     {
         for (DENOPTIMVertex v : g.getRCVertices())

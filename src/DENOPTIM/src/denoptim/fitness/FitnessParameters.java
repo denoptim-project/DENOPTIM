@@ -508,20 +508,18 @@ public class FitnessParameters
                         p = Double.parseDouble(v.params[j]);
                     } else if (parType instanceof Boolean) {
                         p = Boolean.getBoolean(v.params[j]);
+                    } else if (parType instanceof String) {
+                        p = v.params[j];
                     } else if (parType instanceof Class) {
                         String type = ((Class<?>) parType).getSimpleName();
                         switch (type)
-                        {
-                            case "IFingerprinter":
-                                p = makeIFingerprinter(v.params[j]);
-                                break;
-                                
+                        {       
                             case "IBitFingerprint":
                                 // WARNING! we expect this to be found always
                                 // after the corresponding IFingerprinter
                                 // parameter.
                                 p = makeIBitFingerprint(v.params[j], 
-                                        (IFingerprinter) params[j-1]);
+                                        makeIFingerprinter(params[j-1].toString()));
                                 break;
                                 
                             default:
@@ -603,33 +601,15 @@ public class FitnessParameters
 	
     private static IFingerprinter makeIFingerprinter(String classShortName) 
             throws DENOPTIMException
-    {
+    {   
         IFingerprinter fp = null;
         try
         {
-            Class<?> cl = Class.forName("org.openscience.cdk.fingerprint." 
-                    + classShortName);
-            for (Constructor<?> constructor : cl.getConstructors()) 
-            {
-                Class<?>[] params = constructor.getParameterTypes();
-                if (params.length == 0) 
-                {
-                    fp = (IFingerprinter) constructor.newInstance();
-                } else if (params[0].equals(IChemObjectBuilder.class))
-                {
-                    //NB potential source of ambiguity on the builder class
-                    fp = (IFingerprinter) constructor.newInstance(cdkBuilder);
-                }
-            }
+            fp = TanimotoMolSimilarity.makeIFingerprinter(classShortName);
         } catch (Throwable t)
         {
             throw new DENOPTIMException("Could not make new instance of '" 
                     + classShortName + "'.", t);
-        }
-        if (fp == null)
-        {
-            throw new DENOPTIMException("Could not make new instance of '" 
-                    + classShortName + "'. No suitable constructor found.");
         }
         return fp;
     }

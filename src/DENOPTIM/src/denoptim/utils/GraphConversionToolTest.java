@@ -162,7 +162,8 @@ public class GraphConversionToolTest
         
         dg.addRing(v3, v4);
         
-        GraphConversionTool.removeUnusedRCVs(dg);
+        //NB: this replaces unused RCVs with capping groups
+        GraphConversionTool.replaceUnusedRCVsWithCapps(dg);
         
         assertEquals(4, dg.getVertexCount(), "Number of vertexes after "
                 + "removal of 0 unused RCVs.");
@@ -198,11 +199,14 @@ public class GraphConversionToolTest
         v3b.setLevel(1);
         v4b.setLevel(0);
     	
-        GraphConversionTool.removeUnusedRCVs(acyclicGraph);
-        
-        assertEquals(2, acyclicGraph.getVertexCount(), "Number of vertexes after "
+        //NB: this replaces unused RCVs with capping groups
+        GraphConversionTool.replaceUnusedRCVsWithCapps(acyclicGraph);
+       
+        assertEquals(0, acyclicGraph.getRCVertices().size(), "Number of RCVs after "
                 + "removal of 2 unused RCVs.");
-        assertEquals(1, acyclicGraph.getEdgeCount(), "Number of edges after "
+        assertEquals(3, acyclicGraph.getVertexCount(), "Number of vertexes after "
+                + "removal of 2 unused RCVs.");
+        assertEquals(2, acyclicGraph.getEdgeCount(), "Number of edges after "
                 + "removal of 2 unused RCVs.");
     }
     

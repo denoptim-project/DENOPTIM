@@ -44,7 +44,7 @@ public class TanimotoMolSimilarityTest
                 DefaultChemObjectBuilder.getInstance());
         IBitFingerprint fpRef = fpMaker.getBitFingerprint(ref);
         
-        Object[] params = {fpMaker, fpRef};
+        Object[] params = {"PubchemFingerprinter", fpRef};
         descriptor.setParameters(params);
         
         IAtomContainer mol1 = sp.parseSmiles("COc1ccccc1");

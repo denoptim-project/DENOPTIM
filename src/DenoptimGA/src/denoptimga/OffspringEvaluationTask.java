@@ -106,7 +106,10 @@ public class OffspringEvaluationTask extends FitnessTask
         	
             try {
                 DENOPTIMGraph gWithNoRCVs = dGraph.clone();
-                GraphConversionTool.removeUnusedRCVs(gWithNoRCVs);
+                
+                //NB: this replaces unused RCVs with capping groups
+                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
+                
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree
             	// 2) remove RCAs
