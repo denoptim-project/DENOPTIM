@@ -1330,8 +1330,18 @@ public class FragmentSpace
 
     /**
      * Extracts a system of one or more fused rings and adds them to the
-     * fragment space if not already present.
+     * fragment space if not already present. <b>WARNING</b> 
+     * Expanding the libraries of 
+     * building blocks on-the-fly has the potential to overload the memory.
      */
+    
+    //TODO: need something to prevent memory overload: 
+    // -> keep only some templates?
+    // -> remove those who did not lead to good population members?
+    // -> remove redundant? The highest-simmetry principle (i.e., rather than 
+    //    keeping a template as it is, we'd like to keep its highest symmetry 
+    //    isoform) would be the first thing to do.
+    
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) {
         final GraphPattern PATTERN = GraphPattern.RING;
 

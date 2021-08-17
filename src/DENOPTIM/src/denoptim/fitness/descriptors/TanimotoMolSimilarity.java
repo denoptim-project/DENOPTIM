@@ -228,19 +228,11 @@ implements IMolecularDescriptor, IDenoptimDescriptor
                     fingerprinter.getBitFingerprint(mol)));
         } catch (IllegalArgumentException e)
         {
-            //TODO-GG del
-            try
-            {
-                DenoptimIO.writeMolecule("/tmp/failes_TANI.sdf", mol, false);
-            } catch (DENOPTIMException e1)
-            {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            
+            e.printStackTrace();
             result = new DoubleResult(Double.NaN);
         } catch (CDKException e)
         {
+            e.printStackTrace();
             result = new DoubleResult(Double.NaN);
         }
         

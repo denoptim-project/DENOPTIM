@@ -349,8 +349,8 @@ public class ParallelEvolutionaryAlgorithm
     private boolean evolvePopulation(ArrayList<Candidate> molPopulation,
                                 String genDir) throws DENOPTIMException
     {
-        // temporary store for inchi codes
-        ArrayList<String> inchisInPop = EAUtils.getInchiCodes(molPopulation);
+        // temporary store for unique identifiers in the initial population
+        ArrayList<String> uidsInitPop = EAUtils.getUniqueIdentifiers(molPopulation);
 
         // keep a clone of the current population for the parents to be
         // chosen from
@@ -400,7 +400,6 @@ public class ParallelEvolutionaryAlgorithm
                 {
                     if (numTries == MAX_TRIES)
                     {
-                        cleanupCompleted(tcons, futures, submitted);
                         break;
                     }
                 }
@@ -946,6 +945,9 @@ public class ParallelEvolutionaryAlgorithm
                     }
                 }
             } // end while
+            
+            // Remove completed tasks: fixed memory leak
+            cleanupCompleted(tcons, futures, submitted);
         }
         catch (DENOPTIMException dex)
         {
@@ -987,8 +989,6 @@ public class ParallelEvolutionaryAlgorithm
                 {
                     molPopulation.get(l).cleanup();
                 }
-
-                // trim the population to the desired size
                 molPopulation.subList(
                         GAParameters.getPopulationSize(), k).clear();
             }
@@ -1002,14 +1002,14 @@ public class ParallelEvolutionaryAlgorithm
         boolean updated = false;
         for (int i=0; i<molPopulation.size(); i++)
         {
-            if (!inchisInPop.contains(molPopulation.get(i).getUID()))
+            if (!uidsInitPop.contains(molPopulation.get(i).getUID()))
             {
                 updated = true;
                 break;
             }
         }
         
-        inchisInPop.clear();
+        uidsInitPop.clear();
         return updated;
     }
 
@@ -1070,8 +1070,8 @@ public class ParallelEvolutionaryAlgorithm
                     {
 //                      MF: the cleanup method removed also uncompleted tasks
 //                      causing their results to be forgotten.
-                        cleanupCompleted(tcons, futures, submitted);
 //                      cleanup(tcons, futures, submitted);
+                        cleanupCompleted(tcons, futures, submitted);
                         break;
                     }
                 }
@@ -1189,6 +1189,9 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Removes all tasks whether they are completed or not.
+     */
     private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
                             ArrayList<OffspringEvaluationTask> submitted)
     {
@@ -1201,30 +1204,32 @@ public class ParallelEvolutionaryAlgorithm
         {
             tsk.stopTask();
         }
-
         submitted.clear();
-
         tcons.getQueue().clear();
     }
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Removes only tasks that are marked as completed.
+     */
     private void cleanupCompleted(ThreadPoolExecutor tcons,
-                                  List<Future<Object>> futures,
-                                      ArrayList<OffspringEvaluationTask> submitted)
+            List<Future<Object>> futures, 
+            ArrayList<OffspringEvaluationTask> submitted)
     {
-        ArrayList<Integer> completed = new ArrayList<>();
+        ArrayList<OffspringEvaluationTask> completed = 
+                new ArrayList<OffspringEvaluationTask>();
 
-        for (int ift=0; ift<submitted.size(); ift++)
+        for (OffspringEvaluationTask t : submitted)
         {
-            if (submitted.get(ift).isCompleted())
-                completed.add(ift);
+            if (t.isCompleted())
+                completed.add(t);
         }
 
-        for (int ift=completed.size(); ift>0; ift--)
+        for (OffspringEvaluationTask t : completed)
         {
-            submitted.remove(submitted.get(ift-1));
-            futures.remove(futures.get(ift-1));
+            submitted.remove(t);
+            futures.remove(t);
         }
     }
 

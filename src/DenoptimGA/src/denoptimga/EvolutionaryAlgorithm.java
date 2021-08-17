@@ -214,13 +214,10 @@ public class EvolutionaryAlgorithm
     private boolean evolvePopulation(ArrayList<Candidate> molPopulation,
                                 String genDir) throws DENOPTIMException
     {
-        // temporary store for inchi codes
-        ArrayList<String> codes = EAUtils.getInchiCodes(molPopulation);
+        // temporary store for unique identifiers in the initial population
+        ArrayList<String> uidsInitPop = EAUtils.getUniqueIdentifiers(molPopulation);
 
         ArrayList<Task> tasks = new ArrayList<>();
-        
-        double sdev_old = EAUtils.getPopulationSD(molPopulation);
-        
 
         // keep a clone of the current population for the parents to be
         // chosen from.
@@ -705,14 +702,14 @@ public class EvolutionaryAlgorithm
         
         for (Candidate mol : molPopulation)
         {
-            if (!codes.contains(mol.getUID()))
+            if (!uidsInitPop.contains(mol.getUID()))
             {
                 updated = true;
                 break;
             }
         }
         
-        codes.clear();
+        uidsInitPop.clear();
         return updated;
     }
 

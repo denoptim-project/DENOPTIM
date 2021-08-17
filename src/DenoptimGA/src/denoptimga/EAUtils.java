@@ -987,20 +987,18 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @param molPopulation
+     * Extracts the list of unique identifiers from a list of candidates.
+     * @param candidates
      * @return list of INCHI codes for the molecules in the population
      */
 
-    protected static ArrayList<String> getInchiCodes
-                                    (ArrayList<Candidate> molPopulation)
+    protected static ArrayList<String> getUniqueIdentifiers
+                                    (ArrayList<Candidate> candidates)
     {
-        int k = molPopulation.size();
         ArrayList<String> arr = new ArrayList<>();
-
-        for (int i=0; i<k; i++)
+        for (Candidate c : candidates)
         {
-            arr.add(molPopulation.get(i).getUID());
+            arr.add(c.getUID());
         }
         return arr;
     }
