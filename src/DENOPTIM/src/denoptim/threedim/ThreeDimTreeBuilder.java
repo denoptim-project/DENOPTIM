@@ -371,8 +371,10 @@ public class ThreeDimTreeBuilder
             if (rootVrtx.containsAtoms())
             {
                 Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
-                Point3d srcPtApSrc = new Point3d(iacRootVrtx.getAtom(
-                        apSrc.getAtomPositionNumber()).getPoint3d());
+                Point3d srcPtApSrc = new Point3d(
+                        DENOPTIMMoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
+                        apSrc.getAtomPositionNumber())));
+                
             
                 // Append next building block on AP-vector - start recursion
                 append3DFragmentsViaEdges(apSrc.getAtomPositionNumber(),

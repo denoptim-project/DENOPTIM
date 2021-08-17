@@ -183,6 +183,9 @@ public class OffspringEvaluationTask extends FitnessTask
                 numTry--;
             }
 
+            //TODO: here we might need to send also molecular representation to 
+            // enable extraction of refined molecular fragments
+            
             FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph());
         }
         completed = true;

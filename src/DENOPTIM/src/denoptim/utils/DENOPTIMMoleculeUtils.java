@@ -303,7 +303,8 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * returns the SMILES representation of the molecule
+     * Returns the SMILES representation of the molecule. All atoms are expected 
+     * to be explicit, as we set the count of implicit H to zero for all atoms.
      * @param mol the molecule
      * @return smiles string
      * @throws DENOPTIMException
@@ -323,9 +324,14 @@ public class DENOPTIMMoleculeUtils
 
         // remove Dummy atoms
         fmol = DATMHDLR.removeDummyInHapto(fmol);
+        fmol = DATMHDLR.removeDummy(fmol);
 
         // convert PseudoAtoms to H
         removeRCA(fmol);
+        
+        // WARNING: assumptions on implicit H count and bond orders!
+        DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(fmol);
+        DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(fmol);
 
         String smiles = "";
         try
@@ -334,6 +340,7 @@ public class DENOPTIMMoleculeUtils
         }
         catch (Throwable t)
         {
+            t.printStackTrace();
         	String fileName = System.getProperty("user.dir") 
         		+ System.getProperty("file.separator") 
         		+ "failed_generation_of_SMILES.sdf";

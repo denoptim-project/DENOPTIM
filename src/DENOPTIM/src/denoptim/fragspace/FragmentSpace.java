@@ -1340,12 +1340,17 @@ public class FragmentSpace
     // -> remove those who did not lead to good population members?
     // -> remove redundant? The highest-simmetry principle (i.e., rather than 
     //    keeping a template as it is, we'd like to keep its highest symmetry 
-    //    isoform) would be the first thing to do.
+    //    isomorphic) would be the first thing to do.
     
-    public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) {
-        final GraphPattern PATTERN = GraphPattern.RING;
-
-        List<DENOPTIMGraph> subgraphs = extractPattern(graph, PATTERN);
+    //TODO: deal with molecular representation. For each subgraph we want the
+    // corresponding molecular representation with APs and atoms with geometrical
+    // features that might be obtained from the results of the fitness provider.
+    // In particular, we should take optimized 3D geometries when the geom.optimization
+    // is run within the fitness provider.
+    
+    public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) 
+    {
+        List<DENOPTIMGraph> subgraphs = extractPattern(graph, GraphPattern.RING);
 
         for (DENOPTIMGraph g : subgraphs) {
             BBType type = g.hasScaffoldTypeVertex() ? 
@@ -1361,6 +1366,9 @@ public class FragmentSpace
                 
                 DENOPTIMTemplate t = new DENOPTIMTemplate(type);
                 t.setInnerGraph(g);
+                
+                //TODO: try to use the 3D structure from fitness evaluation which called this method.
+                boolean has3Dgeometry = false;
 
                 ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
                         FragmentSpace.getFragmentLibrary() :
@@ -1373,7 +1381,14 @@ public class FragmentSpace
                             FragmentSpaceParameters.getPathnameToAppendedScaffolds();
                 try
                 {
-                    DenoptimIO.writeGraphToSDF(new File(destFileName), g, true);
+                    //TODO: compare with method reading-in fragments
+                    if (has3Dgeometry)
+                    {
+                        //TODO: write a fragment-like molecular representation that can be read in.
+                        throw new DENOPTIMException("Not implemented yet!!!");
+                    } else {
+                        DenoptimIO.writeGraphToSDF(new File(destFileName), g, true, false);
+                    }
                 } catch (DENOPTIMException e)
                 {
                     e.printStackTrace();

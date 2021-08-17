@@ -2192,6 +2192,25 @@ public class DenoptimIO
     /**
      * Writes the graph to SDF file.
      *
+     * @param file the file where to print.
+     * @param graph the of graph to print.
+     * @param append use <code>true</code> to append to the file.
+     * @param make3D use <code>true</code> to convert graph to 3d. 
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphToSDF(File file, DENOPTIMGraph graph,
+            boolean append, boolean make3D) throws DENOPTIMException
+    {
+        ArrayList<DENOPTIMGraph> lst = new ArrayList<>(1);
+        lst.add(graph);
+        writeGraphsToSDF(file, lst, append, make3D);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graph to SDF file.
+     *
      * @param file the file where to print
      * @param graph the of graph to print
      * @param append use <code>true</code> to append to the file
@@ -2218,18 +2237,40 @@ public class DenoptimIO
     public static void writeGraphsToSDF(File file,
             ArrayList<DENOPTIMGraph> graphs, boolean append) throws DENOPTIMException
     {
+        writeGraphsToSDF(file, graphs, append, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graphs to SDF file.
+     *
+     * @param file the file where to print
+     * @param graphs the list of graphs to print
+     * @param append use <code>true</code> to append to the file
+     * @param make3D use <code>true</code> to convert graph to 3d. 
+     * If false an empty molecule will be used.
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToSDF(File file,
+            ArrayList<DENOPTIMGraph> graphs, boolean append, boolean make3D) 
+                    throws DENOPTIMException
+    {
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (DENOPTIMGraph g : graphs) 
         {
             ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
             IAtomContainer iac = builder.newAtomContainer();
-            try {
-                iac = tb.convertGraphTo3DAtomContainer(g);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                System.out.println("Couldn't make 3D-tree representation: "
-                        + t.getMessage());
-                //molLibrary.set(currGrphIdx, builder.newAtomContainer());
+            if (make3D)
+            {
+                try {
+                    iac = tb.convertGraphTo3DAtomContainer(g);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    System.out.println("Couldn't make 3D-tree representation: "
+                            + t.getMessage());
+                    //molLibrary.set(currGrphIdx, builder.newAtomContainer());
+                }
             }
             lst.add(iac);
         }

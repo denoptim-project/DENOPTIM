@@ -1503,7 +1503,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		DENOPTIMEdge eo = null;
     		for (DENOPTIMEdge e : edgesFromOther)
     		{
-    			if (et.sameAs(e,reason))
+    		    if (et.sameAs(e,reason))
     			{
     				found = true;
     				eo = e;

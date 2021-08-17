@@ -477,12 +477,23 @@ public class FragmentSpaceTest
 
             List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
             fragLib.clear(); // Workaround. See @BeforeEach in this class.
+            
+            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
+            //Cleanup tmp files
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedFragments());
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+            
             assertEquals(1, fragLib.size());
             DENOPTIMVertex actual = fragLib.get(0);
-            assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
+            StringBuilder sb = new StringBuilder();
+            assertTrue(testCase.expected.sameAs(actual, sb),
+                    "Problem is "+sb.toString());
         } catch (Exception e) {
             e.printStackTrace();
             fail("Unexpected exception thrown.");
@@ -507,8 +518,17 @@ public class FragmentSpaceTest
 
             List<DENOPTIMVertex> scaffLib = FragmentSpace.getScaffoldLibrary();
             scaffLib.clear();
+            
+            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
+
+            //Cleanup tmp files
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedFragments());
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
 
             assertEquals(1, scaffLib.size());
             DENOPTIMVertex actual = scaffLib.get(0);
@@ -535,10 +555,19 @@ public class FragmentSpaceTest
             List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
             fragLib.clear();
 
+            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+            
             for (DENOPTIMGraph g : sameGraphs) {
                 FragmentSpace.addFusedRingsToFragmentLibrary(g);
             }
 
+            //Cleanup tmp files
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedFragments());
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+            
             assertEquals(1, fragLib.size());
         } catch (DENOPTIMException e) {
             e.printStackTrace();
