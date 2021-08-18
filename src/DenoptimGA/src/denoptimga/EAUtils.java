@@ -97,10 +97,135 @@ public class EAUtils
     protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
 
     private static final String NL =System.getProperty("line.separator");
+    private static final String FSEP = System.getProperty("file.separator");
     
     // flag for debugging
     private static final boolean DEBUG = false;
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a folder meant to hold all the data generated during a generation.
+     * The folder is created under the work space.
+     * @param genId the generation's identity number
+     * @throws DENOPTIMException
+     */
+    protected static void createFolderForGeneration(int genId)
+    {
+        DenoptimIO.createDirectory(EAUtils.getPathNameToGenerationFolder(genId));
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads unique identifiers and initial population files according to the
+     * {@link GAParameters}.
+     */
+    protected static ArrayList<Candidate> importInitialPopulation() throws DENOPTIMException
+    {
+        ArrayList<Candidate> population = new ArrayList<Candidate>();
+
+        HashSet<String> lstUID = new HashSet<>(1024);
+        if (!GAParameters.getUIDFileIn().equals(""))
+        {
+            EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
+            EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
+            DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + lstUID.size() 
+                + " known UIDs from " + GAParameters.getUIDFileIn());
+        }
+        String inifile = GAParameters.getInitialPopulationFile();
+        if (inifile.length() > 0)
+        {
+            EAUtils.getPopulationFromFile(inifile, population, lstUID, 
+                    EAUtils.getPathNameToGenerationFolder(0));
+            DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + population.size() 
+                + " molecules from " + inifile);
+        }
+        return population;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected static Candidate buildCandidateFromScratch(Integer numTries) 
+            throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = EAUtils.buildGraph();
+        if (graph == null)
+        {
+            synchronized(numTries)
+            {
+                numTries++;
+            }
+            return null;
+        }
+        graph.setLocalMsg("NEW");
+        
+        Candidate candidate = new Candidate(graph);
+        
+        Object[] res = EAUtils.evaluateGraph(graph);
+        
+        if (res != null)
+        {
+            if (!EAUtils.setupRings(res,graph))
+            {
+                graph.cleanup();
+                synchronized(numTries)
+                {
+                    numTries++;
+                }
+                return null;
+            }
+        } else {
+            graph.cleanup();
+            synchronized(numTries)
+            {
+                numTries++;
+            }
+            return null;
+        }
+        
+        candidate.setUID(res[0].toString().trim());
+        candidate.setSmiles(res[1].toString().trim());
+        candidate.setChemicalRepresentation((IAtomContainer) res[2]);
+        
+        candidate.setName("M" + GenUtils.getPaddedString(
+                DENOPTIMConstants.MOLDIGITS,
+                GraphUtils.getUniqueMoleculeIndex()));
+        
+        // Check if the chosen combination gives rise to forbidden ends
+        //TODO-V3 this should be considered already when making the list of
+        // possible combination of rings
+        for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
+        {
+            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
+            if (FragmentSpace.getCappingMap().get(apc)==null 
+                    && FragmentSpace.getForbiddenEndList().contains(apc))
+            {
+                res = null;
+            }
+        }
+        
+        if (res == null)
+        {
+            graph.cleanup();
+            synchronized(numTries)
+            {
+                numTries++;
+            }
+            return null;
+        }
+        else
+        {
+            synchronized(numTries)
+            {
+                if (numTries > 0)
+                    numTries--;
+            }
+        }
+        
+        return candidate;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -338,6 +463,54 @@ public class EAUtils
     }
 
 //------------------------------------------------------------------------------
+    
+    public static String getPathNameToGenerationFolder(int genID)
+    {
+        StringBuilder sb = new StringBuilder(32);
+        
+        int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
+        
+        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Gen")
+            .append(GenUtils.getPaddedString(ndigits, genID));
+        
+        return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathNameToGenerationDetailsFile(int genID)
+    {
+        StringBuilder sb = new StringBuilder(32);
+        
+        int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
+        
+        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Gen")
+            .append(GenUtils.getPaddedString(ndigits, genID))
+            .append(FSEP).append("Gen").append(".txt");
+        
+        return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathNameToFinalPopulationFolder()
+    {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Final");
+        return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathNameToFinalPopulationDetailsFile()
+    {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Final")
+            .append(FSEP).append("Final.txt");
+        return sb.toString();
+    }
+
+//------------------------------------------------------------------------------
 
     /**
      * Simply copies the files from the previous directories into the specified
@@ -371,6 +544,46 @@ public class EAUtils
                 }
             }
             outputPopulationDetails(popln, genOutfile);
+        }
+        catch (IOException ioe)
+        {
+            throw new DENOPTIMException(ioe);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Simply copies the files from the previous directories into the specified
+     * folder.
+     * @param popln the final list of best molecules
+     * @param destDir the name of the output directory
+     */
+
+    protected static void outputFinalResults(ArrayList<Candidate> popln) throws DENOPTIMException
+    {
+        String dirName = EAUtils.getPathNameToFinalPopulationFolder();
+        DenoptimIO.createDirectory(dirName);
+        File fileDir = new File(dirName);
+
+        try
+        {
+            for (int i=0; i<GAParameters.getPopulationSize(); i++)
+            {
+                String sdfile = popln.get(i).getSDFFile();
+                String imgfile = popln.get(i).getImageFile();
+
+                if (sdfile != null)
+                {
+                    FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
+                }
+                if (imgfile != null)
+                {
+                    FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
+                }
+            }
+            outputPopulationDetails(popln,
+                    EAUtils.getPathNameToFinalPopulationDetailsFile());
         }
         catch (IOException ioe)
         {
@@ -725,12 +938,10 @@ public class EAUtils
     protected static boolean setupRings(Object[] res, DENOPTIMGraph molGraph)
                                                     throws DENOPTIMException
     {
-        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
-        if (!rcnEnabled)
+        if (!FragmentSpace.useAPclassBasedApproach())
             return true;
 
-        boolean evaluateRings = RingClosureParameters.allowRingClosures();
-        if (!evaluateRings)
+        if (!RingClosureParameters.allowRingClosures())
             return true;
 
         // get a atoms/bonds molecular representation (no 3D needed)
@@ -867,8 +1078,7 @@ public class EAUtils
     protected static void addCappingGroup(DENOPTIMGraph molGraph)
                                                     throws DENOPTIMException
     {
-        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
-        if (!rcnEnabled)
+        if (!FragmentSpace.useAPclassBasedApproach())
             return;
 
         ArrayList<DENOPTIMVertex> lstVert = molGraph.getVertexList();

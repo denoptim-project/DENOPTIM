@@ -736,6 +736,42 @@ public class DENOPTIMMoleculeUtils
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * Constructs a copy of an atom container, i.e., a molecule that reflects 
+     * the one given in the input argument
+     * in terms of atom count, type, and geometric properties, and bond count 
+     * and type. Other properties
+     * @param mol the container to copy.
+     * @return the chemical-copy of the input argument.
+     * @throws DENOPTIMException if there are bonds involving more than two atoms.
+     */
+    public static IAtomContainer makeSameAs(IAtomContainer mol) throws DENOPTIMException
+    {
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer iac = builder.newAtomContainer();
+        
+        for (IAtom oAtm : mol.atoms())
+        {
+            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm,true,true);
+            iac.addAtom(nAtm);
+        }
+        
+        for (IBond oBnd : mol.bonds())
+        {
+            if (oBnd.getAtomCount() != 2)
+            {
+                throw new DENOPTIMException("Unable to deal with bonds "
+                        + "involving more than two atoms.");
+            }
+            int ia = mol.indexOf(oBnd.getAtom(0));
+            int ib = mol.indexOf(oBnd.getAtom(1));
+            iac.addBond(ia,ib,oBnd.getOrder());
+        }
+        return iac;
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * Method that constructs an atom that reflect the same atom given as 

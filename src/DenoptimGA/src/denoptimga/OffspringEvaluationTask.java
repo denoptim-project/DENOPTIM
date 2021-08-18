@@ -57,6 +57,43 @@ public class OffspringEvaluationTask extends FitnessTask
     
     /**
      * 
+     * @param offspring
+     * @param workDir
+     * @param popln reference to the current population. Can be null, in which
+     * case this task will not add its entity to any population.
+     * @param numTry
+     * @param fileUID
+     */
+    //NB: for now we take one instance of Candidate and use another one for the results
+    
+    public OffspringEvaluationTask(Candidate offspring, String workDir,
+            List<Candidate> popln, Integer numTry, String fileUID)
+    {
+        super(offspring.getGraph());
+        this.molName = offspring.getName();
+        this.workDir = workDir;
+        this.fitProvMol = offspring.getChemicalRepresentation();
+        this.curPopln = popln;
+        this.numTry = numTry;
+        
+        result.setName(this.molName);
+        result.setUID(offspring.getUID());
+        result.setSmiles(offspring.getSmiles());
+        
+        // Define pathnames to files used/produced by fitness provider
+        fitProvOutFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvInputFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTIN;
+        fitProvPNGFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.CANDIDATE2DEXTENSION;
+        fitProvUIDFile = fileUID;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * 
      * @param molName
      * @param molGraph
      * @param inchi

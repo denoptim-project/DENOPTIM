@@ -42,32 +42,43 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.task.FitnessTask;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
 import denoptim.utils.TaskUtils;
 
 /**
- *
+ * DENOPTIM's asynchronous evolutionary algorithm. Asynchronous means that there is
+ * no waiting for the completion of a generation before starting the generation 
+ * on a new offspring, and that the generation owning an offspring is decided by 
+ * when the fitness evaluation of that offspring is concluded. It is thus possible 
+ * for an offspring to be designed as a child of generation <i>N</i> and become
+ * a member of generation <i>N+M</i>. In a synchronous algorithms 
+ * (see {@link EvolutionaryAlgorithm}, it is always guaranteed that <i>M = 1</i>.
+ * In the asynchronous algorithm, <i>M</i> is only guaranteed to be greater than 0.
+ * 
  * @author Vishwesh Venkatraman
+ * @author Marco Foscato
  */
-public class ParallelEvolutionaryAlgorithm
+public class EvolutionaryAlgorithmAsynchronous
 {
 
     //TODO-V3 change to Executor and initialize based on GAParameters.parallelizationScheme
 
     final List<Future<Object>> futures;
-    final ArrayList<OffspringEvaluationTask> submitted;
+    final ArrayList<FitnessTask> submitted;
     
     final ThreadPoolExecutor tcons;
 
     private Throwable ex;
    
+    private final String NL = System.getProperty("line.separator");
     private final String fsep = System.getProperty("file.separator");
     
 //------------------------------------------------------------------------------
  
-    public ParallelEvolutionaryAlgorithm()
+    public EvolutionaryAlgorithmAsynchronous()
     {
         futures = new ArrayList<>();
         submitted = new ArrayList<>();
@@ -82,7 +93,6 @@ public class ParallelEvolutionaryAlgorithm
             @Override
             public void run()
             {
-                //System.err.println("Calling shutdown.");
                 tcons.shutdown(); // Disable new tasks from being submitted
                 try
                 {
@@ -91,7 +101,6 @@ public class ParallelEvolutionaryAlgorithm
                     {
                         tcons.shutdownNow(); // Cancel currently executing tasks
                     }
-
                     if (!tcons.awaitTermination(60, TimeUnit.SECONDS))
                     {
                         // pool didn't terminate after the second try
@@ -107,7 +116,6 @@ public class ParallelEvolutionaryAlgorithm
                 }
             }
         });
-
 
         // by default the ThreadPoolExecutor will throw an exception
         tcons.setRejectedExecutionHandler(new RejectedExecutionHandler()
@@ -142,7 +150,7 @@ public class ParallelEvolutionaryAlgorithm
     private boolean checkForException()
     {
         boolean hasprobs = false;
-        for (OffspringEvaluationTask tsk : submitted)
+        for (FitnessTask tsk : submitted)
         {
             if (tsk.foundException())
             {
@@ -160,141 +168,73 @@ public class ParallelEvolutionaryAlgorithm
 
 //------------------------------------------------------------------------------
 
-    public void runGA() throws DENOPTIMException
+    public void run() throws DENOPTIMException
     {
         StopWatch watch = new StopWatch();
         watch.start();
-
-        // start the threads
         tcons.prestartAllCoreThreads();
         
-        StringBuilder sb = new StringBuilder(32);
-
-        int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
-        sb.append(GAParameters.getDataDirectory()).append(fsep).append("Gen")
-                        .append(GenUtils.getPaddedString(ndigits, 0));
+        // Create initial population of candidates
+        EAUtils.createFolderForGeneration(0);
+        ArrayList<Candidate> population = EAUtils.importInitialPopulation();
+        initializePopulation(population);
+        EAUtils.outputPopulationDetails(population, 
+                EAUtils.getPathNameToGenerationDetailsFile(0));
         
-        String genDir = sb.toString();
-        sb.setLength(0);
-        
-        // create the directory for the current generation
-        DenoptimIO.createDirectory(genDir);
-
-        // storage for unique identifiers of known candidates
-        HashSet<String> lstUID = new HashSet<>(1024);
-
-        // first collect UIDs of previously known individuals
-        if (!GAParameters.getUIDFileIn().equals(""))
+        // Ensure that there is some variability in fitness values
+        double sdev = EAUtils.getPopulationSD(population);
+        if (sdev < 0.000001) ///TODO: use a parameter to replace hard-coded threshold?
         {
-            EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
-            EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
-        }
-
-        // placeholder for the population members
-        ArrayList<Candidate> molPopulation = new ArrayList<>();
-
-        // then, get the molecules from the initial population file 
-        String inifile = GAParameters.getInitialPopulationFile();
-        if (inifile.length() > 0)
-        {
-            EAUtils.getPopulationFromFile(inifile, molPopulation, lstUID, genDir);
-            String msg = "Read " + molPopulation.size() + " molecules from " + inifile;
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-        }
-
-        // we are done with initial UIDs
-        lstUID.clear();
-        lstUID = null;
-
-        initializePopulation(molPopulation, genDir);
-        
-        sb.append(genDir).append(fsep).append("Gen")
-            .append(GenUtils.getPaddedString(ndigits, 0)).append(".txt");
-        String genOutfile = sb.toString();
-        sb.setLength(0);
-
-        EAUtils.outputPopulationDetails(molPopulation, genOutfile);
-        
-        double sdev = EAUtils.getPopulationSD(molPopulation);
-        if (sdev < 0.0001)
-        {
-            String msg = "Fitness values have little or no difference. STDDEV="
-                            + String.format("%.6f", sdev);
+            String msg = "Fitness values have negligible standard deviation (STDDEV="
+                            + String.format("%.6f", sdev) + "). Abbandoning "
+                                    + "evolutionary algorithm.";
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            cleanup(molPopulation);
+            cleanup(population);
             return;
         }
 
-        // increment this value if the population is stagnating over a number of
-        // generations
-        int numStag = 0, curGen = 1;
-
-        while (curGen <= GAParameters.getNumberOfGenerations())
+        // Start evolution cycles, i.e., generations
+        int numStag = 0, genId = 1;
+        while (genId <= GAParameters.getNumberOfGenerations())
         {
-            DENOPTIMLogger.appLogger.log(Level.INFO,
-                                        "Starting Generation {0}\n", curGen);
+            DENOPTIMLogger.appLogger.log(Level.INFO,"Starting Generation {0}"+NL, 
+                    genId);
 
-            // create a directory for the current generation
-            sb.append(GAParameters.getDataDirectory()).append(fsep).append("Gen")
-                    .append(GenUtils.getPaddedString(ndigits, curGen));
-            // create a directory for the current generation
-            genDir = sb.toString();
-            sb.setLength(0);
-            DenoptimIO.createDirectory(genDir);
-
-
-            // create a new generation
-            // update the population, by replacing weakest members
-            // evolve returns true if members in the population were replaced
-            // changes to the population should ideally change the variance
-
-            if (!evolvePopulation(molPopulation, genDir))
+            String txt = "No change";
+            if (!evolvePopulation(population, genId))
             {
                 numStag++;
-                DENOPTIMLogger.appLogger.log(Level.INFO,
-                    "No change in population in Generation {0}\n", curGen);
             }
             else
             {
                 numStag = 0;
-                DENOPTIMLogger.appLogger.log(Level.INFO,
-                    "Fitter molecules introduced in Generation {0}\n", curGen);
+                txt = "New members introduced";
             }
-
-            sb.append(genDir).append(fsep).append("Gen").append(
-                    GenUtils.getPaddedString(ndigits, curGen)).append(".txt");
-
-            // dump population details to file
-            genOutfile = sb.toString();
-            sb.setLength(0);
-
-            EAUtils.outputPopulationDetails(molPopulation, genOutfile);
-            
+            DENOPTIMLogger.appLogger.log(Level.INFO,txt + " in Generation {0}"+NL, genId);
+            EAUtils.outputPopulationDetails(population, 
+                    EAUtils.getPathNameToGenerationDetailsFile(genId));
             DENOPTIMLogger.appLogger.log(
-                    Level.INFO,"Generation {0}" + " completed\n"
+                    Level.INFO,"Generation {0}" + " completed"+NL
                             + "----------------------------------------"
-                            + "----------------------------------------\n",
-                            curGen);
+                            + "----------------------------------------"+NL,
+                            genId);
 
-            // check for stagnation
             if (numStag >= GAParameters.getNumberOfConvergenceGenerations())
             {
-                // write a log message
                 DENOPTIMLogger.appLogger.log(Level.WARNING,"No change in "
-                        + "population over {0} iterations. Stopping EA. \n",
+                        + "population over {0} iterations. Stopping EA."+NL,
                         numStag);
                 break;
             }
-
-            curGen++;
+            
+            genId++;
         }
 
-        // shutdown threadpool
+        // Start shutdown operations
         tcons.shutdown();
-
         try
         {
-            // wait for pending tasks to finish
+            // wait a bit for pending tasks to finish
             while (!tcons.awaitTermination(5, TimeUnit.SECONDS))
             {
                 // do nothing
@@ -305,66 +245,51 @@ public class ParallelEvolutionaryAlgorithm
             DENOPTIMLogger.appLogger.log(Level.SEVERE, null, ex);
             throw new DENOPTIMException (ex);
         }
-
-
-
-        // sort the population
-        Collections.sort(molPopulation, Collections.reverseOrder());
+        
+        // Sort the population and trim it to desired size
+        Collections.sort(population, Collections.reverseOrder());
         if (GAParameters.getReplacementStrategy() == 1)
         {
-
-            int k = molPopulation.size();
-
-            // trim the population to the desired size
-            molPopulation.subList(GAParameters.getPopulationSize(), k).clear();
+            int k = population.size();
+            population.subList(GAParameters.getPopulationSize(), k).clear();
         }
 
+        // And write final results
+        EAUtils.outputFinalResults(population);
 
-        genDir = GAParameters.getDataDirectory() + fsep + "Final";
-        DenoptimIO.createDirectory(genDir);
-
-
-        EAUtils.outputFinalResults(molPopulation, genDir);
-        
-        cleanup(molPopulation);
-
+        // Termination
+        cleanup(population);
         watch.stop();
-
-        DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}.\n",
+        DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}."+NL,
                                                             watch.toString());
-
-        DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed.\n");
+        DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed."+NL);
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * generate children that are not already among the current population
-     * they should be valid molecules that do not violate constraints
-     * @param molPopulation
-     * @param lstInchi
-     * @param genDir
+     * Generate children that are not already among the current population members.
+     * @param population the current population
      * @return <code>true</code> if new valid molecules are produced such that
      * the population is updated with fitter structures
      * @throws DENOPTIMException
      */
-    private boolean evolvePopulation(ArrayList<Candidate> molPopulation,
-                                String genDir) throws DENOPTIMException
+    private boolean evolvePopulation(ArrayList<Candidate> population, int genId) 
+            throws DENOPTIMException
     {
-        // temporary store for unique identifiers in the initial population
-        ArrayList<String> uidsInitPop = EAUtils.getUniqueIdentifiers(molPopulation);
-
-        // keep a clone of the current population for the parents to be
-        // chosen from
+        EAUtils.createFolderForGeneration(genId);
+        
+        // Take a snapshot of the initial population
         ArrayList<Candidate> clone_popln;
-        synchronized (molPopulation)
+        synchronized (population)
         {
             clone_popln = new ArrayList<Candidate>();
-            for (Candidate m : molPopulation)
+            for (Candidate m : population)
             {
                 clone_popln.add(m.clone());
             }
         }
+        ArrayList<String> initialUIDs = EAUtils.getUniqueIdentifiers(clone_popln);
 
         int newPopSize = GAParameters.getNumberOfChildren() + clone_popln.size();
 
@@ -383,15 +308,6 @@ public class ParallelEvolutionaryAlgorithm
 
         try
         {
-            //TODO-V3: adapt to allow synchronous AND asynchronous parallelization scheme
-            /*
-             * Need to "pause" the submission of tasks when there are no more
-             * seats for new children, and launch only one of the xover kids when 
-             * there is only 1 seat for a new children. 
-             * Then, wait for completion of the previously submitted tasks, and
-             * if any fails, create only the new tasks needed to fulfil
-             * GAParameters.getNumberOfChildren().
-             */
             while (true)
             {
                 if (checkForException())
@@ -403,16 +319,15 @@ public class ParallelEvolutionaryAlgorithm
 
                 synchronized (numTries)
                 {
-                    if (numTries == MAX_TRIES)
+                    if (numTries >= MAX_TRIES)
                     {
                         break;
                     }
                 }
 
-                synchronized (molPopulation)
+                synchronized (population)
                 {
-                    if (molPopulation.size() == newPopSize 
-                            || molPopulation.size() > newPopSize)
+                    if (population.size() >= newPopSize)
                     {
                         break;
                     }
@@ -659,7 +574,7 @@ public class ParallelEvolutionaryAlgorithm
                     IAtomContainer cmol = (IAtomContainer) res[2];
 
                     OffspringEvaluationTask task = new OffspringEvaluationTask(molName, graph4, inchi, smiles, cmol,
-                                           genDir, molPopulation,
+                            EAUtils.getPathNameToGenerationFolder(genId), population,
                                            numTries,GAParameters.getUIDFileOut());
 
                     //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
@@ -667,10 +582,10 @@ public class ParallelEvolutionaryAlgorithm
                     submitted.add(task);
                     futures.add(tcons.submit(task));
 
-                    synchronized (molPopulation)
+                    synchronized (population)
                     {
-                        if (molPopulation.size() == newPopSize 
-                                || molPopulation.size() > newPopSize)
+                        if (population.size() == newPopSize 
+                                || population.size() > newPopSize)
                         {
                             break;
                         }
@@ -751,7 +666,7 @@ public class ParallelEvolutionaryAlgorithm
                         IAtomContainer cmol = (IAtomContainer) res1[2];
 
                         OffspringEvaluationTask task1 = new OffspringEvaluationTask(molName, graph1, inchi, smiles,
-                                           cmol, genDir, molPopulation,
+                                           cmol, EAUtils.getPathNameToGenerationFolder(genId), population,
                                            numTries,GAParameters.getUIDFileOut());
 
                         //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
@@ -759,10 +674,10 @@ public class ParallelEvolutionaryAlgorithm
                         submitted.add(task1);
                         futures.add(tcons.submit(task1));
 
-                        synchronized (molPopulation)
+                        synchronized (population)
                         {
-                            if (molPopulation.size() == newPopSize 
-                                    || molPopulation.size() > newPopSize)
+                            if (population.size() == newPopSize 
+                                    || population.size() > newPopSize)
                             {
                                 break;
                             }
@@ -842,7 +757,7 @@ public class ParallelEvolutionaryAlgorithm
                         IAtomContainer cmol = (IAtomContainer) res2[2];
 
                         OffspringEvaluationTask task2 = new OffspringEvaluationTask(molName, graph2, inchi, smiles,
-                                                cmol, genDir, molPopulation,
+                                                cmol, EAUtils.getPathNameToGenerationFolder(genId), population,
                                                 numTries, 
                                                 GAParameters.getUIDFileOut());
 
@@ -852,9 +767,9 @@ public class ParallelEvolutionaryAlgorithm
                         submitted.add(task2);
                         futures.add(tcons.submit(task2));
 
-                        synchronized (molPopulation)
+                        synchronized (population)
                         {
-                            if (molPopulation.size() == newPopSize || molPopulation.size() > newPopSize)
+                            if (population.size() == newPopSize || population.size() > newPopSize)
                             {
                                 break;
                             }
@@ -935,7 +850,7 @@ public class ParallelEvolutionaryAlgorithm
                         IAtomContainer cmol = (IAtomContainer) res3[2];
 
                         OffspringEvaluationTask task3 = new OffspringEvaluationTask(molName, graph3, inchi, smiles,
-                                                cmol, genDir, molPopulation,
+                                                cmol, EAUtils.getPathNameToGenerationFolder(genId), population,
                                                 numTries, 
                                                 GAParameters.getUIDFileOut());
 
@@ -945,9 +860,9 @@ public class ParallelEvolutionaryAlgorithm
                         submitted.add(task3);
                         futures.add(tcons.submit(task3));
 
-                        synchronized (molPopulation)
+                        synchronized (population)
                         {
-                            if (molPopulation.size() == newPopSize || molPopulation.size() > newPopSize)
+                            if (population.size() == newPopSize || population.size() > newPopSize)
                             {
                                 break;
                             }
@@ -983,23 +898,23 @@ public class ParallelEvolutionaryAlgorithm
         sb.setLength(0);
 
         // sort the population
-        synchronized (molPopulation)
+        synchronized (population)
         {
-            Collections.sort(molPopulation, Collections.reverseOrder());
+            Collections.sort(population, Collections.reverseOrder());
         }
         
         if (GAParameters.getReplacementStrategy() == 1)
         {
-            synchronized(molPopulation)
+            synchronized(population)
             {
-                int k = molPopulation.size();
+                int k = population.size();
 
                 // trim the population to the desired size
                 for (int l=GAParameters.getPopulationSize(); l<k; l++)
                 {
-                    molPopulation.get(l).cleanup();
+                    population.get(l).cleanup();
                 }
-                molPopulation.subList(
+                population.subList(
                         GAParameters.getPopulationSize(), k).clear();
             }
         }
@@ -1010,59 +925,48 @@ public class ParallelEvolutionaryAlgorithm
         // If yes, return true
         
         boolean updated = false;
-        for (int i=0; i<molPopulation.size(); i++)
+        for (int i=0; i<population.size(); i++)
         {
-            if (!uidsInitPop.contains(molPopulation.get(i).getUID()))
+            if (!initialUIDs.contains(population.get(i).getUID()))
             {
                 updated = true;
                 break;
             }
         }
         
-        uidsInitPop.clear();
+        initialUIDs.clear();
         return updated;
     }
 
 //------------------------------------------------------------------------------
 
-    private void initializePopulation(ArrayList<Candidate> population,
-                String genDir) throws DENOPTIMException
+    private void initializePopulation(ArrayList<Candidate> population) 
+            throws DENOPTIMException
     {
-        final int MAX_TRIES = GAParameters.getPopulationSize() * 
-                                              GAParameters.getMaxTriesFactor();
+        final int MAX_TRIES = GAParameters.getPopulationSize() *
+                GAParameters.getMaxTriesFactor();
+        Integer numTries = 0;
 
+        // Deal with existing initial population members
+        synchronized (population)
+        {
+            Collections.sort(population, Collections.reverseOrder());
+            if (GAParameters.getReplacementStrategy() == 1 && 
+                    population.size() > GAParameters.getPopulationSize())
+            {
+                int k = population.size();
+                for (int l=GAParameters.getPopulationSize(); l<k; l++)
+                {
+                    population.get(l).cleanup();
+                }
+                population.subList(GAParameters.getPopulationSize(),k)
+                    .clear();
+            }
+        }
         if (population.size() == GAParameters.getPopulationSize())
         {
-            synchronized (population)
-            {
-                Collections.sort(population, Collections.reverseOrder());
-            }
             return;
         }
-        else if (GAParameters.getReplacementStrategy() == 1)
-        {
-            if (population.size() > GAParameters.getPopulationSize())
-            {
-                // sort the population
-                synchronized (population)
-                {
-                    Collections.sort(population, Collections.reverseOrder());
-                    int k = population.size();
-                    
-                    // trim the population to the desired size
-                    for (int l=GAParameters.getPopulationSize(); l<k; l++)
-                    {
-                        population.get(l).cleanup();
-                    }
-    
-                    // trim the population to the desired size
-                    population.subList(
-                            GAParameters.getPopulationSize(),k).clear();
-                }
-            }
-        }
-
-        Integer numTries = 0;
 
         try
         {
@@ -1078,9 +982,6 @@ public class ParallelEvolutionaryAlgorithm
                 {
                     if (numTries == MAX_TRIES)
                     {
-//                      MF: the cleanup method removed also uncompleted tasks
-//                      causing their results to be forgotten.
-//                      cleanup(tcons, futures, submitted);
                         cleanupCompleted(tcons, futures, submitted);
                         break;
                     }
@@ -1094,74 +995,15 @@ public class ParallelEvolutionaryAlgorithm
                     }
                 }
 
-
-                // generate a random graph
-                DENOPTIMGraph molGraph = EAUtils.buildGraph();
-                if (molGraph == null)
-                {
-                    synchronized(numTries)
-                    {
-                        numTries++;
-                    }
+                Candidate candidate = EAUtils.buildCandidateFromScratch(
+                        numTries);
+                if (candidate == null)
                     continue;
-                }
-                // check if the graph is valid
                 
-                Object[] res = EAUtils.evaluateGraph(molGraph);
-
-                if (res != null)
-                {
-                    if (!EAUtils.setupRings(res,molGraph))
-                    {
-                        res = null;
-                    }
-                }
-                
-                // Check if the chosen combination gives rise to forbidden ends
-                //TODO-V3 this should be considered already when making the list of
-                // possible combination of rings
-                for (DENOPTIMVertex rcv : molGraph.getFreeRCVertices())
-                {
-                    APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-                    if (FragmentSpace.getCappingMap().get(apc)==null 
-                            && FragmentSpace.getForbiddenEndList().contains(apc))
-                	{
-                		res = null;
-                	}
-                }
-
-                if (res == null)
-                {
-                    molGraph.cleanup();
-                    synchronized(numTries)
-                    {
-                        numTries++;
-                    }
-                    continue;
-                }
-                else
-                {
-                    synchronized(numTries)
-                    {
-                        if(numTries > 0)
-                            numTries--;
-                    }
-                }
-                    
-
-                // Create the task
-                String inchi = res[0].toString().trim();
-                String molName = "M" + GenUtils.getPaddedString(
-                		DENOPTIMConstants.MOLDIGITS,
-                		GraphUtils.getUniqueMoleculeIndex());
-
-                String smiles = res[1].toString().trim();
-                IAtomContainer cmol = (IAtomContainer) res[2];
-
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
-                        molName, molGraph, inchi, smiles, cmol, 
-                        genDir, population, numTries,
-                        GAParameters.getUIDFileOut());
+                        candidate, EAUtils.getPathNameToGenerationFolder(0), 
+                        population, numTries, GAParameters.getUIDFileOut());
+                
                 submitted.add(task);
                 futures.add(tcons.submit(task));
             }
@@ -1179,13 +1021,13 @@ public class ParallelEvolutionaryAlgorithm
             throw new DENOPTIMException(ex);
         }
 
-
-        if (numTries == MAX_TRIES)
+        if (numTries >= MAX_TRIES)
         {
             stopRun();
 
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts.\n", numTries);
+                    "Unable to initialize molecules in {0} attempts.\n", 
+                    numTries);
             throw new DENOPTIMException("Unable to initialize molecules in " +
                             numTries + " attempts.");
         }
@@ -1203,14 +1045,14 @@ public class ParallelEvolutionaryAlgorithm
      * Removes all tasks whether they are completed or not.
      */
     private void cleanup(ThreadPoolExecutor tcons, List<Future<Object>> futures,
-                            ArrayList<OffspringEvaluationTask> submitted)
+                            ArrayList<FitnessTask> submitted)
     {
         for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (OffspringEvaluationTask tsk: submitted)
+        for (FitnessTask tsk: submitted)
         {
             tsk.stopTask();
         }
@@ -1225,21 +1067,20 @@ public class ParallelEvolutionaryAlgorithm
      */
     private void cleanupCompleted(ThreadPoolExecutor tcons,
             List<Future<Object>> futures, 
-            ArrayList<OffspringEvaluationTask> submitted)
+            ArrayList<FitnessTask> submitted)
     {
-        ArrayList<OffspringEvaluationTask> completed = 
-                new ArrayList<OffspringEvaluationTask>();
+        ArrayList<FitnessTask> completed = new ArrayList<FitnessTask>();
 
-        for (OffspringEvaluationTask t : submitted)
+        for (FitnessTask t : submitted)
         {
             if (t.isCompleted())
                 completed.add(t);
         }
 
-        for (OffspringEvaluationTask t : completed)
+        for (FitnessTask t : completed)
         {
             submitted.remove(t);
-            futures.remove(t);
+            futures.remove(t); //FIXME
         }
     }
 
