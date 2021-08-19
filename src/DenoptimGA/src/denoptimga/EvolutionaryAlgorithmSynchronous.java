@@ -272,9 +272,9 @@ public class EvolutionaryAlgorithmSynchronous
                 clone_popln.add(m.clone());
             }
         }
-        ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(population);
+        ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(clone_popln);
         
-        int newPopSize = GAParameters.getNumberOfChildren() + population.size();
+        int newPopSize = GAParameters.getNumberOfChildren() + clone_popln.size();
         
         int i=0;
         ArrayList<Task> tasks = new ArrayList<>();
@@ -379,7 +379,6 @@ public class EvolutionaryAlgorithmSynchronous
                 break;
             }
         }
-        
         initUIDs.clear();
         return updated;
     }

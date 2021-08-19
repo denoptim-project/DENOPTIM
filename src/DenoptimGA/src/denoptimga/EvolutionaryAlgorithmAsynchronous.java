@@ -43,6 +43,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.task.FitnessTask;
+import denoptim.task.Task;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -133,7 +134,6 @@ public class EvolutionaryAlgorithmAsynchronous
                 }
             }
         });
-
     }
 
 //------------------------------------------------------------------------------
@@ -264,6 +264,108 @@ public class EvolutionaryAlgorithmAsynchronous
                 watch.toString());
         DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed." + NL);
     }
+    
+//------------------------------------------------------------------------------
+
+    private void initializePopulation(ArrayList<Candidate> population) 
+            throws DENOPTIMException
+    {   
+        // Deal with existing initial population members
+        synchronized (population)
+        {
+            Collections.sort(population, Collections.reverseOrder());
+            if (GAParameters.getReplacementStrategy() == 1 && 
+                    population.size() > GAParameters.getPopulationSize())
+            {
+                int k = population.size();
+                for (int l=GAParameters.getPopulationSize(); l<k; l++)
+                {
+                    population.get(l).cleanup();
+                }
+                population.subList(GAParameters.getPopulationSize(),k)
+                    .clear();
+            }
+        }
+        if (population.size() == GAParameters.getPopulationSize())
+        {
+            return;
+        }
+        
+        Monitor mnt = new Monitor("Initial population");
+
+        // Loop creation of candidates until we have created enough new valid 
+        // candidates or we have reached the max number of attempts.
+        int i = 0;
+        try
+        {
+            while (i < GAParameters.getPopulationSize() *
+                    GAParameters.getMaxTriesFactor()) 
+            {
+                i++;
+                
+                if (checkForException())
+                {
+                    stopRun();
+                    throw new DENOPTIMException("Errors found during sub tasks "
+                            + "execution.", ex);
+                }
+
+                synchronized (population)
+                {
+                    if (population.size() >= GAParameters.getPopulationSize())
+                    {
+                        break;
+                    }
+                }
+
+                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt);
+                
+                if (candidate == null)
+                    continue;
+                
+                OffspringEvaluationTask task = new OffspringEvaluationTask(
+                        candidate, EAUtils.getPathNameToGenerationFolder(0), 
+                        population, mnt, GAParameters.getUIDFileOut());
+                
+                submitted.add(task);
+                futures.add(tcons.submit(task));
+            }
+        }
+        catch (DENOPTIMException dex)
+        {
+            cleanup(tcons, futures, submitted);
+            tcons.shutdown();
+            throw dex;
+        }
+        catch (Exception ex)
+        {
+            cleanup(tcons, futures, submitted);
+            tcons.shutdown();
+            throw new DENOPTIMException(ex);
+        }
+        
+        mnt.printSummary();
+
+        if (i >= (GAParameters.getPopulationSize() * 
+                GAParameters.getMaxTriesFactor()))
+        {
+            cleanupCompleted(tcons, futures, submitted);
+            stopRun();
+            DENOPTIMLogger.appLogger.log(Level.SEVERE,
+                    "Unable to initialize molecules in {0} attempts."+NL, i);
+
+            throw new DENOPTIMException("Unable to initialize molecules in " +
+                            i + " attempts.");
+        }
+
+        synchronized (population)
+        {
+            // NB: this does not remove any item from the list
+            population.trimToSize();
+            
+            Collections.sort(population, Collections.reverseOrder());
+        }
+    }
 
 //------------------------------------------------------------------------------
 
@@ -290,7 +392,7 @@ public class EvolutionaryAlgorithmAsynchronous
                 clone_popln.add(m.clone());
             }
         }
-        ArrayList<String> initialUIDs = EAUtils.getUniqueIdentifiers(clone_popln);
+        ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(clone_popln);
 
         int newPopSize = GAParameters.getNumberOfChildren() + clone_popln.size();
 
@@ -307,23 +409,21 @@ public class EvolutionaryAlgorithmAsynchronous
         int graphsCreated = 0;
         int GraphCreationLogIntervall = 20;
 
+        int i=0;
+        ArrayList<Task> tasks = new ArrayList<>();
+        Monitor mnt = new Monitor("Generation " + genId);
         try
         {
-            while (true)
+            while (i < GAParameters.getPopulationSize() *
+                    GAParameters.getMaxTriesFactor()) 
             {
+                i++;
+                
                 if (checkForException())
                 {
                     stopRun();
                     throw new DENOPTIMException("Errors found during sub-tasks "
                     		+ "execution.", ex);
-                }
-
-                synchronized (numTries)
-                {
-                    if (numTries >= MAX_TRIES)
-                    {
-                        break;
-                    }
                 }
 
                 synchronized (population)
@@ -333,541 +433,59 @@ public class EvolutionaryAlgorithmAsynchronous
                         break;
                     }
                 }
-
-                DENOPTIMGraph graph1 = null, graph2 = null, graph3 = null,
-                    graph4 = null;
-                Xop = -1;
-                Mop = -1;
-                Bop = -1;
-
-                //TODO-V3: balance decision so that the 
-                // 100% = %XOVER + %MUT + %NEW 
-                // use random number to decide which operation to do.
                 
-                if (RandomUtils.nextBoolean(
-                        GAParameters.getCrossoverProbability()))
+                Candidate candidate = null;
+                switch (EAUtils.chooseGenerationMethos())
                 {
-                    int numatt = 0;
-                    Candidate male = null, female = null;
-                    int mvid = -1, fvid = -1;
-                    boolean foundPars = false;
-                    while (numatt < MAX_EVOLVE_ATTEMPTS)
+                    case CROSSOVER:
                     {
-                        if (FragmentSpace.useAPclassBasedApproach())
-                        {
-                            DENOPTIMVertex[] pair = EAUtils.performFBCC(
-                                    clone_popln);
-                            
-                            if (pair == null)
-                            {
-                                DENOPTIMLogger.appLogger.info("Failed to identify "
-                                        + "compatible parents for crossover.");
-                                numatt++;
-                                continue;
-                            }
-                            male = pair[0].getGraphOwner().getCandidateOwner();
-                            female = pair[1].getGraphOwner().getCandidateOwner();
-                            mvid = pair[0].getGraphOwner().indexOf(pair[0]);
-                            fvid = pair[1].getGraphOwner().indexOf(pair[1]);
-                        } else {
-                            int parents[] = EAUtils.selectBasedOnFitness(
-                                    clone_popln, 2);
-                            if (parents[0] == -1 || parents[1] == -1)
-                            {
-                                DENOPTIMLogger.appLogger.info("Failed to identify "
-                                        + "parents for crossover.");
-                                numatt++;
-                                continue;
-                            }
-                            male = clone_popln.get(parents[0]);
-                            female = clone_popln.get(parents[1]);
-                            mvid = EAUtils.selectNonScaffoldNonCapVertex(
-                                    male.getGraph());
-                            fvid = EAUtils.selectNonScaffoldNonCapVertex(
-                                    female.getGraph());
-                        }
-                        foundPars = true;
-                        break;
-                    }
-
-                    if (foundPars)
-                    {
-                        String molid1 = FilenameUtils.getBaseName(
-                                male.getSDFFile());
-                        String molid2 = FilenameUtils.getBaseName(
-                                female.getSDFFile());
-
-                        int gid1 = male.getGraph().getGraphId();
-                        int gid2 = female.getGraph().getGraphId();
-                        
-                        graph1 = male.getGraph().clone();
-                        graph2 = female.getGraph().clone();
-                        
-                        graph1.renumberGraphVertices();
-                        graph2.renumberGraphVertices();
-
-                        f0 += 2;
-
-                        if (DENOPTIMGraphOperations.performCrossover(graph1, 
-                                graph1.getVertexAtPosition(mvid).getVertexId(),
-                                graph2,
-                                graph2.getVertexAtPosition(fvid).getVertexId()))
-                        {
-                            graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
-                            graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
-                            EAUtils.addCappingGroup(graph1);
-                            EAUtils.addCappingGroup(graph2);
-                            Xop = 1;
-                            
-                            graph1.setLocalMsg("Xover: " + molid1 + "|" + gid1 +
-                                                "=" + molid2 + "|" + gid2);
-                            graph2.setLocalMsg("Xover: " + molid1 + "|" + gid1 +
-                                                "=" + molid2 + "|" + gid2);
-                            
-                            graphsCreated = graphsCreated + 2;
-                        }
-                        else
-                        {
-                            if (graph1 != null)
-                            {
-                                graph1.cleanup();
-                            }
-                            if (graph2 != null)
-                            {
-                                graph2.cleanup();
-                            }
-                            graph1 = null; graph2 = null;
-                        }
-                    }
-                }
-
-                if (RandomUtils.nextBoolean(
-                        GAParameters.getMutationProbability()))
-                {
-                    int numatt = 0;
-                    int i3 = -1;
-                    boolean foundPars = false;
-                    while (numatt < MAX_EVOLVE_ATTEMPTS)
-                    {
-                        i3 = EAUtils.selectBasedOnFitness(clone_popln,1)[0];
-                        if (i3 == -1)
-                        {
-                            DENOPTIMLogger.appLogger.info("Invalid mutable "
-                                    + "candidate selection.");
-                            numatt++;
+                        candidate = EAUtils.buildCandidateByXOver(clone_popln, mnt);
+                        if (candidate == null)
                             continue;
-                        }
-                        foundPars = true;
                         break;
                     }
-                     
-                    if (foundPars)
-                    {
-                        graph3 = clone_popln.get(i3).getGraph().clone();
-                        f1 += 1;
-
-                        String molid3 = FilenameUtils.getBaseName(
-                                clone_popln.get(i3).getSDFFile());
-                        int gid3 = clone_popln.get(i3).getGraph()
-                                .getGraphId();
-
-                        if (DENOPTIMGraphOperations.performMutation(graph3))
-                        {
-                            graph3.setGraphId(GraphUtils.getUniqueGraphIndex());
-                            Mop = 1;
-                            graph3.setLocalMsg("Mutation: " + molid3 + "|" + gid3);
-                        }
-                        EAUtils.addCappingGroup(graph3);
                         
-                        graphsCreated++;
-                    }
-                    else
+                    case MUTATION:
                     {
-                        graph3 = null;
+                        candidate = EAUtils.buildCandidateByMutation(clone_popln, 
+                                mnt);
+                        if (candidate == null)
+                            continue;
+                        break;
+                    }
+                        
+                    case CONSTRUCTION:
+                    {
+                        candidate = EAUtils.buildCandidateFromScratch(mnt);
+                        if (candidate == null)
+                            continue;
+                        break;
                     }
                 }
+                
+                if (candidate == null)
+                    continue;
 
-                // ... if neither xover not mutation has been done, we build a 
-                // new graph from scratch
-                if (Xop == -1 && Mop == -1)
-                {
-                    f2++;
-                    graph4 = EAUtils.buildGraph();
-
-                    if (graph4 != null)
-                    {
-                        Bop = 1;
-                        graph4.setLocalMsg("NEW");
-                        
-                        graphsCreated++;
-                    }
-                }
-
-                // Bop can be != 1 due to impossibility of building a new graph?
-                if (Bop == 1)
-                {
-                    Object[] res = EAUtils.evaluateGraph(graph4);
-
-                    if (res != null)
-                    {
-                        if (!EAUtils.setupRings(res,graph4))
-                        {
-                            res = null;
-                        }
-                    }
-                    
-                    // Check if the chosen combination gives rise to forbidden ends
-                    //TODO-V3 this should be considered already when making the list of
-                    // possible combination of rings
-                    for (DENOPTIMVertex rcv : graph4.getFreeRCVertices())
-                    {
-                        APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-                        if (FragmentSpace.getCappingMap().get(apc)==null 
-                                && FragmentSpace.getForbiddenEndList().contains(apc))
-                    	{
-                    		res = null;
-                    	}
-                    }
-
-                    if (res == null)
-                    {
-                        synchronized(numTries)
-                        {
-                            numTries++;
-                        }
-                        continue;
-                    }
-                    else
-                    {
-                        synchronized(numTries)
-                        {
-                            numTries = 0;
-                        }
-                    }
-
-                    // Create the task
-                    // check if the molinchi has been encountered before
-                    inchi = res[0].toString().trim();
-
-//                    if (lstUID.contains(inchi))
-//                    {
-//                        synchronized(numtry)
-//                        {
-//                            numtry++;
-//                        }
-//                        continue;
-//                    }
-//                    else
-//                    {
-//                        lstUID.add(inchi);
-//                        synchronized(numtry)
-//                        {
-//                            numtry = 0;
-//                        }
-//                    }
-
-                    // file extensions will be added later
-                    molName = "M" + GenUtils.getPaddedString(
-                            DENOPTIMConstants.MOLDIGITS,
-                            GraphUtils.getUniqueMoleculeIndex());
-
-                    smiles = res[1].toString().trim();
-                    IAtomContainer cmol = (IAtomContainer) res[2];
-
+                OffspringEvaluationTask task = new OffspringEvaluationTask(candidate, 
+                        EAUtils.getPathNameToGenerationFolder(genId), 
+                        population, mnt, GAParameters.getUIDFileOut());
+                
+                /*
                     OffspringEvaluationTask task = new OffspringEvaluationTask(molName, graph4, inchi, smiles, cmol,
                             EAUtils.getPathNameToGenerationFolder(genId), population,
                                            numTries,GAParameters.getUIDFileOut());
+                */
+                //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
+                // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
+                submitted.add(task);
+                futures.add(tcons.submit(task));
 
-                    //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
-                    // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
-                    submitted.add(task);
-                    futures.add(tcons.submit(task));
-
-                    synchronized (population)
-                    {
-                        if (population.size() == newPopSize 
-                                || population.size() > newPopSize)
-                        {
-                            break;
-                        }
-                    }
-
-                }
-                
-                if (Xop == 1)
+                //TODO-GG remove duplicate check?
+                synchronized (population)
                 {
-                    if (graph1 != null)
+                    if (population.size() >= newPopSize)
                     {
-                        Object[] res1 = EAUtils.evaluateGraph(graph1);
-
-                        if (res1 != null)
-                        {
-                            if (!EAUtils.setupRings(res1,graph1))
-                            {
-                                res1 = null;
-                            }
-                        }
-                        
-                        // Check if the chosen combination gives rise to forbidden ends
-                        //TODO-V3 this should be considered already when making the list of
-                        // possible combination of rings
-                        for (DENOPTIMVertex rcv : graph1.getFreeRCVertices())
-                        {
-                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-                            if (FragmentSpace.getCappingMap().get(apc)==null 
-                                    && FragmentSpace.getForbiddenEndList().contains(apc))
-                        	{
-                        		res1 = null;
-                        	}
-                        }
-
-                        if (res1 == null)
-                        {
-                            synchronized(numTries)
-                            {
-                                numTries++;
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            synchronized(numTries)
-                            {
-                                numTries = 0;
-                            }
-                        }
-
-                        // Create the task
-                        // check if the molinchi has been encountered before
-                        inchi = res1[0].toString().trim();
-
-//                        if (lstUID.contains(inchi))
-//                        {
-//                            synchronized(numtry)
-//                            {
-//                                numtry++;
-//                            }
-//                            continue;
-//                        }
-//                        else
-//                        {
-//                            lstUID.add(inchi);
-//                            synchronized(numtry)
-//                            {
-//                                numtry = 0;
-//                            }
-//                        }
-
-                        // file extensions will be added later
-                        molName = "M" + GenUtils.getPaddedString(
-                                DENOPTIMConstants.MOLDIGITS,
-                                GraphUtils.getUniqueMoleculeIndex());
-
-                        smiles = res1[1].toString().trim();
-                        IAtomContainer cmol = (IAtomContainer) res1[2];
-
-                        OffspringEvaluationTask task1 = new OffspringEvaluationTask(molName, graph1, inchi, smiles,
-                                           cmol, EAUtils.getPathNameToGenerationFolder(genId), population,
-                                           numTries,GAParameters.getUIDFileOut());
-
-                        //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
-                        // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
-                        submitted.add(task1);
-                        futures.add(tcons.submit(task1));
-
-                        synchronized (population)
-                        {
-                            if (population.size() == newPopSize 
-                                    || population.size() > newPopSize)
-                            {
-                                break;
-                            }
-                        }
-                    }
-
-
-                    // add graph2
-                    if (graph2 != null)
-                    {
-                        Object[] res2 = EAUtils.evaluateGraph(graph2);
-
-                        if (res2 != null)
-                        {
-                            if (!EAUtils.setupRings(res2,graph2))
-                            {
-                                res2 = null;
-                            }
-                        }
-                        
-                        // Check if the chosen combination gives rise to forbidden ends
-                        //TODO-V3 this should be considered already when making the list of
-                        // possible combination of rings
-                        for (DENOPTIMVertex rcv : graph2.getFreeRCVertices())
-                        {
-                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-                            if (FragmentSpace.getCappingMap().get(apc)==null 
-                                    && FragmentSpace.getForbiddenEndList().contains(apc))
-                        	{
-                        		res2 = null;
-                        	}
-                        }
-
-                        if (res2 == null)
-                        {
-                            synchronized(numTries)
-                            {
-                                numTries++;
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            synchronized(numTries)
-                            {
-                                numTries = 0;
-                            }
-                        }
-
-                        // Create the task
-                        // check if the molinchi has been encountered before
-                        inchi = res2[0].toString().trim();
-
-//                        if (lstUID.contains(inchi))
-//                        {
-//                            synchronized(numtry)
-//                            {
-//                                numtry++;
-//                            }
-//                            continue;
-//                        }
-//                        else
-//                        {
-//                            lstUID.add(inchi);
-//                            synchronized(numtry)
-//                            {
-//                                numtry = 0;
-//                            }
-//                        }
-
-                        // file extensions will be added later
-                        molName = "M" + GenUtils.getPaddedString(
-                                DENOPTIMConstants.MOLDIGITS,
-                                GraphUtils.getUniqueMoleculeIndex());
-
-                        smiles = res2[1].toString().trim();
-                        IAtomContainer cmol = (IAtomContainer) res2[2];
-
-                        OffspringEvaluationTask task2 = new OffspringEvaluationTask(molName, graph2, inchi, smiles,
-                                                cmol, EAUtils.getPathNameToGenerationFolder(genId), population,
-                                                numTries, 
-                                                GAParameters.getUIDFileOut());
-
-                        //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
-                        // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
-                        
-                        submitted.add(task2);
-                        futures.add(tcons.submit(task2));
-
-                        synchronized (population)
-                        {
-                            if (population.size() == newPopSize || population.size() > newPopSize)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (Mop == 1)
-                {
-                    // add graph3
-                    if (graph3 != null)
-                    {
-                        Object[] res3 = EAUtils.evaluateGraph(graph3);
-
-                        if (res3 != null)
-                        {
-                            if (!EAUtils.setupRings(res3,graph3))
-                            {
-                                res3 = null;
-                            }
-                        }
-                        
-                        // Check if the chosen combination gives rise to forbidden ends
-                        //TODO-V3 this should be considered already when making the list of
-                        // possible combination of rings
-                        for (DENOPTIMVertex rcv : graph3.getFreeRCVertices())
-                        {
-                            APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-                            if (FragmentSpace.getCappingMap().get(apc)==null 
-                                    && FragmentSpace.getForbiddenEndList().contains(apc))
-                        	{
-                        		res3 = null;
-                        	}
-                        }
-
-                        if (res3 == null)
-                        {
-                            synchronized(numTries)
-                            {
-                                numTries++;
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            synchronized(numTries)
-                            {
-                                numTries = 0;
-                            }
-                        }
-
-                        // Create the task
-                        // check if the molinchi has been encountered before
-                        inchi = res3[0].toString().trim();
-
-//                        if (lstUID.contains(inchi))
-//                        {
-//                            synchronized(numtry)
-//                            {
-//                                numtry++;
-//                            }
-//                            continue;
-//                        }
-//                        else
-//                        {
-//                            lstUID.add(inchi);
-//                            synchronized(numtry)
-//                            {
-//                                numtry = 0;
-//                            }
-//                        }
-
-                        // file extensions will be added later
-                        molName = "M" +
-                                GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
-                                                GraphUtils.getUniqueMoleculeIndex());
-                        smiles = res3[1].toString().trim();
-                        IAtomContainer cmol = (IAtomContainer) res3[2];
-
-                        OffspringEvaluationTask task3 = new OffspringEvaluationTask(molName, graph3, inchi, smiles,
-                                                cmol, EAUtils.getPathNameToGenerationFolder(genId), population,
-                                                numTries, 
-                                                GAParameters.getUIDFileOut());
-
-                        //TODO-V3 make submission dependent on GAParameters.parallelizationScheme? 
-                        // so to remove the duplicated code in classes EvolutionaryAlgorithm and ParallelEvolutionaryAlgorithm
-                        
-                        submitted.add(task3);
-                        futures.add(tcons.submit(task3));
-
-                        synchronized (population)
-                        {
-                            if (population.size() == newPopSize || population.size() > newPopSize)
-                            {
-                                break;
-                            }
-                        }
+                        break;
                     }
                 }
             } // end while
@@ -890,13 +508,7 @@ public class EvolutionaryAlgorithmAsynchronous
             throw new DENOPTIMException(ex);
         }
 
-        StringBuilder sb = new StringBuilder(256);
-        sb.append("Crossover Attempted: ").append(f0).append("\n");
-        sb.append("Mutation Attempted: ").append(f1).append("\n");
-        sb.append("New Molecule Attempted: ").append(f2).append("\n");
-
-        DENOPTIMLogger.appLogger.info(sb.toString());
-        sb.setLength(0);
+        mnt.printSummary();
 
         // sort the population
         synchronized (population)
@@ -926,130 +538,16 @@ public class EvolutionaryAlgorithmAsynchronous
         // If yes, return true
         
         boolean updated = false;
-        for (int i=0; i<population.size(); i++)
+        for (Candidate mol : population)
         {
-            if (!initialUIDs.contains(population.get(i).getUID()))
+            if (!initUIDs.contains(mol.getUID()))
             {
                 updated = true;
                 break;
             }
         }
-        
-        initialUIDs.clear();
+        initUIDs.clear();
         return updated;
-    }
-
-//------------------------------------------------------------------------------
-
-    private void initializePopulation(ArrayList<Candidate> population) 
-            throws DENOPTIMException
-    {
-        final int MAX_TRIES = GAParameters.getPopulationSize() *
-                GAParameters.getMaxTriesFactor();
-        Integer numTries = 0;
-
-        // Deal with existing initial population members
-        synchronized (population)
-        {
-            Collections.sort(population, Collections.reverseOrder());
-            if (GAParameters.getReplacementStrategy() == 1 && 
-                    population.size() > GAParameters.getPopulationSize())
-            {
-                int k = population.size();
-                for (int l=GAParameters.getPopulationSize(); l<k; l++)
-                {
-                    population.get(l).cleanup();
-                }
-                population.subList(GAParameters.getPopulationSize(),k)
-                    .clear();
-            }
-        }
-        if (population.size() == GAParameters.getPopulationSize())
-        {
-            return;
-        }
-        
-        Monitor mnt = new Monitor("Initial population");
-
-        // Loop creation of candidates until we have created enough new valid 
-        // candidates or we have reached the max number of attempts.
-        int i = 0;
-        try
-        {
-            while (true)
-            {
-                i++;
-                
-                if (checkForException())
-                {
-                    stopRun();
-                    throw new DENOPTIMException("Errors found during sub tasks "
-                    		+ "execution.", ex);
-                }
-                synchronized (numTries)
-                {
-                    if (numTries == MAX_TRIES)
-                    {
-                        cleanupCompleted(tcons, futures, submitted);
-                        break;
-                    }
-                }
-
-                synchronized (population)
-                {
-                    if (population.size() >= GAParameters.getPopulationSize())
-                    {
-                        break;
-                    }
-                }
-
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt);
-                
-                if (candidate == null)
-                    continue;
-                
-              //TODO-GG del
-                System.out.println(i+" Submitting one: " + candidate.getName());
-                
-                OffspringEvaluationTask task = new OffspringEvaluationTask(
-                        candidate, EAUtils.getPathNameToGenerationFolder(0), 
-                        population, numTries, GAParameters.getUIDFileOut());
-                
-                submitted.add(task);
-                futures.add(tcons.submit(task));
-            }
-        }
-        catch (DENOPTIMException dex)
-        {
-            cleanup(tcons, futures, submitted);
-            tcons.shutdown();
-            throw dex;
-        }
-        catch (Exception ex)
-        {
-            cleanup(tcons, futures, submitted);
-            tcons.shutdown();
-            throw new DENOPTIMException(ex);
-        }
-
-        if (numTries >= MAX_TRIES)
-        {
-            stopRun();
-
-            DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts.\n", 
-                    numTries);
-            throw new DENOPTIMException("Unable to initialize molecules in " +
-                            numTries + " attempts.");
-        }
-
-        synchronized (population)
-        {
-            // NB: this does not remove any item from the list
-            population.trimToSize();
-            
-            Collections.sort(population, Collections.reverseOrder());
-        }
     }
 
 //------------------------------------------------------------------------------
