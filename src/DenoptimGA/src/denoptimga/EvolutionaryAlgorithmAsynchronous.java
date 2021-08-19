@@ -55,7 +55,7 @@ import denoptim.utils.TaskUtils;
  * when the fitness evaluation of that offspring is concluded. It is thus possible 
  * for an offspring to be designed as a child of generation <i>N</i> and become
  * a member of generation <i>N+M</i>. In a synchronous algorithms 
- * (see {@link EvolutionaryAlgorithm}, it is always guaranteed that <i>M = 1</i>.
+ * (see {@link EvolutionaryAlgorithmSynchronous}, it is always guaranteed that <i>M = 1</i>.
  * In the asynchronous algorithm, <i>M</i> is only guaranteed to be greater than 0.
  * 
  * @author Vishwesh Venkatraman
@@ -74,7 +74,6 @@ public class EvolutionaryAlgorithmAsynchronous
     private Throwable ex;
    
     private final String NL = System.getProperty("line.separator");
-    private final String fsep = System.getProperty("file.separator");
     
 //------------------------------------------------------------------------------
  
@@ -197,8 +196,8 @@ public class EvolutionaryAlgorithmAsynchronous
         int numStag = 0, genId = 1;
         while (genId <= GAParameters.getNumberOfGenerations())
         {
-            DENOPTIMLogger.appLogger.log(Level.INFO,"Starting Generation {0}"+NL, 
-                    genId);
+            DENOPTIMLogger.appLogger.log(Level.INFO,"Starting Generation {0}" 
+                    + NL,genId);
 
             String txt = "No change";
             if (!evolvePopulation(population, genId))
@@ -210,20 +209,21 @@ public class EvolutionaryAlgorithmAsynchronous
                 numStag = 0;
                 txt = "New members introduced";
             }
-            DENOPTIMLogger.appLogger.log(Level.INFO,txt + " in Generation {0}"+NL, genId);
+            DENOPTIMLogger.appLogger.log(Level.INFO,txt + " in Generation {0}" 
+                    + NL, genId);
             EAUtils.outputPopulationDetails(population, 
                     EAUtils.getPathNameToGenerationDetailsFile(genId));
             DENOPTIMLogger.appLogger.log(
-                    Level.INFO,"Generation {0}" + " completed"+NL
+                    Level.INFO,"Generation {0}" + " completed" + NL
                             + "----------------------------------------"
-                            + "----------------------------------------"+NL,
+                            + "----------------------------------------" + NL,
                             genId);
 
             if (numStag >= GAParameters.getNumberOfConvergenceGenerations())
             {
-                DENOPTIMLogger.appLogger.log(Level.WARNING,"No change in "
-                        + "population over {0} iterations. Stopping EA."+NL,
-                        numStag);
+                DENOPTIMLogger.appLogger.log(Level.WARNING,
+                        "No change in population over {0} iterations. "
+                        + "Stopping EA." + NL, numStag);
                 break;
             }
             
@@ -260,16 +260,17 @@ public class EvolutionaryAlgorithmAsynchronous
         // Termination
         cleanup(population);
         watch.stop();
-        DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}."+NL,
-                                                            watch.toString());
-        DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed."+NL);
+        DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}." + NL,
+                watch.toString());
+        DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed." + NL);
     }
 
 //------------------------------------------------------------------------------
 
     /**
      * Generate children that are not already among the current population members.
-     * @param population the current population
+     * @param population the list of items to be evolved.
+     * @param genId the generation number.
      * @return <code>true</code> if new valid molecules are produced such that
      * the population is updated with fitter structures
      * @throws DENOPTIMException
@@ -967,11 +968,18 @@ public class EvolutionaryAlgorithmAsynchronous
         {
             return;
         }
+        
+        Monitor mnt = new Monitor("Initial population");
 
+        // Loop creation of candidates until we have created enough new valid 
+        // candidates or we have reached the max number of attempts.
+        int i = 0;
         try
         {
             while (true)
             {
+                i++;
+                
                 if (checkForException())
                 {
                     stopRun();
@@ -995,10 +1003,13 @@ public class EvolutionaryAlgorithmAsynchronous
                     }
                 }
 
-                Candidate candidate = EAUtils.buildCandidateFromScratch(
-                        numTries);
+                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt);
+                
                 if (candidate == null)
                     continue;
+                
+              //TODO-GG del
+                System.out.println(i+" Submitting one: " + candidate.getName());
                 
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         candidate, EAUtils.getPathNameToGenerationFolder(0), 
@@ -1034,7 +1045,9 @@ public class EvolutionaryAlgorithmAsynchronous
 
         synchronized (population)
         {
+            // NB: this does not remove any item from the list
             population.trimToSize();
+            
             Collections.sort(population, Collections.reverseOrder());
         }
     }

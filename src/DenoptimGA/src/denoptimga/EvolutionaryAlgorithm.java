@@ -887,6 +887,9 @@ GenUtils.pause();
                 //System.err.println("Launching batch of: " + tasks.size());
                 // decrement tries
                 numTries += tasks.size();
+                
+              //TODO-GG del
+                System.out.println(" Submitting batch of "+tasks.size());
 
                 ArrayList<Candidate> results =
                         TasksBatchManager.executeTasks(tasks,

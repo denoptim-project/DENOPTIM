@@ -16,7 +16,41 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EAUtilsTest
 {
+    
+//------------------------------------------------------------------------------
 
+    @Test
+    public void testCandidateGenerationMethod() throws Exception
+    {
+        int ix = 0, im=0, ic=0, tot=1000;
+        double wx = 2, wm = 0.6, wc=0.05;
+        double wtot = wx + wm + wc;
+        for (int i=0; i<tot; i++)
+        {
+            switch (EAUtils.pickNewCandidateGenerationMode(wx,wm,wc))
+            {
+                case CROSSOVER:
+                    ix++;
+                    break;
+                case MUTATION:
+                    im++;
+                    break;
+                case CONSTRUCTION:
+                    ic++;
+                    break;
+            }
+        }
+        double x = ((double)ix) / tot;
+        double m = ((double)im) / tot;
+        double c = ((double)ic) / tot;
+        
+        double thld = 0.05;
+        
+        assertTrue(Math.abs(x-(wx/wtot)) < thld, "#Xover cases are off!");
+        assertTrue(Math.abs(m-(wm/wtot)) < thld, "#Mutation cases are off!");
+        assertTrue(Math.abs(c-(wc/wtot)) < thld, "#Built cases are off!");
+    }
+    
 //------------------------------------------------------------------------------
 	
     @Test

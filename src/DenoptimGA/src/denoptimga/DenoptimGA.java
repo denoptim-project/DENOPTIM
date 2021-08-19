@@ -62,7 +62,10 @@ public class DenoptimGA
         {
         	GAParameters.dataDir = args[1];
         }
-        EvolutionaryAlgorithm evoGA;
+
+        EvolutionaryAlgorithmSynchronous syncEA;
+      //TODO-GG del
+        //EvolutionaryAlgorithm syncEA;
         EvolutionaryAlgorithmAsynchronous asyncEA = null;
         try
         {	
@@ -74,8 +77,11 @@ public class DenoptimGA
             switch (GAParameters.parallelizationScheme)
             {
                 case 1:
-                    evoGA = new EvolutionaryAlgorithm();
-                    evoGA.runGA();
+                    syncEA = new EvolutionaryAlgorithmSynchronous();
+                    syncEA.run();
+                  //TODO-GG del
+                    //syncEA = new EvolutionaryAlgorithm();
+                    //syncEA.runGA();
                     break;
 
                 case 2:

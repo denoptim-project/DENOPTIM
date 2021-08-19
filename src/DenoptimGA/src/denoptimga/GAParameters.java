@@ -76,6 +76,11 @@ public class GAParameters
      * recorded.
      */
     protected static String uidFileOut = "";
+    
+    /**
+     * Pathname of file where EA monitors dumps are printed
+     */
+    protected static String monitorFile = "";
 
     /**
      * Default name of the UIDFileOut
@@ -123,6 +128,12 @@ public class GAParameters
      * so that the maximum number of attempts = factor * population size
      */
     protected static int maxTriesPerPop = 25;
+    
+    /**
+     * Maximum number of attempts to perform any genetic operation (i.e., either
+     * crossover or mutation) on any parents before giving up.
+     */
+    protected static int maxGeneticOpAttempts = 100;
 
     /**
      * Replacement strategy: 1) replace worst individuals with new ones that are
@@ -179,19 +190,34 @@ public class GAParameters
     protected static double crowdingSigmaMiddle = 2.5;
 
     /**
-     * The probability at which mutation is performed
-     */
-    protected static double mutationProbability = 0.2;
-
-    /**
      * The probability at which symmetric substitution occurs
      */
     protected static double symmetricSubProbability = 0.8;
 
     /**
+     * The probability at which mutation is performed
+     */
+    protected static double mutationProbability = 0.2;
+    
+    /**
+     * The relative weight at which mutation is performed
+     */
+    protected static double mutationWeight = 1.0;
+    
+    /**
+     * The relative weight at which construction from scratch is performed
+     */
+    protected static double builtAnewWeight = 1.0;
+    
+    /**
      * The probability at which crossover is performed
      */
     protected static double crossoverProbability = 0.8;
+    
+    /**
+     * The relative weight at which crossover is performed
+     */
+    protected static double crossoverWeight = 1.0;
 
     /**
      * Crossover parents selection strategy: integer code
@@ -230,6 +256,13 @@ public class GAParameters
     protected static int precisionLevel = 3;
 
     /**
+     * Monitor dumps step. The EA {@link Monitor} will dump data to file every 
+     * this number is number of new attempts to generate candidate. 
+     */
+    protected static int monitorDumpStep = 50;
+    
+
+    /**
      * Print level
      */
     protected static int print_level = 0;
@@ -258,6 +291,7 @@ public class GAParameters
     	numConvGen = 5;
     	numGenerations = 100;
     	maxTriesPerPop = 25;
+    	maxGeneticOpAttempts = 100;
     	replacementStrategy = 1;
     	growthProbabilityScheme = 0;
     	growthMultiplier = 0.5;
@@ -266,6 +300,9 @@ public class GAParameters
     	mutationProbability = 0.2;
     	symmetricSubProbability = 0.8;
     	crossoverProbability = 0.8;
+    	crossoverWeight = 1.0;
+    	mutationWeight = 1.0;
+    	builtAnewWeight = 1.0;
     	xoverSelectionMode = 3;
     	strXoverSelectionMode = "STOCHASTIC UNIVERSAL SAMPLING";
     	seed = 0L;
@@ -274,6 +311,7 @@ public class GAParameters
     	sortOrderDecreasing = true;
     	precisionLevel = 3;
     	print_level = 0;
+    	monitorDumpStep = 50;
     	
         FragmentSpaceParameters.resetParameters();
         RingClosureParameters.resetParameters();
@@ -300,6 +338,20 @@ public class GAParameters
     protected static String getVisitedGraphsFile()
     {
         return visitedGraphsFile;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static String getMonitorFile()
+    {
+        return monitorFile;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected static int getMonitorDumpStep()
+    {
+        return monitorDumpStep;
     }
 
 //------------------------------------------------------------------------------
@@ -335,6 +387,13 @@ public class GAParameters
     protected static int getMaxTriesFactor()
     {
         return maxTriesPerPop;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static int getMaxGeneticOpAttempts()
+    {
+        return maxGeneticOpAttempts;
     }
 
 //------------------------------------------------------------------------------
@@ -448,7 +507,27 @@ public class GAParameters
     {
         return numOfChildren;
     }
+    
+//------------------------------------------------------------------------------
+    protected static double getCrossoverWeight()
+    {
+        return crossoverWeight;
+    }
 
+//------------------------------------------------------------------------------
+
+    protected static double getMutationWeight()
+    {
+        return mutationWeight;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static double getConstructionWeight()
+    {
+        return builtAnewWeight;
+    }
+    
 //------------------------------------------------------------------------------
     protected static double getCrossoverProbability()
     {
@@ -612,7 +691,27 @@ public class GAParameters
                     }
                     continue;
                 }
-
+                
+                if (line.toUpperCase().startsWith("GA-MONITORFILE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        monitorFile = option;
+                    }
+                    continue;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-MONITORDUMPSTEP="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        monitorDumpStep = Integer.parseInt(option);
+                    }
+                    continue;
+                }
+                
                 if (line.toUpperCase().startsWith("GA-RANDOMSEED="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
@@ -623,12 +722,18 @@ public class GAParameters
                     continue;
                 }
                 
-
                 if (line.toUpperCase().startsWith("GA-MAXTRIESPERPOPULATION="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                         maxTriesPerPop  = Integer.parseInt(option);
+                }
+                
+                if (line.toUpperCase().startsWith("GA-MAXGENETICOPSATTEMPTS="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                        maxGeneticOpAttempts  = Integer.parseInt(option);
                 }
 
                 if (line.toUpperCase().startsWith("GA-INITPOPLNFILE="))
@@ -745,6 +850,33 @@ public class GAParameters
                     }
                 }
 
+                if (line.toUpperCase().startsWith("GA-CROSSOVERWEIGHT="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        GAParameters.crossoverWeight = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MUTATIONWEIGHT="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        GAParameters.mutationWeight = Double.parseDouble(option);
+                    }
+                }
+                
+                if (line.toUpperCase().startsWith("GA-CONSTRUCTIONWEIGHT="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        GAParameters.builtAnewWeight = Double.parseDouble(option);
+                    }
+                }
+                
                 if (line.toUpperCase().startsWith("GA-CROSSOVERPROBABILITY="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
@@ -928,6 +1060,11 @@ public class GAParameters
         createWorkingDirectory();
 
         logFile = dataDir + ".log";
+        
+        if (monitorFile.equals(""))
+        {
+            monitorFile = dataDir + ".eaMonitor";
+        }
 
         failedSDF = dataDir + "_FAILED.sdf";
 
@@ -1024,6 +1161,24 @@ public class GAParameters
                                 GAParameters.mutationProbability > 1.)
         {
             error = "Mutation probability must be between 0 and 1.";
+            throw new DENOPTIMException(error);
+        }
+        
+        if (GAParameters.mutationWeight < 0.)
+        {
+            error = "Weight of mutation must be a positive number";
+            throw new DENOPTIMException(error);
+        }
+        
+        if (GAParameters.crossoverWeight < 0.)
+        {
+            error = "Weight of crossover must be a positive number";
+            throw new DENOPTIMException(error);
+        }
+        
+        if (GAParameters.builtAnewWeight < 0.)
+        {
+            error = "Weight of construction must be a positive number";
             throw new DENOPTIMException(error);
         }
 
