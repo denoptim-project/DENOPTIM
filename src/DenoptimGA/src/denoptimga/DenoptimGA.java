@@ -63,10 +63,7 @@ public class DenoptimGA
         	GAParameters.dataDir = args[1];
         }
 
-        EvolutionaryAlgorithmSynchronous syncEA;
-      //TODO-GG del
-        //EvolutionaryAlgorithm syncEA;
-        EvolutionaryAlgorithmAsynchronous asyncEA = null;
+        EvolutionaryAlgorithm ea = null;
         try
         {	
             GAParameters.readParameterFile(configFile);
@@ -74,35 +71,17 @@ public class DenoptimGA
             GAParameters.processParameters();
             GAParameters.printParameters();
             
-            switch (GAParameters.parallelizationScheme)
-            {
-                case 1:
-                    syncEA = new EvolutionaryAlgorithmSynchronous();
-                    syncEA.run();
-                  //TODO-GG del
-                    //syncEA = new EvolutionaryAlgorithm();
-                    //syncEA.runGA();
-                    break;
-
-                case 2:
-                    asyncEA = new EvolutionaryAlgorithmAsynchronous();
-                    asyncEA.run();
-                    break;
-                    
-                default:
-                    asyncEA = new EvolutionaryAlgorithmAsynchronous();
-                    asyncEA.run();
-                    break;
-            }
+            ea = new EvolutionaryAlgorithm();
+            ea.run();
         }
         catch (Throwable t)
         {
-            if (asyncEA != null)
-            {
-                asyncEA.stopRun();
-            }
+            if (ea != null)
+                ea.stopRun();
+            
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
             GenUtils.printExceptionChain(t);
+            
             throw new DENOPTIMException("Error in DenoptimGA run.", t);
         }
 
