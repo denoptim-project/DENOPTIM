@@ -193,11 +193,6 @@ public class GAParameters
      * The probability at which symmetric substitution occurs
      */
     protected static double symmetricSubProbability = 0.8;
-
-    /**
-     * The probability at which mutation is performed
-     */
-    protected static double mutationProbability = 0.2;
     
     /**
      * The relative weight at which mutation is performed
@@ -208,11 +203,6 @@ public class GAParameters
      * The relative weight at which construction from scratch is performed
      */
     protected static double builtAnewWeight = 1.0;
-    
-    /**
-     * The probability at which crossover is performed
-     */
-    protected static double crossoverProbability = 0.8;
     
     /**
      * The relative weight at which crossover is performed
@@ -297,9 +287,7 @@ public class GAParameters
     	growthMultiplier = 0.5;
     	growthSigmaSteepness = 1.0;
     	growthSigmaMiddle = 2.5;
-    	mutationProbability = 0.2;
     	symmetricSubProbability = 0.8;
-    	crossoverProbability = 0.8;
     	crossoverWeight = 1.0;
     	mutationWeight = 1.0;
     	builtAnewWeight = 1.0;
@@ -526,19 +514,6 @@ public class GAParameters
     protected static double getConstructionWeight()
     {
         return builtAnewWeight;
-    }
-    
-//------------------------------------------------------------------------------
-    protected static double getCrossoverProbability()
-    {
-        return crossoverProbability;
-    }
-
-//------------------------------------------------------------------------------
-
-    protected static double getMutationProbability()
-    {
-        return mutationProbability;
     }
 
 //------------------------------------------------------------------------------
@@ -877,34 +852,6 @@ public class GAParameters
                     }
                 }
                 
-                if (line.toUpperCase().startsWith("GA-CROSSOVERPROBABILITY="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.crossoverProbability = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-MUTATIONPROBABILITY="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.mutationProbability = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-SYMMETRYPROBABILITY="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.symmetricSubProbability =
-                                Double.parseDouble(option);
-                    }
-                }
-
                 if (line.toUpperCase().startsWith("GA-REPLACEMENTSTRATEGY="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
@@ -1140,27 +1087,18 @@ public class GAParameters
             error = "Number of generations must be a positive number.";
             throw new DENOPTIMException(error);
         }
+        
         if (GAParameters.numConvGen <= 0)
         {
-            error = "Number of convergence iterations must be a positive number.";
+            error = "Number of convergence iterations must be a positive "
+                    + "number.";
             throw new DENOPTIMException(error);
         }
-        if (GAParameters.crossoverProbability < 0. ||
-                                    GAParameters.crossoverProbability > 1.)
-        {
-            error = "Crossover probability must be between 0 and 1.";
-            throw new DENOPTIMException(error);
-        }
+        
         if (GAParameters.symmetricSubProbability < 0. ||
                             GAParameters.symmetricSubProbability > 1.)
         {
             error = "Symmetric molecule probability must be between 0 and 1.";
-            throw new DENOPTIMException(error);
-        }
-        if (GAParameters.mutationProbability < 0. ||
-                                GAParameters.mutationProbability > 1.)
-        {
-            error = "Mutation probability must be between 0 and 1.";
             throw new DENOPTIMException(error);
         }
         

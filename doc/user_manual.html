@@ -1151,6 +1151,18 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
+		<td width="40%"><p><code>GA-MonitorDumpStep</code></p>
+		</td>
+		<td width="60%"><p>The monitor dump is a record of how many attempted and failed operations are performed to produce new candidate population members. The record is printed every N attempts to build a new candidate, and N can be specified by <code>GA-MonitorDumpStep</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-MonitorFile</code></p>
+		</td>
+		<td width="60%"><p>Specifies the pathname where to write monitor dumps and summaries. Dumps are snapshots taken with a frequency controlled by <code>GA-MonitorDumpStep</code>, while summaries are printed at the end of every generation.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
 		<td width="40%"><p><code>GA-RandomSeed</code></p>
 		</td>
 		<td width="60%"><p>Specifies the seed number used by the random number generator.</p>
@@ -1203,6 +1215,13 @@ without providing that specific keyword in the input file.</p>
 			attempts to build a new graph is given by the size of the
 			population, times the factor given by the <code>GA-MaxTriesPerPopulation
 			</code>keyword.</code></p>
+		</td>
+	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>GA-MaxGeneticOpsAttempts</code></p>
+		</td>
+		<td width="60%"><p>Controls the maximum number
+			of attempts to perform a genetic operation such as crossover or mutation.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1288,17 +1307,21 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-CrossoverProbability</code></p>
+		<td width="40%"><p><code>GA-CrossoverWeight</code></p>
 		</td>
-		<td width="60%"><p>Specifies the probability
-			(0.0-1.0) at which crossover is performed.</code></p>
+		<td width="60%"><p>Specifies the relative weight of crossover when generating new candidate population members.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-MutationProbability</code></p>
+		<td width="40%"><p><code>GA-MutationWeight</code></p>
 		</td>
-		<td width="60%"><p>Specifies the probability
-			(0.0-1.0) at which mutation is performed.</code></p>
+		<td width="60%"><p>Specifies the relative weight of mutation when generating new candidate population members.</p>
+		</td>
+	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>GA-ConstructionWeight</code></p>
+		</td>
+		<td width="60%"><p>Specifies the relative weight of construction from scratch when generating new candidate population members.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
