@@ -336,8 +336,8 @@ public class DENOPTIMGraphOperations
 
         ArrayList<DENOPTIMAttachmentPoint> lstDaps = 
                                                 curVrtx.getAttachmentPoints();
-        Set<DENOPTIMAttachmentPoint> toDoAPs = 
-                new HashSet<DENOPTIMAttachmentPoint>();
+        List<DENOPTIMAttachmentPoint> toDoAPs = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
         toDoAPs.addAll(lstDaps);
         for (int i=0; i<lstDaps.size(); i++)
         {
@@ -357,7 +357,7 @@ public class DENOPTIMGraphOperations
                         + "vertex "+ curVrtId 
                         + " (AP: " + apId + ")");
             }
-
+            
             // is it possible to extend on this AP?
             if (!ap.isAvailable())
             {
@@ -669,8 +669,7 @@ public class DENOPTIMGraphOperations
         int numCands = lscFfCc.size();
         if (numCands > 0)
         {
-            MersenneTwister rng = RandomUtils.getRNG();
-            int chosenId = rng.nextInt(numCands);
+            int chosenId = RandomUtils.nextInt(numCands);
             FragForClosabChains chosenFfCc = lscFfCc.get(chosenId);
             ArrayList<Integer> newFragIds = chosenFfCc.getFragIDs();
             int molIdNewFrag = newFragIds.get(0);
@@ -708,33 +707,6 @@ public class DENOPTIMGraphOperations
         }
 
         return res;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Checks if a graph is isomorphic to another template's inner graph in its
-     * appropriate fragment space library (inferred from BBType).
-     *
-     * The GraphPattern parameter is used by the function to speed up the
-     * comparisons between graph by making certain assumptions. The pattern
-     * must therefore be the same pattern as the graph adheres to to filter
-     * correctly.
-     * @param graph to check if has an isomorph in the fragment space.
-     * @param type specifying which fragment space library to check for
-     *             isomorphs in.
-     * @return true if there is an isomorph template in the library of the
-     * specified type.
-     */
-    public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type) {
-        return (type == BBType.SCAFFOLD ?
-                FragmentSpace.getScaffoldLibrary() :
-                FragmentSpace.getFragmentLibrary())
-                .stream()
-                .filter(v -> v instanceof DENOPTIMTemplate)
-                .map(t -> (DENOPTIMTemplate) t)
-                .map(DENOPTIMTemplate::getInnerGraph)
-                .anyMatch(graph::isIsomorphicTo);
     }
 
 //------------------------------------------------------------------------------
@@ -1471,7 +1443,7 @@ public class DENOPTIMGraphOperations
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
         // embedded in templates
-        Set<DENOPTIMVertex> mutable = graph.getMutableSites();
+        List<DENOPTIMVertex> mutable = graph.getMutableSites();
         if (mutable.size() == 0)
         {
             String msg = "Graph has no mutable site. Mutation aborted.";

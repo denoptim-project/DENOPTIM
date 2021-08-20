@@ -40,7 +40,6 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 
 import static denoptimga.DENOPTIMGraphOperations.extractPattern;
-import static denoptimga.DENOPTIMGraphOperations.hasIsomorph;
 
 /**
  * Class defining the fragment space
@@ -1343,62 +1342,98 @@ public class FragmentSpace
     //    isomorphic) would be the first thing to do.
     
     //TODO: deal with molecular representation. For each subgraph we want the
-    // corresponding molecular representation with APs and atoms with geometrical
+    // corresponding molecular representation with APs and atoms with 
+    // geometrical
     // features that might be obtained from the results of the fitness provider.
-    // In particular, we should take optimized 3D geometries when the geom.optimization
+    // In particular, we should take optimized 3D geometries when the 
+    // geom.optimization
     // is run within the fitness provider.
     
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) 
     {
-        List<DENOPTIMGraph> subgraphs = extractPattern(graph, GraphPattern.RING);
+        List<DENOPTIMGraph> subgraphs = extractPattern(graph,GraphPattern.RING);
 
         for (DENOPTIMGraph g : subgraphs) {
             BBType type = g.hasScaffoldTypeVertex() ? 
                     BBType.SCAFFOLD :
                         BBType.FRAGMENT;
 
-            if (!hasIsomorph(g, type)) {
-                
-                //TODO: we should try to transform the template into its isomorphic
-                // with highest symmetry, and define the symmetric sets. This
-                // Enhancement would facilitate the creation of symmetric graphs 
-                // from templates generated on the fly.
-                
-                DENOPTIMTemplate t = new DENOPTIMTemplate(type);
-                t.setInnerGraph(g);
-                
-                //TODO: try to use the 3D structure from fitness evaluation which called this method.
-                boolean has3Dgeometry = false;
-
-                ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
-                        FragmentSpace.getFragmentLibrary() :
-                            FragmentSpace.getScaffoldLibrary();
-
-                FragmentSpace.appendVertexToLibrary(t, type, library);
-                
-                String destFileName = type == BBType.FRAGMENT ?
-                        FragmentSpaceParameters.getPathnameToAppendedFragments() :
-                            FragmentSpaceParameters.getPathnameToAppendedScaffolds();
-                try
-                {
-                    //TODO: compare with method reading-in fragments
-                    if (has3Dgeometry)
+            ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
+                    FragmentSpace.getFragmentLibrary() :
+                        FragmentSpace.getScaffoldLibrary();
+            
+            //synchronized (library)
+            //{
+                if (!hasIsomorph(g, type)) {
+                    
+                    //TODO: we should try to transform the template into its isomorphic
+                    // with highest symmetry, and define the symmetric sets. This
+                    // Enhancement would facilitate the creation of symmetric graphs 
+                    // from templates generated on the fly.
+                    
+                    DENOPTIMTemplate t = new DENOPTIMTemplate(type);
+                    t.setInnerGraph(g);
+                    
+                    //TODO: try to use the 3D structure from fitness evaluation which called this method.
+                    boolean has3Dgeometry = false;
+    
+                    //FragmentSpace.appendVertexToLibrary(t, type, library);
+                    
+                    String destFileName = type == BBType.FRAGMENT ?
+                            FragmentSpaceParameters
+                                    .getPathnameToAppendedFragments() :
+                                FragmentSpaceParameters
+                                         .getPathnameToAppendedScaffolds();
+                    try
                     {
-                        //TODO: write a fragment-like molecular representation that can be read in.
-                        throw new DENOPTIMException("Not implemented yet!!!");
-                    } else {
-                        DenoptimIO.writeGraphToSDF(new File(destFileName), g, true, false);
+                        //TODO: compare with method reading-in fragments
+                        if (has3Dgeometry)
+                        {
+                            //TODO: write a fragment-like molecular representation that can be read in.
+                            throw new DENOPTIMException("Not implemented yet!!!");
+                        } else {
+                            DenoptimIO.writeGraphToSDF(new File(destFileName), 
+                                    g, true, false);
+                        }
+                    } catch (DENOPTIMException e)
+                    {
+                        e.printStackTrace();
+                        System.out.println("WARNING: failed to write newly "
+                                + "generated " + type + " to file '" 
+                                + destFileName + "'.");
                     }
-                } catch (DENOPTIMException e)
-                {
-                    e.printStackTrace();
-                    System.out.println("WARNING: failed to write newly "
-                            + "generated " + type + " to file '" + destFileName 
-                            + "'.");
                 }
-            }
+            //}
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if a graph is isomorphic to another template's inner graph in its
+     * appropriate fragment space library (inferred from BBType).
+     *
+     * The GraphPattern parameter is used by the function to speed up the
+     * comparisons between graph by making certain assumptions. The pattern
+     * must therefore be the same pattern as the graph adheres to to filter
+     * correctly.
+     * @param graph to check if has an isomorph in the fragment space.
+     * @param type specifying which fragment space library to check for
+     *             isomorphs in.
+     * @return true if there is an isomorph template in the library of the
+     * specified type.
+     */
+    public static boolean hasIsomorph(DENOPTIMGraph graph, BBType type) {
+        return (type == BBType.SCAFFOLD ?
+                FragmentSpace.getScaffoldLibrary() :
+                FragmentSpace.getFragmentLibrary())
+                .stream()
+                .filter(v -> v instanceof DENOPTIMTemplate)
+                .map(t -> (DENOPTIMTemplate) t)
+                .map(DENOPTIMTemplate::getInnerGraph)
+                .anyMatch(graph::isIsomorphicTo);
     }
 
 //------------------------------------------------------------------------------
+    
 }

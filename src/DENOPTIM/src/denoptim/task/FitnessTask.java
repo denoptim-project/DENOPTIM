@@ -380,6 +380,12 @@ public abstract class FitnessTask extends Task
             msg = "Fitness value is NaN for " + result.getName();
             errMsg = msg;
             DENOPTIMLogger.appLogger.severe(msg);
+            
+            fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);
+            fitProvMol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                    "#InternalFitness: NaN value");
+            DenoptimIO.writeMolecule(fitProvOutFile, fitProvMol, false);
+            
             dGraph.cleanup();
             throw new DENOPTIMException(msg);
         }

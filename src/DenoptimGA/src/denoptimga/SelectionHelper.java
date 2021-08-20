@@ -24,6 +24,7 @@ import java.util.Arrays;
 import org.apache.commons.math3.random.MersenneTwister;
 
 import denoptim.molecule.Candidate;
+import denoptim.utils.RandomUtils;
 
 
 /**
@@ -48,7 +49,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population
      */
 
-    protected static int[] performTournamentSelection(MersenneTwister rng,
+    protected static int[] performTournamentSelection(
                                     ArrayList<Candidate> molPopulation,
                                     int sz)
     {
@@ -60,12 +61,12 @@ public class SelectionHelper
         for (int i=0; i<sz; i++)
         {
             // Pick two candidates at random.
-            int p1 = rng.nextInt(k);
-            int p2 = rng.nextInt(k);
+            int p1 = RandomUtils.nextInt(k);
+            int p2 = RandomUtils.nextInt(k);
 
-            // Use a random value to decide wether to select the fitter individual
+            // Use a random value to decide weather to select the fitter individual
             // or the weaker one.
-            boolean selectFitter = rng.nextBoolean();
+            boolean selectFitter = RandomUtils.nextBoolean();
             
             if (selectFitter)
             {
@@ -93,14 +94,14 @@ public class SelectionHelper
      * @param sz size of the mating pool
      * @return list of indices of individuals in the population
      */
-    protected static int[] performRandomSelection(MersenneTwister rng,
+    protected static int[] performRandomSelection(
                                     ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int[] selection = new int[sz];
         int psize = molPopulation.size();
         for (int i=0; i<sz; i++)
-            selection[i] = rng.nextInt(psize);
+            selection[i] = RandomUtils.nextInt(psize);
 
         return selection;
     }
@@ -116,9 +117,8 @@ public class SelectionHelper
      * @param sz size of the mating pool
      * @return list of indices of individuals in the population
      */
-    protected static int[] performSUS(MersenneTwister rng,
-                                    ArrayList<Candidate> molPopulation,
-                                    int sz)
+    protected static int[] performSUS(ArrayList<Candidate> molPopulation, 
+            int sz)
     {
         int k = molPopulation.size();
         int[] selection = new int[sz];
@@ -132,7 +132,7 @@ public class SelectionHelper
 
 
         // Pick a random offset between 0 and 1 as the starting point for selection.
-        double startOffset = rng.nextDouble();
+        double startOffset = RandomUtils.nextDouble();
         double cumulativeExpectation = 0;
         int index = 0;
         int c = 0;
@@ -174,8 +174,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population
      */
 
-    protected static int[] performRWS(MersenneTwister rng,
-                                    ArrayList<Candidate> molPopulation,
+    protected static int[] performRWS(ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int k = molPopulation.size();
@@ -193,7 +192,7 @@ public class SelectionHelper
 
         for (int i=0; i<sz; i++)
         {
-            double randomFitness = rng.nextDouble() *
+            double randomFitness = RandomUtils.nextDouble() *
                         cumulativeFitnesses[cumulativeFitnesses.length-1];
             int index = Arrays.binarySearch(cumulativeFitnesses, randomFitness);
             if (index < 0)

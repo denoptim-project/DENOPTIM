@@ -490,7 +490,7 @@ public class EvolutionaryAlgorithm
                 }
                 
                 Candidate candidate = null;
-                switch (EAUtils.chooseGenerationMethos())
+                switch (EAUtils.chooseGenerationMethod())
                 {
                     case CROSSOVER:
                     {
@@ -528,7 +528,7 @@ public class EvolutionaryAlgorithm
                 if (isAsync)
                 {
                     //TODO-GG del
-                    System.out.println("INI: Submitting  "+candidate.getName());
+                    //System.out.println("INI: Submitting  "+candidate.getName());
                     
                     submitted.add(task);
                     futures.add(tcons.submit(task));
@@ -539,7 +539,7 @@ public class EvolutionaryAlgorithm
                             >= Math.abs(population.size() - newPopSize))
                     {
                         //TODO-GG
-                        System.out.println("EVO: Submitting Batch of " + syncronisedTasks.size());
+                        //System.out.println("EVO: Submitting Batch of " + syncronisedTasks.size());
                         
                         // Now we have as many tasks as are needed to fill up 
                         // the population. Therefore, we can run the execution 

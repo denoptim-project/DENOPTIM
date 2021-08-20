@@ -20,9 +20,14 @@ package denoptim.utils;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.math3.random.MersenneTwister;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 /**
  * Toolbox for random number generation.
@@ -32,6 +37,10 @@ public class RandomUtils
 {
     private static long rndSeed = 0L;
     private static MersenneTwister mt = null;
+    
+    //TODO-GG del
+    static ArrayList<String> refTxt;
+    static AtomicInteger i = new AtomicInteger(0);
 
 //------------------------------------------------------------------------------
 
@@ -61,6 +70,18 @@ public class RandomUtils
     {
         setSeed(seed);
         mt = new MersenneTwister(rndSeed);
+        
+        //TODO-GG del
+        /*
+        try
+        {
+            refTxt = DenoptimIO.readList("/tmp/test_Sync/f_3/method");
+        } catch (DENOPTIMException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        */
     }
     
 //------------------------------------------------------------------------------
@@ -75,15 +96,99 @@ public class RandomUtils
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     * Utility to debug
+     */
+  //TODO-GG del
+    private static void print(Object val, String type)
+    {
+        /*
+        int id = i.getAndIncrement();
+        String sss = "asked for "+ type + " "+val.toString();
+        if (true)
+        {
+            Exception ex = new Exception();
+            for (int i=0; i<5;i++)
+            {
+                String cn = ex.getStackTrace()[i].getClassName();
+                if (!cn.contains("RandomUtils"))
+                {
+                    sss = sss + ex.getStackTrace()[i].getClassName()+":"+ex.getStackTrace()[i].getLineNumber()+" ";
+                }
+            }
+        }
+       
+        System.out.println(sss);
+        try
+        {
+            DenoptimIO.writeData("/tmp/method",sss,true);
+            
+        } catch (DENOPTIMException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        */
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static double nextDouble()
+    {
+        double d = getRNG().nextDouble();
+        //TODO-GG del
+        print(d,"double");
+        return d;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static int nextInt(int i)
+    {
+        int r = getRNG().nextInt(i);
+      //TODO-GG del
+        print(r,"int");
+        return r;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static boolean nextBoolean()
+    {
+        boolean r = getRNG().nextBoolean();
+      //TODO-GG del
+        print(r,"boolean");
+        return r;
+    }
+    
+//------------------------------------------------------------------------------
+
+      public static boolean nextBoolean(double prob)
+      {
+          double d = nextDouble();
+        //TODO-GG del
+          print(d,"double-2");
+          
+          return d < prob;
+      }
+      
+//------------------------------------------------------------------------------
     
     /**
      * Chooses one member among the given collection. Works on either ordered
-     * an unordered collections.
+     * or unordered collections. However, be aware! If the choice you hare 
+     * asking this method to make has to be random but
+     * reproducible, i.e., controlled by the random seed that configures the 
+     * random number generation, so that independent runs of pseudo-random
+     * experiments will produce the same numerical outcome, then the collection
+     * must have a given order. A type <b>Set</b> is permitted by is not
+     * compatible with the reproducibility requirement.
      */
     
     public static <T> T randomlyChooseOne(Collection<T> c)
     {
-        int chosen = getRNG().nextInt(c.size());
+        int chosen = nextInt(c.size());
         int i=0;
         T chosenObj = null;
         for (T o : c)
@@ -105,17 +210,6 @@ public class RandomUtils
         byte[] sbuf = sec.generateSeed(8);
         ByteBuffer bb = ByteBuffer.wrap(sbuf);
         rndSeed = bb.getLong();
-    }
-
-//------------------------------------------------------------------------------
-
-    public static boolean nextBoolean(double prob)
-    {
-        if (prob == 0.0)
-            return false;
-        else if (prob == 1.0)
-            return true;
-        return mt.nextDouble() < prob;
     }
 
 //------------------------------------------------------------------------------

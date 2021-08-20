@@ -169,7 +169,7 @@ public class OffspringEvaluationTask extends FitnessTask
     public Object call() throws DENOPTIMException, Exception
     {
         //TODO-GG del
-        System.out.println("Running "+molName);
+        //System.out.println("Running "+molName);
           
         mnt.increase(CounterID.FITNESSEVALS);
           

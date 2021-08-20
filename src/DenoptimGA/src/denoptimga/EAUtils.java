@@ -32,11 +32,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
@@ -163,7 +164,7 @@ public class EAUtils
      * The choice is biased
      * by the weights of the methods as defined in the {@link GAParameters}.
      */
-    protected static CandidateSource chooseGenerationMethos()
+    protected static CandidateSource chooseGenerationMethod()
     {
         return pickNewCandidateGenerationMode(
                 GAParameters.getConstructionWeight(), 
@@ -187,9 +188,8 @@ public class EAUtils
     public static CandidateSource pickNewCandidateGenerationMode(
             double xoverWeight, double mutWeight, double newWeight)
     {
-        double hit = RandomUtils.getRNG().nextDouble() 
+        double hit = RandomUtils.nextDouble() 
                 * (xoverWeight + mutWeight + newWeight);
-        
         if (hit <= xoverWeight)
         {
             return CandidateSource.CROSSOVER;
@@ -346,7 +346,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
     
     protected static Candidate buildCandidateByMutation(
-            ArrayList<Candidate> clone_popln, Monitor mnt)
+            ArrayList<Candidate> pop, Monitor mnt)
                     throws DENOPTIMException
     {
         mnt.increase(CounterID.MUTATTEMTS);
@@ -356,7 +356,7 @@ public class EAUtils
         int parentIdx = -1;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {
-            parentIdx = EAUtils.selectBasedOnFitness(clone_popln,1)[0];
+            parentIdx = EAUtils.selectBasedOnFitness(pop,1)[0];
             if (parentIdx == -1)
             {
                 numatt++;
@@ -364,6 +364,7 @@ public class EAUtils
             }
             break;
         }
+        
         mnt.increaseBy(CounterID.MUTPARENTSEARCH,numatt);
 
         if (parentIdx == -1)
@@ -372,17 +373,22 @@ public class EAUtils
             return null;
         }
         
-        DENOPTIMGraph graph = clone_popln.get(parentIdx).getGraph().clone();
-
+        DENOPTIMGraph graph = pop.get(parentIdx).getGraph().clone();
+        
+        //TODO-GG: reassign IDs to clone
+        
         String molName = FilenameUtils.getBaseName(
-                clone_popln.get(parentIdx).getSDFFile());
-        int graphId = clone_popln.get(parentIdx).getGraph().getGraphId();
+                pop.get(parentIdx).getSDFFile());
+        int graphId = pop.get(parentIdx).getGraph().getGraphId();
 
-        if (DENOPTIMGraphOperations.performMutation(graph))
+        if (!DENOPTIMGraphOperations.performMutation(graph))
         {
-            graph.setGraphId(GraphUtils.getUniqueGraphIndex());
-            graph.setLocalMsg("Mutation: " + molName + "|" + graphId);
+            mnt.increase(CounterID.FAILEDMUTATTEMTS);
+            return null;
         }
+        graph.setGraphId(GraphUtils.getUniqueGraphIndex());
+        graph.setLocalMsg("Mutation: " + molName + "|" + graphId);
+    
         EAUtils.addCappingGroup(graph);
         
         Object[] res = EAUtils.evaluateGraph(graph);
@@ -631,24 +637,20 @@ public class EAUtils
         {
             mates[i] = -1;
         }
-        MersenneTwister rng = RandomUtils.getRNG();
         switch (GAParameters.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection
-                                            (rng, population, number);
+            mates = SelectionHelper.performTournamentSelection(population, 
+                    number);
             break;
         case 2:
-            mates = SelectionHelper.performRWS
-                                            (rng, population, number);
+            mates = SelectionHelper.performRWS(population, number);
             break;
         case 3:
-            mates = SelectionHelper.performSUS
-                                            (rng, population, number);
+            mates = SelectionHelper.performSUS(population, number);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection
-                                            (rng, population, number);
+            mates = SelectionHelper.performRandomSelection(population, number);
             break;
         }
         return mates;
@@ -661,7 +663,7 @@ public class EAUtils
      */
     protected static int selectNonScaffoldNonCapVertex(DENOPTIMGraph g)
     {
-        Set<DENOPTIMVertex> candidates = new HashSet<>(g.getVertexList());
+        List<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>(g.getVertexList());
         candidates.removeIf(v ->
                 v.getBuildingBlockType() == BBType.SCAFFOLD
                 || v.getBuildingBlockType() == BBType.CAP);
@@ -687,23 +689,22 @@ public class EAUtils
             return null;
         }
 
-        Candidate c1 = pop.get(p1);
-        DENOPTIMGraph g1 = c1.getGraph();
-        g1.setCandidateOwner(c1);
+        DENOPTIMGraph g1 = pop.get(p1).getGraph();
+        
+        //TODO.GG
+        GenUtils.counter.set(0);
         
         // Filter population to keep only members that can do 
         // crossover with g1 (and keep track of where each candidate can do
         // crossover with g1)
-        Map<Candidate,List<DENOPTIMVertex[]>> subPop = 
-                new HashMap<Candidate, List<DENOPTIMVertex[]>>();
+        SortedMap<Candidate,List<DENOPTIMVertex[]>> subPop = 
+                new TreeMap<Candidate, List<DENOPTIMVertex[]>>();
         for (int i=0; i<pop.size(); i++)
         {
             if (i == p1)
                 continue;
 
-            Candidate c2 = pop.get(i);
             DENOPTIMGraph g2 = pop.get(i).getGraph();
-            g2.setCandidateOwner(c2);
             
             if (g1.isIsomorphicTo(g2))
                 continue;
@@ -719,11 +720,13 @@ public class EAUtils
         if (subPop.size() == 0)
             return null;
         
+        // Choose a candidate
         ArrayList<Candidate> keys = new ArrayList<Candidate>(subPop.keySet());
         int chosen = selectBasedOnFitness(keys,1)[0];
         if (chosen < 0)
             return null;
         
+        // Choose a vertex within the chosen candidate
         return RandomUtils.randomlyChooseOne(subPop.get(keys.get(chosen)));
     }
 
@@ -749,9 +752,11 @@ public class EAUtils
         
         int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
         
-        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Gen")
-            .append(GenUtils.getPaddedString(ndigits, genID))
-            .append(FSEP).append("Gen").append(".txt");
+        sb.append(GAParameters.getDataDirectory()).append(FSEP)
+            .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
+            .append(FSEP)
+            .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
+            .append(".txt");
         
         return sb.toString();
     }
@@ -1043,10 +1048,7 @@ public class EAUtils
             return 0;
         else
         {
-            MersenneTwister rng = RandomUtils.getRNG();
-            //return GAParameters.getRNG().nextInt(
-            //            FragmentSpace.getScaffoldLibrary().size());
-            return rng.nextInt(FragmentSpace.getScaffoldLibrary().size());
+            return RandomUtils.nextInt(FragmentSpace.getScaffoldLibrary().size());
         }
     }
 
@@ -1063,8 +1065,8 @@ public class EAUtils
             return 0;
         else
         {
-            MersenneTwister rng = RandomUtils.getRNG();
-            return rng.nextInt(FragmentSpace.getFragmentLibrary().size());
+            return RandomUtils.nextInt(
+                    FragmentSpace.getFragmentLibrary().size());
         }
     }
 
@@ -1281,9 +1283,7 @@ public class EAUtils
                 }
                 else
                 {
-                    //MersenneTwister rng = GAParameters.getRNG();
-                    MersenneTwister rng = RandomUtils.getRNG();
-                    int selId = rng.nextInt(sz);
+                    int selId = RandomUtils.nextInt(sz);
                     selected = allCombsOfRings.get(selId);
                 }
 

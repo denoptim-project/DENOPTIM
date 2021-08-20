@@ -125,6 +125,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Reference to the candidate entity owning this graph
      */
     Candidate candidate;
+    
+    /**
+     * JGraph representation used to detect DENOPTIM-isomorphism
+     */
+    private DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> 
+        jGraph = null;
 
     /**
      * Identifier for the format of string representations of a graph
@@ -1249,6 +1255,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> is this graph is isomorphic to the other.
      */
     public boolean isIsomorphicTo(DENOPTIMGraph other) {
+        //TODO-V3: consider having a JGraph representation that is removes every time we change the graph
+        /*
+        if (this.jGraph == null)
+        {
+            this.jGraph = GraphConversionTool.getJGraphFromGraph(this);
+        }
+        
+        if (other.jGraph == null)
+        {
+            other.jGraph = GraphConversionTool.getJGraphFromGraph(other);
+        }
+        */
         DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG =
                 GraphConversionTool.getJGraphFromGraph(this);
 
@@ -3201,9 +3219,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public Set<DENOPTIMVertex> getMutableSites()
+    public List<DENOPTIMVertex> getMutableSites()
     {
-        Set<DENOPTIMVertex> mutableSites = new HashSet<DENOPTIMVertex>();
+        List<DENOPTIMVertex> mutableSites = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : gVertices)
         {
             mutableSites.addAll(v.getMutationSites());

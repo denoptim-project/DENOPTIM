@@ -2292,6 +2292,23 @@ public class DenoptimIO
         Gson writer = DENOPTIMgson.getWriter();
         writeData(file.getAbsolutePath(), writer.toJson(graphs), false);
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the graphs to JSON file.
+     *
+     * @param file the file where to print
+     * @param graphs the list of graphs to print
+     * @param append   use <code>true</code> to append
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphsToJSON(File file,
+            ArrayList<DENOPTIMGraph> graphs, boolean append) throws DENOPTIMException
+    {
+        Gson writer = DENOPTIMgson.getWriter();
+        writeData(file.getAbsolutePath(), writer.toJson(graphs), append);
+    }
 
 //------------------------------------------------------------------------------
 

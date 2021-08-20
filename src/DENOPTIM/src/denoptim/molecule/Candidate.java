@@ -124,6 +124,7 @@ Serializable, Cloneable
     {
         this();
         this.graph = graph;
+        graph.setCandidateOwner(this);
         uid = "UNDEFINED";
         smiles = "UNDEFINED";
         hasFitness = false;
@@ -135,6 +136,7 @@ Serializable, Cloneable
     {
         this();
         this.graph = graph;
+        graph.setCandidateOwner(this);
         uid = "UNDEFINED";
         smiles = "UNDEFINED";
         hasFitness = false;
@@ -147,6 +149,7 @@ Serializable, Cloneable
     {
         this.name = name;
         this.graph = graph;
+        graph.setCandidateOwner(this);
         this.uid = uid;
         this.smiles = smiles;
         this.fitness = fitness;
@@ -161,6 +164,7 @@ Serializable, Cloneable
     {
         this.name = name;
         this.graph = graph;
+        graph.setCandidateOwner(this);
         this.uid = uid;
         this.smiles = smiles;
         this.sdfFile = molFile;
@@ -286,9 +290,11 @@ Serializable, Cloneable
             } else if (json != null) {
                 String js = json.toString();
                 this.graph = DENOPTIMGraph.fromJson(js);
+                graph.setCandidateOwner(this);
             } else {
                 this.graph = GraphConversionTool.getGraphFromString(
                         graphEnc.toString().trim(), useFragSpace);
+                graph.setCandidateOwner(this);
             }
         } catch (Exception e) {
         	throw new DENOPTIMException("Could not read Graph to make "

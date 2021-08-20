@@ -933,9 +933,9 @@ public class ThreeDimTreeBuilder
     
     private Point3d getRandomPoint()
     {
-        double vx = ((double) RandomUtils.getRNG().nextInt(100)) / 100.0;
-        double vy = ((double) RandomUtils.getRNG().nextInt(100)) / 100.0;
-        double vz = ((double) RandomUtils.getRNG().nextInt(100)) / 100.0;
+        double vx = ((double) RandomUtils.nextInt(100)) / 100.0;
+        double vy = ((double) RandomUtils.nextInt(100)) / 100.0;
+        double vz = ((double) RandomUtils.nextInt(100)) / 100.0;
         Point3d c = new Point3d(0,0,0);
         if (mol.getAtomCount() > 0)
         {
