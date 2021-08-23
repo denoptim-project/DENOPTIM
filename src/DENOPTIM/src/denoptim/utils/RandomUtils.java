@@ -37,10 +37,7 @@ public class RandomUtils
 {
     private static long rndSeed = 0L;
     private static MersenneTwister mt = null;
-    
-    //TODO-GG del
-    static ArrayList<String> refTxt;
-    static AtomicInteger i = new AtomicInteger(0);
+    private static final boolean debug = false;
 
 //------------------------------------------------------------------------------
 
@@ -70,18 +67,6 @@ public class RandomUtils
     {
         setSeed(seed);
         mt = new MersenneTwister(rndSeed);
-        
-        //TODO-GG del
-        /*
-        try
-        {
-            refTxt = DenoptimIO.readList("/tmp/test_Sync/f_3/method");
-        } catch (DENOPTIMException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        */
     }
     
 //------------------------------------------------------------------------------
@@ -100,11 +85,8 @@ public class RandomUtils
     /**
      * Utility to debug
      */
-  //TODO-GG del
     private static void print(Object val, String type)
     {
-        /*
-        int id = i.getAndIncrement();
         String sss = "asked for "+ type + " "+val.toString();
         if (true)
         {
@@ -114,7 +96,8 @@ public class RandomUtils
                 String cn = ex.getStackTrace()[i].getClassName();
                 if (!cn.contains("RandomUtils"))
                 {
-                    sss = sss + ex.getStackTrace()[i].getClassName()+":"+ex.getStackTrace()[i].getLineNumber()+" ";
+                    sss = sss + ex.getStackTrace()[i].getClassName() + ":" 
+                            + ex.getStackTrace()[i].getLineNumber()+" ";
                 }
             }
         }
@@ -122,14 +105,13 @@ public class RandomUtils
         System.out.println(sss);
         try
         {
-            DenoptimIO.writeData("/tmp/method",sss,true);
+            DenoptimIO.writeData("/tmp/rng_debug_log",sss,true);
             
         } catch (DENOPTIMException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        */
     }
     
 //------------------------------------------------------------------------------
@@ -137,8 +119,8 @@ public class RandomUtils
     public static double nextDouble()
     {
         double d = getRNG().nextDouble();
-        //TODO-GG del
-        print(d,"double");
+        if (debug)
+            print(d,"double");
         return d;
     }
     
@@ -147,8 +129,8 @@ public class RandomUtils
     public static int nextInt(int i)
     {
         int r = getRNG().nextInt(i);
-      //TODO-GG del
-        print(r,"int");
+        if (debug)
+            print(r,"int");
         return r;
     }
     
@@ -157,8 +139,8 @@ public class RandomUtils
     public static boolean nextBoolean()
     {
         boolean r = getRNG().nextBoolean();
-      //TODO-GG del
-        print(r,"boolean");
+        if (debug)
+            print(r,"boolean");
         return r;
     }
     
@@ -166,11 +148,7 @@ public class RandomUtils
 
       public static boolean nextBoolean(double prob)
       {
-          double d = nextDouble();
-        //TODO-GG del
-          print(d,"double-2");
-          
-          return d < prob;
+          return nextDouble() < prob;
       }
       
 //------------------------------------------------------------------------------

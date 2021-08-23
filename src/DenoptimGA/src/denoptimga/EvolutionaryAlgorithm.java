@@ -199,7 +199,6 @@ public class EvolutionaryAlgorithm
         {
             tcons.prestartAllCoreThreads();
         }
-            
         
         // Create initial population of candidates
         EAUtils.createFolderForGeneration(0);
@@ -237,6 +236,7 @@ public class EvolutionaryAlgorithm
                 numStag = 0;
                 txt = "New members introduced";
             }
+            
             DENOPTIMLogger.appLogger.log(Level.INFO,txt + " in Generation {0}" 
                     + NL, genId);
             EAUtils.outputPopulationDetails(population, 
@@ -367,9 +367,6 @@ public class EvolutionaryAlgorithm
                 // Submission is dependent on the parallelisation scheme
                 if (isAsync)
                 {
-                    //TODO-GG del
-                    System.out.println("INI: Submitting  "+candidate.getName());
-                    
                     submitted.add(task);
                     futures.add(tcons.submit(task));
                 } else {
@@ -377,9 +374,6 @@ public class EvolutionaryAlgorithm
                     if (tasks.size() >= Math.abs(
                             population.size() - GAParameters.getPopulationSize()))
                     {
-                        //TODO-GG del
-                        System.out.println("INI: Submitting Batch of " + tasks.size());
-                        
                         // Now we have as many tasks as are needed to fill up the 
                         // population. Therefore we can run the execution service.
                         // TasksBatchManager takes the collection of tasks and runs
@@ -527,20 +521,15 @@ public class EvolutionaryAlgorithm
                 
                 if (isAsync)
                 {
-                    //TODO-GG del
-                    //System.out.println("INI: Submitting  "+candidate.getName());
-                    
                     submitted.add(task);
                     futures.add(tcons.submit(task));
                 } else {
+                    
                     syncronisedTasks.add(task);
                     
                     if (syncronisedTasks.size() 
                             >= Math.abs(population.size() - newPopSize))
                     {
-                        //TODO-GG
-                        //System.out.println("EVO: Submitting Batch of " + syncronisedTasks.size());
-                        
                         // Now we have as many tasks as are needed to fill up 
                         // the population. Therefore, we can run the execution 
                         // service.

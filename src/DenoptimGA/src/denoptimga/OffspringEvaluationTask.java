@@ -167,10 +167,7 @@ public class OffspringEvaluationTask extends FitnessTask
     
     @Override
     public Object call() throws DENOPTIMException, Exception
-    {
-        //TODO-GG del
-        //System.out.println("Running "+molName);
-          
+    {     
         mnt.increase(CounterID.FITNESSEVALS);
           
     	// Optionally improve the molecular representation, which

@@ -837,6 +837,19 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         if (this.containsAtoms() && other.containsAtoms())
         {
+            if (this.mol.getAtomCount() != other.mol.getAtomCount())
+            {
+                reason.append("Different atom count (" + this.mol.getAtomCount()
+                        + ":" + other.mol.getAtomCount() + "); ");
+            }
+            if (this.mol.getBondCount() != other.mol.getBondCount())
+            {
+                reason.append("Different bond count (" + this.mol.getBondCount()
+                        + ":" + other.mol.getBondCount() + "); ");
+            }
+            
+            //TODO-GG del: rebuilds the fragment's APs and thus takes some time
+            /*
             IAtomContainer tMol = this.getIAtomContainer();
             IAtomContainer oMol = other.getIAtomContainer();
             if (tMol.getAtomCount() != oMol.getAtomCount())
@@ -850,13 +863,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 reason.append("Different bond count (" 
                         + tMol.getBondCount()+":"
                         + oMol.getBondCount()+"); ");
-            }
-            /*
-            //TODO: use fragment comparator from GM3DFragmenter
-            for (int i=0; i<tMol.getAtomCount(); i++)
-            {
-                IAtom tAtm = tMol.getAtom(i);
-                IAtom oAtm = oMol.getAtom(i);
             }
             */
         }

@@ -38,6 +38,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
@@ -216,7 +217,7 @@ public class EAUtils
         int mvid = -1, fvid = -1;
         boolean foundPars = false;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
-        {
+        {   
             if (FragmentSpace.useAPclassBasedApproach())
             {
                 DENOPTIMVertex[] pair = EAUtils.performFBCC(pop);
@@ -684,15 +685,13 @@ public class EAUtils
     {
         // first select 1st parent through whatever scheme is applied
         int p1 = selectBasedOnFitness(pop, 1)[0];
+        
         if (p1 == -1)
         {
             return null;
         }
 
         DENOPTIMGraph g1 = pop.get(p1).getGraph();
-        
-        //TODO.GG
-        GenUtils.counter.set(0);
         
         // Filter population to keep only members that can do 
         // crossover with g1 (and keep track of where each candidate can do
@@ -706,11 +705,15 @@ public class EAUtils
 
             DENOPTIMGraph g2 = pop.get(i).getGraph();
             
+            //TODO-GG store the isomorfic relation somewhere: this is costly
             if (g1.isIsomorphicTo(g2))
+            {
                 continue;
+            }
             
             List<DENOPTIMVertex[]> xoPairs = DENOPTIMGraphOperations
                     .locateCompatibleXOverPoints(g1, g2);
+              
             if (xoPairs.size() > 0)
             {
                 subPop.put(pop.get(i), xoPairs);
