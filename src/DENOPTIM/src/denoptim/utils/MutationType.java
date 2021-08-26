@@ -23,7 +23,7 @@ public enum MutationType {
      * Replace the target vertex and any of the child vertices.
      * The effect on the child vertices is decided by substitution probability.
      */
-    CHANGEBRANCH,
+    CHANGEBRANCH
     
     /**
      * Replace the target vertex but keep as much as possible of the child 

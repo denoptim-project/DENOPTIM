@@ -20,6 +20,8 @@ package denoptim.utils;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -28,8 +30,7 @@ import java.text.NumberFormat;
 public class GenUtils
 {
     private static Runtime RUNTIME = Runtime.getRuntime();
-
-
+    
 //------------------------------------------------------------------------------
     
     // this is the javaboutique version

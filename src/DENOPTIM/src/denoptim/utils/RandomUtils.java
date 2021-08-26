@@ -20,9 +20,14 @@ package denoptim.utils;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.math3.random.MersenneTwister;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 /**
  * Toolbox for random number generation.
@@ -32,6 +37,7 @@ public class RandomUtils
 {
     private static long rndSeed = 0L;
     private static MersenneTwister mt = null;
+    private static final boolean debug = false;
 
 //------------------------------------------------------------------------------
 
@@ -75,15 +81,92 @@ public class RandomUtils
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     * Utility to debug
+     */
+    private static void print(Object val, String type)
+    {
+        String sss = "asked for "+ type + " "+val.toString();
+        if (true)
+        {
+            Exception ex = new Exception();
+            for (int i=0; i<5;i++)
+            {
+                String cn = ex.getStackTrace()[i].getClassName();
+                if (!cn.contains("RandomUtils"))
+                {
+                    sss = sss + ex.getStackTrace()[i].getClassName() + ":" 
+                            + ex.getStackTrace()[i].getLineNumber()+" ";
+                }
+            }
+        }
+       
+        System.out.println(sss);
+        try
+        {
+            DenoptimIO.writeData("/tmp/rng_debug_log",sss,true);
+            
+        } catch (DENOPTIMException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static double nextDouble()
+    {
+        double d = getRNG().nextDouble();
+        if (debug)
+            print(d,"double");
+        return d;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static int nextInt(int i)
+    {
+        int r = getRNG().nextInt(i);
+        if (debug)
+            print(r,"int");
+        return r;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static boolean nextBoolean()
+    {
+        boolean r = getRNG().nextBoolean();
+        if (debug)
+            print(r,"boolean");
+        return r;
+    }
+    
+//------------------------------------------------------------------------------
+
+      public static boolean nextBoolean(double prob)
+      {
+          return nextDouble() < prob;
+      }
+      
+//------------------------------------------------------------------------------
     
     /**
      * Chooses one member among the given collection. Works on either ordered
-     * an unordered collections.
+     * or unordered collections. However, be aware! If the choice you hare 
+     * asking this method to make has to be random but
+     * reproducible, i.e., controlled by the random seed that configures the 
+     * random number generation, so that independent runs of pseudo-random
+     * experiments will produce the same numerical outcome, then the collection
+     * must have a given order. A type <b>Set</b> is permitted by is not
+     * compatible with the reproducibility requirement.
      */
     
     public static <T> T randomlyChooseOne(Collection<T> c)
     {
-        int chosen = getRNG().nextInt(c.size());
+        int chosen = nextInt(c.size());
         int i=0;
         T chosenObj = null;
         for (T o : c)
@@ -105,17 +188,6 @@ public class RandomUtils
         byte[] sbuf = sec.generateSeed(8);
         ByteBuffer bb = ByteBuffer.wrap(sbuf);
         rndSeed = bb.getLong();
-    }
-
-//------------------------------------------------------------------------------
-
-    public static boolean nextBoolean(double prob)
-    {
-        if (prob == 0.0)
-            return false;
-        else if (prob == 1.0)
-            return true;
-        return mt.nextDouble() < prob;
     }
 
 //------------------------------------------------------------------------------

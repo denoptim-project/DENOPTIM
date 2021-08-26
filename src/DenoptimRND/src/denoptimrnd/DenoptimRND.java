@@ -425,12 +425,10 @@ public class DenoptimRND
             throw new DENOPTIMException("ERROR! Not enough graphs in the "
                                            + "collection of evaluated graphs.");
         }
-
-	MersenneTwister rng = RandomUtils.getRNG();
 	
         while (numUsed < numAvail)
         {
-            int rndNum = rng.nextInt(numAvail);
+            int rndNum = RandomUtils.nextInt(numAvail);
             String str = allEvaluatedGraphs.get(rndNum).getComments();
             if (str==null || (str!=null && !str.equals(usedFlag)))
             {

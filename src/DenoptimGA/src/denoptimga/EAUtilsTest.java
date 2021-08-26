@@ -4,8 +4,15 @@ import denoptim.molecule.*;
 import org.junit.jupiter.api.Test;
 
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.utils.RandomUtils;
+import denoptimga.EAUtils.CandidateSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -16,7 +23,90 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EAUtilsTest
 {
+    
+//------------------------------------------------------------------------------
 
+    @Test
+    public void testCandidateGenerationMethod() throws Exception
+    {
+        int ix = 0, im=0, ic=0, tot=1000;
+        double wx = 2, wm = 0.6, wc=0.05;
+        double wtot = wx + wm + wc;
+        for (int i=0; i<tot; i++)
+        {
+            switch (EAUtils.pickNewCandidateGenerationMode(wx,wm,wc))
+            {
+                case CROSSOVER:
+                    ix++;
+                    break;
+                case MUTATION:
+                    im++;
+                    break;
+                case CONSTRUCTION:
+                    ic++;
+                    break;
+            }
+        }
+        double x = ((double)ix) / tot;
+        double m = ((double)im) / tot;
+        double c = ((double)ic) / tot;
+        
+        double thld = 0.05;
+        
+        assertTrue(Math.abs(x-(wx/wtot)) < thld, "#Xover cases are off!");
+        assertTrue(Math.abs(m-(wm/wtot)) < thld, "#Mutation cases are off!");
+        assertTrue(Math.abs(c-(wc/wtot)) < thld, "#Built cases are off!");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testCandidateGenerationMethod2() throws Exception
+    {
+        int tot = 100000;
+        long seed = 1234567;
+        long otherSeed = 987654321;
+        double wx = 2, wm = 0.6, wc=0.05;
+        
+        RandomUtils.initialiseRNG(seed);
+        List<CandidateSource> resultsA = new ArrayList<CandidateSource>();
+        for (int i=0; i<tot; i++)
+        {
+            resultsA.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc));
+        }
+        
+        RandomUtils.initialiseRNG(otherSeed);
+        List<CandidateSource> resultsB = new ArrayList<CandidateSource>();
+        for (int i=0; i<tot; i++)
+        {
+            resultsB.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc));
+        }
+        
+        RandomUtils.initialiseRNG(seed);
+        List<CandidateSource> resultsC = new ArrayList<CandidateSource>();
+        for (int i=0; i<tot; i++)
+        {
+            resultsC.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc));
+        }
+        
+        boolean different = false;
+        for (int i=0; i<tot; i++)
+        {
+            if (resultsA.get(i) != resultsB.get(i))
+            {
+                different = true;
+                break;
+            }
+        }
+        assertTrue(different);
+        
+        for (int i=0; i<tot; i++)
+        {
+            assertEquals(resultsA.get(i),resultsC.get(i),
+                    "Inconsistent sequence of random decisions");
+        }
+    }
+        
 //------------------------------------------------------------------------------
 	
     @Test

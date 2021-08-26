@@ -126,7 +126,7 @@ public abstract class FitnessTask extends Task
         if (fitProvMol == null)
     	{
             ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-            IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
+            fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
     	}
         
         if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
@@ -237,7 +237,6 @@ public abstract class FitnessTask extends Task
             unreadable=true;
         }
         
-        // Check readability and 
         if (unreadable)
         {
         	// If file is not properly readable, we keep track of the 
@@ -381,6 +380,12 @@ public abstract class FitnessTask extends Task
             msg = "Fitness value is NaN for " + result.getName();
             errMsg = msg;
             DENOPTIMLogger.appLogger.severe(msg);
+            
+            fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);
+            fitProvMol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                    "#InternalFitness: NaN value");
+            DenoptimIO.writeMolecule(fitProvOutFile, fitProvMol, false);
+            
             dGraph.cleanup();
             throw new DENOPTIMException(msg);
         }

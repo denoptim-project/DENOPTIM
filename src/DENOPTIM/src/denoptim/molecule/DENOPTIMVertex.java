@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
@@ -159,8 +160,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * List of mutations that we can perform on this vertex
      */
-    private Set<MutationType> allowedMutationTypes = new HashSet<MutationType>(
-            Arrays.asList(MutationType.values()));
+    private List<MutationType> allowedMutationTypes = 
+            new ArrayList<MutationType>(Arrays.asList(MutationType.values()));
 
 //------------------------------------------------------------------------------
 
@@ -681,9 +682,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void setMutationTypes(Set<MutationType> set)
+    public void setMutationTypes(List<MutationType> lst)
     {
-        allowedMutationTypes = set;
+        allowedMutationTypes = lst;
     }
     
 //------------------------------------------------------------------------------
@@ -695,7 +696,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    public Set<MutationType> getMutationTypes()
+    public List<MutationType> getMutationTypes()
     {
         return allowedMutationTypes;
     }

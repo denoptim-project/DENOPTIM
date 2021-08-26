@@ -126,8 +126,6 @@ public class CyclicGraphHandler
             throw new DENOPTIMException(t);
         }
 
-        MersenneTwister randomNumGenerator = RandomUtils.getRNG();
-
         // Get manager of ring size problems
         RingSizeManager rsm = new RingSizeManager();
         rsm.initialize(mol, molGraph);
@@ -140,7 +138,7 @@ public class CyclicGraphHandler
         Set<DENOPTIMRing> combOfRings = new HashSet<DENOPTIMRing>();
         while (wLstVrtI.size() > 0)
         {
-            int vIdI = randomNumGenerator.nextInt(wLstVrtI.size());
+            int vIdI = RandomUtils.nextInt(wLstVrtI.size());
             DENOPTIMVertex vI = wLstVrtI.get(vIdI);
 
             if (verbosity > 1)
@@ -154,7 +152,7 @@ public class CyclicGraphHandler
                                           rsm.getRSBiasedListOfCandidates(vI); 
             while (wLstVrtJ.size() > 0)
             {
-                int vIdJ = randomNumGenerator.nextInt(wLstVrtJ.size());
+                int vIdJ = RandomUtils.nextInt(wLstVrtJ.size());
                 DENOPTIMVertex vJ = wLstVrtJ.get(vIdJ);
                 wLstVrtJ.removeAll(Collections.singleton(vJ));
 

@@ -63,6 +63,10 @@ public class UndirectedEdgeRelation
      */
     private BondType bondType = BondType.UNDEFINED;
 
+    /**
+     * Invariant representation used to compare
+     */
+    private String invariant = null;
 
 //------------------------------------------------------------------------------
     
@@ -99,13 +103,11 @@ public class UndirectedEdgeRelation
     }
     
 //------------------------------------------------------------------------------
- 
-    public int compare(UndirectedEdgeRelation other)
+    
+    private void makeInvariant()
     {
         DENOPTIMVertex tvA = apA.getOwner();
         DENOPTIMVertex tvB = apB.getOwner();
-        DENOPTIMVertex ovA = other.apA.getOwner();
-        DENOPTIMVertex ovB = other.apB.getOwner();
         
         String invariantTA = tvA.getBuildingBlockType().toOldInt() +
                 GenUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
@@ -114,24 +116,28 @@ public class UndirectedEdgeRelation
         String invariantTB = tvB.getBuildingBlockType().toOldInt() +
                 GenUtils.getPaddedString(6,tvB.getBuildingBlockId()) +
                 GenUtils.getPaddedString(4,apB.getIndexInOwner());
-        
-        String invariantOA = ovA.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,ovA.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,other.apA.getIndexInOwner());
-        
-        String invariantOB = ovB.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,ovB.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,other.apB.getIndexInOwner());
                 
-        String invariantThis = invariantTA + invariantTB;
+        String tmp = invariantTA + invariantTB;
         if (invariantTA.compareTo(invariantTB) > 0)
-            invariantThis = invariantTB + invariantTA;
+            tmp = invariantTB + invariantTA;
         
-        String invariantOther = invariantOA + invariantOB;
-        if (invariantOA.compareTo(invariantOB) > 0)
-            invariantOther = invariantOB + invariantOA;
+        this.invariant = tmp;
+    }
+    
+//------------------------------------------------------------------------------
+ 
+    public int compare(UndirectedEdgeRelation other)
+    {
+        if (this.invariant == null)
+        {
+            this.makeInvariant();
+        }
+        if (other.invariant == null)
+        {
+            other.makeInvariant();
+        }
         
-        int resultIgnoringBondType = invariantThis.compareTo(invariantOther);
+        int resultIgnoringBondType = this.invariant.compareTo(other.invariant);
         
         if (resultIgnoringBondType == 0)
         {

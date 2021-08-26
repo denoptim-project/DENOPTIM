@@ -26,6 +26,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 
 
@@ -42,16 +43,21 @@ Serializable, Cloneable
 	 */
 	private static final long serialVersionUID = -3132192038061270220L;
 
+    /**
+     * Unique identifier of this candidate
+     */
+    private String uid;
+    
 	/**
      * Graph representation
      */
     private DENOPTIMGraph graph;
     
     /**
-     * Unique identifier
+     * Chemical object representation
      */
-    private String uid;
-	
+    private IAtomContainer iac;
+    
     /**
      * SMILES representation
      */
@@ -111,13 +117,39 @@ Serializable, Cloneable
         smiles = "UNDEFINED";
         hasFitness = false;
     }
+
+//------------------------------------------------------------------------------
+    
+    public Candidate(DENOPTIMGraph graph)
+    {
+        this();
+        this.graph = graph;
+        graph.setCandidateOwner(this);
+        uid = "UNDEFINED";
+        smiles = "UNDEFINED";
+        hasFitness = false;
+   }
+    
+//------------------------------------------------------------------------------
+    
+    public Candidate(String name, DENOPTIMGraph graph)
+    {
+        this();
+        this.graph = graph;
+        graph.setCandidateOwner(this);
+        uid = "UNDEFINED";
+        smiles = "UNDEFINED";
+        hasFitness = false;
+   }
     
 //------------------------------------------------------------------------------
     
     public Candidate(String name, DENOPTIMGraph graph, double fitness,
             String uid, String smiles)
     {
+        this.name = name;
         this.graph = graph;
+        graph.setCandidateOwner(this);
         this.uid = uid;
         this.smiles = smiles;
         this.fitness = fitness;
@@ -132,6 +164,7 @@ Serializable, Cloneable
     {
         this.name = name;
         this.graph = graph;
+        graph.setCandidateOwner(this);
         this.uid = uid;
         this.smiles = smiles;
         this.sdfFile = molFile;
@@ -143,6 +176,20 @@ Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Builds a candidate from the SDF representation of an atom container. This 
+     * method does interpret the properties of the atom container object and
+     * used them to define the various field values that define this candidate.
+     * @param iac the container to read and interpret.
+     * @param useFragSpace set <code>true</code> to enable usage of the building 
+     * block space when reading in the string-encoder graph representation of 
+     * this object. Use <code>false</code> when a building block space is 
+     * undefined and the graph representation can only be built assuming that
+     * there are as many APs as used in this graph, 
+     * while other information on the graph 
+     * building blocks cannot be inferred.
+     * @throws DENOPTIMException
+     */
     public Candidate(IAtomContainer iac, boolean useFragSpace) 
     		throws DENOPTIMException
     {
@@ -151,6 +198,22 @@ Serializable, Cloneable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Builds a candidate from the SDF representation of an atom container. This 
+     * method does interpret the properties of the atom container object and
+     * used them to define the various field values that define this candidate.
+     * @param iac the container to read and interpret.
+     * @param useFragSpace set <code>true</code> to enable usage of the building 
+     * block space when reading in the string-encoder graph representation of 
+     * this object. Use <code>false</code> when a building block space is 
+     * undefined and the graph representation can only be built assuming that
+     * there are as many APs as used in this graph, 
+     * while other information on the graph 
+     * building blocks cannot be inferred.
+     * @param allowNoUID use <code>true</code> to allow creation on a candidate 
+     * that has no unique identifier.
+     * @throws DENOPTIMException
+     */
     public Candidate(IAtomContainer iac, boolean useFragSpace, 
     		boolean allowNoUID) throws DENOPTIMException
     {
@@ -158,6 +221,8 @@ Serializable, Cloneable
         this.uid = "UNDEFINED";
         this.smiles = "UNDEFINED";
         this.hasFitness = false;
+        
+        this.iac = DENOPTIMMoleculeUtils.makeSameAs(iac);
 		
 		this.name = "noname";
 		if (iac.getProperty(CDKConstants.TITLE) != null)
@@ -178,7 +243,7 @@ Serializable, Cloneable
             double fitVal = Double.parseDouble(fitprp);
             if (Double.isNaN(fitVal))
             {
-                String msg = "Cannot build DENOPTIMMolecule from "
+                String msg = "Cannot build Candidate from "
                 		+ "IAtomContainer: Fitness value is NaN!";
                 throw new DENOPTIMException(msg);
             }
@@ -208,7 +273,7 @@ Serializable, Cloneable
         		this.uid = "noUID";
         	} else {
         		throw new DENOPTIMException("Could not read UID to make "
-        				+ "DENOPTIMMolecule.", e);
+        				+ "Candidate.", e);
         	}
         }
         
@@ -219,19 +284,21 @@ Serializable, Cloneable
             Object json = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
             if (graphEnc == null && json == null) {
                 throw new DENOPTIMException("Attempt to load graph to "
-                        + "DENOPTIMMolecule but the IAtomContainer "
+                        + "Candidate but the IAtomContainer "
                         + "has neither '" + DENOPTIMConstants.GRAPHTAG
                         + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG);
             } else if (json != null) {
                 String js = json.toString();
                 this.graph = DENOPTIMGraph.fromJson(js);
+                graph.setCandidateOwner(this);
             } else {
                 this.graph = GraphConversionTool.getGraphFromString(
                         graphEnc.toString().trim(), useFragSpace);
+                graph.setCandidateOwner(this);
             }
         } catch (Exception e) {
         	throw new DENOPTIMException("Could not read Graph to make "
-        			+ "DENOPTIMMolecule.", e);
+        			+ "Candidate.", e);
         }
         if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
         {
@@ -240,6 +307,27 @@ Serializable, Cloneable
         }
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Just place the argument in the IAtomContainer field of this object. We do 
+     * not read and interpret the input argument as done 
+     * in {@link #Candidate(IAtomContainer)} or
+     * {@link #Candidate(IAtomContainer, boolean)}.
+     * @param iac new value of IAtomContainer field
+     */
+    public void setChemicalRepresentation(IAtomContainer iac)
+    {
+        this.iac = iac;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public IAtomContainer getChemicalRepresentation()
+    {
+        return iac;
+    } 
+    
 //------------------------------------------------------------------------------
     
     public void setComments(String str)
@@ -474,13 +562,28 @@ Serializable, Cloneable
     {
         Candidate c = new Candidate(name, graph.clone(), uid,
                 smiles, sdfFile, imgFile, comment, generationId, level);
+        
         if (hasFitness)
         {
             c.setFitness(fitness);
         }
+        
         if (error!=null)
         {
             c.setError(error);
+        }
+        
+        if (this.iac != null)
+        {
+            try
+            {
+                c.setChemicalRepresentation(DENOPTIMMoleculeUtils.makeSameAs(
+                        this.iac));
+            } catch (DENOPTIMException e)
+            {
+                e.printStackTrace();
+                c.setChemicalRepresentation(null);
+            }
         }
         return c;
     }

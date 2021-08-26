@@ -46,12 +46,82 @@ public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
     private volatile List<Candidate> curPopln;
+    private volatile Monitor mnt;
+    
+    @Deprecated
     private volatile Integer numTry;
     
     /**
      * Tool for generating 3D models assembling 3D building blocks.
      */
     private ThreeDimTreeBuilder tb3d;
+    
+//------------------------------------------------------------------------------
+    
+    public OffspringEvaluationTask(Candidate offspring, String workDir,
+            List<Candidate> popln, Monitor mnt, String fileUID)
+    {
+        super(offspring.getGraph());
+        this.molName = offspring.getName();
+        this.workDir = workDir;
+        this.fitProvMol = offspring.getChemicalRepresentation();
+        this.curPopln = popln;
+        this.mnt = mnt;
+        
+        //TODO-GG remove once numTry is removed
+        this.numTry = new Integer(0);
+        
+        result.setName(this.molName);
+        result.setUID(offspring.getUID());
+        result.setSmiles(offspring.getSmiles());
+        
+        // Define pathnames to files used/produced by fitness provider
+        fitProvOutFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvInputFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTIN;
+        fitProvPNGFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.CANDIDATE2DEXTENSION;
+        fitProvUIDFile = fileUID;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * 
+     * @param offspring
+     * @param workDir
+     * @param popln reference to the current population. Can be null, in which
+     * case this task will not add its entity to any population.
+     * @param numTry
+     * @param fileUID
+     */
+    //NB: for now we take one instance of Candidate and use another one for the results
+    
+    @Deprecated
+    public OffspringEvaluationTask(Candidate offspring, String workDir,
+            List<Candidate> popln, Integer numTry, String fileUID)
+    {
+        super(offspring.getGraph());
+        this.molName = offspring.getName();
+        this.workDir = workDir;
+        this.fitProvMol = offspring.getChemicalRepresentation();
+        this.curPopln = popln;
+        this.numTry = numTry;
+        
+        result.setName(this.molName);
+        result.setUID(offspring.getUID());
+        result.setSmiles(offspring.getSmiles());
+        
+        // Define pathnames to files used/produced by fitness provider
+        fitProvOutFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvInputFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTIN;
+        fitProvPNGFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.CANDIDATE2DEXTENSION;
+        fitProvUIDFile = fileUID;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -67,6 +137,7 @@ public class OffspringEvaluationTask extends FitnessTask
      * @param numTry
      * @param fileUID
      */
+    @Deprecated
     public OffspringEvaluationTask(String molName, DENOPTIMGraph molGraph,
     		String inchi, String smiles, IAtomContainer iac, String workDir,
             List<Candidate> popln, Integer numTry, String fileUID)
@@ -96,7 +167,9 @@ public class OffspringEvaluationTask extends FitnessTask
     
     @Override
     public Object call() throws DENOPTIMException, Exception
-    {
+    {     
+        mnt.increase(CounterID.FITNESSEVALS);
+          
     	// Optionally improve the molecular representation, which
         // is otherwise only given by the collection of building
         // blocks (not aligned, nor roto-translated)
@@ -161,6 +234,7 @@ public class OffspringEvaluationTask extends FitnessTask
 
         if (result.getError() == null)
         {
+            mnt.increase(CounterID.FAILEDFITNESSEVALS);
             synchronized (numTry)
             {
                 numTry++;

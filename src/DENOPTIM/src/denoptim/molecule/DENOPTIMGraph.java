@@ -125,6 +125,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Reference to the candidate entity owning this graph
      */
     Candidate candidate;
+    
+    /**
+     * JGraph representation used to detect DENOPTIM-isomorphism
+     */
+    private DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> 
+        jGraph = null;
 
     /**
      * Identifier for the format of string representations of a graph
@@ -296,6 +302,20 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    public SymmetricSet getSymSetForVertex(DENOPTIMVertex v)
+    {
+        for (SymmetricSet ss : symVertices)
+        {
+            if (ss.contains(v.getVertexId()))
+            {
+                return ss;
+            }
+        }
+        return new SymmetricSet();
+    }
+    
+//------------------------------------------------------------------------------
+
     public SymmetricSet getSymSetForVertexID(int vid)
     {
         for (SymmetricSet ss : symVertices)
@@ -341,6 +361,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void setVertexList(ArrayList<DENOPTIMVertex> vertices)
     {
         gVertices = vertices;
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -348,6 +369,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void setEdgeList(ArrayList<DENOPTIMEdge> edges)
     {
         gEdges = edges;
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -355,6 +377,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void setRings(ArrayList<DENOPTIMRing> rings)
     {
         gRings = rings;
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -579,6 +602,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void addEdge(DENOPTIMEdge edge)
     {
         gEdges.add(edge);
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -586,6 +610,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void addRing(DENOPTIMRing ring)
     {
         gRings.add(ring);
+        jGraph = null;
     }
     
 //------------------------------------------------------------------------------
@@ -613,6 +638,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             throw new DENOPTIMException(s);
         }
         addRing(vI,vJ,bndTypI);
+        jGraph = null;
     }
     
 //------------------------------------------------------------------------------
@@ -633,6 +659,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         DENOPTIMRing ring = new DENOPTIMRing(arrLst);
         ring.setBondType(bndTyp);
         this.addRing(ring);
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -641,6 +668,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         vertex.setGraphOwner(this);
         gVertices.add(vertex);
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -714,6 +742,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // remove the vertex from the graph
         gVertices.remove(vertex);
+        
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -799,6 +829,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
             gEdges.remove(edge);
         }
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -809,6 +840,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             gRings.remove(ring);
         }
+        jGraph = null;
     }
 
 //------------------------------------------------------------------------------
@@ -1207,6 +1239,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             closableChains.clear();
         }
+        jGraph = null;
     }
     
 //------------------------------------------------------------------------------
@@ -1249,29 +1282,114 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> is this graph is isomorphic to the other.
      */
     public boolean isIsomorphicTo(DENOPTIMGraph other) {
-        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> thisG =
-                GraphConversionTool.getJGraphFromGraph(this);
-
-        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> otherG =
-                GraphConversionTool.getJGraphFromGraph(other);
-
+        if (this.jGraph == null)
+        {
+            this.jGraph = GraphConversionTool.getJGraphFromGraph(this);
+        }
+        if (other.jGraph == null)
+        {
+            other.jGraph = GraphConversionTool.getJGraphFromGraph(other);
+        }
+        
+        
+        // Simple but slow because it ignores symmetry
+        /*
         Comparator<DENOPTIMVertex> vComp = (v1, v2) -> {
             // Vertex.sameAs returns boolean, so we need to produce
             // an int to allow comparison.
             StringBuilder sb = new StringBuilder();
-            if (v1.sameAs(v2, sb)) {
+            boolean areSame = v1.sameAs(v2, sb);
+            
+            if (areSame) {
                 return 0;
             } else {
                 return Integer.compare(v1.getBuildingBlockId(),
                         v2.getBuildingBlockId());
             }
         };
+        */
+        
+        Comparator<DENOPTIMVertex> vComp = new Comparator<DENOPTIMVertex>() {
+            
+            Map<DENOPTIMVertex,Set<DENOPTIMVertex>> symmetryShortCuts = 
+                    new HashMap<DENOPTIMVertex,Set<DENOPTIMVertex>>();
+            
+            @Override
+            public int compare(DENOPTIMVertex v1, DENOPTIMVertex v2) {
+                
+                // exploit symmetric relations between vertexes
+                if (symmetryShortCuts.containsKey(v1) 
+                        && symmetryShortCuts.get(v1).contains(v2))
+                {
+                    return 0;
+                }
+
+                // Vertex.sameAs returns boolean, so we need to produce
+                // an int to allow comparison.
+                StringBuilder sb = new StringBuilder();
+                if (v1.sameAs(v2, sb)) 
+                {
+                    Set<DENOPTIMVertex> symToV2 = new HashSet<DENOPTIMVertex>();
+                    SymmetricSet ssV2 = v2.getGraphOwner().getSymSetForVertex(v2);
+                    for (Integer sVrtId : ssV2.getList())
+                    {
+                        symToV2.add(v2.getGraphOwner().getVertexWithId(sVrtId));
+                    }
+                    
+                    Set<DENOPTIMVertex> symToV1 = new HashSet<DENOPTIMVertex>();
+                    SymmetricSet ssV1 = v1.getGraphOwner().getSymSetForVertex(v1);
+                    for (Integer sVrtId : ssV1.getList())
+                    {
+                        symToV1.add(v1.getGraphOwner().getVertexWithId(sVrtId));
+                    }
+                    
+                    for (DENOPTIMVertex v1s : symToV1)
+                    {
+                        if (symmetryShortCuts.containsKey(v1s))
+                        {
+                            symmetryShortCuts.get(v1s).addAll(symToV2);
+                        } else {
+                            symmetryShortCuts.put(v1s,symToV2);
+                        }
+                    }
+                    return 0;
+                } else {
+                    return Integer.compare(v1.getBuildingBlockId(),
+                            v2.getBuildingBlockId());
+                }
+            }
+        };
+        
 
         Comparator<UndirectedEdgeRelation> eComp =
                 UndirectedEdgeRelation::compare;
-
+        
+        // NB: these two were created to evaluate the simplest and fasted 
+        // possible scenario. It turns out that for a graph like the following
+        // one the time spent to do automorphism (i.e., isomorphism with itself)
+        // can only be improved by 20% when using these two simplest and 
+        // useless (i.e., inaccurate) comparators. Instead the above, and useful
+        // comparators do introduce some computational demands, but are less 
+        // detrimental than having to address a wide multitude of possible 
+        // mappings: this seems to be the liming factor, rather than the
+        // implementation of the comparators.
+        
+        // Example of challenging, yet simple graph:
+        //29 853_1_0_-1,855_2_1_0,857_1_1_0,858_1_1_0,859_1_1_0,861_2_1_1,862_2_1_1,863_2_1_1,864_2_1_1,865_2_1_1,866_2_1_1,867_2_1_1,868_2_1_1,869_2_1_1, 853_1_855_0_1_c:0_ATneutral:0,853_0_857_1_1_c:0_c:0,853_2_858_1_1_c:0_c:0,853_3_859_1_1_c:0_c:0,857_0_861_0_1_c:0_ATneutral:0,857_2_862_0_1_c:0_ATneutral:0,857_3_863_0_1_c:0_ATneutral:0,858_0_864_0_1_c:0_ATneutral:0,858_2_865_0_1_c:0_ATneutral:0,858_3_866_0_1_c:0_ATneutral:0,859_0_867_0_1_c:0_ATneutral:0,859_2_868_0_1_c:0_ATneutral:0,859_3_869_0_1_c:0_ATneutral:0, SymmetricSet [symIds=[857, 858, 859]] SymmetricSet [symIds=[861, 862, 863, 864, 865, 866, 867, 868, 869]]
+        
+        /*
+        Comparator<UndirectedEdgeRelation> eCompDummy = (e1, e2) -> {
+            return Integer.compare(e1.hashCode(),e2.hashCode());
+        };
+        Comparator<DENOPTIMVertex> vCompDummy = (v1, v2) -> {
+            return Integer.compare(v1.getBuildingBlockId(),
+                        v2.getBuildingBlockId());
+        };
+        */
+        
         VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdgeRelation> vf2 =
-                new VF2GraphIsomorphismInspector<>(thisG, otherG, vComp, eComp);
+                new VF2GraphIsomorphismInspector<>(this.jGraph, other.jGraph, 
+                        vComp, eComp);
 
         return vf2.isomorphismExists();
     }
@@ -3201,9 +3319,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public Set<DENOPTIMVertex> getMutableSites()
+    public List<DENOPTIMVertex> getMutableSites()
     {
-        Set<DENOPTIMVertex> mutableSites = new HashSet<DENOPTIMVertex>();
+        List<DENOPTIMVertex> mutableSites = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : gVertices)
         {
             mutableSites.addAll(v.getMutationSites());
