@@ -251,6 +251,10 @@ public class GAParameters
      */
     protected static int monitorDumpStep = 50;
     
+    /**
+     * Minimal standard deviation accepted in the fitness values of the initial population
+     */
+    protected static double minFitnessSD = 0.000001;
 
     /**
      * Print level

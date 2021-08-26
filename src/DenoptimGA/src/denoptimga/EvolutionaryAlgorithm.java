@@ -209,7 +209,7 @@ public class EvolutionaryAlgorithm
         
         // Ensure that there is some variability in fitness values
         double sdev = EAUtils.getPopulationSD(population);
-        if (sdev < 0.000001) ///TODO: use a parameter to replace hard-coded threshold?
+        if (sdev < GAParameters.minFitnessSD)
         {
             String msg = "Fitness values have negligible standard deviation (STDDEV="
                             + String.format("%.6f", sdev) + "). Abbandoning "
@@ -341,7 +341,6 @@ public class EvolutionaryAlgorithm
             {
                 i++;
                 
-                //TODO-GG checking for exceptions only in asym?
                 if (checkForException())
                 {
                     stopRun();
@@ -469,7 +468,6 @@ public class EvolutionaryAlgorithm
             {
                 i++;
                 
-                //TODO-GG checking for exceptions only in async?
                 if (checkForException())
                 {
                     stopRun();
@@ -703,7 +701,8 @@ public class EvolutionaryAlgorithm
             }
         } else {
             // We don't really check of exceptions for synchronous scheme
-            // TODO-V3: check what happens is a task hits an exception in sync!
+            // because the executor service will detect the exception and stop
+            // the experiment.
         }
 
         return foundExceptions;

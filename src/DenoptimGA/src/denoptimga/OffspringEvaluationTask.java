@@ -141,6 +141,7 @@ public class OffspringEvaluationTask extends FitnessTask
         }
         catch (Throwable ex)
         {
+            mnt.increase(CounterID.FAILEDFITNESSEVALS);
             hasException = true;
             errMsg = "Exception while running fitness provider";
             thrownExc = ex;
