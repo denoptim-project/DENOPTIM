@@ -847,24 +847,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 reason.append("Different bond count (" + this.mol.getBondCount()
                         + ":" + other.mol.getBondCount() + "); ");
             }
-            
-            //TODO-GG del: rebuilds the fragment's APs and thus takes some time
-            /*
-            IAtomContainer tMol = this.getIAtomContainer();
-            IAtomContainer oMol = other.getIAtomContainer();
-            if (tMol.getAtomCount() != oMol.getAtomCount())
-            {
-                reason.append("Different atom count (" 
-                        + tMol.getAtomCount()+":"
-                        + oMol.getAtomCount()+"); ");
-            }
-            if (tMol.getBondCount() != oMol.getBondCount())
-            {
-                reason.append("Different bond count (" 
-                        + tMol.getBondCount()+":"
-                        + oMol.getBondCount()+"); ");
-            }
-            */
         }
         return sameVertexFeatures(other, reason);
     }

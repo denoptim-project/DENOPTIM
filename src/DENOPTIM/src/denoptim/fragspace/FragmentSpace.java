@@ -1362,8 +1362,8 @@ public class FragmentSpace
                     FragmentSpace.getFragmentLibrary() :
                         FragmentSpace.getScaffoldLibrary();
             
-            //synchronized (library)
-            //{
+            synchronized (library)
+            {
                 if (!hasIsomorph(g, type)) {
                     
                     //TODO: we should try to transform the template into its isomorphic
@@ -1377,7 +1377,7 @@ public class FragmentSpace
                     //TODO: try to use the 3D structure from fitness evaluation which called this method.
                     boolean has3Dgeometry = false;
     
-                    //FragmentSpace.appendVertexToLibrary(t, type, library);
+                    FragmentSpace.appendVertexToLibrary(t, type, library);
                     
                     String destFileName = type == BBType.FRAGMENT ?
                             FragmentSpaceParameters
@@ -1403,7 +1403,7 @@ public class FragmentSpace
                                 + destFileName + "'.");
                     }
                 }
-            //}
+            }
         }
     }
     

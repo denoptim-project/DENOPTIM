@@ -322,6 +322,8 @@ public class EAUtils
                 continue;
             }
             
+            g.renumberGraphVertices();
+            
             Candidate offspring = new Candidate(g);
             offspring.setUID(res[0].toString().trim());
             offspring.setSmiles(res[1].toString().trim());
@@ -375,8 +377,7 @@ public class EAUtils
         }
         
         DENOPTIMGraph graph = pop.get(parentIdx).getGraph().clone();
-        
-        //TODO-GG: reassign IDs to clone
+        graph.renumberGraphVertices();
         
         String molName = FilenameUtils.getBaseName(
                 pop.get(parentIdx).getSDFFile());
