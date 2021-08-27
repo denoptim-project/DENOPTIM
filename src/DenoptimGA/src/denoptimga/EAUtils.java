@@ -135,9 +135,9 @@ public class EAUtils
      * Reads unique identifiers and initial population files according to the
      * {@link GAParameters}.
      */
-    protected static ArrayList<Candidate> importInitialPopulation() throws DENOPTIMException
+    protected static Population importInitialPopulation() throws DENOPTIMException
     {
-        ArrayList<Candidate> population = new ArrayList<Candidate>();
+        Population population = new Population();
 
         HashSet<String> lstUID = new HashSet<>(1024);
         if (!GAParameters.getUIDFileIn().equals(""))
@@ -204,7 +204,7 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    protected static Candidate buildCandidateByXOver(ArrayList<Candidate> pop, 
+    protected static Candidate buildCandidateByXOver(Population pop, 
             Monitor mnt) throws DENOPTIMException
     {
         mnt.increase(CounterID.XOVERATTEMPTS);
@@ -289,7 +289,7 @@ public class EAUtils
         DENOPTIMGraph[] graphs = new DENOPTIMGraph[2];
         graphs[0] = graph1;
         graphs[1] = graph2;
-        List<Candidate> validOnes = new ArrayList<Candidate>();
+        List<Candidate> validOnes = new Population();
         for (DENOPTIMGraph g : graphs)
         {
             Object[] res = EAUtils.evaluateGraph(g);
@@ -349,7 +349,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
     
     protected static Candidate buildCandidateByMutation(
-            ArrayList<Candidate> pop, Monitor mnt)
+            Population pop, Monitor mnt)
                     throws DENOPTIMException
     {
         mnt.increase(CounterID.MUTATTEMTS);
@@ -503,13 +503,13 @@ public class EAUtils
 
     /**
      * Write out summary for the current GA population
-     * @param popln
+     * @param population
      * @param filename
      * @throws DENOPTIMException
      */
 
     protected static void outputPopulationDetails
-                            (ArrayList<Candidate> popln, String filename)
+                            (Population population, String filename)
                                                         throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
@@ -525,9 +525,11 @@ public class EAUtils
         df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
         df.setMinimumFractionDigits(GAParameters.getPrecisionLevel());
 
+        // NB: we consider the configured size of the population, not the actual 
+        // size of list representing the population.
         for (int i=0; i<GAParameters.getPopulationSize(); i++)
         {
-            Candidate mol = popln.get(i);
+            Candidate mol = population.get(i);
             if (mol != null)
             {
                 String mname = new File(mol.getSDFFile()).getName();
@@ -544,7 +546,7 @@ public class EAUtils
         }
 
         // calculate descriptive statistics for the population
-        String stats = getSummaryStatistics(popln);
+        String stats = getSummaryStatistics(population);
         if (stats.trim().length() > 0)
             sb.append(stats);
         DenoptimIO.writeData(filename, sb.toString(), false);
@@ -554,7 +556,7 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    private static String getSummaryStatistics(ArrayList<Candidate> popln)
+    private static String getSummaryStatistics(Population popln)
     {
         double[] fitness = getFitnesses(popln);
         double sdev = DENOPTIMStatUtils.stddev(fitness, true);
@@ -631,7 +633,7 @@ public class EAUtils
      * @return indexes of the selected members of the given population.
      */
 
-    protected static int[] selectBasedOnFitness(ArrayList<Candidate> population, 
+    protected static int[] selectBasedOnFitness(Population population, 
             int number)
     {
         int[] mates = new int[number];
@@ -682,7 +684,7 @@ public class EAUtils
      * or null if no possibility was found.
      */
 
-    protected static DENOPTIMVertex[] performFBCC(ArrayList<Candidate> pop)
+    protected static DENOPTIMVertex[] performFBCC(Population pop)
     {
         // first select 1st parent through whatever scheme is applied
         int p1 = selectBasedOnFitness(pop, 1)[0];
@@ -705,9 +707,11 @@ public class EAUtils
                 continue;
 
             DENOPTIMGraph g2 = pop.get(i).getGraph();
-            
-            //TODO-GG store the isomorfic relation somewhere: this is costly
-            if (g1.isIsomorphicTo(g2))
+           
+            // NB: here exclude parents that have same spanning tree, rather 
+            // than isomorphic graphs. This because crossover between 
+            // isomorphic graphs can produce offspring with non-isomorphic graph
+            if (g1.sameAs(g2, new StringBuilder()))
             {
                 continue;
             }
@@ -725,7 +729,7 @@ public class EAUtils
             return null;
         
         // Choose a candidate
-        ArrayList<Candidate> keys = new ArrayList<Candidate>(subPop.keySet());
+        Population keys = new Population(subPop.keySet());
         int chosen = selectBasedOnFitness(keys,1)[0];
         if (chosen < 0)
             return null;
@@ -793,7 +797,7 @@ public class EAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(ArrayList<Candidate> popln,
+    protected static void outputFinalResults(Population popln,
                             String destDir) throws DENOPTIMException
     {
         String genOutfile = destDir + System.getProperty("file.separator") +
@@ -834,7 +838,7 @@ public class EAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(ArrayList<Candidate> popln) throws DENOPTIMException
+    protected static void outputFinalResults(Population popln) throws DENOPTIMException
     {
         String dirName = EAUtils.getPathNameToFinalPopulationFolder();
         DenoptimIO.createDirectory(dirName);
@@ -870,12 +874,12 @@ public class EAUtils
     /**
      * Reconstruct the molecular population from the file.
      * @param filename
-     * @param molPopulation
+     * @param population
      * @param lstInchi
      * @throws DENOPTIMException
      */
     protected static void getPopulationFromFile(String filename,
-            ArrayList<Candidate> molPopulation, HashSet<String> lstInchi,
+            Population population, HashSet<String> lstInchi,
             String genDir) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> mols;
@@ -977,20 +981,20 @@ public class EAUtils
                 pmol.setSDFFile(molfile);
                 pmol.setImageFile(null);
                 pmol.setName(molName);
-                molPopulation.add(pmol);
+                population.add(pmol);
                 uidsFromInitPop.add(molinchi);
             }
         }
         writeUID(GAParameters.getUIDFileOut(),uidsFromInitPop,true);
 
-        if (molPopulation.isEmpty())
+        if (population.isEmpty())
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
                                         "No data found in file {0}", filename);
             throw new DENOPTIMException("No data found in file " + filename);
         }
 
-        setVertexCounterValue(molPopulation);
+        setVertexCounterValue(population);
     }
 
 //------------------------------------------------------------------------------
@@ -1023,15 +1027,15 @@ public class EAUtils
 
     /**
      * Set the Vertex counter value
-     * @param popln
+     * @param population
      * @throws DENOPTIMException 
      */
 
-    protected static void setVertexCounterValue(ArrayList<Candidate> popln) 
+    protected static void setVertexCounterValue(Population population) 
             throws DENOPTIMException
     {
         int val = Integer.MIN_VALUE;
-        for (Candidate popln1 : popln)
+        for (Candidate popln1 : population)
         {
             DENOPTIMGraph g = popln1.getGraph();
             val = Math.max(val, g.getMaxVertexId());
@@ -1411,7 +1415,7 @@ public class EAUtils
      * @return <code>true</code> if found
      */
 
-    protected static boolean containsMolecule(ArrayList<Candidate> mols,
+    protected static boolean containsMolecule(Population mols,
                                                                 String molcode)
     {
         if(mols.isEmpty())
@@ -1435,7 +1439,7 @@ public class EAUtils
      * @return array of fitness values
      */
 
-    protected static double[] getFitnesses(ArrayList<Candidate> mols)
+    protected static double[] getFitnesses(Population mols)
     {
         int k = mols.size();
         double[] arr = new double[k];
@@ -1456,7 +1460,7 @@ public class EAUtils
      * values exceeds 0.0001
      */
 
-    protected static double getPopulationSD(ArrayList<Candidate> molPopulation)
+    protected static double getPopulationSD(Population molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
         return DENOPTIMStatUtils.stddev(fitvals, true);
@@ -1471,8 +1475,8 @@ public class EAUtils
      * @return list of INCHI codes for the molecules in the population
      */
 
-    protected static ArrayList<String> getUniqueIdentifiers
-                                    (ArrayList<Candidate> candidates)
+    protected static ArrayList<String> getUniqueIdentifiers(
+            Population candidates)
     {
         ArrayList<String> arr = new ArrayList<>();
         for (Candidate c : candidates)

@@ -97,6 +97,10 @@ public class DENOPTIMGraphOperations
                 //Check condition for considering this combination
                 if (isCrossoverPossible(eMale, eFemale))
                 {
+                    //TODO: should verify that the crossover is also "productive"
+                    // meaning that is produced graphs that are different from 
+                    // the parents.
+                    
                     DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vMale,vFemale};
                     pairs.add(pair);
                 }

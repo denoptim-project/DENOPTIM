@@ -72,7 +72,7 @@ public class TasksBatchManager
             futures.add(cservice.submit(tasks.get(i)));
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread()
+        Thread shutDownHook = new Thread()
         {
             @Override
             public void run()
@@ -111,11 +111,10 @@ public class TasksBatchManager
                     Thread.currentThread().interrupt();
                 }
             }
-        });
-
+        };
+        Runtime.getRuntime().addShutdownHook(shutDownHook);
 
         ArrayList<Candidate> results = new ArrayList<>();
-
         try
         {
             for (int i=0; i<tasks.size(); i++)
@@ -148,7 +147,17 @@ public class TasksBatchManager
         finally
         {
             eservice.shutdown();
+            Runtime.getRuntime().removeShutdownHook(shutDownHook);
+            shutDownHook = null;
         }
+        
+        // Cleanup
+        tasks.clear();
+        for (Future<Object> f : futures)
+        {
+            f.cancel(true);
+        }
+        futures.clear();
 
         return results;
     }

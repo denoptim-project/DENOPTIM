@@ -1273,10 +1273,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * {@link BondType} and the 
      * identity of the attachment points connected thereby.</li>
      * </ul>
-     * 
+     * <p>
      * This method makes use of the Vento-Foggia VF2 algorithm (see 
      * <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>)
      * as provided by JGraphT library in {@link VF2GraphIsomorphismInspector}.
+     * </p>
+     * 
+     * <p>Detection of isomorphism can be very slow for pathological cases and
+     * for graphs with large symmetric systems! TODO: consider adding a 
+     * runtime limit or a further simplification/speed-up exploiting symmetry.
+     * The symmetry, however, does not help detecting isomorphism between a
+     * graph with symmetric branches and its isomorphic analogue that is fully
+     * asymmetric.</p>
      * 
      * @param other the graph to be compared with this.
      * @return <code>true</code> is this graph is isomorphic to the other.

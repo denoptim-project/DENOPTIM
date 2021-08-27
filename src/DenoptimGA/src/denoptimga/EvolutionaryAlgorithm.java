@@ -51,8 +51,6 @@ import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
 import denoptimga.EAUtils.CandidateSource;
 
-
-
 /**
  * DENOPTIM's evolutionary algorithm. 
  * <p>This implementation offers two 
@@ -202,7 +200,7 @@ public class EvolutionaryAlgorithm
         
         // Create initial population of candidates
         EAUtils.createFolderForGeneration(0);
-        ArrayList<Candidate> population = EAUtils.importInitialPopulation();
+        Population population = EAUtils.importInitialPopulation();
         initializePopulation(population);
         EAUtils.outputPopulationDetails(population, 
                 EAUtils.getPathNameToGenerationDetailsFile(0));
@@ -439,20 +437,16 @@ public class EvolutionaryAlgorithm
      * the population.
      * @throws DENOPTIMException
      */
-    private boolean evolvePopulation(ArrayList<Candidate> population, 
+    private boolean evolvePopulation(Population population, 
             int genId) throws DENOPTIMException
     {
         EAUtils.createFolderForGeneration(genId);
         
         // Take a snapshot of the initial population
-        ArrayList<Candidate> origPop;
+        Population origPop;
         synchronized (population)
         {
-            origPop = new ArrayList<Candidate>();
-            for (Candidate m : population)
-            {
-                origPop.add(m.clone());
-            }
+            origPop = population.clone();
         }
         ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(origPop);
         
