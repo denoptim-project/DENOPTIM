@@ -509,6 +509,10 @@ Serializable, Cloneable
      * the other object given as argument.
      */
 
+	//TODO: this comparator is meant for specific uses like sorting the 
+	// population according to fitness, and it should thus be a
+	// specific comparator, not here determining the natural ordering.
+	
     @Override
     public int compareTo(Candidate other)
     {

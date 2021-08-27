@@ -213,7 +213,7 @@ public class EvolutionaryAlgorithm
                             + String.format("%.6f", sdev) + "). Abbandoning "
                                     + "evolutionary algorithm.";
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            emptyThisList(population);
+            population.trim(0);
             return;
         }
 
@@ -278,15 +278,14 @@ public class EvolutionaryAlgorithm
         Collections.sort(population, Collections.reverseOrder());
         if (GAParameters.getReplacementStrategy() == 1)
         {
-            int k = population.size();
-            population.subList(GAParameters.getPopulationSize(), k).clear();
+            population.trim(GAParameters.getPopulationSize());
         }
 
         // And write final results
         EAUtils.outputFinalResults(population);
         
         // Termination
-        emptyThisList(population);
+        population.trim(0);
         watch.stop();
         DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}." + NL,
                 watch.toString());
@@ -302,10 +301,10 @@ public class EvolutionaryAlgorithm
      * @throws DENOPTIMException
      */
 
-    private void initializePopulation(ArrayList<Candidate> population) 
+    private void initializePopulation(Population population) 
             throws DENOPTIMException
     {
-     // Deal with existing initial population members
+        // Deal with existing initial population members
         synchronized (population)
         {
             Collections.sort(population, Collections.reverseOrder());
@@ -422,7 +421,6 @@ public class EvolutionaryAlgorithm
         {
             // NB: this does not remove any item from the list
             population.trimToSize();
-            
             Collections.sort(population, Collections.reverseOrder());
         }
     }
@@ -442,15 +440,21 @@ public class EvolutionaryAlgorithm
     {
         EAUtils.createFolderForGeneration(genId);
         
-        // Take a snapshot of the initial population
-        Population origPop;
+        // Take a snapshot of the initial population members. This to exclude
+        // that offstrings of this generation become parents in this generation.
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         synchronized (population)
         {
-            origPop = population.clone();
+            for (Candidate c : population)
+            {
+                eligibleParents.add(c);
+            }
         }
-        ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(origPop);
+        ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(
+                eligibleParents);
         
-        int newPopSize = GAParameters.getNumberOfChildren() + origPop.size();
+        int newPopSize = GAParameters.getNumberOfChildren() 
+                + eligibleParents.size();
         
         int i=0;
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
@@ -480,7 +484,8 @@ public class EvolutionaryAlgorithm
                 {
                     case CROSSOVER:
                     {
-                        candidate = EAUtils.buildCandidateByXOver(origPop, mnt);
+                        candidate = EAUtils.buildCandidateByXOver(
+                                eligibleParents, population, mnt);
                         if (candidate == null)
                             continue;
                         break;
@@ -488,8 +493,8 @@ public class EvolutionaryAlgorithm
                         
                     case MUTATION:
                     {
-                        candidate = EAUtils.buildCandidateByMutation(origPop, 
-                                mnt);
+                        candidate = EAUtils.buildCandidateByMutation(
+                                eligibleParents, mnt);
                         if (candidate == null)
                             continue;
                         break;
@@ -578,17 +583,11 @@ public class EvolutionaryAlgorithm
             Collections.sort(population, Collections.reverseOrder());
             if (GAParameters.getReplacementStrategy() == 1)
             {
-                // trim the population to the desired size
-                int k = population.size();
-                for (int l=GAParameters.getPopulationSize(); l<k; l++)
-                {
-                    population.get(l).cleanup();
-                }
-                population.subList(GAParameters.getPopulationSize(), k).clear();
+                population.trim(GAParameters.getPopulationSize());
             }
         }
         
-        emptyThisList(origPop);
+        eligibleParents = null;
         syncronisedTasks.clear();
 
         // Check if the population has changed
@@ -615,19 +614,6 @@ public class EvolutionaryAlgorithm
             cleanupAsync(tcons, futures, submitted);
             tcons.shutdown();
         }
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Clears the content of each object in the given list of candidates, and
-     * clears the list too.
-     */
-    private void emptyThisList(ArrayList<Candidate> list)
-    {
-        for (Candidate mol : list)
-            mol.cleanup();
-        list.clear();
     }
     
 //------------------------------------------------------------------------------

@@ -204,7 +204,8 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    protected static Candidate buildCandidateByXOver(Population pop, 
+    protected static Candidate buildCandidateByXOver(
+            ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt) throws DENOPTIMException
     {
         mnt.increase(CounterID.XOVERATTEMPTS);
@@ -213,36 +214,37 @@ public class EAUtils
         int numatt = 0;
         
         // Identify a pair of parents that can do crossover
-        Candidate male = null, female = null;
+        Candidate maleCandidate = null, femaleCandidate = null;
         int mvid = -1, fvid = -1;
         boolean foundPars = false;
+        DENOPTIMVertex[] pair = null;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {   
             if (FragmentSpace.useAPclassBasedApproach())
             {
-                DENOPTIMVertex[] pair = EAUtils.performFBCC(pop);
+                pair = EAUtils.performFBCC(eligibleParents, population);
                 if (pair == null)
                 {
                     numatt++;
                     continue;
                 }
-                male = pair[0].getGraphOwner().getCandidateOwner();
-                female = pair[1].getGraphOwner().getCandidateOwner();
+                maleCandidate = pair[0].getGraphOwner().getCandidateOwner();
+                femaleCandidate = pair[1].getGraphOwner().getCandidateOwner();
                 mvid = pair[0].getGraphOwner().indexOf(pair[0]);
                 fvid = pair[1].getGraphOwner().indexOf(pair[1]);
             } else {
-                int parents[] = EAUtils.selectBasedOnFitness(pop, 2);
+                int parents[] = EAUtils.selectBasedOnFitness(eligibleParents, 2);
                 if (parents[0] == -1 || parents[1] == -1)
                 {
                     numatt++;
                     continue;
                 }
-                male = pop.get(parents[0]);
-                female = pop.get(parents[1]);
+                maleCandidate = eligibleParents.get(parents[0]);
+                femaleCandidate = eligibleParents.get(parents[1]);
                 mvid = EAUtils.selectNonScaffoldNonCapVertex(
-                        male.getGraph());
+                        maleCandidate.getGraph());
                 fvid = EAUtils.selectNonScaffoldNonCapVertex(
-                        female.getGraph());
+                        femaleCandidate.getGraph());
             }
             foundPars = true;
             break;
@@ -255,28 +257,33 @@ public class EAUtils
             return null;
         }
         
-        String molid1 = FilenameUtils.getBaseName(
-                male.getSDFFile());
-        String molid2 = FilenameUtils.getBaseName(
-                female.getSDFFile());
+        String molid1 = maleCandidate.getName();
+        String molid2 = femaleCandidate.getName();
 
-        int gid1 = male.getGraph().getGraphId();
-        int gid2 = female.getGraph().getGraphId();
+        int gid1 = maleCandidate.getGraph().getGraphId();
+        int gid2 = femaleCandidate.getGraph().getGraphId();
         
-        DENOPTIMGraph graph1 = male.getGraph().clone();
-        DENOPTIMGraph graph2 = female.getGraph().clone();
+        DENOPTIMGraph graph1 = maleCandidate.getGraph().clone();
+        DENOPTIMGraph graph2 = femaleCandidate.getGraph().clone();
         
         graph1.renumberGraphVertices();
         graph2.renumberGraphVertices();
 
-        //TODO: evaluate if this can be simplified by using refs to vertexes
-        if (!DENOPTIMGraphOperations.performCrossover(graph1, 
-                graph1.getVertexAtPosition(mvid).getVertexId(),
-                graph2,
-                graph2.getVertexAtPosition(fvid).getVertexId()))
+        //TODO: evaluate if all this can be simplified by using refs to vertexes
+        try
         {
-            mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            if (!DENOPTIMGraphOperations.performCrossover(graph1, 
+                    graph1.getVertexAtPosition(mvid).getVertexId(),
+                    graph2,
+                    graph2.getVertexAtPosition(fvid).getVertexId()))
+            {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
+                return null;
+            }
+        } catch (Throwable e)
+        {
+            //TODO-GG remove try block
+            e.printStackTrace();
         }
         graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
         graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -349,7 +356,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
     
     protected static Candidate buildCandidateByMutation(
-            Population pop, Monitor mnt)
+            ArrayList<Candidate> eligibleParents, Monitor mnt)
                     throws DENOPTIMException
     {
         mnt.increase(CounterID.MUTATTEMTS);
@@ -359,7 +366,7 @@ public class EAUtils
         int parentIdx = -1;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {
-            parentIdx = EAUtils.selectBasedOnFitness(pop,1)[0];
+            parentIdx = EAUtils.selectBasedOnFitness(eligibleParents,1)[0];
             if (parentIdx == -1)
             {
                 numatt++;
@@ -376,12 +383,12 @@ public class EAUtils
             return null;
         }
         
-        DENOPTIMGraph graph = pop.get(parentIdx).getGraph().clone();
+        Candidate parent = eligibleParents.get(parentIdx);
+        DENOPTIMGraph graph = parent.getGraph().clone();
         graph.renumberGraphVertices();
         
-        String molName = FilenameUtils.getBaseName(
-                pop.get(parentIdx).getSDFFile());
-        int graphId = pop.get(parentIdx).getGraph().getGraphId();
+        String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
+        int parentGraphId = parent.getGraph().getGraphId();
 
         if (!DENOPTIMGraphOperations.performMutation(graph))
         {
@@ -389,7 +396,7 @@ public class EAUtils
             return null;
         }
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
-        graph.setLocalMsg("Mutation: " + molName + "|" + graphId);
+        graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
     
         EAUtils.addCappingGroup(graph);
         
@@ -628,12 +635,12 @@ public class EAUtils
      * Selects a number of members from the given population. 
      * The selection method is what specified by the
      * configuration of the genetic algorithm ({@link GAParameters}).
-     * @param population the list of candidates to chose from.
+     * @param keys the list of candidates to chose from.
      * @param number how many candidate to pick.
      * @return indexes of the selected members of the given population.
      */
 
-    protected static int[] selectBasedOnFitness(Population population, 
+    protected static int[] selectBasedOnFitness(ArrayList<Candidate> keys, 
             int number)
     {
         int[] mates = new int[number];
@@ -644,17 +651,17 @@ public class EAUtils
         switch (GAParameters.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection(population, 
+            mates = SelectionHelper.performTournamentSelection(keys, 
                     number);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(population, number);
+            mates = SelectionHelper.performRWS(keys, number);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(population, number);
+            mates = SelectionHelper.performSUS(keys, number);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(population, number);
+            mates = SelectionHelper.performRandomSelection(keys, number);
             break;
         }
         return mates;
@@ -679,63 +686,34 @@ public class EAUtils
     /**
      * Perform fitness-based, class-compatible selection of parents for 
      * crossover.
-     * @param pop list of candidates among which to choose.
+     * @param eligibleParents list of candidates among which to choose.
+     * @param population the dynamic population containing the eligible parents.
      * @return returns the pair of vertexes where crossover can be performed,
      * or null if no possibility was found.
      */
 
-    protected static DENOPTIMVertex[] performFBCC(Population pop)
+    protected static DENOPTIMVertex[] performFBCC(
+            ArrayList<Candidate> eligibleParents, Population population)
     {
-        // first select 1st parent through whatever scheme is applied
-        int p1 = selectBasedOnFitness(pop, 1)[0];
-        
+        int p1 = selectBasedOnFitness(eligibleParents, 1)[0];
         if (p1 == -1)
-        {
-            return null;
-        }
-
-        DENOPTIMGraph g1 = pop.get(p1).getGraph();
-        
-        // Filter population to keep only members that can do 
-        // crossover with g1 (and keep track of where each candidate can do
-        // crossover with g1)
-        SortedMap<Candidate,List<DENOPTIMVertex[]>> subPop = 
-                new TreeMap<Candidate, List<DENOPTIMVertex[]>>();
-        for (int i=0; i<pop.size(); i++)
-        {
-            if (i == p1)
-                continue;
-
-            DENOPTIMGraph g2 = pop.get(i).getGraph();
-           
-            // NB: here exclude parents that have same spanning tree, rather 
-            // than isomorphic graphs. This because crossover between 
-            // isomorphic graphs can produce offspring with non-isomorphic graph
-            if (g1.sameAs(g2, new StringBuilder()))
-            {
-                continue;
-            }
-            
-            List<DENOPTIMVertex[]> xoPairs = DENOPTIMGraphOperations
-                    .locateCompatibleXOverPoints(g1, g2);
-              
-            if (xoPairs.size() > 0)
-            {
-                subPop.put(pop.get(i), xoPairs);
-            }
-        }
-        
-        if (subPop.size() == 0)
             return null;
         
-        // Choose a candidate
-        Population keys = new Population(subPop.keySet());
-        int chosen = selectBasedOnFitness(keys,1)[0];
+        Candidate parentA = eligibleParents.get(p1);
+        DENOPTIMGraph g1 = parentA.getGraph();
+        
+        ArrayList<Candidate> matesCompatibleWithFirst = 
+                population.getXoverPartners(parentA,eligibleParents);
+        if (matesCompatibleWithFirst.size() == 0)
+            return null;
+        
+        int chosen = selectBasedOnFitness(matesCompatibleWithFirst,1)[0];
         if (chosen < 0)
             return null;
+        Candidate parentB = matesCompatibleWithFirst.get(chosen);
         
-        // Choose a vertex within the chosen candidate
-        return RandomUtils.randomlyChooseOne(subPop.get(keys.get(chosen)));
+        return RandomUtils.randomlyChooseOne(population.getXoverSites(parentA,
+                parentB));
     }
 
 //------------------------------------------------------------------------------
@@ -1471,15 +1449,15 @@ public class EAUtils
 
     /**
      * Extracts the list of unique identifiers from a list of candidates.
-     * @param candidates
+     * @param candidateParents
      * @return list of INCHI codes for the molecules in the population
      */
 
     protected static ArrayList<String> getUniqueIdentifiers(
-            Population candidates)
+            ArrayList<Candidate> candidateParents)
     {
         ArrayList<String> arr = new ArrayList<>();
-        for (Candidate c : candidates)
+        for (Candidate c : candidateParents)
         {
             arr.add(c.getUID());
         }

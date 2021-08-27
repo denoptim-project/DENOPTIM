@@ -45,7 +45,7 @@ import denoptim.utils.GraphConversionTool;
 public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
-    private volatile List<Candidate> curPopln;
+    private volatile Population population;
     private volatile Monitor mnt;
     
     /**
@@ -56,13 +56,13 @@ public class OffspringEvaluationTask extends FitnessTask
 //------------------------------------------------------------------------------
     
     public OffspringEvaluationTask(Candidate offspring, String workDir,
-            List<Candidate> popln, Monitor mnt, String fileUID)
+            Population popln, Monitor mnt, String fileUID)
     {
         super(offspring.getGraph());
         this.molName = offspring.getName();
         this.workDir = workDir;
         this.fitProvMol = offspring.getChemicalRepresentation();
-        this.curPopln = popln;
+        this.population = popln;
         this.mnt = mnt;
         
         result.setName(this.molName);
@@ -156,13 +156,13 @@ public class OffspringEvaluationTask extends FitnessTask
 
         if (result.hasFitness())
         {
-        	if (curPopln != null)
+        	if (population != null)
         	{
-	            synchronized (curPopln)
+	            synchronized (population)
 	            {
 	            	DENOPTIMLogger.appLogger.log(Level.INFO, 
 	            			"Adding {0} to population", molName);
-	                curPopln.add(result);
+	                population.add(result);
 	            }
         	}
 
