@@ -197,6 +197,8 @@ public class EvolutionaryAlgorithm
         {
             tcons.prestartAllCoreThreads();
         }
+        Monitor mnt = new Monitor();
+        mnt.printHeader();
         
         // Create initial population of candidates
         EAUtils.createFolderForGeneration(0);
@@ -400,7 +402,6 @@ public class EvolutionaryAlgorithm
             throw new DENOPTIMException(ex);
         }
         
-        mnt.printHeader();
         mnt.printSummary();
 
         if (i >= (GAParameters.getPopulationSize() * 
