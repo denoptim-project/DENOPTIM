@@ -327,6 +327,16 @@ public class FragmentSpace
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Set the fragment space to behave according to APClass-based approach.
+     */
+    public static void setSPclassBasedApproach(boolean useAPC)
+    {
+        apClassBasedApproch = useAPC;
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * Check usage of APClass-based approach, i.e., uses attachment points with

@@ -113,6 +113,7 @@ Serializable, Cloneable
 
     public Candidate()
     {
+        name = "noname";
         uid = "UNDEFINED";
         smiles = "UNDEFINED";
         hasFitness = false;
@@ -135,6 +136,7 @@ Serializable, Cloneable
     public Candidate(String name, DENOPTIMGraph graph)
     {
         this();
+        this.name = name;
         this.graph = graph;
         graph.setCandidateOwner(this);
         uid = "UNDEFINED";
@@ -147,6 +149,7 @@ Serializable, Cloneable
     public Candidate(String name, DENOPTIMGraph graph, double fitness,
             String uid, String smiles)
     {
+        this();
         this.name = name;
         this.graph = graph;
         graph.setCandidateOwner(this);
@@ -162,6 +165,7 @@ Serializable, Cloneable
             String uid, String smiles, String molFile, String imgFile,
             String comment, int generationId, int level)
     {
+        this();
         this.name = name;
         this.graph = graph;
         graph.setCandidateOwner(this);
@@ -224,7 +228,6 @@ Serializable, Cloneable
         
         this.iac = DENOPTIMMoleculeUtils.makeSameAs(iac);
 		
-		this.name = "noname";
 		if (iac.getProperty(CDKConstants.TITLE) != null)
 		{
 			this.name = iac.getProperty(CDKConstants.TITLE).toString();
@@ -534,13 +537,18 @@ Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /* TODO: change this method! Now it writes a string that is formatted 
+     * only for logging needs not really a good toString string.
+     * 
+     */
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder(16);
-        String mname = new File(sdfFile).getName();
-        if (mname != null)
-            sb.append(String.format("%-20s", mname));
+        if (sdfFile != null && name == null)
+            name = new File(sdfFile).getName();
+        if (name != null)
+            sb.append(String.format("%-20s", name));
         
         sb.append(String.format("%-20s", this.graph.getGraphId()));
         sb.append(String.format("%-30s", uid));

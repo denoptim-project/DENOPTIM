@@ -252,39 +252,20 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      */
     public ArrayList<Candidate> getXoverPartners(Candidate memberA,
             ArrayList<Candidate> eligibleParents)
-    {
-        //TODO-GG del
-        //System.out.println("MEMBER-A: "+memberA);
-        
+    {   
         DENOPTIMGraph gA = memberA.getGraph();
         
         // First, update to cover any combination of members that has not been 
         // considered before
         for (Candidate memberB : eligibleParents)
         {
-
-            //TODO-GG del
-            //System.out.println("MEMBER-B: "+memberB);
-            
             if (memberA == memberB)
             {
-                //TODO-gg del
-                /*
-                System.out.println("is ==");
-                System.out.println("    "+memberA);
-                System.out.println("    "+memberB);
-                */
                 continue;
             }
             
             if (xoverCompatibilities.contains(memberA,memberB))
             {
-                //TODO-gg del
-                /*
-                System.out.println("done already");
-                System.out.println("    "+memberA);
-                System.out.println("    "+memberB);
-                */
                 continue;
             }
     
