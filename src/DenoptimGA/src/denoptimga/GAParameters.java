@@ -252,6 +252,11 @@ public class GAParameters
     protected static int monitorDumpStep = 50;
     
     /**
+     * Flag controlling if we dump monitored data or not
+     */
+    protected static boolean dumpMonitor = false;
+    
+    /**
      * Minimal standard deviation accepted in the fitness values of the initial population
      */
     protected static double minFitnessSD = 0.000001;
@@ -304,6 +309,7 @@ public class GAParameters
     	precisionLevel = 3;
     	print_level = 0;
     	monitorDumpStep = 50;
+    	dumpMonitor = false;
     	
         FragmentSpaceParameters.resetParameters();
         RingClosureParameters.resetParameters();
@@ -687,6 +693,7 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         monitorDumpStep = Integer.parseInt(option);
+                        dumpMonitor = true;
                     }
                     continue;
                 }

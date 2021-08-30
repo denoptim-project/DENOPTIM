@@ -253,6 +253,7 @@ public class EAUtils
 
         if (!foundPars)
         {
+            mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FINDPARENTS);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
             return null;
         }
@@ -277,6 +278,8 @@ public class EAUtils
                     graph2,
                     graph2.getVertexAtPosition(fvid).getVertexId()))
             {
+
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
                 return null;
             }
@@ -305,8 +308,11 @@ public class EAUtils
             {
                 if (!EAUtils.setupRings(res,g))
                 {
+                    mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
                     res = null;
                 }
+            } else {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS_EVAL);
             }
             
             // Check if the chosen combination gives rise to forbidden ends
@@ -318,6 +324,7 @@ public class EAUtils
                 if (FragmentSpace.getCappingMap().get(apc)==null 
                         && FragmentSpace.getForbiddenEndList().contains(apc))
                 {
+                    mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FORBENDS);
                     res = null;
                 }
             }
@@ -359,7 +366,7 @@ public class EAUtils
             ArrayList<Candidate> eligibleParents, Monitor mnt)
                     throws DENOPTIMException
     {
-        mnt.increase(CounterID.MUTATTEMTS);
+        mnt.increase(CounterID.MUTATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
         int numatt = 0;
@@ -374,9 +381,7 @@ public class EAUtils
             }
             break;
         }
-        
         mnt.increaseBy(CounterID.MUTPARENTSEARCH,numatt);
-
         if (parentIdx == -1)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
@@ -392,6 +397,7 @@ public class EAUtils
 
         if (!DENOPTIMGraphOperations.performMutation(graph))
         {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
             return null;
         }
@@ -407,7 +413,10 @@ public class EAUtils
             if (!EAUtils.setupRings(res,graph))
             {
                 res = null;
+                mnt.increase(CounterID.FAILEDMUTATTEMTS_SETUPRINGS);
             }
+        } else {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_EVAL);
         }
         
         // Check if the chosen combination gives rise to forbidden ends
@@ -420,6 +429,7 @@ public class EAUtils
                     && FragmentSpace.getForbiddenEndList().contains(apc))
             {
                 res = null;
+                mnt.increase(CounterID.FAILEDMUTATTEMTS_FORBENDS);
             }
         }
         
@@ -453,6 +463,7 @@ public class EAUtils
         DENOPTIMGraph graph = EAUtils.buildGraph();
         if (graph == null)
         {
+            mnt.increase(CounterID.FAILEDBUILDATTEMPTS_GRAPHBUILD);
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
             return null;
         }
@@ -465,11 +476,13 @@ public class EAUtils
             if (!EAUtils.setupRings(res,graph))
             {
                 graph.cleanup();
+                mnt.increase(CounterID.FAILEDBUILDATTEMPTS_SETUPRINGS);
                 mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
                 return null;
             }
         } else {
             graph.cleanup();
+            mnt.increase(CounterID.FAILEDBUILDATTEMPTS_EVAL);
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
             return null;
         }
@@ -484,6 +497,7 @@ public class EAUtils
                     && FragmentSpace.getForbiddenEndList().contains(apc))
             {
                 res = null;
+                mnt.increase(CounterID.FAILEDBUILDATTEMPTS_FORBIDENDS);
             }
         }
         
@@ -515,9 +529,8 @@ public class EAUtils
      * @throws DENOPTIMException
      */
 
-    protected static void outputPopulationDetails
-                            (Population population, String filename)
-                                                        throws DENOPTIMException
+    protected static void outputPopulationDetails(Population population, 
+            String filename) throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
 

@@ -9,9 +9,21 @@ public enum CounterID
 {
     //GENERATEDGRAPHS, 
     NEWCANDIDATEATTEMPTS, 
+    
     XOVERATTEMPTS, FAILEDXOVERATTEMPTS, XOVERPARENTSEARCH,
-    MUTATTEMTS, FAILEDMUTATTEMTS, MUTPARENTSEARCH,
-    BUILDANEWATTEMPTS, FAILEDBUILDATTEMPTS,
+    FAILEDXOVERATTEMPTS_FINDPARENTS, FAILEDXOVERATTEMPTS_PERFORM,
+    FAILEDXOVERATTEMPTS_SETUPRINGS,
+    
+    MUTATTEMPTS, FAILEDMUTATTEMTS, MUTPARENTSEARCH, FAILEDMUTATTEMTS_PERFORM,
+    FAILEDMUTATTEMTS_SETUPRINGS, FAILEDMUTATTEMTS_EVAL, 
+    FAILEDMUTATTEMTS_FORBENDS, FAILEDXOVERATTEMPTS_EVAL, 
+    FAILEDXOVERATTEMPTS_FORBENDS,
+    
+    BUILDANEWATTEMPTS, FAILEDBUILDATTEMPTS, FAILEDBUILDATTEMPTS_GRAPHBUILD,
+    FAILEDBUILDATTEMPTS_EVAL, FAILEDBUILDATTEMPTS_SETUPRINGS, 
+    FAILEDBUILDATTEMPTS_FORBIDENDS,
+    
+    
     FITNESSEVALS, FAILEDFITNESSEVALS;
     
     private String description = "";
@@ -27,17 +39,43 @@ public enum CounterID
                 + "by crossover";
         XOVERPARENTSEARCH.description = "Attempts to find a pairs of parents "
                 + "compatible with crossover.";
+        FAILEDXOVERATTEMPTS_FINDPARENTS.description = "Failed attemtps to find "
+                + "crossover partners";
+        FAILEDXOVERATTEMPTS_PERFORM.description = "Failed crossover operations "
+                + "on compatible parents";
+        FAILEDXOVERATTEMPTS_SETUPRINGS.description = "Failed attempts to setup "
+                + "rings in a crossover offspring";
+        FAILEDXOVERATTEMPTS_EVAL.description = "Failed attempt to pass graph "
+                + "evaluation test from crossover offspring";
+        FAILEDXOVERATTEMPTS_FORBENDS.description = "Crossover offsprings that "
+                + "let to forbidden ends";
         
-        MUTATTEMTS.description = "Attempts to do build graph by mutation";
+        MUTATTEMPTS.description = "Attempts to do build graph by mutation";
         FAILEDMUTATTEMTS.description = "Failed attempts to do build a graph "
                 + "by Mutation";
         MUTPARENTSEARCH.description = "Attempts to find a parent that supports "
                 + " mutation";
+        FAILEDMUTATTEMTS_PERFORM.description = "Failed mutation operation of parent "
+                + "that supports mutation.";
+        FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup rings "
+                + "in a mutated offspring";
+        FAILEDMUTATTEMTS_EVAL.description = "Failed attempt to pass graph "
+                + "evaluation test from mutated offspring";
+        FAILEDMUTATTEMTS_FORBENDS.description = "Mutated offsprings that led to "
+                + "forbidden ends";
         
         BUILDANEWATTEMPTS.description = "Attempts to do build graph from "
                 + "scratch";
         FAILEDBUILDATTEMPTS.description = "Failed attempts to do build a graph "
                 + "from scratch";
+        FAILEDBUILDATTEMPTS_GRAPHBUILD.description = "Failed attempts to generate a graph";
+        FAILEDBUILDATTEMPTS_EVAL.description = "Failed attempts to pass graph "
+                + "evaluation test from newly built graphs";
+        FAILEDBUILDATTEMPTS_SETUPRINGS.description = "Failed attempt to setup rings "
+                + "in a newly generated graph";
+        FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new graphs "
+                + "that ped to forbidden ends";
+        
         
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";

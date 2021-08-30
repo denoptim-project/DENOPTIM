@@ -325,7 +325,7 @@ public class EvolutionaryAlgorithm
             return;
         }
         
-        Monitor mnt = new Monitor("Generation 0");
+        Monitor mnt = new Monitor("MonitorGen",0);
         
         // Loop creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
@@ -400,6 +400,7 @@ public class EvolutionaryAlgorithm
             throw new DENOPTIMException(ex);
         }
         
+        mnt.printHeader();
         mnt.printSummary();
 
         if (i >= (GAParameters.getPopulationSize() * 
@@ -458,7 +459,7 @@ public class EvolutionaryAlgorithm
         
         int i=0;
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
-        Monitor mnt = new Monitor("Generation " + genId);
+        Monitor mnt = new Monitor("MonitorGen",genId);
         try
         {
             while (i < GAParameters.getPopulationSize() *

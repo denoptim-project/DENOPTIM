@@ -149,7 +149,7 @@ public class OffspringEvaluationTask extends FitnessTask
             throw new DENOPTIMException(ex);
         }
 
-        if (result.getError() == null)
+        if (result.getError() != null)
         {
             mnt.increase(CounterID.FAILEDFITNESSEVALS);
         }

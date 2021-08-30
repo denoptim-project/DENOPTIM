@@ -46,6 +46,11 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
     public String name = "noname";
     
     /**
+     * A generation number
+     */
+    public int generationId = 0;
+    
+    /**
      * Counter controlling dumps
      */
     private int dumpsId = 0;
@@ -65,10 +70,11 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
 
 //------------------------------------------------------------------------------
     
-    public Monitor(String identifier)
+    public Monitor(String identifier, int genId)
     {
         this();
         name = identifier;
+        generationId = genId;
     }
     
 //------------------------------------------------------------------------------
@@ -82,7 +88,8 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
             if (cid == CounterID.NEWCANDIDATEATTEMPTS)
             {
                 dumpsId++;
-                if (dumpsId >= GAParameters.getMonitorDumpStep())
+                if (dumpsId >= GAParameters.getMonitorDumpStep()
+                        && GAParameters.dumpMonitor)
                 {
                     dumpsId = 0;
                     dump = getMonitorDataLine("DUMP");
@@ -133,11 +140,18 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
     
 //------------------------------------------------------------------------------
 
+    public void printHeader() throws DENOPTIMException
+    {
+        DenoptimIO.writeData(GAParameters.getMonitorFile(),
+                getMonitorDataHeader(),true);
+    }
+    
+//------------------------------------------------------------------------------
+
     public void printSummary() throws DENOPTIMException
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getMonitorDataLine("SUMMARY"));
-        DenoptimIO.writeData(GAParameters.getMonitorFile(),sb.toString(),true);
+        DenoptimIO.writeData(GAParameters.getMonitorFile(),
+                getMonitorDataLine("SUMMARY"),true);
     }
     
 //------------------------------------------------------------------------------
@@ -145,6 +159,26 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
     public void printSnapshot(String snapshot) throws DENOPTIMException
     {
         DenoptimIO.writeData(GAParameters.getMonitorFile(),snapshot,true);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Build a string with the names of all counters.
+     * @return
+     */
+    private String getMonitorDataHeader()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("RecordType MonitorName Generation ");
+        synchronized (this)
+            {
+            for (CounterID cid : CounterID.values())
+            {
+                sb.append(cid).append(" ");
+            }
+        }
+        return sb.toString();
     }
     
 //------------------------------------------------------------------------------
@@ -157,12 +191,13 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
     private String getMonitorDataLine(String prefix)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append(" ").append(name).append(" ");
+        sb.append(prefix).append(" ");
+        sb.append(name).append(" ");
+        sb.append(generationId).append(" ");
         synchronized (this)
             {
             for (CounterID cid : CounterID.values())
             {
-                sb.append(cid).append(": ");
                 sb.append(this.get(cid).get()).append(" ");
             }
         }
