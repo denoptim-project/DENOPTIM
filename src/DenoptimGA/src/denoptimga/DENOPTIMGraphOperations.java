@@ -91,8 +91,9 @@ public class DENOPTIMGraphOperations
                 // NB: since scaffolds cannot be at the target end of an edge 
                 // and capping groups have been excluded, here we have only
                 // standard building blocks (i.e., BBType.FRAGMENT).
-                if (vMale.getBuildingBlockId() == vFemale.getBuildingBlockId())
-                    continue;
+                //TODO-GG: del
+                //if (vMale.getBuildingBlockId() == vFemale.getBuildingBlockId())
+                //    continue;
                 
                 //Check condition for considering this combination
                 if (isCrossoverPossible(eMale, eFemale))
