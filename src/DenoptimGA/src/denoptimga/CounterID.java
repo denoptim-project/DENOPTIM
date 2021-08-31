@@ -67,16 +67,18 @@ public enum CounterID
                 + "by Mutation";
         MUTPARENTSEARCH.description = "Attempts to find a parent that supports "
                 + " mutation";
-        FAILEDMUTATTEMTS_PERFORM.description = "Failed mutation operation of parent "
+        FAILEDMUTATTEMTS_PERFORM.description = "Failed mutation operation of "
+                + "parent "
                 + "that supports mutation.";
         FAILEDMUTATTEMTS_PERFORM_NOMUTSITE.description = "Mutation cannot be "
                 + "done because graph declares no mutation site";
-        FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup rings "
+        FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup "
+                + "rings "
                 + "in a mutated offspring";
         FAILEDMUTATTEMTS_EVAL.description = "Failed attempt to pass graph "
                 + "evaluation test from mutated offspring";
-        FAILEDMUTATTEMTS_FORBENDS.description = "Mutated offsprings that led to "
-                + "forbidden ends";
+        FAILEDMUTATTEMTS_FORBENDS.description = "Mutated offsprings that led "
+                + "to forbidden ends";
         
         BUILDANEWATTEMPTS.description = "Attempts to do build graph from "
                 + "scratch";
