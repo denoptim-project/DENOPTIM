@@ -32,6 +32,7 @@ import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.MutationType;
 import denoptimga.DENOPTIMGraphOperations;
+import denoptimga.Monitor;
 
 /**
  * Tool to test genetic operators
@@ -112,7 +113,7 @@ public class TestOperator
         // NB: last boolean asks to ignore the growth probability
         DENOPTIMGraphOperations.performMutation(v,mt,true,
                 TestOperatorParameters.idNewVrt,
-                TestOperatorParameters.idNewAP);
+                TestOperatorParameters.idNewAP, new Monitor());
 
         System.out.println("Result of mutation:");
         System.out.println(g);

@@ -59,6 +59,9 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
 
 //------------------------------------------------------------------------------
     
+    /**
+     * Creates an unnamed monitor.
+     */
     public Monitor()
     {
         super();
@@ -70,6 +73,11 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
 
 //------------------------------------------------------------------------------
     
+    /**
+     * Creates a named monitor that is marked with the given generation number
+     * @param identifier the string identifying this monitor.
+     * @param genId the generation number.
+     */
     public Monitor(String identifier, int genId)
     {
         this();

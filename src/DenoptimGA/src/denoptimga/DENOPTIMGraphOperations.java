@@ -1435,15 +1435,18 @@ public class DENOPTIMGraphOperations
     
     /**
      * Tries to do mutate the given graph. The mutation site and type are 
-     * chosen randomly according the the possibilities declared by the graph.
+     * chosen randomly according to the possibilities declared by the graph.
      * The graph that owns the vertex will be altered and
      * the original structure and content of the graph will be lost.
      * @param graph the graph to mutate.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
     
-    public static boolean performMutation(DENOPTIMGraph graph)
+    public static boolean performMutation(DENOPTIMGraph graph, Monitor mnt)
                                                     throws DENOPTIMException
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
@@ -1451,12 +1454,13 @@ public class DENOPTIMGraphOperations
         List<DENOPTIMVertex> mutable = graph.getMutableSites();
         if (mutable.size() == 0)
         {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);
             String msg = "Graph has no mutable site. Mutation aborted.";
             DENOPTIMLogger.appLogger.info(msg);
             return false;
         }
         
-        return performMutation(RandomUtils.randomlyChooseOne(mutable));
+        return performMutation(RandomUtils.randomlyChooseOne(mutable),mnt);
     }
     
 //------------------------------------------------------------------------------
@@ -1468,11 +1472,14 @@ public class DENOPTIMGraphOperations
      * The graph that owns the vertex will be altered and
      * the original structure and content of the graph will be lost.
      * @param vertex the vertex to mutate.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
     
-    public static boolean performMutation(DENOPTIMVertex vertex) 
+    public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
             throws DENOPTIMException
     {  
         if (vertex.getGraphOwner() == null)
@@ -1483,7 +1490,7 @@ public class DENOPTIMGraphOperations
         }
         MutationType mType = RandomUtils.randomlyChooseOne(
                 vertex.getMutationTypes());
-        return performMutation(vertex, mType);
+        return performMutation(vertex, mType, mnt);
     }
     
     
@@ -1502,9 +1509,9 @@ public class DENOPTIMGraphOperations
      */
     
     public static boolean performMutation(DENOPTIMVertex vertex, 
-            MutationType mType) throws DENOPTIMException
+            MutationType mType, Monitor mnt) throws DENOPTIMException
     {  
-        return performMutation(vertex, mType, false, -1 ,-1);
+        return performMutation(vertex, mType, false, -1 ,-1, mnt);
     }
     
 //------------------------------------------------------------------------------
@@ -1530,7 +1537,7 @@ public class DENOPTIMGraphOperations
     
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, boolean force, int chosenVrtxIdx, 
-            int chosenApId) throws DENOPTIMException
+            int chosenApId, Monitor mnt) throws DENOPTIMException
     {
         if (vertex.getGraphOwner() == null)
         {
@@ -1572,7 +1579,6 @@ public class DENOPTIMGraphOperations
             msg = msg + "done";
         else
             msg = msg + "unsuccessful";
-        
         DENOPTIMLogger.appLogger.info(msg);
         
         return done;

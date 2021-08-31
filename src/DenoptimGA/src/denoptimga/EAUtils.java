@@ -395,7 +395,7 @@ public class EAUtils
         String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
         int parentGraphId = parent.getGraph().getGraphId();
 
-        if (!DENOPTIMGraphOperations.performMutation(graph))
+        if (!DENOPTIMGraphOperations.performMutation(graph,mnt))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
