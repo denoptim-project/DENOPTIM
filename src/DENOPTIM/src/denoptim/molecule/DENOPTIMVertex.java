@@ -675,7 +675,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public abstract Set<DENOPTIMVertex> getMutationSites();
+    public abstract List<DENOPTIMVertex> getMutationSites();
 
 //------------------------------------------------------------------------------
 

@@ -912,9 +912,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    public Set<DENOPTIMVertex> getMutationSites()
+    public List<DENOPTIMVertex> getMutationSites()
     {
-        Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
+        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
         switch (getBuildingBlockType())
         {
             case CAP:
@@ -924,10 +924,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
                 
             default:
-                set.add(this);
+                lst.add(this);
                 break;
         }
-        return set;
+        return lst;
     }
     
 //------------------------------------------------------------------------------

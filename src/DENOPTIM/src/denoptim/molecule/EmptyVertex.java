@@ -498,11 +498,11 @@ public class EmptyVertex extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    public Set<DENOPTIMVertex> getMutationSites()
+    public List<DENOPTIMVertex> getMutationSites()
     {
-        Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
-        set.add(this);
-        return set;
+        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        lst.add(this);
+        return lst;
     }
     
 //------------------------------------------------------------------------------

@@ -122,7 +122,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     public static DENOPTIMTemplate getTestTemplate(int contractLevel) 
     {
-        DENOPTIMTemplate template = new DENOPTIMTemplate(DENOPTIMVertex.BBType.UNDEFINED);
+        DENOPTIMTemplate template = new DENOPTIMTemplate(
+                DENOPTIMVertex.BBType.UNDEFINED);
         DENOPTIMVertex vrtx = new EmptyVertex(0);
         DENOPTIMVertex vrtx2 = new EmptyVertex(1);
     
@@ -146,7 +147,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Promotes the contract level of this template to the highest value, i.e. makes the template unable to change after
+     * Promotes the contract level of this template to the highest value, 
+     * i.e. makes the template unable to change after
      * calling this method.
      * @return true if already frozen. Else false.
      */
@@ -224,7 +226,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    private boolean isValidInnerGraph(DENOPTIMGraph g) {
+    private boolean isValidInnerGraph(DENOPTIMGraph g) 
+    {
         List<DENOPTIMAttachmentPoint> innerAPs = g.getAvailableAPs();
         if (innerAPs.size() < getRequiredAPs().size()) {
             return false;
@@ -252,7 +255,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
 
-    //TODO-V3: add documentation. In particular define whether we return inner of outer APs
+    //TODO-V3: add documentation. In particular, define whether we return inner of outer APs
     
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
@@ -432,11 +435,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // We store the result in a field of this instance
             mol = iac;
             return mol;
-            
-            //return iac;
         } catch (DENOPTIMException e)
         {
-            //TODO: deal with the situation: report error or state given assumption that allows to go on
+            //TODO: deal with the situation: report error or state given 
+            // assumption that allows to go on
             e.printStackTrace();
         }
         return null;
@@ -465,26 +467,25 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    public Set<DENOPTIMVertex> getMutationSites()
+    public List<DENOPTIMVertex> getMutationSites()
     {
-        Set<DENOPTIMVertex> set = new HashSet<DENOPTIMVertex>();
-        
+        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
         // I doubt templates will ever be used as capping groups, but
         // just in case, then they are not considered mutable sites
         if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
                 || getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
         {
-            return set;
+            return lst;
         }
 
         if (contractLevel == 2) {
-            set.add(this);
+            lst.add(this);
         } else {
             for (DENOPTIMVertex v : innerGraph.gVertices) {
-                set.addAll(v.getMutationSites());
+                lst.addAll(v.getMutationSites());
             }
         }
-        return set;
+        return lst;
     }
 
 //------------------------------------------------------------------------------
