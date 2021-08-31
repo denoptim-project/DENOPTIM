@@ -87,14 +87,6 @@ public class DENOPTIMGraphOperations
                 if (vFemale.getBuildingBlockType() == BBType.CAP)
                     continue;
                 
-                // Exclude pairs where the vertexes are the same building block
-                // NB: since scaffolds cannot be at the target end of an edge 
-                // and capping groups have been excluded, here we have only
-                // standard building blocks (i.e., BBType.FRAGMENT).
-                //TODO-GG: del
-                //if (vMale.getBuildingBlockId() == vFemale.getBuildingBlockId())
-                //    continue;
-                
                 //Check condition for considering this combination
                 if (isCrossoverPossible(eMale, eFemale))
                 {
@@ -1481,13 +1473,7 @@ public class DENOPTIMGraphOperations
     
     public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
             throws DENOPTIMException
-    {  
-        if (vertex.getGraphOwner() == null)
-        {
-            DENOPTIMLogger.appLogger.info("Vertex has no owner - "
-                    + "Mutation aborted");
-            return false;
-        }
+    {
         MutationType mType = RandomUtils.randomlyChooseOne(
                 vertex.getMutationTypes());
         return performMutation(vertex, mType, mnt);
@@ -1541,12 +1527,14 @@ public class DENOPTIMGraphOperations
     {
         if (vertex.getGraphOwner() == null)
         {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOOWNER);
             DENOPTIMLogger.appLogger.info("Vertex has no owner - "
                     + "Mutation aborted");
             return false;
         }
         if (!vertex.getMutationTypes().contains(mType))
         {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE);
             DENOPTIMLogger.appLogger.info("Vertex does not allow mutation type "
                     + "'" + mType + "' - Mutation aborted");
             return false;
@@ -1560,16 +1548,23 @@ public class DENOPTIMGraphOperations
             case CHANGEBRANCH:
                 done = substituteFragment(vertex, force, chosenVrtxIdx, 
                         chosenApId);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);
                 break;
                 
             case EXTEND:
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex, false, false, force, chosenVrtxIdx, 
                         chosenApId);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOEXTEND);
                 break;
                 
             case DELETE:
                 done = deleteFragment(vertex);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELETE);
                 break;
         }
         

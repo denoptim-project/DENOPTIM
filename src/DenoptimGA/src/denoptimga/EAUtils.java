@@ -271,22 +271,15 @@ public class EAUtils
         graph2.renumberGraphVertices();
 
         //TODO: evaluate if all this can be simplified by using refs to vertexes
-        try
+        if (!DENOPTIMGraphOperations.performCrossover(graph1, 
+                graph1.getVertexAtPosition(mvid).getVertexId(),
+                graph2,
+                graph2.getVertexAtPosition(fvid).getVertexId()))
         {
-            if (!DENOPTIMGraphOperations.performCrossover(graph1, 
-                    graph1.getVertexAtPosition(mvid).getVertexId(),
-                    graph2,
-                    graph2.getVertexAtPosition(fvid).getVertexId()))
-            {
 
-                mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
-                mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-                return null;
-            }
-        } catch (Throwable e)
-        {
-            //TODO-GG remove try block
-            e.printStackTrace();
+            mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
+            mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
+            return null;
         }
         graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
         graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -299,6 +292,21 @@ public class EAUtils
         DENOPTIMGraph[] graphs = new DENOPTIMGraph[2];
         graphs[0] = graph1;
         graphs[1] = graph2;
+        
+        //TODO-GG del
+        /*
+        try
+        {
+            graphs[0]= DenoptimIO.readDENOPTIMGraphsFromFile(
+                new File("/Users/marco/butta/toTest.sdf"), true).get(0);
+        } catch (Exception e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        graphs[1]= graphs[0];
+        */
+        
         List<Candidate> validOnes = new Population();
         for (DENOPTIMGraph g : graphs)
         {
@@ -314,6 +322,13 @@ public class EAUtils
             } else {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_EVAL);
             }
+            
+            //TODO-GG del
+            /*
+            ArrayList<DENOPTIMGraph> llll = new ArrayList<>();
+            llll.add(g);
+            DenoptimIO.writeGraphsToJSON(new File("/tmp/new.json"), llll);
+            */
             
             // Check if the chosen combination gives rise to forbidden ends
             //TODO-V3 this should be considered already when making the list of
@@ -1191,8 +1206,7 @@ public class EAUtils
     /**
      * Evaluates the possibility of closing rings in a given graph and if
      * any ring can be closed, it chooses one of the combinations of ring 
-     * closures
-     * that involves the highest number of new rings.
+     * closures that involves the highest number of new rings.
      * @param res an object array containing the inchi code, the smiles string
      * and the 2D representation of the molecule. This object can be
      * <code>null</code> if inchi/smiles/2D conversion fails.
@@ -1213,7 +1227,7 @@ public class EAUtils
         // get a atoms/bonds molecular representation (no 3D needed)
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         t3d.setAlidnBBsIn3D(false);
-        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,false);
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
         
         // Set rotatability property as property of IBond
         ArrayList<ObjectPair> rotBonds = 
@@ -1295,7 +1309,9 @@ public class EAUtils
         }
 
         // Update the IAtomContainer representation
-        DENOPTIMMoleculeUtils.removeUsedRCA(mol,molGraph);
+        //DENOPTIMMoleculeUtils.removeUsedRCA(mol,molGraph);
+        // Done already at t3d.convertGraphTo3DAtomContainer
+        
         res[2] = mol;
 
         // Update the SMILES representation

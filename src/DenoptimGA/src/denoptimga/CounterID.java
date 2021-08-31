@@ -24,6 +24,11 @@ public enum CounterID
     FAILEDMUTATTEMTS,
     FAILEDMUTATTEMTS_PERFORM,
     FAILEDMUTATTEMTS_PERFORM_NOMUTSITE,
+    FAILEDMUTATTEMTS_PERFORM_NOOWNER,
+    FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE,
+    FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH,
+    FAILEDMUTATTEMTS_PERFORM_NOEXTEND,
+    FAILEDMUTATTEMTS_PERFORM_NODELETE,
     FAILEDMUTATTEMTS_SETUPRINGS, 
     FAILEDMUTATTEMTS_EVAL, 
     FAILEDMUTATTEMTS_FORBENDS,
@@ -72,6 +77,16 @@ public enum CounterID
                 + "that supports mutation.";
         FAILEDMUTATTEMTS_PERFORM_NOMUTSITE.description = "Mutation cannot be "
                 + "done because graph declares no mutation site";
+        FAILEDMUTATTEMTS_PERFORM_NOOWNER.description = "Mutation cannot take "
+                + "place on a vertex that has no owner";
+        FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE.description = "Mutation type is "
+                + "not availaable on the requested vertex";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH.description = "Mutation did "
+                + "not replace the branch of a graph";
+        FAILEDMUTATTEMTS_PERFORM_NOEXTEND.description = "Mutation did not "
+                + "extend the graph";
+        FAILEDMUTATTEMTS_PERFORM_NODELETE.description = "Mutation did not "
+                + "delete vertex";
         FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup "
                 + "rings "
                 + "in a mutated offspring";

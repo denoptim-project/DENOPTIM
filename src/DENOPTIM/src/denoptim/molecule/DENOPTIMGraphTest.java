@@ -19,6 +19,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 
 
@@ -725,14 +726,15 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testGetMutationSites() {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
-		DENOPTIMTemplate tmpl = DENOPTIMTemplate.getTestTemplate(2);
+		DENOPTIMTemplate tmpl = DENOPTIMTemplate.getTestTemplate(
+		        ContractLevel.FIXED);
 		graph.addVertex(tmpl);
 
 		assertEquals(1, graph.getMutableSites().size(),
 				"Size of mutation size list in case of frozen template");
 
 		graph = new DENOPTIMGraph();
-		tmpl = DENOPTIMTemplate.getTestTemplate(0);
+		tmpl = DENOPTIMTemplate.getTestTemplate(ContractLevel.FREE);
 		graph.addVertex(tmpl);
 
 		assertEquals(2, graph.getMutableSites().size(),

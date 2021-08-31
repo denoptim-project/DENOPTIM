@@ -70,17 +70,38 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     private IAtomContainer mol = null;
     
     /**
-     * Denotes the constants in the template. It can take values from 0 to 2 and each level promises to uphold the
-     * contracts of previous levels. 0 means exterior attachment points are constant, 1 means the subgraph structure is
-     * constant, and 2 means the vertices are constant.
+     * Denotes the constants in the template.
      */
-    //TODO-V3: make enum
-    private int contractLevel = 0;
+    private ContractLevel contractLevel = ContractLevel.FIXED;
+    
+    /**
+     * Enum specifying to what extent the template's inner graph can be changed.
+     * <ul>
+     * <li>{@link ContractLevel#FIXED} inner graphs are effectively equivalent 
+     * to the DENOPTIMFragment class, as no change in the inner structure is
+     * allowed.</il>
+     * <li>{@link ContractLevel#FREE} inner graphs are free to change within 
+     * the confines of the required APs.</il>
+     * </ul>
+     */
+    public enum ContractLevel {
+        FREE,
+        FIXED
+        //FIXED_STRUCT, //TO-BE-DEVELOPED
+        /*
+        <li>{@link ContractLevel#FIXED_STRUCT} will keep a constant 
+        * inter-connectivity between vertices, but the content at each vertex may 
+        * vary. this contract does not guarantee that the AP classes connecting 
+        * inner
+        * graph vertices will remain the same as the content at vertices change.
+        * </il>
+        */
+    }
 
     private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
 
     private APMap innerToOuterAPs;
-
+    
 //------------------------------------------------------------------------------
 
     public DENOPTIMTemplate(DENOPTIMVertex.BBType bbType)
@@ -120,7 +141,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * Method meant for devel phase only.
      */
     
-    public static DENOPTIMTemplate getTestTemplate(int contractLevel) 
+    public static DENOPTIMTemplate getTestTemplate(ContractLevel contractLevel) 
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(
                 DENOPTIMVertex.BBType.UNDEFINED);
@@ -147,14 +168,15 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Promotes the contract level of this template to the highest value, 
+     * Promotes the contract level of this template to the most constrained one
+     * (i.e., {@link ContractLevel#FIXED}), 
      * i.e. makes the template unable to change after
      * calling this method.
      * @return true if already frozen. Else false.
      */
     public boolean freezeTemplate() {
-        boolean isFrozen = contractLevel == 2;
-        contractLevel = 2;
+        boolean isFrozen = contractLevel == ContractLevel.FIXED;
+        contractLevel = ContractLevel.FIXED;
         return isFrozen;
     }
 
@@ -463,6 +485,21 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         }
         return null;
     }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public List<MutationType> getMutationTypes()
+    {   
+        if (getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
+        {
+            List<MutationType> scaffCompatTypes = new ArrayList<MutationType>();
+            scaffCompatTypes.add(MutationType.EXTEND);
+            //TODO-GG add innerMutation scaffCompatTypes.add(MutationType.);
+            return scaffCompatTypes;
+        }
+        return super.getMutationTypes();
+    }
 
 //------------------------------------------------------------------------------
 
@@ -470,20 +507,24 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public List<DENOPTIMVertex> getMutationSites()
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        // I doubt templates will ever be used as capping groups, but
-        // just in case, then they are not considered mutable sites
+        // capping groups not considered mutable sites
         if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
-                || getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
+                && getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
         {
             return lst;
         }
 
-        if (contractLevel == 2) {
-            lst.add(this);
-        } else {
-            for (DENOPTIMVertex v : innerGraph.gVertices) {
-                lst.addAll(v.getMutationSites());
-            }
+        switch (contractLevel) 
+        {
+            case FIXED:
+                lst.add(this);
+                break;
+                
+            case FREE:
+                for (DENOPTIMVertex v : innerGraph.gVertices) {
+                    lst.addAll(v.getMutationSites());
+                }
+                break;
         }
         return lst;
     }
@@ -491,7 +532,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Adds ap to the list of required APs on this template
+     * Adds attachment point (AP) to the list of required APs on this template
      * @param ap attachment point to require from this template
      * @throws DENOPTIMException 
      */
@@ -653,27 +694,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     private List<DENOPTIMAttachmentPoint> getRequiredAPs() {
         return requiredAPs;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Enum specifying the whether a template's inner graph is completely
-     * fixed (FIXED), fixed structure (FIXED_STRUCT), or is free (FREE).
-     *
-     * FIXED inner graphs are effectively equivalent to the DENOPTIMFragment
-     * class.
-     * FIXED_STRUCT inner graphs will keep a constant inter-connectivity
-     * between vertices, but the content at each vertex may vary.
-     * FIXED_STRUCT does not guarantee that the AP classes connecting inner
-     * graph vertices will remain the same as the content at vertices change.
-     * FREE inner graphs are free to change however they want both in content
-     * and inter-connectivity, within the confines of the required APs.
-     */
-    public enum ContractLevel {
-        FREE,
-        FIXED_STRUCT,
-        FIXED
     }
     
 //------------------------------------------------------------------------------

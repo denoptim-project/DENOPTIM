@@ -128,6 +128,7 @@ public class CyclicGraphHandler
 
         // Get manager of ring size problems
         RingSizeManager rsm = new RingSizeManager();
+        
         rsm.initialize(mol, molGraph);
 
         // Get weighted list of RCVs
@@ -202,7 +203,6 @@ public class CyclicGraphHandler
             }
             rsm.setVertexAsDone(vI);
         }
-
 
         if (verbosity > 0)
         {
@@ -914,8 +914,7 @@ public class CyclicGraphHandler
         //---------------------------------------------------------------------
 
         public RingSizeManager()
-        {
-        }
+        {}
 
         //---------------------------------------------------------------------
 
