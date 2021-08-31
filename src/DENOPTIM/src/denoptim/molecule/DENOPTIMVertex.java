@@ -37,16 +37,13 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
-import denoptim.utils.RandomUtils;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
@@ -443,7 +440,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     @Override
     public String toString()
     {
-        return vertexId  + (buildingBlockId + 1) + "_" 
+        return vertexId  + "_" + (buildingBlockId + 1) + "_" 
                 + buildingBlockType.toOldInt() + "_" + level;
     }
 

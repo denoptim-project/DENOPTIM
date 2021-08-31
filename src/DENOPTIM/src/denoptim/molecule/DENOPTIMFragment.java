@@ -873,7 +873,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     @Override
     public String toString()
     {
-        return getVertexId()+ "_" + (getBuildingBlockId() + 1) + "_" +
+        return getVertexId() + "_" + (getBuildingBlockId() + 1) + "_" +
                 getBuildingBlockType().toOldInt() + "_" + getLevel();
     }
     
