@@ -19,7 +19,6 @@
 
 package denoptimga;
 
-import java.util.List;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
@@ -32,7 +31,6 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
@@ -129,6 +127,7 @@ public class OffspringEvaluationTask extends FitnessTask
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
         		result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
+        fitProvMol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, dGraph.toJson());
         if (dGraph.getLocalMsg() != null)
         {
         	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());

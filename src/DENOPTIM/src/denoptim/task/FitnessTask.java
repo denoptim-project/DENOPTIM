@@ -41,6 +41,7 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.TaskUtils;
 
@@ -135,7 +136,7 @@ public abstract class FitnessTask extends Task
         {
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }
-
+        
         // Run fitness provider
         if (FitnessParameters.useExternalFitness()) {
             // Write file with input data to fitness provider
