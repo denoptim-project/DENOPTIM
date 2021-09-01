@@ -501,7 +501,18 @@ public class EmptyVertex extends DENOPTIMVertex
     public List<DENOPTIMVertex> getMutationSites()
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        lst.add(this);
+        switch (getBuildingBlockType())
+        {
+            case CAP:
+                break;
+                
+            case SCAFFOLD:
+                break;
+                
+            default:
+                lst.add(this);
+                break;
+        }
         return lst;
     }
     

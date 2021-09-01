@@ -85,8 +85,6 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         return clone;
     }
     
-    //TODO-GG intercept remove and do remove also entries in XoverCompatibilitySites
-    
 //------------------------------------------------------------------------------
     
     /**

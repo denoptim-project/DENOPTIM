@@ -1451,7 +1451,6 @@ public class DENOPTIMGraphOperations
             DENOPTIMLogger.appLogger.info(msg);
             return false;
         }
-        
         return performMutation(RandomUtils.randomlyChooseOne(mutable),mnt);
     }
     

@@ -340,6 +340,11 @@ runTest 't24'
 runTest 't25'
 
 #
+# t26: test mutation on template (includes multiple tests)
+#
+runTest "t26"
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"

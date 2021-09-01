@@ -293,20 +293,6 @@ public class EAUtils
         graphs[0] = graph1;
         graphs[1] = graph2;
         
-        //TODO-GG del
-        /*
-        try
-        {
-            graphs[0]= DenoptimIO.readDENOPTIMGraphsFromFile(
-                new File("/Users/marco/butta/toTest.sdf"), true).get(0);
-        } catch (Exception e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        graphs[1]= graphs[0];
-        */
-        
         List<Candidate> validOnes = new Population();
         for (DENOPTIMGraph g : graphs)
         {
@@ -322,13 +308,6 @@ public class EAUtils
             } else {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_EVAL);
             }
-            
-            //TODO-GG del
-            /*
-            ArrayList<DENOPTIMGraph> llll = new ArrayList<>();
-            llll.add(g);
-            DenoptimIO.writeGraphsToJSON(new File("/tmp/new.json"), llll);
-            */
             
             // Check if the chosen combination gives rise to forbidden ends
             //TODO-V3 this should be considered already when making the list of

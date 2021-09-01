@@ -508,12 +508,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
         // capping groups not considered mutable sites
-        if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP
-                && getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
+        if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
         {
             return lst;
         }
 
+        BBType bbt = getBuildingBlockType();
+        
         switch (contractLevel) 
         {
             case FIXED:
@@ -521,7 +522,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 break;
                 
             case FREE:
-                for (DENOPTIMVertex v : innerGraph.gVertices) {
+                for (DENOPTIMVertex v : innerGraph.gVertices) 
+                {
                     lst.addAll(v.getMutationSites());
                 }
                 break;
