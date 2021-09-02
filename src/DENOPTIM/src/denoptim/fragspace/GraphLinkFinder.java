@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.xml.internal.txw2.IllegalSignatureException;
-
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.APMapping;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -234,7 +232,7 @@ public class GraphLinkFinder
                 this.chosenAPMap = chosen.toIntMappig();
             } catch (DENOPTIMException e)
             {
-                throw new IllegalSignatureException(e);
+                throw new IllegalStateException(e);
             }
             if (screenAll)
             {
@@ -246,7 +244,7 @@ public class GraphLinkFinder
                         lst.add(apm.toIntMappig());
                     } catch (DENOPTIMException e)
                     {
-                        throw new IllegalSignatureException(e);
+                        throw new IllegalStateException(e);
                     }
                 }
                 allCompatLinks.put(chosenNewLink, lst);
