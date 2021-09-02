@@ -32,6 +32,7 @@ import org.openscience.cdk.isomorphism.mcss.RMap;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
@@ -170,7 +171,7 @@ public class DENOPTIMGraphOperations
             int chosenVrtxIdx) throws DENOPTIMException
     {
         GraphLinkFinder glf = new GraphLinkFinder(vertex);
-        if (!glf.foundNewLink)
+        if (!glf.foundAlternativeLink())
         {
             //TODO-GG increase counter of no compatible link found
             return false;
@@ -182,9 +183,9 @@ public class DENOPTIMGraphOperations
         {
             DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
                     GraphUtils.getUniqueVertexIndex(), 
-                    glf.chosenNewLink.getBuildingBlockId(),
-                    glf.chosenNewLink.getBuildingBlockType());
-            done = replaceLink(oldLink, newLink, glf.chosenAPMap);
+                    glf.getChosenAlternativeLink().getBuildingBlockId(),
+                    glf.getChosenAlternativeLink().getBuildingBlockType());
+            done = replaceLink(oldLink, newLink, glf.getChosenAPMapping());
             if (!done)
                 break;
         }

@@ -1,7 +1,6 @@
-package denoptimga;
+package denoptim.fragspace;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.*;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
@@ -14,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -233,13 +233,15 @@ public class GraphLinkFinderTest
         expected.put(9, 4);
         expected.put(11, 18);
         
-        Set<DENOPTIMVertex> keys = glf.allCompatLinks.keySet();
+        Map<DENOPTIMVertex, List<Map<Integer, Integer>>> allAltLinks = 
+                glf.getAllAlternativesFound();
+        Set<DENOPTIMVertex> keys = allAltLinks.keySet();
         for (DENOPTIMVertex k : keys)
         {
             int bbId = k.getBuildingBlockId();
             assertTrue(expected.containsKey(bbId), "Vertex with building block "
                     + "ID '" + bbId + "' should not among the results.");
-            assertEquals(expected.get(bbId), glf.allCompatLinks.get(k).size(),
+            assertEquals(expected.get(bbId), allAltLinks.get(k).size(),
                     "Number of APmapping is wrong for bbId '" + bbId + "'.");
             //System.out.println(" -> "+k.getBuildingBlockType()+" "+
             //        k.getBuildingBlockId()+": "+glf.allCompatLinks.get(k));

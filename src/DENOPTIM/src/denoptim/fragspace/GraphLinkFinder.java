@@ -1,4 +1,4 @@
-package denoptimga;
+package denoptim.fragspace;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,6 @@ import java.util.Map;
 import com.sun.xml.internal.txw2.IllegalSignatureException;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.APMapping;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMVertex;
@@ -23,14 +22,14 @@ import denoptim.utils.RandomUtils;
  * @author Marco Foscato
  */
 
-class GraphLinkFinder
+public class GraphLinkFinder
 {
     /**
      * The result of the search for a compatible building block, or null if
      * no compatible link was found. In case of multiple possibilities, the
      * result reported here is chosen randomly among the possible ones.
      */
-    protected DENOPTIMVertex chosenNewLink;
+    private DENOPTIMVertex chosenNewLink;
     
     /**
      * The mapping of attachment points between the original vertex and the
@@ -39,13 +38,13 @@ class GraphLinkFinder
      * In case of multiple possible AP mappings, the
      * result reported here is chosen randomly among the possible ones.
      */
-    protected Map<Integer,Integer> chosenAPMap;
+    private Map<Integer,Integer> chosenAPMap;
     
     /**
      * The collection of all alternative vertex that can replace the 
      * original vertex, with the consistent mappings.
      */
-    protected Map<DENOPTIMVertex,List<Map<Integer,Integer>>> allCompatLinks = 
+    private Map<DENOPTIMVertex,List<Map<Integer,Integer>>> allCompatLinks = 
             new HashMap<DENOPTIMVertex,List<Map<Integer,Integer>>>();
     
     /**
@@ -60,7 +59,7 @@ class GraphLinkFinder
     /**
      * Flag recording if at least one alternative vertex was found.
      */
-    protected boolean foundNewLink = false;
+    private boolean foundNewLink = false;
     
 //------------------------------------------------------------------------------
 
@@ -304,6 +303,55 @@ class GraphLinkFinder
             // Restart building a new combination from the previous combination
             combination = priorCombination;
         }
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the vertex chosen as alternative. If more than one possibilities
+     * exist, then this will return a randomly chosen one. 
+     * Consistency between the return value of this method and 
+     * {@link GraphLinkFinder#getChosenAPMapping()} is guaranteed.
+     * @return the chosen alternative or null is none was found.
+     */
+    public DENOPTIMVertex getChosenAlternativeLink()
+    {
+        return chosenNewLink;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the AP mapping that allows the vertex chosen as alternative to
+     * be installed in the slot originally occupied by the original vertex.
+     * If more than one possibilities exist, then this will return a randomly 
+     * chosen one. Consistency between the return value of this method and 
+     * {@link GraphLinkFinder#getChosenAlternativeLink()} is guaranteed.
+     * @return the chosen alternative or null is none was found.
+     */
+    public Map<Integer, Integer> getChosenAPMapping()
+    {
+        return chosenAPMap;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns all the AP mapping that were identified for any candidate 
+     * vertex that could 
+     * be installed in the slot originally occupied by the original vertex.
+     * @return map of all AP mappings for each alternative vertex. 
+     */
+    public Map<DENOPTIMVertex, List<Map<Integer, Integer>>> getAllAlternativesFound()
+    {
+        return allCompatLinks;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public boolean foundAlternativeLink()
+    {
+        return foundNewLink;
     }
     
 //------------------------------------------------------------------------------
