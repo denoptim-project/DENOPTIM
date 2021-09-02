@@ -10,17 +10,18 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSerializationContext;
 
 /**
- * Attachment point mapping.
+ * Attachment point mapping where keys are sorted by natural ordering.
  */
-public class APMap
+
+public class APTreeMap
         extends TreeMap<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint>
 {
 
   public static class APMapSerializer
-  implements JsonSerializer<APMap>
+  implements JsonSerializer<APTreeMap>
   {
       @Override
-      public JsonElement serialize(APMap apmap, Type typeOfSrc,
+      public JsonElement serialize(APTreeMap apmap, Type typeOfSrc,
               JsonSerializationContext context)
       {
           TreeMap<Integer,DENOPTIMAttachmentPoint> jsonableMap = new TreeMap<>();

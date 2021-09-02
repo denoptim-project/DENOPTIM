@@ -243,8 +243,6 @@ public class GraphLinkFinderTest
                     + "ID '" + bbId + "' should not among the results.");
             assertEquals(expected.get(bbId), allAltLinks.get(k).size(),
                     "Number of APmapping is wrong for bbId '" + bbId + "'.");
-            //System.out.println(" -> "+k.getBuildingBlockType()+" "+
-            //        k.getBuildingBlockId()+": "+glf.allCompatLinks.get(k));
         }
     }
     

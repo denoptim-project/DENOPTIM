@@ -669,6 +669,7 @@ public class DENOPTIMTemplateTest
         
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.UNDEFINED);
         t.setInnerGraph(g);
+        
         return t;
     }
     

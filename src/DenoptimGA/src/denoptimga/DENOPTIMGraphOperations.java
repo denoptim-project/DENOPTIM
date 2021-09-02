@@ -168,51 +168,26 @@ public class DENOPTIMGraphOperations
      */
 
     protected static boolean substituteLink(DENOPTIMVertex vertex,
-            int chosenVrtxIdx) throws DENOPTIMException
+            int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
     {
         GraphLinkFinder glf = new GraphLinkFinder(vertex);
         if (!glf.foundAlternativeLink())
         {
-            //TODO-GG increase counter of no compatible link found
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND);
             return false;
         }
         
-        boolean done = false;
-        for (DENOPTIMVertex oldLink : vertex.getGraphOwner()
-                .getSymVertexesForVertex(vertex))
+        DENOPTIMGraph graph = vertex.getGraphOwner();
+        boolean done = graph.replaceVertex(vertex,
+                glf.getChosenAlternativeLink().getBuildingBlockId(),
+                glf.getChosenAlternativeLink().getBuildingBlockType(),
+                glf.getChosenAPMapping());
+        if (!done)
         {
-            DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
-                    GraphUtils.getUniqueVertexIndex(), 
-                    glf.getChosenAlternativeLink().getBuildingBlockId(),
-                    glf.getChosenAlternativeLink().getBuildingBlockType());
-            done = replaceLink(oldLink, newLink, glf.getChosenAPMapping());
-            if (!done)
-                break;
+            mnt.increase(
+                    CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT);
         }
         return done;
-    }
-    
-//------------------------------------------------------------------------------
-
-    private static boolean replaceLink(DENOPTIMVertex oldLink, DENOPTIMVertex newLink, 
-            Map<Integer,Integer> apMap)
-    {
-        //TODO-GG implement
-        
-        /*
-        DENOPTIMGraph g = vertex.getGraphOwner();
-    
-        // first get the edge with the parent
-        DENOPTIMEdge e = vertex.getEdgeToParent();
-        if (e == null)
-        {
-            String msg = "Program Bug in substituteFragment: Unable to locate "
-                    + "parent edge for vertex "+vertex+" in graph "+g;
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            throw new DENOPTIMException(msg);
-        }
-        */
-        return false;
     }
 
 //------------------------------------------------------------------------------
@@ -1567,7 +1542,7 @@ public class DENOPTIMGraphOperations
      * Mutates the given vertex according to the given mutation type, if
      * possible. Vertex that do not belong to any graph or that do not
      * allow the requested kind of mutation, are not mutated.
-     * The graph that owns the vertex ill be altered and
+     * The graph that owns the vertex will be altered and
      * the original structure and content of the graph will be lost. 
      * @param vertex the vertex to mutate.
      * @param mType the type of mutation to perform.
@@ -1614,7 +1589,7 @@ public class DENOPTIMGraphOperations
                 break;
                 
             case CHANGELINK:
-                done = substituteLink(vertex, chosenVrtxIdx);
+                done = substituteLink(vertex, chosenVrtxIdx, mnt);
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);

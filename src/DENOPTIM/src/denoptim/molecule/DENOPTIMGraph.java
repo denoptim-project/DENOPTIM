@@ -67,6 +67,7 @@ import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
+import denoptimga.CounterID;
 
 import static denoptim.molecule.DENOPTIMVertex.*;
 
@@ -762,6 +763,153 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         gVertices.remove(vertex);
         
         jGraph = null;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaced a given vertex belonging to this graph with a new vertex 
+     * generated specifically for this purpose. This method reproduces the 
+     * change of vertex on all symmetric sites.
+     * @param oldLink the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @param bbId the building block Id of the building blocks that will 
+     * replace the original vertex.
+     * @param bbt the type of building block to be used to replace the 
+     * original vertex.
+     * @param apMap the mapping of attachment points needed to install the new
+     * vertex in the slot of the old one and recreate the edges to the rest of
+     * the graph.
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean replaceVertex(DENOPTIMVertex vertex, int bbId, BBType bbt,
+            Map<Integer, Integer> apMap)throws DENOPTIMException
+    {
+        if (!gVertices.contains(vertex))
+        {
+            return false;
+        }
+        
+        ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(vertex);
+        for (DENOPTIMVertex oldLink : symSites)
+        {
+            DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), bbId, bbt);
+            if (!replaceSingleVertex(oldLink, newLink, apMap))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaced a given vertex belonging to this graph with another vertex that 
+     * does not yet belong to this graph. This method does not project the 
+     * change of vertex on symmetric sites, and does not alter the symmetric 
+     * sets. 
+     * @param oldLink the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @param newLink the vertex to replace the old one with.
+     * @param apMap the mapping of attachment points needed to install the new
+     * vertex in the slot of the old one and recreate the edges to the rest of
+     * the graph.
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean replaceSingleVertex(DENOPTIMVertex oldLink, DENOPTIMVertex newLink,
+            Map<Integer, Integer> apMap) throws DENOPTIMException
+    {
+        if (!gVertices.contains(oldLink) || gVertices.contains(newLink))
+        {
+            return false;
+        }
+        
+        // First keep track of the links that will be broken and re-created
+        Map<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
+                new HashMap<Integer,DENOPTIMAttachmentPoint>();
+
+        Map<Integer,BondType> linkTypesToRecreate = new HashMap<Integer,BondType>();
+        int trgApIdOnNewLink = -1;
+        for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
+        {
+            if (oldAP.isAvailable())
+                continue;
+            
+            int oldApId = oldAP.getIndexInOwner();
+            if (!apMap.containsKey(oldApId))
+            {
+                throw new DENOPTIMException("Mismatch between AP map keys (" 
+                        + apMap.keySet() +") and AP index "+oldApId);
+            }
+            linksToRecreate.put(apMap.get(oldApId), oldAP.getLinkedAP());
+            linkTypesToRecreate.put(apMap.get(oldApId), 
+                    oldAP.getEdgeUser().getBondType());
+            
+            // This is were we identify the edge/ap to the parent of the oldLink
+            if (!oldAP.isSrcInUser())
+            {
+                trgApIdOnNewLink = apMap.get(oldApId);
+            }
+        }
+        
+        oldLink.resetGraphOwner();
+        
+        // update rings
+        if (isVertexInRing(oldLink))
+        {
+            ArrayList<DENOPTIMRing> rToEdit = getRingsInvolvingVertex(oldLink);
+            for (DENOPTIMRing r : rToEdit)
+            {
+                r.replaceVertex(oldLink,newLink);
+            }
+        }
+        
+        // remove edges with old vertex
+        for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
+        {
+            if (!oldAP.isAvailable())
+                removeEdge(oldAP.getEdgeUser());
+        }
+
+        // Update pointers in symmetric sets
+        int oldVrtxId = oldLink.getVertexId();
+        int newVrtxId = newLink.getVertexId();
+        for (SymmetricSet ss : symVertices)
+        {
+            if (ss.contains(oldVrtxId))
+            {
+                int idx = ss.indexOf(oldVrtxId);
+                ss.set(idx,newVrtxId);
+            }
+        }
+
+        // remove the vertex from the graph
+        gVertices.remove(oldLink);
+        
+        // finally introduce the new vertex in the graph
+        appendVertexOnAP(linksToRecreate.get(trgApIdOnNewLink), 
+                newLink.getAP(trgApIdOnNewLink));
+        // and re-link the child parts of the graph
+        for (Integer apIdOnNew : linksToRecreate.keySet())
+        {
+            if (apIdOnNew == trgApIdOnNewLink)
+            {
+                continue; //done just before this loop
+            }
+            DENOPTIMAttachmentPoint srcApOnNewLink = newLink.getAP(apIdOnNew);
+            DENOPTIMAttachmentPoint trgApOnChild = linksToRecreate.get(apIdOnNew);
+            DENOPTIMEdge edge = new DENOPTIMEdge(srcApOnNewLink,trgApOnChild, 
+                    linkTypesToRecreate.get(apIdOnNew));
+            addEdge(edge);
+        }
+        
+        jGraph = null;
+        
+        return !this.containsVertex(oldLink) && this.containsVertex(newLink);
     }
 
 //------------------------------------------------------------------------------
@@ -3619,4 +3767,5 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 .stream()
                 .anyMatch(v -> v.getBuildingBlockType() == BBType.SCAFFOLD);
     }
+
 }

@@ -28,6 +28,8 @@ public enum CounterID
     FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE,
     FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH,
     FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK,
+    FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND,
+    FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT,
     FAILEDMUTATTEMTS_PERFORM_NOEXTEND,
     FAILEDMUTATTEMTS_PERFORM_NODELETE,
     FAILEDMUTATTEMTS_SETUPRINGS, 
@@ -85,6 +87,10 @@ public enum CounterID
                 + "not replace the branch of a graph";
         FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK.description = "Mutation did not "
                 + "replace a vertex in a chain";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND.description = "Failed to "
+                + "find an alternative link vertex";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT.description = "Failed to "
+                + "replace old link with new one";
         FAILEDMUTATTEMTS_PERFORM_NOEXTEND.description = "Mutation did not "
                 + "extend the graph";
         FAILEDMUTATTEMTS_PERFORM_NODELETE.description = "Mutation did not "
@@ -101,13 +107,14 @@ public enum CounterID
                 + "scratch";
         FAILEDBUILDATTEMPTS.description = "Failed attempts to do build a graph "
                 + "from scratch";
-        FAILEDBUILDATTEMPTS_GRAPHBUILD.description = "Failed attempts to generate a graph";
+        FAILEDBUILDATTEMPTS_GRAPHBUILD.description = "Failed attempts to "
+                + "generate a graph";
         FAILEDBUILDATTEMPTS_EVAL.description = "Failed attempts to pass graph "
                 + "evaluation test from newly built graphs";
-        FAILEDBUILDATTEMPTS_SETUPRINGS.description = "Failed attempt to setup rings "
-                + "in a newly generated graph";
-        FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new graphs "
-                + "that ped to forbidden ends";
+        FAILEDBUILDATTEMPTS_SETUPRINGS.description = "Failed attempt to setup "
+                + "rings in a newly generated graph";
+        FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new "
+                + "graphs that ped to forbidden ends";
         
         
         FITNESSEVALS.description = "Number of fitness evaluations";

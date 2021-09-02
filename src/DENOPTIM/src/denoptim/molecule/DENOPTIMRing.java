@@ -229,7 +229,19 @@ public class DENOPTIMRing implements Serializable
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Replaced a vertex that belong to this ring with a new one.
+     * @param oldVrtx the vertex to be replaced.
+     * @param newVrtx the vertex the replace the old one with.
+     */
+    public void replaceVertex(DENOPTIMVertex oldVrtx, DENOPTIMVertex newVrtx)
+    {
+        int idx = vertices.indexOf(oldVrtx);
+        vertices.set(idx, newVrtx);
+    }
 
+//------------------------------------------------------------------------------
 
 
 }

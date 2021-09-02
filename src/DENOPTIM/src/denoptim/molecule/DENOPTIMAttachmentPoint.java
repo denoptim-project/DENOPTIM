@@ -813,6 +813,42 @@ Comparable<DENOPTIMAttachmentPoint>
     public DENOPTIMEdge getEdgeUser() {
         return user;
     }
+    
+//-----------------------------------------------------------------------------
+     
+    /**
+     * Gets the attachment point (AP) that is connected to this AP via the edge 
+     * user.
+     * @return the AP linked with this AP, or null;
+     */
+    public DENOPTIMAttachmentPoint getLinkedAP() 
+    {
+        if (user == null)
+            return null;
+        
+        if (user.getSrcAP() == this)
+        {
+            return user.getTrgAP();
+        } else if (user.getTrgAP() == this)
+        {
+            return user.getSrcAP();
+        }
+        return null;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Checks the role of this AP in the user.
+     * @return <code>true</code> if a user exists and this AP is the src AP in
+     * that edge. Otherwise, this method returns <code >false</code> without
+     * discriminating if this AP is free, i.e., the user is null, or this AP is 
+     * the trg in the edge user.
+     */
+    public boolean isSrcInUser()
+    {
+        return user != null && user.getSrcAP() == this;
+    }
 
 //-----------------------------------------------------------------------------
 

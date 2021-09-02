@@ -119,20 +119,6 @@ public class GraphLinkFinder
                 continue;
             }
             
-          //TODO-GG del
-            //System.out.println("Considering " + chosenNewLink.getBuildingBlockId());
-            /*
-            for (DENOPTIMAttachmentPoint oAP : originalLink.getAttachmentPoints())
-            {
-                System.out.println("   O: "+oAP.getAPClass());
-            }
-
-            for (DENOPTIMAttachmentPoint cAP : newLink.getAttachmentPoints())
-            {
-                System.out.println("   N: "+cAP.getAPClass());
-            }
-            */
-            
             // NB: the new link cannot be the same building block as the old one
             if (chosenNewLink.getBuildingBlockId() == 
                     originalLink.getBuildingBlockId())
@@ -152,15 +138,12 @@ public class GraphLinkFinder
             {
                 for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
                 {  
-                  //TODO-GG del
-                    //System.out.println("   Comparing "+oAP.getAPClass()+"("+oAP.getID()+") "+cAP.getAPClass()+"("+cAP.getID()+")");
-                    
                     boolean compatible = false;
                     if (FragmentSpace.useAPclassBasedApproach())
                     {
-                        // TODO-GG: same APClass or an APClass compatible with 
+                        // TODO: consider same APClass or an APClass compatible with 
                         // the APClass on the child/parent AP?
-                        // TODO-GG: Also, if the vertex is a template, we should
+                        // TODO: Also, if the vertex is a template, we should
                         // consider the required APs.
                         if (oAP.getAPClass().equals(cAP.getAPClass()))
                             compatible = true;
@@ -170,8 +153,6 @@ public class GraphLinkFinder
                     }
                     if (compatible)
                     {
-                      //TODO-GG del
-                      //System.out.println("       COMPATIBLE");
                         if (apCompatilities.containsKey(oAP))
                         {
                             apCompatilities.get(oAP).add(cAP);
@@ -214,9 +195,6 @@ public class GraphLinkFinder
                 }
             }
             apMappings.removeAll(toRemove);
-            
-            //TODO-GG del
-            //System.out.println("completeCombinations: "+apMappings);
             
             if (apMappings.isEmpty())
             {

@@ -34,6 +34,8 @@ import java.util.ArrayList;
  * @author Marco Foscato
  */
 
+//TODO: consider that this class should probably expand the list<Integer>
+
 public class SymmetricSet implements Serializable,Cloneable
 {
     private ArrayList<Integer> symIds;
@@ -92,6 +94,20 @@ public class SymmetricSet implements Serializable,Cloneable
     public boolean contains(Integer val)
     {
         return symIds.contains(val);
+    }    
+
+//------------------------------------------------------------------------------
+
+    public int indexOf(Integer vid)
+    {
+        return symIds.indexOf(vid);
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void set(int index, Integer element)
+    {
+        symIds.set(index, element);
     }
 
 //------------------------------------------------------------------------------
@@ -117,6 +133,7 @@ public class SymmetricSet implements Serializable,Cloneable
     public void remove(Integer i)
     {
         symIds.remove((Integer) i);
+        //TODO: why should this remove only two? either remove all or only one.
         if (symIds.contains(i))
         {
             symIds.remove((Integer) i);

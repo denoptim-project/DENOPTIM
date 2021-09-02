@@ -100,7 +100,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
 
-    private APMap innerToOuterAPs;
+    private APTreeMap innerToOuterAPs;
     
 //------------------------------------------------------------------------------
 
@@ -222,7 +222,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     " required APs");
         }
         this.innerGraph = innerGraph;
-        this.innerToOuterAPs = new APMap();
+        this.innerToOuterAPs = new APTreeMap();
         for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
             DENOPTIMAttachmentPoint outerAP = innerAP.clone();
             outerAP.setOwner(this);
@@ -236,7 +236,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
     {
         mol = null;
-        this.innerToOuterAPs = new APMap();
+        this.innerToOuterAPs = new APTreeMap();
         for (Entry<Integer, DENOPTIMAttachmentPoint> e : map.entrySet())
         {
             DENOPTIMAttachmentPoint innerAP = innerGraph.getAPWithId(e.getKey());

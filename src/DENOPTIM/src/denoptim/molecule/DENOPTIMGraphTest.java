@@ -5,9 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
@@ -19,6 +24,9 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 
@@ -35,9 +43,333 @@ public class DENOPTIMGraphTest {
     private final String APSUBRULE = "1";
     private final String APCLASS = APRULE
             + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
+    
+    private static APClass APCA, APCB, APCC, APCD;
+    private static String a="A", b="B", c="C", d="D";
+    
+//------------------------------------------------------------------------------
+    
+    @BeforeEach
+    public void setBoMap()
+    {
+        //This is just to aboid printing the warning about unset bond order map
+        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
+        boMap.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(boMap);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void prepareFragmentSpace() throws DENOPTIMException
+    {
+        APCA = APClass.make(a, 0);
+        APCB = APClass.make(b, 0);
+        APCC = APClass.make(c, 0);
+        APCD = APClass.make(d, 99);
+        
+        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
+        boMap.put(a,BondType.SINGLE);
+        boMap.put(b,BondType.SINGLE);
+        boMap.put(c,BondType.SINGLE);
+        boMap.put(d,BondType.DOUBLE);
+        
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(APCA);
+        cpMap.put(APCA, lstA);
+        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        lstB.add(APCB);
+        lstB.add(APCC);
+        cpMap.put(APCB, lstB);
+        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        lstC.add(APCB);
+        lstC.add(APCC);
+        cpMap.put(APCC, lstC);
+        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        lstD.add(APCD);
+        cpMap.put(APCD, lstD);
+        
+        
+        /* Compatibility matrix
+         * 
+         *      |  A  |  B  |  C  | D |
+         *    -------------------------
+         *    A |  T  |     |     |   |
+         *    -------------------------
+         *    B |     |  T  |  T  |   |
+         *    -------------------------
+         *    C |     |  T  |  T  |   |
+         *    -------------------------
+         *    D |     |     |     | T |
+         */
+        
+        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+        HashSet<APClass> forbEnds = new HashSet<APClass>();
+        
+        FragmentSpace.setBondOrderMap(boMap);
+        FragmentSpace.setCompatibilityMatrix(cpMap);
+        FragmentSpace.setCappingMap(capMap);
+        FragmentSpace.setForbiddenEndList(forbEnds);
+        FragmentSpace.setAPclassBasedApproach(true);
+        
+        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        
+        DENOPTIMVertex s = new EmptyVertex();
+        s.setBuildingBlockType(BBType.SCAFFOLD);
+        s.addAP(0, 1, 1, APCA);
+        s.addAP(0, 1, 1, APCA);
+        FragmentSpace.appendVertexToLibrary(s, BBType.SCAFFOLD,
+                FragmentSpace.getScaffoldLibrary());
+        
+        DENOPTIMVertex v0 = new EmptyVertex();
+        v0.setBuildingBlockType(BBType.FRAGMENT);
+        v0.addAP(0, 1, 1, APCA);
+        v0.addAP(0, 1, 1, APCB);
+        v0.addAP(0, 1, 1, APCA);
+        FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v1 = new EmptyVertex();
+        v1.setBuildingBlockType(BBType.FRAGMENT);
+        v1.addAP(0, 1, 1, APCA);
+        v1.addAP(0, 1, 1, APCB);
+        v1.addAP(0, 1, 1, APCA);
+        v1.addAP(0, 1, 1, APCB);
+        v1.addAP(0, 1, 1, APCC);
+        FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v2 = new EmptyVertex();
+        v2.setBuildingBlockType(BBType.FRAGMENT);
+        v2.addAP(0, 1, 1, APCB);
+        FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v3 = new EmptyVertex();
+        v3.setBuildingBlockType(BBType.FRAGMENT);
+        v3.addAP(0, 1, 1, APCD);
+        v3.addAP(0, 1, 1, APCD);
+        FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+       
+        DENOPTIMVertex v4 = new EmptyVertex();
+        v4.setBuildingBlockType(BBType.FRAGMENT);
+        v4.addAP(0, 1, 1, APCC);
+        v4.addAP(0, 1, 1, APCB);
+        v4.addAP(0, 1, 1, APCB);
+        v4.addAP(0, 1, 1, APCA);
+        v4.addAP(0, 1, 1, APCA);
+        FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v5 = new EmptyVertex();
+        v5.setBuildingBlockType(BBType.FRAGMENT);
+        v5.addAP(0, 1, 1, APCB);
+        v5.addAP(0, 1, 1, APCD);
+        FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+    }
 
 //------------------------------------------------------------------------------
-	@Test
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v3
+     *       /
+     *      | (B)-(B)-v2
+     *      |/
+     *  (A)-v1-(B)-(B)-v2
+     *       |
+     *      (A)
+     *       |
+     *      (A)
+     *    scaffold
+     *      (A)
+     *       |
+     *      0(A)
+     *       |
+     * 2(A)-v1-1(B)-(B)-v2
+     *      |\
+     *      | 3(B)-(B)-v2
+     *      \
+     *       4(C)-(C)-v3
+     *   </pre>
+     *   
+     *   Replacing it with
+     *   <pre>
+     *      4(A)
+     *      |
+     * 3(A)-v1-1(B)
+     *      |\
+     *      | 2(B)
+     *      \
+     *       0(C)
+     *   <pre>
+     */
+    private DENOPTIMGraph makeTestGraphB() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(0,
+                BBType.SCAFFOLD);
+        graph.addVertex(s);
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1a);
+        DENOPTIMVertex v2a = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        graph.addVertex(v2a);
+        DENOPTIMVertex v2a_bis = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        graph.addVertex(v2a_bis);
+        DENOPTIMVertex v3a = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v3a);
+        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1b);
+        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        graph.addVertex(v2b);
+        DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        graph.addVertex(v2b_bis);
+        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v3b);
+        graph.addEdge(new DENOPTIMEdge(s.getAP(0), v1a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v2a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(3), v2a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(4), v3a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(s.getAP(1), v1b.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(3), v2b_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(4), v3b.getAP(0)));
+        
+        ArrayList<Integer> symA = new ArrayList<Integer>();
+        symA.add(v1a.getVertexId());
+        symA.add(v1b.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        
+        ArrayList<Integer> symB = new ArrayList<Integer>();
+        symB.add(v2a.getVertexId());
+        symB.add(v2a_bis.getVertexId());
+        symB.add(v2b.getVertexId());
+        symB.add(v2b_bis.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+   
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReplaceVertex() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphB();
+        
+        DENOPTIMVertex v1 = g.getVertexAtPosition(1);
+        
+        Map<Integer,Integer> apMap = new HashMap<Integer,Integer>();
+        apMap.put(0, 4); 
+        apMap.put(1, 1);
+        apMap.put(3, 2);
+        apMap.put(4, 0);
+        
+        int chosenBBId = 4;
+        BBType choosenBBTyp = BBType.FRAGMENT;
+        
+        boolean res = g.replaceVertex(v1, chosenBBId, choosenBBTyp, apMap);
+        
+        assertTrue(res,"ReplaceVertex return value.");
+        assertFalse(g.containsVertex(v1),"v1 is still part of graph");
+        int numVertexesWithGoodBBId = 0;
+        int numEdgesWithS = 0;
+        int numEdgesWith2 = 0;
+        int numEdgesWith3 = 0;
+        for (DENOPTIMVertex v : g.gVertices)
+        {
+            if (v.getBuildingBlockType() == choosenBBTyp 
+                    && v.getBuildingBlockId() == chosenBBId)
+            {
+                numVertexesWithGoodBBId++;
+                
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    if (!ap.isAvailable())
+                    {
+                        DENOPTIMVertex nextVrtx = ap.getLinkedAP().getOwner();
+                        if (nextVrtx.getBuildingBlockType() == BBType.SCAFFOLD)
+                        {
+                            numEdgesWithS++;
+                        } else {
+                            switch (nextVrtx.getBuildingBlockId())
+                            {
+                                case 2:
+                                    numEdgesWith2++;
+                                    break;
+                                case 3:
+                                    numEdgesWith3++;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assertEquals(2,numVertexesWithGoodBBId,"Number of new links.");
+        assertEquals(2,numEdgesWithS,"Number of new edges with scaffold.");
+        assertEquals(4,numEdgesWith2,"Number of new edges with v2a/b.");
+        assertEquals(2,numEdgesWith3,"Number of new edges with v3a/b.");
+        
+
+        DENOPTIMGraph g2 = makeTestGraphB();
+        
+        DENOPTIMVertex v2 = g2.getVertexAtPosition(2);
+        
+        Map<Integer,Integer> apMap2 = new HashMap<Integer,Integer>();
+        apMap2.put(0, 1);
+        
+        int chosenBBId2 = 5;
+        BBType choosenBBTyp2 = BBType.FRAGMENT;
+        
+        boolean res2 = g2.replaceVertex(v2, chosenBBId2, choosenBBTyp2, apMap2);
+        
+        assertTrue(res2,"ReplaceVertex return value (2).");
+        assertFalse(g2.containsVertex(v2),"v2 is still part of graph");
+        int numVertexesWithGoodBBId2 = 0;
+        int numEdgesWith1 = 0;
+        for (DENOPTIMVertex v : g2.gVertices)
+        {
+            if (v.getBuildingBlockType() == choosenBBTyp2 
+                    && v.getBuildingBlockId() == chosenBBId2)
+            {
+                numVertexesWithGoodBBId2++;
+                
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    if (!ap.isAvailable())
+                    {
+                        DENOPTIMVertex nextVrtx = ap.getLinkedAP().getOwner();
+                        if (nextVrtx.getBuildingBlockId() == 1)
+                            numEdgesWith1++;
+                    }
+                }
+            }
+        }
+        assertEquals(4,numVertexesWithGoodBBId2,"Number of new links.");
+        assertEquals(4,numEdgesWith1,"Number of new edges with scaffold.");
+    }
+    
+//------------------------------------------------------------------------------
+	
+    @Test
 	public void testRemoveVertex() throws Exception {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);

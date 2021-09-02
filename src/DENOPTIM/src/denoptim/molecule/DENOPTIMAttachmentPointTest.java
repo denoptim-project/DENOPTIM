@@ -2,6 +2,7 @@ package denoptim.molecule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
@@ -48,6 +49,69 @@ public class DENOPTIMAttachmentPointTest
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
 	private final EmptyVertex dummyVertex = new EmptyVertex();
+	
+	
+//-----------------------------------------------------------------------------
+	
+	@Test
+	public void testIsSrcInUser() throws Exception
+	{
+	    // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        EmptyVertex v1 = new EmptyVertex();
+        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
+        DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
+        EmptyVertex v2 = new EmptyVertex();
+        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
+        DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
+        g.addVertex(v1);
+        g.appendVertexOnAP(ap1A, ap2B);
+        
+        assertTrue(ap1A.isSrcInUser(), "Check AP used as src.");
+        assertFalse(ap2B.isSrcInUser(), "Check AP used as trg.");
+        assertFalse(ap1B.isSrcInUser(), "Check AP free on src side.");
+        assertFalse(ap2A.isSrcInUser(), "Check AP free on trg side.");
+	}
+
+//-----------------------------------------------------------------------------
+	
+	@Test
+	public void testGetLinkedAP() throws Exception
+	{
+	    // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+	    DENOPTIMGraph g = new DENOPTIMGraph();
+	    EmptyVertex v1 = new EmptyVertex();
+        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
+        DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
+        EmptyVertex v2 = new EmptyVertex();
+        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
+        DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
+        g.addVertex(v1);
+        g.appendVertexOnAP(ap1A, ap2B);
+        
+        assertTrue(ap1A.getLinkedAP() == ap2B, "Get AP on other side of ap1A");
+        assertTrue(ap2B.getLinkedAP() == ap1A, "Get AP on other dice of ap2");
+        assertNull(ap1B.getLinkedAP(), "Free AP 1B should return null");
+        assertNull(ap2A.getLinkedAP(), "Free AP 2A should return null");
+	}
 	
 //-----------------------------------------------------------------------------
 	

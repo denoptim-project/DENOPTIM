@@ -19,8 +19,8 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.DENOPTIMEdgeSerializer;
 import denoptim.molecule.APClass;
 import denoptim.molecule.APClass.APClassDeserializer;
-import denoptim.molecule.APMap;
-import denoptim.molecule.APMap.APMapSerializer;
+import denoptim.molecule.APTreeMap;
+import denoptim.molecule.APTreeMap.APMapSerializer;
 
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMTemplate;
@@ -48,7 +48,7 @@ public class DENOPTIMgson
       // Custom serializer to make json string use AP's ID as key in the
       // map. If this is not used, then the key.toString() is used to
       // get a string representation of the key.
-      .registerTypeAdapter(APMap.class, new APMapSerializer())
+      .registerTypeAdapter(APTreeMap.class, new APMapSerializer())
       // Custom serializer that keeps only the IDs to vertices and
       // APs defined in the list of  vertices belonging to the graph.
       .registerTypeAdapter(DENOPTIMEdge.class, new DENOPTIMEdgeSerializer())
