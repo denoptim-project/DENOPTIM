@@ -109,6 +109,7 @@ public class DENOPTIMgson
           // cannot serialize chemical representations:
           //     class org.openscience.cdk.Atom declares multiple JSON
           //     fields named identifier
+          
           if (field.getDeclaringClass() == DENOPTIMFragment.class
                   && field.getName().equals("mol")) {
               return true;
@@ -117,7 +118,6 @@ public class DENOPTIMgson
                   && field.getName().equals("owner")) {
               return true;
           }
-
           if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
                   && field.getName().equals("user")) {
               return true;

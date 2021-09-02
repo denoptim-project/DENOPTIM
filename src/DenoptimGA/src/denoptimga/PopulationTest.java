@@ -89,7 +89,7 @@ public class PopulationTest
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);
-        FragmentSpace.setSPclassBasedApproach(true);
+        FragmentSpace.setAPclassBasedApproach(true);
     }
 
 //------------------------------------------------------------------------------

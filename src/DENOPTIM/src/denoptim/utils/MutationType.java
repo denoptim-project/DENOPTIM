@@ -23,13 +23,11 @@ public enum MutationType {
      * Replace the target vertex and any of the child vertices.
      * The effect on the child vertices is decided by substitution probability.
      */
-    CHANGEBRANCH
+    CHANGEBRANCH,
     
     /**
-     * Replace the target vertex but keep as much as possible of the child 
-     * graph structure. Respects constraints defined in the target vertex, and
-     * projects these constraints in the new vertex.
+     * Replace the target vertex keeping all the child structure.
      */
-    //TODO-V3 CHANGELINK
+    CHANGELINK
 
 }

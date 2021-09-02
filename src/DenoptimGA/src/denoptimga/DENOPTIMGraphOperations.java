@@ -149,7 +149,69 @@ public class DENOPTIMGraphOperations
     protected static boolean substituteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
     {
-        return substituteFragment(vertex, false, -1, -1);
+        return substituteBranch(vertex, false, -1, -1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Substitutes a vertex while keeping its surrounding.
+     * Does not replace with same vertex (i.e., new vertex will have different 
+     * building block ID, but might look the same wrt content and properties).
+     * @param vertex the vertex to replace with another one.
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index.
+     * @return <code>true</code> if substitution is successful
+     * @throws DENOPTIMException
+     */
+
+    protected static boolean substituteLink(DENOPTIMVertex vertex,
+            int chosenVrtxIdx) throws DENOPTIMException
+    {
+        GraphLinkFinder glf = new GraphLinkFinder(vertex);
+        if (!glf.foundNewLink)
+        {
+            //TODO-GG increase counter of no compatible link found
+            return false;
+        }
+        
+        boolean done = false;
+        for (DENOPTIMVertex oldLink : vertex.getGraphOwner()
+                .getSymVertexesForVertex(vertex))
+        {
+            DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), 
+                    glf.chosenNewLink.getBuildingBlockId(),
+                    glf.chosenNewLink.getBuildingBlockType());
+            done = replaceLink(oldLink, newLink, glf.chosenAPMap);
+            if (!done)
+                break;
+        }
+        return done;
+    }
+    
+//------------------------------------------------------------------------------
+
+    private static boolean replaceLink(DENOPTIMVertex oldLink, DENOPTIMVertex newLink, 
+            Map<Integer,Integer> apMap)
+    {
+        //TODO-GG implement
+        
+        /*
+        DENOPTIMGraph g = vertex.getGraphOwner();
+    
+        // first get the edge with the parent
+        DENOPTIMEdge e = vertex.getEdgeToParent();
+        if (e == null)
+        {
+            String msg = "Program Bug in substituteFragment: Unable to locate "
+                    + "parent edge for vertex "+vertex+" in graph "+g;
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            throw new DENOPTIMException(msg);
+        }
+        */
+        return false;
     }
 
 //------------------------------------------------------------------------------
@@ -173,11 +235,10 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
-    protected static boolean substituteFragment(DENOPTIMVertex vertex,
+    protected static boolean substituteBranch(DENOPTIMVertex vertex,
             boolean force, int chosenVrtxIdx, int chosenApId)
                                                     throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
         DENOPTIMGraph g = vertex.getGraphOwner();
 
         // first get the edge with the parent
@@ -1545,11 +1606,17 @@ public class DENOPTIMGraphOperations
         switch (mType) 
         {
             case CHANGEBRANCH:
-                done = substituteFragment(vertex, force, chosenVrtxIdx, 
-                        chosenApId);
+                done = substituteBranch(vertex, force, chosenVrtxIdx, chosenApId);
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);
+                break;
+                
+            case CHANGELINK:
+                done = substituteLink(vertex, chosenVrtxIdx);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
                 break;
                 
             case EXTEND:

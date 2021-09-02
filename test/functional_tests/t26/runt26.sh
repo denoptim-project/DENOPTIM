@@ -23,7 +23,7 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 totChecks=0
-for i in $(seq 1 1)
+for i in $(seq 1 2)
 do
     "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/TestOperator.jar" "t26-$i.params" > "t26-$i.log" 2>&1 
     if ! grep -q 'TestOperator run completed' "t26-$i.log"

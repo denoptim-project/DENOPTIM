@@ -1947,7 +1947,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a SDF file
+     * Reads a list of <code>DENOPTIMGraph</code>s from a SDF file.
      *
      * @param fileName the pathname of the file to read
      * @param useFS    set to <code>true</code> when there is a defined

@@ -89,6 +89,7 @@ public class FragmentSpaceTest
 	private static APClass APCC2;
 
 //------------------------------------------------------------------------------
+	
 	/*
 	 * Ideally this could be run once before all tests of this class. However,
 	 * attempts to use @BeforeAll have shown that the static FragmentSpace does 

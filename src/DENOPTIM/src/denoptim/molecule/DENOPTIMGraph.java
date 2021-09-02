@@ -302,6 +302,24 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    public ArrayList<DENOPTIMVertex> getSymVertexesForVertex(DENOPTIMVertex v)
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        for (SymmetricSet ss : symVertices)
+        {
+            if (ss.contains(v.getVertexId()))
+            {
+                for (Integer vid : ss.getList())
+                {
+                    lst.add(this.getVertexWithId(vid));
+                }
+            }
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
     public SymmetricSet getSymSetForVertex(DENOPTIMVertex v)
     {
         for (SymmetricSet ss : symVertices)

@@ -495,7 +495,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         {
             List<MutationType> scaffCompatTypes = new ArrayList<MutationType>();
             scaffCompatTypes.add(MutationType.EXTEND);
-            //TODO-GG add innerMutation scaffCompatTypes.add(MutationType.);
+            scaffCompatTypes.add(MutationType.CHANGELINK);
+            if (contractLevel == ContractLevel.FREE)
+            {
+                //TODO- mutations inside template
+                //scaffCompatTypes.add(MutationType.);
+            }
             return scaffCompatTypes;
         }
         return super.getMutationTypes();
