@@ -167,6 +167,9 @@ public class GraphLinkFinder
             // We map all the compatibilities before choosing a specific mapping
             Map<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
                     new HashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+            
+            //TODO-GG make sure here we include the free APs that are projected to outernAPs in templates
+            
             for (DENOPTIMAttachmentPoint oAP : originalLink.getAttachmentPoints())
             {
                 for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())

@@ -840,40 +840,49 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return false;
         }
         
-        // First keep track of the links that will be broken and re-created
-        // and also of the relation free APs may have with a template that 
-        // embeds this graph.
+        // First keep track of the links that will be broken and re-created,
+        // and also of the relation free APs may have with a possible template
+        // that embeds this graph.
         Map<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
                 new HashMap<Integer,DENOPTIMAttachmentPoint>();
-        Map<Integer,BondType> linkTypesToRecreate = new HashMap<Integer,BondType>();
+        Map<Integer,BondType> linkTypesToRecreate = 
+                new HashMap<Integer,BondType>();
+        Map<Integer,DENOPTIMAttachmentPoint> inToOutAPForTemplate = 
+                new HashMap<Integer,DENOPTIMAttachmentPoint>();
         int trgApIdOnNewLink = -1;
         for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
         {
+            int oldApId = oldAP.getIndexInOwner();
+            int newApId = apMap.get(oldApId);
             if (oldAP.isAvailable())
             {
                 // NB: if this graph is embedded in a template, free/available 
                 // APs at this level are mapped on the templates' surface
                 if (templateJacket!=null)
                 {
-                    //TODO-GG: update InnerToOuter relations
-                }
+                    if (!apMap.containsKey(oldApId))
+                    {
+                        throw new DENOPTIMException("Mismatch between AP map "
+                                + "keys (" + apMap.keySet() + ") and AP index "
+                                +oldApId);
+                    }
+                    inToOutAPForTemplate.put(newApId,oldAP);
+                } 
                 continue;
             }
             
-            int oldApId = oldAP.getIndexInOwner();
             if (!apMap.containsKey(oldApId))
             {
                 throw new DENOPTIMException("Mismatch between AP map keys (" 
                         + apMap.keySet() +") and AP index "+oldApId);
             }
-            linksToRecreate.put(apMap.get(oldApId), oldAP.getLinkedAP());
-            linkTypesToRecreate.put(apMap.get(oldApId), 
-                    oldAP.getEdgeUser().getBondType());
+            linksToRecreate.put(newApId, oldAP.getLinkedAP());
+            linkTypesToRecreate.put(newApId, oldAP.getEdgeUser().getBondType());
             
             // This is were we identify the edge/ap to the parent of the oldLink
             if (!oldAP.isSrcInUser())
             {
-                trgApIdOnNewLink = apMap.get(oldApId);
+                trgApIdOnNewLink = newApId;
             }
         }
         
@@ -936,17 +945,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 continue; //done just before this loop
             }
-            DENOPTIMAttachmentPoint srcApOnNewLink = newLink.getAP(apIdOnNew);
-            DENOPTIMAttachmentPoint trgApOnChild = linksToRecreate.get(apIdOnNew);
-            DENOPTIMEdge edge = new DENOPTIMEdge(srcApOnNewLink,trgApOnChild, 
+            DENOPTIMAttachmentPoint srcOnNewLink = newLink.getAP(apIdOnNew);
+            DENOPTIMAttachmentPoint trgOnChild = linksToRecreate.get(apIdOnNew);
+            DENOPTIMEdge edge = new DENOPTIMEdge(srcOnNewLink,trgOnChild, 
                     linkTypesToRecreate.get(apIdOnNew));
             addEdge(edge);
         }
         
-        //TODO-GG need to update also the mapping with outer APs if this graph is embedded into a template
+        // update the mapping of this vertex's APs in the jacket template
         if (templateJacket!=null)
         {
-            //TODO-GG
+            for (Integer apIdOnNew : inToOutAPForTemplate.keySet())
+            {
+                templateJacket.updateInnerApID(
+                        inToOutAPForTemplate.get(apIdOnNew),
+                        newLink.getAP(apIdOnNew));
+            }
         }
         
         jGraph = null;

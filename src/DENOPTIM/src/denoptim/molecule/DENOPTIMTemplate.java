@@ -249,6 +249,24 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
+    /**
+     * Replaces a given link between APs on the surface of this template (i.e., 
+     * outerAP) and the corresponding APs in the embedded graph 
+     * (i.e., innerAPs). This method does not change anything about the outerAP;
+     * it changes only the inner AP.
+     * @param oldInnerAP the inner AP to be changed
+     * @param newInnerAP the inner AP to change the old one with.
+     */
+    public void updateInnerApID(DENOPTIMAttachmentPoint oldInnerAP, 
+            DENOPTIMAttachmentPoint newInnerAP)
+    {
+        DENOPTIMAttachmentPoint outerAP = innerToOuterAPs.get(oldInnerAP);
+        innerToOuterAPs.remove(oldInnerAP);
+        innerToOuterAPs.put(newInnerAP, outerAP);
+    }
+    
+//-----------------------------------------------------------------------------
+    
     private boolean isValidInnerGraph(DENOPTIMGraph g) 
     {
         List<DENOPTIMAttachmentPoint> innerAPs = g.getAvailableAPs();
