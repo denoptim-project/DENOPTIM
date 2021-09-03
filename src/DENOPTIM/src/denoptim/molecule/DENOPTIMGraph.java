@@ -853,7 +853,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
         {
             int oldApId = oldAP.getIndexInOwner();
-            int newApId = apMap.get(oldApId);
             if (oldAP.isAvailable())
             {
                 // NB: if this graph is embedded in a template, free/available 
@@ -866,7 +865,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                 + "keys (" + apMap.keySet() + ") and AP index "
                                 +oldApId);
                     }
-                    inToOutAPForTemplate.put(newApId,oldAP);
+                    inToOutAPForTemplate.put(apMap.get(oldApId),oldAP);
                 } 
                 continue;
             }
@@ -876,6 +875,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 throw new DENOPTIMException("Mismatch between AP map keys (" 
                         + apMap.keySet() +") and AP index "+oldApId);
             }
+            int newApId = apMap.get(oldApId);
             linksToRecreate.put(newApId, oldAP.getLinkedAP());
             linkTypesToRecreate.put(newApId, oldAP.getEdgeUser().getBondType());
             
