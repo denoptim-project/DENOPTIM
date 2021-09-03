@@ -1,14 +1,14 @@
 #
-# Parameters for DENOPTIM
+# Substitution of a non-scaffold vertex that is part of a ring
 #
 TESTGENOPS-OP=MUTATION
-TESTGENOPS-inpFile=graph-1.sdf
-TESTGENOPS-outFile=graph_mut-1.sdf
-TESTGENOPS-MutationTarget=1
+TESTGENOPS-inpFile=graph-2.sdf
+TESTGENOPS-outFile=graph_mut-2.sdf
+TESTGENOPS-MutationTarget=13
 #TESTGENOPS-MutationType=EXPAND
 #TESTGENOPS-MutationType=CONTRACT
 TESTGENOPS-MutationType=CHANGELINK
-TESTGENOPS-NewVertexMolID=7
+TESTGENOPS-NewVertexMolID=10
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf

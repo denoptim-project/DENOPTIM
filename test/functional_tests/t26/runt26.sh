@@ -15,15 +15,11 @@ do
     sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
-#Run it
-exec 6>&1
-exec > "$logFile"
-exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles/TestOperator.jar" "$paramFile"
-exec 1>&6 6>&- 
-
+#Run sub tests
+nSubTests=2
+elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ')
 totChecks=0
-for i in $(seq 1 1)
+for i in $(seq 1 $nSubTests)
 do
     "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/TestOperator.jar" "t26-$i.params" > "t26-$i.log" 2>&1 
     if ! grep -q 'TestOperator run completed' "t26-$i.log"
@@ -41,7 +37,7 @@ do
     nChecks=0
     nEnd=$(grep -n "M *END" "graph_mut-$i.sdf" | awk -F':' '{print $1}')
     nEndRef=$(grep -n "M *END" "expected_output/graph_mut-$i.sdf" | awk -F':' '{print $1}')
-    for el in 'C  ' 'N  ' 'P  ' 'H  ' 'ATM'
+    for el in "${elSymbols[@]}"
     do
         nEl=$(head -n "$nEnd" "graph_mut-$i.sdf" | grep -c " $el ")
         nElRef=$(head -n "$nEndRef" "expected_output/graph_mut-$i.sdf" | grep -c " $el ")
@@ -52,7 +48,7 @@ do
         nChecks=$((nChecks+1))
     done
 
-    if [ "$nChecks" -ne 5 ]
+    if [ "$nChecks" -ne "${#elSymbols[@]}" ]
     then
         echo "Test 't26' NOT PASSED (sympton: wrong number of checks $nChecks in step $i)"
         exit -1
@@ -60,7 +56,7 @@ do
     totChecks=$((totChecks+1))
 done
 
-if [ "$totChecks" -ne 1 ]
+if [ "$totChecks" -ne $nSubTests ]
 then
     echo "Test 't26' NOT PASSED (sympton: wrong number of sub runs $totChecks)"
     exit -1

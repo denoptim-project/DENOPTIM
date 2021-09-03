@@ -792,8 +792,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(vertex);
+        if (symSites.size() == 0)
+        {
+            symSites.add(vertex);
+        }
         for (DENOPTIMVertex oldLink : symSites)
         {
+            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
                     GraphUtils.getUniqueVertexIndex(), bbId, bbt);
             if (!replaceSingleVertex(oldLink, newLink, apMap))
