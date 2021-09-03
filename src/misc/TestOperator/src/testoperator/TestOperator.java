@@ -26,6 +26,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
@@ -100,14 +101,51 @@ public class TestOperator
         System.out.println(g);
         System.out.println(" ");
         MutationType mt = TestOperatorParameters.mutationType;
-        int vid = TestOperatorParameters.mutationTarget;
-        System.out.println("Attempting mutation '" + mt + "' on vertex " +vid);
         
-        DENOPTIMVertex v = g.getVertexWithId(vid);
-        if (v == null)
+        DENOPTIMVertex v = null;
+        int[] vidv = TestOperatorParameters.mutationTarget;
+        String str = "";
+        if (vidv.length>1)
         {
-            System.out.println("VertexID '" +vid +  "' not found in graph "+g);
-            System.exit(-1);
+            for (int i=(vidv.length-1); i>-1; i--)
+            {
+                if (i==vidv.length-1)
+                {
+                    str = "[" + vidv[i] + "]";
+                } else {
+                    str = "[" + str + " " + vidv[i] + "] ";
+                }
+            }
+            System.out.println("Attempting mutation '" + mt + "' on deep "
+                    + "vertex " + str);
+            DENOPTIMVertex outerVertex = null;
+            DENOPTIMGraph innerGraph = g;
+            for (int i=0; i<vidv.length; i++)
+            {
+                if (outerVertex != null && outerVertex instanceof DENOPTIMTemplate)
+                {
+                    innerGraph = ((DENOPTIMTemplate) outerVertex).getInnerGraph();
+                }
+                outerVertex = innerGraph.getVertexWithId(vidv[i]);
+                if (outerVertex == null)
+                {
+                    System.out.println("VertexID '" + vidv[i] +  "' not found "
+                            + "in graph "+innerGraph);
+                    System.exit(-1);
+                }
+            }
+            v = outerVertex;
+        } else {
+            int vid = vidv[0];
+            System.out.println("Attempting mutation '" + mt + "' on vertex " 
+                    + vidv[0]);
+            v = g.getVertexWithId(vid);
+            if (v == null)
+            {
+                System.out.println("VertexID '" +vid +  "' not found in graph " 
+                        + g);
+                System.exit(-1);
+            }
         }
             
         // NB: last boolean asks to ignore the growth probability

@@ -66,7 +66,7 @@ public class TestOperatorParameters
     /**
      * Target vertex ID for mutation
      */
-    protected static int mutationTarget;
+    protected static int[] mutationTarget;
     
     /**
      * Type of mutation to perform
@@ -250,7 +250,12 @@ public class TestOperatorParameters
                 outFileM = value;
                 break;
             case "TESTGENOPS-MUTATIONTARGET=":
-                mutationTarget = Integer.parseInt(value);
+                String[] parts = value.split(",");
+                mutationTarget = new int[parts.length];
+                for (int i=0; i<parts.length; i++)
+                {
+                    mutationTarget[i] = Integer.parseInt(parts[i]);
+                }
                 break;
             case "TESTGENOPS-MUTATIONTYPE=":
                 mutationType = MutationType.valueOf(value);

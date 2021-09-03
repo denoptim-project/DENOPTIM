@@ -8,7 +8,7 @@ TESTGENOPS-MutationTarget=13
 #TESTGENOPS-MutationType=EXPAND
 #TESTGENOPS-MutationType=CONTRACT
 TESTGENOPS-MutationType=CHANGELINK
-TESTGENOPS-NewVertexMolID=10
+TESTGENOPS-NewVertexMolID=9
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf

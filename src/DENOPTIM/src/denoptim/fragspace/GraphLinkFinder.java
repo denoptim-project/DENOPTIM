@@ -65,10 +65,30 @@ public class GraphLinkFinder
      * Constructor that specifies which vertex has to be replaced. The search 
      * for an alternative building block takes place within this constructor.
      * @param originalLink the vertex to replace.
+     * @throws DENOPTIMException if the required new building block ID cannot
+     * be used.
      */
-    public GraphLinkFinder(DENOPTIMVertex originalLink)
+    public GraphLinkFinder(DENOPTIMVertex originalLink) throws DENOPTIMException
     {  
-        this(originalLink,false);
+        this(originalLink,-1,false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that specifies which vertex has to be replaced and which
+     * building block ID to use as replacement.
+     * @param originalLink the vertex to replace.
+     * @param newBuildingBlockID the index specifying which building block to 
+     * use as replacement. This can be -1, in which case, this method will
+     * search suitable building block candidates and choose randomly.
+     * @throws DENOPTIMException if the required new building block ID cannot
+     * be used.
+     */
+    public GraphLinkFinder(DENOPTIMVertex originalLink, int newBuildingBlockID) 
+            throws DENOPTIMException
+    {  
+        this(originalLink,newBuildingBlockID,false);
     }
     
 //------------------------------------------------------------------------------
@@ -80,23 +100,36 @@ public class GraphLinkFinder
      * @param screenAll use <code>true</code> to NOT stop at the first 
      * compatible
      * vertex, but screen all the library of building blocks.
+     * @param newBuildingBlockID the index specifying which building block to 
+     * use as replacement. This can be -1, in which case, this method will
+     * search suitable building block candidates and choose randomly.
+     * @throws DENOPTIMException if the required new building block ID cannot
+     * be used.
      */
-    public GraphLinkFinder(DENOPTIMVertex originalLink, boolean screenAll) 
+    public GraphLinkFinder(DENOPTIMVertex originalLink, int newBuildingBlockID,
+            boolean screenAll) throws DENOPTIMException 
     {   
         BBType bbt = originalLink.getBuildingBlockType();
         ArrayList<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>();
-        switch (bbt)
+        if (newBuildingBlockID<0)
         {
-            //TODO: limit search to building blocks with a minimal number of APs
-            case FRAGMENT:
-                candidates.addAll(FragmentSpace.getFragmentLibrary());
-                break;
-            case SCAFFOLD:
-                candidates.addAll(FragmentSpace.getScaffoldLibrary());
-            case CAP:
-                break;
-            default:
-                break;
+            switch (bbt)
+            {
+                //TODO: limit search to building blocks with a minimal number of APs
+                case FRAGMENT:
+                    candidates.addAll(FragmentSpace.getFragmentLibrary());
+                    break;
+                case SCAFFOLD:
+                    candidates.addAll(FragmentSpace.getScaffoldLibrary());
+                case CAP:
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            DENOPTIMVertex chosenOne =  FragmentSpace.getVertexFromLibrary(
+                    bbt, newBuildingBlockID);
+            candidates.add(chosenOne);
         }
 
         int candidatesOrigSize = candidates.size();

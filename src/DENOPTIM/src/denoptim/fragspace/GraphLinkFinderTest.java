@@ -222,9 +222,10 @@ public class GraphLinkFinderTest
         prepare();
         DENOPTIMGraph graph = makeTestGraphA();
         GraphLinkFinder glf = new GraphLinkFinder(graph.getVertexAtPosition(1),
-                true); 
+                -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
+        // NB: "-1" is for "no selection of specific new building block".
         
         // These are the expected numbers of AP mappings found for the three
         // vertexes that can be alternative links. 

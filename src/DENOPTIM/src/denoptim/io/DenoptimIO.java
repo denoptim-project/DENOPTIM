@@ -2280,6 +2280,23 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
+     * Writes the graph to JSON file.
+     *
+     * @param file the file where to print
+     * @param graph the graphs to print
+     * @throws DENOPTIMException
+     */
+    public static void writeGraphToJSON(File file, DENOPTIMGraph graph) 
+            throws DENOPTIMException
+    {
+        ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+        graphs.add(graph);
+        writeGraphsToJSON(file,graphs);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Writes the graphs to JSON file.
      *
      * @param file the file where to print

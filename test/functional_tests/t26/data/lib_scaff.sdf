@@ -96,7 +96,8 @@ M  END
       "allowedMutationTypes": [
         "EXTEND",
         "DELETE",
-        "CHANGEBRANCH"
+        "CHANGEBRANCH",
+        "CHANGELINK"
       ]
     },
     {

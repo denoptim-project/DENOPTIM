@@ -388,6 +388,7 @@ public class EAUtils
         
         String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
         int parentGraphId = parent.getGraph().getGraphId();
+        graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
 
         if (!DENOPTIMGraphOperations.performMutation(graph,mnt))
         {
@@ -396,7 +397,6 @@ public class EAUtils
             return null;
         }
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
-        graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
     
         EAUtils.addCappingGroup(graph);
         

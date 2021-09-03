@@ -41,9 +41,7 @@ public class DENOPTIMgson
   private DENOPTIMgson()
   {
     writer = new GsonBuilder()
-      .registerTypeAdapter(DENOPTIMGraph.class,
-                           new DENOPTIMGraphSerializer())
-
+      .registerTypeAdapter(DENOPTIMGraph.class, new DENOPTIMGraphSerializer())
       .setExclusionStrategies(new DENOPTIMExclusionStrategy())
       // Custom serializer to make json string use AP's ID as key in the
       // map. If this is not used, then the key.toString() is used to

@@ -19,6 +19,7 @@
 
 package denoptim.molecule;
 
+import java.io.File;
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -49,6 +50,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexDeserializer;
@@ -123,9 +125,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     String localMsg;
 
     /**
-     * Reference to the candidate entity owning this graph
+     * Reference to the candidate entity owning this graph, or null
      */
     Candidate candidate;
+    
+    /**
+     * Reference to the {@link DENOPTIMTemplate} embedding this graph
+     */
+    DENOPTIMTemplate templateJacket;
     
     /**
      * JGraph representation used to detect DENOPTIM-isomorphism
@@ -834,15 +841,24 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         // First keep track of the links that will be broken and re-created
+        // and also of the relation free APs may have with a template that 
+        // embeds this graph.
         Map<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
                 new HashMap<Integer,DENOPTIMAttachmentPoint>();
-
         Map<Integer,BondType> linkTypesToRecreate = new HashMap<Integer,BondType>();
         int trgApIdOnNewLink = -1;
         for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
         {
             if (oldAP.isAvailable())
+            {
+                // NB: if this graph is embedded in a template, free/available 
+                // APs at this level are mapped on the templates' surface
+                if (templateJacket!=null)
+                {
+                    //TODO-GG: update InnerToOuter relations
+                }
                 continue;
+            }
             
             int oldApId = oldAP.getIndexInOwner();
             if (!apMap.containsKey(oldApId))
@@ -896,9 +912,24 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         gVertices.remove(oldLink);
         
         // finally introduce the new vertex in the graph
-        appendVertexOnAP(linksToRecreate.get(trgApIdOnNewLink), 
-                newLink.getAP(trgApIdOnNewLink));
-        // and re-link the child parts of the graph
+        newLink.setLevel(oldLink.getLevel());
+        addVertex(newLink);
+        
+        // and connect it to the rest of the graph
+        if (trgApIdOnNewLink >= 0)
+        {
+            // newLink has a parent vertex, and the edge should be directed 
+            // accordingly
+            DENOPTIMEdge edge = new DENOPTIMEdge(
+                    linksToRecreate.get(trgApIdOnNewLink),
+                    newLink.getAP(trgApIdOnNewLink), 
+                    linkTypesToRecreate.get(trgApIdOnNewLink));
+            addEdge(edge);
+        } else {
+            // newLink does NOT have a parent vertex, so all the
+            // edges see newLink as target vertex. Such links are dealt with
+            // in the loop below. So, there is nothing special to do, here.
+        }
         for (Integer apIdOnNew : linksToRecreate.keySet())
         {
             if (apIdOnNew == trgApIdOnNewLink)
@@ -910,6 +941,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             DENOPTIMEdge edge = new DENOPTIMEdge(srcApOnNewLink,trgApOnChild, 
                     linkTypesToRecreate.get(apIdOnNew));
             addEdge(edge);
+        }
+        
+        //TODO-GG need to update also the mapping with outer APs if this graph is embedded into a template
+        if (templateJacket!=null)
+        {
+            //TODO-GG
         }
         
         jGraph = null;
@@ -2243,7 +2280,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         // first delete the edge with the parent vertex
         int pvid = removeEdgeWithParent(v);
         if (pvid == -1)
-        {
+        {   
             String msg = "Program bug detected trying to delete vertex "
                     + v + " from graph '" + this + "'. "
                     + "Unable to locate parent edge.";
@@ -2740,8 +2777,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Does not project on symmetrically related vertices or
      * attachment points. No change in symmetric sets, apart from importing
      * those sets that are already defined in the incoming vertex.
-     * @param srcAP the attachment point on the this graph.
-     * @param trgAP the attachment point on the incoming vertex.
+     * @param srcAP the attachment point on this graph (source AP).
+     * @param trgAP the attachment point on the incoming vertex (target AP).
      * @throws DENOPTIMException 
      */
 
@@ -3521,7 +3558,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public String toJson() throws DENOPTIMException
     {
-
         // Check for uniqueness of vertexIDs and APIDs within the
         // graph (ignore nested graphs).
         boolean regenerateVrtxID = false;
@@ -3772,5 +3808,19 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 .stream()
                 .anyMatch(v -> v.getBuildingBlockType() == BBType.SCAFFOLD);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Sets the reference to a template that embeds this graph, i.e., this
+     * graph's "jacket" template.
+     * @param denoptimTemplate the jacket template
+     */
+    public void setTemplateJacket(DENOPTIMTemplate template)
+    {
+        this.templateJacket = template;
+    }
 
+//------------------------------------------------------------------------------    
+    
 }

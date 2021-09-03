@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import denoptim.molecule.*;
 import denoptim.rings.*;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
@@ -170,7 +172,13 @@ public class DENOPTIMGraphOperations
     protected static boolean substituteLink(DENOPTIMVertex vertex,
             int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
     {
-        GraphLinkFinder glf = new GraphLinkFinder(vertex);
+        GraphLinkFinder glf = null;
+        if (chosenVrtxIdx<0)
+        {
+            glf = new GraphLinkFinder(vertex);
+        } else {
+            glf = new GraphLinkFinder(vertex,chosenVrtxIdx);
+        }
         if (!glf.foundAlternativeLink())
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND);
@@ -1561,7 +1569,8 @@ public class DENOPTIMGraphOperations
             MutationType mType, boolean force, int chosenVrtxIdx, 
             int chosenApId, Monitor mnt) throws DENOPTIMException
     {
-        if (vertex.getGraphOwner() == null)
+        DENOPTIMGraph graph = vertex.getGraphOwner();
+        if (graph == null)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOOWNER);
             DENOPTIMLogger.appLogger.info("Vertex has no owner - "
@@ -1576,7 +1585,9 @@ public class DENOPTIMGraphOperations
             return false;
         }
         
-        int graphId = vertex.getGraphOwner().getGraphId();
+        int graphId = graph.getGraphId();
+        graph.setLocalMsg(graph.getLocalMsg() + " " + mType + " " 
+                + vertex.getVertexId());
         
         boolean done = false;
         switch (mType) 
@@ -1617,7 +1628,7 @@ public class DENOPTIMGraphOperations
         else
             msg = msg + "unsuccessful";
         DENOPTIMLogger.appLogger.info(msg);
-        
+
         return done;
     }
 

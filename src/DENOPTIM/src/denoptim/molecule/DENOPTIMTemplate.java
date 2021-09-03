@@ -222,6 +222,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     " required APs");
         }
         this.innerGraph = innerGraph;
+        innerGraph.setTemplateJacket(this);
         this.innerToOuterAPs = new APTreeMap();
         for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
             DENOPTIMAttachmentPoint outerAP = innerAP.clone();
@@ -259,6 +260,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         * Answer from Einar: Let n be the number of attachment points on the
         * graph. If we don't sort then this takes O(n²). If we sort then
         * O(nlog(n)) + O(n) = O(nlog(n)).
+        * The question is actually on whether this sorting is compatible with
+        * the assumption that the list of APs does not change order.
         */
         Comparator<DENOPTIMAttachmentPoint> apClassComparator
                 = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass);
