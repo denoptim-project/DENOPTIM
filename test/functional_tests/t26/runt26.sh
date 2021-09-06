@@ -16,7 +16,7 @@ do
 done
 
 #Run sub tests
-nSubTests=3
+nSubTests=4
 elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ')
 totChecks=0
 for i in $(seq 1 $nSubTests)
