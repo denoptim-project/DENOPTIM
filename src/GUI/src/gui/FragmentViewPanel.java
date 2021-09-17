@@ -870,6 +870,13 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
         			srcAtmPlace.z};
         	double[] endArrow = ap.getDirectionVector();
         	
+        	if (startArrow == null || endArrow==null)
+        	{
+        	    System.out.println("WARNING: AP without geometrical data will "
+        	            + "be ignored! Ignoring ap "+ap);
+        	    continue;
+        	}
+        	
         	double[] offSet = DENOPTIMMathUtils.scale(
         			DENOPTIMMathUtils.subtract(endArrow,startArrow), 0.2);
         	double[] positionLabel = DENOPTIMMathUtils.add(endArrow,offSet); 
