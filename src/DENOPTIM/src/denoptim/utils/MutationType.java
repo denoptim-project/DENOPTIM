@@ -28,6 +28,11 @@ public enum MutationType {
     /**
      * Replace the target vertex keeping all the child structure.
      */
-    CHANGELINK
+    CHANGELINK,
+    
+    /**
+     * Adds a vertex between two previously connected vertexes.
+     */
+    ADDLINK
 
 }

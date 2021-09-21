@@ -50,6 +50,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.GraphLinkFinder;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
@@ -625,6 +626,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Adds the edge to the list of edges belonging to this graph.
+     * @param edge to be included in the list of edges
+     */
     public void addEdge(DENOPTIMEdge edge)
     {
         gEdges.add(edge);
@@ -849,6 +854,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 new HashMap<Integer,BondType>();
         Map<Integer,DENOPTIMAttachmentPoint> inToOutAPForTemplate = 
                 new HashMap<Integer,DENOPTIMAttachmentPoint>();
+        List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
         int trgApIdOnNewLink = -1;
         for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
         {
@@ -856,17 +863,19 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             if (oldAP.isAvailable())
             {
                 // NB: if this graph is embedded in a template, free/available 
-                // APs at this level are mapped on the templates' surface
+                // APs at this level (and from the old link) 
+                // are mapped on the templates' surface
                 if (templateJacket!=null)
                 {
                     if (!apMap.containsKey(oldApId))
                     {
-                        throw new DENOPTIMException("Mismatch between AP map "
-                                + "keys (" + apMap.keySet() + ") and AP index "
-                                +oldApId);
+                        // An AP of the old link is going to be removed from the
+                        // template jacket's list of APs
+                        oldAPToRemoveFromTmpl.add(oldAP);
+                    } else {
+                        inToOutAPForTemplate.put(apMap.get(oldApId),oldAP);
                     }
-                    inToOutAPForTemplate.put(apMap.get(oldApId),oldAP);
-                } 
+                }
                 continue;
             }
             
@@ -924,6 +933,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         newLink.setLevel(oldLink.getLevel());
         addVertex(newLink);
         
+        // We keep track of the APs on the new link that have been dealt with
+        List<DENOPTIMAttachmentPoint> doneApsOnNew = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        
         // and connect it to the rest of the graph
         if (trgApIdOnNewLink >= 0)
         {
@@ -934,6 +947,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     newLink.getAP(trgApIdOnNewLink), 
                     linkTypesToRecreate.get(trgApIdOnNewLink));
             addEdge(edge);
+            doneApsOnNew.add(newLink.getAP(trgApIdOnNewLink));
         } else {
             // newLink does NOT have a parent vertex, so all the
             // edges see newLink as target vertex. Such links are dealt with
@@ -950,22 +964,209 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             DENOPTIMEdge edge = new DENOPTIMEdge(srcOnNewLink,trgOnChild, 
                     linkTypesToRecreate.get(apIdOnNew));
             addEdge(edge);
+            doneApsOnNew.add(srcOnNewLink);
         }
         
         // update the mapping of this vertex's APs in the jacket template
         if (templateJacket!=null)
-        {
+        {   
             for (Integer apIdOnNew : inToOutAPForTemplate.keySet())
             {
                 templateJacket.updateInnerApID(
                         inToOutAPForTemplate.get(apIdOnNew),
                         newLink.getAP(apIdOnNew));
+                doneApsOnNew.add(newLink.getAP(apIdOnNew));
+            }
+            
+            // Project all remaining APs of new Link on the surface of template
+            for (DENOPTIMAttachmentPoint apOnNew : newLink.getAttachmentPoints())
+            {
+                if (!doneApsOnNew.contains(apOnNew))
+                {
+                    templateJacket.addInnerToOuterAPMapping(apOnNew);
+                }
+            }
+            
+            // Remove all APs that existed only in the old link
+            for (DENOPTIMAttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
+            {
+                templateJacket.removeProjectionOfInnerAP(apOnOld);
             }
         }
         
         jGraph = null;
         
         return !this.containsVertex(oldLink) && this.containsVertex(newLink);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Inserts a given vertex in between two vertexes connected by the given
+     * edge. This method reproduces the 
+     * change of vertex on all symmetric sites.
+     * @param edge the edge where to insert the new vertex.
+     * @param bbId the building block Id of the building blocks that will 
+     * be inserted.
+     * @param bbt the type of building block to be inserted.
+     * @param apMap the mapping of attachment points needed to install the new
+     * building block and connect it to the rest of the graph. 
+     * The syntax of this map must be:
+     * <ul>
+     * <li>keys: the APs originally involved in making the edge given as
+     * parameter,</li>
+     * <li>values: the 0-based index of the AP in the new building block that 
+     * will be inserted.</li>
+     * </ul>
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean insertVertex(DENOPTIMEdge edge, int bbId, BBType bbt,
+            Map<DENOPTIMAttachmentPoint,Integer> apMap) 
+                    throws DENOPTIMException
+    {
+        if (!gEdges.contains(edge))
+        {
+            return false;
+        }
+        
+        ArrayList<DENOPTIMEdge> symSites = new ArrayList<DENOPTIMEdge> ();
+        ArrayList<Map<DENOPTIMAttachmentPoint,Integer>> symApMaps = 
+                
+                new ArrayList<Map<DENOPTIMAttachmentPoint,Integer>>();
+        ArrayList<DENOPTIMVertex> symTrgVertexes = getSymVertexesForVertex(
+                edge.getTrgAP().getOwner());
+        if (symTrgVertexes.size() == 0)
+        {
+            symSites.add(edge);
+            symApMaps.add(apMap);
+        } else {
+            for (DENOPTIMVertex trgVrtx : symTrgVertexes)
+            {
+                DENOPTIMEdge symEdge = trgVrtx.getEdgeToParent();
+                symSites.add(symEdge);
+                
+                Map<DENOPTIMAttachmentPoint,Integer> locApMap = new
+                        HashMap<DENOPTIMAttachmentPoint,Integer>();
+                locApMap.put(symEdge.getSrcAP(), apMap.get(edge.getSrcAP()));
+                locApMap.put(symEdge.getTrgAP(), apMap.get(edge.getTrgAP()));
+                symApMaps.add(locApMap);
+            }
+        }
+        
+        SymmetricSet newSS = new SymmetricSet();
+        for (int i=0; i<symSites.size(); i++)
+        {
+            DENOPTIMEdge symEdge = symSites.get(i);
+            Map<DENOPTIMAttachmentPoint,Integer> locApMap = symApMaps.get(i);
+            
+            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
+            DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), bbId, bbt);
+            newSS.add(newLink.getVertexId());
+            Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apToApMap =
+                    new HashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            for (DENOPTIMAttachmentPoint apOnGraph : locApMap.keySet())
+            {
+                apToApMap.put(apOnGraph, newLink.getAP(locApMap.get(apOnGraph)));
+            }
+            if (!insertSingleVertex(symEdge, newLink, apToApMap))
+            {
+                return false;
+            }
+        }
+        if (newSS.size()>1)
+        {
+            addSymmetricSetOfVertices(newSS);
+        }
+        return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Inserts a given vertex in between two vertexes connected by the given
+     * edge. This method reproduces the 
+     * change of vertex on all symmetric sites.
+     * @param edge the edge where to insert the new vertex.
+     * @param newLink the new vertex to be inserted.
+     * @param apMap the mapping of attachment points needed to install the new
+     * vertex and connect it to the rest of the graph. The syntax of this map 
+     * must be:
+     * <ul>
+     * <li>keys: the APs originally involved in making the edge given as
+     * parameter,</li>
+     * <li>values: the APs in the new vertex.</li>
+     * </ul>
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean insertSingleVertex(DENOPTIMEdge edge, DENOPTIMVertex newLink,
+            Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
+                    throws DENOPTIMException
+    {
+        //TODO: for reproducibility the AP mapping should become an optional
+        // parameter: if given we try to use it, if not given we GraphLinkFinder
+        // will try to find a suitable mapping.
+        
+        if (!gEdges.contains(edge) || gVertices.contains(newLink))
+        {
+            return false;
+        }
+        
+        // First keep track of the links that will be broken and re-created,
+        // and also of the relation free APs may have with a possible template
+        // that embeds this graph.
+        DENOPTIMAttachmentPoint orisEdgeSrc = edge.getSrcAP();
+        DENOPTIMAttachmentPoint orisEdgeTrg = edge.getTrgAP();
+        DENOPTIMVertex srcVrtx = orisEdgeSrc.getOwner();
+        DENOPTIMVertex trgVrtx = orisEdgeTrg.getOwner();
+        
+        removeEdge(edge);
+        
+        // Introduce the new vertex in the graph
+        newLink.setLevel(srcVrtx.getLevel()+1);
+        addVertex(newLink);
+        
+        // Connect the new vertex to the graph
+        DENOPTIMEdge eSrcToLink = new DENOPTIMEdge(orisEdgeSrc,
+                apMap.get(orisEdgeSrc), edge.getBondType());
+        addEdge(eSrcToLink);
+        DENOPTIMEdge eLinkToTrg = new DENOPTIMEdge(apMap.get(orisEdgeTrg),
+                orisEdgeTrg, edge.getBondType());
+        addEdge(eLinkToTrg);
+        
+        changeLevelOfChilds(trgVrtx,1);
+        
+        // update any affected ring
+        if (isVertexInRing(srcVrtx) && isVertexInRing(trgVrtx))
+        {
+            ArrayList<DENOPTIMRing> rToEdit = new ArrayList<DENOPTIMRing>();
+            rToEdit.addAll(getRingsInvolvingVertex(srcVrtx));
+            rToEdit.retainAll(getRingsInvolvingVertex(trgVrtx));
+            for (DENOPTIMRing r : rToEdit)
+            {
+                r.insertVertex(newLink,srcVrtx,trgVrtx);
+            }
+        }
+    
+        // NB: if this graph is embedded in a template, new free/available 
+        // APs introduced with the new link need to be mapped on the surface of
+        // the template
+        if (templateJacket != null)
+        {
+            for (DENOPTIMAttachmentPoint ap : newLink.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    templateJacket.addInnerToOuterAPMapping(ap);
+                }
+            }
+        } 
+        
+        jGraph = null;
+        
+        return !gEdges.contains(edge) && this.containsVertex(newLink);
     }
 
 //------------------------------------------------------------------------------
@@ -2410,18 +2611,50 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Update the level at which the new vertices have been added. This
-     * is generally applicable for a crossover or for a substitution operation
-     * @param lvl
+     * Change the level of all vertexes so that the first vertex, 
+     * which is assumed to be the deepest among all the vertexes belonging to 
+     * this graph, gets level given by the argument 
+     * (i.e., <code>newLevlOfFirst</code>). In practice, with
+     * <code>initialDeepestLevel</code> be the current level of the first vertex 
+     * belonging to this graph, the correction applied to all vertexes is, 
+     * <code>correction = newLevlOfFirst - initialDeepestLevel</code>.
+     * This method is generally used on subgraphs that have been moved as 
+     * by a crossover or substitution operation.
+     * @param newLevlOfFirst the new level to be assigned to the first (deepest)
+     * 
      */
 
-    public void updateLevels(int lvl)
+    public void changeLevelToAll(int newLevlOfFirst)
     {
-        List<DENOPTIMVertex> lstVert = getVertexList();
-        int levRoot = lstVert.get(0).getLevel();
-        int correction = lvl - levRoot;
-        for (DENOPTIMVertex v : lstVert) {
-            v.setLevel(v.getLevel() + correction);
+        int levRoot = gVertices.get(0).getLevel();
+        int correction = newLevlOfFirst - levRoot;
+        changeLevelOfChilds(gVertices.get(0), correction);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Changes the level declared by all vertexes that can be reached by a 
+     * direct path (i.e., only following edges along source-to-target direction)
+     * from the given source vertex. <b>NB:</b> the first vertex is assumed 
+     * to be the deepest among all the vertexes belonging to this graph,
+     * @param vertex the source vertex identifying the beginning of the graph 
+     * branch to operate on.
+     * @param levelChange the correction to the level.
+     */
+    public void changeLevelOfChilds(DENOPTIMVertex vertex, int levelChange)
+    {
+        ArrayList<DENOPTIMVertex> vrtxsToEdit = new ArrayList<DENOPTIMVertex>();
+        if (vertex == gVertices.get(0))
+        {
+            vrtxsToEdit.addAll(gVertices);
+        } else {
+            getChildrenTree(vertex, vrtxsToEdit);
+            vrtxsToEdit.add(vertex);
+        }
+        for (DENOPTIMVertex v : vrtxsToEdit)
+        {
+            v.setLevel(v.getLevel() + levelChange);
         }
     }
 

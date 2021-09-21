@@ -25,13 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint
@@ -50,7 +53,154 @@ public class DENOPTIMAttachmentPointTest
 	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
 	private final EmptyVertex dummyVertex = new EmptyVertex();
 	
+//-----------------------------------------------------------------------------
 	
+	@Test
+	public void testAvailableThrougout() throws Exception
+	{
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        vA.addAP(0,1,1);
+        vA.addAP(1,1,1);
+        vA.addAP(2,1,1);
+        vA.addAP(3,1,1);
+        vA.addAP(4,1,1);
+        vA.addAP(5,1,1);
+        vA.addAP(6,1,1);
+        DENOPTIMVertex vB = new EmptyVertex(1);
+        vB.addAP(0,1,1);
+        vB.addAP(0,1,1);
+        
+        DENOPTIMGraph gL0 = new DENOPTIMGraph();
+        gL0.addVertex(vA);
+        gL0.appendVertexOnAP(vA.getAP(0), vB.getAP(1));
+        
+        DENOPTIMTemplate tL0 = new DENOPTIMTemplate(BBType.NONE);
+        tL0.setInnerGraph(gL0);
+        
+        int[] expectedN = {6,6,6,6};
+        int[] expectedNThroughout = {6,5,4,3};
+        
+        checkAvailNT(expectedN[0], expectedNThroughout[0], 0, vA);
+
+        DENOPTIMVertex old = tL0;
+        for (int i=1; i<4; i++)
+        {
+            DENOPTIMVertex vNew = new EmptyVertex(1);
+            vNew.addAP(0,1,1);
+            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            gNew.addVertex(old);
+            gNew.appendVertexOnAP(old.getAP(0), vNew.getAP(0));
+            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            template.setInnerGraph(gNew);
+            checkAvailNT(expectedN[i], expectedNThroughout[i], i, vA);
+            old = template;
+        }
+	}
+	
+//-----------------------------------------------------------------------------
+	
+    private void checkAvailNT(int expN, int expNTm, int level, DENOPTIMVertex v)
+    {
+        int n = 0;
+        int nThroughout = 0;
+        for (DENOPTIMAttachmentPoint apA : v.getAttachmentPoints())
+        {
+            if (apA.isAvailable())
+                n++;
+            if (apA.isAvailableThroughout())
+                nThroughout++;
+        }
+        assertEquals(expN,n,"Number of level-available ("+level+"");
+        assertEquals(expNTm,nThroughout,"Number of throughout-available ("+level+")");
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testGetEdbeUserThrougout() throws Exception
+    {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMVertex vA = new EmptyVertex(0);
+        vA.addAP(0,1,1);
+        vA.addAP(1,1,1);
+        vA.addAP(2,1,1);
+        vA.addAP(3,1,1);
+        vA.addAP(4,1,1);
+        
+        DENOPTIMGraph gL0 = new DENOPTIMGraph();
+        gL0.addVertex(vA);
+        DENOPTIMTemplate tL0 = new DENOPTIMTemplate(BBType.NONE);
+        tL0.setInnerGraph(gL0);
+        
+        List<DENOPTIMVertex> newVrtxs = new ArrayList<DENOPTIMVertex>();
+        
+        DENOPTIMVertex old = tL0;
+        for (int i=0; i<5; i++)
+        {
+            DENOPTIMVertex vNew = new EmptyVertex(1);
+            vNew.addAP(i,1,1);
+            newVrtxs.add(vNew);
+            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            gNew.addVertex(old);
+            gNew.appendVertexOnAP(old.getAP(0), vNew.getAP(0));
+            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            template.setInnerGraph(gNew);
+            checkGetEdgeUserThroughput(vA, newVrtxs);
+            old = template;
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private void checkGetEdgeUserThroughput(DENOPTIMVertex v,
+            List<DENOPTIMVertex> onion)
+    {
+        int i = -1;
+        for (DENOPTIMAttachmentPoint apA : v.getAttachmentPoints())
+        {
+            i++;
+            assertTrue(apA.isAvailable(), "APs of vA are all free within the "
+                    + "graph owning vA.");
+            DENOPTIMEdge e = apA.getEdgeUserThroughout();
+            if (e != null)
+            {
+                DENOPTIMAttachmentPoint inAP = e.getSrcAP();
+                while (true)
+                {
+                    DENOPTIMVertex src = inAP.getOwner();
+                    if (src instanceof DENOPTIMTemplate)
+                    {
+                        inAP = ((DENOPTIMTemplate) src).getInnerAPFromOuterAP(
+                                inAP);
+                    } else {
+                        break;
+                    }
+                }
+                /*
+                System.out.println(">>>> "+apA);
+                System.out.println("     "+inAP);
+                System.out.println("---- "+onion.get(i).getAP(0));
+                System.out.println("     "+e.getTrgAP());
+                */
+                assertEquals(apA,inAP,"Src AP identity");
+                assertEquals(onion.get(i).getAP(0),e.getTrgAP(), "Trg AP identity");
+            } else {
+                //System.out.println(apA.toString()+" free");
+            }
+        }
+    }
+    
 //-----------------------------------------------------------------------------
 	
 	@Test
@@ -138,7 +288,7 @@ public class DENOPTIMAttachmentPointTest
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));
-    	assertEquals(ap2.toString(),ap3.toString());
+    	assertEquals(ap2.toStringNoId(),ap3.toStringNoId());
     }
     
 //-----------------------------------------------------------------------------
@@ -160,7 +310,7 @@ public class DENOPTIMAttachmentPointTest
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));
-    	assertEquals(ap2.toString(),ap3.toString());
+    	assertEquals(ap2.toStringNoId(),ap3.toStringNoId());
     }
     
 //-----------------------------------------------------------------------------

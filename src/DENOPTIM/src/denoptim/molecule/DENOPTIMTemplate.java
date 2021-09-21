@@ -216,6 +216,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public void setInnerGraph(DENOPTIMGraph innerGraph) 
             throws IllegalArgumentException 
     {
+        // NB: if you change anything here, remember that we can modify the
+        // inner graph, so the change you are implementing here might need to be
+        // reflected in any place where the inner graph is modified (e.g.,
+        // DENOPTIMGraph.insertSingleVertex()
+        
         mol = null;
         if (!isValidInnerGraph(innerGraph)) {
             throw new IllegalArgumentException("inner graph does not have all" +
@@ -225,9 +230,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         innerGraph.setTemplateJacket(this);
         this.innerToOuterAPs = new APTreeMap();
         for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
-            DENOPTIMAttachmentPoint outerAP = innerAP.clone();
-            outerAP.setOwner(this);
-            innerToOuterAPs.put(innerAP, outerAP);
+            addInnerToOuterAPMapping(innerAP);
         }
     }
 
@@ -250,19 +253,61 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
     
     /**
+     * Adds the projection of an AP in the template's inner graph (i.e., 
+     * innerAP) to the list of APs visible from outside the template (i.e., the
+     * outerAPs). The AP created on the template's surface is a clone of that
+     * given as argument. If the given AP already has a mapping, nothing 
+     * happens.
+     * @param newInnerAP the inner AP to project on template's surface.
+     */
+    public void addInnerToOuterAPMapping(DENOPTIMAttachmentPoint newInnerAP)
+    {
+        if (innerToOuterAPs.containsKey(newInnerAP))
+        {
+            return;
+        }
+        DENOPTIMAttachmentPoint outerAP = newInnerAP.clone();
+        outerAP.setOwner(this);
+        innerToOuterAPs.put(newInnerAP, outerAP);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
      * Replaces a given link between APs on the surface of this template (i.e., 
      * outerAP) and the corresponding APs in the embedded graph 
      * (i.e., innerAPs). This method does not change anything about the outerAP;
-     * it changes only the inner AP.
+     * it changes only the inner AP. If there is now mapping for the oldInnerAP,
+     * then nothing happens.
      * @param oldInnerAP the inner AP to be changed
      * @param newInnerAP the inner AP to change the old one with.
      */
     public void updateInnerApID(DENOPTIMAttachmentPoint oldInnerAP, 
             DENOPTIMAttachmentPoint newInnerAP)
-    {
+    {   
+        if (!innerToOuterAPs.containsKey(oldInnerAP))
+        {
+            return;
+        }
         DENOPTIMAttachmentPoint outerAP = innerToOuterAPs.get(oldInnerAP);
         innerToOuterAPs.remove(oldInnerAP);
         innerToOuterAPs.put(newInnerAP, outerAP);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Removes the mapping of the given inner AP from this template's surface,
+     * if such mapping exists.
+     * @param oldInnerAP the inner AP of t the mapping to remove.
+     */
+    public void removeProjectionOfInnerAP(DENOPTIMAttachmentPoint oldInnerAP)
+    {
+        if (!innerToOuterAPs.containsKey(oldInnerAP))
+        {
+            return;
+        }
+        innerToOuterAPs.remove(oldInnerAP);
     }
     
 //-----------------------------------------------------------------------------
@@ -507,6 +552,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         return null;
     }
     
+//-----------------------------------------------------------------------------
+    
+    public DENOPTIMAttachmentPoint getOuterAPFromInnerAP(
+            DENOPTIMAttachmentPoint innerAP) 
+    {
+        return innerToOuterAPs.get(innerAP);
+    }
+    
 //------------------------------------------------------------------------------
 
     @Override
@@ -517,6 +570,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             List<MutationType> scaffCompatTypes = new ArrayList<MutationType>();
             scaffCompatTypes.add(MutationType.EXTEND);
             scaffCompatTypes.add(MutationType.CHANGELINK);
+            if (!getChilddren().isEmpty())
+            {
+                scaffCompatTypes.add(MutationType.ADDLINK);
+            }
             if (contractLevel == ContractLevel.FREE)
             {
                 //TODO- mutations inside template

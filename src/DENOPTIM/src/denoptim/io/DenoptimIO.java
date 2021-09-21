@@ -1972,7 +1972,7 @@ public class DenoptimIO
         int i = 0;
         for (IAtomContainer mol : mols) {
             i++;
-            DENOPTIMGraph g = readGraphfromSDFileIAC(mol,i,useFS);
+            DENOPTIMGraph g = readGraphFromSDFileIAC(mol,i,useFS);
             lstGraphs.add(g);
         }
         return lstGraphs;
@@ -1994,7 +1994,7 @@ public class DenoptimIO
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
      */
-    public static DENOPTIMGraph readGraphfromSDFileIAC(IAtomContainer mol, 
+    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
             int molId, boolean useFS) throws DENOPTIMException
     {
         // Something very similar is done also in Candidate
@@ -2429,7 +2429,7 @@ public class DenoptimIO
                         if (FragmentSpace.isDefined())
                         {
                             DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-                            t.setInnerGraph(readGraphfromSDFileIAC(mol,i,true));
+                            t.setInnerGraph(readGraphFromSDFileIAC(mol,i,true));
                             v = t;
                         } else {
                             DENOPTIMLogger.appLogger.log(Level.WARNING,

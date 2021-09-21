@@ -1,75 +1,69 @@
 
-  CDK     09212108313D
+  CDK     09172110193D
 
- 31 31  0  0  0  0  0  0  0  0999 V2000
-    3.2947   -0.2586   -0.0305 N   0  0  0  0  0  2  0  0  0  0  0  0
-    2.0896    0.5813   -0.0116 C   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8463   -0.3105   -0.0170 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.3556    0.5272    0.0020 N   0  0  0  0  0  2  0  0  0  0  0  0
-   -1.5758   -0.0451    0.0009 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.6792   -1.2564   -0.0157 O   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.6814    0.7255    0.0183 N   0  0  0  0  0  2  0  0  0  0  0  0
-    2.0906    1.1979    0.8873 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.0802    1.2231   -0.8925 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8454   -0.9271   -0.9158 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8557   -0.9523    0.8639 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -3.7634    0.2181    0.0174 P   0  0  0  0  0  2  0  0  0  0  0  0
-   -4.3263   -1.7183   -0.3483 P   0  0  0  0  0  0  0  0  0  0  0  0
-   -3.5833   -0.7789   -0.7233 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.5414   -1.0932   -0.6625 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -3.8236   -0.5145   -1.7531 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -5.7065   -2.9291   -1.2590 P   0  0  0  0  0  0  0  0  0  0  0  0
-   -4.6907   -2.2151   -1.4417 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -3.8855   -2.8263   -1.8494 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -4.9301   -1.4151   -2.1424 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -6.3908   -2.6752   -2.2799 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -6.9711   -3.5555   -2.5565 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -7.0664   -1.8466   -2.0676 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -5.2623   -4.0929   -1.5210 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -3.4926   -2.5641    0.0575 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -3.8396   -3.5662   -0.1946 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.5293   -2.3825   -0.4193 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.1635    0.3301   -0.0272 C   0  0  0  0  0  0  0  0  0  0  0  0
-    4.9005   -0.1060   -0.7015 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.9197    1.3394   -0.3590 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.5793    0.3692    0.9990 H   0  0  0  0  0  0  0  0  0  0  0  0
-  1  2  1  0  0  0  0 
+ 28 28  0  0  0  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0550 N   0  0  0  0  0  2  0  0  0  0  0  0
+   -0.0133   -0.9986   -0.2674 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.7539   -1.4805   -0.7245 Si  0  0  0  0  0  2  0  0  0  0  0  0
+   -1.7775   -3.2532   -1.2969 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.3436   -1.6443    0.5350 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.6343   -1.1082   -1.1373 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1298   -3.3628   -2.1668 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.4206   -3.8989   -0.4945 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.9500   -3.5778   -1.6048 P   0  0  0  0  0  2  0  0  0  0  0  0
+   -3.5081   -5.5019   -2.0371 P   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.7579   -4.5529   -2.3713 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.7175   -4.8703   -2.3016 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.9800   -4.2580   -3.3969 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -4.8805   -6.6734   -3.0088 P   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.8539   -5.9657   -3.1508 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.0463   -6.5746   -3.5574 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -4.0700   -5.1451   -3.8349 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -5.5401   -6.3855   -4.0370 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -6.1101   -7.2571   -4.3589 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -6.2239   -5.5668   -3.8125 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -4.4426   -7.8346   -3.2920 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.6824   -6.3604   -1.6419 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.0463   -7.3568   -1.8926 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.7217   -6.1914   -2.1283 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.8582    0.5109   -0.2674 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.4521   -0.1432   -0.9058 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.4500    0.8092    0.5979 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5589    1.4119   -0.8385 H   0  0  0  0  0  0  0  0  0  0  0  0
   2  3  1  0  0  0  0 
   3  4  1  0  0  0  0 
-  4  5  1  0  0  0  0 
-  5  6  2  0  0  0  0 
-  5  7  1  0  0  0  0 
-  2  8  1  0  0  0  0 
-  2  9  1  0  0  0  0 
-  3 10  1  0  0  0  0 
-  3 11  1  0  0  0  0 
-  7 12  1  0  0  0  0 
+  2  5  1  0  0  0  0 
+  2  6  1  0  0  0  0 
+  4  7  1  0  0  0  0 
+  4  8  1  0  0  0  0 
+  1  2  1  0  0  0  0 
+  4  9  1  0  0  0  0 
+ 11 12  1  0  0  0  0 
+ 11 13  1  0  0  0  0 
+ 10 11  1  0  0  0  0 
+  9 11  1  0  0  0  0 
+ 15 16  1  0  0  0  0 
+ 15 17  1  0  0  0  0 
  14 15  1  0  0  0  0 
- 14 16  1  0  0  0  0 
- 13 14  1  0  0  0  0 
- 12 14  1  0  0  0  0 
+ 10 15  1  0  0  0  0 
  18 19  1  0  0  0  0 
  18 20  1  0  0  0  0 
- 17 18  1  0  0  0  0 
- 13 18  1  0  0  0  0 
- 21 22  1  0  0  0  0 
- 21 23  1  0  0  0  0 
- 17 21  1  0  0  0  0 
- 17 24  1  0  0  0  0 
+ 14 18  1  0  0  0  0 
+ 14 21  1  0  0  0  0 
+ 22 23  1  0  0  0  0 
+ 22 24  1  0  0  0  0 
+ 10 22  1  0  0  0  0 
  25 26  1  0  0  0  0 
  25 27  1  0  0  0  0 
- 13 25  1  0  0  0  0 
- 28 29  1  0  0  0  0 
- 28 30  1  0  0  0  0 
-  1 28  1  0  0  0  0 
- 28 31  1  0  0  0  0 
- 21 25  1  0  0  0  0 
+  1 25  1  0  0  0  0 
+ 25 28  1  0  0  0  0 
+ 18 22  1  0  0  0  0 
 M  END
 > <GCODE>
 2
 
 > <GraphENC>
-2 1_2_0_-1,2_5_1_0,4_3_1_0,9_1_2_1,11_5_1_1,13_3_1_2,16_3_1_1,17_6_1_3,18_7_1_2,19_1_2_2, 1_4_2_2_1_p:0_c:0,1_0_4_0_1_n:0_c:0,4_1_9_0_1_c:0_hyd:1,2_1_11_2_1_p:0_c:0,11_1_13_0_1_p:0_c:0,2_0_16_0_1_p:0_c:0,13_1_17_0_1_c:0_ATplus:0,16_1_18_0_1_c:0_ATminus:0,11_0_19_0_1_p:0_hyd:1, DENOPTIMRing [vertices=[17_6_1_3, 13_3_1_2, 11_5_1_1, 16_3_1_1, 18_7_1_2]] 
+2 1_2_0_-1,2_5_1_0,4_3_1_0,9_1_2_1,11_5_1_1,13_3_1_2,16_3_1_1,17_6_1_3,18_7_1_2,19_1_2_2, 1_4_2_2_1_p:0_c:0,1_3_4_0_1_n:0_c:0,4_1_9_0_1_c:0_hyd:1,2_1_11_2_1_p:0_c:0,11_1_13_0_1_p:0_c:0,2_0_16_0_1_p:0_c:0,13_1_17_0_1_c:0_ATplus:0,16_1_18_0_1_c:0_ATminus:0,11_0_19_0_1_p:0_hyd:1, DENOPTIMRing [vertices=[17_6_1_3, 13_3_1_2, 11_5_1_1, 16_3_1_1, 18_7_1_2]] 
 
 > <GraphJson>
 {
@@ -82,9 +76,83 @@ M  END
           {
             "lstAPs": [
               {
+                "id": 305,
+                "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
+                "totalConnections": 1,
+                "freeConnections": 0,
+                "apClass": {
+                  "rule": "n",
+                  "subClass": 0
+                },
+                "dirVec": [
+                  -0.0128,
+                  -0.9601,
+                  -0.255
+                ]
+              },
+              {
+                "id": 306,
+                "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
+                "totalConnections": 1,
+                "freeConnections": 1,
+                "apClass": {
+                  "rule": "n",
+                  "subClass": 0
+                },
+                "dirVec": [
+                  0.8379,
+                  0.4691,
+                  -0.255
+                ]
+              },
+              {
+                "id": 307,
+                "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
+                "totalConnections": 1,
+                "freeConnections": 1,
+                "apClass": {
+                  "rule": "n",
+                  "subClass": 0
+                },
+                "dirVec": [
+                  -0.8251,
+                  0.4912,
+                  -0.255
+                ]
+              }
+            ],
+            "lstSymAPs": [
+              {
+                "symIds": [
+                  0,
+                  1,
+                  2
+                ]
+              }
+            ],
+            "fragmentType": "Molecular_fragment",
+            "vertexId": 3,
+            "buildingBlockId": 0,
+            "buildingBlockType": "FRAGMENT",
+            "isRCV": false,
+            "level": -99,
+            "allowedMutationTypes": [
+              "EXTEND",
+              "CHANGEBRANCH",
+              "DELETE",
+              "CHANGELINK",
+              "ADDLINK"
+            ]
+          },
+          {
+            "lstAPs": [
+              {
                 "id": 308,
                 "atomPositionNumber": 0,
-                "atomPositionNumberInMol": 11,
+                "atomPositionNumberInMol": 8,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -92,15 +160,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -3.55964493096657,
-                  -0.9099740251018513,
-                  -0.8206616805506968
+                  -2.7326985046081615,
+                  -4.681043629544151,
+                  -2.4720620514866085
                 ]
               },
               {
                 "id": 309,
                 "atomPositionNumber": 0,
-                "atomPositionNumberInMol": 11,
+                "atomPositionNumberInMol": 8,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -108,15 +176,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -2.4777184189249573,
-                  0.8210213972956963,
-                  0.01846233303740448
+                  -1.623298195512956,
+                  -3.210516890133067,
+                  -1.2564053142221505
                 ]
               },
               {
                 "id": 310,
                 "atomPositionNumber": 0,
-                "atomPositionNumberInMol": 11,
+                "atomPositionNumberInMol": 8,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -124,9 +192,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -4.496782966501052,
-                  1.0882085924745255,
-                  -0.8319642983975534
+                  -3.3104077050916763,
+                  -2.5514258799517684,
+                  -2.517554251892577
                 ]
               }
             ],
@@ -154,83 +222,67 @@ M  END
           {
             "lstAPs": [
               {
-                "id": 108,
+                "id": 101,
                 "atomPositionNumber": 0,
-                "atomPositionNumberInMol": 0,
-                "totalConnections": 1,
-                "freeConnections": 1,
-                "apClass": {
-                  "rule": "n",
-                  "subClass": 0
-                },
-                "dirVec": [
-                  4.1299,
-                  0.3074,
-                  -0.0273
-                ]
-              },
-              {
-                "id": 109,
-                "atomPositionNumber": 0,
-                "atomPositionNumberInMol": 0,
-                "totalConnections": 1,
-                "freeConnections": 1,
-                "apClass": {
-                  "rule": "n",
-                  "subClass": 0
-                },
-                "dirVec": [
-                  3.295,
-                  -0.908,
-                  0.7417
-                ]
-              },
-              {
-                "id": 110,
-                "atomPositionNumber": 3,
-                "atomPositionNumberInMol": 3,
-                "totalConnections": 1,
-                "freeConnections": 1,
-                "apClass": {
-                  "rule": "n",
-                  "subClass": 0
-                },
-                "dirVec": [
-                  -0.273,
-                  1.4935,
-                  0.0151
-                ]
-              },
-              {
-                "id": 111,
-                "atomPositionNumber": 6,
-                "atomPositionNumberInMol": 6,
-                "totalConnections": 1,
-                "freeConnections": 1,
-                "apClass": {
-                  "rule": "n",
-                  "subClass": 0
-                },
-                "dirVec": [
-                  -2.599,
-                  1.6918,
-                  0.0315
-                ]
-              },
-              {
-                "id": 112,
-                "atomPositionNumber": 6,
-                "atomPositionNumberInMol": 6,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
-                  "rule": "n",
+                  "rule": "c",
                   "subClass": 0
                 },
                 "dirVec": [
-                  -3.5597,
-                  0.3136,
-                  0.0176
+                  5.139152129542022E-4,
+                  0.038547655934163205,
+                  0.06744638406373357
+                ]
+              },
+              {
+                "id": 102,
+                "atomPositionNumber": 1,
+                "atomPositionNumberInMol": 2,
+                "totalConnections": 1,
+                "freeConnections": 1,
+                "apClass": {
+                  "rule": "c",
+                  "subClass": 0
+                },
+                "dirVec": [
+                  -2.240168729642807,
+                  -0.6008294798263727,
+                  -1.8176879117647742
+                ]
+              },
+              {
+                "id": 103,
+                "atomPositionNumber": 1,
+                "atomPositionNumberInMol": 2,
+                "totalConnections": 0,
+                "freeConnections": 0,
+                "apClass": {
+                  "rule": "si",
+                  "subClass": 0
+                },
+                "dirVec": [
+                  -2.6362613977944065,
+                  -1.3311528360224383,
+                  0.46054899286807405
+                ]
+              },
+              {
+                "id": 104,
+                "atomPositionNumber": 2,
+                "atomPositionNumberInMol": 3,
+                "totalConnections": 1,
+                "freeConnections": 0,
+                "apClass": {
+                  "rule": "c",
+                  "subClass": 0
+                },
+                "dirVec": [
+                  -2.7958443419035177,
+                  -3.5351483046923793,
+                  -1.564328881975699
                 ]
               }
             ],
@@ -238,18 +290,16 @@ M  END
               {
                 "symIds": [
                   0,
-                  1,
-                  3,
-                  4
+                  3
                 ]
               }
             ],
             "fragmentType": "Molecular_fragment",
             "vertexId": 5,
-            "buildingBlockId": 12,
+            "buildingBlockId": 11,
             "buildingBlockType": "FRAGMENT",
             "isRCV": false,
-            "level": -99,
+            "level": -98,
             "allowedMutationTypes": [
               "DELETE",
               "EXTEND",
@@ -261,7 +311,12 @@ M  END
         ],
         "gEdges": [
           {
-            "srcAPID": 112,
+            "srcAPID": 305,
+            "trgAPID": 101,
+            "bondType": "SINGLE"
+          },
+          {
+            "srcAPID": 104,
             "trgAPID": 309,
             "bondType": "SINGLE"
           }
@@ -272,23 +327,39 @@ M  END
       "contractLevel": "FREE",
       "requiredAPs": [],
       "innerToOuterAPs": {
-        "108": {
-          "id": 428,
-          "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 0,
+        "102": {
+          "id": 105,
+          "atomPositionNumber": 2,
+          "atomPositionNumberInMol": 2,
           "totalConnections": 1,
-          "freeConnections": 0,
+          "freeConnections": 1,
           "apClass": {
-            "rule": "n",
+            "rule": "c",
             "subClass": 0
           },
           "dirVec": [
-            4.1299,
-            0.3074,
-            -0.0273
+            -2.240168729642807,
+            -0.6008294798263727,
+            -1.8176879117647742
           ]
         },
-        "109": {
+        "103": {
+          "id": 106,
+          "atomPositionNumber": 2,
+          "atomPositionNumberInMol": 2,
+          "totalConnections": 0,
+          "freeConnections": 0,
+          "apClass": {
+            "rule": "si",
+            "subClass": 0
+          },
+          "dirVec": [
+            -2.6362613977944065,
+            -1.3311528360224383,
+            0.46054899286807405
+          ]
+        },
+        "306": {
           "id": 427,
           "atomPositionNumber": 0,
           "atomPositionNumberInMol": 0,
@@ -299,47 +370,31 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            3.295,
-            -0.908,
-            0.7417
+            0.8379,
+            0.4691,
+            -0.255
           ]
         },
-        "110": {
-          "id": 113,
-          "atomPositionNumber": 3,
-          "atomPositionNumberInMol": 3,
+        "307": {
+          "id": 428,
+          "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
-          "freeConnections": 1,
+          "freeConnections": 0,
           "apClass": {
             "rule": "n",
             "subClass": 0
           },
           "dirVec": [
-            -0.273,
-            1.4935,
-            0.0151
-          ]
-        },
-        "111": {
-          "id": 114,
-          "atomPositionNumber": 6,
-          "atomPositionNumberInMol": 6,
-          "totalConnections": 1,
-          "freeConnections": 1,
-          "apClass": {
-            "rule": "n",
-            "subClass": 0
-          },
-          "dirVec": [
-            -2.599,
-            1.6918,
-            0.0315
+            -0.8251,
+            0.4912,
+            -0.255
           ]
         },
         "308": {
           "id": 429,
-          "atomPositionNumber": 11,
-          "atomPositionNumberInMol": 11,
+          "atomPositionNumber": 8,
+          "atomPositionNumberInMol": 8,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -347,15 +402,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -3.55964493096657,
-            -0.9099740251018513,
-            -0.8206616805506968
+            -2.7326985046081615,
+            -4.681043629544151,
+            -2.4720620514866085
           ]
         },
         "310": {
           "id": 430,
-          "atomPositionNumber": 11,
-          "atomPositionNumberInMol": 11,
+          "atomPositionNumber": 8,
+          "atomPositionNumberInMol": 8,
           "totalConnections": 1,
           "freeConnections": 1,
           "apClass": {
@@ -363,9 +418,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -4.496782966501052,
-            1.0882085924745255,
-            -0.8319642983975534
+            -3.3104077050916763,
+            -2.5514258799517684,
+            -2.517554251892577
           ]
         }
       },
@@ -528,7 +583,7 @@ M  END
         "335": {
           "id": 431,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 12,
+          "atomPositionNumberInMol": 9,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -536,15 +591,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -3.3829682131084935,
-            -2.6753129319508333,
-            0.11081711629884869
+            -2.573837152178942,
+            -6.47324462267709,
+            -1.5899806841707536
           ]
         },
         "337": {
           "id": 432,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 12,
+          "atomPositionNumberInMol": 9,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -552,15 +607,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -4.738566030854643,
-            -2.2803689916339933,
-            -1.585491540912122
+            -3.8993255756373157,
+            -6.026718431584552,
+            -3.2972545403362568
           ]
         },
         "339": {
           "id": 433,
           "atomPositionNumber": 1,
-          "atomPositionNumberInMol": 13,
+          "atomPositionNumberInMol": 10,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -568,9 +623,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -3.739708140642869,
-            0.0870030859796142,
-            -0.07994635780190087
+            -2.924758710314893,
+            -3.7060197499585907,
+            -1.7055852935376534
           ]
         }
       },
@@ -590,7 +645,7 @@ M  END
         {
           "id": 436,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 27,
+          "atomPositionNumberInMol": 24,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -598,15 +653,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            3.2611380997091257,
-            -0.28134429545574086,
-            -0.030628589656286717
+            0.03310303069220693,
+            -0.019706955127877804,
+            0.06743720702288705
           ]
         },
         {
           "id": 437,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 27,
+          "atomPositionNumberInMol": 24,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -614,9 +669,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            4.572545032814928,
-            0.36851898824390567,
-            0.9824309191096813
+            -0.5637811821558997,
+            1.3973379547336138,
+            -0.829286250843769
           ]
         }
       ],
@@ -645,7 +700,7 @@ M  END
         {
           "id": 441,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 30,
+          "atomPositionNumberInMol": 27,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -653,9 +708,9 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            4.15673502436079,
-            0.32951327017819304,
-            -0.04377309608678821
+            -0.8630444408818421,
+            0.4963306725074313,
+            -0.258198280974042
           ]
         }
       ],
@@ -820,7 +875,7 @@ M  END
         "534": {
           "id": 443,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 16,
+          "atomPositionNumberInMol": 13,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -828,15 +883,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -5.2110162932656,
-            -4.227388652265339,
-            -1.5512311738526752
+            -4.392049806557292,
+            -7.968814095697326,
+            -3.32474719002522
           ]
         },
         "536": {
           "id": 444,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 16,
+          "atomPositionNumberInMol": 13,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -844,15 +899,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -6.480815112568378,
-            -2.6418134242351554,
-            -2.4141630221201376
+            -5.62686003267523,
+            -6.347621256420101,
+            -4.172135355714843
           ]
         },
         "538": {
           "id": 445,
           "atomPositionNumber": 1,
-          "atomPositionNumberInMol": 17,
+          "atomPositionNumberInMol": 14,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -860,9 +915,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -4.374165464312618,
-            -1.7836354749391568,
-            -0.4920829499235418
+            -3.553591667692414,
+            -5.562848406712634,
+            -2.1835369049931366
           ]
         }
       },
@@ -882,7 +937,7 @@ M  END
         {
           "id": 449,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 20,
+          "atomPositionNumberInMol": 17,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -890,15 +945,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -5.796436899921018,
-            -2.895706412735564,
-            -1.393261891355883
+            -4.967258417377277,
+            -6.635580559853126,
+            -3.1439916619567687
           ]
         },
         {
           "id": 450,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 20,
+          "atomPositionNumberInMol": 17,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -906,9 +961,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -5.729330351872212,
-            -2.4029937409367244,
-            -3.1023935229916155
+            -4.8593092577666805,
+            -6.082467236298622,
+            -4.832426626723212
           ]
         }
       ],
@@ -937,7 +992,7 @@ M  END
         {
           "id": 452,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 24,
+          "atomPositionNumberInMol": 21,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -945,15 +1000,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -4.216647468606271,
-            -1.82952298092258,
-            -0.2949704716661167
+            -3.399572403432459,
+            -5.614729810458234,
+            -1.9851501679270822
           ]
         },
         {
           "id": 453,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 24,
+          "atomPositionNumberInMol": 21,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -961,9 +1016,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -3.384703899287885,
-            -2.478218844766428,
-            1.138718327795492
+            -2.562065291703867,
+            -6.2785931993242645,
+            -0.5616800281885121
           ]
         }
       ],
@@ -992,7 +1047,7 @@ M  END
         {
           "id": 454,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 23,
+          "atomPositionNumberInMol": 20,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1000,9 +1055,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -5.729330351872212,
-            -2.4029937409367244,
-            -3.1023935229916155
+            -4.8593092577666805,
+            -6.082467236298622,
+            -4.832426626723212
           ]
         }
       ],
@@ -1024,7 +1079,7 @@ M  END
         {
           "id": 455,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 27,
+          "atomPositionNumberInMol": 24,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1032,9 +1087,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -3.384703899287885,
-            -2.478218844766428,
-            1.138718327795492
+            -2.562065291703867,
+            -6.2785931993242645,
+            -0.5616800281885121
           ]
         }
       ],
@@ -1056,7 +1111,7 @@ M  END
         {
           "id": 215,
           "atomPositionNumber": 0,
-          "atomPositionNumberInMol": 23,
+          "atomPositionNumberInMol": 20,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1064,9 +1119,9 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            -5.65513976990202,
-            -3.0635585174442963,
-            -1.2892969724664045
+            -4.82993922638274,
+            -6.8076084945970035,
+            -3.0415331736855915
           ]
         }
       ],

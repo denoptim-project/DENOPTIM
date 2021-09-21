@@ -456,13 +456,52 @@ Comparable<DENOPTIMAttachmentPoint>
 //------------------------------------------------------------------------------
 
     /**
-     * Check availability of this attachment point.
-     * @return <code>true</code> if the attachment point has no user
+     * Check availability of this attachment point. Does not account for
+     * embedding of the vertex in a template, i.e., this AP can be available
+     * in the graph owning the vertex this AP belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP might be projected on the
+     * template's surface and used to make an edge at that level. To account for
+     * such possibility use 
+     * {@link DENOPTIMAttachmentPoint#isAvailableThroughout()}
+     * @return <code>true</code> if the attachment point has no user.
      */
 
     public boolean isAvailable()
     {
         return user == null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check availability of this attachment point throughout the graph level, 
+     * i.e., check also across the inner graph template boundary. 
+     * This method does account for
+     * embedding of the vertex in a template, i.e., this AP can be available
+     * in the graph owning the vertex this AP belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP is then projected on the
+     * template's surface and used to make an edge that uses the template as a 
+     * single vertex. To ignore this possibility and consider only edges
+     * that belong to the graph owning the AP's vertex, use 
+     * {@link DENOPTIMAttachmentPoint#isAvailable()}.
+     * @return <code>true</code> if the attachment point has no user.
+     */
+
+    public boolean isAvailableThroughout()
+    {
+        if (user == null)
+        {
+            if (owner.getGraphOwner() != null 
+                    && owner.getGraphOwner().templateJacket != null)
+            {
+               return owner.getGraphOwner().templateJacket
+                    .getOuterAPFromInnerAP(this).isAvailableThroughout();
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -745,6 +784,33 @@ Comparable<DENOPTIMAttachmentPoint>
         }
         return sb.toString();
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Produces a string with the information included in this object.
+     * @return the string
+     */
+    
+    public String toStringNoId()
+    {
+        Map<String,Object> pars = new HashMap<String,Object>();
+        pars.put("atomPositionNumber", atomPositionNumber);
+        pars.put("totalConnections",totalConnections);
+        pars.put("freeConnections",freeConnections);
+        if (apClass != null)
+        {
+            pars.put("apClass",apClass);
+        }
+        if (dirVec != null)
+        {
+            pars.put("dirVec.x",dirVec[0]);
+            pars.put("dirVec.y",dirVec[1]);
+            pars.put("dirVec.z",dirVec[2]);
+        }
+
+        return pars.toString();
+    }
 
 //------------------------------------------------------------------------------
 
@@ -758,6 +824,7 @@ Comparable<DENOPTIMAttachmentPoint>
     {
         Map<String,Object> pars = new HashMap<String,Object>();
         pars.put("atomPositionNumber", atomPositionNumber);
+        pars.put("id", id);
         pars.put("totalConnections",totalConnections);
         pars.put("freeConnections",freeConnections);
         if (apClass != null)
@@ -808,9 +875,48 @@ Comparable<DENOPTIMAttachmentPoint>
     
     /**
      * Gets the edge that is using this AP, or null if no edge is using this AP.
-     * @return
+     * Does NOT account for embedding of the vertex in a template, i.e., 
+     * this AP can be available in the graph (if any) owning the vertex this AP 
+     * belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP is then projected on the
+     * template's surface and might be used to make an edge that uses the 
+     * template as a single vertex. This method considers only any edge user
+     * that belongs to the graph owning the vertex that own this AP, if any such
+     * owners exist. See {@link DENOPTIMAttachmentPoint#getEdgeUserThroughout()}
+     * to crossing the template boundary.
+     * @return the edge that is using this AP.
      */
     public DENOPTIMEdge getEdgeUser() {
+        return user;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets the edge that is using this AP, or null if no edge is using this AP.
+     * This method does account for embedding of the vertex in a template, i.e., 
+     * this AP can be available in the graph (if any) owning the vertex this AP 
+     * belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP is then projected on the
+     * template's surface and might be used to make an edge that uses the 
+     * template as a single vertex. This method considers any level of template
+     * embedding. See {@link DENOPTIMAttachmentPoint#getEdgeUser()}
+     * to remain within the template boundary.
+     * @return the edge that is using this AP.
+     */
+
+    public DENOPTIMEdge getEdgeUserThroughout()
+    {
+        if (user == null)
+        {
+            if (owner != null 
+                    && owner.getGraphOwner() != null 
+                    && owner.getGraphOwner().templateJacket != null)
+            {
+               return owner.getGraphOwner().templateJacket
+                    .getOuterAPFromInnerAP(this).getEdgeUserThroughout();
+            } 
+        } 
         return user;
     }
     

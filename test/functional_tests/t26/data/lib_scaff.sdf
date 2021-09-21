@@ -97,7 +97,8 @@ M  END
         "EXTEND",
         "DELETE",
         "CHANGEBRANCH",
-        "CHANGELINK"
+        "CHANGELINK",
+        "ADDLINK"
       ]
     },
     {

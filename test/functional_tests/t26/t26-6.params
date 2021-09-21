@@ -1,14 +1,13 @@
 #
-# Substitution inside a template with a vertex having more APs than the original
+# adding a vertex in between two connected vertices
 #
 TESTGENOPS-OP=MUTATION
-TESTGENOPS-inpFile=graph-4.sdf
-TESTGENOPS-outFile=graph_mut-4.sdf
-TESTGENOPS-MutationTarget=1,3
-#TESTGENOPS-MutationType=EXPAND
-#TESTGENOPS-MutationType=CONTRACT
-TESTGENOPS-MutationType=CHANGELINK
-TESTGENOPS-NewVertexMolID=12
+TESTGENOPS-inpFile=graph-6.sdf
+TESTGENOPS-outFile=graph_mut-6.sdf
+TESTGENOPS-MutationTarget=2
+TESTGENOPS-MutationType=ADDLINK
+TESTGENOPS-ApIdOnTargetVertex=1
+TESTGENOPS-NewVertexMolID=11
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=/tmp/denoptim_test/t26/lib_scaff.sdf

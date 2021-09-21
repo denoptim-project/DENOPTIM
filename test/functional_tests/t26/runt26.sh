@@ -16,8 +16,8 @@ do
 done
 
 #Run sub tests
-nSubTests=4
-elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ')
+nSubTests=7
+elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ' 'Si ')
 totChecks=0
 for i in $(seq 1 $nSubTests)
 do
@@ -46,6 +46,8 @@ do
             exit -1
         fi
         nChecks=$((nChecks+1))
+        #Only for debugging
+        #echo "$i -> $el $nEl $nElRef"
     done
 
     if [ "$nChecks" -ne "${#elSymbols[@]}" ]
@@ -53,6 +55,22 @@ do
         echo "Test 't26' NOT PASSED (sympton: wrong number of checks $nChecks in step $i)"
         exit -1
     fi
+
+    # Check of graph features
+    g=$(grep -A 1 "GraphENC" "graph_mut-$i.sdf" | tail -n 1)
+    gRef=$(grep -A 1 "GraphENC" "expected_output/graph_mut-$i.sdf" | tail -n 1)
+    string=('DENOPTIMRing' 'SymmetricSet')
+    for s in "${string[@]}"
+    do
+        ng=$(echo "$g" | grep -c "$s")
+        ngRef=$(echo "$gRef" | grep -c "$s")
+        if [ "$ng" -ne "$ngRef" ]
+        then
+            echo "Test 't26' NOT PASSED (sympton: wrong number of $s in step $i)"
+            exit -1
+        fi
+    done
+
     totChecks=$((totChecks+1))
 done
 

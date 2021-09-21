@@ -1,14 +1,12 @@
 #
-# Substitution inside a template with a vertex having more APs than the original
+# Substitution inside a template: new vertex having less APs than original
 #
 TESTGENOPS-OP=MUTATION
-TESTGENOPS-inpFile=graph-4.sdf
-TESTGENOPS-outFile=graph_mut-4.sdf
+TESTGENOPS-inpFile=graph-7.sdf
+TESTGENOPS-outFile=graph_mut-7.sdf
 TESTGENOPS-MutationTarget=1,3
-#TESTGENOPS-MutationType=EXPAND
-#TESTGENOPS-MutationType=CONTRACT
 TESTGENOPS-MutationType=CHANGELINK
-TESTGENOPS-NewVertexMolID=12
+TESTGENOPS-NewVertexMolID=13
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=/tmp/denoptim_test/t26/lib_scaff.sdf

@@ -116,6 +116,17 @@ public class DENOPTIMRing implements Serializable
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Returns the index of the first occurrence of the specified element in 
+     * this ring, or -1 if this list does not contain the element.
+     */
+    public int indexOf(DENOPTIMVertex v)
+    {
+        return vertices.indexOf(v);
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * @return the size of the list
@@ -231,7 +242,7 @@ public class DENOPTIMRing implements Serializable
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced a vertex that belong to this ring with a new one.
+     * Replaces a vertex that belong to this ring with a new one.
      * @param oldVrtx the vertex to be replaced.
      * @param newVrtx the vertex the replace the old one with.
      */
@@ -239,6 +250,37 @@ public class DENOPTIMRing implements Serializable
     {
         int idx = vertices.indexOf(oldVrtx);
         vertices.set(idx, newVrtx);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Adds a vertex to the ring, and in between two defined vertexes.
+     * @param newLink vertex to add to this ring.
+     * @param vA one of the vertexes in between which the new vertex should
+     * in inserted.
+     * @param vB one of the vertexes in between which the new vertex should
+     * in inserted.
+     * @return <code>true</code> if the vertex is inserted, or 
+     * <code>false</code> if the operation cannot be performed for any reason,
+     * e.g., the vertex is already contained in this ring, or either of the two
+     * reference vertexes are not themselves contained here.
+     */
+    public boolean insertVertex(DENOPTIMVertex newLink, DENOPTIMVertex vA,
+            DENOPTIMVertex vB)
+    {
+        if (this.contains(newLink) || !this.contains(vA) || !this.contains(vB))
+            return false;
+        
+        int idA = vertices.indexOf(vA);
+        int idB = vertices.indexOf(vB);
+        if (idA < idB)
+        {
+            vertices.add(idB,newLink);
+        } else {
+            vertices.add(idA,newLink);
+        }
+        return true;
     }
 
 //------------------------------------------------------------------------------

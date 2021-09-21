@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
@@ -150,7 +151,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     private int level = -99; //Initialised to meaningless value
     
     /**
-     * Map of customizable properties
+     * Map of customisable properties
      */
     private Map<Object, Object> properties;
 
@@ -374,6 +375,32 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         return n;
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Counts the number of attachment points that are availability throughout 
+     * the graph level, i.e., checks also across the inner graph template 
+     * boundary. This method does account for embedding of the vertex in a 
+     * template, i.e., APs can be available in the graph owning this vertex,
+     * but if the graph is itself the inner graph of a template, the AP is 
+     * then projected on the template's surface and used to make an edge that 
+     * uses the template as a single vertex. To ignore this possibility and 
+     * consider only edges that belong to the graph owning this vertex, use
+     * {@Link DENOPTIMVertex#getFreeAPCount()}.
+     * @return the number of APs that are not used by any edge, whether within
+     * the graph owning this vertex (if any) or within a graph owning the
+     * template embedding the graph that owns this vertex.
+     */
+    public int getFreeAPCountThroughout()
+    {
+        int n = 0;
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        {
+            if (ap.isAvailableThroughout())
+                n++;
+        }
+        return n;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -695,6 +722,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     public List<MutationType> getMutationTypes()
     {
+        if (owner != null && getChilddren().isEmpty())
+        {
+            return allowedMutationTypes.stream()
+                    .filter(t -> t != MutationType.ADDLINK)
+                    .collect(Collectors.toList());
+        }
         return allowedMutationTypes;
     }
     
@@ -1005,6 +1038,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                     {
                         cLstSymAPs.add(ss.clone());
                     }
+
                     fragWithMol.setMutationTypes(frag.getMutationTypes());
                     fragWithMol.setSymmetricAPSets(cLstSymAPs);
                     fragWithMol.setAsRCV(frag.isRCV());

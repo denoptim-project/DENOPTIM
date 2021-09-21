@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.APClass;
 import denoptim.molecule.APMapping;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
@@ -34,20 +36,44 @@ public class GraphLinkFinder
      * chosen link. This mapping is reported and integer indexes, where each int
      * is the result of {@link DENOPTIMVertex#getIndexInOwner()}. 
      * In case of multiple possible AP mappings, the
-     * result reported here is chosen randomly among the possible ones.
+     * result reported here is randomly chosen among the possible ones. This
+     * field is null in case the constructor was asked to work on an
+     * edge rather than a vertex.
      */
-    private Map<Integer,Integer> chosenAPMap;
+    //TODO: consider getting rid of this and use only chosenAPMap
+    private Map<Integer,Integer> chosenAPMapInt;
     
     /**
      * The collection of all alternative vertex that can replace the 
-     * original vertex, with the consistent mappings.
+     * original vertex, with the consistent mappings. 
+     * This
+     * field is null in case the constructor was asked to work on an
+     * edge rather than a vertex.
      */
-    private Map<DENOPTIMVertex,List<Map<Integer,Integer>>> allCompatLinks = 
+    private Map<DENOPTIMVertex,List<Map<Integer,Integer>>> allCompatLinksInt = 
             new HashMap<DENOPTIMVertex,List<Map<Integer,Integer>>>();
     
     /**
+     * The mapping of attachment points between the original vertex/es and the
+     * chosen link. 
+     * In case of multiple possible AP mappings, the
+     * result reported here is randomly chosen among the possible ones. 
+     */
+    private APMapping chosenAPMap;
+    
+    /**
+     * The collection of all alternative vertex that can replace the 
+     * original vertex, with the consistent mappings. 
+     * This
+     * field is null in case the constructor was asked to work on an
+     * edge rather than a vertex.
+     */
+    private Map<DENOPTIMVertex,List<APMapping>> allCompatLinks = 
+            new HashMap<DENOPTIMVertex,List<APMapping>>();
+    
+    /**
      * Maximum number of combinations. This prevents combinatorial explosion, 
-     * but it is ignored is the constructor is required to screen all.
+     * but it is ignored if the constructor is required to screen all.
      * Remember that the combinations are anyway randomised, so even with the 
      * maximum limit on the number of combination to consider, there is no
      * systematic exclusion of specific combinations.
@@ -97,41 +123,21 @@ public class GraphLinkFinder
      * Constructor that specifies which vertex has to be replaced. The search 
      * for an alternative building block takes place within this constructor.
      * @param originalLink the vertex to replace.
-     * @param screenAll use <code>true</code> to NOT stop at the first 
-     * compatible
-     * vertex, but screen all the library of building blocks.
      * @param newBuildingBlockID the index specifying which building block to 
      * use as replacement. This can be -1, in which case, this method will
      * search suitable building block candidates and choose randomly.
+     * @param screenAll use <code>true</code> to NOT stop at the first 
+     * compatible
+     * vertex, but screen all the library of building blocks.
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
     public GraphLinkFinder(DENOPTIMVertex originalLink, int newBuildingBlockID,
             boolean screenAll) throws DENOPTIMException 
     {   
-        BBType bbt = originalLink.getBuildingBlockType();
-        ArrayList<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>();
-        if (newBuildingBlockID<0)
-        {
-            switch (bbt)
-            {
-                //TODO: limit search to building blocks with a minimal number of APs
-                case FRAGMENT:
-                    candidates.addAll(FragmentSpace.getFragmentLibrary());
-                    break;
-                case SCAFFOLD:
-                    candidates.addAll(FragmentSpace.getScaffoldLibrary());
-                case CAP:
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            DENOPTIMVertex chosenOne =  FragmentSpace.getVertexFromLibrary(
-                    bbt, newBuildingBlockID);
-            candidates.add(chosenOne);
-        }
-
+        ArrayList<DENOPTIMVertex> candidates = getCandidateBBs(
+                originalLink.getBuildingBlockType(), newBuildingBlockID);
+        
         int candidatesOrigSize = candidates.size();
         for (int i=0; i<candidatesOrigSize; i++)
         {
@@ -159,7 +165,8 @@ public class GraphLinkFinder
                 continue;
             }
             
-            if (chosenNewLink.getNumberOfAPs() < originalLink.getNumberOfAPs())
+            if (chosenNewLink.getNumberOfAPs() < (originalLink.getNumberOfAPs() -
+                    originalLink.getFreeAPCountThroughout()))
             {
                 continue;
             }
@@ -218,12 +225,22 @@ public class GraphLinkFinder
             recursiveCombiner(keys, currentKey, apCompatilities, currentMapping, 
                     apMappings, screenAll, false);
             
-            // Keep only complete mappings (i.e., include all APs of the 
+            // Identify APs in old link that are used: we want a mapping that
+            // includes all of those. This to be able to change the link without
+            // removing any branch.
+            ArrayList<DENOPTIMAttachmentPoint> oldAPsRequiredToHaveAMapping = new
+                    ArrayList<DENOPTIMAttachmentPoint>();
+            for (DENOPTIMAttachmentPoint oldAp : originalLink.getAttachmentPoints())
+            {
+                if (!oldAp.isAvailableThroughout())
+                    oldAPsRequiredToHaveAMapping.add(oldAp);
+            }
+            // Keep only mappings that allow retaining the (i.e., include all APs of the 
             // original vertex)
             List<APMapping> toRemove = new ArrayList<APMapping>();
             for (APMapping c : apMappings)
             {
-                if (!c.containsAllKeys(originalLink.getAttachmentPoints()))
+                if (!c.containsAllKeys(oldAPsRequiredToHaveAMapping))
                 {
                     toRemove.add(c);
                 }
@@ -241,7 +258,7 @@ public class GraphLinkFinder
             APMapping chosen = RandomUtils.randomlyChooseOne(apMappings);
             try
             {
-                this.chosenAPMap = chosen.toIntMappig();
+                this.chosenAPMapInt = chosen.toIntMappig();
             } catch (DENOPTIMException e)
             {
                 throw new IllegalStateException(e);
@@ -259,7 +276,194 @@ public class GraphLinkFinder
                         throw new IllegalStateException(e);
                     }
                 }
-                allCompatLinks.put(chosenNewLink, lst);
+                allCompatLinksInt.put(chosenNewLink, lst);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private ArrayList<DENOPTIMVertex> getCandidateBBs(BBType bbt, int bbId) 
+            throws DENOPTIMException 
+    {
+        ArrayList<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>();
+        if (bbId<0)
+        {
+            switch (bbt)
+            {
+                case FRAGMENT:
+                    candidates.addAll(FragmentSpace.getFragmentLibrary());
+                    break;
+                case SCAFFOLD:
+                    candidates.addAll(FragmentSpace.getScaffoldLibrary());
+                case CAP:
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            DENOPTIMVertex chosenOne =  FragmentSpace.getVertexFromLibrary(
+                    bbt, bbId);
+            candidates.add(chosenOne);
+        }
+        return candidates;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that specifies which edge has to be replaced with a vertex 
+     * and two edges. The search 
+     * for an alternative building block takes place within this constructor.
+     * @param originalEdge the vertex to replace.
+     * @param newBuildingBlockID the index specifying which building block to 
+     * use for the linking vertex. This can be -1, in which case, 
+     * this method will
+     * search suitable building block candidates and choose randomly.
+     * @throws DENOPTIMException if the required new building block ID cannot
+     * be used.
+     */
+    public GraphLinkFinder(DENOPTIMEdge originalEdge) 
+            throws DENOPTIMException
+    {  
+        this(originalEdge,-1,false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that specifies which edge has to be replaced with a vertex 
+     * and two edges. The search 
+     * for an alternative building block takes place within this constructor.
+     * @param originalEdge the vertex to replace.
+     * @param newBuildingBlockID the index specifying which building block to 
+     * use for the linking vertex. This can be -1, in which case, 
+     * this method will
+     * search suitable building block candidates and choose randomly.
+     * @throws DENOPTIMException if the required new building block ID cannot
+     * be used.
+     */
+    public GraphLinkFinder(DENOPTIMEdge originalEdge, int newBuildingBlockID) 
+            throws DENOPTIMException
+    {  
+        this(originalEdge,newBuildingBlockID,false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that specifies which edge has to be replaced with a vertex 
+     * and two edges. The search 
+     * for an alternative building block takes place within this constructor.
+     * @param originalEdge the vertex to replace.
+     * @param newBuildingBlockID the index specifying which building block to 
+     * use for the linking vertex. This can be -1, in which case, 
+     * this method will
+     * search suitable building block candidates and choose randomly.
+     * @param screenAll use <code>true</code> to NOT stop at the first 
+     * compatible
+     * vertex, but screen all the library of building blocks.
+     * @throws DENOPTIMException if the required new building block ID cannot
+     * be used.
+     */
+    public GraphLinkFinder(DENOPTIMEdge originalEdge, int newBuildingBlockID,
+            boolean screenAll) throws DENOPTIMException 
+    {   
+        ArrayList<DENOPTIMVertex> candidates = getCandidateBBs(
+                originalEdge.getTrgAP().getOwner().getBuildingBlockType(), 
+                newBuildingBlockID);
+
+        int candidatesOrigSize = candidates.size();
+        for (int i=0; i<candidatesOrigSize; i++)
+        {
+            if (foundNewLink && !screenAll)
+                break;
+            
+            DENOPTIMVertex originalBB = RandomUtils.randomlyChooseOne(
+                    candidates);
+            candidates.remove(originalBB);
+            try
+            {
+                chosenNewLink = FragmentSpace.getVertexFromLibrary(
+                        originalBB.getBuildingBlockType(), 
+                        originalBB.getBuildingBlockId());
+            } catch (DENOPTIMException e)
+            {
+                e.printStackTrace();
+                continue;
+            }
+            
+            if (chosenNewLink.getNumberOfAPs() < 2)
+            {
+                continue;
+            }
+            
+            // We map all the compatibilities before choosing a specific mapping
+            Map<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
+                    new HashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+            
+            List<DENOPTIMAttachmentPoint> needeAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+            needeAPs.add(originalEdge.getSrcAP());
+            needeAPs.add(originalEdge.getTrgAP());
+            for (DENOPTIMAttachmentPoint oAP : needeAPs)
+            {
+                APClass oriAPC = oAP.getAPClass();
+                for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
+                {  
+                    boolean compatible = false;
+                    if (FragmentSpace.useAPclassBasedApproach())
+                    {
+                        if (oriAPC.isCPMapCompatibleWith(cAP.getAPClass()))
+                            compatible = true;
+                    } else {
+                        if (oAP.getTotalConnections() == cAP.getTotalConnections())
+                            compatible = true;
+                    }
+                    if (compatible)
+                    {
+                        if (apCompatilities.containsKey(oAP))
+                        {
+                            apCompatilities.get(oAP).add(cAP);
+                        } else {
+                            List<DENOPTIMAttachmentPoint> lst = 
+                                    new ArrayList<DENOPTIMAttachmentPoint>();
+                            lst.add(cAP);
+                            apCompatilities.put(oAP,lst);
+                        }
+                    }
+                }
+            }
+            // keys is used just to keep the map keys sorted in a separate list
+            // so that the order is randomized only once, then it is retained.
+            List<DENOPTIMAttachmentPoint> keys = 
+                    new ArrayList<DENOPTIMAttachmentPoint>(
+                            apCompatilities.keySet());
+            if (keys.size() < 2)
+            {
+                continue;
+            }
+            
+            // Get all possible combinations of compatible AP pairs
+            List<APMapping> apMappings = new ArrayList<APMapping>();
+            int currentKey = 0;
+            APMapping currentMapping = new APMapping();
+            // yes, a nested loop would do it, but for now I use the same code
+            // as for when there is no limit to the number of keys (here, always 2)
+            recursiveCombiner(keys, currentKey, apCompatilities, currentMapping, 
+                    apMappings, screenAll, false);
+            
+            if (apMappings.isEmpty())
+            {
+                this.chosenNewLink = null;
+                continue;
+            } else {
+                this.foundNewLink = true;
+            }
+            
+            this.chosenAPMap = RandomUtils.randomlyChooseOne(apMappings);
+            if (screenAll)
+            {
+                allCompatLinks.put(chosenNewLink, apMappings);
             }
         }
     }
@@ -321,7 +525,7 @@ public class GraphLinkFinder
      * Returns the vertex chosen as alternative. If more than one possibilities
      * exist, then this will return a randomly chosen one. 
      * Consistency between the return value of this method and 
-     * {@link GraphLinkFinder#getChosenAPMapping()} is guaranteed.
+     * {@link GraphLinkFinder#getChosenAPMappingInt()} is guaranteed.
      * @return the chosen alternative or null is none was found.
      */
     public DENOPTIMVertex getChosenAlternativeLink()
@@ -339,9 +543,9 @@ public class GraphLinkFinder
      * {@link GraphLinkFinder#getChosenAlternativeLink()} is guaranteed.
      * @return the chosen alternative or null is none was found.
      */
-    public Map<Integer, Integer> getChosenAPMapping()
+    public Map<Integer, Integer> getChosenAPMappingInt()
     {
-        return chosenAPMap;
+        return chosenAPMapInt;
     }
     
 //------------------------------------------------------------------------------
@@ -352,7 +556,57 @@ public class GraphLinkFinder
      * be installed in the slot originally occupied by the original vertex.
      * @return map of all AP mappings for each alternative vertex. 
      */
-    public Map<DENOPTIMVertex, List<Map<Integer, Integer>>> getAllAlternativesFound()
+    public Map<DENOPTIMVertex, List<Map<Integer, Integer>>> getAllAlternativesFoundInt()
+    {
+        return allCompatLinksInt;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the AP mapping that allows the usage of the vertex chosen either
+     * as alternative to be installed in the slot originally occupied by the 
+     * original vertex, or to be inserted in between two vertexes. The meaning 
+     * of the mapping depends on how this {@link GraphLinkFinder} was 
+     * constructed. In particular, when this instance if constructed from an 
+     * {@link DENOPTIMVertex}, the syntax of the AP mapping is:
+     * <ul>
+     * <li>null (TODO: FIXME by making the constructor store 
+     * (AP reference):(AP reference)
+     * mapping in
+     * addition to the int:int mapping)</li>
+     * </ul>
+     * Otherwise, when this instance if constructed from an 
+     * {@link DENOPTIMEdge}, the AP mapping's syntax is:
+     * <ul>
+     * <li>keys: the APs originally involved in making that edge,</li>
+     * <li>values: the APs that belong on the new vertex returned by 
+     * {@link GraphLinkFinder#getChosenAlternativeLink()} and that can be 
+     * connected to the corresponding AP in the key.</li>
+     * </ul>
+     * If more than one possible mapping exist, then this will return a randomly 
+     * chosen one. Consistency between the return value of this method and 
+     * {@link GraphLinkFinder#getChosenAlternativeLink()} is guaranteed.
+     * @return the chosen AP mapping or null is none was found.
+     */
+    public APMapping getChosenAPMapping()
+    {
+        return chosenAPMap;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns all the AP mapping that were identified for any candidate 
+     * vertex that could be used either
+     * as alternative to be installed in the slot originally occupied by the 
+     * original vertex, or to be inserted in between two vertexes. 
+     * The meaning 
+     * of the mapping depends on how this {@link GraphLinkFinder} was 
+     * constructed. 
+     * @return map of all AP mappings for each alternative vertex. 
+     */
+    public Map<DENOPTIMVertex, List<APMapping>> getAllAlternativesFound()
     {
         return allCompatLinks;
     }

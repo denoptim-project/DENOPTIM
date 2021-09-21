@@ -21,6 +21,7 @@ package denoptimga;
 
 import java.io.File;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -163,15 +164,23 @@ public class DENOPTIMGraphOperations
      * building block ID, but might look the same wrt content and properties).
      * @param vertex the vertex to replace with another one.
      * @param chosenVrtxIdx if greater than or equals to zero, 
-     * sets the choice of the vertex to the 
-     * given index.
-     * @return <code>true</code> if substitution is successful
+     * sets the choice of the incoming vertex to the 
+     * given index. AP mapping between old and new vertex is not controllable
+     * in this method.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
 
     protected static boolean substituteLink(DENOPTIMVertex vertex,
             int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
     {
+        //TODO: for reproducibility the AP mapping should become an optional
+        // parameter: if given we try to use it, if not given, GraphLinkFinder
+        // will try to find a suitable mapping.
+        
         GraphLinkFinder glf = null;
         if (chosenVrtxIdx<0)
         {
@@ -184,16 +193,140 @@ public class DENOPTIMGraphOperations
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND);
             return false;
         }
-        
+
         DENOPTIMGraph graph = vertex.getGraphOwner();
         boolean done = graph.replaceVertex(vertex,
                 glf.getChosenAlternativeLink().getBuildingBlockId(),
                 glf.getChosenAlternativeLink().getBuildingBlockType(),
-                glf.getChosenAPMapping());
+                glf.getChosenAPMappingInt());
         if (!done)
         {
             mnt.increase(
                     CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT);
+        }
+        return done;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Inserts a vertex in between two connected vertexes that are identified by
+     * the one vertex holding the "source" end of the edge, and the identifier
+     * of the attachment point used by that edge. Effectively, this method
+     * asks to replace an edge with two edges with a new vertex in between.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenAPId the identifier of the AP on the vertex.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException if the request cannot be performed because the
+     * vertex is not the source of an edge at the given AP, or because such AP 
+     * does not exist on the given vertex.
+     */
+    public static boolean extendLink(DENOPTIMVertex vertex,
+            int chosenAPId, Monitor mnt) throws DENOPTIMException
+    {
+        return extendLink(vertex, chosenAPId, -1 , mnt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Inserts a vertex in between two connected vertexes that are identified by
+     * the one vertex holding the "source" end of the edge, and the identifier
+     * of the attachment point used by that edge. Effectively, this method
+     * asks to replace an edge with two edges with a new vertex in between.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenAPId the identifier of the AP on the vertex.
+     * @param chosenNewVrtxId the identifier of the new building block to 
+     * insert in the list.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException if the request cannot be performed because the
+     * vertex is not the source of an edge at the given AP, or because such AP 
+     * does not exist on the given vertex.
+     */
+    public static boolean extendLink(DENOPTIMVertex vertex,
+            int chosenAPId, int chosenNewVrtxId, Monitor mnt) 
+                    throws DENOPTIMException
+    {
+        DENOPTIMAttachmentPoint ap = vertex.getAP(chosenAPId);
+        if (ap == null)
+        {
+            throw new DENOPTIMException("No AP "+chosenAPId+" in vertex "
+                    +vertex+".");
+        }
+        DENOPTIMEdge e = ap.getEdgeUserThroughout();
+        
+        if (e == null)
+        {
+            throw new DENOPTIMException("AP "+chosenAPId+" in vertex "
+                    +vertex+" has no edge user.");
+        }
+        if (e.getSrcAP().getOwner() != vertex)
+        {
+            throw new DENOPTIMException("Request to extend a link from a child "
+                    + "vertex (AP "+chosenAPId+" of vertex "+vertex+").");
+        }
+        return extendLink(e, chosenNewVrtxId, mnt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replace an edge with two edges with a new vertex in between, thus 
+     * inserting a vertex in between two directly connected vertexes, which will
+     * no longer be directly connected.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenBBIdx the identifier of the building block to insert.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    public static boolean extendLink(DENOPTIMEdge edge, int chosenBBIdx,
+            Monitor mnt) throws DENOPTIMException
+    {
+       //TODO: for reproducibility the AP mapping should become an optional
+        // parameter: if given we try to use it, if not given we GraphLinkFinder
+        // will try to find a suitable mapping.
+        
+        GraphLinkFinder glf = null;
+        if (chosenBBIdx < 0)
+        {
+            glf = new GraphLinkFinder(edge);
+        } else {
+            glf = new GraphLinkFinder(edge,chosenBBIdx);
+        }
+        if (!glf.foundAlternativeLink())
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND);
+            return false;
+        }
+        
+        // Need to convert the mapping to make it independent from the instance
+        // or the new link.
+        Map<DENOPTIMAttachmentPoint,Integer> apMap = 
+                new HashMap<DENOPTIMAttachmentPoint,Integer>();
+        for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
+            glf.getChosenAPMapping().entrySet())
+        {
+            apMap.put(e.getKey(), e.getValue().getIndexInOwner());
+        }
+        
+        DENOPTIMGraph graph = edge.getSrcAP().getOwner().getGraphOwner();
+        boolean done = graph.insertVertex(edge,
+                glf.getChosenAlternativeLink().getBuildingBlockId(),
+                glf.getChosenAlternativeLink().getBuildingBlockType(),
+                apMap);
+        if (!done)
+        {
+            mnt.increase(
+                    CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT);
         }
         return done;
     }
@@ -635,10 +768,10 @@ public class DENOPTIMGraphOperations
      * @param curVertex the source graph vertex
      * @param dapidx the attachment point index on the src vertex
      * @param chosenVrtxIdx if greater than or equals to zero, 
-     * sets the choice of the vertex to the 
+     * sets the choice of the incoming vertex to the 
      * given index.
      * @param chosenApId if greater than or equals to zero, 
-     * sets the choice of the AP to the 
+     * sets the choice of the AP (of the incoming vertex) to the 
      * given index.
      * @return the vector of indeces identifying the molId (fragment index) 
      * os a fragment with a compatible attachment point, and the index of such 
@@ -1426,8 +1559,8 @@ public class DENOPTIMGraphOperations
         }
 
         // set the level of each branch according to the destination graph
-        subG_M.updateLevels(lvl_female);
-        subG_F.updateLevels(lvl_male);
+        subG_M.changeLevelToAll(lvl_female);
+        subG_F.changeLevelToAll(lvl_male);
 
         // attach the subgraph from M/F onto F/M in all symmetry related APs
         male.appendGraphOnGraph(symParVertM, symmParAPidxM, subG_F,
@@ -1556,11 +1689,18 @@ public class DENOPTIMGraphOperations
      * @param mType the type of mutation to perform.
      * @param force set to <code>true</code> to ignore growth probability. 
      * @param chosenVrtxIdx if greater than or equals to zero, 
-     * sets the choice of the vertex to the 
-     * given index.
+     * sets the choice of the incoming vertex to the 
+     * given index. This parameter is ignored for mutation types that do not
+     * define an incoming vertex (i.e., {@link MutationType#DELETE}).
      * @param chosenApId if greater than or equals to zero, 
      * sets the choice of the AP to the 
-     * given index.
+     * given index. 
+     * Depending on the type of mutation,
+     * the AP can be on the incoming vertex (i.e., the vertex that will be added
+     * to the graph) or on the target vertex (i.e., the vertex that already 
+     * belongs to the graph and that is the focus of the mutation).
+     * This parameter is ignored for mutation types that do not
+     * define an incoming vertex (i.e., {@link MutationType#DELETE}).
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
@@ -1604,6 +1744,23 @@ public class DENOPTIMGraphOperations
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+                break;
+                
+            case ADDLINK:
+                if (chosenApId < 0)
+                {
+                    List<Integer> candidates = new ArrayList<Integer>();
+                    for (DENOPTIMVertex c : vertex.getChilddren())
+                    {
+                        candidates.add(c.getEdgeToParent().getSrcAP()
+                                .getIndexInOwner());
+                    }
+                    chosenApId = RandomUtils.randomlyChooseOne(candidates);
+                }
+                done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
                 break;
                 
             case EXTEND:

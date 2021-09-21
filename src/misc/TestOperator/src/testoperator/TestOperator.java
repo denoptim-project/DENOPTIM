@@ -147,11 +147,18 @@ public class TestOperator
                 System.exit(-1);
             }
         }
-            
+         
+        int apID = TestOperatorParameters.idNewAP;
+        if (mt==MutationType.ADDLINK)
+        {
+            apID = TestOperatorParameters.idTargetAP;
+            if (apID<0)
+                throw new DENOPTIMException("ID of target AP is negative.");
+        }
+        
         // NB: last boolean asks to ignore the growth probability
         DENOPTIMGraphOperations.performMutation(v,mt,true,
-                TestOperatorParameters.idNewVrt,
-                TestOperatorParameters.idNewAP, new Monitor());
+                TestOperatorParameters.idNewVrt, apID, new Monitor());
 
         System.out.println("Result of mutation:");
         System.out.println(g);

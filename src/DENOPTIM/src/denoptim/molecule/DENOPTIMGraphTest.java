@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -200,16 +201,6 @@ public class DENOPTIMGraphTest {
      *       4(C)-(C)-v3
      *   </pre>
      *   
-     *   Replacing it with
-     *   <pre>
-     *      4(A)
-     *      |
-     * 3(A)-v1-1(B)
-     *      |\
-     *      | 2(B)
-     *      \
-     *       0(C)
-     *   <pre>
      */
     private DENOPTIMGraph makeTestGraphB() throws DENOPTIMException
     {
@@ -264,6 +255,122 @@ public class DENOPTIMGraphTest {
         
         graph.renumberGraphVertices();
         return graph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *      v1-(B)-(B)-v1-(B)-(B)-v1-(B)-(B)-v1
+     *       |           \
+     *      (A)           (A)-(A)-v0
+     *       |
+     *      (A)
+     *    scaffold
+     *      (A)
+     *       |
+     *      0(A)
+     *       |
+     *       v1-1(B)-(B)-v1-(B)-(B)-v1-(B)-(B)-v1
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphC() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(0,
+                BBType.SCAFFOLD);
+        s.setLevel(-1);
+        graph.addVertex(s);
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(s.getAP(0), v1a.getAP(2));
+        DENOPTIMVertex v2a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v1a.getAP(3), v2a.getAP(1));
+        DENOPTIMVertex v3a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v2a.getAP(3), v3a.getAP(1));
+        DENOPTIMVertex v4a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v3a.getAP(3), v4a.getAP(1));
+        DENOPTIMVertex v5a = DENOPTIMVertex.newVertexFromLibrary(0,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v2a.getAP(2), v5a.getAP(0));
+        
+        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(s.getAP(1), v1b.getAP(2));
+        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v1b.getAP(3), v2b.getAP(1));
+        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v2b.getAP(3), v3b.getAP(1));
+        DENOPTIMVertex v4b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v3b.getAP(3), v4b.getAP(1));
+        DENOPTIMVertex v5b = DENOPTIMVertex.newVertexFromLibrary(0,
+                BBType.FRAGMENT);
+        graph.appendVertexOnAP(v2b.getAP(2), v5b.getAP(0));
+        
+        ArrayList<Integer> sym1 = new ArrayList<Integer>();
+        sym1.add(v1a.getVertexId());
+        sym1.add(v1b.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(sym1));
+        ArrayList<Integer> sym2 = new ArrayList<Integer>();
+        sym2.add(v2a.getVertexId());
+        sym2.add(v2b.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(sym2));
+        ArrayList<Integer> sym3 = new ArrayList<Integer>();
+        sym3.add(v3a.getVertexId());
+        sym3.add(v3b.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(sym3));
+        ArrayList<Integer> sym4 = new ArrayList<Integer>();
+        sym4.add(v4a.getVertexId());
+        sym4.add(v4b.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(sym4));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+      
+    @Test
+    public void testChangeLevels() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphC();
+        
+        Map<DENOPTIMVertex,Integer> originalValues = 
+                new HashMap<DENOPTIMVertex,Integer>();
+        for (DENOPTIMVertex v : g.getVertexList())
+        {
+            originalValues.put(v, v.getLevel());
+        }
+        
+        ArrayList<DENOPTIMVertex> affectedVertexes = 
+                new ArrayList<DENOPTIMVertex>();
+        g.getChildrenTree(g.getVertexAtPosition(1), affectedVertexes);
+        affectedVertexes.add(g.getVertexAtPosition(1));
+        
+        g.changeLevelOfChilds(g.getVertexAtPosition(1), 10);
+        
+        for (DENOPTIMVertex v : g.getVertexList())
+        {   
+            int expected = originalValues.get(v);
+            String type = "original";
+            if (affectedVertexes.contains(v))
+            {
+                expected = expected + 10;
+                type = "affected";
+            }
+            assertEquals(expected, v.getLevel(), "Level of " + type + " " +v);
+        }
+        
     }
    
 //------------------------------------------------------------------------------

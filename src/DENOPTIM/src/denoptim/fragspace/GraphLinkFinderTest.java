@@ -11,10 +11,12 @@ import denoptim.molecule.DENOPTIMVertex.BBType;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GraphLinkFinderTest
 {
-    private static APClass APCA, APCB, APCC, APCD;
+    private static APClass APCA, APCB, APCC, APCD, APCE, APCF;
     
 //------------------------------------------------------------------------------
     
@@ -37,6 +39,8 @@ public class GraphLinkFinderTest
         APCB = APClass.make("B", 0);
         APCC = APClass.make("C", 0);
         APCD = APClass.make("D", 99);
+        APCE = APClass.make("E", 13);
+        APCF = APClass.make("F", 17);
         
         HashMap<String,BondType> boMap = new HashMap<String,BondType>();
         boMap.put("A",BondType.SINGLE);
@@ -60,19 +64,28 @@ public class GraphLinkFinderTest
         ArrayList<APClass> lstD = new ArrayList<APClass>();
         lstD.add(APCD);
         cpMap.put(APCD, lstD);
+        ArrayList<APClass> lstE = new ArrayList<APClass>();
+        lstE.add(APCE);
+        cpMap.put(APCE, lstE);
         
         
         /* Compatibility matrix
          * 
-         *      |  A  |  B  |  C  | D |
-         *    -------------------------
-         *    A |  T  |     |     |   |
-         *    -------------------------
-         *    B |     |  T  |  T  |   |
-         *    -------------------------
-         *    C |     |  T  |  T  |   |
-         *    -------------------------
-         *    D |     |     |     | T |
+         *      |  A  |  B  |  C  | D | E | F
+         *    ---------------------------------
+         *    A |  T  |     |     |   |   |
+         *    ---------------------------------
+         *    B |     |  T  |  T  |   |   |
+         *    ---------------------------------
+         *    C |     |  T  |  T  |   |   |
+         *    ---------------------------------
+         *    D |     |     |     | T |   |
+         *    ---------------------------------
+         *    E |     |     |     |   | T |
+         *    ---------------------------------
+         *    F |     |     |     |   |   |
+         *    
+         *    NB: F has NONE!
          */
         
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
@@ -187,6 +200,23 @@ public class GraphLinkFinderTest
         FragmentSpace.appendVertexToLibrary(v11, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
+        DENOPTIMVertex v12 = new EmptyVertex();
+        v12.setBuildingBlockType(BBType.FRAGMENT);
+        v12.addAP(0, 1, 1, APCE);
+        v12.addAP(0, 1, 1, APCE);
+        v12.addAP(0, 1, 1, APCE);
+        FragmentSpace.appendVertexToLibrary(v12, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v13 = new EmptyVertex();
+        v13.setBuildingBlockType(BBType.FRAGMENT);
+        v13.addAP(0, 1, 1, APCF);
+        v13.addAP(0, 1, 1, APCB);
+        v13.addAP(0, 1, 1, APCA);
+        FragmentSpace.appendVertexToLibrary(v13, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        FragmentSpaceUtils.groupAndClassifyFragments(true);
     }
 
 //------------------------------------------------------------------------------
@@ -215,36 +245,226 @@ public class GraphLinkFinderTest
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: v0(E)-(E)v1
+     * @throws DENOPTIMException 
+     *  
+     */
+    private DENOPTIMGraph makeTestGraphE() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v0 = FragmentSpace.getVertexFromLibrary(
+                BBType.FRAGMENT,12);
+        graph.addVertex(v0);
+        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(
+                BBType.FRAGMENT,12);
+        graph.addVertex(v1);
+        graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(1)));
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: v0(F)-(F)v1
+     * @throws DENOPTIMException 
+     *  
+     */
+    private DENOPTIMGraph makeTestGraphF() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v0 = FragmentSpace.getVertexFromLibrary(
+                BBType.FRAGMENT,13);
+        graph.addVertex(v0);
+        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(
+                BBType.FRAGMENT,13);
+        graph.addVertex(v1);
+        graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
     
     @Test
-    public void testSimple() throws Exception
+    public void testLinkFromVertex() throws Exception
     {
         prepare();
         DENOPTIMGraph graph = makeTestGraphA();
         GraphLinkFinder glf = new GraphLinkFinder(graph.getVertexAtPosition(1),
                 -1, true); 
-        // NB: the boolean makes the search complete (within the limits the 
+        // NB: the boolean makes the search complete (within the limits that
         // prevent combinatorial explosion)
         // NB: "-1" is for "no selection of specific new building block".
         
         // These are the expected numbers of AP mappings found for the three
         // vertexes that can be alternative links. 
         Map<Integer,Integer> expected = new HashMap<Integer,Integer>();
-        expected.put(4, 2);
-        expected.put(9, 4);
-        expected.put(11, 18);
+        expected.put(4, 4);
+        expected.put(5, 1);
+        expected.put(9, 8);
+        expected.put(10, 1);
+        expected.put(11, 27);
+        expected.put(13, 1);
         
         Map<DENOPTIMVertex, List<Map<Integer, Integer>>> allAltLinks = 
-                glf.getAllAlternativesFound();
+                glf.getAllAlternativesFoundInt();
         Set<DENOPTIMVertex> keys = allAltLinks.keySet();
         for (DENOPTIMVertex k : keys)
         {
-            int bbId = k.getBuildingBlockId();
+            int bbId = k.getBuildingBlockId();          
             assertTrue(expected.containsKey(bbId), "Vertex with building block "
-                    + "ID '" + bbId + "' should not among the results.");
+                    + "ID '" + bbId + "' should not be among the results.");
             assertEquals(expected.get(bbId), allAltLinks.get(k).size(),
                     "Number of APmapping is wrong for bbId '" + bbId + "'.");
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testLinkFromEdge() throws Exception
+    {
+        prepare();
+        DENOPTIMGraph graph = makeTestGraphA();
+        DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(1);
+        GraphLinkFinder glf = new GraphLinkFinder(targetEdge, -1, true); 
+        // NB: the boolean makes the search complete (within the limits the 
+        // prevent combinatorial explosion)
+        // NB: "-1" is for "no selection of specific new building block".
+        
+        // Expected results in terms of <bbId:list of classes>
+        Map<Integer,List<APClass>> expected = 
+                new HashMap<Integer,List<APClass>>();
+        expected.put(0, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCB,APCB,APCB,APCB,APCB,APCB,APCB)));
+        expected.put(3, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCB,APCB,APCB,APCB,APCB,APCB,APCB)));
+        expected.put(4, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCB,APCB,APCB,APCB,APCB,APCB,APCB)));
+        expected.put(5, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCC,APCB,APCB,APCB,APCB,APCB,APCC)));
+        expected.put(9, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCB,APCB,APCB,APCB,APCB,APCB,APCB)));
+        expected.put(10, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCC,APCB,APCB,APCB,APCB,APCB,APCC)));
+        expected.put(11, new ArrayList<APClass>(Arrays.asList(
+                APCB,APCC,APCB,APCB,
+                APCB,APCC,APCB,APCB,
+                APCB,APCC,APCB,APCB,
+                APCB,APCB,APCB,APCC,
+                APCB,APCB,APCB,APCB,
+                APCB,APCB,APCB,APCB,
+                APCB,APCB,APCB,APCC,
+                APCB,APCB,APCB,APCB,
+                APCB,APCB,APCB,APCB,
+                APCB,APCB,APCB,APCC,
+                APCB,APCB,APCB,APCB,
+                APCB,APCB,APCB,APCB)));
+        
+        ensureConsistencyWithExpectations(expected,
+                glf.getAllAlternativesFound());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testLinkFromEdgeOneMatch() throws Exception
+    {
+        prepare();
+        DENOPTIMGraph graph = makeTestGraphE();
+        DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(0);
+        GraphLinkFinder glf = new GraphLinkFinder(targetEdge, -1, true); 
+        // NB: the boolean makes the search complete (within the limits the 
+        // prevent combinatorial explosion)
+        // NB: "-1" is for "no selection of specific new building block".
+        
+        // Expected results in terms of <bbId:list of classes>
+        Map<Integer,List<APClass>> expected = 
+                new HashMap<Integer,List<APClass>>();
+        expected.put(12, new ArrayList<APClass>(Arrays.asList(
+                APCE,APCE,APCE,APCE,APCE,APCE,APCE,APCE,
+                APCE,APCE,APCE,APCE,APCE,APCE,APCE,APCE,
+                APCE,APCE,APCE,APCE,APCE,APCE,APCE,APCE)));
+        
+        ensureConsistencyWithExpectations(expected,
+                glf.getAllAlternativesFound());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testLinkFromEdgeNoMatch() throws Exception
+    {
+        prepare();
+        DENOPTIMGraph graph = makeTestGraphF();
+        DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(0);
+        GraphLinkFinder glf = new GraphLinkFinder(targetEdge, -1, true); 
+        // NB: the boolean makes the search complete (within the limits the 
+        // prevent combinatorial explosion)
+        // NB: "-1" is for "no selection of specific new building block".
+        
+        // Expected results in terms of <bbId:list of classes>
+        Map<Integer,List<APClass>> expected = 
+                new HashMap<Integer,List<APClass>>();
+        
+        ensureConsistencyWithExpectations(expected,
+                glf.getAllAlternativesFound());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void ensureConsistencyWithExpectations(
+            Map<Integer,List<APClass>> expected,
+            Map<DENOPTIMVertex, List<APMapping>> actual)
+    {
+        // Set this to true to print the mappings on stdout
+        boolean debug = false;
+        
+        for (DENOPTIMVertex k : actual.keySet())
+        {
+            int bbId = k.getBuildingBlockId();
+            
+            if (debug)
+            {
+                System.out.println("BBID: "+bbId);
+            }
+            
+            List<APMapping> list = actual.get(k);
+            
+            assertTrue(expected.containsKey(bbId), "Vertex with building block "
+                    + "ID '" + bbId + "' should not among the results.");
+            assertEquals(expected.get(bbId).size() / 4, actual.get(k).size(),
+                    "Number of APmappings is wrong for bbId '" + bbId + "'.");
+            
+            int i=-1;
+            List<APClass> refList = expected.get(bbId);
+            for (APMapping apm : list)
+            {
+                if (debug)
+                {
+                    System.out.println("    -> "+apm.toString());
+                }
+                for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e 
+                        : apm.entrySet())
+                {
+                    if (debug)
+                    {
+                        System.out.println("       -> "+e.getKey().getAPClass()
+                                +" "+e.getValue().getAPClass());
+                    }
+                    i++;
+                    assertEquals(refList.get(i),e.getKey().getAPClass(),
+                            "APClass in APMapping for bbId "+bbId+" entry " +i);
+                    i++;
+                    assertEquals(refList.get(i),e.getValue().getAPClass(),
+                            "APClass in APMapping for bbId "+bbId+" entry " +i);
+                }
+            }
+        }
+        
     }
     
 //------------------------------------------------------------------------------

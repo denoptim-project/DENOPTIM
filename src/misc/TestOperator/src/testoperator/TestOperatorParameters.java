@@ -69,19 +69,26 @@ public class TestOperatorParameters
     protected static int[] mutationTarget;
     
     /**
+     * Target attachment point ID for mutation (AP belonging already to the 
+     * graph).
+     */
+    protected static int idTargetAP = -1;
+    
+    /**
      * Type of mutation to perform
      */
     protected static MutationType mutationType;
     
     /**
-     * The given vertex index. Used whenever a vertex id has to be given. For
+     * The given vertex index. 
+     * Used whenever a vertex id has to be given. For
      * example, when specifying how to mutate a graph.
      */
     protected static int idNewVrt = -1;
     
     /**
      * The given attachment point index. 
-     * Used whenever a vertex id has to be given. 
+     * Used whenever an AP id has to be given. 
      * For example, when specifying how to mutate a graph.
      */
     protected static int idNewAP = -1;
@@ -237,7 +244,7 @@ public class TestOperatorParameters
                                                       throws DENOPTIMException
     {
         paramsInUse = true;
-        String msg = "";
+        String msg = "";        
         switch (key.toUpperCase())
         {
             case "TESTGENOPS-OP=":
@@ -256,6 +263,9 @@ public class TestOperatorParameters
                 {
                     mutationTarget[i] = Integer.parseInt(parts[i]);
                 }
+                break;
+            case "TESTGENOPS-APIDONTARGETVERTEX=":
+                idTargetAP = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-MUTATIONTYPE=":
                 mutationType = MutationType.valueOf(value);
