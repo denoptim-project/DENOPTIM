@@ -15,9 +15,14 @@ import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
 
 /**
- * An utility class to encapsulate the search for vertexes that can replace 
- * an original vertex while retaining the graph structure of the original 
- * vertex. 
+ * An utility class to encapsulate the search for vertexes that satisfy 
+ * constraints. Typically, this class can be used to find building blocks
+ * that they replace other, non identical, building blocks in a graph
+ * while retaining the graph structure, i.e., the new building blocks offers 
+ * at least enough APs (and APs that are compatible with the surrounding
+ * graph branches) to replace the original building block.
+ * Another example of use case, is the identification of a building block that
+ * can be inserted in between two connected vertexes of a graph.
  * 
  * @author Marco Foscato
  */
@@ -78,7 +83,7 @@ public class GraphLinkFinder
      * maximum limit on the number of combination to consider, there is no
      * systematic exclusion of specific combinations.
      */
-    private static int maxCombs = 50;
+    private static int maxCombs = 250;
     
     /**
      * Flag recording if at least one alternative vertex was found.
@@ -200,7 +205,6 @@ public class GraphLinkFinder
                         } else {
                             List<DENOPTIMAttachmentPoint> lst = 
                                     new ArrayList<DENOPTIMAttachmentPoint>();
-                            lst.add(null);
                             lst.add(cAP);
                             apCompatilities.put(oAP,lst);
                         }
@@ -217,24 +221,37 @@ public class GraphLinkFinder
                 continue;
             }
             
-            // Get all possible combinations of compatible AP pairs
-            // (Includes "empty", i.e., ignoring one pair of compatible APs) 
-            List<APMapping> apMappings = new ArrayList<APMapping>();
-            int currentKey = 0;
-            APMapping currentMapping = new APMapping();
-            recursiveCombiner(keys, currentKey, apCompatilities, currentMapping, 
-                    apMappings, screenAll, false);
-            
             // Identify APs in old link that are used: we want a mapping that
-            // includes all of those. This to be able to change the link without
-            // removing any branch.
+            // includes all of those. This, to be able to change the link without
+            // removing any existing branch.
             ArrayList<DENOPTIMAttachmentPoint> oldAPsRequiredToHaveAMapping = new
                     ArrayList<DENOPTIMAttachmentPoint>();
             for (DENOPTIMAttachmentPoint oldAp : originalLink.getAttachmentPoints())
             {
-                if (!oldAp.isAvailableThroughout())
+                if (oldAp.isAvailableThroughout())
+                {
+                    apCompatilities.get(oldAp).add(null);
+                } else {
                     oldAPsRequiredToHaveAMapping.add(oldAp);
+                    if (!keys.contains(oldAp))
+                    {
+                        // In this case we have no hope of finding a mapping 
+                        // that satisfies out needs.
+                        continue;
+                    }
+                }
             }
+            
+            // Get all possible combinations of compatible AP pairs
+            List<APMapping> apMappings = new ArrayList<APMapping>();
+            int currentKey = 0;
+            APMapping currentMapping = new APMapping();
+            // We try the comprehensive approach, but if that is too demanding
+            // and gets stopped, then we run a a series of simplified attempts
+            // to hit a decent combination with "lucky shots".
+            Boolean stopped = recursiveCombiner(keys, currentKey, 
+                    apCompatilities, currentMapping, apMappings, screenAll);
+            
             // Keep only mappings that allow retaining the (i.e., include all APs of the 
             // original vertex)
             List<APMapping> toRemove = new ArrayList<APMapping>();
@@ -246,6 +263,58 @@ public class GraphLinkFinder
                 }
             }
             apMappings.removeAll(toRemove);
+            
+            // If we where interrupted, we try to get a proper mapping again.
+            // This time we ignore all the possibilities and try a more direct 
+            // approach, which, however, cannot account for all possible combs.
+            if (stopped && apMappings.isEmpty())
+            {
+                for (int iTry = 0; iTry < maxCombs; iTry++)
+                {
+                    APMapping apMap = new APMapping();
+                    List<DENOPTIMAttachmentPoint> used = 
+                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    List<DENOPTIMAttachmentPoint> availKeys = 
+                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    availKeys.addAll(oldAPsRequiredToHaveAMapping);
+                    boolean abandon = false;
+                    for (int jj=0; jj<oldAPsRequiredToHaveAMapping.size(); jj++)
+                    {
+                        DENOPTIMAttachmentPoint ap =
+                                RandomUtils.randomlyChooseOne(availKeys);
+                        availKeys.remove(ap);
+                        List<DENOPTIMAttachmentPoint> availPartners = 
+                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        availPartners.addAll(apCompatilities.get(ap));
+                        boolean done = false;
+                        for (int j=0; j<apCompatilities.get(ap).size(); j++)
+                        {
+                            DENOPTIMAttachmentPoint chosenAvail = 
+                                    RandomUtils.randomlyChooseOne(availPartners);
+                            availPartners.remove(chosenAvail);
+                            if (used.contains(chosenAvail))
+                            {
+                                continue;
+                            }
+                            used.add(chosenAvail);
+                            apMap.put(ap,chosenAvail);
+                            done = true;
+                            break;
+                        }
+                        if (!done)
+                        {
+                            abandon = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!abandon)
+                    {
+                        apMappings.add(apMap);
+                        break;
+                    }
+                }
+            }
             
             if (apMappings.isEmpty())
             {
@@ -449,8 +518,8 @@ public class GraphLinkFinder
             APMapping currentMapping = new APMapping();
             // yes, a nested loop would do it, but for now I use the same code
             // as for when there is no limit to the number of keys (here, always 2)
-            recursiveCombiner(keys, currentKey, apCompatilities, currentMapping, 
-                    apMappings, screenAll, false);
+            Boolean stopped = recursiveCombiner(keys, currentKey, 
+                    apCompatilities, currentMapping, apMappings, screenAll);
             
             if (apMappings.isEmpty())
             {
@@ -470,17 +539,18 @@ public class GraphLinkFinder
     
 //------------------------------------------------------------------------------
     
-    private static void recursiveCombiner(List<DENOPTIMAttachmentPoint> keys,
+    private static boolean recursiveCombiner(List<DENOPTIMAttachmentPoint> keys,
             int currentKey, Map<DENOPTIMAttachmentPoint,
                 List<DENOPTIMAttachmentPoint>> possibilities,
             APMapping combination, List<APMapping> completeCombinations, 
-            boolean screenAll, boolean stop)
+            boolean screenAll)
     {
+        boolean stopped = false;
         DENOPTIMAttachmentPoint apA = keys.get(currentKey);
         for (int i=0; i<possibilities.get(apA).size(); i++)
         {
             // Prevent combinatorial explosion.
-            if (stop)
+            if (stopped)
                 break;
             
             DENOPTIMAttachmentPoint apB = possibilities.get(apA).get(i);
@@ -499,24 +569,25 @@ public class GraphLinkFinder
             // go deeper, to the next key
             if (currentKey+1 < keys.size())
             {
-                recursiveCombiner(keys, currentKey+1, possibilities, 
-                        combination, completeCombinations, screenAll, stop);
+                stopped = recursiveCombiner(keys, currentKey+1, possibilities, 
+                        combination, completeCombinations, screenAll);
             }
             
             // we reached the deepest level: save combination
             if (currentKey+1 == keys.size() && !combination.isEmpty())
-            {
+            {   
                 APMapping storable = combination.clone(); //Shallow clone
                 completeCombinations.add(storable);
                 if (!screenAll && completeCombinations.size() >= maxCombs)
                 {
-                    stop = true;
+                    stopped = true;
                 }
             }
             
             // Restart building a new combination from the previous combination
             combination = priorCombination;
         }
+        return stopped;
     }
 
 //------------------------------------------------------------------------------

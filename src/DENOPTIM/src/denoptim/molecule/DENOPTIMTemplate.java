@@ -269,6 +269,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         DENOPTIMAttachmentPoint outerAP = newInnerAP.clone();
         outerAP.setOwner(this);
         innerToOuterAPs.put(newInnerAP, outerAP);
+        // Recursion on nesting templates to add projections of the AP
+        if (getGraphOwner() != null && getGraphOwner().templateJacket != null)
+        {
+            getGraphOwner().templateJacket.addInnerToOuterAPMapping(outerAP); 
+        }
     }
     
 //-----------------------------------------------------------------------------
@@ -299,13 +304,27 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     /**
      * Removes the mapping of the given inner AP from this template's surface,
      * if such mapping exists.
-     * @param oldInnerAP the inner AP of t the mapping to remove.
+     * @param oldInnerAP the inner AP of the mapping to remove.
+     * @throws DENOPTIMException when the operation involves an AP that is used
+     * in the graph owning this template or in any outer level graph.
      */
-    public void removeProjectionOfInnerAP(DENOPTIMAttachmentPoint oldInnerAP)
+    public void removeProjectionOfInnerAP(DENOPTIMAttachmentPoint oldInnerAP) 
+            throws DENOPTIMException
     {
         if (!innerToOuterAPs.containsKey(oldInnerAP))
         {
             return;
+        }
+        DENOPTIMAttachmentPoint outer = innerToOuterAPs.get(oldInnerAP);
+        if (!outer.isAvailableThroughout())
+        {
+            throw new DENOPTIMException("Attempt to remove an inner AP that "
+                    + "is not available! This possibility is not implelmeted.");
+        }
+        // Recursion on nesting templates to remove all projections of the AP
+        if (getGraphOwner() != null && getGraphOwner().templateJacket != null)
+        {
+            getGraphOwner().templateJacket.removeProjectionOfInnerAP(outer); 
         }
         innerToOuterAPs.remove(oldInnerAP);
     }
@@ -343,8 +362,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
 
-    //TODO-V3: add documentation. In particular, define whether we return inner of outer APs
-    
+    /**
+     * Return the list of attachment points visible from outside the template, 
+     * i.e., the so-called outer APs. Each outer AP is a projection of an AP
+     * present in the embedded graph, i.e., inner AP.
+     * @return the list of outer AP
+     */
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
