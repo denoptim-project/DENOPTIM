@@ -53,6 +53,7 @@ import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
 
@@ -356,7 +357,7 @@ public class ThreeDimTreeBuilder
         apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
         
         // Recursion on all branches of the tree (i.e., all incident edges)
-        for (DENOPTIMEdge edge : graph.getEdgesWithSrc(rootVrtx))
+        for (DENOPTIMEdge edge : this.graph.getEdgesWithSrc(rootVrtx))
         {
             // Get the AP from the current vertex to the next
             DENOPTIMAttachmentPoint apSrc = edge.getSrcAP();
@@ -385,94 +386,6 @@ public class ThreeDimTreeBuilder
                 append3DFragmentsViaEdges(-1, pt, pt, edge, removeUsedRCAs);
             }
         }
-        
-        // loop through the rings and make chords
-        /*
-        // TODO del: this is replaced by the call to demoveRCAs. However, this 
-        // is an example of how to navigate the graph without dealing with atom
-        // indexes as currently done in GraphConversionTool
-        if (removeRCAs)
-        {
-            for (int i=0; i<this.graph.getRings().size(); i++)
-            {
-                DENOPTIMRing r = this.graph.getRings().get(i);
-                DENOPTIMVertex vH = r.getHeadVertex();
-                DENOPTIMVertex vT = r.getTailVertex();
-                int vH_id = vH.getVertexId();
-                int vT_id = vT.getVertexId();
-                
-                DENOPTIMAttachmentPoint apH = apsPerVertexId.get(vH_id).get(0);
-                DENOPTIMAttachmentPoint apT = apsPerVertexId.get(vT_id).get(0);
-                
-                IBond bndToH = null;
-                IBond bndToT = null;
-                boolean doneH = false;
-                boolean doneT = false;
-                for (IBond b : apsPerBond.keySet())
-                {
-                	ArrayList<DENOPTIMAttachmentPoint> aps = apsPerBond.get(b);
-                	if (!doneH && aps.contains(apH))
-                	{
-                		bndToH = b;
-                		doneH = true;
-                	}
-                	if (!doneT && aps.contains(apT))
-                	{
-                		bndToT = b;
-                		doneT = true;
-                	}
-                	if (doneT && doneH)
-                	{
-                		continue;
-                	}
-                }
-                
-                IAtom atmH = null;
-                if (apsPerAtom.get(bndToH.getAtom(0)).contains(apH))
-                {
-                	atmH = bndToH.getAtom(1);
-                } else if (apsPerAtom.get(bndToH.getAtom(1)).contains(apH))
-                {
-                	atmH = bndToH.getAtom(0);
-                } else {
-                	throw new DENOPTIMException("Could not identify atom "
-                			+ "holding RCA "+vH_id);
-                }
-                
-                IAtom atmT = null;
-                if (apsPerAtom.get(bndToT.getAtom(0)).contains(apT))
-                {
-                	atmT = bndToT.getAtom(1);
-                } else if (apsPerAtom.get(bndToT.getAtom(1)).contains(apT))
-                {
-                	atmT = bndToT.getAtom(0);
-                } else {
-                	throw new DENOPTIMException("Could not identify atom "
-                			+ "holding RCA "+vH_id);
-                }
-
-                int idSrcH = mol.getAtomNumber(atmH);
-                int idSrcT = mol.getAtomNumber(atmT);
-
-                int bndOrder = r.getBondType(); 
-                switch (bndOrder)
-                {
-                case 1:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
-                    break;
-                case 2:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.DOUBLE);
-                    break;
-                case 3:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.TRIPLE);
-                    break;
-                default:
-                    mol.addBond(idSrcH, idSrcT, IBond.Order.SINGLE);
-                    break;
-                }
-            }
-        }
-        */
 
         if (removeUsedRCAs)
         {
@@ -560,14 +473,69 @@ public class ThreeDimTreeBuilder
             }
         }
         
-        mol.setProperty(DENOPTIMConstants.GCODETAG, this.graph.getGraphId());
-        mol.setProperty(DENOPTIMConstants.GRAPHTAG, this.graph.toString());
-        mol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, this.graph.toJson());
-        if (this.graph.getLocalMsg() != null 
-                && !this.graph.getLocalMsg().toString().equals(""))
+        // Prepare the string-representation of unused APs on this graph
+        Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> freeAPPerAtm =
+                new HashMap<IAtom,ArrayList<DENOPTIMAttachmentPoint>>();
+        for (IAtom a : apsPerAtom.keySet())
         {
-            mol.setProperty(DENOPTIMConstants.GMSGTAG,this.graph.getLocalMsg());
+            ArrayList<DENOPTIMAttachmentPoint> aps = apsPerAtom.get(a);
+            for (DENOPTIMAttachmentPoint ap : aps)
+            {
+                if (ap.isAvailableThroughout())
+                {
+                    if (freeAPPerAtm.containsKey(a))
+                    {
+                        freeAPPerAtm.get(a).add(ap);
+                    } else {
+                        ArrayList<DENOPTIMAttachmentPoint> lst = 
+                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        lst.add(ap);
+                        freeAPPerAtm.put(a,lst);
+                    }
+                }
+            }
         }
+        String propAPClass = "";
+        String propAttchPnt = "";
+        for (IAtom a : freeAPPerAtm.keySet())
+        {
+            ArrayList<DENOPTIMAttachmentPoint> aps = freeAPPerAtm.get(a);
+            int atmID = mol.getAtomNumber(a)+1;
+            boolean firstCL = true;
+            for (DENOPTIMAttachmentPoint ap : aps)
+            {
+                //Build SDF property DENOPTIMConstants.APCVTAG
+                String stingAPP = ""; //String Attachment Point Property
+                if (firstCL)
+                {
+                    firstCL = false;
+                    stingAPP = ap.getSingleAPStringSDF(true,atmID);
+                } else {
+                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
+                            + ap.getSingleAPStringSDF(false,atmID);
+                }
+                propAPClass = propAPClass + stingAPP;
+    
+                //Build SDF property DENOPTIMConstants.APTAG
+                String sBO = FragmentSpace.getBondOrderForAPClass(
+                        ap.getAPClass().toString()).toOldString();
+                String stBnd = " " + atmID +":"+sBO;
+                if (propAttchPnt.equals(""))
+                {
+                    stBnd = stBnd.substring(1);
+                }
+                propAttchPnt = propAttchPnt + stBnd;
+            }
+            propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
+            
+            
+        }
+        mol.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
+        mol.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+        
+        // Add usual graph-related string-based data to SDF properties
+        GraphUtils.writeSDFFields(mol, this.graph);
+        
         this.conversionCompleted = true;
 
         return mol;

@@ -125,6 +125,7 @@ import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphUtils;
 
 
 /**
@@ -2140,7 +2141,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Writes the graphs to file.
+     * Writes the graphs to file. Always overwrites.
      *
      * @param file the file where to print
      * @param format how to print graphs on file
@@ -2162,7 +2163,7 @@ public class DenoptimIO
                 break;
                 
             case GRAPHSDF:
-                writeGraphsToSDF(file, graphs);
+                writeGraphsToSDF(file, graphs, false, true);
                 break;
                 
             default:
@@ -2269,8 +2270,9 @@ public class DenoptimIO
                     t.printStackTrace();
                     System.out.println("Couldn't make 3D-tree representation: "
                             + t.getMessage());
-                    //molLibrary.set(currGrphIdx, builder.newAtomContainer());
                 }
+            } else {
+                GraphUtils.writeSDFFields(iac,g);
             }
             lst.add(iac);
         }

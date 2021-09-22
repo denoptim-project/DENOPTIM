@@ -755,19 +755,29 @@ Comparable<DENOPTIMAttachmentPoint>
      * Prepare a string for writing this AP in a fragment SDF file.
      * Only DENOPTIM's format is currently supported and we assume three 
      * coordinates are used to define the direction vector.
-     * @param isFirst set <code>true</code> is this is the first AP among those
+     * @param isFirst use <code>true</code> if this is the first AP among those
      * on the same source atom. When you give <code>false</code> the atom ID and
      * the first separator are omitted.
+     * @param srcAtmID the index to use to identify the source atom. Use this to
+     *  write something different from what reported in 
+     *  {@Link DENOPTIMAttachmentPoint#atomPositionNumber}, or use negative
+     *  value to ignore this argument.
      * @returns a string with APClass and coordinated of the AP direction vector
      **/
 
-    public String getSingleAPStringSDF(boolean isFirst)
+    public String getSingleAPStringSDF(boolean isFirst, int srcAtmID)
     {
         StringBuilder sb = new StringBuilder();
         if (isFirst)
         {
             //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
-            sb.append(atomPositionNumber +1);
+            int atmIdx = atomPositionNumber + 1;
+            if (srcAtmID>0)
+            {
+                atmIdx = srcAtmID;
+            }
+           
+            sb.append(atmIdx);
             sb.append(DENOPTIMConstants.SEPARATORAPPROPAAP);
         }
         sb.append(apClass);
@@ -783,6 +793,23 @@ Comparable<DENOPTIMAttachmentPoint>
             sb.append(digits.format(dirVec[2]));
         }
         return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Prepare a string for writing this AP in a fragment SDF file.
+     * Only DENOPTIM's format is currently supported and we assume three 
+     * coordinates are used to define the direction vector.
+     * @param isFirst set <code>true</code> is this is the first AP among those
+     * on the same source atom. When you give <code>false</code> the atom ID and
+     * the first separator are omitted.
+     * @returns a string with APClass and coordinated of the AP direction vector
+     **/
+
+    public String getSingleAPStringSDF(boolean isFirst)
+    {
+        return getSingleAPStringSDF(isFirst, -1);
     }
     
 //------------------------------------------------------------------------------

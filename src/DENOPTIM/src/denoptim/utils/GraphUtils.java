@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
@@ -178,6 +181,21 @@ public class GraphUtils
         return molCounter.getAndIncrement();
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+    
+    public static void writeSDFFields(IAtomContainer iac, DENOPTIMGraph g) 
+            throws DENOPTIMException
+    {
+        iac.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
+        iac.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
+        iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
+        if (g.getLocalMsg() != null 
+                && !g.getLocalMsg().toString().equals(""))
+        {
+            iac.setProperty(DENOPTIMConstants.GMSGTAG,g.getLocalMsg());
+        }
+    }
+
+//------------------------------------------------------------------------------
 
 }

@@ -611,7 +611,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         String propAttchPnt = "";
         for (IAtom atm : mol.atoms())
         {
-        	//WARNING: here is the 1-based criterion implemented
+        	//WARNING: here is the 1-based criterion implemented.
+            // This is done also in ThreeDimTreeBuilder!
         	int atmID = mol.getAtomNumber(atm)+1;
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
@@ -653,7 +654,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			}
 	        propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
 	    }
-
         mol.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
         mol.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
     }
