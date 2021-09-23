@@ -1,0 +1,42 @@
+# Genetic Algorithm - parameters
+GA-RandomSeed=1234567
+GA-PrintLevel=1
+GA-PopulationSize=100
+GA-NumChildren=100
+GA-NumGenerations=100
+GA-NumConvGen=100
+GA-GrowthProbScheme=SIGMA
+GA-GrowthSigmaSteepness=0.3
+GA-GrowthSigmaMiddle=-6.0
+GA-CrowdProbScheme=SIGMA
+#GA-CrowdMultiplier=2.0
+GA-CrowdSigmaSteepness=0.1
+GA-CrowdSigmaMiddle=-20.0
+GA-XOverSelectionMode=TS
+GA-CrossoverWeight=0.70
+GA-MutationWeight=0.90
+GA-ConstructionWeight=0.2
+GA-SymmetryProbability=0.0
+GA-ReplacementStrategy=ELITIST
+GA-NumParallelTasks=8
+GA-Parallelization=Asynchronous
+# Fragment Space - parameters
+FS-ScaffoldLibFile=data/lib_frags.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CappingFragmentLibFile=data/lib_cap.sdf
+FS-CompMatrixFile=data/CPMap.par
+FS-MaxHeavyAtom=50
+FS-MaxMW=600
+FS-MaxRotatableBond=150
+RC-CloseRings=SELECTED_by_GUI
+FS-RCCompMatrixFile=data/RC-CPMap
+RC-RingSizeBias=5 2
+RC-RingSizeBias=6 4
+RC-RingSizeBias=7 1
+RC-RingSizeBias=4 1
+RC-MaxSizeNewRings=10
+RC-EvaluationClosabilityMode=Ring_size
+
+# Fitness Provider - parameters
+FP-Equation=${taniToGoal}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
