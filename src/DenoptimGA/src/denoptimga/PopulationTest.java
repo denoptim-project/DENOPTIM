@@ -17,6 +17,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -305,4 +306,86 @@ public class PopulationTest
         
         return graphD;
     }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetMinMax() throws Exception
+    {
+        Population pop = new Population();
+        
+        DENOPTIMGraph g1 = makeGraphA();
+        Candidate c1 = new Candidate("C1",g1);
+        c1.setFitness(-1.0);
+        pop.add(c1);
+        
+        DENOPTIMGraph g2 = makeGraphB();
+        Candidate c2 = new Candidate("C2",g2);
+        c2.setFitness(0.02);
+        pop.add(c2);
+        
+        DENOPTIMGraph g3 = makeGraphB();
+        Candidate c3 = new Candidate("C3",g3);
+        c3.setFitness(2.0);
+        pop.add(c3);
+        
+        DENOPTIMGraph g4 = makeGraphC();
+        Candidate c4 = new Candidate("C4",g4);
+        c4.setFitness(0.5);
+        pop.add(c4);
+        
+        DENOPTIMGraph g5 = makeGraphD();
+        Candidate c5 = new Candidate("C5",g5);
+        c5.setFitness(-0.5);
+        pop.add(c5);
+        
+        double trsh = 0.001;
+        assertTrue(Math.abs(pop.getMinFitness()-(-1.0)) < trsh, 
+                "getting min fitness");
+        assertTrue(Math.abs(pop.getMaxFitness()-(2.0)) < trsh, 
+                "getting max fitness");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testIsInPercentile() throws Exception
+    {
+        Population pop = new Population();
+        
+        DENOPTIMGraph g1 = makeGraphA();
+        Candidate c1 = new Candidate("C1",g1);
+        c1.setFitness(20.0);
+        pop.add(c1);
+        
+        DENOPTIMGraph g2 = makeGraphB();
+        Candidate c2 = new Candidate("C2",g2);
+        c2.setFitness(120);
+        pop.add(c2);
+        
+        assertTrue(pop.isWithinPercentile(116, 0.05), "116 is in 5%");
+        assertTrue(pop.isWithinPercentile(70.1, 0.5), "70.1 is in 50%");
+        assertFalse(pop.isWithinPercentile(69, 0.5), "69 is not in 50%");
+        assertFalse(pop.isWithinPercentile(114, 0.05), "114 is not in 5%");
+        
+        pop = new Population();
+        
+        DENOPTIMGraph g1b = makeGraphA();
+        Candidate c1b = new Candidate("C1",g1b);
+        c1b.setFitness(-20.0);
+        pop.add(c1b);
+        
+        DENOPTIMGraph g2b = makeGraphB();
+        Candidate c2b = new Candidate("C2",g2b);
+        c2b.setFitness(80);
+        pop.add(c2b);
+        
+        assertTrue(pop.isWithinPercentile(76, 0.05), "76 is in 5%");
+        assertTrue(pop.isWithinPercentile(30.1, 0.5), "30.1 is in 50%");
+        assertFalse(pop.isWithinPercentile(29, 0.5), "29 is not in 50%");
+        assertFalse(pop.isWithinPercentile(74, 0.05), "74 is not in 5%");
+    }
+    
+//------------------------------------------------------------------------------
+      
 }

@@ -14,6 +14,9 @@ GA-CrowdProbScheme=SIGMA
 GA-CrowdSigmaSteepness=10.0
 GA-CrowdSigmaMiddle=1.5
 
+GA-KEEPNEWRINGSYSTEMVERTEXES
+#GA-KEEPNEWRINGSYSTEMSCAFFOLDS
+
 GA-XOverSelectionMode=TS
 GA-CrossoverWeight=0.70
 GA-MutationWeight=0.90

@@ -155,6 +155,7 @@ public class OffspringEvaluationTask extends FitnessTask
 
         if (result.hasFitness())
         {
+            boolean isWithinBestPrcentile = false;
         	if (population != null)
         	{
 	            synchronized (population)
@@ -162,13 +163,22 @@ public class OffspringEvaluationTask extends FitnessTask
 	            	DENOPTIMLogger.appLogger.log(Level.INFO, 
 	            			"Adding {0} to population", molName);
 	                population.add(result);
-	            }
+	                isWithinBestPrcentile = population.isWithinPercentile(
+                            result.getFitness(),
+                            GAParameters.saveRingSystemsFitnessThreshold);
+                }
         	}
 
-            //TODO: here we might need to send also molecular representation to 
-            // enable extraction of refined molecular fragments
-            
-            FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph());
+        	if ((GAParameters.saveRingSystemsAsTemplatesNonScaff
+        	        || GAParameters.saveRingSystemsAsTemplatesScaffolds)
+        	    && isWithinBestPrcentile)
+        	{
+                //TODO: here we might need to send also molecular representation to 
+                // enable extraction of refined molecular fragments
+                FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
+                        GAParameters.saveRingSystemsAsTemplatesScaffolds,
+                        GAParameters.saveRingSystemsAsTemplatesNonScaff);
+        	}
         }
         completed = true;
         return result;

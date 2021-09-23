@@ -26,14 +26,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import scala.PartialFunction.OrElse;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of
@@ -313,6 +316,57 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             xoverCompatibilities.remove(c);
         }
         this.subList(GAParameters.getPopulationSize(), k).clear();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets the minimum value of the fitness in this population.
+     * @return the minimum fitness value in this population
+     */
+    public double getMinFitness()
+    {
+        return this.stream()
+                .min(Comparator.comparing(Candidate::getFitness))
+                .orElse(null)
+                .getFitness();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets the maximum value of the fitness in this population.
+     * @return the maximum fitness value in this population
+     */
+    public double getMaxFitness()
+    {
+        return this.stream()
+                .max(Comparator.comparing(Candidate::getFitness))
+                .orElse(null)
+                .getFitness();
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if a given fitness value if within the given percentile of best 
+     * candidates.
+     * @param value the value of fitness to compare with the population.
+     * @param percentile number in 0-1 range defining the desired percentile.
+     * @return <code>true</code> is the value is among the best 
+     * <i>percentile</i>% values in the current population, i.e., is larger than
+     * min + (100-<i>percentile</i>% * (max-min)).
+     */
+    public boolean isWithinPercentile(double value, double percentile)
+    {
+        double min = getMinFitness();
+        double max = getMaxFitness();
+        double threshold = (1.0 - percentile) * (max-min);
+        
+        if (value > (threshold+min))
+            return true;
+        else
+            return false;
     }
     
 //------------------------------------------------------------------------------

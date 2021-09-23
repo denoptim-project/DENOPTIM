@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import denoptim.molecule.*;
+import denoptimga.GAParameters;
 import denoptimga.GraphPattern;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -1361,12 +1362,57 @@ public class FragmentSpace
     
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) 
     {
+        addFusedRingsToFragmentLibrary(graph,true,true);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Extracts a system of one or more fused rings and adds them to the
+     * fragment space if not already present. <b>WARNING</b> 
+     * Expanding the libraries of 
+     * building blocks on-the-fly has the potential to overload the memory.
+     * @param graph the graph to analyze and possibly chop.
+     * @param addIfScaffold use <code>true</code> to enable saving of new
+     * ring systems that contain any scaffold vertexes as new scaffolds.
+     * @param addIfFragment use <code>true</code> to enable saving of new
+     * ring systems that do NOT contain any scaffold vertexes as new fragments.
+     */
+    
+    //TODO: need something to prevent memory overload: 
+    // -> keep only some templates?
+    // -> remove those who did not lead to good population members?
+    // -> remove redundant? The highest-simmetry principle (i.e., rather than 
+    //    keeping a template as it is, we'd like to keep its highest symmetry 
+    //    isomorphic) would be the first thing to do.
+    
+    //TODO: deal with molecular representation. For each subgraph we want the
+    // corresponding molecular representation with APs and atoms with 
+    // geometrical
+    // features that might be obtained from the results of the fitness provider.
+    // In particular, we should take optimized 3D geometries when the 
+    // geom.optimization
+    // is run within the fitness provider.
+    
+    public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph,
+            boolean addIfScaffold, boolean addIfFragment) 
+    {
         List<DENOPTIMGraph> subgraphs = extractPattern(graph,GraphPattern.RING);
 
-        for (DENOPTIMGraph g : subgraphs) {
+        for (DENOPTIMGraph g : subgraphs) 
+        {
             BBType type = g.hasScaffoldTypeVertex() ? 
                     BBType.SCAFFOLD :
                         BBType.FRAGMENT;
+            
+            if (!addIfFragment && type == BBType.FRAGMENT) 
+            {
+                continue;
+            }
+            if (!addIfScaffold && type == BBType.SCAFFOLD)
+            {
+                continue;
+            }
 
             ArrayList<DENOPTIMVertex> library = type == BBType.FRAGMENT ?
                     FragmentSpace.getFragmentLibrary() :
@@ -1374,8 +1420,8 @@ public class FragmentSpace
             
             synchronized (library)
             {
-                if (!hasIsomorph(g, type)) {
-                    
+                if (!hasIsomorph(g, type)) 
+                {   
                     //TODO: we should try to transform the template into its isomorphic
                     // with highest symmetry, and define the symmetric sets. This
                     // Enhancement would facilitate the creation of symmetric graphs 
@@ -1422,13 +1468,8 @@ public class FragmentSpace
     /**
      * Checks if a graph is isomorphic to another template's inner graph in its
      * appropriate fragment space library (inferred from BBType).
-     *
-     * The GraphPattern parameter is used by the function to speed up the
-     * comparisons between graph by making certain assumptions. The pattern
-     * must therefore be the same pattern as the graph adheres to to filter
-     * correctly.
      * @param graph to check if has an isomorph in the fragment space.
-     * @param type specifying which fragment space library to check for
+     * @param type specifying which fragment library to check for
      *             isomorphs in.
      * @return true if there is an isomorph template in the library of the
      * specified type.

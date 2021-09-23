@@ -1694,7 +1694,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * {@link DENOPTIMVertex#sameAs()}</li>
      * <li>edges are considered undirected and compared considering the 
      * {@link BondType} and the 
-     * identity of the attachment points connected thereby.</li>
+     * identity of the attachment points connected thereby. This latter point
+     * has an important implication: two apparently equal graphs (same vertexes
+     * that are connected to each other forming the same vertex-chains) can be 
+     * non-isomorphic when the APs used to connect two vertexes are not the
+     * same. Chemically, this means the stereochemistry around one or both
+     * vertexed, is different in the two graphs. Therefore two otherwise 
+     * equal-looking graphs can very well be, de facto, not isomorphic.</li>
      * </ul>
      * <p>
      * This method makes use of the Vento-Foggia VF2 algorithm (see 
@@ -1791,7 +1797,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         };
         
-
         Comparator<UndirectedEdgeRelation> eComp =
                 UndirectedEdgeRelation::compare;
         

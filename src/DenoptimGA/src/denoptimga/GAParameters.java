@@ -260,7 +260,28 @@ public class GAParameters
      * Minimal standard deviation accepted in the fitness values of the initial population
      */
     protected static double minFitnessSD = 0.000001;
+    
+    /**
+     * Flag controlling the possibility of collecting cyclic graph systems that 
+     * include a scaffold and save them as new template scaffolds.
+     */
+    protected static boolean saveRingSystemsAsTemplatesScaffolds = false;
+    
+    /**
+     * Flag controlling the possibility of collecting cyclic graph systems that 
+     * do NOT include a scaffold and save them as new template non-scaffold
+     * building blocks.
+     */
+    protected static boolean saveRingSystemsAsTemplatesNonScaff = false;
 
+    /**
+     * Fitness threshold for adding template to building block libraries. 
+     * This is expressed as percentage, i.e., if the fitness is in the best X%
+     * of the population, then the template is added to the scaffold/vertex
+     * library.
+     */
+    protected static double saveRingSystemsFitnessThreshold = 0.10;
+    
     /**
      * Print level
      */
@@ -904,6 +925,16 @@ public class GAParameters
                     {
                         GAParameters.numConvGen = Integer.parseInt(option);
                     }
+                }
+                
+                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMVERTEXES"))
+                {
+                    saveRingSystemsAsTemplatesNonScaff = true;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMSCAFFOLDS"))
+                {
+                    saveRingSystemsAsTemplatesScaffolds = true;
                 }
 
                 if (line.toUpperCase().startsWith("GA-XOVERSELECTIONMODE="))
