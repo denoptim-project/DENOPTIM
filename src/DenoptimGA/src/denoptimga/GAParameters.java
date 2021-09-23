@@ -811,6 +811,15 @@ public class GAParameters
                         crowdingSigmaMiddle = Double.parseDouble(option);
                     }
                 }
+                
+                if (line.toUpperCase().startsWith("GA-SYMMETRYPROBABILITY="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        symmetricSubProbability = Double.parseDouble(option);
+                    }
+                }
 
                 if (line.toUpperCase().startsWith("GA-CROWDPROBSCHEME="))
                 {

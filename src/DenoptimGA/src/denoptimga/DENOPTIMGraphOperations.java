@@ -432,7 +432,6 @@ public class DENOPTIMGraphOperations
      * function that will keep extending the graph according to the 
      * growth/substitution probability.
      *
-     * @param molGraph molecular graph
      * @param curVertex vertex to which further fragments will be appended
      * @param extend if <code>true</code>, then the graph will be grown further 
      * (recursive mode)
