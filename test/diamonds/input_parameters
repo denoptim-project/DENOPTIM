@@ -15,6 +15,7 @@ GA-CrowdSigmaSteepness=10.0
 GA-CrowdSigmaMiddle=1.5
 
 GA-KEEPNEWRINGSYSTEMVERTEXES
+GA-KEEPNEWRINGSYSTEMFITNESSTRSH=0.10
 #GA-KEEPNEWRINGSYSTEMSCAFFOLDS
 
 GA-XOverSelectionMode=TS
@@ -30,9 +31,9 @@ FS-ScaffoldLibFile=data/lib_frags.sdf
 FS-FragmentLibFile=data/lib_frags.sdf
 FS-CappingFragmentLibFile=data/lib_cap.sdf
 FS-CompMatrixFile=data/CPMap.par
-FS-MaxHeavyAtom=50
-FS-MaxMW=600
-FS-MaxRotatableBond=150
+FS-MaxHeavyAtom=20
+FS-MaxMW=200
+FS-MaxRotatableBond=50
 RC-CloseRings=SELECTED_by_GUI
 FS-RCCompMatrixFile=data/RC-CPMap
 RC-RingSizeBias=5 2

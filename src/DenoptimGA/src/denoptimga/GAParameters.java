@@ -936,6 +936,16 @@ public class GAParameters
                 {
                     saveRingSystemsAsTemplatesScaffolds = true;
                 }
+                
+                
+                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMFITNESSTRSH="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        saveRingSystemsFitnessThreshold = Double.parseDouble(option);
+                    }
+                }
 
                 if (line.toUpperCase().startsWith("GA-XOVERSELECTIONMODE="))
                 {
