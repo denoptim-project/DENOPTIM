@@ -2,6 +2,25 @@
 #
 # Script lauching an evolutionary experiment aiming to desing a diamond-like molecule.
 #
+#
+# Usage:
+#
+# ./scriptName.sh [-r]
+#
+# Options:
+# -r           remove previously existing workspace.
+#
+
+# Process arguments
+overwrite=1
+args=($@)
+for ((i=0; i<$#; i++))
+do
+    arg=${args[$i]}
+    case "$arg" in
+        "-r") overwrite=0 ;;
+    esac
+done
 
 # Setting the environment
 export SHELL="/bin/bash"
@@ -25,10 +44,15 @@ echo "Using DENOPTIM from $DENOPTIMJarFiles"
 wDir="/tmp/denoptim_Diamond"
 if [ -d "$wDir" ]
 then
-    echo " "
-    echo "ERROR! Old $wDir exists already! Remove it to run a new test."
-    echo " "
-    exit
+if [ $overwrite -eq 0 ]
+    then
+        rm -fr "$wDir"
+    else
+        echo " "
+        echo "ERROR! Old $wDir exists already! Remove it to run a new test."
+        echo " "
+        exit
+    fi
 fi
 mkdir "$wDir"
 if [ ! -d "$wDir" ]
