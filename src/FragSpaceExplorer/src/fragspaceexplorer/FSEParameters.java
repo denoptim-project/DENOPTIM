@@ -644,7 +644,7 @@ public class FSEParameters
         boolean success = false;
         while (!success)
         {
-            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             String str = "FSE" + sdf.format(new Date());
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);

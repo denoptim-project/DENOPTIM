@@ -1044,7 +1044,7 @@ public class GAParameters
         boolean success = false;
         while (!success)
         {
-            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             String str = "RUN" + sdf.format(new Date());
             dataDir = cdataDir + fileSep + str;
             success = DenoptimIO.createDirectory(dataDir);
