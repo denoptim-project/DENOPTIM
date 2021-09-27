@@ -576,6 +576,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	    });
 		
 		// Setting toolTip when on top of an series item in the chart
+		//TODO deal with superposed points by adding all their names to tip text
 		XYToolTipGenerator ttg = new XYToolTipGenerator() {
 			public String generateToolTip(XYDataset data, int sId, int itemId)
 			{
