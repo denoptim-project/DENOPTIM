@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.vecmath.Point3d;
@@ -35,11 +36,16 @@ import javax.vecmath.Point3d;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.APClass;
+import denoptim.molecule.CandidateLW;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
@@ -64,6 +70,63 @@ public class DenoptimIOTest {
     @TempDir
     File tempDir;
 
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testReadLightWeightCandidate() throws Exception {
+
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
+        
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer iac = builder.newAtomContainer();
+        iac.addAtom(new Atom("C"));
+        String uid = "mmyUiD";
+        String name = "myName";
+        double fitness = 999.123;
+        String err = "myError";
+        String msg = "myMSG";
+        int level = 26;
+        iac.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid);
+        iac.setProperty(CDKConstants.TITLE, name);
+        iac.setProperty(DENOPTIMConstants.FITNESSTAG, fitness);
+        iac.setProperty(DENOPTIMConstants.MOLERRORTAG, err);
+        iac.setProperty(DENOPTIMConstants.GMSGTAG, msg);
+        iac.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
+        
+        DenoptimIO.writeMolecule(pathName, iac, false);
+        
+        IAtomContainer iac2 = builder.newAtomContainer();
+        iac.addAtom(new Atom("C"));
+        String uid2 = "mmyUiD2";
+        String name2 = "myName2";
+        double fitness2 = 999.1232;
+        String err2 = "myError2";
+        String msg2 = "myMSG2";
+        int level2 = 262;
+        iac2.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid2);
+        iac2.setProperty(CDKConstants.TITLE, name2);
+        iac2.setProperty(DENOPTIMConstants.FITNESSTAG, fitness2);
+        iac2.setProperty(DENOPTIMConstants.MOLERRORTAG, err2);
+        iac2.setProperty(DENOPTIMConstants.GMSGTAG, msg2);
+        iac2.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level2);
+        
+        DenoptimIO.writeMolecule(pathName, iac2, true);
+        
+        List<CandidateLW> cands = DenoptimIO.readLightWeightCandidate(
+                new File(pathName));
+        
+        assertEquals(2,cands.size(), "number of candidates in file");
+        assertEquals(uid,cands.get(0).getUid(), "UID 1st");
+        assertEquals(uid2,cands.get(1).getUid(), "UID 2nd");
+        assertEquals(name,cands.get(0).getName(), "name 1st");
+        assertEquals(name2,cands.get(1).getName(), "name 2nd");
+        assertTrue(0.001 > Math.abs(fitness- cands.get(0).getFitness()), 
+                "fitness 1st");
+        assertTrue(0.001 > Math.abs(fitness2 - cands.get(1).getFitness()), 
+                "fitness 2nd");
+    }
+    
 //------------------------------------------------------------------------------
 
 	@Test

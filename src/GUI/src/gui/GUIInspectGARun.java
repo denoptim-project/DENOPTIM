@@ -73,6 +73,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.Candidate;
+import denoptim.molecule.CandidateLW;
 import denoptim.utils.GenUtils;
 
 
@@ -104,10 +105,10 @@ public class GUIInspectGARun extends GUICardPanel
 	
 	private File srcFolder;
 	
-	private ArrayList<Candidate> allIndividuals;
+	private ArrayList<CandidateLW> allIndividuals;
 	private int molsWithFitness = 0;
 	private JLabel lblTotItems;
-	private Map<Integer,Candidate> candsWithFitnessMap;
+	private Map<Integer,CandidateLW> candsWithFitnessMap;
 	
 	// WARNING: itemId in the map is "j" and is just a 
 	// locally generated unique 
@@ -321,12 +322,13 @@ public class GUIInspectGARun extends GUICardPanel
 		}
 
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
 		srcFolder = file;
 		
 		System.out.println("Importing data from '" + srcFolder + "'...");
 		
 		Map<Integer,double[]> popProperties = new HashMap<Integer,double[]>();
-		allIndividuals = new ArrayList<Candidate>();
+		allIndividuals = new ArrayList<CandidateLW>();
 		for (File genFolder : file.listFiles(new FileFilter() {
 			
 			@Override
@@ -392,10 +394,10 @@ public class GUIInspectGARun extends GUICardPanel
 				}
 			}))
 			{
-				Candidate one;
+				CandidateLW one;
 				try {
-					one = DenoptimIO.readDENOPTIMMolecules(
-							fitFile,false).get(0);
+				    //WARNING: here we assume one candidate per file
+					one = DenoptimIO.readLightWeightCandidate(fitFile).get(0);
 				} catch (DENOPTIMException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null,
@@ -421,12 +423,12 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		// Process data and organize then into series for the plot 
         double[][] candsWithFitnessData = new double[2][molsWithFitness];
-        candsWithFitnessMap = new HashMap<Integer,Candidate>();
+        candsWithFitnessMap = new HashMap<Integer,CandidateLW>();
         int j = -1;
         for (int i=0; i<allIndividuals.size(); i++)
         {
-        	Candidate mol = allIndividuals.get(i);
-        	if (!mol.hasFitness())
+        	CandidateLW item = allIndividuals.get(i);
+        	if (!item.hasFitness())
         	{
         		continue;
         	}
@@ -437,9 +439,9 @@ public class GUIInspectGARun extends GUICardPanel
         	// the itemId 'j' into a DENOPTIMMolecule
         	
         	j++;
-        	candsWithFitnessMap.put(j, mol);
-        	candsWithFitnessData[0][j] = mol.getGeneration();
-        	candsWithFitnessData[1][j] = mol.getFitness();
+        	candsWithFitnessMap.put(j, item);
+        	candsWithFitnessData[0][j] = item.getGeneration();
+        	candsWithFitnessData[1][j] = item.getFitness();
         }
 		datasetAllFit.addSeries("Candidates_with_fitness", candsWithFitnessData);
 		
@@ -619,7 +621,7 @@ public class GUIInspectGARun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						Candidate mol = candsWithFitnessMap.get(itemId);
+						CandidateLW mol = candsWithFitnessMap.get(itemId);
 						renderViewWithSelectedItem(mol);
 					}
 					//do we do anything if we select other series? not now...
@@ -638,17 +640,18 @@ public class GUIInspectGARun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void renderViewWithSelectedItem(Candidate mol)
+	private void renderViewWithSelectedItem(CandidateLW item)
 	{
+        mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		// Update series of selected (chart is updated automatically)
         double[][] selectedCandsData = new double[2][1]; //NB: for now allow only one
         int j = -1;
         for (int i=0; i<1; i++) //NB: for now allow only one
         {	
         	j++;
-        	candsWithFitnessMap.put(j, mol);
-        	selectedCandsData[0][j] = mol.getGeneration();
-        	selectedCandsData[1][j] = mol.getFitness();
+        	candsWithFitnessMap.put(j, item);
+        	selectedCandsData[0][j] = item.getGeneration();
+        	selectedCandsData[1][j] = item.getFitness();
         }
         datasetSelected.removeSeries("Selected_candidates");
         datasetSelected.addSeries("Selected_candidates", selectedCandsData);
@@ -656,7 +659,9 @@ public class GUIInspectGARun extends GUICardPanel
 		plot.setDataset(0, datasetSelected);
 		
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(mol.getSDFFile());
+		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
+
+        mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------

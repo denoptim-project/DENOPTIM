@@ -165,6 +165,41 @@ public class GAParameters
     protected static double growthSigmaMiddle = 2.5;
     
     /**
+     * Flag recording the intention to use level-controlled graph extension 
+     * probability.
+     */
+    protected static boolean useLevelBasedProb = false;
+    
+    /**
+     * Flag recording the intention to use molecular size-controlled graph
+     * extension probability.
+     */
+    protected static boolean useMolSizeBasedProb = false;
+    
+    /**
+     * Definition of the molGrowth probability function:
+     */
+    protected static int molGrowthProbabilityScheme = 2;
+
+    /**
+     * Parameter controlling the molGrowth probability function of types
+     * 'EXP_DIFF' and 'TANH'
+     */
+    protected static double molGrowthMultiplier = 0.5;
+
+    /**
+     * Parameters controlling the molGrowth probability function
+     * of type 'SIGMA': steepness of the function where p=50%
+     */
+    protected static double molGrowthSigmaSteepness = 0.5;
+
+    /**
+     * Parameters controlling the molGrowth probability function
+     * of type 'SIGMA': level at which p=50% (can be  a float)
+     */
+    protected static double molGrowthSigmaMiddle = 10;
+    
+    /**
      * Definition of the crowding probability function. By default, the 
      * probability of using an AP that is hosted on an atom that already has an 
      * used AP is 100%.
@@ -317,6 +352,10 @@ public class GAParameters
     	growthMultiplier = 0.5;
     	growthSigmaSteepness = 1.0;
     	growthSigmaMiddle = 2.5;
+        molGrowthProbabilityScheme = 2;
+        molGrowthMultiplier = 0.5;
+        molGrowthSigmaSteepness = 0.5;
+        molGrowthSigmaMiddle = 10;
     	symmetricSubProbability = 0.8;
     	crossoverWeight = 1.0;
     	mutationWeight = 1.0;
@@ -331,6 +370,8 @@ public class GAParameters
     	print_level = 0;
     	monitorDumpStep = 50;
     	dumpMonitor = false;
+    	useLevelBasedProb = false;
+    	useMolSizeBasedProb = false;
     	
         FragmentSpaceParameters.resetParameters();
         RingClosureParameters.resetParameters();
@@ -483,6 +524,34 @@ public class GAParameters
     protected static int getGrowthProbabilityScheme()
     {
         return growthProbabilityScheme;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static double getMolGrowthFactorSteepSigma()
+    {
+        return molGrowthSigmaSteepness;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getMolGrowthFactorMiddleSigma()
+    {
+        return molGrowthSigmaMiddle;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getMolGrowthMultiplier()
+    {
+        return molGrowthMultiplier;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static int getMolGrowthProbabilityScheme()
+    {
+        return molGrowthProbabilityScheme;
     }
 
 //------------------------------------------------------------------------------
@@ -779,6 +848,7 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         growthMultiplier = Double.parseDouble(option);
+                        useLevelBasedProb = true;
                     }
                 }
 
@@ -788,6 +858,7 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         growthSigmaSteepness = Double.parseDouble(option);
+                        useLevelBasedProb = true;
                     }
                 }
 
@@ -797,6 +868,7 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         growthSigmaMiddle = Double.parseDouble(option);
+                        useLevelBasedProb = true;
                     }
                 }
 
@@ -804,6 +876,44 @@ public class GAParameters
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     growthProbabilityScheme = convertGrowthProbabilityScheme(option);
+                    useLevelBasedProb = true;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHMULTIPLIER="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        molGrowthMultiplier = Double.parseDouble(option);
+                        useMolSizeBasedProb = true;
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHSIGMASTEEPNESS="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        molGrowthSigmaSteepness = Double.parseDouble(option);
+                        useMolSizeBasedProb = true;
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHSIGMAMIDDLE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        molGrowthSigmaMiddle = Double.parseDouble(option);
+                        useMolSizeBasedProb = true;
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHPROBSCHEME="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    molGrowthProbabilityScheme = convertGrowthProbabilityScheme(option);
+                    useMolSizeBasedProb = true;
                 }
                 
                 if (line.toUpperCase().startsWith("GA-CROWDMULTIPLIER="))
@@ -1193,6 +1303,15 @@ public class GAParameters
         if (replacementStrategy < 0 || replacementStrategy > 2)
         {
             error = "Allowed values for replacementStrategy (1-2)";
+            throw new DENOPTIMException(error);
+        }
+        
+        if ((useMolSizeBasedProb && useLevelBasedProb) 
+                || (!useMolSizeBasedProb && !useLevelBasedProb) )
+        {
+            error = "Cannot use both graph level or molecular size as criterion "
+                    + "for controlling the growth of graphs. "
+                    + "Please, use either of them.";
             throw new DENOPTIMException(error);
         }
 

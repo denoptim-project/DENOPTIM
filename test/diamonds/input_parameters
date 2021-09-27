@@ -5,9 +5,14 @@ GA-PopulationSize=100
 GA-NumChildren=100
 GA-NumGenerations=100
 GA-NumConvGen=100
-GA-GrowthProbScheme=SIGMA
-GA-GrowthSigmaSteepness=0.4
-GA-GrowthSigmaMiddle=6.0
+
+GA-MOLGROWTHPROBSCHEME=SIGMA
+GA-MOLGROWTHSIGMASTEEPNESS=0.2
+GA-MOLGROWTHSIGMAMIDDLE=20
+
+#GA-GrowthProbScheme=SIGMA
+#GA-GrowthSigmaSteepness=0.4
+#GA-GrowthSigmaMiddle=6.0
 
 GA-CrowdProbScheme=SIGMA
 #GA-CrowdMultiplier=20

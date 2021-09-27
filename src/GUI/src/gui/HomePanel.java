@@ -140,12 +140,12 @@ public class HomePanel extends GUICardPanel
 				{
 					return;
 				}
-				GUIInspectGARun inspector = new GUIInspectGARun(mainPanel);
-				mainPanel.add(inspector);
-				inspector.importGARunData(file);
+				mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		        GUIInspectGARun inspector = new GUIInspectGARun(mainPanel);
+		        mainPanel.add(inspector);
+		        inspector.importGARunData(file);
 			}
 		});
-		
         JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
         btnReadFSEOutput.setToolTipText("Analyzes the output folder of an "
 				+ "combinatorial experiment  (i.e., folder named FSE...)");
@@ -156,6 +156,7 @@ public class HomePanel extends GUICardPanel
                 {
                         return;
                 }
+                mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 GUIInspectFSERun inspector = new GUIInspectFSERun(mainPanel);
                 mainPanel.add(inspector);
                 inspector.importFSERunData(file);

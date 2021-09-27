@@ -545,15 +545,18 @@ public class DENOPTIMGraphOperations
             if (!force)
             {
                 // Decide whether we want to extend the graph at this AP?
-                double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl);
-                double crowdingProp = EAUtils.getCrowdingProbability(ap);
-                double extendGraphProb = growthProb * crowdingProp;
+                // Note that depending on the criterion (level/molSize) one
+                // of these two first factors is 1.0.
+                double molSizeProb = EAUtils.getMolSizeProbability(molGraph);
+                double byLevelProb = EAUtils.getGrowthByLevelProbability(lvl);
+                double crowdingProb = EAUtils.getCrowdingProbability(ap);
+                double extendGraphProb = molSizeProb * byLevelProb * crowdingProb;
                 boolean fgrow =  RandomUtils.nextBoolean(extendGraphProb);
                 if (debug)
                 {
                     System.err.println("Growth probability on this AP:" 
-                            + extendGraphProb + " (growth: "+growthProb+", "
-                                    + "crowding: "+crowdingProp+")");
+                            + extendGraphProb + " (growth: "+byLevelProb+", "
+                                    + "crowding: "+crowdingProb+")");
                 }
                 if (!fgrow)
                 {

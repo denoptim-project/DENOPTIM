@@ -1684,36 +1684,98 @@ public class EAUtils
      * This will require a coin toss with the calculated probability. If a newly
      * drawn random number is less than this value, a new fragment may be added.
      * @param level level of the graph at which fragment is to be added
-     * @param scheme the chosen scheme
-     * @param lambda parameter used by scheme 0 and 1
-     * @param sigmaOne parameter used by scheme 2 (steepness)
-     * @param sigmaTwo parameter used by scheme 2 (middle point)
+     * @param scheme the chosen scheme.
+     * @param lambda parameter used by scheme 0 and 1.
+     * @param sigmaOne parameter used by scheme 2 (steepness).
+     * @param sigmaTwo parameter used by scheme 2 (middle point).
      * @return probability of adding a new fragment at this level.
      */
     
     public static double getGrowthProbabilityAtLevel(int level, int scheme,
                     double lambda, double sigmaOne, double sigmaTwo)
     {
-        double prob = 0.0;
-        
+        return getProbability(level, scheme, lambda, sigmaOne, sigmaTwo);
+    }
+    
+  //------------------------------------------------------------------------------
+
+    /**
+     * Calculated the probability of extending a graph based on the current
+     * size of the molecular representation contained in the graph
+     * and the given parameters.
+     * @param graph the current graph for which to calculate the probability
+     * of extension.
+     * @param scheme the chosen shape of the probability function.
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
+     * @return the crowding probability.
+     */
+    public static double getMolSizeProbability(DENOPTIMGraph graph)
+    {
+        if (!GAParameters.useMolSizeBasedProb)
+            return 1.0;
+        int scheme = GAParameters.getMolGrowthProbabilityScheme();
+        double lambda =GAParameters.getMolGrowthMultiplier();
+        double sigmaOne = GAParameters.getMolGrowthFactorSteepSigma();
+        double sigmaTwo = GAParameters.getMolGrowthFactorMiddleSigma();
+        return getMolSizeProbability(graph, scheme, lambda, sigmaOne, sigmaTwo);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the probability of extending a graph based on the current
+     * size of the molecular representation contained in the graph
+     * and the given parameters.
+     * @param graph the current graph for which to calculate the probability
+     * of extension.
+     * @param scheme the chosen shape of the probability function.
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
+     * @return the crowding probability.
+     */
+    public static double getMolSizeProbability(DENOPTIMGraph graph,
+            int scheme, double lambda, double sigmaOne, double sigmaTwo)
+    {
+        return getProbability(graph.getHeavyAtomsCount(), scheme, lambda, 
+                sigmaOne, sigmaTwo);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated a probability given parameters defining the shape of the 
+     * probability function and a single input value.
+     * @param value the value x for which we calculate f(x).
+     * @param scheme the chosen shape of the probability function.
+     * @param lambda parameter used by scheme 0 and 1
+     * @param sigmaOne parameter used by scheme 2 (steepness)
+     * @param sigmaTwo parameter used by scheme 2 (middle point)
+     * @return the probability.
+     */
+    private static double getProbability(double value, 
+            int scheme, double lambda, double sigmaOne, double sigmaTwo)
+    {
+        double prob = 1.0;
         if (scheme == 0)
         {
-            double f = Math.exp(-1.0 * (double)level * lambda);
+            double f = Math.exp(-1.0 * value * lambda);
             prob = 1 - ((1-f)/(1+f));
         }
         else if (scheme == 1)
         {
-            prob = 1.0 - Math.tanh(lambda * (double)level);
+            prob = 1.0 - Math.tanh(lambda * value);
         }
         else if (scheme == 2)
         {
-            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * ((double) level - sigmaTwo)));
+            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * (value - sigmaTwo)));
         }
         else if (scheme == 3)
         {
             prob = 1.0;
         }
-        
         return prob;
     }
     
@@ -1725,8 +1787,10 @@ public class EAUtils
      * @param level level of the graph at which fragment is to be added
      * @return probability of adding a new fragment at this level.
      */
-    public static double getGrowthProbabilityAtLevel(int level)
+    public static double getGrowthByLevelProbability(int level)
     {
+        if (!GAParameters.useLevelBasedProb)
+            return 1.0;
         int scheme = GAParameters.getGrowthProbabilityScheme();
         double lambda =GAParameters.getGrowthMultiplier();
         double sigmaOne = GAParameters.getGrowthFactorSteepSigma();
@@ -1806,26 +1870,7 @@ public class EAUtils
             int scheme,
             double lambda, double sigmaOne, double sigmaTwo)
     {
-        double prob = 1.0;
-        if (scheme == 0)
-        {
-            double f = Math.exp(-1.0 * crowdedness * lambda);
-            prob = 1 - ((1-f)/(1+f));
-        }
-        else if (scheme == 1)
-        {
-            prob = 1.0 - Math.tanh(lambda * crowdedness);
-        }
-        else if (scheme == 2)
-        {
-            prob = 1.0-1.0/(1.0 + Math.exp(-sigmaOne * (crowdedness - sigmaTwo)));
-        }
-        else if (scheme == 3)
-        {
-            prob = 1.0;
-        }
-        
-        return prob;
+        return getProbability(crowdedness, scheme, lambda, sigmaOne, sigmaTwo);
     }
 
 //------------------------------------------------------------------------------

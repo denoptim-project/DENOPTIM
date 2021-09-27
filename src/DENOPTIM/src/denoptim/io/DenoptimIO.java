@@ -116,6 +116,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
+import denoptim.molecule.CandidateLW;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -956,6 +957,82 @@ public class DenoptimIO
         }
         return newObj;
     }
+    
+ //------------------------------------------------------------------------------
+
+    /**
+     * Read only selected data from a GA produced items. This is a light-weight
+     * reader of SDF files containing an item, which can be successfully or 
+     * Unsuccessfully evaluated.
+     *
+     * @param fileName the pathname to SDF file
+     * @return the light-weight item description.
+     * @throws DENOPTIMException 
+     */
+    public static List<CandidateLW> readLightWeightCandidate(File file) 
+            throws DENOPTIMException
+    {
+        List<String> propNames = new ArrayList<String>(Arrays.asList(
+                DENOPTIMConstants.UNIQUEIDTAG,
+                CDKConstants.TITLE
+                ));
+        List<String> optionalPropNames = new ArrayList<String>(Arrays.asList(
+                DENOPTIMConstants.FITNESSTAG,
+                DENOPTIMConstants.MOLERRORTAG,
+                DENOPTIMConstants.GMSGTAG,
+                DENOPTIMConstants.GRAPHLEVELTAG
+                ));
+        propNames.addAll(optionalPropNames);
+        List<Map<String, Object>> propsPerItem = readSDFProperties(
+                file.getAbsolutePath(), propNames);
+        
+        List<CandidateLW> items = new ArrayList<CandidateLW>();
+        for (Map<String, Object> props : propsPerItem)
+        {
+            Object uidObj = props.get(DENOPTIMConstants.UNIQUEIDTAG);
+            if (uidObj==null )
+            {
+                throw new DENOPTIMException("Cannot create item is SDF tag "
+                        + DENOPTIMConstants.UNIQUEIDTAG + " is null!");
+            }
+            Object nameObj = props.get(CDKConstants.TITLE);
+            if (nameObj==null)
+            {
+                throw new DENOPTIMException("Cannot create item is SDF tag "
+                        + CDKConstants.TITLE + " is null!");
+            }
+            CandidateLW item = new CandidateLW(uidObj.toString(),
+                    nameObj.toString(),file.getAbsolutePath());
+            
+            for (String propName : optionalPropNames)
+            {
+                Object obj = props.get(propName);
+                if (obj != null)
+                {
+                    switch (propName)
+                    {
+                        case DENOPTIMConstants.FITNESSTAG:
+                            item.setFitness(Double.parseDouble(obj.toString()));
+                            break;
+                        
+                        case DENOPTIMConstants.MOLERRORTAG:
+                            item.setError(obj.toString());
+                            break;
+                        
+                        case DENOPTIMConstants.GMSGTAG:
+                            item.setGeneratingSource(obj.toString());
+                            break;
+                            
+                        case DENOPTIMConstants.GRAPHLEVELTAG:
+                            item.setLevel(Integer.parseInt(obj.toString()));
+                            break;
+                    }
+                }
+            }
+            items.add(item);
+        }
+        return items;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1086,6 +1163,33 @@ public class DenoptimIO
         }
 
         return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Extract selected properties from SDF files.
+     * @param pathName to the file to read
+     * @param propNames the list of property names to extract. All the rest will be
+     * ignored.
+     * @return a corresponding map of results.
+     * @throws DENOPTIMException if the file cannot be read.
+     */
+    public static List<Map<String, Object>> readSDFProperties(String pathName, 
+            List<String> propNames) throws DENOPTIMException 
+    {
+        List<Map<String,Object>> results = new ArrayList<Map<String,Object>>();
+        ArrayList<IAtomContainer> iacs =  DenoptimIO.readSDFFile(pathName);
+        for (IAtomContainer iac : iacs)
+        {
+            Map<String,Object> properties = new HashMap<String,Object>();
+            for (String propName : propNames)
+            {
+                properties.put(propName, iac.getProperty(propName));
+            }
+            results.add(properties);
+        }
+        return results;
     }
 
 //------------------------------------------------------------------------------

@@ -571,7 +571,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		switch (fileFormat)
 		{
 			case GA_PARAM:
-				GUIPrepareGARun gaParamsPanel = new GUIPrepareGARun(mainPanel);
+			    GUIPrepareGARun gaParamsPanel = new GUIPrepareGARun(mainPanel);
 				mainPanel.add(gaParamsPanel);
 				gaParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;	
