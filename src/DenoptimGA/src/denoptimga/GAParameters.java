@@ -144,25 +144,25 @@ public class GAParameters
     /**
      * Definition of the growth probability function:
      */
-    protected static int growthProbabilityScheme = 0;
+    protected static int lvlGrowthProbabilityScheme = 0;
  
     /**
      * Parameter controlling the growth probability function of types
      * 'EXP_DIFF' and 'TANH'
      */
-    protected static double growthMultiplier = 0.5;
+    protected static double lvlGrowthMultiplier = 0.5;
  
     /** 
      * Parameters controlling the growth probability function
      * of type 'SIGMA': steepness of the function where p=50%
      */
-    protected static double growthSigmaSteepness = 1.0;
+    protected static double lvlGrowthSigmaSteepness = 1.0;
 
     /** 
      * Parameters controlling the growth probability function
      * of type 'SIGMA': level at which p=50% (can be  a float)
      */
-    protected static double growthSigmaMiddle = 2.5;
+    protected static double lvlGrowthSigmaMiddle = 2.5;
     
     /**
      * Flag recording the intention to use level-controlled graph extension 
@@ -191,13 +191,13 @@ public class GAParameters
      * Parameters controlling the molGrowth probability function
      * of type 'SIGMA': steepness of the function where p=50%
      */
-    protected static double molGrowthSigmaSteepness = 0.5;
+    protected static double molGrowthSigmaSteepness = 0.2;
 
     /**
      * Parameters controlling the molGrowth probability function
      * of type 'SIGMA': level at which p=50% (can be  a float)
      */
-    protected static double molGrowthSigmaMiddle = 10;
+    protected static double molGrowthSigmaMiddle = 25;
     
     /**
      * Definition of the crowding probability function. By default, the 
@@ -348,14 +348,14 @@ public class GAParameters
     	maxTriesPerPop = 25;
     	maxGeneticOpAttempts = 100;
     	replacementStrategy = 1;
-    	growthProbabilityScheme = 0;
-    	growthMultiplier = 0.5;
-    	growthSigmaSteepness = 1.0;
-    	growthSigmaMiddle = 2.5;
+    	lvlGrowthProbabilityScheme = 0;
+    	lvlGrowthMultiplier = 0.5;
+    	lvlGrowthSigmaSteepness = 1.0;
+    	lvlGrowthSigmaMiddle = 2.5;
         molGrowthProbabilityScheme = 2;
         molGrowthMultiplier = 0.5;
-        molGrowthSigmaSteepness = 0.5;
-        molGrowthSigmaMiddle = 10;
+        molGrowthSigmaSteepness = 0.2;
+        molGrowthSigmaMiddle = 25;
     	symmetricSubProbability = 0.8;
     	crossoverWeight = 1.0;
     	mutationWeight = 1.0;
@@ -502,28 +502,28 @@ public class GAParameters
 
     protected static double getGrowthFactorSteepSigma()
     {
-        return growthSigmaSteepness;
+        return lvlGrowthSigmaSteepness;
     }
 
 //------------------------------------------------------------------------------
 
     protected static double getGrowthFactorMiddleSigma()
     {
-        return growthSigmaMiddle;
+        return lvlGrowthSigmaMiddle;
     }
 
 //------------------------------------------------------------------------------
 
     protected static double getGrowthMultiplier()
     {
-        return growthMultiplier;
+        return lvlGrowthMultiplier;
     }
 
 //------------------------------------------------------------------------------
 
     protected static int getGrowthProbabilityScheme()
     {
-        return growthProbabilityScheme;
+        return lvlGrowthProbabilityScheme;
     }
     
 //------------------------------------------------------------------------------
@@ -847,35 +847,35 @@ public class GAParameters
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        growthMultiplier = Double.parseDouble(option);
+                        lvlGrowthMultiplier = Double.parseDouble(option);
                         useLevelBasedProb = true;
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-GROWTHSIGMASTEEPNESS="))
+                if (line.toUpperCase().startsWith("GA-LEVELGROWTHSIGMASTEEPNESS="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        growthSigmaSteepness = Double.parseDouble(option);
+                        lvlGrowthSigmaSteepness = Double.parseDouble(option);
                         useLevelBasedProb = true;
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-GROWTHSIGMAMIDDLE="))
+                if (line.toUpperCase().startsWith("GA-LEVELGROWTHSIGMAMIDDLE="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        growthSigmaMiddle = Double.parseDouble(option);
+                        lvlGrowthSigmaMiddle = Double.parseDouble(option);
                         useLevelBasedProb = true;
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-GROWTHPROBSCHEME="))
+                if (line.toUpperCase().startsWith("GA-LEVELGROWTHPROBSCHEME="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    growthProbabilityScheme = convertGrowthProbabilityScheme(option);
+                    lvlGrowthProbabilityScheme = convertProbabilityScheme(option);
                     useLevelBasedProb = true;
                 }
                 
@@ -912,7 +912,7 @@ public class GAParameters
                 if (line.toUpperCase().startsWith("GA-MOLGROWTHPROBSCHEME="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    molGrowthProbabilityScheme = convertGrowthProbabilityScheme(option);
+                    molGrowthProbabilityScheme = convertProbabilityScheme(option);
                     useMolSizeBasedProb = true;
                 }
                 
@@ -955,7 +955,7 @@ public class GAParameters
                 if (line.toUpperCase().startsWith("GA-CROWDPROBSCHEME="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    crowdingProbabilityScheme = convertGrowthProbabilityScheme(option);
+                    crowdingProbabilityScheme = convertProbabilityScheme(option);
                 }
 
                 if (line.toUpperCase().startsWith("GA-NUMGENERATIONS="))
@@ -1115,7 +1115,7 @@ public class GAParameters
     
 //------------------------------------------------------------------------------
     
-    public static int convertGrowthProbabilityScheme(String option) 
+    public static int convertProbabilityScheme(String option) 
     		throws DENOPTIMException 
     {
         int res = 0;

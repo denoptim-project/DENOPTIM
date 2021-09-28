@@ -1755,7 +1755,7 @@ public class EAUtils
      * @param sigmaTwo parameter used by scheme 2 (middle point)
      * @return the probability.
      */
-    private static double getProbability(double value, 
+    public static double getProbability(double value, 
             int scheme, double lambda, double sigmaOne, double sigmaTwo)
     {
         double prob = 1.0;

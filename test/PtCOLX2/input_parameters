@@ -20,9 +20,9 @@ GA-crossoverWeight=0.50
 GA-mutationWeight=0.50
 GA-ConstructionWeight=0.2
 GA-symmetryProbability=0.0
-GA-growthProbScheme=sigma
-GA-GrowthSigmaSteepness=3.0
-GA-GrowthSigmaMiddle=2.5
+GA-LevelGrowthProbScheme=sigma
+GA-LevelGrowthSigmaSteepness=3.0
+GA-LevelGrowthSigmaMiddle=2.5
 GA-PrecisionLevel=5
 
 # Definition of the Fragment Space 

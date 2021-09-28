@@ -385,7 +385,7 @@ Fragments have different roles in DENOPTIM:
 </ul></p>
 
 <p>Each fragment is characterized by its chemical constitution (i.e., atom,
-bonds, charges) and a set of attachment points. These attachment points are then projected to at the vertex level, so that when a vertex contains a fragment, the list of APS of the vertex is indeed the list defined by the underlying fragment. 
+bonds, charges) and a set of attachment points. These attachment points are then projected to the vertex surface, so that when a vertex contains a fragment, the list of APS of the vertex is indeed the list defined by the underlying fragment. 
 Each attachment point
 (AP) defines where (i.e., on which atom/pseudo-atom) and possibly additional information such as formal bond order,
 geometry. DENOPTIM currently supports two strategies for handling
@@ -544,21 +544,19 @@ crossover points are chosen according to the rules defined in the compatibility 
 
 <p>The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP.
 The substitution probability (<i>P</i>) results from the product of two components: the growth probability (<i>P<sub>g</sub></i>), and the crowding probability (<i>P<sub>c</sub></i>).
-The growth probability (<i>P<sub>g</sub></i>) is meant to limit the growth of a graph by providing a way to reduce the likeliness of adding vertexes in long chains that stretch far from the root vertex. The distance between the root vertex and any other vertex is called <i>level</i> (Figure 4).
+The growth probability (<i>P<sub>g</sub></i>) limits the growth of an item. This limit can be expressed in terms of graph deepness (i.e., using the <i>level</i> of a vertex to determine the likeliness of further graph extention on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
 
 <figure> 
 	<img src="figures/graph_levels.png" alt="figures/graph_levels.png" width="429" border="0"/>
 	<figcaption><i>Figure 4: identification of levels in a graph. Each label L<sub>x</sub> identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L<sub>-1</sub>), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L<sub>0</sub>), and so on.</i></figcaption>
 </figure>
 
-The <b>growth probability</b> can be controlled by one of the following schemes:</p>
+The <b>growth probability</b> can be controlled by one of the following schemes (where <i>L</i> is either the vertex <i>level</i> or the number of heavy atoms):</p>
 
 <ul>
 	<li><b>EXP_DIFF</b>:
 	Given a growth multiplier factor <i>&lambda;</i>,
-	the probability of addition is given by the following equation
-	where <i>L</i>
-	is the level of the free AP.<br>
+	the probability of addition is given by<br>
 	<img src="figures/exp_diff.png" alt="figures/exp_diff.png" width="131" height="45"/></li>
 	<li><b>TANH</b>:
     Given a growth multiplier factor <i>&lambda;</i>,
@@ -566,7 +564,7 @@ The <b>growth probability</b> can be controlled by one of the following schemes:
 	determined by <br>
 	<img src="figures/tanh.png" alt="figures/tanh.png" width="138" height="21"/></li>
 	<li><b>SIGMA</b>:
-	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the level of the point where the probability is 50%), and calculates the probability as <br>
+	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the value of <i>L</i> where the probability is 50%), and calculates the probability as <br>
 	<img src="figures/sigma.png" alt="figures/sigma.png" width="174" height="41"/></li>
 	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels).</li>
 </ul>

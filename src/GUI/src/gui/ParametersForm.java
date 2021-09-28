@@ -24,6 +24,8 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -106,6 +108,13 @@ public class ParametersForm extends JPanel implements IParametersForm
 	 * Listener for changes in combo box-bound parameters
 	 */
 	protected CmbFieldChange cmbFieldChange;
+	
+	/**
+	 * Map of keyword to search for when reading a parameters file. This is NOT
+	 * a list of what will be read, but map of whether each given keyword is 
+	 * found (at the beginning of a line) in the parameters file, or not.
+	 */
+	protected Map<String,Boolean> checkedFlags = new HashMap<String,Boolean>();
     
 //-----------------------------------------------------------------------------
     
@@ -392,6 +401,12 @@ public class ParametersForm extends JPanel implements IParametersForm
                 if (line.startsWith("#"))
                 {
                     continue;
+                }
+                
+                for (String flag : checkedFlags.keySet())
+                {
+                    if (line.toUpperCase().startsWith(flag.toUpperCase()))
+                        checkedFlags.put(flag,true);
                 }
                 
                 if (line.toUpperCase().startsWith(keyRoot.toUpperCase()))

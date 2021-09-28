@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -89,18 +90,7 @@ public class GAParametersForm extends ParametersForm
     JPanel block;    
     JPanel localBlock1;
     JPanel localBlock2;
-    JPanel localBlock3;
-    JPanel localBlock4;
-    JPanel localBlockGraph;
     JPanel advOptsBlock;
-    
-    DefaultXYDataset subsProbData;
-    JFreeChart graphSubProbJFChart;
-	JPanel graphSubProbJFChartChartPanel;
-    JPanel graphSubProbJFChartCtrlPanel;
-    JPanel graphSpinnerPane;
-    Double minLevelProbPlot = 0.0;
-    Double maxLevelProbPlot = 4.0;
 	
 	JPanel lineSrcOrNew;
     JRadioButton rdbSrcOrNew;
@@ -154,26 +144,78 @@ public class GAParametersForm extends ParametersForm
     JPanel linePar10;
     JLabel lblPar10;
     JTextField txtPar10;
+    
+    JPanel lineGrowthPropMode;
+    JLabel lblGrowthPropMode;
+    ButtonGroup bgGrowthMode;
+    JRadioButton rbtLevelGrowth;
+    JRadioButton rbtMolSzGrowth;
+    
+    DefaultXYDataset molSizeProbData;
+    JFreeChart graphMolSzProbJFChart;
+    JPanel graphMolSzProbJFChartChartPanel;
+    JPanel graphMolSzProbJFChartCtrlPanel;
+    JPanel graphMolSzProbSpinnerPane;
+    Double minMolSizeProbPlot = 1.0;
+    Double maxMolSizeProbPlot = 50.0;
 
-    String keyPar11 = "GA-GrowthProbScheme";
+    String keyParMolSz1 = "GA-MolGrowthProbScheme";
+    JPanel lineParMolSz1;
+    JLabel lblParMolSz1;
+    JComboBox<String> cmbParMolSz1;
+
+    String keyParMolSz2 = "GA-MolGrowthMultiplier";
+    JPanel lineParMolSz2;
+    JLabel lblParMolSz2;
+    JSpinner spnParMolSz2;
+
+    String keyParMolSz3 = "GA-MolGrowthSigmaSteepness";
+    JPanel lineParMolSz3;
+    JLabel lblParMolSz3;
+    JSpinner spnParMolSz3;
+
+    String keyParMolSz4 = "GA-MolGrowthSigmaMiddle";
+    JPanel lineParMolSz4;
+    JLabel lblParMolSz4;
+    JSpinner spnParMolSz4;
+    
+    JPanel localBlockMolSz3;
+    JPanel localBlockMolSz4;
+    JPanel localBlockMolSzGraph;
+    JPanel localBlockMolSzAll;
+    
+    DefaultXYDataset levelProbData;
+    JFreeChart graphLvlProbJFChart;
+    JPanel graphLvlProbJFChartChartPanel;
+    JPanel graphLvlProbJFChartCtrlPanel;
+    JPanel graphLvlProbSpinnerPane;
+    Double minLevelProbPlot = 0.0;
+    Double maxLevelProbPlot = 5.0;
+
+    String keyPar11 = "GA-LevelGrowthProbScheme";
     JPanel linePar11;
     JLabel lblPar11;
     JComboBox<String> cmbPar11;
 
-    String keyPar12 = "GA-GrowthMultiplier";
+    String keyPar12 = "GA-LevelGrowthMultiplier";
     JPanel linePar12;
     JLabel lblPar12;
     JSpinner spnPar12;
 
-    String keyPar13 = "GA-GrowthSigmaSteepness";
+    String keyPar13 = "GA-LevelGrowthSigmaSteepness";
     JPanel linePar13;
     JLabel lblPar13;
     JSpinner spnPar13;
 
-    String keyPar14 = "GA-GrowthSigmaMiddle";
+    String keyPar14 = "GA-LevelGrowthSigmaMiddle";
     JPanel linePar14;
     JLabel lblPar14;
     JSpinner spnPar14;
+    
+    JPanel localBlockLvlProb3;
+    JPanel localBlockLvlProb4;
+    JPanel localBlockLvlProbGraph;
+    JPanel localBlockLvlProbAll;
     
     DefaultXYDataset crowdProbData;
     JFreeChart graphCrowdProbJFChart;
@@ -277,37 +319,65 @@ public class GAParametersForm extends ParametersForm
         
         localBlock1 = new JPanel();
         localBlock1.setVisible(false);
-        localBlock1.setLayout(new BoxLayout(localBlock1, SwingConstants.VERTICAL));
+        localBlock1.setLayout(new BoxLayout(localBlock1, 
+                SwingConstants.VERTICAL));
         
         localBlock2 = new JPanel();
         localBlock2.setVisible(true);
-        localBlock2.setLayout(new BoxLayout(localBlock2, SwingConstants.VERTICAL));
+        localBlock2.setLayout(new BoxLayout(localBlock2, 
+                SwingConstants.VERTICAL));
         
-        localBlock3 = new JPanel();
-        localBlock3.setVisible(true);
-        localBlock3.setLayout(new BoxLayout(localBlock3, SwingConstants.VERTICAL));
+        localBlockMolSz3 = new JPanel();
+        localBlockMolSz3.setVisible(false);
+        localBlockMolSz3.setLayout(new BoxLayout(localBlockMolSz3, 
+                SwingConstants.VERTICAL));
+
+        localBlockMolSz4 = new JPanel();
+        localBlockMolSz4.setVisible(true);
+        localBlockMolSz4.setLayout(new BoxLayout(localBlockMolSz4, 
+                SwingConstants.VERTICAL));
+
+        localBlockMolSzGraph = new JPanel();
+        localBlockMolSzGraph.setVisible(true);
+        localBlockMolSzAll = new JPanel();
+        localBlockMolSzAll.setVisible(false);
+        localBlockMolSzAll.setLayout(new BoxLayout(localBlockMolSzAll, 
+                SwingConstants.VERTICAL));
         
-        localBlock4 = new JPanel();
-        localBlock4.setVisible(false);
-        localBlock4.setLayout(new BoxLayout(localBlock4, SwingConstants.VERTICAL));
+        localBlockLvlProb3 = new JPanel();
+        localBlockLvlProb3.setVisible(true);
+        localBlockLvlProb3.setLayout(new BoxLayout(localBlockLvlProb3, 
+                SwingConstants.VERTICAL));
         
-        localBlockGraph = new JPanel();
-        localBlockGraph.setVisible(true);
+        localBlockLvlProb4 = new JPanel();
+        localBlockLvlProb4.setVisible(false);
+        localBlockLvlProb4.setLayout(new BoxLayout(localBlockLvlProb4, 
+                SwingConstants.VERTICAL));
+        
+        localBlockLvlProbGraph = new JPanel();
+        localBlockLvlProbGraph.setVisible(true);
+        localBlockLvlProbAll = new JPanel();
+        localBlockLvlProbAll.setVisible(true);
+        localBlockLvlProbAll.setLayout(new BoxLayout(localBlockLvlProbAll, 
+                SwingConstants.VERTICAL));
         
         localBlockCrowd3 = new JPanel();
         localBlockCrowd3.setVisible(false);
-        localBlockCrowd3.setLayout(new BoxLayout(localBlockCrowd3, SwingConstants.VERTICAL));
+        localBlockCrowd3.setLayout(new BoxLayout(localBlockCrowd3, 
+                SwingConstants.VERTICAL));
         
         localBlockCrowd4 = new JPanel();
         localBlockCrowd4.setVisible(false);
-        localBlockCrowd4.setLayout(new BoxLayout(localBlockCrowd4, SwingConstants.VERTICAL));
+        localBlockCrowd4.setLayout(new BoxLayout(localBlockCrowd4, 
+                SwingConstants.VERTICAL));
         
         localBlockCrowdGraph = new JPanel();
         localBlockCrowdGraph.setVisible(false);
         
         advOptsBlock = new JPanel();
         advOptsBlock.setVisible(false);
-        advOptsBlock.setLayout(new BoxLayout(advOptsBlock, SwingConstants.VERTICAL));
+        advOptsBlock.setLayout(new BoxLayout(advOptsBlock, 
+                SwingConstants.VERTICAL));
         
         String toolTipSrcOrNew = "Tick here to use settings from file.";
         lineSrcOrNew = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -444,11 +514,42 @@ public class GAParametersForm extends ParametersForm
         
         localBlock2.add(new JSeparator());
         
+        lineGrowthPropMode = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblGrowthPropMode = new JLabel("Graph growth controlled by: ");
+        bgGrowthMode = new ButtonGroup();
+        rbtLevelGrowth = new JRadioButton("graph deepness (level)");
+        rbtLevelGrowth.setSelected(true);
+        rbtLevelGrowth.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (rbtLevelGrowth.isSelected())
+                {
+                    localBlockLvlProbAll.setVisible(true);
+                    localBlockMolSzAll.setVisible(false);
+                }
+            }
+        });
+        rbtMolSzGrowth = new JRadioButton("molecular size (heavy atoms count)");
+        rbtMolSzGrowth.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (rbtMolSzGrowth.isSelected())
+                {
+                    localBlockLvlProbAll.setVisible(false);
+                    localBlockMolSzAll.setVisible(true);
+                }
+            }
+        });
+        bgGrowthMode.add(rbtLevelGrowth);
+        bgGrowthMode.add(rbtMolSzGrowth);
+        lineGrowthPropMode.add(lblGrowthPropMode);
+        lineGrowthPropMode.add(rbtLevelGrowth);
+        lineGrowthPropMode.add(rbtMolSzGrowth);
+        localBlock2.add(lineGrowthPropMode);
+        
         String toolTipPar12 = "<html>Specifies the value of the factor used in"
         		+ " growth probability schemes <code>EXP_DIFF</code> and "
         		+ "<code>TANH</code></html>";
         linePar12 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar12 = new JLabel("<html>Graph extension - parameter "
+        lblPar12 = new JLabel("<html>Graph growth by level - parameter "
         		+ "<code>&lambda;</code><html>", SwingConstants.LEFT);
         lblPar12.setPreferredSize(fileLabelSize);
         lblPar12.setToolTipText(toolTipPar12);
@@ -458,14 +559,14 @@ public class GAParametersForm extends ParametersForm
         mapKeyFieldToValueField.put(keyPar12.toUpperCase(),spnPar12);
         linePar12.add(lblPar12);
         linePar12.add(spnPar12);
-        localBlock3.add(linePar12);
+        localBlockLvlProb3.add(linePar12);
         
         String toolTipPar13 = "<html>Specifies the value of parameter "
         		+ "&sigma;<sub>1</sub> used for growth probability scheme"
         		+ " <code>SIGMA</code>.<br>It corresponds to the steepness of"
         		+ " the function where <i>P(level) = 50%</i></html>";
         linePar13 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar13 = new JLabel("<html>Graph extension - parameter "
+        lblPar13 = new JLabel("<html>Graph growth by level - parameter "
         		+ "<code>&sigma;</code><sub>1</sub>:</html>", SwingConstants.LEFT);
         lblPar13.setPreferredSize(fileLabelSize);
         lblPar13.setToolTipText(toolTipPar13);
@@ -475,14 +576,14 @@ public class GAParametersForm extends ParametersForm
         mapKeyFieldToValueField.put(keyPar13.toUpperCase(),spnPar13);
         linePar13.add(lblPar13);
         linePar13.add(spnPar13);
-        localBlock4.add(linePar13);
+        localBlockLvlProb4.add(linePar13);
         
         String toolTipPar14 = "<html>Specifies the value of parameter "
         		+ "&sigma;<sub>2</sub> used in growth probability scheme "
         		+ "<code>SIGMA</code>.<br>It corresponds to the level "
         		+ "where <i>P(level) = 50%</i></html>";
         linePar14 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar14 = new JLabel("<html>Graph extension - parameter <code>&sigma;</code><sub>2</sub>:<html>", SwingConstants.LEFT);
+        lblPar14 = new JLabel("<html>Graph growth by level - parameter <code>&sigma;</code><sub>2</sub>:<html>", SwingConstants.LEFT);
         lblPar14.setPreferredSize(fileLabelSize);
         lblPar14.setToolTipText(toolTipPar14);
         spnPar14 = new JSpinner(new SpinnerNumberModel(3.5, null, null, 0.1));
@@ -491,7 +592,7 @@ public class GAParametersForm extends ParametersForm
         mapKeyFieldToValueField.put(keyPar14.toUpperCase(),spnPar14);
         linePar14.add(lblPar14);
         linePar14.add(spnPar14);
-        localBlock4.add(linePar14);
+        localBlockLvlProb4.add(linePar14);
         
         String toolTipPar11 = "Specifies the growth probability scheme";
         linePar11 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -506,11 +607,11 @@ public class GAParametersForm extends ParametersForm
         
         // NB: we need to create the graph before setting the action listeners
         //     that will eventually edit the data plotted.
-        createSubsProbGraph();
+        createLvlProbGraph();
         
-        graphSubProbJFChartCtrlPanel = new JPanel(new BorderLayout());
-        graphSubProbJFChartCtrlPanel.setMaximumSize(new Dimension(100,100));
-        graphSpinnerPane = new JPanel(new GridLayout(0,2));
+        graphLvlProbJFChartCtrlPanel = new JPanel(new BorderLayout());
+        graphLvlProbJFChartCtrlPanel.setMaximumSize(new Dimension(100,100));
+        graphLvlProbSpinnerPane = new JPanel(new GridLayout(0,2));
         final JSpinner spnMaxLev = new JSpinner(new SpinnerNumberModel(
         		maxLevelProbPlot.intValue(), 1, null, 1));
         spnMaxLev.addChangeListener(new ChangeListener()
@@ -519,25 +620,25 @@ public class GAParametersForm extends ParametersForm
             public void stateChanged(ChangeEvent event)
             {
                 int maxLev = ((Integer) spnMaxLev.getValue()).intValue();                
-                ((XYPlot) graphSubProbJFChart.getPlot())
+                ((XYPlot) graphLvlProbJFChart.getPlot())
                 	.getDomainAxis().setRange(minLevelProbPlot, maxLev);
             }
         }); 
-        graphSpinnerPane.add(new JLabel("X-axis max: "));
-        graphSpinnerPane.add(spnMaxLev);
-        graphSubProbJFChartCtrlPanel.add(graphSpinnerPane, BorderLayout.NORTH);
+        graphLvlProbSpinnerPane.add(new JLabel("X-axis max: "));
+        graphLvlProbSpinnerPane.add(spnMaxLev);
+        graphLvlProbJFChartCtrlPanel.add(graphLvlProbSpinnerPane, BorderLayout.NORTH);
         
-        GroupLayout grpLyoSubPrb = new GroupLayout(localBlockGraph);
-        localBlockGraph.setLayout(grpLyoSubPrb);
+        GroupLayout grpLyoSubPrb = new GroupLayout(localBlockLvlProbGraph);
+        localBlockLvlProbGraph.setLayout(grpLyoSubPrb);
         grpLyoSubPrb.setAutoCreateGaps(true);
         grpLyoSubPrb.setAutoCreateContainerGaps(true);
 		grpLyoSubPrb.setHorizontalGroup(grpLyoSubPrb.createSequentialGroup()
-			.addComponent(graphSubProbJFChartChartPanel)
-			.addComponent(graphSubProbJFChartCtrlPanel));
+			.addComponent(graphLvlProbJFChartChartPanel)
+			.addComponent(graphLvlProbJFChartCtrlPanel));
 		grpLyoSubPrb.setVerticalGroup(grpLyoSubPrb.createParallelGroup(
 				GroupLayout.Alignment.CENTER)
-			.addComponent(graphSubProbJFChartChartPanel)
-			.addComponent(graphSubProbJFChartCtrlPanel));
+			.addComponent(graphLvlProbJFChartChartPanel)
+			.addComponent(graphLvlProbJFChartCtrlPanel));
 		
 		// NB: The listeners must be defined here because we first have to 
 		//     built all the pieces (plot + parameters) and then define how
@@ -571,40 +672,217 @@ public class GAParametersForm extends ParametersForm
         		{
         			case "EXP_DIFF":
         				updateSubsProbDataset();
-        				localBlock3.setVisible(true);
-        				localBlock4.setVisible(false);
-        				localBlockGraph.setVisible(true);
+        				localBlockLvlProb3.setVisible(true);
+        				localBlockLvlProb4.setVisible(false);
+        				localBlockLvlProbGraph.setVisible(true);
             			break;
             			
         			case "TANH":
         				updateSubsProbDataset();
-        				localBlock3.setVisible(true);
-            			localBlock4.setVisible(false);  
-            			localBlockGraph.setVisible(true);
+        				localBlockLvlProb3.setVisible(true);
+            			localBlockLvlProb4.setVisible(false);  
+            			localBlockLvlProbGraph.setVisible(true);
             			break;
             			
         			case "SIGMA":
         				updateSubsProbDataset();
-        				localBlock3.setVisible(false);
-            			localBlock4.setVisible(true);
-            			localBlockGraph.setVisible(true);
+        				localBlockLvlProb3.setVisible(false);
+            			localBlockLvlProb4.setVisible(true);
+            			localBlockLvlProbGraph.setVisible(true);
             			break;
             			
         			default:
-        				localBlock3.setVisible(false);
-            			localBlock4.setVisible(false); 
-            			localBlockGraph.setVisible(false);
+        				localBlockLvlProb3.setVisible(false);
+            			localBlockLvlProb4.setVisible(false); 
+            			localBlockLvlProbGraph.setVisible(false);
             			break;
         		}
 	        }
 	    });
         linePar11.add(lblPar11);
         linePar11.add(cmbPar11);
-        localBlock2.add(linePar11);
-        localBlock2.add(localBlock3);
-        localBlock2.add(localBlock4);
-        localBlock2.add(localBlockGraph);
+        localBlockLvlProbAll.add(linePar11);
+        localBlockLvlProbAll.add(localBlockLvlProb3);
+        localBlockLvlProbAll.add(localBlockLvlProb4);
+        localBlockLvlProbAll.add(localBlockLvlProbGraph);
+        localBlock2.add(localBlockLvlProbAll);
         
+        String toolTipParMolSz2 = "<html>Specifies the value of the factor used in"
+                + " molecular growth probability schemes <code>EXP_DIFF</code> and "
+                + "<code>TANH</code></html>";
+        lineParMolSz2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParMolSz2 = new JLabel("<html>Mol growth probability - parameter "
+                + "<code>&lambda;</code><html>", SwingConstants.LEFT);
+        lblParMolSz2.setPreferredSize(fileLabelSize);
+        lblParMolSz2.setToolTipText(toolTipParMolSz2);
+        spnParMolSz2 = new JSpinner(new SpinnerNumberModel(1.0, 0.0, null, 0.1));
+        spnParMolSz2.setToolTipText(toolTipParMolSz2);
+        spnParMolSz2.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyParMolSz2.toUpperCase(),spnParMolSz2);
+        lineParMolSz2.add(lblParMolSz2);
+        lineParMolSz2.add(spnParMolSz2);
+        localBlockMolSz3.add(lineParMolSz2);
+
+        String toolTipParMolSz3 = "<html>Specifies the value of parameter "
+                + "&sigma;<sub>1</sub> used for molecular growth probability "
+                + "scheme"
+                + " <code>SIGMA</code>.<br>It corresponds to the steepness of"
+                + " the function where <i>P(level) = 50%</i></html>";
+        lineParMolSz3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParMolSz3 = new JLabel("<html>Mol growth probability - parameter "
+                + "<code>&sigma;</code><sub>1</sub>:</html>", SwingConstants.LEFT);
+        lblParMolSz3.setPreferredSize(fileLabelSize);
+        lblParMolSz3.setToolTipText(toolTipParMolSz3);
+        spnParMolSz3 = new JSpinner(new SpinnerNumberModel(0.2, null, null, 0.1));
+        spnParMolSz3.setToolTipText(toolTipParMolSz3);
+        spnParMolSz3.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyParMolSz3.toUpperCase(),spnParMolSz3);
+        lineParMolSz3.add(lblParMolSz3);
+        lineParMolSz3.add(spnParMolSz3);
+        localBlockMolSz4.add(lineParMolSz3);
+
+        String toolTipParMolSz4 = "<html>Specifies the value of parameter "
+                + "&sigma;<sub>2</sub> used in molecular growth probability "
+                + "scheme "
+                + "<code>SIGMA</code>.<br>It corresponds to the level "
+                + "where <i>P(level) = 50%</i></html>";
+        lineParMolSz4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParMolSz4 = new JLabel("<html>Mol growth probability - parameter "
+                + "<code>&sigma;</code><sub>2</sub>:<html>", SwingConstants.LEFT);
+        lblParMolSz4.setPreferredSize(fileLabelSize);
+        lblParMolSz4.setToolTipText(toolTipParMolSz4);
+        spnParMolSz4 = new JSpinner(new SpinnerNumberModel(25.0, null, null, 1.0));
+        spnParMolSz4.setToolTipText(toolTipParMolSz4);
+        spnParMolSz4.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyParMolSz4.toUpperCase(),spnParMolSz4);
+        lineParMolSz4.add(lblParMolSz4);
+        lineParMolSz4.add(spnParMolSz4);
+        localBlockMolSz4.add(lineParMolSz4);
+
+        String toolTipParMolSz1 = "Specifies the molecular growth probability scheme";
+        lineParMolSz1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParMolSz1 = new JLabel("Mol growth probability function:",
+                SwingConstants.LEFT);
+        lblParMolSz1.setPreferredSize(fileLabelSize);
+        lblParMolSz1.setToolTipText(toolTipParMolSz1);
+        cmbParMolSz1 = new JComboBox<String>(new String[] {
+                "EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
+        cmbParMolSz1.setSelectedIndex(2);
+        cmbParMolSz1.setToolTipText(toolTipParMolSz1);
+        cmbParMolSz1.addActionListener(cmbFieldChange);
+        mapKeyFieldToValueField.put(keyParMolSz1.toUpperCase(),cmbParMolSz1);
+
+        // NB: we need to create the graph before setting the action listeners
+        //     that will eventually edit the data plotted.
+        createMolSzProbGraph();
+
+        graphMolSzProbJFChartCtrlPanel = new JPanel(new BorderLayout());
+        graphMolSzProbJFChartCtrlPanel.setMaximumSize(new Dimension(100,100));
+        graphMolSzProbSpinnerPane = new JPanel(new GridLayout(0,2));
+        final JSpinner spnMaxLevMolSz = new JSpinner(new SpinnerNumberModel(
+                maxMolSizeProbPlot.intValue(), 1, null, 1));
+        spnMaxLevMolSz.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent event)
+            {
+                int maxLev = ((Integer) spnMaxLevMolSz.getValue()).intValue();
+                ((XYPlot) graphMolSzProbJFChart.getPlot())
+                    .getDomainAxis().setRange(minMolSizeProbPlot, maxLev);
+            }
+        });
+        graphMolSzProbSpinnerPane.add(new JLabel("X-axis max: "));
+        graphMolSzProbSpinnerPane.add(spnMaxLevMolSz);
+        graphMolSzProbJFChartCtrlPanel.add(graphMolSzProbSpinnerPane, BorderLayout.NORTH);
+
+        GroupLayout grpLyoMolSzProb = new GroupLayout(localBlockMolSzGraph);
+        localBlockMolSzGraph.setLayout(grpLyoMolSzProb);
+        grpLyoMolSzProb.setAutoCreateGaps(true);
+        grpLyoMolSzProb.setAutoCreateContainerGaps(true);
+        grpLyoMolSzProb.setHorizontalGroup(grpLyoMolSzProb.createSequentialGroup()
+            .addComponent(graphMolSzProbJFChartChartPanel)
+            .addComponent(graphMolSzProbJFChartCtrlPanel));
+        grpLyoMolSzProb.setVerticalGroup(grpLyoMolSzProb.createParallelGroup(
+                GroupLayout.Alignment.CENTER)
+            .addComponent(graphMolSzProbJFChartChartPanel)
+            .addComponent(graphMolSzProbJFChartCtrlPanel));
+
+        // NB: The listeners must be defined here because we first have to
+        //     built all the pieces (plot + parameters) and then define how
+        //     things change upon change of the parameters/controllers.
+
+        spnParMolSz2.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+                updatemolSizeProbDataset();
+            }
+        });
+        spnParMolSz3.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+                updatemolSizeProbDataset();
+            }
+        });
+        spnParMolSz4.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent event)
+            {
+                updatemolSizeProbDataset();
+            }
+        });
+
+        cmbParMolSz1.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                String scheme = cmbParMolSz1.getSelectedItem().toString();
+                switch (scheme)
+                {
+                    case "EXP_DIFF":
+                        updatemolSizeProbDataset();
+                        localBlockMolSz3.setVisible(true);
+                        localBlockMolSz4.setVisible(false);
+                        localBlockMolSzGraph.setVisible(true);
+                        break;
+
+                    case "TANH":
+                        updatemolSizeProbDataset();
+                        localBlockMolSz3.setVisible(true);
+                        localBlockMolSz4.setVisible(false);
+                        localBlockMolSzGraph.setVisible(true);
+                        break;
+
+                    case "SIGMA":
+                        updatemolSizeProbDataset();
+                        localBlockMolSz3.setVisible(false);
+                        localBlockMolSz4.setVisible(true);
+                        localBlockMolSzGraph.setVisible(true);
+                        break;
+
+                    case "UNRESTRICTED":
+                        updatemolSizeProbDataset();
+                        localBlockMolSz3.setVisible(false);
+                        localBlockMolSz4.setVisible(false);
+                        localBlockMolSzGraph.setVisible(true);
+                        break;
+
+                    default:
+                        localBlockMolSz3.setVisible(false);
+                        localBlockMolSz4.setVisible(false);
+                        localBlockMolSzGraph.setVisible(false);
+                        break;
+                }
+            }
+        });
+        lineParMolSz1.add(lblParMolSz1);
+        lineParMolSz1.add(cmbParMolSz1);
+        localBlockMolSzAll.add(lineParMolSz1);
+        localBlockMolSzAll.add(localBlockMolSz3);
+        localBlockMolSzAll.add(localBlockMolSz4);
+        localBlockMolSzAll.add(localBlockMolSzGraph);
+        
+        localBlock2.add(localBlockMolSzAll);
+
         localBlock2.add(new JSeparator());
         
         String toolTipParCrowd2 = "<html>Specifies the value of the factor used in"
@@ -1045,20 +1323,20 @@ public class GAParametersForm extends ParametersForm
 
 	private void updateSubsProbDataset() 
 	{
-		createSubsProbDataset();
-		((XYPlot) graphSubProbJFChart.getPlot()).setDataset(subsProbData);	
+		createLvlProbDataset();
+		((XYPlot) graphLvlProbJFChart.getPlot()).setDataset(levelProbData);	
 	}
 		
 //-----------------------------------------------------------------------------
 
-	private void createSubsProbDataset() 
+	private void createLvlProbDataset() 
 	{	
-        subsProbData = new DefaultXYDataset();
+        levelProbData = new DefaultXYDataset();
         
         ArrayList<Double> y = new ArrayList<Double>();
 		try
 		{
-			int scheme = GAParameters.convertGrowthProbabilityScheme(
+			int scheme = GAParameters.convertProbabilityScheme(
 					cmbPar11.getSelectedItem().toString());
 			double l = (Double) spnPar12.getValue();
 			double s1 = (Double) spnPar13.getValue();
@@ -1066,7 +1344,8 @@ public class GAParametersForm extends ParametersForm
 			
 			for (int level=0; level<100; level++)
 			{
-				double prob = EAUtils.getGrowthProbabilityAtLevel(level, scheme, l, s1, s2);
+				double prob = EAUtils.getGrowthProbabilityAtLevel(
+				        level, scheme, l, s1, s2);
 				y.add(prob);
 			}
 		}
@@ -1089,35 +1368,35 @@ public class GAParametersForm extends ParametersForm
         	data[1][level] = y.get(level);
         }
         
-        subsProbData.addSeries("Growth Probability", data);
+        levelProbData.addSeries("Growth Probability", data);
 	}
 	
 //-----------------------------------------------------------------------------
 
-	private void createSubsProbGraph() 
+	private void createLvlProbGraph() 
 	{
-		createSubsProbDataset();
-    	createSubsProbChart();
-    	graphSubProbJFChartChartPanel = new ChartPanel(graphSubProbJFChart);
-    	graphSubProbJFChartChartPanel.setMaximumSize(new Dimension(400,200));
+		createLvlProbDataset();
+    	createLvlProbChart();
+    	graphLvlProbJFChartChartPanel = new ChartPanel(graphLvlProbJFChart);
+    	graphLvlProbJFChartChartPanel.setMaximumSize(new Dimension(400,200));
 	}
 	
 //-----------------------------------------------------------------------------
 	
-    private void createSubsProbChart()
+    private void createLvlProbChart()
     {
-        graphSubProbJFChart = ChartFactory.createXYLineChart(
+        graphLvlProbJFChart = ChartFactory.createXYLineChart(
             null,                         // plot title
             "Level",                      // x axis label
             "Probability",                // y axis label
-            subsProbData,                 // data
+            levelProbData,                 // data
             PlotOrientation.VERTICAL,  
             false,                        // include legend
             false,                        // tooltips
             false                         // urls
         );
 
-        XYPlot plot = (XYPlot) graphSubProbJFChart.getPlot();
+        XYPlot plot = (XYPlot) graphLvlProbJFChart.getPlot();
         
         // axis ranges
         plot.getDomainAxis().setRange(minLevelProbPlot, maxLevelProbPlot);
@@ -1130,7 +1409,7 @@ public class GAParametersForm extends ParametersForm
 
         // series line thickness
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(0, Color.RED);
+        renderer.setSeriesPaint(0, Color.decode("#490092"));
         renderer.setSeriesStroke(0, new BasicStroke(2.0f));
         plot.setRenderer(renderer);
         
@@ -1140,6 +1419,105 @@ public class GAParametersForm extends ParametersForm
         plot.getRangeAxis().setLabelFont(font3);
     }
 	
+  //-----------------------------------------------------------------------------
+
+    private void updatemolSizeProbDataset()
+    {
+        createMolSizeProbDataset();
+        ((XYPlot) graphMolSzProbJFChart.getPlot()).setDataset(molSizeProbData);
+    }
+
+//-----------------------------------------------------------------------------
+
+    private void createMolSizeProbDataset()
+    {
+        molSizeProbData = new DefaultXYDataset();
+
+        ArrayList<Double> y = new ArrayList<Double>();
+        try
+        {
+          int scheme = GAParameters.convertProbabilityScheme(
+                  cmbParMolSz1.getSelectedItem().toString());
+          double l = (Double) spnParMolSz2.getValue();
+          double s1 = (Double) spnParMolSz3.getValue();
+          double s2 = (Double) spnParMolSz4.getValue();
+
+          for (int numHeavyAtoms=0; numHeavyAtoms<100; numHeavyAtoms++)
+          {
+                double prob = EAUtils.getProbability(
+                        numHeavyAtoms, scheme, l, s1, s2);
+                y.add(prob);
+          }
+        }
+        catch (Exception e)
+        {
+          e.printStackTrace();
+          JOptionPane.showMessageDialog(null,
+                  "<html>Exception occurred while reading croding proability "
+                  + "scheme.<br>"
+                  + "Please, report this to the DENOPTIM team.</html>",
+                  "Error",
+                  JOptionPane.ERROR_MESSAGE,
+                  UIManager.getIcon("OptionPane.errorIcon"));
+        }
+
+        double[][] data = new double[2][y.size()];
+        for (int numHeavyAtoms=0; numHeavyAtoms<100; numHeavyAtoms++)
+        {
+          data[0][numHeavyAtoms] = new Double(numHeavyAtoms);
+          data[1][numHeavyAtoms] = y.get(numHeavyAtoms);
+        }
+
+        molSizeProbData.addSeries("Mol Growth Probability", data);
+    }
+
+//-----------------------------------------------------------------------------
+
+    private void createMolSzProbGraph()
+    {
+        createMolSizeProbDataset();
+        createMolSzProbChart();
+        graphMolSzProbJFChartChartPanel = new ChartPanel(graphMolSzProbJFChart);
+        graphMolSzProbJFChartChartPanel.setMaximumSize(new Dimension(400,200));
+    }
+
+//-----------------------------------------------------------------------------
+
+    private void createMolSzProbChart()
+    {
+        graphMolSzProbJFChart = ChartFactory.createXYLineChart(
+          null,                     // plot title
+          "# Heavy Atoms",                // x axis label
+          "Probability",                // y axis label
+          molSizeProbData,                 // data
+          PlotOrientation.VERTICAL,
+          false,                    // include legend
+          false,                    // tooltips
+          false                     // urls
+        );
+
+        XYPlot plot = (XYPlot) graphMolSzProbJFChart.getPlot();
+
+        // axis ranges
+        plot.getDomainAxis().setRange(minMolSizeProbPlot, maxMolSizeProbPlot);
+        plot.getRangeAxis().setRange(0.0, 1.0);
+
+        // axis ticks interval
+        //NB: this if commented out because it blocks automated selection of tick units
+        // and therefore it allows ticks overlap when range is large
+        //((NumberAxis) plot.getDomainAxis()).setTickUnit(new NumberTickUnit(1.0));
+
+        // series line thickness
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0, Color.decode("#db6d00"));
+        renderer.setSeriesStroke(0, new BasicStroke(2.0f));
+        plot.setRenderer(renderer);
+
+        // font of axis label
+        Font font3 = new Font("Dialog", Font.PLAIN, 12);
+        plot.getDomainAxis().setLabelFont(font3);
+        plot.getRangeAxis().setLabelFont(font3);
+    }
     
 //-----------------------------------------------------------------------------
 
@@ -1158,7 +1536,7 @@ public class GAParametersForm extends ParametersForm
         ArrayList<Double> y = new ArrayList<Double>();
         try
         {
-            int scheme = GAParameters.convertGrowthProbabilityScheme(
+            int scheme = GAParameters.convertProbabilityScheme(
                     cmbParCrowd1.getSelectedItem().toString());
             double l = (Double) spnParCrowd2.getValue();
             double s1 = (Double) spnParCrowd3.getValue();
@@ -1175,8 +1553,8 @@ public class GAParametersForm extends ParametersForm
         {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null,
-                    "<html>Exception occurred while reading croding proability "
-                    + "scheme.<br>"
+                    "<html>Exception occurred while reading mol growth "
+                    + "proability scheme.<br>"
                     + "Please, report this to the DENOPTIM team.</html>",
                     "Error",
                     JOptionPane.ERROR_MESSAGE,
@@ -1231,7 +1609,7 @@ public class GAParametersForm extends ParametersForm
 
         // series line thickness
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(0, Color.BLUE);
+        renderer.setSeriesPaint(0, Color.decode("#ff6db6"));
         renderer.setSeriesStroke(0, new BasicStroke(2.0f));
         plot.setRenderer(renderer);
         
@@ -1255,33 +1633,68 @@ public class GAParametersForm extends ParametersForm
     @Override
     public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
     {
+        checkedFlags.clear();
+        checkedFlags.put(keyPar11, false);
+        
     	importParametersFromDenoptimParamsFile(fileName,"GA-");
     	
     	rdbSrcOrNew.setSelected(false);
     	localBlock1.setVisible(false);
-		localBlock2.setVisible(true);		
+		localBlock2.setVisible(true);
 		switch (cmbPar11.getSelectedItem().toString())
 		{
 			case "EXP_DIFF":
-				localBlock3.setVisible(true);
-    			localBlock4.setVisible(false);   
+				localBlockLvlProb3.setVisible(true);
+    			localBlockLvlProb4.setVisible(false);   
     			break;
     			
 			case "TANH":
-				localBlock3.setVisible(true);
-    			localBlock4.setVisible(false);   
+				localBlockLvlProb3.setVisible(true);
+    			localBlockLvlProb4.setVisible(false);   
     			break;
     			
 			case "SIGMA":
-				localBlock3.setVisible(false);
-    			localBlock4.setVisible(true);   
+				localBlockLvlProb3.setVisible(false);
+    			localBlockLvlProb4.setVisible(true);   
     			break;
     			
 			default:
-				localBlock3.setVisible(false);
-    			localBlock4.setVisible(false);   
+				localBlockLvlProb3.setVisible(false);
+    			localBlockLvlProb4.setVisible(false);   
     			break;
 		}
+        switch (cmbParMolSz1.getSelectedItem().toString())
+        {
+            case "EXP_DIFF":
+                localBlockMolSz3.setVisible(true);
+                localBlockMolSz4.setVisible(false);
+                break;
+
+            case "TANH":
+                localBlockMolSz3.setVisible(true);
+                localBlockMolSz4.setVisible(false);
+                break;
+
+            case "SIGMA":
+                localBlockMolSz3.setVisible(false);
+                localBlockMolSz4.setVisible(true);
+                break;
+
+            default:
+                localBlockMolSz3.setVisible(false);
+                localBlockMolSz4.setVisible(false);
+                break;
+        }
+        if (checkedFlags.get(keyPar11))
+        {
+            rbtLevelGrowth.setSelected(true);
+            localBlockLvlProbAll.setVisible(true);
+            localBlockMolSzAll.setVisible(false);
+        } else {
+            rbtMolSzGrowth.setSelected(true);
+            localBlockLvlProbAll.setVisible(false);
+            localBlockMolSzAll.setVisible(true);
+        }
 		advOptsBlock.setVisible(true);
     }
 
@@ -1370,10 +1783,19 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar8,txtPar8));
         sb.append(getStringIfNotEmpty(keyPar9,txtPar9));
         sb.append(getStringIfNotEmpty(keyPar10,txtPar10));
-        sb.append(keyPar11).append("=").append(cmbPar11.getSelectedItem()).append(NL);
-        sb.append(getStringForKVLine(keyPar12,spnPar12));
-        sb.append(getStringForKVLine(keyPar13,spnPar13));
-        sb.append(getStringForKVLine(keyPar14,spnPar14));
+        if (rbtLevelGrowth.isSelected())
+        {
+            sb.append(keyPar11).append("=").append(cmbPar11.getSelectedItem()).append(NL);
+            sb.append(getStringForKVLine(keyPar12,spnPar12));
+            sb.append(getStringForKVLine(keyPar13,spnPar13));
+            sb.append(getStringForKVLine(keyPar14,spnPar14));
+        } else if (rbtMolSzGrowth.isSelected()) 
+        {
+            sb.append(keyParMolSz1).append("=").append(cmbParMolSz1.getSelectedItem()).append(NL);
+            sb.append(getStringForKVLine(keyParMolSz2,spnParMolSz2));
+            sb.append(getStringForKVLine(keyParMolSz3,spnParMolSz3));
+            sb.append(getStringForKVLine(keyParMolSz4,spnParMolSz4));
+        }
         sb.append(keyParCrowd1).append("=").append(cmbParCrowd1.getSelectedItem()).append(NL);
         sb.append(getStringForKVLine(keyParCrowd2,spnParCrowd2));
         sb.append(getStringForKVLine(keyParCrowd3,spnParCrowd3));

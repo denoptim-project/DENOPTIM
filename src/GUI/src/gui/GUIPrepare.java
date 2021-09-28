@@ -130,7 +130,8 @@ public class GUIPrepare extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				File outFile = GUIFileOpener.pickFileForSaving(btnSaveParams);
 				printAllParamsToFile(outFile);
-				DenoptimIO.addToRecentFiles(outFile, getFileFormat("PARAMS"));
+				if (outFile!=null)
+				    DenoptimIO.addToRecentFiles(outFile, getFileFormat("PARAMS"));
 			}
 		});
 		commandsPane.add(btnSaveParams);
