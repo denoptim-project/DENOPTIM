@@ -149,7 +149,7 @@ public class RingClosingAttractor
 
     /**
      * Constructor for a RingClosingAttractor corresponding to an atom in a
-     * molecular object. Note that any atom can be used to contuct a
+     * molecular object. Note that any atom can be used to conduct a
      * RingClosingAttractor but only those deriving from ring closing fragments
      * (which are identified by the atom symbol) are real RingClosingAttractor.
      * After creation it is then suggested to check whether the resulting

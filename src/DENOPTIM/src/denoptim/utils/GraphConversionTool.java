@@ -81,7 +81,8 @@ public class GraphConversionTool
     {
         for (DENOPTIMVertex v : g.getRCVertices())
         {
-            if (g.getRingsInvolvingVertex(v).size()==0)
+            if (g.getRingsInvolvingVertex(v).size()==0 
+                    && v.getEdgeToParent()!=null)
             {
                 DENOPTIMAttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
                 g.removeVertex(v);

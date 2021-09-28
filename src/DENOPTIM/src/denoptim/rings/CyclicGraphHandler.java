@@ -997,6 +997,11 @@ public class CyclicGraphHandler
             {
                 DENOPTIMVertex vI = lstVert.get(i);
                 IAtom atmI = mol.getAtom(vIdToAtmId.get(vI).get(0));
+                
+                // Dealing with the possibility that RCV is the scaffold
+                if (mol.getConnectedAtomsList(atmI).size()==0)
+                    continue;
+                    
                 RingClosingAttractor rcaI = new RingClosingAttractor(atmI,mol);
                 if (!rcaI.isAttractor())
                 {
