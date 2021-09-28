@@ -1234,31 +1234,56 @@ without providing that specific keyword in the input file.</p>
 			Genetic Operations.</p>
 		</td>
 	</tr>
-	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthMultiplier</code></p>
-		</td>
-		<td width="60%"><p>Specifies the value of the
-			factor &lambda; used in growth
-			probability schemes <code>EXP_DIFF</code>, and
-			<code>TANH</code>.</p>
-		</td>
-	</tr>
-	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthSigmaSteepness</code></p>
-		</td>
-		<td width="60%"><p>Specifies the value of
-			parameter &sigma;<sub></sub>1 used in growth
-			probability scheme <code>SIGMA</code>.</p>
-		</td>
-	</tr>
-	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthSigmaMiddle</code></p>
-		</td>
-		<td width="60%"><p>Specifies the value of
-			parameter &sigma;<sub></sub>2 used in growth
-			probability scheme <code>SIGMA</code>.</p>
-		</td>
-	</tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthMultiplier</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of the
+                    factor &lambda; used in graph level-based growth
+                    probability schemes <code>EXP_DIFF</code>, and
+                    <code>TANH</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthSigmaSteepness</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>1 used in graph level-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthSigmaMiddle</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>2 used in graph level-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthMultiplier</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of the
+                    factor &lambda; used in graph molecular size-based growth
+                    probability schemes <code>EXP_DIFF</code>, and
+                    <code>TANH</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthSigmaSteepness</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>1 used in graph molecular size-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthSigmaMiddle</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>2 used in graph molecular size-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-CrowdProbScheme</code></p>
 		</td>
@@ -1337,6 +1362,25 @@ without providing that specific keyword in the input file.</p>
 			for the elitist scheme (survival of the fittest), use <code>NONE</code>
 			for no replacement (all candidates become member of the
 			population, which keeps growing).</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemVertexes</code></p>
+		</td>
+		<td width="60%"><p>Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) as templates in the library of general-purpose building blocks. No new template will include a scaffold vertex or be
+			used as scaffold. See <code>GA-KeepNewRingSystemScaffolds</code> to enable the latter possibilities.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemScaffolds</code></p>
+		</td>
+		<td width="60%"><p>Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemFitnessTrsh</code></p>
+		</td>
+		<td width="60%"><p>Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.</p>
 		</td>
 	</tr>
 	<tr >

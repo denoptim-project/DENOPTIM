@@ -301,6 +301,19 @@ public class GAParametersForm extends ParametersForm
     JPanel linePar25;
     JLabel lblPar25;
     JComboBox<String> cmbPar25;
+    
+    String keyRingTmplsFrags = "GA-KeepNewRingSystemVertexes";
+    JPanel lineRingTmplsFrags;
+    JRadioButton rdbRingTmplsFrags;
+    
+    String keyRingTmplsScaff = "GA-KeepNewRingSystemScaffolds";
+    JPanel lineRingTmplsScaff;
+    JRadioButton rdbRingTmplsScaff;
+    
+    String keyRingSysTmplTrhld = "GA-KeepNewRingSystemFitnessTrsh";
+    JPanel lineRingSysTmpl;
+    JLabel lblRingSysTmpl;
+    JSpinner spnRingSysTmpl;
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
 
@@ -528,6 +541,7 @@ public class GAParametersForm extends ParametersForm
                 }
             }
         });
+        rbtLevelGrowth.addChangeListener(rdbFieldChange);
         rbtMolSzGrowth = new JRadioButton("molecular size (heavy atoms count)");
         rbtMolSzGrowth.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -538,6 +552,7 @@ public class GAParametersForm extends ParametersForm
                 }
             }
         });
+        rbtMolSzGrowth.addChangeListener(rdbFieldChange);
         bgGrowthMode.add(rbtLevelGrowth);
         bgGrowthMode.add(rbtMolSzGrowth);
         lineGrowthPropMode.add(lblGrowthPropMode);
@@ -1287,6 +1302,62 @@ public class GAParametersForm extends ParametersForm
         linePar22.add(txtPar22);
         linePar22.add(btnPar22);
         advOptsBlock.add(linePar22);
+        
+        advOptsBlock.add(new JSeparator());
+        
+        String toolTipRingTmplsFrags = "<html>Specifies whether ring systems "
+                + "should be extracted <br>"
+                + "from generated graphs and stored as new general-"
+                + "purpose building blocks."
+                + "</html>";
+        lineRingTmplsFrags = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbRingTmplsFrags = new JRadioButton("Add new ring systems to building "
+                + "block library.");
+        rdbRingTmplsFrags.setToolTipText(toolTipRingTmplsFrags);
+        rdbRingTmplsFrags.addChangeListener(rdbFieldChange);
+        mapKeyFieldToValueField.put(keyRingTmplsFrags.toUpperCase(),
+                rdbRingTmplsFrags);
+        lineRingTmplsFrags.add(rdbRingTmplsFrags);
+        advOptsBlock.add(lineRingTmplsFrags);
+        
+        String toolTipRingTmplsScaff = "<html>Specifies whether ring systems "
+                + "should be extracted <br>"
+                + "from generated graphs and stored as new "
+                + "scaffold building blocks."
+                + "</html>";
+        lineRingTmplsScaff = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbRingTmplsScaff = new JRadioButton("Add new ring systems to library "
+                + "of scaffold building blocks.");
+        rdbRingTmplsScaff.setToolTipText(toolTipRingTmplsScaff);
+        rdbRingTmplsScaff.addChangeListener(rdbFieldChange);
+        mapKeyFieldToValueField.put(keyRingTmplsScaff.toUpperCase(),
+                rdbRingTmplsScaff);
+        lineRingTmplsScaff.add(rdbRingTmplsScaff);
+        advOptsBlock.add(lineRingTmplsScaff);
+        
+        String toolTipRingSysTmpl = "<html>A %/100 defining how good "
+                + "(high fitness w.r.t. population range)<br> "
+                + "candidates need to be for generating "
+                + "new ring system templates.<br>"
+                + "For example, 0.10"
+                + "allows only the best 10% of the candidates <br>to generate "
+                + "a new building block from theyr graph.</html>";
+        lineRingSysTmpl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblRingSysTmpl = new JLabel("Threshold for saving ring systems:", 
+                SwingConstants.LEFT);
+        lblRingSysTmpl.setPreferredSize(fileLabelSize);
+        lblRingSysTmpl.setToolTipText(toolTipRingSysTmpl);
+        spnRingSysTmpl = new JSpinner(new SpinnerNumberModel(0.10,0.0,1.0,0.05));
+        spnRingSysTmpl.setToolTipText(toolTipRingSysTmpl);
+        spnRingSysTmpl.setPreferredSize(strFieldSize);
+        mapKeyFieldToValueField.put(keyRingSysTmplTrhld.toUpperCase(),
+                spnRingSysTmpl);
+        lineRingSysTmpl.add(lblRingSysTmpl);
+        lineRingSysTmpl.add(spnRingSysTmpl);
+        advOptsBlock.add(rdbRingTmplsFrags);
+        advOptsBlock.add(rdbRingTmplsScaff);
+        advOptsBlock.add(lineRingSysTmpl);
+        
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
         
@@ -1810,6 +1881,12 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar22,txtPar22));
         sb.append(getStringIfNotEmpty(keyPar24,txtPar24));
         sb.append(keyPar25).append("=").append(cmbPar25.getSelectedItem()).append(NL);
+        sb.append(getStringIfSelected(keyRingTmplsFrags,rdbRingTmplsFrags));
+        sb.append(getStringIfSelected(keyRingTmplsScaff,rdbRingTmplsScaff));
+        if (rdbRingTmplsScaff.isSelected() || rdbRingTmplsScaff.isSelected())
+        {
+            sb.append(getStringForKVLine(keyRingSysTmplTrhld,spnRingSysTmpl));
+        }
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
 }
