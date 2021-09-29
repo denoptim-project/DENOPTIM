@@ -178,7 +178,7 @@ public class FragmentSpaceParameters
     
     public static boolean enforceSymmetry()
     {
-	return enforceSymmetry;
+    	return enforceSymmetry;
     }
 
 //------------------------------------------------------------------------------
@@ -192,7 +192,7 @@ public class FragmentSpaceParameters
 
     public static int getVerbosity()
     {
-	return verbosity;
+    	return verbosity;
     }
 
 //------------------------------------------------------------------------------
@@ -287,8 +287,11 @@ public class FragmentSpaceParameters
             }
             break;
         case "FS-ENFORCESYMMETRY":
-	    enforceSymmetry = true;
-	    break;
+		    enforceSymmetry = true;
+		    break;
+        case "FS-ENFORCESYMMETRY=":
+		    enforceSymmetry = true;
+		    break;
 	case "FS-CONSTRAINSYMMETRY=":
 	    symmetryConstraints = true;
 	    try

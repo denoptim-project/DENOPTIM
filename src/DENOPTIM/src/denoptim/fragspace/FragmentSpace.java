@@ -517,7 +517,7 @@ public class FragmentSpace
 
     public static ArrayList<String> getCompatibleAPClasses(String query)
     {
-	return compatMap.get(query);
+    	return compatMap.get(query);
     } 
 
 //------------------------------------------------------------------------------
@@ -830,8 +830,24 @@ public class FragmentSpace
     			new ArrayList<IdFragmentAndAP>();
     	
     	// Take the compatible AP classes
-		ArrayList<String> compatApClasses = 
+		ArrayList<String> compatMapRow = 
 		     FragmentSpace.getCompatibleAPClasses(srcApCls);
+		
+		if (compatMapRow == null)
+		{
+			return compatFragAps;
+		}
+		
+		// Ensure uniqueness
+		ArrayList<String> compatApClasses = new ArrayList<String>();
+		//TODO: all this would be much easier with the use of the APClass
+		for (String c : compatMapRow)
+		{
+			if (!compatApClasses.contains(c))
+			{
+				compatApClasses.add(c);
+			}
+		}
 		
 		// Find all APs with any compatible class
 		if (compatApClasses != null)
@@ -842,7 +858,6 @@ public class FragmentSpace
 			    		FragmentSpace.getFragsWithAPClass(compClass));
 			}
 		}
-		
 		return compatFragAps;
     }
 
@@ -860,7 +875,7 @@ public class FragmentSpace
 
     public static boolean imposeSymmetryOnAPsOfClass(String apClass)
     {
-	boolean res = true;
+    	boolean res = true;
         if (hasSymmetryConstrain(apClass))
         {
             if (getSymmetryConstrain(apClass) <

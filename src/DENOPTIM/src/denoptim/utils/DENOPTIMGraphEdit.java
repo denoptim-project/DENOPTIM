@@ -30,6 +30,7 @@ import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EdgeQuery;
 import denoptim.rings.ClosableChain;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
@@ -61,7 +62,7 @@ public class DENOPTIMGraphEdit
     /**
      * Edge subject to editing task
      */
-    private DENOPTIMEdge focusEdge = null;
+    private EdgeQuery focusEdge = null;
 
     /**
      * Incoming subgraph
@@ -100,7 +101,7 @@ public class DENOPTIMGraphEdit
 //------------------------------------------------------------------------------
 
     public DENOPTIMGraphEdit(String type, DENOPTIMVertex v,
-                             DENOPTIMAttachmentPoint ap, DENOPTIMEdge edg,
+                             DENOPTIMAttachmentPoint ap, EdgeQuery edg,
                              DENOPTIMGraph inGraph)
     {
         this.taskType = type;
@@ -185,57 +186,50 @@ public class DENOPTIMGraphEdit
             String str = line.substring(startOfEdg+EDGLAB.length());
             str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
             str = str.trim();
+            
+            this.focusEdge = new EdgeQuery();
+            
             String strPrts[] = str.split("_");
             // source vertex
-            int srcVertex = -1;
             if (!strPrts[0].equals("*"))
             {
-                srcVertex = Integer.parseInt(strPrts[0]);
+                this.focusEdge.setSourceVertex(Integer.parseInt(strPrts[0]));
             }
             // source attachment point
-            int srcAP = -1;
             if (!strPrts[1].equals("*"))
             {
-                srcAP = Integer.parseInt(strPrts[1]);
+                this.focusEdge.setSourceDAP(Integer.parseInt(strPrts[1]));
             }
             // target vertex
-            int trgVertex = -1;
             if (!strPrts[2].equals("*"))
             {
-                trgVertex = Integer.parseInt(strPrts[2]);
+                this.focusEdge.setTargetVertex(Integer.parseInt(strPrts[2]));
             }
             // target attachment point
-            int trgAP = -1;
             if (!strPrts[3].equals("*"))
             {
-                trgAP = Integer.parseInt(strPrts[3]);
+                this.focusEdge.setTargetDAP(Integer.parseInt(strPrts[3]));
             }
             // bond type
-            int btype = -1;
             if (!strPrts[4].equals("*"))
             {
-                btype = Integer.parseInt(strPrts[4]);
+                this.focusEdge.setBondType(Integer.parseInt(strPrts[4]));
             }
-	    this.focusEdge = new DENOPTIMEdge(srcVertex, trgVertex, srcAP,
-                                                                 trgAP, btype);
-	    if (strPrts.length > 5)
-	    {
-	        //source APClass
-	        String srcAPC = "*";
-	        if (!strPrts[5].equals("*"))
-	        {
-                    srcAPC = strPrts[5];
+		    
+		    if (strPrts.length > 5)
+		    {
+		        //source APClass
+		        if (!strPrts[5].equals("*"))
+		        {
+                    this.focusEdge.setSourceReaction(strPrts[5]);
                 }
-		this.focusEdge.setSourceReaction(srcAPC);
 
                 //target APClass
-                String trgAPC = "*";
                 if (!strPrts[6].equals("*"))
                 {
-                    trgAPC = strPrts[6];
+                    this.focusEdge.setTargetReaction(strPrts[6]);
                 }
-		this.focusEdge.setTargetReaction(trgAPC);
-	    }
+		    }
         }
 
         if (-1 != startOfAP)
@@ -262,19 +256,19 @@ public class DENOPTIMGraphEdit
             {
                 fconn = Integer.parseInt(strPrts[2]);
             }
-	    DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(apid,conn,
+            DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(apid,conn,
 								        fconn);
-	    if (strPrts.length > 3)
-	    {
+		    if (strPrts.length > 3)
+		    {
                 // AP class
                 String apClass = "*";
                 if (!strPrts[3].equals("*"))
                 {
                     apClass = strPrts[3];
                 }
-		ap.setAPClass(apClass);
-	    }
-	    this.focusAP = ap;
+                ap.setAPClass(apClass);
+		    }
+		    this.focusAP = ap;
         }
 
         if (-1 != startOfGraph)
@@ -283,7 +277,7 @@ public class DENOPTIMGraphEdit
             str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
             str = str.trim();
             this.incomingGraph = GraphConversionTool.getGraphFromString(str);
-	}
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -316,7 +310,7 @@ public class DENOPTIMGraphEdit
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMEdge getFocusEdge()
+    public EdgeQuery getFocusEdge()
     {
         return focusEdge;
     }

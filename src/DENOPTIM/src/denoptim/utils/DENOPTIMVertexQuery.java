@@ -21,6 +21,7 @@ package denoptim.utils;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EdgeQuery;
 
 /**
  * Query for searching vertices
@@ -37,12 +38,12 @@ public class DENOPTIMVertexQuery
     /**
      * Query on the vertex' incoming connections (i.e., vertex id the target)
      */
-    private DENOPTIMEdge eInQuery;
+    private EdgeQuery eInQuery;
 
     /**
      * Query on the vertex' outcoming connections (i.e., vertex id the cource)
      */
-    private DENOPTIMEdge eOutQuery;
+    private EdgeQuery eOutQuery;
 
 //------------------------------------------------------------------------------
 
@@ -68,7 +69,7 @@ public class DENOPTIMVertexQuery
      * the candidate vertex if the target.
      */
 
-    public DENOPTIMVertexQuery(DENOPTIMVertex v, DENOPTIMEdge eIn)
+    public DENOPTIMVertexQuery(DENOPTIMVertex v, EdgeQuery eIn)
     {
         this.vQuery = v;
         this.eInQuery = eIn;
@@ -88,8 +89,7 @@ public class DENOPTIMVertexQuery
      * the candidate vertex if the source.
      */
 
-    public DENOPTIMVertexQuery(DENOPTIMVertex v, DENOPTIMEdge eIn, 
-							     DENOPTIMEdge eOut)
+    public DENOPTIMVertexQuery(DENOPTIMVertex v, EdgeQuery eIn, EdgeQuery eOut)
     {
         this.vQuery = v;
         this.eInQuery = eIn;
@@ -100,19 +100,19 @@ public class DENOPTIMVertexQuery
 
     public DENOPTIMVertex getVrtxQuery()
     {
-	return vQuery;
+    	return vQuery;
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMEdge getInEdgeQuery()
+    public EdgeQuery getInEdgeQuery()
     {
         return eInQuery;
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMEdge getOutEdgeQuery()
+    public EdgeQuery getOutEdgeQuery()
     {
         return eOutQuery;
     }

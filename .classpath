@@ -8,6 +8,7 @@
 	<classpathentry kind="src" path="src/FragSpaceExplorer/src"/>
 	<classpathentry kind="src" path="src/GUI/src"/>
 	<classpathentry kind="src" path="src/UpdateUID/src"/>
+	<classpathentry kind="src" path="src/misc/GraphEditor/src"/>
 	<classpathentry kind="lib" path="lib/apiguardian-api-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
@@ -21,7 +22,7 @@
 	<classpathentry kind="lib" path="lib/junit-jupiter-params-5.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/cdk-1.4.19.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/AdoptOpenJDK-1.8">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/adoptopenjdk-8">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

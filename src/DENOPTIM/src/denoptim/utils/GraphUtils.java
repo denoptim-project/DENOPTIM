@@ -43,6 +43,7 @@ import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EdgeQuery;
 import denoptim.molecule.SymmetricSet;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
@@ -2470,15 +2471,15 @@ if(debug)
      * @param onlyOneSymm if <code>true</code> then only one match will be 
      * collected for each symmetric set of partners.
      * @param verbosity the verbosity level
-     * @return the list of mathced vertices
+     * @return the list of matched vertices
      */
 
     public static ArrayList<DENOPTIMVertex> findVertices(DENOPTIMGraph graph,
                 DENOPTIMVertexQuery dnQuery, boolean onlyOneSymm, int verbosity)
     {
         DENOPTIMVertex vQuery = dnQuery.getVrtxQuery();
-        DENOPTIMEdge eInQuery = dnQuery.getInEdgeQuery();
-        DENOPTIMEdge eOutQuery = dnQuery.getOutEdgeQuery();
+        EdgeQuery eInQuery = dnQuery.getInEdgeQuery();
+        EdgeQuery eOutQuery = dnQuery.getOutEdgeQuery();
         
         ArrayList<DENOPTIMVertex> matches = new ArrayList<DENOPTIMVertex>();
         matches.addAll(graph.getVertexList());
@@ -2489,90 +2490,93 @@ if(debug)
         }
 
         //Check condition vertex ID
-        int query = vQuery.getVertexId();
-        if (query > -1) //-1 would be the wildcard
+        if (vQuery != null)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
-            {
-                if (v.getVertexId() == query)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
+	        int query = vQuery.getVertexId();
+	        if (query > -1) //-1 would be the wildcard
+	        {
+	            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
+	            for (DENOPTIMVertex v : matches)
+	            {
+	                if (v.getVertexId() == query)
+	                {
+	                    newLst.add(v);
+	                }
+	            }
+	            matches = newLst;
+	        }
+        
+	        if (verbosity > 2)
+	        {
+	            System.out.println("After ID-based rule: " + matches);
+	        }
+	
+	        //Check condition fragment ID
+	        query = vQuery.getMolId();
+	        if (query > -1) //-1 would be the wildcard
+	        {
+	            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
+	            for (DENOPTIMVertex v : matches)
+	            {
+	                if (v.getMolId() == query)
+	                {
+	                    newLst.add(v);
+	                }
+	            }
+	            matches = newLst;
+	        }
+        
+	        if (verbosity > 2)
+	        {
+	            System.out.println("After MolID-based rule: " + matches);
+	        }
+            
+	        //Check condition fragment type
+	        query = vQuery.getFragmentType();
+	        if (query > -1) //-1 would be the wildcard
+	        {
+	            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
+	            for (DENOPTIMVertex v : matches)
+	            {
+	                if (v.getFragmentType() == query)
+	                {
+	                    newLst.add(v);
+	                }
+	            }
+	            matches = newLst;
+	        }
+	
+	        if (verbosity > 2)
+	        {
+	            System.out.println("After Frag-type rule: " + matches);
+	        }
+	
+	        //Check condition level of vertex
+	        query = vQuery.getLevel();
+	        if (query > -2) //-2 would be the wildcard
+	        {
+	            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
+	            for (DENOPTIMVertex v : matches)
+	            {
+	                if (v.getLevel() == query)
+	                {
+	                    newLst.add(v);
+	                }
+	            }
+	            matches = newLst;
+	        }
+	
+	        if (verbosity > 1)
+	        {
+	            System.out.println("After Vertex-based rules: " + matches);
+	        }
         }
-
-        if (verbosity > 2)
-        {
-            System.out.println("After ID-based rule: " + matches);
-        }
-
-        //Check condition fragment ID
-        query = vQuery.getMolId();
-        if (query > -1) //-1 would be the wildcard
-        {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
-            {
-                if (v.getMolId() == query)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-        }
-
-        if (verbosity > 2)
-        {
-            System.out.println("After MolID-based rule: " + matches);
-        }
-
-        //Check condition fragment type
-        query = vQuery.getFragmentType();
-        if (query > -1) //-1 would be the wildcard
-        {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
-            {
-                if (v.getFragmentType() == query)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-        }
-
-        if (verbosity > 2)
-        {
-            System.out.println("After Frag-type rule: " + matches);
-        }
-
-        //Check condition level of vertex
-        query = vQuery.getLevel();
-        if (query > -2) //-2 would be the wildcard
-        {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
-            {
-                if (v.getLevel() == query)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-        }
-
-        if (verbosity > 1)
-        {
-            System.out.println("After Vertex-based rules: " + matches);
-        }
-
+        
         //Incoming connections (candidate vertex is the target)
         if (eInQuery != null)
         {
             //Check condition target AP
-            query = eInQuery.getTargetDAP();
+            int query = eInQuery.getTargetDAP();
             if (query > -1)
             {
                 ArrayList<DENOPTIMVertex> newLst = 
@@ -2625,7 +2629,7 @@ if(debug)
     
             //Check condition AP class
             String squery = eInQuery.getTargetReaction();
-            if (!squery.equals("*"))
+            if (squery != null)
             {
                 ArrayList<DENOPTIMVertex> newLst = 
                                                new ArrayList<DENOPTIMVertex>();
@@ -2644,7 +2648,7 @@ if(debug)
                 matches = newLst;
             }
             squery = eInQuery.getSourceReaction();
-            if (!squery.equals("*"))
+            if (squery != null)
             {
                 ArrayList<DENOPTIMVertex> newLst =
                                                new ArrayList<DENOPTIMVertex>();
@@ -2673,7 +2677,7 @@ if(debug)
         if (eOutQuery != null)
         {
             //Check condition target AP
-            query = eOutQuery.getSourceDAP();
+            int query = eOutQuery.getSourceDAP();
             if (query > -1)
             {
                 ArrayList<DENOPTIMVertex> newLst = 
@@ -2726,7 +2730,7 @@ if(debug)
 
             //Check condition AP class
             String squery = eOutQuery.getTargetReaction();
-            if (!squery.equals("*"))
+            if (squery != null)
             {
                 ArrayList<DENOPTIMVertex> newLst =
                                                new ArrayList<DENOPTIMVertex>();
@@ -2745,7 +2749,7 @@ if(debug)
                 matches = newLst;
             }
             squery = eOutQuery.getSourceReaction();
-            if (!squery.equals("*"))
+            if (squery != null)
             {
                 ArrayList<DENOPTIMVertex> newLst = 
                                                new ArrayList<DENOPTIMVertex>();
@@ -2818,7 +2822,7 @@ if(debug)
             {
                 case (DENOPTIMGraphEdit.REPLACECHILD):
                 {
-                    DENOPTIMEdge e =  edit.getFocusEdge();
+                    EdgeQuery e =  edit.getFocusEdge();
                     DENOPTIMGraph inGraph = edit.getIncomingGraph();
                     DENOPTIMVertexQuery query = new DENOPTIMVertexQuery(
                                                          edit.getFocusVertex(),
