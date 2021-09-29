@@ -19,32 +19,65 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.vecmath.Point3d;
 
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.utils.DENOPTIMMoleculeUtils;
+
+import static denoptim.molecule.DENOPTIMVertex.*;
 
 /**
- * Class representing a continuously connected portion of molecular object
+ * Class representing a continuously connected portion of chemical object
  * holding attachment points.
- * 
+ *
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
-{ 	
+public class DENOPTIMFragment extends DENOPTIMVertex
+{
     /**
 	 * Version UID
 	 */
-	private static final long serialVersionUID = 4415462924969433010L;
+	private static final long serialVersionUID = 1L;
 
+    /**
+     * attachment points on this vertex
+     */
+    private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
+
+    /**
+     * List of AP sets that are related to each other, so that we
+     * call them "symmetric" (though symmetry is a fuzzy concept here).
+     */
+    private ArrayList<SymmetricSet> lstSymAPs;
+    
+	/**
+	 * Molecular representation of this fragment
+	 */
+	private IAtomContainer mol;
+	
+	/**
+	 * Field distinguishing type DENOPTIMFragment from other types of vertexes.
+	 * The existence of this field triggers interpretation of the JSON string
+	 * as a DENOPTIMFragment.
+	 */
+	private final String fragmentType = "Molecular_fragment";
+	// NB: Don't make static or Gson will ignore it!
+	
 //-----------------------------------------------------------------------------
 
     /**
@@ -54,8 +87,75 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     public DENOPTIMFragment()
     {
         super();
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor for a molecular fragment kind of vertex.
+     * @param vertexId unique identified of the vertex
+     */
+
+    public DENOPTIMFragment(int vertexId)
+    {
+        super(vertexId);
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.mol = builder.newAtomContainer();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Constructor from another atom container, which has APs only as 
+     * molecular properties. WARNING: other properties of the atom container
+     * are not imported!
+     * @param vertexId the identifier of the vertex to construct
+     * @param mol the molecular representation
+     * @throws DENOPTIMException 
+     */
+    
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt)
+            throws DENOPTIMException
+    {     
+        super (vertexId);
+        
+        this.setBuildingBlockType(bbt);
+        
+        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        
+        this.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
+
+        Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
+        if (prop != null)
+        {
+            projectPropertyToAP(prop.toString());
+        }
+        
+        ArrayList<SymmetricSet> simAP = identifySymmetryRelatedAPSets(this.mol, 
+                getAttachmentPoints());
+        setSymmetricAPSets(simAP);
+        
+        this.setAsRCV(getNumberOfAPs() == 1
+                && APClass.RCAAPCLASSSET.contains(
+                        getAttachmentPoints().get(0).getAPClass()));
+    }
+
+//------------------------------------------------------------------------------
+
+    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt,
+                            boolean isRCV)
+            throws DENOPTIMException {
+        this(vertexId, mol, bbt);
+        this.setAsRCV(isRCV);
+    }
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -66,17 +166,119 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(IAtomContainer mol) throws DENOPTIMException
+    public DENOPTIMFragment(IAtomContainer mol, BBType bbt)
+            throws DENOPTIMException
     {    	
-    	// WARNING: atom container properties are not imported
-    	
-        super(mol);
-        
-        Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
-        if (prop != null)
+    	this(-1,mol,bbt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void updateSymmetryRelations()
+    {
+        setSymmetricAPSets(identifySymmetryRelatedAPSets(mol, 
+                getAttachmentPoints()));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
+            IAtomContainer mol,
+            ArrayList<DENOPTIMAttachmentPoint> daps)
+    {
+        ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
+        for (int i=0; i<daps.size()-1; i++)
         {
-            projectPropertyToAP(prop.toString());
+            ArrayList<Integer> lst = new ArrayList<>();
+            Integer i1 = i;
+            lst.add(i1);
+            
+            boolean alreadyFound = false;
+            for (SymmetricSet previousSS : lstCompatible)
+            {
+                if (previousSS.contains(i1))
+                {
+                    alreadyFound = true;
+                    break;
+                }
+            }
+            if (alreadyFound)
+            {
+                continue;
+            }
+        
+            DENOPTIMAttachmentPoint d1 = daps.get(i);
+            for (int j=i+1; j<daps.size(); j++)
+            {
+                DENOPTIMAttachmentPoint d2 = daps.get(j);
+                if (atomsAreCompatible(mol, d1.getAtomPositionNumber(),
+                                    d2.getAtomPositionNumber()))
+                {
+                    // check if reactions are compatible w.r.t. symmetry
+                    if (d1.getAPClass().compareTo(d2.getAPClass()) == 0)
+                    {
+                        Integer i2 = j;
+                        lst.add(i2);
+                    }
+                }
+            }
+            
+            if (lst.size() > 1)
+            {
+                lstCompatible.add(new SymmetricSet(lst));
+            }
         }
+        
+        return lstCompatible;
+    }
+ 
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if the atoms at the given positions have similar environments
+     * i.e. are similar in atom types etc.
+     * @param mol
+     * @param a1 atom position
+     * @param a2 atom position
+     * @return <code>true</code> if atoms have similar environments
+     */
+
+    private static boolean atomsAreCompatible(IAtomContainer mol, int a1, int a2)
+    {
+        // check atom types
+        IAtom atm1 = mol.getAtom(a1);
+        IAtom atm2 = mol.getAtom(a2);
+
+        if (atm1.getSymbol().compareTo(atm2.getSymbol()) != 0)
+            return false;
+
+        // check connected bonds
+        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
+            return false;
+
+        // check connected atoms
+        if (mol.getConnectedBondsCount(atm1)!=mol.getConnectedBondsCount(atm2))
+            return false;
+
+        List<IAtom> la1 = mol.getConnectedAtomsList(atm2);
+        List<IAtom> la2 = mol.getConnectedAtomsList(atm2);
+
+        int k = 0;
+        for (int i=0; i<la1.size(); i++)
+        {
+            IAtom b1 = la1.get(i);
+            for (int j=0; j<la2.size(); j++)
+            {
+                IAtom b2 = la2.get(j);
+                if (b1.getSymbol().compareTo(b2.getSymbol()) == 0)
+                {
+                    k++;
+                    break;
+                }
+            }
+        }
+
+        return k == la1.size();
     }
     
 //-----------------------------------------------------------------------------
@@ -85,41 +287,20 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
      * Add an attachment point to the specifies atom
      * @param srcAtmId the index of the source atom in the atom list of this 
      * chemical representation. Index must be 0-based.
-     * @param propAPClass the attachment point class, or null, if class should not 
+     * @param apc the attachment point class, or null, if class should not 
      * be defines.
      * @param vector the coordinates of the 3D point representing the end of 
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
+     * @param valence the valences used by this AP.
      * @throws DENOPTIMException 
      */
 
-    public void addAP(int srcAtmId, String propAPClass, double[] vector) 
-    		throws DENOPTIMException
+    public void addAP(int srcAtmId, APClass apc, Point3d vector, int valence) 
+            throws DENOPTIMException
     {
-        IAtom srcAtm = this.getAtom(srcAtmId);
-        Point3d p3d = new Point3d(vector[0], vector[1], vector[2]);
-        addAP(srcAtm, propAPClass, p3d);
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Add an attachment point to the specifies atom
-     * @param srcAtmId the index of the source atom in the atom list of this 
-     * chemical representation. Index must be 0-based.
-     * @param propAPClass the attachment point class, or null, if class should not 
-     * be defines.
-     * @param vector the coordinates of the 3D point representing the end of 
-     * the attachment point direction vector, or null. The coordinates must be
-     * consistent with the coordinates of the atoms.
-     * @throws DENOPTIMException 
-     */
-
-    public void addAP(int srcAtmId, String propAPClass, Point3d vector) 
-    		throws DENOPTIMException
-    {
-        IAtom srcAtm = this.getAtom(srcAtmId);
-        addAP(srcAtm, propAPClass, vector);
+        IAtom srcAtm = mol.getAtom(srcAtmId);
+        addAPOnAtom(srcAtm, apc, vector, valence);
     }
     
 //-----------------------------------------------------------------------------
@@ -128,7 +309,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
      * Add an attachment point to the specifies atom
      * @param srcAtm the source atom in the atom list of this 
      * chemical representation.
-     * @param propAPClass the attachment point class, or null, if class should not 
+     * @param apc the attachment point class, or null, if class should not 
      * be defines.
      * @param vector the coordinates of the 3D point representing the end of 
      * the attachment point direction vector, or null. The coordinates must be
@@ -136,28 +317,45 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
      * @throws DENOPTIMException 
      */
 
-    public void addAP(IAtom srcAtm, String propAPClass, Point3d vector) 
-    		throws DENOPTIMException
+    public void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector)
+            throws DENOPTIMException
     {
-    	int atmId = this.getAtomNumber(srcAtm);
-    	DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint();
-    	ap.setAtomPositionNumber(atmId);
-    	ap.setAPClass(propAPClass);
-    	ap.setDirectionVector(new double[]{vector.x, vector.y, vector.z});
-    	
-    	ArrayList<DENOPTIMAttachmentPoint> apList;
-        if (getAPCountOnAtom(srcAtm) > 0)
-        {
-        	apList = getAPListFromAtom(srcAtm);
-        	apList.add(ap);
+        addAPOnAtom(srcAtm,apc,vector,-1);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Add an attachment point to the specifies atom
+     * @param srcAtm the source atom in the atom list of this 
+     * chemical representation.
+     * @param apc the attachment point class, or null, if class should not 
+     * be defines.
+     * @param vector the coordinates of the 3D point representing the end of 
+     * the attachment point direction vector, or null. The coordinates must be
+     * consistent with the coordinates of the atoms.
+     * @param valence the valences used by this AP.
+     * @throws DENOPTIMException 
+     */
+
+    private void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector,
+                             int valence)
+            throws DENOPTIMException
+    {
+        int atmId = mol.indexOf(srcAtm);
+        this.addAP(atmId, valence, valence,
+                new double[] {vector.x, vector.y, vector.z}, apc);
+        ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();
+        DENOPTIMAttachmentPoint ap = aps.get(aps.size() - 1);
+
+        ArrayList<DENOPTIMAttachmentPoint> apList = new ArrayList<>();
+        if (getAPCountOnAtom(srcAtm) > 0) {
+            apList = getAPListFromAtom(srcAtm);
         }
-        else
-        {
-        	apList = new ArrayList<DENOPTIMAttachmentPoint>();
-        	apList.add(ap);
-    	}
-        
+        apList.add(ap);
         srcAtm.setProperty(DENOPTIMConstants.APTAG, apList);
+        
+        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -182,7 +380,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     
     public int getAPCountOnAtom(int srcAtmId)
     {
-        IAtom srcAtm = this.getAtom(srcAtmId);
+        IAtom srcAtm = mol.getAtom(srcAtmId);
         return getAPCountOnAtom(srcAtm);
     }
 
@@ -206,57 +404,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     	}
     	return num;
     }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns the number of APs currently defined.
-     * @return the number of APs
-     */
-    
-    public int getAPCount()
-    {
-    	int num = 0;
-        for (int atmId = 0; atmId<this.getAtomCount(); atmId++)
-        {
-            num = num + getAPCountOnAtom(atmId);
-        }
-    	return num;
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns the list of all APClasses on present on this fragment.
-     * @return the list of APClassess
-     */
-    
-    public ArrayList<String> getAllAPClassess()
-    {
-    	ArrayList<String> lst = new ArrayList<String>();
-    	for (DENOPTIMAttachmentPoint ap : getCurrentAPs())
-    	{
-    		String apCls = ap.getAPClass();
-    		if (!lst.contains(apCls))
-    		{
-    			lst.add(apCls);
-    		}
-    	}
-    	return lst;
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns all APs currently defined.
-     * @return the list of APs
-     */
-    
-    public ArrayList<DENOPTIMAttachmentPoint> getAllAPs()
-    {
-    	return getCurrentAPs();
-    }
-
+	
 //-----------------------------------------------------------------------------
     
     /**
@@ -268,9 +416,9 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     
     public void updateAPs()
     {
-        for (int atmId = 0; atmId<this.getAtomCount(); atmId++)
+        for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
         {
-            IAtom srcAtm = this.getAtom(atmId);
+            IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
             {
             	ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
@@ -282,6 +430,8 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 	            }
             }
         }
+        
+        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -299,24 +449,24 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     {
     	updateAPs();
     	
-    	ArrayList<DENOPTIMAttachmentPoint> allAPs = 
-    			new ArrayList<DENOPTIMAttachmentPoint>();
+    	ArrayList<DENOPTIMAttachmentPoint> allAPs =
+                new ArrayList<>();
     	
-        for (IAtom srcAtm : this.atoms())
+        for (IAtom srcAtm : mol.atoms())
         {
         	if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
             {
         		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
         				getAPListFromAtom(srcAtm);
-		        for (int i = 0; i<apsOnAtm.size(); i++)
-		        {
-		            allAPs.add(apsOnAtm.get(i));
-		        }
+                allAPs.addAll(apsOnAtm);
             }
         }
 
         //Reorder according to DENOPTIMAttachmentPoint priority
-        Collections.sort(allAPs, new DENOPTIMAttachmentPointComparator());
+        allAPs.sort(new DENOPTIMAttachmentPointComparator());
+        
+        //Sync the list of APs stored in superclass
+        setAttachmentPoints(allAPs);
         
         return allAPs;
     }
@@ -334,14 +484,14 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     {
 
 	    String allAtomsProp = "";    
-	    if (this.getProperty(DENOPTIMConstants.APCVTAG) == null)
+	    if (mol.getProperty(DENOPTIMConstants.APCVTAG) == null)
 	    {
 	    	System.out.println("WARNING: no tag " 
 	    			+ DENOPTIMConstants.APCVTAG + "found in fragment."
 	    			+ " No AP created.");
 	    	return;
         }
-	    allAtomsProp = this.getProperty(DENOPTIMConstants.APCVTAG).toString();
+	    allAtomsProp = mol.getProperty(DENOPTIMConstants.APCVTAG).toString();
 	    projectPropertyToAP(allAtomsProp);
     }
 	    
@@ -364,9 +514,9 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
     	}
     	
     	// Cleanup current APs in atom objects
-    	for (int ii=0 ; ii<this.getAtomCount(); ii++)
+    	for (int ii=0 ; ii<mol.getAtomCount(); ii++)
     	{
-    		IAtom atm = this.getAtom(ii);   		
+    		IAtom atm = mol.getAtom(ii);   		
     		atm.removeProperty(DENOPTIMConstants.APTAG);
     	}
 
@@ -374,7 +524,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 	    ArrayList<DENOPTIMAttachmentPoint> allAPs = 
 	    		new ArrayList<DENOPTIMAttachmentPoint>();
 	   
-	    // Collect all the APs an objects
+	    // Collect all the APs as objects
 	    String[] atomsProp = allAtomsProp.split(
 	    		DENOPTIMConstants.SEPARATORAPPROPATMS);
 	    for (int i = 0; i< atomsProp.length; i++)
@@ -386,7 +536,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 			    		DENOPTIMConstants.SEPARATORAPPROPAPS);
 			    
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(moreAPonThisAtm[0],"SDF");
+			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0]);
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
@@ -396,16 +546,16 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 			    	//WARNING here we have to switch to 1-based enumeration
 			    	// because we import from SDF string
 					DENOPTIMAttachmentPoint apMany = 
-							new DENOPTIMAttachmentPoint(atmID+1 
+							new DENOPTIMAttachmentPoint(this, atmID+1
 									+ DENOPTIMConstants.SEPARATORAPPROPAAP
-									+ moreAPonThisAtm[j], "SDF");
+									+ moreAPonThisAtm[j]);
 					allAPs.add(apMany);
 			    }
 			} 
 			else 
 			{
 			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(onThisAtm,"SDF");
+			    		new DENOPTIMAttachmentPoint(this, onThisAtm);
 			    allAPs.add(ap);
 			}
 	    }
@@ -416,13 +566,13 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
             DENOPTIMAttachmentPoint ap = allAPs.get(i);
             int atmID = ap.getAtomPositionNumber();
             
-            if (atmID > this.getAtomCount())
+            if (atmID > mol.getAtomCount())
             {
             	throw new DENOPTIMException("Fragment property defines AP "
             			+ "with out-of-borders atom index (" + atmID + ").");
             }
             
-            IAtom atm = this.getAtom(atmID);
+            IAtom atm = mol.getAtom(atmID);
             if (atm.getProperty(DENOPTIMConstants.APTAG) != null)
             {
 				ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
@@ -438,7 +588,12 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
                 
                 atm.setProperty(DENOPTIMConstants.APTAG,aps);
             }
-        } 
+        }
+
+        //Overwrite the list of APs of the superclass
+        setAttachmentPoints(allAPs);
+        
+        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -448,18 +603,17 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
      * the atoms in this container, and defines the string-based molecular
      * property used to print attachment points in SDF files.
      */
-    
     public void projectAPsToProperties()
     {
-
         //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
 
     	String propAPClass = "";
         String propAttchPnt = "";
-        for (IAtom atm : this.atoms())
+        for (IAtom atm : mol.atoms())
         {
-        	//WARNING: here is the 1-based criterion implemented
-        	int atmID = this.getAtomNumber(atm)+1;
+        	//WARNING: here is the 1-based criterion implemented.
+            // This is done also in ThreeDimTreeBuilder!
+        	int atmID = mol.getAtomNumber(atm)+1;
         	
         	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
@@ -474,7 +628,7 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 	        {
 			    DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
 	
-			    //Build SDF property "CLASS"
+			    //Build SDF property DENOPTIMConstants.APCVTAG
 			    String stingAPP = ""; //String Attachment Point Property
 			    if (firstCL)
 			    {
@@ -488,24 +642,294 @@ public class DENOPTIMFragment extends AtomContainer implements IAtomContainer
 			    }
 			    propAPClass = propAPClass + stingAPP;
 	
-			    //Build SDF property "ATTACHMENT_POINT"
-			    int BndOrd = FragmentSpace.getBondOrderForAPClass(
-			    		ap.getAPClass());
-			    String sBO = Integer.toString(BndOrd);
-			    String stBnd = " " + Integer.toString(atmID)+":"+sBO;
+			    //Build SDF property DENOPTIMConstants.APTAG
+			    String sBO = FragmentSpace.getBondOrderForAPClass(
+                        ap.getAPClass().toString()).toOldString();
+			    String stBnd = " " + atmID +":"+sBO;
 			    if (propAttchPnt.equals(""))
 			    {
-	                stBnd = stBnd.substring(1,stBnd.length());
+	                stBnd = stBnd.substring(1);
 			    }
 			    propAttchPnt = propAttchPnt + stBnd;
 			}
 	        propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
 	    }
-
-        this.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
-        this.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+        mol.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
+        mol.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
     }
 
 //-----------------------------------------------------------------------------
+
+    /**
+     * Returns a deep copy of this fragments.
+     * @throws CloneNotSupportedException 
+     */
     
+    @Override
+    public DENOPTIMFragment clone()
+    {   
+    	DENOPTIMFragment clone = new DENOPTIMFragment();
+		try {
+		    this.projectAPsToProperties();
+		    //deep copy of mol is created in the DENOPTIMFragment constructor
+			clone = new DENOPTIMFragment(getVertexId(),mol,getBuildingBlockType());
+		} catch (Exception e) {
+		    e.printStackTrace();
+			String msg = "Failed to clone DENOPTIMFragment! " +clone;
+			System.err.println(msg);
+		}
+		clone.setBuildingBlockId(this.getBuildingBlockId());
+		clone.setBuildingBlockType(this.getBuildingBlockType());
+		
+		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
+        for (SymmetricSet ss : this.getSymmetricAPSets())
+        {
+            cLstSymAPs.add(ss.clone());
+        }
+        clone.setSymmetricAPSets(cLstSymAPs);
+        
+        clone.setAsRCV(this.isRCV());
+        clone.setLevel(this.getLevel());
+        
+		return clone;
+    }
+
+//-----------------------------------------------------------------------------
+
+    @Override
+    public IAtomContainer getIAtomContainer()
+    {
+        this.projectAPsToProperties();
+        for (int atmPos=0; atmPos<mol.getAtomCount(); atmPos++)
+        {
+            IAtom atm = mol.getAtom(atmPos);
+            atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, getVertexId());
+            atm.setProperty(DENOPTIMConstants.ATMPROPORIGINALATMID, atmPos);
+        }
+        return mol;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public Iterable<IAtom> atoms()
+    {
+        return mol.atoms();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public Iterable<IBond> bonds()
+    {
+        return mol.bonds();
+    }
+
+//-----------------------------------------------------------------------------
+
+    public void addAtom(IAtom atom)
+    {
+        mol.addAtom(atom);
+    }   
+    
+//-----------------------------------------------------------------------------
+
+    public IAtom getAtom(int number)
+    {
+        return mol.getAtom(number);
+    }
+
+//-----------------------------------------------------------------------------
+
+    public int getAtomNumber(IAtom atom)
+    {
+        return mol.getAtomNumber(atom);
+    }
+
+//-----------------------------------------------------------------------------
+
+    public int getAtomCount()
+    {
+        return mol.getAtomCount();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public void addBond(IBond bond)
+    {
+        mol.addBond(bond);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public IBond removeBond(int position)
+    {
+        return mol.removeBond(position);
+    }
+
+//-----------------------------------------------------------------------------
+   
+    public IBond removeBond(IAtom atom1, IAtom atom2)
+    {
+       return mol.removeBond(atom1, atom2);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeBond(IBond bond)
+    {
+        mol.removeBond(bond);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeAtomAndConnectedElectronContainers(IAtom atom)
+    {
+        mol.removeAtomAndConnectedElectronContainers(atom);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public List<IAtom> getConnectedAtomsList(IAtom atom)
+    {
+        return mol.getConnectedAtomsList(atom);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public int getConnectedAtomsCount(IAtom atom)
+    {
+        return mol.getConnectedAtomsCount(atom);
+    }
+ 
+//-----------------------------------------------------------------------------
+
+    @Override
+    public Object getProperty(Object description)
+    {
+        return mol.getProperty(description);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    @Override
+    public void setProperty(Object description, Object property)
+    {
+        mol.setProperty(description, property);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperties(Map<Object, Object> properties)
+    {
+        mol.setProperties(properties);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another fragment ignoring vertex IDs.
+     * @param other
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> if the two vertices represent the same graph
+     * node even if the vertex IDs are different.
+     */
+    public boolean sameAs(DENOPTIMFragment other, StringBuilder reason)
+    {
+        if (this.containsAtoms() && other.containsAtoms())
+        {
+            if (this.mol.getAtomCount() != other.mol.getAtomCount())
+            {
+                reason.append("Different atom count (" + this.mol.getAtomCount()
+                        + ":" + other.mol.getAtomCount() + "); ");
+            }
+            if (this.mol.getBondCount() != other.mol.getBondCount())
+            {
+                reason.append("Different bond count (" + this.mol.getBondCount()
+                        + ":" + other.mol.getBondCount() + "); ");
+            }
+        }
+        return sameVertexFeatures(other, reason);
+    }
+  
+//------------------------------------------------------------------------------
+
+    public int getHeavyAtomsCount()
+    {
+        return DENOPTIMMoleculeUtils.getHeavyAtomCount(mol);
+    }
+
+//------------------------------------------------------------------------------
+
+    public boolean containsAtoms()
+    {
+        if (mol.getAtomCount() > 0)
+            return true;
+        else
+            return false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public String toString()
+    {
+        return getVertexId() + "_" + (getBuildingBlockId() + 1) + "_" +
+                getBuildingBlockType().toOldInt() + "_" + getLevel();
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    {
+        return lstAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP)
+    {
+        this.lstAPs = lstAP;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
+    {
+        this.lstSymAPs = sAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public ArrayList<SymmetricSet> getSymmetricAPSets()
+    {
+        return lstSymAPs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public List<DENOPTIMVertex> getMutationSites()
+    {
+        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        switch (getBuildingBlockType())
+        {
+            case CAP:
+                break;
+                
+            case SCAFFOLD:
+                break;
+                
+            default:
+                lst.add(this);
+                break;
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
 }

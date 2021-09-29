@@ -23,119 +23,158 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
+ * Class representing a list of IDs pointing to instances that are related by
+ * some conventional criterion that is referred as the "symmetry". 
+ * Note that the actual criterion that defined a "symmetry" relation is not 
+ * defined here. So, this list does not know what is the criterion that puts
+ * its entries in relation with each other. Moreover, the list does not know
+ * what the entries are, just their numerical identifier.
  *
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 
-public class SymmetricSet implements Serializable
+//TODO: consider that this class should probably expand the list<Integer>
+
+public class SymmetricSet implements Serializable,Cloneable
 {
-    private ArrayList<Integer> symVrtxIds;
+    private ArrayList<Integer> symIds;
 
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor for an empty set
+     * Constructor for an empty "set" (a list, actually).
      */
     public SymmetricSet()
     {
-        symVrtxIds = new ArrayList<Integer>();
+        symIds = new ArrayList<Integer>();
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor for a symmetric set with a list of vertexes IDs
-     * @param m_lst the list of vertexes IDs
+     * Constructor for a symmetric list of identifiers from the list itself.
+     * @param symIds the list of identifiers.
      */
-    public SymmetricSet(ArrayList<Integer> m_lst)
+    public SymmetricSet(ArrayList<Integer> symIds)
     {
-        symVrtxIds = new ArrayList<>(m_lst);
+        this.symIds = new ArrayList<>(symIds);
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Return the list of symmetric vertexes IDs
-     * @return the list of symmetric vertexes IDs 
+     * Return the list of symmetric identifiers.
+     * @return the list of symmetric identifiers .
      */
     public ArrayList<Integer> getList()
     {
-        return symVrtxIds;
+        return symIds;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Return a specific vertex ID contained in this "set" (a list in reality)
-     * @param i the desired entry number
-     * @return a vertex ID
+     * Return a specific identifier contained in this "set" (a list in reality).
+     * @param i the desired entry number.
+     * @return the identifier.
      */
     public int get(int i)
     {
-        return symVrtxIds.get(i);
+        return symIds.get(i);
     }
     
 //------------------------------------------------------------------------------
     
     /**
-     * Checks whether the given vertex ID is contained in this set
-     * @param m_val
-     * @return <code>true</code> if the vertex ID is contained in this set
+     * Checks whether the given identifiers is contained in this set.
+     * @param val the identifiers to look for.
+     * @return <code>true</code> if the identifiers is contained in this set.
      */
-    public boolean contains(Integer m_val)
+    public boolean contains(Integer val)
     {
-        return symVrtxIds.contains(m_val);
+        return symIds.contains(val);
+    }    
+
+//------------------------------------------------------------------------------
+
+    public int indexOf(Integer vid)
+    {
+        return symIds.indexOf(vid);
+    }
+    
+//------------------------------------------------------------------------------
+
+    public void set(int index, Integer element)
+    {
+        symIds.set(index, element);
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Adds a vertex ID to this set
-     * @param id the vertex ID to add
+     * Adds an identifiers to this list.
+     * @param id the identifiers to add.
      */
     public void add(int id)
     {
-	if (!symVrtxIds.contains(id))
-	{
-	    symVrtxIds.add(id);
-	}
+    	if (!symIds.contains(id))
+    	{
+    	    symIds.add(id);
+    	}
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Removes the given vertexID from the list
-     * @param vid the vertexID to be removed
+     * Removes the given identifier from the list
+     * @param i the identifiers to be removed
      */
-    public void remove(Integer vid)
+    public void remove(Integer i)
     {
-	symVrtxIds.remove((Integer) vid);
-        if (symVrtxIds.contains(vid))
+        symIds.remove((Integer) i);
+        //TODO: why should this remove only two? either remove all or only one.
+        if (symIds.contains(i))
         {
-	    symVrtxIds.remove((Integer) vid);
+            symIds.remove((Integer) i);
         }
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Return the number of vertexes in this set
-     * @return the number of vertexes in this set
+     * Return the number of identifiers in this list.
+     * @return the number of identifiers in this list.
      */
     public int size()
     {
-	return symVrtxIds.size();	
+        return symIds.size();	
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a deep-copy of this set.
+     * @return a deep-copy.
+     */
+    public SymmetricSet clone()
+    {
+        SymmetricSet c = new SymmetricSet();
+        for (Integer i : symIds)
+        {
+            c.add(Integer.parseInt(i.toString()));
+        }
+        return c;
     }
 
 //------------------------------------------------------------------------------
 
     public String toString()
     {
-	StringBuilder sb = new StringBuilder();
-	sb.append("SymmetricSet [symVrtxIds=");
-	sb.append(symVrtxIds.toString()).append("]");
-	return sb.toString();
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("SymmetricSet [symIds=");
+    	sb.append(symIds.toString()).append("]");
+    	return sb.toString();
     }
 
 //------------------------------------------------------------------------------

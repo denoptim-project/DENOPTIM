@@ -23,7 +23,8 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.random.MersenneTwister;
 
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
+import denoptim.utils.RandomUtils;
 
 
 /**
@@ -48,8 +49,8 @@ public class SelectionHelper
      * @return list of indices of individuals in the population
      */
 
-    protected static int[] performTournamentSelection(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+    protected static int[] performTournamentSelection(
+                                    ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int k = molPopulation.size();
@@ -60,24 +61,24 @@ public class SelectionHelper
         for (int i=0; i<sz; i++)
         {
             // Pick two candidates at random.
-            int p1 = rng.nextInt(k);
-            int p2 = rng.nextInt(k);
+            int p1 = RandomUtils.nextInt(k);
+            int p2 = RandomUtils.nextInt(k);
 
-            // Use a random value to decide wether to select the fitter individual
+            // Use a random value to decide weather to select the fitter individual
             // or the weaker one.
-            boolean selectFitter = rng.nextBoolean();
+            boolean selectFitter = RandomUtils.nextBoolean();
             
             if (selectFitter)
             {
                 // Select the fitter candidate.
-                selection[i] = molPopulation.get(p1).getMoleculeFitness() >
-                    molPopulation.get(p2).getMoleculeFitness() ? p1 : p2;
+                selection[i] = molPopulation.get(p1).getFitness() >
+                    molPopulation.get(p2).getFitness() ? p1 : p2;
             }
             else
             {
                 // Select the weaker candidate.
-                selection[i] = molPopulation.get(p2).getMoleculeFitness() >
-                    molPopulation.get(p1).getMoleculeFitness() ? p1 : p2;
+                selection[i] = molPopulation.get(p2).getFitness() >
+                    molPopulation.get(p1).getFitness() ? p1 : p2;
             }
         }
         
@@ -93,14 +94,14 @@ public class SelectionHelper
      * @param sz size of the mating pool
      * @return list of indices of individuals in the population
      */
-    protected static int[] performRandomSelection(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+    protected static int[] performRandomSelection(
+                                    ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int[] selection = new int[sz];
         int psize = molPopulation.size();
         for (int i=0; i<sz; i++)
-            selection[i] = rng.nextInt(psize);
+            selection[i] = RandomUtils.nextInt(psize);
 
         return selection;
     }
@@ -116,9 +117,8 @@ public class SelectionHelper
      * @param sz size of the mating pool
      * @return list of indices of individuals in the population
      */
-    protected static int[] performSUS(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
-                                    int sz)
+    protected static int[] performSUS(ArrayList<Candidate> molPopulation, 
+            int sz)
     {
         int k = molPopulation.size();
         int[] selection = new int[sz];
@@ -127,12 +127,12 @@ public class SelectionHelper
 
         for (int i=0; i<k; i++)
         {
-            aggregateFitness += molPopulation.get(i).getMoleculeFitness();
+            aggregateFitness += molPopulation.get(i).getFitness();
         }
 
 
         // Pick a random offset between 0 and 1 as the starting point for selection.
-        double startOffset = rng.nextDouble();
+        double startOffset = RandomUtils.nextDouble();
         double cumulativeExpectation = 0;
         int index = 0;
         int c = 0;
@@ -141,7 +141,7 @@ public class SelectionHelper
             // Calculate the number of times this candidate is expected to
             // be selected on average and add it to the cumulative total
             // of expected frequencies.
-            cumulativeExpectation += molPopulation.get(i).getMoleculeFitness()
+            cumulativeExpectation += molPopulation.get(i).getFitness()
                                     / aggregateFitness * sz;
 
             // If f is the expected frequency, the candidate will be selected at
@@ -174,26 +174,25 @@ public class SelectionHelper
      * @return list of indices of individuals in the population
      */
 
-    protected static int[] performRWS(MersenneTwister rng,
-                                    ArrayList<DENOPTIMMolecule> molPopulation,
+    protected static int[] performRWS(ArrayList<Candidate> molPopulation,
                                     int sz)
     {
         int k = molPopulation.size();
         int[] selection = new int[sz];
 
         double[] cumulativeFitnesses = new double[k];
-        cumulativeFitnesses[0] = molPopulation.get(0).getMoleculeFitness();
+        cumulativeFitnesses[0] = molPopulation.get(0).getFitness();
 
         for (int i=1; i<k; i++)
         {
-            double fitness = molPopulation.get(i).getMoleculeFitness();
+            double fitness = molPopulation.get(i).getFitness();
 
             cumulativeFitnesses[i] = cumulativeFitnesses[i-1] + fitness;
         }
 
         for (int i=0; i<sz; i++)
         {
-            double randomFitness = rng.nextDouble() *
+            double randomFitness = RandomUtils.nextDouble() *
                         cumulativeFitnesses[cumulativeFitnesses.length-1];
             int index = Arrays.binarySearch(cumulativeFitnesses, randomFitness);
             if (index < 0)

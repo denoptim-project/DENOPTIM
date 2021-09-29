@@ -18,37 +18,36 @@ package denoptim.fragspace;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.vecmath.Point3d;
 
+import denoptim.molecule.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.utils.GraphUtils;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Unit test for fragment space
@@ -58,25 +57,91 @@ import denoptim.molecule.SymmetricSet;
 
 public class FragmentSpaceTest
 {
-	private final String APSUBRULE = "0";
-	private final String APCS = "apc-S"
-			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APC1 = "apc-1"
-			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APC2 = "apc-2"
-			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APC3 = "apc-3"
-			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APCC1 = "cap-1"
-			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final String APCC2 = "cap-1"
-			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	
+    private static final String SEP = System.getProperty("file.separator");
+
+    @TempDir 
+    static File tempDir;
+
+    private final Random rng = new Random();
+    
+	private static final String APSUBRULE = "0";
+
+    private static final String RULAPCS = "apc-S";
+    private static final String RULAPC1 = "apc-1";
+    private static final String RULAPC2 = "apc-2";
+    private static final String RULAPC3 = "apc-3";
+    private static final String RULAPC4 = "apc-4";
+    private static final String RULAPC5 = "apc-5";
+    private static final String RULAPC6 = "apc-6";
+    private static final String RULAPCC1 = "cap-1";
+    private static final String RULAPCC2 = "cap-2";
+    
+    private static final BBType BBTFRAG = BBType.FRAGMENT;
+    
+	private static APClass APCS;
+	private static APClass APC1;
+	private static APClass APC2;
+	private static APClass APC3;
+    private static APClass APC4;
+    private static APClass APC5;
+    private static APClass APC6;
+	private static APClass APCC1;
+	private static APClass APCC2;
+
 //------------------------------------------------------------------------------
 	
+	/*
+	 * Ideally this could be run once before all tests of this class. However,
+	 * attempts to use @BeforeAll have shown that the static FragmentSpace does 
+	 * not remain defined after for all tests. As a workaround, the definition
+	 * of the fragment space is run @BeforeEach test.
+	 */
+	@BeforeEach
 	private void buildFragmentSpace() throws DENOPTIMException
 	{
-    	ArrayList<IAtomContainer> fragLib = new ArrayList<IAtomContainer>();
+	    assertTrue(tempDir.isDirectory(),"Should be a directory ");
+	    
+        try
+        {
+            APCS = APClass.make(RULAPCS
+                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC1 = APClass.make(RULAPC1
+                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC2 = APClass.make(RULAPC2
+                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC3 = APClass.make(RULAPC3
+                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC4 = APClass.make(RULAPC4
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC5 = APClass.make(RULAPC5
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APC6 = APClass.make(RULAPC6
+                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APCC1 = APClass.make(RULAPCC1
+                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APCC2 = APClass.make(RULAPCC2
+                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+        } catch (DENOPTIMException e)
+        {
+            //This will not happen
+        }
+	       
+        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
+        boMap.put(RULAPCS,BondType.SINGLE);
+        boMap.put(RULAPC1,BondType.SINGLE);
+        boMap.put(RULAPC2,BondType.SINGLE);
+        boMap.put(RULAPC3,BondType.SINGLE);
+        boMap.put(RULAPC4,BondType.SINGLE);
+        boMap.put(RULAPC5,BondType.SINGLE);
+        boMap.put(RULAPC6,BondType.DOUBLE);
+        boMap.put(RULAPCC1,BondType.SINGLE);
+        boMap.put(RULAPCC2,BondType.SINGLE);
+        
+        FragmentSpace.setBondOrderMap(boMap);
+
+        String rootName = tempDir.getAbsolutePath() + SEP;
+
+    	ArrayList<DENOPTIMFragment> fragLib = new ArrayList<DENOPTIMFragment>();
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -86,12 +151,12 @@ public class FragmentSpaceTest
     	frg1.addAtom(a3);
     	frg1.addBond(new Bond(a1, a2));
     	frg1.addBond(new Bond(a2, a3));
-    	frg1.addAP(2, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
-    	frg1.addAP(2, APC1, new Point3d(new double[]{0.0, 0.0, 3.3}));
-    	frg1.addAP(2, APC2, new Point3d(new double[]{0.0, 0.0, 1.1}));
-    	frg1.addAP(0, APC3, new Point3d(new double[]{3.0, 0.0, 3.3}));
-    	IAtomContainer f1 = new AtomContainer(frg1);
-    	fragLib.add(f1);
+    	frg1.addAPOnAtom(a3, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+    	frg1.addAPOnAtom(a3, APC1, new Point3d(new double[]{0.0, 0.0, 3.3}));
+    	frg1.addAPOnAtom(a3, APC2, new Point3d(new double[]{0.0, 0.0, 1.1}));
+    	frg1.addAPOnAtom(a1, APC3, new Point3d(new double[]{3.0, 0.0, 3.3}));
+    	frg1.projectAPsToProperties();
+    	fragLib.add(frg1);
     	
         DENOPTIMFragment frg2 = new DENOPTIMFragment();
         Atom a21 = new Atom("N", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -99,111 +164,160 @@ public class FragmentSpaceTest
         frg2.addAtom(a21);
         frg2.addAtom(a22);
         frg2.addBond(new Bond(a21, a22));
-        frg2.addAP(1, APC2, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg2.addAP(1, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        IAtomContainer f2 = new AtomContainer(frg2);
-        fragLib.add(f2);
+        frg2.addAPOnAtom(a22, APC2, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg2.addAPOnAtom(a22, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        frg2.projectAPsToProperties();
+        fragLib.add(frg2);
         
         DENOPTIMFragment frg3 = new DENOPTIMFragment();
         Atom a31 = new Atom("P", new Point3d(new double[]{0.0, 1.1, 2.2}));
         frg3.addAtom(a31);
-        frg3.addAP(0, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg3.addAP(0, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        frg3.addAP(0, APC3, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        IAtomContainer f3 = new AtomContainer(frg3);
-        fragLib.add(f3);
+        frg3.addAPOnAtom(a31, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg3.addAPOnAtom(a31, APC2, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        frg3.addAPOnAtom(a31, APC3, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        frg3.projectAPsToProperties();
+        fragLib.add(frg3);
         
-    	ArrayList<IAtomContainer> scaffLib = new ArrayList<IAtomContainer>();
-        DENOPTIMFragment frg4 = new DENOPTIMFragment();
+        DENOPTIMFragment frg8 = new DENOPTIMFragment();
+        Atom a81 = new Atom("C", new Point3d(new double[]{0.0, 1.1, -2.2}));
+        Atom a82 = new Atom("C", new Point3d(new double[]{1.0, 1.1, -2.2}));
+        Atom a83 = new Atom("C", new Point3d(new double[]{2.0, 1.1, -2.2}));
+        frg8.addAtom(a81);
+        frg8.addAtom(a82);
+        frg8.addAtom(a83);
+        frg8.addBond(new Bond(a81, a82));
+        frg8.addBond(new Bond(a82, a83));
+        frg8.addAPOnAtom(a83, APC4, new Point3d(new double[]{0.0, 2.2, -3.3}));
+        frg8.addAPOnAtom(a83, APC4, new Point3d(new double[]{0.0, 0.0, -3.3}));
+        frg8.addAPOnAtom(a83, APC6, new Point3d(new double[]{0.0, 0.0, -1.1}));
+        frg8.addAPOnAtom(a82, APC5, new Point3d(new double[]{1.0, 0.1, -2.2}));
+        frg8.addAPOnAtom(a82, APC5, new Point3d(new double[]{1.0, 0.1, -1.2}));
+        frg8.addAPOnAtom(a82, APC5, new Point3d(new double[]{1.0, 2.1, -2.2}));
+        frg8.addAPOnAtom(a81, APC5, new Point3d(new double[]{3.0, 0.0, -3.3}));
+        frg8.projectAPsToProperties();
+        fragLib.add(frg8);
+        
+        String fragLibFile = rootName + "frags.sdf";
+        DenoptimIO.writeFragmentSet(fragLibFile, fragLib);
+        
+    	ArrayList<DENOPTIMFragment> scaffLib = new ArrayList<DENOPTIMFragment>();
+        DENOPTIMFragment scaf0 = new DENOPTIMFragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a43 = new Atom("Ru", new Point3d(new double[]{2.0, 1.1, 2.2}));
-        frg4.addAtom(a41);
-        frg4.addAtom(a42);
-        frg4.addAtom(a43);
-        frg4.addBond(new Bond(a41, a42));
-        frg4.addBond(new Bond(a42, a43));
-        frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
-        frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
-        frg4.addAP(2, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
-        frg4.addAP(0, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
-        IAtomContainer f4 = new AtomContainer(frg4);
-        scaffLib.add(f4);
+        scaf0.addAtom(a41);
+        scaf0.addAtom(a42);
+        scaf0.addAtom(a43);
+        scaf0.addBond(new Bond(a41, a42));
+        scaf0.addBond(new Bond(a42, a43));
+        scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        scaf0.addAPOnAtom(a43, APCS, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        scaf0.addAPOnAtom(a41, APCS, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        scaf0.projectAPsToProperties();
+        scaffLib.add(scaf0);
         
-        DENOPTIMFragment frg5 = new DENOPTIMFragment();
+        DENOPTIMFragment scaf1 = new DENOPTIMFragment();
         Atom a51 = new Atom("Zn", new Point3d(new double[]{5.0, 1.1, 2.2}));
-        frg5.addAtom(a51);
-        frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
-        frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
-        frg5.addAP(0, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
-        IAtomContainer f5 = new AtomContainer(frg5);
-        scaffLib.add(f5);
+        scaf1.addAtom(a51);
+        scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
+        scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 0.0, 3.3}));
+        scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 0.0, 1.1}));
+        scaf1.projectAPsToProperties();
+        scaffLib.add(scaf1);
         
-        ArrayList<IAtomContainer> cappLib = new ArrayList<IAtomContainer>();
-        DENOPTIMFragment frg6 = new DENOPTIMFragment();
+        String scaffLibFile = rootName + "scaff.sdf";
+        DenoptimIO.writeFragmentSet(scaffLibFile, scaffLib);
+        
+        ArrayList<DENOPTIMFragment> cappLib = new ArrayList<DENOPTIMFragment>();
+        DENOPTIMFragment cap1 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
-        frg6.addAtom(a61);
-        frg6.addAP(0, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
-        IAtomContainer f6 = new AtomContainer(frg6);
-        cappLib.add(f6);
+        cap1.addAtom(a61);
+        cap1.addAPOnAtom(a61, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
+        cap1.projectAPsToProperties();
+        cappLib.add(cap1);
         
-        DENOPTIMFragment frg7 = new DENOPTIMFragment();
+        DENOPTIMFragment cap2 = new DENOPTIMFragment();
         Atom a71 = new Atom("Cl", new Point3d(new double[]{10.0, 1.1, 2.2}));
-        frg7.addAtom(a71);
-        frg7.addAP(0, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
-        IAtomContainer f7 = new AtomContainer(frg7);
-        cappLib.add(f7);
+        cap2.addAtom(a71);
+        cap2.addAPOnAtom(a71, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
+        cap2.projectAPsToProperties();
+        cappLib.add(cap2);
 
-    	HashMap<String,ArrayList<String>> cpMap = new HashMap<String,ArrayList<String>>();
-    	ArrayList<String> lst1 = new ArrayList<String>();
+        String capLibFile = rootName + "caps.sdf";
+        DenoptimIO.writeFragmentSet(capLibFile, cappLib);
+        
+    	HashMap<APClass,ArrayList<APClass>> cpMap = 
+    	        new HashMap<APClass,ArrayList<APClass>>();
+    	ArrayList<APClass> lst1 = new ArrayList<APClass>();
     	lst1.add(APC1);
     	lst1.add(APC2);
     	cpMap.put(APCS, lst1);
-    	ArrayList<String> lst2 = new ArrayList<String>();
+    	ArrayList<APClass> lst2 = new ArrayList<APClass>();
     	lst2.add(APC2);
     	cpMap.put(APC1, lst2);
-    	ArrayList<String> lst3 = new ArrayList<String>();
+    	ArrayList<APClass> lst3 = new ArrayList<APClass>();
     	lst3.add(APC2);
     	lst3.add(APC3);
     	cpMap.put(APC2, lst3);
     	
-    	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
-    	boMap.put(APCS,1);
-    	boMap.put(APC1,1);
-    	boMap.put(APC2,1);
-    	boMap.put(APC3,1);
-    	boMap.put(APCC1,1);
-    	boMap.put(APCC1,1);
-    	
-    	HashMap<String,String> capMap = new HashMap<String,String>();
+    	HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
     	capMap.put(APCS, APCC2);
     	capMap.put(APC1, APCC1);
     	capMap.put(APC2, APCC1);
 
-    	HashSet<String> ends = new HashSet<String>();
+    	HashSet<APClass> ends = new HashSet<APClass>();
     	ends.add(APC3);
     	
-    	HashMap<String,ArrayList<String>> rcCpMap = 
-    			new HashMap<String,ArrayList<String>>();
+    	String cpmFile = rootName + "cpm.dat";
+    	DenoptimIO.writeCompatibilityMatrix(cpmFile, cpMap, boMap, capMap,ends);
 
-    	FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib,cpMap,boMap,
-    			capMap,ends,rcCpMap);
+    	/*
+    	//Just in case one day we want to have also an RC-CPMap
+    	HashMap<APClass,ArrayList<APClass>> rcCpMap = 
+    			new HashMap<APClass,ArrayList<APClass>>();
+    	*/
+    	
+    	FragmentSpace.defineFragmentSpace(scaffLibFile, fragLibFile, capLibFile,
+    	        cpmFile);
 	}
+	
+//-----------------------------------------------------------------------------        
+    
+    @Test
+    public void testSymmetry() throws Exception
+    {
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+        DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(),3,BBType.FRAGMENT);
+        
+        assertEquals(2,v.getSymmetricAPSets().size(),
+                "Number of symmetric sets of APs");
+        
+        Map<APClass,Integer> expectedCount = new HashMap<APClass,Integer>();
+        expectedCount.put(APC4, 2);
+        expectedCount.put(APC5, 3);
+        for (SymmetricSet ss : v.getSymmetricAPSets())
+        {
+            APClass apc = v.getAP(ss.get(0)).getAPClass();
+            assertEquals(expectedCount.get(apc),ss.size(), 
+                    "Number of APs in symmetric set for APClass "+apc);
+        }
+    }
 	
 //-----------------------------------------------------------------------------    	
 	
     @Test
     public void testGetFragsWithAPClass() throws Exception
     {
-    	buildFragmentSpace();
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	ArrayList<IdFragmentAndAP> l = FragmentSpace.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
     	
-    	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
+    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
+    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	
     	boolean found1 = false;
     	boolean found2 = false;
@@ -234,18 +348,17 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithClass() throws Exception
     {
-    	buildFragmentSpace();
-    	
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	ArrayList<IdFragmentAndAP> lst = 
     			FragmentSpace.getFragAPsCompatibleWithClass(APC1);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
-    	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
-    	
+
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
+    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
+    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
+
     	boolean found1 = false;
     	boolean found2 = false;
     	boolean found3 = false;
@@ -275,29 +388,40 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithTheseAPs() throws Exception
     {
-    	buildFragmentSpace();
-    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,1,0,-1,-1);
-    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
+    	
+    	/*
+    	System.out.println("SRC1 "+FragmentSpace.getAPClassForFragment(src1)+" => "
+    	+FragmentSpace.getCompatibleAPClasses(FragmentSpace.getAPClassForFragment(src1)));
+    	System.out.println("SRC2 "+FragmentSpace.getAPClassForFragment(src2)+" => "
+    	+FragmentSpace.getCompatibleAPClasses(FragmentSpace.getAPClassForFragment(src2)));
+    	System.out.println("Frags with SRC1: "+FragmentSpace.getFragAPsCompatibleWithClass(
+    	        FragmentSpace.getAPClassForFragment(src1)));
+        System.out.println("Frags with SRC2: "+FragmentSpace.getFragAPsCompatibleWithClass(
+                FragmentSpace.getAPClassForFragment(src2)));
+    	*/
     	
     	ArrayList<IdFragmentAndAP> lst = 
     			FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,1,2,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,1,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,1,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
+    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
+    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	
     	boolean found1 = false;
     	boolean found2 = false;
     	boolean found3 = false;
     	boolean found4 = false;
     	for (IdFragmentAndAP id : lst)
-    	{
+    	{            
     		if (id.sameFragAndAp(ref1))
     			found1 = true;
     		if (id.sameFragAndAp(ref2))
@@ -319,23 +443,261 @@ public class FragmentSpaceTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testGetFragmentsCompatibleWithTheseAPs() throws Exception
+    public void testGetFragmentsCompatibleWithTheseAPs()
     {
-    	buildFragmentSpace();
-    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,1,0,-1,-1);
-    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,1,1,-1,-1);
+        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+    	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
+    	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
-    	ArrayList<IAtomContainer> lst = 
+    	ArrayList<DENOPTIMVertex> lst = 
     			FragmentSpace.getFragmentsCompatibleWithTheseAPs(srcAPs);
     	
     	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");
     	
     	FragmentSpace.clearAll();	
     }
-    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Check that the following graph's fused ring gets added to the fragment
+     * library. Dots are chords
+     *   ↑         ↑
+     * ← C1 - C2 - C3 →
+     *   .  / |    ↓
+     *   C4 . C5 →
+     *   ↓    ↓
+     */
+    @Test
+    public void testFusedRingAddedToFragmentLibrary() {
+        try {
+            TestCase testCase = getTestCase();
+
+            List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+            fragLib.clear(); // Workaround. See @BeforeEach in this class.
+            
+            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+
+            FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
+
+            //Cleanup tmp files
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedFragments());
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+            
+            assertEquals(1, fragLib.size());
+            DENOPTIMVertex actual = fragLib.get(0);
+            StringBuilder sb = new StringBuilder();
+            assertTrue(testCase.expected.sameAs(actual, sb),
+                    "Problem is "+sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks that a graph with a fused ring containing a scaffold vertex is
+     * added to the scaffold library.
+     */
+    @Test
+    public void testFusedRingAddedToScaffoldLibrary() {
+        try {
+            TestCase testCase = getTestCase();
+            testCase.graph.getVertexList().get(0)
+                    .setBuildingBlockType(BBType.SCAFFOLD);
+            testCase.expected.setBuildingBlockType(BBType.SCAFFOLD);
+            testCase.expected.getInnerGraph().getVertexList().get(0)
+                    .setBuildingBlockType(BBType.SCAFFOLD);
+
+            List<DENOPTIMVertex> scaffLib = FragmentSpace.getScaffoldLibrary();
+            scaffLib.clear();
+            
+            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+
+            FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
+
+            //Cleanup tmp files
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedFragments());
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+
+            assertEquals(1, scaffLib.size());
+            DENOPTIMVertex actual = scaffLib.get(0);
+            assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFusedRingOnlyAddedOnce() {
+        try {
+            TestCase testCase = getTestCase();
+            final int TRY_ADDING = 10;
+            List<DENOPTIMGraph> sameGraphs = IntStream
+                    .range(0, TRY_ADDING)
+                    .mapToObj(i -> testCase.graph.clone())
+                    .peek(DENOPTIMGraph::renumberGraphVertices)
+                    .collect(Collectors.toList());
+
+            List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+            fragLib.clear();
+
+            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+            
+            for (DENOPTIMGraph g : sameGraphs) {
+                FragmentSpace.addFusedRingsToFragmentLibrary(g);
+            }
+
+            //Cleanup tmp files
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedFragments());
+            DenoptimIO.deleteFile(
+                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+            
+            assertEquals(1, fragLib.size());
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+    }
+
 //------------------------------------------------------------------------------
     
+    /**
+     * <pre>
+     *   ↑         ↑
+     * ← C1 - C2 - C3 →
+     *   .  / |    ↓
+     *   C4 . C5 →
+     *   ↓    ↓
+     * </pre>
+     */
+    private TestCase getTestCase() throws DENOPTIMException {
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        DENOPTIMVertex c1 = getCarbonVertex(), c2 = getCarbonVertex(),
+                c3 = getCarbonVertex(), c4 = getCarbonVertex(),
+                c5 = getCarbonVertex();
+
+        DENOPTIMVertex rcv14 = getRCV(), rcv41 = getRCV(), rcv45 = getRCV(),
+                rcv54 = getRCV();
+
+        g.addVertex(c1);
+        g.appendVertexOnAP(c1.getAP(0), c2.getAP(0));
+        g.appendVertexOnAP(c1.getAP(1), rcv14.getAP(0));
+        g.appendVertexOnAP(c2.getAP(1), c3.getAP(0));
+        g.appendVertexOnAP(c2.getAP(2), c5.getAP(0));
+        g.appendVertexOnAP(c2.getAP(3), c4.getAP(0));
+        g.appendVertexOnAP(c4.getAP(1), rcv41.getAP(0));
+        g.appendVertexOnAP(c4.getAP(2), rcv45.getAP(0));
+        g.appendVertexOnAP(c5.getAP(1), rcv54.getAP(0));
+
+        DENOPTIMRing r124 = new DENOPTIMRing(Arrays.asList(rcv14, c1, c2, c4,
+                rcv41));
+        DENOPTIMRing r425 = new DENOPTIMRing(Arrays.asList(rcv45, c4, c2, c5,
+                rcv54));
+        g.addRing(r124);
+        g.addRing(r425);
+
+        g.renumberGraphVertices();
+
+        DENOPTIMTemplate t = getExpectedTemplate(g, c3);
+
+        return new TestCase(g, t);
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMTemplate getExpectedTemplate(DENOPTIMGraph g,
+                                                 DENOPTIMVertex c3) {
+        DENOPTIMGraph innerGraph = g.clone();
+        innerGraph.renumberGraphVertices();
+        DENOPTIMVertex c3Inner = innerGraph.getVertexAtPosition(g
+                .getIndexOfVertex(c3.getVertexId()));
+        innerGraph.removeVertex(c3Inner);
+
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t.setInnerGraph(innerGraph);
+        t.setBuildingBlockId(0);
+        return t;
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMFragment getCarbonVertex() {
+        try {
+            IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
+            IAtom carbon = builder.newAtom();
+            carbon.setSymbol("C");
+            IAtomContainer mol = builder.newAtomContainer();
+            mol.addAtom(carbon);
+            DENOPTIMFragment v = new DENOPTIMFragment(-1, mol,
+                    BBType.FRAGMENT);
+            for (int i = 0; i < 4; i++) {
+                v.addAP(0, APC1, getRandomVector(), 1);
+            }
+            FragmentSpace.getBondOrderMap().put(APC1.getRule(),
+                    DENOPTIMEdge.BondType.SINGLE);
+            return v;
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+            fail("Unexpected exception thrown.");
+        }
+        return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    private DENOPTIMVertex getRCV() throws DENOPTIMException {
+        IChemObjectBuilder builder = DefaultChemObjectBuilder
+                .getInstance();
+        IAtomContainer dummyMol = builder.newAtomContainer();
+        IAtom dummyAtom = builder.newAtom();
+        dummyMol.addAtom(dummyAtom);
+        DENOPTIMFragment rcv = new DENOPTIMFragment(-1, dummyMol, BBType.FRAGMENT
+                , true);
+        rcv.addAP(0, APC1, getRandomVector(), 1);
+        return rcv;
+    }
+
+//------------------------------------------------------------------------------
+
+    private Point3d getRandomVector() {
+        int precision = 10 * 10 * 10 * 10;
+
+        Supplier<Double> randomCoord = () ->
+                (double) (Math.round(rng.nextDouble() * (double) precision)) /
+                        ((double) precision);
+
+        return new Point3d(randomCoord.get(), randomCoord.get(),
+                randomCoord.get());
+    }
+
+//------------------------------------------------------------------------------
+
+    private static final class TestCase {
+        final DENOPTIMGraph graph;
+        final DENOPTIMTemplate expected;
+
+        TestCase(DENOPTIMGraph g, DENOPTIMTemplate expected) {
+            this.graph = g;
+            this.expected = expected;
+        }
+    }
+
+//------------------------------------------------------------------------------
 }

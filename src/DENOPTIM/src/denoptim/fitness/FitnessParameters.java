@@ -18,32 +18,38 @@
 
 package denoptim.fitness;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.FunctionMapper;
 import javax.servlet.jsp.el.VariableResolver;
 
 import org.apache.commons.el.ExpressionEvaluatorImpl;
-import org.openscience.cdk.qsar.DescriptorEngine;
-import org.openscience.cdk.qsar.DescriptorSpecification;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.fingerprint.Fingerprinter;
+import org.openscience.cdk.fingerprint.IFingerprinter;
+import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 
@@ -81,37 +87,28 @@ public class FitnessParameters
      */
     private static String fitnessExpression = "";
     
+    
     /**
-     * List of definitions for atom/Bond specific descriptors
+     * List of custom variable definitions read from input. 
+     * These lines are the definition of atom/bond specific 
+     * descriptors, and custom parametrised descriptors.
      */
-	private static List<String> atmBndSpecDescExpressions = 
+	private static List<String> customVarDescExpressions = 
 			new ArrayList<String>();
-
+    
     /**
-     * Map defining relation between descriptors names (the shortNames) and 
-     * variable that take values from the results of that descriptors
-     * calculation.
+     * List of variables used in the calculation of the fitness. 
+     * For instance, atom/bond specific descriptors, and customly parametrised 
+     * descriptors.
      */
-	private static Map<String,ArrayList<String>> atmBndSpecDescToVars = 
-			new HashMap<String,ArrayList<String>>();
-	
-    /**
-     * Map defining relation between variable names and atom/Bond specific 
-     * descriptor calcualtion.
-     */
-	private static Map<String,ArrayList<String>> atmBndSpecDescSMARTS = 
-			new HashMap<String,ArrayList<String>>();
+    private static List<Variable> variables = new ArrayList<Variable>();
     
     /**
      * The list of descriptors needed to calculate the fitness with internal 
      * fitness provider.
      */
-    private static List<DescriptorForFitness> descriptors;
-    
-    /**
-     * List of descriptor's short names
-     */
-    private static List<String> descriptorsGeneratingVariables;
+    private static List<DescriptorForFitness> descriptors = 
+            new ArrayList<DescriptorForFitness>();
     
     /**
      * Flag controlling production of png graphics for each candidate
@@ -128,6 +125,11 @@ public class FitnessParameters
      */
     private static boolean make3DTrees = true;
     
+    /**
+     * Utility for constructing CDK objects
+     */
+    private static IChemObjectBuilder cdkBuilder = 
+            DefaultChemObjectBuilder.getInstance();
     
 //------------------------------------------------------------------------------
 
@@ -139,11 +141,9 @@ public class FitnessParameters
     	externalExe = "";
     	interpreterExternalExe = "bash";
     	fitnessExpression = "";
-    	atmBndSpecDescExpressions = new ArrayList<String>();
-    	atmBndSpecDescToVars = new HashMap<String,ArrayList<String>>();
-    	atmBndSpecDescSMARTS = new HashMap<String,ArrayList<String>>();
-    	descriptors = null;
-    	descriptorsGeneratingVariables = null;
+    	customVarDescExpressions = new ArrayList<String>();
+    	descriptors = new ArrayList<DescriptorForFitness>();
+    	variables = new ArrayList<Variable>();
     	makePictures = false;
     	make3DTrees = true;
     }
@@ -279,7 +279,7 @@ public class FitnessParameters
             break;
             
         case "FP-DESCRIPTORSPECS=":
-        	atmBndSpecDescExpressions.add(value);
+        	customVarDescExpressions.add(value);
         	break;
             
         case "FP-MAKEPICTURES":
@@ -300,100 +300,328 @@ public class FitnessParameters
 	
 //------------------------------------------------------------------------------
 
-	private static void parseFitnessExpressionToDefineDescriptors(String value) 
-			throws DENOPTIMException 
+    /**
+     * This method parser the strings defining the fitness as a mathematical
+     * expression using descriptors (i.e., values
+     * that will eventually be calculated by IDescriptor implementations) 
+     * and variables (i.e., values that are derived from descriptors according 
+     * to customisable expressions that aims at cutomise the parameters used
+     * to calculated the descriptor value, or make the descriptor atom/bond
+     * specific). Since
+     * the value obtained from the calculation of each single descriptor can be 
+     * used for multiple purposes (i.e., as a proper descriptor and as a 
+     * component used to calculate the value of a variable) we collect the
+     * descriptors and record the relation between each descriptor and any 
+     * variables that depend on it.
+     * 
+     * @throws DENOPTIMException
+     * @throws CDKException 
+     */
+	private static void parseFitnessExpressionToDefineDescriptors() 
+	        throws DENOPTIMException
 	{
-		// Parse expression to get the names of all variables
+		// Parse expression of the fitness to get the names of all variables
 		ExpressionEvaluatorImpl extractor = new ExpressionEvaluatorImpl();
-		descriptorsGeneratingVariables = new ArrayList<String>();
-        VariableResolver collector = new VariableResolver() {
-			
+		Set<String> variableNames = new HashSet<String>();
+        VariableResolver collectAll = new VariableResolver() {
 			@Override
 			public Double resolveVariable(String varName) throws ELException {
-				if (!descriptorsGeneratingVariables.contains(varName))
-				{
-					descriptorsGeneratingVariables.add(varName);
-				}
+				variableNames.add(varName);
 				return 1.0;
 			}
 		};
-		FunctionMapper funcsMap = new FunctionMapper() {
-
-			@Override
-			public Method resolveFunction(String nameSpace, String methodName) {
-				try {
-					return FitnessParameters.class.getMethod(methodName, 
-							String.class, String.class, String.class);
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		};
+		
+		// Here we read the fitness expression to identify all components that 
+		// are needed to calculate the fitness value. At this stage, we cannot
+		// know whether a string refers to a variable of a descriptor name.
 		try {
-			//NB this is not really an evaluation because the variableResolver
-			// and function map parse the data the get from the  
+			//NB: this is not really an evaluation because the variableResolver
+			// parse the data the get from the  
 			// ExpressionEvaluator
-			extractor.evaluate(fitnessExpression, Double.class, collector, 
+			extractor.evaluate(fitnessExpression, Double.class, collectAll, 
 					null);
 		} catch (ELException e) {
 			throw new DENOPTIMException("ERROR: unable to parse fitness "
 					+ "expression.",e);
 		}
+		// Make all Variables (mostly empty of info, for now)
+		for (String varName : variableNames)
+		{
+		    Variable v = new Variable(varName);
+		    //WARNING: we first write the varName as descName, and then we 
+		    // overwrite it with the function mapper.
+		    v.setDescriptorName(varName);
+		    variables.add(v);
+		}
 		
+		// Dummy variable resolver. This is needed to fulfil the requirements of 
+		// extractor, but it does nothing.
+		//TODO try to use null
+        VariableResolver dummyResolver = new VariableResolver() {
+            @Override
+            public Double resolveVariable(String varName) throws ELException {
+                return 1.0;
+            }
+        };
+        /**
+         * This map allows ExpressionEvaluator to find the methods 
+         * implemented here in FitnessParameter class and that are used to 
+         * parse the expression string.
+         * Currently, such methods are 
+         * {@link FitnessParameters#atomSpecific} and  
+         * {@link FitnessParameters#parametrized}.
+         */
+        FunctionMapper funcsMap = new FunctionMapper() {
+            @Override
+            public Method resolveFunction(String nameSpace, String methodName) {
+                try {
+                    //TODO make the methods part of a private inner class
+                    return FitnessParameters.class.getMethod(methodName, 
+                            String.class, String.class, String.class);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+		// Now, we read the specifics of variables, i.e., any custom 
+		// parametrised and/or atom/bond specific descriptor.
 		try {
-			//NB this is not really an evaluation because the variableResolver
+			//NB: this is not really an evaluation because the variableResolver
 			// and function map only parse the data they get from the 
-			// ExpressionEvaluator
-			for (String descriptorDefinition : atmBndSpecDescExpressions)
+			// ExpressionEvaluator.
+			for (String variableDefinition : customVarDescExpressions)
 			{
-				extractor.evaluate(descriptorDefinition, Double.class, 
-						collector, funcsMap);
+			    //NB: 'funcsMap' tells the extractor how to deal with the data
+			    // fed into functions 'atomSpecific' and 'parametrized'
+				extractor.evaluate(variableDefinition, Double.class, 
+				        dummyResolver, funcsMap);
 			}
 		} catch (ELException e) {
 			throw new DENOPTIMException("ERROR: unable to parse fitness "
 					+ "expression.",e);
 		}
 		
-		// Collect the descriptors needed to calculate the fitness
-		descriptors = DescriptorUtils.findAllDescriptorImplementations(
-				descriptorsGeneratingVariables);
-		
-		// Add specifications to atom/bond specific descriptors
-		for (DescriptorForFitness dff : descriptors)
-		{
-			String descName = dff.getShortName();
-			if (atmBndSpecDescToVars.keySet().contains(descName))
-			{
-				for (String varName : atmBndSpecDescToVars.get(descName))
-				{
-					ArrayList<String> smarts = atmBndSpecDescSMARTS.get(varName);
-					dff.varNames.add(varName);
-					dff.smarts.put(varName, smarts);
-				}
-			}
-		}
-		
+		// Also the descriptors that are simply called by name are transformed 
+		// into variables
 		/*
-		String NL = System.getProperty("line.separator");
-		StringBuilder sb = new StringBuilder();
-		sb.append("Variables defined for each descriptor:"+NL);
-	    for (int i=0; i<descriptors.size(); i++)
+		for (String s : descriptorsGeneratingVariables)
 		{
-			DescriptorForFitness d = descriptors.get(i);
-			sb.append(" -> "+d.getShortName()+" "+d.getVariableNames()+NL);
+		    variables.add(new Variable(s,s));
 		}
-	    DENOPTIMLogger.appLogger.info(sb.toString());
-	    */
+	*/
+        // Collect the descriptor implementations that are needed. Note that
+		// one descriptor implementation can be used by more than one variable,
+		// and the same descriptor implementation (though differently
+		// configured) might be requested by different variables. The latter
+		// situation is not effective here, because the configuration of the
+		// implementations is defined later. Therefore, we get one 
+		// descriptor implementation for all its potentially different
+		// configurations.
+		Set<String> descriptorImplementationNames = new HashSet<String>();
+		for (Variable v : variables)
+		{
+		    descriptorImplementationNames.add(v.getDescriptorName());
+		}
+		List<DescriptorForFitness> rawDescriptors = 
+		        DescriptorUtils.findAllDescriptorImplementations(
+		                descriptorImplementationNames);
+		
+		// This map keeps track of which instances are standard, i.e., not
+		// affected by custom parameters.
+		Map<String,DescriptorForFitness> standardDescriptors = 
+		        new HashMap<String,DescriptorForFitness>();
+		
+		// Now we create the list of descriptors, each with either standard or 
+		// customised configuration, that will be fed to the fitness provider
+		// descriptor engine. This list goes into the field 'descriptors'.
+		for (int i=0; i<variables.size(); i++)
+        {   
+		    Variable v = variables.get(i);
+		    String varName = v.getName();
+		    String descName = v.getDescriptorName();
+
+		    // 'raw' means that it has not yet been configured, so it can be 
+		    // used to draft both standard and customised descriptors instances
+            DescriptorForFitness rawDff = rawDescriptors.stream()
+                    .filter(d -> descName.equals(d.getShortName()))
+                    .findAny()
+                    .orElse(null);
+            if (rawDff==null)
+                throw new DENOPTIMException("Looking for descriptor '" 
+                        + descName + "' that should be used to produce "
+                        + "variable '" + varName
+                        + "', but no match found in the list of descriptor "
+                        + "implementations. "
+                        + "Check the name of the descriptor you are trying to "
+                        + "use.");
+		   
+		    if (v.params == null)
+		    {   
+		        // No custom parameter, so we take (or make) a standard
+		        // implementation of the descriptor.
+		        if (standardDescriptors.containsKey(rawDff.getShortName()))
+		        {
+		            standardDescriptors.get(rawDff.getShortName())
+		                .addDependentVariable(v);
+		        } else {
+    		        DescriptorForFitness dff = rawDff.makeCopy();
+    		        dff.addDependentVariable(v);
+    		        descriptors.add(dff);
+    		        standardDescriptors.put(rawDff.getShortName(),dff);
+		        }
+		    } else {
+		        // This variable requires a customised descriptor configuration
+		        // So, here a brand new descriptor is made and configured
+                DescriptorForFitness dff = rawDff.makeCopy();
+                dff.addDependentVariable(v);
+                
+                IDescriptor impl = dff.implementation;
+                String[] parNames = impl.getParameterNames();
+                if (parNames.length != v.params.length)
+                {
+                    throw new DENOPTIMException("Wrong number of parameters in "
+                            + "configuration of descriptor '" 
+                            + rawDff.getShortName() + "' for variable '" 
+                            + varName + "'. Found " + v.params.length + " but "
+                            + "the descriptor requires " + parNames.length+".");
+                }
+                
+                // Here we configure the descriptor implementation according
+                // to the parameters parsed from the field of the Variable 
+                Object[] params = new Object[parNames.length];
+                for (int j=0; j<parNames.length; j++)
+                {
+                    Object parType = impl.getParameterType(parNames[j]);
+                    if (parType == null)
+                    {
+                        throw new DENOPTIMException("Descriptor '" 
+                                + rawDff.getShortName() + "' does not specify "
+                                + "the type of a parameter.");
+                    }
+                    Object p = null;
+                    if (parType instanceof Integer){
+                        p = Integer.parseInt(v.params[j]);
+                    } else if (parType instanceof Double) {
+                        p = Double.parseDouble(v.params[j]);
+                    } else if (parType instanceof Boolean) {
+                        p = Boolean.getBoolean(v.params[j]);
+                    } else if (parType instanceof String) {
+                        p = v.params[j];
+                    } else if (parType instanceof Class) {
+                        String type = ((Class<?>) parType).getSimpleName();
+                        switch (type)
+                        {       
+                            case "IBitFingerprint":
+                                // WARNING! we expect this to be found always
+                                // after the corresponding IFingerprinter
+                                // parameter.
+                                p = makeIBitFingerprint(v.params[j], 
+                                        makeIFingerprinter(params[j-1].toString()));
+                                break;
+                                
+                            default:
+                                throw new DENOPTIMException("Parameter '" 
+                                        + parNames[j] + "' for descriptor '"
+                                        + descName + "' is requested to be of "
+                                        + "type '" + type + "' but no "
+                                        + "handling of such type is available "
+                                        + "in FitnessParameters. Please, "
+                                        + "report this to the develoment "
+                                        + "team.");
+                        }
+                    } else {
+                        throw new DENOPTIMException("Parameter '" 
+                                + parNames[j] + "' for descriptor '"
+                                + descName + "' in an instance of a class"
+                                + "that is not expected by "
+                                + "in FitnessParameters. Please, "
+                                + "report this to the develoment team.");
+                    }
+                    params[j] = p;
+                }
+                try
+                {
+                    impl.setParameters(params);
+                } catch (CDKException e)
+                {
+                    // This should never happen: type and number of the params
+                    // is made to fit the request of this method.
+                    throw new DENOPTIMException("Wrong set of parameters "
+                            + "for descriptor '" + descName
+                            + "in FitnessParameters. Please, "
+                            + "report this to the develoment team.",e);
+                }
+                descriptors.add(dff);
+		    }
+        }
 	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * For now we only accept a filename from which we read in a molecule
+	 * @throws DENOPTIMException 
+	 */
+    private static IBitFingerprint makeIBitFingerprint(String line, 
+            IFingerprinter fingerprinter) throws DENOPTIMException
+    {
+        String key = "FILE:";
+        line = line.trim();
+        if (!line.toUpperCase().startsWith(key))
+        {
+            throw new DENOPTIMException("Presently, parameters of type "
+                    + "'IBitFingerprint' can only be generated upon "
+                    + "reading a molecule from file. To this end, the "
+                    + "definition of the parameter *MUST* start with '"
+                    + key + "'. Input line '" + line + "' does not.");
+        }
+        if (fingerprinter == null)
+        {
+            throw new IllegalArgumentException("ERROR! Fingerprinter should be "
+                    + "created before attempting generation of a fingerprint.");
+        }
+        String fileName = line.substring(key.length()).trim();
+        IBitFingerprint fp = null;
+        try
+        {
+            IAtomContainer ref = DenoptimIO.readSingleSDFFile(fileName);
+            fp = fingerprinter.getBitFingerprint(ref);
+        } catch (CDKException e)
+        {
+            throw new DENOPTIMException("ERROR! Unable to read molecule from "
+                    + "file '" + fileName + "'.",e);
+        }
+        return fp;
+    }
+
+//------------------------------------------------------------------------------
+	
+    private static IFingerprinter makeIFingerprinter(String classShortName) 
+            throws DENOPTIMException
+    {   
+        IFingerprinter fp = null;
+        try
+        {
+            fp = TanimotoMolSimilarity.makeIFingerprinter(classShortName);
+        } catch (Throwable t)
+        {
+            throw new DENOPTIMException("Could not make new instance of '" 
+                    + classShortName + "'.", t);
+        }
+        return fp;
+    }
 
 //------------------------------------------------------------------------------
 
 	/**
-	 * Fake function definition that is only used to parse the expressions 
-	 * defining atom specific descriptors. This method is public only because
+	 * Function only used to parse the expressions 
+	 * defining atom specific descriptors. Basically, this method takes the
+	 * arguments and records hat variables are use each descriptor, and what
+	 * SMARTS are used for each variable.
+	 * This method is public only because
 	 * is must be found by the ExpressionEvaluator, but should not be used
 	 * outside the FitnessPArameters class.
 	 */
@@ -401,26 +629,46 @@ public class FitnessParameters
 	public static Double atomSpecific(String varName, String descName, 
 			String smartsIdentifier)
 	{
-		if (!descriptorsGeneratingVariables.contains(descName))
-		{
-			descriptorsGeneratingVariables.add(descName);
-		}
-		descriptorsGeneratingVariables.remove(varName);
-		
 		ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
 				smartsIdentifier.split("\\s+")));
-		
-		if (atmBndSpecDescToVars.keySet().contains(descName))
+		for (Variable v : variables)
 		{
-			atmBndSpecDescToVars.get(descName).add(varName);
-		} else {
-			ArrayList<String> lst = new ArrayList<String>();
-			lst.add(varName);
-			atmBndSpecDescToVars.put(descName, lst);
+		    if (v.getName().equals(varName))
+		    {
+		        v.setDescriptorName(descName);
+		        v.setSMARTS(smarts);
+		    }
 		}
-		atmBndSpecDescSMARTS.put(varName, smarts);
+		
 		return 0.0; //just a dummy number to fulfil the executor expectations
 	}
+	
+//------------------------------------------------------------------------------
+
+    /**
+     * Function only used to parse the expressions defining customised
+     * parametrisations of descriptors.
+     * This method is public only because
+     * is must be found by the ExpressionEvaluator, but should not be used
+     * outside the FitnessParameters class.
+     */
+    
+    public static Double parametrized(String varName, String descName, 
+            String paramsStr)
+    {
+        //TODO-V3: unify treatment of third argument. It should be a String[]
+        String[] params = paramsStr.split(", +");
+        for (Variable v : variables)
+        {
+            if (v.getName().equals(varName))
+            {
+                v.setDescriptorName(descName);
+                v.setDescriptorParameters(params);
+            }
+        }
+        
+        return 0.0; //just a dummy number to fulfil the executor expectations
+    }
 	
 //------------------------------------------------------------------------------
 
@@ -467,7 +715,8 @@ public class FitnessParameters
     {
     	if (!fitnessExpression.equals(""))
     	{
-        	parseFitnessExpressionToDefineDescriptors(fitnessExpression);
+    	    // This will take 'fitnessExpression'
+        	parseFitnessExpressionToDefineDescriptors();
     	}
     }
 

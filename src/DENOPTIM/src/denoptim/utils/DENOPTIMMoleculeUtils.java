@@ -19,86 +19,76 @@
 
 package denoptim.utils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.BitSet;
-import java.util.Collections;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.awt.RenderingHints;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Point3d;
-
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 
-import org.openscience.cdk.layout.StructureDiagramGenerator;
-import org.openscience.cdk.smiles.SmilesGenerator;
-import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.exception.InvalidSmilesException;
-import org.openscience.cdk.inchi.InChIGeneratorFactory;
-import org.openscience.cdk.inchi.InChIGenerator;
+import javax.imageio.ImageIO;
+import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
 
-import net.sf.jniinchi.INCHI_RET;
-
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.ringsearch.AllRingsFinder;
-import org.openscience.cdk.geometry.GeometryTools;
-import org.openscience.cdk.graph.ConnectivityChecker;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.interfaces.IMoleculeSet;
-import org.openscience.cdk.geometry.cip.CIPTool;
-import org.openscience.cdk.tools.SaturationChecker;
-import org.openscience.cdk.geometry.cip.ILigand;
-import org.openscience.cdk.geometry.cip.VisitedAtoms;
-import org.openscience.cdk.Ring;
-import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.tools.manipulator.RingSetManipulator;
-import org.openscience.cdk.ringsearch.SSSRFinder;
+import org.openscience.cdk.AtomRef;
+import org.openscience.cdk.PseudoAtom;
+import org.openscience.cdk.aromaticity.Kekulization;
+import org.openscience.cdk.config.IsotopeFactory;
+import org.openscience.cdk.config.Isotopes;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.geometry.GeometryUtil;
+import org.openscience.cdk.graph.ConnectivityChecker;
+import org.openscience.cdk.inchi.InChIGenerator;
+import org.openscience.cdk.inchi.InChIGeneratorFactory;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IAtomType.Hybridization;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IElement;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
-import org.openscience.cdk.qsar.IAtomicDescriptor;
-import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
-import org.openscience.cdk.qsar.descriptors.atomic.AtomDegreeDescriptor;
-import org.openscience.cdk.charges.GasteigerMarsiliPartialCharges;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
-import org.openscience.cdk.fingerprint.Fingerprinter;
+import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.renderer.AtomContainerRenderer;
+import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
-import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.AtomContainerRenderer;
-import org.openscience.cdk.renderer.font.AWTFontManager;
-import org.openscience.cdk.interfaces.*;
-import org.openscience.cdk.qsar.result.DoubleResult;
-import org.openscience.cdk.similarity.Tanimoto;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmiFlavor;
+import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import net.sf.jniinchi.INCHI_RET;
 
-//TODO del if writing of failing molecule is not made systematic
 
 /**
  * Utilities for molecule conversion
@@ -107,16 +97,19 @@ import denoptim.molecule.DENOPTIMVertex;
  */
 public class DENOPTIMMoleculeUtils
 {
-    private static final StructureDiagramGenerator SDG = new StructureDiagramGenerator();
-    private static final SmilesParser SMPARSER =
-                    new SmilesParser(DefaultChemObjectBuilder.getInstance());
-    private static final SmilesGenerator SMGEN = new SmilesGenerator(true);
+    private static final StructureDiagramGenerator SDG = 
+            new StructureDiagramGenerator();
+    private static final SmilesGenerator SMGEN = new SmilesGenerator(
+            SmiFlavor.Generic);
     private static final DummyAtomHandler DATMHDLR = new DummyAtomHandler(
 					      DENOPTIMConstants.DUMMYATMSYMBOL);
+    private static final  IChemObjectBuilder builder = 
+            SilentChemObjectBuilder.getInstance();
 
 //------------------------------------------------------------------------------
 
-    public static double getMolecularWeight(IAtomContainer mol) throws DENOPTIMException
+    public static double getMolecularWeight(IAtomContainer mol) 
+            throws DENOPTIMException
     {
         double ret_wd = 0;
         try
@@ -124,7 +117,8 @@ public class DENOPTIMMoleculeUtils
             WeightDescriptor wd = new WeightDescriptor();
             Object[] pars = {"*"};
             wd.setParameters(pars);
-            ret_wd = ((DoubleResult) wd.calculate(mol).getValue()).doubleValue();
+            ret_wd = ((DoubleResult) wd.calculate(mol).getValue())
+                    .doubleValue();
         }
         catch (Exception ex)
         {
@@ -132,52 +126,68 @@ public class DENOPTIMMoleculeUtils
         }
         return ret_wd;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
-     * parses the SMILES string and returns the molecule
-     * @param smiles string
-     * @return the molecule or <code>null</code> if error in smiles
-     * @throws denoptim.exception.DENOPTIMException
+     * Check element symbol corresponds to real element of Periodic Table
+     * @param atom to check.
+     * @return <code>true</code> if the element symbol correspond to an atom
+     * in the periodic table.
      */
 
-    public static IAtomContainer getMoleculeFromSMILES(String smiles)
-                                                        throws DENOPTIMException
+    public static boolean isElement(IAtom atom)
     {
-        IAtomContainer mol = null;
-        try
-        {
-            mol = SMPARSER.parseSmiles(smiles);
+        String symbol = atom.getSymbol();
+        return isElement(symbol);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check element symbol corresponds to real element of Periodic Table
+     * @param symbol of the element to check
+     * @return <code>true</code> if the element symbol correspond to an atom
+     * in the periodic table.
+     */
+
+    public static boolean isElement(String symbol)
+    {
+        boolean res = false;
+        IsotopeFactory ifact = null;
+        try {
+            ifact = Isotopes.getInstance();
+            if (ifact.isElement(symbol))
+            {
+                @SuppressWarnings("unused")
+                IElement el = ifact.getElement(symbol);
+                res = true;
+            }
+        } catch (Throwable t) {
+            System.out.println("ERROR! Unable to create IsotopeFactory "
+                                        + " (in AtomUtils.getAtomicNumber)");
+            System.exit(-1);;
         }
-        catch (InvalidSmilesException ise)
-        {
-            throw new DENOPTIMException(ise);
-        }
-        return mol;
+        return res;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Replace <code>PseudoAtoms</code>s representing ring closing attractors 
-     * with H. No change in coordinates
-     * @param mol
-     * @throws denoptim.exception.DENOPTIMException
+     * Replace any <code>PseudoAtom</code>s representing ring closing attractors
+     * with H. No change in coordinates.
+     * @param mol Molecule to replace <code>PseudoAtom</code>s of.
      */
-    public static void removeRCA(IAtomContainer mol) throws DENOPTIMException
-    {
+    public static void removeRCA(IAtomContainer mol) {
 
         // convert PseudoAtoms to H
-        ArrayList<IAtom> atmsToRemove = new ArrayList<>();
-        ArrayList<IBond> bndsToRemove = new ArrayList<>();
         for (IAtom a : mol.atoms())
         {
             boolean isRca = false;
             Set<String> rcaElSymbols = DENOPTIMConstants.RCATYPEMAP.keySet();
             for (String rcaEl : rcaElSymbols)
             {
-                if (a.getSymbol().equals(rcaEl))
+                if (DENOPTIMMoleculeUtils.getSymbolOrLabel(a).equals(rcaEl))
                 {
                     isRca = true;
                     break;
@@ -187,7 +197,6 @@ public class DENOPTIMMoleculeUtils
             {
                 IAtom newAtm = new Atom("H",new Point3d(a.getPoint3d()));
                 newAtm.setProperties(a.getProperties());
-
                 AtomContainerManipulator.replaceAtomByAtom(mol,a,newAtm);
             }
         }
@@ -196,162 +205,151 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Replace unused ring closing attractors (RCA) with H atoms and 
-     * remove used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
+     * Replace used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
      * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 
-     * @throws denoptim.exception.DENOPTIMException 
+     * @throws DENOPTIMException if
      */
-    public static void removeRCA(IAtomContainer mol, DENOPTIMGraph graph) 
-						      throws DENOPTIMException
-    {
-		// add ring-closing bonds
-		ArrayList<DENOPTIMVertex> usedRcvs = graph.getUsedRCVertices();
-	    Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
-	    		DENOPTIMMoleculeUtils.getVertexToAtmIdMap(usedRcvs,mol);
-		ArrayList<IAtom> atmsToRemove = new ArrayList<>();
-		ArrayList<Boolean> doneVrtx = new ArrayList<>(
-					  Collections.nCopies(usedRcvs.size(),false));
-		for (DENOPTIMVertex v : usedRcvs)
-		{
-		    if (doneVrtx.get(usedRcvs.indexOf(v)))
-		    {
-		    	continue;
-		    }
-		    ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
-		    if (rings.size() != 1)
-		    {
-				String s = "Unexpected inconsistency between used RCV list "
-					   + v + " in {" + usedRcvs + "}"
-					   + "and list of DENOPTIMRings "
-					   + "{" + rings + "}. Check Code!";
-				throw new DENOPTIMException(s);
-		    }
-		    DENOPTIMVertex vH = rings.get(0).getHeadVertex();
-	        DENOPTIMVertex vT = rings.get(0).getTailVertex();
-		    IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
-		    IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
-		    int iSrcH = mol.getAtomNumber(
-					        mol.getConnectedAtomsList(aH).get(0));
-	        int iSrcT = mol.getAtomNumber(
-						mol.getConnectedAtomsList(aT).get(0));
-		    atmsToRemove.add(aH);
-		    atmsToRemove.add(aT);
-	
-		    switch (rings.get(0).getBondType())
-		    {
-			    case (1):
-			        mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-					break;
-			    case (2):
-					mol.addBond(iSrcH, iSrcT, IBond.Order.DOUBLE);
-					break;
-			    case (3):
-			    	mol.addBond(iSrcH, iSrcT, IBond.Order.TRIPLE);
-			        break;
-			    default:
-			    	mol.addBond(iSrcH, iSrcT, IBond.Order.SINGLE);
-			        break;
-		    }
-		    doneVrtx.set(usedRcvs.indexOf(vH),true);
-	        doneVrtx.set(usedRcvs.indexOf(vT),true);
-		}
-	
-		// remove used RCAs
-		for (IAtom a : atmsToRemove)
-		{
-		    mol.removeAtomAndConnectedElectronContainers(a);
-		}
 
-        // convert remaining PseudoAtoms to H
-		removeRCA(mol);
+    public static void removeUsedRCA(IAtomContainer mol, DENOPTIMGraph graph)
+            throws DENOPTIMException {
+
+        // add ring-closing bonds
+        ArrayList<DENOPTIMVertex> usedRcvs = graph.getUsedRCVertices();
+        Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
+                DENOPTIMMoleculeUtils.getVertexToAtomIdMap(usedRcvs,mol);
+        if (vIdToAtmId.size() == 0)
+        {
+            // No used RCV to remove.
+            return;
+        }
+        ArrayList<IAtom> atmsToRemove = new ArrayList<>();
+        ArrayList<Boolean> doneVertices =
+                new ArrayList<>(Collections.nCopies(usedRcvs.size(),false));
+
+        for (DENOPTIMVertex v : usedRcvs)
+        {
+            if (doneVertices.get(usedRcvs.indexOf(v)))
+            {
+                continue;
+            }
+            ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
+            if (rings.size() != 1)
+            {
+                String s = "Unexpected inconsistency between used RCV list "
+                       + v + " in {" + usedRcvs + "}"
+                       + "and list of DENOPTIMRings "
+                       + "{" + rings + "}. Check Code!";
+                throw new DENOPTIMException(s);
+            }
+            DENOPTIMVertex vH = rings.get(0).getHeadVertex();
+            DENOPTIMVertex vT = rings.get(0).getTailVertex();
+            IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
+            IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
+            int iSrcH = mol.indexOf(mol.getConnectedAtomsList(aH).get(0));
+            int iSrcT = mol.indexOf(mol.getConnectedAtomsList(aT).get(0));
+            atmsToRemove.add(aH);
+            atmsToRemove.add(aT);
+
+            BondType bndTyp = rings.get(0).getBondType();
+            if (bndTyp.hasCDKAnalogue())
+            {
+                mol.addBond(iSrcH, iSrcT, bndTyp.getCDKOrder());
+            } else {
+                System.out.println("WARNING! Attempt to add ring closing bond "
+                        + "did not add any actual chemical bond because the "
+                        + "bond type of the chord is '" + bndTyp +"'.");
+            }
+
+            doneVertices.set(usedRcvs.indexOf(vH),true);
+            doneVertices.set(usedRcvs.indexOf(vT),true);
+	    }
+        
+        // Adapt atom indexes in APs to the upcoming change of atom list
+        ArrayList<Integer> removedIds = new ArrayList<Integer>();
+        for (IAtom a : atmsToRemove)
+        {
+            removedIds.add(mol.indexOf(a));
+        }
+        Collections.sort(removedIds);
+        for (DENOPTIMVertex v : graph.getVertexList())
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                int apSrcId = ap.getAtomPositionNumberInMol();
+                int countOfAtmsBEforeSrc = 0;
+                for (Integer removingId : removedIds)
+                {
+                    if (removingId < apSrcId)
+                    {
+                        countOfAtmsBEforeSrc++; 
+                    } else if (removingId > apSrcId)
+                    {
+                        break;
+                    }
+                }
+                ap.setAtomPositionNumberInMol(apSrcId-countOfAtmsBEforeSrc);
+            }
+        }
+
+        // remove used RCAs
+        for (IAtom a : atmsToRemove)
+        {
+            mol.removeAtom(a);
+        }
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * returns the SMILES representation of the molecule
+     * Returns the SMILES representation of the molecule. All atoms are expected 
+     * to be explicit, as we set the count of implicit H to zero for all atoms.
      * @param mol the molecule
      * @return smiles string
-     * @throws denoptim.exception.DENOPTIMException
+     * @throws DENOPTIMException
      */
 
-    public static String getSMILESForMolecule(IAtomContainer mol) throws DENOPTIMException
-    {
-
-        IAtomContainer fmol = new AtomContainer();
+    public static String getSMILESForMolecule(IAtomContainer mol)
+            throws DENOPTIMException {
+        IAtomContainer fmol = builder.newAtomContainer();
         try 
         {
             fmol = mol.clone();
         }  
-        catch (Throwable t) 
+        catch (CloneNotSupportedException e)
         {
-            throw new DENOPTIMException(t);
+            throw new DENOPTIMException(e);
         }
 
         // remove Dummy atoms
-        if (DATMHDLR != null)
-            fmol = DATMHDLR.removeDummyInHapto(fmol);
+        fmol = DATMHDLR.removeDummyInHapto(fmol);
+        fmol = DATMHDLR.removeDummy(fmol);
 
         // convert PseudoAtoms to H
         removeRCA(fmol);
+        
+        // WARNING: assumptions on implicit H count and bond orders!
+        DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(fmol);
+        DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(fmol);
 
         String smiles = "";
         try
         {
-            AllRingsFinder arf = new AllRingsFinder();
-            arf.findAllRings(fmol);
-            SMGEN.setRingFinder(arf);
-            smiles = SMGEN.createSMILES(fmol);
-        }
-        catch (CDKException cdke)
-        {
-            if (cdke.getMessage().contains("Timeout for AllringsFinder exceeded"))
-            {
-                return null;
-            }
-            else
-            {
-               throw new DENOPTIMException(cdke);
-            }
+            smiles = SMGEN.create(fmol);
         }
         catch (Throwable t)
         {
+            t.printStackTrace();
         	String fileName = System.getProperty("user.dir") 
         		+ System.getProperty("file.separator") 
-        		+ "moldeule_causing_failure.sdf";
+        		+ "failed_generation_of_SMILES.sdf";
         	System.out.println("WARNING: Skipping calculation of SMILES. See "
         			+ "file '" + fileName + "'");
         	DenoptimIO.writeMolecule(fileName,fmol,false);
         	smiles = "calculation_or_SMILES_crashed";
-            //throw new DENOPTIMException(t);
         }
         return smiles;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the list of 3D atom coordinates
-     * @param ac
-     * @return list of 3D atom coordinates
-     */
-
-    public static ArrayList<double[]> getAtomCoordinates(IAtomContainer ac)
-    {
-        ArrayList<double[]> coords = new ArrayList<>();
-
-        for (IAtom atm : ac.atoms())
-        {
-            double[] f = new double[3];
-            f[0] = atm.getPoint3d().x;
-            f[1] = atm.getPoint3d().y;
-            f[2] = atm.getPoint3d().z;
-            coords.add(f);
-        }
-
-        return coords;
     }
 
 //------------------------------------------------------------------------------
@@ -368,35 +366,32 @@ public class DENOPTIMMoleculeUtils
     public static IAtomContainer generate2DCoordinates(IAtomContainer ac)
                                                     throws DENOPTIMException
     {
-
-        IAtomContainer fmol = new AtomContainer();
+        IAtomContainer fmol = builder.newAtomContainer();
         try 
         { 
             fmol = ac.clone();
         }  
-        catch (Throwable t) 
+        catch (CloneNotSupportedException e)
         {
-            throw new DENOPTIMException(t);
+            throw new DENOPTIMException(e);
         }
 
-        // remove Dummy atoms before generating the inchi
-        if (DATMHDLR != null)
-            fmol = DATMHDLR.removeDummyInHapto(fmol);
+        // remove Dummy atoms
+        fmol = DATMHDLR.removeDummyInHapto(fmol);
 
-        // remove PseudoAtoms
+        // remove ring-closing attractors
         removeRCA(fmol);
 
         // Generate 2D structure diagram (for each connected component).
-        IAtomContainer ac2d = new AtomContainer();
-        IMoleculeSet som = ConnectivityChecker.partitionIntoMolecules(fmol);
+        IAtomContainer ac2d = builder.newAtomContainer();
+        IAtomContainerSet som = ConnectivityChecker.partitionIntoMolecules(
+                fmol);
 
-        SDG.setUseTemplates(true);
-
-        for (int n = 0; n < som.getMoleculeCount(); n++)
+        for (int n = 0; n < som.getAtomContainerCount(); n++)
         {
             synchronized (SDG)
             {
-                IMolecule mol = som.getMolecule(n);
+                IAtomContainer mol = som.getAtomContainer(n);
                 SDG.setMolecule(mol, true);
                 try
                 {
@@ -412,8 +407,8 @@ public class DENOPTIMMoleculeUtils
                 ac2d.add(mol);  // add 2D molecule.
             }
         }
-
-        return GeometryTools.has2DCoordinates(ac2d) ? ac2d : null;
+        
+        return GeometryUtil.has2DCoordinates(ac2d) ? ac2d : null;
     }
 
 //------------------------------------------------------------------------------
@@ -426,10 +421,8 @@ public class DENOPTIMMoleculeUtils
      */
 
     public static ObjectPair getInchiForMolecule(IAtomContainer mol)
-                                                        throws DENOPTIMException
-    {
-
-        IAtomContainer fmol = new AtomContainer();
+            throws DENOPTIMException {
+        IAtomContainer fmol = builder.newAtomContainer();
         try 
         { 
             fmol = mol.clone();
@@ -440,33 +433,26 @@ public class DENOPTIMMoleculeUtils
         }
 
         // remove Dummy atoms before generating the inchi
-        if (DATMHDLR != null)
-            fmol = DATMHDLR.removeDummyInHapto(fmol);
+        fmol = DATMHDLR.removeDummyInHapto(fmol);
 
         // remove PseudoAtoms
         removeRCA(fmol);
 
-        // remove 3D coordinates: otherwise they are used to derive InChIKey
-/*
-        for (IAtom a : fmol.atoms())
-            a.setPoint3d(new Point3d());
-*/
-
-        String inchi = null;
+        String inchi;
         try
         {
             InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
             // Get InChIGenerator, this is a non-standard inchi
-            InChIGenerator gen = factory.getInChIGenerator(fmol, "AuxNone RecMet SUU");
+            InChIGenerator gen = factory.getInChIGenerator(
+                    fmol,
+                    "AuxNone RecMet SUU"
+            );
             INCHI_RET ret = gen.getReturnStatus();
             if (ret == INCHI_RET.WARNING)
             {
-                String error = gen.getMessage();
-                // InChI generated, but with warning message
-                if (error.contains("unusual valence(s)"))
-                {
-                    //return new ObjectPair(null, error);
-                }
+                //String error = gen.getMessage();
+                //InChI generated, but with warning message
+                //return new ObjectPair(null, error);
             }
             else if (ret != INCHI_RET.OKAY)
             {
@@ -484,7 +470,7 @@ public class DENOPTIMMoleculeUtils
         if (inchi.length() > 0)
             return new ObjectPair(inchi, null);
         else
-            return new ObjectPair(null, "No InChii key generated");
+            return new ObjectPair(null, "No InChi key generated");
     }
 
 
@@ -492,19 +478,19 @@ public class DENOPTIMMoleculeUtils
 
     /**
      * Count number of rotatable bonds
-     * @param mol
+     * @param mol molecule to count rotatable bonds in
      * @return number of rotatable bonds
      * @throws DENOPTIMException
      */
 
     public static int getNumberOfRotatableBonds(IAtomContainer mol)
-                                                        throws DENOPTIMException
-    {
-        int value = 0;
+            throws DENOPTIMException {
+        int value;
         try
         {
-            IMolecularDescriptor descriptor = new RotatableBondsCountDescriptor();
-            descriptor.setParameters(new Object[]{Boolean.FALSE});
+            IMolecularDescriptor descriptor = 
+                    new RotatableBondsCountDescriptor();
+            descriptor.setParameters(new Object[]{Boolean.FALSE,Boolean.FALSE});
             DescriptorValue result = descriptor.calculate(mol);
             value = ((IntegerResult)result.getValue()).intValue();
         }
@@ -517,311 +503,9 @@ public class DENOPTIMMoleculeUtils
 
 //------------------------------------------------------------------------------
 
-
-    private static void updateElementStats(HashMap<String, Integer> elementMap,
-                                                                    String key)
-    {
-        if (elementMap.containsKey(key))
-        {
-            elementMap.put(key, elementMap.get(key) + 1);
-        }
-        else
-        {
-            elementMap.put(key, 1);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Calculates the Bertz complexity index. Uses the vertex degree as the
-     * local graph invariant. Hydrogen atoms are ignored
-     * Bertz SH: The First General Index of Molecular Complexity. Journal
-     * of the American Chemical Society 1981, 103:3241-3243
-     * @param mol
-     * @return the Bertz complexity index
-     */
-
-    public static double getBertzMolecularComplexity(IAtomContainer mol)
-    {
-        double value = 0, c_a = 0, c_b = 0;
-        HashMap<String, Integer> elementMap = new HashMap<>();
-
-        double eta = 0, c_eta = 0;
-        String elem = null;
-        // calculate the atom degress
-        IAtomicDescriptor descriptor  = new AtomDegreeDescriptor();
-        // ignore hydrogens
-        for (IAtom atom : mol.atoms())
-        {
-            elem = atom.getSymbol();
-            if (elem.compareTo("H") == 0)
-                continue;
-            int deg = ((IntegerResult)
-                       descriptor.calculate(atom, mol)
-                       .getValue()).intValue();
-            updateElementStats(elementMap, elem);
-            eta += deg;
-            c_eta += DENOPTIMMathUtils.log2(deg);
-        }
-
-        value += (2 * eta * DENOPTIMMathUtils.log2(eta) - c_eta);
-
-        eta = 0; c_eta = 0;
-        for (String key : elementMap.keySet())
-        {
-            int e = elementMap.get(key);
-            eta += e;
-            c_eta += (e * DENOPTIMMathUtils.log2(e));
-        }
-
-        value += (eta * DENOPTIMMathUtils.log2(eta) - c_eta);
-
-        return DENOPTIMMathUtils.roundValue(value, 2);
-    }
-
-//------------------------------------------------------------------------------
-    /**
-     * Calculates the number of spiroatoms in the molecule
-     * A spiro atom is the unique common member of two or more otherwise disjoint
-     * ring systems (Pure Appl. Chem. 1999;71:531–558.)
-     * @param mol The molecule
-     * @return nSpiroAtoms number of spiroatoms
-     */
-
-    public static int getNumberOfSpiroAtoms(IAtomContainer mol)
-    {
-        // a spiroatom by definition requires a node degree of at least 4.
-        // A spiro compound has two (or three) rings which have only one atom in
-        // common and the two (or three) rings are not linked by a bridge.
-
-        int nSpiroAtoms = 0;
-        IRingSet allRings = getRingsInMolecule(mol);
-
-        for (IAtom atom : mol.atoms())
-        {
-            if (isSpiroAtom(atom, mol, allRings))
-                nSpiroAtoms++;
-        }
-
-        return nSpiroAtoms;
-    }
-
-//------------------------------------------------------------------------------
-    /**
-     * Calculates the rings in the molecule
-     * @param mol The molecule
-     * @return the set of rings
-     */
-    public static IRingSet getRingsInMolecule(IAtomContainer mol)
-    {
-        SSSRFinder sssrFinder = new SSSRFinder(mol);
-        IRingSet allRings = sssrFinder.findSSSR();
-        return allRings;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Count the number of fused rings in the molecule
-     * @param mol
-     * @return the number of fused rings
-     */
-
-    public static int countFusedRings(IAtomContainer mol)
-    {
-        IRingSet rs = getRingsInMolecule(mol);
-        int n = 0;
-        if (rs != null)
-        {
-            List<IAtomContainer> lst =
-                                    RingSetManipulator.getAllAtomContainers(rs);
-
-            for (int i=0; i<lst.size()-1; i++)
-            {
-                for (int j=i+1; j<lst.size(); j++)
-                {
-                    IAtomContainer iac = AtomContainerManipulator.
-                                    getIntersection(lst.get(i), lst.get(j));
-                    if (iac != null)
-                    {
-                        n += iac.getBondCount();
-                    }
-                }
-            }
-        }
-
-        return n;
-    }
-
-//------------------------------------------------------------------------------
-    /**
-     * Calculates the number of rings with more than 8 atoms in the molecule
-     * @param mol The molecule
-     * @return nMacroCycles number of macrocycles
-     */
-    public static int getNumberOfMacroCycles(IAtomContainer mol)
-    {
-        int nMacroCycles = 0;
-        IRingSet allRings = getRingsInMolecule(mol);
-        if (allRings != null)
-        {
-            for (int i = 0; i < allRings.getAtomContainerCount(); i++)
-            {
-                Ring ring = (Ring) allRings.getAtomContainer(i);
-                if (ring.getAtomCount() > 8)
-                    nMacroCycles++;
-            }
-        }
-
-        return nMacroCycles;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Check an atom to see if it has a potential tetrahedral stereo center.
-     * This can only be true if:
-     * <ol>
-     * <li>It has 4 neighbours OR 3 neighbours and a single implicit hydrogen</li>
-     * <li>These four neighbours are different according to CIP rules</li>
-     * </ol>
-     * If these conditions are met, it returns true.
-     *
-     * @param atom the central atom of the stereocenter
-     * @param mol the atom container the atom is in
-     * @return <code>true</code> if all conditions for a stereocenter are met
-     */
-    public static boolean hasPotentialStereoCenter(IAtom atom, IAtomContainer mol)
-    {
-        List<IAtom> neighbours = mol.getConnectedAtomsList(atom);
-        int numNbs = neighbours.size();
-        boolean hasImplicitHydrogen = false;
-        if (numNbs == 4)
-        {
-            hasImplicitHydrogen = false;
-        }
-        else if (numNbs == 3)
-        {
-            Integer implicitCount = atom.getImplicitHydrogenCount();
-            if (implicitCount != null && implicitCount == 1)
-            {
-                hasImplicitHydrogen = true;
-            }
-            else
-            {
-                SaturationChecker checker = new SaturationChecker();
-                try
-                {
-                    if (checker.calculateNumberOfImplicitHydrogens(atom, mol) == 1)
-                    {
-                        hasImplicitHydrogen = true;
-                    }
-                }
-                catch (CDKException cdke)
-                {
-                    return false;
-                }
-            }
-            if (!hasImplicitHydrogen)
-            {
-                return false;
-            }
-        }
-        else if (numNbs > 4)
-        {
-            return false; // not tetrahedral, anyway
-        }
-        else if (numNbs < 3)
-        {
-            return false; // definitely not chiral
-        }
-        ILigand[] ligands = new ILigand[4];
-        int index = 0;
-        VisitedAtoms bitSet = new VisitedAtoms();
-        int chiralAtomIndex = mol.getAtomNumber(atom);
-        for (IAtom neighbour : neighbours)
-        {
-            int ligandAtomIndex = mol.getAtomNumber(neighbour);
-            ligands[index] = CIPTool.defineLigand(
-                    mol, bitSet, chiralAtomIndex, ligandAtomIndex);
-            index++;
-        }
-        if (hasImplicitHydrogen)
-        {
-            ligands[index] = CIPTool.defineLigand(mol, bitSet, chiralAtomIndex,
-                                                            CIPTool.HYDROGEN);
-        }
-        CIPTool.order(ligands);
-        return CIPTool.checkIfAllLigandsAreDifferent(ligands);
-    }
-
-//------------------------------------------------------------------------------
-    /**
-     * Calculates the number of stereocenters in the molecule
-     * @param mol The molecule
-     * @return nStereoCenters number of Stereocenters
-     */
-    public static int getNumberOfStereoCenters(IAtomContainer mol)
-    {
-        int nStereoCenters = 0;
-        for (IAtom atom : mol.atoms())
-        {
-            if (hasPotentialStereoCenter(atom, mol))
-                nStereoCenters++;
-        }
-
-        return nStereoCenters;
-    }
-
-//------------------------------------------------------------------------------
-
-    private static boolean isBondInRingSet(IBond bond, IRingSet allRings)
-    {
-        int m = allRings.getAtomContainerCount();
-        for (int i=0; i<m; i++)
-        {
-            Ring ring = (Ring) allRings.getAtomContainer(i);
-            if (ring.contains(bond))
-                return true;
-        }
-        return false;
-    }
-
-//------------------------------------------------------------------------------
-
-    // spiro compounds contain two cyclic rings that share one common carbon atom,
-    // which is called as the spiroatom.
-
-    private static boolean isSpiroAtom(IAtom atom, IAtomContainer mol,
-                                                            IRingSet allRings)
-    {
-        int numNbs = mol.getConnectedAtomsCount(atom);
-        if (numNbs < 4)
-            return false;
-
-        // check if this atom has 4 ring bonds
-        int k = 0;
-        List<IBond> bonds = mol.getConnectedBondsList(atom);
-        Iterator<IBond> iter = bonds.iterator();
-        while (iter.hasNext())
-        {
-            IBond bond = iter.next();
-            if (isBondInRingSet(bond, allRings))
-                k++;
-        }
-
-        if (k != 4)
-            return false;
-        return true;
-    }
-
-//------------------------------------------------------------------------------
-
-
     /**
      * The heavy atom count
-     * @param mol
+     * @param mol Molecule to count heavy atoms in
      * @return heavy atom count
      */
 
@@ -835,81 +519,25 @@ public class DENOPTIMMoleculeUtils
         }
         return n;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
-     *
-     * @param features1
-     * @param features2
-     * @return the similarity value between the molecules based on their features
-     * @throws DENOPTIMException
+     * Count atoms with the given elemental symbol.
+     * @param mol Molecule to count atoms in.
+     * @param symbol the elemental symbol to look for.
+     * @return the total number of those elements.
      */
 
-    public static double calculate(double[] features1, double[] features2)
-                                                        throws DENOPTIMException
+    public static int countAtomsOfElement(IAtomContainer mol, String symbol)
     {
-
-        if (features1.length != features2.length)
+        int n = 0;
+        for (IAtom atm : mol.atoms())
         {
-            throw new DENOPTIMException("Features vectors must be of the same length");
+            if (atm.getSymbol().equals(symbol))
+                n++;
         }
-
-        int n = features1.length;
-        double ab = 0.0;
-        double a2 = 0.0;
-        double b2 = 0.0;
-
-        for (int i = 0; i < n; i++)
-        {
-            ab += features1[i] * features2[i];
-            a2 += features1[i]*features1[i];
-            b2 += features2[i]*features2[i];
-        }
-        return ab/(a2+b2-ab);
-    }
-
-//------------------------------------------------------------------------------
-
-    public static double calculateSimilarity(IAtomContainer query,
-                                    IAtomContainer target) throws DENOPTIMException
-    {
-        double tanimoto = 0;
-        try
-        {
-            Fingerprinter fingerprinter = new Fingerprinter();
-            BitSet bs1 = fingerprinter.getFingerprint(query);
-            BitSet bs2 = fingerprinter.getFingerprint(target);
-            tanimoto = Tanimoto.calculate(bs1, bs2);
-        }
-        catch (CDKException cdke)
-        {
-            throw new DENOPTIMException(cdke);
-        }
-        return tanimoto;
-    }
-
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Set Gasteiger-Marsilli charges
-     * @param mol
-     * @throws DENOPTIMException
-     */
-
-    public static void setCharges(IAtomContainer mol) throws DENOPTIMException
-    {
-        try
-        {
-            GasteigerMarsiliPartialCharges peoe = new GasteigerMarsiliPartialCharges();
-            AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
-            peoe.calculateCharges(mol);
-        }
-        catch (CDKException ex)
-        {
-            throw new DENOPTIMException(ex);
-        }
+        return n;
     }
 
 //------------------------------------------------------------------------------
@@ -917,24 +545,21 @@ public class DENOPTIMMoleculeUtils
     /**
      * Method to generate the map making in relation <code>DENOPTIMVertex</code>
      * ID and atom index in the <code>IAtomContainer</code> representation of 
-     * the chemical entity. Note that the S<code>IAtomContainer</code> must 
+     * the chemical entity. Note that the <code>IAtomContainer</code> must 
      * have been generated from the <code>DENOPTIMGraph</code> that contains the
-     * required e<code>DENOPTIMVertex</code>s.
+     * required <code>DENOPTIMVertex</code>s.
      * @param vertLst the list of <code>DENOPTIMVertex</code> to find
      * @param mol the molecular representation
      * @return the map of atom indexes per each <code>DENOPTIMVertex</code> ID
-     * @throws DENOPTIMException
      */
 
-    public static Map<DENOPTIMVertex,ArrayList<Integer>> getVertexToAtmIdMap(
-                                              ArrayList<DENOPTIMVertex> vertLst,
-                                                             IAtomContainer mol)
-                                                        throws DENOPTIMException
-    {
+    public static Map<DENOPTIMVertex,ArrayList<Integer>> getVertexToAtomIdMap(
+            ArrayList<DENOPTIMVertex> vertLst,
+            IAtomContainer mol
+    ) {
+
         ArrayList<Integer> vertIDs = new ArrayList<>();
-        for (int i=0; i<vertLst.size(); i++)
-        {
-            DENOPTIMVertex v = vertLst.get(i);
+        for (DENOPTIMVertex v : vertLst) {
             vertIDs.add(v.getVertexId());
         }
 
@@ -946,7 +571,7 @@ public class DENOPTIMMoleculeUtils
             if (vertIDs.contains(vID))
             {
                 DENOPTIMVertex v = vertLst.get(vertIDs.indexOf(vID));
-                int atmID = mol.getAtomNumber(atm);
+                int atmID = mol.indexOf(atm);
                 if (map.containsKey(v))
                 {
                     map.get(v).add(atmID);
@@ -965,29 +590,25 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
     
     /**
-     * 
-     * @param mol
-     * @param filename
-     * @throws Exception 
+     * Generate a PNG image from molecule <code>mol</code>
+     * @param mol generate molecule PNG from
+     * @param filename name of file to store generated PNG as
+     * @throws DENOPTIMException
      */
     
-    public static void moleculeToPNG(IAtomContainer mol, String filename) 
-                                                        throws Exception
+    public static void moleculeToPNG(IAtomContainer mol, String filename)
+            throws DENOPTIMException
     {
-        IAtomContainer iac;
+        IAtomContainer iac = mol;
 
-        if (!GeometryTools.has2DCoordinates(mol))
+        if (!GeometryUtil.has2DCoordinates(mol))
         {
             iac = generate2DCoordinates(mol);
-        }
-        else
-        {
-            iac = mol;
         }
         
         if (iac == null)
         {
-            throw new Exception("Failed to generate 2D coordinates.");
+            throw new DENOPTIMException("Failed to generate 2D coordinates.");
         }
     
         try
@@ -995,14 +616,16 @@ public class DENOPTIMMoleculeUtils
             int WIDTH = 400;
             int HEIGHT = 400;
             
-            GeometryTools.scaleMolecule(iac, 0.9);
-            GeometryTools.translateAllPositive(iac);
+            GeometryUtil.scaleMolecule(iac, 0.9);
+            GeometryUtil.translateAllPositive(iac);
             // the draw area and the image should be the same size
             Rectangle drawArea = new Rectangle(WIDTH, HEIGHT);
-            Image image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
+            Image image = new BufferedImage(WIDTH, HEIGHT, 
+                    BufferedImage.TYPE_4BYTE_ABGR);
 
             // generators make the image elements
-            ArrayList<IGenerator<IAtomContainer>> generators = new ArrayList<>(); 
+            ArrayList<IGenerator<IAtomContainer>> generators = 
+                    new ArrayList<>(); 
             generators.add(new BasicSceneGenerator());
             generators.add(new BasicBondGenerator());
             generators.add(new BasicAtomGenerator());
@@ -1016,35 +639,281 @@ public class DENOPTIMMoleculeUtils
             model.set(BasicSceneGenerator.UseAntiAliasing.class, true);
             model.set(BasicBondGenerator.BondWidth.class, 2.0);            
             model.set(BasicAtomGenerator.ShowExplicitHydrogens.class, false);
-            //model.set(BasicAtomGenerator.KekuleStructure.class, true);
             model.set(BasicAtomGenerator.AtomRadius.class, 0.5);
-            model.set(BasicAtomGenerator.CompactShape.class, BasicAtomGenerator.Shape.OVAL);
-            //renderer.setZoom(0.9);
-            
+            model.set(BasicAtomGenerator.CompactShape.class, 
+                    BasicAtomGenerator.Shape.OVAL);
+
             // the call to 'setup' only needs to be done on the first paint
             renderer.setup(iac, drawArea);
 
             // paint the background
             Graphics2D g = (Graphics2D)image.getGraphics();
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-		                     RenderingHints.VALUE_ANTIALIAS_ON);
-            
+            g.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
+            );
             g.setColor(Color.WHITE);
             g.fillRect(0, 0, WIDTH, HEIGHT);
             
 
             // the paint method also needs a toolkit-specific renderer
-            renderer.paint(iac, new AWTDrawVisitor(g), new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
+            renderer.paint(iac, new AWTDrawVisitor(g), 
+                    new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
             g.dispose();
 
             ImageIO.write((RenderedImage)image, "PNG", new File(filename));
         }
-        catch (IOException ioe)
+        catch (IOException e)
         {
-            throw ioe;
+            throw new DENOPTIMException(e);
         }
     }
     
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the 3D coordinates, if present.
+     * If only 2D coords exist, then it returns the 2D projected in 3D space.
+     * If neither 3D nor 2D are present returns [0, 0, 0].
+     * @param atm the atom to analyze.
+     * @return a not null.
+     */
+    public static Point3d getPoint3d(IAtom atm)
+    {
+        Point3d p = atm.getPoint3d();
+
+        if (p == null)
+        {
+            Point2d p2d = atm.getPoint2d();
+            if (p2d == null)
+            {
+                p = new Point3d(0.0, 0.0, 0.0);
+            }
+            else
+            {
+                p = new Point3d(p2d.x, p2d.y, 0.0);
+            }
+        }
+        return p;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets zero implicit hydrogen count to all atoms.
+     * @param iac the container to process
+     */
+    public static void setZeroImplicitHydrogensToAllAtoms(IAtomContainer iac)
+    {
+        for (IAtom atm : iac.atoms()) {
+            atm.setImplicitHydrogenCount(0);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets bond order = single to all otherwise unset bonds.
+     * @param iac the container to process
+     */
+    
+    public static void ensureNoUnsetBondOrders(IAtomContainer iac)
+    {
+        try {
+            Kekulization.kekulize(iac);
+        } catch (CDKException e) {
+            DENOPTIMLogger.appLogger.log(Level.WARNING, "Kekulization failed. "
+                    + "Bond orders will be unreliable.");
+        }
+        
+        for (IBond bnd : iac.bonds())
+        {
+            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+            {
+                bnd.setOrder(IBond.Order.SINGLE);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructs a copy of an atom container, i.e., a molecule that reflects 
+     * the one given in the input argument
+     * in terms of atom count, type, and geometric properties, and bond count 
+     * and type. Other properties
+     * @param mol the container to copy.
+     * @return the chemical-copy of the input argument.
+     * @throws DENOPTIMException if there are bonds involving more than two atoms.
+     */
+    public static IAtomContainer makeSameAs(IAtomContainer mol) throws DENOPTIMException
+    {
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer iac = builder.newAtomContainer();
+        
+        for (IAtom oAtm : mol.atoms())
+        {
+            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm,true,true);
+            iac.addAtom(nAtm);
+        }
+        
+        for (IBond oBnd : mol.bonds())
+        {
+            if (oBnd.getAtomCount() != 2)
+            {
+                throw new DENOPTIMException("Unable to deal with bonds "
+                        + "involving more than two atoms.");
+            }
+            int ia = mol.indexOf(oBnd.getAtom(0));
+            int ib = mol.indexOf(oBnd.getAtom(1));
+            iac.addBond(ia,ib,oBnd.getOrder());
+        }
+        return iac;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method that constructs an atom that reflect the same atom given as 
+     * parameter in terms of element symbol (or label, for pseudoatoms),
+     * and Cartesian coordinates, and most of the other attributes.
+     * This method copies valence and implicit H count, in addition to most of
+     * the fields accessible via IAtom. Use 
+     * {@link #makeSameAtomAs(IAtom, boolean, boolean)} to have the option to
+     * exclude valence and implicit H count.
+     * This is basically a cloning method that ignores some fields.
+     * @param oAtm the original
+     * @return the copy of the original
+     */
+    public static IAtom makeSameAtomAs(IAtom oAtm)
+    {
+        return makeSameAtomAs(oAtm, false, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Method that constructs an atom that reflect the same atom given as 
+     * parameter in terms of element symbol (or label, for pseudoatoms),
+     * and Cartesian coordinates, and most of the other attributes unless 
+     * otherwise specified by the flags.
+     * This is basically a cloning method that ignores some fields.
+     * @param oAtm the original
+     * @param ignoreValence if <code>true</code> the returned atom will have 
+     * null valence
+     * @param ignoreImplicitH if <code>true</code> the returned atom will have 
+     * null implicit hydrogen count.
+     * @return the copy of the original
+     */
+    public static IAtom makeSameAtomAs(IAtom oAtm, boolean ignoreValence,
+            boolean ignoreImplicitH)
+    {
+        IAtom nAtm = null;
+        String s = getSymbolOrLabel(oAtm);
+        if (DENOPTIMMoleculeUtils.isElement(oAtm))
+        {
+            nAtm = new Atom(s);
+        } else {
+            nAtm = new PseudoAtom(s);
+        }
+        if (oAtm.getPoint3d() != null)
+        {
+            Point3d p3d = oAtm.getPoint3d();
+            nAtm.setPoint3d(new Point3d(p3d.x, p3d.y, p3d.z));
+        } else if (oAtm.getPoint2d() != null)
+        {
+            Point2d p2d = oAtm.getPoint2d();
+            nAtm.setPoint3d(new Point3d(p2d.x, p2d.y, 0.00001));
+        }
+        if (oAtm.getFormalCharge() != null)
+            nAtm.setFormalCharge(oAtm.getFormalCharge());
+        if (oAtm.getBondOrderSum() != null)
+            nAtm.setBondOrderSum(oAtm.getBondOrderSum());
+        if (oAtm.getCharge() != null)
+            nAtm.setCharge(oAtm.getCharge());
+        if (oAtm.getValency() != null && !ignoreValence)
+            nAtm.setValency(oAtm.getValency());
+        if (oAtm.getExactMass() != null)
+            nAtm.setExactMass(oAtm.getExactMass());
+        if (oAtm.getMassNumber() != null)
+            nAtm.setMassNumber(oAtm.getMassNumber());
+        if (oAtm.getFormalNeighbourCount() != null)
+            nAtm.setFormalNeighbourCount(oAtm.getFormalNeighbourCount());
+        if (oAtm.getFractionalPoint3d() != null)
+            nAtm.setFractionalPoint3d(new Point3d(oAtm.getFractionalPoint3d()));
+        if (oAtm.getHybridization() != null)
+            nAtm.setHybridization(Hybridization.valueOf(
+                    oAtm.getHybridization().toString()));
+        if (oAtm.getImplicitHydrogenCount() != null && !ignoreImplicitH)
+            nAtm.setImplicitHydrogenCount(oAtm.getImplicitHydrogenCount());
+        if (oAtm.getStereoParity() != null)
+            nAtm.setStereoParity(oAtm.getStereoParity());
+        if (oAtm.getMaxBondOrder() != null)
+            nAtm.setMaxBondOrder(oAtm.getMaxBondOrder());
+        if (oAtm.getNaturalAbundance() != null)
+            nAtm.setNaturalAbundance(oAtm.getNaturalAbundance());
+        
+        return nAtm;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets either the elemental symbol (for standard atoms) of the label (for
+     * pseudoatoms). Other classes implementing IAtom are not considered.
+     * This method is a response to the change from CDK-1.* to CDK-2.*. 
+     * In the old CDK-1.* the getSymbol() method of IAtom would return the label 
+     * for a PseudoAtom, but this behaviour is not retained in newer versions.
+     * @param atm
+     * @return either the element symbol of the label
+     */
+    public static String getSymbolOrLabel(IAtom atm)
+    {
+        String s = "none";
+        if (DENOPTIMMoleculeUtils.isElement(atm))
+        {
+            s = atm.getSymbol();
+        } else {
+            //TODO: one day will account for the possibility of having any 
+            // other implementation of IAtom
+            IAtom a = null;
+            if (atm instanceof AtomRef) 
+            {
+                a = ((AtomRef) atm).deref();
+                if (a instanceof PseudoAtom)
+                {
+                    s = ((PseudoAtom) a).getLabel();
+                } else {
+                    // WARNING: we fall back to standard behaviour, but there
+                    // could still be cases where this is not good...
+                    s = a.getSymbol();
+                }
+            } else if (atm instanceof PseudoAtom)
+            {
+                s = ((PseudoAtom) atm).getLabel();
+            }
+        }       
+        return s;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the centroid of the given molecule.
+     * @param mol
+     * @return the centroid.
+     */
+    public static Point3d calculateCentroid(IAtomContainer mol)
+    {
+        Point3d c = new Point3d(0,0,0);
+        for (IAtom atm : mol.atoms())
+        {
+            c.add(getPoint3d(atm));
+        }
+        c.scale(1.0 / ((double) mol.getAtomCount()));
+        return c;
+    }
+
+//------------------------------------------------------------------------------
 
 }

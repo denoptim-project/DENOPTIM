@@ -18,14 +18,13 @@
 
 package denoptim.utils;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.smiles.smarts.SMARTSQueryTool;
-import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.isomorphism.Pattern;
+import org.openscience.cdk.smarts.SmartsPattern;
 
 
 /**
@@ -37,7 +36,7 @@ import org.openscience.cdk.exception.CDKException;
 public class ManySMARTSQuery
 {
     //Container for all matches
-    private Map<String,List<List<Integer>>> allMatches = new HashMap<>();
+    private Map<String,Mappings> allMatches = new HashMap<>();
 
     //Counts for all matches
     private Map<String,Integer> numMatches = new HashMap<>();
@@ -47,68 +46,43 @@ public class ManySMARTSQuery
     private boolean problems = false;
     private String message = "";
 
-
 //------------------------------------------------------------------------------
 
-    public ManySMARTSQuery()
-    {
-        super();
-    }
-
-//------------------------------------------------------------------------------
-
-    public ManySMARTSQuery(IAtomContainer mol, Map<String, String> smarts)
-    {
-        super();
-        String blankSmarts = "[*]";
+    public ManySMARTSQuery(IAtomContainer mol, Map<String, String> smarts) {
         String err="";
         try {
-            SMARTSQueryTool query = new SMARTSQueryTool(blankSmarts);
             for (String smartsRef : smarts.keySet())
             {
                 //get the new query
                 String oneSmarts = smarts.get(smartsRef);
                 err = smartsRef;
-
-                //Update the query tool
-                query.setSmarts(oneSmarts);
                 
-                if (query.matches(mol))
+                Pattern sp = SmartsPattern.create(oneSmarts);
+
+                // WARNING: assumptions on implicit H count and bond orders!
+                DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(mol);
+                
+                if (sp.matches(mol))
                 {
-                    //Store matches
-                    List<List<Integer>> listOfIds = new ArrayList<List<Integer>>();
-                    listOfIds = query.getUniqueMatchingAtoms();
+                    Mappings listOfIds = sp.matchAll(mol);
                     allMatches.put(smartsRef,listOfIds);
-                    //Store number
-                    int num = listOfIds.size();
-                    numMatches.put(smartsRef,num);
+                    numMatches.put(smartsRef,listOfIds.count());
                 }
             }
-        } catch (CDKException cdkEx) 
-        {
-            String cause = cdkEx.getCause().getMessage();
-            err = "\nWARNING! For query " + err + " => " + cause;
-            problems = true;
-            problem = cdkEx;
-            message = err;
-        } 
-        catch (Throwable t) 
-        {
+        } catch (Throwable t) {
             java.lang.StackTraceElement[] stes = t.getStackTrace();
             String cause = "";
             int s = stes.length;
-            if (s >= 1)
-            {
+            if (s >= 1) {
                 java.lang.StackTraceElement ste = stes[0];
                 cause = ste.getClassName();
-            } 
-            else 
-            {
+            } else {
                 cause = "'unknown' (try to process this molecule alone to "
-                                                        + "get more infos)";
+                        + "get more info)";
             }
-            err = "\nWARNING! For query " + err + " => Exception returned "
-                                                              + "by "+cause;
+            err = "WARNING! For query " + err + " => Exception returned "
+                    + "by " + cause;
             problems = true;
             problem = t;
             message = err;
@@ -138,7 +112,7 @@ public class ManySMARTSQuery
     
 //------------------------------------------------------------------------------
     
-    public Map<String,List<List<Integer>>> getAllMatches()
+    public Map<String, Mappings> getAllMatches()
     {
     	return allMatches;
     }
@@ -147,15 +121,12 @@ public class ManySMARTSQuery
 
     public int getNumMatchesOfQuery(String query)
     {
-        if (numMatches.keySet().contains(query))
-            return numMatches.get(query);
-        else
-            return 0;
+        return numMatches.getOrDefault(query, 0);
     }
 
 //------------------------------------------------------------------------------
 
-    public List<List<Integer>> getMatchesOfSMARTS(String ref)
+    public Mappings getMatchesOfSMARTS(String ref)
     {
         return allMatches.get(ref);
     }

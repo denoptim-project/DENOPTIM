@@ -385,7 +385,7 @@ Fragments have different roles in DENOPTIM:
 </ul></p>
 
 <p>Each fragment is characterized by its chemical constitution (i.e., atom,
-bonds, charges) and a set of attachment points. These attachment points are then projected to at the vertex level, so that when a vertex contains a fragment, the list of APS of the vertex is indeed the list defined by the underlying fragment. 
+bonds, charges) and a set of attachment points. These attachment points are then projected to the vertex surface, so that when a vertex contains a fragment, the list of APS of the vertex is indeed the list defined by the underlying fragment. 
 Each attachment point
 (AP) defines where (i.e., on which atom/pseudo-atom) and possibly additional information such as formal bond order,
 geometry. DENOPTIM currently supports two strategies for handling
@@ -500,7 +500,7 @@ from scratch.</p>
 genetic operators used. Currently, these schemes are restricted to a
 single point in a graph. In addition, the vertex corresponding to the scaffold
 is not subject to crossover or mutation, i.e.,
-only vertices attached to the scaffold partake in the genetic
+only vertexes attached to the scaffold partake in the genetic
 exchange. In addition, for symmetric graphs, addition or removal of a
 vertex can be propagated across all points related
 by symmetry. Where APclasses are involved,
@@ -542,38 +542,37 @@ crossover points are chosen according to the rules defined in the compatibility 
 
 <h3 class="western"><a name="Toc44001_808352928"></a>Substitution Probability</h3>
 
-<p>In order to prevent the generation of very large molecules, 
-the probability of appending a fragment to a free AP
-is typically chosen to decrease with the
-distance of the free AP from the root of the graph. 
-This distance is the so-called <i>level</i>, and refers to the fragment
-holding the free AP (Figure 4).
-For the levels L<sub>&gt;0</sub>
-the probability is lowered according to any one of the following
-schemes:</p>
+<p>The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP.
+The substitution probability (<i>P</i>) results from the product of two components: the growth probability (<i>P<sub>g</sub></i>), and the crowding probability (<i>P<sub>c</sub></i>).
+The growth probability (<i>P<sub>g</sub></i>) limits the growth of an item. This limit can be expressed in terms of graph deepness (i.e., using the <i>level</i> of a vertex to determine the likeliness of further graph extention on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
+
+<figure> 
+	<img src="figures/graph_levels.png" alt="figures/graph_levels.png" width="429" border="0"/>
+	<figcaption><i>Figure 4: identification of levels in a graph. Each label L<sub>x</sub> identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L<sub>-1</sub>), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L<sub>0</sub>), and so on.</i></figcaption>
+</figure>
+
+The <b>growth probability</b> can be controlled by one of the following schemes (where <i>L</i> is either the vertex <i>level</i> or the number of heavy atoms):</p>
 
 <ul>
 	<li><b>EXP_DIFF</b>:
 	Given a growth multiplier factor <i>&lambda;</i>,
-	the probability of addition is given by the following equation
-	where <i>L</i>
-	is the level of the free AP.<br>
+	the probability of addition is given by<br>
 	<img src="figures/exp_diff.png" alt="figures/exp_diff.png" width="131" height="45"/></li>
 	<li><b>TANH</b>:
-        Given a growth multiplier factor <i>&lambda;</i>,
+    Given a growth multiplier factor <i>&lambda;</i>,
 	the probability of addition is
 	determined by <br>
 	<img src="figures/tanh.png" alt="figures/tanh.png" width="138" height="21"/></li>
 	<li><b>SIGMA</b>:
-	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the level of the point where the probability is 50%), and calculates the probability as <br>
+	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the value of <i>L</i> where the probability is 50%), and calculates the probability as <br>
 	<img src="figures/sigma.png" alt="figures/sigma.png" width="174" height="41"/></li>
-	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels). Use with caution.</li>
+	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels).</li>
 </ul>
 
-<figure> 
-	<img src="figures/subs_prob.png" alt="figures/subs_prob.png" width="350" border="0"/>
-	<figcaption><i>Figure 4: Level based probability for attaching fragments.</i></figcaption>
-</figure>
+<p>The <b>crowding probability</b> is meant to reduce the likeliness of adding incident edges to a vertex that is already using one or more APs rooted on the same source atom that holds the AP for which we are evaluating the substitution probability. Practically, for a free AP (<i>AP<sub>i</sub></i>) we define the <i>crowdedness</i> (<i>C<sub>AP<sub>i</sub></sub></i>) as the number of non-free APs that are rooted on the same source atom holding <i>AP<sub>i</sub></i>.</p>
+<p>For example, we consider vertex 3 in Figure 4 (i.e., the blue square at the center of the figure), and assume that the molecular representation of this vertex consists of a single atom holding four attachment points. To calculate the crowdedness of <i>AP<sub>2</sub></i> (i.e., the yellow circle located below the blue square representing vertex 3) we count the number of APs that i) share the same source atom of <i>AP<sub>2</sub></i>, and ii) are used to form edges with vertexes that are not capping groups. While condition <i>i</i> is satisfied by all four APs of the vertex, only two APs satisfy condition <i>ii</i>. The crowdedness of <i>AP<sub>2</sub></i> is thus <i>C<sub>AP<sub>2</sub></sub> = 2</i>.</p>
+<p>The crowding probability for <i>AP<sub>i</sub></i> is then calculated using the crowdedness <i>C<sub>AP<sub>i</sub></sub></i> according to any of the schemes presented above (<b>EXP_DIFF</b>, <b>TANH</b>, <b>SIGMA</b>, <b>UNRESTRICTED</b>) using <i>C<sub>AP<sub>i</sub></sub></i> in place of <i>L</i>.</p>
+
 
 <h3 class="western"><a name="Toc40900_1191730726"></a>GA Selection Strategies</h3>
 
@@ -640,14 +639,14 @@ The complete list of keywords is available in the <a href="#Toc35546_1191730726"
 
 <p>The program outputs a number of files during its execution. At the
 beginning of the execution, the program creates a directory
-<code>RUNDDMMYYYYHHMMSS</code> and a log file <code>RUNDDMMYYYYHHMMSS.log</code>
-that are named according to the date (<code>DDMMYYYY</code>)
+<code>RUNYYYYMMDDHHMMSS</code> and a log file <code>RUNYYYYMMDDHHMMSS.log</code>
+that are named according to the date (<code>YYYYMMDD</code>)
 and time (<code>HHMMSS</code>). All files generated by DENOPTIN associated with the current run are
 stored in this folder. Instead, files managed by the fitness provider
 script are not controlled by DenoptimGA and can thus be placed 
 anywhere. Files pertaining to a specific generation are stored in
-sub-folders <code>RUNDDMMYYYYHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
-experiment are collected in sub-folder <code>RUNDDMMYYYYHHMMSS/Final</code> (see Figure 5).</p>
+sub-folders <code>RUNYYYYMMDDHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
+experiment are collected in sub-folder <code>RUNYYYYMMDDHHMMSS/Final</code> (see Figure 5).</p>
 
 <figure> 
 	<img src="figures/ga_folders.png" alt="figures/ga_folders.png" width="500" border="0"/>
@@ -713,9 +712,9 @@ parameters file. Possible keyword are listed in the <a href="#Toc35546_119173072
 <p>The output generated by FragSpaceExplorer is structured as the following
 folder tree:</p>
 <ul>
-	<li><code>FSEDDMMYYYYHHMMSS.log</code> (log file)</li>
-	<li><code>FSEDDMMYYYYHHMMSS.chk</code> (checkpoint file)</li>
-	<li><code>FSEDDMMYYYYHHMMSS</code>
+	<li><code>FSEYYYYMMDDHHMMSS.log</code> (log file)</li>
+	<li><code>FSEYYYYMMDDHHMMSS.chk</code> (checkpoint file)</li>
+	<li><code>FSEYYYYMMDDHHMMSS</code>
 	<ul>
 		<li><code>FSE-Level_-1</code>
 		<ul>
@@ -1057,14 +1056,7 @@ without providing that specific keyword in the input file.</p>
 			evaluation of 3D chain closability by scanning the torsional
 			space.</p>
 		</td>
-	</tr>
-	<tr valign="middle">
-		<td width="46%"><p><code>RC-LinearityLimit</code></p>
-		</td>
-		<td width="54%"><p>Specifies the bond angle above which the triplet of atoms is
-			considered linear.</p>
-		</td>
-	</tr>
+	</tr
 	<tr valign="middle">
 		<td width="46%"><p><code>RC-ExhaustiveConfSearch</code></p>
 		</td>
@@ -1157,6 +1149,18 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
+		<td width="40%"><p><code>GA-MonitorDumpStep</code></p>
+		</td>
+		<td width="60%"><p>The monitor dump is a record of how many attempted and failed operations are performed to produce new candidate population members. The record is printed every N attempts to build a new candidate, and N can be specified by <code>GA-MonitorDumpStep</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-MonitorFile</code></p>
+		</td>
+		<td width="60%"><p>Specifies the pathname where to write monitor dumps and summaries. Dumps are snapshots taken with a frequency controlled by <code>GA-MonitorDumpStep</code>, while summaries are printed at the end of every generation.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
 		<td width="40%"><p><code>GA-RandomSeed</code></p>
 		</td>
 		<td width="60%"><p>Specifies the seed number used by the random number generator.</p>
@@ -1211,6 +1215,13 @@ without providing that specific keyword in the input file.</p>
 			</code>keyword.</code></p>
 		</td>
 	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>GA-MaxGeneticOpsAttempts</code></p>
+		</td>
+		<td width="60%"><p>Controls the maximum number
+			of attempts to perform a genetic operation such as crossover or mutation.</p>
+		</td>
+	</tr>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-GrowthProbScheme</code></p>
 		</td>
@@ -1223,28 +1234,89 @@ without providing that specific keyword in the input file.</p>
 			Genetic Operations.</p>
 		</td>
 	</tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthMultiplier</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of the
+                    factor &lambda; used in graph level-based growth
+                    probability schemes <code>EXP_DIFF</code>, and
+                    <code>TANH</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthSigmaSteepness</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>1 used in graph level-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthSigmaMiddle</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>2 used in graph level-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthMultiplier</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of the
+                    factor &lambda; used in graph molecular size-based growth
+                    probability schemes <code>EXP_DIFF</code>, and
+                    <code>TANH</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthSigmaSteepness</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>1 used in graph molecular size-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthSigmaMiddle</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>2 used in graph molecular size-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthMultiplier</code></p>
+		<td width="40%"><p><code>GA-CrowdProbScheme</code></p>
+		</td>
+		<td width="60%"><p>Specifies the crowding
+			probability scheme. Acceptable values are: 
+			<code>EXP_DIFF</code>,
+			<code>TANH</code>,
+			<code>SIGMA</code>,
+			and <code>UNRESTRICTED</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-CrowdMultiplier</code></p>
 		</td>
 		<td width="60%"><p>Specifies the value of the
-			factor &lambda; used in growth
+			factor &lambda; used in crowding
 			probability schemes <code>EXP_DIFF</code>, and
 			<code>TANH</code>.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthSigmaSteepness</code></p>
+		<td width="40%"><p><code>GA-CrowdSigmaSteepness</code></p>
 		</td>
 		<td width="60%"><p>Specifies the value of
-			parameter &sigma;<sub></sub>1 used in growth
+			parameter &sigma;<sub></sub>1 used in crowding
 			probability scheme <code>SIGMA</code>.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthSigmaMiddle</code></p>
+		<td width="40%"><p><code>GA-CrowdSigmaMiddle</code></p>
 		</td>
 		<td width="60%"><p>Specifies the value of
-			parameter &sigma;<sub></sub>2 used in growth
+			parameter &sigma;<sub></sub>2 used in crowding
 			probability scheme <code>SIGMA</code>.</p>
 		</td>
 	</tr>
@@ -1258,17 +1330,21 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-CrossoverProbability</code></p>
+		<td width="40%"><p><code>GA-CrossoverWeight</code></p>
 		</td>
-		<td width="60%"><p>Specifies the probability
-			(0.0-1.0) at which crossover is performed.</code></p>
+		<td width="60%"><p>Specifies the relative weight of crossover when generating new candidate population members.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-MutationProbability</code></p>
+		<td width="40%"><p><code>GA-MutationWeight</code></p>
 		</td>
-		<td width="60%"><p>Specifies the probability
-			(0.0-1.0) at which mutation is performed.</code></p>
+		<td width="60%"><p>Specifies the relative weight of mutation when generating new candidate population members.</p>
+		</td>
+	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>GA-ConstructionWeight</code></p>
+		</td>
+		<td width="60%"><p>Specifies the relative weight of construction from scratch when generating new candidate population members.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1286,6 +1362,25 @@ without providing that specific keyword in the input file.</p>
 			for the elitist scheme (survival of the fittest), use <code>NONE</code>
 			for no replacement (all candidates become member of the
 			population, which keeps growing).</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemVertexes</code></p>
+		</td>
+		<td width="60%"><p>Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) as templates in the library of general-purpose building blocks. No new template will include a scaffold vertex or be
+			used as scaffold. See <code>GA-KeepNewRingSystemScaffolds</code> to enable the latter possibilities.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemScaffolds</code></p>
+		</td>
+		<td width="60%"><p>Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemFitnessTrsh</code></p>
+		</td>
+		<td width="60%"><p>Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.</p>
 		</td>
 	</tr>
 	<tr >
@@ -1762,7 +1857,7 @@ DEL&nbsp;apclass1:0
 
 <p>The ring closures (RC) 
 compatibility matrix file specifies the pairs of AP classes that are
-allowed to form ring-closing bonds. Note that, contrarily to the
+allowed to form ring-closing bonds. Note that, contrary to the
 standard compatibility matrix, the RC compatibility matrix is
 symmetric. The syntax is the same as for a standard compatibility
 matrix.</p>

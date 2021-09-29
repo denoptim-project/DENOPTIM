@@ -18,23 +18,16 @@
 
 package testoperator;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.logging.Level;
 
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
-import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.utils.MutationType;
+import denoptim.utils.RandomUtils;
 
 
 /**
@@ -54,7 +47,52 @@ public class TestOperatorParameters
      * Working directory
      */
     protected static String workDir = ".";
+    
+    /**
+     * Seed for generation of pseudo-random numbers
+     */
+    protected static long randomSeed = 1234567890L;
+    
+    /**
+     * Testable Operators
+     */
+    protected enum Operator {MUTATION,XOVER}
+    
+    /**
+     * Chosen operator
+     */
+    protected static Operator operatorToTest = Operator.XOVER;
 
+    /**
+     * Target vertex ID for mutation
+     */
+    protected static int[] mutationTarget;
+    
+    /**
+     * Target attachment point ID for mutation (AP belonging already to the 
+     * graph).
+     */
+    protected static int idTargetAP = -1;
+    
+    /**
+     * Type of mutation to perform
+     */
+    protected static MutationType mutationType;
+    
+    /**
+     * The given vertex index. 
+     * Used whenever a vertex id has to be given. For
+     * example, when specifying how to mutate a graph.
+     */
+    protected static int idNewVrt = -1;
+    
+    /**
+     * The given attachment point index. 
+     * Used whenever an AP id has to be given. 
+     * For example, when specifying how to mutate a graph.
+     */
+    protected static int idNewAP = -1;
+    
     /**
      * Input File male
      */
@@ -66,22 +104,22 @@ public class TestOperatorParameters
     protected static String inpFileF;
 
     /**
-     * Male VertedID (not index) on witch perform xover
+     * Male VertedID (not index) on which perform xover
      */
     protected static int mvid;
 
     /**
-     * Male AP index on witch perform xover
+     * Male AP index on which perform xover
      */
     protected static int mapid;
 
     /**
-     * Female VertedID (not index) on witch perform xover
+     * Female VertexID (not index) on which perform xover
      */
     protected static int fvid;
 
     /**
-     * Female AP index on witch perform xover
+     * Female AP index on which perform xover
      */
     protected static int fapid;
 
@@ -206,40 +244,69 @@ public class TestOperatorParameters
                                                       throws DENOPTIMException
     {
         paramsInUse = true;
-        String msg = "";
+        String msg = "";        
         switch (key.toUpperCase())
         {
-        case "TESTGENOPS-WORKDIR=":
-            workDir = value;
-            break;
-	case "TESTGENOPS-INPFILEMALE=":
-	    inpFileM = value;
-	    break;
-        case "TESTGENOPS-INPFILEFEMALE=":
-	    inpFileF = value;
-            break;
-        case "TESTGENOPS-VERTEXMALE=":
-             mvid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-APMALE=":
-             mapid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-VERTEXFEMALE=":
-             fvid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-APFEMALE=":
-             fapid = Integer.parseInt(value);
-            break;
-        case "TESTGENOPS-OUTFILEMALE=":
-            outFileM = value;
-            break;
-        case "TESTGENOPS-OUTFILEFEMALE=":
-            outFileF = value;
-            break;
-        default:
-             msg = "Keyword " + key + " is not a known TestOperator-"
+            case "TESTGENOPS-OP=":
+                operatorToTest = Operator.valueOf(value);
+                break;
+            case "TESTGENOPS-INPFILE=":
+                inpFileM = value;
+                break;
+            case "TESTGENOPS-OUTFILE=":
+                outFileM = value;
+                break;
+            case "TESTGENOPS-MUTATIONTARGET=":
+                String[] parts = value.split(",");
+                mutationTarget = new int[parts.length];
+                for (int i=0; i<parts.length; i++)
+                {
+                    mutationTarget[i] = Integer.parseInt(parts[i]);
+                }
+                break;
+            case "TESTGENOPS-APIDONTARGETVERTEX=":
+                idTargetAP = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-MUTATIONTYPE=":
+                mutationType = MutationType.valueOf(value);
+                break;
+            case "TESTGENOPS-NEWVERTEXMOLID=":
+                idNewVrt = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-NEWAPID=":
+                idNewAP = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-WORKDIR=":
+                workDir = value;
+                break;
+            case "TESTGENOPS-INPFILEMALE=":
+                inpFileM = value;
+                break;
+            case "TESTGENOPS-INPFILEFEMALE=":
+    	        inpFileF = value;
+                break;
+            case "TESTGENOPS-VERTEXMALE=":
+                mvid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-APMALE=":
+                mapid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-VERTEXFEMALE=":
+                fvid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-APFEMALE=":
+                fapid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-OUTFILEMALE=":
+                outFileM = value;
+                break;
+            case "TESTGENOPS-OUTFILEFEMALE=":
+                outFileF = value;
+                break;
+            default:
+                 msg = "Keyword " + key + " is not a known TestOperator-"
                                        + "related keyword. Check input files.";
-            throw new DENOPTIMException(msg);
+                 throw new DENOPTIMException(msg);
         }
     }
 
@@ -258,12 +325,12 @@ public class TestOperatorParameters
             return;
         }
 
-	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
-	{
-	   msg = "Directory " + workDir + " not found. Please specify an "
-		 + "existing directory.";
-	   throw new DENOPTIMException(msg);
-	}
+    	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+    	{
+    	   msg = "Directory " + workDir + " not found. Please specify an "
+    		 + "existing directory.";
+    	   throw new DENOPTIMException(msg);
+    	}
 
         if (!DenoptimIO.checkExists(inpFileM))
         {
@@ -271,7 +338,8 @@ public class TestOperatorParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (!DenoptimIO.checkExists(inpFileF))
+        if (operatorToTest == Operator.XOVER
+                && !DenoptimIO.checkExists(inpFileF))
         {
             msg = "Input file '" + inpFileF + "' not found.";
             throw new DENOPTIMException(msg);
@@ -297,6 +365,8 @@ public class TestOperatorParameters
 
     public static void processParameters() throws DENOPTIMException
     {
+        RandomUtils.initialiseRNG(randomSeed);
+        
         if (FragmentSpaceParameters.fsParamsInUse())
         {
             FragmentSpaceParameters.processParameters();

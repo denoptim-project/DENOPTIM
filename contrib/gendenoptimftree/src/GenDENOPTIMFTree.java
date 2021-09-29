@@ -314,10 +314,10 @@ public class GenDENOPTIMFTree
                                 IO.readSingleSDFFile(xfile.getAbsolutePath());
 
                             // check for errors in the molecule if any
-                            molerr = mol.getProperty("MOL_ERROR");
+                            molerr = mol.getProperty(DENOPTIMConstants.MOLERRORTAG);
 
                             // if no error, create an image
-                            if (molerr == null && mol.getProperty("FITNESS") != null)
+                            if (molerr == null && mol.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
                             {
                                 //molname = mol.getProperty("cdk:Title");
                                 molname = xfile.getName().substring(0, xfile.getName().indexOf("_FIT.sdf"));
@@ -326,7 +326,7 @@ public class GenDENOPTIMFTree
 
                                 smiles = SMGEN.create(mol);
 
-                                fitness = Double.valueOf(mol.getProperty("FITNESS").toString());
+                                fitness = Double.valueOf(mol.getProperty(DENOPTIMConstants.FITNESSTAG).toString());
                                 
                                 imgloc = outputFileName + File.separator + "images";
 
@@ -360,7 +360,7 @@ public class GenDENOPTIMFTree
                                 }
 
 
-                                gmsg = mol.getProperty("GraphMsg");
+                                gmsg = mol.getProperty(DENOPTIMConstants.GMSGTAG);
                                 if (gmsg != null)
                                 {
                                     // check if info about parents exists

@@ -19,45 +19,17 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.vecmath.Point3d;
 
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.utils.FragmentUtils;
+import denoptim.io.FileFormat;
 
 
 /**
@@ -132,7 +104,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "<li>Forbidden ends definitions.</li></ul></html>",250));
 		btnLoadCPMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnLoadCPMap);
+				File inFile = GUIFileOpener.pickFile(btnLoadCPMap);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -148,7 +120,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "all classes in the current tab.</html>",300));
 		btnImportAPClasses.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Set<File> files = DenoptimGUIFileOpener.pickManyFiles(
+				Set<File> files = GUIFileOpener.pickManyFiles(
 						btnImportAPClasses);
 				if (files == null || files.size() == 0)
 				{
@@ -190,13 +162,14 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				+ "<li>Definition of forbidden ends.</li></ul></html>",250));
 		btnSaveFrags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveFrags);
+				File outFile = GUIFileOpener.pickFileForSaving(btnSaveFrags);
 				if (outFile == null || cpMapHandler == null)
 				{
 					return;
 				}
 				cpMapHandler.writeCopatibilityMatrixFile(outFile);
 				unsavedChanges = false;
+				DenoptimIO.addToRecentFiles(outFile, FileFormat.COMP_MAP);
 			}
 		});
 		commandsPane.add(btnSaveFrags);

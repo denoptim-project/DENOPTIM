@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.List;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,13 +42,9 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -60,6 +55,7 @@ import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.editor.ChartEditor;
 import org.jfree.chart.editor.ChartEditorManager;
 import org.jfree.chart.entity.PlotEntity;
@@ -73,9 +69,11 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
+import denoptim.molecule.CandidateLW;
 import denoptim.utils.GenUtils;
 
 
@@ -107,10 +105,10 @@ public class GUIInspectGARun extends GUICardPanel
 	
 	private File srcFolder;
 	
-	private ArrayList<DENOPTIMMolecule> allIndividuals;
+	private ArrayList<CandidateLW> allIndividuals;
 	private int molsWithFitness = 0;
 	private JLabel lblTotItems;
-	private Map<Integer,DENOPTIMMolecule> candsWithFitnessMap;
+	private Map<Integer,CandidateLW> candsWithFitnessMap;
 	
 	// WARNING: itemId in the map is "j" and is just a 
 	// locally generated unique 
@@ -124,6 +122,7 @@ public class GUIInspectGARun extends GUICardPanel
 	private DefaultXYDataset datasetPopMax = new DefaultXYDataset();
 	private DefaultXYDataset datasetPopMean = new DefaultXYDataset();	
 	private DefaultXYDataset datasetPopMedian = new DefaultXYDataset();
+	private XYPlot plot;
 	private JFreeChart chart;
 	private ChartPanel chartPanel;
 	
@@ -175,11 +174,11 @@ public class GUIInspectGARun extends GUICardPanel
 			public void stateChanged(ChangeEvent e) {
 				if (ctrlMin.isSelected())
 				{
-					chart.getXYPlot().getRenderer(2).setSeriesVisible(0,true);
+					plot.getRenderer(2).setSeriesVisible(0,true);
 				}
 				else
 				{
-					chart.getXYPlot().getRenderer(2).setSeriesVisible(0,false);
+					plot.getRenderer(2).setSeriesVisible(0,false);
 				}
 			}
 		});
@@ -187,11 +186,11 @@ public class GUIInspectGARun extends GUICardPanel
 			public void stateChanged(ChangeEvent e) {
 				if (ctrlMax.isSelected())
 				{
-					chart.getXYPlot().getRenderer(3).setSeriesVisible(0,true);
+					plot.getRenderer(3).setSeriesVisible(0,true);
 				}
 				else
 				{
-					chart.getXYPlot().getRenderer(3).setSeriesVisible(0,false);
+					plot.getRenderer(3).setSeriesVisible(0,false);
 				}
 			}
 		});
@@ -199,11 +198,11 @@ public class GUIInspectGARun extends GUICardPanel
 			public void stateChanged(ChangeEvent e) {
 				if (ctrlMean.isSelected())
 				{
-					chart.getXYPlot().getRenderer(4).setSeriesVisible(0,true);
+					plot.getRenderer(4).setSeriesVisible(0,true);
 				}
 				else
 				{
-					chart.getXYPlot().getRenderer(4).setSeriesVisible(0,false);
+					plot.getRenderer(4).setSeriesVisible(0,false);
 				}
 			}
 		});
@@ -211,11 +210,11 @@ public class GUIInspectGARun extends GUICardPanel
 			public void stateChanged(ChangeEvent e) {
 				if (ctrlMedian.isSelected())
 				{
-					chart.getXYPlot().getRenderer(5).setSeriesVisible(0,true);
+					plot.getRenderer(5).setSeriesVisible(0,true);
 				}
 				else
 				{
-					chart.getXYPlot().getRenderer(5).setSeriesVisible(0,false);
+					plot.getRenderer(5).setSeriesVisible(0,false);
 				}
 			}
 		});
@@ -226,9 +225,9 @@ public class GUIInspectGARun extends GUICardPanel
 		JButton rstView = new JButton("Reset Chart View");
 		rstView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				chart.getXYPlot().getDomainAxis().setAutoRange(true);
-				chart.getXYPlot().getRangeAxis().setAutoRange(true);
-				chart.getXYPlot().getDomainAxis().setLowerBound(-0.5);			
+				plot.getDomainAxis().setAutoRange(true);
+				plot.getRangeAxis().setAutoRange(true);
+				plot.getDomainAxis().setLowerBound(-0.5);			
 			}
 		});
 		ctrlPanelLeft.add(rstView);
@@ -323,12 +322,13 @@ public class GUIInspectGARun extends GUICardPanel
 		}
 
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
 		srcFolder = file;
 		
 		System.out.println("Importing data from '" + srcFolder + "'...");
 		
 		Map<Integer,double[]> popProperties = new HashMap<Integer,double[]>();
-		allIndividuals = new ArrayList<DENOPTIMMolecule>();
+		allIndividuals = new ArrayList<CandidateLW>();
 		for (File genFolder : file.listFiles(new FileFilter() {
 			
 			@Override
@@ -380,13 +380,13 @@ public class GUIInspectGARun extends GUICardPanel
 						Double.NaN, Double.NaN, Double.NaN, Double.NaN});
 			}
 			
-			
 			// Read DENOPTIMMolecules
 			for (File fitFile : genFolder.listFiles(new FileFilter() {
 				
 				@Override
 				public boolean accept(File pathname) {
-					if (pathname.getName().endsWith("FIT.sdf"))
+					if (pathname.getName().endsWith(
+					       DENOPTIMConstants.FITFILENAMEEXTOUT))
 					{
 						return true;
 					}
@@ -394,10 +394,10 @@ public class GUIInspectGARun extends GUICardPanel
 				}
 			}))
 			{
-				DENOPTIMMolecule one;
+				CandidateLW one;
 				try {
-					one = DenoptimIO.readDENOPTIMMolecules(
-							fitFile,false).get(0);
+				    //WARNING: here we assume one candidate per file
+					one = DenoptimIO.readLightWeightCandidate(fitFile).get(0);
 				} catch (DENOPTIMException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null,
@@ -423,12 +423,12 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		// Process data and organize then into series for the plot 
         double[][] candsWithFitnessData = new double[2][molsWithFitness];
-        candsWithFitnessMap = new HashMap<Integer,DENOPTIMMolecule>();
+        candsWithFitnessMap = new HashMap<Integer,CandidateLW>();
         int j = -1;
         for (int i=0; i<allIndividuals.size(); i++)
         {
-        	DENOPTIMMolecule mol = allIndividuals.get(i);
-        	if (!mol.hasFitness())
+        	CandidateLW item = allIndividuals.get(i);
+        	if (!item.hasFitness())
         	{
         		continue;
         	}
@@ -439,9 +439,9 @@ public class GUIInspectGARun extends GUICardPanel
         	// the itemId 'j' into a DENOPTIMMolecule
         	
         	j++;
-        	candsWithFitnessMap.put(j, mol);
-        	candsWithFitnessData[0][j] = mol.getGeneration();
-        	candsWithFitnessData[1][j] = mol.getMoleculeFitness();
+        	candsWithFitnessMap.put(j, item);
+        	candsWithFitnessData[0][j] = item.getGeneration();
+        	candsWithFitnessData[1][j] = item.getFitness();
         }
 		datasetAllFit.addSeries("Candidates_with_fitness", candsWithFitnessData);
 		
@@ -472,25 +472,22 @@ public class GUIInspectGARun extends GUICardPanel
 		//TODO: somehow collect and display the candidates that hit a mol error
 		//      Could it be a histogram (#failed x gen) below the evolution plot
 		
-		chart = ChartFactory.createScatterPlot(
-	            null,                         // plot title
-	            "Generation",                 // x axis label
-	            "Fitness",                    // y axis label
-	            datasetAllFit,                // all items with fitness
-	            PlotOrientation.VERTICAL,  
-	            false,                        // include legend
-	            false,                        // tool tips
-	            false                         // urls
-	        );
+        NumberAxis xAxis = new NumberAxis("Generation");
+        xAxis.setRange(-0.5, numGen-0.5); //"-" because numGen includes 0
+        xAxis.setAutoRangeIncludesZero(false);
+        NumberAxis yAxis = new NumberAxis("Fitness");
+        yAxis.setAutoRangeIncludesZero(false);
+		plot = new XYPlot(null,xAxis,yAxis,null);
 		
-		// Chart appearance
-		XYPlot plot = (XYPlot) chart.getPlot();
+		chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT,plot,false);
+		
 		plot.getDomainAxis().setLowerBound(-0.5); //min X-axis
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setDomainGridlinePaint(Color.LIGHT_GRAY);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
 		plot.setSeriesRenderingOrder(SeriesRenderingOrder.FORWARD);
-		// The following brings the points for datasetAllFit on top of the
+		// The following brings the points for datasets of selected
+		// items and the main dataset in front of the
 		// mean/min/max/median lines, thus allowing selection of points
 		// even in presence of these line series, which would otherwise (if in
 		// front-most layer) prevent the mouse clicked event to identify the 
@@ -498,35 +495,39 @@ public class GUIInspectGARun extends GUICardPanel
 		// representation of that item.
 		plot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
 		
+		// dataset of selected items
+        Shape shape0 = new Ellipse2D.Double(
+                 -GUIPreferences.chartPointSize*1.1/2.0,
+                 -GUIPreferences.chartPointSize*1.1/2.0,
+                 GUIPreferences.chartPointSize*1.1, 
+                 GUIPreferences.chartPointSize*1.1);
+        XYLineAndShapeRenderer renderer0 = 
+                new XYLineAndShapeRenderer(false, true);
+        //NB: here is where we define that the selected ones are at '0'
+        // Search for the 'HERE@HERE' string to find where I use this assumption
+        plot.setDataset(0, datasetSelected); 
+        plot.setRenderer(0, renderer0);
+        renderer0.setSeriesShape(0, shape0);
+        renderer0.setSeriesPaint(0, Color.red);
+        renderer0.setSeriesFillPaint(0, Color.red);
+        renderer0.setSeriesOutlinePaint(0, Color.BLACK);
+        renderer0.setUseOutlinePaint(true);
+        renderer0.setUseFillPaint(true);
+        
 		// main dataset (all items with fitness)
-		Shape shape0 = new Ellipse2D.Double(
+		Shape shape1 = new Ellipse2D.Double(
 				 -GUIPreferences.chartPointSize/2.0,
 	             -GUIPreferences.chartPointSize/2.0,
 	             GUIPreferences.chartPointSize, 
 	             GUIPreferences.chartPointSize);
-		XYLineAndShapeRenderer renderer0 = 
-				(XYLineAndShapeRenderer) plot.getRenderer();
-        renderer0.setSeriesShape(0, shape0);
-        renderer0.setSeriesPaint(0, Color.LIGHT_GRAY);
-        renderer0.setSeriesFillPaint(0, Color.LIGHT_GRAY);
-        renderer0.setSeriesOutlinePaint(0, Color.GRAY);
-        renderer0.setUseOutlinePaint(true);
-        renderer0.setUseFillPaint(true);
-        
-        // dataset of selected items
-		Shape shape1 = new Ellipse2D.Double(
-				 -GUIPreferences.chartPointSize*1.1/2.0,
-	             -GUIPreferences.chartPointSize*1.1/2.0,
-	             GUIPreferences.chartPointSize*1.1, 
-	             GUIPreferences.chartPointSize*1.1);
-        XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
-        //now the dataset of selected items is null. Created upon selection
-        //plot.setDataset(1, datasetSelected); 
+		XYLineAndShapeRenderer renderer1 = 
+		        new XYLineAndShapeRenderer(false, true);
+        plot.setDataset(1, datasetAllFit);
         plot.setRenderer(1, renderer1);
         renderer1.setSeriesShape(0, shape1);
-        renderer1.setSeriesPaint(0, Color.red);
-        renderer1.setSeriesFillPaint(0, Color.red);
-        renderer1.setSeriesOutlinePaint(0, Color.BLACK);
+        renderer1.setSeriesPaint(0, Color.LIGHT_GRAY);
+        renderer1.setSeriesFillPaint(0, Color.LIGHT_GRAY);
+        renderer1.setSeriesOutlinePaint(0, Color.GRAY);
         renderer1.setUseOutlinePaint(true);
         renderer1.setUseFillPaint(true);
         
@@ -587,15 +588,15 @@ public class GUIInspectGARun extends GUICardPanel
 	    });
 		
 		// Setting toolTip when on top of an series item in the chart
+        //TODO deal with superposed points by adding all their names to tip text
 		XYToolTipGenerator ttg = new XYToolTipGenerator() {
-			
 			@Override
 			public String generateToolTip(XYDataset data, int sId, int itemId)
 			{
 				return candsWithFitnessMap.get(itemId).getName();
 			}
 		};
-		chart.getXYPlot().getRenderer().setSeriesToolTipGenerator(0, ttg);
+		plot.getRenderer().setSeriesToolTipGenerator(0, ttg);
 		
 		// Clock-based selection of item, possibly displaying mol structure
 		chartPanel.addChartMouseListener(new ChartMouseListener() {
@@ -620,7 +621,7 @@ public class GUIInspectGARun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						DENOPTIMMolecule mol = candsWithFitnessMap.get(itemId);
+						CandidateLW mol = candsWithFitnessMap.get(itemId);
 						renderViewWithSelectedItem(mol);
 					}
 					//do we do anything if we select other series? not now...
@@ -639,24 +640,28 @@ public class GUIInspectGARun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void renderViewWithSelectedItem(DENOPTIMMolecule mol)
+	private void renderViewWithSelectedItem(CandidateLW item)
 	{
+        mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		// Update series of selected (chart is updated automatically)
         double[][] selectedCandsData = new double[2][1]; //NB: for now allow only one
         int j = -1;
         for (int i=0; i<1; i++) //NB: for now allow only one
         {	
         	j++;
-        	candsWithFitnessMap.put(j, mol);
-        	selectedCandsData[0][j] = mol.getGeneration();
-        	selectedCandsData[1][j] = mol.getMoleculeFitness();
+        	candsWithFitnessMap.put(j, item);
+        	selectedCandsData[0][j] = item.getGeneration();
+        	selectedCandsData[1][j] = item.getFitness();
         }
         datasetSelected.removeSeries("Selected_candidates");
         datasetSelected.addSeries("Selected_candidates", selectedCandsData);
-		chart.getXYPlot().setDataset(1, datasetSelected);
+        // NB the '0' is determined by initialization at HERE@HERE
+		plot.setDataset(0, datasetSelected);
 		
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(mol.getMoleculeFile());
+		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
+
+        mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------

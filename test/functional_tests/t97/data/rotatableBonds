@@ -1,0 +1,26 @@
+###############################################################################
+###############################################################################
+#
+# Rotatable Bonds definition
+# ==========================
+#
+# Bonds matching the following SMARTS queries are added to the list of 
+# fragment-fragment bonds in the definition of the rotational space from 
+# which conformations are generated.
+#
+# WARNING: These queries are to be applied on molecules with dummy atoms!
+#          So be careful when using number of connected neighbours because
+#          dummy atoms are counted as neighbours.
+#
+#
+# This version (1.2) is for testing purposes. 
+# It includes all N-[transition metal] and Ph-N[TM] bonds in the list of 
+# rotatable bonds
+# Also CSP2@CSP2 is set to rotatable
+#
+###############################################################################
+###############################################################################
+#
+# C-C
+#
+CSP3@CSP3 [$([#6;X4])]!@~[$([#6;X4])] 

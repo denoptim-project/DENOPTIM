@@ -35,6 +35,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Version;
 import denoptim.rings.RingClosureParameters;
@@ -82,6 +83,11 @@ public class GAParameters
      * recorded.
      */
     protected static String uidFileOut = "";
+    
+    /**
+     * Pathname of file where EA monitors dumps are printed
+     */
+    protected static String monitorFile = "";
 
     /**
      * Default name of the UIDFileOut
@@ -129,6 +135,12 @@ public class GAParameters
      * so that the maximum number of attempts = factor * population size
      */
     protected static int maxTriesPerPop = 25;
+    
+    /**
+     * Maximum number of attempts to perform any genetic operation (i.e., either
+     * crossover or mutation) on any parents before giving up.
+     */
+    protected static int maxGeneticOpAttempts = 100;
 
     /**
      * Replacement strategy: 1) replace worst individuals with new ones that are
@@ -139,40 +151,105 @@ public class GAParameters
     /**
      * Definition of the growth probability function:
      */
-    protected static int growthProbabilityScheme = 0;
+    protected static int lvlGrowthProbabilityScheme = 0;
  
     /**
      * Parameter controlling the growth probability function of types
      * 'EXP_DIFF' and 'TANH'
      */
-    protected static double growthMultiplier = 0.5;
+    protected static double lvlGrowthMultiplier = 0.5;
  
     /** 
      * Parameters controlling the growth probability function
      * of type 'SIGMA': steepness of the function where p=50%
      */
-    protected static double growthSigmaSteepness = 1.0;
+    protected static double lvlGrowthSigmaSteepness = 1.0;
 
     /** 
      * Parameters controlling the growth probability function
      * of type 'SIGMA': level at which p=50% (can be  a float)
      */
-    protected static double growthSigmaMiddle = 2.5;
+    protected static double lvlGrowthSigmaMiddle = 2.5;
+    
+    /**
+     * Flag recording the intention to use level-controlled graph extension 
+     * probability.
+     */
+    protected static boolean useLevelBasedProb = false;
+    
+    /**
+     * Flag recording the intention to use molecular size-controlled graph
+     * extension probability.
+     */
+    protected static boolean useMolSizeBasedProb = false;
+    
+    /**
+     * Definition of the molGrowth probability function:
+     */
+    protected static int molGrowthProbabilityScheme = 2;
 
     /**
-     * The probability at which mutation is performed
+     * Parameter controlling the molGrowth probability function of types
+     * 'EXP_DIFF' and 'TANH'
      */
-    protected static double mutationProbability = 0.2;
+    protected static double molGrowthMultiplier = 0.5;
+
+    /**
+     * Parameters controlling the molGrowth probability function
+     * of type 'SIGMA': steepness of the function where p=50%
+     */
+    protected static double molGrowthSigmaSteepness = 0.2;
+
+    /**
+     * Parameters controlling the molGrowth probability function
+     * of type 'SIGMA': level at which p=50% (can be  a float)
+     */
+    protected static double molGrowthSigmaMiddle = 25;
+    
+    /**
+     * Definition of the crowding probability function. By default, the 
+     * probability of using an AP that is hosted on an atom that already has an 
+     * used AP is 100%.
+     */
+    protected static int crowdingProbabilityScheme = 3;
+ 
+    /**
+     * Parameter controlling the crowding probability function of types
+     * 'EXP_DIFF' and 'TANH'
+     */
+    protected static double crowdingMultiplier = 0.5;
+ 
+    /** 
+     * Parameters controlling the crowding probability function
+     * of type 'SIGMA': steepness of the function where p=50%
+     */
+    protected static double crowdingSigmaSteepness = 1.0;
+
+    /** 
+     * Parameters controlling the crowding probability function
+     * of type 'SIGMA': level at which p=50% (can be  a float)
+     */
+    protected static double crowdingSigmaMiddle = 2.5;
 
     /**
      * The probability at which symmetric substitution occurs
      */
     protected static double symmetricSubProbability = 0.8;
-
+    
     /**
-     * The probability at which crossover is performed
+     * The relative weight at which mutation is performed
      */
-    protected static double crossoverProbability = 0.8;
+    protected static double mutationWeight = 1.0;
+    
+    /**
+     * The relative weight at which construction from scratch is performed
+     */
+    protected static double builtAnewWeight = 1.0;
+    
+    /**
+     * The relative weight at which crossover is performed
+     */
+    protected static double crossoverWeight = 1.0;
 
     /**
      * Crossover parents selection strategy: integer code
@@ -183,7 +260,7 @@ public class GAParameters
      * Crossover parents selection strategy: string
      */
     protected static String strXoverSelectionMode =
-                                                "STOCHASTIC UNIVERSAL SAMPLING";
+            "STOCHASTIC UNIVERSAL SAMPLING";
 
     /**
      * The seed value for random number generation
@@ -211,12 +288,55 @@ public class GAParameters
     protected static int precisionLevel = 3;
 
     /**
+     * Monitor dumps step. The EA {@link Monitor} will dump data to file every 
+     * this number is number of new attempts to generate candidate. 
+     */
+    protected static int monitorDumpStep = 50;
+    
+    /**
+     * Flag controlling if we dump monitored data or not
+     */
+    protected static boolean dumpMonitor = false;
+    
+    /**
+     * Minimal standard deviation accepted in the fitness values of the initial population
+     */
+    protected static double minFitnessSD = 0.000001;
+    
+    /**
+     * Flag controlling the possibility of collecting cyclic graph systems that 
+     * include a scaffold and save them as new template scaffolds.
+     */
+    protected static boolean saveRingSystemsAsTemplatesScaffolds = false;
+    
+    /**
+     * Flag controlling the possibility of collecting cyclic graph systems that 
+     * do NOT include a scaffold and save them as new template non-scaffold
+     * building blocks.
+     */
+    protected static boolean saveRingSystemsAsTemplatesNonScaff = false;
+
+    /**
+     * Fitness threshold for adding template to building block libraries. 
+     * This is expressed as percentage, i.e., if the fitness is in the best X%
+     * of the population, then the template is added to the scaffold/vertex
+     * library.
+     */
+    protected static double saveRingSystemsFitnessThreshold = 0.10;
+    
+    /**
      * Print level
      */
     protected static int print_level = 0;
     
 //------------------------------------------------------------------------------
-    
+
+    /**
+     * Restores the default values of the most important parameters. 
+     * Given that this is a static collection of parameters, running subsequent
+     * experiments from the GUI ends up reusing parameters from the previous
+     * run. This method allows to clean-up old values.
+     */
     public static void resetParameters() 
     {
     	dataDir = System.getProperty("user.dir");
@@ -233,14 +353,20 @@ public class GAParameters
     	numConvGen = 5;
     	numGenerations = 100;
     	maxTriesPerPop = 25;
+    	maxGeneticOpAttempts = 100;
     	replacementStrategy = 1;
-    	growthProbabilityScheme = 0;
-    	growthMultiplier = 0.5;
-    	growthSigmaSteepness = 1.0;
-    	growthSigmaMiddle = 2.5;
-    	mutationProbability = 0.2;
+    	lvlGrowthProbabilityScheme = 0;
+    	lvlGrowthMultiplier = 0.5;
+    	lvlGrowthSigmaSteepness = 1.0;
+    	lvlGrowthSigmaMiddle = 2.5;
+        molGrowthProbabilityScheme = 2;
+        molGrowthMultiplier = 0.5;
+        molGrowthSigmaSteepness = 0.2;
+        molGrowthSigmaMiddle = 25;
     	symmetricSubProbability = 0.8;
-    	crossoverProbability = 0.8;
+    	crossoverWeight = 1.0;
+    	mutationWeight = 1.0;
+    	builtAnewWeight = 1.0;
     	xoverSelectionMode = 3;
     	strXoverSelectionMode = "STOCHASTIC UNIVERSAL SAMPLING";
     	seed = 0L;
@@ -249,6 +375,10 @@ public class GAParameters
     	sortOrderDecreasing = true;
     	precisionLevel = 3;
     	print_level = 0;
+    	monitorDumpStep = 50;
+    	dumpMonitor = false;
+    	useLevelBasedProb = false;
+    	useMolSizeBasedProb = false;
     	
         FragmentSpaceParameters.resetParameters();
         RingClosureParameters.resetParameters();
@@ -275,6 +405,20 @@ public class GAParameters
     protected static String getVisitedGraphsFile()
     {
         return visitedGraphsFile;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static String getMonitorFile()
+    {
+        return monitorFile;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected static int getMonitorDumpStep()
+    {
+        return monitorDumpStep;
     }
 
 //------------------------------------------------------------------------------
@@ -311,6 +455,13 @@ public class GAParameters
     {
         return maxTriesPerPop;
     }
+    
+//------------------------------------------------------------------------------
+
+    protected static int getMaxGeneticOpAttempts()
+    {
+        return maxGeneticOpAttempts;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -328,30 +479,86 @@ public class GAParameters
 
 //------------------------------------------------------------------------------
 
+    protected static double getCrowdingFactorSteepSigma()
+    {
+        return crowdingSigmaSteepness;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getCrowdingFactorMiddleSigma()
+    {
+        return crowdingSigmaMiddle;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getCrowdingMultiplier()
+    {
+        return crowdingMultiplier;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static int getCrowdingProbabilityScheme()
+    {
+        return crowdingProbabilityScheme;
+    }
+    
+//------------------------------------------------------------------------------
+
     protected static double getGrowthFactorSteepSigma()
     {
-        return growthSigmaSteepness;
+        return lvlGrowthSigmaSteepness;
     }
 
 //------------------------------------------------------------------------------
 
     protected static double getGrowthFactorMiddleSigma()
     {
-        return growthSigmaMiddle;
+        return lvlGrowthSigmaMiddle;
     }
 
 //------------------------------------------------------------------------------
 
     protected static double getGrowthMultiplier()
     {
-        return growthMultiplier;
+        return lvlGrowthMultiplier;
     }
 
 //------------------------------------------------------------------------------
 
     protected static int getGrowthProbabilityScheme()
     {
-        return growthProbabilityScheme;
+        return lvlGrowthProbabilityScheme;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static double getMolGrowthFactorSteepSigma()
+    {
+        return molGrowthSigmaSteepness;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getMolGrowthFactorMiddleSigma()
+    {
+        return molGrowthSigmaMiddle;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static double getMolGrowthMultiplier()
+    {
+        return molGrowthMultiplier;
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static int getMolGrowthProbabilityScheme()
+    {
+        return molGrowthProbabilityScheme;
     }
 
 //------------------------------------------------------------------------------
@@ -395,18 +602,25 @@ public class GAParameters
     {
         return numOfChildren;
     }
-
+    
 //------------------------------------------------------------------------------
-    protected static double getCrossoverProbability()
+    protected static double getCrossoverWeight()
     {
-        return crossoverProbability;
+        return crossoverWeight;
     }
 
 //------------------------------------------------------------------------------
 
-    protected static double getMutationProbability()
+    protected static double getMutationWeight()
     {
-        return mutationProbability;
+        return mutationWeight;
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected static double getConstructionWeight()
+    {
+        return builtAnewWeight;
     }
 
 //------------------------------------------------------------------------------
@@ -559,7 +773,28 @@ public class GAParameters
                     }
                     continue;
                 }
-
+                
+                if (line.toUpperCase().startsWith("GA-MONITORFILE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        monitorFile = option;
+                    }
+                    continue;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-MONITORDUMPSTEP="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        monitorDumpStep = Integer.parseInt(option);
+                        dumpMonitor = true;
+                    }
+                    continue;
+                }
+                
                 if (line.toUpperCase().startsWith("GA-RANDOMSEED="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
@@ -570,12 +805,18 @@ public class GAParameters
                     continue;
                 }
                 
-
                 if (line.toUpperCase().startsWith("GA-MAXTRIESPERPOPULATION="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                         maxTriesPerPop  = Integer.parseInt(option);
+                }
+                
+                if (line.toUpperCase().startsWith("GA-MAXGENETICOPSATTEMPTS="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                        maxGeneticOpAttempts  = Integer.parseInt(option);
                 }
 
                 if (line.toUpperCase().startsWith("GA-INITPOPLNFILE="))
@@ -613,32 +854,115 @@ public class GAParameters
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        growthMultiplier = Double.parseDouble(option);
+                        lvlGrowthMultiplier = Double.parseDouble(option);
+                        useLevelBasedProb = true;
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-GROWTHSIGMASTEEPNESS="))
+                if (line.toUpperCase().startsWith("GA-LEVELGROWTHSIGMASTEEPNESS="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        growthSigmaSteepness = Double.parseDouble(option);
+                        lvlGrowthSigmaSteepness = Double.parseDouble(option);
+                        useLevelBasedProb = true;
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-GROWTHSIGMAMIDDLE="))
+                if (line.toUpperCase().startsWith("GA-LEVELGROWTHSIGMAMIDDLE="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        growthSigmaMiddle = Double.parseDouble(option);
+                        lvlGrowthSigmaMiddle = Double.parseDouble(option);
+                        useLevelBasedProb = true;
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-GROWTHPROBSCHEME="))
+                if (line.toUpperCase().startsWith("GA-LEVELGROWTHPROBSCHEME="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
-                    growthProbabilityScheme = convertGrowthProbabilityScheme(option);
+                    lvlGrowthProbabilityScheme = convertProbabilityScheme(option);
+                    useLevelBasedProb = true;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHMULTIPLIER="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        molGrowthMultiplier = Double.parseDouble(option);
+                        useMolSizeBasedProb = true;
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHSIGMASTEEPNESS="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        molGrowthSigmaSteepness = Double.parseDouble(option);
+                        useMolSizeBasedProb = true;
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHSIGMAMIDDLE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        molGrowthSigmaMiddle = Double.parseDouble(option);
+                        useMolSizeBasedProb = true;
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-MOLGROWTHPROBSCHEME="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    molGrowthProbabilityScheme = convertProbabilityScheme(option);
+                    useMolSizeBasedProb = true;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-CROWDMULTIPLIER="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        crowdingMultiplier = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-CROWDSIGMASTEEPNESS="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        crowdingSigmaSteepness = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-CROWDSIGMAMIDDLE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        crowdingSigmaMiddle = Double.parseDouble(option);
+                    }
+                }
+                
+                if (line.toUpperCase().startsWith("GA-SYMMETRYPROBABILITY="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        symmetricSubProbability = Double.parseDouble(option);
+                    }
+                }
+
+                if (line.toUpperCase().startsWith("GA-CROWDPROBSCHEME="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    crowdingProbabilityScheme = convertProbabilityScheme(option);
                 }
 
                 if (line.toUpperCase().startsWith("GA-NUMGENERATIONS="))
@@ -659,34 +983,33 @@ public class GAParameters
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-CROSSOVERPROBABILITY="))
+                if (line.toUpperCase().startsWith("GA-CROSSOVERWEIGHT="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        GAParameters.crossoverProbability = Double.parseDouble(option);
+                        GAParameters.crossoverWeight = Double.parseDouble(option);
                     }
                 }
 
-                if (line.toUpperCase().startsWith("GA-MUTATIONPROBABILITY="))
+                if (line.toUpperCase().startsWith("GA-MUTATIONWEIGHT="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        GAParameters.mutationProbability = Double.parseDouble(option);
+                        GAParameters.mutationWeight = Double.parseDouble(option);
                     }
                 }
-
-                if (line.toUpperCase().startsWith("GA-SYMMETRYPROBABILITY="))
+                
+                if (line.toUpperCase().startsWith("GA-CONSTRUCTIONWEIGHT="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        GAParameters.symmetricSubProbability =
-                                Double.parseDouble(option);
+                        GAParameters.builtAnewWeight = Double.parseDouble(option);
                     }
                 }
-
+                
                 if (line.toUpperCase().startsWith("GA-REPLACEMENTSTRATEGY="))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
@@ -718,6 +1041,26 @@ public class GAParameters
                     if (option.length() > 0)
                     {
                         GAParameters.numConvGen = Integer.parseInt(option);
+                    }
+                }
+                
+                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMVERTEXES"))
+                {
+                    saveRingSystemsAsTemplatesNonScaff = true;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMSCAFFOLDS"))
+                {
+                    saveRingSystemsAsTemplatesScaffolds = true;
+                }
+                
+                
+                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMFITNESSTRSH="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        saveRingSystemsFitnessThreshold = Double.parseDouble(option);
                     }
                 }
 
@@ -779,7 +1122,7 @@ public class GAParameters
     
 //------------------------------------------------------------------------------
     
-    public static int convertGrowthProbabilityScheme(String option) 
+    public static int convertProbabilityScheme(String option) 
     		throws DENOPTIMException 
     {
         int res = 0;
@@ -818,7 +1161,7 @@ public class GAParameters
         boolean success = false;
         while (!success)
         {
-            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             String str = "RUN" + sdf.format(new Date());
             dataDir = cdataDir + fileSep + str;
             success = DenoptimIO.createDirectory(dataDir);
@@ -829,6 +1172,7 @@ public class GAParameters
         	throw new DENOPTIMException("ERROR! Unable to make interface "
         			+ "folder");
         }
+        DenoptimIO.addToRecentFiles(dataDir, FileFormat.GA_RUN);
     }
 
 //------------------------------------------------------------------------------
@@ -847,6 +1191,11 @@ public class GAParameters
         createWorkingDirectory();
 
         logFile = dataDir + ".log";
+        
+        if (monitorFile.equals(""))
+        {
+            monitorFile = dataDir + ".eaMonitor";
+        }
 
         failedSDF = dataDir + "_FAILED.sdf";
 
@@ -922,27 +1271,36 @@ public class GAParameters
             error = "Number of generations must be a positive number.";
             throw new DENOPTIMException(error);
         }
+        
         if (GAParameters.numConvGen <= 0)
         {
-            error = "Number of convergence iterations must be a positive number.";
+            error = "Number of convergence iterations must be a positive "
+                    + "number.";
             throw new DENOPTIMException(error);
         }
-        if (GAParameters.crossoverProbability < 0. ||
-                                    GAParameters.crossoverProbability > 1.)
-        {
-            error = "Crossover probability must be between 0 and 1.";
-            throw new DENOPTIMException(error);
-        }
+        
         if (GAParameters.symmetricSubProbability < 0. ||
                             GAParameters.symmetricSubProbability > 1.)
         {
             error = "Symmetric molecule probability must be between 0 and 1.";
             throw new DENOPTIMException(error);
         }
-        if (GAParameters.mutationProbability < 0. ||
-                                GAParameters.mutationProbability > 1.)
+        
+        if (GAParameters.mutationWeight < 0.)
         {
-            error = "Mutation probability must be between 0 and 1.";
+            error = "Weight of mutation must be a positive number";
+            throw new DENOPTIMException(error);
+        }
+        
+        if (GAParameters.crossoverWeight < 0.)
+        {
+            error = "Weight of crossover must be a positive number";
+            throw new DENOPTIMException(error);
+        }
+        
+        if (GAParameters.builtAnewWeight < 0.)
+        {
+            error = "Weight of construction must be a positive number";
             throw new DENOPTIMException(error);
         }
 
@@ -958,6 +1316,15 @@ public class GAParameters
         if (replacementStrategy < 0 || replacementStrategy > 2)
         {
             error = "Allowed values for replacementStrategy (1-2)";
+            throw new DENOPTIMException(error);
+        }
+        
+        if ((useMolSizeBasedProb && useLevelBasedProb) 
+                || (!useMolSizeBasedProb && !useLevelBasedProb) )
+        {
+            error = "Cannot use both graph level or molecular size as criterion "
+                    + "for controlling the growth of graphs. "
+                    + "Please, use either of them.";
             throw new DENOPTIMException(error);
         }
 

@@ -18,18 +18,19 @@
 
 package denoptim.rings;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
-import java.io.File;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 
 
 /**
@@ -58,8 +59,17 @@ public class RingClosureParameters
     /**
      * Flag activating procedures favouring formation of chelates
      */
-//TODO can we avoid this flag?
     protected static boolean buildChelatesMode = false;
+    
+    /**
+     * List of metal-coordinating APClasses. Used to identify 'orphan'
+     * metal-coordinating sites that give rise to coordination isomerism (i.e.,
+     * we have build a specific isomer, but the existence of unused metal-
+     * coordinating groups opens for the possibility of binding the metal/s with
+     * a different combination of groups).
+     */
+    protected static Set<APClass> metalCoordinatingAPClasses = 
+            new HashSet<APClass>();
 
     /**
      * Flag activating the biased selection of closable fragment chains
@@ -84,7 +94,7 @@ public class RingClosureParameters
      * Maximum number of rotatable bonds for which conformational space
      * is explored.
      */
-    protected static int maxRotBonds = 9; //TODO [n+2] => benzene has n=6 so: 8
+    protected static int maxRotBonds = 7;
 
     /**
      * Maximum size (number of atoms) in ring closing chain. 
@@ -232,7 +242,7 @@ public class RingClosureParameters
     	selectFragsFromCC = false;
     	rcStrategy = "BONDOVERLAP";
     	rceMode = -1;
-    	maxRotBonds = 9; //TODO [n+2] => benzene has n=6 so: 8
+    	maxRotBonds = 7;
     	maxRingSize = 9;
     	minRcaPerType = 0;
     	maxRcaPerType = 50;
@@ -499,6 +509,10 @@ public class RingClosureParameters
             break;
         case "RC-BUILDCHELATESMODE":
             buildChelatesMode = true;
+            break;
+        case "RC-ORPHANAPCLASS=":
+            buildChelatesMode = true;
+            metalCoordinatingAPClasses.add(APClass.make(value));
             break;
         case "RC-SELECTFRAGMENTSFROMCLOSABLECHAINS":
 	    selectFragsFromCC = true;
@@ -813,33 +827,32 @@ public class RingClosureParameters
             throw new DENOPTIMException(msg);
         }
 
-	if (checkInterdepPaths && !exhaustiveConfSrch)
-	{
-            msg = "Evaluation of the simultaneus ring closability "
-		  + "condition requires exhaustive conformational search. "
-		  + "Setting exhaustiveConfSrch=true.";
-            DENOPTIMLogger.appLogger.info(msg);
-	    exhaustiveConfSrch = true;
-	}
-
-	if (exhaustiveConfSrch)
-	{
-	    msg = "Exhaustive conformational search has been turned ON. "
-		  + "This is a time consuming task! Make sure it's what "
-		  + "you want to do.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-	}
-
-//TODO: update when development is over
-	if (selectFragsFromCC)
-	{
-            msg = "DENOPTIM can guide the selection of fragments to " 
-		  + "those leading to known closable chains. This "
-		  + "functionality is currently under development "
-		  + "and is fully operative only for rings "
-		  + "involving the scaffolds. ";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-	}
+    	if (checkInterdepPaths && !exhaustiveConfSrch)
+    	{
+                msg = "Evaluation of the simultaneus ring closability "
+    		  + "condition requires exhaustive conformational search. "
+    		  + "Setting exhaustiveConfSrch=true.";
+                DENOPTIMLogger.appLogger.info(msg);
+    	    exhaustiveConfSrch = true;
+    	}
+    
+    	if (exhaustiveConfSrch)
+    	{
+    	    msg = "Exhaustive conformational search has been turned ON. "
+    		  + "This is a time consuming task! Make sure it's what "
+    		  + "you want to do.";
+                DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+    	}
+    
+    	if (selectFragsFromCC)
+    	{
+                msg = "DENOPTIM can guide the selection of fragments to " 
+    		  + "those leading to known closable chains. This "
+    		  + "functionality is currently under development "
+    		  + "and is fully operative only for rings "
+    		  + "involving the scaffolds. ";
+                DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+    	}
     }
 
 //----------------------------------------------------------------------------

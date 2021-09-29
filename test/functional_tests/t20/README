@@ -1,0 +1,8 @@
+t96 checks the crossover between two graphs.
+
+The male has structure: Template - Template
+The female has structure: Template - Fragment
+
+The result should be
+male: Template - Fragment
+female: Template - Template

@@ -143,7 +143,7 @@ public class FSEUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Serilize all <code>DENOPTIMGraph</code>s to file.
+     * Serialize all <code>DENOPTIMGraph</code>s to file.
      * The pathname of the output file is given by the value of 
      * <code>level</code> and the parameters from <code>FSEParameters</code>.
      * @param lstGraphs
@@ -155,14 +155,17 @@ public class FSEUtils
                                                         throws DENOPTIMException
     {
         for (DENOPTIMGraph g : lstGraphs)
-        {
-            //NOTE: the arraylist is supposed to hold the indeces used to 
-            //      create the next combination of fragments, but this method
-            //      is used only for graphs built with the base scaffolds or 
-            //      the naked root graphs. Therefore there is no set of indeces
-            //      to store and we fed the method with an empty array.
-            // NOTE2: the root Id is set to zero for the same reason.
-            storeGraphOfLevel(g,level,0,new ArrayList());
+              {
+      	    //NOTE: the arraylist is supposed to hold the indeces used to 
+      	    //      create the next combination of fragments, but this method
+      	    //      is used only for graphs built with the base scaffolds or 
+      	    //      the naked root graphs. Therefore there is no set of indeces
+      	    //      to store and we fed the method with an empty array.
+      	    // NOTE2: the root Id is set to zero for the same reason.
+            
+            DENOPTIMGraph c = g.clone();
+            
+            storeGraphOfLevel(c,level,0,new ArrayList());
         }
     }
 
@@ -201,7 +204,8 @@ public class FSEUtils
         String indexFile = getNameOfStorageIndexFile(level);
         String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
                            + rootId + " " + nextIds;
-        SingletonFileAccess.getInstance().serializeToFile(fileSer,graph,true);
+        
+        SingletonFileAccess.getInstance().writeData(fileSer,graph.toJson(),true);
         SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
     }
 

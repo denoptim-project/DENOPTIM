@@ -36,9 +36,8 @@ public final class DENOPTIMStatUtils
     public static double sum(double[] numbers)
     {
         double sum = 0;
-        for (int i=0; i<numbers.length; i++)
-        {
-            sum += numbers[i];
+        for (double number : numbers) {
+            sum += number;
         }
         return sum;
     }
@@ -68,10 +67,9 @@ public final class DENOPTIMStatUtils
     public static double min(double[] numbers)
     {
         double min = Integer.MAX_VALUE;
-        for (int i=0; i<numbers.length; i++)
-        {
-            if (numbers[i] < min)
-                min = numbers[i];
+        for (double number : numbers) {
+            if (number < min)
+                min = number;
         }
         return min;
     }
@@ -87,15 +85,14 @@ public final class DENOPTIMStatUtils
     public static double max(double[] numbers)
     {
         double max = Integer.MIN_VALUE;
-        for (int i=0; i<numbers.length; i++)
-        {
-            if (numbers[i] > max)
-                max = numbers[i];
+        for (double number : numbers) {
+            if (number > max)
+                max = number;
         }
         return max;
     }
 
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 
     /**
      * Returns the standard deviation of the numbers.
@@ -124,7 +121,7 @@ public final class DENOPTIMStatUtils
         }
         return stddev;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -165,11 +162,17 @@ public final class DENOPTIMStatUtils
     }
 
 //------------------------------------------------------------------------------
-    //   Precondition: Array must be sorted
+
+    /**
+     * Calculates median value of a <i>sorted</i> list.
+     *
+     * @param m
+     * @return median value of m
+     */
     public static double median(double[] m)
     {
-        int middle = m.length/2;  // subscript of middle element
-        if (m.length%2 == 1)
+        int middle = m.length / 2;  // subscript of middle element
+        if (m.length % 2 == 1)
         {
             // Odd number of elements -- return the middle one.
             return m[middle];
@@ -182,7 +185,7 @@ public final class DENOPTIMStatUtils
         }
     }
 
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 
     /**
     * Computes the Kurtosis of the available values.
@@ -229,52 +232,33 @@ public final class DENOPTIMStatUtils
         }
         return value;
     }
-
+    
 //------------------------------------------------------------------------------
-
+    
     /**
-    * Computes the skewness of the available values.
-    * <p>
-    * We use the following (unbiased) formula to define skewness:</p>
-    * <p>
-    * skewness = [n / (n -1) (n - 2)] sum[(x_i - mean)^3] / std^3 </p>
-    * <p>
-    * where n is the number of values, mean is the {@link Mean} and std is the
-    * StandardDeviation </p>
-    *
-    */
-
+     * Computes the skewness of the available values.
+     * @param m sample
+     * @param biasCorrected  biasCorrected true if variance is calculated by 
+     * dividing by n - 1. False if by n. stddev is a sqrt of the variance.
+     * @return skewness of sample or NaN if sample size is strictly less than 4.
+     */
+    
     public static double skewness(double[] m, boolean biasCorrected)
     {
-        double value = Double.NaN;
-        int N = m.length;
-
-        if (N > 3)
-        {
-            double variance = var(m, biasCorrected);
-            if (variance < 10E-20)
-                value = 0.0;
-            else
-            {
-                double n = N;
-                double f1 = 0;
-                double f2 = 0;
-                double avg = mean(m);
-
-                for (int i=0; i<N; i++)
-                {
-                    f1 += Math.pow((m[i] - avg), 3);
-                    f2 += Math.pow((m[i] - avg), 2);
-                }
-
-                f1 /= n;
-                f2 /= n;
-                f2 = Math.pow(f2, 1.5);
-
-                value = f1/f2;
-            }
+        double n = m.length;
+        if (n <= 3) {
+            return Double.NaN;
         }
-        return value;
+        double sampleSizeCorrectionTerm = Math.sqrt(n * (n - 1)) / (n - 2);
+        double biasedStandardDeviation = Math.sqrt(n / (n - 1)) 
+                * stddev(m, biasCorrected);
+        double accDeviationFromMean = 0.0;
+        double mean = mean(m);
+        for (double v : m) {
+            accDeviationFromMean += v - mean;
+        }
+        return sampleSizeCorrectionTerm
+                * (accDeviationFromMean / (n * biasedStandardDeviation));
     }
 
 //------------------------------------------------------------------------------

@@ -19,19 +19,19 @@
 package denoptim.rings;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -212,11 +212,11 @@ public class RingClosuresArchive
     public static void storeEntry(String chainId, boolean closable, 
                        RingClosingConformations rcc) throws DENOPTIMException
     {
-	String closability = "F";
-	if (closable)
-	{
-	    closability = "T";
-	}
+    	String closability = "F";
+    	if (closable)
+    	{
+    	    closability = "T";
+    	}
 
         File file = new File(RingClosureParameters.getRCCLibraryIndexFile());
         long fileLength = file.length();
@@ -264,11 +264,11 @@ public class RingClosuresArchive
             // Update RCC index file
             if (closable)
             {
-		rafile.seek(fileLength);
+                rafile.seek(fileLength);
                 rafile.writeBytes(chainId + " " + rccId + " " + "T" +"\n");
                 channel.force(true);
-		if (RingClosureParameters.serializeRCCs())
-		{
+        		if (RingClosureParameters.serializeRCCs())
+        		{
                     String rccFileName = 
 		                  RingClosureParameters.getRCCLibraryFolder()
 			                              + "/" + rccId + ".ser";
@@ -296,7 +296,7 @@ public class RingClosuresArchive
                         fos.close();
                         fos = null;
                     }
-		}
+        		}
             }
             else 
             {
@@ -330,28 +330,6 @@ public class RingClosuresArchive
         }
     }
 
-//---------------------------------------------------------------------------
-
-    /**
-     * Returns the library of previously known paths of fragments
-     */
-//TODO del
-    protected static HashMap<String, ArrayList<String>> getLibraryOfRCCs()
-    {
-        return rccsPerChainId;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Returns the library of closable chains ordered per turning point Id
-     */
-//TODO del
-    public static HashMap<Integer,ArrayList<ClosableChain>> getLibraryCC()
-    {
-        return libCCxTPMolId;
-    }
-
 //-----------------------------------------------------------------------------
 
     /**
@@ -373,18 +351,6 @@ public class RingClosuresArchive
 //----------------------------------------------------------------------------
 
     /**
-     * @return <code>true</code> if the molecular Id has been used before
-     * as turning point
-     */
-//TODO del
-    public static boolean hasEntriesWithTP(int tpId)
-    {
-        return libCCxTPMolId.containsKey(tpId);        
-    }
-
-//----------------------------------------------------------------------------
-
-    /**
      * @param chain the candidate chain
      * @return the already visited chainId that correspond to the same
      * chain of fragments of <code>chain</code>, otherwise an empty string
@@ -393,16 +359,16 @@ public class RingClosuresArchive
 
     public static String containsChain(PathSubGraph chain)
     {
-	String result = "";
-	for (String altChId : chain.getAllAlternativeChainIDs())
-        {
-	    if (rccsPerChainId.containsKey(altChId))
-	    {
-	        result = altChId;
-		break;	    
-	    }
-	}
-	return result;
+    	String result = "";
+    	for (String altChId : chain.getAllAlternativeChainIDs())
+            {
+    	    if (rccsPerChainId.containsKey(altChId))
+    	    {
+    	        result = altChId;
+    		break;	    
+    	    }
+    	}
+    	return result;
     }
 
 //----------------------------------------------------------------------------

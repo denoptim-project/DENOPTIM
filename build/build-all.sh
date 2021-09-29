@@ -93,11 +93,48 @@ if [ "$?" != "0" ]; then
 fi
 echo
 
+echo "build-graphlisthandler.sh"
+bash build-graphlisthandler.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-graphlisthandler.sh."
+    exit -1
+fi
+
+echo
+echo "build-stringconverter.sh"
+bash build-stringconverter.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-stringconverter.sh."
+    exit -1
+fi
+
+echo
+echo "build-isomorphism.sh"
+bash build-isomorphism.sh
+
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-isomorphism.sh."
+    exit -1
+fi
+
+echo "build-fitnessrunner.sh"
+bash build-fitnessrunner.sh
+if [ "$?" != "0" ]; then
+    echo "Execution failed for build-fitnessrunner.sh."
+    exit -1
+fi
+echo
+
+
+echo
+
 if [ "$1" = "makedist" ]; then
     if [ -d "dist" ]; then
         rm -rf dist
     fi
     mkdir dist 
-    cp -r lib dist
+    cp -r ../lib dist
     mv *.jar dist
 fi

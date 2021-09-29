@@ -18,21 +18,17 @@
 
 package serconverter;
 
-import java.util.ArrayList;
+import java.io.File;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import java.io.File;
-
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
-import denoptim.io.DenoptimIO; 
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.threedim.TreeBuilder3D;
-import denoptim.exception.DENOPTIMException;
-import denoptim.fitness.FitnessParameters;
-import denoptim.fragspace.FragmentSpace;
+
 
 /**
  * Conversion tool for serialized <code>DENOPTIMGraph</code>s orjects.
@@ -56,42 +52,27 @@ public class SerConverter
 
         try
         {
-		    SerConvParameters.readParameterFile(args[0]);
-		    SerConvParameters.checkParameters();
-		    SerConvParameters.processParameters();
-	           
-	        DENOPTIMGraph graph = DenoptimIO.deserializeDENOPTIMGraph(
-	        		new File(SerConvParameters.inpFile));
-		    
-		    switch (SerConvParameters.outFormat)
-		    {
-			case "TXT":
-			    String str = graph.toString();
-			    DenoptimIO.writeData(SerConvParameters.outFile,str,false);
-			    break;
-			case "SDF":
-	            // Prepare molecular representation
-	        	IAtomContainer mol;
-	        	if (SerConvParameters.make3DTree)
-	        	{
-		        	try {
-		        		TreeBuilder3D tb3d = new TreeBuilder3D();
-		                mol = tb3d.convertGraphTo3DAtomContainer(graph,true);
-		        	} catch (Throwable t) {
-		        		System.out.println("WARNING! Failed to build 3D-tree "
-		        				+ "like molecular gepmetry. Hind on cause: " 
-		        				+ t.getMessage());
-		        		mol = GraphConversionTool.convertGraphToMolecule(graph, 
-		        				true);
-		        	}
-	        	} else {
-	        		mol = GraphConversionTool.convertGraphToMolecule(graph, 
-	        				true);
-	        	}
-	        	
-			    DenoptimIO.writeMolecule(SerConvParameters.outFile, mol, false);
-			    break;
-		    }
+	    SerConvParameters.readParameterFile(args[0]);
+	    SerConvParameters.checkParameters();
+	    SerConvParameters.processParameters();
+           
+            DENOPTIMGraph graph = DenoptimIO.deserializeDENOPTIMGraph(
+                                           new File(SerConvParameters.inpFile));
+	    
+	    switch (SerConvParameters.outFormat)
+	    {
+		case "TXT":
+		    String str = graph.toString();
+		    DenoptimIO.writeData(SerConvParameters.outFile,str,false);
+		    break;
+		case "SDF":
+
+	        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+	        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph,true);
+		    DenoptimIO.writeMolecule(SerConvParameters.outFile, mol, false);
+		    break;
+	    }
+
         }
         catch (DENOPTIMException de)
         {

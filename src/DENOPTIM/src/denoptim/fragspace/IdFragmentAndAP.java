@@ -20,6 +20,8 @@ package denoptim.fragspace;
 
 import java.io.Serializable;
 
+import denoptim.molecule.DENOPTIMVertex.BBType;
+
 
 /**
  * Data structure containing information that identifies a single AP of 
@@ -30,6 +32,11 @@ import java.io.Serializable;
 
 public class IdFragmentAndAP implements Serializable
 {
+    /**
+     * Vedrsion UID
+     */
+    private static final long serialVersionUID = -863201756763649026L;
+
     /**
      * the ID of the vertex containing the fragment.
      */
@@ -43,7 +50,7 @@ public class IdFragmentAndAP implements Serializable
     /**
      * the type of library containing the fragment. 
      */
-    private int molTyp = -1;
+    private BBType molTyp = BBType.UNDEFINED;
 
     /**
      * the index of a specific attachment point.
@@ -58,7 +65,7 @@ public class IdFragmentAndAP implements Serializable
     /**
      * the index of the symmetric set the AP belongs to.
      */
-    private int aSymSetId = -1;
+    private int apSymSetId = -1;
 
 //------------------------------------------------------------------------------
 
@@ -68,14 +75,15 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public IdFragmentAndAP(int m_vId, int m_molId, int m_molTyp, int m_apId, int m_vSymSetId, int m_aSymSetId)
+    public IdFragmentAndAP(int vId, int molId, BBType molTyp, int apId,
+            int vSymSetId, int apSymSetId)
     {
-        vId = m_vId;
-        molId = m_molId;
-        molTyp = m_molTyp;
-        apId = m_apId;
-	vSymSetId = m_vSymSetId;
-	aSymSetId = m_aSymSetId;
+        this.vId = vId;
+        this.molId = molId;
+        this.molTyp = molTyp;
+        this.apId = apId;
+    	this.vSymSetId = vSymSetId;
+    	this.apSymSetId = apSymSetId;
     }
 
 //------------------------------------------------------------------------------
@@ -94,7 +102,7 @@ public class IdFragmentAndAP implements Serializable
 
 //------------------------------------------------------------------------------
 
-    public int getVertexMolType()
+    public BBType getVertexMolType()
     {
         return molTyp;
     }
@@ -117,14 +125,14 @@ public class IdFragmentAndAP implements Serializable
 
     public int getApSymSetId()
     {
-        return aSymSetId;
+        return apSymSetId;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setVrtSymSetId(int m_vSymSetId)
+    public void setVrtSymSetId(int vSymSetId)
     {
-	vSymSetId = m_vSymSetId;
+        this.vSymSetId = vSymSetId;
     }
     
 //------------------------------------------------------------------------------
@@ -155,10 +163,12 @@ public class IdFragmentAndAP implements Serializable
     {
         StringBuilder sb = new StringBuilder();
         sb.append("IdFragmentAndAP [vId=").append(vId);
-	sb.append(", molId=").append(molId);
-	sb.append(", molTyp=").append(molTyp);
-	sb.append(", apId=").append(apId).append("]");
-	return sb.toString();
+    	sb.append(", molId=").append(molId);
+    	sb.append(", molTyp=").append(molTyp);
+    	sb.append(", apId=").append(apId);
+    	sb.append(", vSymSetId=").append(vSymSetId);
+    	sb.append(", aSymSetId=").append(apSymSetId).append("]");
+    	return sb.toString();
     }
 
 //------------------------------------------------------------------------------

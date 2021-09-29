@@ -33,7 +33,6 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -43,17 +42,13 @@ import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.TaskUtils;
 
 
 /**
- * Generates all combinatons of fragments by means of asyncronous threads.
+ * Generates all combinators of fragments by means of asynchronous threads.
  * Combinations are produced by layer of fragments on root graphs, which can
  * be single fragments (i.e., scaffolds) or complex graphs.
  *
@@ -513,7 +508,7 @@ public class CombinatorialExplorerByLayer
             }
         }
 
-        // shutdown threadpool
+        // shutdown thread pool
         tpe.shutdown();
 
         // closing messages
@@ -560,9 +555,9 @@ public class CombinatorialExplorerByLayer
                     // Vertex ID in root can be whatever and we ignore them
                     // when setting new vertex IDs. To do this, we change sign
                     // to the old IDs to avoid them clashing with the new ones,
-                    GraphUtils.changeSignToVertexID(rootGraph);
+                    rootGraph.changeSignOfVertexID();
                     // ...and renumber starting from vertex ID = 1.
-                    GraphUtils.renumberGraphVertices(rootGraph);
+                    rootGraph.renumberGraphVertices();
                     rootGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
                     scafLevel.add(rootGraph);
                 }
@@ -575,7 +570,7 @@ public class CombinatorialExplorerByLayer
                     scafLevel.add(startNewGraphFromScaffold(i));
                 }
             }
-
+            
             // Store them
             FSEUtils.storeAllGraphsOfLevel(scafLevel,level);
 
@@ -598,7 +593,7 @@ public class CombinatorialExplorerByLayer
         }
         Collection<File> files = FileUtils.listFiles(new File(prevLevDirName),
                        new String[] {DENOPTIMConstants.SERGFILENAMEEXT}, false);
-        ArrayList<File> lstFiles = new ArrayList(files);
+        ArrayList<File> lstFiles = new ArrayList<File>(files);
         Collections.sort(lstFiles);
         for (File file : lstFiles) 
         {
@@ -609,8 +604,9 @@ public class CombinatorialExplorerByLayer
                 continue;
             }
 
-            DENOPTIMGraph rootGraph = DenoptimIO.deserializeDENOPTIMGraph(file);
-
+            DENOPTIMGraph rootGraph = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
+                    file.getAbsolutePath(),true).get(0);
+                    
             // Get combination factory
             FragsCombinationIterator fcf = new FragsCombinationIterator(
                                                                      rootGraph);
@@ -829,24 +825,14 @@ public class CombinatorialExplorerByLayer
         DENOPTIMGraph molGraph = new DENOPTIMGraph();
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
-        ArrayList<DENOPTIMAttachmentPoint> scafAPs =
-        		FragmentUtils.getAPForFragment(scafIdx,0);
+        DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(),scafIdx,DENOPTIMVertex.BBType.SCAFFOLD);
 
-        DENOPTIMVertex scafVertex = new DENOPTIMVertex(
-        		GraphUtils.getUniqueVertexIndex(), scafIdx, scafAPs, 0);
-
-        // as for DenoptimGA, though level=-1 is a bit misleading
         scafVertex.setLevel(-1);
-
-        // identify the symmetric APs if any for this fragment vertex
-        IAtomContainer mol = FragmentSpace.getScaffoldLibrary().get(scafIdx);
-        ArrayList<SymmetricSet> symAPs = 
-                                       FragmentUtils.getMatchingAP(mol,scafAPs);
-        scafVertex.setSymmetricAP(symAPs);
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
-        molGraph.setMsg("NEW");
+        molGraph.setLocalMsg("NEW");
         
         return molGraph;
     }
@@ -875,6 +861,6 @@ public class CombinatorialExplorerByLayer
         tpe.getQueue().clear();
     }
 
-//------------------------------------------------------------------------------   
-    
+//------------------------------------------------------------------------------    
+
 }

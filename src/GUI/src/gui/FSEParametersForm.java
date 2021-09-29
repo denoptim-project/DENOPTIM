@@ -51,7 +51,7 @@ public class FSEParametersForm extends ParametersForm
     /**
 	 * Version
 	 */
-	private static final long serialVersionUID = 5067352357196631445L;
+	private static final long serialVersionUID = 1L;
 	
     /**
      * Map connecting the parameter keyword and the field
@@ -200,7 +200,7 @@ public class FSEParametersForm extends ParametersForm
         btnFSESource = new JButton("Browse");
         btnFSESource.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtFSESource,
+                GUIFileOpener.pickFileForTxtField(txtFSESource,
                 		btnFSESource);
            }
         });
@@ -283,7 +283,7 @@ public class FSEParametersForm extends ParametersForm
         btnPar3 = new JButton("Browse");
         btnPar3.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtPar3,btnPar3);
+                GUIFileOpener.pickFileForTxtField(txtPar3,btnPar3);
            }
         });
         linePar3.add(lblPar3);
@@ -304,7 +304,7 @@ public class FSEParametersForm extends ParametersForm
         btnPar9 = new JButton("Browse");
         btnPar9.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtPar9,btnPar9);
+                GUIFileOpener.pickFileForTxtField(txtPar9,btnPar9);
            }
         });
         linePar9.add(lblPar9);
@@ -357,7 +357,7 @@ public class FSEParametersForm extends ParametersForm
         btnPar1 = new JButton("Browse");
         btnPar1.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFolderForTxtField(txtPar1,btnPar1);
+                GUIFileOpener.pickFolderForTxtField(txtPar1,btnPar1);
            }
         });
         linePar1.add(lblPar1);
@@ -378,7 +378,7 @@ public class FSEParametersForm extends ParametersForm
         btnPar4 = new JButton("Browse");
         btnPar4.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFolderForTxtField(txtPar4,btnPar4);
+                GUIFileOpener.pickFolderForTxtField(txtPar4,btnPar4);
            }
         });
         linePar4.add(lblPar4);
@@ -441,7 +441,7 @@ public class FSEParametersForm extends ParametersForm
         btnPar12 = new JButton("Browse");
         btnPar12.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-                DenoptimGUIFileOpener.pickFileForTxtField(txtPar12,btnPar12);
+                GUIFileOpener.pickFileForTxtField(txtPar12,btnPar12);
            }
         });
         linePar12.add(lblPar12);
@@ -560,7 +560,7 @@ public class FSEParametersForm extends ParametersForm
     @Override
     public void putParametersToString(StringBuilder sb) throws Exception
     {
-    	sb.append("# FragSpaceExplorer - paramerers").append(NL);
+    	sb.append("# FragSpaceExplorer - parameters").append(NL);
     	
         if (rdbSrcOrNew.isSelected())
         {

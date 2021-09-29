@@ -36,6 +36,7 @@ import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.RingClosingAttractor;
 import denoptim.rings.RingClosure;
 import denoptim.rings.RingClosureParameters;
@@ -243,7 +244,7 @@ public class RingClosureTool
             {
 		String err = "#RingClosureTool: uncomplete closure ("
 				+ newRingClosed + "/" + rcaComb.size() + ")";
-		rcMol.getIAtomContainer().setProperty("MOL_ERROR",err);
+		rcMol.getIAtomContainer().setProperty(DENOPTIMConstants.MOLERRORTAG,err);
 	    }
             rcMols.add(rcMol);
 /*
@@ -700,25 +701,32 @@ public class RingClosureTool
 				   * RingClosureParameters.getRCDistTolerance();
             }
 
-	    boolean closeThisBnd = false;
-	    if (verbosity > 2)
-	    {
-		closeThisBnd = rc.isClosable(minDistH1T2,maxDistH1T2,
-					     minDistH2T1,maxDistH2T1,
-					     minDistH2T2,maxDistH2T2,
-					     maxDotProdHT,true);
-	    }
-	    else
-	    {
+    	    boolean closeThisBnd = false;
+    	    if (verbosity > 2)
+    	    {
+    	        closeThisBnd = rc.isClosable(minDistH1T2,maxDistH1T2,
+    					     minDistH2T1,maxDistH2T1,
+    					     minDistH2T2,maxDistH2T2,
+    					     maxDotProdHT,true);
+    	    }
+    	    else
+    	    {
                 closeThisBnd = rc.isClosable(minDistH1T2,maxDistH1T2,
-                                             minDistH2T1,maxDistH2T1,
-                                             minDistH2T2,maxDistH2T2,
-                                             maxDotProdHT,true);
-	    }
-	    if (closeThisBnd)
+                                                 minDistH2T1,maxDistH2T1,
+                                                 minDistH2T2,maxDistH2T2,
+                                                 maxDotProdHT,true);
+    	    }
+    	    if (closeThisBnd)
             {
-		int bt = mol.getDRingFromRCAPair(op).getBondType();
-                mol.addBond(rcaA.getSrcAtom(),rcaB.getSrcAtom(),rc,bt);
+    	        BondType bndTyp =  mol.getDRingFromRCAPair(op).getBondType();
+    	        if (bndTyp.hasCDKAnalogue())
+    	        {
+    	            mol.addBond(rcaA.getSrcAtom(),rcaB.getSrcAtom(),rc, bndTyp);
+    	        } else {
+    	            System.out.println("WARNING! Attempt to add ring closing bond "
+    	                    + "did not add any actual chemical bond because the "
+    	                    + "bond type of the chord is '" + bndTyp +"'.");
+    	        }
                 rcaA.setUsed();
                 rcaB.setUsed();
             }

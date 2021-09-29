@@ -19,36 +19,34 @@
 
 package denoptimga;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
+import denoptim.molecule.*;
+import denoptim.rings.*;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.math3.random.MersenneTwister;
-import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.rings.ChainLink;
-import denoptim.rings.ClosableChain;
-import denoptim.rings.RingClosureParameters;
-import denoptim.utils.FragmentUtils;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
 
 /**
- *
- * @author Vishwesh Venkatraman
- * @author Marco Foscato
+ * Collection of operators meant to alter graphs and associated utilities.
  */
 
 public class DENOPTIMGraphOperations
@@ -60,79 +58,52 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Identify pair of vertices that are suitable for crossover: 
+     * Identify pair of vertices that are suitable for crossover. The criterion
+     * for allowing crossover between two graph branches is defined by 
+     * {@link #isCrossoverPossible(DENOPTIMEdge, DENOPTIMEdge)}. In addition,
+     * the pair of seed vertexes (i.e., the first vertex of each branch to be 
+     * moved) must not represent the same building block. Scaffolds are also 
+     * excluded.
      * @param male <code>DENOPTIMGraph</code> of one member (the male) of the
-     * parents
+     * parents.
      * @param female <code>DENOPTIMGraph</code> of one member (the female) of
-     * the parents
-     * @return a pair of vertex ids (male and female) that will be the crossover
-     * points
+     * the parents.
+     * @return the list of pairs of vertex (Pairs ordered as 
+     * <code>male:female</code>) that can be used as crossover points.
      */
 
-    protected static RMap locateCompatibleXOverPoints(DENOPTIMGraph male,
-                                                    DENOPTIMGraph female)
+    protected static List<DENOPTIMVertex[]> locateCompatibleXOverPoints(
+            DENOPTIMGraph male, DENOPTIMGraph female)
     {
-        ArrayList<RMap> xpairs = new ArrayList<>();
+        List<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
 
-        for (int i=0; i<male.getVertexCount(); i++)
+        for (DENOPTIMEdge eMale : male.getEdgeList())
         {
-            int mtype = male.getVertexAtPosition(i).getFragmentType();
-            int mvid = male.getVertexAtPosition(i).getVertexId();
-            int mfragid = male.getVertexAtPosition(i).getMolId();
-
-            //System.out.println("Male Fragment ID: "+mvid+" type: "+mtype+" ffragid: "+mfragid);
-
-            // if the fragment is a capping group or the scaffold itself ignore
-            if (mtype == 0 || mtype == 2)
+            DENOPTIMVertex vMale = eMale.getTrgAP().getOwner();
+            // We don't do genetic operations on capping vertexes
+            if (vMale.getBuildingBlockType() == BBType.CAP)
                 continue;
-
-            // get edge toward parent vertex
-            // get the edge where the vertex in question is the destination vertex
-            // or end vertex. the source vertex then will be the crossover point
-            int medgeid = male.getIndexOfEdgeWithParent(mvid);
-            DENOPTIMEdge medge = male.getEdgeAtPosition(medgeid);
-
-            for (int j=0; j<female.getVertexCount(); j++)
+            
+            for (DENOPTIMEdge eFemale : female.getEdgeList())
             {
-                int ftype = female.getVertexAtPosition(j).getFragmentType();
-                int fvid = female.getVertexAtPosition(j).getVertexId();
-                int ffragid = female.getVertexAtPosition(j).getMolId();
+                DENOPTIMVertex vFemale = eFemale.getTrgAP().getOwner();
+                // We don't do genetic operations on capping vertexes
+                if (vFemale.getBuildingBlockType() == BBType.CAP)
+                    continue;
                 
-
-                //System.out.println("Female Fragment ID: "+fvid+" type: "+ftype+" ffragid: "+ffragid);
-
-                if (ftype == 0 || ftype == 2)
-                    continue;
-
-                // fragment ids should not match or we get the same molecule
-                if (mfragid == ffragid)
-                    continue;
-
-                // get edge toward parent vertex
-                int fedgeid = female.getIndexOfEdgeWithParent(fvid);
-                DENOPTIMEdge fedge = female.getEdgeAtPosition(fedgeid);
-
                 //Check condition for considering this combination
-                if (isCrossoverPossible(medge, fedge))
+                if (isCrossoverPossible(eMale, eFemale))
                 {
-                    // add the pair of vertex (one for the male, one for the female)
-                    RMap rp = new RMap(mvid, fvid);
-                    xpairs.add(rp);
+                    //TODO: should verify that the crossover is also "productive"
+                    // meaning that is produced graphs that are different from 
+                    // the parents.
+                    
+                    DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vMale,vFemale};
+                    pairs.add(pair);
                 }
             }
         }
-
-        if (xpairs.isEmpty())
-            return null;
-        else if (xpairs.size() == 1)
-            return xpairs.get(0);
-        else
-        {
-            MersenneTwister mtrand = RandomUtils.getRNG();
-            //int idx = GAParameters.getRNG().nextInt(xpairs.size());
-            int idx = mtrand.nextInt(xpairs.size());
-            return xpairs.get(idx);
-        }
+        return pairs;
     }
     
 //------------------------------------------------------------------------------
@@ -150,86 +121,266 @@ public class DENOPTIMGraphOperations
      */
     private static boolean isCrossoverPossible(DENOPTIMEdge eA, DENOPTIMEdge eB)
     {
-        String apClassSrcA = eA.getSourceReaction();
-        String apClassTrgA = eA.getTargetReaction();
-        String apClassSrcB = eB.getSourceReaction();
-        String apClassTrgB = eB.getTargetReaction();
+        APClass apClassSrcA = eA.getSrcAPClass();
+        APClass apClassTrgA = eA.getTrgAPClass();
+        APClass apClassSrcB = eB.getSrcAPClass();
+        APClass apClassTrgB = eB.getTrgAPClass();
         
-
-        if (isCompatible(apClassSrcA, apClassTrgB))
+        if (apClassSrcA.isCPMapCompatibleWith(apClassTrgB))
         {
-            if (isCompatible(apClassSrcB, apClassTrgA))
+            if (apClassSrcB.isCPMapCompatibleWith(apClassTrgA))
             {
                 return true;
             }
         }
         return false;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
-     * Check the compatibility between two classes. Note that, due to the non 
-     * symmetric nature of the compatibility matrix, the result for
-     * isCompatible(A,B) may be different from isCompatible(B,A)
-     * @param parentAPclass class of the attachment point (AP) on the parent
-     * vertex (inner level)
-     * @param childAPclass class of the attachment point (AP) on the child
-     * vertex (outer level)
-     * @return <code>true</code> if the combination corresponds to a true entry
-     * in the compatibility matrix meaning that the two classes, in the 
-     * specified order, are compatible
-     */
-
-    private static boolean isCompatible(String parentAPclass, 
-                                                          String childAPclass)
-    {
-        ArrayList<String> compatibleClasses = 
-                    FragmentSpace.getCompatibilityMatrix().get(parentAPclass);
-        return compatibleClasses.contains(childAPclass);
-    }
-
-//----------------------------------------------------------------------------
-
-    /**
-     * for the vertex in question, disconnect all of its edges, update
-     * valences of other vertices, replace the fragment id of the vertex
-     * in question and then rejoin bonds. A new fragment may be added at
-     * any available attachment point
-     * @param molGraph graph of the molecule
-     * @param curVertex 
+     * Substitutes a vertex. Deletes the given vertex from the graph that owns
+     * it, and removes any child vertex (i.e., reachable from the given vertex
+     * by a directed path). Then it tries to extent the graph from the
+     * parent vertex (i.e., the one that was originally holding the given 
+     * vertex). Moreover, additional extension may occur on
+     * any available attachment point of the parent vertex.
+     * @param vertex to mutate (the given vertex).
      * @return <code>true</code> if substitution is successful
      * @throws DENOPTIMException
      */
 
-    protected static boolean substituteFragment
-                            (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex)
+    protected static boolean substituteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
     {
-        int vid = curVertex.getVertexId();
+        return substituteBranch(vertex, false, -1, -1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Substitutes a vertex while keeping its surrounding.
+     * Does not replace with same vertex (i.e., new vertex will have different 
+     * building block ID, but might look the same wrt content and properties).
+     * @param vertex the vertex to replace with another one.
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the incoming vertex to the 
+     * given index. AP mapping between old and new vertex is not controllable
+     * in this method.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+
+    protected static boolean substituteLink(DENOPTIMVertex vertex,
+            int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
+    {
+        //TODO: for reproducibility the AP mapping should become an optional
+        // parameter: if given we try to use it, if not given, GraphLinkFinder
+        // will try to find a suitable mapping.
+        
+        GraphLinkFinder glf = null;
+        if (chosenVrtxIdx<0)
+        {
+            glf = new GraphLinkFinder(vertex);
+        } else {
+            glf = new GraphLinkFinder(vertex,chosenVrtxIdx);
+        }
+        if (!glf.foundAlternativeLink())
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND);
+            return false;
+        }
+
+        DENOPTIMGraph graph = vertex.getGraphOwner();
+        boolean done = graph.replaceVertex(vertex,
+                glf.getChosenAlternativeLink().getBuildingBlockId(),
+                glf.getChosenAlternativeLink().getBuildingBlockType(),
+                glf.getChosenAPMappingInt());
+        if (!done)
+        {
+            mnt.increase(
+                    CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT);
+        }
+        return done;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Inserts a vertex in between two connected vertexes that are identified by
+     * the one vertex holding the "source" end of the edge, and the identifier
+     * of the attachment point used by that edge. Effectively, this method
+     * asks to replace an edge with two edges with a new vertex in between.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenAPId the identifier of the AP on the vertex.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException if the request cannot be performed because the
+     * vertex is not the source of an edge at the given AP, or because such AP 
+     * does not exist on the given vertex.
+     */
+    public static boolean extendLink(DENOPTIMVertex vertex,
+            int chosenAPId, Monitor mnt) throws DENOPTIMException
+    {
+        return extendLink(vertex, chosenAPId, -1 , mnt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Inserts a vertex in between two connected vertexes that are identified by
+     * the one vertex holding the "source" end of the edge, and the identifier
+     * of the attachment point used by that edge. Effectively, this method
+     * asks to replace an edge with two edges with a new vertex in between.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenAPId the identifier of the AP on the vertex.
+     * @param chosenNewVrtxId the identifier of the new building block to 
+     * insert in the list.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException if the request cannot be performed because the
+     * vertex is not the source of an edge at the given AP, or because such AP 
+     * does not exist on the given vertex.
+     */
+    public static boolean extendLink(DENOPTIMVertex vertex,
+            int chosenAPId, int chosenNewVrtxId, Monitor mnt) 
+                    throws DENOPTIMException
+    {
+        DENOPTIMAttachmentPoint ap = vertex.getAP(chosenAPId);
+        if (ap == null)
+        {
+            throw new DENOPTIMException("No AP "+chosenAPId+" in vertex "
+                    +vertex+".");
+        }
+        DENOPTIMEdge e = ap.getEdgeUserThroughout();
+        
+        if (e == null)
+        {
+            throw new DENOPTIMException("AP "+chosenAPId+" in vertex "
+                    +vertex+" has no edge user.");
+        }
+        if (e.getSrcAP().getOwner() != vertex)
+        {
+            throw new DENOPTIMException("Request to extend a link from a child "
+                    + "vertex (AP "+chosenAPId+" of vertex "+vertex+").");
+        }
+        return extendLink(e, chosenNewVrtxId, mnt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replace an edge with two edges with a new vertex in between, thus 
+     * inserting a vertex in between two directly connected vertexes, which will
+     * no longer be directly connected.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenBBIdx the identifier of the building block to insert.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    public static boolean extendLink(DENOPTIMEdge edge, int chosenBBIdx,
+            Monitor mnt) throws DENOPTIMException
+    {
+       //TODO: for reproducibility the AP mapping should become an optional
+        // parameter: if given we try to use it, if not given we GraphLinkFinder
+        // will try to find a suitable mapping.
+        
+        GraphLinkFinder glf = null;
+        if (chosenBBIdx < 0)
+        {
+            glf = new GraphLinkFinder(edge);
+        } else {
+            glf = new GraphLinkFinder(edge,chosenBBIdx);
+        }
+        if (!glf.foundAlternativeLink())
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND);
+            return false;
+        }
+        
+        // Need to convert the mapping to make it independent from the instance
+        // or the new link.
+        Map<DENOPTIMAttachmentPoint,Integer> apMap = 
+                new HashMap<DENOPTIMAttachmentPoint,Integer>();
+        for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
+            glf.getChosenAPMapping().entrySet())
+        {
+            apMap.put(e.getKey(), e.getValue().getIndexInOwner());
+        }
+        
+        DENOPTIMGraph graph = edge.getSrcAP().getOwner().getGraphOwner();
+        boolean done = graph.insertVertex(edge,
+                glf.getChosenAlternativeLink().getBuildingBlockId(),
+                glf.getChosenAlternativeLink().getBuildingBlockType(),
+                apMap);
+        if (!done)
+        {
+            mnt.increase(
+                    CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT);
+        }
+        return done;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Substitutes a vertex. Deletes the given vertex from the graph that owns
+     * it, and removes any child vertex (i.e., reachable from the given vertex
+     * by a directed path). Then it tries to extent the graph from the
+     * parent vertex (i.e., the one that was originally holding the given 
+     * vertex). Moreover, additional extension may occur on
+     * any available attachment point of the parent vertex.
+     * @param vertex to mutate (the given vertex).
+     * @param force set to <code>true</code> to ignore growth probability.
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index.
+     * @param chosenApId if greater than or equals to zero, 
+     * sets the choice of the AP to the 
+     * given index.
+     * @return <code>true</code> if substitution is successful
+     * @throws DENOPTIMException
+     */
+
+    protected static boolean substituteBranch(DENOPTIMVertex vertex,
+            boolean force, int chosenVrtxIdx, int chosenApId)
+                                                    throws DENOPTIMException
+    {
+        DENOPTIMGraph g = vertex.getGraphOwner();
 
         // first get the edge with the parent
-        int eidx = molGraph.getIndexOfEdgeWithParent(vid);
-        if (eidx == -1)
+        DENOPTIMEdge e = vertex.getEdgeToParent();
+        if (e == null)
         {
-            String msg = "Program Bug in substituteFragment: " +
-                                            "Unable to locate parent edge.";
+            String msg = "Program Bug in substituteFragment: Unable to locate "
+                    + "parent edge for vertex "+vertex+" in graph "+g;
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
         // vertex id of the parent
-        int pvid = molGraph.getEdgeAtPosition(eidx).getSourceVertex();
-        DENOPTIMVertex pvertex = molGraph.getVertexWithId(pvid);
+        int pvid = e.getSrcVertex();
+        DENOPTIMVertex parentVrt = g.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
-        boolean symmetry = molGraph.hasSymmetryInvolvingVertex(vid);
-
+        boolean symmetry = g.hasSymmetryInvolvingVertex(vertex);
+        
         // delete the vertex and its children and all its symmetric partners
-        deleteFragment(molGraph, curVertex);
-
+        deleteFragment(vertex);
+        
         // extend the graph at this vertex but without recursion
-        return extendGraph(molGraph, pvertex, false, symmetry);
+        return extendGraph(parentVrt,false,symmetry,force,chosenVrtxIdx,
+                chosenApId);
     }
 
 //------------------------------------------------------------------------------
@@ -237,19 +388,22 @@ public class DENOPTIMGraphOperations
     /**
      * Deletion mutation removes the vertex and also the
      * symmetric partners on its parent.
-     * @param molGraph
-     * @param curVertex
+     * @param vertex
      * @return <code>true</code> if deletion is successful
      * @throws DENOPTIMException
      */
 
-    protected static boolean deleteFragment
-                            (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex)
+    //TODO-V3+ distinguish between 
+    // 1) removing a vertex and the branch starting on it
+    // 2) removing a vertex and try to glue the child branch to the parent one
+    
+    protected static boolean deleteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
     {
-        int vid = curVertex.getVertexId();
+        int vid = vertex.getVertexId();
+        DENOPTIMGraph molGraph = vertex.getGraphOwner();
 
-        if (molGraph.hasSymmetryInvolvingVertex(vid))
+        if (molGraph.hasSymmetryInvolvingVertex(vertex))
         {
             ArrayList<Integer> toRemove = new ArrayList<Integer>();
             for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
@@ -259,12 +413,12 @@ public class DENOPTIMGraphOperations
             }
             for (Integer svid : toRemove)
             {
-                GraphUtils.deleteVertex(molGraph, svid);
+                molGraph.removeBranchStartingAt(molGraph.getVertexWithId(svid));
             }
         }
         else
         {
-            GraphUtils.deleteVertex(molGraph, vid);
+            molGraph.removeBranchStartingAt(molGraph.getVertexWithId(vid));
         }
 
         if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
@@ -275,35 +429,73 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * function that will keep extending the graph
-     * probability of addition depends on the growth probability
+     * function that will keep extending the graph according to the 
+     * growth/substitution probability.
      *
-     * @param molGraph molecular graph
      * @param curVertex vertex to which further fragments will be appended
      * @param extend if <code>true</code>, then the graph will be grown further 
      * (recursive mode)
      * @param symmetryOnAps if <code>true</code>, then symmetry will be applied
      * on the APs, no matter what. This is mostly needed to retain symmetry 
      * when performing mutations on the root vertex of a symmetric graph.
-     * @throws exception.DENOPTIMException
+     * @throws DENOPTIMException
      * @return <code>true</code> if the graph has been modified
      */
      
-    protected static boolean extendGraph(DENOPTIMGraph molGraph,
-                                         DENOPTIMVertex curVertex, 
+    protected static boolean extendGraph(DENOPTIMVertex curVertex, 
                                          boolean extend, 
-                                         boolean symmetryOnAp) 
+                                         boolean symmetryOnAps)
                                                         throws DENOPTIMException
     {
+        return extendGraph(curVertex,extend,symmetryOnAps,false,-1,-1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * function that will keep extending the graph. The
+     * probability of addition depends on the growth probability scheme.
+     *
+     * @param curVrtx vertex to which further fragments will be appended
+     * @param extend if <code>true</code>, then the graph will be grown further 
+     * (recursive mode)
+     * @param symmetryOnAps if <code>true</code>, then symmetry will be applied
+     * on the APs, no matter what. This is mostly needed to retain symmetry 
+     * when performing mutations on the root vertex of a symmetric graph.
+     * @param force set to <code>true</code> to ignore growth probability.
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the vertex to the 
+     * given index. This selection applies only to the first extension, not to
+     * further recursions.
+     * @param chosenApId if greater than or equals to zero, sets the choice
+     *                   of the AP to the given index. This selection applies
+     *                   only to the first extension, not to further recursions.
+     * @throws DENOPTIMException
+     * @return <code>true</code> if the graph has been modified
+     */
+
+    protected static boolean extendGraph(DENOPTIMVertex curVrtx, 
+                                         boolean extend, 
+                                         boolean symmetryOnAps,
+                                         boolean force,
+                                         int chosenVrtxIdx,
+                                         int chosenApId) 
+                                                        throws DENOPTIMException
+    {  
         // return true if the append has been successful
         boolean status = false;
 
         // check if the fragment has available APs
-        if (!curVertex.hasFreeAP())
+        if (!curVrtx.hasFreeAP())
+        {
+            if (debug)
+                System.err.println("Cannot extend graph that has no free AP!");
             return status;
-
-        int lvl = curVertex.getLevel();
-        int curVrtId = curVertex.getVertexId();
+        }
+        
+        int lvl = curVrtx.getLevel();
+        int curVrtId = curVrtx.getVertexId();
+        DENOPTIMGraph molGraph = curVrtx.getGraphOwner();
         int grphId = molGraph.getGraphId();
 
         if (debug)
@@ -311,27 +503,37 @@ public class DENOPTIMGraphOperations
             System.err.println("---> Extending Graph " + grphId
                                + " on vertex " + curVrtId
                                + " which is in level " + lvl);
-	    System.err.println("     Grap: "+ molGraph);
+            System.err.println("     Grap: "+ molGraph);
         }
-
-        MersenneTwister mtrand = RandomUtils.getRNG();
 
         ArrayList<Integer> addedVertices = new ArrayList<>();
 
         ArrayList<DENOPTIMAttachmentPoint> lstDaps = 
-                                                curVertex.getAttachmentPoints();
-        for (int apId=0; apId<lstDaps.size(); apId++)
+                                                curVrtx.getAttachmentPoints();
+        List<DENOPTIMAttachmentPoint> toDoAPs = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        toDoAPs.addAll(lstDaps);
+        for (int i=0; i<lstDaps.size(); i++)
         {
+            // WARNING: randomisation decouples 'i' from the index of the AP
+            // in the vertex's list of APs! So 'i' is just the i-th attempt on
+            // the curVertex.
+            
+            DENOPTIMAttachmentPoint ap = 
+                    RandomUtils.randomlyChooseOne(toDoAPs);
+            toDoAPs.remove(ap);
+            int apId = ap.getIndexInOwner();
+            
             if (debug)
             {
-                System.err.println("Evaluating growth on AP-" + apId + " of "
-                                                         + "vertex "+ curVrtId);
+                System.err.println("Evaluating growth: attempt #" + i 
+                        + " on AP #" + apId + " of "
+                        + "vertex "+ curVrtId 
+                        + " (AP: " + apId + ")");
             }
-
-            DENOPTIMAttachmentPoint curDap = lstDaps.get(apId);
-
+            
             // is it possible to extend on this AP?
-            if (!curDap.isAvailable())
+            if (!ap.isAvailable())
             {
                 if (debug)
                 {
@@ -340,41 +542,47 @@ public class DENOPTIMGraphOperations
                 continue;
             }
 
-            // Do we want to extend the graph at this AP?
-            double growthProb = EAUtils.getGrowthProbabilityAtLevel(lvl);
-            boolean fgrow =  RandomUtils.nextBoolean(growthProb);
-            if (debug)
+            if (!force)
             {
-                System.err.println("Growth probab. on this AP:" + growthProb);
-            }
-            if (!fgrow)
-            {
+                // Decide whether we want to extend the graph at this AP?
+                // Note that depending on the criterion (level/molSize) one
+                // of these two first factors is 1.0.
+                double molSizeProb = EAUtils.getMolSizeProbability(molGraph);
+                double byLevelProb = EAUtils.getGrowthByLevelProbability(lvl);
+                double crowdingProb = EAUtils.getCrowdingProbability(ap);
+                double extendGraphProb = molSizeProb * byLevelProb * crowdingProb;
+                boolean fgrow =  RandomUtils.nextBoolean(extendGraphProb);
                 if (debug)
                 {
-                    System.err.println("Decided not to grow on this AP!");
+                    System.err.println("Growth probability on this AP:" 
+                            + extendGraphProb + " (growth: "+byLevelProb+", "
+                                    + "crowding: "+crowdingProb+")");
                 }
-                continue;
+                if (!fgrow)
+                {
+                    if (debug)
+                    {
+                        System.err.println("Decided not to grow on this AP!");
+                    }
+                    continue;
+                }
             }
 
             // Apply closability bias in selection of next fragment
-//TODO copy also DENOPTIMRing into growing graph or use DENOPTIMTemplate
-// which is yet to be developed.
             if (RingClosureParameters.allowRingClosures() && 
                       RingClosureParameters.selectFragmentsFromClosableChains())
             {
-                boolean successful = attachFragmentInClosableChain(
-                                                                 curVertex, 
-                                                                 apId, 
-                                                                 molGraph, 
-                                                                 addedVertices);
+                boolean successful = attachFragmentInClosableChain(curVrtx,
+                        apId, molGraph, addedVertices);
                 if (successful)
                 {
                     continue;
                 }
             }
-
+            
             // find a compatible combination of fragment and AP
-            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVertex, apId);
+            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVrtx, 
+                    apId, chosenVrtxIdx, chosenApId);
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
             {
@@ -384,26 +592,42 @@ public class DENOPTIMGraphOperations
                 }
                 continue;
             }
+            
+            // Stop if graph is already too big
+            DENOPTIMVertex incomingVertex = 
+                    DENOPTIMVertex.newVertexFromLibrary(-1, 
+                            chosenFrgAndAp.getVertexMolId(), 
+                            BBType.FRAGMENT);
+            if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
+                    incomingVertex.getHeavyAtomsCount()) > 
+                        FragmentSpaceParameters.getMaxHeavyAtom())
+            {
+                if (debug)
+                {
+                    System.err.println("Graph is growing too large. Skipping AP.");
+                }
+                continue;
+            }
 
             // Decide on symmetric substitution within this vertex...
-            boolean cpOnSymAPs = applySymmetry(curDap.getAPClass());
+            boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
             SymmetricSet symAPs = new SymmetricSet();
-            if (curVertex.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAp))
+            if (curVrtx.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAps))
             {
-                symAPs = curVertex.getPartners(apId);
-		if (symAPs != null)
-		{
+                symAPs = curVrtx.getSymmetricAPs(apId);
+				if (symAPs != null)
+				{
                     if (debug)
                     {
                         System.err.println("Applying intra-fragment symmetric "
                                           + "substitution over APs: " + symAPs);
-		    }
+                    }
                 }
-		else
-		{
-		    symAPs = new SymmetricSet();
-		    symAPs.add(apId);
-		}
+				else
+				{
+				    symAPs = new SymmetricSet();
+				    symAPs.add(apId);
+				}
             }
             else
             {
@@ -411,7 +635,7 @@ public class DENOPTIMGraphOperations
             }
 
             // ...and inherit symmetry from previous levels
-            boolean cpOnSymVrts = molGraph.hasSymmetryInvolvingVertex(curVrtId);
+            boolean cpOnSymVrts = molGraph.hasSymmetryInvolvingVertex(curVrtx);
             SymmetricSet symVerts = new SymmetricSet();
             if (cpOnSymVrts)
             {
@@ -426,57 +650,75 @@ public class DENOPTIMGraphOperations
             {
                 symVerts.add(curVrtId);
             }
+            
+            // Consider size after application of symmetry
+            if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
+                    incomingVertex.getHeavyAtomsCount()*symVerts.size()*symAPs.size()) > 
+                        FragmentSpaceParameters.getMaxHeavyAtom())
+            {
+                if (debug)
+                {
+                    System.err.println("Graph is growing too large. Skipping AP.");
+                }
+                continue;
+            }
+            
+            GraphUtils.ensureVertexIDConsistency(molGraph.getMaxVertexId());
 
             // loop on all symmetric vertices, but can be only one.
             SymmetricSet newSymSetOfVertices = new SymmetricSet();
             for (Integer parVrtId : symVerts.getList())
             {
                 DENOPTIMVertex parVrt = molGraph.getVertexWithId(parVrtId);
+                
                 String typ = "single";
                 if (cpOnSymAPs || cpOnSymVrts)
                 {
                     typ = "symmetric";
                 }
+                
                 for (int si=0; si<symAPs.size(); si++)
                 {
                     int symApId = symAPs.get(si);
-                    if (!parVrt.getAttachmentPoints().get(
-                                                        symApId).isAvailable())
+                    DENOPTIMAttachmentPoint symAP = parVrt.getAttachmentPoints()
+                            .get(symApId);
+                    
+                    if (!symAP.isAvailable())
                     {
                         continue;
                     }
 
                     // Finally add the fragment on a symmetric AP
-                    int newVrtId = attachNewFragmentAtAP(molGraph, parVrt,
-                                                        symApId,chosenFrgAndAp);
-                    if (newVrtId != -1)
-                    {
-                        if (debug)
-                        {
-                            System.err.println("Added fragment " + newVrtId 
-                                    + " on " + typ + " AP-" + symApId 
-                                    + " of vertex " + parVrtId);
-                        }
-                    }
-                    else
-                    {
-                        String msg = "BUG: Unsuccesfull fragment add on "
-                                        + typ + " AP. Please, report this bug.";
-                        DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                        throw new DENOPTIMException(msg);
-                    }
-
+                    int newVrtId = GraphUtils.getUniqueVertexIndex();
+                    DENOPTIMVertex fragVertex = 
+                            DENOPTIMVertex.newVertexFromLibrary(newVrtId, 
+                                    chosenFrgAndAp.getVertexMolId(), 
+                                    BBType.FRAGMENT);
+                    DENOPTIMAttachmentPoint trgAP = fragVertex.getAP(
+                            chosenFrgAndAp.getApId());
+                    
+                    molGraph.appendVertexOnAP(symAP, trgAP);
+                    
                     addedVertices.add(newVrtId);
                     newSymSetOfVertices.add(newVrtId);
                 }
             }
 
-            // If any, store symmmetry of new vertices in the graph
+            // If any, store symmetry of new vertices in the graph
             if (newSymSetOfVertices.size() > 1)
             {
                 molGraph.addSymmetricSetOfVertices(newSymSetOfVertices);
             }
         } // end loop over APs
+        
+        if (debug)
+        {
+            String filename = "/tmp/"+grphId+"_growth.sdf";
+            System.err.println("Writing growing graph to "+filename);
+            ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
+            lst.add(molGraph);
+            DenoptimIO.writeGraphsToSDF(new File(filename), lst, true);
+        }
 
         if (extend)
         {
@@ -490,7 +732,8 @@ public class DENOPTIMGraphOperations
             {
                 int vid = addedVertices.get(i);
                 DENOPTIMVertex fragVertex = molGraph.getVertexWithId(vid);
-                extendGraph(molGraph, fragVertex, extend, symmetryOnAp);
+                DENOPTIMVertex v = molGraph.getVertexWithId(vid);
+                extendGraph(v, extend, symmetryOnAps);
             }
         }
 
@@ -499,74 +742,7 @@ public class DENOPTIMGraphOperations
 
         return status;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Attaches the specified fragment to the vertex
-     * @param molGraph
-     * @param curVertex the vertex to which a fragment is to be attached
-     * @param dapIdx index of the AP at which the fragment is to be attached
-     * @param chosenFrgAndAp indecex identifying the incoming fragment
-     * @return the id of the new vertex created
-     * @throws DENOPTIMException
-     */
     
-    protected static int attachNewFragmentAtAP
-                              (DENOPTIMGraph molGraph, DENOPTIMVertex curVertex,
-                                    int dapIdx, IdFragmentAndAP chosenFrgAndAp)
-                                                        throws DENOPTIMException
-    {
-        // Define the new vertex
-        int fid = chosenFrgAndAp.getVertexMolId();
-        ArrayList<DENOPTIMAttachmentPoint> fragAP =
-                                         FragmentUtils.getAPForFragment(fid, 1);
-        int nvid = GraphUtils.getUniqueVertexIndex();
-        DENOPTIMVertex fragVertex = new DENOPTIMVertex(nvid, fid, fragAP, 1);
-        // update the level of the vertex based on its parent
-        int lvl = curVertex.getLevel();
-        fragVertex.setLevel(lvl+1);
-        // identify the symmetric APs if any for this fragment vertex
-        IAtomContainer mol = FragmentSpace.getFragmentLibrary().get(fid);
-        ArrayList<SymmetricSet> simAP = FragmentUtils.getMatchingAP(mol,fragAP);
-        fragVertex.setSymmetricAP(simAP);
-
-        // get source: where the new fragment is going to be attached
-        ArrayList<DENOPTIMAttachmentPoint> lstDaps =
-                                                curVertex.getAttachmentPoints();
-        DENOPTIMAttachmentPoint curDap = lstDaps.get(dapIdx);
-
-        // make new edge connecting the current vertex with the new one
-        DENOPTIMEdge edge;
-        if (!FragmentSpace.useAPclassBasedApproach())
-        {
-            // connect a randomly selected AP of this fragment
-            // to the current vertex
-            edge = GraphUtils.connectVertices(curVertex, fragVertex);
-        }
-        else
-        {
-            int fapidx = chosenFrgAndAp.getApId();
-            String rcn = curDap.getAPClass(); //on the src
-            String cmpReac = fragAP.get(fapidx).getAPClass();
-
-            edge = GraphUtils.connectVertices(curVertex, fragVertex, dapIdx, 
-                                                          fapidx, rcn, cmpReac);
-        }
-
-        if (edge != null)
-        {
-            // add the fragment as a vertex
-            molGraph.addVertex(fragVertex);
-
-            molGraph.addEdge(edge);
-
-            return fragVertex.getVertexId();
-        }
-
-        return -1;
-    }
-
 //------------------------------------------------------------------------------
 
     /**
@@ -574,48 +750,82 @@ public class DENOPTIMGraphOperations
      * Compatibility can either be class based or based on the free connections
      * @param curVertex the source graph vertex
      * @param dapidx the attachment point index on the src vertex
+     * @return the vector of indexes identifying the molId (fragment index) 
+     * of a fragment with a compatible attachment point, and the index of such 
+     * attachment point.
+     * @throws DENOPTIMException
+     */
+
+    protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
+                                           int dapidx) throws DENOPTIMException
+    {
+        return getFrgApForSrcAp(curVertex, dapidx, -1, -1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Select a compatible fragment for the given attachment point.
+     * Compatibility can either be class based or based on the free connections
+     * @param curVertex the source graph vertex
+     * @param dapidx the attachment point index on the src vertex
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the incoming vertex to the 
+     * given index.
+     * @param chosenApId if greater than or equals to zero, 
+     * sets the choice of the AP (of the incoming vertex) to the 
+     * given index.
      * @return the vector of indeces identifying the molId (fragment index) 
      * os a fragment with a compatible attachment point, and the index of such 
      * attachment point.
      * @throws DENOPTIMException
      */
 
-
     protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
-                                           int dapidx) throws DENOPTIMException
+            int dapidx, int chosenVrtxIdx, int chosenApId) 
+                    throws DENOPTIMException
     {
         ArrayList<DENOPTIMAttachmentPoint> lstDaps =
                                               curVertex.getAttachmentPoints();
         DENOPTIMAttachmentPoint curDap = lstDaps.get(dapidx);
-        
-        IdFragmentAndAP res;
+
+        // Initialize with an empty pointer
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
+                -1, -1);
         if (!FragmentSpace.useAPclassBasedApproach())
         {
             int fid = EAUtils.selectRandomFragment();
-            res = new IdFragmentAndAP(-1,fid,1,-1,-1,-1);
+            res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
         }
         else
         {
-            res = EAUtils.selectClassBasedFragment(curDap);
+            ArrayList<IdFragmentAndAP> candidates = 
+                    FragmentSpace.getFragAPsCompatibleWithClass(
+                    curDap.getAPClass());
+            if (candidates.size() > 0)
+            {
+                if (chosenVrtxIdx>-1 && chosenApId>-1)
+                {
+                    // We have asked to force the selection
+                    res = new IdFragmentAndAP(-1,chosenVrtxIdx,BBType.FRAGMENT,
+                            chosenApId,-1,-1);
+                } else {
+                    res = RandomUtils.randomlyChooseOne(candidates);
+                }
+            }
         }
         return res;
     }
 
 //------------------------------------------------------------------------------
 
-    protected static boolean  attachFragmentInClosableChain(
+    protected static boolean attachFragmentInClosableChain(
                                                DENOPTIMVertex curVertex, 
                                                int dapidx,
                                                DENOPTIMGraph molGraph,
                                                ArrayList<Integer> addedVertices)
                                                         throws DENOPTIMException
     {
-
-//TODO evaluate this
-/*
-DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
-*/
-
         boolean res = false;
 
         // Get candidate fragments
@@ -629,66 +839,38 @@ DENOPTIM/src/utils/GraphUtils.getClosableVertexChainsFromDB
         // 2) an empty list because no fragments allow to close rings
         // 3) "-1" as molID that means there are closable chains that
         //    terminate at the current level, so we let the standard 
-        //    routine proceede selecting an extension of the chain
+        //    routine proceeds selecting an extension of the chain
         //    or cap this end.
 
         // Choose a candidate and attach it to the graph
         int numCands = lscFfCc.size();
         if (numCands > 0)
         {
-            MersenneTwister rng = RandomUtils.getRNG();
-            int chosenId = rng.nextInt(numCands);
+            int chosenId = RandomUtils.nextInt(numCands);
             FragForClosabChains chosenFfCc = lscFfCc.get(chosenId);
             ArrayList<Integer> newFragIds = chosenFfCc.getFragIDs();
             int molIdNewFrag = newFragIds.get(0);
-            int typeNewFrag = newFragIds.get(1);
+            BBType typeNewFrag = BBType.parseInt(newFragIds.get(1));
             int dapNewFrag = newFragIds.get(2);
-//TODO del
-if(debug)
-{
-    System.out.println("Closable Chains involving frag/AP: "+newFragIds);
-    int iii = 0;
-    for (ClosableChain cc : chosenFfCc.getCompatibleCC())
-    {
-        iii++;
-    System.out.println(iii+"  "+cc);
-    }
-}
             if (molIdNewFrag != -1)
             {
-//TODO del
-if(debug)
-    System.out.println("Before attach: "+molGraph);
-                int newvid = GraphUtils.attachNewFragmentAtAPWithAP(molGraph,
-                                                                  curVertex,
-                                                                   dapidx,
-                                                                   molIdNewFrag,
-                                                                   typeNewFrag,
-                                                                   dapNewFrag);
-//TODO del
-if(debug)
-    System.out.println("After attach: "+molGraph);
-
+                int newvid = GraphUtils.getUniqueVertexIndex();
+                DENOPTIMVertex newVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                        newvid, molIdNewFrag, typeNewFrag);
+                
+                molGraph.appendVertexOnAP(curVertex.getAP(dapidx), 
+                        newVrtx.getAP(dapNewFrag));
+                
                 if (newvid != -1)
                 {
                     addedVertices.add(newvid);
-
-//TODO del
-if(debug)
-    System.out.println("Before update: "+molGraph.getClosableChains().size());
                     // update list of candidate closable chains
                     molGraph.getClosableChains().removeAll(
-                                                chosenFfCc.getIncompatibleCC());
-//TODO del
-if(debug)
-    System.out.println("After update: "+molGraph.getClosableChains().size());
-
+                            chosenFfCc.getIncompatibleCC());
                     if (applySymmetry(curVertex.getAttachmentPoints().get(
-                                                          dapidx).getAPClass()))
+                            dapidx).getAPClass()))
                     {
-//TODO
 //TODO: implement symmetric substitution with closability bias
-//TODO
                     }
                     res = true;
                 }
@@ -707,7 +889,174 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Private class representig a selected closable chain of fragments
+     * Extracts subgraphs from the graph parameter that match the provided
+     * pattern.
+     * @param graph graph to extract pattern from.
+     * @param pattern to match against.
+     * @return The subgraphs matching the provided pattern.
+     */
+    public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
+                                                     GraphPattern pattern) {
+        if (pattern != GraphPattern.RING) {
+            throw new IllegalArgumentException("Graph pattern " + pattern +
+                    " not supported.");
+        }
+
+        List<Set<DENOPTIMVertex>> disjointMultiCycleVertices = graph
+                .getRings()
+                .stream()
+                .map(DENOPTIMRing::getVertices)
+                .map(HashSet::new)
+                .collect(Collectors.toList());
+
+        unionOfIntersectingSets(disjointMultiCycleVertices);
+
+        List<DENOPTIMGraph> subgraphs = new ArrayList<>();
+        for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
+            subgraphs.add(extractSubgraph(graph, fusedRing));
+        }
+
+        for (DENOPTIMGraph g : subgraphs) {
+            g.renumberGraphVertices();
+            fixGraph(g);
+        }
+
+        return subgraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the subgraph in the graph defined on the a set of vertices.
+     * The graph is cloned before the subgraph is extracted.
+     * @param graph To extract subgraph from.
+     * @param definedOn Set of vertices in the graph that the subgraph is
+     *                  defined on.
+     * @return Subgraph of graph defined on set of vertices.
+     */
+    private static DENOPTIMGraph extractSubgraph(DENOPTIMGraph graph,
+                                                 Set<DENOPTIMVertex> definedOn) {
+        DENOPTIMGraph subgraph = graph.clone();
+
+        Set<DENOPTIMVertex> complement = subgraph
+                .getVertexList()
+                .stream()
+                .filter(u -> definedOn
+                        .stream()
+                        .allMatch(v -> v.getVertexId() != u.getVertexId())
+                ).collect(Collectors.toSet());
+
+        for (DENOPTIMVertex v : complement) {
+            subgraph.removeVertex(v);
+        }
+        return subgraph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the vertex at the lowest level as the scaffold, changes the  
+     * directions of edges so that the scaffold is the source, and changes 
+     * the levels of the graph's other vertices to be consistent with the new
+     * scaffold.
+     * @param g Graph to fix.
+     */
+    private static void fixGraph(DENOPTIMGraph g) {
+        DENOPTIMVertex newScaffold = g
+                .getVertexList()
+                .stream()
+                .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
+                .orElse(null);
+        if (newScaffold == null) {
+            return;
+        }
+        DENOPTIMGraph.setScaffold(newScaffold);
+
+        fixEdgeDirections(g);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes the union of any two sets in this list that intersect. Performs
+     * operations in-place.
+     * @param l List to merge sets of
+     */
+    private static <T> void unionOfIntersectingSets(List<Set<T>> l) {
+        for (int i = 0; i < l.size() - 1; i++) {
+            Set<T> setA = l.get(i);
+            for (int j = i + 1; j < l.size(); ) {
+                Set<T> setB = l.get(j);
+                if (Collections.disjoint(setA, setB)) {
+                    j++;
+                } else {
+                    setA.addAll(setB);
+                    l.remove(j);
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Flips edges in the graph so that the scaffold is the only source vertex.
+     * @param graph to fix edges of.
+     */
+    private static void fixEdgeDirections(DENOPTIMGraph graph) {
+        boolean foundScaffold = false;
+        for (DENOPTIMVertex v : graph.getVertexList()) {
+            foundScaffold = v.getLevel() == -1;
+            if (foundScaffold) {
+                fixEdgeDirections(v, new HashSet<>());
+                break;
+            }
+        }
+        if (!foundScaffold) {
+            throw new IllegalArgumentException("Vertex at level -1 not found");
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Recursive utility method for fixEdgeDirections(DENOPTIMGraph graph).
+     * @param v current vertex
+     */
+    private static void fixEdgeDirections(DENOPTIMVertex v,
+                                          Set<Integer> visited) {
+        visited.add(v.getVertexId());
+        int visitedVertexEncounters = 0;
+        for (int i = 0; i < v.getNumberOfAPs(); i++) {
+            DENOPTIMAttachmentPoint ap = v.getAP(i);
+            DENOPTIMEdge edge = ap.getEdgeUser();
+            if (edge != null) {
+                int srcVertex = edge.getSrcVertex();
+                boolean srcIsVisited =
+                        srcVertex != v.getVertexId() && visited.contains(srcVertex);
+
+                visitedVertexEncounters += srcIsVisited ? 1 : 0;
+                if (visitedVertexEncounters >= 2) {
+                    throw new IllegalArgumentException("Invalid graph. Contains a" +
+                            " cycle.");
+                }
+
+                boolean edgeIsWrongWay = edge.getTrgVertex() == v.getVertexId()
+                        && !srcIsVisited;
+                if (edgeIsWrongWay) {
+                    edge.flipEdge();
+                }
+                if (!srcIsVisited) {
+                    fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Private class representing a selected closable chain of fragments
      */
 
     private static class FragForClosabChains
@@ -769,9 +1118,7 @@ if(debug)
 
     /**
      * Method to select fragments that increase the likeliness of generating
-     * closable chains.
-     * TODO: only works for scaffold. neet to make it working for any type
-     * of fragment
+     * closable chains. Only works for scaffold.
      */
 
     protected static ArrayList<FragForClosabChains> getFragmentForClosableChain(
@@ -791,43 +1138,27 @@ if(debug)
             return lstChosenFfCc;            
         }
 
-        if (curVertex.getFragmentType() == 0)  
+        if (curVertex.getBuildingBlockType() == BBType.SCAFFOLD)  
         {
             for (ClosableChain cc : molGraph.getClosableChains())
             {
-//TODO del 
-if (debug)
-{
-    System.out.println(" ");
-    System.out.println("dapidx:"+dapidx+" curVertex"+curVertex);
-    System.out.println("ClosableChain: " + cc);
-}
-
                 int posInCc = cc.involvesVertex(curVertex);
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
-                int nfty = -1;
+                BBType nfty = BBType.UNDEFINED;
                 int nfap = -1;
 
                 if (cLink.getApIdToLeft() != dapidx && 
                     cLink.getApIdToRight() != dapidx)
                 {
                     // Chain does not involve AP dapidx
-//TODO del
-if(debug)
-    System.out.println("HERE: dapidx:"+dapidx+" curVertex"+curVertex+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
                     continue;
-
                 }
 
                 if (cLink.getApIdToRight() == dapidx)
                 {
                     if (cc.getSize() > (posInCc+1))
                     {
-//TODO del
-if(debug)
-    System.out.println("A: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is NOT the rightmost chain link
                         ChainLink nextChainLink = cc.getLink(posInCc+1);
                         nfid = nextChainLink.getMolID();
@@ -836,10 +1167,6 @@ if(debug)
                     }
                     else
                     {
-//TODO del
-if(debug)
-    System.out.println("B: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is the rightmost chain link
                         // closability bias suggest NO fragment
                     }
@@ -848,10 +1175,6 @@ if(debug)
                 {
                     if ((posInCc-1) >= 0)
                     {
-//TODO del
-if(debug)
-    System.out.println("C: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is NOT the leftmost chain link
                         ChainLink nextChainLink = cc.getLink(posInCc-1);
                         nfid = nextChainLink.getMolID();
@@ -860,10 +1183,6 @@ if(debug)
                     }
                     else
                     {
-//TODO del
-if(debug)
-    System.out.println("D: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                         // cLink is the leftmost chain link
                         // closability bias suggest NO fragment
                     }
@@ -871,13 +1190,13 @@ if(debug)
 
                 ArrayList<Integer> eligibleFrgId = new ArrayList<Integer>();
                 eligibleFrgId.add(nfid);
-                eligibleFrgId.add(nfty);
+                eligibleFrgId.add(nfty.toOldInt());
                 eligibleFrgId.add(nfap);
                 boolean found = false;
                 for (FragForClosabChains ffcc : lstChosenFfCc)
                 {
                     int fidA = ffcc.getFragIDs().get(0);
-                    int ftyA = ffcc.getFragIDs().get(1);
+                    BBType ftyA = BBType.parseInt(ffcc.getFragIDs().get(1));
                     int fapA = ffcc.getFragIDs().get(2);
                     if (nfid==fidA && nfty==ftyA && nfap==fapA)
                     {
@@ -907,85 +1226,45 @@ if(debug)
                     newChosenCc.addCompatibleCC(cc);
                     lstChosenFfCc.add(newChosenCc);
                 }
-
-//TODO del 
-if(debug)
-{
-    System.out.println("eligibleFrgId: "+eligibleFrgId);
-    System.out.println("lstChosenFfCc.size: "+lstChosenFfCc.size());
-    int iiii = 0;
-    for (FragForClosabChains ffcc : lstChosenFfCc)
-    {
-      iiii++;
-      System.out.println(iiii+" "+ffcc.getFragIDs()+" "+ffcc.getCompatibleCC().size()+ " "+ffcc.getIncompatibleCC().size());
-    }
-}
             }
         }
         else
         {
-            DENOPTIMVertex parent = molGraph.getParent(curVertex.getVertexId());
-            DENOPTIMEdge edge = molGraph.getEdgeAtPosition(
-                                molGraph.getIndexOfEdgeWithParent(
-                                             curVertex.getVertexId()));
-            int prntId = parent.getMolId();
-            int prntTyp = parent.getFragmentType();
-            int prntAp = edge.getSourceDAP();
-            int chidAp = edge.getTargetDAP();
+            DENOPTIMVertex parent = molGraph.getParent(curVertex);
+            DENOPTIMEdge edge = molGraph.getEdgeWithParent(
+                    curVertex.getVertexId());
+            int prntId = parent.getBuildingBlockId();
+            BBType prntTyp = parent.getBuildingBlockType();
+            int prntAp = edge.getSrcAPID();
+            int chidAp = edge.getTrgAPID();
             for (ClosableChain cc : molGraph.getClosableChains())
             {
-//TODO del 
-if(debug)
-{
-    System.out.println(" ");
-    System.out.println("dapidx:"+dapidx+" curVertex"+curVertex);
-    System.out.println("2-ClosableChain: " + cc);
-}
                 int posInCc = cc.involvesVertexAndAP(curVertex, dapidx, chidAp);
 
                 if (posInCc == -1)
                 {
                     // closable chain does not span this combination
                     // of vertex and APs
-//TODO del
-if(debug)
-    System.out.println("2-HERE: dapidx:"+dapidx+" curVertex"+curVertex+" chidAp:"+chidAp);
-
                     continue;
                 }
 
                 ChainLink cLink = cc.getLink(posInCc);
                 int nfid = -1;
-                int nfty = -1;
+                BBType nfty = BBType.UNDEFINED;
                 int nfap = -1;
 
                 int posScaffInCc = cc.getTurningPoint();
-
-//TODO del
-if(debug)
-    System.out.println("posInCc: "+posInCc+" posScaffInCc: "+posScaffInCc);
-
                 if (posInCc > posScaffInCc)
                 {
                     ChainLink parentLink = cc.getLink(posInCc - 1);
                     int pLnkId = parentLink.getMolID();
-                    int pLnkTyp = parentLink.getFragType();
+                    BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToRight();
-//TODO del
-if(debug)
-{
-    System.out.println("SCAFF is LEFT");
-    System.out.println("parent leftside: "+parentLink); 
-}
                     if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
                         cLink.getApIdToLeft() == chidAp)
                     {
                         if (cc.getSize() > (posInCc+1))
                         {
-//TODO del
-if(debug)
-    System.out.println("2A: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                             ChainLink nextChainLink = cc.getLink(posInCc + 1);
                             nfid = nextChainLink.getMolID();
                             nfty = nextChainLink.getFragType();
@@ -993,10 +1272,6 @@ if(debug)
                         }
                         else
                         {
-//TODO del
-if(debug)
-    System.out.println("2B: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                             // cLink is the rightmost chain link
                             // closability bias suggests NO fragment
                         }
@@ -1004,14 +1279,6 @@ if(debug)
                     else
                     {
                         // different parent link
-//TODO del
-if(debug)
-{
-    System.out.println("01: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-    System.out.println("prntId: "+prntId+", prntTyp:"+prntTyp+", prntAp:"+prntAp+", chidAp:"+chidAp);
-    System.out.println("pLnkId: "+pLnkId+", pLnkTyp:"+pLnkTyp+", pLnkAp:"+pLnkAp+", cLink.getApIdToLeft():"+cLink.getApIdToLeft());
-    System.out.println("DIFFERENT PARENT LINK");
-}
                         continue;
                     }
                 }
@@ -1019,22 +1286,13 @@ if(debug)
                 {
                     ChainLink parentLink = cc.getLink(posInCc + 1);
                     int pLnkId = parentLink.getMolID();
-                    int pLnkTyp = parentLink.getFragType();
+                    BBType pLnkTyp = parentLink.getFragType();
                     int pLnkAp = parentLink.getApIdToLeft();
-//TODO del
-if(debug)
-{
-    System.out.println("SCAFF is RIGHT");
-    System.out.println("parent rightside: "+parentLink);
-}
                     if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
                         cLink.getApIdToRight() == chidAp)
                     {
                         if ((posInCc-1) >= 0)
                         {
-//TODO del
-if(debug)
-    System.out.println("2C: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
                             ChainLink nextChainLink = cc.getLink(posInCc - 1);
                             nfid = nextChainLink.getMolID();
                             nfty = nextChainLink.getFragType();
@@ -1042,10 +1300,6 @@ if(debug)
                         }
                         else
                         {
-//TODO del
-if(debug)
-    System.out.println("2D: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-
                             // cLink is the leftmost chain link
                             // closability bias suggest NO fragment
                         }
@@ -1053,14 +1307,6 @@ if(debug)
                     else
                     {
                         // different parent link
-//TODO del
-if(debug)
-{
-    System.out.println("02: "+dapidx+" apL:"+cLink.getApIdToLeft()+" apR:"+cLink.getApIdToRight()+" "+posInCc);
-    System.out.println("prntId: "+prntId+", prntTyp:"+prntTyp+", prntAp:"+prntAp+", chidAp:"+chidAp);
-    System.out.println("pLnkId: "+pLnkId+", pLnkTyp:"+pLnkTyp+", pLnkAp:"+pLnkAp+", cLink.getApIdToRight():"+cLink.getApIdToRight());
-    System.out.println("DIFFERENT PARENT LINK");
-}
                         continue;
 
                     }
@@ -1070,13 +1316,13 @@ if(debug)
 
                 ArrayList<Integer> eligibleFrgId = new ArrayList<Integer>();
                 eligibleFrgId.add(nfid);
-                eligibleFrgId.add(nfty);
+                eligibleFrgId.add(nfty.toOldInt());
                 eligibleFrgId.add(nfap);
                 boolean found = false;
                 for (FragForClosabChains ffcc : lstChosenFfCc)
                 {
                     int fidA = ffcc.getFragIDs().get(0);
-                    int ftyA = ffcc.getFragIDs().get(1);
+                    BBType ftyA = BBType.parseInt(ffcc.getFragIDs().get(1));
                     int fapA = ffcc.getFragIDs().get(2);
                     if (nfid==fidA && nfty==ftyA && nfap==fapA)
                     {
@@ -1106,18 +1352,6 @@ if(debug)
                     newChosenCc.addCompatibleCC(cc);
                     lstChosenFfCc.add(newChosenCc);
                 }
-//TODO del 
-if(debug)
-{
-    System.out.println("eligibleFrgId: "+eligibleFrgId);
-    System.out.println("lstChosenFfCc.size: "+lstChosenFfCc.size());
-    int iiii = 0;
-    for (FragForClosabChains ffcc : lstChosenFfCc)
-    {
-      iiii++;
-      System.out.println(iiii+" "+ffcc.getFragIDs()+" "+ffcc.getCompatibleCC().size()+ " "+ffcc.getIncompatibleCC().size());
-    }
-}
             }
         }
 
@@ -1127,75 +1361,13 @@ if(debug)
 //------------------------------------------------------------------------------
 
     /**
-     * Selects proper verices and performs crossover between two graphs
-     * @param male the first Graph
-     * @param female the second Graph
-     * @return <code>true</code> if a new graph has been successfully produced
-     * @throws DENOPTIMException 
-     */
-
-    public static boolean performCrossover(DENOPTIMGraph male,
-                                DENOPTIMGraph female) throws DENOPTIMException
-    {
-
-        // This is done to maintain a unique vertex-id mapping
-        GraphUtils.renumberGraphVertices(male);
-        GraphUtils.renumberGraphVertices(female);
-
-        if(debug)
-        {
-            System.err.println("DBUG: performCrossover " + male.getGraphId() +
-                                                " " + female.getGraphId());
-            System.err.println("DBUG: MALE(renum): " + male);
-            System.err.println("DBUG: FEMALE(renum): " + female);
-        }
-
-        // select vertices for crossover
-        int mvid, fvid;
-        if (FragmentSpace.useAPclassBasedApproach())
-        {
-            // remove the capping groups
-            GraphUtils.removeCappingGroups(male);
-            GraphUtils.removeCappingGroups(female);
-            
-            // select vertices with compatible parent class
-            RMap rp = locateCompatibleXOverPoints(male, female);
-            //System.err.println("XOVER POINTS " + rp.toString());
-            
-            mvid = rp.getId1();
-            fvid = rp.getId2();
-        }
-        else
-        {
-            MersenneTwister rng = RandomUtils.getRNG();
-            // select randomly
-            //int k1 = GAParameters.getRNG().nextInt(male.getVertexCount());
-            //int k2 = GAParameters.getRNG().nextInt(female.getVertexCount());
-            
-            int k1 = rng.nextInt(male.getVertexCount());
-            int k2 = rng.nextInt(female.getVertexCount());
-
-            if (k1 == 0)
-                k1 = k1 + 1; // not selecting the first vertex
-            if (k2 == 0)
-                k2 = k2 + 1; // not selecting the first vertex
-            mvid = male.getVertexAtPosition(k1).getVertexId();
-            fvid = female.getVertexAtPosition(k2).getVertexId();
-        }
-
-        return performCrossover(male,mvid,female,fvid);
-    }
-
-
-//------------------------------------------------------------------------------
-
-    /**
      * Performs crossover between two graphs on a given pair of vertexIDs
      * @param male the first Graph
      * @param female the second Graph
-     * @param mvid vertexID of the root vertex of the branch of male to echange
-     * @param mfvid vertexID of the root vertex of the branch of female to 
-     * echange
+     * @param mvid vertexID of the root vertex of the branch of male to exchange
+     * @param fvid vertexID of the root vertex of the branch of female to
+     * exchange
+     * @par
      * @return <code>true</code> if a new graph has been successfully produced
      * @throws DENOPTIMException
      */
@@ -1203,93 +1375,170 @@ if(debug)
     public static boolean performCrossover(DENOPTIMGraph male, int mvid,
                         DENOPTIMGraph female, int fvid) throws DENOPTIMException
     {
+        return performCrossover(male, mvid, female, fvid, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Performs crossover between two graphs on a given pair of vertexIDs
+     * @param male the first Graph
+     * @param female the second Graph
+     * @param mvid vertexID of the root vertex of the branch of male to exchange
+     * @param fvid vertexID of the root vertex of the branch of female to
+     * exchange
+     * @return <code>true</code> if a new graph has been successfully produced
+     * @throws DENOPTIMException
+     */
+
+    public static boolean performCrossover(DENOPTIMGraph male, int mvid,
+                        DENOPTIMGraph female, int fvid, boolean debug)
+                                throws DENOPTIMException
+    {   
         if(debug)
         {
             System.err.println("Crossover on vertices " + mvid + " " + fvid);
+            System.err.println("Male graph:   "+male);
+            System.err.println("Female graph: "+female);
         }
 
-        // get details about crosover points
+        // get details about crossover points
         DENOPTIMVertex mvert = male.getVertexWithId(mvid);
         DENOPTIMVertex fvert = female.getVertexWithId(fvid);
-        int eidxM = male.getIndexOfEdgeWithParent(mvid);
-        int eidxF = female.getIndexOfEdgeWithParent(fvid);
-        DENOPTIMEdge eM = male.getEdgeAtPosition(eidxM);
-        DENOPTIMEdge eF = female.getEdgeAtPosition(eidxF);
-        int apidxMP = eM.getSourceDAP(); // ap index of the male parent
-        int apidxMC = eM.getTargetDAP(); // ap index of the male
-        int apidxFC = eF.getTargetDAP(); // ap index of the female
-        int apidxFP = eF.getSourceDAP(); // ap index of the female parent
-        int bndOrder = eM.getBondType();
+        
+        return performCrossover(male, mvert, female, fvert, debug);
+    }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Performs crossover between two graphs on a given pair of vertexes. 
+     * This method does changes the given graphs, so 
+     * @param male the first Graph
+     * @param female the second Graph
+     * @param mvert the root vertex of the branch of male to exchange
+     * @param fvert the root vertex of the branch of female to
+     * exchange
+     * @return <code>true</code> if a new graph has been successfully produced
+     * @throws DENOPTIMException
+     */
+
+    public static boolean performCrossover(DENOPTIMGraph male, 
+            DENOPTIMVertex mvert,DENOPTIMGraph female, DENOPTIMVertex fvert, 
+            boolean debug) throws DENOPTIMException
+    {
+        //TODO-V3 massive use of pointers (i.e., integers pointing to a position 
+        // in a list of things) should be replaced with use of references
+        
         if(debug)
         {
-            int fragid_M = mvert.getMolId();
-            int fragid_F = fvert.getMolId();
-            System.err.println("Male XOVER frag   molID: " + fragid_M);
-            System.err.println("Female XOVER frag molID: " + fragid_F);
+            System.err.println("Attempt to perform Crossover");
+            System.err.println("Male graph:   "+male);
+            System.err.println("Male XOVER vertex: " + mvert);
+            System.err.println("Female graph: "+female);
+            System.err.println("Female XOVER vertex: " + fvert);
         }
+        
+        DENOPTIMEdge eM = mvert.getEdgeToParent();
+        DENOPTIMEdge eF = fvert.getEdgeToParent();
+        int apidxMP = eM.getSrcAPID(); // ap index of the male parent
+        int apidxMC = eM.getTrgAPID(); // ap index of the male
+        int apidxFC = eF.getTrgAPID(); // ap index of the female
+        int apidxFP = eF.getSrcAPID(); // ap index of the female parent
+        BondType bndOrder = eM.getBondType();
 
         // Identify all verteces symmetric to the ones chosen for xover
         // Xover is to be projected on each of these
-	// TODO: evaluate whether to use the symmetricSets already in the graph
-	// instead of re-determinimg the symmetry from scratch
+        
         ArrayList<Integer> symVrtIDs_M = 
-                        GraphUtils.getSymmetricVertices(male, mvert,
-                             FragmentSpace.useAPclassBasedApproach());
-        ArrayList<Integer> symVrtIDs_F =
-                        GraphUtils.getSymmetricVertices(female, fvert,
-                            FragmentSpace.useAPclassBasedApproach());
-
+                male.getSymSetForVertexID(mvert.getVertexId()).getList();
+        ArrayList<Integer> symVrtIDs_F = 
+                female.getSymSetForVertexID(fvert.getVertexId()).getList();
+        
+        if (debug)
+        {
+            System.out.println("DBUG: MALE sym sites: "+symVrtIDs_M);
+            System.out.println("DBUG: FEMALE sym sites: "+symVrtIDs_F);
+        }
+        
         // MALE: Find all parent verteces and AP indeces where the incoming 
         // graph will have to be placed
         ArrayList<DENOPTIMVertex> symParVertM = new ArrayList<DENOPTIMVertex>();
         ArrayList<Integer> symmParAPidxM = new ArrayList<Integer>();
+        ArrayList<Integer> toRemoveFromM = new ArrayList<Integer>();
         for (int i=0; i<symVrtIDs_M.size(); i++)
         {
             int svid = symVrtIDs_M.get(i);
+            if (svid == mvert.getVertexId())
+            {
+                // We keep only the branch of the vertex identified for crossover
+                continue;
+            }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = male.getEdgeWithParent(svid);
-            DENOPTIMVertex spv = male.getParent(svid);
+            DENOPTIMVertex spv = male.getParent(male.getVertexWithId(svid));
             symParVertM.add(spv);
-            symmParAPidxM.add(se.getSourceDAP());
-            //Delete the symmetric vertex 
-            GraphUtils.deleteVertex(male, svid);
+            symmParAPidxM.add(se.getSrcAPID());
+            toRemoveFromM.add(svid);
+        }
+        for (Integer svid : toRemoveFromM)
+        {
+            male.removeBranchStartingAt(male.getVertexWithId(svid));
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
-        symParVertM.add(male.getParent(mvid));        
+        symParVertM.add(male.getParent(mvert));        
         symmParAPidxM.add(apidxMP);
+        if (debug)
+        {
+            System.out.println("DEBUG: MALE After removal of symm:");
+            System.out.println("DEBUG: "+male);
+        }
 
         // FEMALE Find all parent verteces and AP indeces where the incoming
         // graph will have to be placed
         ArrayList<DENOPTIMVertex> symParVertF = new ArrayList<DENOPTIMVertex>();
         ArrayList<Integer> symmParAPidxF = new ArrayList<Integer>();
+        ArrayList<Integer> toRemoveFromF = new ArrayList<Integer>();
         for (int i=0; i<symVrtIDs_F.size(); i++)
         {
             int svid = symVrtIDs_F.get(i);
+            if (svid == fvert.getVertexId())
+            {
+                // We keep only the branch of the vertex identified for crossover
+                continue;
+            }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = female.getEdgeWithParent(svid);
-            DENOPTIMVertex spv = female.getParent(svid);
+            DENOPTIMVertex spv = female.getParent(female.getVertexWithId(svid));
             symParVertF.add(spv);
-            symmParAPidxF.add(se.getSourceDAP());
-            //Delete the symmetric vertex
-            GraphUtils.deleteVertex(female, svid);
+            symmParAPidxF.add(se.getSrcAPID());
+            toRemoveFromF.add(svid);
+        }
+        for (Integer svid : toRemoveFromF)
+        {
+            female.removeBranchStartingAt(female.getVertexWithId(svid));
         }
         // Include also the chosen vertex (and AP), but do NOT remove it
-        symParVertF.add(female.getParent(fvid));        
+        symParVertF.add(female.getParent(fvert));        
         symmParAPidxF.add(apidxFP);
+        if (debug)
+        {
+            System.out.println("DEBUG: FEMALE After removal of symm:");
+            System.out.println("DEBUG: "+female);
+        }
 
         // record levels: we'll need to set them in the incoming subgraphs
-        int lvl_male = male.getVertexWithId(mvid).getLevel();
-        int lvl_female = female.getVertexWithId(fvid).getLevel();
+        int lvl_male = mvert.getLevel();
+        int lvl_female = fvert.getLevel();
 
-        // extract subgraphs (i.e., branched of graphs that will be exchanged)
+        // extract subgraphs (i.e., branches of graphs that will be exchanged)
         if (debug)
         {
             System.out.println("DBUG: MALE sites for FEMALE subGraph:");
             for (int i=0; i<symParVertM.size(); i++)
             {
-                System.out.println("     v:"  + symParVertM.get(i) + 
-                                                   " ap:"+symmParAPidxM.get(i));
+                System.out.println("     v:"  + symParVertM.get(i) 
+                    + " ap:"+symmParAPidxM.get(i));
             }
             System.out.println("DBUG: FEMALE sites for MALE subGraph:");
             for (int i=0; i<symParVertF.size(); i++)
@@ -1300,8 +1549,9 @@ if(debug)
             System.out.println("DBUG: MALE before extraction: "+male);
             System.out.println("DBUG: FEMALE before extraction: "+female);
         }
-        DENOPTIMGraph subG_M =  GraphUtils.extractSubgraph(male,mvid);
-        DENOPTIMGraph subG_F =  GraphUtils.extractSubgraph(female,fvid);
+        
+        DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
+        DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
         if (debug)
         {
             System.out.println("DBUG: subGraph from male: "+subG_M);
@@ -1311,14 +1561,14 @@ if(debug)
         }
 
         // set the level of each branch according to the destination graph
-        GraphUtils.updateLevels(subG_M.getVertexList(), lvl_female);
-        GraphUtils.updateLevels(subG_F.getVertexList(), lvl_male);
+        subG_M.changeLevelToAll(lvl_female);
+        subG_F.changeLevelToAll(lvl_male);
 
         // attach the subgraph from M/F onto F/M in all symmetry related APs
-        GraphUtils.appendGraphOnGraph(male, symParVertM, symmParAPidxM, 
-                subG_F, subG_F.getVertexAtPosition(0), apidxFC, bndOrder, true);
-        GraphUtils.appendGraphOnGraph(female, symParVertF, symmParAPidxF, 
-                subG_M, subG_M.getVertexAtPosition(0), apidxMC, bndOrder, true);
+        male.appendGraphOnGraph(symParVertM, symmParAPidxM, subG_F,
+                subG_F.getVertexAtPosition(0), apidxFC, bndOrder, true);
+        female.appendGraphOnGraph(symParVertF, symmParAPidxF, subG_M,
+                subG_M.getVertexAtPosition(0), apidxMC, bndOrder, true);
 
         return true;
     }
@@ -1328,18 +1578,18 @@ if(debug)
     /**
      * Decides whether to apply constitutional symmetry or not. Application
      * of this type of symmetry implies that the operation on the graph/molecule
-     * is to be performed on all the attachment point/verteces related to each
+     * is to be performed on all the attachment point/vertices related to each
      * other by "constitutional symmetry". Such type symmetry is defined by
      * {@link DENOPTIM.utils.FragmentUtils.getMatchingAP getMatchingAP} 
-     * for a single fragment, and symmetric verices in a graph are found by
+     * for a single fragment, and symmetric vertices in a graph are found by
      * {@link DENOPTIM.utils.GraphUtils.getSymmetricVertices getSymmetricVertices}.
-     * This method takes into account the effect of the symmetric subtitution 
+     * This method takes into account the effect of the symmetric substitution 
      * probability, and the symmetry-related keywords.
      * @param apClass the attachment point class.
      * @return <code>true</code> if symmetry is to be applied
      */
 
-    protected static boolean applySymmetry(String apClass)
+    protected static boolean applySymmetry(APClass apClass)
     {
         boolean r = false;
         if (FragmentSpace.imposeSymmetryOnAPsOfClass(apClass))
@@ -1352,7 +1602,197 @@ if(debug)
         }
         return r;
     }
+   
+//------------------------------------------------------------------------------
+    
+    /**
+     * Tries to do mutate the given graph. The mutation site and type are 
+     * chosen randomly according to the possibilities declared by the graph.
+     * The graph that owns the vertex will be altered and
+     * the original structure and content of the graph will be lost.
+     * @param graph the graph to mutate.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMGraph graph, Monitor mnt)
+                                                    throws DENOPTIMException
+    {  
+        // Get vertices that can be mutated: they can be part of subgraphs
+        // embedded in templates
+        List<DENOPTIMVertex> mutable = graph.getMutableSites();
+        if (mutable.size() == 0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);
+            String msg = "Graph has no mutable site. Mutation aborted.";
+            DENOPTIMLogger.appLogger.info(msg);
+            return false;
+        }
+        return performMutation(RandomUtils.randomlyChooseOne(mutable),mnt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Tries to do mutate the given vertex. We assume the vertex to belong to a 
+     * graph, if not no mutation is done. The mutation type is
+     * chosen randomly according the the possibilities declared by the vertex.
+     * The graph that owns the vertex will be altered and
+     * the original structure and content of the graph will be lost.
+     * @param vertex the vertex to mutate.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
+            throws DENOPTIMException
+    {
+        MutationType mType = RandomUtils.randomlyChooseOne(
+                vertex.getMutationTypes());
+        return performMutation(vertex, mType, mnt);
+    }
+    
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Mutates the given vertex according to the given mutation type, if
+     * possible. Vertex that do not belong to any graph or that do not
+     * allow the requested kind of mutation, are not mutated.
+     * The graph that owns the vertex ill be altered and
+     * the original structure and content of the graph will be lost. 
+     * @param vertex the vertex to mutate.
+     * @param mType the type of mutation to perform.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMVertex vertex, 
+            MutationType mType, Monitor mnt) throws DENOPTIMException
+    {  
+        return performMutation(vertex, mType, false, -1 ,-1, mnt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Mutates the given vertex according to the given mutation type, if
+     * possible. Vertex that do not belong to any graph or that do not
+     * allow the requested kind of mutation, are not mutated.
+     * The graph that owns the vertex will be altered and
+     * the original structure and content of the graph will be lost. 
+     * @param vertex the vertex to mutate.
+     * @param mType the type of mutation to perform.
+     * @param force set to <code>true</code> to ignore growth probability. 
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the incoming vertex to the 
+     * given index. This parameter is ignored for mutation types that do not
+     * define an incoming vertex (i.e., {@link MutationType#DELETE}).
+     * @param chosenApId if greater than or equals to zero, 
+     * sets the choice of the AP to the 
+     * given index. 
+     * Depending on the type of mutation,
+     * the AP can be on the incoming vertex (i.e., the vertex that will be added
+     * to the graph) or on the target vertex (i.e., the vertex that already 
+     * belongs to the graph and that is the focus of the mutation).
+     * This parameter is ignored for mutation types that do not
+     * define an incoming vertex (i.e., {@link MutationType#DELETE}).
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    
+    public static boolean performMutation(DENOPTIMVertex vertex, 
+            MutationType mType, boolean force, int chosenVrtxIdx, 
+            int chosenApId, Monitor mnt) throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = vertex.getGraphOwner();
+        if (graph == null)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOOWNER);
+            DENOPTIMLogger.appLogger.info("Vertex has no owner - "
+                    + "Mutation aborted");
+            return false;
+        }
+        if (!vertex.getMutationTypes().contains(mType))
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE);
+            DENOPTIMLogger.appLogger.info("Vertex does not allow mutation type "
+                    + "'" + mType + "' - Mutation aborted");
+            return false;
+        }
+        
+        int graphId = graph.getGraphId();
+        graph.setLocalMsg(graph.getLocalMsg() + " " + mType + " " 
+                + vertex.getVertexId());
+        
+        boolean done = false;
+        switch (mType) 
+        {
+            case CHANGEBRANCH:
+                done = substituteBranch(vertex, force, chosenVrtxIdx, chosenApId);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);
+                break;
+                
+            case CHANGELINK:
+                done = substituteLink(vertex, chosenVrtxIdx, mnt);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+                break;
+                
+            case ADDLINK:
+                if (chosenApId < 0)
+                {
+                    List<Integer> candidates = new ArrayList<Integer>();
+                    for (DENOPTIMVertex c : vertex.getChilddren())
+                    {
+                        candidates.add(c.getEdgeToParent().getSrcAP()
+                                .getIndexInOwner());
+                    }
+                    chosenApId = RandomUtils.randomlyChooseOne(candidates);
+                }
+                done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
+                break;
+                
+            case EXTEND:
+                vertex.getGraphOwner().removeCappingGroupsOn(vertex);
+                done = extendGraph(vertex, false, false, force, chosenVrtxIdx, 
+                        chosenApId);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOEXTEND);
+                break;
+                
+            case DELETE:
+                done = deleteFragment(vertex);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELETE);
+                break;
+        }
+        
+        String msg = "Mutation '" + mType.toString() + "' on vertex " +
+        vertex.toString() + " (graph " + graphId+"): ";
+        if (done)
+            msg = msg + "done";
+        else
+            msg = msg + "unsuccessful";
+        DENOPTIMLogger.appLogger.info(msg);
+
+        return done;
+    }
 
 //------------------------------------------------------------------------------
+
+
 
 }

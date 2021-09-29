@@ -18,30 +18,26 @@
 
 package grapheditor;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
+import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.GraphConversionTool;
-import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.io.DenoptimIO;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.rings.RingClosureParameters;
 
 
 /**
@@ -460,8 +456,7 @@ public class GraphEdParameters
      * @throws DENOPTIMException
      */
 
-    public static void processParameters() throws DENOPTIMException
-    {
+    public static void processParameters() throws DENOPTIMException {
         if (FragmentSpaceParameters.fsParamsInUse())
         {
             FragmentSpaceParameters.processParameters();
@@ -489,7 +484,7 @@ public class GraphEdParameters
 	    {
 		case (STRINGFORMATLABEL):
 		{
-                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
                                                              inGraphsFile,true);
 		    break;
                 }
@@ -508,9 +503,10 @@ public class GraphEdParameters
 		    for (IAtomContainer m : inMols)
 		    {
 			i++;
-			if (m.getProperty("GraphENC") != null)
+			if (m.getProperty(DENOPTIMConstants.GRAPHTAG) != null)
             		{
-			    String sGrp = m.getProperty("GraphENC").toString();
+			    String sGrp = m.getProperty(
+			            DENOPTIMConstants.GRAPHTAG).toString();
 			    GraphConversionTool gct = new GraphConversionTool();
 			    DENOPTIMGraph g = gct.getGraphFromString(sGrp);
 			    inGraphs.add(g);

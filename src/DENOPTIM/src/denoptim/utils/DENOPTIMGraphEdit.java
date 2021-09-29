@@ -18,22 +18,18 @@
 
 package denoptim.utils;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EdgeQuery;
-import denoptim.rings.ClosableChain;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
+import denoptim.molecule.EmptyVertex;
 
 
 /**
@@ -42,8 +38,7 @@ import denoptim.utils.GraphConversionTool;
  * @author Marco Foscato
  */
 
-public class DENOPTIMGraphEdit
-{
+public class DENOPTIMGraphEdit {
     /**
      * Type of editing task
      */
@@ -57,7 +52,7 @@ public class DENOPTIMGraphEdit
     /**
      * Attachment point subject to editing task
      */
-    private DENOPTIMAttachmentPoint focusAP = null; 
+    private DENOPTIMAttachmentPoint focusAP = null;
 
     /**
      * Edge subject to editing task
@@ -73,11 +68,11 @@ public class DENOPTIMGraphEdit
     private final String TYPLAB = "Type=";
     private final String VRTLAB = "FocusVertex=";
     private final String EDGLAB = "FocusEdge=";
-    private final String APLAB  = "FocusAP=";
+    private final String APLAB = "FocusAP=";
     private final String GRPLAB = "IncomingGraph=";
 
     /**
-     * String identifying the task of replacing a chiled and all its branch
+     * String identifying the task of replacing a child and all its branch
      * with a given sub-graph
      */
     public static final String REPLACECHILD = "REPLACECHILD";
@@ -87,15 +82,11 @@ public class DENOPTIMGraphEdit
      */
     public static final String DELETEVERTEX = "DELETEVERTEX";
     public static final Set<String> EDIT_TASKS =
-                    new HashSet<>(Arrays.asList(new String[] {
-                                  REPLACECHILD,
-                                  DELETEVERTEX}
-                    ));
+            new HashSet<>(Arrays.asList(REPLACECHILD, DELETEVERTEX));
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraphEdit()
-    {
+    public DENOPTIMGraphEdit() {
     }
 
 //------------------------------------------------------------------------------
@@ -113,13 +104,11 @@ public class DENOPTIMGraphEdit
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraphEdit(String line) throws DENOPTIMException
-    {
-        if (!line.trim().startsWith("DENOPTIMGraphEdit "))
-        {
-            String msg = "Line '" + line.trim() +"' does not start with the "
-                         + " 'DENOPTIMGraphEdit ' label. Cannot be converted "
-                         + "into a DENOPTIMGraphEdit.";
+    public DENOPTIMGraphEdit(String line) throws DENOPTIMException {
+        if (!line.trim().startsWith("DENOPTIMGraphEdit ")) {
+            String msg = "Line '" + line.trim() + "' does not start with the "
+                    + " 'DENOPTIMGraphEdit ' label. Cannot be converted "
+                    + "into a DENOPTIMGraphEdit.";
             throw new DENOPTIMException(msg);
         }
 
@@ -128,63 +117,59 @@ public class DENOPTIMGraphEdit
         int startOfEdg = line.indexOf(EDGLAB);
         int startOfAP = line.indexOf(APLAB);
         int startOfGraph = line.indexOf(GRPLAB);
-        if (-1 == startOfType)
-        {
-            String msg = "Cannot fine type of graph enditing task in Line '" 
-                                          + line.trim() +"'. Check the inptu.";
+        if (-1 == startOfType) {
+            String msg = "Cannot fine type of graph editing task in Line '"
+                    + line.trim() + "'. Check the input.";
             throw new DENOPTIMException(msg);
         }
-        String typStr = line.substring(startOfType+TYPLAB.length());
-        typStr = typStr.substring(0,GenUtils.getIdxOfClosing(2,typStr));
-        if (!EDIT_TASKS.contains(typStr.toUpperCase()))
-        {
-            String msg = "Unrecognized type of graph enditing task in Line '"
-                                          + line.trim() +"'. Check the inptu.";
+        String typStr = line.substring(startOfType + TYPLAB.length());
+        typStr = typStr.substring(0, GenUtils.getIdxOfClosing(2, typStr));
+        if (!EDIT_TASKS.contains(typStr.toUpperCase())) {
+            String msg = "Unrecognized type of graph editing task in Line '"
+                    + line.trim() + "'. Check the input.";
             throw new DENOPTIMException(msg);
         }
         this.taskType = typStr;
 
-        if (-1 != startOfVrt)
-        {
-            String str = line.substring(startOfVrt+VRTLAB.length());
-            str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
-	    str = str.trim();
-            String strPrts[] = str.split("_");
+        if (-1 != startOfVrt) {
+            String str = line.substring(startOfVrt + VRTLAB.length());
+            str = str.substring(0, GenUtils.getIdxOfClosing(2, str));
+            str = str.trim();
+            String[] strPrts = str.split("_");
             // vertex id
-	    int vid = -1;
-	    if (!strPrts[0].equals("*"))
-	    {
-		vid = Integer.parseInt(strPrts[0]);
-	    }
+            int vid = -1;
+            if (!strPrts[0].equals("*")) {
+                vid = Integer.parseInt(strPrts[0]);
+            }
             // molid
             int molid = -1;
-            if (!strPrts[1].equals("*"))
-            {
+            if (!strPrts[1].equals("*")) {
                 molid = Integer.parseInt(strPrts[1]) - 1;
             }
             // type scaffold/fragment/capping group
-            int fragtype = -1;
-            if (!strPrts[2].equals("*"))
-            {
-                fragtype = Integer.parseInt(strPrts[2]);
+            DENOPTIMVertex.BBType fragtype = DENOPTIMVertex.BBType.UNDEFINED;
+            if (!strPrts[2].equals("*")) {
+                fragtype = DENOPTIMVertex.BBType.parseInt(Integer.parseInt(strPrts[2]));
             }
             // level
             int level = -2;
-            if (!strPrts[3].equals("*"))
-            {
+            if (!strPrts[3].equals("*")) {
                 level = Integer.parseInt(strPrts[3]);
             }
-            DENOPTIMVertex dv = new DENOPTIMVertex(vid, molid, 
-			   new ArrayList<DENOPTIMAttachmentPoint>(), fragtype);
+
+            //TODO-V3: use whatever way to identify a fragment without giving a 
+            // vertex ID
+            DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,
+                    fragtype);
+
             dv.setLevel(level);
 
             this.focusVrtx = dv;
         }
 
-        if (-1 != startOfEdg)
-        {
-            String str = line.substring(startOfEdg+EDGLAB.length());
-            str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
+        if (-1 != startOfEdg) {
+            String str = line.substring(startOfEdg + EDGLAB.length());
+            str = str.substring(0, GenUtils.getIdxOfClosing(2, str));
             str = str.trim();
             
             this.focusEdge = new EdgeQuery();
@@ -198,7 +183,7 @@ public class DENOPTIMGraphEdit
             // source attachment point
             if (!strPrts[1].equals("*"))
             {
-                this.focusEdge.setSourceDAP(Integer.parseInt(strPrts[1]));
+                this.focusEdge.setSourceAPIdx(Integer.parseInt(strPrts[1]));
             }
             // target vertex
             if (!strPrts[2].equals("*"))
@@ -208,12 +193,12 @@ public class DENOPTIMGraphEdit
             // target attachment point
             if (!strPrts[3].equals("*"))
             {
-                this.focusEdge.setTargetDAP(Integer.parseInt(strPrts[3]));
+                this.focusEdge.setTargetAPIdx(Integer.parseInt(strPrts[3]));
             }
             // bond type
             if (!strPrts[4].equals("*"))
             {
-                this.focusEdge.setBondType(Integer.parseInt(strPrts[4]));
+                this.focusEdge.setBondType(BondType.valueOf(strPrts[4]));
             }
 		    
 		    if (strPrts.length > 5)
@@ -221,49 +206,44 @@ public class DENOPTIMGraphEdit
 		        //source APClass
 		        if (!strPrts[5].equals("*"))
 		        {
-                    this.focusEdge.setSourceReaction(strPrts[5]);
+                    this.focusEdge.setSourceAPClass(APClass.make(strPrts[5]));
                 }
 
                 //target APClass
                 if (!strPrts[6].equals("*"))
                 {
-                    this.focusEdge.setTargetReaction(strPrts[6]);
+                    this.focusEdge.setTargetAPClass(APClass.make(strPrts[6]));
                 }
 		    }
         }
 
-        if (-1 != startOfAP)
-        {
-            String str = line.substring(startOfAP+APLAB.length());
-            str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
+        if (-1 != startOfAP) {
+            String str = line.substring(startOfAP + APLAB.length());
+            str = str.substring(0, GenUtils.getIdxOfClosing(2, str));
             str = str.trim();
-            String strPrts[] = str.split("\\|");
+            String[] strPrts = str.split("\\|");
             // AP index
             int apid = -1;
-            if (!strPrts[0].equals("*"))
-            {
+            if (!strPrts[0].equals("*")) {
                 apid = Integer.parseInt(strPrts[0]);
             }
             // number of potential connections
             int conn = -1;
-            if (!strPrts[1].equals("*"))
-            {
+            if (!strPrts[1].equals("*")) {
                 conn = Integer.parseInt(strPrts[1]);
             }
             // number of free connections
             int fconn = -1;
-            if (!strPrts[2].equals("*"))
-            {
+            if (!strPrts[2].equals("*")) {
                 fconn = Integer.parseInt(strPrts[2]);
             }
-            DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(apid,conn,
-								        fconn);
-		    if (strPrts.length > 3)
-		    {
+            EmptyVertex dummyVertex = new EmptyVertex();
+            dummyVertex.addAP(apid, conn, fconn);
+            DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
+            if (strPrts.length > 3) {
                 // AP class
                 String apClass = "*";
-                if (!strPrts[3].equals("*"))
-                {
+                if (!strPrts[3].equals("*")) {
                     apClass = strPrts[3];
                 }
                 ap.setAPClass(apClass);
@@ -271,10 +251,9 @@ public class DENOPTIMGraphEdit
 		    this.focusAP = ap;
         }
 
-        if (-1 != startOfGraph)
-        {
-            String str = line.substring(startOfGraph+GRPLAB.length());
-            str = str.substring(0,GenUtils.getIdxOfClosing(2,str));
+        if (-1 != startOfGraph) {
+            String str = line.substring(startOfGraph + GRPLAB.length());
+            str = str.substring(0, GenUtils.getIdxOfClosing(2, str));
             str = str.trim();
             this.incomingGraph = GraphConversionTool.getGraphFromString(str);
         }
@@ -282,29 +261,25 @@ public class DENOPTIMGraphEdit
 
 //------------------------------------------------------------------------------
 
-    public String getType()
-    {
+    public String getType() {
         return taskType;
     }
-    
+
 //------------------------------------------------------------------------------
 
-    public void setType(String t)
-    {
+    public void setType(String t) {
         this.taskType = t;
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getFocusVertex()
-    {
+    public DENOPTIMVertex getFocusVertex() {
         return focusVrtx;
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMAttachmentPoint getFocusAP()
-    {
+    public DENOPTIMAttachmentPoint getFocusAP() {
         return focusAP;
     }
 
@@ -317,27 +292,21 @@ public class DENOPTIMGraphEdit
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph getIncomingGraph()
-    {
-	return incomingGraph;
+    public DENOPTIMGraph getIncomingGraph() {
+        return incomingGraph;
     }
 
 //------------------------------------------------------------------------------
 
     @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder(512);
-        
-        sb.append("DENOPTIMGraphEdit [[");
-        sb.append(TYPLAB).append("=").append(taskType).append("] ");
-        sb.append(VRTLAB).append("=").append(focusVrtx.toString()).append("] ");
-        sb.append(EDGLAB).append("=").append(focusEdge.toString()).append("] ");
-        sb.append(APLAB).append("=").append(focusAP.toString()).append("] ");
-        sb.append(GRPLAB).append("=").append(incomingGraph.toString());
-        sb.append("]] ");
-
-        return sb.toString();
+    public String toString() {
+        return "DENOPTIMGraphEdit [[" +
+                TYPLAB + "=" + taskType + "] " +
+                VRTLAB + "=" + focusVrtx.toString() + "] " +
+                EDGLAB + "=" + focusEdge.toString() + "] " +
+                APLAB + "=" + focusAP.toString() + "] " +
+                GRPLAB + "=" + incomingGraph.toString() +
+                "]] ";
     }
 
 //------------------------------------------------------------------------------

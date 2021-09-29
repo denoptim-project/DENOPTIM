@@ -159,9 +159,9 @@ public class FSECheckPoint implements Serializable
      * latest one that has been properly processed.
      */
 
-    public void setNextIds(ArrayList<Integer> m_nextIds)
+    public void setNextIds(ArrayList<Integer> nextIds)
     {
-	nextIds = m_nextIds;
+	this.nextIds = nextIds;
     }
 
 //-----------------------------------------------------------------------------
@@ -170,9 +170,9 @@ public class FSECheckPoint implements Serializable
      * Set the current level
      */
 
-    public void setLevel(int m_level)
+    public void setLevel(int level)
     {
-	level = m_level;
+	this.level = level;
     }
 
 //-----------------------------------------------------------------------------

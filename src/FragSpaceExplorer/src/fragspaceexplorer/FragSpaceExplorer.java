@@ -22,7 +22,6 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.GenUtils;
 
 
 /**
@@ -101,13 +100,12 @@ public class FragSpaceExplorer
         }
         catch (Throwable t)
         {
-        	if (pCombExp != null)
-            {
-                pCombExp.stopRun();
-            }
+    	    if (pCombExp != null)
+    	    {
+                    pCombExp.stopRun();
+    	    }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
-            GenUtils.printExceptionChain(t);
-            throw new DENOPTIMException("Error in FragSpaceExplorer run.", t);
+            System.exit(-1);
         }
         
         // normal completion: do NOT call System exit(0) as we might be calling

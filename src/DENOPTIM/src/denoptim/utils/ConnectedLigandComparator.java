@@ -34,7 +34,6 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
     public int compare(ConnectedLigand a, ConnectedLigand b)
     {
         final int FIRST = 1;
-        final int EQUAL = 0;
         final int LAST = -1;
 
 	// Get the connection number
@@ -50,10 +49,10 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
             {
                 cnnA = 100;
             }
-	}
-	else
-	{
-            massA = a.getAtom().getMassNumber();
+    	}
+    	else
+    	{
+            massA = a.getAtom().getAtomicNumber();
         }
 
         if (b.isDummy())
@@ -65,27 +64,13 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
         }
         else
         {
-            massB = b.getAtom().getMassNumber();
+            massB = b.getAtom().getAtomicNumber();
         }
 
         //Decide on priority
         if (cnnA == cnnB)
         {
-            if (massA == massB)
-            {
-                return EQUAL;
-            }
-            else
-            {
-                if (massA < massB)
-                {
-                    return FIRST;
-                }
-                else
-                {
-                    return LAST;
-                }
-            }
+            return Integer.compare(massB, massA);
         }
         else
         {

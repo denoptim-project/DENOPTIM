@@ -20,14 +20,13 @@
 package denoptim.utils;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.interfaces.IAtom;
@@ -55,16 +54,9 @@ public class DummyAtomHandler
     
 //------------------------------------------------------------------------------
     
-    public void setDummyElement(String m_elm)
+    public DummyAtomHandler(String elm)
     {
-        elm = m_elm;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    public DummyAtomHandler(String m_elm)
-    {
-        elm = m_elm;
+        this.elm = elm;
     }    
 
 //------------------------------------------------------------------------------
@@ -75,30 +67,28 @@ public class DummyAtomHandler
 
     public static boolean isElement(String s)
     {
-        return (DENOPTIMConstants.ALL_ELEMENTS.contains(s)) ? true : false;
+        return DENOPTIMConstants.ALL_ELEMENTS.contains(s);
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Removes alldummy atoms and the bonds connecting them to other atoms
+     * Removes all dummy atoms and the bonds connecting them to other atoms
      */
 
-    public IAtomContainer removeDummy(IAtomContainer mol) throws DENOPTIMException
+    public IAtomContainer removeDummy(IAtomContainer mol)
     {
         List<IAtom> dummiesList = new ArrayList<>();
-        List<Integer> dummiesIdxs = new ArrayList<>();
 
         //Identify the target atoms to be treated
         for (IAtom atm : mol.atoms())
         {
-            String symbol = atm.getSymbol();
+            String symbol = DENOPTIMMoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
                 if (!isElement(symbol))
                 {
                     dummiesList.add(atm);
-                    dummiesIdxs.add(mol.getAtomNumber(atm));
                 }
             }
             else
@@ -106,7 +96,6 @@ public class DummyAtomHandler
                 if (symbol.equals(elm))
                 {
                     dummiesList.add(atm);
-                    dummiesIdxs.add(mol.getAtomNumber(atm));
                 }
             }
         }
@@ -141,20 +130,18 @@ public class DummyAtomHandler
     
     public IAtomContainer removeDummyInHapto(IAtomContainer mol) 
                                                         throws DENOPTIMException
-    {
+    {   
         List<IAtom> dummiesList = new ArrayList<>();
-        List<Integer> dummiesIdxs = new ArrayList<>();
         
         //Identify the target atoms to be treated
         for (IAtom atm : mol.atoms())
         {
-            String symbol = atm.getSymbol();
+            String symbol = DENOPTIMMoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
                 if (!isElement(symbol))
                 {
                     dummiesList.add(atm);
-                    dummiesIdxs.add(mol.getAtomNumber(atm));
                 }
             } 
             else 
@@ -162,7 +149,6 @@ public class DummyAtomHandler
                 if (symbol.equals(elm)) 
                 {
                     dummiesList.add(atm);
-                    dummiesIdxs.add(mol.getAtomNumber(atm));
                 }
             }
         }
@@ -224,7 +210,10 @@ public class DummyAtomHandler
                     Set<IAtom> s = goupsOfTerms.get(i);
                     System.err.print(" Group "+i+" - Hapticity: "+hapticity.get(i)+" => ");
                     for (IAtom sa : s)
-                        System.err.print((mol.getAtomNumber(sa)+1)+sa.getSymbol()+" ");
+                    {
+                        System.err.print((mol.getAtomNumber(sa)+1)+
+                                DENOPTIMMoleculeUtils.getSymbolOrLabel(sa)+" ");
+                    }
                     System.err.println(" ");
                 }
             }
@@ -328,9 +317,11 @@ public class DummyAtomHandler
                             {
                                 System.err.println("Making a bond between: " + 
                                     mol.getAtomNumber(ligandAtm) + 
-                                    ligandAtm.getSymbol() + " - " + 
+                                    DENOPTIMMoleculeUtils.getSymbolOrLabel(
+                                            ligandAtm) + " - " + 
                                     mol.getAtomNumber(centralAtm) + 
-                                    centralAtm.getSymbol());
+                                    DENOPTIMMoleculeUtils.getSymbolOrLabel(
+                                            centralAtm));
                             }
                             IBond bnd = new Bond(ligandAtm,centralAtm);
                             mol.addBond(bnd);
@@ -363,14 +354,7 @@ public class DummyAtomHandler
     private Set<IAtom> exploreConnectedToAtom(IAtom seed, List<IAtom> inList, 
                                 IAtomContainer mol, List<Boolean> doneFlag)
     {
-        // Set string for reporting and debugging
-        String recFlag = "";
-        for (int ri = 0; ri < recNum; ri++)
-             recFlag = recFlag+"-";
-
         Set<IAtom> outSet = new HashSet<>();
-        //System.err.println(recFlag+"Calling EXPLORE with seed: "+(mol.getAtomNumber(seed)+1)+seed.getSymbol());
-        //System.err.println(recFlag+"doneFlag is: "+doneFlag);
 
         //Deal with the seed
         int idx = inList.indexOf(seed);
@@ -379,22 +363,17 @@ public class DummyAtomHandler
 
         //Look for other atoms reachable from here
         List<IAtom> connToSeed = mol.getConnectedAtomsList(seed);
-        //System.err.println("size-PRE: "+connToSeed.size());
         connToSeed.retainAll(inList);
-        //System.err.println(recFlag+"size_POST: "+connToSeed.size());
         for (IAtom nbr : connToSeed)
         {
-            //System.err.println(recFlag+"NBS of seed: "+(mol.getAtomNumber(nbr)+1)+nbr.getSymbol());
             int idx2 = inList.indexOf(nbr);
             if (!doneFlag.get(idx2))
             {
                 recNum++;
-                //System.err.println(recFlag+"Recursion from: "+(mol.getAtomNumber(nbr)+1)+nbr.getSymbol());
-                Set<IAtom> recursiveOut = 
+                Set<IAtom> recursiveOut =
                             exploreConnectedToAtom(nbr,inList,mol, doneFlag);
                 recNum--;
-                for (IAtom recNbr : recursiveOut)
-                    outSet.add(recNbr);
+                outSet.addAll(recursiveOut);
             }
         }
         return outSet;
@@ -412,28 +391,10 @@ public class DummyAtomHandler
     private List<Boolean> getFlagsVector(int size)
     {
         //create a vector with false entries
-        int atoms = size;
         List<Boolean> flg = new ArrayList<>();
-        for (int i = 0; i<atoms; i++)
-                flg.add(false);
-
-        return flg;
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Generates a vector of boolean flags. The size of the vector equals the 
-     * number of atoms in the <code>IAtomContainer<code/>. 
-     * All flags are initialized to <code>false<code/>.
-     * @param mol molecular object for which the vector of flags has to be generated.
-     * @return a vector of flags.
-     */
-    private List<Boolean> getFlagsVector(IAtomContainer mol)
-    {
-        //create a vector with false entries
-        int atoms = mol.getAtomCount();
-        List<Boolean> flg = getFlagsVector(atoms);
+        for (int i = 0; i<size; i++) {
+            flg.add(false);
+        }
         return flg;
     }
 
@@ -441,8 +402,7 @@ public class DummyAtomHandler
 
     private static int getSDFAtomNumber(IAtomContainer mol, IAtom atm)
     {
-        int num = mol.getAtomNumber(atm)+1;
-        return num;
+        return mol.getAtomNumber(atm) + 1;
     }
     
 //------------------------------------------------------------------------------    

@@ -19,17 +19,12 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.utils.FragmentUtils;
-
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
+import denoptim.molecule.DENOPTIMVertex;
 
 
 /**
@@ -55,15 +50,14 @@ public class FragmentSpaceUtils
 		if (apClassBasedApproch)
 		{
 		    FragmentSpace.setFragsApsPerApClass(
-				   new HashMap<String,ArrayList<ArrayList<Integer>>>());
+				   new HashMap<APClass,ArrayList<ArrayList<Integer>>>());
 		    FragmentSpace.setAPClassesPerFrag(
-					      new HashMap<Integer,ArrayList<String>>());
+					      new HashMap<Integer,ArrayList<APClass>>());
 		}
 		for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
 		{
-		    IAtomContainer frag = FragmentSpace.getFragmentLibrary().get(j);
-		    DENOPTIMFragment dnFrag = new DENOPTIMFragment(frag);
-		    classifyFragment(dnFrag,1,j);
+			DENOPTIMVertex frag = FragmentSpace.getFragmentLibrary().get(j);
+		    classifyFragment(frag,1,j);
 		}
 	}
 
@@ -78,11 +72,11 @@ public class FragmentSpaceUtils
      * @throws DENOPTIMException
      */
 
-    private static void classifyFragment(DENOPTIMFragment frg, int type, 
+    private static void classifyFragment(DENOPTIMVertex frg, int type, 
 					    int fragId) throws DENOPTIMException
-    {
+    {   
 		// Classify according to number of APs
-        int nAps = frg.getAPCount();
+        int nAps = frg.getFreeAPCount();
 		if (nAps != 0)
 		{
             if (FragmentSpace.getMapOfFragsPerNumAps().containsKey(nAps))
@@ -100,18 +94,26 @@ public class FragmentSpaceUtils
 		if (FragmentSpace.useAPclassBasedApproach())
 		{
 		    // Collect classes per fragment
-		    ArrayList<String> lstAPC = frg.getAllAPClassess();
+		    ArrayList<APClass> lstAPC = frg.getAllAPClasses();
 	        FragmentSpace.getMapAPClassesPerFragment().put(fragId,lstAPC);
-	
+	        
 		    // Classify according to AP-Classes
-	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = frg.getAllAPs();
-	
+	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+	                frg.getAttachmentPoints();
+	        
 		    for (int j=0; j<lstAPs.size(); j++)
 		    {
+		        DENOPTIMAttachmentPoint ap = lstAPs.get(j);
 				ArrayList<Integer> apId = new ArrayList<Integer>();
 				apId.add(fragId);
 				apId.add(j);
-				String cls = lstAPs.get(j).getAPClass();
+				APClass cls = ap.getAPClass();
+				
+				if (!ap.isAvailable())
+				{
+				    continue;
+				}
+				
 			    if (FragmentSpace.getMapFragsAPsPerAPClass().containsKey(cls))
 				{
 				    FragmentSpace.getMapFragsAPsPerAPClass().get(cls)

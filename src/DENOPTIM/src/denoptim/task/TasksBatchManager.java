@@ -19,17 +19,17 @@
 package denoptim.task;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
 import java.util.List;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 
 
 /**
@@ -53,7 +53,7 @@ public class TasksBatchManager
      * @throws DENOPTIMException
      */
 
-    public static ArrayList<DENOPTIMMolecule>
+    public static ArrayList<Candidate>
             executeTasks(final ArrayList<Task> tasks, int numOfProcessors)
                                                         throws DENOPTIMException
     {
@@ -76,7 +76,7 @@ public class TasksBatchManager
             futures.add(cservice.submit(tasks.get(i)));
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread()
+        Thread shutDownHook = new Thread()
         {
             @Override
             public void run()
@@ -115,11 +115,10 @@ public class TasksBatchManager
                     Thread.currentThread().interrupt();
                 }
             }
-        });
+        };
+        Runtime.getRuntime().addShutdownHook(shutDownHook);
 
-
-        ArrayList<DENOPTIMMolecule> results = new ArrayList<>();
-
+        ArrayList<Candidate> results = new ArrayList<>();
         try
         {
             for (int i=0; i<tasks.size(); i++)
@@ -128,9 +127,8 @@ public class TasksBatchManager
             	{
             		continue;
             	}
-                DENOPTIMMolecule taskResult =
-                                    (DENOPTIMMolecule) cservice.take().get();
-                if (!taskResult.getMoleculeUID().equals("UNDEFINED"))
+                Candidate taskResult = (Candidate) cservice.take().get();
+                if (!taskResult.getUID().equals("UNDEFINED"))
                 {
                     results.add(taskResult);
                 }
@@ -156,7 +154,17 @@ public class TasksBatchManager
         finally
         {
             eservice.shutdown();
+            Runtime.getRuntime().removeShutdownHook(shutDownHook);
+            shutDownHook = null;
         }
+        
+        // Cleanup
+        tasks.clear();
+        for (Future<Object> f : futures)
+        {
+            f.cancel(true);
+        }
+        futures.clear();
 
         return results;
     }

@@ -19,41 +19,35 @@
 package denoptim.utils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.text.NumberFormat;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
- * General utilities like pause()
- * @author Vishwesh Venkatraman
+ * General utilities
  */
 public class GenUtils
 {
     private static Runtime RUNTIME = Runtime.getRuntime();
-
-
+    
 //------------------------------------------------------------------------------
     
     // this is the javaboutique version
-    public static void printExceptionChain(Throwable thr)
-    {
+    public static void printExceptionChain(Throwable thr) {
         
-        StackTraceElement elements[] = thr.getStackTrace();
-        for (int i = 0, n = elements.length; i < n; i++) 
-        {
-            System.err.println(elements[i].getFileName() +  ":" 
-                            + elements[i].getLineNumber() + ">> " 
-                            + elements[i].getMethodName() + "()"
-                            );
+        StackTraceElement[] elements = thr.getStackTrace();
+        for (StackTraceElement element : elements) {
+            System.err.println(element.getFileName() + ":"
+                    + element.getLineNumber() + ">> "
+                    + element.getMethodName() + "()"
+            );
         }
     
     
         StackTraceElement[] steArr;
         Throwable cause = thr;
-        while (cause != null) 
-        {
+        while (cause != null) {
             System.err.println("-------------------------------");
             steArr = cause.getStackTrace();
             StackTraceElement s0 = steArr[0];
@@ -74,8 +68,7 @@ public class GenUtils
      * C++ equivalent of a getchar()
      */
      
-    public static void pause()
-    {
+    public static void pause() {
         System.err.println("Press a key to continue");
         try 
         {
@@ -102,11 +95,16 @@ public class GenUtils
 
 //------------------------------------------------------------------------------
 
-    // returns a padded string with zeroes for the count,
+    /**
+     * returns the padded string with zeroes placed to the left of 'number' up to
+     * reach the desired number of digits.
+     * @param count the total number of digits.
+     * @param number the number to be formatted.
+     * @return the padded string.
+     */
     public static String getPaddedString(int count, int number)
     {
-        String formatted = String.format("%0" + count + "d", number);
-        return formatted;
+        return String.format("%0" + count + "d", number);
     }
 
 //------------------------------------------------------------------------------
@@ -128,40 +126,19 @@ public class GenUtils
         sb.append(format.format(maxMemory / 1024));
         sb.append("\n");
         sb.append("Total free memory: ");
-        sb.append(format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024));
+        sb.append(format.format((freeMemory + (maxMemory - allocatedMemory)) 
+                / 1024));
         sb.append("\n");
         
         System.out.println(sb.toString());
     }
-        
-//------------------------------------------------------------------------------
 
-    public static double roundValue(double d, int n)
-    {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(n, BigDecimal.ROUND_HALF_UP);
-        return bd.doubleValue();
-    }
-
-//------------------------------------------------------------------------------  
-
-    /**
-     * match a number with optional '-' and decimal.
-     * @param str
-     * @return <code>true<true> if the string is a number
-     */
-
-    public static boolean isNumeric(String str)
-    {
-        return str.matches("-?\\d+(\\.\\d+)?");
-    }
-    
 //------------------------------------------------------------------------------
 
     /**
      * Return the index of the closing parenthesis. 
      * Ignores nested parenthesis
-     * @param id identified of the paranthesis 
+     * @param id identified of the parenthesis
      * (use 1 for round, 2 for square, and three for curly brackets)
      * @param s the string to analyze
      * @return the index of the closing parenthesis
@@ -201,8 +178,7 @@ public class GenUtils
                 }
                 else
                 {
-                    nOpen = nOpen - 1;
-                    continue;
+                    nOpen -= 1;
                 }
             }
             else if (ss.startsWith(openingSing))
@@ -213,7 +189,7 @@ public class GenUtils
         
         return result;
     }
-
+    
 //------------------------------------------------------------------------------
    
 }

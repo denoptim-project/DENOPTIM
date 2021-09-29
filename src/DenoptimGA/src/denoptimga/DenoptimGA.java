@@ -44,7 +44,7 @@ public class DenoptimGA
 	/*
 	 * Runs the thread with the listener that accepts instructions from outside.
 	 */
-	//TODO: this is static for now, but will have to become thread-specific
+	//TODO-GG: this is static for now, but will have to become thread-specific
 	private static ExecutorService executor;
 	
 	private static Future<?> futureWatchers;
@@ -80,8 +80,8 @@ public class DenoptimGA
         {
         	GAParameters.dataDir = args[1];
         }
-        EvolutionaryAlgorithm evoGA;
-        ParallelEvolutionaryAlgorithm pGA = null;
+        
+        EvolutionaryAlgorithm ea = null;
         ExternalCmdsListener ecl = null;
         try
         {	
@@ -96,28 +96,22 @@ public class DenoptimGA
             futureWatchers = executor.submit(ecl);
             executor.shutdown();
             
-            if (GAParameters.parallelizationScheme == 1)
-            {
-                evoGA = new EvolutionaryAlgorithm(ecl);
-                evoGA.runGA();
-            }
-            else
-            {
-                pGA = new ParallelEvolutionaryAlgorithm(ecl);
-                pGA.runGA();
-            }
-
+            ea = new EvolutionaryAlgorithm(ecl);
+            ea.run();
         }
         catch (Throwable t)
         {
-            if (pGA != null)
+            if (ea != null)
             {
-                pGA.stopRun();
+                ea.stopRun();
             }
+            
             stopExternalCmdListener(ecl);
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
+
             GenUtils.printExceptionChain(t);
-            throw new DENOPTIMException("Error in DenootimGA run.", t);
+            
+            throw new DENOPTIMException("Error in DenoptimGA run.", t);
         }
 
         stopExternalCmdListener(ecl);

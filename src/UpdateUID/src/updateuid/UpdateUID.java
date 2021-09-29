@@ -45,6 +45,8 @@ import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
+import denoptim.constants.DENOPTIMConstants;
+
 
 /**
  *
@@ -150,10 +152,11 @@ public class UpdateUID
             }
             else
             {
-                mol.setProperty("MOL_ERROR", "#Duplicate: UID Already exists.");
+                mol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                        "#Duplicate: UID Already exists.");
             }
 
-            mol.setProperty("UID", keyToVerify);
+            mol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, keyToVerify);
             objUpdate.writeMolecule(objUpdate.sdfFile, mol, false);
         }
         catch (Exception de)

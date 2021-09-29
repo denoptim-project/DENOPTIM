@@ -19,11 +19,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,20 +27,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.task.DenoptimGATask;
-import denoptim.task.DummyTask;
+import denoptim.task.FitnessRunnerTask;
+import denoptim.task.FitnessTask;
 import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.GUIInvokedMainTask;
 import denoptim.task.StaticTaskManager;
-import denoptim.task.Task;
 
 /**
  * Class representing the general structure of a form including a specific
@@ -108,7 +102,7 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>and imports parameters into the form.</html>");
 		btnLoadParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File inFile = DenoptimGUIFileOpener.pickFile(btnLoadParams);
+				File inFile = GUIFileOpener.pickFile(btnLoadParams);
 				if (inFile == null || inFile.getAbsolutePath().equals(""))
 				{
 					return;
@@ -134,8 +128,10 @@ public class GUIPrepare extends GUICardPanel
 				+ "<br>This will produce a DENOPTIM parameter file.</html>");
 		btnSaveParams.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = DenoptimGUIFileOpener.pickFileForSaving(btnSaveParams);
+				File outFile = GUIFileOpener.pickFileForSaving(btnSaveParams);
 				printAllParamsToFile(outFile);
+				if (outFile!=null)
+				    DenoptimIO.addToRecentFiles(outFile, getFileFormat("PARAMS"));
 			}
 		});
 		commandsPane.add(btnSaveParams);
@@ -169,6 +165,7 @@ public class GUIPrepare extends GUICardPanel
 						+ "the experiment will be terminated as well.</p><br>";
 				msg = msg + StaticTaskManager.getQueueSnapshot();
 				msg = msg + "<p>Continue?</p></body></html>";
+				//TODO: add capability of running in the background
 				String[] options = new String[]{"Yes", "Cancel"};
 				int res = JOptionPane.showOptionDialog(null,
 						String.format(msg, 450),
@@ -204,9 +201,11 @@ public class GUIPrepare extends GUICardPanel
 				                    JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						
 						JOptionPane.showMessageDialog(null,
 								"<html>Experiment submitted!<br>"
-								+ "See under " + location+"</html>",
+    								+ "See under " + location+"<br>"
+    								+ "or 'File -&gt; Open Recent'</html>",
 			                    "Submitted",
 			                    JOptionPane.INFORMATION_MESSAGE);
 						break;
@@ -292,25 +291,60 @@ public class GUIPrepare extends GUICardPanel
 		});
 		commandsPane.add(btnHelp);
 	}
-
+	
 //------------------------------------------------------------------------------
-
-	/**
-	 * This will get the dafault name of the JAR file with "Main" class defined
-	 * for the kind of task we are submitting: DenoptimGA or FragSpaceEsplorer.
-	 */
-	private String getNameOfCorrespondingJAR()
-	{
-		String baseName = "some_name.jar";
-		if (this instanceof GUIPrepareGARun)
-		{
-			baseName = "DenoptimGA";
-		} else if (this instanceof GUIPrepareFSERun)
-		{
-			baseName = "FragSpaceExplorer";
-		}
-		return baseName;
-	}
+	
+    private FileFormat getFileFormat(String string)
+    {
+        
+        if (this instanceof GUIPrepareGARun)
+        {
+            switch(string)
+            {
+                case "PARAMS":
+                    return FileFormat.GA_PARAM;
+                case "RUN":
+                    return FileFormat.GA_RUN;
+                default:
+                    throw new IllegalArgumentException("BUG: GUIPrepare"
+                            + "subclasses must "
+                            + "declare what kind of recent file to store. "
+                            + "Current declaration is not valid. Report this "
+                            + "to the development team.");
+            }
+        } else if (this instanceof GUIPrepareFSERun)
+        {
+            switch(string)
+            {
+                case "PARAMS":
+                    return FileFormat.FSE_PARAM;
+                case "RUN":
+                    return FileFormat.FSE_PARAM;
+                default:
+                    throw new IllegalArgumentException("BUG: GUIPrepare"
+                            + "subclasses must "
+                            + "declare what kind of recent file to store. "
+                            + "Current declaration is not valid. Report this "
+                            + "to the development team.");
+            }
+        } else if (this instanceof GUIPrepareFitnessRunner)
+        {
+            switch(string)
+            {
+                case "PARAMS":
+                    return FileFormat.FSE_PARAM;
+                case "RUN":
+                    return FileFormat.FSE_PARAM;
+                default:
+                    throw new IllegalArgumentException("BUG: GUIPrepare"
+                            + "subclasses must "
+                            + "declare what kind of recent file to store. "
+                            + "Current declaration is not valid. Report this "
+                            + "to the development team.");
+            }
+        }
+        return null;
+    }
 	
 //------------------------------------------------------------------------------
 	
@@ -323,7 +357,10 @@ public class GUIPrepare extends GUICardPanel
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			baseName = "FSE";
-		}
+		} else if (this instanceof GUIPrepareFitnessRunner)
+        {
+            baseName = "FR";
+        }
 		return baseName;
 	}
 	
@@ -409,6 +446,9 @@ public class GUIPrepare extends GUICardPanel
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			task = new FragSpaceExplorerTask();
+		} else if (this instanceof GUIPrepareFitnessRunner)
+		{
+		    task = new FitnessRunnerTask();
 		}
 		return task;
 	}

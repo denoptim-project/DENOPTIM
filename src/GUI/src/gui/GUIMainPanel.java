@@ -39,7 +39,7 @@ public class GUIMainPanel extends JPanel
 	/**
 	 * Reference to the main tool bar of the GUI
 	 */
-	private MainToolBar toolBar;
+    MainToolBar toolBar;
 	
 //-----------------------------------------------------------------------------
 	
@@ -85,9 +85,9 @@ public class GUIMainPanel extends JPanel
 	{
 		if (comp instanceof GUICardPanel)
 		{
-			if (comp instanceof GUIFragmentInspector)
+			if (comp instanceof GUIVertexInspector)
 			{
-				((GUIFragmentInspector) comp).dispose();
+				((GUIVertexInspector) comp).dispose();
 			}
 			if (comp instanceof GUIGraphHandler)
 			{

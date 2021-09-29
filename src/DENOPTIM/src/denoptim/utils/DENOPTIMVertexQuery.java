@@ -19,7 +19,6 @@
 package denoptim.utils;
 
 import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EdgeQuery;
 
@@ -28,12 +27,14 @@ import denoptim.molecule.EdgeQuery;
  * @author Marco Foscato
  */
 
+//TODO-GG rename to VertexQuery
+
 public class DENOPTIMVertexQuery
 { 
     /**
      * Query on the vertex properties
      */
-    private DENOPTIMVertex vQuery;
+    private final DENOPTIMVertex vQuery;
    
     /**
      * Query on the vertex' incoming connections (i.e., vertex id the target)

@@ -26,9 +26,9 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.TaskUtils;
-import denoptimga.GAParameters;
 
 /**
  * Task that runs any of the main methods in the denoptim project, such as 
@@ -66,6 +66,7 @@ public abstract class GUIInvokedMainTask extends Task
     public Object call()
     {
     	String implName = this.getClass().getSimpleName();
+    	
     	//TODO log or del
     	System.out.println("Calling " + implName +" ("
     			+ " id="+id+", configFile="
@@ -91,6 +92,9 @@ public abstract class GUIInvokedMainTask extends Task
 	        	System.out.println(implName + " id="+id+" returned an error. "
 	        			+ "Inspect the log before this line.");
 			}
+            
+            DenoptimIO.addToRecentFiles(errFile, FileFormat.TXT);
+            
             // NB: the static logger should have been set by the main we called
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
 		}

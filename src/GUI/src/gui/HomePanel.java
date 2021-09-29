@@ -119,7 +119,7 @@ public class HomePanel extends GUICardPanel
 		JButton btnNewFragments = new JButton("New Fragments");
 		btnNewFragments.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainPanel.add(new GUIFragmentInspector(mainPanel));
+				mainPanel.add(new GUIVertexInspector(mainPanel));
 			}
 		});
 		
@@ -135,30 +135,38 @@ public class HomePanel extends GUICardPanel
 				+ "evolutionary experiment  (i.e., folder named RUN...)");
 		btnReadGAOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFolder(btnReadGAOutput);
+				File file = GUIFileOpener.pickFolder(btnReadGAOutput);
 				if (file == null)
 				{
 					return;
 				}
-				GUIInspectGARun inspector = new GUIInspectGARun(mainPanel);
-				mainPanel.add(inspector);
-				inspector.importGARunData(file);
+				mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		        GUIInspectGARun inspector = new GUIInspectGARun(mainPanel);
+		        mainPanel.add(inspector);
+		        inspector.importGARunData(file);
 			}
 		});
-		
         JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
         btnReadFSEOutput.setToolTipText("Analyzes the output folder of an "
 				+ "combinatorial experiment  (i.e., folder named FSE...)");
         btnReadFSEOutput.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                File file = DenoptimGUIFileOpener.pickFolder(btnReadFSEOutput);
+                File file = GUIFileOpener.pickFolder(btnReadFSEOutput);
                 if (file == null)
                 {
                         return;
                 }
+                mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 GUIInspectFSERun inspector = new GUIInspectFSERun(mainPanel);
                 mainPanel.add(inspector);
                 inspector.importFSERunData(file);
+            }
+        });
+        
+        JButton btnTestFitness = new JButton("Test Fitness Provider");
+        btnTestFitness.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.add(new GUIPrepareFitnessRunner(mainPanel));
             }
         });
  
@@ -217,6 +225,8 @@ public class HomePanel extends GUICardPanel
         				.addComponent(btnNewGA)
         				.addComponent(btnNewVirtualScreening))
         		.addGroup(lyoCentralPanel.createSequentialGroup()
+                        .addComponent(btnTestFitness))
+        		.addGroup(lyoCentralPanel.createSequentialGroup()
         				.addComponent(btnReadGAOutput)
         				.addComponent(btnReadFSEOutput))
         		.addComponent(labEmpty));
@@ -230,32 +240,11 @@ public class HomePanel extends GUICardPanel
         				.addComponent(btnNewGA)
         				.addComponent(btnNewVirtualScreening))
         		.addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(btnTestFitness))
+        		.addGroup(lyoCentralPanel.createParallelGroup(GroupLayout.Alignment.CENTER)
         				.addComponent(btnReadGAOutput)
         				.addComponent(btnReadFSEOutput))
                 .addComponent(labEmpty));
-		
-
-		//TODO del: only for devel
-		/*
-		GUIInspectGARun eiPanel = 
-				new GUIInspectGARun(mainPanel);
-			mainPanel.add(eiPanel);
-			eiPanel.importGARunData(new java.io.File("/tmp/denoptim_PtCO/RUN21122019104034"));
-		*/
-		
-		//TODO del: only for devel
-		/*
-		GUIInspectFSERun inspector = new GUIInspectFSERun(mainPanel);
-		mainPanel.add(inspector);
-		inspector.importFSERunData(new File("/tmp/denoptim_FSE/FSE19122019014853"));
-		*/
-		
-		//TODO del: only for devel
-		/*
-		GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
-		mainPanel.add(cpmap);
-		cpmap.importCPMapFromFile(new File("/tmp/CPMap.par"));
-		*/
 		
 	}
 }

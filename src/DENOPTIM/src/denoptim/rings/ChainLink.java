@@ -20,9 +20,12 @@ package denoptim.rings;
 
 import java.io.Serializable;
 
+import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
+
 /**
  * ChainLink represents a vertex in a closable chain.
- * This data structure stores information as to the corrersponding
+ * This data structure stores information as to the corresponding
  * molecule ID in the library of fragments, the type of fragment 
  * and the identify of the AP linking to the chain link before and after
  *
@@ -39,7 +42,7 @@ public class ChainLink implements Cloneable, Serializable
     /**
      * Fragment type
      */
-    private int ftype;
+    private DENOPTIMVertex.BBType ftype;
 
     /**
      * Index of AP towards left
@@ -50,11 +53,6 @@ public class ChainLink implements Cloneable, Serializable
      * Index of AP towards right
      */
     private int apRight;
-
-    /**
-     * Total number of APs on this link
-     */
-    private int numAPs;
 
 
 //-----------------------------------------------------------------------------
@@ -73,7 +71,7 @@ public class ChainLink implements Cloneable, Serializable
      *  Constructs a ChainLink from the involved points
      */
 
-    public ChainLink(int molID, int ftype, int apLeft, int apRight)
+    public ChainLink(int molID, DENOPTIMVertex.BBType ftype, int apLeft, int apRight)
     {
         this.molID = molID;
         this.ftype = ftype;
@@ -98,7 +96,7 @@ public class ChainLink implements Cloneable, Serializable
      * @return the type of fragment library
      */
 
-    public int getFragType()
+    public DENOPTIMVertex.BBType getFragType()
     {
         return ftype;
     }
@@ -106,7 +104,7 @@ public class ChainLink implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
-     * @return the index of the attachment point derected to the left side
+     * @return the index of the attachment point directed to the left side
      * of the chain from this link
      */
     
@@ -118,7 +116,7 @@ public class ChainLink implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
-     * @return the index of the attachment point derected to the right side
+     * @return the index of the attachment point directed to the right side
      * of the chain from this link
      */
 
@@ -130,14 +128,26 @@ public class ChainLink implements Cloneable, Serializable
 //-----------------------------------------------------------------------------
 
     /**
+     * Returns a deep-clone
+     * @return a deep-clone
+     */
+    public ChainLink clone()
+    {
+        ChainLink c = new ChainLink(molID, ftype, apLeft, apRight);
+        return c;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
      * @return the string representation of this ChainLink
      */
 
     public String toString()
     {
-	String str = " ChainLink[molID: " + molID + ", ftype: " + ftype
+        String str = " ChainLink[molID: " + molID + ", ftype: " + ftype
 		      + ", apLeft: " + apLeft + ", apRight: " + apRight + "]";
-	return str;
+        return str;
     }
 
 //-----------------------------------------------------------------------------

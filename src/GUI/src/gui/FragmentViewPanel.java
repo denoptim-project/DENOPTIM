@@ -20,20 +20,16 @@ package gui;
 
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -44,20 +40,17 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
-import org.jmol.adapter.smarter.SmarterJmolAdapter;
-import org.jmol.api.JmolViewer;
-import org.jmol.smiles.InvalidSmilesException;
 import org.jmol.viewer.Viewer;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.modeling.builder3d.ModelBuilder3D;
 import org.openscience.cdk.modeling.builder3d.TemplateHandler3D;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -67,10 +60,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
+import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.FragmentUtils;
-import gui.GUIPreferences.SMITo3DEngine;
 
 
 /**
@@ -79,7 +71,7 @@ import gui.GUIPreferences.SMITo3DEngine;
  * @author Marco Foscato
  */
 
-public class FragmentViewPanel extends JSplitPane
+public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 {
 	/**
 	 * Version UID
@@ -97,7 +89,7 @@ public class FragmentViewPanel extends JSplitPane
 	protected Map<Integer,DENOPTIMAttachmentPoint> mapAPs = null;
 	
 	/**
-	 * Flag signaling that data about APs has been changed in the GUI
+	 * Flag signalling that data about APs has been changed in the GUI
 	 */
 	public boolean alteredAPData = false;
 	
@@ -132,6 +124,7 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 */
 	public FragmentViewPanel(JComponent parent, boolean editableTable)
@@ -144,10 +137,12 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param parent the parent component
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
-	public FragmentViewPanel(JComponent parent, boolean editableTable, int dividerPosition)
+	public FragmentViewPanel(JComponent parent, boolean editableTable, 
+	        int dividerPosition)
 	{
 		this.parent = parent;
 		editableAPTable = editableTable;
@@ -215,7 +210,7 @@ public class FragmentViewPanel extends JSplitPane
 	
 	/**
 	 * Overrides the flag signaling unsaved edits to saying that there are no
-	 * altered data.
+	 * altered data. Use this after processing/saving the changes.
 	 */
 	public void deprotectEdits()
 	{
@@ -312,37 +307,43 @@ public class FragmentViewPanel extends JSplitPane
 	
 //-----------------------------------------------------------------------------
 	
-	private void testCDKgenerator(String smiles) throws CDKException, 
+	private void make3DusingCDKgenerator(String smiles) throws CDKException, 
 	CloneNotSupportedException, IOException
 	{
-		IMolecule molecule = null;
+		IAtomContainer mol = null;
 
 		SmilesParser sp = new SmilesParser(
 				DefaultChemObjectBuilder.getInstance());
-		molecule = sp.parseSmiles(smiles);
+		mol = sp.parseSmiles(smiles);
 		
+		// This seems to be needed in the opposite order since cdk-2.3
+		/*
 	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
-	    		molecule.getBuilder());
-	    adder.addImplicitHydrogens(molecule);
+	    		mol.getBuilder());
+	    adder.addImplicitHydrogens(mol);
+		*/
 		
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(
-				molecule.getBuilder());
-	    for (IAtom atom : molecule.atoms()) 
+				mol.getBuilder());
+	    for (IAtom atom : mol.atoms()) 
 	    {
-	        IAtomType type = matcher.findMatchingAtomType(molecule, atom);
+	        IAtomType type = matcher.findMatchingAtomType(mol, atom);
 	        AtomTypeManipulator.configure(atom, type);
 	    }
 	    
-	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(molecule);
+	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
+                mol.getBuilder());
+        adder.addImplicitHydrogens(mol);
 	    
-		TemplateHandler3D tHandler3d = TemplateHandler3D.getInstance();
-		String forceFieldName = "mmff94";
-		ModelBuilder3D 	md3b = ModelBuilder3D.getInstance(tHandler3d,
-				forceFieldName);
-		molecule = md3b.generate3DCoordinates(molecule, false);
+	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(mol);
+
+        ModelBuilder3D mb3d = ModelBuilder3D.getInstance(
+                TemplateHandler3D.getInstance(), "mmff94", 
+                DefaultChemObjectBuilder.getInstance());
+		mol = mb3d.generate3DCoordinates(mol, false);
 
 		// Load the system int oJmol
-		loadPlainStructure(molecule);
+		loadPlainStructure(mol);
 		
 		// Run Jmol MM energy minimization
 		jmolPanel.viewer.evalString("minimize");
@@ -427,7 +428,7 @@ public class FragmentViewPanel extends JSplitPane
 				if (res == 0)
 				{
 					try {
-						testCDKgenerator(smiles);
+						make3DusingCDKgenerator(smiles);
 					} catch (CDKException | CloneNotSupportedException 
 							| IOException e1) {
 						e1.printStackTrace();
@@ -463,7 +464,7 @@ public class FragmentViewPanel extends JSplitPane
 			
 		case CDK:
 			try {
-				testCDKgenerator(smiles);
+				make3DusingCDKgenerator(smiles);
 			} catch (CDKException | CloneNotSupportedException 
 					| IOException e1) {
 				e1.printStackTrace();
@@ -488,8 +489,15 @@ public class FragmentViewPanel extends JSplitPane
 		
 		// Now we should have a structure loaded in the viewer, 
 		// so we take that one and put it in the IAtomContainer representation
-		try	{
-		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer());
+		try	{ 
+		    // WARNING! Here we assume we are always making undefined building
+		    // blocks. Namely, neither a scaffold, nor a Fragment, nor a 
+		    // capping group. This because when we make frags 
+		    // from the GUI we are only saving an SDF file. The latter is later
+		    // imported as part of the library of scaffolds/fragments/capping
+		    // groups, and in that moment the BBType is re-assigned.
+		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer(),
+		            DENOPTIMVertex.BBType.FRAGMENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
@@ -518,7 +526,8 @@ public class FragmentViewPanel extends JSplitPane
 	private IAtomContainer getStructureFromJmolViewer() 
 			throws DENOPTIMException
 	{
-		IAtomContainer mol = new AtomContainer();
+	    IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+		IAtomContainer mol = builder.newAtomContainer();
 		
 		String strData = getDataFromJmol();
 		if (strData.trim().equals(""))
@@ -580,10 +589,11 @@ public class FragmentViewPanel extends JSplitPane
 	{
 		DENOPTIMFragment fromViewer = new DENOPTIMFragment();
 		try {
-			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer());
+			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer(),
+			        DENOPTIMVertex.BBType.FRAGMENT);
 			putAPsFromTableIntoIAtomContainer(fromViewer);
 		} catch (DENOPTIMException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			return fragment;
 		}
 		
@@ -598,9 +608,9 @@ public class FragmentViewPanel extends JSplitPane
 		boolean sameSMILES = false;
 		try {
 			sameSMILES = DENOPTIMMoleculeUtils.getSMILESForMolecule(
-					fromViewer)
+					fromViewer.getIAtomContainer())
 					.equals(DENOPTIMMoleculeUtils.getSMILESForMolecule(
-							fragment));
+							fragment.getIAtomContainer()));
 		} catch (DENOPTIMException e) {
 			// we get false
 		}
@@ -614,8 +624,10 @@ public class FragmentViewPanel extends JSplitPane
 		double thrld = 0.0001;
 		for (int i=0; i<fragment.getAtomCount(); i++)
 		{
-			Point3d pA = FragmentUtils.getPoint3d(fromViewer.getAtom(i));
-			Point3d pB = FragmentUtils.getPoint3d(fragment.getAtom(i));
+			Point3d pA = DENOPTIMMoleculeUtils.getPoint3d(
+			        fromViewer.getAtom(i));
+			Point3d pB = DENOPTIMMoleculeUtils.getPoint3d(
+			        fragment.getAtom(i));
 			if (pA.distance(pB)>thrld)
 			{
 				fragment = fromViewer;
@@ -638,7 +650,7 @@ public class FragmentViewPanel extends JSplitPane
 			return;
 		}
 		
-		if (mol.getAPCount() == mapAPs.size())
+		if (mol.getNumberOfAPs() == mapAPs.size())
 		{
 			return;
 		}
@@ -661,7 +673,9 @@ public class FragmentViewPanel extends JSplitPane
         				+ "srcAtmId:" + srcAtmId 
         				+ " #atms:" + mol.getAtomCount());
         	}
-        	mol.addAP(srcAtmId, ap.getAPClass(), ap.getDirectionVector());
+        	mol.addAP(srcAtmId, ap.getAPClass(), 
+        	        new Point3d(ap.getDirectionVector()), 
+        	        ap.getTotalConnections());
         }
 	}
 
@@ -670,25 +684,35 @@ public class FragmentViewPanel extends JSplitPane
 	/**
 	 * Loads a structure in the Jmol viewer.
 	 * @param mol the structure to load
+	 * @return the atom container created to visualize the molecular content.
+	 * This is needed for operations involving the identification by means of 
+	 * reference to the atoms selected/present in the viewer.
 	 */
 	public void loadPlainStructure(IAtomContainer mol)
 	{
-		if (mol instanceof DENOPTIMFragment)
-		{
-			fragment = (DENOPTIMFragment) mol;
-		} else {
-			try {
-				fragment = new DENOPTIMFragment(mol);
-			} catch (DENOPTIMException e) {
-				//Should never happen
-				e.printStackTrace();
-			}
+		try {
+			fragment = new DENOPTIMFragment(mol, DENOPTIMVertex.BBType.UNDEFINED);
+	        loadStructure();
+		} catch (DENOPTIMException e) {
+			//Should never happen
+			e.printStackTrace();
 		}
+	}
+		
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Loads the structure of the currently loaded 'fragment' (i.e., our member)
+     * into the Jmol viewer.
+     */
+    private void loadStructure()
+    {		
 		
 		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(null,
-	                "<html>No structure loaded.<br>This is most likely a bug!"
+	                "<html>No structure loaded.<br>This is most likely a bug "
+			        + "in FragmentViewPanel. "
 	                + "Please report it to the development team.</html>",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -700,7 +724,8 @@ public class FragmentViewPanel extends JSplitPane
 		// fragile/discontinued CDK-to-Jmol support.
 		
 		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, fragment, false);
+			DenoptimIO.writeMolecule(tmpSDFFile, fragment.getIAtomContainer(), 
+			        false);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			System.out.println("Error writing TMP file '" + tmpSDFFile + "'");
@@ -722,18 +747,12 @@ public class FragmentViewPanel extends JSplitPane
 	 * the generation of the graphical objects representing the APs.
 	 * @param frag the fragment to visualize
 	 */
-	public void loadFragImentToViewer(DENOPTIMFragment frag)
-	{		
-		clearAPTable();
-		
-		this.fragment = frag;
-			
-		loadPlainStructure(fragment);
-		
-		updateAPsMapAndTable();
-        
-        updateAPsInJmolViewer();
-        
+	public void loadFragmentToViewer(DENOPTIMFragment frag)
+	{	
+		this.fragment = frag;			
+		loadStructure();		
+		updateAPsMapAndTable();        
+        updateAPsInJmolViewer();        
         preSelectAPs();
 	}
 	
@@ -769,8 +788,8 @@ public class FragmentViewPanel extends JSplitPane
 	
 	private void preSelectAPs()
 	{
-		String PRESELPROP = GUIFragmentSelector.PRESELECTEDAPSFIELD;
-		String PRESELPROPSEP = GUIFragmentSelector.PRESELECTEDAPSFIELDSEP;
+		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
+		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
 		if (fragment.getProperty(PRESELPROP) == null)
 		{
@@ -820,11 +839,13 @@ public class FragmentViewPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Clears the molecular viewer
+	 * Clears the molecular viewer. This operation is slow! 
+	 * It usually a second or two.
 	 */
 	public void clearMolecularViewer()
 	{
-		jmolPanel.viewer.evalString("zap");
+		//TODO-V3: evaluate reducing to the minimum the need to run this: it is a slow command!
+	    jmolPanel.viewer.evalString("zap");
 	}
 
 //-----------------------------------------------------------------------------
@@ -841,13 +862,20 @@ public class FragmentViewPanel extends JSplitPane
         {
         	DENOPTIMAttachmentPoint ap = mapAPs.get(arrId);
         	int srcAtmId = ap.getAtomPositionNumber();
-        	Point3d srcAtmPlace = FragmentUtils.getPoint3d(
+        	Point3d srcAtmPlace = DENOPTIMMoleculeUtils.getPoint3d(
         			fragment.getAtom(srcAtmId));
         	double[] startArrow = new double[]{
         			srcAtmPlace.x,
         			srcAtmPlace.y,
         			srcAtmPlace.z};
         	double[] endArrow = ap.getDirectionVector();
+        	
+        	if (startArrow == null || endArrow==null)
+        	{
+        	    System.out.println("WARNING: AP without geometrical data will "
+        	            + "be ignored! Ignoring ap "+ap);
+        	    continue;
+        	}
         	
         	double[] offSet = DENOPTIMMathUtils.scale(
         			DENOPTIMMathUtils.subtract(endArrow,startArrow), 0.2);
@@ -965,7 +993,8 @@ public class FragmentViewPanel extends JSplitPane
             		&& e.getType() == TableModelEvent.UPDATE)
             {
                 alteredAPData = true;
-                firePropertyChange("APDATA", false, true);
+                firePropertyChange(IVertexAPSelection.APDATACHANGEEVENT, false, 
+                        true);
             }
 		}
         
@@ -1005,6 +1034,22 @@ public class FragmentViewPanel extends JSplitPane
 	{
 		jmolPanel.dispose();
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    @Override
+    public Map<Integer, DENOPTIMAttachmentPoint> getMapOfAPsInTable()
+    {
+        return mapAPs;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    @Override
+    public DefaultTableModel getAPTableModel()
+    {
+        return apTabModel;
+    }
   	
 //-----------------------------------------------------------------------------
 

@@ -18,20 +18,14 @@
 
 package denoptim.fragspace;
 
+import java.io.File;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.logging.Level;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.GenUtils;
+import denoptim.molecule.APClass;
 
 
 /**
@@ -85,7 +79,7 @@ public class FragmentSpaceParameters
     protected static String rotBndsFile = "";
 
     /**
-     * FLag defining use of AP class-based approach
+     * Flag defining use of AP class-based approach
      */
     private static boolean apClassBasedApproch = false;
 
@@ -117,8 +111,8 @@ public class FragmentSpaceParameters
     /**
      * List of constitutional symmetry constraints
      */
-    protected static HashMap<String, Double> symmConstraintsMap = 
-						  new HashMap<String, Double>();
+    protected static HashMap<APClass, Double> symmConstraintsMap = 
+						  new HashMap<APClass, Double>();
 
     /**
      * Verbosity level
@@ -142,7 +136,7 @@ public class FragmentSpaceParameters
     	maxMW = 500;
     	enforceSymmetry = false;
     	symmetryConstraints = false;
-    	symmConstraintsMap = new HashMap<String, Double>();
+    	symmConstraintsMap = new HashMap<APClass, Double>();
     	verbosity = 0;
 	}
 
@@ -201,6 +195,22 @@ public class FragmentSpaceParameters
     {
         return rotBndsFile;
     }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathnameToAppendedFragments()
+    {
+        File libFile = new File(fragmentLibFile);
+        return libFile.getAbsolutePath() + "_addedFragments.sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getPathnameToAppendedScaffolds()
+    {
+        File libFile = new File(scaffoldLibFile);
+        return libFile.getAbsolutePath() + "_addedScaffolds.sdf";
+    }
 
 //------------------------------------------------------------------------------
     
@@ -225,8 +235,8 @@ public class FragmentSpaceParameters
 
 //------------------------------------------------------------------------------
 
-    public static void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+    public static void interpretKeyword(String key, String value) 
+            throws DENOPTIMException
     {
         fsParamsInUse = true;
         String msg = "";
@@ -287,67 +297,65 @@ public class FragmentSpaceParameters
             }
             break;
         case "FS-ENFORCESYMMETRY":
-		    enforceSymmetry = true;
-		    break;
-        case "FS-ENFORCESYMMETRY=":
-		    enforceSymmetry = true;
-		    break;
-	case "FS-CONSTRAINSYMMETRY=":
-	    symmetryConstraints = true;
-	    try
-	    {
+            enforceSymmetry = true;
+            break;
+    	case "FS-CONSTRAINSYMMETRY=":
+    	    symmetryConstraints = true;
+    	    try
+    	    {
                 if (value.length() > 0)
-		{
-		    String[] words = value.trim().split("\\s+");
-		    if (words.length != 2)
-		    {
+        		{
+        		    String[] words = value.trim().split("\\s+");
+        		    if (words.length != 2)
+        		    {
                         msg = "Keyword " + key + " requires two arguments: " 
                               + "[APClass (String)] [probability (Double)].";
                         throw new DENOPTIMException(msg);
-		    }
-		    String apClass = words[0];
-		    double prob = 0.0;
-		    try
-		    {
-			prob = Double.parseDouble(words[1]);
-		    }
-		    catch (Throwable t2)
-		    {
-			msg = "Unable to convert '" + words[1] + "' into a "
-			      + "double.";
-                        throw new DENOPTIMException(msg);
-		    }
+        		    }
+        		    APClass apClass = APClass.make(words[0]);
+        		    double prob = 0.0;
+        		    try
+        		    {
+        		        prob = Double.parseDouble(words[1]);
+        		    }
+        		    catch (Throwable t2)
+        		    {
+        		        msg = "Unable to convert '" + words[1] + "' into a "
+        			      + "double.";
+                                throw new DENOPTIMException(msg);
+        		    }
                     symmConstraintsMap.put(apClass,prob);
-		}
-		else
-		{
-		    msg = "Keyword '" + key + "' requires two arguments: " 
-			         + "[APClass (String)] [probability (Double)].";
+        		}
+        		else
+        		{
+        		    msg = "Keyword '" + key + "' requires two arguments: " 
+        			         + "[APClass (String)] [probability (Double)].";
+                            throw new DENOPTIMException(msg);
+        		}
+    	    }
+    	    catch (Throwable t)
+    	    {
+        		if (msg.equals(""))
+        		{
+        		    msg = "Unable to understand value '" + value + "'";
+        		}
+                throw new DENOPTIMException(msg);
+    	    }
+    	    break;
+    	case "FS-VERBOSITY=":
+    	    try
+    	    {
+    	        verbosity = Integer.parseInt(value);
+    	    }
+    	    catch (Throwable t)
+    	    {
+    	        msg = "Unable to understand value '" + value + "'";
                     throw new DENOPTIMException(msg);
-		}
-	    }
-	    catch (Throwable t)
-	    {
-		if (msg.equals(""))
-		{
-		    msg = "Unable to understand value '" + value + "'";
-		}
-                throw new DENOPTIMException(msg);
-	    }
-	    break;
-	case "FS-VERBOSITY=":
-	    try
-	    {
-	        verbosity = Integer.parseInt(value);
-	    }
-	    catch (Throwable t)
-	    {
-		msg = "Unable to understand value '" + value + "'";
-                throw new DENOPTIMException(msg);
-	    }
+    	    }
+    	    break;
         default:
              msg = "Keyword " + key + " is not a known fragment space-"
-                                          + "related keyword. Check input files.";
+                     + "related keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }
@@ -421,7 +429,7 @@ public class FragmentSpaceParameters
             throw new DENOPTIMException(msg);
         }
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -431,50 +439,9 @@ public class FragmentSpaceParameters
      */
     public static void processParameters() throws DENOPTIMException
     {
-        ArrayList<IAtomContainer> scaffLib = 
-        		DenoptimIO.readInLibraryOfFragments(scaffoldLibFile,"scaffold");
-        ArrayList<IAtomContainer> fragLib = 
-        		DenoptimIO.readInLibraryOfFragments(fragmentLibFile,"fragment");
-        
-        ArrayList<IAtomContainer> cappLib = new ArrayList<IAtomContainer>();
-    	HashMap<String,ArrayList<String>> cpMap = 
-    			new HashMap<String,ArrayList<String>>();
-    	HashMap<String,Integer> boMap = new HashMap<String,Integer>();
-    	HashMap<String,String> capMap = new HashMap<String,String>();
-    	HashSet<String> forbEnds = new HashSet<String>();
-    	HashMap<String,ArrayList<String>> rcCpMap = 
-    			new HashMap<String,ArrayList<String>>();
-        
-        if (cappingLibFile.length() > 0)
-        {
-            cappLib = DenoptimIO.readInLibraryOfFragments(cappingLibFile,
-            		"capping group");
-        }
-
-        if (compMatrixFile.length() > 0)
-        {
-            DenoptimIO.readCompatibilityMatrix(compMatrixFile,
-						cpMap,
-						boMap,
-						capMap,
-						forbEnds);
-        }
-
-        if (rcCompMatrixFile != null && rcCompMatrixFile.length() > 0)
-        {
-        	DenoptimIO.readRCCompatibilityMatrix(rcCompMatrixFile,rcCpMap);
-        }
-
-        if (compMatrixFile.length() > 0)
-        {
-		    FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib,cpMap,
-		    		boMap,capMap,forbEnds,rcCpMap);
-		    FragmentSpace.setSymmConstraints(symmConstraintsMap);
-        }
-        else
-        {
-        	FragmentSpace.defineFragmentSpace(scaffLib,fragLib,cappLib);
-        }
+        FragmentSpace.defineFragmentSpace(scaffoldLibFile, fragmentLibFile, 
+                cappingLibFile, compMatrixFile, rcCompMatrixFile, 
+                symmConstraintsMap); 
     }
 
 //------------------------------------------------------------------------------

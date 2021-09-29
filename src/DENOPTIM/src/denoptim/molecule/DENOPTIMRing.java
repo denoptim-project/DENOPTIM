@@ -18,38 +18,50 @@
 
 package denoptim.molecule;
 
-import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.ArrayList;
+
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSerializationContext;
+
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
- * This class represents the closure of a ring in a spamming tree
+ * This class represents the closure of a ring in a spanning tree
  *
  * @author Marco Foscato
  */
 public class DENOPTIMRing implements Serializable 
 {
+
     /**
      * List of <code>DENOPTIMVertex</code> involved in the ring. 
      */
-    private ArrayList<DENOPTIMVertex> verteces;
+    private List<DENOPTIMVertex> vertices;
 
     /**
      * Bond type (i.e., bond order) to be used between head and tail vertices
      */
-    private int bndTyp = 1; 
+    private BondType bndTyp = BondType.UNDEFINED; 
 
 //------------------------------------------------------------------------------
 
     public DENOPTIMRing()
     {
-        verteces = new ArrayList<DENOPTIMVertex>();
+        vertices = new ArrayList<>();
     }
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMRing(ArrayList<DENOPTIMVertex> m_verteces)
+    public DENOPTIMRing(List<DENOPTIMVertex> vertices)
     {
-        verteces = m_verteces;
+        this.vertices = vertices;
     }
     
 //------------------------------------------------------------------------------
@@ -60,7 +72,7 @@ public class DENOPTIMRing implements Serializable
 
     public void addVertex(DENOPTIMVertex v)
     {
-        verteces.add(v);
+        vertices.add(v);
     }
     
 //------------------------------------------------------------------------------
@@ -72,7 +84,7 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMVertex getHeadVertex()
     {
-        return verteces.get(0);
+        return vertices.get(0);
     }
 
 //------------------------------------------------------------------------------
@@ -84,7 +96,7 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMVertex getTailVertex()
     {
-        return verteces.get(verteces.size() - 1);
+        return vertices.get(vertices.size() - 1);
     }
 
 //------------------------------------------------------------------------------
@@ -96,13 +108,24 @@ public class DENOPTIMRing implements Serializable
 
     public DENOPTIMVertex getVertexAtPosition(int i)
     {
-	if (i>=verteces.size() || i<0)
+	if (i>= vertices.size() || i<0)
 	{
 	    return null;
 	}
-        return verteces.get(i);
+        return vertices.get(i);
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the index of the first occurrence of the specified element in 
+     * this ring, or -1 if this list does not contain the element.
+     */
+    public int indexOf(DENOPTIMVertex v)
+    {
+        return vertices.indexOf(v);
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -112,7 +135,7 @@ public class DENOPTIMRing implements Serializable
 
     public int getSize()
     {
-	return verteces.size();
+        return vertices.size();
     }
 
 //------------------------------------------------------------------------------
@@ -122,7 +145,7 @@ public class DENOPTIMRing implements Serializable
      * the head and the tail vertices
      */
 
-    public int getBondType()
+    public BondType getBondType()
     {
         return bndTyp;
     }
@@ -134,9 +157,9 @@ public class DENOPTIMRing implements Serializable
      * the head and the tail vertices
      */
 
-    public void setBondType(int bndType)
+    public void setBondType(BondType bndType)
     {
-        this.bndTyp = bndTyp;
+        this.bndTyp = bndType;
     }
 
 //------------------------------------------------------------------------------
@@ -150,7 +173,7 @@ public class DENOPTIMRing implements Serializable
 
     public boolean contains(DENOPTIMVertex v)
     {
-        return verteces.contains(v);
+        return vertices.contains(v);
     }
 
 //------------------------------------------------------------------------------
@@ -166,7 +189,7 @@ public class DENOPTIMRing implements Serializable
     public boolean containsID(int vid)
     {
 	boolean result = false;
-	for (DENOPTIMVertex v : verteces)
+	for (DENOPTIMVertex v : vertices)
 	{
 	    if (v.getVertexId() == vid)
 	    {
@@ -184,10 +207,83 @@ public class DENOPTIMRing implements Serializable
      */
 
     @Override
-    public String toString()
-    {
-        return "DENOPTIMRing [verteces=" + verteces + "]";
+    public String toString() {
+        return "DENOPTIMRing [vertices=" + vertices + "]";
     }
 
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
+
+    public List<DENOPTIMVertex> getVertices() {
+        return Collections.unmodifiableList(vertices);
+    }
+
+//------------------------------------------------------------------------------
+
+    public static class DENOPTIMRingSerializer
+    implements JsonSerializer<DENOPTIMRing>
+    {
+        @Override
+        public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc,
+              JsonSerializationContext context)
+        {
+            JsonObject jsonObject = new JsonObject();
+            ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
+            for (int i=0; i<ring.getSize(); i++)
+            {
+                DENOPTIMVertex v = ring.getVertexAtPosition(i);
+                vertexIDs.add(v.getVertexId());
+            }
+            jsonObject.add("vertices",context.serialize(vertexIDs));
+            jsonObject.add("bndTyp",context.serialize(ring.getBondType()));
+            return jsonObject;
+        }
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaces a vertex that belong to this ring with a new one.
+     * @param oldVrtx the vertex to be replaced.
+     * @param newVrtx the vertex the replace the old one with.
+     */
+    public void replaceVertex(DENOPTIMVertex oldVrtx, DENOPTIMVertex newVrtx)
+    {
+        int idx = vertices.indexOf(oldVrtx);
+        vertices.set(idx, newVrtx);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Adds a vertex to the ring, and in between two defined vertexes.
+     * @param newLink vertex to add to this ring.
+     * @param vA one of the vertexes in between which the new vertex should
+     * in inserted.
+     * @param vB one of the vertexes in between which the new vertex should
+     * in inserted.
+     * @return <code>true</code> if the vertex is inserted, or 
+     * <code>false</code> if the operation cannot be performed for any reason,
+     * e.g., the vertex is already contained in this ring, or either of the two
+     * reference vertexes are not themselves contained here.
+     */
+    public boolean insertVertex(DENOPTIMVertex newLink, DENOPTIMVertex vA,
+            DENOPTIMVertex vB)
+    {
+        if (this.contains(newLink) || !this.contains(vA) || !this.contains(vB))
+            return false;
+        
+        int idA = vertices.indexOf(vA);
+        int idB = vertices.indexOf(vB);
+        if (idA < idB)
+        {
+            vertices.add(idB,newLink);
+        } else {
+            vertices.add(idA,newLink);
+        }
+        return true;
+    }
+
+//------------------------------------------------------------------------------
+
+
 }

@@ -19,21 +19,18 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GraphUtils;
 
 
@@ -126,8 +123,9 @@ public class FragsCombinationIterator
         for (DENOPTIMVertex v : this.rootGraph.getVertexList())
         {
             int vIdx = v.getVertexId();
-            int vMolId = v.getMolId();
-            int vMolTyp = v.getFragmentType();
+
+            int vMolId = v.getBuildingBlockId();
+            DENOPTIMVertex.BBType vMolTyp = v.getBuildingBlockType();
            
             // deal with symmetric sets of vertices
             boolean keepThisVertex = true;
@@ -161,8 +159,12 @@ public class FragsCombinationIterator
                 continue;
             }
 
-            for (Integer apIdx : v.getFreeAPList())
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
             {
+                if (!ap.isAvailable())
+                    continue;
+                
+                int apIdx = v.getIndexOfAP(ap);
                 // deal with symmetric sets of APs on this vertex
                 boolean keepThisAP = true;
                 if ((FragmentSpaceParameters.enforceSymmetry() ||
@@ -171,14 +173,14 @@ public class FragsCombinationIterator
                 {
                     keepThisAP = false;
                     boolean isInSymSet = false;
-                    for (SymmetricSet ss : v.getSymmetricAP())
+                    for (SymmetricSet ss : v.getSymmetricAPSets())
                     {
                         if (ss.contains(apIdx))
                         {
-                            String apClass = v.getAttachmentPoints().get(
-                                                            apIdx).getAPClass();
+                            APClass apClass = v.getAttachmentPoints().get(
+                                    apIdx).getAPClass();
                             if (!FragmentSpace.imposeSymmetryOnAPsOfClass(
-                                                                       apClass))
+                                    apClass))
                             {
                                 continue;
                             }
@@ -210,12 +212,11 @@ public class FragsCombinationIterator
         // Collect all possibilities (frags, caps, entry) for each free AP
         for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
-            int fTyp = candSrcAp.getVertexMolType();
+            DENOPTIMVertex.BBType fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
-            IAtomContainer frag = FragmentSpace.getFragment(fTyp, fIdx); 
-            String srcApCls = 
-                    FragmentUtils.getAPForFragment(frag).get(apId).getAPClass();
+            DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
+            APClass srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 
             ArrayList<IdFragmentAndAP> candsForThisSrc = 
@@ -230,7 +231,7 @@ public class FragsCombinationIterator
                 int vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
                 		            compatApId.getVertexMolId(), //MolId,
-                                    1, //FragType
+                                    DENOPTIMVertex.BBType.FRAGMENT,
                                     compatApId.getApId(), //ApId
 							        -1, //noVSym
 							        -1);//noAPSym
@@ -241,7 +242,7 @@ public class FragsCombinationIterator
             // Get other possible destinies for the free AP
             // NOTE: in principle there should be only ONE capping group, but
             //       this is made to work also in case of more than one group.
-            String capApCls = FragmentSpace.getCappingClass(srcApCls);
+            APClass capApCls = FragmentSpace.getAPClassOfCappingVertex(srcApCls);
             if (capApCls != null)
             {
                 // Use of capping groups
@@ -255,10 +256,10 @@ public class FragsCombinationIterator
                     int vid = GraphUtils.getUniqueVertexIndex();
                     IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid,//vertxId
                                                                     i,//MolId,
-                                                                    2,//FrgType
+                                                                    DENOPTIMVertex.BBType.CAP,
                                                                     0,//ApId
-								   -1,//noVSym
-								   -1);//noAPSym
+                                								   -1,//noVSym
+                                								   -1);//noAPSym
                     candsForThisSrc.add(trgFrgAp);
                 }
             }
@@ -398,6 +399,7 @@ public class FragsCombinationIterator
 		// of which incoming fragments are related by symmetry (i.e., we
 		// set the symmetric set ID for each incoming vertex) to allow
 		// an easy update of the graph's SymmetricSet list
+        
         FragsCombination currentComb = new FragsCombination();
         ArrayList<Integer> currentIds = new ArrayList<Integer>();
         String msg = "";
@@ -555,12 +557,12 @@ public class FragsCombinationIterator
                 {
                     continue;
                 }
-                for (SymmetricSet ss : v.getSymmetricAP())
+                for (SymmetricSet ss : v.getSymmetricAPSets())
                 {
                     if (ss.contains(srcApId))
                     {
-                        String apClass = v.getAttachmentPoints().get(
-                                                          srcApId).getAPClass();
+                        APClass apClass = v.getAttachmentPoints().get(srcApId)
+                                .getAPClass();
                         if (!FragmentSpace.imposeSymmetryOnAPsOfClass(apClass))
                         {
                             continue;
@@ -579,8 +581,8 @@ public class FragsCombinationIterator
 
                             IdFragmentAndAP symSrcFrgAp = new IdFragmentAndAP(
                                                                        srcVrtId,
-                                                                   v.getMolId(),
-                                                            v.getFragmentType(),
+                                                                   v.getBuildingBlockId(),
+                                                            v.getBuildingBlockType(),
                                                                      symSrcApId,
 						      srcFrgAp.getVrtSymSetId(),
 							                    -1);
@@ -631,8 +633,8 @@ public class FragsCombinationIterator
                                 IdFragmentAndAP symSrcFrgAp = 
                                                            new IdFragmentAndAP(
                                                                     symSrcVrtID,
-                                                           symVertex.getMolId(),
-                                                    symVertex.getFragmentType(),
+                                                           symVertex.getBuildingBlockId(),
+                                                    symVertex.getBuildingBlockType(),
                                                              srcFrgAp.getApId(),
 						      srcFrgAp.getVrtSymSetId(),
 							                    -1);

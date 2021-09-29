@@ -19,13 +19,8 @@
 
 package denoptimga;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
-import org.apache.commons.io.FileUtils;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -33,15 +28,12 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
-import denoptim.threedim.TreeBuilder3D;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.TaskUtils;
-import fragspaceexplorer.FSEParameters;
+import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.GraphConversionTool;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a
@@ -51,100 +43,94 @@ import fragspaceexplorer.FSEParameters;
 public class OffspringEvaluationTask extends FitnessTask
 {
     private final String molName;
-    private volatile ArrayList<DENOPTIMMolecule> curPopln;
-    private volatile Integer numtry;
+    private volatile Population population;
+    private volatile Monitor mnt;
     
     /**
      * Tool for generating 3D models assembling 3D building blocks.
      */
-    private TreeBuilder3D tb3d;
+    private ThreeDimTreeBuilder tb3d;
     
 //------------------------------------------------------------------------------
     
-    /**
-     * 
-     * @param m_molName
-     * @param m_molGraph
-     * @param m_inchi
-     * @param m_smiles
-     * @param m_dir
-     * @param m_Id
-     * @param m_popln reference to the current population. Can be null, in which
-     * case this task will not add its entity to any population.
-     * @param m_try
-     * @param m_fileUID
-     */
-    public OffspringEvaluationTask(String m_molName, DENOPTIMGraph m_molGraph, 
-    		String inchi,
-            String smiles, IAtomContainer m_iac, String m_dir,
-            ArrayList<DENOPTIMMolecule> m_popln, Integer m_try, String m_fileUID)
+    public OffspringEvaluationTask(Candidate offspring, String workDir,
+            Population popln, Monitor mnt, String fileUID)
     {
-    	super(m_molGraph);
-        molName = m_molName;
-        workDir = m_dir;
-        fitProvMol = m_iac;
-        curPopln = m_popln;
-        numtry = m_try;
+        super(offspring.getGraph());
+        this.molName = offspring.getName();
+        this.workDir = workDir;
+        this.fitProvMol = offspring.getChemicalRepresentation();
+        this.population = popln;
+        this.mnt = mnt;
         
-        result.setName(molName);
-        result.setMoleculeUID(inchi);
-        result.setMoleculeSmiles(smiles);
+        result.setName(this.molName);
+        result.setUID(offspring.getUID());
+        result.setSmiles(offspring.getSmiles());
         
         // Define pathnames to files used/produced by fitness provider
-        //TODO use constants
-        fitProvOutFile = workDir + SEP + molName + "_FIT.sdf";
-        fitProvInputFile = workDir + SEP + molName + "_I.sdf";
-        fitProvPNGFile = workDir + SEP + molName + ".png";
-        fitProvUIDFile = m_fileUID;
+        fitProvOutFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvInputFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.FITFILENAMEEXTIN;
+        fitProvPNGFile = this.workDir + SEP + this.molName + 
+                DENOPTIMConstants.CANDIDATE2DEXTENSION;
+        fitProvUIDFile = fileUID;
     }
 
 //------------------------------------------------------------------------------
     
     @Override
     public Object call() throws DENOPTIMException, Exception
-    {
+    {     
+        mnt.increase(CounterID.FITNESSEVALS);
+          
     	// Optionally improve the molecular representation, which
         // is otherwise only given by the collection of building
         // blocks (not aligned, nor roto-translated)
         if (FitnessParameters.make3dTree())
         {
-        	TreeBuilder3D tb3d = new TreeBuilder3D(
-        			FragmentSpace.getScaffoldLibrary(),
-        			FragmentSpace.getFragmentLibrary(),
-        			FragmentSpace.getCappingLibrary());
+        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
         	
             try {
-            	// TODO-V3
+                DENOPTIMGraph gWithNoRCVs = dGraph.clone();
+                
+                //NB: this replaces unused RCVs with capping groups
+                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
+                
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree
             	// 2) remove RCAs
-            	// 3) remove dummy in multy hapto
+            	// 3) remove dummy in multi-hapto
             	// 4) remove dummy in linearities
+                // 5) set atom properties that are expected by CDK classes (for
+                //    example, the number of implicit atoms).
             	// All this should be done within the TreeBuilder3D and 
             	// controlled by flags. Obviously, if we remove all these 
             	// functional dummy atoms, then we cannot use them anymore,
             	// So: is are there cases where we need to keep them?
             	// We can always rebuild the 3d-tree (with Dummy atoms) if
             	// we need the get it back. Thus, for the moment I do not see
-            	// a reason for keeping the Dus in the molecular representation,
-            	// but potential down stream effects have to be evaluated.
-                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
+            	// a reason for keeping Du in the molecular representation,
+            	// but potential down-stream effects have to be evaluated.
+                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(
+                        gWithNoRCVs,true);
                 fitProvMol = mol;
         	} catch (Throwable t) {
         		//we have it already from before
         	}
         }
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
-        fitProvMol.setProperty("SMILES", result.getMoleculeSmiles());
-        fitProvMol.setProperty("InChi", result.getMoleculeUID());
+        fitProvMol.setProperty(DENOPTIMConstants.SMILESTAG, result.getSmiles());
+        fitProvMol.setProperty(DENOPTIMConstants.INCHIKEYTAG, result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, 
         		dGraph.getGraphId());
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
-        		result.getMoleculeUID());
+        		result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
-        if (dGraph.getMsg() != null)
+        fitProvMol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, dGraph.toJson());
+        if (dGraph.getLocalMsg() != null)
         {
-        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getMsg());
+        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
         }
         
         // Run the fitness provider, whatever that is
@@ -154,6 +140,7 @@ public class OffspringEvaluationTask extends FitnessTask
         }
         catch (Throwable ex)
         {
+            mnt.increase(CounterID.FAILEDFITNESSEVALS);
             hasException = true;
             errMsg = "Exception while running fitness provider";
             thrownExc = ex;
@@ -161,34 +148,41 @@ public class OffspringEvaluationTask extends FitnessTask
             throw new DENOPTIMException(ex);
         }
 
-        if (result.getError() == null)
+        if (result.getError() != null)
         {
-            synchronized (numtry)
-            {
-                numtry++;
-            }
+            mnt.increase(CounterID.FAILEDFITNESSEVALS);
         }
 
         if (result.hasFitness())
         {
-        	if (curPopln != null)
+            boolean isWithinBestPrcentile = false;
+        	if (population != null)
         	{
-	            synchronized (curPopln)
+	            synchronized (population)
 	            {
 	            	DENOPTIMLogger.appLogger.log(Level.INFO, 
 	            			"Adding {0} to population", molName);
-	                curPopln.add(result);
-	            }
+	                population.add(result);
+	                isWithinBestPrcentile = population.isWithinPercentile(
+                            result.getFitness(),
+                            GAParameters.saveRingSystemsFitnessThreshold);
+                }
         	}
-            synchronized (numtry)
-            {
-                numtry--;
-            }
+
+        	if ((GAParameters.saveRingSystemsAsTemplatesNonScaff
+        	        || GAParameters.saveRingSystemsAsTemplatesScaffolds)
+        	    && isWithinBestPrcentile)
+        	{
+                //TODO: here we might need to send also molecular representation to 
+                // enable extraction of refined molecular fragments
+                FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
+                        GAParameters.saveRingSystemsAsTemplatesScaffolds,
+                        GAParameters.saveRingSystemsAsTemplatesNonScaff);
+        	}
         }
         completed = true;
         return result;
     }
 
 //------------------------------------------------------------------------------
-
 }

@@ -34,12 +34,13 @@ import org.apache.commons.io.FileUtils;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -76,7 +77,7 @@ class RNDEAUtils
      */
 
     protected static void outputPopulationDetails
-                            (ArrayList<DENOPTIMMolecule> pop, String filename)
+                            (ArrayList<Candidate> pop, String filename)
                                                         throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
@@ -84,13 +85,13 @@ class RNDEAUtils
 
         for (int i=0; i<pop.size(); i++)
         {
-            DENOPTIMMolecule mol = pop.get(i);
+            Candidate mol = pop.get(i);
             if (mol != null)
             {
                 sb.append(String.format("%-20s", 
-					  mol.getMoleculeGraph().getGraphId()));
-                sb.append(String.format("%-30s", mol.getMoleculeUID()));
-                sb.append(df.format(mol.getMoleculeFitness()));
+					  mol.getGraph().getGraphId()));
+                sb.append(String.format("%-30s", mol.getUID()));
+                sb.append(df.format(mol.getFitness()));
                 sb.append(System.getProperty("line.separator"));
             }
         }
@@ -106,7 +107,7 @@ class RNDEAUtils
 
 //------------------------------------------------------------------------------
 
-    private static String getSummaryStatistics(ArrayList<DENOPTIMMolecule> pop)
+    private static String getSummaryStatistics(ArrayList<Candidate> pop)
     {
         double[] fitness = getFitnesses(pop);
         String res = "";
@@ -135,11 +136,11 @@ class RNDEAUtils
         sb.append(String.format("%-30s", "MEDIAN:"));
 	sb.append(String.format("%12.3f", f));
         sb.append(System.getProperty("line.separator"));
-        f = DENOPTIMStatUtils.stddev(fitness, true);
+        f = DENOPTIMStatUtils.stddev(fitness,true);
         sb.append(String.format("%-30s", "STDDEV:"));
 	sb.append(String.format("%12.3f", f));
         sb.append(System.getProperty("line.separator"));
-        f = DENOPTIMStatUtils.skewness(fitness, true);
+        f = DENOPTIMStatUtils.skewness(fitness,true);
         sb.append(String.format("%-30s", "SKEW:"));
 	sb.append(String.format("%12.3f", f));
         sb.append(System.getProperty("line.separator"));
@@ -152,9 +153,9 @@ class RNDEAUtils
         }
         for (int i=0; i<RNDParameters.getPopulationSize(); i++)
         {
-            DENOPTIMMolecule mol = pop.get(i);
-            DENOPTIMGraph g = mol.getMoleculeGraph();
-            int scafIdx = g.getVertexAtPosition(0).getMolId() + 1;
+            Candidate mol = pop.get(i);
+            DENOPTIMGraph g = mol.getGraph();
+            int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
             scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
         }
         sb.append("\n\n#####SCAFFOLD ANALYSIS#####\n");
@@ -179,7 +180,7 @@ class RNDEAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(ArrayList<DENOPTIMMolecule> pop,
+    protected static void outputFinalResults(ArrayList<Candidate> pop,
                             String destDir) throws DENOPTIMException
     {
         String genOutfile = destDir + System.getProperty("file.separator") +
@@ -191,7 +192,7 @@ class RNDEAUtils
         {
             for (int i=0; i<RNDParameters.getPopulationSize(); i++)
             {
-                String sdfile = pop.get(i).getMoleculeFile();
+                String sdfile = pop.get(i).getSDFFile();
                 String imgfile = pop.get(i).getImageFile();
 
                 if (sdfile != null && imgfile != null)
@@ -217,14 +218,14 @@ class RNDEAUtils
      * @return array of fitness values
      */
 
-    protected static double[] getFitnesses(ArrayList<DENOPTIMMolecule> mols)
+    protected static double[] getFitnesses(ArrayList<Candidate> mols)
     {
         int k = mols.size();
         double[] arr = new double[k];
 
         for (int i=0; i<k; i++)
         {
-            arr[i] = mols.get(i).getMoleculeFitness();
+            arr[i] = mols.get(i).getFitness();
         }
         return arr;
     }
@@ -238,14 +239,14 @@ class RNDEAUtils
      */
 
     protected static ArrayList<String> getInchiCodes
-                                    (ArrayList<DENOPTIMMolecule> molPopulation)
+                                    (ArrayList<Candidate> molPopulation)
     {
         int k = molPopulation.size();
         ArrayList<String> arr = new ArrayList<>();
 
         for (int i=0; i<k; i++)
         {
-            arr.add(molPopulation.get(i).getMoleculeUID());
+            arr.add(molPopulation.get(i).getUID());
         }
         return arr;
     }
@@ -254,12 +255,13 @@ class RNDEAUtils
 
     /**
      * Import the molecular population from a file.
-     * @param fileName the pathname to the file ti read
+     * @param fileName the pathname to the file to read
      * @return the list of population members 
      * @throws DENOPTIMException
+     * @Deprecated use DenoptimIO
      */
-
-    protected static ArrayList<DENOPTIMMolecule> readGraphsWithFitnessFromFile(
+    @Deprecated
+    protected static ArrayList<Candidate> readGraphsWithFitnessFromFile(
                                        String fileName) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> mols;
@@ -276,7 +278,7 @@ class RNDEAUtils
         String fsep = System.getProperty("file.separator");
 
         Set<String> lstUIDs = new HashSet();
-        ArrayList<DENOPTIMMolecule> members = new ArrayList<DENOPTIMMolecule>();
+        ArrayList<Candidate> members = new ArrayList<Candidate>();
         for (int i=0; i<mols.size(); i++)
         {
             DENOPTIMGraph graph = null;
@@ -284,7 +286,7 @@ class RNDEAUtils
             String molsmiles = null, molinchi = null, molfile = null;
 
             IAtomContainer mol = mols.get(i);
-            Object apProperty = mol.getProperty("GraphENC");
+            Object apProperty = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
             if (apProperty != null)
             {
                 graph = GraphConversionTool.getGraphFromString(
@@ -298,7 +300,7 @@ class RNDEAUtils
                         "Molecule does not have the DENOPTIMGraph encoding.");
             }
 
-            apProperty = mol.getProperty("FITNESS");
+            apProperty = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
             if (apProperty != null)
             {
                 fitness = Double.parseDouble(apProperty.toString());
@@ -311,7 +313,7 @@ class RNDEAUtils
                             "Molecule does not have the associated fitness.");
             }
 
-            apProperty = mol.getProperty("SMILES");
+            apProperty = mol.getProperty(DENOPTIMConstants.SMILESTAG);
             if (apProperty != null)
             {
                 molsmiles = apProperty.toString().trim();
@@ -321,14 +323,15 @@ class RNDEAUtils
                 molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
             }
 
-            apProperty = mol.getProperty("InChi");
+            apProperty = mol.getProperty(DENOPTIMConstants.INCHIKEYTAG);
             if (apProperty != null)
             {
                 molinchi = apProperty.toString();
             }
-            if (mol.getProperty("UID") != null)
+            if (mol.getProperty(DENOPTIMConstants.UNIQUEIDTAG) != null)
             {
-                molinchi = mol.getProperty("UID").toString();
+                molinchi = mol.getProperty(
+                        DENOPTIMConstants.UNIQUEIDTAG).toString();
             }
             else
             {
@@ -346,14 +349,16 @@ class RNDEAUtils
                 String molName = "M" + GenUtils.getPaddedString(8, ctr);
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 graph.setGraphId(gctr);
-                graph.setMsg("NEW");
-                mol.setProperty("GCODE", gctr);
+                graph.setLocalMsg("NEW");
+                mol.setProperty(DENOPTIMConstants.GCODETAG, gctr);
                 mol.setProperty(CDKConstants.TITLE, molName);
-                mol.setProperty("GraphENC", graph.toString());
-                mol.setProperty("GraphMsg", "From Initial Population File");
+                mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
+                mol.setProperty(DENOPTIMConstants.GMSGTAG, 
+                        "From Initial Population File");
 
-                DENOPTIMMolecule pmol =
-                    new DENOPTIMMolecule(graph, molinchi, molsmiles, fitness);
+                Candidate pmol = new Candidate(molName, graph, fitness, 
+                        molinchi, molsmiles);
+                
                 pmol.setImageFile(null);
                 members.add(pmol);
             }

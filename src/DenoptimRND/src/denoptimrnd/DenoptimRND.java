@@ -28,7 +28,7 @@ import org.apache.commons.math3.random.MersenneTwister;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
 import denoptim.utils.GenUtils;
 import denoptim.utils.RandomUtils;
 
@@ -49,8 +49,8 @@ public class DenoptimRND
      * Colection of DENOPTIM representations of
      * graphs with fitness.
      */
-    private static ArrayList<DENOPTIMMolecule> allEvaluatedGraphs =
-                                              new ArrayList<DENOPTIMMolecule>();
+    private static ArrayList<Candidate> allEvaluatedGraphs =
+                                              new ArrayList<Candidate>();
 
     /**
      * Comment used to flag previously used graphs
@@ -147,7 +147,7 @@ public class DenoptimRND
         // create the population
 
         // placeholder for the population members
-        ArrayList<DENOPTIMMolecule> molPopulation = new ArrayList<>();
+        ArrayList<Candidate> molPopulation = new ArrayList<>();
         
 	// Create first population, if not already complete
         initializePopulation(molPopulation, genDir);
@@ -249,20 +249,20 @@ public class DenoptimRND
      */
 
     private static boolean evolvePopulation
-	              (ArrayList<DENOPTIMMolecule> molPopulation, String genDir)
+	              (ArrayList<Candidate> molPopulation, String genDir)
                                                         throws DENOPTIMException
     {
 	ArrayList<String> oldUIDs = new ArrayList<String>();
-        for (DENOPTIMMolecule mol : molPopulation)
+        for (Candidate mol : molPopulation)
         {
-            oldUIDs.add(mol.getMoleculeUID());
+            oldUIDs.add(mol.getUID());
         }
 
         int n = RNDParameters.getNumberOfChildren() + molPopulation.size();
 
         while (molPopulation.size() < n)
         {
-            DENOPTIMMolecule dm = getRandomEntry();
+            Candidate dm = getRandomEntry();
             molPopulation.add(dm);
             if (molPopulation.size() == n)
             {
@@ -296,9 +296,9 @@ public class DenoptimRND
         // produced. If yes, return true
         boolean updated = false;
         
-        for (DENOPTIMMolecule mol : molPopulation)
+        for (Candidate mol : molPopulation)
         {
-            if (!oldUIDs.contains(mol.getMoleculeUID()))
+            if (!oldUIDs.contains(mol.getUID()))
             {
                 updated = true;
                 break;
@@ -322,7 +322,7 @@ public class DenoptimRND
      */
 
     private static void initializePopulation
-		      (ArrayList<DENOPTIMMolecule> molPopulation, String genDir)
+		      (ArrayList<Candidate> molPopulation, String genDir)
 						        throws DENOPTIMException
     {
         final int MAX_TRIES = RNDParameters.getPopulationSize() * 
@@ -363,7 +363,7 @@ public class DenoptimRND
 	    t+=1;
 
             // Pick a graph from the list of known (and evaluated) graphs
-            DENOPTIMMolecule dm = getRandomEntry();
+            Candidate dm = getRandomEntry();
             molPopulation.add(dm);
 
 	    // Stop appending to the population
@@ -390,9 +390,9 @@ public class DenoptimRND
 
 //------------------------------------------------------------------------------
     
-    private static void cleanup(ArrayList<DENOPTIMMolecule> popln)
+    private static void cleanup(ArrayList<Candidate> popln)
     {
-        for (DENOPTIMMolecule mol:popln)
+        for (Candidate mol:popln)
             mol.cleanup();
         popln.clear();
     }
@@ -404,7 +404,7 @@ public class DenoptimRND
      * @param dmols the entities to append
      */
 
-    private static void addEvaluatedGraphs(ArrayList<DENOPTIMMolecule> dmols)
+    private static void addEvaluatedGraphs(ArrayList<Candidate> dmols)
     {
 	allEvaluatedGraphs.addAll(dmols);
 	numAvail = allEvaluatedGraphs.size();
@@ -416,21 +416,19 @@ public class DenoptimRND
      * Select an evaluated graph that was not selected before
      */
 
-    private static DENOPTIMMolecule getRandomEntry() throws DENOPTIMException
+    private static Candidate getRandomEntry() throws DENOPTIMException
     {
-        DENOPTIMMolecule newOne = null;
+        Candidate newOne = null;
 
         if (numUsed == numAvail)
         {
             throw new DENOPTIMException("ERROR! Not enough graphs in the "
                                            + "collection of evaluated graphs.");
         }
-
-	MersenneTwister rng = RandomUtils.getRNG();
 	
         while (numUsed < numAvail)
         {
-            int rndNum = rng.nextInt(numAvail);
+            int rndNum = RandomUtils.nextInt(numAvail);
             String str = allEvaluatedGraphs.get(rndNum).getComments();
             if (str==null || (str!=null && !str.equals(usedFlag)))
             {
@@ -439,7 +437,7 @@ public class DenoptimRND
                 numUsed+=1;
                 StringBuilder sb = new StringBuilder();
                 sb.append(String.format("Selecting graph %d ",rndNum));
-                sb.append(newOne.getMoleculeUID());
+                sb.append(newOne.getUID());
                 sb.append(String.format(" (Usage %d/%d)",numUsed,numAvail));
                 DENOPTIMLogger.appLogger.log(Level.INFO,sb.toString());
                 break;

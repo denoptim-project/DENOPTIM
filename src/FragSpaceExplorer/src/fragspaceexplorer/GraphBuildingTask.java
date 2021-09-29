@@ -21,7 +21,6 @@ package fragspaceexplorer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -32,17 +31,16 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.SymmetricSet;
 import denoptim.task.FitnessTask;
-import denoptim.threedim.TreeBuilder3D;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.FragmentUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -93,7 +91,7 @@ public class GraphBuildingTask extends FitnessTask
     /**
      * Tool for generating 3D models assembling 3D building blocks.
      */
-    private TreeBuilder3D tb3d;
+    private ThreeDimTreeBuilder tb3d;
 
 //------------------------------------------------------------------------------
    
@@ -101,16 +99,13 @@ public class GraphBuildingTask extends FitnessTask
      * Constructor
      */
  
-    public GraphBuildingTask(DENOPTIMGraph m_molGraph, 
+    public GraphBuildingTask(DENOPTIMGraph molGraph,
     		FragsCombination fragsToAdd, int level, String workDir, 
     		int verbosity) throws DENOPTIMException
     {
-    	//TODO: replace all serialization-based deep cloning with deep clone method
-    	// We are going to modify the graph is this cannot be a reference to the
-    	// original.
-        super((DENOPTIMGraph) DenoptimIO.deepCopy(m_molGraph));
+        super(molGraph.clone());
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
-        rootId = m_molGraph.getGraphId();
+        rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();
         this.workDir = workDir;
         this.fragsToAdd = fragsToAdd;
@@ -207,6 +202,7 @@ public class GraphBuildingTask extends FitnessTask
         {
             String msg = "Call GraphBuildingTask " + id 
                          + " (Lev:" + level + ", comb:" + nextIds + ")";
+            
             if (verbosity > 1)
             {
                 msg = msg + DENOPTIMConstants.EOL + " - Fragsments to add: ";
@@ -224,11 +220,10 @@ public class GraphBuildingTask extends FitnessTask
             }
             
             // Initialize the 3d model builder
-            if (FitnessParameters.make3dTree())
+            tb3d = new ThreeDimTreeBuilder();
+            if (!FitnessParameters.make3dTree())
             {
-            	tb3d = new TreeBuilder3D(FragmentSpace.getScaffoldLibrary(),
-            			FragmentSpace.getFragmentLibrary(),
-            			FragmentSpace.getCappingLibrary());
+            	tb3d.setAlidnBBsIn3D(false);
             }
 
             // Extend graph as requested
@@ -237,19 +232,23 @@ public class GraphBuildingTask extends FitnessTask
             for (IdFragmentAndAP srcAp : fragsToAdd.keySet())
             {
                 int sVId = srcAp.getVertexId();
+                int sFId = srcAp.getVertexMolId();
+                DENOPTIMVertex.BBType sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
                 DENOPTIMVertex srcVrtx = dGraph.getVertexWithId(sVId);
-                String sCls = 
-                          srcVrtx.getAttachmentPoints().get(sApId).getAPClass();
+                
+                APClass sCls = srcVrtx.getAttachmentPoints().get(
+                        sApId).getAPClass();
     
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
                 int tVId = trgAp.getVertexId();
                 int tFId = trgAp.getVertexMolId();
-                int tFTyp = trgAp.getVertexMolType(); 
+                DENOPTIMVertex.BBType tFTyp = trgAp.getVertexMolType(); 
                 int tApId = trgAp.getApId();
         
-                // type -1 is used to represent unused AP
-                if (tFTyp == -1) 
+                // type "NONE" is used to represent unused AP
+                if (tFTyp == DENOPTIMVertex.BBType.NONE 
+                        || tFTyp == DENOPTIMVertex.BBType.UNDEFINED)
                 {
                     continue;
                 }
@@ -266,31 +265,12 @@ public class GraphBuildingTask extends FitnessTask
                     ss.add(tVId);
                     newSymSets.put(tSymSetID,ss);
                 }
-                ArrayList<DENOPTIMAttachmentPoint> tFAPs =
-                                    FragmentUtils.getAPForFragment(tFId, tFTyp);
-                String tCls = tFAPs.get(tApId).getAPClass();
     
-                DENOPTIMVertex trgVrtx = new DENOPTIMVertex(tVId, tFId, tFAPs,
-                                                                         tFTyp);
-                IAtomContainer mol = FragmentSpace.getFragment(tFTyp, tFId);
-                ArrayList<SymmetricSet> symAPs =
-                                        FragmentUtils.getMatchingAP(mol, tFAPs);
-                trgVrtx.setSymmetricAP(symAPs);
-
-                trgVrtx.setLevel(srcVrtx.getLevel() + 1);
+                DENOPTIMVertex trgVrtx = DENOPTIMVertex.newVertexFromLibrary(
+                        tVId, tFId, tFTyp);
                 
-                DENOPTIMEdge edge = GraphUtils.connectVertices(srcVrtx, trgVrtx,
-                                                                   sApId, tApId,
-                                                                    sCls, tCls);
-                if (edge == null)
-                {
-                    msg = "Unable to make new edge.";
-                    DENOPTIMLogger.appLogger.severe(msg);
-                    throw new DENOPTIMException(msg);
-                }
-    
-                dGraph.addVertex(trgVrtx);
-                dGraph.addEdge(edge);
+                dGraph.appendVertexOnAP(srcVrtx.getAP(sApId), 
+                        trgVrtx.getAP(tApId));
             }
 
             // Append new symmetric sets
@@ -304,8 +284,8 @@ public class GraphBuildingTask extends FitnessTask
             }
 
             // Evaluate graph
-            Object[] res = GraphUtils.evaluateGraph(dGraph);
-            if (res == null) // null is used to indicate unacceptable graph
+            Object[] res = dGraph.evaluateGraph();
+            if (res == null) // null is used to indicate an unacceptable graph
             {
                 if (verbosity > 1)
                 {
@@ -316,30 +296,30 @@ public class GraphBuildingTask extends FitnessTask
                 nSubTasks = 1;
 
                 // Store graph
-                FSEUtils.storeGraphOfLevel(dGraph,level,rootId,nextIds);
+                FSEUtils.storeGraphOfLevel(dGraph.clone(),level,rootId,nextIds);
             }
             else
             {
                 // We don't add capping groups as they are among the candidate
                 // fragments to be put in each AP.
                 // If a graph still holds unused APs that should be capped,
-                // then such graph is an unfinished molecular candidate that
+                // then such graph is an unfinished molecular entity that
                 // will be further grown, so no need to perceive rings or
                 // submit any external task.
                 boolean needsCaps = false;
                 if (FragmentSpace.useAPclassBasedApproach())
                 {
-                    needsCaps = GraphUtils.graphNeedsCappingGroups(dGraph);
+                    needsCaps = dGraph.graphNeedsCappingGroups();
                 }
 
-                ArrayList<DENOPTIMGraph> altCyclicGraphs =
-                                                new ArrayList<DENOPTIMGraph>();
+                ArrayList<DENOPTIMGraph> altCyclicGraphs = new ArrayList<DENOPTIMGraph>();
                 if (!needsCaps)
                 {
-                    altCyclicGraphs = 
-                        GraphUtils.makeAllGraphsWithDifferentRingSets(dGraph);
+                    altCyclicGraphs =
+                            dGraph.makeAllGraphsWithDifferentRingSets();
                 }
                 int sz = altCyclicGraphs.size();
+                
                 if (sz>0 && !needsCaps)
                 {
                     nSubTasks = sz;
@@ -352,7 +332,7 @@ public class GraphBuildingTask extends FitnessTask
                         DENOPTIMLogger.appLogger.info(msg); 
                     }
 
-                    // WARNING! If cyclic versions of molGraph are available,
+                    // WARNING! If cyclic versions of dGraph are available,
                     // we IGNORE the acyclic original. This is because,
                     // if at all possible, the acyclic graph is built anyway
                     // using capping groups instead of ring closing attractors.
@@ -369,10 +349,11 @@ public class GraphBuildingTask extends FitnessTask
                     for (int ig = 0; ig<altCyclicGraphs.size(); ig++)
                     {
                         DENOPTIMGraph g = altCyclicGraphs.get(ig);
+                        int gId = g.getGraphId();
                         
                         if (verbosity > 0)
                         {
-                            msg = "Graph " + g.getGraphId()
+                            msg = "Graph " + gId
                                   + " is cyclic alternative "
                                   + (ig+1) + "/" + altCyclicGraphs.size()
                                   + " " + lst;
@@ -387,21 +368,12 @@ public class GraphBuildingTask extends FitnessTask
                         try 
                         {
                             // Prepare molecular representation
-                        	IAtomContainer mol;
-                        	if (FitnessParameters.make3dTree())
-                        	{
-	                        	try {
-	                                mol = tb3d.convertGraphTo3DAtomContainer(g,true);
-	                        	} catch (Throwable t) {
-	                        		mol = GraphConversionTool
-	                        				.convertGraphToMolecule(g, true);
-	                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
-	                        	}
-                        	} else {
-                        		mol = GraphConversionTool
-                        				.convertGraphToMolecule(g, true);
-                        		DENOPTIMMoleculeUtils.removeRCA(mol,g);
-                        	}
+                        	DENOPTIMGraph gWithNoRCVs = g.clone();
+                        	//NB: this replaces unused RCVs with capping groups
+                        	GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
+                        	IAtomContainer mol = 
+                        	        tb3d.convertGraphTo3DAtomContainer(
+	                                    gWithNoRCVs,true);
                             
                             // Level that generated this graph
                             altRes[4] = level;
@@ -427,11 +399,11 @@ public class GraphBuildingTask extends FitnessTask
                             {
                                 pr.setFirst("UNDEFINED_INCHI");
                             }
-                            altRes[0] = pr.getFirst(); 
-                      
+                            altRes[0] = pr.getFirst();
+                            
                             // Store graph
-                            FSEUtils.storeGraphOfLevel(g,level,rootId,nextIds);
-                            graphId = g.getGraphId();
+                            FSEUtils.storeGraphOfLevel(g.clone(),level,rootId,nextIds);
+                            graphId = gId;
     
                             // Optionally perform external task
                             if (FSEParameters.submitFitnessTask())
@@ -451,21 +423,19 @@ public class GraphBuildingTask extends FitnessTask
                     nSubTasks = 1;
 
                     // Store graph
-                    FSEUtils.storeGraphOfLevel(dGraph,level,rootId,nextIds);
+                    DENOPTIMGraph gClone = dGraph.clone();
+                    FSEUtils.storeGraphOfLevel(gClone,level,rootId,nextIds);
                     
                     // Optionally improve the molecular representation, which
                     // is otherwise only given by the collection of building
                     // blocks (not aligned, nor roto-translated)
                 	if (FitnessParameters.make3dTree())
                 	{
-                		IAtomContainer mol;
-                    	try {
-                            mol = tb3d.convertGraphTo3DAtomContainer(dGraph,true);
-                    	} catch (Throwable t) {
-                    		mol = GraphConversionTool
-                    				.convertGraphToMolecule(dGraph, true);
-                        	DENOPTIMMoleculeUtils.removeRCA(mol,dGraph);
-                    	}
+                	    //NB: this replaces unused RCVs with capping groups
+                        GraphConversionTool.replaceUnusedRCVsWithCapps(gClone);
+                        IAtomContainer mol = 
+                                tb3d.convertGraphTo3DAtomContainer(
+                                        gClone,true);
                         res[2] = mol;
                 	}
                    
@@ -510,9 +480,9 @@ public class GraphBuildingTask extends FitnessTask
         fitProvMol = (IAtomContainer) res[2];
         String parentGraphId = res[3].toString().trim();
         String level = res[4].toString().trim();
-        fitProvMol.setProperty("InChi", molinchi);
-        fitProvMol.setProperty("UID", molinchi);
-        fitProvMol.setProperty("SMILES", molsmiles);
+        fitProvMol.setProperty(DENOPTIMConstants.INCHIKEYTAG, molinchi);
+        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, molinchi);
+        fitProvMol.setProperty(DENOPTIMConstants.SMILESTAG, molsmiles);
         fitProvMol.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 

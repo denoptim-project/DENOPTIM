@@ -25,11 +25,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.vecmath.Point3d;
+
+import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * Each attachment point is annotated by the number (position) of the atom
@@ -42,14 +45,14 @@ import denoptim.fragspace.FragmentSpace;
  */
 
 
-public class DENOPTIMAttachmentPoint implements Serializable,
-Comparable<DENOPTIMAttachmentPoint>
+public class DENOPTIMAttachmentPoint implements Serializable, Cloneable, 
+    Comparable<DENOPTIMAttachmentPoint>
 {
-	/**
-	 * Version UID
-	 */
-	private static final long serialVersionUID = -3680248393705286640L;
-
+    /**
+     * Version UID
+     */
+    private static final long serialVersionUID = -3680248393705286640L;
+    
     /**
      * Index used to keep the order in a list of attachment points
      */
@@ -58,51 +61,61 @@ Comparable<DENOPTIMAttachmentPoint>
 	/**
 	 * The index of the source atom in the atom list of the fragment (0-based)
 	 */
-    private int atomPostionNumber;
+    private int atomPositionNumber;
     
+    /**
+     * The index of the source atom in the atom list of the entire molecule 
+     * (0-based)
+     */
+    private int atomPositionNumberInMol;
+    
+    //TODO-V3 remove
     /**
      * the original number of connections of this atom
      */
-    private int atomConnections; 
+    private int totalConnections; 
 
+
+    //TODO-V3 remove
     /**
      * the current free connections
      */
-    private int apConnections; 
+    private int freeConnections; 
     
     /**
-     * The cutting rule that generated this AP (the main APClass)
+     * The attachment point class
      */
-    private String apRule;
-    
-    /**
-     * The direction index of the cutting rule that generated this AP 
-     * (the subClass)
-     */
-    private int apSubClass;
-    
-    /**
-     * The class associated with the AP
-     */
-    private String apClass;
+    private APClass apClass;
     
     /**
      * The direction vector representing the bond direction
      */
-    private double[] dirVec; 
+    private double[] dirVec;
+
+    /**
+     * The vertex to which this AP is attached to.
+     */
+    private DENOPTIMVertex owner;
+    
+    /**
+     * The edge that is using this AP, if any
+     */
+    private DENOPTIMEdge user;
 
 
 //------------------------------------------------------------------------------
 
     /**
      * Constructor for undefined DENOPTIMAttachmentPoint
+     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    public DENOPTIMAttachmentPoint()
+    @Deprecated
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
-        atomPostionNumber = 0;
-        atomConnections = 0;
-        apConnections = 0;
-        apClass = "";
+        this.owner = owner;
+        atomPositionNumber = 0;
+        totalConnections = 0;
+        freeConnections = 0;
         id = FragmentSpace.apID.getAndIncrement();
     }
 
@@ -110,41 +123,80 @@ Comparable<DENOPTIMAttachmentPoint>
 
     /**
      * Constructor
-     * @param m_AtomPosNum the index of the source atom (0-based)
-     * @param m_atomConnections the total number of connections
-     * @param m_apConnections the number of free connections
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    public DENOPTIMAttachmentPoint(int m_AtomPosNum, int m_atomConnections,
-                                                            int m_apConnections)
+    @Deprecated
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
+                                   int atomConnections,int apConnections) 
     {
-        atomPostionNumber = m_AtomPosNum;
-        atomConnections = m_atomConnections;
-        apConnections = m_apConnections;
-        apClass = "";
-        id = FragmentSpace.apID.getAndIncrement();
+        this(owner);
+        this.atomPositionNumber = atomPositionNumber;
+        totalConnections = atomConnections;
+        freeConnections = apConnections;
     }
     
 //------------------------------------------------------------------------------
     
     /**
      * Constructor
-     * @param m_AtomPosNum the index of the source atom (0-based)
-     * @param m_atomConnections the total number of connections
-     * @param m_apConnections the number of free connections
-     * @param m_dirVec the AP direction vector end (the beginning ate the 
-     * coords of the source atom). This must array have 3 entries.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param dirVec the AP direction vector end (the beginning are the
+     * coords of the source atom). This array must have 3 entries.
+     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    public DENOPTIMAttachmentPoint(int m_AtomPosNum, int m_atomConnections,
-                                        int m_apConnections, double[] m_dirVec)
+    @Deprecated
+    private DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
+                                   int atomConnections, int apConnections,
+                                   double[] dirVec) 
     {
-        atomPostionNumber = m_AtomPosNum;
-        atomConnections = m_atomConnections;
-        apConnections = m_apConnections;
-        apClass = "";
-        
-        dirVec = new double[3];
-        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);
-        id = FragmentSpace.apID.getAndIncrement();
+        this(owner, atomPositionNumber, atomConnections, apConnections);
+        this.dirVec = new double[3];
+        System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     * @param atomPosNum the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param apClass the APClass
+     * @deprecated Use DENOPTIMVertex.addAP(...) instead
+     */
+    @Deprecated
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
+                                   int atomConnections, int apConnections,
+                                   APClass apClass) {
+        this(owner, atomPosNum, atomConnections, apConnections,
+                new double[]{0.0, 0.0, 0.0}, apClass);
+    }
+
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     * @param atomPosNum the index of the source atom (0-based)
+     * @param atomConnections the total number of connections
+     * @param apConnections the number of free connections
+     * @param dirVec the AP direction vector end (the beginning at the coords
+     *               of the source atom). This must array have 3 entries.
+     * @param apClass the APClass
+     * @deprecated Use DENOPTIMVertex.addAP(...) instead
+     */
+    @Deprecated
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
+                                   int atomConnections, int apConnections,
+                                   double[] dirVec, APClass apClass) 
+    {
+        this(owner, atomPosNum, atomConnections, apConnections, dirVec);
+        this.apClass = apClass;
     }
     
 //------------------------------------------------------------------------------
@@ -152,151 +204,71 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Construct an attachment point based on the formatted string 
      * representation. The format is the one used in SDF files.
+     * @param owner the vertex this AP is owned by.
      * @param str the formatted string.
-     * @param format is the format of the string. Acceptable values are 
-     * <code>SDF</code> for strings coming from SDF file molecular properties,
-     * and <code>MAP</code> for strings generated by the <code>toString()</code>
-     * method of DENOPTIMAttachmentPoint.
      * @throws DENOPTIMException
      */
-    public DENOPTIMAttachmentPoint(String str, String format) 
-    		throws DENOPTIMException
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, String str)
+            throws DENOPTIMException
     {
-    	switch (format)
-    	{
-    		case "SDF":
-    			processSdfString(str);
-    			break;
-    			
-    		case "MAP":
-    			processMapString(str);
-    			break;
-    			
-    		default:
-    			throw new DENOPTIMException("Unknown format for string "
-    					+ "representation of DENOPTIMAttachmentPoint");
-    	}
-    	id = FragmentSpace.apID.getAndIncrement();
+        this(owner);
+        processSdfString(str);
     }
+ 
 //-----------------------------------------------------------------------------
-	
-    private void processMapString(String str) throws DENOPTIMException
-    {
-    	if (str.contains("{") || str.contains("}")
-    			|| str.contains("[") || str.contains("]"))
-    	{
-    		throw new DENOPTIMException("Unable to parse APString '" + str 
-    				+ "'");
-    	}
-    	
-    	String[] params = str.split(",");
-    	for (int i=0; i<params.length; i++)
-    	{
-    		String pvPair = params[i];
-    		String[] parts = pvPair.split("=");
-    		if (parts.length != 2)
-    		{
-    			throw new DENOPTIMException("Unable to parse APString '" + str 
-    					+ "'");
-    		}
-    		switch (parts[0])
-    		{
-    			case "atomPostionNumber":
-    				this.atomPostionNumber = Integer.parseInt(parts[1]);
-    				break;
-    				
-    			case "atomConnections":
-					this.atomConnections = Integer.parseInt(parts[1]);
-					break;
-				
-    			case "apConnections":
-    				this.apConnections = Integer.parseInt(parts[1]);
-					break;
-				
-    			case "apRule":
-    				this.apRule = parts[1];
-					break;
-				
-    			case "apSubClass":
-    				this.apSubClass = Integer.parseInt(parts[1]);
-					break;
-				
-    			case "apClass":
-    				this.apClass = parts[1];
-					break;
-				
-    			case "dirVec.x":
-    				this.dirVec[0] = Double.parseDouble(parts[1]);
-					break;
-				
-    			case "dirVec.y":
-    				this.dirVec[1] = Double.parseDouble(parts[1]);
-					break;
-					
-    			case "dirVec.z":
-    				this.dirVec[2] = Double.parseDouble(parts[1]);
-					break;
-				
-				default:
-					throw new DENOPTIMException("Unable to parse APString '" 
-							+ str + "'");    				
-    		}
-    	}
-    }
-    
-//-----------------------------------------------------------------------------
-    	
+        
     private void processSdfString(String str) throws DENOPTIMException
     {
         try 
         {
             String[] parts = str.split(
-            		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPAAP));
+                    Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPAAP));
             
             //WARNING here we convert from 1-based to 0-based index
-            this.atomPostionNumber = Integer.parseInt(parts[0])-1;
+            this.atomPositionNumber = Integer.parseInt(parts[0])-1;
 
             String[] details = parts[1].split(
-            		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
+                    Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
             switch (details.length)
             {
-	            case 2:
-	            	//APClass:subclass but no direction vector
-	            	break;
-	            	
-	            case 3:
-	            	//APClass:subclass:direction_vector
-	            	break;
-	            	
-	            default:
-	            	throw new DENOPTIMException("Unable to split APClass, "
-	            			+ "subclass, and coordinates");
+                case 2:
+                    //APClass:subclass but no direction vector
+                    break;
+                    
+                case 3:
+                    //APClass:subclass:direction_vector
+                    break;
+                    
+                default:
+                    throw new DENOPTIMException("Unable to split APClass, "
+                            + "subclass, and coordinates");
             }
             
-            this.apRule = details[0];
-            this.apSubClass = Integer.parseInt(details[1]);
-            this.apClass = this.apRule + DENOPTIMConstants.SEPARATORAPPROPSCL 
-            		+ Integer.toString(this.apSubClass);
+            this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
             
             if (details.length == 3)
             {
-	            String[] coord = details[2].split(
-	            		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
-	            
-	            if (coord.length == 3)
-	            {
-	            	this.dirVec = new double[3];
-	            	this.dirVec[0] = Double.parseDouble(coord[0]);
-	            	this.dirVec[1] = Double.parseDouble(coord[1]);
-	            	this.dirVec[2] = Double.parseDouble(coord[2]);
-	            }
+                String[] coord = details[2].split(
+                        Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                
+                if (coord.length == 3)
+                {
+                    this.dirVec = new double[3];
+                    this.dirVec[0] = Double.parseDouble(coord[0]);
+                    this.dirVec[1] = Double.parseDouble(coord[1]);
+                    this.dirVec[2] = Double.parseDouble(coord[2]);
+                }
             }
-	    } catch (Throwable t) {
-			throw new DENOPTIMException("Cannot construct AP from string '" 
-						+ str + "'");
-	    }
+            this.freeConnections = FragmentSpace.getBondOrderForAPClass(
+                    apClass.getRule()).getValence();
+            this.totalConnections = this.freeConnections;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new DENOPTIMException("Cannot construct AP from string '" 
+                        + str + "'",t);
+        }
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -307,7 +279,18 @@ Comparable<DENOPTIMAttachmentPoint>
     {
         return id;
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Sets the unique integer that is used to sort list of attachment points.
+     * <b>WARNING</b>: we do not check for uniqueness of the given value.
+     */
+    public void setID(int id)
+    {
+        this.id = id;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -317,9 +300,9 @@ Comparable<DENOPTIMAttachmentPoint>
      * the APClass-based formalism.
      * @return the max number of connections
      */
-    public int getAtmConnections()
+    public int getTotalConnections()
     {
-    	return atomConnections;
+        return totalConnections;
     }    
 
 //------------------------------------------------------------------------------
@@ -331,9 +314,9 @@ Comparable<DENOPTIMAttachmentPoint>
      * the APClass-based formalism.
      * @return the current free connections associated with the atom
      */
-    public int getAPConnections()
+    public int getFreeConnections()
     {
-        return apConnections;
+        return freeConnections;
     }
 
 //------------------------------------------------------------------------------
@@ -345,7 +328,7 @@ Comparable<DENOPTIMAttachmentPoint>
      */
     public int getAtomPositionNumber()
     {
-        return atomPostionNumber;
+        return atomPositionNumber;
     }
 
 //------------------------------------------------------------------------------
@@ -353,11 +336,37 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Set the index of the source atom in the list of atoms of the fragment.
      * The index should reflect 0-based enumeration.
-     * @param m_atomPostionNumber the index
+     * @param atomPositionNumber the index
      */
-    public void setAtomPositionNumber(int m_atomPostionNumber)
+    public void setAtomPositionNumber(int atomPositionNumber)
     {
-        atomPostionNumber = m_atomPostionNumber;
+        this.atomPositionNumber = atomPositionNumber;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * The index of the source atom in the atom list of the entire molecule. 
+     * The index is reported considering 0-based enumeration.
+     * @return the index of the source atom in the atom list of the entire
+     * molecule
+     */
+    public int getAtomPositionNumberInMol()
+    {
+        return atomPositionNumberInMol;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Set the index of the source atom in the list of atoms of the entire 
+     * molecule.
+     * The index should reflect 0-based enumeration.
+     * @param atomPositionNumberInMol the index
+     */
+    public void setAtomPositionNumberInMol(int atomPositionNumberInMol)
+    {
+        this.atomPositionNumberInMol = atomPositionNumberInMol;
     }
 
 //------------------------------------------------------------------------------
@@ -367,11 +376,11 @@ Comparable<DENOPTIMAttachmentPoint>
      * to the number of unsaturated valences that can still be used on this 
      * attachment point. This is useful for attachment points that do not follow
      * the APClass-based formalism.
-     * @param m_apConnections
+     * @param freeConnections
      */
-    public void setAPConnections(int m_apConnections)
+    public void setFreeConnections(int freeConnections)
     {
-        apConnections = m_apConnections;
+        this.freeConnections = freeConnections;
     }
     
 //------------------------------------------------------------------------------
@@ -379,15 +388,15 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Sets the end of the 3D vector defining the direction of the AP in 3D.
      * Note that the source of this vector is the source atom, and that the 
-     * entries of <code>m_dirVec</code> are referred to the same origin as
+     * entries of <code>dirVec</code> are referred to the same origin as
      * the coordinates of the source atom.
-     * @param m_dirVec the coordinates of the 3D point defining the end of the 
+     * @param dirVec the coordinates of the 3D point defining the end of the
      * direction vector
      */
-    public void setDirectionVector(double[] m_dirVec)
+    public void setDirectionVector(double[] dirVec)
     {
-        dirVec = new double[3];
-        System.arraycopy(m_dirVec, 0, dirVec, 0, m_dirVec.length);  
+        this.dirVec = new double[3];
+        System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
     }
 
 //------------------------------------------------------------------------------
@@ -395,109 +404,35 @@ Comparable<DENOPTIMAttachmentPoint>
     /**
      * Set the Attachment Point class. The APClass is the combination of a main
      * class (or "rule") and a subclass (or direction).  
-     * @param m_class the new APClass.
+     * @param apClass the new APClass.
      */
-    public void setAPClass(String m_class) throws DENOPTIMException
+    
+    public void setAPClass(String apClass) throws DENOPTIMException
     {
-    	if (!isValidAPClassString(m_class))
-    	{
-    		throw new DENOPTIMException("Attempt to use APClass '" + m_class 
-    					+"' that does not respect main:subclass syntax.");
-    	}
-        apClass = m_class;
+        this.apClass = APClass.make(apClass);
     }
     
 //------------------------------------------------------------------------------
-    
+
     /**
-     * Evaluate if a candidate string can be used as APClass. This method checks
-     * whether the string reflects the expected syntax of an APClass string
+     * Set the Attachment Point class. 
+     * @param apClass the new APClass.
      */
     
-    public static boolean isValidAPClassString(String temptAPClass)
+    public void setAPClass(APClass apClass) throws DENOPTIMException
     {
-		if (!temptAPClass.matches("^[a-z,A-Z,0-9].*"))
-			return false;
-		
-		if (!temptAPClass.matches(".*[0-9]$"))
-			return false;
-		
-		if (temptAPClass.contains(" "))
-			return false;
-		
-		if (!temptAPClass.contains(DENOPTIMConstants.SEPARATORAPPROPSCL))
-			return false;
-		
-		/*
-		//Avoiding StringUtils
-		int numSep = StringUtils.countMatches(temptAPClass,
-				DENOPTIMConstants.SEPARATORAPPROPSCL);
-		*/
-		
-		int numSep = 0;
-		for (int i=0; i<temptAPClass.length(); i++)
-		{
-			if (temptAPClass.charAt(i) == 
-					DENOPTIMConstants.SEPARATORAPPROPSCL.charAt(0))
-			{
-				numSep++;
-			}
-		}
-		
-		if (1 != numSep)
-			return false;
-		
-		return true;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Evaluate if a candidate string can be used as APRule. This method checks
-     * whether the string reflects the expected syntax of an APRule, i.e.,
-     * a string with no spaces and no 
-     * {@value DENOPTIMConstants.SEPARATORAPPROPSCL}.
-     */
-    
-    //TODO-V3 use APClass.isValidAPRuleString()
-    public static boolean isValidAPRuleString(String temptAPRule)
-    {
-		if (temptAPRule == null)
-            return false;
-        return temptAPRule.matches("^[a-zA-Z0-9_-]+$");
+        this.apClass = apClass;
     }
 
 //------------------------------------------------------------------------------
 
     /**
      * Returns the Attachment Point class.
-     * @return the APClass
+     * @return the APClass or null.
      */
-    public String getAPClass()
+    public APClass getAPClass()
     {
         return apClass;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the Attachment Point sub class.
-     * @return the APClass
-     */
-    public int getAPSubClass()
-    {
-        return apSubClass;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the main part of the APClass (i.e., the "rule").
-     * @return the APClass
-     */
-    public String getAPRule()
-    {
-        return apRule;
     }
     
 //------------------------------------------------------------------------------
@@ -510,40 +445,68 @@ Comparable<DENOPTIMAttachmentPoint>
     public double[] getDirectionVector()
     {
         return dirVec;
-    }    
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Resets the connections of this AP. Makes all connections free.
-     */
-
-    public void resetAPConnections()
-    {
-        setAPConnections(atomConnections);
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
      * Change the number of free connections by the given delta.
      * @param delta the amount of change.
      */
-    public void updateAPConnections(int delta)
+    public void updateFreeConnections(int delta)
     {
-        apConnections = apConnections + delta;
+        freeConnections = freeConnections + delta;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Check availability of free connections
-     * @return <code>true</code> if the attachment point has free connections
+     * Check availability of this attachment point. Does not account for
+     * embedding of the vertex in a template, i.e., this AP can be available
+     * in the graph owning the vertex this AP belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP might be projected on the
+     * template's surface and used to make an edge at that level. To account for
+     * such possibility use 
+     * {@link DENOPTIMAttachmentPoint#isAvailableThroughout()}
+     * @return <code>true</code> if the attachment point has no user.
      */
 
     public boolean isAvailable()
     {
-        return apConnections > 0;
+        return user == null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Check availability of this attachment point throughout the graph level, 
+     * i.e., check also across the inner graph template boundary. 
+     * This method does account for
+     * embedding of the vertex in a template, i.e., this AP can be available
+     * in the graph owning the vertex this AP belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP is then projected on the
+     * template's surface and used to make an edge that uses the template as a 
+     * single vertex. To ignore this possibility and consider only edges
+     * that belong to the graph owning the AP's vertex, use 
+     * {@link DENOPTIMAttachmentPoint#isAvailable()}.
+     * @return <code>true</code> if the attachment point has no user.
+     */
+
+    public boolean isAvailableThroughout()
+    {
+        if (user == null)
+        {
+            if (owner.getGraphOwner() != null 
+                    && owner.getGraphOwner().templateJacket != null)
+            {
+               return owner.getGraphOwner().templateJacket
+                    .getOuterAPFromInnerAP(this).isAvailableThroughout();
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -554,16 +517,17 @@ Comparable<DENOPTIMAttachmentPoint>
      */
     public boolean isClassEnabled()
     {
-        return apClass.length() > 0;
+        return apClass != null;
     }
     
 //------------------------------------------------------------------------------
-    
+
     /**
-     * Compare this and given attachment point. This method defines how
-     * DENOPTIMAttachmentPoint are sorted.
-     * @param other
-     * @return an integer that can be used by a comparator.
+     * Compares this and another attachment points based on their unique 
+     * identifier. This is done to retain the order of attachment points when
+     * regenerating AP lists multiple times.
+     * @param other the attachment point to compare this with.
+     * @return an integer that can be used by a comparator
      */
     @Override
     public int compareTo(DENOPTIMAttachmentPoint other)
@@ -589,141 +553,253 @@ Comparable<DENOPTIMAttachmentPoint>
         if (this == other)
             return EQUAL;
         
+        if (this.sameAs(other))
+            return EQUAL;
+        
         //Compare source atom
         if (this.getAtomPositionNumber() < other.getAtomPositionNumber())
-        	return BEFORE;
-        else if (this.getAtomPositionNumber() > other.getAtomPositionNumber())
-        	return AFTER;
-
-        //Compare CLASS name
-        String cl = this.getAPClass();
-        String othercl = other.getAPClass();
-        int res = cl.compareTo(othercl);
-        if (res < 0)
             return BEFORE;
-        else if (res > 0)
+        else if (this.getAtomPositionNumber() > other.getAtomPositionNumber())
             return AFTER;
+
+        //Compare APClass
+        if (this.getAPClass()!=null && other.getAPClass()!=null)
+        {
+            int res = this.apClass.compareTo(other.apClass);
+            if (res != 0)
+                return res;
+        }
         
         //Compare Direction Vector if AtomID is equal
         if (this.getDirectionVector() != null 
-        		&& other.getDirectionVector() != null)
+                && other.getDirectionVector() != null)
         {
-	        double[] thisVec = this.getDirectionVector();
-	        double[] otherVec = other.getDirectionVector();
-	
-	        if (thisVec[0] < otherVec[0])
-	        {
-	            return BEFORE;
-	        }
-	        else if (thisVec[0] > otherVec[0])
-	            return AFTER;
-	
-	        if (thisVec[1] < otherVec[1])
-	        {
-	            return BEFORE;
-	            
-	        }
-	        else if (thisVec[1] > otherVec[1])
-	            return AFTER;
-	        
-	        if (thisVec[2] < otherVec[2])
-	        {
-	            return BEFORE;
-	        }
-	        else if (thisVec[2] > otherVec[2])
-	            return AFTER;
+            double[] thisVec = this.getDirectionVector();
+            double[] otherVec = other.getDirectionVector();
+    
+            if (thisVec[0] < otherVec[0])
+            {
+                return BEFORE;
+            }
+            else if (thisVec[0] > otherVec[0])
+                return AFTER;
+    
+            if (thisVec[1] < otherVec[1])
+            {
+                return BEFORE;
+                
+            }
+            else if (thisVec[1] > otherVec[1])
+                return AFTER;
+            if (thisVec.length > 2 && otherVec.length > 2)
+            {
+                if (thisVec[2] < otherVec[2])
+                {
+                    return BEFORE;
+                }
+                else if (thisVec[2] > otherVec[2])
+                    return AFTER;
+            }
         }
         else
         {
-        	if (this.getDirectionVector() != null)
-        	{
-        		return AFTER;
-        	}
-        	else
-        	{
-        		if (other.getDirectionVector() != null)
-        		{
-                	return BEFORE;
-        		}
-        	}
+            if (this.getDirectionVector() != null)
+            {
+                return AFTER;
+            }
+            else
+            {
+                if (other.getDirectionVector() != null)
+                {
+                    return BEFORE;
+                }
+            }
         }
         
-        // Make sure we are consistent with equals method
-        assert this.equals(other) : 
-        	"DENOPTIMAttachmentPoint.compareTo inconsistent with equals.";
+        // We should have returned already
+        System.err.println("DENOPTIMAttachmentPoint.comparePropertiesTo "
+                + "inconsistent with sameAs. Please report this bug.");
         
         return EQUAL;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Compares the features of this and another attachment point and decides if
+     * the two are same. 
+     * Does not check hashcodes, so this is not an <code>equals</code> method.
+     * @param other AP to compare with this AP.
+     * @return <code>true</code> is the two APs have the same features.
+     */
+    public boolean sameAs(DENOPTIMAttachmentPoint other)
+    {
+        return sameAs(other, new StringBuilder());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Compares the features of this and another attachment point and decides if
+     * the two are same. 
+     * Does not check hashcodes, so this is not an <code>equals</code> method.
+     * @param other AP to compare with this AP.
+     * @param reason string builder used to build the message clarifying the 
+     * reason for returning <code>false</code>.
+     * @return <code>true</code> is the two APs have the same features.
+     */
+    public boolean sameAs(DENOPTIMAttachmentPoint other, StringBuilder reason)
+    {
+        if (this.getAtomPositionNumber() != other.getAtomPositionNumber())
+        {
+            reason.append("Different source atom for APs ("
+                    + this.getAtomPositionNumber() + ","
+                    + other.getAtomPositionNumber() + ");");
+            return false;
+        }
+        
+        if (this.getTotalConnections() != other.getTotalConnections())
+        {
+            reason.append("Different total number of connections APs;");
+            return false;
+        }
+
+        if (this.getFreeConnections() != other.getFreeConnections())
+        {
+            reason.append("Different number of free connections APs;");
+            return false;
+        }
+        
+        if (this.getAPClass()!=null && other.getAPClass()!=null)
+        {
+            if (!this.getAPClass().equals(other.getAPClass()))
+            {
+                reason.append("Different APClass ("
+                        + this.getAPClass() + ","
+                        + other.getAPClass() + ");");
+                return false;
+            }
+        }
+        
+        if (this.getDirectionVector()!=null && other.getDirectionVector()!=null)
+        {
+            boolean different = false;
+            double trslh = 0.001;
+            for (int i=0; i<3; i++)
+            {
+                if (Math.abs(this.getDirectionVector()[i]
+                        -other.getDirectionVector()[i])
+                        > trslh)
+                {
+                    different = true;
+                    break;
+                }
+            }
+           
+            if (different)
+            {
+                reason.append("Different direction vector");
+                return false;
+            }
+        }
+        
+        return true;
     }
     
 //------------------------------------------------------------------------------
     
-
-    public boolean equals(DENOPTIMAttachmentPoint other)
-    {
-    	if (this.getAtomPositionNumber() != other.getAtomPositionNumber())
-    	{
-    		return false;
-    	}
-    	
-    	if (this.getAtmConnections() != other.getAtmConnections())
-    	{
-    		return false;
-    	}
-
-    	if (this.getAPConnections() != other.getAPConnections())
-    	{
-    		return false;
-    	}
-    	
-    	if (this.getAPClass()!=null && other.getAPClass()!=null)
-    	{
-	    	if (!this.getAPClass().equals(other.getAPClass()))
-	    	{
-	    		return false;
-	    	}
-    	}
-    	
-    	if (this.getAPRule()!=null && other.getAPRule()!=null)
-    	{
-	    	if (!this.getAPRule().equals(other.getAPRule()))
-	    	{
-	    		return false;
-	    	}
-    	}
-    	
-    	if (this.getAPSubClass() != other.getAPSubClass())
-    	{
-    		return false;
-    	}
-        
-    	if (this.getDirectionVector()!=null && other.getDirectionVector()!=null)
-    	{
-	    	double trslh = 0.001;
-	        if (Math.abs(this.getDirectionVector()[0]
-	        		-other.getDirectionVector()[0])
-	        		> trslh)
-	        {
-	        	return false;
-	        }
-	       
-	        if (Math.abs(this.getDirectionVector()[1]
-	        		-other.getDirectionVector()[1])
-	        		> trslh)
-	        {
-	        	return false;
-	        }
-	        
-	        if (Math.abs(this.getDirectionVector()[2]
-	        		-other.getDirectionVector()[2])
-	        		> trslh)
-	        {
-	        	return false;
-	        }
-    	}
-        
-    	return true;
+    /**
+     * Returns a deep clone of this attachment point
+     * @return a deep clone
+     */
+    
+    public DENOPTIMAttachmentPoint clone()
+    {   
+        if (apClass == null)
+        {
+            if (dirVec == null)
+            {
+                return new DENOPTIMAttachmentPoint(
+                        getOwner(),
+                        atomPositionNumber,
+                        totalConnections,
+                        freeConnections
+                );
+            } else {
+                return new DENOPTIMAttachmentPoint(
+                        getOwner(),
+                        atomPositionNumber,
+                        totalConnections,
+                        freeConnections,
+                        dirVec
+                );
+            }
+        } else {
+            if (dirVec == null) {
+                return new DENOPTIMAttachmentPoint(
+                        getOwner(),
+                        atomPositionNumber,
+                        totalConnections,
+                        freeConnections,
+                        apClass.clone()
+                );
+            }
+            return new DENOPTIMAttachmentPoint(
+                    getOwner(),
+                    atomPositionNumber,
+                    totalConnections,
+                    freeConnections,
+                    dirVec,
+                    apClass.clone());
+        }
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Prepare a string for writing this AP in a fragment SDF file.
+     * Only DENOPTIM's format is currently supported and we assume three 
+     * coordinates are used to define the direction vector.
+     * @param isFirst use <code>true</code> if this is the first AP among those
+     * on the same source atom. When you give <code>false</code> the atom ID and
+     * the first separator are omitted.
+     * @param srcAtmID the index to use to identify the source atom. Use this to
+     *  write something different from what reported in 
+     *  {@Link DENOPTIMAttachmentPoint#atomPositionNumber}, or use negative
+     *  value to ignore this argument.
+     * @returns a string with APClass and coordinated of the AP direction vector
+     **/
+
+    public String getSingleAPStringSDF(boolean isFirst, int srcAtmID)
+    {
+        StringBuilder sb = new StringBuilder();
+        if (isFirst)
+        {
+            //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
+            int atmIdx = atomPositionNumber + 1;
+            if (srcAtmID>0)
+            {
+                atmIdx = srcAtmID;
+            }
+           
+            sb.append(atmIdx);
+            sb.append(DENOPTIMConstants.SEPARATORAPPROPAAP);
+        }
+        sb.append(apClass);
+        if (dirVec != null)
+        {
+            DecimalFormat digits = new DecimalFormat("###.####");
+            digits.setMinimumFractionDigits(4);
+            sb.append(DENOPTIMConstants.SEPARATORAPPROPSCL);
+            sb.append(digits.format(dirVec[0]));
+            sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
+            sb.append(digits.format(dirVec[1]));
+            sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
+            sb.append(digits.format(dirVec[2]));
+        }
+        return sb.toString();
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -738,26 +814,34 @@ Comparable<DENOPTIMAttachmentPoint>
 
     public String getSingleAPStringSDF(boolean isFirst)
     {
-		StringBuilder sb = new StringBuilder();
-		if (isFirst)
-		{
-			//WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
-			sb.append(atomPostionNumber+1);
-			sb.append(DENOPTIMConstants.SEPARATORAPPROPAAP);
-		}
-		sb.append(apClass);
-		if (dirVec != null)
-		{
-	        DecimalFormat digits = new DecimalFormat("###.####");
-	        digits.setMinimumFractionDigits(4);
-			sb.append(DENOPTIMConstants.SEPARATORAPPROPSCL);
-			sb.append(digits.format(dirVec[0]));
-			sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-			sb.append(digits.format(dirVec[1]));
-			sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-			sb.append(digits.format(dirVec[2]));
-		}
-		return sb.toString();
+        return getSingleAPStringSDF(isFirst, -1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Produces a string with the information included in this object.
+     * @return the string
+     */
+    
+    public String toStringNoId()
+    {
+        Map<String,Object> pars = new HashMap<String,Object>();
+        pars.put("atomPositionNumber", atomPositionNumber);
+        pars.put("totalConnections",totalConnections);
+        pars.put("freeConnections",freeConnections);
+        if (apClass != null)
+        {
+            pars.put("apClass",apClass);
+        }
+        if (dirVec != null)
+        {
+            pars.put("dirVec.x",dirVec[0]);
+            pars.put("dirVec.y",dirVec[1]);
+            pars.put("dirVec.z",dirVec[2]);
+        }
+
+        return pars.toString();
     }
 
 //------------------------------------------------------------------------------
@@ -770,35 +854,161 @@ Comparable<DENOPTIMAttachmentPoint>
     @Override
     public String toString()
     {
-    	Map<String,Object> pars = new HashMap<String,Object>();
-    	pars.put("atomPostionNumber",atomPostionNumber);
-    	pars.put("atomConnections",atomConnections);
-    	pars.put("apConnections",apConnections);
-    	if (apClass != null)
-    	{
-        	pars.put("apRule",apRule);
-        	pars.put("apSubClass",apSubClass);
-        	pars.put("apClass",apClass);
-    	}
-    	if (dirVec != null)
-    	{
-	    	pars.put("dirVec.x",dirVec[0]);
-	    	pars.put("dirVec.y",dirVec[1]);
-	    	pars.put("dirVec.z",dirVec[2]);
-    	}
+        Map<String,Object> pars = new HashMap<String,Object>();
+        pars.put("atomPositionNumber", atomPositionNumber);
+        pars.put("id", id);
+        pars.put("totalConnections",totalConnections);
+        pars.put("freeConnections",freeConnections);
+        if (apClass != null)
+        {
+            pars.put("apClass",apClass);
+        }
+        if (dirVec != null)
+        {
+            pars.put("dirVec.x",dirVec[0]);
+            pars.put("dirVec.y",dirVec[1]);
+            pars.put("dirVec.z",dirVec[2]);
+        }
 
-		return pars.toString();
+        return pars.toString();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    //TODO-V3: we should not be given the possibility to change the AP's owner
+    // However, this is currently needed because of the DNOPTIMVertex.addAP(...)
+    
+    /**
+     * Sets the reference to the vertex the owns this attachment point.
+     * @param owner the vertex that own this attachment point.
+     */
+    public void setOwner(DENOPTIMVertex owner)
+    {
+        this.owner = owner;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public DENOPTIMVertex getOwner() {
+        return owner;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Sets the reference to the edge that is using this attachment point.
+     * @param edge the user
+     */
+    public void setUser(DENOPTIMEdge edge) {
+        this.user = edge;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Gets the edge that is using this AP, or null if no edge is using this AP.
+     * Does NOT account for embedding of the vertex in a template, i.e., 
+     * this AP can be available in the graph (if any) owning the vertex this AP 
+     * belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP is then projected on the
+     * template's surface and might be used to make an edge that uses the 
+     * template as a single vertex. This method considers only any edge user
+     * that belongs to the graph owning the vertex that own this AP, if any such
+     * owners exist. See {@link DENOPTIMAttachmentPoint#getEdgeUserThroughout()}
+     * to crossing the template boundary.
+     * @return the edge that is using this AP.
+     */
+    public DENOPTIMEdge getEdgeUser() {
+        return user;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets the edge that is using this AP, or null if no edge is using this AP.
+     * This method does account for embedding of the vertex in a template, i.e., 
+     * this AP can be available in the graph (if any) owning the vertex this AP 
+     * belongs to, but if the graph is 
+     * itself the inner graph of a template, the AP is then projected on the
+     * template's surface and might be used to make an edge that uses the 
+     * template as a single vertex. This method considers any level of template
+     * embedding. See {@link DENOPTIMAttachmentPoint#getEdgeUser()}
+     * to remain within the template boundary.
+     * @return the edge that is using this AP.
+     */
+
+    public DENOPTIMEdge getEdgeUserThroughout()
+    {
+        if (user == null)
+        {
+            if (owner != null 
+                    && owner.getGraphOwner() != null 
+                    && owner.getGraphOwner().templateJacket != null)
+            {
+               return owner.getGraphOwner().templateJacket
+                    .getOuterAPFromInnerAP(this).getEdgeUserThroughout();
+            } 
+        } 
+        return user;
+    }
+    
+//-----------------------------------------------------------------------------
+     
+    /**
+     * Gets the attachment point (AP) that is connected to this AP via the edge 
+     * user.
+     * @return the AP linked with this AP, or null;
+     */
+    public DENOPTIMAttachmentPoint getLinkedAP() 
+    {
+        if (user == null)
+            return null;
+        
+        if (user.getSrcAP() == this)
+        {
+            return user.getTrgAP();
+        } else if (user.getTrgAP() == this)
+        {
+            return user.getSrcAP();
+        }
+        return null;
     }
     
 //-----------------------------------------------------------------------------
     
-    // TODO-V3 Upon merging branches this method can be removed
+    /**
+     * Checks the role of this AP in the user.
+     * @return <code>true</code> if a user exists and this AP is the src AP in
+     * that edge. Otherwise, this method returns <code >false</code> without
+     * discriminating if this AP is free, i.e., the user is null, or this AP is 
+     * the trg in the edge user.
+     */
+    public boolean isSrcInUser()
+    {
+        return user != null && user.getSrcAP() == this;
+    }
 
-	public static String getOnlyRule(String apClass) {
-		String[] parts = apClass.split(
-        		Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
-		return parts[0];
-	}
-    
 //-----------------------------------------------------------------------------
+
+    public void setTotalConnections(int totalConnections) {
+        this.totalConnections = totalConnections;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the current index of this AP in the list of APs of the owner, or
+     * -1 if the owner is null.
+     */
+    public int getIndexInOwner()
+    {
+        if (owner == null)
+        {
+            return -1;
+        }
+        return owner.getIndexOfAP(this);
+    }
+
+//-----------------------------------------------------------------------------
+
 }

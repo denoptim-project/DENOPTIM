@@ -18,26 +18,21 @@
 
 package gui;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import denoptim.task.StaticTaskManager;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Graphical User Interface of the DENOPTIM package.
@@ -252,7 +247,7 @@ public class GUI
 		}
 		else
 		{
-			//System.exit(0); //this will wait for synch locks to the released
+			//System.exit(0); //this will wait for synch locks to be released,
 			// but here we want to really stop the JVM and kill all threads.
 			Runtime.getRuntime().halt(0);
 		}

@@ -18,10 +18,12 @@
 
 package denoptim.rings;
 
-import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.ArrayList;
 
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 
 /**
  * ClosableChain represents a chain of fragments (chain links) that
@@ -51,7 +53,7 @@ public class ClosableChain implements Cloneable, Serializable
 
     public ClosableChain()
     {
-	this.links = new ArrayList<ChainLink>();
+        this.links = new ArrayList<ChainLink>();
     }
 
 //-----------------------------------------------------------------------------
@@ -62,27 +64,50 @@ public class ClosableChain implements Cloneable, Serializable
 
     public ClosableChain(String str)
     {
-	links = new ArrayList<ChainLink>();
-
-	String[] parts = str.trim().split("_");
-	int lastFType = Integer.MAX_VALUE;
-	for (int i=0; i<parts.length; i++)
-	{
-	    String clStr = parts[i];
+    	links = new ArrayList<ChainLink>();
+    
+    	String[] parts = str.trim().split("_");
+    	int lastFType = Integer.MAX_VALUE;
+    	for (int i=0; i<parts.length; i++)
+    	{
+    	    String clStr = parts[i];
             String[] clParts = clStr.trim().split("/");
             int molID = Integer.parseInt(clParts[0]);
             int ftype = Integer.parseInt(clParts[1]);
+            DENOPTIMVertex.BBType bbt = DENOPTIMVertex.BBType.parseInt(ftype);
             String[] partsAps = clParts[2].split("ap");
             int apLeft = Integer.parseInt(partsAps[1]);
-	    int apRight = Integer.parseInt(partsAps[2]);
-	    if (ftype < lastFType)
-	    {
-		tuningPoint = i;
-		lastFType = ftype;
-	    }
-	    ChainLink cl = new ChainLink(molID, ftype, apLeft, apRight);
-	    links.add(cl);
-	}
+    	    int apRight = Integer.parseInt(partsAps[2]);
+    	    if (ftype < lastFType)
+    	    {
+        		tuningPoint = i;
+        		lastFType = ftype;
+    	    }
+    	    ChainLink cl = new ChainLink(molID, bbt, apLeft, apRight);
+    	    links.add(cl);
+    	}
+    }
+    
+//----------------------------------------------------------------------------
+
+    /**
+     * Append a link to this chain
+     * @param link the link to be appended
+     */
+    public void appendLink(ChainLink l)
+    {
+        links.add(l);
+    }
+    
+//----------------------------------------------------------------------------
+    
+    /**
+     * Defined the turning point in the list of links.
+     * @param tp the index of the turning point
+     */
+    public void setTurningPoint(int tp)
+    {
+        this.tuningPoint = tp;
     }
 
 //----------------------------------------------------------------------------
@@ -93,7 +118,7 @@ public class ClosableChain implements Cloneable, Serializable
 
     public ArrayList<ChainLink> getLinks()
     {
-	return links;
+        return links;
     }
 
 //-----------------------------------------------------------------------------
@@ -106,7 +131,7 @@ public class ClosableChain implements Cloneable, Serializable
 
     public ChainLink getLink(int i)
     {
-	return links.get(i);
+        return links.get(i);
     }
 
 //-----------------------------------------------------------------------------
@@ -118,7 +143,7 @@ public class ClosableChain implements Cloneable, Serializable
 
     public int getSize()
     {
-	return links.size();
+        return links.size();
     }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +158,7 @@ public class ClosableChain implements Cloneable, Serializable
 
     public int getTurningPoint()
     {
-	return tuningPoint;
+        return tuningPoint;
     }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +173,7 @@ public class ClosableChain implements Cloneable, Serializable
 
     public int getTurningPointMolID()
     {
-	return getLink(tuningPoint).getMolID();
+        return getLink(tuningPoint).getMolID();
     }
 
 //-----------------------------------------------------------------------------
@@ -163,16 +188,19 @@ public class ClosableChain implements Cloneable, Serializable
     public int involvesVertex(DENOPTIMVertex vert)
     {
         int result = -1;
-        int vertMolID = vert.getMolId();
-        int vertFrgTyp = vert.getFragmentType();
-        for (int i=0; i<links.size(); i++)
+        if (vert instanceof DENOPTIMFragment)
         {
-            ChainLink cl = links.get(i);
-            if (cl.getMolID() == vertMolID &&
-                cl.getFragType() == vertFrgTyp)
+            int vertMolID = ((DENOPTIMFragment)vert).getBuildingBlockId();
+            DENOPTIMVertex.BBType vertFrgTyp = ((DENOPTIMFragment)vert).getBuildingBlockType();
+            for (int i=0; i<links.size(); i++)
             {
-                result = i;
-                break;
+                ChainLink cl = links.get(i);
+                if (cl.getMolID() == vertMolID &&
+                    cl.getFragType() == vertFrgTyp)
+                {
+                    result = i;
+                    break;
+                }
             }
         }
         return result;
@@ -194,24 +222,44 @@ public class ClosableChain implements Cloneable, Serializable
 
     public int involvesVertexAndAP(DENOPTIMVertex vert, int apIDA, int apIDB)
     {
-	int result = -1;
-	int vertMolID = vert.getMolId();
-	int vertFrgTyp = vert.getFragmentType();
-	for (int i=0; i<links.size(); i++)
-	{
-	    ChainLink cl = links.get(i);
-	    if (cl.getMolID() == vertMolID && 
-		cl.getFragType() == vertFrgTyp &&
-		((cl.getApIdToLeft()==apIDA && cl.getApIdToRight()==apIDB) || 
-		 (cl.getApIdToLeft()==apIDB && cl.getApIdToRight()==apIDA)))
-	    {
-		result = i;
-		break;
-	    }
-	}
+    	int result = -1;
+        if (vert instanceof DENOPTIMFragment)
+        {
+            int vertMolID = ((DENOPTIMFragment)vert).getBuildingBlockId();
+            DENOPTIMVertex.BBType vertFrgTyp = ((DENOPTIMFragment)vert).getBuildingBlockType();
+        	for (int i=0; i<links.size(); i++)
+        	{
+        	    ChainLink cl = links.get(i);
+        	    if (cl.getMolID() == vertMolID && 
+        		cl.getFragType() == vertFrgTyp &&
+        		((cl.getApIdToLeft()==apIDA && cl.getApIdToRight()==apIDB) || 
+        		 (cl.getApIdToLeft()==apIDB && cl.getApIdToRight()==apIDA)))
+        	    {
+        		result = i;
+        		break;
+        	    }
+        	}
+        }
         return result;
     }
 
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns a deep-copy
+     * @return a deep copy
+     */
+    public ClosableChain clone()
+    {
+        ClosableChain c = new ClosableChain();
+        for (ChainLink l : links)
+        {
+            c.appendLink(l.clone());
+        }
+        c.setTurningPoint(tuningPoint);
+        return c;
+    }
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -220,13 +268,13 @@ public class ClosableChain implements Cloneable, Serializable
 
     public String toString()
     {
-	String str = " ClosableChain[";
-	for (ChainLink cc : links)
-	{
-	    str = str + cc;
-	}
-	str = str + "]";
-	return str;
+    	String str = " ClosableChain[";
+    	for (ChainLink cc : links)
+    	{
+    	    str = str + cc;
+    	}
+    	str = str + "]";
+    	return str;
     }
 
 //-----------------------------------------------------------------------------

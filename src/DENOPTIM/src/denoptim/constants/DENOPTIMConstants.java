@@ -19,12 +19,16 @@
 
 package denoptim.constants;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 
 /**
@@ -43,6 +47,44 @@ public final class DENOPTIMConstants
      */
     public static final String FSEP = System.getProperty("file.separator");
 
+    /**
+     * Global configuration folder
+     */
+    public static final File GLOBALCONFIG = ensureConfigFolderExists();
+    private static File ensureConfigFolderExists()
+    {
+        File configFolder = new File(
+                System.getProperty("user.home") + FSEP + ".denoptim");
+        try
+        {
+            if (!configFolder.exists())
+            {
+                boolean wasMade = DenoptimIO.createDirectory(
+                        configFolder.getAbsolutePath());
+                if (!wasMade)
+                {
+                    throw new DENOPTIMException("ERROR: could not make "
+                            + "configuration folder '" 
+                            + configFolder.getAbsolutePath() + "'");
+                }
+            }
+        } catch (Throwable t)
+        {
+            t.printStackTrace();
+            System.out.println("ERROR: unable to make configuration folder '"  
+                    + configFolder.getAbsolutePath() + "'");
+            System.err.println("ERROR: unable to make configuration folder '"  
+                    + configFolder.getAbsolutePath() + "'");
+            System.exit(-1);
+        }
+        return configFolder;
+    }
+    
+    /**
+     * List of recent files
+     */
+    public static final File RECENTFILESLIST = new File(
+            GLOBALCONFIG.getAbsoluteFile() + FSEP + "recent_files_list");
  
     public static final Map<String, Integer> VALENCE_MAP = createMap();
     private static Map<String, Integer> createMap()
@@ -124,7 +166,7 @@ public final class DENOPTIMConstants
      * Keyword identifying compatibility matrix file lines with
      * forbidden ends
      */
-    public static final String APCMAPFORBEND = "DEL";
+    public static final String APCMAPFORBIDDENEND = "DEL";
     
     /**
      * Keyword identifying compatibility matrix file lines with
@@ -175,6 +217,16 @@ public final class DENOPTIMConstants
     public static final String FITFILENAMEEXTOUT = "_out.sdf";
     
     /**
+     * Extension of output file with 2D picture of candidate
+     */
+    public static final String CANDIDATE2DEXTENSION = ".png";    
+    
+    /**
+     * Postfix used to mark a file that cannot be read.
+     */
+    public static final String UNREADABLEFILEPOSTFIX = "_UNREADABLE";
+    
+    /**
      * Label used to point at text based graph format
      */
     public static final String GRAPHFORMATSTRING = "STRING";
@@ -199,6 +251,16 @@ public final class DENOPTIMConstants
      * SDF tag containing graph encoding
      */
     public static final String GRAPHTAG = "GraphENC";
+    
+    /**
+     * SDF tag containing graph encoding in JSON format
+     */
+    public static final String GRAPHJSONTAG = "GraphJson";
+    
+    /**
+     * SDF tag containing vertex encoding in JSON format
+     */
+    public static final String VERTEXJSONTAG = "VertexJson";
     
     /**
      * SDF tag containing metadata on graph
@@ -236,6 +298,11 @@ public final class DENOPTIMConstants
     public static final String UNIQUEIDTAG = "UID";
     
     /**
+     * SDF tag containing the unique identifier of a candidate
+     */
+    public static final String INCHIKEYTAG = "InChi";
+    
+    /**
      * SDF tag defining the ID of a parent graph (used in FSE)
      */
     public static final String PARENTGRAPHTAG = "ParentGraph";  
@@ -256,6 +323,12 @@ public final class DENOPTIMConstants
      * to which the atom belongs.
      */
     public static final String ATMPROPVERTEXID = "DENOPTIMVertexID";
+    
+    /**
+     * String tag of <code>Atom</code> property used to store the original
+     * position of an atom in the atom list of the fragment.
+     */
+    public static final String ATMPROPORIGINALATMID = "DENOPTIMAtomPosition";
 
     /**
      * String tag of <code>Bond</code>'s property used to store the 
@@ -275,14 +348,6 @@ public final class DENOPTIMConstants
             put("ATN", "ATN");
         };
     };
-
-    /**
-     * Recognized attachment point classes of RingClosingAttractor
-     */
-    public static final Set<String> RCAAPCLASSSET = 
-		    new HashSet<>(Arrays.asList(new String[] {"ATplus:0",
-			"ATminus:0", "ATneutral:0"}
-		    ));
 
     /**
      * Smallest difference for comparison of double and float numbers.

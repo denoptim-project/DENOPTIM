@@ -1,11 +1,14 @@
 package denoptim.fitness;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openscience.cdk.qsar.DescriptorSpecification;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.IImplementationSpecification;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
 
 import denoptim.exception.DENOPTIMException;
@@ -31,13 +34,11 @@ public class DescriptorForFitness
 	 * Descriptor short name.
 	 */
 	protected String shortName;
-	
+
 	/**
-	 * Variable name. Used to identify variables calculated from this 
-	 * descriptor in equations. The list must contain only the shortName 
-	 * unless we have atom/bond specific descriptor
-	 */
-	protected List<String> varNames = new ArrayList<String>();
+     * Variables that use values calculated by this descriptor.
+     */
+    protected List<Variable> variables = new ArrayList<Variable>();
 	
 	/**
 	 * Pointer to a specific results among those that are produced by the 
@@ -45,19 +46,6 @@ public class DescriptorForFitness
 	 * single value.
 	 */
 	protected int resultId = 0;
-	
-	/**
-	 * SMARTS used to identify the atom/bonds in case of atom/bond specific
-	 * variable names. The keys are variable names, the values are lists of
-	 * smarts as strings.
-	 */
-	protected Map<String,ArrayList<String>> smarts = 
-			new HashMap<String,ArrayList<String>>();
-	
-	/**
-	 * The type of descriptor as define in the descriptor dictionary.
-	 */
-	protected String dictType;
 	
 	/**
 	 * The class(es) of descriptor as define in the descriptor dictionary.
@@ -74,43 +62,30 @@ public class DescriptorForFitness
 	 */
 	protected String dictTitle;
 	
+    /**
+     * Utility for constructing CDK objects
+     */
+    private static IChemObjectBuilder cdkBuilder = 
+            DefaultChemObjectBuilder.getInstance();
+	
 //------------------------------------------------------------------------------
 
 	public DescriptorForFitness(String shortName, String className, 
 			IDescriptor implementation, int resultId)
 	{
 		this.shortName = shortName;
-		this.varNames.add(shortName);
 		this.className = className;
 		this.implementation = implementation;
 		this.resultId = resultId;
 	}
-	
-//------------------------------------------------------------------------------
 
-	private DescriptorForFitness(String shortName, String className, 
-			int resultId, List<String> varNames, 
-			Map<String,ArrayList<String>> smarts, String dictType,
-			String[] dictClasses, String dictDefinition, String dictTitle)
-	{
-		this.shortName = shortName;
-		this.varNames = varNames;
-		this.className = className;
-		//this.implementation does have to stay null
-		this.resultId = resultId;
-		this.smarts = smarts;
-		this.dictType = dictType;
-		this.dictClasses = dictClasses;
-		this.dictTitle = dictTitle;
-	}
 //------------------------------------------------------------------------------
 
 	public DescriptorForFitness(String shortName, String className, 
-			IDescriptor implementation, int resultId, String dictType,
+			IDescriptor implementation, int resultId,
 			String[] dictClasses, String dictDefinition, String dictTitle)
 	{
 		this(shortName, className, implementation, resultId);
-		this.dictType = dictType;
 		this.dictClasses = dictClasses;
 		this.dictDefinition = dictDefinition;
 		this.dictTitle = dictTitle;
@@ -124,16 +99,26 @@ public class DescriptorForFitness
 	}
 	
 //------------------------------------------------------------------------------
-
+	
 	/**
-	 * The varName differs from the shortName only for atom/bond specific
-	 * parameters
-	 * @return
+	 * Overwrites the list of variables using this descriptor.
+	 * @param variables the new list of variable.
 	 */
-	public List<String> getVariableNames()
+	public void setVariables(List<Variable> variables)
 	{
-		return varNames;
+	    this.variables = variables;
 	}
+	
+//------------------------------------------------------------------------------
+
+    /**
+     * Get the variables that make use of values produced by this descriptor.
+     * @return the list of variables.
+     */
+    public List<Variable> getVariables()
+    {
+        return variables;
+    }
 	
 //------------------------------------------------------------------------------
 
@@ -147,13 +132,6 @@ public class DescriptorForFitness
 	public IDescriptor getImplementation()
 	{
 		return implementation;
-	}
-	
-//------------------------------------------------------------------------------
-
-	public String getDictType()
-	{
-		return dictType;
 	}
 	
 //------------------------------------------------------------------------------
@@ -184,10 +162,15 @@ public class DescriptorForFitness
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("DescriptorForFitness [shortName:").append(shortName);
-		sb.append(", varName:").append(varNames);		
+		sb.append(", variables:[");
+		for (Variable v : variables)
+		{
+		    sb.append(v.getName() + ", ");
+	    }
+		sb.append("]");
 		sb.append(", className:").append(className);
 		sb.append(", resultId:").append(resultId);
-		DescriptorSpecification specs = implementation.getSpecification();
+		IImplementationSpecification specs = implementation.getSpecification();
 		sb.append(", specReference:").append(
 				specs.getSpecificationReference());
 		sb.append(", implTitle:").append(
@@ -209,7 +192,6 @@ public class DescriptorForFitness
 		String NL = System.getProperty("line.separator");
 		StringBuilder sb = new StringBuilder();
 		sb.append("Titile: ").append(dictTitle).append(NL);
-		sb.append("Type: ").append(dictType).append(NL);
 		sb.append("Definition: ").append(dictDefinition).append(NL);
 		sb.append("Classes: ");
 		if (dictClasses != null)
@@ -227,20 +209,84 @@ public class DescriptorForFitness
 //------------------------------------------------------------------------------
 	
 	/**
-	 * This is a sort of clooning that builds a new DescriptorForFitness with 
-	 * the fields on this one, but a null implementation. The latter will
-	 * have to be instatiated elsewhere.
-	 * @return
+	 * This is a sort of cloning that returns a new DescriptorForFitness 
+	 * with the same field content of this one (i.e., deep copy), 
+	 * but a shallow copy of the list of variables, and a null implementation.
+	 * The latter will have to be instantiated 
+	 * elsewhere.
+	 * @return a clone with null descriptor implementation
 	 */
 
 	public DescriptorForFitness cloneAllButImpl() 
 	{
-		// NB: this private constructor by-passes the implementation!
-		DescriptorForFitness newDff = new DescriptorForFitness(shortName, 
-				className, resultId, varNames, smarts, dictType, dictClasses, 
+	    DescriptorForFitness dff = new DescriptorForFitness(shortName, 
+				className, null, resultId, dictClasses, 
 				dictDefinition, dictTitle);
-		return newDff;
+	    dff.setVariables(new ArrayList<Variable>(variables));
+	    return dff;
 	}
+
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Copy this descriptor and created an independent instance of the
+	 * underlying descriptor implementation.
+	 * @throws DENOPTIMException
+	 */
+	public DescriptorForFitness makeCopy() throws DENOPTIMException
+	{
+	    DescriptorForFitness clone = this.cloneAllButImpl();
+        clone.implementation = newDescriptorImplementation(this);
+        return clone;
+	}
+	
+//------------------------------------------------------------------------------
+	
+    private static IDescriptor newDescriptorImplementation(
+            DescriptorForFitness oldParent) throws DENOPTIMException
+    {
+        String className = oldParent.getImplementation().getClass().getName();
+        IDescriptor descriptor = null;
+        try
+        {
+            Class<?> cl = Class.forName(className);
+            for (Constructor<?> constructor : cl.getConstructors()) 
+            {
+                Class<?>[] params = constructor.getParameterTypes();
+                if (params.length == 0) 
+                {
+                    descriptor = (IDescriptor) constructor.newInstance();
+                } else if (params[0].equals(IChemObjectBuilder.class))
+                {
+                    //NB potential source of ambiguity on the builder class
+                    descriptor = (IDescriptor) constructor.newInstance(cdkBuilder);
+                }
+            }
+        } catch (Throwable t)
+        {
+            throw new DENOPTIMException("Could not make new instance of '" 
+                    + className + "'.", t);
+        }
+        if (descriptor == null)
+        {
+            throw new DENOPTIMException("Could not make new instance of '" 
+                    + className + "'. No suitable constructor found.");
+        }
+        descriptor.initialise(cdkBuilder);
+        return descriptor;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Append the reference to a variable that used data produced by the 
+     * calculation of this descriptor.
+     * @param v the reference to the variable.
+     */
+    public void addDependentVariable(Variable v)
+    {
+        variables.add(v);
+    }
 
 //------------------------------------------------------------------------------
 	

@@ -8,8 +8,7 @@ echo "Starting JUnit tests..."
 #java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar --scan-classpath --details=tree
 
 # To run only DENOPTIM's tests
-java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -p denoptim
-
+java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -p denoptim -p denoptimga
 
 # To run a specific test
-#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.threedim.TreeBuilder3DTest
+#java -jar ../test/junit/junit-platform-console-standalone-1.5.2.jar -cp DENOPTIM-GUI.jar -c denoptim.fitness.DescriptorUtilsTest

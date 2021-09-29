@@ -28,6 +28,8 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -36,8 +38,10 @@ import denoptim.fitness.FitnessProvider;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
+import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.TaskUtils;
 
@@ -65,23 +69,26 @@ public abstract class FitnessTask extends Task
     /**
      * The data structure holding the results of this task
      */
-    protected DENOPTIMMolecule result = new DENOPTIMMolecule();
+    protected Candidate result = new Candidate();
     
     /**
      * The file where we store the input to the fitness provider.
      */
-    protected String fitProvInputFile = "noName.sdf";
+    protected String fitProvInputFile = "noName"
+            + DENOPTIMConstants.FITFILENAMEEXTIN;
     
     /**
      * The file where we store the final output from the fitness provider.
      */
-    protected String fitProvOutFile = "noName.sdf";
+    protected String fitProvOutFile = "noName" 
+            + DENOPTIMConstants.FITFILENAMEEXTOUT;
     
     /**
      * The file where we store the a graphical representation of the candidate 
      * (i.e., a picture).
      */
-    protected String fitProvPNGFile = "noName.png";
+    protected String fitProvPNGFile = "noName"
+            + DENOPTIMConstants.CANDIDATE2DEXTENSION;
     
     /**
      * The file where we store the list of unique identifiers or previously 
@@ -101,7 +108,7 @@ public abstract class FitnessTask extends Task
     {
     	super(TaskUtils.getUniqueTaskIndex());
         this.dGraph = molGraph;
-        result.setMoleculeGraph(molGraph);
+        result.setGraph(molGraph);
     }
 
 //------------------------------------------------------------------------------
@@ -113,40 +120,34 @@ public abstract class FitnessTask extends Task
      * @return the object with data obtained from the fitness provider.
      * @throws DENOPTIMException
      */
-    protected DENOPTIMMolecule runFitnessProvider() throws DENOPTIMException
+    protected Candidate runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
-        result.setMoleculeFile(fitProvOutFile);
+        result.setSDFFile(fitProvOutFile);
         if (fitProvMol == null)
     	{
-        	// Just in case we do not have any molecular representation already
-    	    try {
-				fitProvMol = GraphConversionTool.convertGraphToMolecule(dGraph, 
-						true);
-			} catch (DENOPTIMException e) {
-				throw new DENOPTIMException("Failed conversion of graph to "
-						+ "chemical representation",e);
-			}
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+            fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
     	}
         
         if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
-        		fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG).toString().equals(""))
+        		fitProvMol.getProperty(
+        		        DENOPTIMConstants.GMSGTAG).toString().equals(""))
         {
         	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
         }
         
-        // Write file with input data to fitness provider
-        DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
-        
         // Run fitness provider
-        if (FitnessParameters.useExternalFitness())
-        {
-	        if (!runExternalFitness())
+        if (FitnessParameters.useExternalFitness()) {
+            // Write file with input data to fitness provider
+            DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
+
+            if (!runExternalFitness())
 	        {
 	            return result;
 	        }
         } else {
-        	// NB: the internal fitness provider removed dummy atoms before 
+        	// NB: the internal fitness provider removes dummy atoms before 
             // calculating CDK descriptors, so the 'fitProvMol' changes
         	if (!runInternalFitness())
 	        {
@@ -221,7 +222,8 @@ public abstract class FitnessTask extends Task
         processHandler = null;
         
         // Read results from fitness provider
-        IAtomContainer processedMol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer processedMol = builder.newAtomContainer();
         boolean unreadable = false;
         try
         {
@@ -236,7 +238,6 @@ public abstract class FitnessTask extends Task
             unreadable=true;
         }
         
-        // Check readability and 
         if (unreadable)
         {
         	// If file is not properly readable, we keep track of the 
@@ -248,8 +249,8 @@ public abstract class FitnessTask extends Task
             		+ "). Check " + result.getName() + ".";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
             
-            //TODO use constant
-            String fileBkp = fitProvOutFile + "_Unreadble";
+            String fileBkp = fitProvOutFile 
+                    + DENOPTIMConstants.UNREADABLEFILEPOSTFIX;
             try {
 				FileUtils.copyFile(new File(fitProvOutFile), new File(fileBkp));
 			} catch (IOException e) {
@@ -263,9 +264,9 @@ public abstract class FitnessTask extends Task
             processedMol = new AtomContainer();
             processedMol.addAtom(new Atom("H"));
             processedMol.setProperty(CDKConstants.TITLE, result.getName());
-            processedMol.setProperty("MOL_ERROR", err);
-            processedMol.setProperty("GCODE", dGraph.getGraphId());
-            processedMol.setProperty("GraphENC", dGraph.toString());
+            processedMol.setProperty(DENOPTIMConstants.MOLERRORTAG, err);
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.getGraphId());
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
             DenoptimIO.writeMolecule(fitProvOutFile, processedMol, false);
 
             result.setError(err);
@@ -276,7 +277,7 @@ public abstract class FitnessTask extends Task
         // we need to update in the the returned value
         if (processedMol.getProperty(DENOPTIMConstants.UNIQUEIDTAG) != null)
         {
-            result.setMoleculeUID(processedMol.getProperty(
+            result.setUID(processedMol.getProperty(
             		DENOPTIMConstants.UNIQUEIDTAG).toString());
         }
         
@@ -323,18 +324,18 @@ public abstract class FitnessTask extends Task
                 throw new DENOPTIMException(msg);
             }
 
-            processedMol.setProperty("GCODE", dGraph.getGraphId());                
-            processedMol.setProperty("SMILES", result.getMoleculeSmiles());
-            processedMol.setProperty("GraphENC", dGraph.toString());
-            if (dGraph.getMsg() != null && !dGraph.getMsg().equals(""))
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.getGraphId());                
+            processedMol.setProperty(DENOPTIMConstants.SMILESTAG, result.getSmiles());
+            processedMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
+            if (dGraph.getLocalMsg() != null && !dGraph.getLocalMsg().equals(""))
             {
-                processedMol.setProperty("GraphMsg", dGraph.getMsg());
+                processedMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
             }
             
             // Update molecular representation of this object
             fitProvMol = processedMol;
             DenoptimIO.writeMolecule(fitProvOutFile, processedMol, false);
-            result.setMoleculeFitness(fitVal);
+            result.setFitness(fitVal);
         } else {
             if (fitnessIsRequired)
             {
@@ -380,13 +381,19 @@ public abstract class FitnessTask extends Task
             msg = "Fitness value is NaN for " + result.getName();
             errMsg = msg;
             DENOPTIMLogger.appLogger.severe(msg);
+            
+            fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);
+            fitProvMol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                    "#InternalFitness: NaN value");
+            DenoptimIO.writeMolecule(fitProvOutFile, fitProvMol, false);
+            
             dGraph.cleanup();
             throw new DENOPTIMException(msg);
         }
         
         // Store a written copy of the result to file
         DenoptimIO.writeMolecule(fitProvOutFile, fitProvMol, false);
-        result.setMoleculeFitness(fitVal);
+        result.setFitness(fitVal);
 	   
 		return true;
 	}

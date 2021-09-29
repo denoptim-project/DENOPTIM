@@ -33,6 +33,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
@@ -151,9 +152,12 @@ public class FSEParameters
     
 //-----------------------------------------------------------------------------
 
-    //TODO-V3 with a static collection of parameters, running subsequent
-    // experiments from the GUI ends up reusing parameters from the previous
-    // run. so we need a way to clean-up old values
+    /**
+     * Restores the default values of the most important parameters. 
+     * Given that this is a static collection of parameters, running subsequent
+     * experiments from the GUI ends up reusing parameters from the previous
+     * run. This method allows to clean-up old values.
+     */
     public static void resetParameters()
     {
         fseParamsInUse = false;
@@ -641,11 +645,12 @@ public class FSEParameters
         boolean success = false;
         while (!success)
         {
-            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             String str = "FSE" + sdf.format(new Date());
             workDir = curDir + fileSep + str;
             success = DenoptimIO.createDirectory(workDir);
         }
+        DenoptimIO.addToRecentFiles(workDir, FileFormat.FSE_RUN);
 		if (dbRootDir.equals(".") || dbRootDir.equals(""))
 		{
 		    dbRootDir = workDir;
@@ -683,7 +688,7 @@ public class FSEParameters
             {
 				if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATSTRING))
 				{
-                    rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    rootGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
 								rootGraphsFile,true);
 				}
 				else if (rootGraphsFormat.equals(DENOPTIMConstants.GRAPHFORMATBYTE))

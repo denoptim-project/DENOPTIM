@@ -19,17 +19,15 @@
 package grapheditor;
 
 import java.util.logging.Level;
-import java.util.ArrayList;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.GraphConversionTool;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.DENOPTIMGraph;
+import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.GenUtils;
+import denoptim.utils.GraphConversionTool;
 
 
 /**
@@ -78,10 +76,11 @@ public class GraphEditor
             for (DENOPTIMGraph graph : GraphEdParameters.getInputGraphs())
             {
                 i++;
-                DENOPTIMGraph modGraph = GraphUtils.editGraph(graph,
+                DENOPTIMGraph modGraph = graph.editGraph(
                                          GraphEdParameters.getGraphEditTasks(),
                                               GraphEdParameters.symmetryFlag(),
-                                             GraphEdParameters.getVerbosity());
+                                             GraphEdParameters.getVerbosity()
+                );
                
                 if (GraphEdParameters.getVerbosity() > 0)
                 {
@@ -108,10 +107,11 @@ public class GraphEditor
                     }
                     case ("SDF"):
                     {
-                        IAtomContainer newMol = 
-                           GraphConversionTool.convertGraphToMolecule(modGraph,
-                                                                          true);
-                        if (GraphEdParameters.getInFormat().equals("SDF"))
+
+                        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+                        IAtomContainer newMol = t3d
+                                .convertGraphTo3DAtomContainer(modGraph,true);
+                         if (GraphEdParameters.getInFormat().equals("SDF"))
                         {
                             IAtomContainer oldMol = 
                                                  GraphEdParameters.getInpMol(i);

@@ -18,14 +18,15 @@
 
 package denoptim.rings;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.molecule.APClass;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
 /**
@@ -122,7 +123,7 @@ public class RingClosingAttractor
     /**
      * Class of the Attachment Point represented by this RCA
      */
-    private String apClass = "none";
+    private APClass apClass;
 
     /**
      * Flag: this RingClosingAttractor is used to close a ring
@@ -148,7 +149,7 @@ public class RingClosingAttractor
 
     /**
      * Constructor for a RingClosingAttractor corresponding to an atom in a
-     * molecular object. Note that any atom can be used to contuct a
+     * molecular object. Note that any atom can be used to conduct a
      * RingClosingAttractor but only those deriving from ring closing fragments
      * (which are identified by the atom symbol) are real RingClosingAttractor.
      * After creation it is then suggested to check whether the resulting
@@ -165,7 +166,7 @@ public class RingClosingAttractor
         this.src = mol.getConnectedAtomsList(atm).get(0);
         for (String atyp : DENOPTIMConstants.RCATYPEMAP.keySet())
         {
-            if (atm.getSymbol().equals(atyp))
+            if (DENOPTIMMoleculeUtils.getSymbolOrLabel(atm).equals(atyp))
             {
                 this.attType = atyp;
                 this.attA11 = paramAR11.get(atyp);
@@ -250,7 +251,7 @@ public class RingClosingAttractor
      * @return the attachment point class
      */
 
-    public String getApClass()
+    public APClass getApClass()
     {
         return apClass;
     }
@@ -260,12 +261,12 @@ public class RingClosingAttractor
     /**
      * Set the class of the Attachment Point occupied by this 
      * RingClosingAttractor, if any.
-     * @param apClass the string format of the attachment point class
+     * @param apclass2 the string format of the attachment point class
      */
 
-    public void setApClass(String apClass)
+    public void setApClass(APClass apclass2)
     {
-        this.apClass = apClass;
+        this.apClass = apclass2;
     }
 
 //-----------------------------------------------------------------------------
@@ -359,8 +360,8 @@ public class RingClosingAttractor
 	}
 	else
 	{
-	    s = s + "Atm: " + this.atm.getSymbol() 
-		  + " SrcAtm: " + this.src.getSymbol();
+	    s = s + "Atm: " + DENOPTIMMoleculeUtils.getSymbolOrLabel(this.atm) 
+		  + " SrcAtm: " + DENOPTIMMoleculeUtils.getSymbolOrLabel(this.src);
 	}
 	s = s + ")";
 

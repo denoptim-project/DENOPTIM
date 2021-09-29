@@ -18,6 +18,7 @@
 
 package denoptim.molecule;
 
+import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
  * A query for edges: a list of properties that target edges should possess in 
@@ -51,17 +52,17 @@ public class EdgeQuery
     /**
      * The bond type associated with the connection between the fragments
      */
-    private int bondType = -1;
+    private BondType bondType = BondType.UNDEFINED;
     
     /**
      * The class associated with the source AP
      */
-    private String srcRcn = null;
+    private APClass srcAPC = null;
     
     /**
      * The class associated with the target AP
      */
-    private String trgRcn = null;
+    private APClass trgAPC = null;
 
 //------------------------------------------------------------------------------
     
@@ -82,15 +83,13 @@ public class EdgeQuery
      * @param m_btype the bond type
      */
     public EdgeQuery(int m_src, int m_trg, int m_srcDAP, int m_trgDAP, 
-                                                                    int m_btype)
+            BondType bt)
     {
         srcVertex = m_src;
         trgVertex = m_trg;
         srcDAP = m_srcDAP;
         trgDAP = m_trgDAP;
-        bondType = m_btype;  
-        trgRcn = "";
-        srcRcn = "";
+        bondType = bt;
     }
     
 //------------------------------------------------------------------------------
@@ -102,14 +101,14 @@ public class EdgeQuery
     
 //------------------------------------------------------------------------------
 
-    public void setSourceDAP(int m_srcDAP)
+    public void setSourceAPIdx(int m_srcDAP)
     {
         srcDAP = m_srcDAP;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setTargetDAP(int m_trgDAP)
+    public void setTargetAPIdx(int m_trgDAP)
     {
         trgDAP = m_trgDAP;
     }        
@@ -123,9 +122,9 @@ public class EdgeQuery
 
 //------------------------------------------------------------------------------
 
-    public void setBondType(int m_btype)
+    public void setBondType(BondType bt)
     {
-        bondType = m_btype; 
+        bondType = bt; 
     }
     
 //------------------------------------------------------------------------------
@@ -137,14 +136,14 @@ public class EdgeQuery
     
 //------------------------------------------------------------------------------
 
-    public int getSourceDAP()
+    public int getSourceAPIdx()
     {
         return srcDAP;
     }
     
 //------------------------------------------------------------------------------
 
-    public int getTargetDAP()
+    public int getTargetAPIdx()
     {
         return trgDAP;
     }        
@@ -158,36 +157,35 @@ public class EdgeQuery
     
 //------------------------------------------------------------------------------
     
-    public String getSourceReaction()
+    public APClass getSourceAPClass()
     {
-        return srcRcn;
+        return srcAPC;
     }
     
 //------------------------------------------------------------------------------
     
-    public String getTargetReaction()
+    public APClass getTargetAPClass()
     {
-        return trgRcn;
+        return trgAPC;
     }    
     
 //------------------------------------------------------------------------------
     
-    public void setSourceReaction(String m_rcn)
+    public void setSourceAPClass(APClass apc)
     {
-        srcRcn = m_rcn;
+        srcAPC = apc;
     }
     
 //------------------------------------------------------------------------------
     
-    public void setTargetReaction(String m_rcn)
+    public void setTargetAPClass(APClass apc)
     {
-        trgRcn = m_rcn;
+        trgAPC = apc;
     }    
     
-
 //------------------------------------------------------------------------------
 
-    public int getBondType()
+    public BondType getBondType()
     {
         return bondType;
     }
@@ -204,30 +202,30 @@ public class EdgeQuery
      */
     public boolean sameAs(EdgeQuery other, StringBuilder reason)
     {
-    	if (this.getSourceDAP() != other.getSourceDAP())
+    	if (this.getSourceAPIdx() != other.getSourceAPIdx())
     	{
-    		reason.append("Different source atom ("+this.getSourceDAP()+":"
-    						+other.getSourceDAP()+"); ");
+    		reason.append("Different source atom ("+this.getSourceAPIdx()+":"
+    						+other.getSourceAPIdx()+"); ");
     		return false;
     	}
-    	if (this.getTargetDAP() != other.getTargetDAP())
+    	if (this.getTargetAPIdx() != other.getTargetAPIdx())
     	{
-    		reason.append("Different target atom ("+this.getTargetDAP()+":"
-					+other.getTargetDAP()+"); ");
+    		reason.append("Different target atom ("+this.getTargetAPIdx()+":"
+					+other.getTargetAPIdx()+"); ");
     		return false;
     	}
-    	if (!this.getSourceReaction().equals(other.getSourceReaction()))
+    	if (!this.getSourceAPClass().equals(other.getSourceAPClass()))
     	{
     		reason.append("Different source APClass ("
-    				+this.getSourceReaction()+":"
-					+other.getSourceReaction()+"); ");
+    				+this.getSourceAPClass()+":"
+					+other.getSourceAPClass()+"); ");
     		return false;
     	}
-    	if (!this.getTargetReaction().equals(other.getTargetReaction()))
+    	if (!this.getTargetAPClass().equals(other.getTargetAPClass()))
     	{
     		reason.append("Different target APClass ("
-    				+this.getTargetReaction()+":"
-					+other.getTargetReaction()+"); ");
+    				+this.getTargetAPClass()+":"
+					+other.getTargetAPClass()+"); ");
     		return false;
     	}
     	if (this.getBondType() != (other.getBondType()))
@@ -248,8 +246,8 @@ public class EdgeQuery
         sb.append(srcVertex).append("_").append(srcDAP).append("_").
                 append(trgVertex).append("_").append(trgDAP).append("_").
                 append(bondType);
-        if (srcRcn != null && trgRcn != null)
-            sb.append("_").append(srcRcn).append("_").append(trgRcn);
+        if (srcAPC != null && trgAPC != null)
+            sb.append("_").append(srcAPC).append("_").append(trgAPC);
 
         return sb.toString();
     }

@@ -72,7 +72,8 @@ import org.jfree.data.xy.XYDataset;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMMolecule;
+import denoptim.molecule.Candidate;
+import denoptim.molecule.CandidateLW;
 
 
 /**
@@ -104,14 +105,14 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 	private JComboBox<String> cmbPlotType;
 	
-	private ArrayList<DENOPTIMMolecule> allItems;
-	private int molsWithFitness = 0;
+	private ArrayList<CandidateLW> allItems;
+	private int itemsWithFitness = 0;
 	private int minLevel = 1;
 	private int maxLevel = -1;
 	private JLabel lblTotItems;
 	
-	private Map<Integer,DENOPTIMMolecule> mapCandsInByLevel;
-	private ArrayList<DENOPTIMMolecule> sorted;
+	private Map<Integer,CandidateLW> mapItemsInByLevel;
+	private ArrayList<CandidateLW> sorted;
 	
 	// WARNING: integer key in the map is is just a 
 	// locally generated unique 
@@ -292,9 +293,9 @@ public class GUIInspectFSERun extends GUICardPanel
 	private void resetViewInPlotOfSortedList()
 	{
 		chartBySorted.getXYPlot().getDomainAxis().setLowerBound(
-				molsWithFitness * -0.05);
+				itemsWithFitness * -0.05);
 		chartBySorted.getXYPlot().getDomainAxis().setUpperBound(
-				molsWithFitness * 1.05);
+				itemsWithFitness * 1.05);
 		chartBySorted.getXYPlot().getRangeAxis().setAutoRange(true);
 	}
 	
@@ -315,9 +316,9 @@ public class GUIInspectFSERun extends GUICardPanel
 		
 		System.out.println("Importing data from '" + folder + "'... ");
 		
-		allItems = new ArrayList<DENOPTIMMolecule>();
+		allItems = new ArrayList<CandidateLW>();
 		boolean skippFurtherErrors = false;
-		for (File molFile : folder.listFiles(new FileFilter() {
+		for (File itemFile : folder.listFiles(new FileFilter() {
 			
 			@Override
 			public boolean accept(File pathname) {
@@ -333,10 +334,10 @@ public class GUIInspectFSERun extends GUICardPanel
 			}
 		}))
 		{			
-			DENOPTIMMolecule mol = new DENOPTIMMolecule();
+			CandidateLW item = null;
 			try {
-				mol = DenoptimIO.readDENOPTIMMolecules(
-						molFile,false).get(0);
+				//WARNING: here we assume one candidate per file
+                item = DenoptimIO.readLightWeightCandidate(itemFile).get(0);
 			} catch (DENOPTIMException e1) {
 				if (!skippFurtherErrors)
 				{
@@ -346,7 +347,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 					JPanel msgPanel = new JPanel(new GridLayout(2, 1));
 					String msg = "<html><body width='%1s'>Could not read data "
-							+ "from '" + molFile + "'. Hint on cause: "
+							+ "from '" + itemFile + "'. Hint on cause: "
 							+ e1.getMessage() + " Should we try to "
 							+ "visualize the results anyway?</html>";
 					JLabel text = new JLabel(String.format(msg, 450));
@@ -378,12 +379,12 @@ public class GUIInspectFSERun extends GUICardPanel
 				}
 			}
 			
-			if (mol.hasFitness())
+			if (item.hasFitness())
 			{
-				molsWithFitness++;
+				itemsWithFitness++;
 			}
 			
-			int lev = mol.getLevel();
+			int lev = item.getLevel();
 			if (lev > maxLevel)
 			{
 				maxLevel = lev;
@@ -392,22 +393,22 @@ public class GUIInspectFSERun extends GUICardPanel
 				minLevel = lev;
 			}
 			
-			allItems.add(mol);
+			allItems.add(item);
 		}
 		
 		System.out.println("Imported "+allItems.size()+" individuals.");
 		
 		lblTotItems.setText("Found "+allItems.size()+" candidates ("
-				+molsWithFitness+" with fitness)");
+				+itemsWithFitness+" with fitness)");
 		
 		// Process data and organize them into series for the plot
-        double[][] candsWithFitnessDataPerLevel = new double[2][molsWithFitness];
-        mapCandsInByLevel = new HashMap<Integer,DENOPTIMMolecule>();
+        double[][] itemsWithFitnessDataPerLevel = new double[2][itemsWithFitness];
+        mapItemsInByLevel = new HashMap<Integer,CandidateLW>();
 		int j= -1;
         for (int i=0; i<allItems.size(); i++)
         {
-        	DENOPTIMMolecule mol = allItems.get(i);
-        	if (!mol.hasFitness())
+        	CandidateLW item = allItems.get(i);
+        	if (!item.hasFitness())
         	{
         		continue;
         	}
@@ -418,35 +419,35 @@ public class GUIInspectFSERun extends GUICardPanel
         	// the itemId 'j' into a DENOPTIMMolecule
         	
         	j++;
-        	mapCandsInByLevel.put(j, mol);
-        	candsWithFitnessDataPerLevel[0][j] = mol.getLevel();
-        	candsWithFitnessDataPerLevel[1][j] = mol.getMoleculeFitness();
+        	mapItemsInByLevel.put(j, item);
+        	itemsWithFitnessDataPerLevel[0][j] = item.getLevel();
+        	itemsWithFitnessDataPerLevel[1][j] = item.getFitness();
         }
         
-        sorted = new ArrayList<DENOPTIMMolecule>();
-        sorted.addAll(mapCandsInByLevel.values());
-        sorted.sort(new Comparator<DENOPTIMMolecule>() {
-			public int compare(DENOPTIMMolecule a, DENOPTIMMolecule b) {
-				return Double.compare(a.getMoleculeFitness(),
-						b.getMoleculeFitness());
+        sorted = new ArrayList<CandidateLW>();
+        sorted.addAll(mapItemsInByLevel.values());
+        sorted.sort(new Comparator<CandidateLW>() {
+			public int compare(CandidateLW a, CandidateLW b) {
+				return Double.compare(a.getFitness(),
+						b.getFitness());
 			}
 		});
         
-        double[][] candsWithFitnessDataSorted = new double[2][molsWithFitness];
-        for (int i=0; i<molsWithFitness; i++)
+        double[][] itemsWithFitnessDataSorted = new double[2][itemsWithFitness];
+        for (int i=0; i<itemsWithFitness; i++)
         {
-        	DENOPTIMMolecule mol = sorted.get(i);
-        	candsWithFitnessDataSorted[0][i] = i;
-        	candsWithFitnessDataSorted[1][i] = mol.getMoleculeFitness();
+        	CandidateLW item = sorted.get(i);
+        	itemsWithFitnessDataSorted[0][i] = i;
+        	itemsWithFitnessDataSorted[1][i] = item.getFitness();
         }
         
         datasetAllFit = new DefaultXYDataset(); 
 		datasetAllFit.addSeries("Candidates_with_fitness", 
-				candsWithFitnessDataPerLevel);
+				itemsWithFitnessDataPerLevel);
 		
 		datasetSorted = new DefaultXYDataset();
 		datasetSorted.addSeries("Sorted_candidates", 
-				candsWithFitnessDataSorted);
+				itemsWithFitnessDataSorted);
 		
 		//TODO: somehow collect and display the candidates that hit a mol error
 		//      Could it be a histogram (#failed x level) below the levels plot
@@ -576,10 +577,11 @@ public class GUIInspectFSERun extends GUICardPanel
 	    });
 		
 		// Setting toolTip when on top of an series item in the chart
+		//TODO deal with superposed points by adding all their names to tip text
 		XYToolTipGenerator ttg = new XYToolTipGenerator() {
 			public String generateToolTip(XYDataset data, int sId, int itemId)
 			{
-				return mapCandsInByLevel.get(itemId).getName();
+				return mapItemsInByLevel.get(itemId).getName();
 			}
 		};
 		chartByLevel.getXYPlot().getRenderer().setSeriesToolTipGenerator(0, 
@@ -602,8 +604,8 @@ public class GUIInspectFSERun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						DENOPTIMMolecule mol = mapCandsInByLevel.get(itemId);
-						renderViewWithSelectedItem(mol);
+						CandidateLW item = mapItemsInByLevel.get(itemId);
+						renderViewWithSelectedItem(item);
 					}
 					//do we do anything if we select other series? not now...
 				}
@@ -628,8 +630,8 @@ public class GUIInspectFSERun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						DENOPTIMMolecule mol = sorted.get(itemId);
-						renderViewWithSelectedItem(mol);
+						CandidateLW item = sorted.get(itemId);
+						renderViewWithSelectedItem(item);
 					}
 				}
 				else if (e.getEntity() instanceof PlotEntity)
@@ -653,27 +655,27 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void renderViewWithSelectedItem(DENOPTIMMolecule mol)
+	private void renderViewWithSelectedItem(CandidateLW item)
 	{	
 		// NB: we just change the series of selected items
 		// The charts are updated automatically
 		
         double[][] selectedCandsDataLev = new double[2][1]; 
-    	selectedCandsDataLev[0][0] = mol.getLevel();
-    	selectedCandsDataLev[1][0] = mol.getMoleculeFitness();
+    	selectedCandsDataLev[0][0] = item.getLevel();
+    	selectedCandsDataLev[1][0] = item.getFitness();
         datasetSelectedLev.removeSeries("Selected_candidates");
         datasetSelectedLev.addSeries("Selected_candidates", selectedCandsDataLev);
 		chartByLevel.getXYPlot().setDataset(1, datasetSelectedLev);
 
 		double[][] selectedCandsDataOrd = new double[2][1]; 
-    	selectedCandsDataOrd[0][0] = sorted.indexOf(mol);
-    	selectedCandsDataOrd[1][0] = mol.getMoleculeFitness();        	
+    	selectedCandsDataOrd[0][0] = sorted.indexOf(item);
+    	selectedCandsDataOrd[1][0] = item.getFitness();        	
         datasetSelectedOrd.removeSeries("Selected_candidates");
         datasetSelectedOrd.addSeries("Selected_candidates", selectedCandsDataOrd);
 		chartBySorted.getXYPlot().setDataset(1, datasetSelectedOrd);
 		
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(mol.getMoleculeFile());
+		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
 	}
 	
 //-----------------------------------------------------------------------------

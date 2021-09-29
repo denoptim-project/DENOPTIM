@@ -36,7 +36,6 @@ public class ExternalCmdsListener implements Runnable
     private final WatchService watcher;
     private final WatchKey key;
     private EvolutionaryAlgorithm ea;
-    private ParallelEvolutionaryAlgorithm pea;
     
 //------------------------------------------------------------------------------
 
@@ -132,10 +131,6 @@ public class ExternalCmdsListener implements Runnable
 				if (ea != null)
 				{
 					ea.stopRun();
-				}	
-				if (pea != null)
-				{
-					pea.stopRun();
 				}
 			}
 			//TODO: add removal on one population member and its downstream relatives
@@ -147,13 +142,6 @@ public class ExternalCmdsListener implements Runnable
     public void closeWatcher() throws IOException
     {
     	this.watcher.close();
-    }
-    
-//------------------------------------------------------------------------------
-    //TODO, make interface for algorithms or eait untim parallel and normal evolutionaty algorithms have been merged
-    public void setReferenceToRunningAlgorithm(ParallelEvolutionaryAlgorithm pea)
-    {
-    	this.pea = pea;
     }
     
 //------------------------------------------------------------------------------

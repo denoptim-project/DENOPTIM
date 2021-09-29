@@ -21,7 +21,9 @@ package denoptim.molecule;
 import java.util.Comparator;
 
 /**
- * Comparator for DENOPTIMAttachmentPoint
+ * Comparator for DENOPTIMAttachmentPoints. APs are sorted by creation time,
+ * effectively. This is the standard behaviour of 
+ * {@link DENOPTIMAttachmentPoint#compareTo(DENOPTIMAttachmentPoint)}.
  * 
  * @author Marco Foscato
  */

@@ -18,23 +18,15 @@
 
 package serconverter;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.logging.Level;
+import java.util.ArrayList;
 
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
-import denoptim.fragspace.FragmentSpaceParameters;
 
 
 /**

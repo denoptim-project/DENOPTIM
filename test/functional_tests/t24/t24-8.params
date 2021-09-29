@@ -1,0 +1,14 @@
+#
+# Parameters for DENOPTIM
+#
+Isomorphism-inpGraphA=graph8.sdf 
+# graph8 and graph9 differ by the bond type in the chord, and are therefore not isomorphic
+Isomorphism-inpGraphB=graph9.sdf
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds

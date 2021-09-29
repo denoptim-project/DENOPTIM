@@ -194,7 +194,7 @@ public class HTMLUtils
                 {
                     sb.append(Constants.TD_START_TAG).append(str);
                 }
-                else if (propName.equalsIgnoreCase("GCODE"))
+                else if (propName.equalsIgnoreCase(DENOPTIMConstants.GRAPHTAG))
                 {
                     sb.append(Constants.TD_START_TAG).append(str);
                 }

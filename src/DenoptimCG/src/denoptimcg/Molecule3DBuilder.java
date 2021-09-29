@@ -28,20 +28,23 @@ import java.util.Set;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.graph.PathTools;
 import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.silent.RingSet;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMEdge;
+import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
@@ -127,12 +130,6 @@ public class Molecule3DBuilder
      */
     private double atmOveralScore = Double.NaN;
 
-    /**
-     * Variable needed by recursions
-     */
-    private int rec = 0;
-    private int maxLng = 0;
-
 
 //------------------------------------------------------------------------------
 
@@ -143,7 +140,8 @@ public class Molecule3DBuilder
     public Molecule3DBuilder()
     {
         this.molGraph = new DENOPTIMGraph();
-        this.fmol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        this.fmol = builder.newAtomContainer();
         this.tmol = new TinkerMolecule();
         this.attractors = new ArrayList<RingClosingAttractor>();
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
@@ -160,10 +158,10 @@ public class Molecule3DBuilder
      * Constructs a <code>Molecule3DBuilder</code> specifying all its features
      * @param molGraph the graph representation
      * @param fmol the CDK molecular representation
-     * @param tmol the intermal coordinates representation
+     * @param tmol the internal coordinates representation
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
-     * indeces)
+     * indexes)
      * @param attractors all the ring closing attractors (RCA)
      * @param attToAtmID the correspondence between RCA and atom index
      * @param allRCACombs all combinations of compatible pairs of RCAs
@@ -186,7 +184,6 @@ public class Molecule3DBuilder
         this.attractors = attractors;
         this.attToAtmID = attToAtmID;
         this.allRCACombs = allRCACombs;
-        this.mapDRingsRCACombs = mapDRingsRCACombs;
         this.rotatableBnds = rotatableBnds;
         this.molName = molName;
         this.newRingClosures = ringClosures;
@@ -255,7 +252,7 @@ public class Molecule3DBuilder
         // Assign the class of the related attachment point to each RCA
         for (RingClosingAttractor rca : attractors)
         {
-            String apclass = getClassFromAttractor(rca);
+            APClass apclass = getClassFromAttractor(rca);
             rca.setApClass(apclass);
         }
 
@@ -323,16 +320,15 @@ public class Molecule3DBuilder
 
 //------------------------------------------------------------------------------
 
-    private String getClassFromAttractor(RingClosingAttractor rca)
+    private APClass getClassFromAttractor(RingClosingAttractor rca)
     {
-        String cls = null;
+        APClass cls = null;
         IAtom atm = rca.getIAtom();
         int i = fmol.getAtomNumber(atm) + 1;
         TinkerAtom tatm = tmol.getAtom(i);
         int vtxId = tatm.getVertexId();
-        int edgeId = molGraph.getIndexOfEdgeWithParent(vtxId);
-        DENOPTIMEdge edge = molGraph.getEdgeAtPosition(edgeId);
-        cls = edge.getSourceReaction();
+        DENOPTIMEdge edge = molGraph.getEdgeWithParent(vtxId);
+        cls = edge.getSrcAPClass();
         return cls;
     }
 
@@ -705,31 +701,26 @@ public class Molecule3DBuilder
      * atoms
      */
 
-    public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc, int bondType)
+    public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc, 
+            BondType bndTyp)
     {
         this.newRingClosures.add(nRc);
         this.overalRCScore = Double.NaN;
 
         int iA = fmol.getAtomNumber(atmA);
         int iB = fmol.getAtomNumber(atmB);
-
-        if (verbosity > 2)
-            System.out.println("ADDING BOND: "+iA+" "+iB);
-
-        String btStr = "SINGLE";        
-        switch (bondType)
+       
+        if (bndTyp.hasCDKAnalogue())
         {
-            case (2):
-                btStr = "DOUBLE";
-                break;
-            case (3):
-                btStr = "TRIPLE";
-                break;
-            default:
-                btStr = "SINGLE";
-                break;
+            this.fmol.addBond(iA, iB, bndTyp.getCDKOrder());
+            if (verbosity > 2)
+                System.out.println("ADDING BOND: "+iA+" "+iB);
+        } else {
+            System.out.println("WARNING! Attempt to add ring closing bond "
+                    + "did not add any actual chemical bond because the "
+                    + "bond type of the chord is '" + bndTyp +"'.");
         }
-        this.fmol.addBond(iA, iB, IBond.Order.valueOf(btStr));
+
         if (iA < iB)
         {
             this.tmol.addBond(iA+1, iB+1);
@@ -825,12 +816,10 @@ public class Molecule3DBuilder
             int ioatm = this.getAtmIdOfRCA(oRca);
             IAtom atm = nFMol.getAtom(ioatm);
             RingClosingAttractor nRca = new RingClosingAttractor(atm,nFMol);
-            String cls = null;
             TinkerAtom nTa = nTMol.getAtom(ioatm+1);
             int vtxId = nTa.getVertexId();
-            int edgeId = nMolGraph.getIndexOfEdgeWithParent(vtxId);
-            DENOPTIMEdge edge = nMolGraph.getEdgeAtPosition(edgeId);
-            cls = edge.getSourceReaction();
+            DENOPTIMEdge edge = nMolGraph.getEdgeWithParent(vtxId);
+            APClass cls = edge.getSrcAPClass();
             nRca.setApClass(cls);
             nAttractors.add(nRca);
             nAttToAtmID.put(nRca,ioatm);

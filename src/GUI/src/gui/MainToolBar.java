@@ -18,33 +18,46 @@
 
 package gui;
 
-import javax.swing.Box;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
-import denoptim.task.StaticTaskManager;
-
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.GridLayout;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.swing.Box;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
+import denoptim.io.FileFormat;
+import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.StaticTaskManager;
 
 
 /**
@@ -53,7 +66,8 @@ import java.util.Map;
  * @author Marco Foscato
  */
 
-public class MainToolBar extends JMenuBar {
+public class MainToolBar extends JMenuBar implements ILoadFragSpace
+{
 	
 	/**
 	 * Version
@@ -69,11 +83,21 @@ public class MainToolBar extends JMenuBar {
 	 * Main File menu
 	 */
 	private JMenu menuFile;
+	
+	/**
+	 * Menu with list of recent files
+	 */
+	private JMenu openRecent;
 
 	/**
 	 * The menu listing the active panels in the deck of cards
 	 */	 
 	private JMenu activeTabsMenu;
+	
+	/**
+     * The fragment space menu
+     */  
+    private JMenu fragSpaceMenu;
 	
 	/**
 	 * List of the active panels in the deck of cards
@@ -240,7 +264,7 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem newFr = new JMenuItem("New Fragments");
 		newFr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainPanel.add(new GUIFragmentInspector(mainPanel));
+				mainPanel.add(new GUIVertexInspector(mainPanel));
 			}
 		});
 		newMenu.add(newFr);		
@@ -262,18 +286,29 @@ public class MainToolBar extends JMenuBar {
 		JMenuItem open = new JMenuItem("Open...");
 		open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File file = DenoptimGUIFileOpener.pickFileOrFolder(open);
+				File file = GUIFileOpener.pickFileOrFolder(open);
 				try {
-					openFile(file, DenoptimGUIFileOpener.detectFileFormat(
+					openFile(file, DenoptimIO.detectFileFormat(
 							file));
 				} catch (Exception e1) {
 					if (file == null)
 					{
 						return;
 					}
-					String[] options = {"Abandon", "GA-PARAMS", "FSE-PARAMS",
-							"FRAGMENTS", "GRAPHS", "CompatibilityMatrix",  
-							"GA-RUN", "FSE-RUN", "SERGRAPH"};
+					String[] options = {"Abandon", 
+					        "GA Parameters", 
+					        "FSE Parameters",
+                            "FR Parameters",
+					        "Compatibility Matrix",  
+							"GA Output", 
+							"FSE Output"};
+					FileFormat[] ffOpts = {null, 
+					        FileFormat.GA_PARAM, 
+					        FileFormat.FSE_PARAM,
+                            FileFormat.FR_PARAM,
+					        FileFormat.COMP_MAP,
+					        FileFormat.GA_RUN,
+					        FileFormat.FSE_RUN};
 					JComboBox<String> cmbFiletype = 
 							new JComboBox<String>(options);
 					cmbFiletype.setSelectedIndex(0);
@@ -297,15 +332,49 @@ public class MainToolBar extends JMenuBar {
 						{
 							return;
 						}
-						openFile(file,options[cmbFiletype.getSelectedIndex()]); 
+						openFile(file,ffOpts[cmbFiletype.getSelectedIndex()]); 
 					}
 				}
 			}
 		});
 		menuFile.add(open);
 		
+	    openRecent = new JMenu("Open Recent");
+	    menuFile.add(openRecent);
+	    menuFile.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) 
+            {
+                updateOpenRecentMenu();
+            }
+            @Override
+            public void menuDeselected(MenuEvent e) {}
+            @Override
+            public void menuCanceled(MenuEvent e) {}
+        });
+	    
+		
 		activeTabsMenu = new JMenu("Active Tabs");
 		this.add(activeTabsMenu);
+		
+		fragSpaceMenu = new JMenu("Building Block Space");
+		JMenuItem loadSpace = new JMenuItem("Load Space of Building Blocks");
+		loadSpace.setToolTipText(String.format("<html><body width='%1s'>"
+		        + "Use this to load or define a space of building blocks, "
+		        + "i.e., a combination of building blocks "
+		        + "and rules on how we can connect those building blocks. ",
+		        350));
+		loadSpace.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (cancelDueToConflictWithPreviouslyLoadedData())
+                {
+                    return;
+                }
+                loadFragmentSpace();
+            }
+        });
+		fragSpaceMenu.add(loadSpace);
+		this.add(fragSpaceMenu);
 		
 		JMenu menuHelp = new JMenu("Help");
 		this.add(menuHelp);
@@ -314,7 +383,7 @@ public class MainToolBar extends JMenuBar {
 		usrManual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		    	try {
-		    		String url = "http://htmlpreview.github.com/?https://"
+		    		String url = "http://htmlpreview.github.io/?https://"
 		    				+ "github.com/denoptim-project/DENOPTIM/blob/"
 		    				+ "master/doc/user_manual.html";
                     Desktop.getDesktop().browse(new URI(url));
@@ -337,74 +406,246 @@ public class MainToolBar extends JMenuBar {
 		StaticTaskManager.queueStatusBar.setValue(1);
 		this.add(StaticTaskManager.queueStatusBar);
 	}
+
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Updated the the list of recent files in the "open Recent" menu
+	 */
+    private void updateOpenRecentMenu()
+    {
+        openRecent.removeAll();
+        Map<File,FileFormat> recentFiles = DenoptimIO.readRecentFilesMap();
+        int s = recentFiles.size();
+        if (recentFiles.size() == 0)
+        {
+            openRecent.setEnabled(false);
+        } else {
+            openRecent.setEnabled(true);
+        }
+        for (Entry<File, FileFormat> e : recentFiles.entrySet())
+        {
+            RecentFileItem item = new RecentFileItem(e.getKey(), e.getValue());
+            item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    openFile(item.file, item.ff); 
+                }
+            });
+            openRecent.add(item);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private class RecentFileItem extends JMenuItem {
+        protected FileFormat ff;
+        protected File file;
+        public RecentFileItem(File file, FileFormat ff)
+        {
+            super(file.getAbsolutePath());
+            this.file = file;
+            this.ff = ff;
+        }
+    }
+
+//-----------------------------------------------------------------------------
+	
+	private void loadFragmentSpace()
+	{
+	    FSParamsDialog fsParams = new FSParamsDialog(this);
+        fsParams.pack();
+        fsParams.setVisible(true);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+    /**
+     * Changes the GUI appearance compatibly to no loaded fragment space
+     */
+    public void renderForLackOfFragSpace() 
+    {
+        for (GUICardPanel panel : activeTabsAndRefs.keySet())
+        {
+            if (panel instanceof GUIGraphHandler)
+            {
+                ((GUIGraphHandler)panel).renderThisForLackOfFragSpace();
+            }
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Changes the GUI appearance and activated buttons that depend on the
+     * fragment space being loaded
+     */
+    public void renderForPresenceOfFragSpace()
+    {
+        for (GUICardPanel panel : activeTabsAndRefs.keySet())
+        {
+            if (panel instanceof GUIGraphHandler)
+            {
+                ((GUIGraphHandler)panel).renderThisForPresenceOfFragSpace();
+            }
+        }
+    }
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Check if there is any potential source of conflict between currently 
+	 * open/loaded data and the possibility of changing fragment space. If there
+	 * are conflicts, we bring up a warning that allows the user to cancel or
+	 * impose the change of fragment space.
+	 * @return <code>true</code> if we have decided not to load a fragment space
+	 * after all.
+	 */
+    private boolean cancelDueToConflictWithPreviouslyLoadedData()
+    {
+        String msg = "<html><body width='%1s'>"
+                + "<b>WARNING</b>: you are introducing a "
+                + "potential source of mistmatch between "
+                + "the IDs of the building block used in graphs "
+                + "and the currently loaded"
+                + "space of building block.<br>In particular:<br>"
+                + "<ul>";
+        boolean showWarning = false;
+
+        boolean foundGraphs = false;
+        for (GUICardPanel panel : activeTabsAndRefs.keySet())
+        {
+            if (panel instanceof GUIGraphHandler)
+            {
+                if (((GUIGraphHandler)panel).dnGraphLibrary.size() != 0)
+                {
+                    foundGraphs = true;
+                }
+            }
+        }
+        if (foundGraphs)
+        {
+            msg = msg 
+                    + "<li>One or more graphs are already loaded.</li>";
+            showWarning = true;
+        }
+        if (FragmentSpace.isDefined())
+        {
+            msg = msg + "<li>A space of building block is alredy loaded.</li>";
+            showWarning = true;
+        }
+        if (showWarning)
+        {
+            msg = msg + "</ul>"
+                    + "<p>Changing the space might affect any of these "
+                    + "currently loaded data.</p> <p> </p>"
+                    + "Do you want to change the building blocks "
+                    + "space? </html>";
+            String[] options = new String[]{"Yes", "No"};
+            int res = JOptionPane.showOptionDialog(null,
+                    String.format(msg,350),                     
+                    "Change Space?",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"),
+                    options,
+                    options[1]);
+            if (res == 1)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 	
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Process a file that has a recognized file format and loads a suitable 
+	 * Process a file that has a recognised file format and loads a suitable 
 	 * GUI card to visualize the file content.
 	 * @param file the file to open
-	 * @param fFormat the DENOPTIM format of the file
+	 * @param fileFormat the DENOPTIM format of the file
 	 */
 	
-	private void openFile(File file, String fFormat) 
+	private void openFile(File file, FileFormat fileFormat) 
 	{
-		switch (fFormat)
+		switch (fileFormat)
 		{
-			case ("GA-PARAMS"):
-				GUIPrepareGARun gaParamsPanel = new GUIPrepareGARun(mainPanel);
+			case GA_PARAM:
+			    GUIPrepareGARun gaParamsPanel = new GUIPrepareGARun(mainPanel);
 				mainPanel.add(gaParamsPanel);
 				gaParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;	
 				
-			case ("FSE-PARAMS"):
+			case FSE_PARAM:
 				GUIPrepareFSERun fseParamsPanel = 
 					new GUIPrepareFSERun(mainPanel);
 				mainPanel.add(fseParamsPanel);
 				fseParamsPanel.importParametersFromDenoptimParamsFile(file);
 				break;
+				
+           case FR_PARAM:
+                GUIPrepareFitnessRunner frParamsPanel = 
+                    new GUIPrepareFitnessRunner(mainPanel);
+                mainPanel.add(frParamsPanel);
+                frParamsPanel.importParametersFromDenoptimParamsFile(file);
+                break;
 		
-			case ("FRAGMENTS"):
-				GUIFragmentInspector fragPanel = 
-					new GUIFragmentInspector(mainPanel);
+			case VRTXSDF:
+				GUIVertexInspector fragPanel = 
+					new GUIVertexInspector(mainPanel);
 				mainPanel.add(fragPanel);
-				fragPanel.importFragmentsFromFile(file,"SDF");
+				fragPanel.importVerticesFromFile(file,"SDF");
 				break;	
 				
-			case ("GRAPHS"):
+			case GRAPHSDF:
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanel);
 				graphPanel.importGraphsFromFile(file);
 				break;
 				
-			case ("CompatibilityMatrix"):
+			case GRAPHJSON:
+                GUIGraphHandler graphPanel2 = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel2);
+                graphPanel2.importGraphsFromFile(file);
+                break;
+                
+				
+			case COMP_MAP:
 				GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
 				mainPanel.add(cpmap);
 				cpmap.importCPMapFromFile(file);
 				break;
 				
+				/*
 			case ("SERGRAPH"):
 				GUIGraphHandler graphPanelSer = new GUIGraphHandler(mainPanel);
 				mainPanel.add(graphPanelSer);
 				graphPanelSer.importGraphsFromFile(file); //NB: deals with SER/SDF/TXT
 				break;
+				*/
 				
-			case ("GA-RUN"):
+			case GA_RUN:
 				GUIInspectGARun eiPanel = 
 					new GUIInspectGARun(mainPanel);
 				mainPanel.add(eiPanel);
 				eiPanel.importGARunData(file);
 				break;
 				
-			case ("FSE-RUN"):
+			case FSE_RUN:
 				GUIInspectFSERun fsei = new GUIInspectFSERun(mainPanel);
 				mainPanel.add(fsei);
 				fsei.importFSERunData(file);
 				break;
+				
+            case TXT:
+                GUITextReader txt = new GUITextReader(mainPanel);
+                mainPanel.add(txt);
+                txt.displayContent(file);
+                break;
 			
 			default:
 				JOptionPane.showMessageDialog(null,
-						"File format '" + fFormat + "' not recognized.",
+						"File format '" + fileFormat + "' not recognized.",
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));

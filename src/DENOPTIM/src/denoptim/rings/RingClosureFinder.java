@@ -21,16 +21,17 @@ package denoptim.rings;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.AxisAngle4d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMathUtils;
@@ -92,7 +93,8 @@ public class RingClosureFinder
                                 + " Please, Report this bug to the author.");
             System.exit(1);
         }
-        if (sz > RingClosureParameters.getMaxNumberRotatableBonds())
+        //NB: the '+2' comes from the 'bonds' to RCAs: 2 per fundamental ring
+        if (sz > RingClosureParameters.getMaxNumberRotatableBonds()+2)
         {
             if (verbosity > 0)
             {
@@ -358,17 +360,17 @@ public class RingClosureFinder
                     }
                 }
             }
-	    if (stopAtFirstMatch)
-	    {
+    	    if (stopAtFirstMatch)
+    	    {
                 if (res)
                 {
-		    if (verbosity > 1)
-		    {
-			System.out.println("Stop recursive conf. search."
-					   + " (rec.: " + rec + ")");
-		    }
+            	    if (verbosity > 1)
+            	    {
+            		System.out.println("Stop recursive conf. search."
+            				   + " (rec.: " + rec + ")");
+            	    }
                     break;
-		}
+                }
             }
         }
 
@@ -417,7 +419,8 @@ public class RingClosureFinder
 
     private static void reportForDebug(String filename, List<Point3d> chain)
     {
-        IAtomContainer mol = new AtomContainer();
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer mol = builder.newAtomContainer();
         for (int ia=0 ; ia<chain.size(); ia++)
         {
             Atom atm = new Atom("He",chain.get(ia));

@@ -34,7 +34,7 @@ public class GUIPrepareGARun extends GUIPrepare
 	/**
 	 * Version UID
 	 */
-	private static final long serialVersionUID = -2208699600683389219L;
+	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Unique identified for instances of this form
@@ -58,11 +58,13 @@ public class GUIPrepareGARun extends GUIPrepare
 		super.allParams.add(gaParsPane);
 		super.tabbedPane.addTab("Genetic Algorithm", null, gaParsPane, null);
 		
-		FSParametersForm fseParsPane = new FSParametersForm(mainPanel.getSize());
+		FSParametersForm fseParsPane = new FSParametersForm(
+		        mainPanel.getSize());
 		super.allParams.add(fseParsPane);
 		super.tabbedPane.addTab("Fragment Space", null, fseParsPane, null);
 		
-		FitnessParametersForm fitParsPane = new FitnessParametersForm(mainPanel.getSize());
+		FitnessParametersForm fitParsPane = new FitnessParametersForm(
+		        mainPanel.getSize());
 		super.allParams.add(fitParsPane);
 		super.tabbedPane.addTab("Fitness Provider", null, fitParsPane, null);
 		
