@@ -254,15 +254,20 @@ public class GAParametersForm extends ParametersForm
     JLabel lblPar15;
     JComboBox<String> cmbPar15;
 
-    String keyPar16 = "GA-CrossoverProbability";
+    String keyPar16 = "GA-CrossoverWeight";
     JPanel linePar16;
     JLabel lblPar16;
     JTextField txtPar16;
 
-    String keyPar17 = "GA-MutationProbability";
+    String keyPar17 = "GA-MutationWeight";
     JPanel linePar17;
     JLabel lblPar17;
     JTextField txtPar17;
+    
+    String keyParWC = "GA-ConstructionWeight";
+    JPanel lineParWC;
+    JLabel lblParWC;
+    JTextField txtParWC;
 
     String keyPar18 = "GA-SymmetryProbability";
     JPanel linePar18;
@@ -1092,9 +1097,10 @@ public class GAParametersForm extends ParametersForm
         linePar15.add(cmbPar15);
         localBlock2.add(linePar15);
 
-        String toolTipPar16 = "Specifies the probability (0.0-1.0) at which crossover is performed.";
+        String toolTipPar16 = "<html>Specifies the relative weight of "
+                + "crossover operations.</html>";
         linePar16 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar16 = new JLabel("Crossover probability:", SwingConstants.LEFT);
+        lblPar16 = new JLabel("Crossover weight:", SwingConstants.LEFT);
         lblPar16.setPreferredSize(fileLabelSize);
         lblPar16.setToolTipText(toolTipPar16);
         txtPar16 = new JTextField();
@@ -1106,9 +1112,10 @@ public class GAParametersForm extends ParametersForm
         linePar16.add(txtPar16);
         localBlock2.add(linePar16);
 
-        String toolTipPar17 = "Specifies the probability (0.0-1.0) at which mutation is performed.";
+        String toolTipPar17 = "<html>Specifies the relative weight of "
+                + "mutation operations.</html>";
         linePar17 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar17 = new JLabel("Mutation probability:", SwingConstants.LEFT);
+        lblPar17 = new JLabel("Mutation weight:", SwingConstants.LEFT);
         lblPar17.setPreferredSize(fileLabelSize);
         lblPar17.setToolTipText(toolTipPar17);
         txtPar17 = new JTextField();
@@ -1119,6 +1126,21 @@ public class GAParametersForm extends ParametersForm
         linePar17.add(lblPar17);
         linePar17.add(txtPar17);
         localBlock2.add(linePar17);
+        
+        String toolTipParWC = "<html>Specifies the relative weight of "
+                + "construction from scratch.</html>";
+        lineParWC = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParWC = new JLabel("Construction weight:", SwingConstants.LEFT);
+        lblParWC.setPreferredSize(fileLabelSize);
+        lblParWC.setToolTipText(toolTipParWC);
+        txtParWC = new JTextField();
+        txtParWC.setToolTipText(toolTipParWC);
+        txtParWC.setPreferredSize(strFieldSize);
+        txtParWC.getDocument().addDocumentListener(fieldListener);
+        mapKeyFieldToValueField.put(keyParWC.toUpperCase(),txtParWC);
+        lineParWC.add(lblParWC);
+        lineParWC.add(txtParWC);
+        localBlock2.add(lineParWC);
 
         String toolTipPar18 = "Specifies the probability (0.0-1.0) of symmetric operations.";
         linePar18 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -1874,6 +1896,7 @@ public class GAParametersForm extends ParametersForm
         sb.append(keyPar15).append("=").append(cmbPar15.getSelectedItem()).append(NL);
         sb.append(getStringIfNotEmpty(keyPar16,txtPar16));
         sb.append(getStringIfNotEmpty(keyPar17,txtPar17));
+        sb.append(getStringIfNotEmpty(keyParWC,txtParWC));
         sb.append(getStringIfNotEmpty(keyPar18,txtPar18));
         sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem()).append(NL);
         sb.append(getStringIfNotEmpty(keyPar20,txtPar20));
