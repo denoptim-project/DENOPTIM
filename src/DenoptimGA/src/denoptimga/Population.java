@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
@@ -74,13 +75,14 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     
 //------------------------------------------------------------------------------
 
+    
     public Population clone()
     {
         Population clone = new Population();
 
         for (Candidate c : this)
         {
-            clone.add(c.clone());
+            clone.add(c);
         }
         
         //TODO: clone relations
@@ -124,7 +126,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          */
         public void put(Candidate c1, Candidate c2, 
                 List<DENOPTIMVertex[]> pairs)
-        {
+        {       
             if (data.containsKey(c1))
             {
                 data.get(c1).put(c2, pairs);

@@ -40,6 +40,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 
 import denoptim.utils.DENOPTIMgson;
+import denoptim.utils.GraphUtils;
 
 
 /**
@@ -75,7 +76,7 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     public EmptyVertex()
     {
-        super(-1);
+        super(GraphUtils.getUniqueVertexIndex());
         lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         lstSymAPs = new ArrayList<SymmetricSet>();
     }
@@ -84,6 +85,10 @@ public class EmptyVertex extends DENOPTIMVertex
 
     /**
      * Constructor for an identified vertex without attachment points.
+     * @param id the VertedID of the vertex to construct. Note that this ID 
+     * should be unique within a graph. To generate unique IDs either use 
+     * {@link GraphUtils#getUniqueVertexIndex()} or use constructor
+     * {@link EmptyVertex()}.
      */
     public EmptyVertex(int id)
     {
@@ -251,11 +256,13 @@ public class EmptyVertex extends DENOPTIMVertex
      * Returns a deep-copy of this vertex
      * @return a deep-copy
      */
+    @Override
     public EmptyVertex clone()
     {
         EmptyVertex c = new EmptyVertex(getVertexId());
         c.setLevel(this.getLevel());
         c.setAsRCV(this.isRCV());
+        c.setBuildingBlockId(this.getBuildingBlockId());
         c.setBuildingBlockType(this.getBuildingBlockType());
         
         for (DENOPTIMAttachmentPoint ap : lstAPs)

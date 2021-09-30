@@ -695,8 +695,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void addVertex(DENOPTIMVertex vertex)
+    public void addVertex(DENOPTIMVertex vertex) throws DENOPTIMException
     {
+        if (containsVertexID(vertex.getVertexId()))
+            throw new DENOPTIMException("Vertex must have a VertexID that is "
+                    + "unique within the graph. VertexID '" 
+                    + vertex.getVertexId()+ "' already present in graph " 
+                    + getGraphId());
         vertex.setGraphOwner(this);
         gVertices.add(vertex);
         jGraph = null;
@@ -1483,7 +1488,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             DENOPTIMVertex vClone = vOrig.clone();
             vClone.setLevel(vOrig.getLevel());
             cListVrtx.add(vClone);
-            vidsInClone.put(vClone.getVertexId(),vClone);}
+            vidsInClone.put(vClone.getVertexId(),vClone);
+        }
 
         ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<>();
         for (DENOPTIMEdge e : gEdges)
@@ -1633,6 +1639,26 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             mval = Math.max(mval, v.getVertexId());
         }
         return mval;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if a number is already used as VertexIDs within the graph.
+     * @return <code>true</code> if the number is already used.
+     */
+    public boolean containsVertexID(int id)
+    {
+        boolean result = false;
+        for (DENOPTIMVertex v : gVertices) 
+        {
+            if (id == v.getVertexId())
+            {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
 //------------------------------------------------------------------------------
@@ -2287,140 +2313,41 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Extracts the subgraph of a graph G starting from a given seed vertex of
-     * G.
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * when exploring the spanning tree from a given seed vertex.
      * Only the seed vertex and all child vertices (and further successors)
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param seed the vertex from which the extraction has to start
-     * @return the subgraph
+     * @return a new vertex that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
             throws DENOPTIMException
     {
-        DENOPTIMGraph subGraph = new DENOPTIMGraph();
+        DENOPTIMGraph subGraph = this.clone();
+        DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
+                this.indexOf(seed));
+        
         ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
-        subGrpVrtxs.add(seed);
-        getChildrenTree(seed, subGrpVrtxs);
-        // Copy vertices to subgraph
-        for (DENOPTIMVertex v : subGrpVrtxs)
+        subGrpVrtxs.add(seedClone);
+        subGraph.getChildrenTree(seedClone, subGrpVrtxs);
+        
+        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGraph.gVertices)
         {
-            subGraph.addVertex(v);
-            // vertices are removed later (see below) otherwise also
-            // rings and sym.sets are removed
-        }
-
-        // Remove the edge joining graph and subgraph
-        removeEdgeWithParent(seed);
-
-        // Identify edges belonging to subgraph
-        Iterator<DENOPTIMEdge> edgesIterator = getEdgeList().iterator();
-        while (edgesIterator.hasNext())
-        {
-            DENOPTIMEdge edge = edgesIterator.next();
-            for (DENOPTIMVertex v : subGrpVrtxs)
+            if (!subGrpVrtxs.contains(v))
             {
-                if (edge.getSrcAP().getOwner() == v
-                        || edge.getTrgAP().getOwner() == v)
-                {
-                    // Copy edge to subgraph...
-                    subGraph.addEdge(edge);
-                    // ...and remove it from this graph
-                    edgesIterator.remove();
-                    break;
-                }
+                toRemove.add(v);
             }
         }
-
-        // Identify and move rings
-        Iterator<DENOPTIMRing> ringsIterator = getRings().iterator();
-        while (ringsIterator.hasNext())
+        
+        for (DENOPTIMVertex v : toRemove)
         {
-            DENOPTIMRing ring = ringsIterator.next();
-            boolean rSpanAnySGVrtx = false;
-            boolean rWithinSubGrph = true;
-            for (int i=0; i<ring.getSize(); i++)
-            {
-                int idVrtInRing = ring.getVertexAtPosition(i).getVertexId();
-                if (subGrpVrtxs.contains(getVertexWithId(idVrtInRing)))
-                {
-                    rSpanAnySGVrtx = true;
-                }
-                else
-                {
-                    rWithinSubGrph = false;
-                }
-            }
-            if (rSpanAnySGVrtx && rWithinSubGrph)
-            {
-                //copy ring to subgraph
-                subGraph.addRing(ring);
-                //remove ring from molGraph
-                ringsIterator.remove();
-            }
-            //else if (!rSpanAnySGVrtx && rWithinSubGrph) impossible!
-            else if (!rSpanAnySGVrtx && !rWithinSubGrph)
-            {
-                //ignore ring
-                continue;
-            }
-            else if (rSpanAnySGVrtx && !rWithinSubGrph)
-            {
-                // only remove ring from molGraph
-                ringsIterator.remove();
-            }
+            subGraph.removeVertex(v);
         }
-
-        // Identify and move symmetric sets
-        Iterator<SymmetricSet> symSetsIterator = getSymSetsIterator();
-        while (symSetsIterator.hasNext())
-        {
-            SymmetricSet ss = symSetsIterator.next();
-            boolean ssSpanAnySGVrtx = false;
-            boolean ssWithinSubGrph = true;
-            SymmetricSet partOfSSInSubGraph = new SymmetricSet();
-            for (Integer idVrtInSS : ss.getList())
-            {
-                if (subGrpVrtxs.contains(getVertexWithId(idVrtInSS)))
-                {
-                    partOfSSInSubGraph.add(idVrtInSS);
-                    ssSpanAnySGVrtx = true;
-                }
-                else
-                {
-                    ssWithinSubGrph = false;
-                }
-            }
-            if (ssSpanAnySGVrtx && ssWithinSubGrph)
-            {
-                //copy symm.set to subgraph
-                subGraph.addSymmetricSetOfVertices(ss);
-                //remove symm.set from molGraph
-                symSetsIterator.remove();
-            }
-            //else if (!ssSpanAnySGVrtx && ssWithinSubGrph) impossible!
-            else if (!ssSpanAnySGVrtx && !ssWithinSubGrph)
-            {
-                //ignore sym.set
-                continue;
-            }
-            else if (ssSpanAnySGVrtx && !ssWithinSubGrph)
-            {
-                //copy only portion of sym.set
-                subGraph.addSymmetricSetOfVertices(partOfSSInSubGraph);
-                //remove sym.set from molGraph
-                symSetsIterator.remove();
-            }
-        }
-
-        // Remove vertices from molGraph
-        for (DENOPTIMVertex v : subGrpVrtxs)
-        {
-            removeVertex(v);
-        }
-
+        
         return subGraph;
     }
 
@@ -3005,8 +2932,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                    ArrayList<Integer> parentAPIdx,
                                    DENOPTIMGraph subGraph,
                                    DENOPTIMVertex childVertex, int childAPIdx,
-                                   BondType bndType, boolean onAllSymmAPs
-    ) throws DENOPTIMException
+                                   BondType bndType, boolean onAllSymmAPs) 
+                                           throws DENOPTIMException
     {
         // Collector for symmetries created by appending copies of subGraph
         Map<Integer,SymmetricSet> newSymSets = new HashMap<>();

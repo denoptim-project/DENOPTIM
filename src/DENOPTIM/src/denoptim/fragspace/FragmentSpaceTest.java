@@ -587,7 +587,8 @@ public class FragmentSpaceTest
      *   ↓    ↓
      * </pre>
      */
-    private TestCase getTestCase() throws DENOPTIMException {
+    private TestCase getTestCase() throws DENOPTIMException 
+    {
         DENOPTIMGraph g = new DENOPTIMGraph();
         DENOPTIMVertex c1 = getCarbonVertex(), c2 = getCarbonVertex(),
                 c3 = getCarbonVertex(), c4 = getCarbonVertex(),
@@ -638,38 +639,39 @@ public class FragmentSpaceTest
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMFragment getCarbonVertex() {
-        try {
-            IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
-            IAtom carbon = builder.newAtom();
-            carbon.setSymbol("C");
-            IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(carbon);
-            DENOPTIMFragment v = new DENOPTIMFragment(-1, mol,
-                    BBType.FRAGMENT);
-            for (int i = 0; i < 4; i++) {
-                v.addAP(0, APC1, getRandomVector(), 1);
-            }
-            FragmentSpace.getBondOrderMap().put(APC1.getRule(),
-                    DENOPTIMEdge.BondType.SINGLE);
-            return v;
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-            fail("Unexpected exception thrown.");
+    private DENOPTIMFragment getCarbonVertex() throws DENOPTIMException
+    {
+        IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
+        IAtom carbon = builder.newAtom();
+        carbon.setSymbol("C");
+        IAtomContainer mol = builder.newAtomContainer();
+        mol.addAtom(carbon);
+        DENOPTIMFragment v = new DENOPTIMFragment(
+                GraphUtils.getUniqueVertexIndex(), 
+                mol,
+                BBType.FRAGMENT);
+        for (int i = 0; i < 4; i++) {
+            v.addAP(0, APC1, getRandomVector(), 1);
         }
-        return null;
+        FragmentSpace.getBondOrderMap().put(APC1.getRule(),
+                DENOPTIMEdge.BondType.SINGLE);
+        return v;
     }
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMVertex getRCV() throws DENOPTIMException {
+    private DENOPTIMVertex getRCV() throws DENOPTIMException 
+    {
         IChemObjectBuilder builder = DefaultChemObjectBuilder
                 .getInstance();
         IAtomContainer dummyMol = builder.newAtomContainer();
         IAtom dummyAtom = builder.newAtom();
         dummyMol.addAtom(dummyAtom);
-        DENOPTIMFragment rcv = new DENOPTIMFragment(-1, dummyMol, BBType.FRAGMENT
-                , true);
+        DENOPTIMFragment rcv = new DENOPTIMFragment(
+                GraphUtils.getUniqueVertexIndex(),
+                dummyMol, 
+                BBType.FRAGMENT,
+                true);
         rcv.addAP(0, APC1, getRandomVector(), 1);
         return rcv;
     }

@@ -235,6 +235,7 @@ public class EAUtils
                 }
                 maleCandidate = pair[0].getGraphOwner().getCandidateOwner();
                 femaleCandidate = pair[1].getGraphOwner().getCandidateOwner();
+                
                 vertxOnMale = pair[0];
                 vertxOnFemale = pair[1];
             } else {
@@ -253,9 +254,19 @@ public class EAUtils
             }
             
             // Avoid redundant xover, i.e., xover that swaps the same subgraph
-            //TODO-GG
-            
-            foundPars = true;
+            try {
+                DENOPTIMGraph test1 = maleCandidate.getGraph().clone();
+                DENOPTIMGraph test2 = femaleCandidate.getGraph().clone();
+                DENOPTIMGraph subGraph1 = test1.extractSubgraph(vertxOnMale);
+                DENOPTIMGraph subGraph2 = test2.extractSubgraph(vertxOnFemale);
+                if (!subGraph1.isIsomorphicTo(subGraph2))
+                {
+                    foundPars = true;
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+                continue;
+            }
             break;
         }
         mnt.increaseBy(CounterID.XOVERPARENTSEARCH, numatt);
@@ -712,7 +723,7 @@ public class EAUtils
             return null;
         
         DENOPTIMGraph g1 = parentA.getGraph();
-        
+    
         ArrayList<Candidate> matesCompatibleWithFirst = 
                 population.getXoverPartners(parentA,eligibleParents);
         if (matesCompatibleWithFirst.size() == 0)

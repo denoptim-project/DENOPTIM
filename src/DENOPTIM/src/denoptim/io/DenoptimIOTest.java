@@ -43,6 +43,7 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.APClass;
 import denoptim.molecule.CandidateLW;
@@ -265,7 +266,8 @@ public class DenoptimIOTest {
 //------------------------------------------------------------------------------
 
 	private void buildVertexAndConnectToGraph(DENOPTIMVertex v, int apCount,
-											  DENOPTIMGraph graph) {
+											  DENOPTIMGraph graph) 
+											          throws DENOPTIMException {
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {

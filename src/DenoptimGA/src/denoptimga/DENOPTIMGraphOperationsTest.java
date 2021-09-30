@@ -3,6 +3,8 @@ package denoptimga;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.*;
+import denoptim.utils.GraphUtils;
+
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -41,7 +43,7 @@ public class DENOPTIMGraphOperationsTest {
     @BeforeAll
     static void setUpClass() {
         try {
-            DEFAULT_APCLASS = APClass.make("norule", 0);
+            DEFAULT_APCLASS = APClass.make("norule:0");
         } catch (DENOPTIMException e) {
             e.printStackTrace();
         }
@@ -50,50 +52,44 @@ public class DENOPTIMGraphOperationsTest {
 //------------------------------------------------------------------------------
 
     @Test
-    public void testExtractPattern_singleRingSystem() {
-        try {
-            DENOPTIMGraph g = getThreeCycle();
+    public void testExtractPattern_singleRingSystem() throws Throwable
+    {
+        DENOPTIMGraph g = getThreeCycle();
 
-            List<DENOPTIMGraph> subgraphs = DENOPTIMGraphOperations
-                    .extractPattern(g, GraphPattern.RING);
+        List<DENOPTIMGraph> subgraphs = DENOPTIMGraphOperations
+                .extractPattern(g, GraphPattern.RING);
 
-            assertEquals(1, subgraphs.size());
-            DENOPTIMGraph actual = subgraphs.get(0);
-            DENOPTIMGraph expected = g;
+        assertEquals(1, subgraphs.size());
+        DENOPTIMGraph actual = subgraphs.get(0);
+        DENOPTIMGraph expected = g;
 
-            assertEquals(expected.getVertexCount(), actual.getVertexCount());
-            assertEquals(expected.getEdgeCount(), actual.getEdgeCount());
-            assertEquals(1, actual.getRingCount());
+        assertEquals(expected.getVertexCount(), actual.getVertexCount());
+        assertEquals(expected.getEdgeCount(), actual.getEdgeCount());
+        assertEquals(1, actual.getRingCount());
 
-            assertTrue(DENOPTIMGraph.compareGraphNodes(getScaffold(expected),
-                    expected, getScaffold(actual), actual));
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail("Unexpected exception thrown.");
-        }
+        assertTrue(DENOPTIMGraph.compareGraphNodes(getScaffold(expected),
+                expected, getScaffold(actual), actual));
     }
 
 //------------------------------------------------------------------------------
 
     @Test
-    public void testExtractPattern_returnsEmptyListIfNoRings() {
-        try {
-            DENOPTIMGraph g = getThreeCycle();
-            g.removeRing(g.getRings().get(0));
-            List<DENOPTIMGraph> subgraphs =
-                    DENOPTIMGraphOperations.extractPattern(g, GraphPattern.RING);
+    public void testExtractPattern_returnsEmptyListIfNoRings() 
+            throws Throwable
+    {
+        DENOPTIMGraph g = getThreeCycle();
+        g.removeRing(g.getRings().get(0));
+        List<DENOPTIMGraph> subgraphs =
+                DENOPTIMGraphOperations.extractPattern(g, GraphPattern.RING);
 
-            assertEquals(0, subgraphs.size());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("Unexpected exception thrown.");
-        }
+        assertEquals(0, subgraphs.size());
     }
 
 //------------------------------------------------------------------------------
 
     @Test
-    public void testExtractPattern_fusedRings() {
+    public void testExtractPattern_fusedRings() throws Throwable 
+    {
         ExtractPatternCase testCase = getFusedRings();
 
         List<DENOPTIMGraph> subgraphs = DENOPTIMGraphOperations
@@ -125,7 +121,8 @@ public class DENOPTIMGraphOperationsTest {
      * .   |   .       |   .     ↓
      * . . 5 . .       9 . .
      */
-    private ExtractPatternCase getFusedRings() {
+    private ExtractPatternCase getFusedRings() throws Throwable
+    {
         BiFunction<String, Boolean, DENOPTIMVertex> vertexSupplier =
                 (s, isRCV) -> {
             int apCount = 0;
@@ -175,7 +172,15 @@ public class DENOPTIMGraphOperationsTest {
                 Arrays.asList(12)
         );
 
-        DENOPTIMGraph g = buildGraph(vertices, edges);
+        DENOPTIMGraph g = null;
+        try
+        {
+            g = buildGraph(vertices, edges);
+        } catch (DENOPTIMException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         g.renumberGraphVertices();
         DENOPTIMGraph.setScaffold(vertices.get(0));
         addRings(vertices, g);
@@ -186,7 +191,8 @@ public class DENOPTIMGraphOperationsTest {
 //------------------------------------------------------------------------------
 
     private DENOPTIMGraph buildGraph(List<DENOPTIMVertex> vertices,
-                                     List<List<Integer>> edges) {
+                                     List<List<Integer>> edges) 
+                                             throws DENOPTIMException {
         HashMap<String, BondType> bondMap = new HashMap<>();
         bondMap.put(String.valueOf(DEFAULT_APCLASS), BondType.SINGLE);
         FragmentSpace.setBondOrderMap(bondMap);
@@ -292,28 +298,33 @@ public class DENOPTIMGraphOperationsTest {
 //------------------------------------------------------------------------------
 
     private DENOPTIMVertex buildFragment(String elementSymbol, int apCount,
-                                         boolean isRCV) {
-        try {
+            boolean isRCV)
+    {
+        try
+        {
             IAtomContainer atomContainer = chemBuilder.newAtomContainer();
             IAtom oxygen = chemBuilder.newAtom();
             oxygen.setSymbol(elementSymbol);
             atomContainer.addAtom(oxygen);
-
-            DENOPTIMFragment v = new DENOPTIMFragment(-1, atomContainer,
+    
+            DENOPTIMFragment v = new DENOPTIMFragment(
+                    GraphUtils.getUniqueVertexIndex(), atomContainer,
                     BBType.FRAGMENT, isRCV);
-            for (int i = 0; i < apCount; i++) {
+            for (int i = 0; i < apCount; i++) 
+            {
                 v.addAP(0, DEFAULT_APCLASS, getRandomVector(), 1);
             }
             return v;
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
+        } catch (Throwable t)
+        {
+            return null;
         }
-        return null;
-    }
+   }
 
 //------------------------------------------------------------------------------
 
-    private Point3d getRandomVector() {
+    private Point3d getRandomVector() 
+    {
         double precision = 10*10*10*10;
         return new Point3d(
                 (double) (Math.round(rng.nextDouble() * precision)) / precision,
@@ -330,7 +341,8 @@ public class DENOPTIMGraphOperationsTest {
      *   /           \
      * RCV -(chord)- RCV
      */
-    private DENOPTIMGraph getThreeCycle() throws DENOPTIMException {
+    private DENOPTIMGraph getThreeCycle() throws DENOPTIMException 
+    {
         DENOPTIMVertex v1 = new EmptyVertex(0);
         v1.setLevel(-1);
         DENOPTIMVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
@@ -361,7 +373,8 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMVertex getScaffold(DENOPTIMGraph g) throws Throwable {
+    private DENOPTIMVertex getScaffold(DENOPTIMGraph g) throws Throwable 
+    {
         return g
                 .getVertexList()
                 .stream()
@@ -373,7 +386,8 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    private static final class ExtractPatternCase {
+    private static final class ExtractPatternCase 
+    {
         final DENOPTIMGraph g;
         final int expectedSize;
         final Set<DENOPTIMGraph> expectedGraphs;
@@ -391,9 +405,10 @@ public class DENOPTIMGraphOperationsTest {
             if (actuals.size() != expectedSize) {
                 return false;
             }
-
+                
             Set<DENOPTIMGraph> unmatchedGraphs = new HashSet<>(expectedGraphs);
-            for (DENOPTIMGraph g : actuals) {
+            for (DENOPTIMGraph g : actuals) 
+            {
                 boolean hasMatch = expectedGraphs
                         .stream()
                         .anyMatch(exp -> graphComparator.compare(g, exp) == 0);

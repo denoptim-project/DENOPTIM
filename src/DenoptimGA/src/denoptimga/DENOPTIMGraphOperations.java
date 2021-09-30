@@ -1413,7 +1413,7 @@ public class DENOPTIMGraphOperations
 
     /**
      * Performs crossover between two graphs on a given pair of vertexes. 
-     * This method does changes the given graphs, so 
+     * This method does changes the given graphs. 
      * @param male the first Graph
      * @param female the second Graph
      * @param mvert the root vertex of the branch of male to exchange
@@ -1436,13 +1436,26 @@ public class DENOPTIMGraphOperations
             System.err.println("Female XOVER vertex: " + fvert);
         }
         
+        // Prepare subgraphs that will be exchanged
+        DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
+        DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
+        int lvl_male = mvert.getLevel();
+        int lvl_female = fvert.getLevel();
+        subG_M.changeLevelToAll(lvl_female);
+        subG_F.changeLevelToAll(lvl_male);
+        if (debug)
+        {
+            System.out.println("DBUG: subGraph from male: "+subG_M);
+            System.out.println("DBUG: subGraph from female: "+subG_F);
+        }
+        
         DENOPTIMEdge eM = mvert.getEdgeToParent();
         DENOPTIMEdge eF = fvert.getEdgeToParent();
         int apidxMP = eM.getSrcAPID(); // ap index of the male parent
         int apidxMC = eM.getTrgAPID(); // ap index of the male
         int apidxFC = eF.getTrgAPID(); // ap index of the female
         int apidxFP = eF.getSrcAPID(); // ap index of the female parent
-        BondType bndOrder = eM.getBondType();
+        BondType bndType = eM.getBondType();
 
         // Identify all verteces symmetric to the ones chosen for xover
         // Xover is to be projected on each of these
@@ -1466,11 +1479,6 @@ public class DENOPTIMGraphOperations
         for (int i=0; i<symVrtIDs_M.size(); i++)
         {
             int svid = symVrtIDs_M.get(i);
-            if (svid == mvert.getVertexId())
-            {
-                // We keep only the branch of the vertex identified for crossover
-                continue;
-            }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = male.getEdgeWithParent(svid);
             DENOPTIMVertex spv = male.getParent(male.getVertexWithId(svid));
@@ -1478,17 +1486,15 @@ public class DENOPTIMGraphOperations
             symmParAPidxM.add(se.getSrcAPID());
             toRemoveFromM.add(svid);
         }
+        if (symVrtIDs_M.size() == 0)
+        {
+            symParVertM.add(male.getParent(mvert));        
+            symmParAPidxM.add(apidxMP);
+            toRemoveFromM.add(mvert.getVertexId());
+        }
         for (Integer svid : toRemoveFromM)
         {
             male.removeBranchStartingAt(male.getVertexWithId(svid));
-        }
-        // Include also the chosen vertex (and AP), but do NOT remove it
-        symParVertM.add(male.getParent(mvert));        
-        symmParAPidxM.add(apidxMP);
-        if (debug)
-        {
-            System.out.println("DEBUG: MALE After removal of symm:");
-            System.out.println("DEBUG: "+male);
         }
 
         // FEMALE Find all parent verteces and AP indeces where the incoming
@@ -1499,11 +1505,6 @@ public class DENOPTIMGraphOperations
         for (int i=0; i<symVrtIDs_F.size(); i++)
         {
             int svid = symVrtIDs_F.get(i);
-            if (svid == fvert.getVertexId())
-            {
-                // We keep only the branch of the vertex identified for crossover
-                continue;
-            }
             // Store information on where the symmetric vertex is attached
             DENOPTIMEdge se = female.getEdgeWithParent(svid);
             DENOPTIMVertex spv = female.getParent(female.getVertexWithId(svid));
@@ -1511,23 +1512,17 @@ public class DENOPTIMGraphOperations
             symmParAPidxF.add(se.getSrcAPID());
             toRemoveFromF.add(svid);
         }
+        if (symVrtIDs_F.size() == 0)
+        {
+            symParVertF.add(female.getParent(fvert));        
+            symmParAPidxF.add(apidxFP);
+            toRemoveFromF.add(fvert.getVertexId());
+        }
         for (Integer svid : toRemoveFromF)
         {
             female.removeBranchStartingAt(female.getVertexWithId(svid));
         }
-        // Include also the chosen vertex (and AP), but do NOT remove it
-        symParVertF.add(female.getParent(fvert));        
-        symmParAPidxF.add(apidxFP);
-        if (debug)
-        {
-            System.out.println("DEBUG: FEMALE After removal of symm:");
-            System.out.println("DEBUG: "+female);
-        }
-
-        // record levels: we'll need to set them in the incoming subgraphs
-        int lvl_male = mvert.getLevel();
-        int lvl_female = fvert.getLevel();
-
+        
         // extract subgraphs (i.e., branches of graphs that will be exchanged)
         if (debug)
         {
@@ -1543,29 +1538,15 @@ public class DENOPTIMGraphOperations
                 System.out.println("     v:"  + symParVertF.get(i) + 
                                                    " ap:"+symmParAPidxF.get(i));
             }
-            System.out.println("DBUG: MALE before extraction: "+male);
-            System.out.println("DBUG: FEMALE before extraction: "+female);
+            System.out.println("DBUG: MALE after pruning: "+male);
+            System.out.println("DBUG: FEMALE after pruning: "+female);
         }
-        
-        DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
-        DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
-        if (debug)
-        {
-            System.out.println("DBUG: subGraph from male: "+subG_M);
-            System.out.println("DBUG: MALE after extraction: "+male);
-            System.out.println("DBUG: subGraph from female: "+subG_F);
-            System.out.println("DBUG: FEMALE after extraction: "+female);
-        }
-
-        // set the level of each branch according to the destination graph
-        subG_M.changeLevelToAll(lvl_female);
-        subG_F.changeLevelToAll(lvl_male);
 
         // attach the subgraph from M/F onto F/M in all symmetry related APs
         male.appendGraphOnGraph(symParVertM, symmParAPidxM, subG_F,
-                subG_F.getVertexAtPosition(0), apidxFC, bndOrder, true);
+                subG_F.getVertexAtPosition(0), apidxFC, bndType, true);
         female.appendGraphOnGraph(symParVertF, symmParAPidxF, subG_M,
-                subG_M.getVertexAtPosition(0), apidxMC, bndOrder, true);
+                subG_M.getVertexAtPosition(0), apidxMC, bndType, true);
 
         return true;
     }

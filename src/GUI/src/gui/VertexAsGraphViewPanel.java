@@ -34,6 +34,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
@@ -203,7 +204,13 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
         {
             //We plot the empty vertex as a single-node graph
             DENOPTIMGraph dnGraph = new DENOPTIMGraph();
-            dnGraph.addVertex(vertex.clone()); //Clone avoids setting owner of ev
+            try
+            {
+                dnGraph.addVertex(vertex.clone()); //Clone avoids setting owner
+            } catch (DENOPTIMException e)
+            {
+                //This will never happen because this is a one-vertex graph
+            } 
             graphViewer.cleanup();
             graphViewer.loadGraphToViewer(dnGraph);
         } else {

@@ -31,6 +31,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
+import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -215,7 +216,9 @@ public class DENOPTIMTemplateTest
         atomContainer.addBond(0, 2, IBond.Order.SINGLE);
         atomContainer.addBond(0, 3, IBond.Order.SINGLE);
 
-        DENOPTIMFragment v = new DENOPTIMFragment(3, atomContainer,
+        DENOPTIMFragment v = new DENOPTIMFragment(
+                GraphUtils.getUniqueVertexIndex(), 
+                atomContainer,
                 BBType.FRAGMENT);
 
         APClass apClass = APClass.make("c", 0);
@@ -244,7 +247,8 @@ public class DENOPTIMTemplateTest
      * @return 3D building block CH2 with two APs both on C.
      * @throws DENOPTIMException
      */
-    private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException {
+    private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException 
+    {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
         Point3d[] atmCoords = new Point3d[]{
@@ -261,7 +265,9 @@ public class DENOPTIMTemplateTest
         atomContainer.addBond(0, 1, IBond.Order.SINGLE);
         atomContainer.addBond(0, 2, IBond.Order.SINGLE);
 
-        DENOPTIMFragment v = new DENOPTIMFragment(2, atomContainer,
+        DENOPTIMFragment v = new DENOPTIMFragment(
+                GraphUtils.getUniqueVertexIndex(),
+                atomContainer,
                 BBType.FRAGMENT);
         
         Point3d[] apCoords = new Point3d[]{
@@ -288,7 +294,8 @@ public class DENOPTIMTemplateTest
      * @return 3D building block C(=O)N with three APs: one on C and two on N.
      * @throws DENOPTIMException
      */
-    private DENOPTIMVertex getAmideFragment() throws DENOPTIMException {
+    private DENOPTIMVertex getAmideFragment() throws DENOPTIMException 
+    {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "O", "N"};
         Point3d[] atmCoords = new Point3d[]{
@@ -305,7 +312,9 @@ public class DENOPTIMTemplateTest
         atomContainer.addBond(0, 1, IBond.Order.DOUBLE);
         atomContainer.addBond(0, 2, IBond.Order.SINGLE);
 
-        DENOPTIMFragment v = new DENOPTIMFragment(2, atomContainer,
+        DENOPTIMFragment v = new DENOPTIMFragment(
+                GraphUtils.getUniqueVertexIndex(), 
+                atomContainer,
                 BBType.FRAGMENT);
         
         Point3d[] apCoords = new Point3d[]{
@@ -345,7 +354,9 @@ public class DENOPTIMTemplateTest
 
         atomContainer.addBond(0, 1, IBond.Order.SINGLE);
 
-        DENOPTIMFragment v = new DENOPTIMFragment(1, atomContainer,
+        DENOPTIMFragment v = new DENOPTIMFragment(
+                GraphUtils.getUniqueVertexIndex(), 
+                atomContainer,
                 BBType.FRAGMENT);
         double precision = 10*10*10*10;
         APClass apClass = APClass.make("o", 0);
@@ -366,7 +377,9 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() {
+    public void testGetAttachmentPoints_returnsAPsWithTemplateAsOwner() 
+            throws DENOPTIMException
+    {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
         template.addAP(0, 1, 1);
@@ -461,7 +474,8 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    private void testSameAPClass(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
+    private void testSameAPClass(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) 
+    {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
         try {
             ap.setAPClass(
@@ -476,7 +490,8 @@ public class DENOPTIMTemplateTest
 
 //------------------------------------------------------------------------------
 
-    private void testSameDirVec(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) {
+    private void testSameDirVec(DENOPTIMTemplate t, DENOPTIMGraph innerGraph) 
+    {
         DENOPTIMAttachmentPoint ap = innerGraph.getVertexAtPosition(0).getAP(1);
         double[] correctDirVec = ap.getDirectionVector();
         correctDirVec[1] = -correctDirVec[1];
@@ -487,7 +502,8 @@ public class DENOPTIMTemplateTest
 //------------------------------------------------------------------------------
 
     private void testAtLeastSameNumberOfAPs(DENOPTIMTemplate t,
-                                            int expNumberOfAPs) {
+            int expNumberOfAPs) throws DENOPTIMException
+    {
         DENOPTIMVertex v = new EmptyVertex();
         for (int i = 0; i < expNumberOfAPs - 1; i++) {
             v.addAP();

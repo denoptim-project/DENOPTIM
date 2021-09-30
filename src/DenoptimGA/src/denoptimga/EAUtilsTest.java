@@ -23,6 +23,42 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EAUtilsTest
 {
+  //------------------------------------------------------------------------------
+
+    @Test
+    public void testAvoidRedundantXOver() throws Exception
+    {   
+        DENOPTIMGraph g1 = new DENOPTIMGraph();
+        EmptyVertex s = new EmptyVertex();
+        s.addAP();
+        s.addAP();
+        s.setBuildingBlockType(BBType.SCAFFOLD);
+        
+        EmptyVertex v = new EmptyVertex();
+        v.addAP();
+        v.setBuildingBlockType(BBType.FRAGMENT);
+        
+        g1.addVertex(s);
+        g1.appendVertexOnAP(s.getAP(0), v.getAP(0));
+        
+        Candidate c1 = new Candidate(g1); 
+        
+        DENOPTIMGraph g2 = g1.clone();
+        Candidate c2 = new Candidate(g2);
+        
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(c1);
+        eligibleParents.add(c2);
+        Population population = new Population();
+        population.add(c1);
+        population.add(c2);
+        Monitor mnt = new Monitor();
+        
+        Candidate offspring = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt);
+        
+        assertTrue(offspring==null, "Redudnat xover is not done");
+    }
     
 //------------------------------------------------------------------------------
 

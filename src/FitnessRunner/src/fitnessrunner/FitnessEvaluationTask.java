@@ -23,6 +23,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
@@ -46,7 +47,7 @@ public class FitnessEvaluationTask extends FitnessTask
     public FitnessEvaluationTask(DENOPTIMGraph molGraph, IAtomContainer iac, 
             String workDir, String outFileName)
     {
-    	super(molGraph);
+    	super(new Candidate(molGraph));
         this.workDir = workDir;
         fitProvMol = iac;
         fitProvOutFile = outFileName;

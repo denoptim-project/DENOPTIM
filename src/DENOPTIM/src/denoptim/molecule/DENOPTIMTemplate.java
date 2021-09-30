@@ -139,9 +139,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
     /**
      * Method meant for devel phase only.
+     * @throws DENOPTIMException 
      */
     
     public static DENOPTIMTemplate getTestTemplate(ContractLevel contractLevel) 
+            throws DENOPTIMException 
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(
                 DENOPTIMVertex.BBType.UNDEFINED);
@@ -710,8 +712,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * template using available fragments from the fragment space.
      * @param type Mutation type
      * @return True if a change occurred.
+     * @throws DENOPTIMException 
      */
-    public boolean mutate(MutationType type) {
+    
+    //TODO-V3: this is used only in test class. It should not be needed.
+    
+    public boolean mutate(MutationType type) throws DENOPTIMException 
+    {
         mol = null;
         
         /*

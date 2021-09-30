@@ -151,6 +151,7 @@ public class PathSubGraph
         List<DENOPTIMEdge> vAToSeedEdges = new ArrayList<DENOPTIMEdge>();
         vAToSeed.add(vA);
         DENOPTIMVertex currVert = vA;
+        //TODO: can we avoid the use of level?
         for (int i=-1; i<vA.getLevel(); i++)
         {
             DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();

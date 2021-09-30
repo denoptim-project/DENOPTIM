@@ -44,6 +44,7 @@ import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.utils.GraphUtils;
 
 import static denoptimga.DENOPTIMGraphOperations.extractPattern;
 
@@ -507,6 +508,8 @@ public class FragmentSpace
                 throw new DENOPTIMException(msg);
         }
         DENOPTIMVertex clone = originalVrtx.clone();
+        
+        clone.setVertexId(GraphUtils.getUniqueVertexIndex());
 
         clone.setBuildingBlockId(bbIdx);
         if (originalVrtx.getBuildingBlockId() != bbIdx)

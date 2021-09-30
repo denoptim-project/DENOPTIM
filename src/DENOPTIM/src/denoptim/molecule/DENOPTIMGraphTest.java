@@ -117,11 +117,19 @@ public class DENOPTIMGraphTest {
         FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
         
-        DENOPTIMVertex s = new EmptyVertex();
-        s.setBuildingBlockType(BBType.SCAFFOLD);
-        s.addAP(0, 1, 1, APCA);
-        s.addAP(0, 1, 1, APCA);
-        FragmentSpace.appendVertexToLibrary(s, BBType.SCAFFOLD,
+        DENOPTIMVertex s0 = new EmptyVertex();
+        s0.setBuildingBlockType(BBType.SCAFFOLD);
+        s0.addAP(0, 1, 1, APCA);
+        s0.addAP(0, 1, 1, APCA);
+        FragmentSpace.appendVertexToLibrary(s0, BBType.SCAFFOLD,
+                FragmentSpace.getScaffoldLibrary());
+        
+        DENOPTIMVertex s1 = new EmptyVertex();
+        s1.setBuildingBlockType(BBType.SCAFFOLD);
+        s1.addAP(0, 1, 1, APCA);
+        s1.addAP(0, 1, 1, APCA);
+        s1.addAP(0, 1, 1, APCD);
+        FragmentSpace.appendVertexToLibrary(s1, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
         DENOPTIMVertex v0 = new EmptyVertex();
@@ -170,6 +178,20 @@ public class DENOPTIMGraphTest {
         v5.addAP(0, 1, 1, APCB);
         v5.addAP(0, 1, 1, APCD);
         FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v6 = new EmptyVertex();
+        v6.setBuildingBlockType(BBType.FRAGMENT);
+        v6.addAP(0, 1, 1, APCC);
+        v6.addAP(0, 1, 1, APCD);
+        FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v7 = new EmptyVertex();
+        v7.setBuildingBlockType(BBType.FRAGMENT);
+        v7.setAsRCV(true);
+        v7.addAP(0, 1, 1, APCB);
+        FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
     }
@@ -338,6 +360,244 @@ public class DENOPTIMGraphTest {
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v6-(D)--(D)-v7
+     *        /                    |
+     *       /                   chord
+     *      |                      |
+     *      | (B)-(C)-v6-(D)--(D)-v7
+     *      |/
+     *  (A)-v1-(B)-(C)-v6-(D)--(D)-v7
+     *       |                     |
+     *      (A)                    |
+     *       |                   chord
+     *      (A)                    |
+     *    scaffold(D)----------(D)-v7
+     *      (A)
+     *       |
+     *      0(A)
+     *       |
+     *      v1
+     *       |
+     *      2(A)
+     *       |
+     *      0(A)
+     *       |
+     * 2(A)-v1-1(B)-(B)-v2
+     *      |\
+     *      | 3(B)-(B)-v2
+     *      \
+     *       4(C)-(C)-v3
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphD() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.SCAFFOLD);
+        s.setLevel(-1);
+        graph.addVertex(s);
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        v1a.setLevel(0);
+        graph.addVertex(v1a);
+        DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        v6a.setLevel(1);
+        graph.addVertex(v6a);
+        DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        v6a_bis.setLevel(1);
+        graph.addVertex(v6a_bis);
+        DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        v6a_tris.setLevel(1);
+        graph.addVertex(v6a_tris);
+        DENOPTIMVertex v7a = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a.setLevel(2);
+        graph.addVertex(v7a);
+        DENOPTIMVertex v7a_bis = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a_bis.setLevel(2);
+        graph.addVertex(v7a_bis);
+        DENOPTIMVertex v7a_tris = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a_tris.setLevel(2);
+        graph.addVertex(v7a_tris);
+        
+        DENOPTIMVertex v7a_quat = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a_quat.setLevel(0);
+        graph.addVertex(v7a_quat);
+        
+        DENOPTIMVertex v1c = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        v1c.setLevel(0);
+        graph.addVertex(v1c);
+        
+        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        v1b.setLevel(1);
+        graph.addVertex(v1b);
+        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        v2b.setLevel(2);
+        graph.addVertex(v2b);
+        DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        v2b_bis.setLevel(2);
+        graph.addVertex(v2b_bis);
+        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        v3b.setLevel(2);
+        graph.addVertex(v3b);
+        graph.addEdge(new DENOPTIMEdge(s.getAP(0), v1a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v6a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(3), v6a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(4), v6a_tris.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a.getAP(1), v7a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a_bis.getAP(1), v7a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a_tris.getAP(1), v7a_tris.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(s.getAP(2), v7a_quat.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(s.getAP(1), v1c.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1c.getAP(2), v1b.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(3), v2b_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(4), v3b.getAP(0)));
+        
+        graph.addRing(v7a, v7a_quat);
+        graph.addRing(v7a_bis, v7a_tris);
+        
+        ArrayList<Integer> symA = new ArrayList<Integer>();
+        symA.add(v1a.getVertexId());
+        symA.add(v1c.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        
+        ArrayList<Integer> symB = new ArrayList<Integer>();
+        symB.add(v2b.getVertexId());
+        symB.add(v2b_bis.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v6-(D)--(D)-v7
+     *        /                    |
+     *       /                   chord
+     *      |                      |
+     *      | (B)-(C)-v6-(D)--(D)-v7
+     *      |/
+     *  (A)-v1-(B)-(C)-v6-(D)--(D)-v7
+ 
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphDSub1() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        v1a.setLevel(-1);
+        graph.addVertex(v1a);
+        DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        v6a.setLevel(0);
+        graph.addVertex(v6a);
+        DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        v6a_bis.setLevel(0);
+        graph.addVertex(v6a_bis);
+        DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        v6a_tris.setLevel(0);
+        graph.addVertex(v6a_tris);
+        DENOPTIMVertex v7a = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a.setLevel(1);
+        graph.addVertex(v7a);
+        DENOPTIMVertex v7a_bis = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a_bis.setLevel(1);
+        graph.addVertex(v7a_bis);
+        DENOPTIMVertex v7a_tris = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        v7a_tris.setLevel(1);
+        graph.addVertex(v7a_tris);
+        
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v6a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(3), v6a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(4), v6a_tris.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a.getAP(1), v7a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a_bis.getAP(1), v7a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a_tris.getAP(1), v7a_tris.getAP(0)));
+        
+        graph.addRing(v7a_bis, v7a_tris);
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+
+     * 2(A)-v1-1(B)-(B)-v2
+     *      |\
+     *      | 3(B)-(B)-v2
+     *      \
+     *       4(C)-(C)-v3
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphDSub2() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        v1b.setLevel(1);
+        graph.addVertex(v1b);
+        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        v2b.setLevel(2);
+        graph.addVertex(v2b);
+        DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        v2b_bis.setLevel(2);
+        graph.addVertex(v2b_bis);
+        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        v3b.setLevel(2);
+        graph.addVertex(v3b);
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(3), v2b_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(4), v3b.getAP(0)));
+        
+        ArrayList<Integer> symB = new ArrayList<Integer>();
+        symB.add(v2b.getVertexId());
+        symB.add(v2b_bis.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
       
     @Test
     public void testChangeLevels() throws Exception
@@ -435,7 +695,6 @@ public class DENOPTIMGraphTest {
         assertEquals(4,numEdgesWith2,"Number of new edges with v2a/b.");
         assertEquals(2,numEdgesWith3,"Number of new edges with v3a/b.");
         
-
         DENOPTIMGraph g2 = makeTestGraphB();
         
         DENOPTIMVertex v2 = g2.getVertexAtPosition(2);
@@ -578,7 +837,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_Equal() {
+	public void testSameAs_Equal() throws DENOPTIMException
+	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graphA);
@@ -618,7 +878,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_DiffVertex() {
+	public void testSameAs_DiffVertex() throws DENOPTIMException
+	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graphA);
@@ -806,7 +1067,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_SameRings() {
+	public void testSameAs_SameRings() throws DENOPTIMException
+	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
@@ -889,7 +1151,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_DisorderRings() {
+	public void testSameAs_DisorderRings() throws Exception 
+	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
@@ -972,7 +1235,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testSameAs_DiffRings() {
+	public void testSameAs_DiffRings() throws DENOPTIMException
+	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
 		DENOPTIMVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
@@ -1053,7 +1317,9 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testGetAvailableAPs_returnsListOfAvailableAPs() {
+	public void testGetAvailableAPs_returnsListOfAvailableAPs() 
+	        throws DENOPTIMException 
+	{
 		DENOPTIMVertex vertex0 = new EmptyVertex(0);
 		DENOPTIMVertex vertex1 = new EmptyVertex(1);
 
@@ -1163,7 +1429,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testGetMutationSites() {
+	public void testGetMutationSites() throws DENOPTIMException 
+	{
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 		DENOPTIMTemplate tmpl = DENOPTIMTemplate.getTestTemplate(
 		        ContractLevel.FIXED);
@@ -1179,6 +1446,46 @@ public class DENOPTIMGraphTest {
 		assertEquals(2, graph.getMutableSites().size(),
 				"Size of mutation size list in case of free template");
 	}
+	
+//------------------------------------------------------------------------------
+    
+    /**
+     * Build a graph meant to be used in unit tests. The returned graph has
+     * only the scaffold.
+     * @return a new instance of the test graph.
+     */
+    private static DENOPTIMGraph makeTestGraph0() throws Exception
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(0,
+                BBType.SCAFFOLD);
+        graph.addVertex(s);
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Build a graph meant to be used in unit tests. The returned graph has
+     * only the scaffold and one vertex, plus the edge
+     * @return a new instance of the test graph.
+     */
+    private static DENOPTIMGraph makeTestGraph1() throws Exception
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.SCAFFOLD);
+        s.setLevel(-1);
+        graph.addVertex(s);
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        v1a.setLevel(0);
+        graph.addVertex(v1a);
+
+        graph.addEdge(new DENOPTIMEdge(s.getAP(0), v1a.getAP(0)));
+        
+        return graph;
+    }
 	
 //------------------------------------------------------------------------------
 	
@@ -1314,7 +1621,6 @@ public class DENOPTIMGraphTest {
 		assertTrue(null == v4.getGraphOwner(),
 				"Owner of removed capping group is null");
 
-
 		DENOPTIMGraph graph2 = new DENOPTIMGraph();
 
 		IAtomContainer iac12 = builder.newAtomContainer();
@@ -1369,7 +1675,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	private void buildVertexAndConnectToGraph(DENOPTIMVertex v, int apCount,
-											  DENOPTIMGraph graph) {
+	        DENOPTIMGraph graph) throws DENOPTIMException 
+	{
 		final int ATOM_CONNS = 1;
 		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
@@ -1381,7 +1688,8 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testFromToJSON() throws Exception {
+	public void testFromToJSON() throws Exception 
+	{
 	    DENOPTIMGraph graph = new DENOPTIMGraph();
 	    
 	    //TODO-V3 del: cannot do this without defining a fragment space
@@ -1489,4 +1797,88 @@ public class DENOPTIMGraphTest {
         
         assertTrue(json1.equals(json2), "Round-trip via JSON is successful");
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testGraphIsomorphism() throws Exception 
+    {
+        prepareFragmentSpace();
+        
+        DENOPTIMGraph gAempty = new DENOPTIMGraph();
+        DENOPTIMGraph gBempty = new DENOPTIMGraph();
+
+        assertTrue(gAempty.isIsomorphicTo(gAempty),
+                "self isomorphism on empty graph");
+        assertTrue(gAempty.isIsomorphicTo(gBempty),
+                "isomorphism on empty graphs");
+        
+        DENOPTIMGraph g01 = makeTestGraph0();
+        DENOPTIMGraph g02 = makeTestGraph0();
+        assertTrue(g01.isIsomorphicTo(g02),
+                "single-vertex graph");
+        assertTrue(g01.isIsomorphicTo(g01.clone()),
+                "single-vertex graph vs clone");
+        
+        DENOPTIMGraph g11 = makeTestGraph1();
+        DENOPTIMGraph g12 = makeTestGraph1();
+        assertTrue(g11.isIsomorphicTo(g12),"two-vertex graph");
+        assertTrue(g11.isIsomorphicTo(g11.clone()),"two-vertex graph vs clone");
+        
+        DENOPTIMGraph gD1 = makeTestGraphD();
+        DENOPTIMGraph gD2 = makeTestGraphD();
+        assertTrue(gD1.isIsomorphicTo(gD2),"two of same graph D");
+        assertFalse(gD1.isIsomorphicTo(gAempty),"graph D vs empty graph");
+        assertFalse(gAempty.isIsomorphicTo(gD1),"empty graph vs graph D");
+        
+        DENOPTIMGraph gB1 = makeTestGraphB();
+        assertFalse(gD1.isIsomorphicTo(gB1),"graph D vs graph B");
+        
+        DENOPTIMGraph gB2 = gB1.clone();
+        assertTrue(gB1.isIsomorphicTo(gB2),"graph B vs its clone");
+    }
+	
+//-----------------------------------------------------------------------------
+	
+	@Test
+    public void testExtractSubgraph() throws Exception 
+	{
+        prepareFragmentSpace();
+        DENOPTIMGraph graph = makeTestGraphD();
+        DENOPTIMGraph graphOriginal = makeTestGraphD();
+        
+        // This takes all graph
+        DENOPTIMGraph subGraph = graph.extractSubgraph(
+                graph.getVertexAtPosition(0));
+        assertTrue(subGraph.isIsomorphicTo(graph), "complete subgraph");
+        assertTrue(graph.isIsomorphicTo(graphOriginal), 
+                "Original stays the same");
+        
+        // This takes a subgraph with a ring
+        DENOPTIMGraph subGraph1 = graph.extractSubgraph(
+                graph.getVertexAtPosition(1));
+        DENOPTIMGraph expected1 = makeTestGraphDSub1();
+        
+        assertTrue(subGraph1.isIsomorphicTo(expected1), "Subgraph1");
+        assertEquals(0,subGraph1.getSymmetricSetCount(),
+                "SymmetricSets in subGraph1");
+        assertEquals(1,subGraph1.getRingCount(),"Rings in subGraph1");
+        assertTrue(graph.isIsomorphicTo(graphOriginal), 
+                "Original stays the same");
+       
+        // This takes a subgraph with symmetric set, but no rings
+        DENOPTIMGraph subGraph2 = graph.extractSubgraph(
+                graph.getVertexAtPosition(10));
+        DENOPTIMGraph expected2 = makeTestGraphDSub2();
+        
+        assertTrue(subGraph2.isIsomorphicTo(expected2), "Subgraph2");
+        assertEquals(1,subGraph2.getSymmetricSetCount(),
+                "SymmetricSets in subGraph2");
+        assertEquals(0,subGraph2.getRingCount(),"Rings in subGraph2");
+        assertTrue(graph.isIsomorphicTo(graphOriginal), 
+                "Original stays the same");
+	}
+	
+//-----------------------------------------------------------------------------
+	
 }

@@ -287,7 +287,23 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 					                UIManager.getIcon("OptionPane.errorIcon"));
 							return;
 						}
-						startGraphFromFragSpace();
+						try
+                        {
+                            startGraphFromFragSpace();
+                        } catch (DENOPTIMException e1)
+                        {
+                            e1.printStackTrace();
+                            JOptionPane.showMessageDialog(null,
+                                    "<html>Could not create graph!<br>"
+                                    + "Exception thrown when starting the "
+                                    + "construction<br>"
+                                    + "of a new graph. Please, report this to "
+                                    + "the authors.</html>",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE,
+                                    UIManager.getIcon("OptionPane.errorIcon"));
+                            return;
+                        }
 						break;
 					
 					case 1:
@@ -838,8 +854,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 
 	/**
 	 * Start the construction of a new graph from scratch
+	 * @throws DENOPTIMException 
 	 */
-	private void startGraphFromFragSpace()
+	private void startGraphFromFragSpace() throws DENOPTIMException
 	{
 	    BBType rootType = BBType.SCAFFOLD;
 	    String[] options = new String[]{"Scaffold", "Fragment", "Cancel"};

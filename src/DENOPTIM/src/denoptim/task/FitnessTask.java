@@ -41,8 +41,6 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.DENOPTIMgson;
-import denoptim.utils.GraphConversionTool;
 import denoptim.utils.TaskUtils;
 
 /**
@@ -69,7 +67,7 @@ public abstract class FitnessTask extends Task
     /**
      * The data structure holding the results of this task
      */
-    protected Candidate result = new Candidate();
+    protected Candidate result;
     
     /**
      * The file where we store the input to the fitness provider.
@@ -104,11 +102,11 @@ public abstract class FitnessTask extends Task
 
 //------------------------------------------------------------------------------
     
-    public FitnessTask(DENOPTIMGraph molGraph)
+    public FitnessTask(Candidate c)
     {
     	super(TaskUtils.getUniqueTaskIndex());
-        this.dGraph = molGraph;
-        result.setGraph(molGraph);
+    	this.result = c;
+        this.dGraph = c.getGraph();
     }
 
 //------------------------------------------------------------------------------

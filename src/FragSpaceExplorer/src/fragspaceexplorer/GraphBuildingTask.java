@@ -33,6 +33,7 @@ import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
+import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
@@ -103,7 +104,7 @@ public class GraphBuildingTask extends FitnessTask
     		FragsCombination fragsToAdd, int level, String workDir, 
     		int verbosity) throws DENOPTIMException
     {
-        super(molGraph.clone());
+        super(new Candidate(molGraph.clone()));
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();

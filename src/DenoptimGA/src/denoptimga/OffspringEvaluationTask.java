@@ -56,7 +56,7 @@ public class OffspringEvaluationTask extends FitnessTask
     public OffspringEvaluationTask(Candidate offspring, String workDir,
             Population popln, Monitor mnt, String fileUID)
     {
-        super(offspring.getGraph());
+        super(offspring);
         this.molName = offspring.getName();
         this.workDir = workDir;
         this.fitProvMol = offspring.getChemicalRepresentation();

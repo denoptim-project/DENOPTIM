@@ -168,7 +168,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     public DENOPTIMVertex()
     {
-        vertexId = -1;
+        vertexId = GraphUtils.getUniqueVertexIndex();
         isRCV = false;
     }
     
@@ -176,6 +176,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     /**
      * Constructor for an identified vertex without attachment points.
+     * @param id the VertedID of the vertex to construct. Note that this ID 
+     * should be unique within a graph. To generate unique IDs either use 
+     * {@link GraphUtils#getUniqueVertexIndex()} or use constructor
+     * {@link DENOPTIMVertex()}.
      */
     public DENOPTIMVertex(int id)
     {
@@ -187,6 +191,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     /**
      * Constructor for an identified vertex with attachment points.
+     * @param id the VertedID of the vertex to construct. Note that this ID 
+     * should be unique within a graph. To generate unique IDs use 
+     * {@link GraphUtils#getUniqueVertexIndex()}.
      */
     public DENOPTIMVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs)
     {
@@ -199,6 +206,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     /**
      * Constructor for an identified vertex.
+     * @param id the VertedID of the vertex to construct. Note that this ID 
+     * should be unique within a graph. To generate unique IDs use 
+     * {@link GraphUtils#getUniqueVertexIndex()}.
      */
     public DENOPTIMVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs,
             ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)

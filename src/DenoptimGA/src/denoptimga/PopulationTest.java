@@ -185,7 +185,7 @@ public class PopulationTest
      *  -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
      *  
      */
-    private DENOPTIMGraph makeGraphA()
+    private DENOPTIMGraph makeGraphA() throws DENOPTIMException
     {
         DENOPTIMGraph graphA = new DENOPTIMGraph();
         DENOPTIMVertex v0 = new EmptyVertex(0);
@@ -229,9 +229,8 @@ public class PopulationTest
 
     /**
      *  v0(A)-(A)v1(A)-(A)v2
-     *  
      */
-    private DENOPTIMGraph makeGraphB()
+    private DENOPTIMGraph makeGraphB() throws DENOPTIMException
     {
         DENOPTIMGraph graphB = new DENOPTIMGraph();
         DENOPTIMVertex v0 = new EmptyVertex(0);
@@ -258,9 +257,8 @@ public class PopulationTest
 
     /**
      *  -(C)v0(C)-(C)v1(A)-(A)v2
-     *  
      */
-    private DENOPTIMGraph makeGraphC()
+    private DENOPTIMGraph makeGraphC() throws DENOPTIMException
     {
         DENOPTIMGraph graphC = new DENOPTIMGraph();
         DENOPTIMVertex v0 = new EmptyVertex(0);
@@ -288,9 +286,8 @@ public class PopulationTest
 
     /**
      *  v0(D)-(D)v1
-     *  
      */
-    private DENOPTIMGraph makeGraphD()
+    private DENOPTIMGraph makeGraphD() throws DENOPTIMException
     {
         DENOPTIMGraph graphD = new DENOPTIMGraph();
         DENOPTIMVertex v0 = new EmptyVertex(0);
