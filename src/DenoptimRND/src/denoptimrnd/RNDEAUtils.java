@@ -21,9 +21,11 @@ package denoptimrnd;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -56,7 +58,14 @@ import denoptim.utils.ObjectPair;
 
 class RNDEAUtils
 {
-    protected static DecimalFormat df = new DecimalFormat();
+    private static Locale enUsLocale = new Locale("en", "US");
+    private static DecimalFormat df = initialiseFormatter();
+    private static DecimalFormat initialiseFormatter() {
+    	DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(
+    			enUsLocale);
+    	df.setGroupingUsed(false);
+    	return df;
+    }
     
 //------------------------------------------------------------------------------
 

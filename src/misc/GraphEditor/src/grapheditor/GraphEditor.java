@@ -115,9 +115,12 @@ public class GraphEditor
                         {
                             IAtomContainer oldMol = 
                                                  GraphEdParameters.getInpMol(i);
-                            String name = oldMol.getProperty(
+                            if (oldMol.getProperty("cdk:Title") != null)
+                            {
+                            	String name = oldMol.getProperty(
                                                         "cdk:Title").toString();
-                            newMol.setProperty("cdk:Title",name);
+                            	newMol.setProperty("cdk:Title",name);
+                            }
                         }
                         DenoptimIO.writeMolecule(GraphEdParameters.getOutFile(),
                                                                    newMol,true);

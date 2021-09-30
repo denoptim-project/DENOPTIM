@@ -21,7 +21,12 @@ package denoptim.fragspace;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -1055,7 +1060,8 @@ public class FragmentSpace
     public static ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithClass(
             APClass aPC1)
     {
-        ArrayList<IdFragmentAndAP> compatFragAps = new ArrayList<IdFragmentAndAP>();
+        ArrayList<IdFragmentAndAP> compatFragAps = 
+                new ArrayList<IdFragmentAndAP>();
 
         // Take the compatible AP classes
         ArrayList<APClass> compatApClasses = FragmentSpace
@@ -1066,8 +1072,8 @@ public class FragmentSpace
         {
             for (APClass compClass : compatApClasses)
             {
-                compatFragAps
-                        .addAll(FragmentSpace.getFragsWithAPClass(compClass));
+                compatFragAps.addAll(FragmentSpace.getFragsWithAPClass(
+                        compClass));
             }
         }
 
@@ -1089,7 +1095,7 @@ public class FragmentSpace
 
     public static boolean imposeSymmetryOnAPsOfClass(APClass apClass)
     {
-        boolean res = true;
+    	boolean res = true;
         if (hasSymmetryConstrain(apClass))
         {
             if (getSymmetryConstrain(apClass) < (1.0
@@ -1308,8 +1314,8 @@ public class FragmentSpace
      * @param library where to import the vertices to.
      */
     
-    public static void appendVerticesToLibrary(ArrayList<DENOPTIMVertex> list,
-                                               DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
+    public static void appendVerticesToLibrary(ArrayList<DENOPTIMVertex> list, 
+            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
     {
         for (DENOPTIMVertex v : list)
         {

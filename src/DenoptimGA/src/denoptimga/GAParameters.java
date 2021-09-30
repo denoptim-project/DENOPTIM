@@ -52,7 +52,14 @@ public class GAParameters
     /**
      * Pathname to the working directory for the current run
      */
-    protected static String dataDir = System.getProperty("user.dir");
+    private static String dataDir = System.getProperty("user.dir");
+    
+    /**
+     * Pathname to the interface directory for the current run. This is the
+     * pathname that is watched for external instructions
+     */
+    private static String interfaceDir = dataDir 
+    		+ System.getProperty("file.separator") + "interface";
 
     /**
      * Pathname of user defined parameters
@@ -80,7 +87,7 @@ public class GAParameters
     /**
      * Pathname of file where EA monitors dumps are printed
      */
-    protected static String monitorFile = "";
+    private static String monitorFile = "";
 
     /**
      * Default name of the UIDFileOut
@@ -322,6 +329,8 @@ public class GAParameters
      */
     protected static int print_level = 0;
     
+    private static final String FS = System.getProperty("file.separator");
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -401,6 +410,13 @@ public class GAParameters
     }
     
 //------------------------------------------------------------------------------
+    
+    public static String getInterfaceDir()
+    {
+        return interfaceDir;
+    }
+    
+//------------------------------------------------------------------------------
 
     protected static String getMonitorFile()
     {
@@ -461,6 +477,29 @@ public class GAParameters
     protected static String getDataDirectory()
     {
         return dataDir;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static void setWorkingDirectory(String pathName)
+    {
+        dataDir = pathName;
+        monitorFile = pathName + ".eaMonitor";
+        interfaceDir = pathName + FS + "interface";
+        
+        logFile = dataDir + ".log";
+        
+        if (monitorFile.equals(""))
+        {
+            monitorFile = dataDir + ".eaMonitor";
+        }
+
+        failedSDF = dataDir + "_FAILED.sdf";
+
+        if (uidFileOut.equals(""))
+        {
+            uidFileOut = dataDir + FS + DEFUIDFILEOUTNAME;
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -832,7 +871,7 @@ public class GAParameters
                     continue;
                 }
 
-                if (line.toUpperCase().startsWith("GA-SORTBYINCREASINGFITNESS="))
+                if (line.toUpperCase().startsWith("GA-SORTBYINCREASINGFITNESS"))
                 {
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
@@ -1147,17 +1186,22 @@ public class GAParameters
      * @throws DENOPTIMException 
      */
 
-    protected static void createWorkingDirectory() throws DENOPTIMException
+    private static void createWorkingDirectory() throws DENOPTIMException
     {
-        String fileSep = System.getProperty("file.separator");
         String cdataDir = dataDir;
         boolean success = false;
         while (!success)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             String str = "RUN" + sdf.format(new Date());
-            dataDir = cdataDir + fileSep + str;
+            dataDir = cdataDir + FS + str;
             success = DenoptimIO.createDirectory(dataDir);
+        }
+        setWorkingDirectory(dataDir);
+        if (!DenoptimIO.createDirectory(interfaceDir))
+        {
+        	throw new DENOPTIMException("ERROR! Unable to make interface "
+        			+ "folder '" + interfaceDir + "'");
         }
         DenoptimIO.addToRecentFiles(dataDir, FileFormat.GA_RUN);
     }
@@ -1168,28 +1212,12 @@ public class GAParameters
     // other initialization code such as the random number generator
     protected static void processParameters() throws DENOPTIMException
     {
-        String fileSep = System.getProperty("file.separator");
-
         // regardless of the random number seed, the following
         // will always create a new directory
         // inside this directory all further directories
         // will be created
         
         createWorkingDirectory();
-
-        logFile = dataDir + ".log";
-        
-        if (monitorFile.equals(""))
-        {
-            monitorFile = dataDir + ".eaMonitor";
-        }
-
-        failedSDF = dataDir + "_FAILED.sdf";
-
-        if (uidFileOut.equals(""))
-        {
-            uidFileOut = dataDir + fileSep + DEFUIDFILEOUTNAME;
-        }
 
         try
         {

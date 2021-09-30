@@ -353,12 +353,12 @@ public class FragmentSpaceTest
     			FragmentSpace.getFragAPsCompatibleWithClass(APC1);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
-    	
+
     	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
     	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
     	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	
+
     	boolean found1 = false;
     	boolean found2 = false;
     	boolean found3 = false;
@@ -577,12 +577,15 @@ public class FragmentSpaceTest
     }
 
 //------------------------------------------------------------------------------
+    
     /**
+     * <pre>
      *   ↑         ↑
      * ← C1 - C2 - C3 →
      *   .  / |    ↓
      *   C4 . C5 →
      *   ↓    ↓
+     * </pre>
      */
     private TestCase getTestCase() throws DENOPTIMException {
         DENOPTIMGraph g = new DENOPTIMGraph();

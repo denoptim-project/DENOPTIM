@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="src/misc/StringConverter/src"/>
 	<classpathentry kind="src" path="src/misc/RDKITFragmenter/src"/>
 	<classpathentry kind="src" path="src/misc/SerConverter/src"/>
-	<classpathentry kind="src" path="src/misc/GraphEditor/src"/>
 	<classpathentry kind="src" path="src/misc/CheckpointReader/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareFitnessOutput/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareMOPAC/src"/>

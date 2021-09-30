@@ -23,12 +23,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.EdgeQuery;
 import denoptim.molecule.EmptyVertex;
 
 
@@ -57,7 +57,7 @@ public class DENOPTIMGraphEdit {
     /**
      * Edge subject to editing task
      */
-    private DENOPTIMEdge focusEdge = null;
+    private EdgeQuery focusEdge = null;
 
     /**
      * Incoming subgraph
@@ -92,8 +92,9 @@ public class DENOPTIMGraphEdit {
 //------------------------------------------------------------------------------
 
     public DENOPTIMGraphEdit(String type, DENOPTIMVertex v,
-                             DENOPTIMAttachmentPoint ap, DENOPTIMEdge edg,
-                             DENOPTIMGraph inGraph) {
+                             DENOPTIMAttachmentPoint ap, EdgeQuery edg,
+                             DENOPTIMGraph inGraph)
+    {
         this.taskType = type;
         this.focusVrtx = v;
         this.focusAP = ap;
@@ -170,69 +171,50 @@ public class DENOPTIMGraphEdit {
             String str = line.substring(startOfEdg + EDGLAB.length());
             str = str.substring(0, GenUtils.getIdxOfClosing(2, str));
             str = str.trim();
-            String[] strPrts = str.split("_");
+            
+            this.focusEdge = new EdgeQuery();
+            
+            String strPrts[] = str.split("_");
             // source vertex
-            int srcVertexId = -1;
-            if (!strPrts[0].equals("*")) {
-                srcVertexId = Integer.parseInt(strPrts[0]);
+            if (!strPrts[0].equals("*"))
+            {
+                this.focusEdge.setSourceVertex(Integer.parseInt(strPrts[0]));
             }
             // source attachment point
-            int srcAPId = -1;
-            if (!strPrts[1].equals("*")) {
-                srcAPId = Integer.parseInt(strPrts[1]);
+            if (!strPrts[1].equals("*"))
+            {
+                this.focusEdge.setSourceAPIdx(Integer.parseInt(strPrts[1]));
             }
             // target vertex
-            int trgVertexId = -1;
-            if (!strPrts[2].equals("*")) {
-                trgVertexId = Integer.parseInt(strPrts[2]);
+            if (!strPrts[2].equals("*"))
+            {
+                this.focusEdge.setTargetVertex(Integer.parseInt(strPrts[2]));
             }
             // target attachment point
-            int trgAPId = -1;
-            if (!strPrts[3].equals("*")) {
-                trgAPId = Integer.parseInt(strPrts[3]);
+            if (!strPrts[3].equals("*"))
+            {
+                this.focusEdge.setTargetAPIdx(Integer.parseInt(strPrts[3]));
             }
             // bond type
-            int btype = -1;
-            if (!strPrts[4].equals("*")) {
-                btype = Integer.parseInt(strPrts[4]);
+            if (!strPrts[4].equals("*"))
+            {
+                this.focusEdge.setBondType(BondType.valueOf(strPrts[4]));
             }
-
-            //TODO-V3 fix this
-            // TODO: Broken code. Only here to allow code to compile.
-            // Change this section when wildcard problem solved.
-            DENOPTIMVertex srcVertex = new EmptyVertex(srcVertexId);
-            // Have to fill source and target vertex with enough APs
-            for (int i = 0; i <= srcAPId; i++) {
-                srcVertex.addAP();
-            }
-            DENOPTIMVertex trgVertex = new EmptyVertex(trgVertexId);
-            for (int i = 0; i <= trgAPId; i++) {
-                trgVertex.addAP();
-            }
-		    this.focusEdge = new DENOPTIMEdge(srcVertex.getAP(srcAPId),
-                    trgVertex.getAP(trgAPId), BondType.parseInt(btype));
-
-            if (strPrts.length > 5) {
-                //source APClass
-                String srcAPC = "*";
-                if (!strPrts[5].equals("*")) {
-                    srcAPC = strPrts[5];
+		    
+		    if (strPrts.length > 5)
+		    {
+		        //source APClass
+		        if (!strPrts[5].equals("*"))
+		        {
+                    this.focusEdge.setSourceAPClass(APClass.make(strPrts[5]));
                 }
-                // old code
-//                this.focusEdge.setSrcApClass(srcAPC);
-                srcVertex.getAP(srcAPId).setAPClass(srcAPC);
 
                 //target APClass
-                String trgAPC = "*";
-                if (!strPrts[6].equals("*")) {
-                    trgAPC = strPrts[6];
+                if (!strPrts[6].equals("*"))
+                {
+                    this.focusEdge.setTargetAPClass(APClass.make(strPrts[6]));
                 }
-                //old code
-//                this.focusEdge.setTrgApClass(trgAPC);
-                trgVertex.getAP(trgAPId).setAPClass(trgAPC);
-
-            }
-            // TODO: End of broken code section
+		    }
         }
 
         if (-1 != startOfAP) {
@@ -255,7 +237,6 @@ public class DENOPTIMGraphEdit {
             if (!strPrts[2].equals("*")) {
                 fconn = Integer.parseInt(strPrts[2]);
             }
-
             EmptyVertex dummyVertex = new EmptyVertex();
             dummyVertex.addAP(apid, conn, fconn);
             DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
@@ -266,8 +247,8 @@ public class DENOPTIMGraphEdit {
                     apClass = strPrts[3];
                 }
                 ap.setAPClass(apClass);
-            }
-            this.focusAP = ap;
+		    }
+		    this.focusAP = ap;
         }
 
         if (-1 != startOfGraph) {
@@ -304,7 +285,8 @@ public class DENOPTIMGraphEdit {
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMEdge getFocusEdge() {
+    public EdgeQuery getFocusEdge()
+    {
         return focusEdge;
     }
 

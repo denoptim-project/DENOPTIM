@@ -3290,8 +3290,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             int verbosity)
     {
         DENOPTIMVertex vQuery = dnQuery.getVrtxQuery();
-        DENOPTIMEdge eInQuery = dnQuery.getInEdgeQuery();
-        DENOPTIMEdge eOutQuery = dnQuery.getOutEdgeQuery();
+        EdgeQuery eInQuery = dnQuery.getInEdgeQuery();
+        EdgeQuery eOutQuery = dnQuery.getOutEdgeQuery();
 
         ArrayList<DENOPTIMVertex> matches = new ArrayList<>(getVertexList());
 
@@ -3405,7 +3405,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (eInQuery != null)
         {
             //Check condition target AP
-            if (eInQuery.getTrgAPID() > -1)
+            if (eInQuery.getTargetAPIdx() > -1)
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<DENOPTIMVertex>();
@@ -3416,7 +3416,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         continue;
                     }
                     DENOPTIMEdge e = getEdgeWithParent(v.getVertexId());
-                    if (e!=null && e.getTrgAPID() == eInQuery.getTrgAPID())
+                    if (e!=null && e.getTrgAPID() == eInQuery.getTargetAPIdx())
                     {
                         newLst.add(v);
                     }
@@ -3455,7 +3455,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition AP class
-            if (!eInQuery.getTrgAPClass().equals(new APClass()))
+            if (!eInQuery.getTargetAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -3467,14 +3467,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     }
                     DENOPTIMEdge e = getEdgeWithParent(v.getVertexId());
                     if (e!=null && e.getTrgAPClass().equals(
-                            eInQuery.getTrgAPClass()))
+                            eInQuery.getTargetAPClass()))
                     {
                         newLst.add(v);
                     }
                 }
                 matches = newLst;
             }
-            if (!eInQuery.getSrcAPClass().equals(new APClass()))
+            if (!eInQuery.getSourceAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -3486,7 +3486,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     }
                     DENOPTIMEdge e = getEdgeWithParent(v.getVertexId());
                     if (e!=null && e.getSrcAPClass().equals(
-                            eInQuery.getSrcAPClass()))
+                            eInQuery.getSourceAPClass()))
                     {
                         newLst.add(v);
                     }
@@ -3504,7 +3504,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (eOutQuery != null)
         {
             //Check condition target AP
-            if (eOutQuery.getSrcAPID() > -1)
+            if (eOutQuery.getSourceAPIdx() > -1)
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -3513,7 +3513,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     for (DENOPTIMEdge e : getEdgesWithChild(
                             v.getVertexId()))
                     {
-                        if (e.getSrcAPID() == eOutQuery.getSrcAPID())
+                        if (e.getSrcAPID() == eOutQuery.getSourceAPIdx())
                         {
                             newLst.add(v);
                             break;
@@ -3554,7 +3554,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
 
             //Check condition AP class
-            if (!eOutQuery.getTrgAPClass().equals(new APClass()))
+            if (!eOutQuery.getTargetAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -3564,7 +3564,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             v.getVertexId()))
                     {
                         if (e.getTrgAPClass().equals(
-                                eOutQuery.getTrgAPClass()))
+                                eOutQuery.getTargetAPClass()))
                         {
                             newLst.add(v);
                             break;
@@ -3573,7 +3573,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
                 matches = newLst;
             }
-            if (!eOutQuery.getSrcAPClass().equals(new APClass()))
+            if (!eOutQuery.getSourceAPClass().equals(new APClass()))
             {
                 ArrayList<DENOPTIMVertex> newLst =
                         new ArrayList<>();
@@ -3583,7 +3583,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             v.getVertexId()))
                     {
                         if (e.getSrcAPClass().equals(
-                                eOutQuery.getSrcAPClass()))
+                                eOutQuery.getSourceAPClass()))
                         {
                             newLst.add(v);
                             break;
@@ -3678,8 +3678,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     public DENOPTIMGraph editGraph(ArrayList<DENOPTIMGraphEdit> edits,
-                                   boolean symmetry, int verbosity)
-                                           throws DENOPTIMException
+            boolean symmetry, int verbosity) throws DENOPTIMException
     {
 
         //Make sure there is no clash with vertex IDs
@@ -3703,7 +3702,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 case (DENOPTIMGraphEdit.REPLACECHILD):
                 {
-                    DENOPTIMEdge e =  edit.getFocusEdge();
+                    EdgeQuery e =  edit.getFocusEdge();
                     DENOPTIMGraph inGraph = edit.getIncomingGraph();
                     DENOPTIMVertexQuery query = new DENOPTIMVertexQuery(
                             edit.getFocusVertex(),
@@ -3713,9 +3712,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             query,verbosity);
                     for (int pid : matches)
                     {
-                        int wantedApID = edit.getFocusEdge().getSrcAPID();
+                        int wantedApID = edit.getFocusEdge().getSourceAPIdx();
                         APClass wantedApCl =
-                                edit.getFocusEdge().getSrcAPClass();
+                                edit.getFocusEdge().getSourceAPClass();
                         ArrayList<Integer> symmUnqChilds =
                                 modGraph.getChildVertices(pid);
                         if (symmetry)
@@ -3742,9 +3741,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                 continue;
                             }
                             modGraph.removeBranchStartingAt(cv,symmetry);
-                            int wantedTrgApId = e.getTrgAPID();
+                            int wantedTrgApId = e.getTargetAPIdx();
                             int trgApLstSize = inGraph.getVertexWithId(
-                                    e.getTrgVertex()).getNumberOfAPs();
+                                    e.getTargetVertex()).getNumberOfAPs();
                             if (wantedTrgApId >= trgApLstSize)
                             {
                                 String msg = "Request to use AP number "
@@ -3756,7 +3755,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                     modGraph.getVertexWithId(pid),
                                     srcApId,
                                     inGraph,
-                                    inGraph.getVertexWithId(e.getTrgVertex()),
+                                    inGraph.getVertexWithId(e.getTargetVertex()),
                                     wantedTrgApId,
                                     e.getBondType(),
                                     new HashMap<>(),

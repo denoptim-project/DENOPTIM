@@ -97,8 +97,13 @@ public class EAUtils
     /**
      * Format for decimal fitness numbers that overwrites Locale to en_US
      */
-    protected static DecimalFormat df = (DecimalFormat)
-    		NumberFormat.getNumberInstance(enUsLocale);
+    private static DecimalFormat df = initialiseFormatter();
+    private static DecimalFormat initialiseFormatter() {
+    	DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(
+    			enUsLocale);
+    	df.setGroupingUsed(false);
+    	return df;
+    }
     
     // for each fragment store the reactions associated with it
     protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
@@ -115,7 +120,7 @@ public class EAUtils
    
     // flag for debugging
     private static final boolean DEBUG = false;
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -527,7 +532,6 @@ public class EAUtils
             String filename) throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
-
         sb.append(String.format("%-20s", "#Name "));
         sb.append(String.format("%-20s", "GraphId "));
         sb.append(String.format("%-30s", "UID "));
@@ -616,7 +620,7 @@ public class EAUtils
             scf_cntr.put(i, 0);
         }
 
-        for (int i=0; i<GAParameters.getPopulationSize(); i++)
+        for (int i=0; i<popln.size(); i++)
         {
             Candidate mol = popln.get(i);
             DENOPTIMGraph g = mol.getGraph();
@@ -831,7 +835,7 @@ public class EAUtils
 
         try
         {
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
+            for (int i=0; i<popln.size(); i++)
             {
                 String sdfile = popln.get(i).getSDFFile();
                 String imgfile = popln.get(i).getImageFile();
@@ -876,6 +880,12 @@ public class EAUtils
         else
         {
             mols = DenoptimIO.readLinksToMols(filename);
+        }
+        if (mols.size() == 0)
+        {
+        	String msg = "Found 0 candidates in file " + filename;
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            throw new DENOPTIMException(msg);
         }
 
         String fsep = System.getProperty("file.separator");
@@ -974,9 +984,10 @@ public class EAUtils
 
         if (population.isEmpty())
         {
-            DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                                        "No data found in file {0}", filename);
-            throw new DENOPTIMException("No data found in file " + filename);
+        	String msg = "Population is still empty after having processes "
+        			+ mols.size() + " candidates from file " + filename;
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            throw new DENOPTIMException(msg);
         }
 
         setVertexCounterValue(population);

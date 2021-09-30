@@ -172,7 +172,7 @@ public class FragmentSpaceParameters
     
     public static boolean enforceSymmetry()
     {
-        return enforceSymmetry;
+    	return enforceSymmetry;
     }
 
 //------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ public class FragmentSpaceParameters
 
     public static int getVerbosity()
     {
-        return verbosity;
+    	return verbosity;
     }
 
 //------------------------------------------------------------------------------
@@ -235,8 +235,8 @@ public class FragmentSpaceParameters
 
 //------------------------------------------------------------------------------
 
-    public static void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+    public static void interpretKeyword(String key, String value) 
+            throws DENOPTIMException
     {
         fsParamsInUse = true;
         String msg = "";
@@ -296,13 +296,9 @@ public class FragmentSpaceParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-            
-        //NB: this is supposed to be without "=" sign because it's a parameter
-        // without value
         case "FS-ENFORCESYMMETRY":
-    	    enforceSymmetry = true;
-    	    break;
-            
+            enforceSymmetry = true;
+            break;
     	case "FS-CONSTRAINSYMMETRY=":
     	    symmetryConstraints = true;
     	    try

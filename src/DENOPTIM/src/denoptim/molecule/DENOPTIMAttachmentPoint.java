@@ -44,8 +44,9 @@ import denoptim.utils.DENOPTIMMoleculeUtils;
  * @author Marco Foscato
  */
 
+
 public class DENOPTIMAttachmentPoint implements Serializable, Cloneable, 
-Comparable<DENOPTIMAttachmentPoint>
+    Comparable<DENOPTIMAttachmentPoint>
 {
     /**
      * Version UID
@@ -56,10 +57,10 @@ Comparable<DENOPTIMAttachmentPoint>
      * Index used to keep the order in a list of attachment points
      */
     private int id;
-
-    /**
-     * The index of the source atom in the atom list of the fragment (0-based)
-     */
+    
+	/**
+	 * The index of the source atom in the atom list of the fragment (0-based)
+	 */
     private int atomPositionNumber;
     
     /**
@@ -109,7 +110,8 @@ Comparable<DENOPTIMAttachmentPoint>
      * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
     @Deprecated
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) {
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
+    {
         this.owner = owner;
         atomPositionNumber = 0;
         totalConnections = 0;
@@ -128,7 +130,8 @@ Comparable<DENOPTIMAttachmentPoint>
      */
     @Deprecated
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
-                                   int atomConnections,int apConnections) {
+                                   int atomConnections,int apConnections) 
+    {
         this(owner);
         this.atomPositionNumber = atomPositionNumber;
         totalConnections = atomConnections;
@@ -149,7 +152,8 @@ Comparable<DENOPTIMAttachmentPoint>
     @Deprecated
     private DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
                                    int atomConnections, int apConnections,
-                                   double[] dirVec) {
+                                   double[] dirVec) 
+    {
         this(owner, atomPositionNumber, atomConnections, apConnections);
         this.dirVec = new double[3];
         System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
@@ -189,7 +193,8 @@ Comparable<DENOPTIMAttachmentPoint>
     @Deprecated
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
                                    int atomConnections, int apConnections,
-                                   double[] dirVec, APClass apClass) {
+                                   double[] dirVec, APClass apClass) 
+    {
         this(owner, atomPosNum, atomConnections, apConnections, dirVec);
         this.apClass = apClass;
     }

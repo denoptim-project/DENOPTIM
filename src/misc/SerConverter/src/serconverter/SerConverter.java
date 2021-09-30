@@ -29,6 +29,7 @@ import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
+
 /**
  * Conversion tool for serialized <code>DENOPTIMGraph</code>s orjects.
  * @author Marco Foscato
@@ -47,7 +48,7 @@ public class SerConverter
         {
             System.err.println("Usage: java -jar SerConverter.jar paramsFile");
             System.exit(-1);
-	}
+        }
 
         try
         {
@@ -71,6 +72,7 @@ public class SerConverter
 		    DenoptimIO.writeMolecule(SerConvParameters.outFile, mol, false);
 		    break;
 	    }
+
         }
         catch (DENOPTIMException de)
         {

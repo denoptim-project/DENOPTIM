@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -38,6 +39,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
+import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMGraph;
@@ -331,8 +333,21 @@ public class CombinatorialExplorerByLayer
                   + chk.getLatestSafelyCompletedGraphId()
                   + ". You can find them in the "
                   + "index file ('" + DENOPTIMConstants.FSEIDXNAMEROOT + level
-                  + ".txt'). ";
+                  + ".txt')."
+                  + DENOPTIMConstants.EOL
+                  + "Now reading '" + DENOPTIMConstants.SERGFILENAMEEXT + "' "
+                  + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+            
+            if (!DenoptimIO.checkExists(FSEUtils.getNameOfStorageDir(level)))
+            {
+            	msg = "ERROR! Folder '" + FSEUtils.getNameOfStorageDir(level) 
+            			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
+            			+ "provide the pathname to the existing folder where "
+            			+ "the previously generated graphs are located.";
+                DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+            	throw new DENOPTIMException(msg);
+            }
 
             Collection<File> lst = FileUtils.listFiles(
             		new File(FSEUtils.getNameOfStorageDir(level)),
@@ -615,6 +630,25 @@ public class CombinatorialExplorerByLayer
                 sb.append(" - Total #Combinations = ");
                 sb.append(fcf.getTotNumbCombs() + DENOPTIMConstants.EOL);
                 sb.append(" - Root graph: " + DENOPTIMConstants.EOL+rootGraph);
+                if (verbosity > 1)
+                {
+                	sb.append(DENOPTIMConstants.EOL);
+                	sb.append(" - Details for root APs:");
+                	sb.append(DENOPTIMConstants.EOL);
+                	Map<IdFragmentAndAP, ArrayList<IdFragmentAndAP>> m = 
+                			fcf.getCandidatesMap();
+                	for (IdFragmentAndAP srcAP : m.keySet())
+                	{
+                		sb.append("   -> "+srcAP).append(DENOPTIMConstants.EOL);
+                		int iTrgAP = 0;
+                		for (IdFragmentAndAP trgAP : m.get(srcAP))
+                		{
+                			iTrgAP++;
+                			sb.append("      " + iTrgAP + " -> "+trgAP);
+                			sb.append(DENOPTIMConstants.EOL);
+                		}
+                	}
+                }
                 msg = sb.toString() + DENOPTIMConstants.EOL;
                 DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             }
