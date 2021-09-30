@@ -175,10 +175,10 @@ public class EAUtilsTest
         g.appendVertexOnAP(v.getAP(2), c3.getAP(0));
         g.appendVertexOnAP(v.getAP(3), c4.getAP(0));
         
-        int expected = g.indexOf(v);
+        DENOPTIMVertex expected = v;
         for (int i=0; i<5; i++)
         {
-            int chosen = EAUtils.selectNonScaffoldNonCapVertex(g);
+            DENOPTIMVertex chosen = EAUtils.selectNonScaffoldNonCapVertex(g);
             assertEquals(expected, chosen, "Index of the only choosable " +
                     "vertex");
         }

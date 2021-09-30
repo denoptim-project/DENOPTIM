@@ -1427,9 +1427,6 @@ public class DENOPTIMGraphOperations
             DENOPTIMVertex mvert,DENOPTIMGraph female, DENOPTIMVertex fvert, 
             boolean debug) throws DENOPTIMException
     {
-        //TODO-V3 massive use of pointers (i.e., integers pointing to a position 
-        // in a list of things) should be replaced with use of references
-        
         if(debug)
         {
             System.err.println("Attempt to perform Crossover");

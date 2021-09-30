@@ -220,14 +220,14 @@ public class EAUtils
         
         // Identify a pair of parents that can do crossover
         Candidate maleCandidate = null, femaleCandidate = null;
-        int mvid = -1, fvid = -1;
+        DENOPTIMVertex vertxOnMale = null, vertxOnFemale = null;
         boolean foundPars = false;
-        DENOPTIMVertex[] pair = null;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {   
             if (FragmentSpace.useAPclassBasedApproach())
             {
-                pair = EAUtils.performFBCC(eligibleParents, population);
+                DENOPTIMVertex[] pair = EAUtils.performFBCC(eligibleParents, 
+                        population);
                 if (pair == null)
                 {
                     numatt++;
@@ -235,22 +235,26 @@ public class EAUtils
                 }
                 maleCandidate = pair[0].getGraphOwner().getCandidateOwner();
                 femaleCandidate = pair[1].getGraphOwner().getCandidateOwner();
-                mvid = pair[0].getGraphOwner().indexOf(pair[0]);
-                fvid = pair[1].getGraphOwner().indexOf(pair[1]);
+                vertxOnMale = pair[0];
+                vertxOnFemale = pair[1];
             } else {
-                int parents[] = EAUtils.selectBasedOnFitness(eligibleParents, 2);
-                if (parents[0] == -1 || parents[1] == -1)
+                Candidate[] parents = EAUtils.selectBasedOnFitness(eligibleParents, 2);
+                if (parents[0] == null || parents[1] == null)
                 {
                     numatt++;
                     continue;
                 }
-                maleCandidate = eligibleParents.get(parents[0]);
-                femaleCandidate = eligibleParents.get(parents[1]);
-                mvid = EAUtils.selectNonScaffoldNonCapVertex(
+                maleCandidate = parents[0];
+                femaleCandidate = parents[1];
+                vertxOnMale = EAUtils.selectNonScaffoldNonCapVertex(
                         maleCandidate.getGraph());
-                fvid = EAUtils.selectNonScaffoldNonCapVertex(
+                vertxOnFemale = EAUtils.selectNonScaffoldNonCapVertex(
                         femaleCandidate.getGraph());
             }
+            
+            // Avoid redundant xover, i.e., xover that swaps the same subgraph
+            //TODO-GG
+            
             foundPars = true;
             break;
         }
@@ -265,23 +269,23 @@ public class EAUtils
         
         String molid1 = maleCandidate.getName();
         String molid2 = femaleCandidate.getName();
-
         int gid1 = maleCandidate.getGraph().getGraphId();
         int gid2 = femaleCandidate.getGraph().getGraphId();
+        int vid1 = maleCandidate.getGraph().indexOf(vertxOnMale);
+        int vid2 = femaleCandidate.getGraph().indexOf(vertxOnFemale);
         
         DENOPTIMGraph graph1 = maleCandidate.getGraph().clone();
         DENOPTIMGraph graph2 = femaleCandidate.getGraph().clone();
         
         graph1.renumberGraphVertices();
         graph2.renumberGraphVertices();
-
-        //TODO: evaluate if all this can be simplified by using refs to vertexes
+        
         if (!DENOPTIMGraphOperations.performCrossover(graph1, 
-                graph1.getVertexAtPosition(mvid).getVertexId(),
+                graph1.getVertexAtPosition(vid1),
                 graph2,
-                graph2.getVertexAtPosition(fvid).getVertexId()))
+                graph2.getVertexAtPosition(vid2),
+                false))
         {
-
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
             return null;
@@ -290,7 +294,8 @@ public class EAUtils
         graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
         EAUtils.addCappingGroup(graph1);
         EAUtils.addCappingGroup(graph2);
-        String msg = "Xover: "+molid1+"|"+gid1+"="+molid2+"|"+gid2;
+        String msg = "Xover: " + molid1 + "|" + gid1 + "|" + vid1 + "="
+                    + molid2 + "|" + gid2 + "|" + vid2;
         graph1.setLocalMsg(msg);
         graph2.setLocalMsg(msg);
         
@@ -315,7 +320,7 @@ public class EAUtils
             }
             
             // Check if the chosen combination gives rise to forbidden ends
-            //TODO-V3 this should be considered already when making the list of
+            //TODO this should be considered already when making the list of
             // possible combination of rings
             for (DENOPTIMVertex rcv : g.getFreeRCVertices())
             {
@@ -369,11 +374,11 @@ public class EAUtils
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
         int numatt = 0;
-        int parentIdx = -1;
+        Candidate parent = null;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {
-            parentIdx = EAUtils.selectBasedOnFitness(eligibleParents,1)[0];
-            if (parentIdx == -1)
+            parent = EAUtils.selectBasedOnFitness(eligibleParents,1)[0];
+            if (parent == null)
             {
                 numatt++;
                 continue;
@@ -381,13 +386,12 @@ public class EAUtils
             break;
         }
         mnt.increaseBy(CounterID.MUTPARENTSEARCH,numatt);
-        if (parentIdx == -1)
+        if (parent == null)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
             return null;
         }
         
-        Candidate parent = eligibleParents.get(parentIdx);
         DENOPTIMGraph graph = parent.getGraph().clone();
         graph.renumberGraphVertices();
         
@@ -646,33 +650,29 @@ public class EAUtils
      * Selects a number of members from the given population. 
      * The selection method is what specified by the
      * configuration of the genetic algorithm ({@link GAParameters}).
-     * @param keys the list of candidates to chose from.
+     * @param candidates the list of candidates to chose from.
      * @param number how many candidate to pick.
      * @return indexes of the selected members of the given population.
      */
 
-    protected static int[] selectBasedOnFitness(ArrayList<Candidate> keys, 
-            int number)
+    protected static Candidate[] selectBasedOnFitness(
+            ArrayList<Candidate> candidates, int number)
     {
-        int[] mates = new int[number];
-        for (int i=0; i<number; i++)
-        {
-            mates[i] = -1;
-        }
+        Candidate[] mates = new Candidate[number];
         switch (GAParameters.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection(keys, 
+            mates = SelectionHelper.performTournamentSelection(candidates, 
                     number);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(keys, number);
+            mates = SelectionHelper.performRWS(candidates, number);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(keys, number);
+            mates = SelectionHelper.performSUS(candidates, number);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(keys, number);
+            mates = SelectionHelper.performRandomSelection(candidates, number);
             break;
         }
         return mates;
@@ -683,13 +683,14 @@ public class EAUtils
     /**
      * Chose randomly a vertex that is neither scaffold or capping group.
      */
-    protected static int selectNonScaffoldNonCapVertex(DENOPTIMGraph g)
+    protected static DENOPTIMVertex selectNonScaffoldNonCapVertex(DENOPTIMGraph g)
     {
-        List<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>(g.getVertexList());
+        List<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>(
+                g.getVertexList());
         candidates.removeIf(v ->
                 v.getBuildingBlockType() == BBType.SCAFFOLD
                 || v.getBuildingBlockType() == BBType.CAP);
-        return g.indexOf(RandomUtils.randomlyChooseOne(candidates));
+        return RandomUtils.randomlyChooseOne(candidates);
     }
               
 //------------------------------------------------------------------------------
@@ -706,11 +707,10 @@ public class EAUtils
     protected static DENOPTIMVertex[] performFBCC(
             ArrayList<Candidate> eligibleParents, Population population)
     {
-        int p1 = selectBasedOnFitness(eligibleParents, 1)[0];
-        if (p1 == -1)
+        Candidate parentA = selectBasedOnFitness(eligibleParents, 1)[0];
+        if (parentA == null)
             return null;
         
-        Candidate parentA = eligibleParents.get(p1);
         DENOPTIMGraph g1 = parentA.getGraph();
         
         ArrayList<Candidate> matesCompatibleWithFirst = 
@@ -718,10 +718,9 @@ public class EAUtils
         if (matesCompatibleWithFirst.size() == 0)
             return null;
         
-        int chosen = selectBasedOnFitness(matesCompatibleWithFirst,1)[0];
-        if (chosen < 0)
+        Candidate parentB = selectBasedOnFitness(matesCompatibleWithFirst,1)[0];
+        if (parentB == null)
             return null;
-        Candidate parentB = matesCompatibleWithFirst.get(chosen);
         
         return RandomUtils.randomlyChooseOne(population.getXoverSites(parentA,
                 parentB));

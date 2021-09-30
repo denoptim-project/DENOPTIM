@@ -30,6 +30,7 @@ import denoptim.utils.RandomUtils;
 /**
  *
  * @author Vishwesh Venkatraman
+ * @author Marco Foscato
  */
 public class SelectionHelper
 {
@@ -43,26 +44,21 @@ public class SelectionHelper
      * thus increasing genetic diversity.
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param rng
-     * @param molPopulation 
-     * @param sz size of the mating pool
-     * @return list of indices of individuals in the population
+     * @param population the ensemble of individuals to choose from
+     * @param sz number of individuals to select
+     * @return list of selected individuals 
      */
 
-    protected static int[] performTournamentSelection(
-                                    ArrayList<Candidate> molPopulation,
+    protected static Candidate[] performTournamentSelection(
+                                    ArrayList<Candidate> population,
                                     int sz)
     {
-        int k = molPopulation.size();
-        
-        int[] selection = new int[sz];
-        
-
+        Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
         {
             // Pick two candidates at random.
-            int p1 = RandomUtils.nextInt(k);
-            int p2 = RandomUtils.nextInt(k);
+            Candidate p1 = RandomUtils.randomlyChooseOne(population);
+            Candidate p2 = RandomUtils.randomlyChooseOne(population);
 
             // Use a random value to decide weather to select the fitter individual
             // or the weaker one.
@@ -71,17 +67,14 @@ public class SelectionHelper
             if (selectFitter)
             {
                 // Select the fitter candidate.
-                selection[i] = molPopulation.get(p1).getFitness() >
-                    molPopulation.get(p2).getFitness() ? p1 : p2;
+                selection[i] = p1.getFitness() > p2.getFitness() ? p1 : p2;
             }
             else
             {
                 // Select the weaker candidate.
-                selection[i] = molPopulation.get(p2).getFitness() >
-                    molPopulation.get(p1).getFitness() ? p1 : p2;
+                selection[i] = p2.getFitness() > p1.getFitness() ? p1 : p2;
             }
         }
-        
         return selection;
     }
 
@@ -89,19 +82,17 @@ public class SelectionHelper
 
     /**
      * Randomly select k individuals from the population
-     * @param rng
-     * @param molPopulation  
-     * @param sz size of the mating pool
+     * @param population the ensemble of individuals to choose from
+     * @param sz number of individuals to select
      * @return list of indices of individuals in the population
      */
-    protected static int[] performRandomSelection(
-                                    ArrayList<Candidate> molPopulation,
+    protected static Candidate[] performRandomSelection(
+                                    ArrayList<Candidate> population,
                                     int sz)
     {
-        int[] selection = new int[sz];
-        int psize = molPopulation.size();
+        Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
-            selection[i] = RandomUtils.nextInt(psize);
+            selection[i] = RandomUtils.randomlyChooseOne(population);
 
         return selection;
     }
@@ -112,22 +103,21 @@ public class SelectionHelper
      * Stochastic Uniform Sampling
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param rng
-     * @param molPopulation 
-     * @param sz size of the mating pool
+     * @param population the ensemble of individuals to choose from
+     * @param sz number of individuals to select
      * @return list of indices of individuals in the population
      */
-    protected static int[] performSUS(ArrayList<Candidate> molPopulation, 
+    protected static Candidate[] performSUS(ArrayList<Candidate> population, 
             int sz)
     {
-        int k = molPopulation.size();
-        int[] selection = new int[sz];
+        int k = population.size();
+        Candidate[] selection = new Candidate[sz];
         // Calculate the sum of all fitness values.
         double aggregateFitness = 0;
 
         for (int i=0; i<k; i++)
         {
-            aggregateFitness += molPopulation.get(i).getFitness();
+            aggregateFitness += population.get(i).getFitness();
         }
 
 
@@ -141,7 +131,7 @@ public class SelectionHelper
             // Calculate the number of times this candidate is expected to
             // be selected on average and add it to the cumulative total
             // of expected frequencies.
-            cumulativeExpectation += molPopulation.get(i).getFitness()
+            cumulativeExpectation += population.get(i).getFitness()
                                     / aggregateFitness * sz;
 
             // If f is the expected frequency, the candidate will be selected at
@@ -149,7 +139,7 @@ public class SelectionHelper
             // actual count depends on the random starting offset.
             while (cumulativeExpectation > startOffset + index)
             {
-                selection[c] = i;
+                selection[c] = population.get(i);
                 c++;
                 index++;
             }
@@ -160,7 +150,7 @@ public class SelectionHelper
 
 //------------------------------------------------------------------------------
 
-    /*
+    /**
      * Roulette wheel selection is implemented as follows:
      * 1. Sum the fitness of all the population members. TF (total fitness).
      * 2. Generate a random number r, between 0 and TF.
@@ -168,24 +158,23 @@ public class SelectionHelper
      *    population members is greater than or equal to r.
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param rng
-     * @param molPopulation 
-     * @param size of the mating pool
+     * @param population the ensemble of individuals to choose from
+     * @param sz number of individuals to select
      * @return list of indices of individuals in the population
      */
 
-    protected static int[] performRWS(ArrayList<Candidate> molPopulation,
+    protected static Candidate[] performRWS(ArrayList<Candidate> population,
                                     int sz)
     {
-        int k = molPopulation.size();
-        int[] selection = new int[sz];
+        int k = population.size();
+        Candidate[] selection = new Candidate[sz];
 
         double[] cumulativeFitnesses = new double[k];
-        cumulativeFitnesses[0] = molPopulation.get(0).getFitness();
+        cumulativeFitnesses[0] = population.get(0).getFitness();
 
         for (int i=1; i<k; i++)
         {
-            double fitness = molPopulation.get(i).getFitness();
+            double fitness = population.get(i).getFitness();
 
             cumulativeFitnesses[i] = cumulativeFitnesses[i-1] + fitness;
         }
@@ -200,7 +189,7 @@ public class SelectionHelper
                 // Convert negative insertion point to array index.
                 index = Math.abs(index + 1);
             }
-            selection[i] = index;
+            selection[i] = population.get(index);
         }
         
         return selection;

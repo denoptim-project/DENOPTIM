@@ -8,7 +8,6 @@ TESTGENOPS-MutationTarget=11
 TESTGENOPS-MutationType=EXTEND
 TESTGENOPS-NewVertexMolID=2
 TESTGENOPS-NewApID=0
-#TESTGENOPS-MutationType=CHANGEBRANCH
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
@@ -17,11 +16,4 @@ FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
 FS-compMatrixFile=OTF_WDIR/CPMap.par
 FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
 FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
-
-# Parameters controlling handling of cyclic graphs
-#RC-CLOSERINGS=yes, we do!
-#RC-EVALUATIONCLOSABILITYMODE=CONSTITUTION
-#RC-CLOSABLERINGSMARTS=C1CCCC1
-#RC-CLOSABLERINGSMARTS=C1CCCCC1
-#RC-CLOSABLERINGSMARTS=C1CCCCCC1
 
