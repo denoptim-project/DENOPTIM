@@ -37,6 +37,8 @@ public class ExternalCmdsListener implements Runnable
     private final WatchKey key;
     private EvolutionaryAlgorithm ea;
     
+    private final String NL = System.getProperty("line.separator");
+    
 //------------------------------------------------------------------------------
 
     public ExternalCmdsListener(Path pathname) throws IOException 
@@ -109,7 +111,8 @@ public class ExternalCmdsListener implements Runnable
 			lines = DenoptimIO.readList(file.getAbsolutePath());
 		} catch (DENOPTIMException e) {
 			DENOPTIMLogger.appLogger.log(Level.WARNING, "Unable to read file '"  
-	        		+ file.getAbsolutePath() + "'. Live instructions lost.");
+	        		+ file.getAbsolutePath() + "'. Any instruction contained "
+	        		        + "in that file is ignored."+NL);
 		}
 
 		if (lines.size() == 0)
@@ -123,17 +126,18 @@ public class ExternalCmdsListener implements Runnable
 		{
 			if (line.startsWith("STOP_GA"))
 			{
-				//TODO-M del
-				System.out.println("STIPPING request from file "+file);
 				DENOPTIMLogger.appLogger.log(Level.SEVERE, "GA run will be "
 						+ "stopped upon external request from '"  
-		        		+ file.getAbsolutePath() + "'.");
+		        		+ file.getAbsolutePath() + "'." + NL);
 				if (ea != null)
 				{
 					ea.stopRun();
 				}
 			}
-			//TODO: add removal on one population member and its downstream relatives
+			
+			
+			//TODO-V3: add removal on one population member and its downstream relatives
+			
 		}
 	}
 

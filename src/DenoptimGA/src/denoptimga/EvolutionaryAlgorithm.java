@@ -80,7 +80,7 @@ public class EvolutionaryAlgorithm
 	final ExternalCmdsListener cmdListener;
 	
 	/**
-	 * Flag signaling this EA was stopped
+	 * Flag signalling this EA was stopped
 	 */
     private boolean stopped = false;
 
@@ -104,7 +104,7 @@ public class EvolutionaryAlgorithm
     /*
      * Execution service used in asynchronous parallelisation scheme.
      */
-    private ThreadPoolExecutor tcons;
+    private ThreadPoolExecutor tpe;
 
     /*
      * Issue emerging from a thread submitted by asynchronous parallelisation 
@@ -118,7 +118,7 @@ public class EvolutionaryAlgorithm
 
     public EvolutionaryAlgorithm(ExternalCmdsListener cmdListener)
     {
-            this.cmdListener = cmdListener;
+        this.cmdListener = cmdListener;
         // There is currently nothing to initialise for the synchronous scheme
         if (GAParameters.parallelizationScheme == 1)
         {
@@ -128,7 +128,7 @@ public class EvolutionaryAlgorithm
             futures = new ArrayList<>();
             submitted = new ArrayList<>();
             
-            tcons = new ThreadPoolExecutor(GAParameters.getNumberOfCPU(),
+            tpe = new ThreadPoolExecutor(GAParameters.getNumberOfCPU(),
                                     GAParameters.getNumberOfCPU(), 0L,
                                     TimeUnit.MILLISECONDS,
                                     new ArrayBlockingQueue<Runnable>(1));
@@ -138,24 +138,24 @@ public class EvolutionaryAlgorithm
                 @Override
                 public void run()
                 {
-                    tcons.shutdown(); // Disable new tasks from being submitted
+                    tpe.shutdown(); // Disable new tasks from being submitted
                     try
                     {
                         // Wait a while for existing tasks to terminate
-                        if (!tcons.awaitTermination(30, TimeUnit.SECONDS))
+                        if (!tpe.awaitTermination(30, TimeUnit.SECONDS))
                         {
-                            tcons.shutdownNow(); //Cancel running tasks
+                            tpe.shutdownNow(); //Cancel running tasks
                         }
-                        if (!tcons.awaitTermination(60, TimeUnit.SECONDS))
+                        if (!tpe.awaitTermination(60, TimeUnit.SECONDS))
                         {
                             // pool didn't terminate after the second try
                         }
                     }
                     catch (InterruptedException ie)
                     {
-                        cleanupAsync(tcons, futures, submitted);
+                        cleanupAsync(tpe, futures, submitted);
                         // (Re-)Cancel if current thread also interrupted
-                        tcons.shutdownNow();
+                        tpe.shutdownNow();
                         // Preserve interrupt status
                         Thread.currentThread().interrupt();
                     }
@@ -163,7 +163,7 @@ public class EvolutionaryAlgorithm
             });
     
             // by default the ThreadPoolExecutor will throw an exception
-            tcons.setRejectedExecutionHandler(new RejectedExecutionHandler()
+            tpe.setRejectedExecutionHandler(new RejectedExecutionHandler()
             {
                 @Override
                 public void rejectedExecution(Runnable r, 
@@ -193,7 +193,7 @@ public class EvolutionaryAlgorithm
         watch.start();
         if (isAsync)
         {
-            tcons.prestartAllCoreThreads();
+            tpe.prestartAllCoreThreads();
         }
         Monitor mnt = new Monitor();
         mnt.printHeader();
@@ -221,11 +221,6 @@ public class EvolutionaryAlgorithm
         int numStag = 0, genId = 1;
         while (genId <= GAParameters.getNumberOfGenerations())
         {
-        	if (stopped)
-        	{
-        		break;
-        	}
-        
             DENOPTIMLogger.appLogger.log(Level.INFO,"Starting Generation {0}"
                     + NL, genId);
 
@@ -244,11 +239,21 @@ public class EvolutionaryAlgorithm
                     + NL, genId);
             EAUtils.outputPopulationDetails(population, 
                     EAUtils.getPathNameToGenerationDetailsFile(genId));
-            DENOPTIMLogger.appLogger.log(
-                    Level.INFO,"Generation {0}" + " completed" + NL
-                            + "----------------------------------------"
-                            + "----------------------------------------" + NL,
-                            genId);
+            
+            if (stopped)
+            {
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, 
+                        "EA stopped while working on generation {0}. " + NL
+                        + "Reporting data for incomplete generation {0}."
+                        + NL,genId);
+                break;
+            } else {
+                DENOPTIMLogger.appLogger.log(Level.INFO,
+                        "Generation {0}" + " completed" + NL
+                        + "----------------------------------------"
+                        + "----------------------------------------" 
+                        + NL, genId);
+            }
 
             if (numStag >= GAParameters.getNumberOfConvergenceGenerations())
             {
@@ -263,11 +268,11 @@ public class EvolutionaryAlgorithm
         
         if (isAsync)
         {
-            tcons.shutdown();
+            tpe.shutdown();
             try
             {
                 // wait a bit for pending tasks to finish
-                while (!tcons.awaitTermination(5, TimeUnit.SECONDS))
+                while (!tpe.awaitTermination(5, TimeUnit.SECONDS))
                 {
                     // do nothing
                 }
@@ -294,7 +299,13 @@ public class EvolutionaryAlgorithm
         watch.stop();
         DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}." + NL,
                 watch.toString());
-        DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed." + NL);
+        
+        if (stopped)
+        {
+            DENOPTIMLogger.appLogger.info("DENOPTIM EA run stopped." + NL);
+        } else {
+            DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed." + NL);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -348,6 +359,11 @@ public class EvolutionaryAlgorithm
             {
                 i++;
                 
+                if (stopped)
+                {
+                    break;
+                }
+                
                 if (checkForException())
                 {
                     stopRun();
@@ -374,7 +390,7 @@ public class EvolutionaryAlgorithm
                 if (isAsync)
                 {
                     submitted.add(task);
-                    futures.add(tcons.submit(task));
+                    futures.add(tpe.submit(task));
                 } else {
                     tasks.add(task);
                     if (tasks.size() >= Math.abs(
@@ -395,8 +411,8 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tcons, futures, submitted);
-                tcons.shutdown();
+                cleanupAsync(tpe, futures, submitted);
+                tpe.shutdown();
             }
             throw dex;
         }
@@ -404,8 +420,8 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tcons, futures, submitted);
-                tcons.shutdown();
+                cleanupAsync(tpe, futures, submitted);
+                tpe.shutdown();
             }
             throw new DENOPTIMException(ex);
         }
@@ -417,7 +433,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupCompleted(tcons, futures, submitted);
+                cleanupCompleted(tpe, futures, submitted);
                 stopRun();
             }
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
@@ -476,6 +492,11 @@ public class EvolutionaryAlgorithm
             {
                 i++;
                 
+                if (stopped)
+                {
+                    break;
+                }
+                
                 if (checkForException())
                 {
                     stopRun();
@@ -529,7 +550,7 @@ public class EvolutionaryAlgorithm
                 if (isAsync)
                 {
                     submitted.add(task);
-                    futures.add(tcons.submit(task));
+                    futures.add(tpe.submit(task));
                 } else {
                     
                     syncronisedTasks.add(task);
@@ -554,8 +575,8 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tcons, futures, submitted);
-                tcons.shutdown();
+                cleanupAsync(tpe, futures, submitted);
+                tpe.shutdown();
             }
             dex.printStackTrace();
             throw dex;
@@ -564,8 +585,8 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tcons, futures, submitted);
-                tcons.shutdown();
+                cleanupAsync(tpe, futures, submitted);
+                tpe.shutdown();
             }
             ex.printStackTrace();
             throw new DENOPTIMException(ex);
@@ -578,7 +599,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupCompleted(tcons, futures, submitted);
+                cleanupCompleted(tpe, futures, submitted);
                 stopRun();
             }
             DENOPTIMLogger.appLogger.log(Level.WARNING,
@@ -621,9 +642,11 @@ public class EvolutionaryAlgorithm
     {
         if (isAsync)
         {
-            cleanupAsync(tcons, futures, submitted);
-            tcons.shutdown();
+            cleanupAsync(tpe, futures, submitted);
+            tpe.shutdown();
         }
+        
+        stopped = true;
     }
     
 //------------------------------------------------------------------------------
@@ -631,7 +654,7 @@ public class EvolutionaryAlgorithm
     /**
      * Removes all tasks whether they are completed or not.
      */
-    private void cleanupAsync(ThreadPoolExecutor tcons, 
+    private void cleanupAsync(ThreadPoolExecutor executor, 
             List<Future<Object>> futures, ArrayList<FitnessTask> submitted)
     {
         for (Future<Object> f : futures)
@@ -644,7 +667,7 @@ public class EvolutionaryAlgorithm
             tsk.stopTask();
         }
         submitted.clear();
-        tcons.getQueue().clear();
+        executor.getQueue().clear();
     }
     
 //------------------------------------------------------------------------------

@@ -38,10 +38,9 @@ import denoptim.molecule.Candidate;
  */
 public class TasksBatchManager
 {
-	private static ArrayList<Task> taskList;
-	private static ExecutorService eservice;
-	private static CompletionService<Object> cservice;
-	private static List<Future<Object>> futures;
+    private static ArrayList<Task> taskList;
+    private static ExecutorService eservice;
+    private static List<Future<Object>> futures;
 
 //------------------------------------------------------------------------------
 
@@ -54,10 +53,10 @@ public class TasksBatchManager
      */
 
     public static ArrayList<Candidate>
-            executeTasks(final ArrayList<Task> tasks, int numOfProcessors)
+            executeTasks(ArrayList<Task> tasks, int numOfProcessors)
                                                         throws DENOPTIMException
     {
-    	taskList = tasks;
+        taskList = tasks;
         int numOfJobs = tasks.size();
 
         int n = Math.min(numOfJobs, numOfProcessors);
@@ -68,7 +67,8 @@ public class TasksBatchManager
         // available processors.
         
         eservice = Executors.newFixedThreadPool(n);
-        cservice = new ExecutorCompletionService<>(eservice);
+        CompletionService<Object> cservice = 
+                new ExecutorCompletionService<>(eservice);
         futures = new ArrayList<>();
 
         for (int i=0; i<numOfJobs; i++)
@@ -123,11 +123,8 @@ public class TasksBatchManager
         {
             for (int i=0; i<tasks.size(); i++)
             {
-            	if (cservice.take().isCancelled())
-            	{
-            		continue;
-            	}
-                Candidate taskResult = (Candidate) cservice.take().get();
+                Candidate taskResult =
+                                    (Candidate) cservice.take().get();
                 if (!taskResult.getUID().equals("UNDEFINED"))
                 {
                     results.add(taskResult);

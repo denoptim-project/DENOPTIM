@@ -78,7 +78,7 @@ public class DenoptimGA
         String configFile = args[0];
         if (args.length > 1)
         {
-        	GAParameters.dataDir = args[1];
+        	GAParameters.setWorkingDirectory(args[1]);
         }
         
         EvolutionaryAlgorithm ea = null;
@@ -91,7 +91,7 @@ public class DenoptimGA
             GAParameters.printParameters();
             
             ecl = new ExternalCmdsListener(
-            		Paths.get(GAParameters.interfaceDir));
+            		Paths.get(GAParameters.getInterfaceDir()));
             executor = Executors.newSingleThreadExecutor();
             futureWatchers = executor.submit(ecl);
             executor.shutdown();
