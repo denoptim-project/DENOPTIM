@@ -166,6 +166,17 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         template.contractLevel = contractLevel;
         return template;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Imposes the given contract to this template.
+     * @param contract the contract to impose on this template.
+     */
+    public void setContractLevel(ContractLevel contract)
+    {
+        this.contractLevel = contract;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -451,10 +462,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public IAtomContainer getIAtomContainer()
     {
+        /*
         if (!containsAtoms())
         {
             return null;
         }
+        */
         
         if (mol != null)
         {
@@ -593,17 +606,29 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         if (getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
         {
             List<MutationType> scaffCompatTypes = new ArrayList<MutationType>();
-            scaffCompatTypes.add(MutationType.EXTEND);
-            scaffCompatTypes.add(MutationType.CHANGELINK);
-            if (!getChilddren().isEmpty())
+            if (getNumberOfAPs() != 0)
             {
-                scaffCompatTypes.add(MutationType.ADDLINK);
+                scaffCompatTypes.add(MutationType.EXTEND);
+                scaffCompatTypes.add(MutationType.CHANGELINK);
+                if (!getChilddren().isEmpty())
+                {
+                    scaffCompatTypes.add(MutationType.ADDLINK);
+                }
             }
+                
             if (contractLevel == ContractLevel.FREE)
             {
-                //TODO- mutations inside template
+                //TODO-GG mutations inside template
                 //scaffCompatTypes.add(MutationType.);
+                // HEre we should add mutation types that pertain the template
+                // not the embedded vertexes!
             }
+            
+            // NB: to freeze graph structure while allowing mutation of
+            // single vertexes, i.e., retain the graph topology, it should be 
+            // sufficient to remove RCVs from the list of mutation sites, and 
+            // do only CHANGELINK
+            
             return scaffCompatTypes;
         }
         return super.getMutationTypes();
@@ -615,7 +640,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     public List<DENOPTIMVertex> getMutationSites()
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        // capping groups not considered mutable sites
+        // capping groups not considered as mutable sites
         if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
         {
             return lst;

@@ -303,11 +303,11 @@ public class GraphLinkFinderTest
         // vertexes that can be alternative links. 
         Map<Integer,Integer> expected = new HashMap<Integer,Integer>();
         expected.put(4, 4);
-        expected.put(5, 1);
-        expected.put(9, 8);
-        expected.put(10, 1);
-        expected.put(11, 27);
-        expected.put(13, 1);
+        expected.put(5, 4);
+        expected.put(9, 12);
+        expected.put(10, 6);
+        expected.put(11, 84);
+        expected.put(13, 2);
         
         Map<DENOPTIMVertex, List<Map<Integer, Integer>>> allAltLinks = 
                 glf.getAllAlternativesFoundInt();

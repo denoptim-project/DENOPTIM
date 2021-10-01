@@ -1,6 +1,12 @@
 package denoptimga;
 
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
 import denoptim.molecule.*;
+import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
+
 import org.junit.jupiter.api.Test;
 
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -8,9 +14,11 @@ import denoptim.utils.RandomUtils;
 import denoptimga.EAUtils.CandidateSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +31,150 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EAUtilsTest
 {
-  //------------------------------------------------------------------------------
+    
+    private static APClass APCA, APCB, APCC;
+    private static String a="A", b="B", c="C";
+    
+//------------------------------------------------------------------------------
+    
+    private void prepareFragmentSpace() throws DENOPTIMException
+    {
+        APCA = APClass.make(a, 0);
+        APCB = APClass.make(b, 1);
+        APCC = APClass.make(c, 2);
+        
+        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
+        boMap.put(a,BondType.SINGLE);
+        boMap.put(b,BondType.SINGLE);
+        boMap.put(c,BondType.SINGLE);
+        
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(APCA);
+        cpMap.put(APCA, lstA);
+        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        lstB.add(APCB);
+        lstB.add(APCC);
+        cpMap.put(APCB, lstB);
+        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        lstC.add(APCB);
+        lstC.add(APCC);
+        cpMap.put(APCC, lstC);
+        
+        /* Compatibility matrix
+         * 
+         *      |  A  |  B  |  C  |
+         *    -------------------------
+         *    A |  T  |     |     |   
+         *    -------------------------
+         *    B |     |  T  |  T  |   
+         *    -------------------------
+         *    C |     |  T  |  T  |   
+         *    -------------------------
+         */
+        
+        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+        HashSet<APClass> forbEnds = new HashSet<APClass>();
+        
+        FragmentSpace.setBondOrderMap(boMap);
+        FragmentSpace.setCompatibilityMatrix(cpMap);
+        FragmentSpace.setCappingMap(capMap);
+        FragmentSpace.setForbiddenEndList(forbEnds);
+        FragmentSpace.setAPclassBasedApproach(true);
+        
+        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        
+        DENOPTIMVertex v1 = new EmptyVertex();
+        v1.setBuildingBlockType(BBType.FRAGMENT);
+        v1.addAP(0, 1, 1, APCB);
+        v1.addAP(0, 1, 1, APCB);
+        FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex v2 = new EmptyVertex();
+        v2.setBuildingBlockType(BBType.FRAGMENT);
+        v2.addAP(0, 1, 1, APCC);
+        v2.addAP(0, 1, 1, APCC);
+        FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMVertex rcv = new EmptyVertex();
+        rcv.setBuildingBlockType(BBType.FRAGMENT);
+        rcv.addAP(0, 1, 1, APCC);
+        rcv.setAsRCV(true);
+        FragmentSpace.appendVertexToLibrary(rcv, BBType.FRAGMENT,
+                FragmentSpace.getFragmentLibrary());
+        
+        DENOPTIMGraph graphForTemplate = new DENOPTIMGraph();
+        DENOPTIMVertex vg1 = DENOPTIMVertex.newVertexFromLibrary(0,
+                        BBType.FRAGMENT);
+        graphForTemplate.addVertex(vg1);
+        for (int i=1; i<6; i++)
+        {
+            DENOPTIMVertex vgi = DENOPTIMVertex.newVertexFromLibrary(0,
+                    BBType.FRAGMENT);
+            DENOPTIMVertex vgi_1 = graphForTemplate.getVertexAtPosition(i-1);
+            graphForTemplate.appendVertexOnAP(vgi_1.getAP(1), vgi.getAP(0));
+        }
+        DENOPTIMVertex rcv1 = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        graphForTemplate.appendVertexOnAP(
+                graphForTemplate.getVertexAtPosition(5).getAP(1),rcv1.getAP(0));
+        DENOPTIMVertex rcv2 = DENOPTIMVertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT);
+        graphForTemplate.appendVertexOnAP(
+                graphForTemplate.getVertexAtPosition(0).getAP(0),rcv2.getAP(0));
+        graphForTemplate.addRing(rcv1, rcv2);
+        
+        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.SCAFFOLD);
+        template.setInnerGraph(graphForTemplate);
+        template.setContractLevel(ContractLevel.FREE);
+        FragmentSpace.appendVertexToLibrary(template, BBType.SCAFFOLD,
+                FragmentSpace.getScaffoldLibrary());
+        
+        
+      //TODO-GG del
+        /*
+        DenoptimIO.writeVertices("/tmp/frags.sdf", FragmentSpace.getFragmentLibrary());
+        DenoptimIO.writeVertices("/tmp/scaff.sdf", FragmentSpace.getScaffoldLibrary());
+        */
+        
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testBuildGraphFromTemplateScaffold() throws Exception
+    {      
+        prepareFragmentSpace();
+        
+        DENOPTIMGraph g = EAUtils.buildGraph();
+        
+        if (g == null)
+            assertTrue(false,"faild construction of graph");
+        
+        DENOPTIMTemplate t = (DENOPTIMTemplate) g.getVertexAtPosition(0);
+        
+        //NB: we want to not allow access to the inner graph from outside the 
+        // template, but this means we cannot easily explore the inner graph.
+        // Looking at the mutation sites is a dirty trick to get a look inside 
+        // this template, that has contract level "free" (meaning that the 
+        // content of the template can change).
+        
+        //TODO-GG
+        DenoptimIO.writeGraphToJSON(new File("/tmp/g.json"), g);
+        
+        boolean foundChange = false;
+        for (DENOPTIMVertex v : t.getMutationSites())
+        {
+            if (v.getBuildingBlockId() != 0)
+                foundChange = true;
+        }
+        assertTrue(foundChange,"The initial inner graph has changed.");
+    }
+//------------------------------------------------------------------------------
 
     @Test
     public void testAvoidRedundantXOver() throws Exception

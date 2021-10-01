@@ -287,7 +287,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
     
-    protected void setAsRCV(boolean isRCV)
+    public void setAsRCV(boolean isRCV)
     {
         this.isRCV = isRCV;
     }
@@ -723,22 +723,31 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    public void addMutationType(MutationType mt)
-    {
-        allowedMutationTypes.add(mt);
-    }
-    
-//------------------------------------------------------------------------------
-
     public List<MutationType> getMutationTypes()
     {
-        if (owner != null && getChilddren().isEmpty())
+        List<MutationType> filteredTypes = new ArrayList<MutationType>(
+                allowedMutationTypes);
+        if (owner != null)
         {
-            return allowedMutationTypes.stream()
-                    .filter(t -> t != MutationType.ADDLINK)
-                    .collect(Collectors.toList());
+            // this vertex is part of a graph
+            
+            // Cannot add/change link on vertex that is not linked
+            if (getChilddren().isEmpty())
+            {
+                filteredTypes.remove(MutationType.ADDLINK);
+                filteredTypes.remove(MutationType.CHANGELINK);
+            }
+            
+            // Cannot extend vertex that has no truly free AP
+            if (getFreeAPCountThroughout()==0)
+                filteredTypes.remove(MutationType.EXTEND);
+            
+            // Cannot remove the only vertex of a graph
+            if (owner.getVertexCount()==0)
+                filteredTypes.remove(MutationType.DELETE);
         }
-        return allowedMutationTypes;
+        
+        return filteredTypes;
     }
     
 //------------------------------------------------------------------------------

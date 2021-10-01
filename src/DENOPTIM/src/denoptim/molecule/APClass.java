@@ -285,10 +285,12 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
 //------------------------------------------------------------------------------
     
     /**
-     * Check compatibility as defined in the compatibility matrix.
+     * Check compatibility as defined in the compatibility matrix considering
+     * this AP as source and the other as target.
      * @param other
      * @return <code>true</code> is APs of these two classes are allowed to
-     * for new vertex-vertex connections.
+     * form new vertex-vertex connections where this AP is source and other is
+     * target.
      */
     public boolean isCPMapCompatibleWith(APClass other)
     {

@@ -316,11 +316,14 @@ public class DenoptimIO
      */
     
     public static void writeVertices(String pathName,
-                                     ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException {
+            ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException 
+    {
         SDFWriter sdfWriter = null;
-        try {
+        try 
+        {
             IAtomContainerSet molSet = new AtomContainerSet();
-            for (int idx = 0; idx < vertices.size(); idx++) {
+            for (int idx = 0; idx < vertices.size(); idx++) 
+            {
                 DENOPTIMVertex v = vertices.get(idx);
                 if (v.containsAtoms())
                 {

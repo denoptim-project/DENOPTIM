@@ -60,6 +60,7 @@ import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMRing;
+import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
@@ -1120,63 +1121,53 @@ public class EAUtils
 
     protected static DENOPTIMGraph buildGraph() throws DENOPTIMException
     {
-        DENOPTIMGraph molGraph = new DENOPTIMGraph();
-        molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        graph.setGraphId(GraphUtils.getUniqueGraphIndex());
         
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold();
 
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, DENOPTIMVertex.BBType.SCAFFOLD);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, 
+                DENOPTIMVertex.BBType.SCAFFOLD);
 
-        // we set the level to -1, as the base
+        // we set the level to -1, by convention
         scafVertex.setLevel(-1);
         
-        //TODO-V3: did we pick a template? Then, we'll have to deal with it:
-        // meaning, if the template has a fully finished content, it just behaves as
-        // a normal vertex, otherwise it has to be filled with content.
-        
         // add the scaffold as a vertex
-        molGraph.addVertex(scafVertex);
-        molGraph.setLocalMsg("NEW");
-
+        graph.addVertex(scafVertex);
+        graph.setLocalMsg("NEW");
+        
+        if (graph.getAvailableAPs().size()==0
+                && scafVertex instanceof DENOPTIMTemplate)
+        {
+            Monitor mnt = new Monitor();
+            mnt.name = "IntraTemplateBuild";
+            if (!DENOPTIMGraphOperations.performMutation(graph,mnt))
+            {
+                mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
+                mnt.increase(CounterID.FAILEDMUTATTEMTS);
+                return null;
+            }
+        }
+        
 //TODO this works only for scaffolds at the moment. make the preference for 
 // fragments that lead to known closable chains operate also when fragments are
 // the "turning point".
-        molGraph.setCandidateClosableChains(
+        graph.setCandidateClosableChains(
                         RingClosuresArchive.getCCFromTurningPointId(scafIdx));
 
-        if (DEBUG)
-        {
-            System.err.println(" ");
-            System.err.println("START GRAPH: " + molGraph.getGraphId() 
-                                + " scaffold: " + molGraph.toString());
-            String filename = "/tmp/" + molGraph.getGraphId() + "_growth.sdf";
-            DenoptimIO.deleteFile(filename);
-        }
-
         DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
-
-        if (DEBUG)
+        
+        if (!(scafVertex instanceof DENOPTIMTemplate) 
+                && graph.getVertexCount() == 0)
         {
-            System.err.println("AFTER EXTENSION: " + molGraph.toString());
+            return null;
         }
         
-        if (molGraph.getVertexCount() > 1)
-        {
-
-            // add Capping if necessary
-            addCappingGroup(molGraph);
-
-            if (DEBUG)
-            {
-                System.err.println("AFTER CAPPING: " + molGraph.toString());
-                //GenUtils.pause();
-            }
-            
-            return molGraph;
-        }
-        return null;
+        // add Capping if necessary
+        addCappingGroup(graph);
+        return graph;
     }
 
 //------------------------------------------------------------------------------
