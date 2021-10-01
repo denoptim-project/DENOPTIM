@@ -225,7 +225,7 @@ then
     errMsg="#UID: not found"
     abandon "$preOutSDF" "$E_OPTERROR"
 else
-    fitness=$(grep "$uid" "$uidToFitness" | awk '{print $2}')
+    fitness=$(grep "$uid" "$uidToFitness" | tail -n 1 | awk '{print $2}')
     addPropertyToSingleMolSDF "FITNESS" "$fitness" "$preOutSDF"
 fi
 
