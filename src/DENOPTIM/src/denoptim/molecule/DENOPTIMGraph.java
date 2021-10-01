@@ -1394,13 +1394,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param children list containing the references to all the children
      */
     public void getChildrenTree(DENOPTIMVertex vertex,
-            ArrayList<DENOPTIMVertex> children) {
+            ArrayList<DENOPTIMVertex> children) 
+    {
         ArrayList<DENOPTIMVertex> lst = getChildVertices(vertex);
-        if (lst.isEmpty()) {
+        if (lst.isEmpty()) 
+        {
             return;
         }
-        for (DENOPTIMVertex child : lst) {
-            if (!children.contains(child)) {
+        for (DENOPTIMVertex child : lst) 
+        {
+            if (!children.contains(child)) 
+            {
                 children.add(child);
                 getChildrenTree(child, children);
             }
@@ -2309,6 +2313,25 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             removeVertex(getVertexWithId(vid));
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * when exploring the spanning tree from a given seed vertex.
+     * Only the seed vertex and all child vertices (and further successors)
+     * are considered part of
+     * the subgraph, which includes also rings and symmetric sets. All
+     * rings that include vertices not belonging to the subgraph are lost.
+     * @param index the position of the seed vertex in the list of vertexes of this graph.
+     * @return a new vertex that corresponds to the subgraph of this graph.
+     */
+
+    public DENOPTIMGraph extractSubgraph(int index)
+            throws DENOPTIMException
+    {
+        return extractSubgraph(this.getVertexAtPosition(index));
+    }
 
 //------------------------------------------------------------------------------
 
@@ -2326,6 +2349,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
             throws DENOPTIMException
     {
+        if (!this.gVertices.contains(seed))
+        {
+            throw new DENOPTIMException("Attempt to extract a subgraph giving "
+                    + "a seed vertex that is not contained in this graph.");
+        }
         DENOPTIMGraph subGraph = this.clone();
         DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
                 this.indexOf(seed));
@@ -2333,7 +2361,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
         subGrpVrtxs.add(seedClone);
         subGraph.getChildrenTree(seedClone, subGrpVrtxs);
-        
         ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : subGraph.gVertices)
         {

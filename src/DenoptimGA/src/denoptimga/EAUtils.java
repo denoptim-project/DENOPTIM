@@ -220,6 +220,7 @@ public class EAUtils
         
         // Identify a pair of parents that can do crossover
         Candidate maleCandidate = null, femaleCandidate = null;
+        DENOPTIMGraph maleGraph = null, femaleGraph = null;
         DENOPTIMVertex vertxOnMale = null, vertxOnFemale = null;
         boolean foundPars = false;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
@@ -233,11 +234,12 @@ public class EAUtils
                     numatt++;
                     continue;
                 }
-                maleCandidate = pair[0].getGraphOwner().getCandidateOwner();
-                femaleCandidate = pair[1].getGraphOwner().getCandidateOwner();
-                
                 vertxOnMale = pair[0];
                 vertxOnFemale = pair[1];
+                maleGraph = vertxOnMale.getGraphOwner();
+                maleCandidate = maleGraph.getCandidateOwner();
+                femaleGraph = vertxOnFemale.getGraphOwner();
+                femaleCandidate = femaleGraph.getCandidateOwner();
             } else {
                 Candidate[] parents = EAUtils.selectBasedOnFitness(eligibleParents, 2);
                 if (parents[0] == null || parents[1] == null)
@@ -246,19 +248,21 @@ public class EAUtils
                     continue;
                 }
                 maleCandidate = parents[0];
+                maleGraph = maleCandidate.getGraph();
                 femaleCandidate = parents[1];
-                vertxOnMale = EAUtils.selectNonScaffoldNonCapVertex(
-                        maleCandidate.getGraph());
-                vertxOnFemale = EAUtils.selectNonScaffoldNonCapVertex(
-                        femaleCandidate.getGraph());
+                femaleGraph = femaleCandidate.getGraph();
+                vertxOnMale = EAUtils.selectNonScaffoldNonCapVertex(maleGraph);
+                vertxOnFemale = EAUtils.selectNonScaffoldNonCapVertex(femaleGraph);
             }
             
             // Avoid redundant xover, i.e., xover that swaps the same subgraph
             try {
-                DENOPTIMGraph test1 = maleCandidate.getGraph().clone();
-                DENOPTIMGraph test2 = femaleCandidate.getGraph().clone();
-                DENOPTIMGraph subGraph1 = test1.extractSubgraph(vertxOnMale);
-                DENOPTIMGraph subGraph2 = test2.extractSubgraph(vertxOnFemale);
+                DENOPTIMGraph test1 = maleGraph.clone();
+                DENOPTIMGraph test2 = femaleGraph.clone();
+                DENOPTIMGraph subGraph1 = test1.extractSubgraph(
+                        maleGraph.indexOf(vertxOnMale));
+                DENOPTIMGraph subGraph2 = test2.extractSubgraph(
+                        femaleGraph.indexOf(vertxOnFemale));
                 if (!subGraph1.isIsomorphicTo(subGraph2))
                 {
                     foundPars = true;
@@ -280,10 +284,10 @@ public class EAUtils
         
         String molid1 = maleCandidate.getName();
         String molid2 = femaleCandidate.getName();
-        int gid1 = maleCandidate.getGraph().getGraphId();
-        int gid2 = femaleCandidate.getGraph().getGraphId();
-        int vid1 = maleCandidate.getGraph().indexOf(vertxOnMale);
-        int vid2 = femaleCandidate.getGraph().indexOf(vertxOnFemale);
+        int gid1 = maleGraph.getGraphId();
+        int gid2 = femaleGraph.getGraphId();
+        int vid1 = maleGraph.indexOf(vertxOnMale);
+        int vid2 = femaleGraph.indexOf(vertxOnFemale);
         
         DENOPTIMGraph graph1 = maleCandidate.getGraph().clone();
         DENOPTIMGraph graph2 = femaleCandidate.getGraph().clone();
