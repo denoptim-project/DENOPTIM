@@ -144,48 +144,13 @@ public class PathSubGraph
         this.vA = vA;
         this.vB = vB;
         
-        // Identify the path between vA and vB
-        
-        // Obtain path from vA to seed of the graph
+        // Identify the path between vA/vB and spanning tree seed
         List<DENOPTIMVertex> vAToSeed = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMEdge> vAToSeedEdges = new ArrayList<DENOPTIMEdge>();
-        vAToSeed.add(vA);
-        DENOPTIMVertex currVert = vA;
-        //TODO: can we avoid the use of level?
-        for (int i=-1; i<vA.getLevel(); i++)
-        {
-            DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();
-            vAToSeedEdges.add(edgeToParent);
-            DENOPTIMVertex parent = molGraph.getParent(currVert);
-            vAToSeed.add(parent);
-            currVert = parent;
-            // This is the bugfix that allows to handle graphs with wrong level
-            // reported in the fragments
-            if (parent.getLevel() == -1)
-            {
-                break;
-            }
-        }
-        
-        // Obtain path from vB to seed of the graph
+        molGraph.getParentTree(vA, vAToSeed);
+        vAToSeed.add(0, vA);
         List<DENOPTIMVertex> vBToSeed = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMEdge> vBToSeedEdges = new ArrayList<DENOPTIMEdge>();
-        vBToSeed.add(vB);
-        currVert = vB;
-        for (int i=-1; i<vB.getLevel(); i++)
-        {
-            DENOPTIMEdge edgeToParent = currVert.getEdgeToParent();
-            vBToSeedEdges.add(edgeToParent);
-            DENOPTIMVertex parent = molGraph.getParent(currVert);
-            vBToSeed.add(parent);
-            currVert = parent;
-            // This is the bugfix that allows to handle graphs with wrong level
-            // reported in the fragments
-            if (parent.getLevel() == -1)
-            {
-                break;
-            }
-        }
+        molGraph.getParentTree(vB, vBToSeed);
+        vBToSeed.add(0, vB);
 
         // find XOR plus junction vertex (turning point)
         vertPathVAVB = new ArrayList<DENOPTIMVertex>();
@@ -207,14 +172,14 @@ public class PathSubGraph
                 {
                     // we climb towards vB
                     vertPathVAVB.add(vBToSeed.get(j));
-                    edgesPathVAVB.add(vBToSeedEdges.get(j));
+                    edgesPathVAVB.add(vBToSeed.get(j).getEdgeToParent());
                 }
                 break;
             }
             else
-            {
+            {   
                 vertPathVAVB.add(vAToSeed.get(i));
-                edgesPathVAVB.add(vAToSeedEdges.get(i));
+                edgesPathVAVB.add(vAToSeed.get(i).getEdgeToParent());
             }
         }
         

@@ -1421,10 +1421,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * recursively visited so far.
      */
     public void getParentTree(DENOPTIMVertex vertex,
-            ArrayList<DENOPTIMVertex> parentTree) 
+            List<DENOPTIMVertex> parentTree) 
     {
         DENOPTIMVertex parent = getParent(vertex);
-        if (parent == null) {
+        if (parent == null) 
+        {
             return;
         }
         if (parentTree.contains(parent))
