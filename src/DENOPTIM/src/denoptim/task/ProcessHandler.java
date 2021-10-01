@@ -82,7 +82,6 @@ public class ProcessHandler
                 @Override
                 public void run()
                 {
-                    //System.out.println("Running Shutdown Hook");
                     proc.destroy();
                 }
             });
@@ -94,7 +93,6 @@ public class ProcessHandler
             // Any output?
             StreamGobbler outputGobbler =
                     new StreamGobbler(proc.getInputStream(), "OUT");
-
 
             errorGobbler.start();
             outputGobbler.start();
@@ -309,9 +307,9 @@ public class ProcessHandler
                 proc.destroy();
             }
         }
-        catch (IOException ioe)
+        catch (Throwable t)
         {
-
+            // do nothing
         }
     }
 

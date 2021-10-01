@@ -295,16 +295,31 @@ public class EAUtils
         graph1.renumberGraphVertices();
         graph2.renumberGraphVertices();
         
-        if (!DENOPTIMGraphOperations.performCrossover(graph1, 
-                graph1.getVertexAtPosition(vid1),
-                graph2,
-                graph2.getVertexAtPosition(vid2),
-                false))
-        {
-            mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
-            mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+        try
+        {   
+            if (!DENOPTIMGraphOperations.performCrossover(graph1, 
+                    graph1.getVertexAtPosition(vid1),
+                    graph2,
+                    graph2.getVertexAtPosition(vid2),
+                    false))
+            {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
+                return null;
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            ArrayList<DENOPTIMGraph> parents = new ArrayList<DENOPTIMGraph>();
+            parents.add(maleGraph);
+            parents.add(graph1);
+            parents.add(femaleGraph);
+            parents.add(graph2);
+            DenoptimIO.writeGraphsToSDF(new File(GAParameters.getDataDirectory()
+                    + "failed_xover.sdf"), parents, true);
+            throw new DENOPTIMException("Error while performing crossover. "
+                    + "Please, report this to the authors ",t);
         }
+        
         graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
         graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
         EAUtils.addCappingGroup(graph1);
@@ -847,29 +862,35 @@ public class EAUtils
         DenoptimIO.createDirectory(dirName);
         File fileDir = new File(dirName);
 
-        try
+        for (int i=0; i<popln.size(); i++)
         {
-            for (int i=0; i<popln.size(); i++)
-            {
-                String sdfile = popln.get(i).getSDFFile();
-                String imgfile = popln.get(i).getImageFile();
+            Candidate c = popln.get(i);
+            String sdfile = c.getSDFFile();
+            String imgfile = c.getImageFile();
 
-                if (sdfile != null)
-                {
+            if (sdfile != null)
+            {
+                try {
                     FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                }
-                if (imgfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
+                } catch (IOException ioe) {
+                    throw new DENOPTIMException("Failed to copy file '" 
+                            + sdfile + "' to '" + fileDir + "' for candidate "
+                            + c.getName(), ioe);
                 }
             }
-            outputPopulationDetails(popln,
-                    EAUtils.getPathNameToFinalPopulationDetailsFile());
+            if (imgfile != null)
+            {
+                try {
+                    FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
+                } catch (IOException ioe) {
+                    throw new DENOPTIMException("Failed to copy file '" 
+                            + imgfile + "' to '" + fileDir + "' for candidate "
+                            + c.getName(), ioe);
+                }
+            }
         }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
+        outputPopulationDetails(popln,
+                EAUtils.getPathNameToFinalPopulationDetailsFile());        
     }
 
 //------------------------------------------------------------------------------

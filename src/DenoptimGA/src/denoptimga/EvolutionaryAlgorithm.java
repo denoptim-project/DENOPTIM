@@ -279,9 +279,9 @@ public class EvolutionaryAlgorithm
             }
             catch (InterruptedException ex)
             {
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, null, ex);
-                throw new DENOPTIMException (ex);
+                //Do nothing
             }
+            tpe.shutdown();
         }
 
         // Sort the population and trim it to desired size
