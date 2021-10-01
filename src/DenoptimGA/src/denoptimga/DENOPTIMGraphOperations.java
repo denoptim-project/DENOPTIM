@@ -1541,12 +1541,12 @@ public class DENOPTIMGraphOperations
             System.out.println("DBUG: MALE after pruning: "+male);
             System.out.println("DBUG: FEMALE after pruning: "+female);
         }
-
+        
         // attach the subgraph from M/F onto F/M in all symmetry related APs
         male.appendGraphOnGraph(symParVertM, symmParAPidxM, subG_F,
-                subG_F.getVertexAtPosition(0), apidxFC, bndType, true);
+                subG_F.getSourceVertex(), apidxFC, bndType, true);
         female.appendGraphOnGraph(symParVertF, symmParAPidxF, subG_M,
-                subG_M.getVertexAtPosition(0), apidxMC, bndType, true);
+                subG_M.getSourceVertex(), apidxMC, bndType, true);
 
         return true;
     }
