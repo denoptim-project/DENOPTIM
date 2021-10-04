@@ -101,6 +101,9 @@ public class EmptyVertex extends DENOPTIMVertex
 
     /**
      * Constructor for an identified vertex with attachment points.
+     * @param id the VertedID of the vertex to construct. Note that this ID 
+     * should be unique within a graph. To generate unique IDs either use 
+     * @param lstAPs the list of attachment point on this vertex.
      */
     public EmptyVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs)
     {
@@ -113,6 +116,12 @@ public class EmptyVertex extends DENOPTIMVertex
 
     /**
      * Constructor for an identified vertex.
+     * @param id the VertedID of the vertex to construct. Note that this ID 
+     * should be unique within a graph. To generate unique IDs either use 
+     * @param lstAPs the list of attachment point on this vertex.
+     * @param lstSymAPs the list of symmetric sets of APs.
+     * @param isRCV set <code>true</code> to mark this vertex as a 
+     * ring-closing vertex.
      */
     public EmptyVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs,
             ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)

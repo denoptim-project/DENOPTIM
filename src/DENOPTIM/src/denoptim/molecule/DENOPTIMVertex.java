@@ -1139,7 +1139,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
             t.setInnerGraph(g);
             v = t;
-        } else if (jsonVertex != null)
+        } else if (jsonVertex != null && iac.getAtomCount()==0)
         {
             EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
             v = ev;

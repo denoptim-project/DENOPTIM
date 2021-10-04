@@ -71,6 +71,35 @@ public class DenoptimIOTest {
     @TempDir
     File tempDir;
 
+ //------------------------------------------------------------------------------
+
+    @Test
+    public void testIOEmptyVertex() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
+        
+        //TODO-GG del
+        System.out.println("Here: "+pathName);
+        
+        DENOPTIMVertex v = new EmptyVertex();
+        double[] xyz = {1.1,-2.2,3.3};
+        v.addAP(0, 1, 1, xyz, APClass.make("myClass:0"));
+        v.addAP(1, 1, 1, xyz, APClass.make("myClass:1"));
+        v.addAP(1, 1, 1, xyz, APClass.make("myClass:2"));
+        v.addAP(2, 1, 1, xyz, APClass.make("myClass:3"));
+        
+        DenoptimIO.writeVertex(pathName, v);
+        
+        ArrayList<DENOPTIMVertex> readInVrtxs = 
+                DenoptimIO.readVerices(new File(pathName));
+        
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+    }
+    
 //------------------------------------------------------------------------------
 
     @Test
@@ -275,7 +304,7 @@ public class DenoptimIOTest {
 		}
 		graph.addVertex(v);
 	}
-	
+
 //------------------------------------------------------------------------------
 
     @Test

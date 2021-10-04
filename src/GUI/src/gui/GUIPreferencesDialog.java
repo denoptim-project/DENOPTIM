@@ -108,6 +108,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 
 	public GUIPreferencesDialog()
 	{
+	    setTitle("Preferences");
 		centralPanel = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(centralPanel);
         centralPanel.setLayout(new BoxLayout(

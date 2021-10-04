@@ -60,6 +60,7 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 import static denoptim.molecule.DENOPTIMVertex.*;
@@ -126,6 +127,9 @@ public class GUIVertexInspector extends GUICardPanel
 	private JButton btnOpenMol;
 	private JButton btnOpenSMILES;
 	
+    private JPanel pnlEmptFrag;
+    private JButton btnEmptFrag;
+    
 	private JPanel pnlAtmToAP;
 	private JButton btnAtmToAP;
 	
@@ -378,8 +382,40 @@ public class GUIVertexInspector extends GUICardPanel
 	                                .addComponent(btnOpenMol)
 	                                .addComponent(btnOpenSMILES)));       
         ctrlPane.add(pnlImportStruct);
+
+        ctrlPane.add(new JSeparator());
         
-		ctrlPane.add(new JSeparator());
+        pnlEmptFrag = new JPanel();
+        btnEmptFrag = new JButton("Create Empty Vertex");
+        btnEmptFrag.setToolTipText("<html>Creates an empty vertex:<br>a vertex "
+                + "that contains no molecular structure.<html>");
+        btnEmptFrag.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                GUIEmptyVertexMaker makeEmptyVertexDialog = 
+                        new GUIEmptyVertexMaker();
+                makeEmptyVertexDialog.pack();
+                Object ev = makeEmptyVertexDialog.showDialog();
+                if (ev == null)
+                {
+                    return;
+                }
+                ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>(1);
+                lst.add((EmptyVertex) ev);
+                GUIVertexSelector fragSelector = new GUIVertexSelector(lst);
+                fragSelector.btnDone.setText("Confirm");
+                fragSelector.setRequireApSelection(false);
+                Object selected = fragSelector.showDialog();
+                if (selected == null)
+                {
+                    return;
+                }
+                importVertices(lst);
+            }
+        });
+        pnlEmptFrag.add(btnEmptFrag);
+        ctrlPane.add(pnlEmptFrag);
+        
+        ctrlPane.add(new JSeparator());
 		
 		pnlAtmToAP = new JPanel();
 		btnAtmToAP = new JButton("Atom to AP");
@@ -1214,7 +1250,7 @@ public class GUIVertexInspector extends GUICardPanel
   	 * @return 
   	 * @throws DENOPTIMException 
   	 */
-	private String ensureGoodAPClassString(String currApClass, 
+	public static String ensureGoodAPClassString(String currApClass, 
 			boolean mustReply) 
 			throws DENOPTIMException 
 	{		

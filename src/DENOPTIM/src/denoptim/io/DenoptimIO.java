@@ -308,6 +308,24 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
+     * Writes a vertex to file.
+     *
+     * @param pathName The pathname where to write
+     * @param vertices The list of vertices to write
+     * @throws DENOPTIMException
+     */
+    
+    public static void writeVertex(String pathName, DENOPTIMVertex vertex) 
+            throws DENOPTIMException 
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        lst.add(vertex);
+        writeVertices(pathName, lst);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Writes vertices to SDF file.
      *
      * @param pathName The pathname where to write
@@ -318,6 +336,10 @@ public class DenoptimIO
     public static void writeVertices(String pathName,
             ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException 
     {
+        
+        //TODO: add option to append
+        //TODO: add option to choose file format
+        
         SDFWriter sdfWriter = null;
         try 
         {
@@ -2498,6 +2520,34 @@ public class DenoptimIO
         return res;
     }
     
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads vertices from a file. This method does not import vertices into 
+     * the fragment space. Therefore, the imported vertices cannot be 
+     * interdependent (i.e., a template that is vertex N in the list of vertices
+     * we are importing here, cannot incorporate any vertex that is not already
+     * defined in the fragment space. Nevertheless, this method will
+     * interpret {@link DENOPTIMGraph}s with available attachment points
+     * as {@link DENOPTIMTemplate}s.
+     *  
+     * @param file the file we want to read.
+     * @throws IOException 
+     * @throws UndetectedFileFormatException 
+     * @throws DENOPTIMException 
+     * @throws IllegalArgumentException 
+     * @throws Exception
+     */
+    public static ArrayList<DENOPTIMVertex> readVerices(File file) 
+            throws IllegalArgumentException, UndetectedFileFormatException, 
+            IOException, DENOPTIMException
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        appendVerticesFromFileToLibrary(file, BBType.UNDEFINED, lst, false);
+        return lst;
+    }
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -2524,6 +2574,14 @@ public class DenoptimIO
             boolean setBBId) throws UndetectedFileFormatException, IOException,
     IllegalArgumentException, DENOPTIMException
     {
+        // NB: we do NOT read in all vertexes, first, and then add them to the
+        // library because that is inconsistent with having vertexes that depend
+        // on previously defined vertexes.
+        // For instance, if vertex N is a template that contains vertex N-1, the
+        // latter must be already in the fragment space when we read vertex N.
+        // Therefore, here we read and add vertices to the appropriate library 
+        // right away.
+        
         FileFormat ff = DenoptimIO.detectFileFormat(file);
         switch (ff)
         {
@@ -2534,6 +2592,7 @@ public class DenoptimIO
                     i++;
                     DENOPTIMVertex v = null;
                     Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
+                    //TODO-GG this criterion is wrong!!! Templates can have APs!
                     if (ap == null) {
                         if (FragmentSpace.isDefined())
                         {
@@ -2542,11 +2601,11 @@ public class DenoptimIO
                             v = t;
                         } else {
                             DENOPTIMLogger.appLogger.log(Level.WARNING,
-                                "No attachment point information for " + bbt + " "
-                                        + i + " in file '" + file 
-                                        + "'. No fragment space defined that could be "
-                                        + "used to interprete the SDF file ocntent. "
-                                        + "I'm ignoring " + bbt + " " + i);
+                                "No attachment point information for " + bbt 
+                                + " " + i + " in file '" + file 
+                                + "'. No fragment space defined that could be "
+                                + "used to interprete the SDF file content. "
+                                + "I'm ignoring " + bbt + " " + i);
                             continue;
                         }
                     } else {
