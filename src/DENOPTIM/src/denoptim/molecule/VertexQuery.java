@@ -16,20 +16,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.utils;
-
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EdgeQuery;
+package denoptim.molecule;
 
 /**
  * Query for searching vertices
  * @author Marco Foscato
  */
 
-//TODO-GG rename to VertexQuery
-
-public class DENOPTIMVertexQuery
+public class VertexQuery
 { 
     /**
      * Query on the vertex properties
@@ -42,7 +36,7 @@ public class DENOPTIMVertexQuery
     private EdgeQuery eInQuery;
 
     /**
-     * Query on the vertex' outcoming connections (i.e., vertex id the cource)
+     * Query on the vertex' out coming connections (i.e., vertex id the source)
      */
     private EdgeQuery eOutQuery;
 
@@ -53,7 +47,7 @@ public class DENOPTIMVertexQuery
      * @param v the vertex query (filters candidates based on vertex properties)
      */
 
-    public DENOPTIMVertexQuery(DENOPTIMVertex v)
+    public VertexQuery(DENOPTIMVertex v)
     {
         this.vQuery = v;
         this.eInQuery = null;
@@ -70,7 +64,7 @@ public class DENOPTIMVertexQuery
      * the candidate vertex if the target.
      */
 
-    public DENOPTIMVertexQuery(DENOPTIMVertex v, EdgeQuery eIn)
+    public VertexQuery(DENOPTIMVertex v, EdgeQuery eIn)
     {
         this.vQuery = v;
         this.eInQuery = eIn;
@@ -90,7 +84,7 @@ public class DENOPTIMVertexQuery
      * the candidate vertex if the source.
      */
 
-    public DENOPTIMVertexQuery(DENOPTIMVertex v, EdgeQuery eIn, EdgeQuery eOut)
+    public VertexQuery(DENOPTIMVertex v, EdgeQuery eIn, EdgeQuery eOut)
     {
         this.vQuery = v;
         this.eInQuery = eIn;

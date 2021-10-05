@@ -146,7 +146,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                     apClassList.setSelectedIndex(0);
                 }
                 
-                //Make and lauch dialog for the user to make the selection
+                //Make and launch dialog for the user to make the selection
                 JPanel chooseApPanel = new JPanel();
                 JLabel header = new JLabel("Choose APClass:");
                 JScrollPane apClassScroll = new JScrollPane(apClassList);

@@ -71,15 +71,12 @@ public class DenoptimIOTest {
     @TempDir
     File tempDir;
 
- //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     @Test
     public void testIOEmptyVertex() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
-        
-        //TODO-GG del
-        System.out.println("Here: "+pathName);
         
         DENOPTIMVertex v = new EmptyVertex();
         double[] xyz = {1.1,-2.2,3.3};
@@ -97,7 +94,6 @@ public class DenoptimIOTest {
         StringBuilder sb = new StringBuilder();
         assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
                 + sb.toString());
-        
     }
     
 //------------------------------------------------------------------------------

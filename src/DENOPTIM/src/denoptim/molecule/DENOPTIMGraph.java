@@ -63,7 +63,6 @@ import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.DENOPTIMVertexQuery;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
@@ -3226,7 +3225,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return the list of matches
      */
     public ArrayList<Integer> findVerticesIds(
-            DENOPTIMVertexQuery query,
+            VertexQuery query,
             int verbosity)
     {
         ArrayList<Integer> matches = new ArrayList<>();
@@ -3248,7 +3247,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
 
     public ArrayList<DENOPTIMVertex> findVertices(
-            DENOPTIMVertexQuery dnQuery,
+            VertexQuery dnQuery,
             int verbosity)
     {
         DENOPTIMVertex vQuery = dnQuery.getVrtxQuery();
@@ -3666,7 +3665,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 {
                     EdgeQuery e =  edit.getFocusEdge();
                     DENOPTIMGraph inGraph = edit.getIncomingGraph();
-                    DENOPTIMVertexQuery query = new DENOPTIMVertexQuery(
+                    VertexQuery query = new VertexQuery(
                             edit.getFocusVertex(),
                             null,
                             edit.getFocusEdge());
@@ -3729,7 +3728,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
                 case (DENOPTIMGraphEdit.DELETEVERTEX):
                 {
-                    DENOPTIMVertexQuery query = new DENOPTIMVertexQuery(
+                    VertexQuery query = new VertexQuery(
                             edit.getFocusVertex(), edit.getFocusEdge()
                     );
                     ArrayList<Integer> matches = modGraph.findVerticesIds(

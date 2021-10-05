@@ -2592,8 +2592,8 @@ public class DenoptimIO
                     i++;
                     DENOPTIMVertex v = null;
                     Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
-                    //TODO-GG this criterion is wrong!!! Templates can have APs!
                     if (ap == null) {
+                        //NB: templates with no APs land here
                         if (FragmentSpace.isDefined())
                         {
                             DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
@@ -2609,6 +2609,7 @@ public class DenoptimIO
                             continue;
                         }
                     } else {
+                        //NB: templates that do have APs land here
                         v = DENOPTIMVertex.convertIACToVertex(mol,bbt);
                     }
                     if (setBBId)

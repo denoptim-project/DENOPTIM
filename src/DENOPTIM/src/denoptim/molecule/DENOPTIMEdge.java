@@ -112,6 +112,20 @@ public class DENOPTIMEdge implements Serializable
     
 //------------------------------------------------------------------------------
 
+    public DENOPTIMAttachmentPoint getSrcAPThroughout()
+    {
+        return srcAP.getEmbeddedAP();
+    }
+    
+//------------------------------------------------------------------------------
+
+    public DENOPTIMAttachmentPoint getTrgAPThroughout()
+    {
+        return trgAP.getEmbeddedAP();
+    }
+    
+//------------------------------------------------------------------------------
+
     public DENOPTIMAttachmentPoint getTrgAP()
     {
         return trgAP;

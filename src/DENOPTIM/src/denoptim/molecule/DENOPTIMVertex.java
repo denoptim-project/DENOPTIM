@@ -1107,11 +1107,12 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
             DENOPTIMAttachmentPoint apB)
     {
-        String a2b = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
+        String a2b = this.getBuildingBlockId() + "/" 
+                + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
-        String b2a = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
+        String b2a = this.getBuildingBlockId() + "/" 
+                + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
-        
         String[] pair = {a2b,b2a};
         return pair;
     }
@@ -1146,11 +1147,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         } else {
             v = new DENOPTIMFragment(iac,bbt);
         }
-        
         v.setAsRCV(v.getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
-        
         return v;
     }
     

@@ -193,26 +193,27 @@ public class GraphLinkFinder
                         if (oAP.getAPClass().equals(cAP.getAPClass()))
                             compatible = true;
                         
-                        //TODO-GG distinguish the two roles src/trg of oAP
-                        /*
-                        // When oAP is used as Target
-                        if (oAP.getLinkedAP().getAPClass().isCPMapCompatibleWith(cAP.getAPClass()))
-                            compatible = true;
-                        
-                        // When oAP is used as Source
-                        if (cAP.getAPClass().isCPMapCompatibleWith(oAP.getLinkedAP().getAPClass()))
-                            compatible = true;
-                        */
-                        
-                        //TODO-GG del: ignores src vs trg role of oAP
                         if (oAP.isAvailableThroughout())
                         {
-                            // NB: this is a place where the template's requires AP will have to be considered
+                            //NB:template's requires AP will have to be considered here as well
                             compatible = true;
                         } else {
-                            if (oAP.getLinkedAP().getAPClass().isCPMapCompatibleWith(cAP.getAPClass())
-                                    && cAP.getAPClass().isCPMapCompatibleWith(oAP.getLinkedAP().getAPClass()))
-                                compatible = true;
+                            DENOPTIMAttachmentPoint lAP = 
+                                    oAP.getLinkedAPThroughout();
+                            if (oAP.isSrcInUserThroughout())
+                            {
+                                if (lAP!=null && cAP.getAPClass()
+                                      .isCPMapCompatibleWith(lAP.getAPClass()))
+                                {
+                                    compatible = true;
+                                }
+                            } else {
+                                if (lAP!=null && lAP.getAPClass()
+                                      .isCPMapCompatibleWith(cAP.getAPClass()))
+                                {
+                                    compatible = true;
+                                }
+                            }
                         }
                     } else {
                         if (oAP.getTotalConnections() == cAP.getTotalConnections())

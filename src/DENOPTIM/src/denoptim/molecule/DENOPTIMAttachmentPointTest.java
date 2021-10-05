@@ -54,6 +54,188 @@ public class DENOPTIMAttachmentPointTest
 	private final EmptyVertex dummyVertex = new EmptyVertex();
 	
 //-----------------------------------------------------------------------------
+    
+    @Test
+    public void testGetEmbeddedAP() throws Exception
+    {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMVertex vA1 = new EmptyVertex(0);
+        vA1.addAP(0,1,1);
+        vA1.addAP(1,1,1);
+        vA1.addAP(2,1,1);
+        vA1.addAP(3,1,1);
+        vA1.addAP(4,1,1);
+        vA1.addAP(5,1,1);
+        vA1.addAP(6,1,1);
+        ArrayList<DENOPTIMAttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
+        DENOPTIMVertex vB1 = new EmptyVertex(1);
+        vB1.addAP(0,1,1);
+        
+        DENOPTIMGraph gL01 = new DENOPTIMGraph();
+        gL01.addVertex(vA1);
+        gL01.appendVertexOnAP(vA1.getAP(0), vB1.getAP(0));
+        
+        DENOPTIMTemplate tL01 = new DENOPTIMTemplate(BBType.NONE);
+        tL01.setInnerGraph(gL01);
+
+        DENOPTIMVertex old1 = tL01;
+        
+        int[] expected1 = {6,5,4,3,2,1};
+        
+        DENOPTIMEdge e1 = gL01.getEdgeAtPosition(0); //there is only 1 edge
+        DENOPTIMAttachmentPoint srcAP1 = e1.getSrcAPThroughout();
+        DENOPTIMAttachmentPoint trgAP1 = e1.getTrgAPThroughout();
+        assertTrue(deepAPs1.contains(srcAP1),"srcAP is deep");
+        assertTrue(trgAP1==vB1.getAP(0),"trgAP is on surface");
+        checkIdentityOfEmbeddedAP(expected1[0],deepAPs1,old1);
+        
+        List<DENOPTIMVertex> addedVertexes1 = new ArrayList<DENOPTIMVertex>();
+        addedVertexes1.add(vB1);
+        for (int i=1; i<6; i++)
+        {
+            DENOPTIMVertex vNew = new EmptyVertex(1);
+            vNew.addAP(0,1,1);
+            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            gNew.addVertex(old1);
+            gNew.appendVertexOnAP(old1.getAP(0), vNew.getAP(0));
+            addedVertexes1.add(vNew);
+            
+            e1 = gNew.getEdgeAtPosition(0); //there is only 1 edge
+            srcAP1 = e1.getSrcAPThroughout();
+            trgAP1 = e1.getTrgAPThroughout();
+            assertTrue(deepAPs1.contains(srcAP1),"srcAP is deep");
+            assertTrue(trgAP1==vNew.getAP(0),"trgAP is on surface");
+            
+            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            template.setInnerGraph(gNew);
+            old1 = template;
+
+            checkIdentityOfEmbeddedAP(expected1[i],deepAPs1,old1);
+        }
+        
+        int nTotAvailAPs1 = 0;
+        int correntLinks1 = 0;
+        for (DENOPTIMAttachmentPoint deepAP : vA1.getAttachmentPoints())
+        {
+            if (deepAP.isAvailableThroughout())
+            {
+                nTotAvailAPs1++;
+            } else {
+                DENOPTIMVertex linkedOwner = deepAP.getLinkedAPThroughout().getOwner();
+                if (addedVertexes1.contains(linkedOwner))
+                    correntLinks1++;
+            }
+        }
+        assertEquals(1,nTotAvailAPs1,"total number deep available");
+        assertEquals(addedVertexes1.size(),correntLinks1,"number links to layers");
+        
+        //
+        // Now we do the same by building the graph in the opposite direction
+        //
+        
+        DENOPTIMVertex vA2 = new EmptyVertex();
+        vA2.addAP(0,1,1);
+        vA2.addAP(1,1,1);
+        vA2.addAP(2,1,1);
+        vA2.addAP(3,1,1);
+        vA2.addAP(4,1,1);
+        vA2.addAP(5,1,1);
+        vA2.addAP(6,1,1);
+        ArrayList<DENOPTIMAttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
+        DENOPTIMVertex vB2 = new EmptyVertex(1);
+        vB2.addAP(0,1,1);
+        
+        DENOPTIMGraph gL02 = new DENOPTIMGraph();
+        
+        //NB: here we pick the other vertex as source (w.r.t. gL01)
+        gL02.addVertex(vB2);
+        
+        //NB: here is the different direction
+        gL02.appendVertexOnAP(vB2.getAP(0),vA2.getAP(0));
+        
+        DENOPTIMTemplate tL02 = new DENOPTIMTemplate(BBType.NONE);
+        tL02.setInnerGraph(gL02);
+
+        DENOPTIMVertex old2 = tL02;
+        
+        int[] expected2 = {6,5,4,3,2,1};
+        
+        DENOPTIMEdge e2 = gL02.getEdgeAtPosition(0); //there is only 1 edge
+        DENOPTIMAttachmentPoint srcAP2 = e2.getSrcAPThroughout();
+        DENOPTIMAttachmentPoint trgAP2 = e2.getTrgAPThroughout();
+        assertTrue(deepAPs2.contains(trgAP2),"trgAP is deep");
+        assertTrue(srcAP2==vB2.getAP(0),"srcAP is on surface");
+        checkIdentityOfEmbeddedAP(expected2[0],deepAPs2,old2);
+        
+        List<DENOPTIMVertex> addedVertexes2 = new ArrayList<DENOPTIMVertex>();
+        addedVertexes2.add(vB2);
+        for (int i=1; i<6; i++)
+        {
+            DENOPTIMVertex vNew = new EmptyVertex(1);
+            vNew.addAP(0,1,1);
+            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            
+            //NB: here we pick the other vertex as source
+            gNew.addVertex(vNew);
+            
+            //NB: here is the different direction
+            gNew.appendVertexOnAP(vNew.getAP(0), old2.getAP(0));
+            addedVertexes2.add(vNew);
+            
+            e2 = gNew.getEdgeAtPosition(0); //there is only 1 edge
+            srcAP2 = e2.getSrcAPThroughout();
+            trgAP2 = e2.getTrgAPThroughout();
+            assertTrue(deepAPs2.contains(trgAP2),"trgAP is deep");
+            assertTrue(srcAP2==vNew.getAP(0),"srcAP is on surface");
+            
+            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            template.setInnerGraph(gNew);
+            old2 = template;
+
+            checkIdentityOfEmbeddedAP(expected2[i],deepAPs2,old2);
+        }
+        
+        int nTotAvailAPs = 0;
+        int correntLinks = 0;
+        for (DENOPTIMAttachmentPoint deepAP : vA2.getAttachmentPoints())
+        {
+            if (deepAP.isAvailableThroughout())
+            {
+                nTotAvailAPs++;
+            } else {
+                DENOPTIMVertex linkedOwner = deepAP.getLinkedAPThroughout().getOwner();
+                if (addedVertexes2.contains(linkedOwner))
+                    correntLinks++;
+            }
+        }
+        assertEquals(1,nTotAvailAPs,"total number deep available");
+        assertEquals(addedVertexes2.size(),correntLinks,"number links to layers");
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private void checkIdentityOfEmbeddedAP(int expectedMAtches,
+            ArrayList<DENOPTIMAttachmentPoint> deepAPs, DENOPTIMVertex v)
+    {
+        int nfound=0;
+        for (DENOPTIMAttachmentPoint outAP : v.getAttachmentPoints())
+        {
+            DENOPTIMAttachmentPoint ap = outAP.getEmbeddedAP();
+            if (deepAPs.contains(ap))
+            {
+                nfound++;
+                continue;
+            }
+        }
+        assertEquals(expectedMAtches,nfound,"number of deep-traced APs");
+    }
+	
+//-----------------------------------------------------------------------------
 	
 	@Test
 	public void testAvailableThrougout() throws Exception

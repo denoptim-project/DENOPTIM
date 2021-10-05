@@ -953,6 +953,29 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     }
     
 //-----------------------------------------------------------------------------
+    
+    /**
+     * For vertexes that are templates this method returns the attachment point
+     * that is embedded in the template's inner graph. Effectively, it returns
+     * the original object of which this object is a projection on the templates
+     * surface.
+     * @return this attachment point (for vertexes that are no templates) or
+     * the original attachment point this is a projection of (for templates).
+     */
+    public DENOPTIMAttachmentPoint getEmbeddedAP()
+    {
+        if (owner != null && owner instanceof DENOPTIMTemplate)
+        {
+            DENOPTIMAttachmentPoint embeddedAP = 
+                    ((DENOPTIMTemplate)owner).getInnerAPFromOuterAP(this);
+            //NB: if embeddedAP has no further embedding it returns itself
+            return embeddedAP.getEmbeddedAP();
+        } else {
+            return this;
+        }
+    }
+    
+//-----------------------------------------------------------------------------
      
     /**
      * Gets the attachment point (AP) that is connected to this AP via the edge 
@@ -972,6 +995,52 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             return user.getSrcAP();
         }
         return null;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Gets the attachment point (AP) that is connected to this AP via the edge 
+     * user or in any user that might be
+     * external to the template embedding the graph where this AP is directly
+     * reachable.
+     * @return the AP linked with this AP, or null;
+     */
+    public DENOPTIMAttachmentPoint getLinkedAPThroughout() 
+    {
+        DENOPTIMEdge user = getEdgeUserThroughout();
+        if (user == null)
+        {
+            return null;
+        }
+        if (user.getSrcAPThroughout() == this){
+            return user.getTrgAP();
+        } else if (user.getTrgAPThroughout() == this)
+        {
+            return user.getSrcAP();
+        }
+        return null;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Checks the role of this AP in the user or in any user that might be
+     * external to the template embedding the graph where this AP is directly
+     * reachable.
+     * @return <code>true</code> if a user exists and this AP is the src AP in
+     * that edge. Otherwise, this method returns <code >false</code> without
+     * discriminating if this AP is free, i.e., the user is null, or this AP is 
+     * the trg in the edge user.
+     */
+    public boolean isSrcInUserThroughout()
+    {
+        DENOPTIMEdge user = getEdgeUserThroughout();
+        if (user == null)
+        {
+            return false;
+        }
+        return user.getSrcAPThroughout() == this;
     }
     
 //-----------------------------------------------------------------------------

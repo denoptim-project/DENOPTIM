@@ -133,14 +133,6 @@ public class EAUtilsTest
         template.setContractLevel(ContractLevel.FREE);
         FragmentSpace.appendVertexToLibrary(template, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
-        
-        
-      //TODO-GG del
-        /*
-        DenoptimIO.writeVertices("/tmp/frags.sdf", FragmentSpace.getFragmentLibrary());
-        DenoptimIO.writeVertices("/tmp/scaff.sdf", FragmentSpace.getScaffoldLibrary());
-        */
-        
     }
 
 //------------------------------------------------------------------------------
@@ -162,9 +154,6 @@ public class EAUtilsTest
         // Looking at the mutation sites is a dirty trick to get a look inside 
         // this template, that has contract level "free" (meaning that the 
         // content of the template can change).
-        
-        //TODO-GG
-        DenoptimIO.writeGraphToJSON(new File("/tmp/g.json"), g);
         
         boolean foundChange = false;
         for (DENOPTIMVertex v : t.getMutationSites())

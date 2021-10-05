@@ -1043,7 +1043,7 @@ public class FragmentSpace
         
         if (compatAps.size()==0)
         {
-            DENOPTIMLogger.appLogger.log(Level.WARNING,"WARNING: No compatible "
+            DENOPTIMLogger.appLogger.log(Level.WARNING,"No compatible "
                     + "AP found in the fragment space for APClass '" 
                     + aPC1 + "'.");
         }
