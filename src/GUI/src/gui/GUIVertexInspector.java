@@ -403,6 +403,7 @@ public class GUIVertexInspector extends GUICardPanel
                 lst.add((EmptyVertex) ev);
                 GUIVertexSelector fragSelector = new GUIVertexSelector(lst);
                 fragSelector.btnDone.setText("Confirm");
+                fragSelector.ctrlPane.setVisible(false);
                 fragSelector.setRequireApSelection(false);
                 Object selected = fragSelector.showDialog();
                 if (selected == null)

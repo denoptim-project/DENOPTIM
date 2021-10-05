@@ -695,6 +695,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Appends a vertex to this graph without creating any edge. This is a
+     * good way to add the first vertex.
+     * @param vertex the vertex that will be added (no cloning).
+     * @throws DENOPTIMException in the vertex has an ID that is already 
+     * present in the current list of vertices of this graph, if any.
+     */
     public void addVertex(DENOPTIMVertex vertex) throws DENOPTIMException
     {
         if (containsVertexID(vertex.getVertexId()))

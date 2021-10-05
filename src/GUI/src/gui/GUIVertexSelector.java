@@ -72,7 +72,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	private int currApIdx = -1;
 	
 	private VertexViewPanel vertexViewer;
-	private JPanel ctrlPane;
+	protected JPanel ctrlPane;
 	private JPanel navigPanel;
 	private JPanel navigPanel2;
 	
@@ -222,6 +222,8 @@ public class GUIVertexSelector extends GUIModalDialog
     		this.btnDone.setToolTipText("<html>Process the currently displayed "
     				+ "vertex<br>and the currently selected AP, "
     				+ "if any.</html>");
+    		this.btnDone.removeActionListener(
+    		        this.btnDone.getActionListeners()[0]);
     		this.btnDone.addActionListener(new ActionListener() {
     			
     			@SuppressWarnings("unchecked")

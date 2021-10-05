@@ -68,6 +68,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
@@ -162,7 +163,8 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 												new GraphSpinnerChangeEvent();
 	
 	private JPanel pnlEditVrtxBtns;
-	private JButton btnAddVrtx;
+	private JButton btnAddLibVrtx;
+    private JButton btnAddEmptyVrtx;
 	private JButton btnDelSel;
 	private JButton btnAddChord; 
 	
@@ -278,18 +280,19 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 						if (!hasFragSpace)
 						{
 							JOptionPane.showMessageDialog(null,
-					                "<html>No fragment space is currently "
-					                + "loaded!<br>"
-					                + "You must load a fragment space to build"
-					                + " graphs.</html>",
-					                "Error",
-					                JOptionPane.ERROR_MESSAGE,
-					                UIManager.getIcon("OptionPane.errorIcon"));
-							return;
+					                "<html>No fragment space is currently loaded!<br>"
+					                + "You must load a fragment space to build graphs that<br>"
+					                + "contain molecular frgments. <br>"
+					                + "However, without a fragment space, you can still build<br>"
+					                + "graphs made of empty vertexes (i.e., vertexes contain<br>"
+					                + "no atoms, but only attachment points).</html>",
+					                "WARNING",
+					                JOptionPane.WARNING_MESSAGE,
+					                UIManager.getIcon("OptionPane.warningIcon"));
 						}
 						try
                         {
-                            startGraphFromFragSpace();
+                            startGraphFromFragSpaceOrCreationOfEmptyVertex();
                         } catch (DENOPTIMException e1)
                         {
                             e1.printStackTrace();
@@ -453,11 +456,13 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		// Controls to alter the presently loaded graph (if any)
 		pnlEditVrtxBtns = new JPanel();
 		JLabel edtVertxsLab = new JLabel("Edit Graph:");
-		btnAddVrtx = new JButton("Add Vertex");
-		btnAddVrtx.setToolTipText("<html>Append a vertex to the selected "
-				+ "attachment point<html>");
-		btnAddVrtx.setEnabled(false);
-		btnAddVrtx.addActionListener(new ActionListener() {
+		btnAddLibVrtx = new JButton("Add Vertex from Library");
+		btnAddLibVrtx.setToolTipText("<html>Choose a vertex from the "
+		        + "loaded fragment space and<br>"
+		        + "append it to the "
+				+ "attachment point/s selected in the current graph.<html>");
+		btnAddLibVrtx.setEnabled(false);
+		btnAddLibVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {	
 				if (!hasFragSpace)
 				{
@@ -476,8 +481,8 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				if (selAps.size() == 0)
 				{
 					JOptionPane.showMessageDialog(null,
-			                "<html>No attachment point selected!<br> Drag the "
-			                + "mouse to select APs.<br> "
+			                "<html>No attachment point selected!<br>"
+			                + "Drag the mouse to select APs.<br> "
 			                + "Click again to unselect.</html>",
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
@@ -498,6 +503,40 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		        updateMolViewer = true;
 			}
 		});
+		
+		
+	    btnAddEmptyVrtx = new JButton("Add Empty Vertex");
+        btnAddEmptyVrtx.setToolTipText("<html>Creates an empty vertex "
+                + "(i.e., a vertex with attachment points<br>"
+                + "and properties, but that contains no atoms) and appends it "
+                + "to<br>"
+                + "the attachment points selected in the current graph."
+                + "<html>");
+        btnAddEmptyVrtx.setEnabled(true);
+        btnAddEmptyVrtx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<DENOPTIMAttachmentPoint> selAps = 
+                        new ArrayList<DENOPTIMAttachmentPoint> ();
+                if (dnGraph != null)
+                {
+                    selAps = visualPanel.getAPsSelectedInViewer(); 
+                    if (selAps.size() == 0)
+                    {
+                        //This would overwrite the current graph, so no-go!
+                        JOptionPane.showMessageDialog(null,
+                                "<html>No attachment point selected!<br>"
+                                + "Drag the mouse to select APs.<br> "
+                                + "Click again to unselect.</html>",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE,
+                                UIManager.getIcon("OptionPane.errorIcon"));
+                        return;
+                    }
+                }
+                startGraphFromCreationOfEmptyVertex(selAps);
+            }
+        });
+        
 		
 		btnDelSel = new JButton("Remove Vertex");
 		btnDelSel.setToolTipText("<html>Removes the selected vertices from "
@@ -598,12 +637,14 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		lyoEditVertxs.setHorizontalGroup(lyoEditVertxs.createParallelGroup(
 				GroupLayout.Alignment.CENTER)
 				.addComponent(edtVertxsLab)
-				.addComponent(btnAddVrtx)
+				.addComponent(btnAddLibVrtx)
+                .addComponent(btnAddEmptyVrtx)
 				.addComponent(btnDelSel)
 				.addComponent(btnAddChord));
 		lyoEditVertxs.setVerticalGroup(lyoEditVertxs.createSequentialGroup()
 				.addComponent(edtVertxsLab)
-				.addComponent(btnAddVrtx)
+				.addComponent(btnAddLibVrtx)
+                .addComponent(btnAddEmptyVrtx)
 				.addComponent(btnDelSel)
 				.addComponent(btnAddChord));
 		graphCtrlPane.add(pnlEditVrtxBtns);
@@ -816,38 +857,91 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 			}
 		});
 		commandsPane.add(btnHelp);
-		
-		//TODO del (This is used only for devel phase of debug)
-		/*
-		try {
-			ArrayList<String> lines = DenoptimIO.readList(
-			        //"/Users/marco/butta/___params_for_ring");
-		            "/Users/marco/butta/___params_w_template");
-            
-			for (String l : lines)
-			{
-			    FragmentSpaceParameters.interpretKeyword(l);
-			}
-			FragmentSpaceParameters.processParameters();
-			renderThisForPresenceOfFragSpace();
-		} catch (DENOPTIMException e1) {
-			e1.printStackTrace();
-		}
-		//appendGraphsFromFile(new File("/Users/marco/butta/___graph_w_template.sdf"));
-		//appendGraphsFromFile(new File("/Users/marco/butta/___graph_closable.json"));
-		*/
 	}
 	
 //-----------------------------------------------------------------------------
 	
 	private void enableGraphDependentButtons(boolean enable)
 	{
-		btnAddVrtx.setEnabled(enable);
+		btnAddLibVrtx.setEnabled(enable);
+        //btnAddEmptyVrtx.setEnabled(enable); //Always enabled
 		btnDelSel.setEnabled(enable);
 		btnAddChord.setEnabled(enable);
 		cmbLabel.setEnabled(enable);
 		btnAddLabel.setEnabled(enable);
 		btnDelLabel.setEnabled(enable);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void startGraphFromCreationOfEmptyVertex(
+	        ArrayList<DENOPTIMAttachmentPoint> selAps)
+	{   
+        GUIEmptyVertexMaker makeEmptyVertexDialog = 
+                new GUIEmptyVertexMaker();
+        makeEmptyVertexDialog.pack();
+        Object evObj = makeEmptyVertexDialog.showDialog();
+        if (evObj == null)
+        {
+            return;
+        }
+        DENOPTIMVertex ev = (EmptyVertex) evObj;
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>(1);
+        lst.add(ev);
+        GUIVertexSelector fragSelector = new GUIVertexSelector(lst);
+        fragSelector.ctrlPane.setVisible(false);
+        if (selAps.size() == 0)
+        {
+            fragSelector.btnDone.setText("Confirm");
+            fragSelector.setRequireApSelection(false); 
+        } else {
+            fragSelector.btnDone.setText("Confirm Selected AP");
+            fragSelector.setRequireApSelection(true); 
+        }
+        Object selected = fragSelector.showDialog();
+        if (selected == null)
+        {
+            return;
+        }
+        
+        @SuppressWarnings("unchecked")
+        ArrayList<Integer> trgFragApId = 
+            ((ArrayList<ArrayList<Integer>>)selected).get(0);
+        int incomingAPId = trgFragApId.get(1);
+                      
+        if (selAps.size() == 0)
+        {
+            currGrphIdx = dnGraphLibrary.size();
+            initializeCurrentGraph();
+            ev.setLevel(-1);
+            try
+            {
+                dnGraph.addVertex(ev);
+            } catch (DENOPTIMException e1)
+            {
+                e1.printStackTrace();
+                JOptionPane.showMessageDialog(null,"Could not make the "
+                        + "new graph. " + e1.getMessage(),
+                        "Error",
+                        JOptionPane.PLAIN_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+                return;
+            }
+        } else {
+            extendCurrentGraph(ev.getAP(incomingAPId), selAps);
+        }
+        
+        // Update viewer
+        visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+        enableGraphDependentButtons(true);
+        
+        // Protect edited system
+        unsavedChanges = true;
+        protectEditedSystem();
+
+        // The molecular representation is updated when we save changes
+        visualPanel.renderMolVieverToNeedUpdate();
+        updateMolViewer = true;
 	}
 
 //-----------------------------------------------------------------------------
@@ -856,21 +950,37 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	 * Start the construction of a new graph from scratch
 	 * @throws DENOPTIMException 
 	 */
-	private void startGraphFromFragSpace() throws DENOPTIMException
+	private void startGraphFromFragSpaceOrCreationOfEmptyVertex() 
+	        throws DENOPTIMException
 	{
 	    BBType rootType = BBType.SCAFFOLD;
-	    String[] options = new String[]{"Scaffold", "Fragment", "Cancel"};
 	    String msg = "<html><body width='%1s'>"
-	            + "Please choose the type of building block used to start "
-                + "building the graph. Use a scaffold if the graph is meant to "
-                + "represent a necessary portion of a candidate entity.</html>";
+                + "Please choose the type of building block to use as first "
+                + "vertex of the graph.";
+	    String[] options = null;
+	    String defaultOpt = null;
+	    if (hasFragSpace)
+	    {
+	        options = new String[]{"Scaffold", "Fragment", "EmptyVertex", 
+	            "Cancel"};
+	        defaultOpt = options[3];
+	        msg = msg + "Use a scaffold if the graph is meant to "
+	                + "represent a necessary portion of a candidate entity.</html>";
+	    } else {
+	        options = new String[]{"EmptyVertex", "Cancel"};
+	        defaultOpt = options[1];
+	    }
         int res = JOptionPane.showOptionDialog(null,String.format(msg,350),
                 "Specify type of initial building block",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 UIManager.getIcon("OptionPane.warningIcon"),
                 options,
-                options[2]);
+                defaultOpt);
+        if (!hasFragSpace)
+        {
+            res = res + 10;
+        }
         
         ArrayList<DENOPTIMVertex> vrtxLib = new  ArrayList<DENOPTIMVertex>();
         switch (res)
@@ -891,7 +1001,18 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 }
                 break;
                 
+            case 10:
             case 2:
+                // In this case we do not use the fragment space. So, all the 
+                // index-based operations on the fragment space that are done 
+                // after this 'switch' block make no sense. Instead, we use the 
+                // same method called by the "Add Empty Vertex" button.
+                ArrayList<DENOPTIMAttachmentPoint> selectedAPs = new ArrayList<>();
+                startGraphFromCreationOfEmptyVertex(selectedAPs);
+                return;
+            
+            case 11: 
+            case 3:
                 return;
         }
         if (vrtxLib.size() == 0)
@@ -920,20 +1041,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		
 		// Create the new graph
 		currGrphIdx = dnGraphLibrary.size();
-		dnGraph = new DENOPTIMGraph();
-		dnGraph.setGraphId(graphUID.getAndIncrement());
-		
-		// Add new graph and corresponding mol representation (must exist)
-		dnGraphLibrary.add(dnGraph);
-		//NB: we add an empty molecular representation to keep the list
-		// of graphs and that of mol.rep. in sync
-		molLibrary.add(builder.newAtomContainer());
-		
-		// Since there is no molecular representation in it, we cleanup
-		// the mol viewer and replace it with the placeholder
-		visualPanel.clearMolecularViewer();
-		
-		updateGraphListSpinner();
+		initializeCurrentGraph();
 		
 		// Create the node
 		int firstBBId = 1;
@@ -961,6 +1069,21 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		unsavedChanges = true;
 		updateMolViewer = true;
         protectEditedSystem();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void initializeCurrentGraph()
+	{
+        dnGraph = new DENOPTIMGraph();
+        dnGraph.setGraphId(graphUID.getAndIncrement());
+        // Add new graph and corresponding mol representation (must exist)
+        dnGraphLibrary.add(dnGraph);
+        //NB: we add an empty molecular representation to keep the list
+        // of graphs and that of mol.rep. in sync
+        molLibrary.add(builder.newAtomContainer());
+        visualPanel.clearMolecularViewer();
+        updateGraphListSpinner();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -1085,29 +1208,38 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		        ((ArrayList<ArrayList<Integer>>)selected).get(0);
 		DENOPTIMVertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
 		
-		// Append the new nodes
-		for (int i=0; i<selAps.size(); i++)
-		{
-			DENOPTIMAttachmentPoint srcAp = selAps.get(i);
-			
-			DENOPTIMVertex trgVertex = chosenVrtx.clone();
-			trgVertex.setVertexId(dnGraph.getMaxVertexId()+1);
-			
-			DENOPTIMAttachmentPoint trgAp = trgVertex.getAP(trgFragApId.get(1));
-
-			try
-			{
-			    dnGraph.appendVertexOnAP(srcAp, trgAp);
-			} catch (DENOPTIMException e)
-	        {
-	        	JOptionPane.showMessageDialog(null,"Unable to make new edge. "
-	        	        + e.getMessage(),
-    	                "Error",
-    	                JOptionPane.PLAIN_MESSAGE,
-    	                UIManager.getIcon("OptionPane.errorIcon"));
-	    		return;
-	        }
-		}
+		extendCurrentGraph(chosenVrtx.getAP(trgFragApId.get(1)),selAps);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void extendCurrentGraph(DENOPTIMAttachmentPoint apOnIncomingVrtx,
+            ArrayList<DENOPTIMAttachmentPoint> selAps)
+	{   
+        DENOPTIMVertex chosenVrtx = apOnIncomingVrtx.getOwner();
+        if (chosenVrtx == null)
+            return;
+        
+        int apIdOnIncVrtx = apOnIncomingVrtx.getIndexInOwner();
+       
+        for (int i=0; i<selAps.size(); i++)
+        {
+            DENOPTIMAttachmentPoint srcAp = selAps.get(i);
+            DENOPTIMVertex trgVertex = chosenVrtx.clone();
+            trgVertex.setVertexId(dnGraph.getMaxVertexId()+1);
+            DENOPTIMAttachmentPoint trgAp = trgVertex.getAP(apIdOnIncVrtx);
+            try
+            {
+                dnGraph.appendVertexOnAP(srcAp, trgAp);
+            } catch (DENOPTIMException e) {
+                JOptionPane.showMessageDialog(null,"Unable to make new edge. "
+                        + e.getMessage(),
+                        "Error",
+                        JOptionPane.PLAIN_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+                return;
+            }
+	    }
 	}
 
 //-----------------------------------------------------------------------------

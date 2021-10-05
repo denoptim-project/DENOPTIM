@@ -273,6 +273,8 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
 			    
 			    //TODO : add props
 			    
+			    //TODO-GG isRCV
+			    
 			    result = ev;
 			    close();
 			}
