@@ -27,16 +27,20 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
@@ -67,6 +71,8 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
     private JTable apTable;
     private DefaultTableModel apTabModel;
 	
+    private JPanel lineRCV;
+    private JRadioButton rcbIsRCV;
 
     //TODO: uncomment when properties will be enables
     /*
@@ -122,14 +128,67 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
         btnAPInsert.setToolTipText("Click to add an attachment point.");
         btnAPInsert.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                String apClass;
-                try {
-                    apClass = GUIVertexInspector.ensureGoodAPClassString("",false);
-                } catch (Exception e1) {
-                    // We have pressed cancel or closed the dialog, so abandon
+                String apClass = "none";
+                // To facilitate selection of existing APCs we offer a list...
+                DefaultListModel<String> apClassLstModel =
+                        new DefaultListModel<String>();
+                JList<String> apClassList = new JList<String>(apClassLstModel);
+                for (String apc : APClass.getAllAPClassesAsString())
+                {
+                    apClassLstModel.addElement(apc);
+                }
+                //...and to the list we add the option to create a new APClass.
+                apClassLstModel.addElement(
+                        "<html><b><i>Define a new APClass...<i></b></html>");
+                apClassList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                if (apClassList.getModel().getSize() == 1)
+                {
+                    apClassList.setSelectedIndex(0);
+                }
+                
+                //Make and lauch dialog for the user to make the selection
+                JPanel chooseApPanel = new JPanel();
+                JLabel header = new JLabel("Choose APClass:");
+                JScrollPane apClassScroll = new JScrollPane(apClassList);
+                chooseApPanel.add(header);
+                chooseApPanel.add(apClassScroll);
+                
+                int res = JOptionPane.showConfirmDialog(btnAPInsert,
+                        chooseApPanel, 
+                        "New APClass compatibility rule", 
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE, 
+                        null);
+                if (res != JOptionPane.OK_OPTION)
+                {
                     return;
                 }
-                apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,apClass});
+                
+                // Interpret the selection made by the user
+                if (apClassList.getSelectedIndices().length > 0)
+                {
+                    //NB: we allow a single selection in the APClass list
+                    Integer idAPC = apClassList.getSelectedIndices()[0];
+                    
+                    if (idAPC.intValue() == (apClassLstModel.size()-1))
+                    {
+                        // We chose to create a new class 
+                        try {
+                            APClass apc = APClass.make(
+                                    GUIVertexInspector.ensureGoodAPClassString(
+                                            "",
+                                            false));
+                            apClass = apc.toString();
+                        } catch (Exception e1) {
+                            // We have pressed cancel or closed the dialog: abandon
+                            return;
+                        }
+                    } else {
+                        apClass = apClassLstModel.getElementAt(idAPC);
+                    }
+                    apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,
+                        apClass});
+                }
             }
         });
         btnAPDelete = new JButton("Remove Selected");
@@ -170,6 +229,13 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                 .addComponent(apTabPanel))
         );
         centralPanel.add(lineAPsBtns);
+        
+        rcbIsRCV = new JRadioButton("ring-closing vertex");
+        rcbIsRCV.setToolTipText("Select to mark this vertex as a ring-closing "
+                + "vertex");
+        lineRCV = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lineRCV.add(rcbIsRCV);
+        centralPanel.add(lineRCV);
         
         //TODO: uncomment when properties will be enables
         /*
@@ -273,7 +339,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
 			    
 			    //TODO : add props
 			    
-			    //TODO-GG isRCV
+			    ev.setAsRCV(rcbIsRCV.isSelected());
 			    
 			    result = ev;
 			    close();

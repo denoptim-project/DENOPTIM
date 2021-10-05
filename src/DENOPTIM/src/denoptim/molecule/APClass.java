@@ -3,7 +3,9 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gson.JsonDeserializationContext;
@@ -173,6 +175,23 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
     
     private void setSubClass(int sumClass) {
         this.subClass = sumClass;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the list of the names of all APClasses. This method 
+     * @return
+     */
+    public static List<String> getAllAPClassesAsString()
+    {
+        List<String> names = new ArrayList<String>();
+        for (APClass apc : uniqueAPClasses)
+        {
+            names.add(apc.toString());
+        }
+        Collections.sort(names);
+        return names;
     }
     
 //------------------------------------------------------------------------------
