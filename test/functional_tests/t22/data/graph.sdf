@@ -1,38 +1,37 @@
 
-  CDK     04012114473D
+  CDK     10052117473D
 
- 31 30  0  0  0  0  0  0  0  0999 V2000
-    0.0000    0.0000    0.0550 N   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0000    0.0000    0.0557 P   0  0  0  0  0  6  0  0  0  0  0  0
-   -0.1054   -1.1054   -0.4585 P   0  0  0  0  0  6  0  0  0  0  0  0
-   -0.0710   -1.1239   -0.4982 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.8530   -1.6747   -0.3221 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.2167   -0.9921   -1.5703 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.6365   -1.8445   -1.2765 P   0  0  0  0  0  6  0  0  0  0  0  0
-   -0.6126   -1.8586   -1.3248 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.0343   -2.7223   -1.4790 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.7202   -1.3132   -2.2624 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.4118   -2.0128   -2.2490 C   0  0  0  0  0  6  0  0  0  0  0  0
-   -2.0651   -2.8622   -2.0500 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.0148   -1.1162   -2.3922 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.1146   -2.1112   -2.7079 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-    0.0300   -2.9290   -1.2788 H   0  0  0  0  0  2  0  0  0  0  0  0
-    0.8766   -1.7819   -0.0674 C   0  0  0  0  0  6  0  0  0  0  0  0
-    0.7361   -2.8246   -0.3524 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.7878   -1.3991   -0.5271 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.9186   -1.7450    0.4867 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-    0.8715    0.4879   -0.2674 C   0  0  0  0  0  6  0  0  0  0  0  0
+ 30 29  0  0  0  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0550 N   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0154   -1.1557   -0.3181 P   0  0  0  0  0  0  0  0  0  0  0  0
+    0.4668   -1.7463   -2.2205 P   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8846   -1.1593   -1.1928 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.7622   -1.6793   -0.8089 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.1513   -0.1328   -1.4440 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0750   -0.8183   -4.0052 P   0  0  0  0  0  2  0  0  0  0  0  0
+    0.9545   -1.0435   -3.1387 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.7893   -1.5734   -3.5976 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.3072   -0.0988   -2.7249 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.3139    0.3741   -4.3156 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.7055    0.4135   -5.3321 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.6061    0.9558   -4.2578 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0639    0.7965   -3.6132 ATP 0  0  0  0  0  0  0  0  0  0  0  0
+    1.1991   -2.7650   -2.2548 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.5883   -3.6449   -2.4570 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.9438   -2.6508   -3.0425 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.7121   -2.8867   -1.2736 ATM 0  0  0  0  0  0  0  0  0  0  0  0
+    0.8715    0.4879   -0.2674 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.3480   -0.1001   -1.0518 H   0  0  0  0  0  0  0  0  0  0  0  0
     0.6135    1.4726   -0.6573 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.5693    0.5998    0.5858 H   0  0  0  0  0  2  0  0  0  0  0  0
-   -0.8582    0.5109   -0.2674 C   0  0  0  0  0  6  0  0  0  0  0  0
+    1.5693    0.5998    0.5858 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.8582    0.5109   -0.2674 C   0  0  0  0  0  0  0  0  0  0  0  0
    -1.4521   -0.1432   -0.9058 H   0  0  0  0  0  0  0  0  0  0  0  0
    -1.4500    0.8092    0.5979 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.5589    1.4119   -0.8385 H   0  0  0  0  0  2  0  0  0  0  0  0
-   -0.9379    0.6234   -0.4982 C   0  0  0  0  0  6  0  0  0  0  0  0
-   -1.5023   -0.0589   -1.1338 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.5972    1.0397    0.2635 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.5221    1.4443   -1.1153 H   0  0  0  0  0  2  0  0  0  0  0  0
+   -0.5589    1.4119   -0.8385 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.0578   -1.1905   -1.0162 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.6452   -2.0688   -0.7485 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.6462   -0.2909   -0.8356 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.7828   -1.2429   -2.0882 H   0  0  0  0  0  0  0  0  0  0  0  0
   1  2  1  0  0  0  0 
   4  5  1  0  0  0  0 
   4  6  1  0  0  0  0 
@@ -46,29 +45,34 @@
  11 13  1  0  0  0  0 
   7 11  1  0  0  0  0 
  11 14  1  0  0  0  0 
-  7 15  1  0  0  0  0 
- 16 17  1  0  0  0  0 
- 16 18  1  0  0  0  0 
-  3 16  1  0  0  0  0 
- 16 19  1  0  0  0  0 
- 20 21  1  0  0  0  0 
- 20 22  1  0  0  0  0 
-  1 20  1  0  0  0  0 
- 20 23  1  0  0  0  0 
- 24 25  1  0  0  0  0 
- 24 26  1  0  0  0  0 
-  1 24  1  0  0  0  0 
- 24 27  1  0  0  0  0 
- 28 29  1  0  0  0  0 
- 28 30  1  0  0  0  0 
-  2 28  1  0  0  0  0 
- 28 31  1  0  0  0  0 
+ 15 16  1  0  0  0  0 
+ 15 17  1  0  0  0  0 
+  3 15  1  0  0  0  0 
+ 15 18  1  0  0  0  0 
+ 19 20  1  0  0  0  0 
+ 19 21  1  0  0  0  0 
+  1 19  1  0  0  0  0 
+ 19 22  1  0  0  0  0 
+ 23 24  1  0  0  0  0 
+ 23 25  1  0  0  0  0 
+  1 23  1  0  0  0  0 
+ 23 26  1  0  0  0  0 
+ 27 28  1  0  0  0  0 
+ 27 29  1  0  0  0  0 
+  2 27  1  0  0  0  0 
+ 27 30  1  0  0  0  0 
 M  END
+> <CLASS>
+7#p:0:0.5810%-1.5229%-5.1295 
+
+> <ATTACHMENT_POINT>
+7:1
+
 > <GCODE>
 2
 
 > <GraphENC>
-2 1_ABS_VERTEX,2_ABS_VERTEX,3_3_1_0,4_3_1_0,5_3_1_0,8_1_2_1,9_1_2_1,10_1_2_1,11_ABS_VERTEX,13_3_1_2,16_3_1_1,17_6_1_3,18_7_1_2,19_1_2_2, 1_2_2_2_1_p:0_c:0,1_0_3_0_1_n:0_c:0,1_1_4_0_1_n:0_c:0,1_3_5_0_1_p:0_c:0,3_1_8_0_1_c:0_hyd:1,4_1_9_0_1_c:0_hyd:1,5_1_10_0_1_c:0_hyd:1,2_1_11_2_1_p:0_c:0,11_1_13_0_1_p:0_c:0,2_0_16_0_1_p:0_c:0,13_1_17_0_1_c:0_ATplus:0,16_1_18_0_1_c:0_ATminus:0,11_0_19_0_1_p:0_hyd:1, DENOPTIMRing [verteces=[17_6_1_3, 13_3_1_2, 11_ABS_VERTEX, 16_3_1_1, 18_7_1_2]] 
+2 1_2_0_-1,2_5_1_0,3_3_1_0,4_3_1_0,5_3_1_0,8_1_2_1,9_1_2_1,10_1_2_1,11_5_1_1,13_3_1_2,16_3_1_1,17_6_1_3,18_7_1_2, 1_2_2_2_1_p:0_c:0,1_0_3_0_1_n:0_c:0,1_1_4_0_1_n:0_c:0,1_3_5_0_1_p:0_c:0,3_1_8_0_1_c:0_hyd:1,4_1_9_0_1_c:0_hyd:1,5_1_10_0_1_c:0_hyd:1,2_1_11_2_1_p:0_c:0,11_1_13_0_1_p:0_c:0,2_0_16_0_1_p:0_c:0,13_1_17_0_1_c:0_ATplus:0,16_1_18_0_1_c:0_ATminus:0, DENOPTIMRing [vertices=[17_6_1_3, 13_3_1_2, 11_5_1_1, 16_3_1_1, 18_7_1_2]] 
 
 > <GraphJson>
 {
@@ -83,6 +87,7 @@ M  END
               {
                 "id": 305,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -98,6 +103,7 @@ M  END
               {
                 "id": 306,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -113,6 +119,7 @@ M  END
               {
                 "id": 307,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -152,6 +159,7 @@ M  END
               {
                 "id": 308,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -159,14 +167,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -0.0803,
-                  -1.2717,
-                  -0.571
+                  1.0028921080425781,
+                  -1.1598291458230687,
+                  -1.3078255673097123
                 ]
               },
               {
                 "id": 309,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -174,14 +183,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  1.1415,
-                  0.5663,
-                  -0.571
+                  0.0026072070084471577,
+                  0.19556089443828847,
+                  0.11814329473582912
                 ]
               },
               {
                 "id": 310,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -189,9 +199,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -1.0612,
-                  0.7054,
-                  -0.571
+                  -1.1948177186044482,
+                  -1.1950879834543289,
+                  -1.108031793062385
                 ]
               }
             ],
@@ -227,12 +237,12 @@ M  END
         "gRings": [],
         "symVertices": []
       },
-      "contractLevel": 0,
       "requiredAPs": [],
       "innerToOuterAPs": {
         "306": {
           "id": 427,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -248,6 +258,7 @@ M  END
         "307": {
           "id": 428,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -263,6 +274,7 @@ M  END
         "308": {
           "id": 429,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 1,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -270,14 +282,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.0803,
-            -1.2717,
-            -0.571
+            1.0028921080425781,
+            -1.1598291458230687,
+            -1.3078255673097123
           ]
         },
         "310": {
           "id": 430,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 1,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -285,9 +298,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -1.0612,
-            0.7054,
-            -0.571
+            -1.1948177186044482,
+            -1.1950879834543289,
+            -1.108031793062385
           ]
         }
       },
@@ -311,6 +324,7 @@ M  END
               {
                 "id": 335,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -326,6 +340,7 @@ M  END
               {
                 "id": 336,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -341,6 +356,7 @@ M  END
               {
                 "id": 337,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -380,6 +396,7 @@ M  END
               {
                 "id": 338,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -387,14 +404,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -0.89,
-                  0.0,
-                  0.6293
+                  0.13264337004325072,
+                  0.06580459085019102,
+                  -0.01712312746921174
                 ]
               },
               {
                 "id": 339,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -402,9 +420,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  0.89,
-                  0.0,
-                  0.6293
+                  1.803866604977152,
+                  0.6231604497542478,
+                  0.23737116630255017
                 ]
               }
             ],
@@ -439,12 +457,12 @@ M  END
         "gRings": [],
         "symVertices": []
       },
-      "contractLevel": 0,
       "requiredAPs": [],
       "innerToOuterAPs": {
         "335": {
           "id": 431,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 2,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -452,14 +470,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.0803,
-            -1.2717,
-            -0.571
+            1.295362251949843,
+            -2.898928025679065,
+            -2.2592903163438653
           ]
         },
         "337": {
           "id": 432,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 2,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -467,14 +486,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -1.0612,
-            0.7054,
-            -0.571
+            1.0186424321035947,
+            -0.9510766388210636,
+            -3.259485465312119
           ]
         },
         "339": {
           "id": 433,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 3,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -482,9 +502,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            0.10291538327733764,
+            -1.1561452297349146,
+            -0.4331406911987701
           ]
         }
       },
@@ -504,6 +524,7 @@ M  END
         {
           "id": 434,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 18,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -511,14 +532,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -0.033602395042997446,
+            -0.018812368438560573,
+            0.06743196379440175
           ]
         },
         {
           "id": 435,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 18,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -526,9 +548,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            1.5580530021781458,
+            0.5979871300954598,
+            0.5720025486534341
           ]
         }
       ],
@@ -557,6 +579,7 @@ M  END
         {
           "id": 436,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 22,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -564,14 +587,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            0.03310303069220688,
+            -0.019706955127877818,
+            0.06743720702288705
           ]
         },
         {
           "id": 437,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 22,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -579,9 +603,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -0.5637811821558997,
+            1.3973379547336138,
+            -0.829286250843769
           ]
         }
       ],
@@ -610,6 +634,7 @@ M  END
         {
           "id": 438,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 26,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -617,14 +642,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            -0.15245768394033105,
+            -1.160242421650872,
+            -0.40993033101734544
           ]
         },
         {
           "id": 439,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 26,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -632,9 +658,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            -0.7872266429616023,
+            -1.242028213383606,
+            -2.070887721480359
           ]
         }
       ],
@@ -663,6 +689,7 @@ M  END
         {
           "id": 440,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 21,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -670,9 +697,9 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
+            0.8602129030382138,
+            0.4861023224947669,
+            -0.28123544618641966
           ]
         }
       ],
@@ -694,6 +721,7 @@ M  END
         {
           "id": 441,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 25,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -701,9 +729,9 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
+            -0.8630444408818421,
+            0.49633067250743124,
+            -0.2581982809740419
           ]
         }
       ],
@@ -725,6 +753,7 @@ M  END
         {
           "id": 442,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 29,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -732,9 +761,9 @@ M  END
             "subClass": 1
           },
           "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
+            -1.062215953674818,
+            -1.189659243437211,
+            -0.9989024324217666
           ]
         }
       ],
@@ -760,6 +789,7 @@ M  END
               {
                 "id": 534,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -775,6 +805,7 @@ M  END
               {
                 "id": 535,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -790,6 +821,7 @@ M  END
               {
                 "id": 536,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 0,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -829,6 +861,7 @@ M  END
               {
                 "id": 537,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 0,
                 "apClass": {
@@ -836,14 +869,15 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  -0.89,
-                  0.0,
-                  0.6293
+                  0.13264337004325072,
+                  0.06580459085019102,
+                  -0.01712312746921174
                 ]
               },
               {
                 "id": 538,
                 "atomPositionNumber": 0,
+                "atomPositionNumberInMol": 1,
                 "totalConnections": 1,
                 "freeConnections": 1,
                 "apClass": {
@@ -851,9 +885,9 @@ M  END
                   "subClass": 0
                 },
                 "dirVec": [
-                  0.89,
-                  0.0,
-                  0.6293
+                  1.803866604977152,
+                  0.6231604497542478,
+                  0.23737116630255017
                 ]
               }
             ],
@@ -888,27 +922,28 @@ M  END
         "gRings": [],
         "symVertices": []
       },
-      "contractLevel": 0,
       "requiredAPs": [],
       "innerToOuterAPs": {
         "534": {
           "id": 443,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 6,
           "totalConnections": 1,
-          "freeConnections": 0,
+          "freeConnections": 1,
           "apClass": {
             "rule": "p",
             "subClass": 0
           },
           "dirVec": [
-            -0.0803,
-            -1.2717,
-            -0.571
+            0.5810309084180836,
+            -1.5229089627367765,
+            -5.129451382047242
           ]
         },
         "536": {
           "id": 444,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 6,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -916,14 +951,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -1.0612,
-            0.7054,
-            -0.571
+            0.3452962500857359,
+            0.5308528009219073,
+            -4.356417741773739
           ]
         },
         "538": {
           "id": 445,
           "atomPositionNumber": 1,
+          "atomPositionNumberInMol": 7,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -931,9 +967,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            0.5309678244569256,
+            -1.6539212221803323,
+            -2.341195056426671
           ]
         }
       },
@@ -953,6 +989,7 @@ M  END
         {
           "id": 449,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 10,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -960,14 +997,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            0.10642492218093866,
+            -0.6614921276239214,
+            -4.046049627387225
           ]
         },
         {
           "id": 450,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 10,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -975,9 +1013,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            1.0497095612964595,
+            0.7885297607023358,
+            -3.6264657704724743
           ]
         }
       ],
@@ -1006,6 +1044,7 @@ M  END
         {
           "id": 452,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 14,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1013,14 +1052,15 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.89,
-            0.0,
-            0.6293
+            0.5631181916831751,
+            -1.880259269671108,
+            -2.2249696142602136
           ]
         },
         {
           "id": 453,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 14,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1028,9 +1068,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.89,
-            0.0,
-            0.6293
+            1.7011634359319954,
+            -2.8841283886168156,
+            -1.2946471894687794
           ]
         }
       ],
@@ -1059,6 +1099,7 @@ M  END
         {
           "id": 454,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 13,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1066,9 +1107,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            -0.0087,
-            -0.007,
-            -0.0079
+            1.0497095612964595,
+            0.7885297607023358,
+            -3.6264657704724743
           ]
         }
       ],
@@ -1090,6 +1131,7 @@ M  END
         {
           "id": 455,
           "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 17,
           "totalConnections": 1,
           "freeConnections": 0,
           "apClass": {
@@ -1097,9 +1139,9 @@ M  END
             "subClass": 0
           },
           "dirVec": [
-            0.0109,
-            -0.0071,
-            0.0026
+            1.7011634359319954,
+            -2.8841283886168156,
+            -1.2946471894687794
           ]
         }
       ],
@@ -1114,37 +1156,6 @@ M  END
         "DELETE",
         "EXTEND",
         "CHANGEBRANCH"
-      ]
-    },
-    {
-      "lstAPs": [
-        {
-          "id": 215,
-          "atomPositionNumber": 0,
-          "totalConnections": 1,
-          "freeConnections": 0,
-          "apClass": {
-            "rule": "hyd",
-            "subClass": 1
-          },
-          "dirVec": [
-            0.4667,
-            -1.7366,
-            0.3905
-          ]
-        }
-      ],
-      "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
-      "vertexId": 19,
-      "buildingBlockId": 0,
-      "buildingBlockType": "CAP",
-      "isRCV": false,
-      "level": 2,
-      "allowedMutationTypes": [
-        "DELETE",
-        "CHANGEBRANCH",
-        "EXTEND"
       ]
     }
   ],
@@ -1207,11 +1218,6 @@ M  END
     {
       "srcAPID": 453,
       "trgAPID": 455,
-      "bondType": "SINGLE"
-    },
-    {
-      "srcAPID": 443,
-      "trgAPID": 215,
       "bondType": "SINGLE"
     }
   ],
