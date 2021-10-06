@@ -473,14 +473,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     @Override
     public IAtomContainer getIAtomContainer()
-    {
-        /*
-        if (!containsAtoms())
-        {
-            return null;
-        }
-        */
-        
+    {   
         if (mol != null)
         {
             return mol;
@@ -498,7 +491,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // the atom list of the entire molecular representation of the 
             // templates.
             // And we collects the outer APs per atom at the same time
-            Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = new TreeMap<>();
+            Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
+                    new TreeMap<>();
             for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) {
                 DENOPTIMAttachmentPoint inAP = getInnerAPFromOuterAP(outAP);
                 outAP.setDirectionVector(inAP.getDirectionVector());
@@ -521,9 +515,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 a.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,
                         getVertexId());
             }
-            
-            //TODO-gg this.toJson()
-            iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG,innerGraph.toJson());
             
             // Prepare SDF-like string for atom container
             // Done as in  DENOPTIMFragment.projectAPsToProperties
@@ -570,6 +561,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
             iac.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
             iac.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+            iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+            
+            iac.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
+            iac.removeProperty(DENOPTIMConstants.GRAPHTAG);
+            iac.removeProperty(DENOPTIMConstants.GMSGTAG);
+            iac.removeProperty(DENOPTIMConstants.GCODETAG);
             
             // We store the result in a field of this instance
             mol = iac;

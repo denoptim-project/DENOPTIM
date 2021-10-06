@@ -34,6 +34,7 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonDeserializer;
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
@@ -43,6 +44,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 
@@ -985,6 +987,14 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         properties.put(key, property);
     }
+    
+//------------------------------------------------------------------------------
+    
+    public static DENOPTIMVertex fromJson(String json)
+    {
+        Gson gson = DENOPTIMgson.getReader();
+        return gson.fromJson(json, DENOPTIMVertex.class);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1092,10 +1102,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
             t.setInnerGraph(g);
             v = t;
-        } else if (jsonVertex != null && iac.getAtomCount()==0)
+        } else if (jsonVertex != null)
         {
-            EmptyVertex ev = EmptyVertex.fromJson(jsonVertex.toString());
-            v = ev;
+            v = fromJson(jsonVertex.toString());
         } else {
             v = new DENOPTIMFragment(iac,bbt);
         }

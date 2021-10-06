@@ -45,24 +45,22 @@ public class DENOPTIMVertexTest
         // while here we expect no fragment space to be defined.
         FragmentSpace.clearAll();
         
-        Gson gson = DENOPTIMgson.getReader();
-        
         EmptyVertex ev = new EmptyVertex();
         assertEquals(VertexType.EmptyVertex,ev.vertexType);
         String evStr = ev.toJson();
-        DENOPTIMVertex ev2 = gson.fromJson(evStr, DENOPTIMVertex.class);
+        DENOPTIMVertex ev2 = DENOPTIMVertex.fromJson(evStr);
         assertTrue(ev2 instanceof EmptyVertex);
         
         DENOPTIMFragment f = new DENOPTIMFragment();
         assertEquals(VertexType.MolecularFragment,f.vertexType);
         String fStr = f.toJson();
-        DENOPTIMVertex f2 = gson.fromJson(fStr, DENOPTIMVertex.class);
+        DENOPTIMVertex f2 = DENOPTIMVertex.fromJson(fStr);
         assertTrue(f2 instanceof DENOPTIMFragment);
         
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
         assertEquals(VertexType.Template,t.vertexType);
         String tStr = t.toJson();
-        DENOPTIMVertex t2 = gson.fromJson(tStr, DENOPTIMVertex.class);
+        DENOPTIMVertex t2 = DENOPTIMVertex.fromJson(tStr);
         assertTrue(t2 instanceof DENOPTIMTemplate);
     }
 	
