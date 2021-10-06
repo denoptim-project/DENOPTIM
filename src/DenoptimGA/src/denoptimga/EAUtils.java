@@ -522,23 +522,16 @@ public class EAUtils
         }
         
         // Check if the chosen combination gives rise to forbidden ends
-        //TODO-V3 this should be considered already when making the list of
+        //TODO: this should be considered already when making the list of
         // possible combination of rings
         for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
         {
-            //TODO-GG del
-            if (rcv.getEdgeToParent() == null)
-                System.out.println("HERE");
-            
-            //TODO-GG keep?
             // Also exclude any RCV that is not bound to anything?
-            /*
             if (rcv.getEdgeToParent() == null)
             {
                 res = null;
                 mnt.increase(CounterID.FAILEDBUILDATTEMPTS_FORBIDENDS);
             }
-            */
             
             APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
             if (FragmentSpace.getCappingMap().get(apc)==null 
@@ -1157,11 +1150,20 @@ public class EAUtils
         {
             Monitor mnt = new Monitor();
             mnt.name = "IntraTemplateBuild";
-            if (!DENOPTIMGraphOperations.performMutation(graph,mnt))
+            List<DENOPTIMVertex> initialMutableSites = graph.getMutableSites();
+            for (DENOPTIMVertex mutableSite : initialMutableSites)
             {
-                mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
-                mnt.increase(CounterID.FAILEDMUTATTEMTS);
-                return null;
+                // This account for the possibility that a mutation changes a 
+                // branch of the initial graph or deleted vertexes.
+                if (!graph.containsVertex(mutableSite))
+                    continue;
+                
+                if (!DENOPTIMGraphOperations.performMutation(mutableSite,mnt))
+                {
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS);
+                    return null;
+                }
             }
         }
         
@@ -1171,7 +1173,10 @@ public class EAUtils
         graph.setCandidateClosableChains(
                         RingClosuresArchive.getCCFromTurningPointId(scafIdx));
 
-        DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
+        if (scafVertex.hasFreeAP())
+        {
+            DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
+        }
         
         if (!(scafVertex instanceof DENOPTIMTemplate) 
                 && graph.getVertexCount() == 0)
@@ -1179,7 +1184,6 @@ public class EAUtils
             return null;
         }
         
-        // add Capping if necessary
         addCappingGroup(graph);
         return graph;
     }

@@ -274,6 +274,8 @@ public class EmptyVertex extends DENOPTIMVertex
         c.setBuildingBlockId(this.getBuildingBlockId());
         c.setBuildingBlockType(this.getBuildingBlockType());
         
+        c.setMutationTypes(this.getUnfilteredMutationTypes());
+        
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
             c.addAP(ap.clone());
@@ -525,7 +527,8 @@ public class EmptyVertex extends DENOPTIMVertex
                 break;
                 
             default:
-                lst.add(this);
+                if (getMutationTypes().size()>0)
+                    lst.add(this);
                 break;
         }
         return lst;

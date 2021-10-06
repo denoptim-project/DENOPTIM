@@ -442,7 +442,7 @@ public class FragmentSpace
             case SCAFFOLD:
                 if (bbIdx >-1 && bbIdx < scaffoldLib.size())
                 {
-                        originalVrtx = scaffoldLib.get(bbIdx);        
+                    originalVrtx = scaffoldLib.get(bbIdx);        
                 }
                 else
                 {

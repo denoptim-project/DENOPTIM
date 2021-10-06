@@ -499,8 +499,19 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             if (owner.getGraphOwner() != null 
                     && owner.getGraphOwner().templateJacket != null)
             {
-               return owner.getGraphOwner().templateJacket
-                    .getOuterAPFromInnerAP(this).isAvailableThroughout();
+                DENOPTIMAttachmentPoint apProjOnTemplateSurface =
+                        owner.getGraphOwner().templateJacket
+                        .getOuterAPFromInnerAP(this);
+                if (apProjOnTemplateSurface != null)
+                {
+                    return apProjOnTemplateSurface.isAvailableThroughout();
+                } else {
+                    throw new IllegalStateException("Available AP inside a"
+                            + "template should have a projection on the "
+                            + "surface of the template, "
+                            + "but it has none. "
+                            + "Please, report this to the authors.");
+                }
             } else {
                 return true;
             }

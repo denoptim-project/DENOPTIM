@@ -1,0 +1,6 @@
+# APCLass Compatibility rules
+RCN peptide:0 peptide:1,ATneutral:0
+RCN peptide:1 peptide:0,ATneutral:0
+# APClass-to-BondOrder
+RBO peptide 1
+RBO ATneutral 1

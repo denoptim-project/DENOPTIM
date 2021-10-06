@@ -215,6 +215,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         c.setVertexId(this.getVertexId());
         c.setBuildingBlockId(this.getBuildingBlockId());
         c.contractLevel = this.contractLevel;
+        c.setMutationTypes(this.getUnfilteredMutationTypes());
 
         for (DENOPTIMAttachmentPoint oriAP : this.requiredAPs)
         {
@@ -625,19 +626,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     scaffCompatTypes.add(MutationType.ADDLINK);
                 }
             }
-                
-            if (contractLevel == ContractLevel.FREE)
-            {
-                //TODO-GG mutations inside template
-                //scaffCompatTypes.add(MutationType.);
-                // HEre we should add mutation types that pertain the template
-                // not the embedded vertexes!
-            }
             
             // NB: to freeze graph structure while allowing mutation of
-            // single vertexes, i.e., retain the graph topology, it should be 
+            // single vertexes, i.e., retain the graph topology, it is 
             // sufficient to remove RCVs from the list of mutation sites, and 
-            // do only CHANGELINK
+            // do only CHANGELINK. See 'cyclicpeptide' test case.
             
             return scaffCompatTypes;
         }
@@ -661,7 +654,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         switch (contractLevel) 
         {
             case FIXED:
-                lst.add(this);
+                if (getMutationTypes().size() > 0)
+                    lst.add(this);
                 break;
                 
             case FREE:

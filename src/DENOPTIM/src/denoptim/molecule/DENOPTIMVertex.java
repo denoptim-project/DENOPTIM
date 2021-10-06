@@ -434,7 +434,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     {
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
         {
-            if (ap.isAvailable())
+            if (ap.isAvailableThroughout())
                 return true;
         }
         return false;
@@ -735,6 +735,20 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     public void setMutationTypes(List<MutationType> lst)
     {
         allowedMutationTypes = lst;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the mutation types that are constitutionally configures for this
+     * vertex irrespectively on the graph or the context in which this vertex
+     * is included.
+     * @return the list of allowed mutation types as configured upon vertex 
+     * contitution.
+     */
+    protected List<MutationType> getUnfilteredMutationTypes()
+    {
+        return allowedMutationTypes;
     }
     
 //------------------------------------------------------------------------------

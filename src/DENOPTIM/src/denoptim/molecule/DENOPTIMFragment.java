@@ -677,6 +677,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 		}
 		clone.setBuildingBlockId(this.getBuildingBlockId());
 		clone.setBuildingBlockType(this.getBuildingBlockType());
+
+        clone.setMutationTypes(this.getUnfilteredMutationTypes());
 		
 		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : this.getSymmetricAPSets())
@@ -921,7 +923,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
                 
             default:
-                lst.add(this);
+                if (getMutationTypes().size()>0)
+                    lst.add(this);
                 break;
         }
         return lst;

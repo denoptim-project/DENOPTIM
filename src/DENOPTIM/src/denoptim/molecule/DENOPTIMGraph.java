@@ -65,6 +65,7 @@ import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
@@ -696,7 +697,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Appends a vertex to this graph without creating any edge. This is a
-     * good way to add the first vertex.
+     * good way to add the first vertex, but can be used also if you intend to 
+     * add edges manually.
      * @param vertex the vertex that will be added (no cloning).
      * @throws DENOPTIMException in the vertex has an ID that is already 
      * present in the current list of vertices of this graph, if any.
@@ -824,6 +826,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
                     GraphUtils.getUniqueVertexIndex(), bbId, bbt);
+
+            newLink.setMutationTypes(oldLink.getUnfilteredMutationTypes());
+            
             if (!replaceSingleVertex(oldLink, newLink, apMap))
             {
                 return false;
@@ -856,7 +861,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return false;
         }
         
-        // First keep track of the links that will be broken and re-created,
+        // Keep track of the links that will be broken and re-created,
         // and also of the relation free APs may have with a possible template
         // that embeds this graph.
         Map<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
