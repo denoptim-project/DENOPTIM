@@ -247,6 +247,12 @@ public class DENOPTIMMoleculeUtils
             DENOPTIMVertex vT = rings.get(0).getTailVertex();
             IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
             IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
+            if (mol.getConnectedAtomsList(aH).size() == 0
+                    || mol.getConnectedAtomsList(aT).size() == 0)
+            {
+                // This can happen when building a graph with empty vertexes
+                continue;
+            }
             int iSrcH = mol.indexOf(mol.getConnectedAtomsList(aH).get(0));
             int iSrcT = mol.indexOf(mol.getConnectedAtomsList(aT).get(0));
             atmsToRemove.add(aH);
