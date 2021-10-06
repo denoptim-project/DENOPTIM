@@ -526,6 +526,20 @@ public class EAUtils
         // possible combination of rings
         for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
         {
+            //TODO-GG del
+            if (rcv.getEdgeToParent() == null)
+                System.out.println("HERE");
+            
+            //TODO-GG keep?
+            // Also exclude any RCV that is not bound to anything?
+            /*
+            if (rcv.getEdgeToParent() == null)
+            {
+                res = null;
+                mnt.increase(CounterID.FAILEDBUILDATTEMPTS_FORBIDENDS);
+            }
+            */
+            
             APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
             if (FragmentSpace.getCappingMap().get(apc)==null 
                     && FragmentSpace.getForbiddenEndList().contains(apc))

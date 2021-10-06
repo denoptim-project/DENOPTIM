@@ -109,13 +109,13 @@ public class DenoptimRND
         catch (DENOPTIMException de)
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", de);
-            GenUtils.printExceptionChain(de);
+            de.printStackTrace(System.err);
             System.exit(-1);
         }
         catch (Exception e)
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
-            GenUtils.printExceptionChain(e);
+            e.printStackTrace(System.err);
             System.exit(-1);
         }
 

@@ -61,7 +61,8 @@ public class DENOPTIMgson
     reader = new GsonBuilder()
       .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
       // Custom deserializer to dispatch to the correct subclass of Vertex
-      .registerTypeAdapter(DENOPTIMVertex.class, new DENOPTIMVertexDeserializer())
+      .registerTypeAdapter(DENOPTIMVertex.class, 
+              new DENOPTIMVertexDeserializer())
       // Custom deserializer takes care of converting ID-based components
       // to references to vertices and APs
       .registerTypeAdapter(DENOPTIMGraph.class, new DENOPTIMGraphDeserializer())
@@ -140,7 +141,8 @@ public class DENOPTIMgson
 
 //------------------------------------------------------------------------------
 
-      public static class DENOPTIMExclusionStrategyNoAPMap implements ExclusionStrategy
+      public static class DENOPTIMExclusionStrategyNoAPMap 
+          implements ExclusionStrategy
       {
           @Override
           public boolean shouldSkipField(FieldAttributes field) {

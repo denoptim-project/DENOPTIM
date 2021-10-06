@@ -132,7 +132,7 @@ public class GraphEditor
         catch (Exception e)
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
-            GenUtils.printExceptionChain(e);
+            e.printStackTrace(System.err);
             System.exit(-1);
         }
 

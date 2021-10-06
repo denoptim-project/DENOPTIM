@@ -100,7 +100,7 @@ public class DenoptimCG
         }
         catch (DENOPTIMException de)
         {
-            GenUtils.printExceptionChain(de);
+            de.printStackTrace(System.err);
             System.exit(-1);
         }
         

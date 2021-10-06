@@ -365,7 +365,7 @@ public class EmptyVertex extends DENOPTIMVertex
         IAtomContainer iac = new AtomContainer();
         
         // We need to get the APs sorted by pseudo-atom source ID. This
-        // to write the CLASS and ATTACHMENT_PPOINT fileds of the SDF.
+        // to write the CLASS and ATTACHMENT_PPOINT fields of the SDF.
         
         Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = new TreeMap<>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
@@ -440,8 +440,7 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     
     public String toJson()
-    {
-        
+    {    
         Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;

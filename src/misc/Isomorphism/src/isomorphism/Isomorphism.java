@@ -62,7 +62,7 @@ public class Isomorphism
         }
         catch (DENOPTIMException de)
         {
-            GenUtils.printExceptionChain(de);
+            de.printStackTrace(System.err);
             System.exit(-1);
         }
 

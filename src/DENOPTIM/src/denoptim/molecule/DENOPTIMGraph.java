@@ -3770,6 +3770,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     public String toJson() throws DENOPTIMException
     {
+        //TODO: vertexID uniqueness should be guaranteed by the addVertex method
+        // Therefore, this check should not be needed. Consider removal.
+        //TODO: then the addVertex method should ensure also AP ID uniqueness.
+        
         // Check for uniqueness of vertexIDs and APIDs within the
         // graph (ignore nested graphs).
         boolean regenerateVrtxID = false;

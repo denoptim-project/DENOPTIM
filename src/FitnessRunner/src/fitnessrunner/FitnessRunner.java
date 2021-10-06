@@ -97,7 +97,7 @@ public class FitnessRunner
     	        runner.stopRun();
     	    }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
-            GenUtils.printExceptionChain(t);
+            t.printStackTrace(System.err);
             throw new DENOPTIMException("Error in FitnessRunner run.", t);
         }
         

@@ -1631,8 +1631,12 @@ public class DENOPTIMGraphOperations
     public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
             throws DENOPTIMException
     {
-        MutationType mType = RandomUtils.randomlyChooseOne(
-                vertex.getMutationTypes());
+        List<MutationType> mTypes = vertex.getMutationTypes();
+        if (mTypes.size() == 0)
+        {
+            return false;
+        }
+        MutationType mType = RandomUtils.randomlyChooseOne(mTypes);
         return performMutation(vertex, mType, mnt);
     }
     
@@ -1735,6 +1739,12 @@ public class DENOPTIMGraphOperations
                         candidates.add(c.getEdgeToParent().getSrcAP()
                                 .getIndexInOwner());
                     }
+                    if (candidates.size() == 0)
+                    {
+                        mnt.increase(
+                                CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
+                    break;
+                    }   
                     chosenApId = RandomUtils.randomlyChooseOne(candidates);
                 }
                 done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt);

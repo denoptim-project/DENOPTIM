@@ -109,7 +109,7 @@ public class DenoptimGA
             stopExternalCmdListener(ecl);
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
 
-            GenUtils.printExceptionChain(t);
+            t.printStackTrace(System.err);
             
             throw new DENOPTIMException("Error in DenoptimGA run.", t);
         }

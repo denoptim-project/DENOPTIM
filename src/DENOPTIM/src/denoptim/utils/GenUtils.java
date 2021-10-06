@@ -33,36 +33,6 @@ public class GenUtils
     
 //------------------------------------------------------------------------------
     
-    // this is the javaboutique version
-    public static void printExceptionChain(Throwable thr) {
-        
-        StackTraceElement[] elements = thr.getStackTrace();
-        for (StackTraceElement element : elements) {
-            System.err.println(element.getFileName() + ":"
-                    + element.getLineNumber() + ">> "
-                    + element.getMethodName() + "()"
-            );
-        }
-    
-        StackTraceElement[] steArr;
-        Throwable cause = thr;
-        while (cause != null) {
-            System.err.println("-------------------------------");
-            steArr = cause.getStackTrace();
-            StackTraceElement s0 = steArr[0];
-            System.err.println(cause.toString());
-            System.err.println("  at " + s0.toString());
-            if (cause.getCause() == null) 
-            {
-                System.err.println("-------------------------------");
-                cause.printStackTrace();
-            }
-            cause = cause.getCause();
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
     /**
      * C++ equivalent of a getchar()
      */
