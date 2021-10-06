@@ -38,7 +38,7 @@ import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
-
+import denoptim.molecule.DENOPTIMVertex.VertexType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 
@@ -76,7 +76,7 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     public EmptyVertex()
     {
-        super(GraphUtils.getUniqueVertexIndex());
+        super(VertexType.EmptyVertex, GraphUtils.getUniqueVertexIndex());
         lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         lstSymAPs = new ArrayList<SymmetricSet>();
     }
@@ -92,12 +92,12 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     public EmptyVertex(int id)
     {
-        super(id);
+        super(VertexType.EmptyVertex, id);
         lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         lstSymAPs = new ArrayList<SymmetricSet>();
     }
 
-  //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Constructor for an identified vertex with attachment points.
@@ -107,7 +107,7 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     public EmptyVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs)
     {
-        super(id);
+        super(VertexType.EmptyVertex, id);
         this.lstAPs = lstAPs;
         this.lstSymAPs = new ArrayList<SymmetricSet>();
     }
@@ -126,7 +126,7 @@ public class EmptyVertex extends DENOPTIMVertex
     public EmptyVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs,
             ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)
     {
-        super(id);
+        super(VertexType.EmptyVertex, id);
         this.lstAPs = lstAPs;
         this.lstSymAPs = lstSymAPs;
         setAsRCV(isRCV);

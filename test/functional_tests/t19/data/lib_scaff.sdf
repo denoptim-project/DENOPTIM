@@ -112,7 +112,7 @@ M  END
           ]
         }
       ],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 13,
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
@@ -197,7 +197,7 @@ M  END
           ]
         }
       ],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 14,
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
@@ -282,7 +282,7 @@ M  END
           ]
         }
       ],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 15,
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
@@ -367,7 +367,7 @@ M  END
           ]
         }
       ],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 16,
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
@@ -398,7 +398,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 17,
       "buildingBlockId": 4,
       "buildingBlockType": "FRAGMENT",
@@ -429,7 +429,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 18,
       "buildingBlockId": 5,
       "buildingBlockType": "FRAGMENT",
@@ -460,7 +460,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 19,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
@@ -491,7 +491,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 20,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
@@ -522,7 +522,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 21,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
@@ -553,7 +553,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 22,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
@@ -584,7 +584,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 23,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
@@ -615,7 +615,7 @@ M  END
         }
       ],
       "lstSymAPs": [],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 24,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",

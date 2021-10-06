@@ -2102,7 +2102,7 @@ public class DenoptimIO
         int i = 0;
         for (IAtomContainer mol : mols) {
             i++;
-            DENOPTIMGraph g = readGraphFromSDFileIAC(mol,i,useFS);
+            DENOPTIMGraph g = readGraphFromSDFileIAC(mol,i,useFS,fileName);
             lstGraphs.add(g);
         }
         return lstGraphs;
@@ -2127,6 +2127,28 @@ public class DenoptimIO
     public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
             int molId, boolean useFS) throws DENOPTIMException
     {
+        return readGraphFromSDFileIAC(mol, molId, useFS, "unKnown");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts an atom container read in from an SDF file into a graph, if 
+     * possible. Otherwise, throws an exception.
+     * @param mol the atom container coming from SDF representation
+     * @param molId identified used only for logging purposed
+     * @param useFS set to <code>true</code> when there is a defined
+     * fragment space that contains the fragments used to build the graphs.
+     * Otherwise, use <code>false</code>. This will create only as many APs as
+     * needed to satisfy the graph representation, thus creating a potential
+     * mismatch between fragment space and graph representation.
+     * @return the corresponding graph or null.
+     * @throws DENOPTIMException is the atom container cannot be converted due
+     * to lack of the proper SDF tags, or failure in the conversion.
+     */
+    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
+            int molId, boolean useFS, String fileName) throws DENOPTIMException
+    {
         // Something very similar is done also in Candidate
         DENOPTIMGraph g = null;
         Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
@@ -2138,7 +2160,14 @@ public class DenoptimIO
                     + "' tag. Check molecule " + molId + " in the SDF file.");
         } else if (json != null) {
             String js = json.toString();
-            g = DENOPTIMGraph.fromJson(js);
+            try
+            {
+                g = DENOPTIMGraph.fromJson(js);
+            } catch (Exception e)
+            {
+                throw new DENOPTIMException(e.getMessage()+"Check file '" 
+                        + fileName + "'", e);
+            }
         } else {
             g = GraphConversionTool.getGraphFromString(
                     graphEnc.toString().trim(), useFS);

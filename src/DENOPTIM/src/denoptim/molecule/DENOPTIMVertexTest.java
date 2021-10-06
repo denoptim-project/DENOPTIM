@@ -5,17 +5,25 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
+
+import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.DENOPTIMVertex.VertexType;
+import denoptim.utils.DENOPTIMgson;
 
 /**
  * Unit test for DENOPTIMVertex
@@ -26,6 +34,37 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 public class DENOPTIMVertexTest
 {
 	private StringBuilder reason = new StringBuilder();
+	
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFromToJSON_minimal() throws Exception 
+    {
+        // This is because we do not know in which order the unit test run,
+        // so, there could be a previous test that defines the fragment space,
+        // while here we expect no fragment space to be defined.
+        FragmentSpace.clearAll();
+        
+        Gson gson = DENOPTIMgson.getReader();
+        
+        EmptyVertex ev = new EmptyVertex();
+        assertEquals(VertexType.EmptyVertex,ev.vertexType);
+        String evStr = ev.toJson();
+        DENOPTIMVertex ev2 = gson.fromJson(evStr, DENOPTIMVertex.class);
+        assertTrue(ev2 instanceof EmptyVertex);
+        
+        DENOPTIMFragment f = new DENOPTIMFragment();
+        assertEquals(VertexType.MolecularFragment,f.vertexType);
+        String fStr = f.toJson();
+        DENOPTIMVertex f2 = gson.fromJson(fStr, DENOPTIMVertex.class);
+        assertTrue(f2 instanceof DENOPTIMFragment);
+        
+        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        assertEquals(VertexType.Template,t.vertexType);
+        String tStr = t.toJson();
+        DENOPTIMVertex t2 = gson.fromJson(tStr, DENOPTIMVertex.class);
+        assertTrue(t2 instanceof DENOPTIMTemplate);
+    }
 	
 //------------------------------------------------------------------------------
 	

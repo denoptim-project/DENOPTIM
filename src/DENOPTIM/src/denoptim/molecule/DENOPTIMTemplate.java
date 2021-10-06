@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.io.File;
+import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -19,6 +21,13 @@ import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.internal.Streams;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -27,6 +36,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.PathSubGraph;
 import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
@@ -53,9 +63,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     private static final long serialVersionUID = 1L;
     
     /**
-     * Graph that is embedded in this vertex. This field differentiates a
-     * template from any other subclass of {@link DENOPTIMVertex}, and its name
-     * is used in {@link DENOPTIMVertexDeserializer} to deserialize JSON string.
+     * Graph that is embedded in this vertex.
      */
     private DENOPTIMGraph innerGraph;
     
@@ -101,12 +109,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
 
     private APTreeMap innerToOuterAPs;
+
     
 //------------------------------------------------------------------------------
 
     public DENOPTIMTemplate(DENOPTIMVertex.BBType bbType)
     {
-        super();
+        super(VertexType.Template);
         setBuildingBlockType(bbType);
     }
 
@@ -384,7 +393,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
-        return new ArrayList<>(innerToOuterAPs.values());
+        if (innerToOuterAPs == null)
+            return new ArrayList<>();
+        else
+            return new ArrayList<>(innerToOuterAPs.values());
     }
 
 //-----------------------------------------------------------------------------
@@ -510,6 +522,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                         getVertexId());
             }
             
+            //TODO-gg this.toJson()
             iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG,innerGraph.toJson());
             
             // Prepare SDF-like string for atom container
@@ -837,6 +850,73 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * Produces a string that represents this vertex and that adheres to the 
+     * JSON format.
+     * @return the JSON format as a single string
+     */
+    
+    public String toJson()
+    {    
+        Gson gson = DENOPTIMgson.getWriter();
+        String jsonOutput = gson.toJson(this);
+        return jsonOutput;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a JSON string and returns an instance of this class.
+     * @param json the string to parse.
+     * @return a new instance of this class.
+     */
+    
+    public static DENOPTIMTemplate fromJson(String json)
+    {
+        Gson gson = DENOPTIMgson.getReader();
+        
+        // This deserializes many "easy" fields, but not the embedded graph
+        // which is not "easy" as it need its own deserializer to 
+        // recreate all the references to APs/edges/vertexes.
+        DENOPTIMTemplate t = gson.fromJson(json, DENOPTIMTemplate.class);
+        
+        // Now, recover the missing bits (if present) from the original string
+        JsonObject jsonObject = (JsonObject) Streams.parse(new JsonReader(
+                new StringReader(json)));
+       
+        if (jsonObject.has("innerGraph"))
+        {
+            JsonObject innerGraphJson = jsonObject.getAsJsonObject(
+                    "innerGraph");
+            DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(
+                    innerGraphJson.toString());
+            t.setInnerGraph(innerGraph);
 
+            if (jsonObject.has("innerToOuterAPs"))
+            {
+                Type type = new TypeToken<TreeMap<Integer,
+                        DENOPTIMAttachmentPoint>>(){}.getType();
+                TreeMap<Integer,DENOPTIMAttachmentPoint> map =
+                        gson.fromJson(jsonObject.getAsJsonObject(
+                                "innerToOuterAPs"), type);
+                t.updateInnerToOuter(map);
+            }
+        }
+        
+        for (DENOPTIMAttachmentPoint ap : t.getAttachmentPoints())
+        {
+            ap.setOwner(t);
+        }
+        
+        // WARNING: other fields, such as 'owner' and AP 'user' are
+        // recovered upon deserializing the graph containing this 
+        // vertex, if any
+        
+        return t;
+    }
+    
+//------------------------------------------------------------------------------
+    
 }
 

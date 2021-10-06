@@ -87,7 +87,7 @@ M  END
           ]
         }
       ],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 3,
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
@@ -158,7 +158,7 @@ M  END
           ]
         }
       ],
-      "fragmentType": "Molecular_fragment",
+      "vertexType": "MolecularFragment",
       "vertexId": 4,
       "buildingBlockId": 1,
       "buildingBlockType": "FRAGMENT",

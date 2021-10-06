@@ -32,11 +32,15 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMgson;
 
 import static denoptim.molecule.DENOPTIMVertex.*;
 
@@ -69,14 +73,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 	 * Molecular representation of this fragment
 	 */
 	private IAtomContainer mol;
-	
-	/**
-	 * Field distinguishing type DENOPTIMFragment from other types of vertexes.
-	 * The existence of this field triggers interpretation of the JSON string
-	 * as a DENOPTIMFragment.
-	 */
-	private final String fragmentType = "Molecular_fragment";
-	// NB: Don't make static or Gson will ignore it!
+
 	
 //-----------------------------------------------------------------------------
 
@@ -86,7 +83,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
     public DENOPTIMFragment()
     {
-        super();
+        super(VertexType.MolecularFragment);
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
@@ -102,7 +99,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     public DENOPTIMFragment(int vertexId)
     {
-        super(vertexId);
+        super(VertexType.MolecularFragment, vertexId);
         this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
@@ -123,7 +120,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
-        super (vertexId);
+        super (VertexType.MolecularFragment, vertexId);
         
         this.setBuildingBlockType(bbt);
         
@@ -928,6 +925,117 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
         }
         return lst;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Produces a string that represents this vertex and that adheres to the 
+     * JSON format.
+     * @return the JSON format as a single string
+     */
+    
+    public String toJson()
+    {    
+        Gson gson = DENOPTIMgson.getWriter();
+        String jsonOutput = gson.toJson(this);
+        return jsonOutput;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a JSON string and returns an instance of this class.
+     * @param json the string to parse.
+     * @return a new instance of this class.
+     */
+    
+    public static DENOPTIMFragment fromJson(String json)
+    {   
+        DENOPTIMFragment returnedFrag = null;
+        
+        //TODO-V3?: serialize AtomContainer2 somehow (as an SDF string?)
+        // Perhaps, an idea is to place a json version of the atom
+        // container only if the json string is meant to go in a .json file
+        // but not if it goes in an SDF file
+
+        // The serialized fragment does NOT include its molecular
+        // representation, which cannot be serialized (so far...)
+        Gson gson = DENOPTIMgson.getReader();
+        DENOPTIMFragment fragNoMol = gson.fromJson(json, DENOPTIMFragment.class);
+        // fragNoMol has these issues:
+        // - mol in null
+        // - AP user/owner is null
+
+        if (FragmentSpace.isDefined())
+        {
+            // If a fragment space exists, we rebuild the fragment from the
+            // library, and attach to it the serialized data
+            DENOPTIMFragment fragWithMol;
+            try
+            {
+                DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(
+                            fragNoMol.getBuildingBlockType(), 
+                            fragNoMol.getBuildingBlockId());
+                if (v instanceof DENOPTIMFragment)
+                {
+                    fragWithMol = (DENOPTIMFragment) v;
+                } else {
+                    throw new JsonParseException("Building block "
+                            + fragNoMol.getBuildingBlockType() + " " 
+                            + fragNoMol.getBuildingBlockId()
+                            + " is not a " + DENOPTIMFragment.class.getName() 
+                            + "as claimed by JSON representation.");
+                }
+            } catch (DENOPTIMException e)
+            {
+                throw new JsonParseException("Could not get "
+                        + fragNoMol.getBuildingBlockType() + " " 
+                        + fragNoMol.getBuildingBlockId()
+                        + " from "
+                        + "library. ",e);
+            }
+            ArrayList<SymmetricSet> cLstSymAPs = 
+                    new ArrayList<SymmetricSet>();
+            for (SymmetricSet ss : fragNoMol.getSymmetricAPSets())
+            {
+                cLstSymAPs.add(ss.clone());
+            }
+
+            fragWithMol.setMutationTypes(fragNoMol.getMutationTypes());
+            fragWithMol.setSymmetricAPSets(cLstSymAPs);
+            fragWithMol.setAsRCV(fragNoMol.isRCV());
+            fragWithMol.setVertexId(fragNoMol.getVertexId());
+            fragWithMol.setLevel(fragNoMol.getLevel());
+            for (int iap = 0; iap<fragNoMol.getNumberOfAPs(); iap++)
+            {
+                DENOPTIMAttachmentPoint oriAP = fragNoMol.getAP(iap);
+                DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(
+                        iap);
+                newAP.setID(oriAP.getID());
+            }
+            returnedFrag = fragWithMol;
+        } else {
+            System.err.println("WARNING: undefined fragment space. "
+                    + "Templates will contain fragments with no "
+                    + "molecular representation. To avoid this, "
+                    + "first "
+                    + "define the fragment space, and "
+                    + "then work with "
+                    + "templates.");
+            returnedFrag = fragNoMol;
+        }
+        
+        for (DENOPTIMAttachmentPoint ap : returnedFrag.getAttachmentPoints())
+        {
+            ap.setOwner(returnedFrag);
+        }
+        
+        // WARNING: other fields, such as 'owner' and AP 'user' are
+        // recovered upon deserializing the graph containing this 
+        // vertex, if any
+
+        return returnedFrag;
     }
     
 //------------------------------------------------------------------------------
