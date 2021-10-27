@@ -32,6 +32,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,12 +79,12 @@ public class GraphViewerPanel2 extends JPanel
 	 */
 	private static final long serialVersionUID = 2L;
 	
+	Graph<JVertex, JEdge> loadedGraph;
 	VisualizationViewer<JVertex, JEdge>  viewer;
 	private DefaultModalGraphMouse<JVertex, JEdge> gm;
-
-	public static final String SPRITE_APCLASS = "sprite.apClass";
-	public static final String SPRITE_BNDORD = "sprite.bndOrd";
-	public static final String SPRITE_FRGID = "sprite.fragId";
+	
+	public enum LabelType {APC, BT, BBID};
+	
 	public static final String SPRITEATT_UICLASS_APCLASSSRC = "apLabelSRC";
 	public static final String SPRITEATT_UICLASS_APCLASSTRG = "apLabelTRG";
 	public static final String SPRITEATT_UICLASS_BNDORD = "bndTypLabel";
@@ -91,9 +92,6 @@ public class GraphViewerPanel2 extends JPanel
 	public static final String SPRITEATT_UICLASS_APID = "apIdLabel";
 	
     public enum JVertexType {SCAF, FRAG, CAP, RCV, AP, NONE};
-    
-    private boolean displayAPClass = true;
-    private boolean displayBndTyp = true;
     
 //------------------------------------------------------------------------------
     
@@ -121,13 +119,26 @@ public class GraphViewerPanel2 extends JPanel
         JVertexType vtype = JVertexType.NONE;
         
         /**
-         * The string used as label when gaphycally depicting this vertex.
+         * The string used as label when graphycally depicting this vertex.
          */
         String idStr = "nan";
         
         /**
+         * Flag requiring to display building block ID
+         */
+        boolean displayBBID = false;
+        
+        /**
+         * Reference to the {@link JEdge} linking this vertex to its parent 
+         * vertex. This is non-null only for vertexes that represent APs.
+         */
+        JEdge edgeToParent;
+        
+        /**
          * Constructor for vertex that represents a given 
-         * {@link DENOPTIMAttachmentPoint}.
+         * {@link DENOPTIMAttachmentPoint}. Note that the reference to the JEdge
+         * linking this JVertex to its parent is set when creating the JEdge
+         * {@link GraphViewerPanel2#convertDnGraphToGSGraph(DENOPTIMGraph, DENOPTIMTemplate)}
          * @param ap the {@link DENOPTIMAttachmentPoint}.
          */
         public JVertex(DENOPTIMAttachmentPoint ap) {
@@ -196,6 +207,16 @@ public class GraphViewerPanel2 extends JPanel
          * {@link DENOPTIMAttachmentPoint}.
          */
         boolean toAp = false;
+        
+        /**
+         * Flag requiring to display APClasses
+         */
+        boolean displayAPCs = false;
+        
+        /**
+         * Flag requiring to display Bond type
+         */
+        boolean displayBndTyp = false;
    
         /**
          * Constructor for a JUNG edge representing a 
@@ -267,8 +288,11 @@ public class GraphViewerPanel2 extends JPanel
 	 */
 	public void cleanup()
 	{
-	    viewer.removeAll();
-		for (Component c : this.getComponents())
+	    if (viewer != null)
+	    {
+	        viewer.removeAll();
+	    }
+	    for (Component c : this.getComponents())
 		{
 			this.remove(c);
 		}
@@ -360,9 +384,10 @@ public class GraphViewerPanel2 extends JPanel
                 {
                     JVertex vap = new JVertex(ap);
                     g.addVertex(vap);
-                    JEdge f = new JEdge(ap.getAPClass().toString());
-                    f.toAp = true;
-                    g.addEdge(f, vMap.get(v), vap, EdgeType.DIRECTED);
+                    JEdge e = new JEdge(ap.getAPClass().toString());
+                    e.toAp = true;
+                    g.addEdge(e, vMap.get(v), vap, EdgeType.DIRECTED);
+                    vap.edgeToParent = e;
                 }
             }
         }
@@ -431,7 +456,7 @@ public class GraphViewerPanel2 extends JPanel
 	 * Load the given graph to the graph viewer.
 	 * @param g the graph to load
 	 */
-	public void loadGraphToViewer(Graph g)
+	public void loadGraphToViewer(Graph<JVertex, JEdge>  g)
 	{
 		loadGraphToViewer(g,null);
 	}
@@ -446,7 +471,8 @@ public class GraphViewerPanel2 extends JPanel
 	 * displayed, or the position of nodes.
 	 */
 	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, GSGraphSnapshot prevStatus)
-	{	
+	{
+	    loadedGraph = g;
 	    Layout<JVertex, JEdge>  layout = new ISOMLayout<>(g);
         layout.setSize(new Dimension(300, 300)); //TODO-GG: get size from parent component
         viewer = new VisualizationViewer<>(layout);
@@ -510,8 +536,17 @@ public class GraphViewerPanel2 extends JPanel
         public String apply(JVertex v) {
             String label = "";
             if (v.vtype == JVertexType.AP)
-                label = "          ";
-            label = label + v.idStr;
+            {
+                label = "             AP" + v.idStr;
+            } else {
+                label = v.idStr;
+                if (v.displayBBID)
+                {
+                    label = "<html><body style='text-align: center'>" 
+                            + label + "<br>" + v.dnpVertex.getBuildingBlockId()
+                            + "</body></html>";
+                }
+            }
             return label;
         }
     }
@@ -607,30 +642,31 @@ public class GraphViewerPanel2 extends JPanel
     {
         @Override
         public String apply(JEdge e) {
-            if (!displayBndTyp && !displayAPClass)
+            if (!e.displayAPCs && !e.displayBndTyp)
             {
                 return null;
             }
             String label = "";
             if (e.toAp)
             {
-                if (displayAPClass)
+                if (e.displayAPCs)
                 {
                     label = e.srcAPC;
                 }
             } else {
-                if (displayBndTyp)
+                if (e.displayBndTyp)
                 {
                     label = label + e.bt;
-                    if (displayAPClass)
+                    if (e.displayAPCs)
+                    {
                         label = label + "<br>";
+                    }
                 }
-                if (displayAPClass)
+                if (e.displayAPCs)
                 {
                     label = label + e.srcAPC + "<br>" + e.trgAPC;
                 }
             }
-            
             if (!label.isEmpty())
             {
                 label = "<html><body style='text-align: center'>" 
@@ -638,7 +674,6 @@ public class GraphViewerPanel2 extends JPanel
             }
             return label;
         }
-        
     }
 	
 //-----------------------------------------------------------------------------
@@ -722,182 +757,90 @@ public class GraphViewerPanel2 extends JPanel
 	}
 	*/
 	
+//-----------------------------------------------------------------------------
 
 	/**
-	 * Append new labels related to the selected elements in the graph view.
-	 * @param sprType the class of labels chosen among the public fields of
-	 * this GraphViewerPanel (fields beginning with <code>SPRITE_</code>).
+	 * Adds or removes labels from the elements selected in the graph view. The
+	 * logics is a bit complex in that the behaviour is special in case one/more 
+	 * nodes are selected AND we want to alter the APClass labels: 
+	 * if there is only one selected node, then we display the APClasses on
+	 * all incident vertexes, if there is more than one,
+	 * @param labelType the type of label to act on.
+	 * @param show use <code>true</code> to display labels, or <code>false</code>
+	 * to hide labels of the given kind.
 	 */
-	public void appendSprites(String sprType)
+	public void alterLabels(LabelType labelType, boolean show)
 	{
-	    /*
-		switch (sprType)
+		switch (labelType)
 		{
-			case SPRITE_APCLASS:
-				for (Node n : getSelectedNodes())
-				{
-				    if (n.getAttribute("ui.class").equals("ap"))
-			        {
-			            return;
-			        }
-					for (Edge e : graph.getEdgeSet())
-					{
-					    if (e.hasAttribute("ui.class") 
-					            && e.getAttribute("ui.class").equals("rc"))
-					    {
-					        continue;
-					    }
-						if (e.getSourceNode() == n)
-						{
-							addSrcApClassSprite(e);
-						}
-						if (e.getTargetNode() == n)
-						{
-							addTrgApClassSprite(e);
-						}
-					}
-				}
+			case APC:
+			    for (JVertex v : getSelectedNodes())
+		        {
+			        for (JEdge e : loadedGraph.getIncidentEdges(v))
+                    {
+                        e.displayAPCs = show;
+                    }
+		        }
 				break;
 				
-			case SPRITE_BNDORD:
-				for (Edge e : getSelectedEdges())
-				{
-					addBondSprite(e);
-				}
+			case BT:
+			    for (JVertex v : getSelectedNodes())
+                {
+                    for (JEdge e : loadedGraph.getIncidentEdges(v))
+                    {
+                        e.displayBndTyp = show;
+                    }
+                }
 				break;
 				
-			case SPRITE_FRGID:
-				for (Node n : getSelectedNodes())
+			case BBID:
+				for (JVertex v : getSelectedNodes())
 				{
-					addFrgIdSprite(n);
+					v.displayBBID = show;
 				}
 				break;
 		}
-		*/
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Check if a sprite with the given identifier already exists.
-	 * @param sprId the identifier
-	 * @return <code>true</code> if a sprite with the given identifier is found
-	 */
-	public boolean hasSprite(String sprId)
-	{
-		boolean res = false;
-		/*//TODO
-		for (Sprite s : sman.sprites())
-		{
-			if (s.getId().equals(sprId))
-			{
-				res = true;
-				break;
-			}
-		}*/
-		return res;
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Remove labels related to the selected elements in the graph view.
-	 * @param sprType the class of labels chosen among the public fields of
-	 * this GraphViewerPanel (fields beginning with <code>SPRITE_</code>).
-	 */
-	public void removeSprites(String sprType)
-	{
-	    /*//TODO
-		ArrayList<String> sprToDel = new ArrayList<String>();
-		switch (sprType)
-		{
-			case SPRITE_APCLASS:	
-				for (Node n : getSelectedNodes())
-				{
-					for (Edge e : graph.getEdgeSet())
-					{
-						if (e.getSourceNode() == n)
-						{
-							Sprite s = sman.getSprite("srcApClass-"+e.getId());
-							if (s != null)
-							{
-								sprToDel.add(s.getId());
-							}
-						}
-						if (e.getTargetNode() == n)
-						{
-							Sprite s = sman.addSprite("trgApClass-"+e.getId());
-							if (s != null)
-							{
-								sprToDel.add(s.getId());
-							}
-						}
-					}
-				}
-				break;
-				
-			case SPRITE_BNDORD:
-				for (Edge e : getSelectedEdges())
-				{
-					Sprite s = sman.addSprite("bndTyp-"+e.getId());
-					if (s != null)
-					{
-						sprToDel.add(s.getId());
-					}
-				}
-				break;
-				
-			case SPRITE_FRGID:
-				for (Node n : getSelectedNodes())
-				{
-					Sprite s = sman.addSprite("molID-"+n.getId());
-					if (s != null)
-					{
-						sprToDel.add(s.getId());
-					}
-				}
-				break;
-		}	
-		
-		// Finally remove the chosen sprites
-		for (String id : sprToDel)
-		{
-			sman.removeSprite(id);
-		}
-		*/
+		viewer.repaint();
 	}
 
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Takes the list of selected edges from the viewer
-	 * @return the list of edges
+	 * Finds of selected edges from the viewer
+	 * @return the set of edges
 	 */
-	//TODO-GG remove if not used!!!
-	public ArrayList<JEdge> getSelectedEdges()
+	public Set<JEdge> getSelectedEdges()
 	{
-		ArrayList<JEdge> selectedEdges = new ArrayList<JEdge>();
-		/*//TODO
-		ArrayList<String> selectedNodeIds = mouseManager.getSelectedNodes();
-		for (Edge e : graph.getEdgeSet())
-		{
-			ArrayList<String> srcAndTrgNodeIDs = new ArrayList<String>();
-			srcAndTrgNodeIDs.add(e.getSourceNode().getId());
-			srcAndTrgNodeIDs.add(e.getTargetNode().getId());
-			if (selectedNodeIds.containsAll(srcAndTrgNodeIDs))
-			{
-			    selectedEdges.add(e);
-			}
-		}
-		*/
-		return selectedEdges;
+	    Set<JEdge> selEdges = new HashSet<>(
+	            viewer.getPickedEdgeState().getPicked());
+	    List<JVertex> lstNodes = new ArrayList<JVertex>(
+	            viewer.getPickedVertexState().getPicked());
+	    for (int i=0; i<lstNodes.size(); i++)
+	    {
+	        for (int j=i+1; j<lstNodes.size(); j++)
+	        {
+	            JEdge e = loadedGraph.findEdge(lstNodes.get(i), 
+	                    lstNodes.get(j));
+	            if (e != null)
+	            {
+	                selEdges.add(e);
+	            }
+	            JEdge erev = loadedGraph.findEdge(lstNodes.get(j), 
+	                    lstNodes.get(i));
+                if (erev != null)
+                {
+                    selEdges.add(erev);
+                }
+	        }
+	    }
+		return selEdges;
 	}
 	
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Takes the list of selected nodes from the viewer.
-	 * @return the list of nodes.
+	 * Finds selected nodes from the viewer.
+	 * @return the set of nodes.
 	 */
 	public Set<JVertex> getSelectedNodes()
 	{
@@ -939,6 +882,8 @@ public class GraphViewerPanel2 extends JPanel
 		cleanup();
 	}
 	
+	//-----------------------------------------------------------------------------
+
 //TODO-GG delete
 	   private APClass APCA, APCB, APCC, APCD;
 	    private String a="A", b="B", c="C", d="D";

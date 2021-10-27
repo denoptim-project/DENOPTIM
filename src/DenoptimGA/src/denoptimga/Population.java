@@ -37,7 +37,6 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMVertex;
-import scala.PartialFunction.OrElse;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of

@@ -54,7 +54,6 @@ import denoptim.molecule.SymmetricSet;
 import denoptim.molecule.UndirectedEdgeRelation;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptimga.EAUtils;
-import scala.deprecated;
 
 
 /**

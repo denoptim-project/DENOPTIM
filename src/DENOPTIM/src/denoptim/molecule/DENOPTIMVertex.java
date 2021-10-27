@@ -1127,6 +1127,20 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                         v.getAttachmentPoints().get(0).getAPClass()));
         return v;
     }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if this and another vertex are directly connected by an edge 
+     * within the same graph recursion level, i.e., both vertexes must belong
+     * to the same graph.
+     * @param other 
+     * @return <code>true</code>
+     */
+    public boolean connectedTo(DENOPTIMVertex other)
+    {
+        return this.getParent() == other || this == other.getParent();
+    }
     
 //------------------------------------------------------------------------------
     

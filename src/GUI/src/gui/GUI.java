@@ -60,7 +60,7 @@ public class GUI
 	/**
 	 * Default height
 	 */
-	private int height = 600;
+	private int height = 650;
 	
 	/**
 	 * Launch the application.

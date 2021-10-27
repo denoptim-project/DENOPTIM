@@ -29,8 +29,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
@@ -45,8 +43,10 @@ import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import edu.uci.ics.jung.graph.Graph;
 import gui.GraphViewerPanel2.JVertex;
 import gui.GraphViewerPanel2.JVertexType;
+import gui.GraphViewerPanel2.LabelType;
 
 
 /**
@@ -456,7 +456,10 @@ public class GraphVertexMolViewerPanel extends JSplitPane
             
 			// Otherwise try to load the clicked-on vertex into the viewer
 			String nodeId = (String) evt.getNewValue();
-			Node n = graphGS.getNode(nodeId);
+			
+			//TODO-GG
+			Object n = 1;
+			//JVertex n = graphGS.getNode(nodeId);
 			if (n == null || !hasFragSpace)
 			{
 				return;
@@ -527,24 +530,15 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Adds labels to the graph components that are presently selected
-	 * @param labelName the string identifying which label to add
+	 * Adds/Removes labels to the graph components that are presently selected
+	 * @param labelName the string identifying which label to add.
+	 * @param show use <code>true</code> to display labels, or <code>false</code>
+     * to hide labels of the given kind.
 	 */
-	public void addLabelsToGraph(String labelName)
+	public void alterLabels(LabelType labelName, boolean show)
 	{
-	    graphViewer.appendSprites(labelName);
+	    graphViewer.alterLabels(labelName, show);
 	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-     * Removes labels to the graph  components that are presently selected
-     * @param labelName the string identifying which label to add
-     */
-    public void removeLabelsToGraph(String labelName)
-    {
-        graphViewer.removeSprites(labelName);
-    }
     
 //-----------------------------------------------------------------------------
     

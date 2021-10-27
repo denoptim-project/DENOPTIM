@@ -30,9 +30,6 @@
 	<classpathentry kind="lib" path="lib/junit-jupiter-params-5.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/cdk-2.3.jar" sourcepath="/Users/marco/tools/cdk/cdk-cdk-2.3"/>
-	<classpathentry kind="lib" path="lib/gs-core-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/gs-ui-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/gs-algo-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-el-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/javax.servlet-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/Jmol-14.31.18.jar"/>

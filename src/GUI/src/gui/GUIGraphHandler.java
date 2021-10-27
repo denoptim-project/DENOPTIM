@@ -71,6 +71,7 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import gui.GraphViewerPanel2.LabelType;
 
 
 /**
@@ -169,9 +170,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	private JButton btnAddChord; 
 	
 	private JPanel pnlShowLabels;
-	private JButton btnAddLabel;
-	private JButton btnDelLabel;
-	private JComboBox<String> cmbLabel;
+	private JButton btnLabAPC;
+    private JButton btnLabBT;
+    private JButton btnLabBB;
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
@@ -653,62 +654,22 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		
 		// Controls of displayed attributes
 		pnlShowLabels = new JPanel();
-		JLabel lblShowHideLabels = new JLabel("Manage graph labels:");
-		cmbLabel = new JComboBox<String>(new String[] {
-		        GraphViewerPanel2.SPRITE_APCLASS, 
-		        GraphViewerPanel2.SPRITE_BNDORD, 
-		        GraphViewerPanel2.SPRITE_FRGID});
-		cmbLabel.setToolTipText("<html>Select the kind of type of information"
-				+ "<br>to add or remove from the graph view.</html>");
-		cmbLabel.setEnabled(false);
-		btnAddLabel = new JButton("Show");
-		btnAddLabel.setToolTipText("<html>Shows the chosen label for the "
-				+ "<br>selected elements.</html>");
-		btnAddLabel.setEnabled(false);
-		btnAddLabel.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (visualPanel.hasSelectedNodes())
-				{
-					visualPanel.addLabelsToGraph(
-							cmbLabel.getSelectedItem().toString());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null,
-							"<html>No elements selected! Drag the "
-			                + "mouse to select elements."
-					        + "<br>Click on background to unselect.</html>",
-			                "Error",
-			                JOptionPane.ERROR_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-				}
-			}
-		});
-		btnDelLabel = new JButton("Hide");
-		btnDelLabel.setToolTipText("<html>Hides the chosen label for the "
-				+ "<br>selected elements.</html>");
-		btnDelLabel.setEnabled(false);
-		btnDelLabel.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (visualPanel.hasSelectedNodes())
-				{
-				    visualPanel.removeLabelsToGraph(
-							cmbLabel.getSelectedItem().toString());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null,
-							"<html>No elements selected! Drag the "
-			                + "mouse to select elements."
-					        + "<br>Click on background to unselect.</html>",
-			                "Error",
-			                JOptionPane.ERROR_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-				}
-			}
-		});
+		JLabel lblShowHideLabels = new JLabel("Show/Hide labels:");
+		
+		btnLabAPC = new JButton("APClass");
+		btnLabAPC.addActionListener(new showHideLabelsListener(LabelType.APC));
+		btnLabAPC.setEnabled(false);
+        btnLabAPC.setToolTipText("Show/Hide attachment point class labels.");
+        
+        btnLabBT = new JButton("Bnd Typ");
+        btnLabBT.addActionListener(new showHideLabelsListener(LabelType.BT));
+        btnLabBT.setEnabled(false);
+        btnLabBT.setToolTipText("Show/Hide bond type ID labels.");
+        
+        btnLabBB = new JButton("BB ID");
+        btnLabBB.addActionListener(new showHideLabelsListener(LabelType.BBID));
+        btnLabBB.setEnabled(false);
+        btnLabBB.setToolTipText("Show/Hide building block ID labels.");
 		
         GroupLayout lyoShowAttr = new GroupLayout(pnlShowLabels);
         pnlShowLabels.setLayout(lyoShowAttr);
@@ -717,16 +678,14 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         lyoShowAttr.setHorizontalGroup(lyoShowAttr.createParallelGroup(
                         GroupLayout.Alignment.CENTER)
                         .addComponent(lblShowHideLabels)
-                        .addComponent(cmbLabel)
-                        .addGroup(lyoShowAttr.createSequentialGroup()
-	                        .addComponent(btnAddLabel)
-	                        .addComponent(btnDelLabel)));
+                        .addComponent(btnLabAPC)
+                        .addComponent(btnLabBT)
+                        .addComponent(btnLabBB));
         lyoShowAttr.setVerticalGroup(lyoShowAttr.createSequentialGroup()
 		                .addComponent(lblShowHideLabels)
-		                .addComponent(cmbLabel)
-		                .addGroup(lyoShowAttr.createParallelGroup()
-		                        .addComponent(btnAddLabel)
-		                        .addComponent(btnDelLabel)));
+                        .addComponent(btnLabAPC)
+                        .addComponent(btnLabBT)
+                        .addComponent(btnLabBB));
         graphCtrlPane.add(pnlShowLabels);
         
         graphCtrlPane.add(new JSeparator());
@@ -861,15 +820,50 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	
 //-----------------------------------------------------------------------------
 	
+	private class showHideLabelsListener implements ActionListener
+	{
+	    private LabelType labTyp;
+	    private Map<LabelType,Boolean> lastIteration = new HashMap<>();
+	    
+	    public showHideLabelsListener(LabelType labTyp) 
+	    {   
+	        this.labTyp = labTyp;
+	        for (LabelType lt : LabelType.values())
+	            lastIteration.put(lt, false);
+	    }
+	    
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (visualPanel.hasSelectedNodes())
+            {
+                boolean show = !lastIteration.get(labTyp);
+                visualPanel.alterLabels(labTyp, show);
+                lastIteration.put(labTyp,show);
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null,
+                        "<html>No elements selected! Drag the "
+                        + "mouse to select elements."
+                        + "<br>Click on background to unselect.</html>",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+            }
+        }
+	}
+	
+//-----------------------------------------------------------------------------
+	
 	private void enableGraphDependentButtons(boolean enable)
 	{
 		btnAddLibVrtx.setEnabled(enable);
         //btnAddEmptyVrtx.setEnabled(enable); //Always enabled
 		btnDelSel.setEnabled(enable);
 		btnAddChord.setEnabled(enable);
-		cmbLabel.setEnabled(enable);
-		btnAddLabel.setEnabled(enable);
-		btnDelLabel.setEnabled(enable);
+		btnLabAPC.setEnabled(enable);
+        btnLabBT.setEnabled(enable);
+        btnLabBB.setEnabled(enable);
 	}
 	
 //-----------------------------------------------------------------------------
