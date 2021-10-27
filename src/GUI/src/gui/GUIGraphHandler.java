@@ -655,9 +655,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		pnlShowLabels = new JPanel();
 		JLabel lblShowHideLabels = new JLabel("Manage graph labels:");
 		cmbLabel = new JComboBox<String>(new String[] {
-		        GraphViewerPanel.SPRITE_APCLASS, 
-		        GraphViewerPanel.SPRITE_BNDORD, 
-		        GraphViewerPanel.SPRITE_FRGID});
+		        GraphViewerPanel2.SPRITE_APCLASS, 
+		        GraphViewerPanel2.SPRITE_BNDORD, 
+		        GraphViewerPanel2.SPRITE_FRGID});
 		cmbLabel.setToolTipText("<html>Select the kind of type of information"
 				+ "<br>to add or remove from the graph view.</html>");
 		cmbLabel.setEnabled(false);

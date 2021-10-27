@@ -45,6 +45,8 @@ import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.EmptyVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import gui.GraphViewerPanel2.JVertex;
+import gui.GraphViewerPanel2.JVertexType;
 
 
 /**
@@ -108,7 +110,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	protected final String MOLVIEWERCARDNAME = "molViewerCard";
 	protected final String FRAGVIEWERCARDNAME = "fragViewerCard";
 	protected final String TMPLVIEWERCARDNAME = "tmplViewwerCard";
-	protected GraphViewerPanel graphViewer;
+	protected GraphViewerPanel2 graphViewer;
 	
 	//Default divider location
 	private double defDivLoc = 0.5;
@@ -147,7 +149,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		leftPane.setResizeWeight(0.5);
 		setLeftComponent(leftPane);
 		
-		graphViewer = new GraphViewerPanel();
+		graphViewer = new GraphViewerPanel2();
 		setRightComponent(graphViewer);
 		graphViewer.addPropertyChangeListener(
 				new PropertyChangeListenerProxy(
@@ -286,7 +288,8 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		
 		graphViewer.cleanup();
 		graphViewer.loadGraphToViewer(dnGraph,oldGSStatus);
-		graphGS = graphViewer.graph;
+		//TODO-GG remove?
+		//graphGS = graphViewer.graph;
 	}
 
 //-----------------------------------------------------------------------------
@@ -554,63 +557,16 @@ public class GraphVertexMolViewerPanel extends JSplitPane
     {
         ArrayList<DENOPTIMAttachmentPoint> aps = 
                 new ArrayList<DENOPTIMAttachmentPoint>();
-        for (Node n : graphViewer.getSelectedNodes())
+        for (JVertex jv : graphViewer.getSelectedNodes())
         {
-            if (!n.getAttribute("ui.class").equals("ap"))
-            {
-                continue;
+            if (jv.vtype == JVertexType.AP)
+            {   
+                aps.add(jv.ap);
             }
-            int vId = n.getAttribute("dnp.srcVrtId");
-            int apId = n.getAttribute("dnp.srcVrtApId");
-            
-            DENOPTIMVertex v = dnGraph.getVertexWithId(vId);
-            DENOPTIMAttachmentPoint ap = v.getAP(apId);
-            
-            aps.add(ap);
         }
         return aps;
     }
     
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Identifies which APs are selected in the graph viewer.
-     * @return the list of identifiers
-     */
-    
-    //TODO-V3: with APs having an owner field, the IdFragmentAndAP is obsolete
-    /*
-    public ArrayList<IdFragmentAndAP> getAPsSelectedInViewer()
-    {
-        ArrayList<IdFragmentAndAP> allIDs = new ArrayList<IdFragmentAndAP>();
-        for (Node n : graphViewer.getSelectedNodes())
-        {
-            if (!n.getAttribute("ui.class").equals("ap"))
-            {
-                continue;
-            }
-            int vId = n.getAttribute("dnp.srcVrtId");
-            int apId = n.getAttribute("dnp.srcVrtApId");
-            
-            IdFragmentAndAP id = null;
-            if (hasFragSpace)
-            {
-                DENOPTIMVertex v = dnGraph.getVertexWithId(vId);
-                id = new IdFragmentAndAP(vId,
-                                         v.getMolId(),
-                                         v.getFragmentType(),
-                                         apId,-99,-99);
-            }
-            else
-            {
-                id = new IdFragmentAndAP(vId,-99,BBType.UNDEFINED,apId,-99,-99);
-            }
-            
-            allIDs.add(id);
-        }
-        return allIDs;
-    }
-    */
 //-----------------------------------------------------------------------------
     
     /**
@@ -620,15 +576,14 @@ public class GraphVertexMolViewerPanel extends JSplitPane
     public ArrayList<DENOPTIMVertex> getSelectedNodesInViewer()
     {
         ArrayList<DENOPTIMVertex> selected = new ArrayList<DENOPTIMVertex>();
-        for (Node n : graphViewer.getSelectedNodes())
+        for (JVertex jv : graphViewer.getSelectedNodes())
         {
-            if (n.getAttribute("ui.class").equals("ap"))
+            if (jv.vtype == JVertexType.AP)
             {
                 continue;
             }
-            int vId = Integer.parseInt(n.getAttribute("dnp.VrtId"));
-            selected.add(dnGraph.getVertexWithId(vId));
-        }   
+            selected.add(jv.dnpVertex);
+        }
         return selected; 
     }
 	

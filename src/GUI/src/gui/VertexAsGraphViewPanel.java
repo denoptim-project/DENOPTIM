@@ -72,7 +72,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	 */
 	public boolean alteredAPData = false;
 	
-	private GraphViewerPanel graphViewer;
+	private GraphViewerPanel2 graphViewer;
 	private JScrollPane tabPanel;
 	protected DefaultTableModel apTabModel;
 	protected JTable apTable;
@@ -140,7 +140,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 		this.setResizeWeight(0.5);
         
         // GraphStream Viewer
-		graphViewer = new GraphViewerPanel();
+		graphViewer = new GraphViewerPanel2();
         this.setTopComponent(graphViewer);
         
 		// List of attachment points

@@ -53,7 +53,7 @@ import denoptim.molecule.DENOPTIMVertex;
  */
 public class GraphViewerPanel extends JPanel 
 {
-
+    //TODO-GG remove class
 	/**
 	 * Version UID
 	 */
