@@ -121,7 +121,7 @@ public class GraphViewerPanel2 extends JPanel
         JVertexType vtype = JVertexType.NONE;
         
         /**
-         * The string used as label when graphycally depicting this vertex.
+         * The string used as label when graphically depicting this vertex.
          */
         String idStr = "nan";
         
@@ -193,6 +193,13 @@ public class GraphViewerPanel2 extends JPanel
     public class JEdge 
     {
         /**
+         * String identifying this edge within a graph. This is not meant
+         * to be unique across graphs, but is unique within a graph,
+         * provided that the vertex IDs are uniwue.
+         */
+        String id = "";
+        
+        /**
          * String representing the {@link APClass} on the source AP of 
          * directed edges or on the AP this edge represents.
          */
@@ -233,8 +240,12 @@ public class GraphViewerPanel2 extends JPanel
          * @param srcAPC the string representation of the {@link APClass} of the
          * AP.
          */
-        public JEdge(String srcAPC) {
-            this(srcAPC,"none","none");
+        public JEdge(DENOPTIMAttachmentPoint srcAP) 
+        {
+            this.id = srcAP.getOwner().getVertexId()+"_"+srcAP.getIndexInOwner();
+            this.srcAPC = srcAP.getAPClass().toString();
+            this.trgAPC = "none";
+            this.bt = "none";
         }
         
         /**
@@ -247,9 +258,14 @@ public class GraphViewerPanel2 extends JPanel
          * @param bt the string representation of the bond type in the 
          * {@link DENOPTIMEdge} represented by this JUNG edge.
          */
-        public JEdge(String srcAPC, String trgAPC, String bt){
-            this.srcAPC = srcAPC;
-            this.trgAPC = trgAPC;
+        public JEdge(DENOPTIMAttachmentPoint srcAP, 
+                DENOPTIMAttachmentPoint trgAP, String bt) 
+        {
+            this.id = srcAP.getOwner().getVertexId() 
+                    + "-" 
+                    + trgAP.getOwner().getVertexId();
+            this.srcAPC = srcAP.getAPClass().toString();
+            this.trgAPC = trgAP.getAPClass().toString();
             this.bt = bt;
         }
     }
@@ -275,19 +291,6 @@ public class GraphViewerPanel2 extends JPanel
 		this.setLayout(new BorderLayout());
 		this.setBackground(Color.decode("#D9D9D9"));
 		this.setToolTipText("No graph to visualize");
-		
-		//TODO-GG del
-		/*
-		prepareFragSpace();
-        DENOPTIMGraph dnpGraph = null;
-        try {
-            dnpGraph = makeTestGraphD();
-        } catch (DENOPTIMException e) {
-            System.out.println("Could not make DENOPTIM graph");
-            e.printStackTrace();
-        }
-        loadGraphToViewer(dnpGraph);
-		*/
 	}
 	
 //-----------------------------------------------------------------------------
@@ -344,7 +347,7 @@ public class GraphViewerPanel2 extends JPanel
      * displayed, or the position of nodes.
      */
     public void loadGraphToViewer(DENOPTIMGraph dnGraph, 
-            GSGraphSnapshot prevStatus)
+            JUNGGraphSnapshot prevStatus)
     {
         loadGraphToViewer(convertDnGraphToGSGraph(dnGraph),prevStatus);
     }
@@ -393,7 +396,7 @@ public class GraphViewerPanel2 extends JPanel
                 {
                     JVertex vap = new JVertex(ap);
                     g.addVertex(vap);
-                    JEdge e = new JEdge(ap.getAPClass().toString());
+                    JEdge e = new JEdge(ap);
                     e.toAp = true;
                     g.addEdge(e, vMap.get(v), vap, EdgeType.DIRECTED);
                     vap.edgeToParent = e;
@@ -402,8 +405,8 @@ public class GraphViewerPanel2 extends JPanel
         }
         for (DENOPTIMEdge e : dnpGraph.getEdgeList())
         {
-            g.addEdge(new JEdge(e.getSrcAP().getAPClass().toString(),
-                    e.getTrgAP().getAPClass().toString(), 
+            g.addEdge(new JEdge(e.getSrcAP(),
+                    e.getTrgAP(), 
                     e.getBondType().toString()), 
                     vMap.get(e.getSrcAP().getOwner()), 
                     vMap.get(e.getTrgAP().getOwner()), EdgeType.DIRECTED);
@@ -411,8 +414,8 @@ public class GraphViewerPanel2 extends JPanel
         for (DENOPTIMRing r : dnpGraph.getRings())
         {
             g.addEdge(new JEdge(
-                        r.getHeadVertex().getEdgeToParent().getSrcAP().getAPClass().toString(),
-                        r.getTailVertex().getEdgeToParent().getSrcAP().getAPClass().toString(), 
+                        r.getHeadVertex().getEdgeToParent().getSrcAP(),
+                        r.getTailVertex().getEdgeToParent().getSrcAP(), 
                         r.getBondType().toString()), 
                     vMap.get(r.getHeadVertex()), 
                     vMap.get(r.getTailVertex()), EdgeType.UNDIRECTED);
@@ -479,11 +482,16 @@ public class GraphViewerPanel2 extends JPanel
 	 * remember previously chosen settings, such as the sprites to be 
 	 * displayed, or the position of nodes.
 	 */
-	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, GSGraphSnapshot prevStatus)
+	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, JUNGGraphSnapshot prevStatus)
 	{
 	    loadedGraph = g;
 	    Layout<JVertex, JEdge>  layout = new ISOMLayout<>(g);
-        layout.setSize(new Dimension(300, 300)); //TODO-GG: get size from parent component
+	    if (prevStatus != null)
+	    {
+	        // Here we set the features according to a previous graph view
+	        inheritFeatures(layout,prevStatus);
+	    }
+	    layout.setSize(new Dimension(300, 300)); //TODO-GG: get size from parent component
         viewer = new VisualizationViewer<>(layout);
 		
         viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
@@ -549,20 +557,42 @@ public class GraphViewerPanel2 extends JPanel
         gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
         viewer.setGraphMouse(gm);
         viewer.addKeyListener(gm.getModeKeyListener());
-        
-		//TODO-GG appendSpritesFromSnapshot(prevStatus);
-		
-		//TODO-GG Not working. See comment in the method.
-		//placeNodesAccordingToSnapshot(prevStatus);
-
-        //TODO-GG addAllAPIdSprites();
-	    
 		this.add(viewer);
 	}
 	
 //-----------------------------------------------------------------------------
 	
-	private class VertexLabelTransformer implements Function<JVertex,String>
+	private void inheritFeatures(Layout<JVertex, JEdge> layout,
+            JUNGGraphSnapshot prevStatus)
+    {
+	    ArrayList<String> lst = prevStatus.getVertexeIDsWithLabel(
+	            LabelType.BBID);
+        for(JVertex jv : loadedGraph.getVertices())
+        {
+            if (lst.contains(jv.idStr))
+            {
+                jv.displayBBID = true;
+            }
+        }
+        
+        ArrayList<String> lstBT = prevStatus.getEdgeIDsWithLabel(LabelType.BT);
+        ArrayList<String> lstAP = prevStatus.getEdgeIDsWithLabel(LabelType.APC);
+        for(JEdge je : loadedGraph.getEdges())
+        {
+            if (lstBT.contains(je.id))
+            {
+                je.displayBndTyp = true;
+            }
+            if (lstAP.contains(je.id))
+            {
+                je.displayAPCs = true;
+            }
+        }
+    }
+
+//-----------------------------------------------------------------------------
+    
+    private class VertexLabelTransformer implements Function<JVertex,String>
 	{
         @Override
         public String apply(JVertex v) {
@@ -711,87 +741,6 @@ public class GraphViewerPanel2 extends JPanel
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Append sprites from snapshot.
-	 * @param snapshot
-	 */
-    /*
-	private void appendSpritesFromSnapshot(GSGraphSnapshot snapshot)
-	{	
-		if (snapshot == null)
-		{
-			return;
-		}
-		
-		if (!snapshot.getGraphId().equals(graph.getId()))
-		{
-			return;
-		}
-		
-		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_APCLASSSRC))
-		{
-			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_APCLASSSRC))
-			{
-				if (el instanceof Edge)
-				{
-					Edge ed = graph.getEdge(el.getId());
-					if (ed != null)
-					{
-						addSrcApClassSprite(ed);
-					}
-				}
-			}
-		}
-		
-		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_APCLASSTRG))
-		{
-			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_APCLASSTRG))
-			{
-				if (el instanceof Edge)
-				{
-					Edge ed = graph.getEdge(el.getId());
-					if (ed != null)
-					{
-						addTrgApClassSprite(ed);
-					}
-				}
-			}
-		}
-		
-		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_BNDORD))
-		{
-			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_BNDORD))
-			{
-				if (el instanceof Edge)
-				{
-					Edge ed = graph.getEdge(el.getId());
-					if (ed != null)
-					{
-						addBondSprite(ed);
-					}
-				}
-			}
-		}
-		
-		if (snapshot.hasSpritesOfType(SPRITEATT_UICLASS_FRGID))
-		{
-			for (Element el : snapshot.getSpritesOfType(SPRITEATT_UICLASS_FRGID))
-			{
-				if (el instanceof Node)
-				{
-					Node n = graph.getNode(el.getId());
-					if (n != null)
-					{
-						addFrgIdSprite(n);
-					}
-				}
-			}
-		}
-	}
-	*/
-	
-//-----------------------------------------------------------------------------
-
-	/**
 	 * Adds or removes labels from the elements selected in the graph view. The
 	 * logics is a bit complex in that the behaviour is special in case one/more 
 	 * nodes are selected AND we want to alter the APClass labels: 
@@ -895,15 +844,13 @@ public class GraphViewerPanel2 extends JPanel
 	/**
 	 * Returns a copy of the graph loaded into the viewer
 	 */
-	public GSGraphSnapshot getStatusSnapshot()
+	public JUNGGraphSnapshot getGraphStatusSnapshot()
 	{	
-		GSGraphSnapshot snapshot = null;
-		/*//TODO
-		if (graph !=null && sman != null)
+		JUNGGraphSnapshot snapshot = null;
+		if (loadedGraph != null)
 		{
-			snapshot = new GSGraphSnapshot(graph,sman);
+			snapshot = new JUNGGraphSnapshot(loadedGraph);
 		}
-		*/
 		return snapshot;
 	}
 
@@ -914,246 +861,6 @@ public class GraphViewerPanel2 extends JPanel
 		cleanup();
 	}
 	
-	//-----------------------------------------------------------------------------
-
-//TODO-GG delete
-	   private APClass APCA, APCB, APCC, APCD;
-	    private String a="A", b="B", c="C", d="D";
-	    
-	   private void prepareFragSpace() {
-	       
-	        try {
-	            APCA = APClass.make(a, 0);
-	            APCB = APClass.make(b, 0);
-	            APCC = APClass.make(c, 0);
-	            APCD = APClass.make(d, 99);
-	        } catch (DENOPTIMException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	        }
-	        
-	        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-	        boMap.put(a,BondType.SINGLE);
-	        boMap.put(b,BondType.SINGLE);
-	        boMap.put(c,BondType.SINGLE);
-	        boMap.put(d,BondType.DOUBLE);
-	        
-	        HashMap<APClass,ArrayList<APClass>> cpMap = 
-	                new HashMap<APClass,ArrayList<APClass>>();
-	        ArrayList<APClass> lstA = new ArrayList<APClass>();
-	        lstA.add(APCA);
-	        cpMap.put(APCA, lstA);
-	        ArrayList<APClass> lstB = new ArrayList<APClass>();
-	        lstB.add(APCB);
-	        lstB.add(APCC);
-	        cpMap.put(APCB, lstB);
-	        ArrayList<APClass> lstC = new ArrayList<APClass>();
-	        lstC.add(APCB);
-	        lstC.add(APCC);
-	        cpMap.put(APCC, lstC);
-	        ArrayList<APClass> lstD = new ArrayList<APClass>();
-	        lstD.add(APCD);
-	        cpMap.put(APCD, lstD);
-	        
-	        /* Compatibility matrix
-	         * 
-	         *      |  A  |  B  |  C  | D |
-	         *    -------------------------
-	         *    A |  T  |     |     |   |
-	         *    -------------------------
-	         *    B |     |  T  |  T  |   |
-	         *    -------------------------
-	         *    C |     |  T  |  T  |   |
-	         *    -------------------------
-	         *    D |     |     |     | T |
-	         */
-	        
-	        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
-	        HashSet<APClass> forbEnds = new HashSet<APClass>();
-	        
-	        FragmentSpace.setBondOrderMap(boMap);
-	        FragmentSpace.setCompatibilityMatrix(cpMap);
-	        FragmentSpace.setCappingMap(capMap);
-	        FragmentSpace.setForbiddenEndList(forbEnds);
-	        FragmentSpace.setAPclassBasedApproach(true);
-	        
-	        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
-	        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
-	        
-	        DENOPTIMVertex s0 = new EmptyVertex();
-	        s0.setBuildingBlockType(BBType.SCAFFOLD);
-	        s0.addAP(0, 1, 1, APCA);
-	        s0.addAP(0, 1, 1, APCA);
-	        FragmentSpace.appendVertexToLibrary(s0, BBType.SCAFFOLD,
-	                FragmentSpace.getScaffoldLibrary());
-	        
-	        DENOPTIMVertex s1 = new EmptyVertex();
-	        s1.setBuildingBlockType(BBType.SCAFFOLD);
-	        s1.addAP(0, 1, 1, APCA);
-	        s1.addAP(0, 1, 1, APCA);
-	        s1.addAP(0, 1, 1, APCD);
-	        s1.addAP(0, 1, 1, APCB);
-	        s1.addAP(0, 1, 1, APCB);
-	        FragmentSpace.appendVertexToLibrary(s1, BBType.SCAFFOLD,
-	                FragmentSpace.getScaffoldLibrary());
-	        
-	        DENOPTIMVertex v0 = new EmptyVertex();
-	        v0.setBuildingBlockType(BBType.FRAGMENT);
-	        v0.addAP(0, 1, 1, APCA);
-	        v0.addAP(0, 1, 1, APCB);
-	        v0.addAP(0, 1, 1, APCA);
-	        FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	        
-	        DENOPTIMVertex v1 = new EmptyVertex();
-	        v1.setBuildingBlockType(BBType.FRAGMENT);
-	        v1.addAP(0, 1, 1, APCA);
-	        v1.addAP(0, 1, 1, APCB);
-	        v1.addAP(0, 1, 1, APCA);
-	        v1.addAP(0, 1, 1, APCB);
-	        v1.addAP(0, 1, 1, APCC);
-	        FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	        
-	        DENOPTIMVertex v2 = new EmptyVertex();
-	        v2.setBuildingBlockType(BBType.FRAGMENT);
-	        v2.addAP(0, 1, 1, APCB);
-	        FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	        
-	        DENOPTIMVertex v3 = new EmptyVertex();
-	        v3.setBuildingBlockType(BBType.FRAGMENT);
-	        v3.addAP(0, 1, 1, APCD);
-	        v3.addAP(0, 1, 1, APCD);
-	        FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	       
-	        DENOPTIMVertex v4 = new EmptyVertex();
-	        v4.setBuildingBlockType(BBType.FRAGMENT);
-	        v4.addAP(0, 1, 1, APCC);
-	        v4.addAP(0, 1, 1, APCB);
-	        v4.addAP(0, 1, 1, APCB);
-	        v4.addAP(0, 1, 1, APCA);
-	        v4.addAP(0, 1, 1, APCA);
-	        FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	        
-	        DENOPTIMVertex v5 = new EmptyVertex();
-	        v5.setBuildingBlockType(BBType.FRAGMENT);
-	        v5.addAP(0, 1, 1, APCB);
-	        v5.addAP(0, 1, 1, APCD);
-	        FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	        
-	        DENOPTIMVertex v6 = new EmptyVertex();
-	        v6.setBuildingBlockType(BBType.FRAGMENT);
-	        v6.addAP(0, 1, 1, APCC);
-	        v6.addAP(0, 1, 1, APCD);
-	        FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	        
-	        DENOPTIMVertex v7 = new EmptyVertex();
-	        v7.setBuildingBlockType(BBType.FRAGMENT);
-	        v7.setAsRCV(true);
-	        v7.addAP(0, 1, 1, APCB);
-	        FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
-	                FragmentSpace.getFragmentLibrary());
-	    }
-	    
-	    private DENOPTIMGraph makeTestGraphD() throws DENOPTIMException
-	    {
-	        DENOPTIMGraph graph = new DENOPTIMGraph();
-	        DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(1,
-	                BBType.SCAFFOLD);
-	        s.setLevel(-1);
-	        graph.addVertex(s);
-	        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
-	                BBType.FRAGMENT);
-	        v1a.setLevel(0);
-	        graph.addVertex(v1a);
-	        DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
-	                BBType.FRAGMENT);
-	        v6a.setLevel(1);
-	        graph.addVertex(v6a);
-	        DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
-	                BBType.FRAGMENT);
-	        v6a_bis.setLevel(1);
-	        graph.addVertex(v6a_bis);
-	        DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
-	                BBType.FRAGMENT);
-	        v6a_tris.setLevel(1);
-	        graph.addVertex(v6a_tris);
-	        DENOPTIMVertex v7a = DENOPTIMVertex.newVertexFromLibrary(7,
-	                BBType.FRAGMENT);
-	        v7a.setLevel(2);
-	        graph.addVertex(v7a);
-	        DENOPTIMVertex v7a_bis = DENOPTIMVertex.newVertexFromLibrary(7,
-	                BBType.FRAGMENT);
-	        v7a_bis.setLevel(2);
-	        graph.addVertex(v7a_bis);
-	        DENOPTIMVertex v7a_tris = DENOPTIMVertex.newVertexFromLibrary(7,
-	                BBType.FRAGMENT);
-	        v7a_tris.setLevel(2);
-	        graph.addVertex(v7a_tris);
-	        
-	        DENOPTIMVertex v7a_quat = DENOPTIMVertex.newVertexFromLibrary(7,
-	                BBType.FRAGMENT);
-	        v7a_quat.setLevel(0);
-	        graph.addVertex(v7a_quat);
-	        
-	        DENOPTIMVertex v1c = DENOPTIMVertex.newVertexFromLibrary(1,
-	                BBType.FRAGMENT);
-	        v1c.setLevel(0);
-	        graph.addVertex(v1c);
-	        
-	        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
-	                BBType.FRAGMENT);
-	        v1b.setLevel(1);
-	        graph.addVertex(v1b);
-	        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2,
-	                BBType.FRAGMENT);
-	        v2b.setLevel(2);
-	        graph.addVertex(v2b);
-	        DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(2,
-	                BBType.FRAGMENT);
-	        v2b_bis.setLevel(2);
-	        graph.addVertex(v2b_bis);
-	        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3,
-	                BBType.FRAGMENT);
-	        v3b.setLevel(2);
-	        graph.addVertex(v3b);
-	        graph.addEdge(new DENOPTIMEdge(s.getAP(0), v1a.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v6a.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1a.getAP(3), v6a_bis.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1a.getAP(4), v6a_tris.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v6a.getAP(1), v7a.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v6a_bis.getAP(1), v7a_bis.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v6a_tris.getAP(1), v7a_tris.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(s.getAP(2), v7a_quat.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(s.getAP(1), v1c.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1c.getAP(2), v1b.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1b.getAP(3), v2b_bis.getAP(0)));
-	        graph.addEdge(new DENOPTIMEdge(v1b.getAP(4), v3b.getAP(0)));
-	        
-	        //graph.addRing(v7a, v7a_quat);
-	        v7a.setAsRCV(true);
-	        v7a_quat.setAsRCV(true);
-	        graph.addRing(v7a_bis, v7a_tris);
-	        
-	        ArrayList<Integer> symA = new ArrayList<Integer>();
-	        symA.add(v1a.getVertexId());
-	        symA.add(v1c.getVertexId());
-	        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
-	        
-	        ArrayList<Integer> symB = new ArrayList<Integer>();
-	        symB.add(v2b.getVertexId());
-	        symB.add(v2b_bis.getVertexId());
-	        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
-	        
-	        graph.renumberGraphVertices();
-	        return graph;
-	    }
-	
 //-----------------------------------------------------------------------------
+
 }

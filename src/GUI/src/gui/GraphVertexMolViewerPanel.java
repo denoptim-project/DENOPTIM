@@ -76,7 +76,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 * The snapshot of the old (removed) visualized GraphStrem system. 
 	 * Used only to remember stuff like sprites and node positions.
 	 */
-	private GSGraphSnapshot oldGSStatus;
+	private JUNGGraphSnapshot oldGSStatus;
 	
 	/**
 	 * Flag signalling that there is a fully defined fragment space
@@ -262,11 +262,11 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	/**
 	 * Loads the given graph into the graph viewer.
 	 * @param dnGraph the graph to load.
-	 * @param keepSprites if <code>true</code> we'll keep track of old labels.
+	 * @param keepLabels if <code>true</code> we'll keep track of old labels.
 	 * @param useFragSpace give <code>true</code> when a fragment space is 
 	 * loaded.
 	 */
-	public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, boolean keepSprites, 
+	public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, boolean keepLabels, 
 	        boolean useFragSpace)
 	{
 	    hasFragSpace = useFragSpace;
@@ -274,9 +274,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	    resetFragViewerCardDeck();
 		
 		// Keep a snapshot of the old data visualised
-		if (keepSprites)
+		if (keepLabels)
 		{
-			oldGSStatus = graphViewer.getStatusSnapshot();
+			oldGSStatus = graphViewer.getGraphStatusSnapshot();
 		} else {
 			oldGSStatus = null;
 		}
