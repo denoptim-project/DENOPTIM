@@ -29,6 +29,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,16 +83,11 @@ public class GraphViewerPanel2 extends JPanel
 	private static final long serialVersionUID = 2L;
 	
 	Graph<JVertex, JEdge> loadedGraph;
+	DNPSpringLayout<JVertex, JEdge> layout;
 	VisualizationViewer<JVertex, JEdge>  viewer;
 	private DefaultModalGraphMouse<JVertex, JEdge> gm;
 	
 	public enum LabelType {APC, BT, BBID};
-	
-	public static final String SPRITEATT_UICLASS_APCLASSSRC = "apLabelSRC";
-	public static final String SPRITEATT_UICLASS_APCLASSTRG = "apLabelTRG";
-	public static final String SPRITEATT_UICLASS_BNDORD = "bndTypLabel";
-	public static final String SPRITEATT_UICLASS_FRGID = "molIdLabel";
-	public static final String SPRITEATT_UICLASS_APID = "apIdLabel";
 	
     public enum JVertexType {SCAF, FRAG, CAP, RCV, AP, NONE};
     
@@ -479,20 +475,36 @@ public class GraphViewerPanel2 extends JPanel
 	 * Load the given graph to the graph viewer.
 	 * @param g the graph to load
 	 * @param prevStatus the snapshot of the previous status. We use this to 
-	 * remember previously chosen settings, such as the sprites to be 
+	 * remember previously chosen settings, such as the labels to be 
 	 * displayed, or the position of nodes.
 	 */
-	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, JUNGGraphSnapshot prevStatus)
+	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
+	        JUNGGraphSnapshot prevStatus)
 	{
 	    loadedGraph = g;
-	    Layout<JVertex, JEdge>  layout = new ISOMLayout<>(g);
+	    layout = new DNPSpringLayout<>(g);
 	    if (prevStatus != null)
 	    {
-	        // Here we set the features according to a previous graph view
-	        inheritFeatures(layout,prevStatus);
+	        // Here we set view features according to a previous graph view
+	        inheritFeatures(prevStatus);
 	    }
-	    layout.setSize(new Dimension(300, 300)); //TODO-GG: get size from parent component
-        viewer = new VisualizationViewer<>(layout);
+	    
+	    //NB: the size depends on where this panel is used. In GUIVertexSelector
+	    // the size vanishes, so we need to set a decent value or the graph will
+	    // be displayed with 0:0 dimensions, i.e., all nodes on top of each other
+	    if (this.getSize().height<100)
+	    {
+	        layout.setSize(new Dimension(100, 100));
+	    } else {
+	        double w = this.getSize().width 
+                    - GUIPreferences.graphNodeSize * 1.5;
+            double h = this.getSize().height 
+                    - GUIPreferences.graphNodeSize * 1.5;
+	        Dimension dim = new Dimension((int) w, (int) h);
+	        layout.setSize(dim);
+	    }
+	    
+	    viewer = new VisualizationViewer<>(layout);
 		
         viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
             
@@ -554,7 +566,7 @@ public class GraphViewerPanel2 extends JPanel
         });
         
         gm = new DefaultModalGraphMouse<JVertex, JEdge> ();
-        gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
+        gm.setMode(ModalGraphMouse.Mode.PICKING);
         viewer.setGraphMouse(gm);
         viewer.addKeyListener(gm.getModeKeyListener());
 		this.add(viewer);
@@ -562,9 +574,17 @@ public class GraphViewerPanel2 extends JPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void inheritFeatures(Layout<JVertex, JEdge> layout,
-            JUNGGraphSnapshot prevStatus)
+	public void setMouseMode(ModalGraphMouse.Mode mode)
+	{
+	    if (gm != null)
+	        gm.setMode(mode);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void inheritFeatures(JUNGGraphSnapshot prevStatus)
     {
+	    // Set labels on vertexes
 	    ArrayList<String> lst = prevStatus.getVertexeIDsWithLabel(
 	            LabelType.BBID);
         for(JVertex jv : loadedGraph.getVertices())
@@ -575,6 +595,7 @@ public class GraphViewerPanel2 extends JPanel
             }
         }
         
+        // Set labels on edges
         ArrayList<String> lstBT = prevStatus.getEdgeIDsWithLabel(LabelType.BT);
         ArrayList<String> lstAP = prevStatus.getEdgeIDsWithLabel(LabelType.APC);
         for(JEdge je : loadedGraph.getEdges())
@@ -588,8 +609,11 @@ public class GraphViewerPanel2 extends JPanel
                 je.displayAPCs = true;
             }
         }
+        
+        // Set the positions via initialising of the layout
+        layout.setInitialLocations(prevStatus.vertexPosition);
     }
-
+	
 //-----------------------------------------------------------------------------
     
     private class VertexLabelTransformer implements Function<JVertex,String>
@@ -849,7 +873,7 @@ public class GraphViewerPanel2 extends JPanel
 		JUNGGraphSnapshot snapshot = null;
 		if (loadedGraph != null)
 		{
-			snapshot = new JUNGGraphSnapshot(loadedGraph);
+			snapshot = new JUNGGraphSnapshot(loadedGraph,layout);
 		}
 		return snapshot;
 	}

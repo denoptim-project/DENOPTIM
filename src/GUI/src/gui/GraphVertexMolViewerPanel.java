@@ -20,6 +20,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
@@ -44,6 +45,7 @@ import denoptim.molecule.EmptyVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import gui.GraphViewerPanel2.JVertex;
 import gui.GraphViewerPanel2.JVertexType;
 import gui.GraphViewerPanel2.LabelType;
@@ -52,9 +54,9 @@ import gui.GraphViewerPanel2.LabelType;
 /**
  * A panel that collects three viewers: 
  * <ul>
- * <li>one for Graphs,</il>
- * <li>one for vertex content,</il>
- * <li>and one for molecular structures.</il>
+ * <li>one for Graphs,</li>
+ * <li>one for vertex content,</li>
+ * <li>and one for molecular structures.</li>
  * </ul>
  * 
  * @author Marco Foscato
@@ -110,7 +112,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	//Default divider location
 	private double defDivLoc = 0.5;
 	
-	private static final  IChemObjectBuilder builder = 
+	private static final IChemObjectBuilder builder = 
 	            SilentChemObjectBuilder.getInstance();
 	
 //-----------------------------------------------------------------------------
@@ -462,8 +464,19 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                 fragViewer.clearAll();
                 fragViewerTmplViewerCard = 
                         new GraphVertexMolViewerPanel();
+                
+                //NB: this setting of the size is needed to allow generation
+                // of the graph layout.
+                Dimension d = new Dimension();
+                d.height = (int) fragViewerCardHolder.getSize().height;
+                d.width = (int) (fragViewerCardHolder.getSize().width*0.5);
+                fragViewerTmplViewerCard.graphViewer.setSize(d);
+                
                 fragViewerCardHolder.add(fragViewerTmplViewerCard, 
                         TMPLVIEWERCARDNAME);
+                fragViewerTmplViewerCard.setSize(
+                        fragViewerCardHolder.getSize());
+                
                 fragViewerTmplViewerCard.loadDnGraphToViewer(
                         t.getInnerGraph(), false, hasFragSpace);
                 fragViewerTmplViewerCard.updateMolevularViewer();
@@ -605,6 +618,17 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		    fragViewerTmplViewerCard.dispose();
 		}
 	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Alters the functionality of mouse in the graph visualization panel.
+	 * @param mode the mode of action of the mouse.
+	 */
+    public void setMouseMode(ModalGraphMouse.Mode mode)
+    {
+        graphViewer.setMouseMode(mode);
+    }
 		
 //-----------------------------------------------------------------------------
   	

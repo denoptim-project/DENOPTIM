@@ -139,7 +139,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 		this.setDividerLocation(dividerPosition);
 		this.setResizeWeight(0.5);
         
-        // GraphStream Viewer
+        // Graph Viewer
 		graphViewer = new GraphViewerPanel2();
         this.setTopComponent(graphViewer);
         

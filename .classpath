@@ -43,9 +43,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jung-visualization-2.1.1.jar" sourcepath="/Users/marco/Downloads/jung-visualization-2.1.1-sources.jar"/>
-	<classpathentry kind="lib" path="lib/jung-graph-impl-2.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/jung-api-2.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/jung-algorithms-2.1.1.jar" sourcepath="/Users/marco/Downloads/jung-visualization-2.1.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jung-graph-impl-2.1.1.jar" sourcepath="/Users/marco/Downloads/jung-graph-impl-2.1.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jung-api-2.1.1.jar" sourcepath="/Users/marco/Downloads/jung-api-2.1.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jung-algorithms-2.1.1.jar" sourcepath="/Users/marco/Downloads/jung-algorithms-2.1.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/guava-19.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

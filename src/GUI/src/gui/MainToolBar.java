@@ -22,6 +22,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +48,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -98,6 +100,11 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
      * The fragment space menu
      */  
     private JMenu fragSpaceMenu;
+    
+    /**
+     * An indicator to whether a fragment space is loaded or not
+     */
+    private JTextField fragSpaceIndicator;
 	
 	/**
 	 * List of the active panels in the deck of cards
@@ -371,6 +378,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                     return;
                 }
                 loadFragmentSpace();
+                fragSpaceIndicator.setBackground(Color.decode("#4cc253"));
             }
         });
 		fragSpaceMenu.add(loadSpace);
@@ -401,10 +409,22 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		
 		// From here the items will be added to the RIGHT of the menu bar
 		this.add(Box.createGlue());
+
+        StaticTaskManager.queueStatusBar.setMaximum(1);
+        StaticTaskManager.queueStatusBar.setValue(1);
+        StaticTaskManager.queueStatusBar.setToolTipText("Status of tasks");
+        this.add(StaticTaskManager.queueStatusBar);
+        
+		fragSpaceIndicator = new JTextField("BBSpace");
+		fragSpaceIndicator.setHorizontalAlignment(JTextField.CENTER);
+		fragSpaceIndicator.setMaximumSize(new Dimension(80,25));
+		fragSpaceIndicator.setToolTipText("<html>Status of fragment space:<ul>"
+		        + "<li>Green: loaded</li>"
+		        + "<li>Orange: unloaded</li></ul></html>");
+		fragSpaceIndicator.setBackground(Color.ORANGE);
+		fragSpaceIndicator.setEditable(false);
+		this.add(fragSpaceIndicator);
 		
-		StaticTaskManager.queueStatusBar.setMaximum(1);
-		StaticTaskManager.queueStatusBar.setValue(1);
-		this.add(StaticTaskManager.queueStatusBar);
 	}
 
 //-----------------------------------------------------------------------------

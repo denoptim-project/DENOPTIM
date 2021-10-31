@@ -1,8 +1,10 @@
 package gui;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import edu.uci.ics.jung.graph.Graph;
 import gui.GraphViewerPanel2.JEdge;
@@ -11,7 +13,7 @@ import gui.GraphViewerPanel2.LabelType;
 
 /**
  * This class collects information on how a graph was displayed in a JUNG
- * viewer (i.e., node positions and visible labels).
+ * visialisation server (i.e., node positions and visible labels).
  */
 
 public class JUNGGraphSnapshot
@@ -28,9 +30,15 @@ public class JUNGGraphSnapshot
     private Map<LabelType,ArrayList<String>> edgesWithLabels =
                     new HashMap<LabelType,ArrayList<String>>();
     
+    /**
+     * Positions of nodes
+     */
+    Map<String,Point2D> vertexPosition = new HashMap<String,Point2D>();
+    
 //-----------------------------------------------------------------------------
     
-    public JUNGGraphSnapshot(Graph<JVertex, JEdge> graph)
+    public JUNGGraphSnapshot(Graph<JVertex, JEdge> graph, 
+            DNPSpringLayout<JVertex, JEdge> layout)
     {
         for (JEdge je : graph.getEdges())
         {
@@ -53,12 +61,16 @@ public class JUNGGraphSnapshot
             if (jv.displayBBID)
             {
                 processVertex(jv,LabelType.BBID);
-            }   
-        }
-        
-        //TODO-GG
-        System.out.println("HERE_V: "+vertexesWithLabels.keySet());
-        System.out.println("HERE_E: "+edgesWithLabels.keySet());
+            }
+            try
+            {
+                Point2D p = layout.getVertexPosition(jv);
+                vertexPosition.put(jv.idStr, new Point2D.Double(p.getX(),p.getY()));
+            } catch (ExecutionException e)
+            {
+                //e.printStackTrace();
+            }
+        } 
     }
     
 //-----------------------------------------------------------------------------

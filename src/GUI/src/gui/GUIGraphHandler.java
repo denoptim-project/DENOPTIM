@@ -71,6 +71,7 @@ import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import gui.GraphViewerPanel2.LabelType;
 
 
@@ -130,7 +131,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	/**
 	 * Flag signaling that there is a fully defined fragment space
 	 */
-	private boolean hasFragSpace = false;
+	private boolean hasFragSpace = FragmentSpace.isDefined();
 	
 	// The panel that hosts graph, vertex, and molecular viewers
 	private GraphVertexMolViewerPanel visualPanel;
@@ -141,18 +142,10 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	// The panel hosting buttons for navigation in the list of graphs
 	private JPanel graphNavigPane;
 	
-	// Components managing loading of the fragment space
-	private JPanel pnlFragSpace;
-	private JTextField txtFragSpace;
-	private JButton btnFragSpace; 
-	private String loadFSToolTip = "<html>No fragment space loaded.<br>"
-			+ "Graphs can be inspected without loading a fragment space.<br>"
-			+ "However, loading a fragment space allows: <ul>"
-			+ "<li>visualize the molecular fragments linked to each node,</li>"
-			+ "<li>edit existing graphs,</li>"
-			+ "<li>build graphs manually.</li>"
-			+ "</ul></html>";
-	
+	private JPanel pnlMouseMode;
+	private JButton btnPickMode;
+	private JButton btnMoveMode;
+    
 	private JButton btnAddGraph;
 	private JButton btnGraphDel;
 	
@@ -367,92 +360,50 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                                         .addComponent(btnGraphDel)));
 		graphCtrlPane.add(graphNavigPane);
 		
-		graphCtrlPane.add(new JSeparator());
-		
-		// Fragment Space
-		if (FragmentSpace.isDefined())
-		{
-			hasFragSpace = true;
-		}
-		
-		txtFragSpace = new JTextField();
-		txtFragSpace.setHorizontalAlignment(JTextField.CENTER);
-		if (!hasFragSpace)
-		{
-			renderThisForLackOfFragSpace();
-		}
-		else
-		{
-			renderThisForPresenceOfFragSpace();
-		}
-		txtFragSpace.setEditable(false);
-		
-		btnFragSpace = new JButton("Load Fragment Space");
-		btnFragSpace.setToolTipText(loadFSToolTip);
-		btnFragSpace.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean showWarning = false;
-				String msg = "<html><body width='%1s'>"
-						+ "<b>WARNING</b>: you are introducing a "
-						+ "potential source of mistmatch between "
-						+ "the IDs of the building block used in graphs "
-						+ "and the loaded"
-						+ "space of building blocks.<br>In particular:<br>"
-						+ "<ul>";
-				
-				//NB: we do the same in MainToolBar.java
-				
-				if (dnGraphLibrary.size() != 0)
-				{
-					msg = msg 
-							+ "<li>One or more graphs are already loaded.</li>";
-					showWarning = true;
-				}
-				if (hasFragSpace)
-				{
-					msg = msg + "<li>A space of building blocks is alredy "
-					        + "loaded.</li>";
-					showWarning = true;
-				}
-				if (showWarning)
-				{
-					msg = msg + "</ul>"
-							+ ""
-			                + "Do you want to change the building block "
-			                + "space? </html>";
-					String[] options = new String[]{"Yes", "No"};
-					int res = JOptionPane.showOptionDialog(null,
-							String.format(msg,350),			            
-			                "Change frgment space?",
-			                JOptionPane.DEFAULT_OPTION,
-			                JOptionPane.WARNING_MESSAGE,
-			                UIManager.getIcon("OptionPane.warningIcon"),
-			                options,
-			                options[1]);
-					if (res == 1)
-					{
-						return;
-					}
-				}
-				loadFragmentSpace();
-			}
-		});
-		pnlFragSpace = new JPanel();
-        GroupLayout lyoFragSpace = new GroupLayout(pnlFragSpace);
-        pnlFragSpace.setLayout(lyoFragSpace);
-        lyoFragSpace.setAutoCreateGaps(true);
-        lyoFragSpace.setAutoCreateContainerGaps(true);
-        lyoFragSpace.setHorizontalGroup(lyoFragSpace.createParallelGroup(
-                                        GroupLayout.Alignment.CENTER)
-                        .addComponent(btnFragSpace)
-                        .addComponent(txtFragSpace));
-        lyoFragSpace.setVerticalGroup(lyoFragSpace.createSequentialGroup()
-		                .addComponent(btnFragSpace)
-		                .addComponent(txtFragSpace));
-        graphCtrlPane.add(pnlFragSpace);
 		
 		graphCtrlPane.add(new JSeparator());
+		
+		
+		JLabel mouseModeLab = new JLabel("Mouse mode:");
+		btnPickMode = new JButton("Pick");
+		btnPickMode.setToolTipText("Make the mouse select vertex on click.");
+		btnPickMode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                visualPanel.setMouseMode(ModalGraphMouse.Mode.PICKING);
+            }
+        });
+        btnMoveMode = new JButton("Move");
+        btnMoveMode.setToolTipText("Makes mouse move transform the graph view.");
+        btnMoveMode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                visualPanel.setMouseMode(ModalGraphMouse.Mode.TRANSFORMING);
+            }
+        });
+        pnlMouseMode = new JPanel();
+        GroupLayout lyoMouseModeLayout = new GroupLayout(pnlMouseMode);
+        pnlMouseMode.setLayout(lyoMouseModeLayout);
+        lyoMouseModeLayout.setAutoCreateGaps(true);
+        lyoMouseModeLayout.setAutoCreateContainerGaps(true);
+        lyoMouseModeLayout.setHorizontalGroup(lyoMouseModeLayout.createParallelGroup(
+                GroupLayout.Alignment.CENTER)
+                .addComponent(mouseModeLab)
+                .addGroup(lyoMouseModeLayout.createSequentialGroup()
+                        .addComponent(btnMoveMode)
+                        .addComponent(btnPickMode)));
+        lyoMouseModeLayout.setVerticalGroup(lyoMouseModeLayout.createSequentialGroup()
+                .addComponent(mouseModeLab)
+                .addGroup(lyoMouseModeLayout.createParallelGroup()
+                        .addComponent(btnMoveMode)
+                        .addComponent(btnPickMode)));
+        graphCtrlPane.add(pnlMouseMode);
+        
+		
+		graphCtrlPane.add(new JSeparator());
+		
 		
 		// Controls to alter the presently loaded graph (if any)
 		pnlEditVrtxBtns = new JPanel();
@@ -1310,9 +1261,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
     void renderThisForLackOfFragSpace() 
     {
         hasFragSpace = false;
-        txtFragSpace.setText("No fragment space");
-        txtFragSpace.setToolTipText(loadFSToolTip);
-        txtFragSpace.setBackground(Color.ORANGE);
         visualPanel.bringCardToTopOfVertexViewer(visualPanel.NOFSCARDNAME);
     }
     
@@ -1325,12 +1273,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
     void renderThisForPresenceOfFragSpace() 
     {
         hasFragSpace = true;
-        txtFragSpace.setText("Fragment space loaded");
-        txtFragSpace.setToolTipText("<html>A fragment space has been loaded "
-                + "previously<br>and is ready to use. You can change the "
-                + "fragment space<br> by loading another one, but be aware "
-                + "of any dependency from<br>currently loaded graphs.</html>");
-        txtFragSpace.setBackground(Color.decode("#4cc253"));
     }
 //-----------------------------------------------------------------------------
 
@@ -1516,7 +1458,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		}
 		
 		// Clears the "dnGraph" and GUI components, but keep memory of the 
-    	// status of the graph of an easy recovery, (see GSGraphSnapshot)
+    	// status of the graph of an easy recovery
     	clearCurrentSystem();
     	
 		dnGraph = dnGraphLibrary.get(currGrphIdx);
@@ -1673,7 +1615,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	    		}
 	
 	    		// We use the currGrphIdx to load another dnGraph
-		    	loadCurrentGraphIdxToViewer(true);
+		    	loadCurrentGraphIdxToViewer(false); 
 		    	updateGraphListSpinner();
     		}
     		else
@@ -1751,7 +1693,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 //-----------------------------------------------------------------------------
 
 	/*
-	 * This is needed to stop GraphStream and Jmol threads upon closure of this
+	 * This is needed to stop JUNG and Jmol threads upon closure of this
 	 * gui card.
 	 */
 	public void dispose() 
