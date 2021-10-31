@@ -73,11 +73,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	private DENOPTIMGraph dnGraph;
 	
 	/**
-	 * The currently loaded graph as GraphStream object
-	 */
-	private Graph graphGS = null;
-	
-	/**
 	 * The snapshot of the old (removed) visualized GraphStrem system. 
 	 * Used only to remember stuff like sprites and node positions.
 	 */
@@ -288,8 +283,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		
 		graphViewer.cleanup();
 		graphViewer.loadGraphToViewer(dnGraph,oldGSStatus);
-		//TODO-GG remove?
-		//graphGS = graphViewer.graph;
 	}
 
 //-----------------------------------------------------------------------------
@@ -452,30 +445,12 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			if (evt.getNewValue() == null)
 			{
 			    resetFragViewerCardDeck();
-			}
-            
-			// Otherwise try to load the clicked-on vertex into the viewer
-			String nodeId = (String) evt.getNewValue();
-			
-			//TODO-GG
-			Object n = 1;
-			//JVertex n = graphGS.getNode(nodeId);
-			if (n == null || !hasFragSpace)
-			{
-				return;
-			}
-			
-			DENOPTIMVertex v;
-			try {
-				v = dnGraph.getVertexWithId(
-						Integer.parseInt(nodeId));
-			} catch (NumberFormatException e1) {
-			    //When we click on an AP node we get a nodeId that is like v1ap0
-			    // and this triggers this exception, which we can ignore.
 			    return;
 			}
+			
+			JVertex jv = (JVertex) evt.getNewValue();
 
-		    DENOPTIMVertex bb = v.clone();
+		    DENOPTIMVertex bb = jv.dnpVertex.clone();
 			if (bb instanceof DENOPTIMFragment)
 			{
 			    removeNestedGraphViewer(); //Just is case we still have it

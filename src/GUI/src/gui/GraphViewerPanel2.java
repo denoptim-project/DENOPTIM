@@ -27,6 +27,7 @@ import java.awt.Font;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
@@ -129,6 +131,12 @@ public class GraphViewerPanel2 extends JPanel
         boolean displayBBID = false;
         
         /**
+         * Flag enabling opening vertex inner view (i.e., expand templates)
+         * in graph viewer
+         */
+        boolean expandable = false;
+        
+        /**
          * Reference to the {@link JEdge} linking this vertex to its parent 
          * vertex. This is non-null only for vertexes that represent APs.
          */
@@ -153,6 +161,7 @@ public class GraphViewerPanel2 extends JPanel
          */
         public JVertex(DENOPTIMVertex v) {
             this.dnpVertex = v;
+            this.expandable = true;
             idStr = Integer.toString(v.getVertexId());
             switch (v.getBuildingBlockType())
             {
@@ -477,14 +486,37 @@ public class GraphViewerPanel2 extends JPanel
         layout.setSize(new Dimension(300, 300)); //TODO-GG: get size from parent component
         viewer = new VisualizationViewer<>(layout);
 		
-        viewer.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+        viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
+            
+            @Override
+            public void graphReleased(JVertex v, MouseEvent me)
+            {}
+            
+            @Override
+            public void graphPressed(JVertex v, MouseEvent me)
+            {}
+            
+            @Override
+            public void graphClicked(JVertex v, MouseEvent me)
+            {
+                if (v.expandable)
+                {
+                    firePropertyChange("NODECLICKED", null, v);
+                } else {
+                    firePropertyChange("NODECLICKED", null, null);
+                }
+            }
+        });
+        viewer.getRenderer().getVertexLabelRenderer().setPosition(
+                Position.CNTR);
         viewer.getRenderContext().setVertexShapeTransformer(
                 new VertexShapePaintTransformer());
         viewer.getRenderContext().setVertexFillPaintTransformer(
                 new VertexFillPaintTransformer(viewer.getPickedVertexState()));
         viewer.getRenderContext().setVertexLabelTransformer(
                 new VertexLabelTransformer());
-        viewer.getRenderContext().setVertexFontTransformer(new Function<JVertex, Font>(){
+        viewer.getRenderContext().setVertexFontTransformer(
+                new Function<JVertex, Font>(){
             @Override
             public Font apply(JVertex v) {
                 return new Font("Helvetica", Font.PLAIN, 
