@@ -33,6 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -199,7 +201,7 @@ public class GraphViewerPanel extends JPanel
         /**
          * String identifying this edge within a graph. This is not meant
          * to be unique across graphs, but is unique within a graph,
-         * provided that the vertex IDs are uniwue.
+         * provided that the vertex IDs are unique.
          */
         String id = "";
         
@@ -518,6 +520,7 @@ public class GraphViewerPanel extends JPanel
 	    if (this.getSize().height<100)
 	    {
 	        layout.setSize(new Dimension(100, 100));
+	        viewer = new VisualizationViewer<>(layout,new Dimension(100, 100));
 	    } else {
 	        double w = this.getSize().width 
                     - GUIPreferences.graphNodeSize * 1.5;
@@ -525,9 +528,8 @@ public class GraphViewerPanel extends JPanel
                     - GUIPreferences.graphNodeSize * 1.5;
 	        Dimension dim = new Dimension((int) w, (int) h);
 	        layout.setSize(dim);
+	        viewer = new VisualizationViewer<>(layout,this.getSize());
 	    }
-	    
-	    viewer = new VisualizationViewer<>(layout);
 		
 	    // Listener for clicks on the graph nodes
         viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
@@ -581,7 +583,8 @@ public class GraphViewerPanel extends JPanel
                 new BasicEdgeArrowRenderingSupport<JVertex, JEdge>());
         viewer.getRenderContext().setEdgeLabelTransformer(
                 new EdgeLabelTransformer());
-        viewer.getRenderContext().setEdgeFontTransformer(new Function<JEdge, Font>(){
+        viewer.getRenderContext().setEdgeFontTransformer(
+                new Function<JEdge, Font>(){
             @Override
             public Font apply(JEdge e) {
                 return new Font("Helvetica", Font.PLAIN, 
@@ -595,19 +598,54 @@ public class GraphViewerPanel extends JPanel
         viewer.setGraphMouse(gm);
         viewer.addKeyListener(gm.getModeKeyListener());
 		this.add(viewer);
-		
-		//This is supposed to resize and center the graph into the frame
-		MultiLayerTransformer mlt = viewer.getRenderContext().getMultiLayerTransformer();
-		MutableTransformer layoutTransformer = mlt.getTransformer(Layer.LAYOUT);
-        MutableTransformer viewTransformer = mlt.getTransformer(Layer.VIEW);
-		AffineTransform layoutTransform = layoutTransformer.getTransform();
-        AffineTransform viewTransform = viewTransformer.getTransform();
-        layoutTransformer.setToIdentity();
-        viewTransformer.setToIdentity();
-        layoutTransformer.concatenate(layoutTransform);
-        viewTransformer.concatenate(viewTransform);
+        
+        centerGraphLayout();
 	}
+
+//-----------------------------------------------------------------------------
 	
+	public void centerGraphLayout()
+	{
+        Point2D centerGraph = getLayoutCenter();
+        Point2D centerViewer = viewer.getRenderContext()
+                .getMultiLayerTransformer()
+                .inverseTransform(Layer.LAYOUT, viewer.getCenter());
+        viewer.getRenderContext().getMultiLayerTransformer()
+        .getTransformer(Layer.LAYOUT).translate(
+                          -(centerGraph.getX() - centerViewer.getX()),
+                          -(centerGraph.getY() - centerViewer.getY()));
+	}
+
+//-----------------------------------------------------------------------------
+
+    private Point2D getLayoutCenter()
+    {
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        for (JVertex v : loadedGraph.getVertices())
+        {
+            try
+            {
+                Point2D p = layout.getVertexPosition(v);
+                if (p.getX() < minX)
+                    minX = p.getX();
+                if (p.getY() < minY)
+                    minY = p.getY();
+                if (p.getX() > maxX)
+                    maxX = p.getX();
+                if (p.getY() > maxY)
+                    maxY = p.getY();
+            } catch (ExecutionException e)
+            {
+                //ignore it
+            }
+        }
+        return new Point2D.Double(minX + (maxX-minX)/2.0, 
+                minY + (maxY-minY)/2.0);
+    }
+
 //-----------------------------------------------------------------------------
 	
 	private class PopupGraphMousePlugin extends AbstractPopupGraphMousePlugin 
@@ -629,6 +667,7 @@ public class GraphViewerPanel extends JPanel
 	{
 	    public GraphOptsPopup() {
 	        super();
+	        
             JMenuItem mnuRelax = new JMenuItem("Refine node locations");
             mnuRelax.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -637,6 +676,17 @@ public class GraphViewerPanel extends JPanel
                     loadGraphToViewer(loadedGraph,snpSht,false);
                 }});
             this.add(mnuRelax);
+            
+            this.add(new JSeparator());
+            
+            
+            JMenuItem mnuCenterView = new JMenuItem("Center View");
+            mnuCenterView.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    centerGraphLayout();
+                }
+            });
+            this.add(mnuCenterView);
             
             this.add(new JSeparator());
             
