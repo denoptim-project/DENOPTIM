@@ -447,7 +447,7 @@ public class GraphViewerPanel extends JPanel
             DENOPTIMAttachmentPoint inAP = tmpl.getInnerAPFromOuterAP(outAP);
             for (JVertex v : graph.getVertices())
             {
-                if (v.vstype == JVertexType.AP)
+                if (v.vtype == JVertexType.AP)
                 {
                     if (v.ap == inAP)
                     {
