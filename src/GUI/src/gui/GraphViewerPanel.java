@@ -474,6 +474,21 @@ public class GraphViewerPanel extends JPanel
 	}
 	
 //-----------------------------------------------------------------------------
+    
+    /**
+     * Load the given graph to the graph viewer.
+     * @param g the graph to load
+     * @param prevStatus the snapshot of the previous status. We use this to 
+     * remember previously chosen settings, such as the labels to be 
+     * displayed, or the position of nodes.
+     */
+    public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
+            JUNGGraphSnapshot prevStatus)
+    {
+        loadGraphToViewer(g, prevStatus, true);
+    }
+	
+//-----------------------------------------------------------------------------
 	
 	/**
 	 * Load the given graph to the graph viewer.
@@ -483,14 +498,14 @@ public class GraphViewerPanel extends JPanel
 	 * displayed, or the position of nodes.
 	 */
 	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
-	        JUNGGraphSnapshot prevStatus)
+	        JUNGGraphSnapshot prevStatus, boolean lock)
 	{
 	    loadedGraph = g;
 	    layout = new DNPSpringLayout<>(g);
 	    if (prevStatus != null)
 	    {
 	        // Here we set view features according to a previous graph view
-	        inheritFeatures(prevStatus);
+	        inheritFeatures(prevStatus, lock);
 	    }
 	    
 	    //NB: the size depends on where this panel is used. In GUIVertexSelector
@@ -599,6 +614,17 @@ public class GraphViewerPanel extends JPanel
 	{
 	    public GraphOptsPopup() {
 	        super();
+            JMenuItem mnuRelax = new JMenuItem("Refine node locations");
+            mnuRelax.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JUNGGraphSnapshot snpSht = getGraphStatusSnapshot();
+                    cleanup();
+                    loadGraphToViewer(loadedGraph,snpSht,false);
+                }});
+            this.add(mnuRelax);
+            
+            this.add(new JSeparator());
+            
 	        JMenuItem mnuShowAPC = new JMenuItem("Show APClasses");
 	        mnuShowAPC.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
@@ -664,7 +690,7 @@ public class GraphViewerPanel extends JPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void inheritFeatures(JUNGGraphSnapshot prevStatus)
+	private void inheritFeatures(JUNGGraphSnapshot prevStatus, boolean lock)
     {
 	    // Set labels on vertexes
 	    ArrayList<String> lst = prevStatus.getVertexeIDsWithLabel(
@@ -693,7 +719,7 @@ public class GraphViewerPanel extends JPanel
         }
         
         // Set the positions via initialising of the layout
-        layout.setInitialLocations(prevStatus.vertexPosition);
+        layout.setInitialLocations(prevStatus.vertexPosition, lock);
     }
 	
 //-----------------------------------------------------------------------------

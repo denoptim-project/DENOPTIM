@@ -36,6 +36,7 @@ public class DNPSpringLayout<V, E> extends SpringLayout2<V, E>
     
     private int iteration = 0;
     private int maxIterations = 500;
+    private boolean lockInitialPositions = false;
     
 //------------------------------------------------------------------------------
       
@@ -47,8 +48,10 @@ public class DNPSpringLayout<V, E> extends SpringLayout2<V, E>
     
 //------------------------------------------------------------------------------
       
-    public void setInitialLocations(Map<String, Point2D> vertexPosition)
+    public void setInitialLocations(Map<String, Point2D> vertexPosition, 
+            boolean lock)
     {
+        this.lockInitialPositions = lock;
         this.oldVertexPosition = vertexPosition;
         double maxX = -1.0;
         double maxY = -1.0;
@@ -76,13 +79,16 @@ public class DNPSpringLayout<V, E> extends SpringLayout2<V, E>
             // visualisation of a previous version of this graph.
             setInitializer(new RecreateKnownPositions(oldVertexPosition));
             
-            // Freeze/lock the position of those nodes with known position
-            for (V v : this.graph.getVertices())
+            if (lockInitialPositions)
             {
-                if (v instanceof JVertex)
+                // Freeze/lock the position of those nodes with known position
+                for (V v : this.graph.getVertices())
                 {
-                    if (oldVertexPosition.containsKey(((JVertex) v).idStr))
-                        lock(v,true);
+                    if (v instanceof JVertex)
+                    {
+                        if (oldVertexPosition.containsKey(((JVertex) v).idStr))
+                            lock(v,true);
+                    }
                 }
             }
         }
@@ -145,7 +151,6 @@ public class DNPSpringLayout<V, E> extends SpringLayout2<V, E>
     {
         if (iteration > maxIterations)
         {
-            System.err.println("DNP SpringLayout terminated by mxIterations");
             done = true;
         }        
     } 
