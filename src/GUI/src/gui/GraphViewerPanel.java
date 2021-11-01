@@ -429,44 +429,35 @@ public class GraphViewerPanel extends JPanel
             vMap.get(r.getTailVertex()).vtype = JVertexType.RCV;
         }
         
-        //TODO adapt to new type
-        /*
         if (tmpl != null)
         {
             renumberAPs(tmpl, g);
         }
-        */
         return g;
     }
     
 //-----------------------------------------------------------------------------    
 
-    //TODO
-    /*
-    private static void renumberAPs(DENOPTIMTemplate tmpl, Graph graph)
+    private static void renumberAPs(DENOPTIMTemplate tmpl, 
+            Graph<JVertex, JEdge> graph)
     {
         for (int i=0; i<tmpl.getAttachmentPoints().size(); i++)
         {
             DENOPTIMAttachmentPoint outAP = tmpl.getAttachmentPoints().get(i);
             DENOPTIMAttachmentPoint inAP = tmpl.getInnerAPFromOuterAP(outAP);
-            for (Node n : graph.getNodeSet())
+            for (JVertex v : graph.getVertices())
             {
-                if (n.getAttribute("ui.class").equals("ap"))
+                if (v.vstype == JVertexType.AP)
                 {
-                    int gsVrtId = n.getAttribute("dnp.srcVrtId");
-                    int gsApUID = n.getAttribute("dnp.ApUID");
-                    int dnVrtId = inAP.getOwner().getVertexId();
-                    int dnApUID = inAP.getID();
-                    if (gsVrtId == dnVrtId && gsApUID == dnApUID)
+                    if (v.ap == inAP)
                     {
-                        n.setAttribute("dnp.ApId", i+1);
+                        v.idStr = Integer.toString(i+1);
                         break;
                     }
                 }
             }
         }
     }
-    */
 	
 //-----------------------------------------------------------------------------
 
