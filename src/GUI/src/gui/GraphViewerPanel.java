@@ -31,6 +31,7 @@ import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
@@ -62,6 +63,8 @@ import denoptim.molecule.DENOPTIMVertex;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
+import edu.uci.ics.jung.visualization.Layer;
+import edu.uci.ics.jung.visualization.MultiLayerTransformer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -71,6 +74,7 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import edu.uci.ics.jung.visualization.renderers.BasicEdgeArrowRenderingSupport;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 import gui.GraphViewerPanel.LabelType;
 
 
@@ -591,6 +595,17 @@ public class GraphViewerPanel extends JPanel
         viewer.setGraphMouse(gm);
         viewer.addKeyListener(gm.getModeKeyListener());
 		this.add(viewer);
+		
+		//This is supposed to resize and center the graph into the frame
+		MultiLayerTransformer mlt = viewer.getRenderContext().getMultiLayerTransformer();
+		MutableTransformer layoutTransformer = mlt.getTransformer(Layer.LAYOUT);
+        MutableTransformer viewTransformer = mlt.getTransformer(Layer.VIEW);
+		AffineTransform layoutTransform = layoutTransformer.getTransform();
+        AffineTransform viewTransform = viewTransformer.getTransform();
+        layoutTransformer.setToIdentity();
+        viewTransformer.setToIdentity();
+        layoutTransformer.concatenate(layoutTransform);
+        viewTransformer.concatenate(viewTransform);
 	}
 	
 //-----------------------------------------------------------------------------

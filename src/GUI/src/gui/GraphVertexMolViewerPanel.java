@@ -156,7 +156,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		fragViewerHeader = new JPanel();
 		fragViewerHeader.add(new JLabel("Node content:"));
 		String fragViewerToolTip = "<html>This viewer shows the "
-				+ "chemical structure of the selected vertex.<br>"
+				+ "content of the selected vertex.<br>"
 				+ "Click on a node to select it and display its "
 				+ "content here.</html>";
 		fragViewerHeader.setToolTipText(fragViewerToolTip);
