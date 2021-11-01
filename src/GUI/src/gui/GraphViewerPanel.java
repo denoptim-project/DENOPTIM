@@ -25,11 +25,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,12 +40,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.UIManager;
+
+import java.awt.event.MouseListener;
 
 import com.google.common.base.Function;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
@@ -51,16 +58,12 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
+
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
@@ -68,6 +71,7 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import edu.uci.ics.jung.visualization.renderers.BasicEdgeArrowRenderingSupport;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import gui.GraphViewerPanel.LabelType;
 
 
 /**
@@ -75,7 +79,7 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
  * 
  * @author Marco Foscato
  */
-public class GraphViewerPanel2 extends JPanel 
+public class GraphViewerPanel extends JPanel 
 {
 	/**
 	 * Version UID
@@ -142,7 +146,7 @@ public class GraphViewerPanel2 extends JPanel
          * Constructor for vertex that represents a given 
          * {@link DENOPTIMAttachmentPoint}. Note that the reference to the JEdge
          * linking this JVertex to its parent is set when creating the JEdge
-         * {@link GraphViewerPanel2#convertDnGraphToGSGraph(DENOPTIMGraph, DENOPTIMTemplate)}
+         * {@link GraphViewerPanel#convertDnGraphToGSGraph(DENOPTIMGraph, DENOPTIMTemplate)}
          * @param ap the {@link DENOPTIMAttachmentPoint}.
          */
         public JVertex(DENOPTIMAttachmentPoint ap) {
@@ -271,7 +275,7 @@ public class GraphViewerPanel2 extends JPanel
 	/**
 	 * Constructor
 	 */
-	public GraphViewerPanel2()
+	public GraphViewerPanel()
 	{
 		super();
 		initialize();
@@ -506,6 +510,7 @@ public class GraphViewerPanel2 extends JPanel
 	    
 	    viewer = new VisualizationViewer<>(layout);
 		
+	    // Listener for clicks on the graph nodes
         viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
             
             @Override
@@ -567,9 +572,86 @@ public class GraphViewerPanel2 extends JPanel
         
         gm = new DefaultModalGraphMouse<JVertex, JEdge> ();
         gm.setMode(ModalGraphMouse.Mode.PICKING);
+        gm.add(new PopupGraphMousePlugin());
         viewer.setGraphMouse(gm);
         viewer.addKeyListener(gm.getModeKeyListener());
 		this.add(viewer);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private class PopupGraphMousePlugin extends AbstractPopupGraphMousePlugin 
+	{
+	    
+        @Override
+        protected void handlePopup(MouseEvent e)
+        {
+            Point p = e.getPoint();
+            GraphOptsPopup popup = new GraphOptsPopup();
+            popup.show((Component) e.getSource(), e.getX(), e.getY());
+        }
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	@SuppressWarnings("serial")
+    private class GraphOptsPopup extends JPopupMenu
+	{
+	    public GraphOptsPopup() {
+	        super();
+	        JMenuItem mnuShowAPC = new JMenuItem("Show APClasses");
+	        mnuShowAPC.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	                alterLabels(LabelType.APC, true);
+	            }});
+            this.add(mnuShowAPC);
+	        JMenuItem mnuHideAPC = new JMenuItem("Hide APClasses");
+	        mnuHideAPC.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.APC, false);
+                }});
+            this.add(mnuHideAPC);
+            
+	        this.add(new JSeparator());
+	        
+            JMenuItem mnuShowBT = new JMenuItem("Show Bond Types");
+            mnuShowBT.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.BT, true);
+                }});
+            this.add(mnuShowBT);
+            JMenuItem mnuHideBT = new JMenuItem("Hide Bond Types");
+            mnuHideBT.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.BT, false);
+                }});
+	        this.add(mnuHideBT);
+	        
+	        this.add(new JSeparator());
+	        
+            JMenuItem mnuShowBBID = new JMenuItem("Show Building Block IDs");
+            mnuShowBBID.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.BBID, true);
+                }});
+            this.add(mnuShowBBID);
+            JMenuItem mnuHideBBID = new JMenuItem("Hide Building Block IDs");
+            mnuHideBBID.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.BBID, false);
+                }});
+            this.add(mnuHideBBID);
+            
+            this.add(new JSeparator());
+            
+            JMenuItem mnuHideAll = new JMenuItem("Hide All Labels");
+            mnuHideAll.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    for (LabelType lt : LabelType.values())
+                        alterLabels(lt, false);
+                }});
+            this.add(mnuHideAll);
+	    }
 	}
 	
 //-----------------------------------------------------------------------------

@@ -15,8 +15,8 @@ import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
 import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
 import edu.uci.ics.jung.graph.Graph;
-import gui.GraphViewerPanel2.JEdge;
-import gui.GraphViewerPanel2.JVertex;
+import gui.GraphViewerPanel.JEdge;
+import gui.GraphViewerPanel.JVertex;
 
 /**
  * This layout extends the SpringLayout to change its behaviour. The

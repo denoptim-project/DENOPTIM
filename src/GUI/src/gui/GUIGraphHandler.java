@@ -72,7 +72,7 @@ import denoptim.molecule.EmptyVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
-import gui.GraphViewerPanel2.LabelType;
+import gui.GraphViewerPanel.LabelType;
 
 
 /**

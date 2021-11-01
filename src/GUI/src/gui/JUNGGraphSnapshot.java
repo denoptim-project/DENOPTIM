@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import edu.uci.ics.jung.graph.Graph;
-import gui.GraphViewerPanel2.JEdge;
-import gui.GraphViewerPanel2.JVertex;
-import gui.GraphViewerPanel2.LabelType;
+import gui.GraphViewerPanel.JEdge;
+import gui.GraphViewerPanel.JVertex;
+import gui.GraphViewerPanel.LabelType;
 
 /**
  * This class collects information on how a graph was displayed in a JUNG

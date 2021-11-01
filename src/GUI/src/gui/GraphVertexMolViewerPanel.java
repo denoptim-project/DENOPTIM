@@ -46,9 +46,9 @@ import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
-import gui.GraphViewerPanel2.JVertex;
-import gui.GraphViewerPanel2.JVertexType;
-import gui.GraphViewerPanel2.LabelType;
+import gui.GraphViewerPanel.JVertex;
+import gui.GraphViewerPanel.JVertexType;
+import gui.GraphViewerPanel.LabelType;
 
 
 /**
@@ -107,7 +107,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	protected final String MOLVIEWERCARDNAME = "molViewerCard";
 	protected final String FRAGVIEWERCARDNAME = "fragViewerCard";
 	protected final String TMPLVIEWERCARDNAME = "tmplViewwerCard";
-	protected GraphViewerPanel2 graphViewer;
+	protected GraphViewerPanel graphViewer;
 	
 	//Default divider location
 	private double defDivLoc = 0.5;
@@ -146,7 +146,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		leftPane.setResizeWeight(0.5);
 		setLeftComponent(leftPane);
 		
-		graphViewer = new GraphViewerPanel2();
+		graphViewer = new GraphViewerPanel();
 		setRightComponent(graphViewer);
 		graphViewer.addPropertyChangeListener(
 				new PropertyChangeListenerProxy(
