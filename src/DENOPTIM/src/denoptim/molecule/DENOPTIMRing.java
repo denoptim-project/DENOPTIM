@@ -238,6 +238,14 @@ public class DENOPTIMRing implements Serializable
             return jsonObject;
         }
     }
+    
+//------------------------------------------------------------------------------
+    
+    public void removeVertex(DENOPTIMVertex oldVrtx)
+    {
+        int idx = vertices.indexOf(oldVrtx);
+        vertices.remove(idx);
+    }
 
 //------------------------------------------------------------------------------
     

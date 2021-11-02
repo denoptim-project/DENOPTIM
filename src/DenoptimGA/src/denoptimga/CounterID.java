@@ -30,6 +30,8 @@ public enum CounterID
     FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK,
     FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND,
     FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT,
+    FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT,
+    FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT,
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK,
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND,
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT,
@@ -94,6 +96,10 @@ public enum CounterID
                 + "find an alternative link vertex";
         FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT.description = "Failed to "
                 + "replace old link with new one";
+        FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT.description = "Failed to "
+                + "identify the parent of a link selected for removal.";
+        FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT.description = "Failed to "
+                + "remove vertex and weld remaining parts.";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK.description = "Mutation did not "
                 + "introduce a verted between a pairs of previously "
                 + "connected vertexes.";

@@ -57,7 +57,7 @@ public class SymmetricSet implements Serializable,Cloneable
      * @param symIds the list of identifiers.
      */
     public SymmetricSet(ArrayList<Integer> symIds)
-    {
+    {       
         this.symIds = new ArrayList<>(symIds);
     }
 

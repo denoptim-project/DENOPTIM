@@ -33,6 +33,12 @@ public enum MutationType {
     /**
      * Adds a vertex between two previously connected vertexes.
      */
-    ADDLINK
+    ADDLINK,
+    
+    /**
+     * Removes a vertex from a tree and merges remaining branches into the
+     * remaining trunk.
+     */
+    DELETELINK
 
 }

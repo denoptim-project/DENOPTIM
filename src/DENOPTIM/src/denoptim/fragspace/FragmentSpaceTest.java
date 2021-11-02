@@ -543,37 +543,42 @@ public class FragmentSpaceTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testFusedRingOnlyAddedOnce() {
-        try {
-            TestCase testCase = getTestCase();
-            final int TRY_ADDING = 10;
-            List<DENOPTIMGraph> sameGraphs = IntStream
-                    .range(0, TRY_ADDING)
-                    .mapToObj(i -> testCase.graph.clone())
-                    .peek(DENOPTIMGraph::renumberGraphVertices)
-                    .collect(Collectors.toList());
+    public void testFusedRingOnlyAddedOnce() throws DENOPTIMException
+    {
+        TestCase testCase = getTestCase();
+        final int TRY_ADDING = 10;
+        List<DENOPTIMGraph> sameGraphs = IntStream
+                .range(0, TRY_ADDING)
+                .mapToObj(i -> testCase.graph.clone())
+                .peek(t -> {
+                    try
+                    {
+                        t.renumberGraphVertices();
+                    } catch (DENOPTIMException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                })
+                .collect(Collectors.toList());
 
-            List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
-            fragLib.clear();
+        List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+        fragLib.clear();
 
-            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
-            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
-            
-            for (DENOPTIMGraph g : sameGraphs) {
-                FragmentSpace.addFusedRingsToFragmentLibrary(g);
-            }
-
-            //Cleanup tmp files
-            DenoptimIO.deleteFile(
-                    FragmentSpaceParameters.getPathnameToAppendedFragments());
-            DenoptimIO.deleteFile(
-                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
-            
-            assertEquals(1, fragLib.size());
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-            fail("Unexpected exception thrown.");
+        FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
+        FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+        
+        for (DENOPTIMGraph g : sameGraphs) {
+            FragmentSpace.addFusedRingsToFragmentLibrary(g);
         }
+
+        //Cleanup tmp files
+        DenoptimIO.deleteFile(
+                FragmentSpaceParameters.getPathnameToAppendedFragments());
+        DenoptimIO.deleteFile(
+                FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+        
+        assertEquals(1, fragLib.size());
     }
 
 //------------------------------------------------------------------------------
@@ -624,7 +629,7 @@ public class FragmentSpaceTest
 //------------------------------------------------------------------------------
 
     private DENOPTIMTemplate getExpectedTemplate(DENOPTIMGraph g,
-                                                 DENOPTIMVertex c3) {
+            DENOPTIMVertex c3) throws DENOPTIMException {
         DENOPTIMGraph innerGraph = g.clone();
         innerGraph.renumberGraphVertices();
         DENOPTIMVertex c3Inner = innerGraph.getVertexAtPosition(g

@@ -496,7 +496,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     {
         if (user == null)
         {
-            if (owner.getGraphOwner() != null 
+            if (owner != null && owner.getGraphOwner() != null 
                     && owner.getGraphOwner().templateJacket != null)
             {
                 DENOPTIMAttachmentPoint apProjOnTemplateSurface =
@@ -1024,7 +1024,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         {
             return null;
         }
-        if (user.getSrcAPThroughout() == this){
+        if (user.getSrcAPThroughout() == this)
+        {
             return user.getTrgAP();
         } else if (user.getTrgAPThroughout() == this)
         {

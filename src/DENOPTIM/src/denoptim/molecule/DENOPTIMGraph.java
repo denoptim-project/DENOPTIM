@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,6 +51,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.FragmentSpaceUtils;
 import denoptim.fragspace.GraphLinkFinder;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
@@ -793,6 +795,289 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
+     * Remove a given vertex belonging to this graph and re-connects the 
+     * resulting graph branches as much as possible.
+     * This method reproduces the change of vertex on all symmetric sites.
+     * @param oldLink the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @return <code>true</code> if the operation is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean removeVertexAndWeld(DENOPTIMVertex vertex) throws DENOPTIMException
+    {
+        if (!gVertices.contains(vertex))
+        {
+            return false;
+        }
+        
+        ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(vertex);
+        if (symSites.size() == 0)
+        {
+            symSites.add(vertex);
+        }
+        for (DENOPTIMVertex oldLink : symSites)
+        {
+            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
+            if (!removeSingleVertexAndWeld(oldLink))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+  
+//------------------------------------------------------------------------------
+    
+    /**
+     * Remove a given vertex belonging to this graph and re-connects the 
+     * resulting graph branches as much as possible.
+     * @param vertex the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @return <code>true</code> if the operation is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean removeSingleVertexAndWeld(DENOPTIMVertex vertex) 
+            throws DENOPTIMException
+    {
+        if (!gVertices.contains(vertex))
+        {
+            return false;
+        }
+        DENOPTIMVertex parent = vertex.getParent();
+        if (parent == null)
+        {
+            //TODO-GG what is this is a vertex embedded in a template? Ic can
+            // have not parent and still be a valid template!
+            
+            //TODO:check. it might work without this requirement
+            
+            //When we come from mutation operations, we have checked this 
+            // already, and recorder failed attempt in appropriate monitor.
+            return false;
+        }
+        
+        // Get all APs that we'll try to weld into the parent
+        ArrayList<DENOPTIMAttachmentPoint> needyAPsOnChildren = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        // And all APs where we could weld onto
+        ArrayList<DENOPTIMAttachmentPoint> freeAPsOnParent = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        //        vertex.getAPsFromChilddren(); //No, because it enter templates
+        Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apOnOldToNeedyAP = 
+                new HashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint apOnOld : vertex.getAttachmentPoints())
+        {
+            if (!apOnOld.isAvailableThroughout())
+            {
+                if (apOnOld.isSrcInUserThroughout())
+                {
+                    // Links that depart from vertex
+                    DENOPTIMAttachmentPoint needyAP = 
+                            apOnOld.getLinkedAPThroughout();
+                    // NB: here do not use getSrcThroughout because it would 
+                    // enter trg templates rather than staying on their surface.
+                    needyAPsOnChildren.add(needyAP);
+                    apOnOldToNeedyAP.put(apOnOld, needyAP);
+                } else {
+                    DENOPTIMAttachmentPoint apOnParent = 
+                            apOnOld.getLinkedAPThroughout();
+                    // NB: here do not use getSrcThroughout because it would 
+                    // enter src templates rather than staying on their surface.
+                    freeAPsOnParent.add(apOnParent);
+                    freeAPsOnParent.addAll(apOnParent.getOwner()
+                            .getFreeAPThroughout());
+                }
+            }
+        }
+        
+        // Get all possible parentAPs-childAPs mappings
+        List<APMapping> mappings = FragmentSpaceUtils.mapAPClassCompatibilities(
+                freeAPsOnParent, needyAPsOnChildren, 500);
+        if (mappings.size() == 0)
+        {
+            // No APClass-compatible possibility of removing the link.
+            return false;
+        }
+        
+        // Score mapping to prioritise those that preserve rings.
+        // This to differentiate from the combination of DELETE+EXTEND operation
+        // which cannot preserve rings.
+        List<Integer> preferences = new ArrayList<Integer>();
+        // Score rings in this level's graph
+        for (int i=0; i<needyAPsOnChildren.size(); i++)
+        {
+            DENOPTIMAttachmentPoint needyAP = needyAPsOnChildren.get(i);
+            preferences.add(0);
+            
+            DENOPTIMVertex ownerOfNeedy = needyAP.getOwner();
+            for (DENOPTIMRing r : ownerOfNeedy.getGraphOwner()
+                    .getRingsInvolvingVertex(ownerOfNeedy))
+            {
+                // NB: here we stay at the level of the graph owning ownerOfNeedy
+                DENOPTIMVertex lastBeforeOwnerOfNeedy = 
+                        needyAP.getLinkedAP().getOwner();
+                if (r.contains(lastBeforeOwnerOfNeedy))
+                {
+                    preferences.set(i, preferences.get(i) + 1); 
+                }
+            }
+        }
+        
+        // Choose best scoring mapping
+        int maxScore = Integer.MIN_VALUE;
+        APMapping bestScoringMapping = null;
+        for (APMapping apm : mappings)
+        {
+            int score = 0;
+            for (DENOPTIMAttachmentPoint ap : apm.values())
+            {
+                score = score + preferences.get(needyAPsOnChildren.indexOf(ap));
+            }
+            if (score > maxScore)
+            {
+                maxScore = score;
+                bestScoringMapping = apm;
+            }
+        }
+        
+        APMapping bestScoringMappingReverse = new APMapping();
+        for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
+            bestScoringMapping.entrySet())
+        {
+            bestScoringMappingReverse.put(e.getValue(), e.getKey());
+        }
+        
+        // Update rings involving vertex directly (i.e., in this graph)
+        ArrayList<DENOPTIMRing> rToEdit = getRingsInvolvingVertex(vertex);
+        ArrayList<DENOPTIMRing> ringsToRemove = new ArrayList<DENOPTIMRing>();
+        for (DENOPTIMRing r : rToEdit)
+        {
+            r.removeVertex(vertex);
+            if (r.getSize() < 3)
+                ringsToRemove.add(r);
+        }
+        for (DENOPTIMRing r : ringsToRemove)
+        {
+            removeRing(r);
+        }
+        
+        // Remove edges to/from old vertex, while keeping track of edits to do
+        // in a hypothetical jacket template (if such template exists)
+        Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> inToOutAPForTemplate = //rename to newInReplaceOldInInTmpl
+                new HashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint oldAP : vertex.getAttachmentPoints())
+        {
+            if (oldAP.isAvailable())
+            {
+                // NB: if this graph is embedded in a template, free/available 
+                // APs at this level (and sources at the vertex we are removing) 
+                // are mapped on the jacket templates' surface, and must be 
+                // removed.
+                if (templateJacket!=null)
+                {
+                    if (!oldAP.isAvailableThroughout())
+                    {
+                        DENOPTIMAttachmentPoint lAP = 
+                                oldAP.getLinkedAPThroughout();
+                        if (bestScoringMapping.values().contains(lAP))
+                        {
+                            inToOutAPForTemplate.put(
+                                    bestScoringMappingReverse.get(lAP), oldAP);
+                        } else {
+                            oldAPToRemoveFromTmpl.add(oldAP);
+                        }
+                    } else {
+                        oldAPToRemoveFromTmpl.add(oldAP);
+                    }
+                }
+            } else {
+                removeEdge(oldAP.getEdgeUser());
+            }
+        }
+        
+        // Update pointers in symmetric sets in this graph level
+        // NB: this deals only with the symmetric relations of the removed vertex
+        // The symm. relations of other removed child vertexes are dealt with
+        // when removing those vertexes.
+        int oldVrtxId = vertex.getVertexId();
+        ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
+        Iterator<SymmetricSet> ssIter = getSymSetsIterator();
+        while (ssIter.hasNext())
+        {
+            SymmetricSet ss = ssIter.next();
+            if (ss.contains(oldVrtxId))
+            {
+                ss.remove((Integer) oldVrtxId);
+            }
+            if (ss.size() < 2)
+                ssToRemove.add(ss);
+        }
+        symVertices.removeAll(ssToRemove);
+        
+        // Remove the vertex
+        getVertexList().remove(vertex);
+        vertex.resetGraphOwner();
+        
+        // Add new edges (within the graph owning the removed vertex) 
+        List<DENOPTIMAttachmentPoint> reconnettedApsOnChilds = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> e : 
+            bestScoringMapping.entrySet())
+        {
+            DENOPTIMAttachmentPoint apOnParent = e.getKey();
+            DENOPTIMAttachmentPoint apOnChild = e.getValue();
+            if (containsVertex(apOnChild.getOwner()))
+            {
+                DENOPTIMEdge edge = new DENOPTIMEdge(apOnParent,apOnChild,
+                        FragmentSpace.getBondOrderForAPClass(
+                                apOnParent.getAPClass()));
+                addEdge(edge);
+                reconnettedApsOnChilds.add(apOnChild);
+            } else {
+                if (templateJacket!=null)
+                {
+                    templateJacket.updateInnerApID(
+                            inToOutAPForTemplate.get(apOnParent), //AP on old vertex
+                            apOnParent);
+                    reconnettedApsOnChilds.add(apOnChild);
+                } else {
+                    DENOPTIMException de = new DENOPTIMException("AP '"
+                            + apOnChild + "' seems connected to a template, "
+                            + "no template was found. Possible bug!");
+                    throw de;
+                }
+            }
+        }
+        
+        // update the mapping of this vertex's APs in the jacket template
+        if (templateJacket!=null)
+        {   
+            // Remove all APs that existed only in the old vertex
+            for (DENOPTIMAttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
+            {
+                templateJacket.removeProjectionOfInnerAP(apOnOld);
+            }
+        }
+        
+        // Remove branches of child-APs that were not mapped/done
+        for (DENOPTIMAttachmentPoint apOnChild : needyAPsOnChildren)
+        {
+            if (!reconnettedApsOnChilds.contains(apOnChild))
+            {
+                removeOrphanBranchStartingAt(apOnChild.getOwner());
+            }
+        }
+
+        jGraph = null;
+        
+        return !this.containsVertex(vertex);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Replaced a given vertex belonging to this graph with a new vertex 
      * generated specifically for this purpose. This method reproduces the 
      * change of vertex on all symmetric sites.
@@ -948,6 +1233,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         // finally introduce the new vertex in the graph
         newLink.setLevel(oldLink.getLevel());
         addVertex(newLink);
+        
+        //TODO-V3 update levels?
         
         // We keep track of the APs on the new link that have been dealt with
         List<DENOPTIMAttachmentPoint> doneApsOnNew = 
@@ -1400,7 +1687,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Gets all the children of the current vertex recursively.
+     * Gets all the children of the current vertex recursively. 
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
      */
@@ -1493,7 +1782,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     @Override
     public DENOPTIMGraph clone()
-    {
+    {   
         // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
         ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
@@ -2445,10 +2734,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             res = removeBranchStartingAt(v);
         }
-
         return res;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -2472,7 +2760,28 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     + "Unable to locate parent edge.";
             throw new DENOPTIMException(msg);
         }
+        
+        return removeOrphanBranchStartingAt(v);
+    }
+  
+//------------------------------------------------------------------------------
 
+    /**
+     * Deletes the branch, i.e., the specified vertex and its children.
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * Symmetry relations are updated accordingly.
+     * @param vid the vertexID of the root of the branch. We'll remove also
+     * this vertex.
+     * @param allowOrphan use <code>true</code> to allow removal of branches
+     * starting with a vertex that has no edge to a parent.
+     * @return <code>true</code> if operation is successful
+     * @throws DENOPTIMException
+     */
+
+    public boolean removeOrphanBranchStartingAt(DENOPTIMVertex v)
+            throws DENOPTIMException
+    {
         // now get the vertices attached to v
         ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
         getChildrenTree(v, children);
@@ -2535,9 +2844,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Reassign vertex IDs to a graph.
      * Before any operation is performed on the graph, its vertices should be
      * renumbered to differentiate them from their clones.
+     * @throws DENOPTIMException 
      */
 
-    public void renumberGraphVertices()
+    public void renumberGraphVertices() throws DENOPTIMException
     {
         renumberVerticesGetMap();
     }
@@ -2549,9 +2859,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Before any operation is performed on the graph, its vertices should be
      * renumbered so as to differentiate them from their clones
      * @return map with old IDs as key and new IDs as values
+     * @throws DENOPTIMException 
      */
 
-    public Map<Integer,Integer> renumberVerticesGetMap() {
+    public Map<Integer,Integer> renumberVerticesGetMap() throws DENOPTIMException 
+    {
         Map<Integer, Integer> nmap = new HashMap<>();
 
         // for the vertices in the graph, get new vertex ids
@@ -2572,6 +2884,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             SymmetricSet ss = iter.next();
             for (int i=0; i<ss.getList().size(); i++)
             {
+                if (!nmap.containsKey(ss.getList().get(i)))
+                {
+                    DENOPTIMException e = new DENOPTIMException("Assumption "
+                            + "violated: vertex IDs in "
+                            + "symmetric seta are out of sync w.r.t. actual "
+                            + "vertex IDs. Reposrt bug!");
+                    throw e;
+                }
                 ss.getList().set(i,nmap.get(ss.getList().get(i)));
             }
         }

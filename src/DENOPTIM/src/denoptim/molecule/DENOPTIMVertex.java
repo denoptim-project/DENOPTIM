@@ -400,6 +400,35 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         }
         return n;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets attachment points that are availability throughout 
+     * the graph level, i.e., checks also across the inner graph template 
+     * boundary. This method does account for embedding of the vertex in a 
+     * template, i.e., APs can be available in the graph owning this vertex,
+     * but if the graph is itself the inner graph of a template, the AP is 
+     * then projected on the template's surface and used to make an edge that 
+     * uses the template as a single vertex. To ignore this possibility and 
+     * consider only edges that belong to the graph owning this vertex, use
+     * {@Link DENOPTIMVertex#getFreeAPCount()}.
+     * @return the APs of this vertex that are not used by any edge, 
+     * whether within
+     * the graph owning this vertex (if any) or within a graph owning the
+     * template embedding the graph that owns this vertex.
+     */
+    public ArrayList<DENOPTIMAttachmentPoint> getFreeAPThroughout()
+    {
+        ArrayList<DENOPTIMAttachmentPoint> lst = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        {
+            if (ap.isAvailableThroughout())
+                lst.add(ap);
+        }
+        return lst;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -419,13 +448,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     public int getFreeAPCountThroughout()
     {
-        int n = 0;
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
-        {
-            if (ap.isAvailableThroughout())
-                n++;
-        }
-        return n;
+        return getFreeAPThroughout().size();
     }
 
 //------------------------------------------------------------------------------
@@ -777,6 +800,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 filteredTypes.remove(MutationType.DELETE);
         }
         
+        if (getAttachmentPoints().size()-getFreeAPCountThroughout() < 2)
+        {
+            filteredTypes.remove(MutationType.DELETELINK);
+        }
+        
         return filteredTypes;
     }
     
@@ -938,7 +966,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @return the vertex parent to this or null.
      */
 
-    public DENOPTIMVertex getParent() {
+    public DENOPTIMVertex getParent() 
+    {
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
             DENOPTIMEdge user = ap.getEdgeUser();
@@ -957,16 +986,52 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     /**
      * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the list of attachment point on child vertexes 
+     * that form an edge with any of the APs of this vertex.
+     * Searches also beyond template boundaries, i.e., an AP can be free in the 
+     * graph owning this vertex and be projected of the surface of the template
+     * that embeds such graph, so that the apparently free AP can be used in the
+     * outside of the template (a.k.a., beyond template's boundaries).
+     * @return the list of APs on child vertices 
+     * (can be empty list, but not null)
+     */
+
+    public ArrayList<DENOPTIMAttachmentPoint> getAPsFromChilddren() 
+    {
+        ArrayList<DENOPTIMAttachmentPoint> apsOnChildren = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUserThroughout();
+            if (user == null)
+                continue;
+            
+            if (ap == user.getSrcAPThroughout())
+            {
+                apsOnChildren.add(user.getTrgAPThroughout());
+            }
+        }
+        return apsOnChildren;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
      * this vertex and returns the list of vertices which are target of any 
      * edge departing from this vertex. Only the directly connected children
-     * are considered (no recursion).
+     * are considered (no recursion). This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
      * @return the list of child vertices (can be empty list, but not null)
      */
 
-    public ArrayList<DENOPTIMVertex> getChilddren() {
+    public ArrayList<DENOPTIMVertex> getChilddren() 
+    {
         ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
+            // NB: this is meant to NOT cross template boundaries, so that all
+            // childres do belong to the same graph.
             DENOPTIMEdge user = ap.getEdgeUser();
             if (user == null)
                 continue;

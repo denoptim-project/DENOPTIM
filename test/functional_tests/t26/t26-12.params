@@ -1,0 +1,17 @@
+#
+# Substitution deep inside nested template
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-12.sdf
+TESTGENOPS-outFile=graph_mut-12.sdf
+TESTGENOPS-MutationTarget=2,1,6
+TESTGENOPS-MutationType=DELETELINK
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=/tmp/denoptim_test/t26/lib_scaff.sdf
+FS-fragmentLibFile=/tmp/denoptim_test/t26/lib_frags.sdf
+FS-cappingFragmentLibFile=/tmp/denoptim_test/t26/lib_cap.sdf
+FS-compMatrixFile=/tmp/denoptim_test/t26/CPMap.par
+FS-rcCompMatrixFile=/tmp/denoptim_test/t26/RC-CPMap.par
+FS-RotBondsDefFile=/tmp/denoptim_test/t26/rotatableBonds
+

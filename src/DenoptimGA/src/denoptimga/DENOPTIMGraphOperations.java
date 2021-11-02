@@ -35,6 +35,7 @@ import org.openscience.cdk.isomorphism.mcss.RMap;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.fragspace.FragmentSpaceUtils;
 import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.io.DenoptimIO;
@@ -154,6 +155,38 @@ public class DENOPTIMGraphOperations
                                                     throws DENOPTIMException
     {
         return substituteBranch(vertex, false, -1, -1);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Removes a vertex while merging as many of the child branches into the
+     * parent vertex.
+     * @param vertex the vertex to remove.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+
+    protected static boolean deleteLink(DENOPTIMVertex vertex,
+            int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
+    {   
+        DENOPTIMVertex parent = vertex.getParent();
+        if (parent == null)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT);
+            return false;
+        }
+
+        DENOPTIMGraph graph = vertex.getGraphOwner();
+        boolean done = graph.removeVertexAndWeld(vertex);
+        if (!done)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT);
+        }
+        return done;
     }
     
 //------------------------------------------------------------------------------
@@ -894,9 +927,10 @@ public class DENOPTIMGraphOperations
      * @param graph graph to extract pattern from.
      * @param pattern to match against.
      * @return The subgraphs matching the provided pattern.
+     * @throws DENOPTIMException 
      */
     public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
-                                                     GraphPattern pattern) {
+            GraphPattern pattern) throws DENOPTIMException {
         if (pattern != GraphPattern.RING) {
             throw new IllegalArgumentException("Graph pattern " + pattern +
                     " not supported.");
@@ -935,7 +969,7 @@ public class DENOPTIMGraphOperations
      * @return Subgraph of graph defined on set of vertices.
      */
     private static DENOPTIMGraph extractSubgraph(DENOPTIMGraph graph,
-                                                 Set<DENOPTIMVertex> definedOn) {
+            Set<DENOPTIMVertex> definedOn) {
         DENOPTIMGraph subgraph = graph.clone();
 
         Set<DENOPTIMVertex> complement = subgraph
@@ -961,12 +995,18 @@ public class DENOPTIMGraphOperations
      * scaffold.
      * @param g Graph to fix.
      */
-    private static void fixGraph(DENOPTIMGraph g) {
-        DENOPTIMVertex newScaffold = g
-                .getVertexList()
-                .stream()
-                .min(Comparator.comparingInt(DENOPTIMVertex::getLevel))
-                .orElse(null);
+    private static void fixGraph(DENOPTIMGraph g) 
+    {
+        DENOPTIMVertex newScaffold = null;
+        int minLevel = Integer.MAX_VALUE;
+        for (DENOPTIMVertex v : g.getVertexList())
+        {
+            if (v.getLevel()<minLevel)
+            {
+                minLevel = v.getLevel();
+                newScaffold = v;
+            }
+        }
         if (newScaffold == null) {
             return;
         }
@@ -1640,7 +1680,6 @@ public class DENOPTIMGraphOperations
         return performMutation(vertex, mType, mnt);
     }
     
-    
 //------------------------------------------------------------------------------
     
     /**
@@ -1725,6 +1764,13 @@ public class DENOPTIMGraphOperations
                 
             case CHANGELINK:
                 done = substituteLink(vertex, chosenVrtxIdx, mnt);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+                break;
+                
+            case DELETELINK:
+                done = deleteLink(vertex, chosenApId, mnt);
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);

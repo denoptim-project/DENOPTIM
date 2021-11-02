@@ -271,8 +271,9 @@ public class GraphLinkFinder
             // We try the comprehensive approach, but if that is too demanding
             // and gets stopped, then we run a a series of simplified attempts
             // to hit a decent combination with "lucky shots".
-            Boolean stopped = recursiveCombiner(keys, currentKey, 
-                    apCompatilities, currentMapping, apMappings, screenAll);
+            Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
+                    currentKey, apCompatilities, currentMapping, apMappings, 
+                    screenAll, maxCombs);
             
             // Keep only mappings that allow retaining the (i.e., include all APs of the 
             // original vertex)
@@ -540,8 +541,9 @@ public class GraphLinkFinder
             APMapping currentMapping = new APMapping();
             // yes, a nested loop would do it, but for now I use the same code
             // as for when there is no limit to the number of keys (here, always 2)
-            Boolean stopped = recursiveCombiner(keys, currentKey, 
-                    apCompatilities, currentMapping, apMappings, screenAll);
+            Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
+                    currentKey, apCompatilities, currentMapping, apMappings, 
+                    screenAll, maxCombs);
             
             if (apMappings.isEmpty())
             {
@@ -559,59 +561,6 @@ public class GraphLinkFinder
         }
     }
     
-//------------------------------------------------------------------------------
-    
-    private static boolean recursiveCombiner(List<DENOPTIMAttachmentPoint> keys,
-            int currentKey, Map<DENOPTIMAttachmentPoint,
-                List<DENOPTIMAttachmentPoint>> possibilities,
-            APMapping combination, List<APMapping> completeCombinations, 
-            boolean screenAll)
-    {
-        boolean stopped = false;
-        DENOPTIMAttachmentPoint apA = keys.get(currentKey);
-        for (int i=0; i<possibilities.get(apA).size(); i++)
-        {
-            // Prevent combinatorial explosion.
-            if (stopped)
-                break;
-            
-            DENOPTIMAttachmentPoint apB = possibilities.get(apA).get(i);
-            
-            // Move on if apB is already used by another pairing
-            if (combination.containsValue(apB))
-                continue;
-
-            // add this pairing to the growing combinations
-            APMapping priorCombination = combination.clone();
-            if (apA != null && apB != null)
-            {
-                combination.put(apA,apB);
-            }
-            
-            // go deeper, to the next key
-            if (currentKey+1 < keys.size())
-            {
-                stopped = recursiveCombiner(keys, currentKey+1, possibilities, 
-                        combination, completeCombinations, screenAll);
-            }
-            
-            // we reached the deepest level: save combination
-            if (currentKey+1 == keys.size() && !combination.isEmpty())
-            {   
-                APMapping storable = combination.clone(); //Shallow clone
-                completeCombinations.add(storable);
-                if (!screenAll && completeCombinations.size() >= maxCombs)
-                {
-                    stopped = true;
-                }
-            }
-            
-            // Restart building a new combination from the previous combination
-            combination = priorCombination;
-        }
-        return stopped;
-    }
-
 //------------------------------------------------------------------------------
     
     /**

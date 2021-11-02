@@ -20,11 +20,15 @@ package denoptim.fragspace;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.APClass;
+import denoptim.molecule.APMapping;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.utils.RandomUtils;
 
 
 /**
@@ -128,6 +132,143 @@ public class FragmentSpaceUtils
 				}
 		    }
 		}
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Given two lists of APs this method maps the APClass-compatibilities 
+     * from between the two lists considering the APs in the first list the 
+     * for the role of source AP in the hypothetical edge.
+     * @param listA list of candidate source APs
+     * @param listB list of candidate target APs
+     * @param maxCombinations a maximum limit; if reached we are happy we give
+     * up finding more combination.
+     * @return 
+     */
+    public static List<APMapping> mapAPClassCompatibilities(
+            List<DENOPTIMAttachmentPoint> listA, 
+            List<DENOPTIMAttachmentPoint> listB, int maxCombinations)
+    {
+        Map<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
+                new HashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+        
+        for (DENOPTIMAttachmentPoint apA : listA)
+        {
+            for (DENOPTIMAttachmentPoint apB : listB)
+            {  
+                boolean compatible = false;
+                if (FragmentSpace.useAPclassBasedApproach())
+                {   
+                    if (apA.getAPClass().isCPMapCompatibleWith(apB.getAPClass()))
+                    {
+                        compatible = true;
+                    }
+                } else {
+                    if (apA.getTotalConnections() == apB.getTotalConnections())
+                        compatible = true;
+                }
+                if (compatible)
+                {
+                    if (apCompatilities.containsKey(apA))
+                    {
+                        apCompatilities.get(apA).add(apB);
+                    } else {
+                        List<DENOPTIMAttachmentPoint> lst = 
+                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        lst.add(apB);
+                        apCompatilities.put(apA,lst);
+                    }
+                }
+            }
+        }
+        
+        // This is used only to keep a sorted list of the map keys
+        List<DENOPTIMAttachmentPoint> keys = 
+                new ArrayList<DENOPTIMAttachmentPoint>(
+                        apCompatilities.keySet());
+        
+        // Get all possible combinations of compatible AP pairs
+        List<APMapping> apMappings = new ArrayList<APMapping>();
+        if (keys.size() > 0)
+        {
+            int currentKey = 0;
+            APMapping currentMapping = new APMapping();
+            Boolean stopped = recursiveCombiner(keys, currentKey, 
+                    apCompatilities, currentMapping, apMappings, true, 
+                    maxCombinations);
+        }
+        
+        return apMappings;
+    }
+    
+
+//------------------------------------------------------------------------------
+      
+    /**
+     * Search for all possible combinations of compatible APs. 
+     * @param keys sorted list of keys in the 'possibilities' argument.
+     * @param currentKey index of the currently active key in 'keys'
+     * @param possibilities the mapping of all APs from listB that are
+     * compatible with a specific AP from list A.
+     * @param combination the combination currently under construction.
+     * @param completeCombinations the storage of all valid combination; this
+     * is effectively the output of this method.
+     * @param screenAll flag requiring comprehensive exploration of all 
+     * combinations
+     * @param maxCombs maximum number of combinations to consider. If this 
+     * number is reached then we stop searching for more.
+     * @return a flag indicating whether execution was stopper or not.
+     */
+    public static boolean recursiveCombiner(List<DENOPTIMAttachmentPoint> keys,
+            int currentKey, Map<DENOPTIMAttachmentPoint,
+                List<DENOPTIMAttachmentPoint>> possibilities,
+            APMapping combination, List<APMapping> completeCombinations, 
+            boolean screenAll, int maxCombs)
+    {
+        boolean stopped = false;
+        DENOPTIMAttachmentPoint apA = keys.get(currentKey);
+        for (int i=0; i<possibilities.get(apA).size(); i++)
+        {
+            // Prevent combinatorial explosion.
+            if (stopped)
+                break;
+            
+            DENOPTIMAttachmentPoint apB = possibilities.get(apA).get(i);
+            
+            // Move on if apB is already used by another pairing
+            if (combination.containsValue(apB))
+                continue;
+    
+            // add this pairing to the growing combinations
+            APMapping priorCombination = combination.clone();
+            if (apA != null && apB != null)
+            {
+                combination.put(apA,apB);
+            }
+            
+            // go deeper, to the next key
+            if (currentKey+1 < keys.size())
+            {
+                stopped = recursiveCombiner(keys, currentKey+1, possibilities, 
+                        combination, completeCombinations, screenAll, maxCombs);
+            }
+            
+            // we reached the deepest level: save combination
+            if (currentKey+1 == keys.size() && !combination.isEmpty())
+            {   
+                APMapping storable = combination.clone(); //Shallow clone
+                completeCombinations.add(storable);
+                if (!screenAll && completeCombinations.size() >= maxCombs)
+                {
+                    stopped = true;
+                }
+            }
+            
+            // Restart building a new combination from the previous combination
+            combination = priorCombination;
+        }
+        return stopped;
     }
 
 //------------------------------------------------------------------------------

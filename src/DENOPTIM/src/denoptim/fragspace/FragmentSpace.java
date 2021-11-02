@@ -656,6 +656,37 @@ public class FragmentSpace
     {
         return bondOrderMap;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the bond order for the given APClass, if defined.
+     * 
+     * @param apclass the APclass to be converted into bond order
+     * @return the bond order as an integer, or 1 if either the Fragment space
+     *         is not defined, that is, the bond order map is <code>null</code>,
+     *         or a fully defined map does not include any mapping for the given
+     *         APClass.
+     */
+    public static BondType getBondOrderForAPClass(APClass apc)
+    {
+        if (bondOrderMap == null)
+        {
+            String msg = "Attempting to get bond order, but no "
+                    + "FragmentSpace defined (i.e., null BondOrderMap). "
+                    + "Assuming edge represents an " + BondType.UNDEFINED
+                    + " bond.";
+            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+
+            // Exception e = new Exception(msg);
+            // e.printStackTrace();
+
+            return BondType.UNDEFINED;
+        } else
+        {
+            return bondOrderMap.getOrDefault(apc.getRule(), BondType.UNDEFINED);
+        }
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1406,7 +1437,16 @@ public class FragmentSpace
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph,
             boolean addIfScaffold, boolean addIfFragment) 
     {
-        List<DENOPTIMGraph> subgraphs = extractPattern(graph,GraphPattern.RING);
+        List<DENOPTIMGraph> subgraphs = null;
+        try
+        {
+            subgraphs = extractPattern(graph,GraphPattern.RING);
+        } catch (DENOPTIMException e1)
+        {
+            DENOPTIMLogger.appLogger.log(Level.WARNING, "Failed to extract "
+                    + "fused ring patters.");
+            e1.printStackTrace();
+        }
 
         for (DENOPTIMGraph g : subgraphs) 
         {

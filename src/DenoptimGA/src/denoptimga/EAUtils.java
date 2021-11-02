@@ -64,6 +64,7 @@ import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.SymmetricSet;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
@@ -482,7 +483,7 @@ public class EAUtils
         offspring.setName("M" + GenUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
-
+        
         return offspring;
     }
     

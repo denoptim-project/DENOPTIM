@@ -16,7 +16,7 @@ do
 done
 
 #Run sub tests
-nSubTests=10
+nSubTests=14
 elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ' 'Si ' 'F  ' 'S  ')
 totChecks=0
 for i in $(seq 1 $nSubTests)
@@ -31,6 +31,11 @@ do
 
     if [ ! -f "graph_mut-$i.sdf" ]; then
         echo "Test 't26' NOT PASSED (symptom: file graph_mut-$i.sdf not found)"
+        exit -1
+    fi
+
+    if [ ! -f "expected_output/graph_mut-$i.sdf" ]; then
+        echo "Test 't26' NOT PASSED (symptom: cannot find file with expected results (expected_output/graph_mut-$i.sdf)"
         exit -1
     fi
 

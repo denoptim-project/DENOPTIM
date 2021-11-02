@@ -326,10 +326,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     /**
      * Removes the mapping of the given inner AP from this template's surface,
-     * if such mapping exists.
+     * if such mapping exists. If the old innerAP maps to an outer AP that is
+     * used, then the edge user and any vertex reachable from it are removed.
      * @param oldInnerAP the inner AP of the mapping to remove.
-     * @throws DENOPTIMException when the operation involves an AP that is used
-     * in the graph owning this template or in any outer level graph.
      */
     public void removeProjectionOfInnerAP(DENOPTIMAttachmentPoint oldInnerAP) 
             throws DENOPTIMException
@@ -339,10 +338,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return;
         }
         DENOPTIMAttachmentPoint outer = innerToOuterAPs.get(oldInnerAP);
-        if (!outer.isAvailableThroughout())
+        if (!outer.isAvailable())
         {
-            throw new DENOPTIMException("Attempt to remove an inner AP that "
-                    + "is not available! This possibility is not implelmeted.");
+            DENOPTIMAttachmentPoint linkedAP = outer.getLinkedAP();
+            getGraphOwner().removeBranchStartingAt(linkedAP.getOwner());
         }
         // Recursion on nesting templates to remove all projections of the AP
         if (getGraphOwner() != null && getGraphOwner().templateJacket != null)

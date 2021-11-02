@@ -36,6 +36,7 @@ import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
+import denoptimga.EAUtils.CandidateSource;
 
 /**
  * DENOPTIM's evolutionary algorithm. 
@@ -511,7 +512,8 @@ public class EvolutionaryAlgorithm
                 }
                 
                 Candidate candidate = null;
-                switch (EAUtils.chooseGenerationMethod())
+                CandidateSource src = EAUtils.chooseGenerationMethod();
+                switch (src)
                 {
                     case CROSSOVER:
                     {
@@ -542,7 +544,7 @@ public class EvolutionaryAlgorithm
                 
                 if (candidate == null)
                     continue;
-    
+                
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         candidate, EAUtils.getPathNameToGenerationFolder(genId), 
                         population, mnt, GAParameters.getUIDFileOut());
