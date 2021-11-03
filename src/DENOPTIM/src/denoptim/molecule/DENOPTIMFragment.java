@@ -1005,7 +1005,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 cLstSymAPs.add(ss.clone());
             }
 
-            fragWithMol.setMutationTypes(fragNoMol.getMutationTypes());
+            fragWithMol.setMutationTypes(fragNoMol.getUnfilteredMutationTypes());
             fragWithMol.setSymmetricAPSets(cLstSymAPs);
             fragWithMol.setAsRCV(fragNoMol.isRCV());
             fragWithMol.setVertexId(fragNoMol.getVertexId());
