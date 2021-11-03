@@ -8,10 +8,10 @@ TESTGENOPS-MutationTarget=2,1,6
 TESTGENOPS-MutationType=DELETELINK
 
 # Definition of the Fragment Space
-FS-scaffoldLibFile=/tmp/denoptim_test/t26/lib_scaff.sdf
-FS-fragmentLibFile=/tmp/denoptim_test/t26/lib_frags.sdf
-FS-cappingFragmentLibFile=/tmp/denoptim_test/t26/lib_cap.sdf
-FS-compMatrixFile=/tmp/denoptim_test/t26/CPMap.par
-FS-rcCompMatrixFile=/tmp/denoptim_test/t26/RC-CPMap.par
-FS-RotBondsDefFile=/tmp/denoptim_test/t26/rotatableBonds
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap.par
+FS-rcCompMatrixFile=RC-CPMap.par
+FS-RotBondsDefFile=rotatableBonds
 
