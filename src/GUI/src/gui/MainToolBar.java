@@ -378,7 +378,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                     return;
                 }
                 loadFragmentSpace();
-                fragSpaceIndicator.setBackground(Color.decode("#4cc253"));
             }
         });
 		fragSpaceMenu.add(loadSpace);
@@ -421,10 +420,10 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		fragSpaceIndicator.setToolTipText("<html>Status of fragment space:<ul>"
 		        + "<li>Green: loaded</li>"
 		        + "<li>Orange: unloaded</li></ul></html>");
-		fragSpaceIndicator.setBackground(Color.ORANGE);
 		fragSpaceIndicator.setEditable(false);
 		this.add(fragSpaceIndicator);
 		
+		renderForLackOfFragSpace();
 	}
 
 //-----------------------------------------------------------------------------
@@ -491,6 +490,8 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                 ((GUIGraphHandler)panel).renderThisForLackOfFragSpace();
             }
         }
+
+        fragSpaceIndicator.setBackground(Color.ORANGE);
     }
     
 //-----------------------------------------------------------------------------
@@ -508,6 +509,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                 ((GUIGraphHandler)panel).renderThisForPresenceOfFragSpace();
             }
         }
+        fragSpaceIndicator.setBackground(Color.decode("#4cc253"));
     }
 	
 //-----------------------------------------------------------------------------

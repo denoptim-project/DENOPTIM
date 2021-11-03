@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -46,8 +47,11 @@ class FSParamsDialog extends GUIModalDialog
 				+ "<br> build a fragment space and make it available to"
 				+ "<br>the graph handler.</html>");
 		
+		// NB: Assumption: 1 action listener inherited from superclass.
+		// We want to remove it because we need to acquire full control over
+		// when the modal panel has to be closed.
+		btnDone.removeActionListener(btnDone.getActionListeners()[0]);
 		btnDone.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {					
 				try {
@@ -55,9 +59,9 @@ class FSParamsDialog extends GUIModalDialog
 					makeFragSpace();
 				} catch (Exception e1) {
 				    e1.printStackTrace();
-					String msg = "<html>The given parameters did not "
-							+ "allow to "
-							+ "build a fragment space.<br>"
+					String msg = "<html><body width='%1s'>"
+					        + "These parameters did not allow to "
+							+ "build a space of graph building blocks.<br>"
 							+ "Possible cause of this problem: " 
 							+ "<br>";
 							
@@ -72,7 +76,8 @@ class FSParamsDialog extends GUIModalDialog
 					msg = msg + "<br>Please alter the "
 							+ "settings and try again.</html>";
 							
-					JOptionPane.showMessageDialog(btnDone, msg,
+					JOptionPane.showMessageDialog(btnDone,
+					        String.format(msg,400),
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
