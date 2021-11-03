@@ -97,7 +97,7 @@ public class GraphViewerPanel extends JPanel
 	VisualizationViewer<JVertex, JEdge>  viewer;
 	private DefaultModalGraphMouse<JVertex, JEdge> gm;
 	
-	public enum LabelType {APC, BT, BBID};
+	public enum LabelType {APC, BT, BBID, APID};
 	
     public enum JVertexType {SCAF, FRAG, CAP, RCV, AP, NONE};
     
@@ -157,7 +157,9 @@ public class GraphViewerPanel extends JPanel
          */
         public JVertex(DENOPTIMAttachmentPoint ap) {
             this.ap = ap;
-            idStr = Integer.toString(ap.getID());
+            //idStr = Integer.toString(ap.getID());
+            //NB: in the GUI (like in the SDF files) we use 1-based indexing
+            idStr = Integer.toString(ap.getIndexInOwner()+1);
             vtype = JVertexType.AP;
         }
         
@@ -218,6 +220,20 @@ public class GraphViewerPanel extends JPanel
         String trgAPC;
         
         /**
+         * String representing the index of the source AP in the list of APs
+         * of the vertex owning the source AP. This property allies only to
+         * directed edges
+         */
+        String srcAPID = "";
+
+        /**
+         * String representing the index of the target AP in the list of APs
+         * of the vertex owning the source AP. This property allies only to
+         * directed edges
+         */
+        String trgAPID = "";
+        
+        /**
          * The bond type for edges that correspond to connections between 
          * {@link DENOPTIMVertex}s or <code>"none"</code> when for edges
          * representing {@link DENOPTIMAttachmentPoint}s.
@@ -234,6 +250,11 @@ public class GraphViewerPanel extends JPanel
          * Flag requiring to display APClasses
          */
         boolean displayAPCs = false;
+        
+        /**
+         * Flag requiring to display APClasses
+         */
+        boolean displayAPIDs = false;
         
         /**
          * Flag requiring to display Bond type
@@ -272,6 +293,9 @@ public class GraphViewerPanel extends JPanel
                     + trgAP.getOwner().getVertexId();
             this.srcAPC = srcAP.getAPClass().toString();
             this.trgAPC = trgAP.getAPClass().toString();
+            //NB: in GUI as well as in SDF files APs have 1-based index!
+            this.srcAPID = "AP" + (srcAP.getIndexInOwner()+1);
+            this.trgAPID = "AP" + (trgAP.getIndexInOwner()+1);
             this.bt = bt;
         }
     }
@@ -694,6 +718,21 @@ public class GraphViewerPanel extends JPanel
                 }});
             this.add(mnuHideAPC);
             
+            this.add(new JSeparator());
+            
+            JMenuItem mnuShowAPID = new JMenuItem("Show AP IDs");
+            mnuShowAPID.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.APID, true);
+                }});
+            this.add(mnuShowAPID);
+            JMenuItem mnuHideAPID = new JMenuItem("Hide AP IDs");
+            mnuHideAPID.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    alterLabels(LabelType.APID, false);
+                }});
+            this.add(mnuHideAPID);
+            
 	        this.add(new JSeparator());
 	        
             JMenuItem mnuShowBT = new JMenuItem("Show Bond Types");
@@ -761,16 +800,22 @@ public class GraphViewerPanel extends JPanel
         
         // Set labels on edges
         ArrayList<String> lstBT = prevStatus.getEdgeIDsWithLabel(LabelType.BT);
-        ArrayList<String> lstAP = prevStatus.getEdgeIDsWithLabel(LabelType.APC);
+        ArrayList<String> lstAPC = prevStatus.getEdgeIDsWithLabel(LabelType.APC);
+        ArrayList<String> lstAPID = prevStatus.getEdgeIDsWithLabel(
+                LabelType.APID);
         for(JEdge je : loadedGraph.getEdges())
         {
             if (lstBT.contains(je.id))
             {
                 je.displayBndTyp = true;
             }
-            if (lstAP.contains(je.id))
+            if (lstAPC.contains(je.id))
             {
                 je.displayAPCs = true;
+            }
+            if (lstAPID.contains(je.id))
+            {
+                je.displayAPIDs = true;
             }
         }
         
@@ -892,7 +937,7 @@ public class GraphViewerPanel extends JPanel
     {
         @Override
         public String apply(JEdge e) {
-            if (!e.displayAPCs && !e.displayBndTyp)
+            if (!e.displayAPCs && !e.displayBndTyp && !e.displayAPIDs)
             {
                 return null;
             }
@@ -907,18 +952,27 @@ public class GraphViewerPanel extends JPanel
                 if (e.displayBndTyp)
                 {
                     label = label + e.bt;
-                    if (e.displayAPCs)
-                    {
-                        label = label + "<br>";
-                    }
                 }
                 if (e.displayAPCs)
                 {
+                    if (!label.isEmpty()) label = label + "<br>";
                     label = label + e.srcAPC + "<br>" + e.trgAPC;
                 }
+                if (e.displayAPIDs)
+                {
+                    if (!label.isEmpty()) label = label + "<br>";
+                    label = label + e.srcAPID + ":" + e.trgAPID;
+                }
             }
+            
             if (!label.isEmpty())
             {
+                // This is to place single-line labels above/below the edge
+                // rather than on top of it.
+                if (!label.contains("<br>"))
+                {
+                    label = " <br>" + label;
+                }
                 label = "<html><body style='text-align: center'>" 
                         + label + "</body></html>";
             }
@@ -951,6 +1005,16 @@ public class GraphViewerPanel extends JPanel
                     }
 		        }
 				break;
+				
+			case APID:
+                for (JVertex v : getSelectedNodes())
+                {
+                    for (JEdge e : loadedGraph.getIncidentEdges(v))
+                    {
+                        e.displayAPIDs = show;
+                    }
+                }
+                break;
 				
 			case BT:
 			    for (JVertex v : getSelectedNodes())
