@@ -843,17 +843,31 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             return false;
         }
-        DENOPTIMVertex parent = vertex.getParent();
-        if (parent == null)
+        if (vertex == getSourceVertex())
         {
-            //TODO-GG what is this is a vertex embedded in a template? Ic can
-            // have not parent and still be a valid template!
+            // Make sure there is something to weld, or give up. This to avoid
+            // trying to remove the scaffold vertex (i.e., a vertex that has no
+            // parents in this graph and the APs of which are only user as 
+            // source APs)
+            boolean foundLinkToParent = false;
+            for (DENOPTIMAttachmentPoint ap : vertex.getAttachmentPoints())
+            {
+                if (ap.isAvailable() && !ap.isAvailableThroughout())
+                {
+                    if (!ap.isSrcInUserThroughout())
+                        foundLinkToParent = true;
+                }
+            }
+            if (!foundLinkToParent)
+                return false;
             
-            //TODO:check. it might work without this requirement
-            
-            //When we come from mutation operations, we have checked this 
-            // already, and recorder failed attempt in appropriate monitor.
-            return false;
+            // When we try to remove the only vertex inside a template, we
+            // are removing the template itself
+            if (gVertices.size()==1 && templateJacket!=null)
+            {
+                return templateJacket.getGraphOwner().removeSingleVertexAndWeld(
+                        templateJacket);
+            }
         }
         
         // Get all APs that we'll try to weld into the parent
@@ -981,7 +995,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     {
                         DENOPTIMAttachmentPoint lAP = 
                                 oldAP.getLinkedAPThroughout();
-                        if (bestScoringMapping.values().contains(lAP))
+                        if (bestScoringMapping.keySet().contains(lAP))
+                        {
+                            inToOutAPForTemplate.put(
+                                    bestScoringMapping.get(lAP), oldAP);
+                        } else if (bestScoringMapping.values().contains(lAP))
                         {
                             inToOutAPForTemplate.put(
                                     bestScoringMappingReverse.get(lAP), oldAP);
@@ -1028,7 +1046,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             DENOPTIMAttachmentPoint apOnParent = e.getKey();
             DENOPTIMAttachmentPoint apOnChild = e.getValue();
-            if (containsVertex(apOnChild.getOwner()))
+            if (containsVertex(apOnChild.getOwner()) 
+                    && containsVertex(apOnParent.getOwner()))
             {
                 DENOPTIMEdge edge = new DENOPTIMEdge(apOnParent,apOnChild,
                         FragmentSpace.getBondOrderForAPClass(
@@ -1038,10 +1057,23 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             } else {
                 if (templateJacket!=null)
                 {
-                    templateJacket.updateInnerApID(
-                            inToOutAPForTemplate.get(apOnParent), //AP on old vertex
-                            apOnParent);
-                    reconnettedApsOnChilds.add(apOnChild);
+                    if (containsVertex(apOnParent.getOwner()))
+                    {
+                        templateJacket.updateInnerApID(
+                                inToOutAPForTemplate.get(apOnParent), //AP on old vertex
+                                apOnParent);
+                        reconnettedApsOnChilds.add(apOnChild);
+                    }
+                    if (containsVertex(apOnChild.getOwner()))
+                    {
+                        templateJacket.updateInnerApID(
+                                inToOutAPForTemplate.get(apOnChild), //AP on old vertex
+                                apOnChild);
+                        reconnettedApsOnChilds.add(apOnChild);
+                    }
+                    // The case where neither is contained in 'this' cannot
+                    // occur because of the initial checks that identify 
+                    // attempts to remove the only vertex inside a template.
                 } else {
                     DENOPTIMException de = new DENOPTIMException("AP '"
                             + apOnChild + "' seems connected to a template, "
@@ -2682,24 +2714,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Removes the edge that links the given vertex to its parent
-     * @param vertex the vertex whose edge to parent is to be removed.
-     * @return the id of the parent vertex.
-     */
-
-    public int removeEdgeWithParent(DENOPTIMVertex vertex)
-    {
-        DENOPTIMEdge e = vertex.getEdgeToParent();
-        if (e == null)
-            return -1;
-        int pvid = e.getSrcVertex();
-        removeEdge(e);
-        return pvid;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Deletes the branch, i.e., the specified vertex and its children.
      * @param vid the vertexID of the root of the branch. We'll remove also
      * this vertex.
@@ -2751,19 +2765,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public boolean removeBranchStartingAt(DENOPTIMVertex v)
             throws DENOPTIMException
     {
-        // first delete the edge with the parent vertex
-        int pvid = removeEdgeWithParent(v);
-        if (pvid == -1)
-        {   
-            String msg = "Program bug detected trying to delete vertex "
-                    + v + " from graph '" + this + "'. "
-                    + "Unable to locate parent edge.";
-            throw new DENOPTIMException(msg);
+        DENOPTIMEdge edgeToParent = v.getEdgeToParent();
+        if (edgeToParent != null)
+        {
+            removeEdge(edgeToParent);
         }
-        
         return removeOrphanBranchStartingAt(v);
     }
-  
+
 //------------------------------------------------------------------------------
 
     /**

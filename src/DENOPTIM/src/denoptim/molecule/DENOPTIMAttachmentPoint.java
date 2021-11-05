@@ -1012,7 +1012,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     
     /**
      * Gets the attachment point (AP) that is connected to this AP via the edge 
-     * user or in any user that might be
+     * user or in any edge user that might be
      * external to the template embedding the graph where this AP is directly
      * reachable.
      * @return the AP linked with this AP, or null;
@@ -1024,10 +1024,10 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         {
             return null;
         }
-        if (user.getSrcAPThroughout() == this)
+        if (user.getSrcAPThroughout() == this || user.getSrcAP() == this)
         {
             return user.getTrgAP();
-        } else if (user.getTrgAPThroughout() == this)
+        } else if (user.getTrgAPThroughout() == this || user.getTrgAP() == this)
         {
             return user.getSrcAP();
         }
@@ -1052,7 +1052,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         {
             return false;
         }
-        return user.getSrcAPThroughout() == this;
+        return user.getSrcAPThroughout() == this || user.getSrcAP() == this;
     }
     
 //-----------------------------------------------------------------------------

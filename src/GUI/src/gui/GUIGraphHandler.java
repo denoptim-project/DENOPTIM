@@ -1421,7 +1421,8 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		catch (Exception e) 
         {
 			e.printStackTrace();
-			String msg = "<html>Could not read graph from file <br> "
+			String msg = "<html><body width='%1s'>Could not read graph from "
+			        + "file <br> "
 					+ "'" + file.getAbsolutePath() 
 	                + "'<br>Hint on cause: ";
 			msg = msg + e.getClass().getName()+ " (";
@@ -1437,13 +1438,13 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 			if (hasFragSpace)
 			{
 				msg = msg + "<br>This could be due to a mistmatch between "
-						+ "the fragment IDs in the<br>"
+						+ "the fragment IDs in the "
 						+ "graph you are trying to load, "
 						+ "and the currently loaded fragment space.<br>"
 						+ "Aborting import of graphs.";
 			}
 			msg = msg + "</html>";
-			JOptionPane.showMessageDialog(null,msg,
+			JOptionPane.showMessageDialog(null,String.format(msg,400),
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));

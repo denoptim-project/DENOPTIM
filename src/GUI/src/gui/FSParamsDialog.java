@@ -42,10 +42,9 @@ class FSParamsDialog extends GUIModalDialog
 		addToCentralPane(fsParsForm);
 		
 		btnDone.setText("Create Fragment Space");
-		btnDone.setToolTipText("<html>Uses the parameters defined "
-				+ "above to"
-				+ "<br> build a fragment space and make it available to"
-				+ "<br>the graph handler.</html>");
+		btnDone.setToolTipText(String.format("<html><body width='%1s'>"
+		        + "Uses the parameters defined above to build a fragment space "
+		        + "and make it available to the graph handler.</html>",400));
 		
 		// NB: Assumption: 1 action listener inherited from superclass.
 		// We want to remove it because we need to acquire full control over

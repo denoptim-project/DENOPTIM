@@ -98,7 +98,6 @@ public class DENOPTIMGraphOperations
                     //TODO: should verify that the crossover is also "productive"
                     // meaning that is produced graphs that are different from 
                     // the parents.
-                    
                     DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vMale,vFemale};
                     pairs.add(pair);
                 }
@@ -173,13 +172,16 @@ public class DENOPTIMGraphOperations
     protected static boolean deleteLink(DENOPTIMVertex vertex,
             int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
     {   
+        /*
+         //TODO-GG remove
         DENOPTIMVertex parent = vertex.getParent();
         if (parent == null)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT);
             return false;
         }
-
+*/
+        
         DENOPTIMGraph graph = vertex.getGraphOwner();
         boolean done = graph.removeVertexAndWeld(vertex);
         if (!done)
@@ -210,7 +212,7 @@ public class DENOPTIMGraphOperations
     protected static boolean substituteLink(DENOPTIMVertex vertex,
             int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
     {
-        //TODO: for reproducibility the AP mapping should become an optional
+        //TODO: for reproducibility, the AP mapping should become an optional
         // parameter: if given we try to use it, if not given, GraphLinkFinder
         // will try to find a suitable mapping.
         
@@ -324,7 +326,7 @@ public class DENOPTIMGraphOperations
     public static boolean extendLink(DENOPTIMEdge edge, int chosenBBIdx,
             Monitor mnt) throws DENOPTIMException
     {
-       //TODO: for reproducibility the AP mapping should become an optional
+       //TODO: for reproducibility, the AP mapping should become an optional
         // parameter: if given we try to use it, if not given we GraphLinkFinder
         // will try to find a suitable mapping.
         
@@ -425,10 +427,6 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if deletion is successful
      * @throws DENOPTIMException
      */
-
-    //TODO-V3+ distinguish between 
-    // 1) removing a vertex and the branch starting on it
-    // 2) removing a vertex and try to glue the child branch to the parent one
     
     protected static boolean deleteFragment(DENOPTIMVertex vertex)
                                                     throws DENOPTIMException
@@ -929,6 +927,7 @@ public class DENOPTIMGraphOperations
      * @return The subgraphs matching the provided pattern.
      * @throws DENOPTIMException 
      */
+    
     public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
             GraphPattern pattern) throws DENOPTIMException {
         if (pattern != GraphPattern.RING) {
