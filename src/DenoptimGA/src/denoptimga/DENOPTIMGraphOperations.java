@@ -171,17 +171,7 @@ public class DENOPTIMGraphOperations
 
     protected static boolean deleteLink(DENOPTIMVertex vertex,
             int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
-    {   
-        /*
-         //TODO-GG remove
-        DENOPTIMVertex parent = vertex.getParent();
-        if (parent == null)
-        {
-            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT);
-            return false;
-        }
-*/
-        
+    {
         DENOPTIMGraph graph = vertex.getGraphOwner();
         boolean done = graph.removeVertexAndWeld(vertex);
         if (!done)

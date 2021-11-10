@@ -38,16 +38,10 @@ import denoptim.utils.GenUtils;
 /**
  *
  * @author Vishwesh Venkatraman
+ * @author Marco Foscato
  */
 public class DenoptimGA
 {
-	/*
-	 * Runs the thread with the listener that accepts instructions from outside.
-	 */
-	//TODO-GG: this is static for now, but will have to become thread-specific
-	private static ExecutorService executor;
-	
-	private static Future<?> futureWatchers;
 
 //------------------------------------------------------------------------------
 
@@ -81,6 +75,9 @@ public class DenoptimGA
         	GAParameters.setWorkingDirectory(args[1]);
         }
         
+        ExecutorService executor = null;
+        Future<?> futureWatchers = null;
+        
         EvolutionaryAlgorithm ea = null;
         ExternalCmdsListener ecl = null;
         try
@@ -106,7 +103,7 @@ public class DenoptimGA
                 ea.stopRun();
             }
             
-            stopExternalCmdListener(ecl);
+            stopExternalCmdListener(ecl,executor,futureWatchers);
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
 
             t.printStackTrace(System.err);
@@ -114,14 +111,15 @@ public class DenoptimGA
             throw new DENOPTIMException("Error in DenoptimGA run.", t);
         }
 
-        stopExternalCmdListener(ecl);
+        stopExternalCmdListener(ecl,executor,futureWatchers);
         // normal completion: do NOT call System exit(0) as we might be calling
         // this main from another thread, which would be killed as well.
     }
 
 //------------------------------------------------------------------------------
     
-	private static void stopExternalCmdListener(ExternalCmdsListener ecl) 
+	private static void stopExternalCmdListener(ExternalCmdsListener ecl,
+	        ExecutorService executor, Future<?> futureWatchers) 
 	{
         if (executor != null)
         {

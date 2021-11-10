@@ -345,6 +345,12 @@ runTest 't25'
 runTest "t26"
 
 #
+# t27: test interaction of GA with external instructions to add/remove candidates
+#
+runTest "t27"
+
+
+#
 # t97: under development - mutation involving templates
 #
 #runTest "t97"

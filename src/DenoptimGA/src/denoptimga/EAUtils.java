@@ -114,7 +114,7 @@ public class EAUtils
      * A chosen method for generation of new {@link Candidate}s.
      */
     public enum CandidateSource {
-        CROSSOVER, MUTATION, CONSTRUCTION;
+        CROSSOVER, MUTATION, CONSTRUCTION, MANUAL;
     }
     
     private static final String NL =System.getProperty("line.separator");
@@ -455,7 +455,7 @@ public class EAUtils
         }
         
         // Check if the chosen combination gives rise to forbidden ends
-        //TODO-V3 this should be considered already when making the list of
+        //TODO this should be considered already when making the list of
         // possible combination of rings
         for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
         {
@@ -485,6 +485,80 @@ public class EAUtils
                 GraphUtils.getUniqueMoleculeIndex()));
         
         return offspring;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected static Candidate readCandidateFromFile(File srcFile, Monitor mnt) 
+            throws DENOPTIMException
+    {
+        mnt.increase(CounterID.MANUALADDATTEMPTS);
+        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
+
+        ArrayList<DENOPTIMGraph> graphs;
+        try
+        {
+            graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    srcFile, FragmentSpace.isDefined());
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
+            String msg = "Could not read graphs from file " + srcFile
+                    + ". No candidate generated!";
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            return null;
+        }
+        if (graphs.size() == 0 || graphs.size() > 1)
+        {
+            mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
+            String msg = "Found " + graphs.size() + " graphs in file " + srcFile
+                    + ". I expect one and only one graph. "
+                    + "No candidate generated!";
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            return null;
+        }
+
+        DENOPTIMGraph graph = graphs.get(0);
+        if (graph == null)
+        {
+            mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
+            String msg = "Null graph from file " + srcFile
+                    + ". Expected one and only one graph. "
+                    + "No candidate generated!";
+            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            return null;
+        }
+        graph.setLocalMsg("MANUAL_ADD");
+        
+        // We expect users to know what they ask for. Therefore, we do
+        // evaluate the graph, but in a permissive manner, meaning that 
+        // several filters are disabled to permit the introduction of graphs 
+        // that cannot be generated automatically.
+        Object[] res = EAUtils.evaluateGraph(graph, true);
+        
+        if (res == null)
+        {
+            graph.cleanup();
+            mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS_EVAL);
+            mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
+            return null;
+        }
+
+        Candidate candidate = new Candidate(graph);
+        candidate.setUID(res[0].toString().trim());
+        candidate.setSmiles(res[1].toString().trim());
+        candidate.setChemicalRepresentation((IAtomContainer) res[2]);
+        
+        candidate.setName("M" + GenUtils.getPaddedString(
+                DENOPTIMConstants.MOLDIGITS,
+                GraphUtils.getUniqueMoleculeIndex()));
+        
+        String msg = "Candidate " + candidate.getName() + " is imported from " 
+                + srcFile;
+        DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+        
+        return candidate;
     }
     
 //------------------------------------------------------------------------------
@@ -1527,7 +1601,7 @@ public class EAUtils
         }
         return arr;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -1539,8 +1613,31 @@ public class EAUtils
      * An additional check is the number of atoms in the graph
      */
 
-    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph)
-                                                      throws DENOPTIMException
+    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph) 
+            throws DENOPTIMException
+    {
+        return evaluateGraph(molGraph, false);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * check conversion of the graph to molecule translation
+     * @param molGraph the molecular graph representation
+     * @param permissive use <code>true</code> to by-pass some of the filters 
+     * that prevent graphs from violating constrains on 
+     * fully connected molecules (<code>true</code> enables disconnected systems),
+     * molecular weight,
+     * maximun number of rotatable bonds, 
+     * and number of ring closures.
+     * @return an object array containing the inchi code, the molecular
+     * representation of the candidate, and additional attributes. Or 
+     * <code>null</code> is returned if inchi/smiles/2D conversion fails
+     * An additional check is the number of atoms in the graph
+     */
+
+    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph, 
+            boolean permissive) throws DENOPTIMException
     {
         if (molGraph == null)
         {
@@ -1584,7 +1681,7 @@ public class EAUtils
         }
 
         // if by chance the molecule is disconnected
-        if (molsmiles.contains("."))
+        if (molsmiles.contains(".") && !permissive)
         {
             String msg = "Evaluation of graph: SMILES contains \".\"" 
                                                                   + molsmiles;
@@ -1594,7 +1691,7 @@ public class EAUtils
             return null;
         }
 
-        if (FragmentSpaceParameters.getMaxHeavyAtom() > 0)
+        if (FragmentSpaceParameters.getMaxHeavyAtom() > 0 && !permissive)
         {
             if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
                                         FragmentSpaceParameters.getMaxHeavyAtom())
@@ -1611,7 +1708,7 @@ public class EAUtils
 
         double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
 
-        if (FragmentSpaceParameters.getMaxMW() > 0)
+        if (FragmentSpaceParameters.getMaxMW() > 0 && !permissive)
         {
             if (mw > FragmentSpaceParameters.getMaxMW())
             {
@@ -1627,7 +1724,7 @@ public class EAUtils
         mol.setProperty("MOL_WT", mw);
 
         int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
-        if (FragmentSpaceParameters.getMaxRotatableBond() > 0)
+        if (FragmentSpaceParameters.getMaxRotatableBond() > 0 && !permissive)
         {
             if (nrot > FragmentSpaceParameters.getMaxRotatableBond())
             {
@@ -1655,7 +1752,7 @@ public class EAUtils
             }
         }
         
-        if (RingClosureParameters.allowRingClosures())
+        if (RingClosureParameters.allowRingClosures() && !permissive)
         {
             // Count rings and RCAs
             int nPossRings = 0;

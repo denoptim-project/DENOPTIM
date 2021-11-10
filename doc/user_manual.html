@@ -117,6 +117,7 @@
 				<li><a href="#Toc14761_799972446">GA Parallelization Schemes</a></li>
 				<li><a href="#Toc17842_799972446">DenoptimGA Input</a></li>
 				<li><a href="#Toc16845_799972446">DenoptimGA Output</a></li>
+				<li><a href="#Toc17843_799972446">Interacting with Ongoing DenoptimGA Run</a></li>
 			</ul></li>
 			<li><a href="#Toc14852_799972446">FragSpaceExplorer</a>
 			<ul>
@@ -390,7 +391,7 @@ Each attachment point
 (AP) defines where (i.e., on which atom/pseudo-atom) and possibly additional information such as formal bond order,
 geometry. DENOPTIM currently supports two strategies for handling
 attachment points: the valence-based approach, and the class-based
-approach.</code></p>
+approach.</p>
 
 <h4 class="western"><a name="Toc14751_799972446"></a>Valence-based approach</h4>
 <p>Within the valence-based strategy, each attachment points is a portion of the
@@ -412,7 +413,7 @@ To explain this syntax, we consider how fragmentation is performed, for instance
 The fragmentation algorithm
 uses cutting rules to identify the bond to break when generating fragments. 
 For each broken bond two attachment
-points are generated (one on each side of the broken bond) and, in order to distinguish between the two sides of the broken bond, these attachment points are given two complementary APClasses. These APClasses share a common part (the reference to the cutting rule) and have an additional suffix that makes them distinguishable. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.<p>
+points are generated (one on each side of the broken bond) and, in order to distinguish between the two sides of the broken bond, these attachment points are given two complementary APClasses. These APClasses share a common part (the reference to the cutting rule) and have an additional suffix that makes them distinguishable. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.</p>
 
 <p>When working with the class-based approach valence rules are not imposed and the possibility to connect attachment points is decided by a Compatibility Matrix (see below). This allows to define a completely customizable set of rules for building any kind of entity, including  models of disconnected systems, active species and transition states. However, in order to make sure that the entities built with by class-based approach are valid chemical entities, an additional procedure takes care of saturating free attachment points that, if left unused, would result in unwanted open valences. This procedure is called "capping" and it adds "capping groups" on specifically defined free attachment points.</p>
 
@@ -492,7 +493,6 @@ from scratch.</p>
 	<img src="figures/ea.gif" alt="figures/ea.gif" width="700"/>
 	<figcaption><i>Figure 3: Evolutionary optimization scheme.</i></figcaption>
 </figure>
-
 </p>
 
 <h3 class="western"><a name="Toc40898_1191730726"></a>Genetic Operations</h3>
@@ -657,6 +657,18 @@ experiment are collected in sub-folder <code>RUNYYYYMMDDHHMMSS/Final</code> (see
 instance, the summary for generation <code>N</code>,
 where <code>N</code> is an integer number, is available as a TXT file (<code>GenN/GenN.txt</code>)
 or HTML (<code>GenN/GenN.html</code>).</p>
+
+<h3 class="western"><a name="Toc17843_799972446"></a>Interacting with Ongoing DenoptimGA Runs</h3>
+
+<p>During a DenoptimGA experiment the user often desired to intervene with actions altering the course of the experiment. DenoptimGA runs a command listener that checks to instructions deposited in a dedicated location of the file system. Depending on the instruction found, Denoptim will try to perform corresponding tasks as soon as compatible with the ongoing execution. One an instruction has been found and interpreted by Denoptim (this is reported in the log file), it cannot be undone/overwritten, even if it is still to be performed.</p>
+<p>The user can formulate instruction in the form of properly formatted ascii files (i.e., an <i>intructions_file</i>) that are deposited under the <code>RUNYYYYMMDDHHMMSS/interface</code> folder, i.e., a file-system location that is specific for a single GA run. The <i>intructions_file</i> has effects only on the specific GA run that generated the <code>RUNYYYYMMDDHHMMSS</code> folder.</p>
+<p>The <i>intructions_file</i> is a text file. The name of any such file is irrelevant: any file will be read irrespectively of its name. Each <i>intructions_file</i> is red line-by-line: each line can be arbitrarily long and will be interpreted as a single instruction. Each line begins with a keyword that defines the kind of instruction. The keyword is separated from the rest of the line by a blank space. After the blank space a variable number of arguments can be given depending on the specific instruction (see below). Currently the following instructions can be given to Denoptim:
+<ul>
+	<li>Terminate the GA experiment. Keyword: <code>STOP_GA</code>; Arguments: no further arguments required. Just type the <code>STOP_GA</code> keyword.</li>
+	<li>Remove one or more candidate from the current population. Keyword <code>REMOVE_CANDIDATE</code>, Arguments: space-separated list of candidate names (e.g., <code>REMOVE_CANDIDATE M00000028 M00000031</code> asks to remove both candidates from the population, if they are still in the population).</li>
+	<li>Evaluate one or more manually generated candidates and possibly include them into the population. Keyword <code>ADD_CANDIDATE</code>, Arguments: space-separated list of pathnames to files defining the candidate to be added (e.g., <code>ADD_CANDIDATE /tmp/candidate_1.sdf /tmp/candidate_2.sdf</code>)</li>
+</ul></p>
+
 
 <h2 class="western"><a name="Toc14852_799972446"></a>FragSpaceExplorer</h2>
 

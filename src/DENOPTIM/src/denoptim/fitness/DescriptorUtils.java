@@ -25,6 +25,8 @@ import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.qsar.DescriptorEngine;
 import org.openscience.cdk.qsar.IDescriptor;
 
+import com.google.common.io.Files;
+
 import denoptim.exception.DENOPTIMException;
 
 public class DescriptorUtils
@@ -132,12 +134,10 @@ public class DescriptorUtils
             {
                 URL url = roots.nextElement();
                 File root = new File(url.getPath());
-                Iterator<File> it = FileUtils.iterateFiles(root, 
-                        new String[] {"class"}, true);
-                while(it.hasNext())
+                for (File f : Files.fileTreeTraverser().breadthFirstTraversal(
+                        root))
                 {
-                    File f = it.next();
-                    if (f.getPath().contains(
+                    if (!f.isDirectory() && f.getPath().contains(
                             pkgPath.replaceAll(FS,File.separator)))
                     {
                         String tmp = f.getPath()

@@ -13,8 +13,11 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
@@ -38,6 +41,8 @@ public class ExternalCmdsListener implements Runnable
     private EvolutionaryAlgorithm ea;
     
     private final String NL = System.getProperty("line.separator");
+    
+    
     
 //------------------------------------------------------------------------------
 
@@ -134,10 +139,37 @@ public class ExternalCmdsListener implements Runnable
 					ea.stopRun();
 				}
 			}
-			
-			
-			//TODO-V3: add removal on one population member and its downstream relatives
-			
+		
+	        if (line.startsWith("REMOVE_CANDIDATE"))
+            {
+	            String candIDs = line.substring(
+	                    "REMOVE_CANDIDATE".length()).trim();
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, "Removing '"
+                        + candIDs + "' upon external request from '"  
+                        + file.getAbsolutePath() + "'." + NL);
+                String[] parts = candIDs.split("\\s+");
+                Set<String> candNames = new HashSet<String>(Arrays.asList(parts));
+                if (ea != null)
+                {   
+                    ea.removeCandidates(candNames);
+                }
+            }
+	        
+	        if (line.startsWith("ADD_CANDIDATE"))
+            {
+                String fileNamesLst = line.substring(
+                        "ADD_CANDIDATE".length()).trim();
+                DENOPTIMLogger.appLogger.log(Level.SEVERE, "Adding c"
+                        + "andidates from '"
+                        + fileNamesLst + "' upon external request from '"  
+                        + file.getAbsolutePath() + "'." + NL);
+                String[] parts = fileNamesLst.split("\\s+");
+                Set<String> paths = new HashSet<String>(Arrays.asList(parts));
+                if (ea != null)
+                {   
+                    ea.addCandidates(paths);
+                }
+            }
 		}
 	}
 

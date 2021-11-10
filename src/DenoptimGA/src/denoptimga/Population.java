@@ -73,8 +73,11 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     }
     
 //------------------------------------------------------------------------------
-
     
+    /**
+     * Does not clone the cross-over compatibility relations between each pairs
+     * of population members.
+     */
     public Population clone()
     {
         Population clone = new Population();
@@ -84,7 +87,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             clone.add(c);
         }
         
-        //TODO: clone relations
+        //TODO: clone relations "xoverCompatibilities"
         
         return clone;
     }
@@ -368,6 +371,22 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             return true;
         else
             return false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the candidate with the given name, if present, or null.
+     * @param name the name of the candidate to retrieve
+     * @return the candidate with the given name, if present, or null.
+     */
+    
+    public Candidate getCandidateNamed(String name)
+    {
+        return this.stream()
+                .filter(candidate -> name.equals(candidate.getName()))
+                .findAny()
+                .orElse(null);
     }
     
 //------------------------------------------------------------------------------

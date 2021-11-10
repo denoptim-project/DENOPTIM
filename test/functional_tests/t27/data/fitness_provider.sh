@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# This is a fitness evaluation script for testing purposes.
-# Fitness is only based on number of rings and C atoms
+# This is a fitness evaluation script for testing purposes
 #
 
 
@@ -76,8 +75,7 @@ UIDFILE=$5
 
 locDir=$(pwd)
 
-molName=`basename $inpSDF .sdf`
-molNum=`basename $inpSDF _I.sdf`
+molName=`basename $inpSDF _inp.sdf`
 
 #
 # Log of this script
@@ -101,15 +99,47 @@ then
 fi
 
 #
-# FITNESS: number of rings
+# FITNESS: # Cl and F atoms
 #
-nRings=$(grep -c "DENOPTIMRing" "$inpSDF")
-nRings=$((nRings+1))
-nCAtoms=$(grep -c " C " "$inpSDF")
-fitness=$(echo "10.0 * $nRings - $nCAtoms" | bc -l)
-if [[ ! $fitness =~ ^[+-]?([0-9]+)?([.])?[0-9]+$ ]] ; then
+ncl=$(grep -c " Cl " $inpSDF)
+nf=$(grep -c " F " $inpSDF)
+fitness=$((ncl + nf))
+
+candIdTo50="M00000028"
+candIdTo40="M00000031"
+triggerRemovalAndAddition="Gen10"
+triggerStop="Gen15" 
+# NB: if you change these numbers be aware that dome candidates never reach this point
+# of the fitness evaluation script. This because they are rejected due to duplicate UID.
+# For example, M00000056 is abandoned before reaching this point.
+
+removalAndAdditionTaskFile="$wrkDir/../interface/removal_task"
+stopTaskFile="$wrkDir/../interface/stop_run_task"
+newCandSrc="$wrkDir/../../newCandSrc.json"
+
+if [[ "$candIdTo50" == $molName ]]; then
+    fitness=50
+    echo "Setting fitness to $fitness for this candidate"
+fi
+if [[ "$candIdTo40" == $molName ]]; then
+    fitness=40
+    echo "Setting fitness to $fitness for this candidate"
+fi
+if [[ "$wrkDir" == *"$triggerRemovalAndAddition"* ]]; then
+    echo "Triggering removal of $candIdTo50 and $candIdTo40! See file $removalAndAdditionTaskFile"
+    echo "REMOVE_CANDIDATE $candIdTo50 $candIdTo40" > "$wrkDir/tmpInstruction"
+    echo "Triggering inclusion of $newCandSrc! See file $removalAndAdditionTaskFile"
+    echo "ADD_CANDIDATE $newCandSrc" >> "$wrkDir/tmpInstruction"
+    mv "$wrkDir/tmpInstruction" "$removalAndAdditionTaskFile"
+fi
+if [[ "$wrkDir" == *"$triggerStop"* ]]; then
+    echo "Triggering manual stop of this GA run! See file $stopTaskFile"
+    echo "STOP_GA" > $stopTaskFile
+fi
+
+if [[ ! $fitness =~ ^-?[0-9]+$ ]] ; then
     cp $inpSDF $outSDF
-    addPropertyToSingleMolSDF "MOL_ERROR" "#Fitness: not a number" $outSDF
+    addPropertyToSingleMolSDF "MOL_ERROR" "#Fitness: not an integer" $outSDF
     exit $E_FATAL
 fi
 

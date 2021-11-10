@@ -18,14 +18,18 @@
 
 package denoptimga;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -84,6 +88,20 @@ public class EvolutionaryAlgorithm
 	 * Flag signalling this EA was stopped
 	 */
     private boolean stopped = false;
+    
+    /**
+     * List of IDs of candidates to be removed from the population. This list
+     * is cleared once it content has been processed.
+     */
+    private Set<String> candidatesToRemove = new HashSet<String>();
+    
+    /**
+     * List of IDs of candidates to be evaluated upon request from the user.
+     * There candidates might or might not end up in the populations depending
+     * on their performance. This list
+     * is cleared once it content has been processed.
+     */
+    private List<String> candidatesToAdd = new ArrayList<String>();
 
     /**
      * Flag determining the use of asynchronous parallelization scheme.
@@ -468,7 +486,7 @@ public class EvolutionaryAlgorithm
         EAUtils.createFolderForGeneration(genId);
         
         // Take a snapshot of the initial population members. This to exclude
-        // that offstrings of this generation become parents in this generation.
+        // that offsprings of this generation become parents in this generation.
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         synchronized (population)
         {
@@ -507,14 +525,54 @@ public class EvolutionaryAlgorithm
                 
                 synchronized (population)
                 {
+                    synchronized (candidatesToRemove)
+                    {
+                        if (candidatesToRemove.size()>0)
+                        {
+                            for (String id : candidatesToRemove)
+                            {
+                                Candidate c = population.getCandidateNamed(id);
+                                if (c != null)
+                                {
+                                    population.remove(c);
+                                    eligibleParents.remove(c);
+                                }
+                            }
+                            candidatesToRemove.clear();
+                        }
+                    }
+                }
+                
+                synchronized (population)
+                {
                     if (population.size() >= newPopSize)
                         break;
                 }
                 
+                File srcOfCandidate = null;
                 Candidate candidate = null;
-                CandidateSource src = EAUtils.chooseGenerationMethod();
+                CandidateSource src = CandidateSource.CONSTRUCTION;
+                synchronized (candidatesToAdd)
+                {
+                    if (candidatesToAdd.size()>0)
+                    {
+                        src = CandidateSource.MANUAL;
+                        srcOfCandidate = new File(candidatesToAdd.get(0));
+                        candidatesToAdd.remove(0);
+                    } else {
+                        src = EAUtils.chooseGenerationMethod();
+                    }
+                }
                 switch (src)
                 {
+                    case MANUAL:
+                    {
+                        candidate = EAUtils.readCandidateFromFile(
+                                srcOfCandidate, mnt);
+                        if (candidate == null)
+                            continue;
+                        break;
+                    }
                     case CROSSOVER:
                     {
                         candidate = EAUtils.buildCandidateByXOver(
@@ -708,8 +766,9 @@ public class EvolutionaryAlgorithm
                 {
                     foundExceptions = true;
                     DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-                      + tsk.toString() + ". ErrorMessage: '" + tsk.getErrorMessage() 
-                      + "'. ExceptionInTask: "+tsk.getException());
+                      + tsk.toString() + ". ErrorMessage: '" 
+                      + tsk.getErrorMessage() + "'. ExceptionInTask: "
+                      + tsk.getException());
                     ex = tsk.getException().getCause();
                     break;
                 }
@@ -720,6 +779,36 @@ public class EvolutionaryAlgorithm
             // the experiment.
         }
         return foundExceptions;
+    }
+
+//------------------------------------------------------------------------------    
+
+    /**
+     * Adds candidate IDs to the list of "to-be-removed" candidates.
+     */
+    public void removeCandidates(Set<String> candID)
+    {
+        synchronized (candidatesToRemove)
+        {
+            candidatesToRemove.addAll(candID);
+        }
+    }
+    
+//------------------------------------------------------------------------------    
+
+    /**
+     * Adds candidate IDs to the list of "to-be-included" candidates.
+     */
+    public void addCandidates(Set<String> pathNames)
+    {
+        synchronized (candidatesToAdd)
+        {
+            for (String pathName : pathNames)
+            {
+                if (!candidatesToAdd.contains(pathName))
+                    candidatesToAdd.add(pathName);
+            }
+        }
     }
     
 //------------------------------------------------------------------------------    

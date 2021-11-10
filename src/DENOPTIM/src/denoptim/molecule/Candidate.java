@@ -539,7 +539,6 @@ Serializable, Cloneable
 
     /* TODO: change this method! Now it writes a string that is formatted 
      * only for logging needs not really a good toString string.
-     * 
      */
     @Override
     public String toString()
