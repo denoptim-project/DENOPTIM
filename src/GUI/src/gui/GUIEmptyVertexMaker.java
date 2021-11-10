@@ -140,7 +140,8 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                 //...and to the list we add the option to create a new APClass.
                 apClassLstModel.addElement(
                         "<html><b><i>Define a new APClass...<i></b></html>");
-                apClassList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                apClassList.setSelectionMode(
+                        ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 if (apClassList.getModel().getSize() == 1)
                 {
                     apClassList.setSelectedIndex(0);
@@ -155,7 +156,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                 
                 int res = JOptionPane.showConfirmDialog(btnAPInsert,
                         chooseApPanel, 
-                        "New APClass compatibility rule", 
+                        "Choose APClasses to Add", 
                         JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE, 
                         null);
@@ -165,29 +166,29 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                 }
                 
                 // Interpret the selection made by the user
-                if (apClassList.getSelectedIndices().length > 0)
+                int[] selectedIds = apClassList.getSelectedIndices();
+                if (selectedIds.length > 0)
                 {
-                    //NB: we allow a single selection in the APClass list
-                    Integer idAPC = apClassList.getSelectedIndices()[0];
-                    
-                    if (idAPC.intValue() == (apClassLstModel.size()-1))
+                    for (int ii=0; ii<selectedIds.length; ii++)
                     {
-                        // We chose to create a new class 
-                        try {
-                            APClass apc = APClass.make(
-                                    GUIVertexInspector.ensureGoodAPClassString(
-                                            "",
-                                            false));
-                            apClass = apc.toString();
-                        } catch (Exception e1) {
-                            // We have pressed cancel or closed the dialog: abandon
-                            return;
+                        Integer idAPC = selectedIds[ii];
+                        if (idAPC.intValue() == (apClassLstModel.size()-1))
+                        {
+                            // We chose to create a new class 
+                            try {
+                                APClass apc = APClass.make(GUIVertexInspector
+                                        .ensureGoodAPClassString("",false));
+                                apClass = apc.toString();
+                            } catch (Exception e1) {
+                                // We have pressed cancel or closed the dialog: abandon
+                                return;
+                            }
+                        } else {
+                            apClass = apClassLstModel.getElementAt(idAPC);
                         }
-                    } else {
-                        apClass = apClassLstModel.getElementAt(idAPC);
+                        apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,
+                            apClass});
                     }
-                    apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,
-                        apClass});
                 }
             }
         });
