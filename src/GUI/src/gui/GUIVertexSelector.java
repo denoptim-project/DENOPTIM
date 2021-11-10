@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -94,64 +95,23 @@ public class GUIVertexSelector extends GUIModalDialog
 	public static final String PRESELECTEDAPSFIELDSEP = "pre-SelectedAPs";
 
 //-----------------------------------------------------------------------------
-
-	/**
-	 * Constructor
-	 * @param vrtxLib the library of vertex to load
-	 */
-	public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib)
-	{
-		this(vrtxLib,0, false);
-	}
-	
-//-----------------------------------------------------------------------------
-
-    /**
-     * Constructor
-     * @param vrtxLib the library of vertex to load
-     */
-    public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib, boolean use3rd)
-    {
-        this(vrtxLib, 0, use3rd);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     * @param vrtxLib the library of vertex to load
-     * @param initialId the 0-based index of the vertex to open 
-     * when displaying the dialog
-     */
-    public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib, 
-            int initialId)
-    {
-        this(vrtxLib, initialId, false);
-    }
-    
-//-----------------------------------------------------------------------------
 	
 	/**
-	 * Constructor
-	 * @param vrtxLib the library of vertex to load
-	 * @param initialId the 0-based index of the vertex to open 
-	 * when displaying the dialog
+	 * Constructor for an empty modal panel meant for selection of vertexes.
+	 * @param use3rd set <code>true</code> to request the third button
+     * in the control panel.
 	 */
-	public GUIVertexSelector(ArrayList<DENOPTIMVertex> vrtxLib, 
-			int initialId, boolean use3rd)
+	public GUIVertexSelector(JComponent parent, boolean use3rd)
 	{
 		super(use3rd);
-		vertexLibrary = vrtxLib;
-		this.setBounds(150, 150, 400, 550);
-		this.setTitle("Select Vertex and AP");
-		/*
-		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		*/
+		setLocationRelativeTo(parent);
 		
 		// The viewer with Jmol and APtable (not editable)
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
+		
+        //super.setBounds(150, 150, 400, 550);
+        this.setTitle("Select Vertex and AP");
 		
 		// Controls for navigating the vertices list
         ctrlPane = new JPanel();
@@ -226,7 +186,6 @@ public class GUIVertexSelector extends GUIModalDialog
     		        this.btnDone.getActionListeners()[0]);
     		this.btnDone.addActionListener(new ActionListener() {
     			
-    			@SuppressWarnings("unchecked")
                 @Override
     			public void actionPerformed(ActionEvent e) {
     				ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
@@ -260,10 +219,28 @@ public class GUIVertexSelector extends GUIModalDialog
     		});
 		}
 		
-		// Load the first vertex
-		currVrtxIdx = initialId;
-		loadCurrentVrtxIdxToViewer();
-		updateVrtxListSpinner();	
+		//This is key in allowing to render the graph according to the size of
+		// the panels.
+		pack();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Load the list of vertexes to choose from.
+	 * @param vrtxLib the list of vertexes among which the usel will be allowed 
+	 * to chose.
+	 * @param initialId the index of the one vertex that should be displayed 
+	 * when showing the dialog.
+	 */
+	public void load(ArrayList<DENOPTIMVertex> vrtxLib, int initialId) 
+	{
+//        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        vertexLibrary = vrtxLib;
+        currVrtxIdx = initialId;
+        loadCurrentVrtxIdxToViewer();
+        updateVrtxListSpinner();
+  //      this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 //-----------------------------------------------------------------------------

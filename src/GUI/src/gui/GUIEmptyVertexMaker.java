@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -87,8 +88,9 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
     
 //------------------------------------------------------------------------------
 
-	public GUIEmptyVertexMaker()
+	public GUIEmptyVertexMaker(Component parent)
 	{
+	    setLocationRelativeTo(parent);
 	    setTitle("Create Empty Vertex");
 		centralPanel = new JPanel();
         centralPanel.setLayout(new BoxLayout(

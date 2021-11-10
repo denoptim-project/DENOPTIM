@@ -129,7 +129,13 @@ public class GraphViewerPanel extends JPanel
         /**
          * The string used as label when graphically depicting this vertex.
          */
-        String idStr = "nan";
+        String label = "NA";
+        
+        /**
+         * The string used as identifier of this JVertex in different instances 
+         * representing the same graph.
+         */
+        String idStr = "NA";
         
         /**
          * Flag requiring to display building block ID
@@ -157,9 +163,10 @@ public class GraphViewerPanel extends JPanel
          */
         public JVertex(DENOPTIMAttachmentPoint ap) {
             this.ap = ap;
-            //idStr = Integer.toString(ap.getID());
+            idStr = Integer.toString(ap.getOwner().getVertexId()) 
+                    + Integer.toString(ap.getID());
             //NB: in the GUI (like in the SDF files) we use 1-based indexing
-            idStr = Integer.toString(ap.getIndexInOwner()+1);
+            label = Integer.toString(ap.getIndexInOwner()+1);
             vtype = JVertexType.AP;
         }
         
@@ -171,6 +178,7 @@ public class GraphViewerPanel extends JPanel
             this.dnpVertex = v;
             this.expandable = true;
             idStr = Integer.toString(v.getVertexId());
+            label = Integer.toString(v.getVertexId());
             switch (v.getBuildingBlockType())
             {
                 case SCAFFOLD:
@@ -475,7 +483,7 @@ public class GraphViewerPanel extends JPanel
                 {
                     if (v.ap == inAP)
                     {
-                        v.idStr = Integer.toString(i+1);
+                        v.label = Integer.toString(i+1);
                         break;
                     }
                 }
@@ -532,10 +540,10 @@ public class GraphViewerPanel extends JPanel
 	    //NB: the size depends on where this panel is used. In GUIVertexSelector
 	    // the size vanishes, so we need to set a decent value or the graph will
 	    // be displayed with 0:0 dimensions, i.e., all nodes on top of each other
-	    if (this.getSize().height<100)
+	    if (this.getSize().height<150)
 	    {
-	        layout.setSize(new Dimension(100, 100));
-	        viewer = new VisualizationViewer<>(layout,new Dimension(100, 100));
+	        layout.setSize(new Dimension(150, 150));
+	        viewer = new VisualizationViewer<>(layout,new Dimension(150, 150));
 	    } else {
 	        double w = this.getSize().width 
                     - GUIPreferences.graphNodeSize * 1.5;
@@ -832,9 +840,9 @@ public class GraphViewerPanel extends JPanel
             String label = "";
             if (v.vtype == JVertexType.AP)
             {
-                label = "             AP" + v.idStr;
+                label = "             AP" + v.label;
             } else {
-                label = v.idStr;
+                label = v.label;
                 if (v.displayBBID)
                 {
                     label = "<html><body style='text-align: center'>" 

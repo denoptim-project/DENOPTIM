@@ -105,7 +105,7 @@ public class VertexViewPanel extends JPanel
 	 */
 	public VertexViewPanel(boolean editableTable)
 	{
-		this(null,editableTable);
+		this(null, editableTable);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -113,32 +113,20 @@ public class VertexViewPanel extends JPanel
 	/**
 	 * Constructor that allows to specify whether the AP table is editable or 
 	 * not.
+	 * @param the parent component to which we bound this panel.
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 */
 	public VertexViewPanel(JComponent parent, boolean editableTable)
 	{
-		this(parent,editableTable,340);
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * Constructor that allows to specify whether the AP table is editable or 
-	 * not.
-	 * @param editableTable use <code>true</code> to make the AP table editable
-	 * @param dividerPosition allows to set the initial position of the divide
-	 */
-	public VertexViewPanel(JComponent parent, boolean editableTable, int dividerPosition)
-	{
 	    super(new BorderLayout());
 	    this.parent = parent;
 		this.editableAPTable = editableTable;
-		initialize(dividerPosition);
+		initialize();
 	}
 	
 //-----------------------------------------------------------------------------
 
-	private void initialize(int dividerPosition)
+	private void initialize()
 	{
 	    centralPanel = new JPanel(new CardLayout());
 	    this.add(centralPanel, BorderLayout.CENTER);
@@ -188,7 +176,7 @@ public class VertexViewPanel extends JPanel
             }
         });
         centralPanel.add(graphNodeViewer, GRAPHVIEWERCARDNAME);
-	        
+            
         fragViewer = new FragmentViewPanel(editableAPTable);
         fragViewer.addPropertyChangeListener(
                 IVertexAPSelection.APDATACHANGEEVENT, 
@@ -201,7 +189,6 @@ public class VertexViewPanel extends JPanel
             }
         });
         centralPanel.add(fragViewer, MOLVIEWERCARDNAME);
-        
         switchToEmptyCard();
 	}
 	

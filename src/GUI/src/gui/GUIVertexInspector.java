@@ -280,10 +280,11 @@ public class GUIVertexInspector extends GUICardPanel
 					case 1:
 						ArrayList<DENOPTIMVertex> selectedVrtxs = 
 								new ArrayList<DENOPTIMVertex>();
-						GUIVertexSelector vrtxSelector = 
-						        new GUIVertexSelector(vrtxLib,true);
-						vrtxSelector.setRequireApSelection(false);
-						Object selected = vrtxSelector.showDialog();
+					    GUIVertexSelector vrtxSelector = new GUIVertexSelector(
+					            btnAddVrtx,true);
+					    vrtxSelector.setRequireApSelection(false);
+					    vrtxSelector.load(vrtxLib, 0);
+					    Object selected = vrtxSelector.showDialog();
 
 						if (selected != null)
 						{
@@ -310,7 +311,7 @@ public class GUIVertexInspector extends GUICardPanel
 				try {
 					removeCurrentVrtx();
 				} catch (DENOPTIMException e1) {
-					System.out.println("Esception while removing the current "
+					System.out.println("Exception while removing the current "
 					        + "building block:");
 					e1.printStackTrace();
 				}
@@ -392,7 +393,7 @@ public class GUIVertexInspector extends GUICardPanel
         btnEmptFrag.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 GUIEmptyVertexMaker makeEmptyVertexDialog = 
-                        new GUIEmptyVertexMaker();
+                        new GUIEmptyVertexMaker(btnEmptFrag);
                 makeEmptyVertexDialog.pack();
                 Object ev = makeEmptyVertexDialog.showDialog();
                 if (ev == null)
@@ -401,7 +402,9 @@ public class GUIVertexInspector extends GUICardPanel
                 }
                 ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>(1);
                 lst.add((EmptyVertex) ev);
-                GUIVertexSelector fragSelector = new GUIVertexSelector(lst);
+                GUIVertexSelector fragSelector = new GUIVertexSelector(
+                        btnEmptFrag,false);
+                fragSelector.load(lst, 0);
                 fragSelector.btnDone.setText("Confirm");
                 fragSelector.ctrlPane.setVisible(false);
                 fragSelector.setRequireApSelection(false);

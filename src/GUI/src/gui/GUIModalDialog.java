@@ -90,7 +90,7 @@ public class GUIModalDialog extends JDialog
 	{
 		this.setModal(true);
 		this.setLayout(new BorderLayout());
-		this.setBounds(150, 150, 800, 450);
+		//this.setBounds(150, 150, 800, 450);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		
 		btnDone = new JButton("Done");
@@ -133,6 +133,7 @@ public class GUIModalDialog extends JDialog
 	 */
 	public Object showDialog()
 	{
+	    pack();
 		setVisible(true);
 		return result;
 	}

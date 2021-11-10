@@ -834,7 +834,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	        ArrayList<DENOPTIMAttachmentPoint> selAps)
 	{   
         GUIEmptyVertexMaker makeEmptyVertexDialog = 
-                new GUIEmptyVertexMaker();
+                new GUIEmptyVertexMaker(this);
         makeEmptyVertexDialog.pack();
         Object evObj = makeEmptyVertexDialog.showDialog();
         if (evObj == null)
@@ -844,7 +844,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         DENOPTIMVertex ev = (EmptyVertex) evObj;
         ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>(1);
         lst.add(ev);
-        GUIVertexSelector fragSelector = new GUIVertexSelector(lst);
+        GUIVertexSelector fragSelector = new GUIVertexSelector(this, false);
         fragSelector.ctrlPane.setVisible(false);
         if (selAps.size() == 0)
         {
@@ -854,6 +854,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
             fragSelector.btnDone.setText("Confirm Selected AP");
             fragSelector.setRequireApSelection(true); 
         }
+        fragSelector.load(lst, 0);
         Object selected = fragSelector.showDialog();
         if (selected == null)
         {
@@ -982,8 +983,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		}
 		
 		// Select the scaffold
-		GUIVertexSelector fragSelector = new GUIVertexSelector(vrtxLib);
+		GUIVertexSelector fragSelector = new GUIVertexSelector(this, false);
 		fragSelector.setRequireApSelection(false);
+        fragSelector.load(vrtxLib, 0);
 		Object selected = fragSelector.showDialog();
 		if (selected == null)
 		{
@@ -1153,9 +1155,11 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		}
 		
 		// Select the incoming fragment and its AP to use
-		GUIVertexSelector fragSelector = new GUIVertexSelector(vertxLib);
-		fragSelector.setRequireApSelection(true);
-		Object selected = fragSelector.showDialog();
+
+	    GUIVertexSelector fragSelector = new GUIVertexSelector(this,false);
+        fragSelector.setRequireApSelection(true);
+        fragSelector.load(vertxLib, 0);
+        Object selected = fragSelector.showDialog();
 		if (selected == null)
 		{
 			return;

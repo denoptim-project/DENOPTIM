@@ -181,7 +181,8 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		
 		fragViewerNoFSCard = new JPanel();
 		String txtb = "<html><body width='%1s'><center>To inspect the content "
-				+ "of nodes, please load a fragment space.</center></html>";
+				+ "of nodes, please load a space of building blocks, "
+				+ "and re-open this tab.</center></html>";
 		fragViewerNoFSCard.add(new JLabel(String.format(txtb, 120)));
 		fragViewerNoFSCard.setToolTipText(fragViewerToolTip);
 		fragViewerCardHolder.add(fragViewerNoFSCard, NOFSCARDNAME);
@@ -190,7 +191,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		fragViewerCardHolder.add(fragViewer, FRAGVIEWERCARDNAME);
 		
 		((CardLayout) fragViewerCardHolder.getLayout()).show(
-				fragViewerCardHolder, NOFSCARDNAME);
+				fragViewerCardHolder, EMPTYCARDNAME);
 		
 		leftPane.setTopComponent(fragViewerPanel);
 		
@@ -437,6 +438,13 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			}
 			
 			JVertex jv = (JVertex) evt.getNewValue();
+			
+            if (!hasFragSpace)
+            {
+                removeNestedGraphViewer(); //Just is case we still have it
+                bringCardToTopOfVertexViewer(NOFSCARDNAME);
+                return;
+            }
 
 		    DENOPTIMVertex bb = jv.dnpVertex.clone();
 			if (bb instanceof DENOPTIMFragment)

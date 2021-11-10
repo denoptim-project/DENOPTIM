@@ -165,11 +165,11 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 		apTable.putClientProperty("terminateEditOnFocusLost", true);
 		apTable.getColumnModel().getColumn(0).setMaxWidth(75);
 		apTable.setGridColor(Color.LIGHT_GRAY);
+        apTable.setPreferredScrollableViewportSize(apTable.getPreferredSize());
 		JTableHeader apTabHeader = apTable.getTableHeader();
 		apTabHeader.setPreferredSize(new Dimension(100, 20));
 		apTabModel.addTableModelListener(new PausableTableModelListener());
 		tabPanel = new JScrollPane(apTable);
-		tabPanel.setMinimumSize(new Dimension(100,30));
 		this.setBottomComponent(tabPanel);
 	}
 	

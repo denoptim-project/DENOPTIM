@@ -116,7 +116,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 */
 	public FragmentViewPanel(boolean editableTable)
 	{
-		this(null,editableTable);
+		this(null, editableTable);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -844,7 +844,6 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 */
 	public void clearMolecularViewer()
 	{
-		//TODO-V3: evaluate reducing to the minimum the need to run this: it is a slow command!
 	    jmolPanel.viewer.evalString("zap");
 	}
 
