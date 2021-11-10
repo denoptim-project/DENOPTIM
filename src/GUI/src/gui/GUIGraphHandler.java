@@ -1224,8 +1224,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		for (DENOPTIMAttachmentPoint ap : compatAps)
 		{
 		    int vId = ap.getOwner().hashCode();
-		    //TODO-V3 replace hash with Id
-			//int vId = ap.getOwner().getVertexId();
 			int apId = ap.getOwner().getIndexOfAP(ap);
 			if (genToLocIDMap.keySet().contains(vId))
 			{

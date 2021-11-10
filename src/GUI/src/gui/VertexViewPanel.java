@@ -413,26 +413,27 @@ public class VertexViewPanel extends JPanel
     {       
         if (tmpl.containsAtoms())
         {
-            // TODO: take molecular model from read in data, if available
-            
-            // here we want to avoid converting graph to molecule, so if we have
-            // the molecular model from having read the template from SDF, then
-            // good, we can display it, otherwise, no molecule should be shown.
-            
-            /*
-            DENOPTIMFragment frag = new DENOPTIMFragment();
-            loadFragmentToViewer(frag);
-            btnSwitchToMolViewer.setEnabled(true);
-            btnSwitchToNodeViewer.setEnabled(true);
-            */
+            DENOPTIMFragment frag;
+            try
+            {
+                frag = new DENOPTIMFragment(tmpl.getVertexId(), 
+                        tmpl.getIAtomContainer(), tmpl.getBuildingBlockType());
+
+                loadFragmentToViewer(frag);
+                btnSwitchToMolViewer.setEnabled(true);
+                btnSwitchToNodeViewer.setEnabled(true);
+                switchbleByVertexType = true;
+            } catch (DENOPTIMException e)
+            {
+                fragViewer.clearAll();
+                switchbleByVertexType = false;
+            }
         } else {
             fragViewer.clearAll();
+            switchbleByVertexType = false;
         }
         graphNodeViewer.loadVertexToViewer(tmpl);
         switchToGraphNodeViewer();
-        // These will have to change if we allow displaying molecular models for 
-        // templates
-        switchbleByVertexType = false;
         graphNodeViewer.setVertexSpecificEditableAPTable(false);
     }
     
@@ -461,7 +462,6 @@ public class VertexViewPanel extends JPanel
      */
     public void clearMolecularViewer()
     {
-        //TODO-V3: evaluate reducing to the minimum the need to run this: it is a slow command!
         fragViewer.clearMolecularViewer();
     }
     
