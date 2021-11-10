@@ -325,10 +325,16 @@ public class MoleculeViewPanel extends JSplitPane
 					item = new Candidate(DenoptimIO.readMoleculeData(
 							file.getAbsolutePath()).get(0),false,true);
 				} catch (DENOPTIMException e1) {
-					e1.printStackTrace();
-					this.setCursor(Cursor.getPredefinedCursor(
-							Cursor.DEFAULT_CURSOR));
-					return;
+				    try {
+				        item = Candidate.fromAtomContainerNoGraph(
+				                DenoptimIO.readMoleculeData(
+				                        file.getAbsolutePath()).get(0), true);
+				    } catch (DENOPTIMException e2) {
+    					e1.printStackTrace();
+    					this.setCursor(Cursor.getPredefinedCursor(
+    							Cursor.DEFAULT_CURSOR));
+    					return;
+				    }
 				}
 			}
 		}

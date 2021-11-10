@@ -221,7 +221,6 @@ Serializable, Cloneable
     public Candidate(IAtomContainer iac, boolean useFragSpace, 
     		boolean allowNoUID) throws DENOPTIMException
     {
-    	// Initialize, then we try to take info from IAtomContainer
         this.uid = "UNDEFINED";
         this.smiles = "UNDEFINED";
         this.hasFitness = false;
@@ -280,6 +279,12 @@ Serializable, Cloneable
         	}
         }
         
+        if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
+        {
+            this.comment = iac.getProperty(
+                    DENOPTIMConstants.GMSGTAG).toString();
+        }
+        
         try
         {
             //Something very similar is done also in DenoptimIO
@@ -303,13 +308,89 @@ Serializable, Cloneable
         	throw new DENOPTIMException("Could not read Graph to make "
         			+ "Candidate.", e);
         }
-        if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
-        {
-            this.comment = iac.getProperty(
-            		DENOPTIMConstants.GMSGTAG).toString();
-        }
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Wraps an atom container as a candidate even if a graph is not 
+     * available. Essentially, this method produces a candidate that has as much
+     * info as available in the atom container, but ignores the lack of a valid 
+     * graph definition.
+     * @param iac the atom container to be wrapped.
+     * @param allowNoUID use <code>true</code> to allow creation on a candidate 
+     * that has no unique identifier.
+     * @return a new candidate with no graph but with a molecular representation.
+     * @throws DENOPTIMException if the UID is required but not found.
+     */
+    public static Candidate fromAtomContainerNoGraph(IAtomContainer iac, 
+            boolean allowNoUID) throws DENOPTIMException
+    {
+        Candidate cand = new Candidate();
+        
+        cand.iac = DENOPTIMMoleculeUtils.makeSameAs(iac);
+        
+        if (iac.getProperty(CDKConstants.TITLE) != null)
+        {
+            cand.name = iac.getProperty(CDKConstants.TITLE).toString();
+        }
+        
+        if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
+        {
+            cand.error = iac.getProperty(
+                    DENOPTIMConstants.MOLERRORTAG).toString();
+        }
+
+        if (iac.getProperty(DENOPTIMConstants.FITNESSTAG) != null)
+        {
+            String fitprp = iac.getProperty(
+                    DENOPTIMConstants.FITNESSTAG).toString();
+            double fitVal = Double.parseDouble(fitprp);
+            if (Double.isNaN(fitVal))
+            {
+                String msg = "Cannot build Candidate from "
+                        + "IAtomContainer: Fitness value is NaN!";
+                throw new DENOPTIMException(msg);
+            }
+            cand.fitness = fitVal;
+            cand.hasFitness = true;
+        }
+        
+        if (iac.getProperty(DENOPTIMConstants.GRAPHLEVELTAG) != null)
+        {
+            cand.level = Integer.parseInt(iac.getProperty(
+                    DENOPTIMConstants.GRAPHLEVELTAG).toString());
+        }
+        
+        if (iac.getProperty(DENOPTIMConstants.SMILESTAG) != null)
+        {
+            cand.smiles = iac.getProperty(
+                    DENOPTIMConstants.SMILESTAG).toString();
+        }
+
+        try {
+            cand.uid = iac.getProperty(DENOPTIMConstants.UNIQUEIDTAG).toString();
+        } catch (Exception e) {
+            if (allowNoUID)
+            {
+                cand.uid = "noUID";
+            } else {
+                throw new DENOPTIMException("Could not read UID to make "
+                        + "Candidate. No property '" 
+                        + DENOPTIMConstants.UNIQUEIDTAG 
+                        + "' in the atom container.", e);
+            }
+        }
+        
+        if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
+        {
+            cand.comment = iac.getProperty(
+                    DENOPTIMConstants.GMSGTAG).toString();
+        }
+        
+        return cand;
+    }
+    
 //------------------------------------------------------------------------------
     
     /**

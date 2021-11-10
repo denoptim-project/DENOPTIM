@@ -1652,12 +1652,12 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
   		dnGraphLibrary.set(currGrphIdx, dnGraph);
   		
   		// WARNING: the dnGraph in the visualPanel should be in sync because any
-  		// changes to it has resulted in an updaate of the graphViewer.
+  		// changes to it has resulted in an update of the graphViewer.
   		// Still, it is possible to introduce code modifications that make it
   		// go out of sync.
-  		// Here, we ASSUME the dhGraph displayed in the graphViewer component
+  		// Here, we ASSUME the graph displayed in the graphViewer component
   		// of the visualPanel is in sync with dnGraph. Therefore, we just
-  		// update the molecular viewer.
+  		// rebuild the molecular viewer.
   		
   		if (updateMolViewer)
   		{
@@ -1666,18 +1666,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
   			    IAtomContainer mol = visualPanel.updateMolevularViewer();
   			    if (mol != null)
   			    {
-      				try
-                    {
-                        DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
-                        molLibrary.set(currGrphIdx, mol);
-                        mol.setProperty(DENOPTIMConstants.GMSGTAG,
-                                "ManuallyBuilt");
-                    } catch (DENOPTIMException e)
-                    {
-                        System.err.println("Could not remove RCAs from while "
-                                + "updating mol-viewer.");
-                        e.printStackTrace();
-                    }
+                    molLibrary.set(currGrphIdx, mol);
+                    mol.setProperty(DENOPTIMConstants.GMSGTAG,
+                            "ManuallyBuilt");
 	        	} else {
 	        	    // Logging done within visualPanel
 	        		molLibrary.set(currGrphIdx, builder.newAtomContainer());

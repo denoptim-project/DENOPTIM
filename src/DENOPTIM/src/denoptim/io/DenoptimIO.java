@@ -2325,7 +2325,7 @@ public class DenoptimIO
                 break;
                 
             default:
-                throw new DENOPTIMException("Cannot read graphs from format '" 
+                throw new DENOPTIMException("Cannot write graphs with format '" 
                         + format + "'.");
         }
         return file;

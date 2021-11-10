@@ -303,61 +303,47 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Updates the molecular representation of the loaded
-	 * graph.
+	 * Updates the molecular representation of the loaded graph. We rebuild 
+	 * the molecular representation, if we can do so because we have the space
+	 * of building blocks. Thismethod is needed in case of changes to the loaded
+	 * graph, to project those changes in the graph into the molecular
+	 * representation.
 	 */
 	public IAtomContainer updateMolevularViewer()
 	{
 	    molViewer.clearAll();
-	    
-	    //TODO-V3
-	    if (false) //if 3d is available from library
-	    {
-	        try {
-	            /*
-                molViewer.loadChemicalStructure( // get mol from library );
-                */      
-	            bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Could not read molecular data: "+
-                        e.getCause() + " " + e.getMessage());
-                bringCardToTopOfMolViewer(EMPTYCARDNAME);
+
+        IAtomContainer mol = builder.newAtomContainer();
+        if (hasFragSpace)
+        {
+            ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
+            try {
+                mol = tb.convertGraphTo3DAtomContainer(
+                        dnGraph);
+                DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                System.out.println("Couldn't make 3D-tree representation: "
+                        + t.getMessage());
+                //molLibrary.set(currGrphIdx, builder.newAtomContainer());
             }
-	    } else {
-            IAtomContainer mol = builder.newAtomContainer();
-            if (hasFragSpace)
+
+            if (mol.getAtomCount() > 0)
             {
-                ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
                 try {
-                    mol = tb.convertGraphTo3DAtomContainer(
-                            dnGraph);
-                    DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    System.out.println("Couldn't make 3D-tree representation: "
-                            + t.getMessage());
-                    //molLibrary.set(currGrphIdx, builder.newAtomContainer());
-                }
-    
-                if (mol.getAtomCount() > 0)
-                {
-                    try {
-                        molViewer.loadChemicalStructure(mol);
-                        bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.out.println("Could not read molecular data: "+
-                                e.getCause() + " " + e.getMessage());
-                        bringCardToTopOfMolViewer(EMPTYCARDNAME);
-                    }
-                } else {
+                    molViewer.loadChemicalStructure(mol);
+                    bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Could not read molecular data: "+
+                            e.getCause() + " " + e.getMessage());
                     bringCardToTopOfMolViewer(EMPTYCARDNAME);
                 }
+            } else {
+                bringCardToTopOfMolViewer(EMPTYCARDNAME);
             }
-            return mol;
-	    }
-	    return null;
+        }
+        return mol;
 	}
 
 //-----------------------------------------------------------------------------
@@ -476,11 +462,11 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                         TMPLVIEWERCARDNAME);
                 fragViewerTmplViewerCard.setSize(
                         fragViewerCardHolder.getSize());
-                
-                fragViewerTmplViewerCard.loadDnGraphToViewer(
-                        t.getInnerGraph(), false, hasFragSpace);
-                fragViewerTmplViewerCard.updateMolevularViewer();
-			    bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
+
+                fragViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), 
+                        t.getIAtomContainer(), false, hasFragSpace);
+			    
+                bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
 			    fragViewerTmplViewerCard.setDividerLocation(defDivLoc);
 			} else if (bb instanceof EmptyVertex) {
 			    removeNestedGraphViewer(); //Just is case we still have it
