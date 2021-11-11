@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -436,7 +437,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				if (selectedAtms.size() == 0)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnAtmToAP,
 			                "<html>No atom selected! Click on atoms to select"
 			                + " them.<br>Click again to unselect.</html>",
 			                "Error",
@@ -453,7 +454,7 @@ public class GUIVertexInspector extends GUICardPanel
 					
 					String apClass;
 					try {
-						apClass = ensureGoodAPClassString("",false);
+						apClass = ensureGoodAPClassString("",false,btnAtmToAP);
 					} catch (Exception e1) {
 						// We have pressed cancel or closed the dialog, so abandon
 						return;
@@ -1171,7 +1172,8 @@ public class GUIVertexInspector extends GUICardPanel
 	        	
 	        	// Make sure the new class has a proper syntax
 	        	try {
-					currApClass = ensureGoodAPClassString(currApClass,true);
+					currApClass = ensureGoodAPClassString(currApClass,true,
+					        btnSaveEdits);
 				} catch (DENOPTIMException e1) {
 					currApClass = "dafaultAPClass:0";
 				}
@@ -1190,7 +1192,7 @@ public class GUIVertexInspector extends GUICardPanel
 							// We made sure the class is valid, so this
 							// should never happen, though one never knows
 							e.printStackTrace();
-							JOptionPane.showMessageDialog(null,
+							JOptionPane.showMessageDialog(btnSaveEdits,
 			    	                "<html>Could not save due to errors setting a "
 			    	                + "new APClass.<br>Please report this to the "
 			    	                + "DENOPTIM team.</html>",
@@ -1203,7 +1205,7 @@ public class GUIVertexInspector extends GUICardPanel
 	        	}
 	        	else
 	        	{
-	    			JOptionPane.showMessageDialog(null,
+	    			JOptionPane.showMessageDialog(btnSaveEdits,
 	    	                "<html>Could not save due to mistmatch between AP "
 	    	                + "table and map.<br>Please report this to the "
 	    	                + "DENOPTIM team.</html>",
@@ -1255,12 +1257,13 @@ public class GUIVertexInspector extends GUICardPanel
   	 * @throws DENOPTIMException 
   	 */
 	public static String ensureGoodAPClassString(String currApClass, 
-			boolean mustReply) 
+			boolean mustReply, JComponent parent) 
 			throws DENOPTIMException 
 	{		
-		return ensureGoodAPClassString(currApClass,"Define APClass",mustReply);
+		return ensureGoodAPClassString(currApClass,"Define APClass",mustReply, 
+		        parent);
 	}
-  	
+	
 //-----------------------------------------------------------------------------
   	
   	/**
@@ -1268,11 +1271,15 @@ public class GUIVertexInspector extends GUICardPanel
   	 * @param currApClass the current value of the APClass, or empty string
   	 * @param mustReply set to <code>true</code> to prevent escaping the 
   	 * question
+  	 * @param parent the component to bind the dialog to. Can be null, in which
+  	 * case the dialog will appear in default location and perhaps behind 
+  	 * other windows.
   	 * @return the APClass
   	 * @throws DENOPTIMException 
   	 */
 	public static String ensureGoodAPClassString(String currApClass, 
-			String title, boolean mustReply) throws DENOPTIMException 
+			String title, boolean mustReply, JComponent parent) 
+			        throws DENOPTIMException 
 	{		
 		String preStr = "";
 		while (!APClass.isValidAPClassString(currApClass))
@@ -1288,7 +1295,7 @@ public class GUIVertexInspector extends GUICardPanel
 	    				+ "<li><code>subClass</code> is an integer</li>";
 			}
 			
-    		currApClass = JOptionPane.showInputDialog(null, 
+    		currApClass = JOptionPane.showInputDialog(parent, 
     				"<html>" + preStr + "</ul>Please, provide a valid "
     				+ "APClass string: ", title, JOptionPane.PLAIN_MESSAGE);
         	
@@ -1324,23 +1331,28 @@ public class GUIVertexInspector extends GUICardPanel
   	 * @throws DENOPTIMException is the used did not choose a valid value.
   	 */
 	public static String ensureGoodAPRuleString(String currApRule, 
-			String title, boolean mustReply) throws DENOPTIMException 
+			String title, boolean mustReply, JComponent parent) 
+			        throws DENOPTIMException 
 	{		
 		String preStr = "";
 		while (!APClass.isValidAPRuleString(currApRule))
     	{
 			if (currApRule != "")
 			{
-	    		preStr = "APClass rule '" + currApRule + "' is not valid!<br>"
-	    				+ "The valid APClass rile is a string with no spaces "
-	    				+ "and no '"
-	        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
-	    				+ "' character.<br>";
+			    preStr = "APRule '" + currApRule + "' is not valid!<br>"
+                        + "The valid syntax for APClass is:<br><br><code>APRule" 
+                        + DENOPTIMConstants.SEPARATORAPPROPSCL 
+                        + "subClass</code><br><br> where "
+                        + "<ul><li><code>APRule</code>"
+                        + " is the string you should provide now, and is "
+                        + "typically any string with no spaces,</li>"
+                        + "<li><code>subClass</code> is an integer.</ul>";
 			}
 			
-    		currApRule = JOptionPane.showInputDialog(null, 
-    				"<html>" + preStr + " Please, provide a valid "
-    				+ "APClass rule string: ",
+    		currApRule = JOptionPane.showInputDialog(parent,String.format( 
+    		        "<html><body width='%1s'>" + preStr 
+    		        + " Please, provide a valid APClass rule string: </html>",
+    		        300),
     				title,
     				JOptionPane.PLAIN_MESSAGE);
         	

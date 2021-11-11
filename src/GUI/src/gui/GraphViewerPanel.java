@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -61,7 +62,8 @@ import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
-
+import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
+import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -94,6 +96,7 @@ public class GraphViewerPanel extends JPanel
 	
 	Graph<JVertex, JEdge> loadedGraph;
 	DNPSpringLayout<JVertex, JEdge> layout;
+	private double scaling = 1.0;
 	VisualizationViewer<JVertex, JEdge>  viewer;
 	private DefaultModalGraphMouse<JVertex, JEdge> gm;
 	
@@ -516,7 +519,22 @@ public class GraphViewerPanel extends JPanel
     {
         loadGraphToViewer(g, prevStatus, true);
     }
-	
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Load the given graph to the graph viewer.
+     * @param g the graph to load
+     * @param prevStatus the snapshot of the previous status. We use this to 
+     * remember previously chosen settings, such as the labels to be 
+     * displayed, or the position of nodes.
+     * @param lock decides whether we lock the initial position of nodes or not.
+     */
+    public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
+            JUNGGraphSnapshot prevStatus, boolean lock)
+    {
+        loadGraphToViewer(g, prevStatus, lock, 1.0);
+    }
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -525,34 +543,47 @@ public class GraphViewerPanel extends JPanel
 	 * @param prevStatus the snapshot of the previous status. We use this to 
 	 * remember previously chosen settings, such as the labels to be 
 	 * displayed, or the position of nodes.
+	 * @param lock decides whether we lock the initial position of nodes or not.
+	 * @param reScaling a factor to be multiplied to the current scaling of 
+	 * the graph layout size. This allows to
+	 * reduce/enlarge the space considered for plotting the graph.
 	 */
 	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
-	        JUNGGraphSnapshot prevStatus, boolean lock)
+	        JUNGGraphSnapshot prevStatus, boolean lock, double reScaling)
 	{
 	    loadedGraph = g;
+	    scaling = scaling * reScaling;
 	    layout = new DNPSpringLayout<>(g);
+	    
+	    //NB: the size depends on where this panel is used. In GUIVertexSelector
+        // the size vanishes, so we need to set a decent value or the graph will
+        // be displayed with 0:0 dimensions, i.e., all nodes on top of each other
+	    Dimension dimLayout = null;
+	    Dimension dimViewer = null;
+        if (this.getSize().height<150)
+        {
+            dimLayout = new Dimension(150, 150);
+            layout.setSize(dimLayout);
+            dimViewer = new Dimension(150, 150);
+        } else {
+            double w = this.getSize().width * scaling
+                    - GUIPreferences.graphNodeSize * 1.5;
+            double h = this.getSize().height * scaling
+                    - GUIPreferences.graphNodeSize * 1.5;
+            dimLayout = new Dimension((int) w, (int) h);
+            layout.setSize(dimLayout);
+            dimViewer = this.getSize();
+        }
+	    
+	    // Unless we have a snapshot from previous visualization, generate the
+        // initial layout of nodes with ISOM layout
 	    if (prevStatus != null)
 	    {
 	        // Here we set view features according to a previous graph view
 	        inheritFeatures(prevStatus, lock);
 	    }
 	    
-	    //NB: the size depends on where this panel is used. In GUIVertexSelector
-	    // the size vanishes, so we need to set a decent value or the graph will
-	    // be displayed with 0:0 dimensions, i.e., all nodes on top of each other
-	    if (this.getSize().height<150)
-	    {
-	        layout.setSize(new Dimension(150, 150));
-	        viewer = new VisualizationViewer<>(layout,new Dimension(150, 150));
-	    } else {
-	        double w = this.getSize().width 
-                    - GUIPreferences.graphNodeSize * 1.5;
-            double h = this.getSize().height 
-                    - GUIPreferences.graphNodeSize * 1.5;
-	        Dimension dim = new Dimension((int) w, (int) h);
-	        layout.setSize(dim);
-	        viewer = new VisualizationViewer<>(layout,this.getSize());
-	    }
+        viewer = new VisualizationViewer<>(layout,dimViewer);
 		
 	    // Listener for clicks on the graph nodes
         viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
@@ -692,6 +723,12 @@ public class GraphViewerPanel extends JPanel
 	        super();
 	        
             JMenuItem mnuRelax = new JMenuItem("Refine node locations");
+            mnuRelax.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Relaxe the position of graph nodes as to avoid node "
+                    + "overlap. Depending on the complexity of the graph, you "
+                    + "might consider moving specific portions of the graph "
+                    + "before attempting any refinement, or consider tunning "
+                    + "this refinement multiple times</html>", 300));
             mnuRelax.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JUNGGraphSnapshot snpSht = getGraphStatusSnapshot();
@@ -699,11 +736,41 @@ public class GraphViewerPanel extends JPanel
                     loadGraphToViewer(loadedGraph,snpSht,false);
                 }});
             this.add(mnuRelax);
+
+            this.add(new JSeparator());
+            
+            JMenuItem mnuShrink = new JMenuItem("Shrink Plottable Area");
+            mnuShrink.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Re-plot the graph using a shrinked plottable region."
+                    + "This will force nosed to fit into a smaller space."
+                    + "</html>", 300));
+            mnuShrink.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JUNGGraphSnapshot snpSht = getGraphStatusSnapshot();
+                    cleanup();
+                    loadGraphToViewer(loadedGraph,snpSht,false,0.75);
+                }});
+            this.add(mnuShrink);
+            
+            JMenuItem mnuEnlarge = new JMenuItem("Enlarge Plottable Area");
+            mnuEnlarge.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Re-plot the graph using an enlarged plottable region."
+                    + "This will allow nodes to be places farther apart."
+                    + "</html>", 300));
+            mnuEnlarge.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JUNGGraphSnapshot snpSht = getGraphStatusSnapshot();
+                    cleanup();
+                    loadGraphToViewer(loadedGraph,snpSht,false,1.25);
+                }});
+            this.add(mnuEnlarge);
             
             this.add(new JSeparator());
             
-            
             JMenuItem mnuCenterView = new JMenuItem("Center View");
+            mnuCenterView.setToolTipText(String.format(
+                    "<html><body width='%1s'>"
+                    + "Center the graph to the vindow.</html>", 300));
             mnuCenterView.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     centerGraphLayout();
@@ -714,12 +781,22 @@ public class GraphViewerPanel extends JPanel
             this.add(new JSeparator());
             
 	        JMenuItem mnuShowAPC = new JMenuItem("Show APClasses");
+	        mnuShowAPC.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Add labels with "
+                    + "attachment point classes on edges and attachment points "
+                    + "related to "
+                    + "the selected nodes.</html>", 300));
 	        mnuShowAPC.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
 	                alterLabels(LabelType.APC, true);
 	            }});
             this.add(mnuShowAPC);
 	        JMenuItem mnuHideAPC = new JMenuItem("Hide APClasses");
+	        mnuHideAPC.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Remove labels with "
+                    + "attachment point classes from edges "
+                    + "and attachment points related to "
+                    + "the selected nodes.</html>", 300));
 	        mnuHideAPC.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.APC, false);
@@ -729,12 +806,19 @@ public class GraphViewerPanel extends JPanel
             this.add(new JSeparator());
             
             JMenuItem mnuShowAPID = new JMenuItem("Show AP IDs");
+            mnuShowAPID.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Add labels declaring which attachment points are used "
+                    + "to form an edge. Acts on any edge related to the "
+                    + "selected nodes.</html>", 300));
             mnuShowAPID.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.APID, true);
                 }});
             this.add(mnuShowAPID);
             JMenuItem mnuHideAPID = new JMenuItem("Hide AP IDs");
+            mnuHideAPID.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Remove labales attachment point identifiers from the "
+                    + "edges related to the selecgted nodes.</html>", 300));
             mnuHideAPID.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.APID, false);
@@ -744,12 +828,19 @@ public class GraphViewerPanel extends JPanel
 	        this.add(new JSeparator());
 	        
             JMenuItem mnuShowBT = new JMenuItem("Show Bond Types");
+            mnuShowBT.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Add labels  defining the bond type on "
+                    + "the edges related to the selected nodes."
+                    + "</html>", 300));
             mnuShowBT.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.BT, true);
                 }});
             this.add(mnuShowBT);
             JMenuItem mnuHideBT = new JMenuItem("Hide Bond Types");
+            mnuHideBT.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Remove labels defining the bond type from the edges"
+                    + "related to the selected nodes.</html>", 300));
             mnuHideBT.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.BT, false);
@@ -759,12 +850,18 @@ public class GraphViewerPanel extends JPanel
 	        this.add(new JSeparator());
 	        
             JMenuItem mnuShowBBID = new JMenuItem("Show Building Block IDs");
+            mnuShowBBID.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Add labels with "
+                    + "building block IDs to the selected nodes.</html>", 300));
             mnuShowBBID.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.BBID, true);
                 }});
             this.add(mnuShowBBID);
             JMenuItem mnuHideBBID = new JMenuItem("Hide Building Block IDs");
+            mnuHideBBID.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Hide building block IDs in the selected nodes."
+                    + "</html>", 300));
             mnuHideBBID.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     alterLabels(LabelType.BBID, false);
@@ -774,6 +871,9 @@ public class GraphViewerPanel extends JPanel
             this.add(new JSeparator());
             
             JMenuItem mnuHideAll = new JMenuItem("Hide All Labels");
+            mnuHideAll.setToolTipText(String.format("<html><body width='%1s'>"
+                    + "Hide all labels related to the selected nodes.</html>", 
+                    300));
             mnuHideAll.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     for (LabelType lt : LabelType.values())

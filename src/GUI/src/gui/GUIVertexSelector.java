@@ -164,7 +164,7 @@ public class GUIVertexSelector extends GUIModalDialog
                         }
                         else if (enforceAPSelection)
                         {
-                            JOptionPane.showMessageDialog(null,"<html>"
+                            JOptionPane.showMessageDialog(btnDone,"<html>"
                                     + "No attachment point (AP) selected.<br>"
                                     + "Please select an AP in the table."
                                     + "</html>",
@@ -202,7 +202,7 @@ public class GUIVertexSelector extends GUIModalDialog
     					}
     					else if (enforceAPSelection)
     					{
-    						JOptionPane.showMessageDialog(null,"<html>"
+    						JOptionPane.showMessageDialog(btnDone,"<html>"
     								+ "No attachment point (AP) selected.<br>"
     								+ "Please select an AP in the table."
     								+ "</html>",

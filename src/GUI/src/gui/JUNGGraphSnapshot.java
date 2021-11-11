@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.graph.Graph;
 import gui.GraphViewerPanel.JEdge;
 import gui.GraphViewerPanel.JVertex;
@@ -70,6 +71,18 @@ public class JUNGGraphSnapshot
             {
                 //e.printStackTrace();
             }
+        } 
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public JUNGGraphSnapshot(Graph<JVertex, JEdge> graph, 
+            ISOMLayout<JVertex, JEdge> layout)
+    {   
+        for (JVertex jv : graph.getVertices())
+        {
+            Point2D p = layout.apply(jv);
+            vertexPosition.put(jv.idStr, new Point2D.Double(p.getX(),p.getY()));
         } 
     }
     

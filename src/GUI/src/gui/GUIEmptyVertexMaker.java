@@ -179,7 +179,10 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                             // We chose to create a new class 
                             try {
                                 APClass apc = APClass.make(GUIVertexInspector
-                                        .ensureGoodAPClassString("",false));
+                                        .ensureGoodAPClassString("", 
+                                                "Define APClass", 
+                                                false,
+                                                btnAPInsert));
                                 apClass = apc.toString();
                             } catch (Exception e1) {
                                 // We have pressed cancel or closed the dialog: abandon

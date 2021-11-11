@@ -49,6 +49,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -288,10 +289,12 @@ public class CompatibilityMatrixForm extends JPanel {
                 		try {
                 			srcAPClass = APClass.make(GUIVertexInspector
 									.ensureGoodAPClassString("",
-											"Define new Source APClass",true));
+											"Define new Source APClass",
+											true,
+											btnAddCompRul));
                 			if (allAPClasses.contains(srcAPClass))
                 			{
-                				JOptionPane.showMessageDialog(null,
+                				JOptionPane.showMessageDialog(btnAddCompRul,
     		        					"<html>Class '<code>" + srcAPClass
     		        					+"</code>' is not new!</html>",
     		        	                "Error",
@@ -303,7 +306,7 @@ public class CompatibilityMatrixForm extends JPanel {
 							allAPClasses.add(srcAPClass);
 							allAPRules.add(srcAPClass.getRule());
 						} catch (DENOPTIMException e1) {
-		        			JOptionPane.showMessageDialog(null,
+		        			JOptionPane.showMessageDialog(btnAddCompRul,
 		        					"<html>Error definging anew APClass.<br>"
 		        					+ "Please, report this to the DENOPTIM "
 		        					+ "team.</html>",
@@ -334,7 +337,9 @@ public class CompatibilityMatrixForm extends JPanel {
 	                		try {
 								String newAPC = GUIVertexInspector
 										.ensureGoodAPClassString("",
-										"Define new compatible APClass", false);
+										"Define new compatible APClass", 
+										false,
+										btnAddCompRul);
 	                			APClass cls = APClass.make(newAPC);
 								trgCPClasses.add(cls);
 								allAPClasses.add(cls);
@@ -728,10 +733,12 @@ public class CompatibilityMatrixForm extends JPanel {
 	                		try {
 								String newAPR = GUIVertexInspector
 										.ensureGoodAPRuleString("",
-										"Define APClass Rule", false);
+										"Define APClass Rule", 
+										false,
+										btnAddAPClsBO);
 	                			if (allAPRules.contains(newAPR))
 	                			{
-	                				JOptionPane.showMessageDialog(null,
+	                				JOptionPane.showMessageDialog(btnAddAPClsBO,
 	    		        					"<html>Class '<code>" + newAPR
 	    		        					+"</code>' is not new!</html>",
 	    		        	                "Error",
@@ -980,10 +987,12 @@ public class CompatibilityMatrixForm extends JPanel {
                 		try {
                 			cappingAPClass = APClass.make(GUIVertexInspector
 									.ensureGoodAPClassString("",
-									"Define new Capping Group APClass", false));
+									"Define new Capping Group APClass",
+									false,
+									btnAddCapping));
                 			if (allAPClasses.contains(cappingAPClass))
                 			{
-                				JOptionPane.showMessageDialog(null,
+                				JOptionPane.showMessageDialog(btnAddCapping,
     		        					"<html>Class '<code>" + cappingAPClass
     		        					+"</code>' is not new!</html>",
     		        	                "Error",
@@ -994,7 +1003,7 @@ public class CompatibilityMatrixForm extends JPanel {
 							allAPClasses.add(cappingAPClass);
 							allAPRules.add(cappingAPClass.getRule());
 						} catch (DENOPTIMException e1) {
-		        			JOptionPane.showMessageDialog(null,
+		        			JOptionPane.showMessageDialog(btnAddCapping,
 		        					"<html>Error definging a new APClass.<br>"
 		        					+ "Please, report this to the DENOPTIM "
 		        					+ "team.</html>",
@@ -1025,10 +1034,12 @@ public class CompatibilityMatrixForm extends JPanel {
 	                		    APClass newAPC = APClass.make(
 	                		            GUIVertexInspector
 										.ensureGoodAPClassString("",
-										"Define new Source APClass", false));
+										"Define new Source APClass", 
+										false,
+										btnAddCapping));
 	                			if (allAPClasses.contains(newAPC))
 	                			{
-	                				JOptionPane.showMessageDialog(null,
+	                				JOptionPane.showMessageDialog(btnAddCapping,
 	    		        					"<html>Class '<code>" + newAPC
 	    		        					+"</code>' is not new!</html>",
 	    		        	                "Error",
@@ -1225,10 +1236,12 @@ public class CompatibilityMatrixForm extends JPanel {
                 		try {
                 		    APClass newAPC = APClass.make(GUIVertexInspector
 									.ensureGoodAPClassString("",
-									"Define new APClass", false));
+									"Define new APClass",
+									false,
+									btnAddFrbEnd));
                 			if (allAPClasses.contains(newAPC))
                 			{
-                				JOptionPane.showMessageDialog(null,
+                				JOptionPane.showMessageDialog(btnAddFrbEnd,
     		        					"<html>Class '<code>" + newAPC
     		        					+"</code>' is not new!</html>",
     		        	                "Error",
@@ -1334,61 +1347,6 @@ public class CompatibilityMatrixForm extends JPanel {
         panelFrbEnd.add(panelFrbEndTable, BorderLayout.CENTER);
 		
 	}
-	
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Forces the user to specify a properly formatted APRule, i.e., the first
-     * component of an APClass. If the APClass is "myRule:1", the APRule is 
-     * "myRule".
-     * @param currApRule the current value of the APClass, or empty string
-     * @param mustReply set to <code>true</code> to prevent escaping the question
-     * @return 
-     * @throws DENOPTIMException 
-     */
-    public static String ensureGoodAPRuleString(String currApRule, 
-            String title, boolean mustReply) throws DENOPTIMException 
-    {       
-        String preStr = "";
-        while (!APClass.isValidAPRuleString(currApRule))
-        {
-            if (currApRule != "")
-            {
-                preStr = "APRule '" + currApRule + "' is not valid!<br>"
-                        + "The valid syntax for APClass is:<br><br><code>APRule" 
-                        + DENOPTIMConstants.SEPARATORAPPROPSCL 
-                        + "subClass</code><br><br> where "
-                        + "<ul><li><code>APrule</code>"
-                        + " is the wtring you should provide now, and is"
-                        + "typically any string with no spaces,</li>"
-                        + "<li><code>subClass</code> is an integer.</li>";
-            }
-            
-            currApRule = JOptionPane.showInputDialog(null, 
-                    "<html>" + preStr + "</ul>Please, provide a valid "
-                    + "APClass string: ", title, JOptionPane.PLAIN_MESSAGE);
-            
-            if (currApRule == null)
-            {
-                currApRule = "";
-                if (!mustReply)
-                {
-                    throw new DENOPTIMException();
-                }
-            }
-            
-            preStr = "APRule '" + currApRule + "' is not valid!<br>"
-                    + "The valid syntax for APClass is:<br><br><code>APRule" 
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL 
-                    + "subClass</code><br><br> where "
-                    + "<ul><li><code>APrule</code>"
-                    + " is the wtring you should provide now, and is"
-                    + "typically any string with no spaces,</li>"
-                    + "<li><code>subClass</code> is an integer.</li>";
-        }
-        
-        return currApRule;
-    }
 	
 //-----------------------------------------------------------------------------
 
@@ -2037,10 +1995,11 @@ public class CompatibilityMatrixForm extends JPanel {
 		                		            GUIVertexInspector
 											.ensureGoodAPClassString("",
 											"Define new compatible APClass",
-											false));
+											false,
+											btnAdd));
 		                			if (allAPClasses.contains(newAPC))
 		                			{
-		                				JOptionPane.showMessageDialog(null,
+		                				JOptionPane.showMessageDialog(btnAdd,
 		    		        					"<html>Class '<code>" + newAPC
 		    		        					+"</code>' is not new!</html>",
 		    		        	                "Error",

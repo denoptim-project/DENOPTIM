@@ -44,6 +44,8 @@ public class DNPSpringLayout<V, E> extends SpringLayout2<V, E>
     public DNPSpringLayout(Graph<V, E> g)
     {
         super(g, (Function<E,Integer>)Functions.<Integer>constant(60));
+        setForceMultiplier(1);
+        setRepulsionRange(200);
     }
     
 //------------------------------------------------------------------------------
