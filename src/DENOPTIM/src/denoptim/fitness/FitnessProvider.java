@@ -103,7 +103,7 @@ public class FitnessProvider
 		{
 			DescriptorForFitness dff = descriptors.get(i);
 			classnames.add(dff.getClassName());
-			//TODO-V3 consider using dff.makeCopy()
+			//TODO consider using dff.makeCopy()
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		// Instantiate new instances of the descriptors implementations
@@ -153,7 +153,7 @@ public class FitnessProvider
 		
 		// Preparation of the chemical representation
 		
-		// TODO-V3 add possibility to submit external molecular modeling task
+		// TODO add possibility to submit external molecular modeling task
 		// this could be done by a Modeller class
 		
 		// Cleanup: remove dummy atoms

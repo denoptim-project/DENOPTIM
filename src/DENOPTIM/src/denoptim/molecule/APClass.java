@@ -96,21 +96,16 @@ public class APClass implements Cloneable,Comparable<APClass>,Serializable
      * Creates an APClass if it does not exist already, or returns the 
      * reference to the existing instance.
      */
-    public static APClass make(String ruleAndSunClass) throws DENOPTIMException 
+    public static APClass make(String ruleAndSubclass) throws DENOPTIMException 
     { 
-        //TODO-V3 this is needed only because at present we need an APClass 
-        // object to define edges. Eventually get rid of this
-        if (ruleAndSunClass.equals(""))
-            ruleAndSunClass = "noclass:0";
-        
-        if (!isValidAPClassString(ruleAndSunClass))
+        if (!isValidAPClassString(ruleAndSubclass))
         {
             throw new DENOPTIMException("Attempt to use APClass '" 
-                        + ruleAndSunClass
+                        + ruleAndSubclass
                         + "' that does not respect syntax <rule>"
                         + DENOPTIMConstants.SEPARATORAPPROPSCL + "<subClass>.");
         }
-        String[] parts = ruleAndSunClass.split(
+        String[] parts = ruleAndSubclass.split(
                 DENOPTIMConstants.SEPARATORAPPROPSCL);
         return getUnique(parts[0], Integer.parseInt(parts[1]));
     }

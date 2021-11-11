@@ -1562,6 +1562,7 @@ public class DENOPTIMGraphTest {
             */
         } catch (Throwable t)
         {
+            t.printStackTrace();
             System.err.println("FATAL ERROR! Could not make test graph (A). "
                     + "Please, report this to the development team.");
             System.exit(-1);

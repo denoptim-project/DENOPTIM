@@ -34,8 +34,6 @@ import java.util.ArrayList;
  * @author Marco Foscato
  */
 
-//TODO: consider that this class should probably expand the list<Integer>
-
 public class SymmetricSet implements Serializable,Cloneable
 {
     private ArrayList<Integer> symIds;

@@ -3346,9 +3346,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         BondType btSrc = FragmentSpace.getBondOrderForAPClass(
-                srcAP.getAPClass().getRule());
+                srcAP.getAPClass());
         BondType btTrg = FragmentSpace.getBondOrderForAPClass(
-                trgAP.getAPClass().getRule());
+                trgAP.getAPClass());
         BondType bndTyp = btSrc;
         if (btSrc != btTrg)
         {

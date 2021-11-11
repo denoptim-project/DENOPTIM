@@ -355,6 +355,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     private boolean isValidInnerGraph(DENOPTIMGraph g) 
     {
+        if (requiredAPs.size()==0)
+            return true;
+        
         List<DENOPTIMAttachmentPoint> innerAPs = g.getAvailableAPs();
         if (innerAPs.size() < getRequiredAPs().size()) {
             return false;
@@ -368,13 +371,16 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         * the assumption that the list of APs does not change order.
         */
         Comparator<DENOPTIMAttachmentPoint> apClassComparator
-                = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass);
+                = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass,
+                        Comparator.nullsLast(Comparator.naturalOrder()));
         innerAPs.sort(apClassComparator);
         List<DENOPTIMAttachmentPoint> reqAPs = getRequiredAPs();
         reqAPs.sort(apClassComparator);
         int matchesLeft = reqAPs.size();
-        for (int i = 0, j = 0; matchesLeft > 0 && i < innerAPs.size(); i++) {
-            if (apClassComparator.compare(innerAPs.get(i), reqAPs.get(j)) == 0) {
+        for (int i = 0, j = 0; matchesLeft > 0 && i < innerAPs.size(); i++) 
+        {
+            if (apClassComparator.compare(innerAPs.get(i), reqAPs.get(j)) == 0) 
+            {
                 matchesLeft--;
                 j++;
             }
@@ -548,7 +554,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         
                     //Build SDF property DENOPTIMConstants.APTAG
                     String sBO = FragmentSpace.getBondOrderForAPClass(
-                            ap.getAPClass().toString()).toOldString();
+                            ap.getAPClass()).toOldString();
                     String stBnd = " " + atmID +":"+sBO;
                     if (propAttchPnt.equals(""))
                     {

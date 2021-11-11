@@ -662,7 +662,7 @@ public class FragmentSpace
     /**
      * Returns the bond order for the given APClass, if defined.
      * 
-     * @param apclass the APclass to be converted into bond order
+     * @param apclass the APclass to be converted into bond order.
      * @return the bond order as an integer, or 1 if either the Fragment space
      *         is not defined, that is, the bond order map is <code>null</code>,
      *         or a fully defined map does not include any mapping for the given
@@ -670,7 +670,7 @@ public class FragmentSpace
      */
     public static BondType getBondOrderForAPClass(APClass apc)
     {
-        if (bondOrderMap == null)
+        if (bondOrderMap == null || apc == null)
         {
             String msg = "Attempting to get bond order, but no "
                     + "FragmentSpace defined (i.e., null BondOrderMap). "
@@ -685,38 +685,6 @@ public class FragmentSpace
         } else
         {
             return bondOrderMap.getOrDefault(apc.getRule(), BondType.UNDEFINED);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the bond order for the given APClass, if defined.
-     * 
-     * @param apclass the APclass to be converted into bond order
-     * @return the bond order as an integer, or 1 if either the Fragment space
-     *         is not defined, that is, the bond order map is <code>null</code>,
-     *         or a fully defined map does not include any mapping for the given
-     *         APClass.
-     */
-    public static BondType getBondOrderForAPClass(String apclass)
-    {
-        String apRule = apclass.split(DENOPTIMConstants.SEPARATORAPPROPSCL)[0];
-        if (bondOrderMap == null)
-        {
-            String msg = "Attempting to get bond order, but no "
-                    + "FragmentSpace defined (i.e., null BondOrderMap). "
-                    + "Assuming edge represents an " + BondType.UNDEFINED
-                    + " bond.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-
-            // Exception e = new Exception(msg);
-            // e.printStackTrace();
-
-            return BondType.UNDEFINED;
-        } else
-        {
-            return bondOrderMap.getOrDefault(apRule, BondType.UNDEFINED);
         }
     }
 

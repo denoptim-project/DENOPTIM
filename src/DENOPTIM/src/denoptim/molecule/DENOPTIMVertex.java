@@ -865,17 +865,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      *               of the source atom). This must array have 3 entries.
      */
     public void addAP(int atomPositionNumber, int atomConnections,
-                      int apConnections, double[] dirVec) {
-        try
-        {
-            addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
-                    APClass.make(""));
-        } catch (DENOPTIMException e)
-        {
-            // We should never reach this point because the make("") will
-            // result in an AP with class "noclass:0"
-            e.printStackTrace();
-        }
+                      int apConnections, double[] dirVec) 
+    {
+        addAP(atomPositionNumber, atomConnections, apConnections, dirVec,
+                    null);
     }
 
 //------------------------------------------------------------------------------
@@ -904,6 +897,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      *               of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
+    //TODO-V3 get rid of this
     public void addAP(int atomPositionNumber, int atomConnections,
                       int apConnections, double[] dirVec, APClass apClass) {
         addAP(new DENOPTIMAttachmentPoint(this,

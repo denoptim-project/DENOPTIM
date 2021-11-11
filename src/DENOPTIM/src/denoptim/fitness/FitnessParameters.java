@@ -656,7 +656,6 @@ public class FitnessParameters
     public static Double parametrized(String varName, String descName, 
             String paramsStr)
     {
-        //TODO-V3: unify treatment of third argument. It should be a String[]
         String[] params = paramsStr.split(", +");
         for (Variable v : variables)
         {

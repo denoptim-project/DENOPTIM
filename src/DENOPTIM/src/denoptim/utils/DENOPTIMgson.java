@@ -53,7 +53,6 @@ public class DENOPTIMgson
       // Custom serialized that keeps only the IDs to vertices defined in
       // the list of vertices belonging to the graph
       .registerTypeAdapter(DENOPTIMRing.class, new DENOPTIMRingSerializer())
-      //TODO-V3 add custom de/serialized for symmetric sets
       .setPrettyPrinting()
       .create();
 
@@ -73,7 +72,7 @@ public class DENOPTIMgson
     /*
      * WARNING:
      * If you have to add a Type adapter in the reader, you should consider
-     * doping it also in the GSON reader defined in DENOPTIMVertexDeserializer.
+     * doing it also in the GSON reader defined in DENOPTIMVertexDeserializer.
      */
     
   }

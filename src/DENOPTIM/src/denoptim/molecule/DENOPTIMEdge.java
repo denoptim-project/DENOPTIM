@@ -99,8 +99,7 @@ public class DENOPTIMEdge implements Serializable
     
     public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
                           DENOPTIMAttachmentPoint trgAP) {
-        this(srcAP, trgAP, FragmentSpace.getBondOrderForAPClass(
-                  srcAP.getAPClass().toString()));
+        this(srcAP, trgAP, BondType.UNDEFINED);
     }
      
 //------------------------------------------------------------------------------

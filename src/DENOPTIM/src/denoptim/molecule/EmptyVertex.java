@@ -415,7 +415,7 @@ public class EmptyVertex extends DENOPTIMVertex
     
                 //Build SDF property DENOPTIMConstants.APTAG
                 String sBO = FragmentSpace.getBondOrderForAPClass(
-                        ap.getAPClass().toString()).toOldString();
+                        ap.getAPClass()).toOldString();
                 String stBnd = " " + atmID +":"+sBO;
                 if (propAttchPnt.equals(""))
                 {

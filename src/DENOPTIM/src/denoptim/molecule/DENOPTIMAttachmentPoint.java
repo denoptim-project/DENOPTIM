@@ -260,7 +260,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                 }
             }
             this.freeConnections = FragmentSpace.getBondOrderForAPClass(
-                    apClass.getRule()).getValence();
+                    apClass).getValence();
             this.totalConnections = this.freeConnections;
         } catch (Throwable t) {
             t.printStackTrace();
