@@ -204,8 +204,8 @@ public class TestOperator
         System.out.println(" ");
     
         // Remember position of vertex chosen for xover
-        int ivmale = male.getIndexOfVertex(TestOperatorParameters.mvid);
-        int ivfemale = female.getIndexOfVertex(TestOperatorParameters.fvid);
+        int ivmale = male.indexOfVertexWithID(TestOperatorParameters.mvid);
+        int ivfemale = female.indexOfVertexWithID(TestOperatorParameters.fvid);
         // Ensure uniqueness on vertexID
         male.renumberGraphVertices();
         female.renumberGraphVertices();

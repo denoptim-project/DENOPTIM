@@ -1335,8 +1335,10 @@ public class DENOPTIMGraphTest {
 		graph.addVertex(vertex1);
 		graph.addEdge(edge0);
 
-
-		//TODO-V3 add assert statements
+		List<DENOPTIMAttachmentPoint> lst = graph.getAvailableAPs();
+		assertEquals(1,lst.size(), "Size of list");
+		assertEquals(vertex0.getVertexId(),lst.get(0).getOwner().getVertexId(),
+		        "ID of the vertex holding the available AP.");
 	}
 
 //------------------------------------------------------------------------------
@@ -1692,43 +1694,6 @@ public class DENOPTIMGraphTest {
 	public void testFromToJSON() throws Exception 
 	{
 	    DENOPTIMGraph graph = new DENOPTIMGraph();
-	    
-	    //TODO-V3 del: cannot do this without defining a fragment space
-	    /*
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<String, BondType>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
-        DENOPTIMFragment v0 = new DENOPTIMFragment();
-        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
-        Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
-        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
-        v0.addAtom(a1);
-        v0.addAtom(a2);
-        v0.addAtom(a3);
-        v0.addBond(new Bond(a1, a2));
-        v0.addBond(new Bond(a2, a3));
-        v0.addAP(a3, APClass.make(APCLASS), 
-                new Point3d(new double[]{0.0, 2.2, 3.3}));
-        v0.addAP(a3, APClass.make(APCLASS), 
-                new Point3d(new double[]{0.0, 0.0, 3.3}));
-        v0.addAP(a3, APClass.make(APCLASS), 
-                new Point3d(new double[]{0.0, 0.0, 1.1}));
-        v0.addAP(a1, APClass.make(APCLASS), 
-                new Point3d(new double[]{3.0, 0.0, 3.3}));
-        
-        ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
-        ssaps.add(new SymmetricSet(new ArrayList<Integer>(
-                Arrays.asList(0,1,2))));
-        v0.setSymmetricAPSets(ssaps);
-        v0.setVertexId(18);
-        v0.setLevel(26);
-        v0.setAsRCV(true);
-        v0.setBuildingBlockType(BBType.SCAFFOLD);
-        graph.addVertex(v0);
-        */
         
         DENOPTIMVertex v0 = new EmptyVertex(0);
         buildVertexAndConnectToGraph(v0, 3, graph);
@@ -1773,28 +1738,10 @@ public class DENOPTIMGraphTest {
         graph.addSymmetricSetOfVertices(new SymmetricSet(
                 new ArrayList<>(Arrays.asList(6, 7))));
         
-        //TODO-V3 del        
-	    // Current string encoding this graph is
-//	        "0 0_1_0_0,1_1_1_0,2_1_1_0,3_1_1_0,4_1_1_0,5_1_1_0,"
-//	              + "6_1_1_0,7_1_1_0, 0_0_1_0_1,1_1_2_0_1,2_1_3_0_1,0_1_4_0_1,"
-//	              + "4_1_5_0_1,0_2_6_0_1,4_2_7_0_1, "
-//	              + "DENOPTIMRing [verteces=[5_1_1_0, 4_1_1_0, 0_1_0_0, 1_1_1_0,"
-//	              + " 2_1_1_0, 3_1_1_0]] DENOPTIMRing [verteces=[6_1_1_0,"
-//	              + " 0_1_0_0, 4_1_1_0, 7_1_1_0]] "
-//	              + "SymmetricSet [symVrtxIds=[3, 5]] "
-//	              + "SymmetricSet [symVrtxIds=[6, 7]]";
-        
         String json1 = graph.toJson();
         
         DENOPTIMGraph g2 = DENOPTIMGraph.fromJson(json1);
         String json2 = g2.toJson();
-
-        //TODO-V3 remove. Tested, and confirmed graph.toString().equals(g2.toString() == true
-        /*
-        System.out.println("1:" + graph.toString());
-        System.out.println("2:" + g2.toString());
-        assertTrue(graph.toString().equals(g2.toString()), "Round-trip via JSON and toString.");
-        */
         
         assertTrue(json1.equals(json2), "Round-trip via JSON is successful");
 	}

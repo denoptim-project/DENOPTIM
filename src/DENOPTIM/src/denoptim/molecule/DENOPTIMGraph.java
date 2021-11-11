@@ -1541,7 +1541,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public DENOPTIMVertex getVertexWithId(int vid)
     {
         DENOPTIMVertex v = null;
-        int idx = getIndexOfVertex(vid);
+        int idx = indexOfVertexWithID(vid);
         if (idx != -1)
             v = gVertices.get(idx);
         return v;
@@ -1549,8 +1549,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
-    //TODO-V3 rename to mean it works on ID
-    public int getIndexOfVertex(int vid)
+    /**
+     * Returns the position of the first vertex that has the given ID.
+     * @param vid the vertedID of the vertex we are looking for.
+     * @return the index in the list of vertexes.
+     */
+    public int indexOfVertexWithID(int vid)
     {
         int idx = -1;
         for (int i=0; i<gVertices.size(); i++)

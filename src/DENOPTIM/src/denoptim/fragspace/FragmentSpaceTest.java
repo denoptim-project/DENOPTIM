@@ -633,7 +633,7 @@ public class FragmentSpaceTest
         DENOPTIMGraph innerGraph = g.clone();
         innerGraph.renumberGraphVertices();
         DENOPTIMVertex c3Inner = innerGraph.getVertexAtPosition(g
-                .getIndexOfVertex(c3.getVertexId()));
+                .indexOfVertexWithID(c3.getVertexId()));
         innerGraph.removeVertex(c3Inner);
 
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);

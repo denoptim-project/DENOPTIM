@@ -37,7 +37,6 @@ public class DENOPTIMgson
   
 //------------------------------------------------------------------------------
 
-
   private DENOPTIMgson()
   {
     writer = new GsonBuilder()

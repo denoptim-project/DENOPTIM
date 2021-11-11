@@ -678,9 +678,6 @@ public class FragmentSpace
                     + " bond.";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
 
-            // Exception e = new Exception(msg);
-            // e.printStackTrace();
-
             return BondType.UNDEFINED;
         } else
         {

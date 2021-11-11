@@ -62,7 +62,7 @@ public class DENOPTIMLogger
     
     public void setupLogger(String logFile) throws IOException
     {
-    	//TODO: this is a hack to allow changing setup and use the singleton
+    	//TODO-V3: this is a hack to allow changing setup and use the singleton
     	// logger for two different and independent experiments run is a 
     	// sequence (parallelization not possible yet.
     	
@@ -105,10 +105,9 @@ public class DENOPTIMLogger
     }
 
 //------------------------------------------------------------------------------
-    // avoid cloning
 
     /**
-     *
+     * Clone is not supported!
      * @return
      * @throws CloneNotSupportedException
      */
@@ -118,5 +117,6 @@ public class DENOPTIMLogger
         throw new CloneNotSupportedException();
     }
     
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------  
+    
 }

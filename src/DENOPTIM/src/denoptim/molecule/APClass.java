@@ -1,6 +1,5 @@
 package denoptim.molecule;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,23 +12,17 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 
-public class APClass implements Cloneable,Comparable<APClass>,Serializable
-{
-    
-    //TODO-V3 remove serializable interface once json serializer has replaces
-    // object based serialization.
-    
+public class APClass implements Cloneable,Comparable<APClass>
+{   
     /**
      * Version UID
      */
-    private static final long serialVersionUID = 6888932496975573345L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * The main feature of the APClass. This would usually correspond to the
