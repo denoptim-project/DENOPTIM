@@ -162,7 +162,10 @@ public class GUIPrepare extends GUICardPanel
 						+ "(GUI) makes it dependent on "
 						+ "the GUI itself. Therefore, if the GUI is closed "
 						+ "or shut down, "
-						+ "the experiment will be terminated as well.</p><br>";
+						+ "the experiment will be terminated as well.</p>"
+						+ "<p>To avoid this, consider running your experiment "
+						+ "as a batch process disconnected from the GUI.</p>"
+						+ "<br>";
 				msg = msg + StaticTaskManager.getQueueSnapshot();
 				msg = msg + "<p>Continue?</p></body></html>";
 				//TODO: add capability of running in the background
@@ -182,7 +185,7 @@ public class GUIPrepare extends GUICardPanel
 						try {
 							GUIInvokedMainTask task = buildMainCall();
 							File wrkSpace = prepareWorkSpace();
-							File paramFile = instatiateParametersFile(wrkSpace);
+							File paramFile = instantiateParametersFile(wrkSpace);
 							if (printAllParamsToFile(paramFile))
 							{
 								task.setConfigFile(paramFile);
@@ -366,7 +369,7 @@ public class GUIPrepare extends GUICardPanel
 	
 //------------------------------------------------------------------------------
 	
-	private File instatiateParametersFile(File wrkSpace)
+	private File instantiateParametersFile(File wrkSpace)
 	{
 		String baseName = getAchronimFromClass() + ".params";
 		File paramFile = new File (wrkSpace.getAbsolutePath() 

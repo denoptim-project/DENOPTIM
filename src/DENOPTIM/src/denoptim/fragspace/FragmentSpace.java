@@ -54,6 +54,11 @@ import static denoptimga.DENOPTIMGraphOperations.extractPattern;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
+
+// TODO: this will have to become thread specific if we want to allow multiple 
+// GA/FSE runs to occur within the same JVM, but on different threads. A use
+// case would be preparing and submitting multiple GA experiments from the GUI
+
 public class FragmentSpace
 {
     /**

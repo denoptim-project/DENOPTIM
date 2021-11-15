@@ -10,10 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JProgressBar;
 
+import denoptim.fragspace.FragmentSpace;
+import denoptim.logging.DENOPTIMLogger;
+
 /**
  * Manager for tasks submitted by the GUI. The main purpose is to launch and
  * manage calls placed upon requests coming from the GUI and aimed at
- * running DENOPTIM's main classes in DenoptimGS and FragSpaceExplorer.
+ * running DENOPTIM's main classes in DenoptimGA and FragSpaceExplorer.
  * 
  * @author Marco Foscato
  */
@@ -37,7 +40,8 @@ public class StaticTaskManager
 			new HashMap<Task,Future<?>>();
 	
 	/**
-	 * Number of threads
+	 * Number of threads. Only one for now and as long as the 
+	 * {@link FragmentSpace} and {@link DENOPTIMLogger} will be static objects.
 	 */
 	private static final int maxthreads = 1;
 	

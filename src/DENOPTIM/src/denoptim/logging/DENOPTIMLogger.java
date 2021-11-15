@@ -32,7 +32,11 @@ import java.util.logging.XMLFormatter;
  * @author Vishwesh Venkatraman
  */
 
-//TODO-V3: singleton by design. Will have to be changed into a thread-specific class
+//TODO: this singleton by design. It will have to be changed into a 
+// thread-specific class. However, this change makes sense only is the fragment 
+// space becomes thread-specific as well. Now, both logger and fragment space 
+// are static objects,
+// so running multiple GS experiments on different threads is not possible.
 
 public class DENOPTIMLogger 
 {
@@ -62,10 +66,6 @@ public class DENOPTIMLogger
     
     public void setupLogger(String logFile) throws IOException
     {
-    	//TODO-V3: this is a hack to allow changing setup and use the singleton
-    	// logger for two different and independent experiments run is a 
-    	// sequence (parallelization not possible yet.
-    	
     	int n = appLogger.getHandlers().length;
     	for (int i=0; i<n; i++)
     	{
