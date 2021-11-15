@@ -683,12 +683,18 @@ public class EvolutionaryAlgorithm
 
         // Check if the population has changed
         boolean hasChanged = false;
-        for (Candidate mol : population)
+        synchronized (population)
         {
-            if (!initUIDs.contains(mol.getUID()))
+            //TODO: this should be done more efficiently by making the population class 
+            // have an atomic integer with the update value and compare that value
+            // with the value originally there when initUIDs wa created.
+            for (Candidate mol : population)
             {
-                hasChanged = true;
-                break;
+                if (!initUIDs.contains(mol.getUID()))
+                {
+                    hasChanged = true;
+                    break;
+                }
             }
         }
         initUIDs.clear();
