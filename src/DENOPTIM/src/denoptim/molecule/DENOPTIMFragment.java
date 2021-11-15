@@ -19,10 +19,14 @@ package denoptim.molecule;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.vecmath.Point3d;
 
@@ -602,57 +606,36 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     public void projectAPsToProperties()
     {
-        //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
-
-    	String propAPClass = "";
-        String propAttchPnt = "";
+        
+        // Prepare the string-representation of unused APs on this graph
+        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom =
+                new LinkedHashMap<>();
         for (IAtom atm : mol.atoms())
-        {
-        	//WARNING: here is the 1-based criterion implemented.
-            // This is done also in ThreeDimTreeBuilder!
-        	int atmID = mol.getAtomNumber(atm)+1;
-        	
-        	if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
+        {   
+            if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
             {
-        		continue;
+                continue;
             }
-        	
-        	ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
-        			getAPListFromAtom(atm);
-	        
-	        boolean firstCL = true;
-	        for (int i = 0; i<apsOnAtm.size(); i++)
-	        {
-			    DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
-	
-			    //Build SDF property DENOPTIMConstants.APCVTAG
-			    String stingAPP = ""; //String Attachment Point Property
-			    if (firstCL)
-			    {
-					firstCL = false;
-					stingAPP = ap.getSingleAPStringSDF(true);
-			    } 
-			    else 
-			    {
-			    	stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
-			    			+ ap.getSingleAPStringSDF(false);
-			    }
-			    propAPClass = propAPClass + stingAPP;
-	
-			    //Build SDF property DENOPTIMConstants.APTAG
-			    String sBO = FragmentSpace.getBondOrderForAPClass(
-                        ap.getAPClass()).toOldString();
-			    String stBnd = " " + atmID +":"+sBO;
-			    if (propAttchPnt.equals(""))
-			    {
-	                stBnd = stBnd.substring(1);
-			    }
-			    propAttchPnt = propAttchPnt + stBnd;
-			}
-	        propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
-	    }
-        mol.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
-        mol.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+            int atmID = mol.indexOf(atm);
+            ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
+                    getAPListFromAtom(atm);
+            for (DENOPTIMAttachmentPoint ap : apsOnAtm)
+            {
+                if (apsPerAtom.containsKey(atmID))
+                {
+                    apsPerAtom.get(atmID).add(ap);
+                } else {
+                    List<DENOPTIMAttachmentPoint> lst = 
+                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    lst.add(ap);
+                    apsPerAtom.put(atmID,lst);
+                }
+            }
+        }
+        //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
+        String[] pair = DenoptimIO.getAPDefinitionsForSDF(apsPerAtom);
+        mol.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
+        mol.setProperty(DENOPTIMConstants.APTAG, pair[1]);
     }
 
 //-----------------------------------------------------------------------------

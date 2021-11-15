@@ -287,7 +287,7 @@ public class DENOPTIMEdge implements Serializable
                 .append(srcAPID).append("_").
                 append(trgVertex.getVertexId()).append("_")
                 .append(trgAPID).append("_").
-                append(bondType.toOldString());
+                append(bondType.toString());
         if (srcAP.getAPClass()!=null && trgAP.getAPClass()!=null)
         {
             sb.append("_").append(srcAP.getAPClass()).append("_").append(
@@ -317,8 +317,8 @@ public class DENOPTIMEdge implements Serializable
 
         NONE, UNDEFINED, ANY, SINGLE, DOUBLE, TRIPLE, QUADRUPLE;
 
-        //TODO-V3: this is to be consistent with old "int-based" internal
-        // convention. Eventually, we'll not need this anymore.
+        // This is to be consistent with old "int-based" internal
+        // convention.
         private String oldString = "1";
 
         private int valenceUsed = 0;

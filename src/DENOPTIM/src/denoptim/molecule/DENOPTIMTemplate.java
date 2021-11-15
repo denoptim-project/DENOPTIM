@@ -497,9 +497,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // the atom list of the entire molecular representation of the 
             // templates.
             // And we collects the outer APs per atom at the same time
-            Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
-                    new TreeMap<>();
-            for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) {
+            LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
+                    new LinkedHashMap<>();
+            for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) 
+            {
                 DENOPTIMAttachmentPoint inAP = getInnerAPFromOuterAP(outAP);
                 outAP.setDirectionVector(inAP.getDirectionVector());
                 int atmIndexInMol = inAP.getAtomPositionNumberInMol();
@@ -523,50 +524,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             }
             
             // Prepare SDF-like string for atom container
-            // Done as in  DENOPTIMFragment.projectAPsToProperties
-            String propAPClass = "";
-            String propAttchPnt = "";
-            for (Integer ii : apsPerAtom.keySet())
-            {
-                //WARNING: here is the 1-based criterion implemented
-                int atmID = ii+1;
-                
-                List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerAtom.get(ii);
-                
-                boolean firstCL = true;
-                for (int i = 0; i<apsOnAtm.size(); i++)
-                {
-                    DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
-        
-                    //Build SDF property DENOPTIMConstants.APCVTAG
-                    String stingAPP = ""; //String Attachment Point Property
-                    if (firstCL)
-                    {
-                        firstCL = false;
-                        stingAPP = ap.getSingleAPStringSDF(true);
-                    } 
-                    else 
-                    {
-                        stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
-                                + ap.getSingleAPStringSDF(false);
-                    }
-                    propAPClass = propAPClass + stingAPP;
-        
-                    //Build SDF property DENOPTIMConstants.APTAG
-                    String sBO = FragmentSpace.getBondOrderForAPClass(
-                            ap.getAPClass()).toOldString();
-                    String stBnd = " " + atmID +":"+sBO;
-                    if (propAttchPnt.equals(""))
-                    {
-                        stBnd = stBnd.substring(1);
-                    }
-                    propAttchPnt = propAttchPnt + stBnd;
-                }
-                propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
-            }
-
-            iac.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
-            iac.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+            String[] pair = DenoptimIO.getAPDefinitionsForSDF(apsPerAtom);
+            iac.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
+            iac.setProperty(DENOPTIMConstants.APTAG, pair[1]);
+            
             iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
             
             iac.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);

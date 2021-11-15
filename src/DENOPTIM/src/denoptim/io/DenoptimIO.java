@@ -59,6 +59,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -1406,7 +1407,7 @@ public class DenoptimIO
         for (String apc : keysBO) {
             sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
             sb.append(apc).append(" ").append(
-                    boMap.get(apc).toOldString()).append(NL);
+                    boMap.get(apc).toString()).append(NL);
         }
 
         sb.append(DENOPTIMConstants.APCMAPIGNORE);
@@ -3137,6 +3138,74 @@ public class DenoptimIO
             DENOPTIMLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
                     + "write list of recent files.", e);
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Prepares the two strings that can be used to define 
+     * {@link DENOPTIMAttachmentPoint}s in SDF files.
+     * @param apsPerIndex a map of {@link DENOPTIMAttachmentPoint}s grouped by 
+     * index. The index may or may not be an index of an existing atom (i.e.,
+     * we do not use it as such, but we just place if in the text-representation
+     * of the AP. This index is supposed to be 0-based (i.e., in this method it 
+     * is transformed in 1-based).
+     * @return a pairs of strings: the first is meant for the 
+     * {@link DENOPTIMConstants#APCVTAG} tag and the second for the
+     * {@link DENOPTIMConstants#APTAG} tag 
+     */
+    
+    // WARNING: here is a place where we still assume a fixed order of APs
+    // In fact, the order in which we process the keys is given by the comparable
+    // class Integer, i.e., the APs are reported in SDF following the ordering
+    // of the respective source atoms.
+    
+    public static String[] getAPDefinitionsForSDF(
+            LinkedHashMap<Integer, List<DENOPTIMAttachmentPoint>> apsPerIndex)
+    {   
+        String propAPClass = "";
+        String propAttchPnt = "";
+        for (Integer ii : apsPerIndex.keySet())
+        {
+            //WARNING: here is the 1-based criterion implemented also for
+            // fake atom IDs!
+            int atmID = ii+1;
+
+            List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerIndex.get(ii);
+            
+            boolean firstCL = true;
+            for (int i = 0; i<apsOnAtm.size(); i++)
+            {
+                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+                
+                //Build SDF property DENOPTIMConstants.APCVTAG
+                String stingAPP = ""; //String Attachment Point Property
+                if (firstCL)
+                {
+                    firstCL = false;
+                    stingAPP = ap.getSingleAPStringSDF(true,atmID);
+                } else {
+                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
+                            + ap.getSingleAPStringSDF(false,atmID);
+                }
+                propAPClass = propAPClass + stingAPP;
+    
+                //Build SDF property DENOPTIMConstants.APTAG
+                String sBO = FragmentSpace.getBondOrderForAPClass(
+                        ap.getAPClass()).toString();
+                String stBnd = " " + atmID +":"+sBO;
+                if (propAttchPnt.equals(""))
+                {
+                    stBnd = stBnd.substring(1);
+                }
+                propAttchPnt = propAttchPnt + stBnd;
+            }
+            propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
+        }
+        String[] result = new String[2];
+        result[0] = propAPClass;
+        result[1] = propAttchPnt;
+        return result;
     }
     
 //------------------------------------------------------------------------------

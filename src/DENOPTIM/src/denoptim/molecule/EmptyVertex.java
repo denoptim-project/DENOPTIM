@@ -22,9 +22,11 @@ import java.lang.reflect.Type;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.openscience.cdk.AtomContainer;
@@ -38,6 +40,7 @@ import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMVertex.VertexType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
@@ -369,7 +372,8 @@ public class EmptyVertex extends DENOPTIMVertex
         // We need to get the APs sorted by pseudo-atom source ID. This
         // to write the CLASS and ATTACHMENT_PPOINT fields of the SDF.
         
-        Map<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = new TreeMap<>();
+        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
+                new LinkedHashMap<>();
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
         {
             int atmSrcId = ap.getAtomPositionNumber();
@@ -383,51 +387,9 @@ public class EmptyVertex extends DENOPTIMVertex
                 apsPerAtom.put(atmSrcId, list);
             }
         }
-        // This is largely as done in  DENOPTIMFragment.projectAPsToProperties
-        String propAPClass = "";
-        String propAttchPnt = "";
-        for (Integer ii : apsPerAtom.keySet())
-        {
-            //WARNING: here is the 1-based criterion implemented also for
-            // fake atom IDs!
-            int atmID = ii+1;
-            
-            List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerAtom.get(ii);
-            
-            boolean firstCL = true;
-            for (int i = 0; i<apsOnAtm.size(); i++)
-            {
-                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
-    
-                //Build SDF property DENOPTIMConstants.APCVTAG
-                String stingAPP = ""; //String Attachment Point Property
-                if (firstCL)
-                {
-                    firstCL = false;
-                    stingAPP = ap.getSingleAPStringSDF(true);
-                } 
-                else 
-                {
-                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
-                            + ap.getSingleAPStringSDF(false);
-                }
-                propAPClass = propAPClass + stingAPP;
-    
-                //Build SDF property DENOPTIMConstants.APTAG
-                String sBO = FragmentSpace.getBondOrderForAPClass(
-                        ap.getAPClass()).toOldString();
-                String stBnd = " " + atmID +":"+sBO;
-                if (propAttchPnt.equals(""))
-                {
-                    stBnd = stBnd.substring(1);
-                }
-                propAttchPnt = propAttchPnt + stBnd;
-            }
-            propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
-        }
-
-        iac.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
-        iac.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+        String[] pair = DenoptimIO.getAPDefinitionsForSDF(apsPerAtom);
+        iac.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
+        iac.setProperty(DENOPTIMConstants.APTAG, pair[1]);
         iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
         return iac;

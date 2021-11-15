@@ -129,25 +129,26 @@ public class DENOPTIMFragmentTest
         frg1.addAtom(a3);
         frg1.addBond(new Bond(a1, a2));
         frg1.addBond(new Bond(a2, a3));
-        frg1.addAPOnAtom(a1, APClass.make(APCLASS),
+        frg1.addAPOnAtom(a1, APClass.make(APCLASS),              // 0
                 new Point3d(new double[]{1.0, 2.5, 3.3}));
-        frg1.addAPOnAtom(a1, APClass.make(APRULE+APCSEP+"2"),
+        frg1.addAPOnAtom(a1, APClass.make(APRULE+APCSEP+"2"),    // 1
                 new Point3d(new double[]{2.0, -2.5, 3.3}));
-        frg1.addAPOnAtom(a1, APClass.make(APRULE+APCSEP+"3"),
+        frg1.addAPOnAtom(a1, APClass.make(APRULE+APCSEP+"3"),    // 2
                 new Point3d(new double[]{-2.0, -2.5, 3.3}));
-        frg1.addAPOnAtom(a2, APClass.make(APCLASS),
+        frg1.addAPOnAtom(a2, APClass.make(APCLASS),              // 3
                 new Point3d(new double[]{2.5, 2.5, 3.3}));
-        frg1.addAPOnAtom(a3, APClass.make(APCLASS),
+        frg1.addAPOnAtom(a3, APClass.make(APCLASS),              // 4
                 new Point3d(new double[]{3.0, 2.5, 3.3}));
-        frg1.addAPOnAtom(a3, APClass.make(APRULE+APCSEP+"2"),
+        frg1.addAPOnAtom(a3, APClass.make(APRULE+APCSEP+"2"),    // 5
                 new Point3d(new double[]{4.0, -2.5, 3.3}));
-        frg1.addAPOnAtom(a3, APClass.make(APRULE+APCSEP+"4"),
+        frg1.addAPOnAtom(a3, APClass.make(APRULE+APCSEP+"4"),    // 6
                 new Point3d(new double[]{-4.0, -2.5, 3.3}));
         frg1.projectAPsToProperties();
         
         IAtomContainer iac = frg1.getIAtomContainer();
         
-        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.UNDEFINED);
+        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac, 
+                DENOPTIMVertex.BBType.UNDEFINED);
         
         assertEquals(7,frg1.getNumberOfAPs(),"#APs in frg1");
         assertEquals(7,frg2.getNumberOfAPs(),"#APs in frg2");

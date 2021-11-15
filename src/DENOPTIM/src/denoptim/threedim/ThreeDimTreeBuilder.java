@@ -21,7 +21,11 @@ package denoptim.threedim;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 import javax.vecmath.AxisAngle4d;
@@ -408,64 +412,31 @@ public class ThreeDimTreeBuilder
         }
         
         // Prepare the string-representation of unused APs on this graph
-        Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> freeAPPerAtm =
-                new HashMap<IAtom,ArrayList<DENOPTIMAttachmentPoint>>();
+        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> freeAPPerAtm =
+                new LinkedHashMap<>();
         for (IAtom a : apsPerAtom.keySet())
         {
+            int atmID = mol.indexOf(a);
             ArrayList<DENOPTIMAttachmentPoint> aps = apsPerAtom.get(a);
             for (DENOPTIMAttachmentPoint ap : aps)
             {
                 if (ap.isAvailableThroughout())
                 {
-                    if (freeAPPerAtm.containsKey(a))
+                    if (freeAPPerAtm.containsKey(atmID))
                     {
-                        freeAPPerAtm.get(a).add(ap);
+                        freeAPPerAtm.get(atmID).add(ap);
                     } else {
-                        ArrayList<DENOPTIMAttachmentPoint> lst = 
+                        List<DENOPTIMAttachmentPoint> lst = 
                                 new ArrayList<DENOPTIMAttachmentPoint>();
                         lst.add(ap);
-                        freeAPPerAtm.put(a,lst);
+                        freeAPPerAtm.put(atmID,lst);
                     }
                 }
             }
         }
-        String propAPClass = "";
-        String propAttchPnt = "";
-        for (IAtom a : freeAPPerAtm.keySet())
-        {
-            ArrayList<DENOPTIMAttachmentPoint> aps = freeAPPerAtm.get(a);
-            int atmID = mol.indexOf(a)+1;
-            boolean firstCL = true;
-            for (DENOPTIMAttachmentPoint ap : aps)
-            {
-                //Build SDF property DENOPTIMConstants.APCVTAG
-                String stingAPP = ""; //String Attachment Point Property
-                if (firstCL)
-                {
-                    firstCL = false;
-                    stingAPP = ap.getSingleAPStringSDF(true,atmID);
-                } else {
-                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
-                            + ap.getSingleAPStringSDF(false,atmID);
-                }
-                propAPClass = propAPClass + stingAPP;
-    
-                //Build SDF property DENOPTIMConstants.APTAG
-                String sBO = FragmentSpace.getBondOrderForAPClass(
-                        ap.getAPClass()).toOldString();
-                String stBnd = " " + atmID +":"+sBO;
-                if (propAttchPnt.equals(""))
-                {
-                    stBnd = stBnd.substring(1);
-                }
-                propAttchPnt = propAttchPnt + stBnd;
-            }
-            propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
-            
-            
-        }
-        mol.setProperty(DENOPTIMConstants.APCVTAG,propAPClass);
-        mol.setProperty(DENOPTIMConstants.APTAG,propAttchPnt);
+        String[] pair = DenoptimIO.getAPDefinitionsForSDF(freeAPPerAtm);
+        mol.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
+        mol.setProperty(DENOPTIMConstants.APTAG, pair[1]);
         
         // Add usual graph-related string-based data to SDF properties
         GraphUtils.writeSDFFields(mol, graph);
