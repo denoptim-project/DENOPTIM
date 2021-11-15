@@ -29,6 +29,7 @@ import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecule.DENOPTIMAttachmentPoint;
 
 
 /**
@@ -337,7 +338,7 @@ public final class DENOPTIMConstants
     public static final String BONDPROPROTATABLE = "DENOPTIMRotable";
 
     /**
-     * Recognized types of RingClosingAttractor and compatible types
+     * Recognised types of RingClosingAttractor and compatible types
      */
     public static final Map<String,String> RCATYPEMAP =
 		    new HashMap<String,String>() 
@@ -370,7 +371,7 @@ public final class DENOPTIMConstants
     public static final String SEPARATORAPPROPAAP = "#";
     
     /**
-     * Separator between APClass and APSubClass and coords
+     * Separator between APClass and APSubClass and coordinates.
      */
     public static final String SEPARATORAPPROPSCL = ":";
     
@@ -379,4 +380,27 @@ public final class DENOPTIMConstants
      */
     public static final String SEPARATORAPPROPXYZ = "%";
 
+    /**
+     * Key for {@link IAtomContainer} property containing the map of 
+     * {@link DENOPTIMAttachmentPoint}s per vertex ID. 
+     */
+    public static final Object MOLPROPAPxVID = "APsPerVertexID";
+
+    /**
+     * Key for {@link IAtomContainer} property containing the map of 
+     * {@link DENOPTIMAttachmentPoint}s per edge. 
+     */
+    public static final Object MOLPROPAPxEDGE = "APsPerEdge";
+    
+    /**
+     * Key for {@link IAtomContainer} property containing the map of 
+     * {@link DENOPTIMAttachmentPoint}s per vertex ID. 
+     */
+    public static final Object MOLPROPAPxATOM = "APsPerAtom";
+    
+    /**
+     * Key for {@link IAtomContainer} property containing the map of 
+     * {@link DENOPTIMAttachmentPoint}s per atom. 
+     */
+    public static final Object MOLPROPAPxBOND = "APsPerBond";
 }

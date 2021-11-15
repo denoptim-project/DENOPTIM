@@ -418,17 +418,10 @@ public class PathSubGraph
         // Build molecular representation 
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
-        // and get the information on APs
-        /*
-        Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
-                                                        tb.getApsPerVertexId();
-        Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
-                                                            tb.getApsPerEdge();
-        */
-        Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom =
-                                                            tb.getApsPerAtom();
+        Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom = 
+                iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxATOM);
         Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
-                                                            tb.getApsPerBond();
+                iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxBOND);
 
     	if (debug)
     	{
