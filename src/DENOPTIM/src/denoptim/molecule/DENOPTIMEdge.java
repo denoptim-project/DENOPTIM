@@ -394,11 +394,17 @@ public class DENOPTIMEdge implements Serializable
         }
 
         /**
-         * @param string to be parsed
-         * @return the corresponding bond type, if known, or UNDEFINED.
+         * @param string to be parsed.
+         * @return the corresponding bond type, if the string corresponds to a
+         * known value, or UNDEFINED.
          */
         public static BondType parseStr(String string)
         {
+            for (BondType bt : BondType.values())
+            {
+                if (bt.name().equals(string.trim().toUpperCase()))
+                    return bt;
+            }
             switch (string.trim())
             {
                 case "1":

@@ -687,7 +687,7 @@ public class EvolutionaryAlgorithm
         {
             //TODO: this should be done more efficiently by making the population class 
             // have an atomic integer with the update value and compare that value
-            // with the value originally there when initUIDs wa created.
+            // with the value originally there when initUIDs was created.
             for (Candidate mol : population)
             {
                 if (!initUIDs.contains(mol.getUID()))

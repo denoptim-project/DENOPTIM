@@ -28,18 +28,23 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.ListSelectionModel;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -451,14 +456,17 @@ public class GUIVertexInspector extends GUICardPanel
 					// if multihapto, then use all the selected atoms for 1 AP
 					// and ask to select another set for other end of bond to 
 					// break.
+				    
+	                List<APClass> selectedAPCs = choseOrCreateNewAPClass(
+	                        btnAtmToAP, true);
 					
-					String apClass;
-					try {
-						apClass = ensureGoodAPClassString("",false,btnAtmToAP);
-					} catch (Exception e1) {
+	                //The size of the list is either 0 or 1
+					if (selectedAPCs.size() == 0)
+					{
 						// We have pressed cancel or closed the dialog, so abandon
 						return;
 					}
+					String apClass = selectedAPCs.get(0).toString();
 					
 					ArrayList<IAtom> failed = new ArrayList<IAtom>();
 					for (IAtom atm : selectedAtms)
@@ -1246,8 +1254,95 @@ public class GUIVertexInspector extends GUICardPanel
   		
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   	}
-
+  	
 //----------------------------------------------------------------------------
+
+  	/**
+  	 * Runs a dialog aimed at selecting an existing APClass or defining a new
+  	 * one.
+  	 * @param parent the component the dialog window will the bound to.
+  	 * @param singleSelection use <code>true</code> to restrict the choice to
+  	 * a single APClass.
+  	 * @return
+  	 */
+  	public static List<APClass> choseOrCreateNewAPClass(JComponent parent,
+  	        boolean singleSelection)
+  	{
+        // To facilitate selection of existing APCs we offer a list...
+        DefaultListModel<String> apClassLstModel =
+              new DefaultListModel<String>();
+        JList<String> apClassList = new JList<String>(apClassLstModel);
+        for (String apc : APClass.getAllAPClassesAsString())
+        {
+            apClassLstModel.addElement(apc);
+        }
+        //...and to the list we add the option to create a new APClass.
+        apClassLstModel.addElement(
+              "<html><b><i>Define a new APClass...<i></b></html>");
+        if (singleSelection)
+        {
+            apClassList.setSelectionMode(
+                    ListSelectionModel.SINGLE_SELECTION);
+  	    } else {
+            apClassList.setSelectionMode(
+                    ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        }
+        if (apClassList.getModel().getSize() == 1)
+        {
+            apClassList.setSelectedIndex(0);
+        }
+      
+        //Make and launch dialog for the user to make the selection
+        JPanel chooseApPanel = new JPanel();
+        JLabel header = new JLabel("Choose APClass:");
+        JScrollPane apClassScroll = new JScrollPane(apClassList);
+        chooseApPanel.add(header);
+        chooseApPanel.add(apClassScroll);
+      
+        int res = JOptionPane.showConfirmDialog(parent,
+              chooseApPanel, 
+              "Choose APClasses to Add", 
+              JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.PLAIN_MESSAGE, 
+              null);
+        if (res != JOptionPane.OK_OPTION)
+        {
+          return new ArrayList<APClass>();
+        }
+      
+        // Interpret the selection made by the user
+        ArrayList<APClass> selectedSPCs = new ArrayList<APClass>();
+        int[] selectedIds = apClassList.getSelectedIndices();
+        if (selectedIds.length > 0)
+        {
+            for (int ii=0; ii<selectedIds.length; ii++)
+            {
+                APClass apc = null;
+                Integer idAPC = selectedIds[ii];
+                
+                try {
+                    if (idAPC.intValue() == (apClassLstModel.size()-1))
+                    {
+                        // We chose to create a new class
+                        apc = APClass.make(GUIVertexInspector
+                              .ensureGoodAPClassString("", 
+                                  "Define APClass", 
+                                  false,
+                                  parent));
+                    } else {
+                        apc = APClass.make(apClassLstModel.getElementAt(idAPC));
+                    }
+                } catch (Exception e1) {
+                    // We have pressed cancel or closed the dialog: abandon
+                    continue;
+                }
+                selectedSPCs.add(apc);
+            }
+        }
+  	    return selectedSPCs;
+  	}
+  	
+//------------------------------------------------------------------------------
   	
   	/**
   	 * Forces the user to specify a properly formatted APClass.

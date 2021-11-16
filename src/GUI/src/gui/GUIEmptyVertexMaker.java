@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -130,70 +131,13 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
         btnAPInsert.setToolTipText("Click to add an attachment point.");
         btnAPInsert.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                String apClass = "none";
-                // To facilitate selection of existing APCs we offer a list...
-                DefaultListModel<String> apClassLstModel =
-                        new DefaultListModel<String>();
-                JList<String> apClassList = new JList<String>(apClassLstModel);
-                for (String apc : APClass.getAllAPClassesAsString())
+                List<APClass> selectedAPCs = 
+                        GUIVertexInspector.choseOrCreateNewAPClass(btnAPInsert,
+                                false);
+                for (APClass apc : selectedAPCs)
                 {
-                    apClassLstModel.addElement(apc);
-                }
-                //...and to the list we add the option to create a new APClass.
-                apClassLstModel.addElement(
-                        "<html><b><i>Define a new APClass...<i></b></html>");
-                apClassList.setSelectionMode(
-                        ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                if (apClassList.getModel().getSize() == 1)
-                {
-                    apClassList.setSelectedIndex(0);
-                }
-                
-                //Make and launch dialog for the user to make the selection
-                JPanel chooseApPanel = new JPanel();
-                JLabel header = new JLabel("Choose APClass:");
-                JScrollPane apClassScroll = new JScrollPane(apClassList);
-                chooseApPanel.add(header);
-                chooseApPanel.add(apClassScroll);
-                
-                int res = JOptionPane.showConfirmDialog(btnAPInsert,
-                        chooseApPanel, 
-                        "Choose APClasses to Add", 
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE, 
-                        null);
-                if (res != JOptionPane.OK_OPTION)
-                {
-                    return;
-                }
-                
-                // Interpret the selection made by the user
-                int[] selectedIds = apClassList.getSelectedIndices();
-                if (selectedIds.length > 0)
-                {
-                    for (int ii=0; ii<selectedIds.length; ii++)
-                    {
-                        Integer idAPC = selectedIds[ii];
-                        if (idAPC.intValue() == (apClassLstModel.size()-1))
-                        {
-                            // We chose to create a new class 
-                            try {
-                                APClass apc = APClass.make(GUIVertexInspector
-                                        .ensureGoodAPClassString("", 
-                                                "Define APClass", 
-                                                false,
-                                                btnAPInsert));
-                                apClass = apc.toString();
-                            } catch (Exception e1) {
-                                // We have pressed cancel or closed the dialog: abandon
-                                return;
-                            }
-                        } else {
-                            apClass = apClassLstModel.getElementAt(idAPC);
-                        }
-                        apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,
-                            apClass});
-                    }
+                    apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,
+                            apc.toString()});
                 }
             }
         });

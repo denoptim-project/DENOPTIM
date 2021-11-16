@@ -679,7 +679,8 @@ public class FragmentSpace
         {
             String msg = "Attempting to get bond order, but no "
                     + "FragmentSpace defined (i.e., null BondOrderMap). "
-                    + "Assuming edge represents an " + BondType.UNDEFINED
+                    + "Assuming edge/APClass represents an " 
+                    + BondType.UNDEFINED
                     + " bond.";
             DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
 
