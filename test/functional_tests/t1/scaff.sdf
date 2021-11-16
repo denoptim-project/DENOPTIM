@@ -44,11 +44,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 2#sArF:1:2.5397%-3.3299%3.1451 3#sArF:1:4.7672%-4.4227%4.1621 4#sArF:1:5.2028%-4.4195%6.8365 5#sArF:1:3.3580%-3.3023%8.4962 6#sArF:1:1.1649%-2.1913%7.5250 17#MCp:0:-1.5928%0.1309%2.1036,MCp:0:0.7868%1.6964%5.0236
-
-> <ATTACHMENT_POINT>
-2:1 3:1 4:1 5:1 6:1 17:2
 
 $$$$
 Fragment
@@ -63,11 +60,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#sArF:0:2.7020%-3.3049%4.4875
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -84,11 +78,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCp:0:-0.4236%7.1328%4.3877,MCp:0:0.6334%4.1375%5.2975
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -103,11 +94,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MArene:0:-1.8423%4.3649%8.5709,MCO:0:-1.7526%1.6900%10.3053,MCO:0:0.0423%1.8277%8.5333,MCO:0:0.2721%3.2745%10.6729
-
-> <ATTACHMENT_POINT>
-1:4
 
 $$$$
 Fragment
@@ -199,11 +187,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 21#MArene:1:-1.0010%3.0770%9.3440 22#MCp:1:0.0803%5.6321%4.8318
-
-> <ATTACHMENT_POINT>
-21:1 22:1
 
 $$$$
 Fragment
@@ -222,11 +207,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 2#MCO:1:-1.0028%3.0620%9.3583
-
-> <ATTACHMENT_POINT>
-2:1
 
 $$$$
 Fragment
@@ -245,11 +227,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 2#MCO:1:-1.0019%3.0614%9.3634
-
-> <ATTACHMENT_POINT>
-2:1
 
 $$$$
 Fragment
@@ -295,11 +274,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCl:0:1.5552%-0.8854%1.5509,MCl:0:2.2426%-0.8770%4.8284,MCp:0:1.3020%2.4116%3.3078 3#MCl:0:7.6880%1.1507%-0.5485,MCp:0:8.2890%-2.5445%-0.4412
-
-> <ATTACHMENT_POINT>
-1:3 3:2
 
 $$$$
 Fragment
@@ -316,11 +292,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MAreneM:0:0.0058%3.9492%0.0035,MCp:0:1.2372%1.3601%-2.2087
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -379,11 +352,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 13#MAreneM:1:-0.5666%5.2024%1.0030,MAreneM:1:0.5615%2.7088%-1.0126
-
-> <ATTACHMENT_POINT>
-13:2
 
 $$$$
 Fragment
@@ -400,11 +370,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Mpentahapto:0:-0.6655%4.1508%9.3092,Mpentahapto:0:0.2015%1.2162%8.8507
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -456,11 +423,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 10#CCtriple:0:-0.9891%0.8225%4.5960 11#MCp:1:2.1135%3.5192%5.3754
-
-> <ATTACHMENT_POINT>
-10:3 11:1
 
 $$$$
 Fragment
@@ -481,11 +445,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CCtriple:0:-0.4750%1.8207%4.9933 2#CCtriple:0:-2.1154%-1.2540%3.5895
-
-> <ATTACHMENT_POINT>
-1:3 2:3
 
 $$$$
 Fragment
@@ -502,11 +463,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MButadiene:0:-1.0114%1.4931%3.6512,MCp:0:1.7413%2.5595%2.2797
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -574,11 +532,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MAlkene:0:-1.0259%1.9145%19.2383,MAlkene:0:0.2224%-0.6696%19.2597 3#LPhosphineSubAr:0:2.4033%-0.6835%15.9698,LPhosphineSubAr:0:3.6533%-0.6863%18.7160 4#sArOther:0:0.9812%5.6938%18.6605 19#Mpentahapto:1:2.4121%4.3615%15.9397
-
-> <ATTACHMENT_POINT>
-1:2 3:2 4:1 19:1
 
 $$$$
 Fragment
@@ -595,11 +550,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCp:0:2.0171%4.7770%14.2260,Mpentahapto:0:2.9537%4.0443%17.5992
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -618,11 +570,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCO:1:3.8754%0.2358%0.0129
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -639,11 +588,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCO:0:2.4049%2.6298%2.7508,MCO:0:2.6701%3.7077%5.4246,MCO:0:4.6535%1.9788%4.4548,MCO:0:5.0189%3.5816%2.0918,MCO:0:5.2171%4.8668%4.6888,MCsingle:0:2.7856%5.7658%3.0085
-
-> <ATTACHMENT_POINT>
-1:6
 
 $$$$
 Fragment
@@ -660,11 +606,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Mpentahapto:0:2.1426%7.1098%2.8336,Mpentahapto:0:2.5031%6.9313%-0.4679
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -681,11 +624,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCp:0:2.1466%1.9032%9.5987,Mpentahapto:0:-0.3485%2.1556%7.4211
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -767,11 +707,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 27#Mpentahapto:1:0.9565%1.9899%8.4563
-
-> <ATTACHMENT_POINT>
-27:1
 
 $$$$
 Fragment
@@ -788,11 +725,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Mpentahapto:0:-0.6624%4.1585%9.3038,Mpentahapto:0:0.2079%1.2238%8.8357
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -809,11 +743,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MCO:0:5.4215%-1.3821%-1.1195,MCl:0:6.1851%1.7625%-0.4205,MCsingle:0:3.3353%0.3003%0.3173,MCsingle:0:5.2598%0.8051%2.5845,MCsingle:0:7.3566%-0.8619%1.1717,MCtriple:0:4.6190%-2.0336%1.7515
-
-> <ATTACHMENT_POINT>
-1:1 1:1 1:1 1:1 1:1 1:3
 
 $$$$
 Fragment
@@ -830,11 +761,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CNtriple:0:5.2096%1.3893%3.5649,MCsingle:1:5.3392%-0.3079%0.7486
-
-> <ATTACHMENT_POINT>
-1:3 1:1
 
 $$$$
 Fragment
@@ -851,11 +779,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CNtriple:0:2.2673%0.6095%0.0968,MCsingle:1:5.3426%-0.3153%0.7526
-
-> <ATTACHMENT_POINT>
-1:3 1:1
 
 $$$$
 Fragment
@@ -870,11 +795,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CNtriple:1:0.0091%0.0003%1.5387
-
-> <ATTACHMENT_POINT>
-1:3
 
 $$$$
 Fragment
@@ -895,11 +817,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CNtriple:0:0.0071%0.0054%-0.0078 2#CCtriple:0:0.0043%0.0022%4.6236
-
-> <ATTACHMENT_POINT>
-1:3 2:3
 
 $$$$
 Fragment
@@ -918,11 +837,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CCtriple:0:0.0064%0.0030%3.0715
-
-> <ATTACHMENT_POINT>
-1:3
 
 $$$$
 Fragment
@@ -939,11 +855,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MBr:0:1.4372%2.4234%0.0689,MCO:0:-1.6197%1.1659%-0.0444,MCO:0:1.9467%-0.8508%0.0587,MCsingle:0:0.0807%0.1235%2.1335,MCsingle:0:0.2188%0.1211%-2.1301,MCtriple:0:-0.9144%-1.7417%-0.0205
-
-> <ATTACHMENT_POINT>
-1:1 1:1 1:1 1:1 1:1 1:3
 
 $$$$
 Fragment
@@ -960,10 +873,7 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#CNtriple:0:0.0427%0.1146%3.2884,MCsingle:1:0.1232%0.0882%-0.0002
-
-> <ATTACHMENT_POINT>
-1:3 1:1
 
 $$$$

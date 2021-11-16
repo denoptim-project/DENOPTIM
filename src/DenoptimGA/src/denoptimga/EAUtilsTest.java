@@ -86,23 +86,23 @@ public class EAUtilsTest
         FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
         
-        DENOPTIMVertex v1 = new EmptyVertex();
+        EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0, 1, 1, APCB);
-        v1.addAP(0, 1, 1, APCB);
+        v1.addAP(0,APCB);
+        v1.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v2 = new EmptyVertex();
+        EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0, 1, 1, APCC);
-        v2.addAP(0, 1, 1, APCC);
+        v2.addAP(0,APCC);
+        v2.addAP(0,APCC);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex rcv = new EmptyVertex();
+        EmptyVertex rcv = new EmptyVertex();
         rcv.setBuildingBlockType(BBType.FRAGMENT);
-        rcv.addAP(0, 1, 1, APCC);
+        rcv.addAP(0,APCC);
         rcv.setAsRCV(true);
         FragmentSpace.appendVertexToLibrary(rcv, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());

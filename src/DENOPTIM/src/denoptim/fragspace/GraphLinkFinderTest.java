@@ -100,119 +100,119 @@ public class GraphLinkFinderTest
         FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
         
-        DENOPTIMVertex s = new EmptyVertex();
+        EmptyVertex s = new EmptyVertex();
         s.setBuildingBlockType(BBType.SCAFFOLD);
-        s.addAP(0, 1, 1, APCA);
+        s.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(s, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
-        DENOPTIMVertex v0 = new EmptyVertex();
+        EmptyVertex v0 = new EmptyVertex();
         v0.setBuildingBlockType(BBType.FRAGMENT);
-        v0.addAP(0, 1, 1, APCA);
-        v0.addAP(0, 1, 1, APCB);
-        v0.addAP(0, 1, 1, APCB);
+        v0.addAP(0,APCA);
+        v0.addAP(0,APCB);
+        v0.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v1 = new EmptyVertex();
+        EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0, 1, 1, APCB);
+        v1.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v2 = new EmptyVertex();
+        EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0, 1, 1, APCA);
-        v2.addAP(0, 1, 1, APCA);
+        v2.addAP(0,APCA);
+        v2.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v3 = new EmptyVertex();
+        EmptyVertex v3 = new EmptyVertex();
         v3.setBuildingBlockType(BBType.FRAGMENT);
-        v3.addAP(0, 1, 1, APCB);
-        v3.addAP(0, 1, 1, APCB);
+        v3.addAP(0,APCB);
+        v3.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v4 = new EmptyVertex();
+        EmptyVertex v4 = new EmptyVertex();
         v4.setBuildingBlockType(BBType.FRAGMENT);
-        v4.addAP(0, 1, 1, APCA);
-        v4.addAP(0, 1, 1, APCB);
-        v4.addAP(0, 1, 1, APCB);
+        v4.addAP(0,APCA);
+        v4.addAP(0,APCB);
+        v4.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v5 = new EmptyVertex();
+        EmptyVertex v5 = new EmptyVertex();
         v5.setBuildingBlockType(BBType.FRAGMENT);
-        v5.addAP(0, 1, 1, APCA);
-        v5.addAP(0, 1, 1, APCC);
-        v5.addAP(0, 1, 1, APCB);
+        v5.addAP(0,APCA);
+        v5.addAP(0,APCC);
+        v5.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v6 = new EmptyVertex();
+        EmptyVertex v6 = new EmptyVertex();
         v6.setBuildingBlockType(BBType.FRAGMENT);
-        v6.addAP(0, 1, 1, APCD);
-        v6.addAP(0, 1, 1, APCD);
+        v6.addAP(0,APCD);
+        v6.addAP(0,APCD);
         FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v7 = new EmptyVertex();
+        EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
-        v7.addAP(0, 1, 1, APCA);
+        v7.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v8 = new EmptyVertex();
+        EmptyVertex v8 = new EmptyVertex();
         v8.setBuildingBlockType(BBType.FRAGMENT);
-        v8.addAP(0, 1, 1, APCB);
+        v8.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v8, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v9 = new EmptyVertex();
+        EmptyVertex v9 = new EmptyVertex();
         v9.setBuildingBlockType(BBType.FRAGMENT);
-        v9.addAP(0, 1, 1, APCA);
-        v9.addAP(0, 1, 1, APCA);
-        v9.addAP(0, 1, 1, APCB);
-        v9.addAP(0, 1, 1, APCB);
+        v9.addAP(0,APCA);
+        v9.addAP(0,APCA);
+        v9.addAP(0,APCB);
+        v9.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v9, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v10 = new EmptyVertex();
+        EmptyVertex v10 = new EmptyVertex();
         v10.setBuildingBlockType(BBType.FRAGMENT);
-        v10.addAP(0, 1, 1, APCA);
-        v10.addAP(0, 1, 1, APCC);
-        v10.addAP(0, 1, 1, APCD);
-        v10.addAP(0, 1, 1, APCB);
+        v10.addAP(0,APCA);
+        v10.addAP(0,APCC);
+        v10.addAP(0,APCD);
+        v10.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v10, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v11 = new EmptyVertex();
+        EmptyVertex v11 = new EmptyVertex();
         v11.setBuildingBlockType(BBType.FRAGMENT);
-        v11.addAP(0, 1, 1, APCA);
-        v11.addAP(0, 1, 1, APCD);
-        v11.addAP(0, 1, 1, APCA);
-        v11.addAP(0, 1, 1, APCA);
-        v11.addAP(0, 1, 1, APCC);
-        v11.addAP(0, 1, 1, APCB);
-        v11.addAP(0, 1, 1, APCB);
-        v11.addAP(0, 1, 1, APCB);
+        v11.addAP(0,APCA);
+        v11.addAP(0,APCD);
+        v11.addAP(0,APCA);
+        v11.addAP(0,APCA);
+        v11.addAP(0,APCC);
+        v11.addAP(0,APCB);
+        v11.addAP(0,APCB);
+        v11.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v11, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v12 = new EmptyVertex();
+        EmptyVertex v12 = new EmptyVertex();
         v12.setBuildingBlockType(BBType.FRAGMENT);
-        v12.addAP(0, 1, 1, APCE);
-        v12.addAP(0, 1, 1, APCE);
-        v12.addAP(0, 1, 1, APCE);
+        v12.addAP(0,APCE);
+        v12.addAP(0,APCE);
+        v12.addAP(0,APCE);
         FragmentSpace.appendVertexToLibrary(v12, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v13 = new EmptyVertex();
+        EmptyVertex v13 = new EmptyVertex();
         v13.setBuildingBlockType(BBType.FRAGMENT);
-        v13.addAP(0, 1, 1, APCF);
-        v13.addAP(0, 1, 1, APCB);
-        v13.addAP(0, 1, 1, APCA);
+        v13.addAP(0,APCF);
+        v13.addAP(0,APCB);
+        v13.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(v13, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         

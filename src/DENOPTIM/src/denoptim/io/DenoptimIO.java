@@ -2621,7 +2621,7 @@ public class DenoptimIO
                 {
                     i++;
                     DENOPTIMVertex v = null;
-                    Object ap = mol.getProperty(DENOPTIMConstants.APTAG);
+                    Object ap = mol.getProperty(DENOPTIMConstants.APSTAG);
                     if (ap == null) {
                         //NB: templates with no APs land here
                         if (FragmentSpace.isDefined())
@@ -2640,11 +2640,11 @@ public class DenoptimIO
                         }
                     } else {
                         //NB: templates that do have APs land here
-                        v = DENOPTIMVertex.convertIACToVertex(mol,bbt);
+                        v = DENOPTIMVertex.convertIACToVertex(mol, bbt);
                     }
                     if (setBBId)
                     {
-                        FragmentSpace.appendVertexToLibrary(v,bbt,library);
+                        FragmentSpace.appendVertexToLibrary(v, bbt, library);
                     } else {
                         library.add(v);
                     }
@@ -3150,9 +3150,8 @@ public class DenoptimIO
      * we do not use it as such, but we just place if in the text-representation
      * of the AP. This index is supposed to be 0-based (i.e., in this method it 
      * is transformed in 1-based).
-     * @return a pairs of strings: the first is meant for the 
-     * {@link DENOPTIMConstants#APCVTAG} tag and the second for the
-     * {@link DENOPTIMConstants#APTAG} tag 
+     * @return the string meant the be the value of the
+     * {@link DENOPTIMConstants#APSTAG} tag in SDF file.
      */
     
     // WARNING: here is a place where we still assume a fixed order of APs
@@ -3160,11 +3159,10 @@ public class DenoptimIO
     // class Integer, i.e., the APs are reported in SDF following the ordering
     // of the respective source atoms.
     
-    public static String[] getAPDefinitionsForSDF(
+    public static String getAPDefinitionsForSDF(
             LinkedHashMap<Integer, List<DENOPTIMAttachmentPoint>> apsPerIndex)
     {   
-        String propAPClass = "";
-        String propAttchPnt = "";
+        String s = "";
         for (Integer ii : apsPerIndex.keySet())
         {
             //WARNING: here is the 1-based criterion implemented also for
@@ -3188,24 +3186,11 @@ public class DenoptimIO
                     stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
                             + ap.getSingleAPStringSDF(false,atmID);
                 }
-                propAPClass = propAPClass + stingAPP;
-    
-                //Build SDF property DENOPTIMConstants.APTAG
-                String sBO = FragmentSpace.getBondOrderForAPClass(
-                        ap.getAPClass()).toString();
-                String stBnd = " " + atmID +":"+sBO;
-                if (propAttchPnt.equals(""))
-                {
-                    stBnd = stBnd.substring(1);
-                }
-                propAttchPnt = propAttchPnt + stBnd;
+                s = s + stingAPP;
             }
-            propAPClass = propAPClass + DENOPTIMConstants.SEPARATORAPPROPATMS;
+            s = s + DENOPTIMConstants.SEPARATORAPPROPATMS;
         }
-        String[] result = new String[2];
-        result[0] = propAPClass;
-        result[1] = propAttchPnt;
-        return result;
+        return s;
     }
     
 //------------------------------------------------------------------------------

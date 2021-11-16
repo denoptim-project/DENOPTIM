@@ -272,7 +272,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
 			        String apClass = apTabModel.getValueAt(i, 1).toString();
 			        try
                     {
-                        ev.addAP(-1,1,1, APClass.make(apClass));
+                        ev.addAP(-1,APClass.make(apClass));
                     } catch (DENOPTIMException e1)
                     {
                         e1.printStackTrace();

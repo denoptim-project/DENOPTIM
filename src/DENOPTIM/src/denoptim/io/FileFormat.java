@@ -55,7 +55,7 @@ public enum FileFormat {
         
         VRTXSDF.extension = "sdf";
         VRTXSDF.definingRegex = new HashSet<String>(Arrays.asList(
-                "^> *<" + DENOPTIMConstants.APTAG+">.*"));
+                "^> *<" + DENOPTIMConstants.APSTAG+">.*"));
         VRTXSDF.endOfSampleRegex = "\\$\\$\\$\\$";
 
         //------------------------------------

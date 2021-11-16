@@ -44,6 +44,7 @@ import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMTemplate;
@@ -229,7 +230,7 @@ public class GraphConversionTool
                 BondType btype = BondType.parseStr(s4[4]);
 
                 /* Find source and target attachment points of edge */
-                DENOPTIMVertex dummy = new EmptyVertex();
+                EmptyVertex dummy = new EmptyVertex();
                 dummy.addAP();
                 dummy.addAP();
                 DENOPTIMAttachmentPoint srcAP = dummy.getAP(0);
@@ -249,7 +250,10 @@ public class GraphConversionTool
                             for (int k = vertex.getNumberOfAPs(); k<(srcAPID+1);
                                  k++)
                             {
-                                vertex.addAP(0,1,1);
+                                if (vertex instanceof EmptyVertex)
+                                    ((EmptyVertex)vertex).addAP(0);
+                                if (vertex instanceof DENOPTIMFragment)
+                                    ((DENOPTIMFragment)vertex).addAP(0);
                             }
 
                             srcAP = vertex.getAP(srcAPID);
@@ -268,7 +272,10 @@ public class GraphConversionTool
                             for (int k = vertex.getNumberOfAPs(); k<(trgAPID+1);
                                  k++)
                             {
-                                vertex.addAP(0,1,1);
+                                if (vertex instanceof EmptyVertex)
+                                    ((EmptyVertex)vertex).addAP(0);
+                                if (vertex instanceof DENOPTIMFragment)
+                                    ((DENOPTIMFragment)vertex).addAP(0);
                             }
 
                             trgAP = vertex.getAP(trgAPID);

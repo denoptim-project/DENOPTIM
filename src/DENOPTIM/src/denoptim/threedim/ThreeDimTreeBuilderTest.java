@@ -91,15 +91,15 @@ public class ThreeDimTreeBuilderTest
     	frg1.addAtom(a1);
     	frg1.addAtom(a2);
     	frg1.addBond(new Bond(a1, a2));
-    	frg1.addAP(0, a0, new Point3d(new double[]{0.0, 0.0, 1.0}), 1);
-    	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}), 1);
+    	frg1.addAP(0, a0, new Point3d(new double[]{0.0, 0.0, 1.0}));
+    	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}));
     	frg1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment frg2 = new DENOPTIMFragment();
     	IAtom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	frg2.addAtom(a3);
-    	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
-    	frg2.addAP(0, b0, new Point3d(new double[]{0.0, 1.0, -1.0}), 1);   
+    	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}));
+    	frg2.addAP(0, b0, new Point3d(new double[]{0.0, 1.0, -1.0}));   
     	frg2.projectAPsToProperties(); 
     	
         DENOPTIMFragment frg3 = new DENOPTIMFragment();
@@ -108,29 +108,29 @@ public class ThreeDimTreeBuilderTest
         frg3.addAtom(a7);
         frg3.addAtom(a8);
         frg3.addBond(new Bond(a7, a8));
-        frg3.addAP(0, a0, new Point3d(new double[]{2.0, 1.0, 1.0}), 1);
-        frg3.addAP(0, a0, new Point3d(new double[]{2.0, 1.0, -1.0}), 1);  
-        frg3.addAP(0, b0, new Point3d(new double[]{3.0, 1.0, -1.0}), 1); 
+        frg3.addAP(0, a0, new Point3d(new double[]{2.0, 1.0, 1.0}));
+        frg3.addAP(0, a0, new Point3d(new double[]{2.0, 1.0, -1.0}));  
+        frg3.addAP(0, b0, new Point3d(new double[]{3.0, 1.0, -1.0})); 
         frg3.projectAPsToProperties(); 
 
     	DENOPTIMFragment rca1 = new DENOPTIMFragment();
     	IAtom a4 = new PseudoAtom("ATP", new Point3d(
     	        new double[]{0.0, 0.0, 0.0}));
     	rca1.addAtom(a4);
-    	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment rca2 = new DENOPTIMFragment();
     	IAtom a5 = new PseudoAtom("ATM", new Point3d(
     	        new double[]{1.0, 0.0, 0.0}));
     	rca2.addAtom(a5);
-    	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca2.projectAPsToProperties(); 
     	
     	DENOPTIMFragment cap = new DENOPTIMFragment();
     	IAtom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	cap.addAtom(a6);
-    	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	cap.projectAPsToProperties(); 
     	
     	ArrayList<DENOPTIMVertex> scaff = new ArrayList<DENOPTIMVertex>();
@@ -234,9 +234,9 @@ public class ThreeDimTreeBuilderTest
     	
     	
         DENOPTIMGraph g3 = new DENOPTIMGraph();
-        DENOPTIMVertex v1c = new EmptyVertex(1);
-        v1c.addAP(-1, 1, 1, a0);
-        v1c.addAP(-1, 1, 1, a0);
+        EmptyVertex v1c = new EmptyVertex(1);
+        v1c.addAP(-1,a0);
+        v1c.addAP(-1, a0);
         DENOPTIMVertex v2c = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT);
         DENOPTIMVertex v3c = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
@@ -272,19 +272,19 @@ public class ThreeDimTreeBuilderTest
         
         
         DENOPTIMGraph g4 = new DENOPTIMGraph();
-        DENOPTIMVertex v1d = new EmptyVertex(1);
-        v1d.addAP(-1, 1, 1, a0);
-        v1d.addAP(-1, 1, 1, a0);
-        DENOPTIMVertex v2d = new EmptyVertex(2);
-        v2d.addAP(-1, 1, 1, a0);
-        v2d.addAP(-1, 1, 1, b0);
+        EmptyVertex v1d = new EmptyVertex(1);
+        v1d.addAP(-1,a0);
+        v1d.addAP(-1,a0);
+        EmptyVertex v2d = new EmptyVertex(2);
+        v2d.addAP(-1,a0);
+        v2d.addAP(-1,b0);
         DENOPTIMVertex v3d = DENOPTIMVertex.newVertexFromLibrary(3, 3, 
                 BBType.FRAGMENT);
         DENOPTIMVertex v4d = DENOPTIMVertex.newVertexFromLibrary(4, 0, 
                 BBType.FRAGMENT);
-        DENOPTIMVertex v5d = new EmptyVertex(5);
-        v5d.addAP(-1, 1, 1, b0);
-        v5d.addAP(-1, 1, 1, b0);
+        EmptyVertex v5d = new EmptyVertex(5);
+        v5d.addAP(-1,b0);
+        v5d.addAP(-1,b0);
         DENOPTIMVertex v6d = DENOPTIMVertex.newVertexFromLibrary(6, 0, 
                 BBType.FRAGMENT);
         DENOPTIMVertex v7d = DENOPTIMVertex.newVertexFromLibrary(7, 0, 

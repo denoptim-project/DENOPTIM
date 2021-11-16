@@ -7,11 +7,8 @@ M  END
 > <cdk:Title>
 hydrogen
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#hyd:1:0.4667%-1.7366%0.3905
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 AttractorPLUS
@@ -26,11 +23,8 @@ AttractorPLUS
 > <cdk:Remark>
 Built manually
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#ATplus:0:-0.0039%-0.0072%0.0017
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 AttractorMINUS
@@ -45,10 +39,7 @@ AttractorMINUS
 > <cdk:Remark>
 Built manually
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#ATminus:0:-0.0018%0.0063%-0.0053
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$

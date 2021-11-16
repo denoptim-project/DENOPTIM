@@ -80,8 +80,6 @@ public class DENOPTIMEdge implements Serializable
         this.srcAP = srcAP;
         this.trgAP = trgAP;
         this.bondType = bondType;
-        this.srcAP.updateFreeConnections(-bondType.getValence());
-        this.trgAP.updateFreeConnections(-bondType.getValence());
         this.srcAP.setUser(this);
         this.trgAP.setUser(this);
     }

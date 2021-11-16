@@ -227,18 +227,8 @@ public class DENOPTIMGraphEdit {
             if (!strPrts[0].equals("*")) {
                 apid = Integer.parseInt(strPrts[0]);
             }
-            // number of potential connections
-            int conn = -1;
-            if (!strPrts[1].equals("*")) {
-                conn = Integer.parseInt(strPrts[1]);
-            }
-            // number of free connections
-            int fconn = -1;
-            if (!strPrts[2].equals("*")) {
-                fconn = Integer.parseInt(strPrts[2]);
-            }
             EmptyVertex dummyVertex = new EmptyVertex();
-            dummyVertex.addAP(apid, conn, fconn);
+            dummyVertex.addAP(apid);
             DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
             if (strPrts.length > 3) {
                 // AP class

@@ -143,10 +143,8 @@ public class SetupBRICS
             else
                 sb2.append("" + (pos+1) + ":" + "1" + " ");
         }
-        
-        
-        mol.setProperty(DENOPTIMConstants.APCVTAG, sb1.toString().trim());
-        mol.setProperty(DENOPTIMConstants.APTAG, sb2.toString().trim());
+       
+        mol.setProperty(DENOPTIMConstants.APSTAG, sb1.toString().trim());
     }    
     
 //------------------------------------------------------------------------------
@@ -185,10 +183,8 @@ public class SetupBRICS
             else
                 sb2.append("" + (pos+1) + ":" + "1" + " ");
         }
-        
-        
-        mol.setProperty(DENOPTIMConstants.APCVTAG, sb1.toString().trim());
-        mol.setProperty(DENOPTIMConstants.APTAG, sb2.toString().trim());
+       
+        mol.setProperty(DENOPTIMConstants.APSTAG, sb1.toString().trim());
     }
     
 //------------------------------------------------------------------------------

@@ -23,11 +23,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LBisAminoPhosphineSubR:0:0.3764%10.7736%7.1349,MBisAminoPhosphine:1:3.6147%11.0347%7.1640 2#LCycloBisAminoPhospholeSubN:0:2.2014%8.0793%4.9170 7#LCycloBisAminoPhospholeSubN:0:1.6933%13.2626%4.8557
-
-> <ATTACHMENT_POINT>
-1:2 2:1 7:1
 
 > <ISOMER>
 1_1448648079799-15
@@ -62,11 +59,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 7#LCycloBisAminoPhosphineSubN:0:5.4511%15.1436%1.4287 8#LCycloBisAminoPhosphineSubN:0:6.0653%19.8894%3.4007 9#LBisAminoPhosphineSubR:0:8.3189%17.0023%3.3101,MBisAminoPhosphine:1:7.5466%18.0250%0.2486
-
-> <ATTACHMENT_POINT>
-7:1 8:1 9:2
 
 > <ISOMER>
 5_1448648080106-57
@@ -84,11 +78,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenterv
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LBisAminoPhosphineN:0:-1.9380%-0.2445%5.6152,LBisAminoPhosphineN:0:-1.4158%-2.2206%3.8839,LBisAminoPhosphineSubR:0:-3.1775%-0.3605%3.1872,MBisAminoPhosphine:1:0.1740%0.6690%3.3548
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 0
@@ -109,11 +100,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LMonoAminoPhosphineN:0:3.1481%10.0702%6.8970,LMonoAminoPhosphineSubR:0:0.3932%9.4860%6.7101,LMonoAminoPhosphineSubR:0:2.2200%7.7961%8.2674,MMonoAminoPhosphine:1:2.6018%7.6217%4.8042
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 1
@@ -136,11 +124,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LAminoPhosphineNH:1:6.5518%10.0443%0.7938,AminoPhosphineSubNL:0:5.3537%10.9962%-1.5444
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -155,11 +140,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LAminoPhosphineN:1:6.6443%11.4420%3.6353,AminoPhosphineSubN:0:8.2377%9.4631%2.5151,AminoPhosphineSubN:0:8.6438%10.1530%4.8830
-
-> <ATTACHMENT_POINT>
-1:3
 
 $$$$
 Fragment
@@ -199,11 +181,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LAminoPhosphineCycloN:1:-1.0851%2.3588%2.6896
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 3_1448279242888-429
@@ -252,11 +231,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LAminoPhosphineCycloN:1:4.5638%2.7684%17.4473
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1448279239738-373
@@ -301,11 +277,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 13#LAminoPhosphineCycloN:1:3.8389%4.4654%2.8685
-
-> <ATTACHMENT_POINT>
-13:1
 
 > <ISOMER>
 0_1448279239737-432
@@ -340,11 +313,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LAminoPhosphineCycloN:1:-1.3138%5.4246%7.3896
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 3_1448279242888-352
@@ -405,11 +375,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LAminoPhosphineCycloN:1:6.1092%9.1320%-2.0464
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 9_1448279242715-718
@@ -427,11 +394,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LTrisAminoPhosphineN:0:-1.3046%-4.7070%1.6266,LTrisAminoPhosphineN:0:-1.2548%-3.0643%3.6258,LTrisAminoPhosphineN:0:1.0279%-4.3080%2.6464,MTrisAminoPhosphine:1:-0.0532%-1.6116%0.9541
-
-> <ATTACHMENT_POINT>
-1:4
 
 $$$$
 Fragment
@@ -469,11 +433,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#L6HPyrimidinylideneSubN:0:3.6976%10.1263%12.1898 2#L6HPyrimidinylideneSubN:0:4.7971%14.0028%14.7738 3#M6HPyrimidinylidene:1:6.0040%12.0476%12.7231
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1
 
 > <ISOMER>
 1_1471286449491-110
@@ -504,11 +465,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubNS:0:1.1388%2.9759%6.3717 2#MPyrrolidinylidene:1:1.1415%5.0550%3.7956 3#LPyrrolidinylideneSubCGammaL:0:-1.6545%3.6889%2.5640,LPyrrolidinylideneSubCGammaS:0:0.2555%2.2238%1.9438 5#LPyrrolidinylideneSubCAlpha:0:-1.0962%0.9650%6.3670,LPyrrolidinylideneSubCAlpha:0:0.6961%0.1552%4.8310
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:2 5:2
 
 $$$$
 Fragment
@@ -549,11 +507,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LIsoindolylideneSubNL:0:8.2571%13.2702%19.2489 12#LIsoindolylideneSubCS:0:8.8046%11.8202%16.2132,LIsoindolylideneSubCS:0:9.9890%10.7336%18.2764 13#MIsoindolylidene:1:10.5849%15.8016%19.2896
-
-> <ATTACHMENT_POINT>
-1:1 12:2 13:1
 
 > <ISOMER>
 1_1471286449491-409
@@ -584,11 +539,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LImidazolidinylideneSubNL:0:1.1004%-4.2726%-0.0703 2#MImidazolidinylidene:1:0.0068%-1.1584%-0.2091 3#LImidazolidinylideneSubNL:0:-0.4112%-1.1816%-3.5221 4#LImidazolidinylideneSubCL:0:-1.1916%-4.3876%-4.1821 5#LImidazolidinylideneSubCL:0:2.4317%-4.9222%-3.0596
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:1 5:1
 
 > <ISOMER>
 3_1471428984590-72
@@ -619,11 +571,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LImidazolidinylideneSubNL:0:7.7889%6.0841%4.7041 2#LImidazolidinylideneSubNL:0:9.2405%7.4408%0.1465 3#MImidazolidinylidene:1:7.3772%8.8109%2.9472 4#LImidazolidinylideneSubCS:0:8.0223%3.5389%2.7838,LImidazolidinylideneSubCS:0:10.1756%4.5280%3.5788
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:2
 
 > <ISOMER>
 3_1471428984590-90
@@ -650,11 +599,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LImidazolidinylideneSubNL:0:10.7565%7.5191%14.0947 2#LImidazolidinylideneSubNL:0:13.6856%5.3848%10.8002 3#MImidazolidinylidene:1:11.8054%8.3951%11.2355 4#LImidazolidinylideneSubCS:0:10.0495%4.6209%13.2124,LImidazolidinylideneSubCS:0:11.5120%4.7576%15.2537 5#LImidazolidinylideneSubCS:0:12.2917%3.1140%12.2919,LImidazolidinylideneSubCS:0:13.9044%4.3632%13.7090
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:2 5:2
 
 > <ISOMER>
 6_1471428984612-130
@@ -681,11 +627,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#MImidazolylidene:1:6.8965%0.0968%12.1142 2#LImidazolylideneSubNL:0:4.1150%2.1769%11.1441 3#LImidazolylideneSubCS:0:2.2071%3.3070%13.3350 4#LImidazolylideneSubCS:0:3.4255%2.4076%16.1647 5#LImidazolylideneSubNL:0:5.9084%0.5808%15.5261
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:1 5:1
 
 > <ISOMER>
 9_1471428984177-111
@@ -709,11 +652,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LImidazolylideneSubCS:1:-0.1166%4.1100%2.0323
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -728,11 +668,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LImidazolylideneSubCS:1:5.5040%2.2853%3.7573
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -768,11 +705,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LImidazolylideneSubCS:1:-0.2353%-4.1965%3.5719
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -793,11 +727,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubCGammaS:1:1.4406%1.6746%2.2841
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1471286449491-15
@@ -827,11 +758,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubCGammaS:1:2.2188%11.3371%13.4128
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1471286449491-33
@@ -867,11 +795,8 @@ Manual_Fragment
 > <cdk:Remark>
 Manual
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubCGammaL:1:6.4989%8.5855%8.7477
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Manual_Fragment
@@ -919,11 +844,8 @@ Manual_Fragment
 > <cdk:Remark>
 Manual
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubCGammaL:1:6.0053%16.8291%4.6769
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -959,11 +881,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubCGammaL:1:8.8741%5.0958%2.2151
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1471286449491-82
@@ -987,11 +906,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPyrrolidinylideneSubCAlpha:1:10.5831%9.5797%19.5373
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1471286449491-1
@@ -1015,11 +931,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LIsoindolylideneSubCS:1:-0.0209%17.9946%6.1924
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1471286449491-405
@@ -1058,11 +971,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LIsoindolylideneSubCS:1:5.5862%5.9760%-0.2376
-
-> <ATTACHMENT_POINT>
-1:1
 
 > <ISOMER>
 1_1471286449491-408
@@ -1083,11 +993,8 @@ M  END
 > <cdk:Title>
 Frag-Me
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#SubRS:1:0.2834%0.3844%-0.6342
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Frag-Et
@@ -1111,11 +1018,8 @@ M  END
 > <cdk:Title>
 Frag-Et
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 2#SubRS:1:0.2863%0.3877%-0.6329
-
-> <ATTACHMENT_POINT>
-2:1
 
 $$$$
 Frag-iPr
@@ -1145,11 +1049,8 @@ M  END
 > <cdk:Title>
 Frag-iPr
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 2#SubRM:1:0.2945%0.3926%-0.6411
-
-> <ATTACHMENT_POINT>
-2:1
 
 $$$$
 Frag-tBu
@@ -1185,11 +1086,8 @@ M  END
 > <cdk:Title>
 Frag-tBu
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#SubRL:1:0.2978%0.3816%-0.6416
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Frag-Cy
@@ -1234,11 +1132,8 @@ M  END
 > <cdk:Title>
 Frag-Cy
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#SubRM:1:0.2923%0.3882%-0.6293
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Frag-Ph
@@ -1271,11 +1166,8 @@ M  END
 > <cdk:Title>
 Frag-Ph
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#SubArS:1:0.2882%0.3895%-0.6387
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Frag-oMePh
@@ -1314,11 +1206,8 @@ M  END
 > <cdk:Title>
 Frag-oMePh
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#SubArM:1:0.2949%0.3954%-0.6401
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Frag-ooDiMePh
@@ -1363,11 +1252,8 @@ M  END
 > <cdk:Title>
 Frag-ooDiMePh
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#SubArL:1:0.2996%0.3960%-0.6258
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Frag-naphthyl
@@ -1413,11 +1299,8 @@ M  END
 > <cdk:Title>
 Frag-naphthyl
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 3#SubArM:1:0.2865%0.3805%-0.6321
-
-> <ATTACHMENT_POINT>
-3:1
 
 $$$$
 Fragment
@@ -1478,11 +1361,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubM:0:7.9270%-2.5122%6.3820,MPhosphine:1:5.3692%-0.8432%7.9012
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 0_1448648079813-14
@@ -1537,11 +1417,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubM:0:10.5610%2.3954%3.5074,MPhosphine:1:9.1596%5.4952%2.7864
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 0_1448648079813-37
@@ -1584,11 +1461,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubM:0:2.7163%1.7501%13.2618,MPhosphine:1:4.8392%-0.2788%11.5887
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 3_1448648079851-65
@@ -1637,11 +1511,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubM:0:-1.1842%9.2736%11.0863,MPhosphine:1:0.7317%6.5362%10.7273
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 3_1448648079851-66
@@ -1726,11 +1597,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubM:0:9.6779%11.1852%8.6273,MPhosphine:1:6.9704%12.5796%7.2659
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 0_1448648079813-54
@@ -1748,11 +1616,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubMSym:0:6.6279%0.0013%3.7002,LPhosphineSubMSym:0:9.0901%-1.5382%3.4154,LPhosphineSubMSym:0:9.1041%1.5210%3.4089,MPhosphine:1:7.9623%0.0032%0.5107
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 0_9999999999999-111
@@ -1773,11 +1638,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphineSubMSym:0:6.6263%0.0026%3.6967,LPhosphineSubMSym:0:9.0933%-1.5292%3.4186,LPhosphineSubM:0:9.0924%1.5277%3.4073,MPhosphine:1:7.9525%-0.0067%0.5202
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 0_9999999999999-111
@@ -1798,11 +1660,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphiniteSubO:0:7.6638%4.9096%6.0689,LPhosphiniteSubR:0:5.1954%3.9738%6.7955,LPhosphiniteSubR:0:5.5478%5.8014%4.6085,MPhosphinite:1:6.7698%2.6801%3.9033
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 0
@@ -1823,11 +1682,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphiniteSubO:1:-3.8418%7.5335%4.6518,OPhosphiniteSub:1:-3.5546%7.8149%2.0180
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -1889,11 +1745,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 23#LPhosphiteSubO:0:6.6788%5.3778%17.8009,MPhosphite:1:5.2089%8.2146%18.2756
-
-> <ATTACHMENT_POINT>
-23:2
 
 > <ISOMER>
 29
@@ -1987,11 +1840,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphiteSubO:0:7.8993%2.3018%-0.9995,MPhosphite:1:8.0930%3.5709%2.0014
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 16
@@ -2012,11 +1862,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphiteSubO:0:4.0526%2.1503%6.3117,LPhosphiteSubO:0:4.3496%0.5250%4.4384,LPhosphiteSubO:0:6.1955%1.2874%6.0253,MPhosphite:1:5.4775%3.3705%3.6107
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 1
@@ -2037,11 +1884,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphiteSubO:1:0.7033%2.9035%2.8210,OPhosphiteSub:1:0.0571%5.2914%1.9514
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 13
@@ -2096,11 +1940,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhospholeSubAlpha:0:-0.8989%5.4051%13.4656 16#LPhospholeSubAlpha:0:3.5610%2.5640%12.0468 17#LPhospholeSubR:0:2.0250%5.5714%11.2303,MPhosphole:1:-0.1005%3.0598%10.4097
-
-> <ATTACHMENT_POINT>
-1:1 16:1 17:2
 
 > <ISOMER>
 4_1448648079864-44
@@ -2146,11 +1987,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhospholeSubR:0:2.8332%3.6960%7.6085,MPhosphole:1:5.4216%3.8958%5.0946 2#LPhospholeSubAlpha:0:1.4326%4.7583%4.2276 14#LPhospholeSubAlpha:0:3.9679%0.2831%6.6234
-
-> <ATTACHMENT_POINT>
-1:2 2:1 14:1
 
 > <ISOMER>
 4_1448648079864-69
@@ -2181,11 +2019,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhospholeSubR:0:4.2227%-5.7748%-2.4076,MPhosphole:1:1.5639%-5.3823%-4.7450 2#LPhospholeSubAlpha:0:4.3520%-8.6007%-4.7498 5#LPhospholeSubAlpha:0:4.7637%-2.9895%-4.8368
-
-> <ATTACHMENT_POINT>
-1:2 2:1 5:1
 
 > <ISOMER>
 5_1448648080106-89
@@ -2212,11 +2047,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhospholeSubR:0:-0.1563%-3.1625%-2.0650,MPhosphole:1:0.0084%-0.0030%-0.0064 2#LPhospholeSubAlpha:0:3.2052%-2.5560%-1.0592 3#LPhospholeSubBeta:0:4.2531%-1.1262%-3.6392 4#LPhospholeSubBeta:0:2.0472%0.1224%-5.3052 5#LPhospholeSubAlpha:0:-0.8070%-0.3246%-4.0929
-
-> <ATTACHMENT_POINT>
-1:2 2:1 3:1 4:1 5:1
 
 > <ISOMER>
 5_1448648080106-90
@@ -2277,11 +2109,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhospholeSubR:0:8.2966%3.6668%9.9081,MPhosphole:1:8.1133%1.5532%6.7539
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 0_9999999999999-999
@@ -2319,11 +2148,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphoniteSubR:0:4.6640%2.2152%1.9265,MPhosphonite:1:2.1469%0.0872%0.9529
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 1_1448648079799-81
@@ -2364,11 +2190,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 12#LPhosphoniteSubR:0:2.7240%1.5236%3.4881,MPhosphonite:1:2.5430%4.7838%4.3964
-
-> <ATTACHMENT_POINT>
-12:2
 
 > <ISOMER>
 4_1448648079864-14
@@ -2430,11 +2253,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphoniteSubR:0:8.5959%-0.8603%13.5215,MPhosphonite:1:10.4745%1.7340%12.8051
-
-> <ATTACHMENT_POINT>
-1:2
 
 > <ISOMER>
 4_1448648079864-54
@@ -2470,11 +2290,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphoniteSubR:0:4.4170%7.1691%3.2342,MPhosphonite:1:2.0988%9.8596%2.0393 6#sArCl:1:0.6923%4.2269%0.5527 7#sArCl:1:-1.3627%2.6751%2.3964 8#sArCl:1:-1.5731%3.4856%5.4028 9#sArCl:1:0.1260%5.8492%6.5229
-
-> <ATTACHMENT_POINT>
-1:2 6:1 7:1 8:1 9:1
 
 > <ISOMER>
 5_1448648080106-44
@@ -2492,11 +2309,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphoniteSubO:0:5.2876%0.8403%6.1125,LPhosphoniteSubO:0:6.5394%2.7453%7.2019,LPhosphoniteSubR:0:4.1331%2.2966%8.0935,MPhosphonite:1:4.3704%3.7550%5.0631
-
-> <ATTACHMENT_POINT>
-1:4
 
 > <ISOMER>
 0
@@ -2517,11 +2331,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#LPhosphoniteSubO:1:5.1349%2.3429%6.5952,OPhosphoniteSub:1:7.6619%3.0159%6.3093
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$
 Fragment
@@ -2544,11 +2355,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Xlig:1:-0.0995%0.0150%-1.0196
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -2571,11 +2379,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Xlig:1:-0.1627%0.1068%-0.4598
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -2594,11 +2399,8 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Xlig:1:0.0187%0.0059%-0.5607
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 Fragment
@@ -2613,10 +2415,7 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#Xlig:1:-0.0031%0.0088%0.6326
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$

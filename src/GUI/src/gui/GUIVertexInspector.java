@@ -695,8 +695,7 @@ public class GUIVertexInspector extends GUICardPanel
 					file.getAbsolutePath());
 			
 			// We mean to import only the structure: get rid of AP
-			mol.setProperty(DENOPTIMConstants.APTAG,null);
-			mol.setProperty(DENOPTIMConstants.APCVTAG,null);
+			mol.setProperty(DENOPTIMConstants.APSTAG,null);
 			
 			// NB: here we let the vertexViewer create a fragment object that we
 			// then put into the local library. This to make sure that the 

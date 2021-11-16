@@ -133,7 +133,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         
         this.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
 
-        Object prop = mol.getProperty(DENOPTIMConstants.APCVTAG);
+        Object prop = mol.getProperty(DENOPTIMConstants.APSTAG);
         if (prop != null)
         {
             projectPropertyToAP(prop.toString());
@@ -282,6 +282,54 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         return k == la1.size();
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point with a dummy APClass and dummy properties.
+     * This is used only for testing purposes.
+     */
+    public void addAP() {
+        addAP(0);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point with a dummy APClass.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     */
+    public void addAP(int atomPositionNumber) {
+        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
+                atomPositionNumber);
+        getAttachmentPoints().add(ap);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param apClass the APClass
+     */
+    public void addAP(int atomPositionNumber, APClass apClass) {
+        addAP(atomPositionNumber, new double[]{0.0, 0.0, 0.0}, apClass);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param dirVec the AP direction vector end (the beginning at the 
+     * coordinates of the source atom). This must array have 3 entries.
+     * @param apClass the APClass
+     */
+    public void addAP(int atomPositionNumber, double[] dirVec, APClass apClass) {
+        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
+                atomPositionNumber, dirVec, apClass);
+        getAttachmentPoints().add(ap);
+    }
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -297,11 +345,11 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
 
-    public void addAP(int srcAtmId, APClass apc, Point3d vector, int valence) 
+    public void addAP(int srcAtmId, APClass apc, Point3d vector) 
             throws DENOPTIMException
     {
         IAtom srcAtm = mol.getAtom(srcAtmId);
-        addAPOnAtom(srcAtm, apc, vector, valence);
+        addAPOnAtom(srcAtm, apc, vector);
     }
     
 //-----------------------------------------------------------------------------
@@ -321,31 +369,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector)
             throws DENOPTIMException
     {
-        addAPOnAtom(srcAtm,apc,vector,-1);
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Add an attachment point to the specifies atom
-     * @param srcAtm the source atom in the atom list of this 
-     * chemical representation.
-     * @param apc the attachment point class, or null, if class should not 
-     * be defines.
-     * @param vector the coordinates of the 3D point representing the end of 
-     * the attachment point direction vector, or null. The coordinates must be
-     * consistent with the coordinates of the atoms.
-     * @param valence the valences used by this AP.
-     * @throws DENOPTIMException 
-     */
-
-    private void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector,
-                             int valence)
-            throws DENOPTIMException
-    {
         int atmId = mol.indexOf(srcAtm);
-        this.addAP(atmId, valence, valence,
-                new double[] {vector.x, vector.y, vector.z}, apc);
+        this.addAP(atmId, new double[] {vector.x, vector.y, vector.z}, apc);
         ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();
         DENOPTIMAttachmentPoint ap = aps.get(aps.size() - 1);
 
@@ -354,7 +379,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             apList = getAPListFromAtom(srcAtm);
         }
         apList.add(ap);
-        srcAtm.setProperty(DENOPTIMConstants.APTAG, apList);
+        srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
         
         updateSymmetryRelations();
     }
@@ -366,7 +391,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         @SuppressWarnings("unchecked")
 		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
         		(ArrayList<DENOPTIMAttachmentPoint>) srcAtm.getProperty(
-        				DENOPTIMConstants.APTAG);
+        				DENOPTIMConstants.ATMPROPAPS);
         return apsOnAtm;
     }
     
@@ -397,7 +422,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public int getAPCountOnAtom(IAtom srcAtm)
     {
     	int num = 0;
-    	if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
+    	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
     	{
 			ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
 					getAPListFromAtom(srcAtm);
@@ -420,7 +445,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
         {
             IAtom srcAtm = mol.getAtom(atmId);
-            if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
+            if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
             	ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
             			getAPListFromAtom(srcAtm);
@@ -455,7 +480,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	
         for (IAtom srcAtm : mol.atoms())
         {
-        	if (srcAtm.getProperty(DENOPTIMConstants.APTAG) != null)
+        	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
         		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
         				getAPListFromAtom(srcAtm);
@@ -485,14 +510,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
 
 	    String allAtomsProp = "";    
-	    if (mol.getProperty(DENOPTIMConstants.APCVTAG) == null)
+	    if (mol.getProperty(DENOPTIMConstants.APSTAG) == null)
 	    {
 	    	System.out.println("WARNING: no tag " 
-	    			+ DENOPTIMConstants.APCVTAG + "found in fragment."
+	    			+ DENOPTIMConstants.APSTAG + "found in fragment."
 	    			+ " No AP created.");
 	    	return;
         }
-	    allAtomsProp = mol.getProperty(DENOPTIMConstants.APCVTAG).toString();
+	    allAtomsProp = mol.getProperty(DENOPTIMConstants.APSTAG).toString();
 	    projectPropertyToAP(allAtomsProp);
     }
 	    
@@ -518,7 +543,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	for (int ii=0 ; ii<mol.getAtomCount(); ii++)
     	{
     		IAtom atm = mol.getAtom(ii);   		
-    		atm.removeProperty(DENOPTIMConstants.APTAG);
+    		atm.removeProperty(DENOPTIMConstants.ATMPROPAPS);
     	}
 
 	    // Temp storage for APs
@@ -574,12 +599,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             }
             
             IAtom atm = mol.getAtom(atmID);
-            if (atm.getProperty(DENOPTIMConstants.APTAG) != null)
+            if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
 				ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
 						getAPListFromAtom(atm);
                 oldAPs.add(ap);
-                atm.setProperty(DENOPTIMConstants.APTAG,oldAPs);
+                atm.setProperty(DENOPTIMConstants.ATMPROPAPS,oldAPs);
             } 
             else
             {
@@ -587,7 +612,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 		new ArrayList<DENOPTIMAttachmentPoint>();
                 aps.add(ap);
                 
-                atm.setProperty(DENOPTIMConstants.APTAG,aps);
+                atm.setProperty(DENOPTIMConstants.ATMPROPAPS,aps);
             }
         }
 
@@ -612,7 +637,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 new LinkedHashMap<>();
         for (IAtom atm : mol.atoms())
         {   
-            if (atm.getProperty(DENOPTIMConstants.APTAG) == null)
+            if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) == null)
             {
                 continue;
             }
@@ -633,9 +658,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             }
         }
         //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
-        String[] pair = DenoptimIO.getAPDefinitionsForSDF(apsPerAtom);
-        mol.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
-        mol.setProperty(DENOPTIMConstants.APTAG, pair[1]);
+        mol.setProperty(DENOPTIMConstants.APSTAG, 
+                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
     }
 
 //-----------------------------------------------------------------------------

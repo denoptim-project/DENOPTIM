@@ -69,8 +69,7 @@ for aaa, a in aminoacids.items():
         propertyClass= cTermAP+" "+nTermAP
         propertyAP = str(ctermAPSrcID)+":1 "+str(ntermAPSrcID)+":1"
     
-    mol.SetProp(key='CLASS', val=propertyClass)
-    mol.SetProp(key='ATTACHMENT_POINT', val=propertyAP)
+    mol.SetProp(key='ATTACHMENT_POINTS', val=propertyClass)
     fileWriter.write(mol, confId=conformationIDs[lowestEnergyConfId])
 
 fileWriter.close()

@@ -88,35 +88,35 @@ public class GraphConversionToolTest
     	frg1.addAtom(a1);
     	frg1.addAtom(a2);
     	frg1.addBond(new Bond(a1, a2));
-    	frg1.addAP(0, a0, new Point3d(new double[]{0.0, 0.0, 1.0}), 1);
-    	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}), 1);
+    	frg1.addAP(0, a0, new Point3d(new double[]{0.0, 0.0, 1.0}));
+    	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}));
     	frg1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment frg2 = new DENOPTIMFragment();
     	IAtom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	frg2.addAtom(a3);
-    	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
-    	frg2.addAP(0, b0, new Point3d(new double[]{0.0, 1.0, -1.0}), 1);   
+    	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}));
+    	frg2.addAP(0, b0, new Point3d(new double[]{0.0, 1.0, -1.0}));   
     	frg2.projectAPsToProperties(); 
 
     	DENOPTIMFragment rca1 = new DENOPTIMFragment();
     	IAtom a4 = new PseudoAtom("ATP", new Point3d(
     	        new double[]{0.0, 0.0, 0.0}));
     	rca1.addAtom(a4);
-    	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca1.projectAPsToProperties(); 
     	
     	DENOPTIMFragment rca2 = new DENOPTIMFragment();
     	IAtom a5 = new PseudoAtom("ATM", new Point3d(
     	        new double[]{1.0, 0.0, 0.0}));
     	rca2.addAtom(a5);
-    	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca2.projectAPsToProperties(); 
     	
     	DENOPTIMFragment cap = new DENOPTIMFragment();
     	IAtom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	cap.addAtom(a6);
-    	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}), 1);
+    	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	cap.projectAPsToProperties(); 
     	
     	ArrayList<DENOPTIMVertex> scaff = new ArrayList<DENOPTIMVertex>();

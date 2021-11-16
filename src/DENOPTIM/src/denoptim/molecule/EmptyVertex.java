@@ -281,7 +281,9 @@ public class EmptyVertex extends DENOPTIMVertex
         
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            c.addAP(ap.clone());
+            c.addAP(ap.getAtomPositionNumber(),
+                    ap.getDirectionVector(),
+                    ap.getAPClass());
         }
 
         ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
@@ -292,6 +294,54 @@ public class EmptyVertex extends DENOPTIMVertex
         c.setSymmetricAPSets(cLstSymAPs);
 
         return c;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point with a dummy APClass and dummy properties.
+     * This is used only for testing purposes.
+     */
+    public void addAP() {
+        addAP(0);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point with a dummy APClass.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     */
+    public void addAP(int atomPositionNumber) {
+        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
+                atomPositionNumber);
+        getAttachmentPoints().add(ap);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param apClass the APClass
+     */
+    public void addAP(int atomPositionNumber, APClass apClass) {
+        addAP(atomPositionNumber, new double[]{0.0, 0.0, 0.0}, apClass);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Adds an attachment point.
+     * @param atomPositionNumber the index of the source atom (0-based)
+     * @param dirVec the AP direction vector end (the beginning at the 
+     * coordinates of the source atom). This must array have 3 entries.
+     * @param apClass the APClass
+     */
+    public void addAP(int atomPositionNumber, double[] dirVec, APClass apClass) {
+        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
+                atomPositionNumber, dirVec, apClass);
+        getAttachmentPoints().add(ap);
     }
 
 //------------------------------------------------------------------------------
@@ -387,9 +437,8 @@ public class EmptyVertex extends DENOPTIMVertex
                 apsPerAtom.put(atmSrcId, list);
             }
         }
-        String[] pair = DenoptimIO.getAPDefinitionsForSDF(apsPerAtom);
-        iac.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
-        iac.setProperty(DENOPTIMConstants.APTAG, pair[1]);
+        iac.setProperty(DENOPTIMConstants.APSTAG, 
+                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
         iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
         return iac;

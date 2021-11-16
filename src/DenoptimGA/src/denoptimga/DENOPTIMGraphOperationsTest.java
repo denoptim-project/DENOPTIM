@@ -312,7 +312,7 @@ public class DENOPTIMGraphOperationsTest {
                     BBType.FRAGMENT, isRCV);
             for (int i = 0; i < apCount; i++) 
             {
-                v.addAP(0, DEFAULT_APCLASS, getRandomVector(), 1);
+                v.addAP(0, DEFAULT_APCLASS, getRandomVector());
             }
             return v;
         } catch (Throwable t)
@@ -343,20 +343,20 @@ public class DENOPTIMGraphOperationsTest {
      */
     private DENOPTIMGraph getThreeCycle() throws DENOPTIMException 
     {
-        DENOPTIMVertex v1 = new EmptyVertex(0);
+        EmptyVertex v1 = new EmptyVertex(0);
         v1.setLevel(-1);
-        DENOPTIMVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
+        EmptyVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
                 new ArrayList<>(), true);
-        DENOPTIMVertex rcv2 = new EmptyVertex(2, new ArrayList<>(),
+        EmptyVertex rcv2 = new EmptyVertex(2, new ArrayList<>(),
                 new ArrayList<>(), true);
 
-        List<DENOPTIMVertex> vertices = Arrays.asList(v1, rcv1, rcv2);
-        for (DENOPTIMVertex v : vertices) {
+        List<EmptyVertex> vertices = Arrays.asList(v1, rcv1, rcv2);
+        for (EmptyVertex v : vertices) {
             v.setBuildingBlockType(BBType.FRAGMENT);
-            v.addAP(-1, 1, 1);
+            v.addAP(-1);
         }
         // Need an additional AP on v1
-        v1.addAP(-1, 1, 1);
+        v1.addAP(-1);
 
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(v1);

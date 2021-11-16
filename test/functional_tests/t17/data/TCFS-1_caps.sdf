@@ -7,11 +7,8 @@ M  END
 > <cdk:Title>
 hydrogen
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#hyd:1:0.4752%-1.7399%0.3852
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 methyl
@@ -32,11 +29,8 @@ methyl
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#me:1:6.3913%0.4705%7.6865
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 ph
@@ -72,10 +66,7 @@ ph
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#ph:1:8.8679%5.0860%2.2234
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$

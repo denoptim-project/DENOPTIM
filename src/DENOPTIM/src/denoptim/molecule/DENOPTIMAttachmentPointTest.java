@@ -64,17 +64,17 @@ public class DENOPTIMAttachmentPointTest
         map.put(APRULE,BondType.SINGLE);
         FragmentSpace.setBondOrderMap(map);
         
-        DENOPTIMVertex vA1 = new EmptyVertex(0);
-        vA1.addAP(0,1,1);
-        vA1.addAP(1,1,1);
-        vA1.addAP(2,1,1);
-        vA1.addAP(3,1,1);
-        vA1.addAP(4,1,1);
-        vA1.addAP(5,1,1);
-        vA1.addAP(6,1,1);
+        EmptyVertex vA1 = new EmptyVertex(0);
+        vA1.addAP(0);
+        vA1.addAP(1);
+        vA1.addAP(2);
+        vA1.addAP(3);
+        vA1.addAP(4);
+        vA1.addAP(5);
+        vA1.addAP(6);
         ArrayList<DENOPTIMAttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
-        DENOPTIMVertex vB1 = new EmptyVertex(1);
-        vB1.addAP(0,1,1);
+        EmptyVertex vB1 = new EmptyVertex(1);
+        vB1.addAP(0);
         
         DENOPTIMGraph gL01 = new DENOPTIMGraph();
         gL01.addVertex(vA1);
@@ -98,8 +98,8 @@ public class DENOPTIMAttachmentPointTest
         addedVertexes1.add(vB1);
         for (int i=1; i<6; i++)
         {
-            DENOPTIMVertex vNew = new EmptyVertex(1);
-            vNew.addAP(0,1,1);
+            EmptyVertex vNew = new EmptyVertex(1);
+            vNew.addAP(0);
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             gNew.addVertex(old1);
             gNew.appendVertexOnAP(old1.getAP(0), vNew.getAP(0));
@@ -138,17 +138,17 @@ public class DENOPTIMAttachmentPointTest
         // Now we do the same by building the graph in the opposite direction
         //
         
-        DENOPTIMVertex vA2 = new EmptyVertex();
-        vA2.addAP(0,1,1);
-        vA2.addAP(1,1,1);
-        vA2.addAP(2,1,1);
-        vA2.addAP(3,1,1);
-        vA2.addAP(4,1,1);
-        vA2.addAP(5,1,1);
-        vA2.addAP(6,1,1);
+        EmptyVertex vA2 = new EmptyVertex();
+        vA2.addAP(0);
+        vA2.addAP(1);
+        vA2.addAP(2);
+        vA2.addAP(3);
+        vA2.addAP(4);
+        vA2.addAP(5);
+        vA2.addAP(6);
         ArrayList<DENOPTIMAttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
-        DENOPTIMVertex vB2 = new EmptyVertex(1);
-        vB2.addAP(0,1,1);
+        EmptyVertex vB2 = new EmptyVertex(1);
+        vB2.addAP(0);
         
         DENOPTIMGraph gL02 = new DENOPTIMGraph();
         
@@ -176,8 +176,8 @@ public class DENOPTIMAttachmentPointTest
         addedVertexes2.add(vB2);
         for (int i=1; i<6; i++)
         {
-            DENOPTIMVertex vNew = new EmptyVertex(1);
-            vNew.addAP(0,1,1);
+            EmptyVertex vNew = new EmptyVertex(1);
+            vNew.addAP(0);
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             
             //NB: here we pick the other vertex as source
@@ -246,17 +246,17 @@ public class DENOPTIMAttachmentPointTest
         map.put(APRULE,BondType.SINGLE);
         FragmentSpace.setBondOrderMap(map);
         
-        DENOPTIMVertex vA = new EmptyVertex(0);
-        vA.addAP(0,1,1);
-        vA.addAP(1,1,1);
-        vA.addAP(2,1,1);
-        vA.addAP(3,1,1);
-        vA.addAP(4,1,1);
-        vA.addAP(5,1,1);
-        vA.addAP(6,1,1);
-        DENOPTIMVertex vB = new EmptyVertex(1);
-        vB.addAP(0,1,1);
-        vB.addAP(0,1,1);
+        EmptyVertex vA = new EmptyVertex(0);
+        vA.addAP(0);
+        vA.addAP(1);
+        vA.addAP(2);
+        vA.addAP(3);
+        vA.addAP(4);
+        vA.addAP(5);
+        vA.addAP(6);
+        EmptyVertex vB = new EmptyVertex(1);
+        vB.addAP(0);
+        vB.addAP(0);
         
         DENOPTIMGraph gL0 = new DENOPTIMGraph();
         gL0.addVertex(vA);
@@ -273,8 +273,8 @@ public class DENOPTIMAttachmentPointTest
         DENOPTIMVertex old = tL0;
         for (int i=1; i<4; i++)
         {
-            DENOPTIMVertex vNew = new EmptyVertex(1);
-            vNew.addAP(0,1,1);
+            EmptyVertex vNew = new EmptyVertex(1);
+            vNew.addAP(0);
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             gNew.addVertex(old);
             gNew.appendVertexOnAP(old.getAP(0), vNew.getAP(0));
@@ -313,12 +313,12 @@ public class DENOPTIMAttachmentPointTest
         map.put(APRULE,BondType.SINGLE);
         FragmentSpace.setBondOrderMap(map);
         
-        DENOPTIMVertex vA = new EmptyVertex(0);
-        vA.addAP(0,1,1);
-        vA.addAP(1,1,1);
-        vA.addAP(2,1,1);
-        vA.addAP(3,1,1);
-        vA.addAP(4,1,1);
+        EmptyVertex vA = new EmptyVertex(0);
+        vA.addAP(0);
+        vA.addAP(1);
+        vA.addAP(2);
+        vA.addAP(3);
+        vA.addAP(4);
         
         DENOPTIMGraph gL0 = new DENOPTIMGraph();
         gL0.addVertex(vA);
@@ -330,8 +330,8 @@ public class DENOPTIMAttachmentPointTest
         DENOPTIMVertex old = tL0;
         for (int i=0; i<5; i++)
         {
-            DENOPTIMVertex vNew = new EmptyVertex(1);
-            vNew.addAP(i,1,1);
+            EmptyVertex vNew = new EmptyVertex(1);
+            vNew.addAP(i);
             newVrtxs.add(vNew);
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             gNew.addVertex(old);
@@ -369,16 +369,8 @@ public class DENOPTIMAttachmentPointTest
                         break;
                     }
                 }
-                /*
-                System.out.println(">>>> "+apA);
-                System.out.println("     "+inAP);
-                System.out.println("---- "+onion.get(i).getAP(0));
-                System.out.println("     "+e.getTrgAP());
-                */
                 assertEquals(apA,inAP,"Src AP identity");
                 assertEquals(onion.get(i).getAP(0),e.getTrgAP(), "Trg AP identity");
-            } else {
-                //System.out.println(apA.toString()+" free");
             }
         }
     }
@@ -396,13 +388,13 @@ public class DENOPTIMAttachmentPointTest
         
         DENOPTIMGraph g = new DENOPTIMGraph();
         EmptyVertex v1 = new EmptyVertex();
-        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
-        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
         DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
         EmptyVertex v2 = new EmptyVertex();
-        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
-        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
         DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
         g.addVertex(v1);
@@ -427,13 +419,13 @@ public class DENOPTIMAttachmentPointTest
         
 	    DENOPTIMGraph g = new DENOPTIMGraph();
 	    EmptyVertex v1 = new EmptyVertex();
-        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
-        v1.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
         DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
         EmptyVertex v2 = new EmptyVertex();
-        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
-        v2.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
         DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
         g.addVertex(v1);
@@ -456,7 +448,7 @@ public class DENOPTIMAttachmentPointTest
         map.put(APRULE,BondType.SINGLE);
         FragmentSpace.setBondOrderMap(map);
 
-		dummyVertex.addAP(ATMID, APCONN, APCONN, DIRVEC, APClass.make(APCLASS));
+		dummyVertex.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
     	
     	String str2 = ap.getSingleAPStringSDF(true);
@@ -478,7 +470,7 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFStringNoDirVec() throws Exception
     {
-		dummyVertex.addAP(ATMID, APCONN, APCONN, APClass.make(APCLASS));
+		dummyVertex.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
 
     	String str2 = ap.getSingleAPStringSDF(true);
@@ -500,22 +492,22 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSortAPs() throws Exception
     {
-    	dummyVertex.addAP(0,2,1);
-    	dummyVertex.addAP(0,1,1);
+    	dummyVertex.addAP(0);
+    	dummyVertex.addAP(0);
 		DENOPTIMAttachmentPoint ap1 = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint ap2 = dummyVertex.getAP(1);
 
-		dummyVertex.addAP(4, APCONN, APCONN, DIRVEC, APClass.make("AA:0"));
+		dummyVertex.addAP(4, DIRVEC, APClass.make("AA:0"));
 		DENOPTIMAttachmentPoint ap3 = dummyVertex.getAP(2);
 
-		dummyVertex.addAP(4, APCONN, APCONN, DIRVEC, APClass.make("AA:1"));
+		dummyVertex.addAP(4, DIRVEC, APClass.make("AA:1"));
 		DENOPTIMAttachmentPoint ap4 = dummyVertex.getAP(3);
 
-		dummyVertex.addAP(5, APCONN, APCONN, new double[]{1.1, 2.2, 3.3},
+		dummyVertex.addAP(5, new double[]{1.1, 2.2, 3.3},
 				APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap5 = dummyVertex.getAP(4);
 
-		dummyVertex.addAP(5, APCONN, APCONN, new double[]{2.2, 2.2, 3.3},
+		dummyVertex.addAP(5, new double[]{2.2, 2.2, 3.3},
 				APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap6 = dummyVertex.getAP(5);
 
@@ -537,8 +529,8 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSameAs()
     {
-		dummyVertex.addAP(1, 2, 1);
-		dummyVertex.addAP(1, 2, 1);
+		dummyVertex.addAP(1);
+		dummyVertex.addAP(1);
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
@@ -551,8 +543,8 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSameAs_DiffSrcAtm()
     {
-		dummyVertex.addAP(1, 2, 1);
-		dummyVertex.addAP(2, 2, 1);
+		dummyVertex.addAP(1);
+		dummyVertex.addAP(2);
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
@@ -565,8 +557,8 @@ public class DENOPTIMAttachmentPointTest
     public void testSameAs_SameAPClass() throws Exception
     {
 		APClass apClass = APClass.make("classA:0");
-		dummyVertex.addAP(1, 2, 1, apClass);
-    	dummyVertex.addAP(1, 2, 1, apClass);
+		dummyVertex.addAP(1,apClass);
+    	dummyVertex.addAP(1,apClass);
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
@@ -578,8 +570,8 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSameAs_DiffAPClass() throws Exception
     {
-    	dummyVertex.addAP(1, 2, 1, APClass.make("classA:0"));
-    	dummyVertex.addAP(1, 2, 1, APClass.make("classB:0"));
+    	dummyVertex.addAP(1,APClass.make("classA:0"));
+    	dummyVertex.addAP(1,APClass.make("classB:0"));
 
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
@@ -591,7 +583,7 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testClone() throws Exception
     {
-        dummyVertex.addAP(1, 2, 1, APClass.make(APCLASS));
+        dummyVertex.addAP(1,APClass.make(APCLASS));
         DENOPTIMAttachmentPoint orig = dummyVertex.getAP(
                 dummyVertex.getNumberOfAPs()-1);
         

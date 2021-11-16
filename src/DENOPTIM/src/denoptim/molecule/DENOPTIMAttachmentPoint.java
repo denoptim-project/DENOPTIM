@@ -35,10 +35,14 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
- * Each attachment point is annotated by the number (position) of the atom
- * in the molecule, the number of bonds it is associated with, the current
- * number of bonds it is still allowed to form. Where applicable further
- * information in the form of the set of reaction classes is also added.
+ * An attachment point (AP) is a possibility to attach a {@link DENOPTIMVertex} 
+ * onto the vertex
+ * holding the AP (i.e., the owner of the AP), this way forming a new 
+ * {@link DENOPTIMEdge} (i.e., the user of the AP).
+ * It can be annotated with the index (position) of an atom
+ * in the molecule, which is called the attachment point's source atom,
+ * three-dimensional information in the form of Cartesian coordinates,
+ * and information on the kind of attachment point in terms of {@link APClass}.
  * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
@@ -51,7 +55,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     /**
      * Version UID
      */
-    private static final long serialVersionUID = -3680248393705286640L;
+    private static final long serialVersionUID = 3L;
     
     /**
      * Index used to keep the order in a list of attachment points
@@ -68,19 +72,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * (0-based)
      */
     private int atomPositionNumberInMol;
-    
-    //TODO-V3 remove
-    /**
-     * the original number of connections of this atom
-     */
-    private int totalConnections; 
-
-
-    //TODO-V3 remove
-    /**
-     * the current free connections
-     */
-    private int freeConnections; 
     
     /**
      * The attachment point class
@@ -107,15 +98,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
 
     /**
      * Constructor for undefined DENOPTIMAttachmentPoint
-     * @deprecated Use DENOPTIMVertex.addAP(...) instead
+     * @param owner the vertex that holds the attachment point under creation.
      */
-    @Deprecated
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
         this.owner = owner;
         atomPositionNumber = 0;
-        totalConnections = 0;
-        freeConnections = 0;
         id = FragmentSpace.apID.getAndIncrement();
     }
 
@@ -123,58 +111,46 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
 
     /**
      * Constructor
+     * @param owner the vertex that holds the attachment point under creation.
      * @param atomPositionNumber the index of the source atom (0-based)
-     * @param atomConnections the total number of connections
-     * @param apConnections the number of free connections
-     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    @Deprecated
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
-                                   int atomConnections,int apConnections) 
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber) 
     {
         this(owner);
         this.atomPositionNumber = atomPositionNumber;
-        totalConnections = atomConnections;
-        freeConnections = apConnections;
     }
     
 //------------------------------------------------------------------------------
     
     /**
      * Constructor
+     * @param owner the vertex that holds the attachment point under creation.
      * @param atomPositionNumber the index of the source atom (0-based)
-     * @param atomConnections the total number of connections
-     * @param apConnections the number of free connections
      * @param dirVec the AP direction vector end (the beginning are the
      * coords of the source atom). This array must have 3 entries.
-     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    @Deprecated
     private DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
-                                   int atomConnections, int apConnections,
                                    double[] dirVec) 
     {
-        this(owner, atomPositionNumber, atomConnections, apConnections);
-        this.dirVec = new double[3];
-        System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
+        this(owner, atomPositionNumber);
+        if (dirVec != null)
+        {
+            this.dirVec = new double[3];
+            System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
+        }
     }
 
 //------------------------------------------------------------------------------
 
     /**
      * Constructor
+     * @param owner the vertex that holds the attachment point under creation.
      * @param atomPosNum the index of the source atom (0-based)
-     * @param atomConnections the total number of connections
-     * @param apConnections the number of free connections
      * @param apClass the APClass
-     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    @Deprecated
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
-                                   int atomConnections, int apConnections,
                                    APClass apClass) {
-        this(owner, atomPosNum, atomConnections, apConnections,
-                new double[]{0.0, 0.0, 0.0}, apClass);
+        this(owner, atomPosNum, new double[]{0.0, 0.0, 0.0}, apClass);
     }
 
     
@@ -182,20 +158,16 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     
     /**
      * Constructor
+     * @param owner the vertex that holds the attachment point under creation.
      * @param atomPosNum the index of the source atom (0-based)
-     * @param atomConnections the total number of connections
-     * @param apConnections the number of free connections
-     * @param dirVec the AP direction vector end (the beginning at the coords
-     *               of the source atom). This must array have 3 entries.
+     * @param dirVec the AP direction vector end (the beginning at the 
+     * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
-     * @deprecated Use DENOPTIMVertex.addAP(...) instead
      */
-    @Deprecated
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
-                                   int atomConnections, int apConnections,
                                    double[] dirVec, APClass apClass) 
     {
-        this(owner, atomPosNum, atomConnections, apConnections, dirVec);
+        this(owner, atomPosNum, dirVec);
         this.apClass = apClass;
     }
     
@@ -232,11 +204,11 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             switch (details.length)
             {
                 case 2:
-                    //APClass:subclass but no direction vector
+                    //OK, APClass:subclass but no direction vector
                     break;
                     
                 case 3:
-                    //APClass:subclass:direction_vector
+                    //OK, APClass:subclass:direction_vector
                     break;
                     
                 default:
@@ -259,9 +231,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                     this.dirVec[2] = Double.parseDouble(coord[2]);
                 }
             }
-            this.freeConnections = FragmentSpace.getBondOrderForAPClass(
-                    apClass).getValence();
-            this.totalConnections = this.freeConnections;
         } catch (Throwable t) {
             t.printStackTrace();
             throw new DENOPTIMException("Cannot construct AP from string '" 
@@ -289,34 +258,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public void setID(int id)
     {
         this.id = id;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the total number of connections that can be generated by this AP.
-     * This practically corresponds to the max valence this AP can occupy.
-     * This is useful for attachment points that do not follow
-     * the APClass-based formalism.
-     * @return the max number of connections
-     */
-    public int getTotalConnections()
-    {
-        return totalConnections;
-    }    
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the number of unoccupied connections. This practically corresponds
-     * to the number of unsaturated valences that can still be used on this 
-     * attachment point. This is useful for attachment points that do not follow
-     * the APClass-based formalism.
-     * @return the current free connections associated with the atom
-     */
-    public int getFreeConnections()
-    {
-        return freeConnections;
     }
 
 //------------------------------------------------------------------------------
@@ -367,20 +308,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public void setAtomPositionNumberInMol(int atomPositionNumberInMol)
     {
         this.atomPositionNumberInMol = atomPositionNumberInMol;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Set the number of unoccupied connections. This practically corresponds
-     * to the number of unsaturated valences that can still be used on this 
-     * attachment point. This is useful for attachment points that do not follow
-     * the APClass-based formalism.
-     * @param freeConnections
-     */
-    public void setFreeConnections(int freeConnections)
-    {
-        this.freeConnections = freeConnections;
     }
     
 //------------------------------------------------------------------------------
@@ -445,17 +372,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public double[] getDirectionVector()
     {
         return dirVec;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Change the number of free connections by the given delta.
-     * @param delta the amount of change.
-     */
-    public void updateFreeConnections(int delta)
-    {
-        freeConnections = freeConnections + delta;
     }
 
 //------------------------------------------------------------------------------
@@ -669,18 +585,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             return false;
         }
         
-        if (this.getTotalConnections() != other.getTotalConnections())
-        {
-            reason.append("Different total number of connections APs;");
-            return false;
-        }
-
-        if (this.getFreeConnections() != other.getFreeConnections())
-        {
-            reason.append("Different number of free connections APs;");
-            return false;
-        }
-        
         if (this.getAPClass()!=null && other.getAPClass()!=null)
         {
             if (!this.getAPClass().equals(other.getAPClass()))
@@ -732,16 +636,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             {
                 return new DENOPTIMAttachmentPoint(
                         getOwner(),
-                        atomPositionNumber,
-                        totalConnections,
-                        freeConnections
+                        atomPositionNumber
                 );
             } else {
                 return new DENOPTIMAttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
-                        totalConnections,
-                        freeConnections,
                         dirVec
                 );
             }
@@ -750,16 +650,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                 return new DENOPTIMAttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
-                        totalConnections,
-                        freeConnections,
                         apClass.clone()
                 );
             }
             return new DENOPTIMAttachmentPoint(
                     getOwner(),
                     atomPositionNumber,
-                    totalConnections,
-                    freeConnections,
                     dirVec,
                     apClass.clone());
         }
@@ -839,8 +735,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     {
         Map<String,Object> pars = new HashMap<String,Object>();
         pars.put("atomPositionNumber", atomPositionNumber);
-        pars.put("totalConnections",totalConnections);
-        pars.put("freeConnections",freeConnections);
         if (apClass != null)
         {
             pars.put("apClass",apClass);
@@ -868,8 +762,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         Map<String,Object> pars = new HashMap<String,Object>();
         pars.put("atomPositionNumber", atomPositionNumber);
         pars.put("id", id);
-        pars.put("totalConnections",totalConnections);
-        pars.put("freeConnections",freeConnections);
         if (apClass != null)
         {
             pars.put("apClass",apClass);
@@ -1067,12 +959,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public boolean isSrcInUser()
     {
         return user != null && user.getSrcAP() == this;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public void setTotalConnections(int totalConnections) {
-        this.totalConnections = totalConnections;
     }
 
 //-----------------------------------------------------------------------------

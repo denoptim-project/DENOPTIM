@@ -4,10 +4,7 @@ H atom
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.8900    0.0000    0.6293 H   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#h:0:0.0000%0.0000%0.0000 
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$

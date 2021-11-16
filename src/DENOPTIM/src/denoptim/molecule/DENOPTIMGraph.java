@@ -1582,10 +1582,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             DENOPTIMAttachmentPoint srcAP = edge.getSrcAP();
             DENOPTIMAttachmentPoint trgAP = edge.getTrgAP();
-
-            srcAP.updateFreeConnections(edge.getBondType().getValence());
-            trgAP.updateFreeConnections(edge.getBondType().getValence());
-
             srcAP.setUser(null);
             trgAP.setUser(null);
 
@@ -4256,8 +4252,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 {
                     // Regenerate reference to AP owner
                     ap.setOwner(v);
-                    // Reset connection count
-                    ap.setFreeConnections(ap.getTotalConnections());
                 }
             }
 

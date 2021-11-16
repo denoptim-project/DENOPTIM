@@ -84,8 +84,7 @@ public class DENOPTIMFragmentTest
     	        new Point3d(new double[]{3.0, 0.0, 3.3}));
     	
     	frg1.projectAPsToProperties(); 
-    	String apStr = frg1.getProperty(DENOPTIMConstants.APTAG).toString();
-    	String clsStr = frg1.getProperty(DENOPTIMConstants.APCVTAG).toString();
+    	String clsStr = frg1.getProperty(DENOPTIMConstants.APSTAG).toString();
     	
     	DENOPTIMFragment frg2 = new DENOPTIMFragment();
     	Atom a4 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -96,11 +95,11 @@ public class DENOPTIMFragmentTest
     	frg2.addAtom(a6);
     	frg2.addBond(new Bond(a4, a5));
     	frg2.addBond(new Bond(a5, a6));
-    	frg2.setProperty(DENOPTIMConstants.APTAG, apStr);
-    	frg2.setProperty(DENOPTIMConstants.APCVTAG, clsStr);
+    	frg2.setProperty(DENOPTIMConstants.APSTAG, clsStr);
     	frg2.projectPropertyToAP();
     	
-    	assertEquals(frg1.getNumberOfAPs(),frg2.getNumberOfAPs(),"Equality of #AP");
+    	assertEquals(frg1.getNumberOfAPs(),frg2.getNumberOfAPs(),
+    	        "Equality of #AP");
     	assertEquals(frg1.getAPCountOnAtom(0),frg2.getAPCountOnAtom(0),
     	        "Equality of #AP-on-atom");
     }

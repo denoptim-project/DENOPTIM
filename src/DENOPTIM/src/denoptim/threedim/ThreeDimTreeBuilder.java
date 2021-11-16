@@ -434,9 +434,8 @@ public class ThreeDimTreeBuilder
                 }
             }
         }
-        String[] pair = DenoptimIO.getAPDefinitionsForSDF(freeAPPerAtm);
-        mol.setProperty(DENOPTIMConstants.APCVTAG, pair[0]);
-        mol.setProperty(DENOPTIMConstants.APTAG, pair[1]);
+        mol.setProperty(DENOPTIMConstants.APSTAG, 
+                DenoptimIO.getAPDefinitionsForSDF(freeAPPerAtm));
         
         // Add usual graph-related string-based data to SDF properties
         GraphUtils.writeSDFFields(mol, graph);

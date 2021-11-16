@@ -117,80 +117,80 @@ public class DENOPTIMGraphTest {
         FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
         
-        DENOPTIMVertex s0 = new EmptyVertex();
+        EmptyVertex s0 = new EmptyVertex();
         s0.setBuildingBlockType(BBType.SCAFFOLD);
-        s0.addAP(0, 1, 1, APCA);
-        s0.addAP(0, 1, 1, APCA);
+        s0.addAP(0,APCA);
+        s0.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(s0, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
-        DENOPTIMVertex s1 = new EmptyVertex();
+        EmptyVertex s1 = new EmptyVertex();
         s1.setBuildingBlockType(BBType.SCAFFOLD);
-        s1.addAP(0, 1, 1, APCA);
-        s1.addAP(0, 1, 1, APCA);
-        s1.addAP(0, 1, 1, APCD);
+        s1.addAP(0,APCA);
+        s1.addAP(0,APCA);
+        s1.addAP(0,APCD);
         FragmentSpace.appendVertexToLibrary(s1, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
-        DENOPTIMVertex v0 = new EmptyVertex();
+        EmptyVertex v0 = new EmptyVertex();
         v0.setBuildingBlockType(BBType.FRAGMENT);
-        v0.addAP(0, 1, 1, APCA);
-        v0.addAP(0, 1, 1, APCB);
-        v0.addAP(0, 1, 1, APCA);
+        v0.addAP(0,APCA);
+        v0.addAP(0,APCB);
+        v0.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v1 = new EmptyVertex();
+        EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0, 1, 1, APCA);
-        v1.addAP(0, 1, 1, APCB);
-        v1.addAP(0, 1, 1, APCA);
-        v1.addAP(0, 1, 1, APCB);
-        v1.addAP(0, 1, 1, APCC);
+        v1.addAP(0,APCA);
+        v1.addAP(0,APCB);
+        v1.addAP(0,APCA);
+        v1.addAP(0,APCB);
+        v1.addAP(0,APCC);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v2 = new EmptyVertex();
+        EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0, 1, 1, APCB);
+        v2.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v3 = new EmptyVertex();
+        EmptyVertex v3 = new EmptyVertex();
         v3.setBuildingBlockType(BBType.FRAGMENT);
-        v3.addAP(0, 1, 1, APCD);
-        v3.addAP(0, 1, 1, APCD);
+        v3.addAP(0,APCD);
+        v3.addAP(0,APCD);
         FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
        
-        DENOPTIMVertex v4 = new EmptyVertex();
+        EmptyVertex v4 = new EmptyVertex();
         v4.setBuildingBlockType(BBType.FRAGMENT);
-        v4.addAP(0, 1, 1, APCC);
-        v4.addAP(0, 1, 1, APCB);
-        v4.addAP(0, 1, 1, APCB);
-        v4.addAP(0, 1, 1, APCA);
-        v4.addAP(0, 1, 1, APCA);
+        v4.addAP(0,APCC);
+        v4.addAP(0,APCB);
+        v4.addAP(0,APCB);
+        v4.addAP(0,APCA);
+        v4.addAP(0,APCA);
         FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v5 = new EmptyVertex();
+        EmptyVertex v5 = new EmptyVertex();
         v5.setBuildingBlockType(BBType.FRAGMENT);
-        v5.addAP(0, 1, 1, APCB);
-        v5.addAP(0, 1, 1, APCD);
+        v5.addAP(0,APCB);
+        v5.addAP(0,APCD);
         FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v6 = new EmptyVertex();
+        EmptyVertex v6 = new EmptyVertex();
         v6.setBuildingBlockType(BBType.FRAGMENT);
-        v6.addAP(0, 1, 1, APCC);
-        v6.addAP(0, 1, 1, APCD);
+        v6.addAP(0,APCC);
+        v6.addAP(0,APCD);
         FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
-        DENOPTIMVertex v7 = new EmptyVertex();
+        EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
         v7.setAsRCV(true);
-        v7.addAP(0, 1, 1, APCB);
+        v7.addAP(0,APCB);
         FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
@@ -738,34 +738,34 @@ public class DENOPTIMGraphTest {
     @Test
 	public void testRemoveVertex() throws Exception {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graph);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graph);
 		graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 3, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0)));
 
-		DENOPTIMVertex v5 = new EmptyVertex(5);
+		EmptyVertex v5 = new EmptyVertex(5);
 		buildVertexAndConnectToGraph(v5, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
 
-		DENOPTIMVertex v6 = new EmptyVertex(6);
+		EmptyVertex v6 = new EmptyVertex(6);
 		buildVertexAndConnectToGraph(v6, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0)));
 
-		DENOPTIMVertex v7 = new EmptyVertex(7);
+		EmptyVertex v7 = new EmptyVertex(7);
 		buildVertexAndConnectToGraph(v7, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0)));
 
@@ -840,36 +840,30 @@ public class DENOPTIMGraphTest {
 	public void testSameAs_Equal() throws DENOPTIMException
 	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
 
 		// Other graph, but is the same graph
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 3, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v91.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v91.getAP(1), v92.getAP(0)));
-
-    	/*
-    	System.out.println("Graphs");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
 
 		StringBuilder reason = new StringBuilder();
 		assertTrue(graphA.sameAs(graphB, reason), reason.toString());
@@ -881,36 +875,30 @@ public class DENOPTIMGraphTest {
 	public void testSameAs_DiffVertex() throws DENOPTIMException
 	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
 
 		// Other graph
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 3, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v91.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 3, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v91.getAP(1), v92.getAP(0)));
-
-    	/*
-    	System.out.println("Graphs");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
 
 		StringBuilder reason = new StringBuilder();
 		assertFalse(graphA.sameAs(graphB, reason));
@@ -921,22 +909,22 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testSameAs_SameSymmSet() throws Exception {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(2), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(3), v4.getAP(0)));
 
@@ -952,22 +940,22 @@ public class DENOPTIMGraphTest {
 		// Other
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v91.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(1), v92.getAP(0)));
 
-		DENOPTIMVertex v93 = new EmptyVertex(93);
+		EmptyVertex v93 = new EmptyVertex(93);
 		buildVertexAndConnectToGraph(v93, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(2), v93.getAP(0)));
 
-		DENOPTIMVertex v94 = new EmptyVertex(94);
+		EmptyVertex v94 = new EmptyVertex(94);
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(3), v94.getAP(0)));
 
@@ -995,22 +983,22 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testSameAs_DiffSymmSet() throws Exception {
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(2), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(3), v4.getAP(0)));
 
@@ -1026,22 +1014,22 @@ public class DENOPTIMGraphTest {
 		// Other
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v0.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v93 = new EmptyVertex(93);
+		EmptyVertex v93 = new EmptyVertex(93);
 		buildVertexAndConnectToGraph(v93, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v0.getAP(2), v3.getAP(0)));
 
-		DENOPTIMVertex v94 = new EmptyVertex(94);
+		EmptyVertex v94 = new EmptyVertex(94);
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v0.getAP(3), v4.getAP(0)));
 
@@ -1054,12 +1042,6 @@ public class DENOPTIMGraphTest {
 		ssB2.add(4);                           //difference
 		graphB.addSymmetricSetOfVertices(ssB2);
 
-    	/*
-    	System.out.println("Graphs DIFF SS");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
-
 		StringBuilder reason = new StringBuilder();
 		assertFalse(graphA.sameAs(graphB, reason));
 	}
@@ -1070,22 +1052,22 @@ public class DENOPTIMGraphTest {
 	public void testSameAs_SameRings() throws DENOPTIMException
 	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(2), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(3), v4.getAP(0)));
 
@@ -1106,22 +1088,22 @@ public class DENOPTIMGraphTest {
 		// Other
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v91.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(1), v92.getAP(0)));
 
-		DENOPTIMVertex v93 = new EmptyVertex(93);
+		EmptyVertex v93 = new EmptyVertex(93);
 		buildVertexAndConnectToGraph(v93, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(2), v93.getAP(0)));
 
-		DENOPTIMVertex v94 = new EmptyVertex(94);
+		EmptyVertex v94 = new EmptyVertex(94);
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(3), v94.getAP(0)));
 
@@ -1138,12 +1120,6 @@ public class DENOPTIMGraphTest {
 		DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
 		graphB.addRing(rB2);
 
-    	/*
-    	System.out.println("Graphs Same Rings");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
-
 		StringBuilder reason = new StringBuilder();
 		assertTrue(graphA.sameAs(graphB, reason));
 	}
@@ -1154,22 +1130,22 @@ public class DENOPTIMGraphTest {
 	public void testSameAs_DisorderRings() throws Exception 
 	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(2), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(3), v4.getAP(0)));
 
@@ -1190,22 +1166,22 @@ public class DENOPTIMGraphTest {
 		// Other
 
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v91.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(1), v92.getAP(0)));
 
-		DENOPTIMVertex v93 = new EmptyVertex(93);
+		EmptyVertex v93 = new EmptyVertex(93);
 		buildVertexAndConnectToGraph(v93, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(2), v93.getAP(0)));
 
-		DENOPTIMVertex v94 = new EmptyVertex(94);
+		EmptyVertex v94 = new EmptyVertex(94);
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(3), v94.getAP(0)));
 
@@ -1222,12 +1198,6 @@ public class DENOPTIMGraphTest {
 		DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
 		graphB.addRing(rB2);
 
-    	/*
-    	System.out.println("Graphs Disordered Rings");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
-
 		StringBuilder reason = new StringBuilder();
 		assertTrue(graphA.sameAs(graphB, reason));
 	}
@@ -1238,22 +1208,22 @@ public class DENOPTIMGraphTest {
 	public void testSameAs_DiffRings() throws DENOPTIMException
 	{
 		DENOPTIMGraph graphA = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(2), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new DENOPTIMEdge(v0.getAP(3), v4.getAP(0)));
 
@@ -1272,22 +1242,22 @@ public class DENOPTIMGraphTest {
 
 		// Other
 		DENOPTIMGraph graphB = new DENOPTIMGraph();
-		DENOPTIMVertex v90 = new EmptyVertex(90);
+		EmptyVertex v90 = new EmptyVertex(90);
 		buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DENOPTIMVertex v91 = new EmptyVertex(91);
+		EmptyVertex v91 = new EmptyVertex(91);
 		buildVertexAndConnectToGraph(v91, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(0), v91.getAP(0)));
 
-		DENOPTIMVertex v92 = new EmptyVertex(92);
+		EmptyVertex v92 = new EmptyVertex(92);
 		buildVertexAndConnectToGraph(v92, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(1), v92.getAP(0)));
 
-		DENOPTIMVertex v93 = new EmptyVertex(93);
+		EmptyVertex v93 = new EmptyVertex(93);
 		buildVertexAndConnectToGraph(v93, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(2), v93.getAP(0)));
 
-		DENOPTIMVertex v94 = new EmptyVertex(94);
+		EmptyVertex v94 = new EmptyVertex(94);
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new DENOPTIMEdge(v90.getAP(3), v94.getAP(0)));
 
@@ -1304,12 +1274,6 @@ public class DENOPTIMGraphTest {
 		DENOPTIMRing rB2 = new DENOPTIMRing(vrB2);
 		graphB.addRing(rB2);
 
-    	/*
-    	System.out.println("Graphs DIFF Rings");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
-
 		StringBuilder reason = new StringBuilder();
 		assertFalse(graphA.sameAs(graphB, reason));
 	}
@@ -1320,12 +1284,12 @@ public class DENOPTIMGraphTest {
 	public void testGetAvailableAPs_returnsListOfAvailableAPs() 
 	        throws DENOPTIMException 
 	{
-		DENOPTIMVertex vertex0 = new EmptyVertex(0);
-		DENOPTIMVertex vertex1 = new EmptyVertex(1);
+	    EmptyVertex vertex0 = new EmptyVertex(0);
+	    EmptyVertex vertex1 = new EmptyVertex(1);
 
-		vertex0.addAP(0, 1, 1);
-		vertex0.addAP(0, 1, 1);
-		vertex1.addAP(0, 1, 1);
+		vertex0.addAP(0);
+		vertex0.addAP(0);
+		vertex1.addAP(0);
 
 		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getAP(0),
 		        vertex1.getAP(0));
@@ -1346,34 +1310,34 @@ public class DENOPTIMGraphTest {
 	@Test
 	public void testClone() throws DENOPTIMException {
 		DENOPTIMGraph graph = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graph);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graph);
 		graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 3, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0)));
 
-		DENOPTIMVertex v5 = new EmptyVertex(5);
+		EmptyVertex v5 = new EmptyVertex(5);
 		buildVertexAndConnectToGraph(v5, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
 
-		DENOPTIMVertex v6 = new EmptyVertex(6);
+		EmptyVertex v6 = new EmptyVertex(6);
 		buildVertexAndConnectToGraph(v6, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0)));
 
-		DENOPTIMVertex v7 = new EmptyVertex(7);
+		EmptyVertex v7 = new EmptyVertex(7);
 		buildVertexAndConnectToGraph(v7, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0)));
 
@@ -1521,31 +1485,31 @@ public class DENOPTIMGraphTest {
             iac1.addAtom(ia2);
             iac1.addBond(new Bond(ia1, ia2, IBond.Order.SINGLE));
             
-            DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, 
+            DENOPTIMFragment v1 = new DENOPTIMFragment(1, iac1, 
                     BBType.SCAFFOLD);
-            v1.addAP(0, 1, 1);
-            v1.addAP(0, 1, 1);
-            v1.addAP(0, 1, 1);
-            v1.addAP(1, 1, 1);
+            v1.addAP(0);
+            v1.addAP(0);
+            v1.addAP(0);
+            v1.addAP(1);
         
             IAtomContainer iac2 = builder.newAtomContainer();
             iac2.addAtom(new Atom("O"));
-            DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, 
+            DENOPTIMFragment v2 = new DENOPTIMFragment(2, iac2, 
                     BBType.FRAGMENT);
-            v2.addAP(0, 1, 1);
-            v2.addAP(0, 1, 1);
+            v2.addAP(0);
+            v2.addAP(0);
         
             IAtomContainer iac3 = builder.newAtomContainer();
             iac3.addAtom(new Atom("H"));
-            DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, 
+            DENOPTIMFragment v3 = new DENOPTIMFragment(3, iac3, 
                     BBType.CAP);
-            v3.addAP(0, 1, 1);
+            v3.addAP(0);
         
             IAtomContainer iac4 = builder.newAtomContainer();
             iac4.addAtom(new Atom("H"));
-            DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, 
+            DENOPTIMFragment v4 = new DENOPTIMFragment(4, iac4, 
                     BBType.CAP);
-            v4.addAP(0, 1, 1);
+            v4.addAP(0);
         
             graph.addVertex(v1);
             graph.addVertex(v2);
@@ -1583,25 +1547,25 @@ public class DENOPTIMGraphTest {
 		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 		IAtomContainer iac1 = builder.newAtomContainer();
 		iac1.addAtom(new Atom("C"));
-		DENOPTIMVertex v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
-		v1.addAP(1, 1, 1);
-		v1.addAP(1, 1, 1);
+		DENOPTIMFragment v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
+		v1.addAP(1);
+		v1.addAP(1);
 
 		IAtomContainer iac2 = builder.newAtomContainer();
 		iac2.addAtom(new Atom("O"));
-		DENOPTIMVertex v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
-		v2.addAP(1, 1, 1);
-		v2.addAP(1, 1, 1);
+		DENOPTIMFragment v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
+		v2.addAP(1);
+		v2.addAP(1);
 
 		IAtomContainer iac3 = builder.newAtomContainer();
 		iac3.addAtom(new Atom("H"));
-		DENOPTIMVertex v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
-		v3.addAP(1, 1, 1);
+		DENOPTIMFragment v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
+		v3.addAP(1);
 
 		IAtomContainer iac4 = builder.newAtomContainer();
 		iac4.addAtom(new Atom("H"));
-		DENOPTIMVertex v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
-		v4.addAP(1, 1, 1);
+		DENOPTIMFragment v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
+		v4.addAP(1);
 
 		graph.addVertex(v1);
 		graph.addVertex(v2);
@@ -1628,25 +1592,25 @@ public class DENOPTIMGraphTest {
 
 		IAtomContainer iac12 = builder.newAtomContainer();
 		iac12.addAtom(new Atom("C"));
-		DENOPTIMVertex v21 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
-		v21.addAP(0, 1, 1);
-		v21.addAP(0, 1, 1);
+		DENOPTIMFragment v21 = new DENOPTIMFragment(21, iac12, BBType.SCAFFOLD);
+		v21.addAP(0);
+		v21.addAP(0);
 
 		IAtomContainer iac22 = builder.newAtomContainer();
 		iac22.addAtom(new Atom("O"));
-		DENOPTIMVertex v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
-		v22.addAP(0, 1, 1);
-		v22.addAP(0, 1, 1);
+		DENOPTIMFragment v22 = new DENOPTIMFragment(22, iac22, BBType.FRAGMENT);
+		v22.addAP(0);
+		v22.addAP(0);
 
 		IAtomContainer iac23 = builder.newAtomContainer();
 		iac23.addAtom(new Atom("H"));
-		DENOPTIMVertex v23 = new DENOPTIMFragment(23, iac23, BBType.CAP);
-		v23.addAP(0, 1, 1);
+		DENOPTIMFragment v23 = new DENOPTIMFragment(23, iac23, BBType.CAP);
+		v23.addAP(0);
 
 		IAtomContainer iac24 = builder.newAtomContainer();
 		iac24.addAtom(new Atom("H"));
-		DENOPTIMVertex v24 = new DENOPTIMFragment(24, iac24, BBType.CAP);
-		v24.addAP(0, 1, 1);
+		DENOPTIMFragment v24 = new DENOPTIMFragment(24, iac24, BBType.CAP);
+		v24.addAP(0);
 
 		graph2.addVertex(v21);
 		graph2.addVertex(v22);
@@ -1674,16 +1638,14 @@ public class DENOPTIMGraphTest {
 		assertTrue(null == v23.getGraphOwner(),
 				"Owner of removed capping group is null (C)");
 	}
-
+	    
 //------------------------------------------------------------------------------
 
-	private void buildVertexAndConnectToGraph(DENOPTIMVertex v, int apCount,
+	private void buildVertexAndConnectToGraph(EmptyVertex v, int apCount,
 	        DENOPTIMGraph graph) throws DENOPTIMException 
 	{
-		final int ATOM_CONNS = 1;
-		final int AP_CONNS = 1;
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
+			v.addAP(atomPos);
 		}
 		graph.addVertex(v);
 	}
@@ -1695,34 +1657,34 @@ public class DENOPTIMGraphTest {
 	{
 	    DENOPTIMGraph graph = new DENOPTIMGraph();
         
-        DENOPTIMVertex v0 = new EmptyVertex(0);
+	    EmptyVertex v0 = new EmptyVertex(0);
         buildVertexAndConnectToGraph(v0, 3, graph);
 
-        DENOPTIMVertex v1 = new EmptyVertex(1);
+        EmptyVertex v1 = new EmptyVertex(1);
         buildVertexAndConnectToGraph(v1, 2, graph);
         graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 
-        DENOPTIMVertex v2 = new EmptyVertex(2);
+        EmptyVertex v2 = new EmptyVertex(2);
         buildVertexAndConnectToGraph(v2, 2, graph);
         graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
 
-        DENOPTIMVertex v3 = new EmptyVertex(3);
+        EmptyVertex v3 = new EmptyVertex(3);
         buildVertexAndConnectToGraph(v3, 1, graph);
         graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
 
-        DENOPTIMVertex v4 = new EmptyVertex(4);
+        EmptyVertex v4 = new EmptyVertex(4);
         buildVertexAndConnectToGraph(v4, 3, graph);
         graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0)));
 
-        DENOPTIMVertex v5 = new EmptyVertex(5);
+        EmptyVertex v5 = new EmptyVertex(5);
         buildVertexAndConnectToGraph(v5, 1, graph);
         graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
 
-        DENOPTIMVertex v6 = new EmptyVertex(6);
+        EmptyVertex v6 = new EmptyVertex(6);
         buildVertexAndConnectToGraph(v6, 1, graph);
         graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0)));
 
-        DENOPTIMVertex v7 = new EmptyVertex(7);
+        EmptyVertex v7 = new EmptyVertex(7);
         buildVertexAndConnectToGraph(v7, 1, graph);
         graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0)));
 

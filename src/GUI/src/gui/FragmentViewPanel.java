@@ -674,8 +674,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
         				+ " #atms:" + mol.getAtomCount());
         	}
         	mol.addAP(srcAtmId, ap.getAPClass(), 
-        	        new Point3d(ap.getDirectionVector()), 
-        	        ap.getTotalConnections());
+        	        new Point3d(ap.getDirectionVector()));
         }
 	}
 

@@ -188,30 +188,30 @@ public class PopulationTest
     private DENOPTIMGraph makeGraphA() throws DENOPTIMException
     {
         DENOPTIMGraph graphA = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = new EmptyVertex(0);
+        EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
-        v0.addAP(0, 1, 1, APCA);
-        v0.addAP(0, 1, 1, APCA);
+        v0.addAP(0,APCA);
+        v0.addAP(0,APCA);
         graphA.addVertex(v0);
-        DENOPTIMVertex v1 = new EmptyVertex(1);
-        v1.addAP(0, 1, 1, APCA);
-        v1.addAP(0, 1, 1, APCA);
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(0,APCA);
+        v1.addAP(0,APCA);
         graphA.addVertex(v1);
-        DENOPTIMVertex v2 = new EmptyVertex(2);
-        v2.addAP(0, 1, 1, APCA);
-        v2.addAP(0, 1, 1, APCA);
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(0,APCA);
+        v2.addAP(0,APCA);
         graphA.addVertex(v2);
-        DENOPTIMVertex v3 = new EmptyVertex(3);
-        v3.addAP(0, 1, 1, APCA);
-        v3.addAP(0, 1, 1, APCB);
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(0,APCA);
+        v3.addAP(0,APCB);
         graphA.addVertex(v3);
-        DENOPTIMVertex v4 = new EmptyVertex(4);
-        v4.addAP(0, 1, 1, APCB);
-        v4.addAP(0, 1, 1, APCB);
+        EmptyVertex v4 = new EmptyVertex(4);
+        v4.addAP(0,APCB);
+        v4.addAP(0,APCB);
         graphA.addVertex(v4);
-        DENOPTIMVertex v5 = new EmptyVertex(5);
-        v5.addAP(0, 1, 1, APCB);
-        v5.addAP(0, 1, 1, APCB);
+        EmptyVertex v5 = new EmptyVertex(5);
+        v5.addAP(0,APCB);
+        v5.addAP(0,APCB);
         graphA.addVertex(v5);
 
         graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
@@ -233,16 +233,16 @@ public class PopulationTest
     private DENOPTIMGraph makeGraphB() throws DENOPTIMException
     {
         DENOPTIMGraph graphB = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = new EmptyVertex(0);
+        EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
-        v0.addAP(0, 1, 1, APCA);
+        v0.addAP(0,APCA);
         graphB.addVertex(v0);
-        DENOPTIMVertex v1 = new EmptyVertex(1);
-        v1.addAP(0, 1, 1, APCA);
-        v1.addAP(0, 1, 1, APCA);
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(0,APCA);
+        v1.addAP(0,APCA);
         graphB.addVertex(v1);
-        DENOPTIMVertex v2 = new EmptyVertex(2);
-        v2.addAP(0, 1, 1, APCA);
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(0,APCA);
         graphB.addVertex(v2);       
 
         graphB.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
@@ -261,17 +261,17 @@ public class PopulationTest
     private DENOPTIMGraph makeGraphC() throws DENOPTIMException
     {
         DENOPTIMGraph graphC = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = new EmptyVertex(0);
+        EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
-        v0.addAP(0, 1, 1, APCC);
-        v0.addAP(0, 1, 1, APCC);
+        v0.addAP(0,APCC);
+        v0.addAP(0,APCC);
         graphC.addVertex(v0);
-        DENOPTIMVertex v1 = new EmptyVertex(1);
-        v1.addAP(0, 1, 1, APCC);
-        v1.addAP(0, 1, 1, APCA);
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(0,APCC);
+        v1.addAP(0,APCA);
         graphC.addVertex(v1);
-        DENOPTIMVertex v2 = new EmptyVertex(2);
-        v2.addAP(0, 1, 1, APCA);
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(0,APCA);
         graphC.addVertex(v2);       
 
         graphC.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
@@ -290,12 +290,12 @@ public class PopulationTest
     private DENOPTIMGraph makeGraphD() throws DENOPTIMException
     {
         DENOPTIMGraph graphD = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = new EmptyVertex(0);
+        EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
-        v0.addAP(0, 1, 1, APCD);
+        v0.addAP(0,APCD);
         graphD.addVertex(v0);
-        DENOPTIMVertex v1 = new EmptyVertex(1);
-        v1.addAP(0, 1, 1, APCD);  
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(0,APCD);  
 
         graphD.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
 

@@ -165,8 +165,7 @@ public class FragmentSpaceUtils
                         compatible = true;
                     }
                 } else {
-                    if (apA.getTotalConnections() == apB.getTotalConnections())
-                        compatible = true;
+                    compatible = true;
                 }
                 if (compatible)
                 {

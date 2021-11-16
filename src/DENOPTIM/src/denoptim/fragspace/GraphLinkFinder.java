@@ -216,8 +216,7 @@ public class GraphLinkFinder
                             }
                         }
                     } else {
-                        if (oAP.getTotalConnections() == cAP.getTotalConnections())
-                            compatible = true;
+                        compatible = true;
                     }
                     if (compatible)
                     {
@@ -508,8 +507,7 @@ public class GraphLinkFinder
                         if (oriAPC.isCPMapCompatibleWith(cAP.getAPClass()))
                             compatible = true;
                     } else {
-                        if (oAP.getTotalConnections() == cAP.getTotalConnections())
-                            compatible = true;
+                        compatible = true;
                     }
                     if (compatible)
                     {

@@ -7,10 +7,7 @@ M  END
 > <cdk:Title>
 hydrogen
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#hyd:1:0.4667%-1.7366%0.3905
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$

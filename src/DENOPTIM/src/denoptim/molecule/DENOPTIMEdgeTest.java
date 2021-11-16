@@ -19,8 +19,8 @@ import denoptim.molecule.DENOPTIMVertex.BBType;
  */
 
 public class DENOPTIMEdgeTest {
-    private DENOPTIMVertex dummyVertexA;
-    private DENOPTIMVertex dummyVertexB;
+    private EmptyVertex dummyVertexA;
+    private EmptyVertex dummyVertexB;
 	private StringBuilder reason = new StringBuilder();
 	private DENOPTIMAttachmentPoint dummyApA1;
     private DENOPTIMAttachmentPoint dummyApA2;

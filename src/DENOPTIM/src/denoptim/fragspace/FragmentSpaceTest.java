@@ -656,7 +656,7 @@ public class FragmentSpaceTest
                 mol,
                 BBType.FRAGMENT);
         for (int i = 0; i < 4; i++) {
-            v.addAP(0, APC1, getRandomVector(), 1);
+            v.addAP(0, APC1, getRandomVector());
         }
         FragmentSpace.getBondOrderMap().put(APC1.getRule(),
                 DENOPTIMEdge.BondType.SINGLE);
@@ -677,7 +677,7 @@ public class FragmentSpaceTest
                 dummyMol, 
                 BBType.FRAGMENT,
                 true);
-        rcv.addAP(0, APC1, getRandomVector(), 1);
+        rcv.addAP(0, APC1, getRandomVector());
         return rcv;
     }
 

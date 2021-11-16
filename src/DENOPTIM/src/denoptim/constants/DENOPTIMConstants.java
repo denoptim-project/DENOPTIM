@@ -269,14 +269,9 @@ public final class DENOPTIMConstants
     public static final String GMSGTAG = "GraphMsg";
 
     /**
-     * SDF tag defining attachment points 
+     * SDF tag defining attachment points
      */
-    public static final String APTAG = "ATTACHMENT_POINT";
-
-    /**
-     * SDF tag defining attachment points (APs) with AP class and AP vector
-     */
-    public static final String APCVTAG = "CLASS";
+    public static final String APSTAG = "ATTACHMENT_POINTS";
     
     /**
      * SDF tag containing errors during execution of molecule specific tasks
@@ -317,6 +312,11 @@ public final class DENOPTIMConstants
      * Symbol of dummy atom
      */
     public static final String DUMMYATMSYMBOL = "Du";
+    
+    /**
+     * String tag of <code>Atom</code> property used to store attachment points
+     */
+    public static final String ATMPROPAPS = "ATTACHMENT_POINTS";
 
     /**
      * String tag of <code>Atom</code> property used to store the unique ID of

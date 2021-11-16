@@ -10,11 +10,8 @@ AttractorPLUS
 > <cdk:Remark>
 Built manually
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#ATplus:0:0.0040%0.0031%-0.0036
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 AttractorMINUS
@@ -29,11 +26,8 @@ AttractorMINUS
 > <cdk:Remark>
 Built manually
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#ATminus:0:-0.0080%-0.0061%0.0059
-
-> <ATTACHMENT_POINT>
-1:1
 
 $$$$
 C_sp3_2H
@@ -48,11 +42,8 @@ C_sp3_2H
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#cca:0:-0.4692%-1.3052%0.3427,ccb:0:-0.4799%0.3448%-1.2984,ch:0:-0.4840%0.9444%0.9608,ch:0:1.4216%-0.0032%0.0002
-
-> <ATTACHMENT_POINT>
-1:4
 
 $$$$
 Fragment
@@ -67,10 +58,7 @@ Fragment
 > <cdk:Remark>
 From GM3DFragmenter
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#coa:1:-0.4772%-1.2917%0.3463,cob:1:-0.4805%0.3468%-1.3085
-
-> <ATTACHMENT_POINT>
-1:2
 
 $$$$

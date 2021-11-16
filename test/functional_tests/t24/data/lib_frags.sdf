@@ -4,11 +4,8 @@
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0550 N   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#n:0:-0.0128%-0.9601%-0.2550,n:0:0.8379%0.4691%-0.2550,n:0:-0.8251%0.4912%-0.2550 
-
-> <ATTACHMENT_POINT>
-1:1 1:1 1:1
 
 $$$$
 
@@ -17,11 +14,8 @@ $$$$
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0557 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#p:0:-0.0803%-1.2717%-0.5710,p:0:1.1415%0.5663%-0.5710,p:0:-1.0612%0.7054%-0.5710 
-
-> <ATTACHMENT_POINT>
-1:1 1:1 1:1
 
 $$$$
 
@@ -34,11 +28,8 @@ $$$$
   1  2  1  0  0  0  0 
   1  3  1  0  0  0  0 
 M  END
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#c:0:-0.8900%0.0000%0.6293,c:0:0.8900%0.0000%0.6293 
-
-> <ATTACHMENT_POINT>
-1:1 1:1
 
 $$$$
 
@@ -367,7 +358,7 @@ AttractorPLUS
 >  <cdk:Remark>
 Built manually
 
->  <CLASS>
+>  <ATTACHMENT_POINTS>
 1#ATplus:0:-0.0087%-0.0070%-0.0079
 
 >  <ATTACHMENT_POINT>
@@ -386,7 +377,7 @@ AttractorMINUS
 >  <cdk:Remark>
 Built manually
 
->  <CLASS>
+>  <ATTACHMENT_POINTS>
 1#ATminus:0:0.0109%-0.0071%0.0026
 
 >  <ATTACHMENT_POINT>
@@ -399,11 +390,8 @@ $$$$
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.6550    0.0000    0.0001 C   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#c:0:-1.1950%-0.9353%-0.0009,c:0:-1.1950%0.9353%0.0014,c2:0:0.6550%0.0000%-0.0004
-
-> <ATTACHMENT_POINT>
-1:1 1:1 1:1
 
 $$$$
 AttractorN
@@ -418,7 +406,7 @@ AttractorN
 >  <cdk:Remark>
 Built manually
 
->  <CLASS>
+>  <ATTACHMENT_POINTS>
 1#ATneutral:0:-0.0087%-0.0070%-0.0079
 
 >  <ATTACHMENT_POINT>

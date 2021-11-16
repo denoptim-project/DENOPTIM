@@ -78,12 +78,12 @@ public class DenoptimIOTest {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
         
-        DENOPTIMVertex v = new EmptyVertex();
+        EmptyVertex v = new EmptyVertex();
         double[] xyz = {1.1,-2.2,3.3};
-        v.addAP(0, 1, 1, xyz, APClass.make("myClass:0"));
-        v.addAP(1, 1, 1, xyz, APClass.make("myClass:1"));
-        v.addAP(1, 1, 1, xyz, APClass.make("myClass:2"));
-        v.addAP(2, 1, 1, xyz, APClass.make("myClass:3"));
+        v.addAP(0, xyz, APClass.make("myClass:0"));
+        v.addAP(1, xyz, APClass.make("myClass:1"));
+        v.addAP(1, xyz, APClass.make("myClass:2"));
+        v.addAP(2, xyz, APClass.make("myClass:3"));
         
         DenoptimIO.writeVertex(pathName, v);
         
@@ -162,34 +162,34 @@ public class DenoptimIOTest {
         String jsonFile = tempDir.getAbsolutePath() + SEP + "graph.json";
         
 		DENOPTIMGraph graph = new DENOPTIMGraph();
-		DENOPTIMVertex v0 = new EmptyVertex(0);
+		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graph);
 
-		DENOPTIMVertex v1 = new EmptyVertex(1);
+		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0),BT));
 
-		DENOPTIMVertex v2 = new EmptyVertex(2);
+		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graph);
 		graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0),BT));
 
-		DENOPTIMVertex v3 = new EmptyVertex(3);
+		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0),BT));
 
-		DENOPTIMVertex v4 = new EmptyVertex(4);
+		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 3, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0),BT));
 
-		DENOPTIMVertex v5 = new EmptyVertex(5);
+		EmptyVertex v5 = new EmptyVertex(5);
 		buildVertexAndConnectToGraph(v5, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0),BT));
 
-		DENOPTIMVertex v6 = new EmptyVertex(6);
+		EmptyVertex v6 = new EmptyVertex(6);
 		buildVertexAndConnectToGraph(v6, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0),BT));
 
-		DENOPTIMVertex v7 = new EmptyVertex(7);
+		EmptyVertex v7 = new EmptyVertex(7);
 		buildVertexAndConnectToGraph(v7, 1, graph);
 		graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0),BT));
 
@@ -290,13 +290,12 @@ public class DenoptimIOTest {
 
 //------------------------------------------------------------------------------
 
-	private void buildVertexAndConnectToGraph(DENOPTIMVertex v, int apCount,
+	private void buildVertexAndConnectToGraph(EmptyVertex v, int apCount,
 											  DENOPTIMGraph graph) 
 											          throws DENOPTIMException {
-		final int ATOM_CONNS = 1;
-		final int AP_CONNS = 1;
+
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos, ATOM_CONNS, AP_CONNS);
+			v.addAP(atomPos);
 		}
 		graph.addVertex(v);
 	}
@@ -314,7 +313,7 @@ public class DenoptimIOTest {
         assertThrows(UndetectedFileFormatException.class, 
                 () -> DenoptimIO.detectFileFormat(ffile));
         
-        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.APTAG 
+        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.APSTAG
                 + ">", false);
         assertTrue(FileFormat.VRTXSDF == DenoptimIO.detectFileFormat(file),
                 "Vertex SDF");

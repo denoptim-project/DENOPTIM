@@ -8,11 +8,8 @@ standard scaffolr
   1  2  1  0  0  0  0
   1  3  1  0  0  0  0
 M  END
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#c:0:0.1100%0.0000%0.6293,c:0:1.8900%0.0000%0.6293
-
-> <ATTACHMENT_POINT>
-1:1 1:1
 
 $$$$
 Scaffold with template
@@ -182,10 +179,7 @@ M  END
   "symVertices": []
 }
 
-> <CLASS>
+> <ATTACHMENT_POINTS>
 1#c:0:0.8575%0.6599%0.2044,c:0:0.2160%0.5785%0.0755 2#c:0:0.2162%0.0266%0.2183,c:0:0.1134%0.9177%0.5083
-
-> <ATTACHMENT_POINT>
-1:1 1:1 2:1 2:1
 
 $$$$

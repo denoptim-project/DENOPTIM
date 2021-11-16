@@ -27,14 +27,14 @@ runFolder=$(basename $(ls -lrtd "$wrkDir"/RUN*/ | tail -n 1 | awk '{print $NF}')
 n28=$(grep -l M00000028 "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
 n31=$(grep -l M00000031 "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
 nMAX28=$(grep -l "MAX: *28.000" "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
-if [ "$n28" -lt 7 ] || [ "$n28" -gt 9 ]; then
+if [ "$n28" -lt 7 ] || [ "$n28" -gt 10 ]; then
     echo " "
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including M00000028: $n28)"
     exit 1
 fi
-if [ "$n31" -lt 6 ] || [ "$n31" -gt 8 ]; then
+if [ "$n31" -lt 7 ] || [ "$n31" -gt 10 ]; then
     echo " "
-    echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including M00000030: $n31)"
+    echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including M00000031: $n31)"
     exit 1
 fi
 if [ "$nMAX28" -lt 7 ] || [ "$nMAX28" -gt 9 ]; then
