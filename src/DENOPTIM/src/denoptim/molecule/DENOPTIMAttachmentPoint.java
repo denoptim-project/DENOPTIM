@@ -81,7 +81,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     /**
      * The direction vector representing the bond direction
      */
-    private double[] dirVec;
+    private Point3d dirVec;
 
     /**
      * The vertex to which this AP is attached to.
@@ -130,13 +130,12 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * coords of the source atom). This array must have 3 entries.
      */
     private DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
-                                   double[] dirVec) 
+            Point3d dirVec) 
     {
         this(owner, atomPositionNumber);
         if (dirVec != null)
         {
-            this.dirVec = new double[3];
-            System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
+            this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
         }
     }
 
@@ -150,7 +149,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      */
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
                                    APClass apClass) {
-        this(owner, atomPosNum, new double[]{0.0, 0.0, 0.0}, apClass);
+        this(owner, atomPosNum, null, apClass);
     }
 
     
@@ -164,8 +163,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
-                                   double[] dirVec, APClass apClass) 
+    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum, 
+            Point3d dirVec, APClass apClass) 
     {
         this(owner, atomPosNum, dirVec);
         this.apClass = apClass;
@@ -225,10 +224,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                 
                 if (coord.length == 3)
                 {
-                    this.dirVec = new double[3];
-                    this.dirVec[0] = Double.parseDouble(coord[0]);
-                    this.dirVec[1] = Double.parseDouble(coord[1]);
-                    this.dirVec[2] = Double.parseDouble(coord[2]);
+                    this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                            Double.parseDouble(coord[1]),
+                            Double.parseDouble(coord[2]));
                 }
             }
         } catch (Throwable t) {
@@ -309,7 +307,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     {
         this.atomPositionNumberInMol = atomPositionNumberInMol;
     }
-    
+
 //------------------------------------------------------------------------------
     
     /**
@@ -320,10 +318,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * @param dirVec the coordinates of the 3D point defining the end of the
      * direction vector
      */
-    public void setDirectionVector(double[] dirVec)
+    public void setDirectionVector(Point3d dirVec)
     {
-        this.dirVec = new double[3];
-        System.arraycopy(dirVec, 0, this.dirVec, 0, dirVec.length);
+        this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
     }
 
 //------------------------------------------------------------------------------
@@ -369,7 +366,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * the same reference system of the fragment holding this AP.
      * @return the direction vector.
      */
-    public double[] getDirectionVector()
+    public Point3d getDirectionVector()
     {
         return dirVec;
     }
@@ -501,32 +498,27 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         if (this.getDirectionVector() != null 
                 && other.getDirectionVector() != null)
         {
-            double[] thisVec = this.getDirectionVector();
-            double[] otherVec = other.getDirectionVector();
+            Point3d thisVec = this.getDirectionVector();
+            Point3d otherVec = other.getDirectionVector();
     
-            if (thisVec[0] < otherVec[0])
+            if (thisVec.x < otherVec.x)
             {
                 return BEFORE;
-            }
-            else if (thisVec[0] > otherVec[0])
+            } else if (thisVec.x > otherVec.x)
                 return AFTER;
     
-            if (thisVec[1] < otherVec[1])
+            if (thisVec.y < otherVec.y)
             {
                 return BEFORE;
                 
-            }
-            else if (thisVec[1] > otherVec[1])
+            } else if (thisVec.y > otherVec.y)
                 return AFTER;
-            if (thisVec.length > 2 && otherVec.length > 2)
+            
+            if (thisVec.z < otherVec.z)
             {
-                if (thisVec[2] < otherVec[2])
-                {
-                    return BEFORE;
-                }
-                else if (thisVec[2] > otherVec[2])
-                    return AFTER;
-            }
+                return BEFORE;
+            } else if (thisVec.z > otherVec.z)
+                return AFTER;
         }
         else
         {
@@ -600,18 +592,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         {
             boolean different = false;
             double trslh = 0.001;
-            for (int i=0; i<3; i++)
-            {
-                if (Math.abs(this.getDirectionVector()[i]
-                        -other.getDirectionVector()[i])
-                        > trslh)
-                {
-                    different = true;
-                    break;
-                }
-            }
-           
-            if (different)
+            if (this.getDirectionVector().distance(
+                    other.getDirectionVector()) > trslh)
             {
                 reason.append("Different direction vector");
                 return false;
@@ -698,11 +680,11 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             DecimalFormat digits = new DecimalFormat("###.####");
             digits.setMinimumFractionDigits(4);
             sb.append(DENOPTIMConstants.SEPARATORAPPROPSCL);
-            sb.append(digits.format(dirVec[0]));
+            sb.append(digits.format(dirVec.x));
             sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-            sb.append(digits.format(dirVec[1]));
+            sb.append(digits.format(dirVec.y));
             sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-            sb.append(digits.format(dirVec[2]));
+            sb.append(digits.format(dirVec.z));
         }
         return sb.toString();
     }
@@ -741,9 +723,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         }
         if (dirVec != null)
         {
-            pars.put("dirVec.x",dirVec[0]);
-            pars.put("dirVec.y",dirVec[1]);
-            pars.put("dirVec.z",dirVec[2]);
+            pars.put("dirVec.x",dirVec.x);
+            pars.put("dirVec.y",dirVec.y);
+            pars.put("dirVec.z",dirVec.z);
         }
 
         return pars.toString();
@@ -768,9 +750,9 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         }
         if (dirVec != null)
         {
-            pars.put("dirVec.x",dirVec[0]);
-            pars.put("dirVec.y",dirVec[1]);
-            pars.put("dirVec.z",dirVec[2]);
+            pars.put("dirVec.x",dirVec.x);
+            pars.put("dirVec.y",dirVec.y);
+            pars.put("dirVec.z",dirVec.z);
         }
 
         return pars.toString();

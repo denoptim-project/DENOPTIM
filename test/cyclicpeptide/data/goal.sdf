@@ -112,11 +112,11 @@ M  END
             "rule": "peptide",
             "subClass": 1
           },
-          "dirVec": [
-            2.0145,
-            -0.7672,
-            -0.0581
-          ]
+          "dirVec": {
+            "x": 2.0145,
+            "y": -0.7672,
+            "z": -0.0581
+            }
         },
         {
           "id": 243,
@@ -128,11 +128,11 @@ M  END
             "rule": "peptide",
             "subClass": 0
           },
-          "dirVec": [
-            -1.1954,
-            -0.3608,
-            0.4216
-          ]
+          "dirVec": {
+            "x": -1.1954,
+            "y": -0.3608,
+            "z": 0.4216
+            }
         }
       ],
       "lstSymAPs": [],
@@ -141,7 +141,6 @@ M  END
       "buildingBlockId": 17,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": -1,
       "allowedMutationTypes": [
         "CHANGELINK"
       ]
@@ -158,11 +157,11 @@ M  END
             "rule": "peptide",
             "subClass": 1
           },
-          "dirVec": [
-            -0.9807247094327567,
-            -1.4947104750129738,
-            1.1731639607673934
-          ]
+          "dirVec": {
+            "x": -0.9807247094327567,
+            "y": -1.4947104750129738,
+            "z": 1.1731639607673934
+            }
         },
         {
           "id": 294,
@@ -174,11 +173,11 @@ M  END
             "rule": "peptide",
             "subClass": 0
           },
-          "dirVec": [
-            -2.4121402598348016,
-            -1.3023402401249444,
-            -1.7615888865429783
-          ]
+          "dirVec": {
+            "x": -2.4121402598348016,
+            "y": -1.3023402401249444,
+            "z": -1.7615888865429783
+            }
         }
       ],
       "lstSymAPs": [],
@@ -187,7 +186,6 @@ M  END
       "buildingBlockId": 17,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": 0,
       "allowedMutationTypes": [
         "CHANGELINK"
       ]
@@ -204,11 +202,11 @@ M  END
             "rule": "peptide",
             "subClass": 1
           },
-          "dirVec": [
-            -3.2070189736589008,
-            -0.43311464796280397,
-            -1.0479352358913665
-          ]
+          "dirVec": {
+            "x": -3.2070189736589008,
+            "y": -0.43311464796280397,
+            "z": -1.0479352358913665
+            }
         },
         {
           "id": 341,
@@ -220,11 +218,11 @@ M  END
             "rule": "peptide",
             "subClass": 0
           },
-          "dirVec": [
-            -3.94910624276627,
-            -3.4737873715034286,
-            -1.9978546710777472
-          ]
+          "dirVec": {
+            "x": -3.94910624276627,
+            "y": -3.4737873715034286,
+            "z": -1.9978546710777472
+            }
         }
       ],
       "lstSymAPs": [],
@@ -233,7 +231,6 @@ M  END
       "buildingBlockId": 17,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": 1,
       "allowedMutationTypes": [
         "CHANGELINK"
       ]
@@ -250,11 +247,11 @@ M  END
             "rule": "peptide",
             "subClass": 1
           },
-          "dirVec": [
-            -3.644189126434435,
-            -2.908068005039563,
-            -3.2159162390718494
-          ]
+          "dirVec": {
+            "x": -3.644189126434435,
+            "y": -2.908068005039563,
+            "z": -3.2159162390718494
+            }
         },
         {
           "id": 388,
@@ -266,11 +263,11 @@ M  END
             "rule": "peptide",
             "subClass": 0
           },
-          "dirVec": [
-            -6.615357564604518,
-            -3.621351348771316,
-            -2.048818966529069
-          ]
+          "dirVec": {
+            "x": -6.615357564604518,
+            "y": -3.621351348771316,
+            "z": -2.048818966529069
+            }
         }
       ],
       "lstSymAPs": [],
@@ -279,7 +276,6 @@ M  END
       "buildingBlockId": 17,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": 2,
       "allowedMutationTypes": [
         "CHANGELINK"
       ]
@@ -296,11 +292,11 @@ M  END
             "rule": "peptide",
             "subClass": 1
           },
-          "dirVec": [
-            -6.01979557121111,
-            -4.860373593099727,
-            -1.9662561242008747
-          ]
+          "dirVec": {
+            "x": -6.01979557121111,
+            "y": -4.860373593099727,
+            "z": -1.9662561242008747
+            }
         },
         {
           "id": 435,
@@ -312,11 +308,11 @@ M  END
             "rule": "peptide",
             "subClass": 0
           },
-          "dirVec": [
-            -8.22319747902261,
-            -3.8619704175863987,
-            -4.1678333297009535
-          ]
+          "dirVec": {
+            "x": -8.22319747902261,
+            "y": -3.8619704175863987,
+            "z": -4.1678333297009535
+            }
         }
       ],
       "lstSymAPs": [],
@@ -325,7 +321,6 @@ M  END
       "buildingBlockId": 17,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": 3,
       "allowedMutationTypes": [
         "CHANGELINK"
       ]
@@ -342,11 +337,11 @@ M  END
             "rule": "peptide",
             "subClass": 1
           },
-          "dirVec": [
-            -8.917418629068166,
-            -3.6177718192894606,
-            -3.003741034275936
-          ]
+          "dirVec": {
+            "x": -8.917418629068166,
+            "y": -3.6177718192894606,
+            "z": -3.003741034275936
+            }
         },
         {
           "id": 482,
@@ -358,11 +353,11 @@ M  END
             "rule": "peptide",
             "subClass": 0
           },
-          "dirVec": [
-            -9.393609216018543,
-            -6.065644846094717,
-            -5.120316388365444
-          ]
+          "dirVec": {
+            "x": -9.393609216018543,
+            "y": -6.065644846094717,
+            "z": -5.120316388365444
+            }
         }
       ],
       "lstSymAPs": [],
@@ -371,7 +366,6 @@ M  END
       "buildingBlockId": 17,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": 4,
       "allowedMutationTypes": [
         "CHANGELINK"
       ]
@@ -388,11 +382,11 @@ M  END
             "rule": "ATneutral",
             "subClass": 0
           },
-          "dirVec": [
-            2.0145,
-            -0.7672,
-            -0.05810000000000004
-          ]
+          "dirVec": {
+            "x": 2.0145,
+            "y": -0.7672,
+            "z": -0.05810000000000004
+            }
         }
       ],
       "lstSymAPs": [],
@@ -401,7 +395,6 @@ M  END
       "buildingBlockId": 20,
       "buildingBlockType": "FRAGMENT",
       "isRCV": true,
-      "level": 0,
       "allowedMutationTypes": [
       ]
     },
@@ -417,11 +410,11 @@ M  END
             "rule": "ATneutral",
             "subClass": 0
           },
-          "dirVec": [
-            -9.393609216018543,
-            -6.065644846094717,
-            -5.120316388365444
-          ]
+          "dirVec": {
+            "x": -9.393609216018543,
+            "y": -6.065644846094717,
+            "z": -5.120316388365444
+            }
         }
       ],
       "lstSymAPs": [],
@@ -430,7 +423,6 @@ M  END
       "buildingBlockId": 20,
       "buildingBlockType": "FRAGMENT",
       "isRCV": true,
-      "level": 5,
       "allowedMutationTypes": [
       ]
     }

@@ -312,7 +312,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param apClass the APClass
      */
     public void addAP(int atomPositionNumber, APClass apClass) {
-        addAP(atomPositionNumber, new double[]{0.0, 0.0, 0.0}, apClass);
+        addAP(atomPositionNumber, null, apClass);
     }
 
 //------------------------------------------------------------------------------
@@ -324,7 +324,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
-    public void addAP(int atomPositionNumber, double[] dirVec, APClass apClass) {
+    public void addAP(int atomPositionNumber, Point3d dirVec, APClass apClass) {
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, dirVec, apClass);
         getAttachmentPoints().add(ap);
@@ -370,7 +370,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             throws DENOPTIMException
     {
         int atmId = mol.indexOf(srcAtm);
-        this.addAP(atmId, new double[] {vector.x, vector.y, vector.z}, apc);
+        this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);
         ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();
         DENOPTIMAttachmentPoint ap = aps.get(aps.size() - 1);
 

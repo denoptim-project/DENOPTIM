@@ -560,7 +560,7 @@ public class ThreeDimTreeBuilder
                 {
                     Point3d pt = new Point3d(ap.getDirectionVector());
                     pt.sub(tr1);
-                    ap.setDirectionVector(new double[] {pt.x, pt.y, pt.z});
+                    ap.setDirectionVector(pt);
                 }
                 trgApB = new Point3d(apB.getDirectionVector());
                 srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
@@ -627,7 +627,7 @@ public class ThreeDimTreeBuilder
                         pt.sub(srcApA);
                         rotMat.transform(pt);
                         pt.add(srcApA);
-                        ap.setDirectionVector(new double[] {pt.x, pt.y, pt.z});
+                        ap.setDirectionVector(pt);
                     }
         
                     // Update points defining AP vector
@@ -720,7 +720,7 @@ public class ThreeDimTreeBuilder
                                 + "Check source code.";
                         throw new DENOPTIMException(str);
                     }
-                    ap.setDirectionVector(new double[] {pt.x, pt.y, pt.z});
+                    ap.setDirectionVector(pt);
                 }
             }
     

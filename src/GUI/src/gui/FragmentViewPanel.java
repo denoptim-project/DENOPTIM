@@ -866,7 +866,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
         			srcAtmPlace.x,
         			srcAtmPlace.y,
         			srcAtmPlace.z};
-        	double[] endArrow = ap.getDirectionVector();
+        	double[] endArrow = new double[]{ap.getDirectionVector().x,
+        	        ap.getDirectionVector().y, ap.getDirectionVector().z};
         	
         	if (startArrow == null || endArrow==null)
         	{

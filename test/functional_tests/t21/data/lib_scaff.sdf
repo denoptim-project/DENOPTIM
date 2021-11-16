@@ -38,11 +38,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            0.0672,
-            0.1681,
-            0.1149
-          ]
+          "dirVec": {
+            "x": 0.0672,
+            "y": 0.1681,
+            "z": 0.1149
+            }
         },
         {
           "id": 22,
@@ -53,11 +53,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            0.8575,
-            0.6599,
-            0.2044
-          ]
+          "dirVec": {
+            "x": 0.8575,
+            "y": 0.6599,
+            "z": 0.2044
+            }
         },
         {
           "id": 23,
@@ -68,11 +68,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            0.216,
-            0.5785,
-            0.0755
-          ]
+          "dirVec": {
+            "x": 0.216,
+            "y": 0.5785,
+            "z": 0.0755
+            }
         }
       ],
       "lstSymAPs": [
@@ -89,7 +89,6 @@ M  END
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": -99,
       "allowedMutationTypes": [
         "EXTEND",
         "DELETE",
@@ -107,11 +106,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            0.2162,
-            0.0266,
-            0.2183
-          ]
+          "dirVec": {
+            "x": 0.2162,
+            "y": 0.0266,
+            "z": 0.2183
+            }
         },
         {
           "id": 25,
@@ -122,11 +121,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            0.2269,
-            0.1099,
-            0.1229
-          ]
+          "dirVec": {
+            "x": 0.2269,
+            "y": 0.1099,
+            "z": 0.1229
+            }
         },
         {
           "id": 26,
@@ -137,11 +136,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            0.1134,
-            0.9177,
-            0.5083
-          ]
+          "dirVec": {
+            "x": 0.1134,
+            "y": 0.9177,
+            "z": 0.5083
+            }
         }
       ],
       "lstSymAPs": [
@@ -158,7 +157,6 @@ M  END
       "buildingBlockId": 1,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": -99,
       "allowedMutationTypes": [
         "EXTEND",
         "DELETE",

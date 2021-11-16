@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.vecmath.Point3d;
+
 import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -50,7 +52,7 @@ public class DENOPTIMAttachmentPointTest
 	private final String APSUBRULE = "1";
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-	private final double[] DIRVEC = new double[]{1.1, 2.2, 3.3};
+	private final Point3d DIRVEC = new Point3d(1.1, 2.2, 3.3);
 	private final EmptyVertex dummyVertex = new EmptyVertex();
 	
 //-----------------------------------------------------------------------------
@@ -503,11 +505,11 @@ public class DENOPTIMAttachmentPointTest
 		dummyVertex.addAP(4, DIRVEC, APClass.make("AA:1"));
 		DENOPTIMAttachmentPoint ap4 = dummyVertex.getAP(3);
 
-		dummyVertex.addAP(5, new double[]{1.1, 2.2, 3.3},
+		dummyVertex.addAP(5, new Point3d(1.1, 2.2, 3.3),
 				APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap5 = dummyVertex.getAP(4);
 
-		dummyVertex.addAP(5, new double[]{2.2, 2.2, 3.3},
+		dummyVertex.addAP(5, new Point3d(2.2, 2.2, 3.3),
 				APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap6 = dummyVertex.getAP(5);
 

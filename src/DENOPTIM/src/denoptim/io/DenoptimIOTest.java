@@ -79,7 +79,7 @@ public class DenoptimIOTest {
         String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
         
         EmptyVertex v = new EmptyVertex();
-        double[] xyz = {1.1,-2.2,3.3};
+        Point3d xyz = new Point3d(1.1,-2.2,3.3);
         v.addAP(0, xyz, APClass.make("myClass:0"));
         v.addAP(1, xyz, APClass.make("myClass:1"));
         v.addAP(1, xyz, APClass.make("myClass:2"));

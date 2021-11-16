@@ -76,11 +76,11 @@ M  END
                               "rule": "hyd",
                               "subClass": 1
                             },
-                            "dirVec": [
-                              2.912025844755978,
-                              0.8899063972064066,
-                              0.001587671767185624
-                            ]
+                            "dirVec": {
+                              "x": 2.912025844755978,
+                              "y": 0.8899063972064066,
+                              "z": 0.001587671767185624
+                              }
                           }
                         ],
                         "lstSymAPs": [],
@@ -89,7 +89,6 @@ M  END
                         "buildingBlockId": 0,
                         "buildingBlockType": "CAP",
                         "isRCV": false,
-                        "level": 0,
                         "allowedMutationTypes": [
                           "DELETE",
                           "EXTEND",
@@ -110,11 +109,11 @@ M  END
                               "rule": "c",
                               "subClass": 0
                             },
-                            "dirVec": [
-                              3.5774,
-                              -1.1453,
-                              -0.0192
-                            ]
+                            "dirVec": {
+                              "x": 3.5774,
+                              "y": -1.1453,
+                              "z": -0.0192
+                              }
                           },
                           {
                             "id": 196,
@@ -126,11 +125,11 @@ M  END
                               "rule": "c",
                               "subClass": 0
                             },
-                            "dirVec": [
-                              -2.6406,
-                              2.3199,
-                              0.0184
-                            ]
+                            "dirVec": {
+                              "x": -2.6406,
+                              "y": 2.3199,
+                              "z": 0.0184
+                              }
                           },
                           {
                             "id": 197,
@@ -142,11 +141,11 @@ M  END
                               "rule": "c",
                               "subClass": 0
                             },
-                            "dirVec": [
-                              -0.3773,
-                              3.2135,
-                              0.0296
-                            ]
+                            "dirVec": {
+                              "x": -0.3773,
+                              "y": 3.2135,
+                              "z": 0.0296
+                              }
                           },
                           {
                             "id": 198,
@@ -158,11 +157,11 @@ M  END
                               "rule": "c",
                               "subClass": 0
                             },
-                            "dirVec": [
-                              2.0624,
-                              2.83,
-                              0.0257
-                            ]
+                            "dirVec": {
+                              "x": 2.0624,
+                              "y": 2.83,
+                              "z": 0.0257
+                              }
                           },
                           {
                             "id": 199,
@@ -174,11 +173,11 @@ M  END
                               "rule": "c",
                               "subClass": 0
                             },
-                            "dirVec": [
-                              3.9419,
-                              1.2847,
-                              0.007
-                            ]
+                            "dirVec": {
+                              "x": 3.9419,
+                              "y": 1.2847,
+                              "z": 0.007
+                              }
                           }
                         ],
                         "lstSymAPs": [
@@ -197,7 +196,6 @@ M  END
                         "buildingBlockId": 19,
                         "buildingBlockType": "FRAGMENT",
                         "isRCV": false,
-                        "level": -1,
                         "allowedMutationTypes": [
                           "DELETE",
                           "EXTEND",
@@ -231,11 +229,11 @@ M  END
                         "rule": "c",
                         "subClass": 0
                       },
-                      "dirVec": [
-                        3.5774,
-                        -1.1453,
-                        -0.0192
-                      ]
+                      "dirVec": {
+                        "x": 3.5774,
+                        "y": -1.1453,
+                        "z": -0.0192
+                        }
                     },
                     "196": {
                       "id": 1701,
@@ -247,11 +245,11 @@ M  END
                         "rule": "c",
                         "subClass": 0
                       },
-                      "dirVec": [
-                        -2.6406,
-                        2.3199,
-                        0.0184
-                      ]
+                      "dirVec": {
+                        "x": -2.6406,
+                        "y": 2.3199,
+                        "z": 0.0184
+                        }
                     },
                     "197": {
                       "id": 1698,
@@ -263,11 +261,11 @@ M  END
                         "rule": "c",
                         "subClass": 0
                       },
-                      "dirVec": [
-                        -0.3773,
-                        3.2135,
-                        0.0296
-                      ]
+                      "dirVec": {
+                        "x": -0.3773,
+                        "y": 3.2135,
+                        "z": 0.0296
+                        }
                     },
                     "198": {
                       "id": 1700,
@@ -279,18 +277,17 @@ M  END
                         "rule": "c",
                         "subClass": 0
                       },
-                      "dirVec": [
-                        2.0624,
-                        2.83,
-                        0.0257
-                      ]
+                      "dirVec": {
+                        "x": 2.0624,
+                        "y": 2.83,
+                        "z": 0.0257
+                        }
                     }
                   },
                   "vertexId": 1,
                   "buildingBlockId": 16,
                   "buildingBlockType": "FRAGMENT",
                   "isRCV": false,
-                  "level": -1,
                   "allowedMutationTypes": [
                     "DELETE",
                     "EXTEND",
@@ -311,11 +308,11 @@ M  END
                         "rule": "hyd",
                         "subClass": 1
                       },
-                      "dirVec": [
-                        2.7096785526234983,
-                        -0.46445983409919533,
-                        -0.01552364692178936
-                      ]
+                      "dirVec": {
+                        "x": 2.7096785526234983,
+                        "y": -0.46445983409919533,
+                        "z": -0.01552364692178936
+                        }
                     }
                   ],
                   "lstSymAPs": [],
@@ -324,7 +321,6 @@ M  END
                   "buildingBlockId": 0,
                   "buildingBlockType": "CAP",
                   "isRCV": false,
-                  "level": 0,
                   "allowedMutationTypes": [
                     "DELETE",
                     "EXTEND",
@@ -358,11 +354,11 @@ M  END
                   "rule": "c",
                   "subClass": 0
                 },
-                "dirVec": [
-                  -0.3773,
-                  3.2135,
-                  0.0296
-                ]
+                "dirVec": {
+                  "x": -0.3773,
+                  "y": 3.2135,
+                  "z": 0.0296
+                  }
               },
               "1700": {
                 "id": 1704,
@@ -374,11 +370,11 @@ M  END
                   "rule": "c",
                   "subClass": 0
                 },
-                "dirVec": [
-                  2.0624,
-                  2.83,
-                  0.0257
-                ]
+                "dirVec": {
+                  "x": 2.0624,
+                  "y": 2.83,
+                  "z": 0.0257
+                  }
               },
               "1701": {
                 "id": 1705,
@@ -390,18 +386,17 @@ M  END
                   "rule": "c",
                   "subClass": 0
                 },
-                "dirVec": [
-                  -2.6406,
-                  2.3199,
-                  0.0184
-                ]
+                "dirVec": {
+                  "x": -2.6406,
+                  "y": 2.3199,
+                  "z": 0.0184
+                  }
               }
             },
             "vertexId": 1,
             "buildingBlockId": 17,
             "buildingBlockType": "FRAGMENT",
             "isRCV": false,
-            "level": -1,
             "allowedMutationTypes": [
               "DELETE",
               "EXTEND",
@@ -422,11 +417,11 @@ M  END
                   "rule": "hyd",
                   "subClass": 1
                 },
-                "dirVec": [
-                  -0.5377302185031168,
-                  2.1223498506010188,
-                  0.016324424948819603
-                ]
+                "dirVec": {
+                  "x": -0.5377302185031168,
+                  "y": 2.1223498506010188,
+                  "z": 0.016324424948819603
+                  }
               }
             ],
             "lstSymAPs": [],
@@ -435,7 +430,6 @@ M  END
             "buildingBlockId": 0,
             "buildingBlockType": "CAP",
             "isRCV": false,
-            "level": 0,
             "allowedMutationTypes": [
               "DELETE",
               "EXTEND",
@@ -469,11 +463,11 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            2.0624,
-            2.83,
-            0.0257
-          ]
+          "dirVec": {
+            "x": 2.0624,
+            "y": 2.83,
+            "z": 0.0257
+            }
         },
         "1705": {
           "id": 1708,
@@ -485,18 +479,17 @@ M  END
             "rule": "c",
             "subClass": 0
           },
-          "dirVec": [
-            -2.6406,
-            2.3199,
-            0.0184
-          ]
+          "dirVec": {
+            "x": -2.6406,
+            "y": 2.3199,
+            "z": 0.0184
+            }
         }
       },
       "vertexId": 1,
       "buildingBlockId": 18,
       "buildingBlockType": "FRAGMENT",
       "isRCV": false,
-      "level": -1,
       "allowedMutationTypes": [
         "DELETE",
         "EXTEND",
@@ -517,11 +510,11 @@ M  END
             "rule": "hyd",
             "subClass": 1
           },
-          "dirVec": [
-            -1.7816409642582451,
-            1.6281167984645526,
-            0.010128013090585834
-          ]
+          "dirVec": {
+            "x": -1.7816409642582451,
+            "y": 1.6281167984645526,
+            "z": 0.010128013090585834
+            }
         }
       ],
       "lstSymAPs": [],
@@ -530,7 +523,6 @@ M  END
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
       "isRCV": false,
-      "level": 0,
       "allowedMutationTypes": [
         "DELETE",
         "EXTEND",

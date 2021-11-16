@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import javax.vecmath.Point3d;
+
 import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -218,9 +220,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         for (DENOPTIMAttachmentPoint ap : this.requiredAPs)
         {
-            c.addRequiredAP(ap.getAtomPositionNumber(),
-                    ap.getDirectionVector(),
-                    ap.getAPClass());
+            c.addRequiredAP(ap.getDirectionVector(), ap.getAPClass());
         }
         c.setInnerGraph(this.getInnerGraph().clone());
         
@@ -620,15 +620,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @param ap attachment point to require from this template
      * @throws DENOPTIMException 
      */
-    public void addRequiredAP(int atomPositionNumber, double[] dirVec,
-            APClass apClass) {
+    public void addRequiredAP(Point3d pt, APClass apClass) {
         mol = null;
         if (getInnerGraph() != null) {
             throw new IllegalArgumentException("cannot add more required APs " +
                     "after setting the inner graph");
         }
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
-                atomPositionNumber, dirVec, apClass);
+        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, -1, pt, 
+                apClass);
         requiredAPs.add(ap);
     }
 

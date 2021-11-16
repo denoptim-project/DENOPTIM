@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.vecmath.Point3d;
+
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -325,7 +327,7 @@ public class EmptyVertex extends DENOPTIMVertex
      * @param apClass the APClass
      */
     public void addAP(int atomPositionNumber, APClass apClass) {
-        addAP(atomPositionNumber, new double[]{0.0, 0.0, 0.0}, apClass);
+        addAP(atomPositionNumber, null, apClass);
     }
 
 //------------------------------------------------------------------------------
@@ -337,7 +339,7 @@ public class EmptyVertex extends DENOPTIMVertex
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
-    public void addAP(int atomPositionNumber, double[] dirVec, APClass apClass) {
+    public void addAP(int atomPositionNumber, Point3d dirVec, APClass apClass) {
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, dirVec, apClass);
         getAttachmentPoints().add(ap);

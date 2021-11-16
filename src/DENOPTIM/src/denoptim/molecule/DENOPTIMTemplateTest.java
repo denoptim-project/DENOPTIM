@@ -369,7 +369,7 @@ public class DENOPTIMTemplateTest
         int v1APCount = 3;
         int v2APCount = 2;
         for (int i = 0; i < requiredAPCount; i++) {
-            template.addRequiredAP(atmPos, null, null);
+            template.addRequiredAP(null, null);
         }
         for (int i = 0; i < v1APCount; i++) {
             v1.addAP(atmPos);
@@ -396,9 +396,9 @@ public class DENOPTIMTemplateTest
     public void testSetInnerGraph_throws_on_graph_incompatible_w_requiredAPs()
             throws DENOPTIMException {
         int numberOfAPs = 2;
-        List<double[]> dirVecs = Arrays.asList(
-                new double[]{1.0, -2.1,3.2},
-                new double[]{-2.0, 1.1, -3.2}
+        List<Point3d> dirVecs = Arrays.asList(
+                new Point3d(1.0, -2.1,3.2),
+                new Point3d(-2.0, 1.1, -3.2)
         );
         List<APClass> APClasses = Arrays.asList(
                 APClass.make("rule1", 0),
@@ -409,7 +409,7 @@ public class DENOPTIMTemplateTest
                 new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
         for (int i = 0; i < numberOfAPs; i++) {
-            template.addRequiredAP(-1, dirVecs.get(i),
+            template.addRequiredAP(dirVecs.get(i),
                     APClasses.get(i));
             v.addAP(-1, dirVecs.get(i),
                     APClasses.get(i));
@@ -462,8 +462,8 @@ public class DENOPTIMTemplateTest
         DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.NONE);
         DENOPTIMGraph g = new DENOPTIMGraph();
         t.setInnerGraph(g);
-        assertThrows(IllegalArgumentException.class, () -> t.addRequiredAP(0,
-                new double[]{0.0, 0.0, 0.0}, APClass.make("dummy:0")));
+        assertThrows(IllegalArgumentException.class, () -> t.addRequiredAP(
+                new Point3d(0,0,0), APClass.make("dummy:0")));
     }
     
 //------------------------------------------------------------------------------
