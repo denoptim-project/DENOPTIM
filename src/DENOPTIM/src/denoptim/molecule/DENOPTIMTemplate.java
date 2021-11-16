@@ -252,6 +252,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         this.innerGraph = innerGraph;
         innerGraph.setTemplateJacket(this);
         this.innerToOuterAPs = new APTreeMap();
+
+        //TODO: we might need to remove unused RCVs from inner graph.
+        // Such RCVs cannot be used outside the template.
+        
         for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
             addInnerToOuterAPMapping(innerAP);
         }
@@ -259,8 +263,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    //TODO-V3 possibly relocate this and make private
-    public void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
+    private void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
     {
         mol = null;
         this.innerToOuterAPs = new APTreeMap();
@@ -362,14 +365,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         if (innerAPs.size() < getRequiredAPs().size()) {
             return false;
         }
-
-        /* TODO-V3: is sorting needed?
-        * Answer from Einar: Let n be the number of attachment points on the
-        * graph. If we don't sort then this takes O(n²). If we sort then
-        * O(nlog(n)) + O(n) = O(nlog(n)).
-        * The question is actually on whether this sorting is compatible with
-        * the assumption that the list of APs does not change order.
-        */
         Comparator<DENOPTIMAttachmentPoint> apClassComparator
                 = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass,
                         Comparator.nullsLast(Comparator.naturalOrder()));
@@ -407,21 +402,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    // NB: since the list of APs of a template depends on the embedded graph,
-    // setting a list of APs on a template should not be needed/useful. 
-    // However, we need a way to set the constrained (i.e., required) APs that
-    // a template must guarantee.
-    // What we want to do on a template is to define a the constrains w.r.t.
-    // the list of APs, rather than set the sets of list of APs itself.
-    @Override
-    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP)
-    {
-        mol = null;
-        // TODO Auto-generated method stub
-    }
-
-//-----------------------------------------------------------------------------
-    
     //NB: since the symmetry depends on the embedded graph, what we want to do 
     // on a template is define a symmetry constrain rather than set the sets of 
     // symmetric vertices
@@ -434,18 +414,20 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
 //-----------------------------------------------------------------------------
     
+    /**
+     * This operation cannot yet be done on a template because the 
+     *  SymmetricSet class holds only one set of integer identifiers that 
+     *  can be used to identify symmetric things like vertices in a graph,
+     *  or APs belonging to the SAME vertex. However, the symmetric APs on 
+     *  a template can belong to different vertices, meaning that
+     *  identifying these APs with indexes requires at least two sets of
+     *  indexes (one for the vertex, one for the AP).
+     *  For the moment, we cannot return a sensible ArrayList<SymmetricSet>
+     *  thus we return an empty one.
+     */
     @Override
     public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
-        //TODO-V3: this cannot yet be done on a template because the 
-        // SymmetricSet class holds only one set of integer identifiers that 
-        // can be used to identify symmetric things like vertices in a graph,
-        // or APs belonging to the SAME vertex. However, the symmetric APs on 
-        // a template can belong to different vertices, meaning that
-        // identifying these APs with indexes requires at least two sets of
-        // indexes (one for the vertex, one for the AP).
-        // For the moment, we cannot return a sensible ArrayList<SymmetricSet>
-        // thus we return an empty one.
         return new ArrayList<SymmetricSet>();
     }
 
@@ -485,10 +467,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return mol;
         }
         try
-        {
-            //TODO-V3 we might need to remove unused RCVs from inner graph.
-            // Such RCVs cannot be used outside the template.
-            
+        {   
             ThreeDimTreeBuilder t3b = new ThreeDimTreeBuilder();
             IAtomContainer iac = t3b.convertGraphTo3DAtomContainer(
                     innerGraph, true);

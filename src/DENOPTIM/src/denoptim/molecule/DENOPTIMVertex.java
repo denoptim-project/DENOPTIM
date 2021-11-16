@@ -203,38 +203,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         vertexId = id;
     }
     
-  //------------------------------------------------------------------------------
-
-    /**
-     * Constructor for an identified vertex with attachment points.
-     * @param id the VertedID of the vertex to construct. Note that this ID 
-     * should be unique within a graph. To generate unique IDs use 
-     * {@link GraphUtils#getUniqueVertexIndex()}.
-     */
-    public DENOPTIMVertex(VertexType vertexType, int id, 
-            ArrayList<DENOPTIMAttachmentPoint> lstAPs)
-    {
-        this(vertexType, id);
-        setAttachmentPoints(lstAPs);
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructor for an identified vertex.
-     * @param id the VertedID of the vertex to construct. Note that this ID 
-     * should be unique within a graph. To generate unique IDs use 
-     * {@link GraphUtils#getUniqueVertexIndex()}.
-     */
-    public DENOPTIMVertex(VertexType vertexType, int id,
-            ArrayList<DENOPTIMAttachmentPoint> lstAPs,
-            ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)
-    {
-        this(vertexType, id, lstAPs);
-        setSymmetricAPSets(lstSymAPs);
-        this.isRCV = isRCV;
-    }
-    
 //------------------------------------------------------------------------------
 
     /**
@@ -279,28 +247,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     public abstract ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints();
 
-//------------------------------------------------------------------------------
-
-    /**
-     * Append and attachment point to the list of attachment points on this 
-     * vertex.
-     * @param ap the attachment point to add
-     */
-    protected void addAttachmentPoint(DENOPTIMAttachmentPoint ap)
-    {
-        ap.setOwner(this);
-        getAttachmentPoints().add(ap);
-    }
-    
-//------------------------------------------------------------------------------
-
-    //TODO-V3: should be protected? Now it's public to allow refilling of AP list
-    // as done in GraphConversionTool.getGraphFromString to recover at least
-    // some of the entire list of APs of a vertex read-in from a string
-    // representation of a graph. That's obviously not ideal, so eventually
-    // we must get rid of it and move this back to protected.
-    public abstract void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP);
-    
 //------------------------------------------------------------------------------
     
     public void setAsRCV(boolean isRCV)

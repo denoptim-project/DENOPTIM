@@ -502,14 +502,6 @@ public class EmptyVertex extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
 
     @Override
-    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP)
-    {
-        this.lstAPs = lstAP;
-    }
-
-//-----------------------------------------------------------------------------
-
-    @Override
     protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
         this.lstSymAPs = sAPs;

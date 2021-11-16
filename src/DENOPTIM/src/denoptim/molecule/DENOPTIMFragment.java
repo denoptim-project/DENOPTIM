@@ -475,8 +475,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
     	updateAPs();
     	
-    	ArrayList<DENOPTIMAttachmentPoint> allAPs =
-                new ArrayList<>();
+    	lstAPs.clear();
     	
         for (IAtom srcAtm : mol.atoms())
         {
@@ -484,17 +483,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             {
         		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
         				getAPListFromAtom(srcAtm);
-                allAPs.addAll(apsOnAtm);
+        		lstAPs.addAll(apsOnAtm);
             }
         }
 
         //Reorder according to DENOPTIMAttachmentPoint priority
-        allAPs.sort(new DENOPTIMAttachmentPointComparator());
+        lstAPs.sort(new DENOPTIMAttachmentPointComparator());
         
-        //Sync the list of APs stored in superclass
-        setAttachmentPoints(allAPs);
-        
-        return allAPs;
+        return lstAPs;
     }
     
 //-----------------------------------------------------------------------------
@@ -534,6 +530,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
     public void projectPropertyToAP(String allAtomsProp) throws DENOPTIMException
     {
+        lstAPs.clear();
     	if (allAtomsProp.trim().equals(""))
     	{
     		return;
@@ -545,10 +542,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     		IAtom atm = mol.getAtom(ii);   		
     		atm.removeProperty(DENOPTIMConstants.ATMPROPAPS);
     	}
-
-	    // Temp storage for APs
-	    ArrayList<DENOPTIMAttachmentPoint> allAPs = 
-	    		new ArrayList<DENOPTIMAttachmentPoint>();
 	   
 	    // Collect all the APs as objects
 	    String[] atomsProp = allAtomsProp.split(
@@ -566,7 +559,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
-	            allAPs.add(ap);
+			    lstAPs.add(ap);
 			    for (int j = 1; j<moreAPonThisAtm.length; j++ )
 			    {
 			    	//WARNING here we have to switch to 1-based enumeration
@@ -575,21 +568,21 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 							new DENOPTIMAttachmentPoint(this, atmID+1
 									+ DENOPTIMConstants.SEPARATORAPPROPAAP
 									+ moreAPonThisAtm[j]);
-					allAPs.add(apMany);
+					lstAPs.add(apMany);
 			    }
 			} 
 			else 
 			{
 			    DENOPTIMAttachmentPoint ap = 
 			    		new DENOPTIMAttachmentPoint(this, onThisAtm);
-			    allAPs.add(ap);
+			    lstAPs.add(ap);
 			}
 	    }
 
 		// Write attachment points in the atoms
-        for (int i = 0; i < allAPs.size(); i++)
+        for (int i = 0; i < lstAPs.size(); i++)
         {
-            DENOPTIMAttachmentPoint ap = allAPs.get(i);
+            DENOPTIMAttachmentPoint ap = lstAPs.get(i);
             int atmID = ap.getAtomPositionNumber();
             
             if (atmID > mol.getAtomCount())
@@ -615,9 +608,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,aps);
             }
         }
-
-        //Overwrite the list of APs of the superclass
-        setAttachmentPoints(allAPs);
         
         updateSymmetryRelations();
     }
@@ -889,14 +879,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
     {
         return lstAPs;
-    }
-    
-//------------------------------------------------------------------------------
-
-    @Override
-    public void setAttachmentPoints(ArrayList<DENOPTIMAttachmentPoint> lstAP)
-    {
-        this.lstAPs = lstAP;
     }
     
 //------------------------------------------------------------------------------

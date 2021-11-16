@@ -777,16 +777,14 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     }
     
 //-----------------------------------------------------------------------------
-
-    //TODO-V3: we should not be given the possibility to change the AP's owner
-    // However, this is currently needed because of the DNOPTIMVertex.addAP(...)
     
     /**
-     * Sets the reference to the vertex the owns this attachment point.
+     * Sets the reference to the vertex that owns this attachment point. 
+     * This method should be used with caution as it has the capability of
+     * altering graphs!
      * @param owner the vertex that own this attachment point.
      */
-    public void setOwner(DENOPTIMVertex owner)
-    {
+    public void setOwner(DENOPTIMVertex owner) {
         this.owner = owner;
     }
     
