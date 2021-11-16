@@ -1758,7 +1758,8 @@ public class CyclicGraphHandler
 
             // check for orphan coordinating atoms:
             // they have RCAs but none of them is included in a rings
-            if (vert.getLevel() == 0 
+            int levelOfVert = molGraph.getLevel(vert);
+            if (levelOfVert == 0 
                     && vertFrag.getBuildingBlockType() == DENOPTIMVertex.BBType.FRAGMENT)
             {
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
@@ -1791,7 +1792,7 @@ public class CyclicGraphHandler
 
             // check for not fully coordinating multidentate bridges
 //TODO: make the full-denticity requirement optional for same/all APclasses
-            if (vert.getLevel() > 0)
+            if (levelOfVert > 0)
             {
                 Map<String,ArrayList<DENOPTIMVertex>> rcasOnThisVertex =
                                new HashMap<String,ArrayList<DENOPTIMVertex>>();

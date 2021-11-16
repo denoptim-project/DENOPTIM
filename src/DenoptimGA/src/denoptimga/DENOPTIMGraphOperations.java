@@ -514,9 +514,9 @@ public class DENOPTIMGraphOperations
             return status;
         }
         
-        int lvl = curVrtx.getLevel();
         int curVrtId = curVrtx.getVertexId();
         DENOPTIMGraph molGraph = curVrtx.getGraphOwner();
+        int lvl = molGraph.getLevel(curVrtx);
         int grphId = molGraph.getGraphId();
 
         if (debug)
@@ -941,7 +941,7 @@ public class DENOPTIMGraphOperations
 
         for (DENOPTIMGraph g : subgraphs) {
             g.renumberGraphVertices();
-            fixGraph(g);
+            reorderVertexList(g);
         }
 
         return subgraphs;
@@ -984,23 +984,13 @@ public class DENOPTIMGraphOperations
      * scaffold.
      * @param g Graph to fix.
      */
-    private static void fixGraph(DENOPTIMGraph g) 
+    private static void reorderVertexList(DENOPTIMGraph g) 
     {
-        DENOPTIMVertex newScaffold = null;
-        int minLevel = Integer.MAX_VALUE;
-        for (DENOPTIMVertex v : g.getVertexList())
-        {
-            if (v.getLevel()<minLevel)
-            {
-                minLevel = v.getLevel();
-                newScaffold = v;
-            }
-        }
+        DENOPTIMVertex newScaffold = g.getSourceVertex();
         if (newScaffold == null) {
             return;
         }
         DENOPTIMGraph.setScaffold(newScaffold);
-
         fixEdgeDirections(g);
     }
 
@@ -1033,17 +1023,8 @@ public class DENOPTIMGraphOperations
      * @param graph to fix edges of.
      */
     private static void fixEdgeDirections(DENOPTIMGraph graph) {
-        boolean foundScaffold = false;
-        for (DENOPTIMVertex v : graph.getVertexList()) {
-            foundScaffold = v.getLevel() == -1;
-            if (foundScaffold) {
-                fixEdgeDirections(v, new HashSet<>());
-                break;
-            }
-        }
-        if (!foundScaffold) {
-            throw new IllegalArgumentException("Vertex at level -1 not found");
-        }
+        DENOPTIMVertex src = graph.getSourceVertex();
+        fixEdgeDirections(src, new HashSet<>());
     }
 
 //------------------------------------------------------------------------------
@@ -1468,10 +1449,6 @@ public class DENOPTIMGraphOperations
         // Prepare subgraphs that will be exchanged
         DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
         DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
-        int lvl_male = mvert.getLevel();
-        int lvl_female = fvert.getLevel();
-        subG_M.changeLevelToAll(lvl_female);
-        subG_F.changeLevelToAll(lvl_male);
         if (debug)
         {
             System.out.println("DBUG: subGraph from male: "+subG_M);

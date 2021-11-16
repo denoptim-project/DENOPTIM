@@ -512,9 +512,11 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				}
 				
 				// Prevent removal of the scaffold
+				/*
+				DENOPTIMVertex src = dnGraph.getSourceVertex();
 				for (DENOPTIMVertex v : selVrtx)
 				{
-					if (v.getLevel() == -1)
+					if (v == src)
 					{
 						JOptionPane.showMessageDialog(null,
 								"<html>The scaffold cannot be removed."
@@ -525,6 +527,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 						return;
 					}
 				}
+				*/
 				
 				for (DENOPTIMVertex v : selVrtx)
 				{
@@ -870,7 +873,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         {
             currGrphIdx = dnGraphLibrary.size();
             initializeCurrentGraph();
-            ev.setLevel(-1);
             try
             {
                 dnGraph.addVertex(ev);
@@ -1018,7 +1020,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
             return;
         }
 
-		firstVertex.setLevel(-1);
 		dnGraph.addVertex(firstVertex);
 		
 		// Put the graph to the viewer

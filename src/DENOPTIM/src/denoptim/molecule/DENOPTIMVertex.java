@@ -144,14 +144,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     private boolean isRCV;
     
-    //TODO-V3 remove: get it from the graph. It is a property of a vertex in a 
-    // graph, not of a vertex in itself. Also, how is the level counted when
-    // we are after (or inside) a template?
-    /*
-     * if the level at which this vertex is in a graph
-     */
-    private int level = -99; //Initialised to meaningless value
-    
     /**
      * Map of customisable properties
      */
@@ -411,20 +403,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
 //------------------------------------------------------------------------------
 
-    public void setLevel(int level)
-    {
-        this.level = level;
-    }
-
-//------------------------------------------------------------------------------
-
-    public int getLevel()
-    {
-        return level;
-    }
-
-//------------------------------------------------------------------------------
-
     /**
      *
      * @return <code>true</code> if vertex is a ring closing vertex
@@ -463,7 +441,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     public String toString()
     {
         return vertexId  + "_" + (buildingBlockId + 1) + "_" 
-                + buildingBlockType.toOldInt() + "_" + level;
+                + buildingBlockType.toOldInt();
     }
 
 //------------------------------------------------------------------------------

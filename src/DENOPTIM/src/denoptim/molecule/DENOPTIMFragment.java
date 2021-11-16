@@ -683,10 +683,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             cLstSymAPs.add(ss.clone());
         }
         clone.setSymmetricAPSets(cLstSymAPs);
-        
         clone.setAsRCV(this.isRCV());
-        clone.setLevel(this.getLevel());
-        
 		return clone;
     }
 
@@ -870,7 +867,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public String toString()
     {
         return getVertexId() + "_" + (getBuildingBlockId() + 1) + "_" +
-                getBuildingBlockType().toOldInt() + "_" + getLevel();
+                getBuildingBlockType().toOldInt();
     }
     
 //------------------------------------------------------------------------------
@@ -998,7 +995,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             fragWithMol.setSymmetricAPSets(cLstSymAPs);
             fragWithMol.setAsRCV(fragNoMol.isRCV());
             fragWithMol.setVertexId(fragNoMol.getVertexId());
-            fragWithMol.setLevel(fragNoMol.getLevel());
             for (int iap = 0; iap<fragNoMol.getNumberOfAPs(); iap++)
             {
                 DENOPTIMAttachmentPoint oriAP = fragNoMol.getAP(iap);

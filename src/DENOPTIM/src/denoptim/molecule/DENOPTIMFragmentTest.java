@@ -197,7 +197,6 @@ public class DENOPTIMFragmentTest
                 Arrays.asList(0,1,2))));
         v.setSymmetricAPSets(ssaps);
         v.setVertexId(18);
-        v.setLevel(26);
         v.setAsRCV(true);
         v.setBuildingBlockType(DENOPTIMVertex.BBType.SCAFFOLD);
         
@@ -216,7 +215,6 @@ public class DENOPTIMFragmentTest
         assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
         assertEquals(v.getSymmetricAPSets().size(), 
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
-        assertEquals(v.getLevel(), c.getLevel(), "Level");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
         assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");  
         assertEquals(v.getBuildingBlockType(),

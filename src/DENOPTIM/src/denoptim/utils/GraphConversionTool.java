@@ -191,9 +191,8 @@ public class GraphConversionTool
             // molid
             int molid = Integer.parseInt(s3[1]) - 1;
             // fragment/scaffold
-            DENOPTIMVertex.BBType fragtype = DENOPTIMVertex.BBType.parseInt(Integer.parseInt(s3[2]));
-            // level
-            int level = Integer.parseInt(s3[3]);
+            DENOPTIMVertex.BBType fragtype = DENOPTIMVertex.BBType.parseInt(
+                    Integer.parseInt(s3[2]));
 	            
             DENOPTIMVertex dv;
             if (FragmentSpace.isDefined())
@@ -205,7 +204,6 @@ public class GraphConversionTool
                 // build the graph.
                 dv =  new EmptyVertex(vid);
             }
-            dv.setLevel(level);
 
             vertices.add(dv);
         }

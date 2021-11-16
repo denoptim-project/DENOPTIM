@@ -826,9 +826,8 @@ public class CombinatorialExplorerByLayer
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(),scafIdx,DENOPTIMVertex.BBType.SCAFFOLD);
-
-        scafVertex.setLevel(-1);
+                GraphUtils.getUniqueVertexIndex(),scafIdx,
+                DENOPTIMVertex.BBType.SCAFFOLD);
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);

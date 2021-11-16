@@ -91,19 +91,6 @@ public class DENOPTIMGraphEdit {
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraphEdit(String type, DENOPTIMVertex v,
-                             DENOPTIMAttachmentPoint ap, EdgeQuery edg,
-                             DENOPTIMGraph inGraph)
-    {
-        this.taskType = type;
-        this.focusVrtx = v;
-        this.focusAP = ap;
-        this.focusEdge = edg;
-        this.incomingGraph = inGraph;
-    }
-
-//------------------------------------------------------------------------------
-
     public DENOPTIMGraphEdit(String line) throws DENOPTIMException {
         if (!line.trim().startsWith("DENOPTIMGraphEdit ")) {
             String msg = "Line '" + line.trim() + "' does not start with the "
@@ -161,8 +148,6 @@ public class DENOPTIMGraphEdit {
             // vertex ID
             DENOPTIMVertex dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid,
                     fragtype);
-
-            dv.setLevel(level);
 
             this.focusVrtx = dv;
         }

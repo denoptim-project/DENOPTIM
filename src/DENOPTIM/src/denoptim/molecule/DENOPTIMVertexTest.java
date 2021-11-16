@@ -121,7 +121,6 @@ public class DENOPTIMVertexTest
         v.addAP(1);
         v.addAP(2);
         v.addAP(3);
-        v.setLevel(26);
         
         DENOPTIMVertex c = v.clone();
         
@@ -129,7 +128,6 @@ public class DENOPTIMVertexTest
         assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
         assertEquals(v.getSymmetricAPSets().size(), 
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
-        assertEquals(v.getLevel(), c.getLevel(), "Level");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
         assertNotEquals(v.hashCode(), c.hashCode(), "Hash code"); 
         
@@ -152,7 +150,6 @@ public class DENOPTIMVertexTest
                 new double[]{0.0, 0.0, 1.1}));
         v2.addAPOnAtom(a1, APClass.make(APCLASS), new Point3d(
                 new double[]{3.0, 0.0, 3.3}));
-        v2.setLevel(62);
         
         DENOPTIMVertex c2 = v2.clone();
         
@@ -160,7 +157,6 @@ public class DENOPTIMVertexTest
         assertEquals(v2.getNumberOfAPs(), c2.getNumberOfAPs(), "Number of APS");
         assertEquals(v2.getSymmetricAPSets().size(), 
                 c2.getSymmetricAPSets().size(), "Number of SymAPs sets");
-        assertEquals(v2.getLevel(), c2.getLevel(), "Level");
         assertEquals(v2.isRCV(), c2.isRCV(), "RCV flag");
         assertNotEquals(v2.hashCode(), c2.hashCode(), "Hash code");
         assertEquals(v2.getAllAPClasses(),c2.getAllAPClasses(),"APClass list");

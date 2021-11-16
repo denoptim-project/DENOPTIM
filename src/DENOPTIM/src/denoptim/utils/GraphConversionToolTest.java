@@ -155,11 +155,6 @@ public class GraphConversionToolTest
         dg.addEdge(e2);
         dg.addEdge(e3);
         
-        v1.setLevel(-1);
-        v2.setLevel(0);
-        v3.setLevel(1);
-        v4.setLevel(0);
-        
         dg.addRing(v3, v4);
         
         //NB: this replaces unused RCVs with capping groups
@@ -193,11 +188,6 @@ public class GraphConversionToolTest
         acyclicGraph.addEdge(e1b);
         acyclicGraph.addEdge(e2b);
         acyclicGraph.addEdge(e3b);
-        
-        v1b.setLevel(-1);
-        v2b.setLevel(0);
-        v3b.setLevel(1);
-        v4b.setLevel(0);
     	
         //NB: this replaces unused RCVs with capping groups
         GraphConversionTool.replaceUnusedRCVsWithCapps(acyclicGraph);

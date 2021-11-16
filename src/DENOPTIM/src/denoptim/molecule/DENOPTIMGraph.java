@@ -441,13 +441,20 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * <b>WARNING</b>: the graph is assumed to be an healthy spanning tree, in 
      * that it has only one seed that is reachable from any vertex by a 
      * inverse directed path.
-     * The result is unpredictable for disconnected graphs or unhealthy
-     * spanning trees.
+     * The result <code>null</code> for disconnected graphs or otherwise 
+     * unhealthy spanning trees.
      * 
      * @return the seed/root of the spanning tree
      */
     public DENOPTIMVertex getSourceVertex()
     {
+        switch (gVertices.size())
+        {
+            case 0:
+                return null;
+            case 1:
+                return getVertexAtPosition(0);
+        }
         DENOPTIMVertex v0 = getVertexAtPosition(0);
         for (DENOPTIMEdge e : this.getEdgeList())
         {
@@ -1263,10 +1270,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         gVertices.remove(oldLink);
         
         // finally introduce the new vertex in the graph
-        newLink.setLevel(oldLink.getLevel());
         addVertex(newLink);
-        
-        //TODO-V3 update levels?
         
         // We keep track of the APs on the new link that have been dealt with
         List<DENOPTIMAttachmentPoint> doneApsOnNew = 
@@ -1460,7 +1464,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         removeEdge(edge);
         
         // Introduce the new vertex in the graph
-        newLink.setLevel(srcVrtx.getLevel()+1);
         addVertex(newLink);
         
         // Connect the new vertex to the graph
@@ -1470,8 +1473,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         DENOPTIMEdge eLinkToTrg = new DENOPTIMEdge(apMap.get(orisEdgeTrg),
                 orisEdgeTrg, edge.getBondType());
         addEdge(eLinkToTrg);
-        
-        changeLevelOfChilds(trgVrtx,1);
         
         // update any affected ring
         if (isVertexInRing(srcVrtx) && isVertexInRing(trgVrtx))
@@ -1517,7 +1518,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Check if the graph contains the specified vertex.
      * @param v the vertex.
-     * @return <code>true</code> if the vertex belong tho this graph.
+     * @return <code>true</code> if the vertex belong to this graph.
      */
     public boolean containsVertex(DENOPTIMVertex v)
     {
@@ -1746,7 +1747,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Traverse the graph until it identified the source of the directed path
+     * Traverse the graph until it identifies the source of the directed path
      * reachable from the given vertex recursively.
      * @param vertex the child vertex from which we start traversing the graph.
      * @param parentTree list containing the references to all the parents
@@ -1823,7 +1824,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex vOrig : gVertices)
         {
             DENOPTIMVertex vClone = vOrig.clone();
-            vClone.setLevel(vOrig.getLevel());
             cListVrtx.add(vClone);
             vidsInClone.put(vClone.getVertexId(),vClone);
         }
@@ -1951,17 +1951,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         return lstEdges;
-    }
-
-//------------------------------------------------------------------------------
-
-    public int getMaxLevel()
-    {
-        int mval = -1;
-        for (DENOPTIMVertex vtx : gVertices) {
-            mval = Math.max(mval, vtx.getLevel());
-        }
-        return mval;
     }
 
 //------------------------------------------------------------------------------
@@ -2907,55 +2896,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         return nmap;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Change the level of all vertexes so that the first vertex, 
-     * which is assumed to be the deepest among all the vertexes belonging to 
-     * this graph, gets level given by the argument 
-     * (i.e., <code>newLevlOfFirst</code>). In practice, with
-     * <code>initialDeepestLevel</code> be the current level of the first vertex 
-     * belonging to this graph, the correction applied to all vertexes is, 
-     * <code>correction = newLevlOfFirst - initialDeepestLevel</code>.
-     * This method is generally used on subgraphs that have been moved as 
-     * by a crossover or substitution operation.
-     * @param newLevlOfFirst the new level to be assigned to the first (deepest)
-     * 
-     */
-
-    public void changeLevelToAll(int newLevlOfFirst)
-    {
-        int levRoot = gVertices.get(0).getLevel();
-        int correction = newLevlOfFirst - levRoot;
-        changeLevelOfChilds(gVertices.get(0), correction);
-    }
     
 //------------------------------------------------------------------------------
     
     /**
-     * Changes the level declared by all vertexes that can be reached by a 
-     * direct path (i.e., only following edges along source-to-target direction)
-     * from the given source vertex. <b>NB:</b> the first vertex is assumed 
-     * to be the deepest among all the vertexes belonging to this graph,
-     * @param vertex the source vertex identifying the beginning of the graph 
-     * branch to operate on.
-     * @param levelChange the correction to the level.
+     * Calculates the level of a vertex in this graph.
+     * @param v the gertex for which we want the level.
+     * @return the level, i.e., an integer that is -1 for the seed vertex of
+     * this graph and increases by one unit per each edge that has to be 
+     * traversed to reach the vertex given as argument via a direct path.
      */
-    public void changeLevelOfChilds(DENOPTIMVertex vertex, int levelChange)
+    
+    public int getLevel(DENOPTIMVertex v)
     {
-        ArrayList<DENOPTIMVertex> vrtxsToEdit = new ArrayList<DENOPTIMVertex>();
-        if (vertex == gVertices.get(0))
-        {
-            vrtxsToEdit.addAll(gVertices);
-        } else {
-            getChildrenTree(vertex, vrtxsToEdit);
-            vrtxsToEdit.add(vertex);
-        }
-        for (DENOPTIMVertex v : vrtxsToEdit)
-        {
-            v.setLevel(v.getLevel() + levelChange);
-        }
+        ArrayList<DENOPTIMVertex> parentTree = new ArrayList<>();
+        getParentTree(v,parentTree);
+        return parentTree.size() - 1;
     }
 
 //------------------------------------------------------------------------------
@@ -3355,7 +3311,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             bndTyp = BondType.UNDEFINED;
         }
 
-        trgAP.getOwner().setLevel(srcAP.getOwner().getLevel() + 1);
         this.addVertex(trgAP.getOwner());
         DENOPTIMEdge edge = new DENOPTIMEdge(srcAP,trgAP, bndTyp);
         addEdge(edge);
@@ -3678,6 +3633,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         //Check condition: level of vertex
+        //TODO-V3 change to use an object different from the DENOPTIMVertex
+        /*
         if (vQuery.getLevel() > -2) //-2 would be the wildcard
         {
             ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
@@ -3690,6 +3647,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
             matches = newLst;
         }
+        */
 
         if (verbosity > 1)
         {
@@ -4294,9 +4252,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Update the graph so that the vertex argument is at the scaffold level
-     * i.e. is the source of this graph. The other graph's vertices will have
-     * levels updated that corresponds to the layers of a breadth-first
-     * search (BFS) starting from this vertex. The vertex list of this graph
+     * i.e. is the source of this graph. The vertex list of this graph
      * will also be reordered in a way that corresponds to the BFS.
      *
      * @param v vertex to set as scaffold
@@ -4305,7 +4261,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         ArrayList<DENOPTIMVertex> newVertexList = new ArrayList<>();
 
         Set<Integer> visited = new HashSet<>();
-        int level = -1;
         Queue<DENOPTIMVertex> currLevel = new ArrayDeque<>();
         Queue<DENOPTIMVertex> nextLevel = new ArrayDeque<>();
         currLevel.add(v);
@@ -4318,8 +4273,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 visited.add(currId);
 
                 newVertexList.add(currVertex);
-
-                currVertex.setLevel(level);
 
                 Iterable<DENOPTIMVertex> neighbors = currVertex
                         .getAttachmentPoints()
@@ -4338,7 +4291,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             if (currLevel.isEmpty()) {
                 currLevel = nextLevel;
                 nextLevel = new ArrayDeque<>();
-                level++;
             }
         }
 

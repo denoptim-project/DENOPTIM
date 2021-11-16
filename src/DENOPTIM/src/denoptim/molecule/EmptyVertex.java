@@ -272,7 +272,6 @@ public class EmptyVertex extends DENOPTIMVertex
     public EmptyVertex clone()
     {
         EmptyVertex c = new EmptyVertex(getVertexId());
-        c.setLevel(this.getLevel());
         c.setAsRCV(this.isRCV());
         c.setBuildingBlockId(this.getBuildingBlockId());
         c.setBuildingBlockType(this.getBuildingBlockType());

@@ -170,11 +170,6 @@ public class ThreeDimTreeBuilderTest
         g1.addEdge(e2);
         g1.addEdge(e3);
         
-        v1.setLevel(-1);
-        v2.setLevel(0);
-        v3.setLevel(1);
-        v4.setLevel(0);
-        
         g1.addRing(v3, v4);
         
     	ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
@@ -219,11 +214,6 @@ public class ThreeDimTreeBuilderTest
         g2.addEdge(e1b);
         g2.addEdge(e2b);
         g2.addEdge(e3b);
-        
-        v1b.setLevel(-1);
-        v2b.setLevel(0);
-        v3b.setLevel(1);
-        v4b.setLevel(0);
     	
     	IAtomContainer acyclicMol = t3d.convertGraphTo3DAtomContainer(
     			g2,true);
@@ -257,11 +247,6 @@ public class ThreeDimTreeBuilderTest
         g3.addEdge(e1c);
         g3.addEdge(e2c);
         g3.addEdge(e3c);
-        
-        v1c.setLevel(-1);
-        v2c.setLevel(0);
-        v3c.setLevel(1);
-        v4c.setLevel(0);
         
         IAtomContainer molFromEmptyScaff = t3d.convertGraphTo3DAtomContainer(
                 g3,true);
@@ -315,14 +300,6 @@ public class ThreeDimTreeBuilderTest
         g4.addEdge(e4d);
         g4.addEdge(e5d);
         g4.addEdge(e6d);
-        
-        v1d.setLevel(-1);
-        v2d.setLevel(0);
-        v3d.setLevel(0);
-        v4d.setLevel(1);
-        v5d.setLevel(2);
-        v6d.setLevel(2);
-        v7d.setLevel(1);
         
         IAtomContainer molWithEmptyNodes = t3d.convertGraphTo3DAtomContainer(
                 g4,true);

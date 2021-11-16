@@ -304,7 +304,6 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(0,
                 BBType.SCAFFOLD);
-        s.setLevel(-1);
         graph.addVertex(s);
         DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
@@ -400,62 +399,48 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.SCAFFOLD);
-        s.setLevel(-1);
         graph.addVertex(s);
         DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
-        v1a.setLevel(0);
         graph.addVertex(v1a);
         DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
                 BBType.FRAGMENT);
-        v6a.setLevel(1);
         graph.addVertex(v6a);
         DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
                 BBType.FRAGMENT);
-        v6a_bis.setLevel(1);
         graph.addVertex(v6a_bis);
         DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
                 BBType.FRAGMENT);
-        v6a_tris.setLevel(1);
         graph.addVertex(v6a_tris);
         DENOPTIMVertex v7a = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a.setLevel(2);
         graph.addVertex(v7a);
         DENOPTIMVertex v7a_bis = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a_bis.setLevel(2);
         graph.addVertex(v7a_bis);
         DENOPTIMVertex v7a_tris = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a_tris.setLevel(2);
         graph.addVertex(v7a_tris);
         
         DENOPTIMVertex v7a_quat = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a_quat.setLevel(0);
         graph.addVertex(v7a_quat);
         
         DENOPTIMVertex v1c = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
-        v1c.setLevel(0);
         graph.addVertex(v1c);
         
         DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
-        v1b.setLevel(1);
         graph.addVertex(v1b);
         DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2,
                 BBType.FRAGMENT);
-        v2b.setLevel(2);
         graph.addVertex(v2b);
         DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(2,
                 BBType.FRAGMENT);
-        v2b_bis.setLevel(2);
         graph.addVertex(v2b_bis);
         DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3,
                 BBType.FRAGMENT);
-        v3b.setLevel(2);
         graph.addVertex(v3b);
         graph.addEdge(new DENOPTIMEdge(s.getAP(0), v1a.getAP(0)));
         graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v6a.getAP(0)));
@@ -510,31 +495,24 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
-        v1a.setLevel(-1);
         graph.addVertex(v1a);
         DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
                 BBType.FRAGMENT);
-        v6a.setLevel(0);
         graph.addVertex(v6a);
         DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
                 BBType.FRAGMENT);
-        v6a_bis.setLevel(0);
         graph.addVertex(v6a_bis);
         DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
                 BBType.FRAGMENT);
-        v6a_tris.setLevel(0);
         graph.addVertex(v6a_tris);
         DENOPTIMVertex v7a = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a.setLevel(1);
         graph.addVertex(v7a);
         DENOPTIMVertex v7a_bis = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a_bis.setLevel(1);
         graph.addVertex(v7a_bis);
         DENOPTIMVertex v7a_tris = DENOPTIMVertex.newVertexFromLibrary(7,
                 BBType.FRAGMENT);
-        v7a_tris.setLevel(1);
         graph.addVertex(v7a_tris);
         
         graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v6a.getAP(0)));
@@ -570,19 +548,15 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
-        v1b.setLevel(1);
         graph.addVertex(v1b);
         DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2,
                 BBType.FRAGMENT);
-        v2b.setLevel(2);
         graph.addVertex(v2b);
         DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(2,
                 BBType.FRAGMENT);
-        v2b_bis.setLevel(2);
         graph.addVertex(v2b_bis);
         DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3,
                 BBType.FRAGMENT);
-        v3b.setLevel(2);
         graph.addVertex(v3b);
         graph.addEdge(new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0)));
         graph.addEdge(new DENOPTIMEdge(v1b.getAP(3), v2b_bis.getAP(0)));
@@ -598,40 +572,83 @@ public class DENOPTIMGraphTest {
     }
     
 //------------------------------------------------------------------------------
-      
+    
+    /**
+     * Makes a graph with disordered list of vertexes, i.e., the first vertex is
+     * not the source.
+     * <pre>
+     * 
+     * v5-0-->0-v3-1-->1-v4-0-->0-v1-1-->0-v2
+     * 
+     * </pre>
+     * @return a disordered graph
+     * @throws DENOPTIMException
+     */
+    private DENOPTIMGraph makeDisorderedGraph() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1 = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v1);
+        DENOPTIMVertex v2 = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v2);
+        DENOPTIMVertex v3 = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v3);
+        DENOPTIMVertex v4 = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v4);
+        DENOPTIMVertex v5 = DENOPTIMVertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT);
+        graph.addVertex(v5);
+        
+        graph.addEdge(new DENOPTIMEdge(v4.getAP(0), v1.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v3.getAP(1), v4.getAP(1)));
+        graph.addEdge(new DENOPTIMEdge(v5.getAP(0), v3.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
+        return graph;
+    }
+
+//------------------------------------------------------------------------------
+    
     @Test
-    public void testChangeLevels() throws Exception
+    public void testGetSourceVertex() throws Exception
     {
         prepareFragmentSpace();
-        DENOPTIMGraph g = makeTestGraphC();
-        
-        Map<DENOPTIMVertex,Integer> originalValues = 
-                new HashMap<DENOPTIMVertex,Integer>();
-        for (DENOPTIMVertex v : g.getVertexList())
-        {
-            originalValues.put(v, v.getLevel());
-        }
-        
-        ArrayList<DENOPTIMVertex> affectedVertexes = 
-                new ArrayList<DENOPTIMVertex>();
-        g.getChildrenTree(g.getVertexAtPosition(1), affectedVertexes);
-        affectedVertexes.add(g.getVertexAtPosition(1));
-        
-        g.changeLevelOfChilds(g.getVertexAtPosition(1), 10);
-        
-        for (DENOPTIMVertex v : g.getVertexList())
-        {   
-            int expected = originalValues.get(v);
-            String type = "original";
-            if (affectedVertexes.contains(v))
-            {
-                expected = expected + 10;
-                type = "affected";
-            }
-            assertEquals(expected, v.getLevel(), "Level of " + type + " " +v);
-        }
-        
+        DENOPTIMGraph g = makeDisorderedGraph();
+        DENOPTIMVertex src = g.getSourceVertex();
+        assertEquals(g.getVertexAtPosition(4),src,
+                "Inconsistent source vertex");
+
+        DENOPTIMGraph g2 = makeTestGraphC();
+        DENOPTIMVertex src2 = g2.getSourceVertex();
+        assertEquals(g2.getVertexAtPosition(0),src2,
+                "Inconsistent source vertex");
     }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetLevel() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeDisorderedGraph();
+        int[] expected = new int[] {2,3,0,1,-1};
+        for (int i=0; i<g.getVertexCount(); i++)
+        {
+            assertEquals(expected[i],g.getLevel(g.getVertexAtPosition(i)),
+                    "Wrong level for vertex at position "+i);
+        }
+        
+        DENOPTIMGraph g2 = makeTestGraphC();
+        expected = new int[] {-1,0,1,2,3,2,0,1,2,3,2};
+        for (int i=0; i<g2.getVertexCount(); i++)
+        {
+            assertEquals(expected[i],g2.getLevel(g2.getVertexAtPosition(i)),
+                    "Bis: Wrong level for vertex at position "+i);
+        }
+    }   
    
 //------------------------------------------------------------------------------
     
@@ -1441,11 +1458,9 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         DENOPTIMVertex s = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.SCAFFOLD);
-        s.setLevel(-1);
         graph.addVertex(s);
         DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT);
-        v1a.setLevel(0);
         graph.addVertex(v1a);
 
         graph.addEdge(new DENOPTIMEdge(s.getAP(0), v1a.getAP(0)));
@@ -1747,7 +1762,8 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph gB2 = gB1.clone();
         assertTrue(gB1.isIsomorphicTo(gB2),"graph B vs its clone");
     }
-	
+
+    
 //-----------------------------------------------------------------------------
 	
 	@Test

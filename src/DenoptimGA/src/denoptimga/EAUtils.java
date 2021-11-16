@@ -1212,9 +1212,6 @@ public class EAUtils
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, 
                 DENOPTIMVertex.BBType.SCAFFOLD);
-
-        // we set the level to -1, by convention
-        scafVertex.setLevel(-1);
         
         // add the scaffold as a vertex
         graph.addVertex(scafVertex);

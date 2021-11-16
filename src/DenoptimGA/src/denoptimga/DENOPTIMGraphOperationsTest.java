@@ -67,8 +67,8 @@ public class DENOPTIMGraphOperationsTest {
         assertEquals(expected.getEdgeCount(), actual.getEdgeCount());
         assertEquals(1, actual.getRingCount());
 
-        assertTrue(DENOPTIMGraph.compareGraphNodes(getScaffold(expected),
-                expected, getScaffold(actual), actual));
+        assertTrue(DENOPTIMGraph.compareGraphNodes(expected.getSourceVertex(),
+                expected, actual.getSourceVertex(), actual));
     }
 
 //------------------------------------------------------------------------------
@@ -262,11 +262,6 @@ public class DENOPTIMGraphOperationsTest {
                 .map(indices -> indices.collect(Collectors.toSet()))
                 .collect(Collectors.toList());
 
-        List<List<Integer>> vertexLevels = Arrays.asList(
-                Arrays.asList(-1, 0, 1, 1, 2, 2),
-                Arrays.asList(-1, 0, 0, 1, 2)
-        );
-
         List<DENOPTIMGraph> expectedSubgraphs = new ArrayList<>(2);
         for (Set<Integer> keepVertex : keepVertices) {
             DENOPTIMGraph expSubgraph = graph.clone();
@@ -281,15 +276,6 @@ public class DENOPTIMGraphOperationsTest {
                 expSubgraph.removeVertex(removeVertex);
             }
             expectedSubgraphs.add(expSubgraph);
-        }
-
-        for (int i = 0; i < expectedSubgraphs.size(); i++) {
-            DENOPTIMGraph g = expectedSubgraphs.get(i);
-            List<Integer> levels = vertexLevels.get(i);
-            for (int j = 0; j < g.getVertexCount(); j++) {
-                int l = levels.get(j);
-                g.getVertexAtPosition(j).setLevel(l);
-            }
         }
 
         return new HashSet<>(expectedSubgraphs);
@@ -344,7 +330,6 @@ public class DENOPTIMGraphOperationsTest {
     private DENOPTIMGraph getThreeCycle() throws DENOPTIMException 
     {
         EmptyVertex v1 = new EmptyVertex(0);
-        v1.setLevel(-1);
         EmptyVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
                 new ArrayList<>(), true);
         EmptyVertex rcv2 = new EmptyVertex(2, new ArrayList<>(),
@@ -369,19 +354,6 @@ public class DENOPTIMGraphOperationsTest {
 
         g.renumberGraphVertices();
         return g;
-    }
-
-//------------------------------------------------------------------------------
-
-    private DENOPTIMVertex getScaffold(DENOPTIMGraph g) throws Throwable 
-    {
-        return g
-                .getVertexList()
-                .stream()
-                .filter(v -> v.getLevel() == -1)
-                .findFirst()
-                .orElseThrow((Supplier<Throwable>) () ->
-                        new IllegalArgumentException("No vertex at level -1"));
     }
 
 //------------------------------------------------------------------------------
