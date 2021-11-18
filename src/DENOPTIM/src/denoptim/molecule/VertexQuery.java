@@ -18,98 +18,152 @@
 
 package denoptim.molecule;
 
+import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.DENOPTIMVertex.VertexType;
+
 /**
- * Query for searching vertices
+ * Query for searching vertexes.
  * @author Marco Foscato
  */
 
 public class VertexQuery
 { 
     /**
-     * Query on the vertex properties
+     * Query on unique identifier or null.
      */
-    private final DENOPTIMVertex vQuery;
+    private Integer vertexId = null;
+    
+    /**
+     * Query on building block in the library of building blocks, or null.
+     */
+    private Integer buildingBlockId = null;
+    
+    /**
+     * Query on building block type or null.
+     */
+    private BBType buildingBlockType = null;
+    
+    /**
+     * Query on type of vertex
+     */
+    private VertexType vertexType = null;
    
+    /**
+     * Query about the level of the vertex
+     */
+    private Integer level = null;
+
     /**
      * Query on the vertex' incoming connections (i.e., vertex id the target)
      */
-    private EdgeQuery eInQuery;
+    private EdgeQuery incomingEdgeQuery;
 
     /**
      * Query on the vertex' out coming connections (i.e., vertex id the source)
      */
-    private EdgeQuery eOutQuery;
+    private EdgeQuery outgoingEdgeQuery;
 
 //------------------------------------------------------------------------------
 
     /**
      * Constructor from vertex and edge queries
-     * @param v the vertex query (filters candidates based on vertex properties)
-     */
-
-    public VertexQuery(DENOPTIMVertex v)
-    {
-        this.vQuery = v;
-        this.eInQuery = null;
-        this.eOutQuery = null;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructor from vertex and edge queries
-     * @param v the vertex query (filters candidates based on vertex properties)
+     * @param vID the query on vertex's unique identifier, or null.
+     * @param vType the query on vertex's type (i.e., {@link EmptyVertex}, 
+     * {@link DENOPTIMFragment}, or {@link DENOPTIMTemplate}), or null.
+     * @param bbType the query on vertex's building block type, or null,
+     * @param bbID  the query on vertex's building block ID in the library of 
+     * hit type, or null.
+     * @param level the level of the vertexes to match, or null. Remember level
+     * is an integer that starts from -1.
      * @param eIn the edge query (filters candidates based on the connection of
      * a candidate with the rest of the graph) for incoming connections where
      * the candidate vertex if the target.
      */
 
-    public VertexQuery(DENOPTIMVertex v, EdgeQuery eIn)
+    public VertexQuery(Integer vID, VertexType vType, BBType bbType, 
+            Integer bbID, Integer level, EdgeQuery eIn)
     {
-        this.vQuery = v;
-        this.eInQuery = eIn;
-        this.eOutQuery = null;
+        this.vertexId = vID;
+        this.vertexType = vType;
+        this.buildingBlockType = bbType;
+        this.buildingBlockId = bbID;
+        this.level = level;
+        this.incomingEdgeQuery = eIn;
+        this.outgoingEdgeQuery = null;
     }
-	
+    
 //------------------------------------------------------------------------------
 
     /**
      * Constructor from vertex and edge queries
-     * @param v the vertex query (filters candidates based on vertex properties)
      * @param eIn the edge query (filters candidates based on the connection of
      * a candidate with the rest of the graph) for incoming connections where
      * the candidate vertex if the target.
+     * @param vID the query on vertex's unique identifier, or null.
+     * @param vType the query on vertex's type (i.e., {@link EmptyVertex}, 
+     * {@link DENOPTIMFragment}, or {@link DENOPTIMTemplate}), or null.
+     * @param bbType the query on vertex's building block type, or null,
+     * @param bbID  the query on vertex's building block ID in the library of 
+     * hit type, or null.
      * @param eOut the edge query (filters candidates based on the connection of
      * a candidate with the rest of the graph) for incoming connections where
      * the candidate vertex if the source.
      */
 
-    public VertexQuery(DENOPTIMVertex v, EdgeQuery eIn, EdgeQuery eOut)
+    public VertexQuery(Integer vID, VertexType vType, BBType bbType, 
+            Integer bbID, Integer level, EdgeQuery eIn, EdgeQuery eOut)
     {
-        this.vQuery = v;
-        this.eInQuery = eIn;
-        this.eOutQuery = eOut;
+        this(vID, vType, bbType, bbID, level, eIn);
+        this.outgoingEdgeQuery = eOut;
     }
 	
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getVrtxQuery()
+    public VertexType getVertexTypeQuery()
     {
-    	return vQuery;
+    	return vertexType;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public Integer getVertexIDQuery()
+    {
+        return vertexId;
     }
 
 //------------------------------------------------------------------------------
 
+    public BBType getVertexBBTypeQuery()
+    {
+        return buildingBlockType;
+    }
+
+//------------------------------------------------------------------------------
+
+    public Integer getVertexBBIDQuery()
+    {
+        return buildingBlockId;
+    }
+
+//------------------------------------------------------------------------------
+    
+    public Integer getVertexLevelQuery()
+    {
+        return level;
+    }
+    
+//------------------------------------------------------------------------------
+
     public EdgeQuery getInEdgeQuery()
     {
-        return eInQuery;
+        return incomingEdgeQuery;
     }
 
 //------------------------------------------------------------------------------
 
     public EdgeQuery getOutEdgeQuery()
     {
-        return eOutQuery;
+        return outgoingEdgeQuery;
     }
 
 //------------------------------------------------------------------------------

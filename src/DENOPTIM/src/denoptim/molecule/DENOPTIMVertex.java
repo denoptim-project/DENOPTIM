@@ -908,6 +908,19 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Returns the value of the vertex type. Note the returned object is 
+     * independent from the object holding the information about the type of
+     * this vertex.
+     * @return the value of the vertex type
+     */
+    public VertexType getVertexType()
+    {
+        return VertexType.valueOf(vertexType.name());
+    }
+    
+//------------------------------------------------------------------------------
 
     public static class DENOPTIMVertexDeserializer 
     implements JsonDeserializer<DENOPTIMVertex>

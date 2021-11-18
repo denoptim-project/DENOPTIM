@@ -113,6 +113,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.molecule.DENOPTIMEdge;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
@@ -121,8 +122,13 @@ import denoptim.molecule.CandidateLW;
 import denoptim.molecule.DENOPTIMTemplate;
 import denoptim.molecule.DENOPTIMVertex;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.DENOPTIMVertex.VertexType;
+import denoptim.molecule.EdgeQuery;
+import denoptim.molecule.EmptyVertex;
+import denoptim.molecule.VertexQuery;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
+import denoptim.utils.DENOPTIMGraphEdit.EditTask;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GenUtils;
@@ -1938,54 +1944,66 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of graph editing tasks from a text file
+     * Reads a list of graph editing tasks from a JSON file
      *
      * @param fileName the pathname of the file to read
      * @return the list of editing tasks
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraphEdit> readDENOPTIMGraphEditFromFile(
-            String fileName)
-            throws DENOPTIMException {
-        ArrayList<DENOPTIMGraphEdit> lst = new ArrayList<>();
+            String fileName) throws DENOPTIMException 
+    {
+        ArrayList<DENOPTIMGraphEdit> graphEditTasks = new ArrayList<>();
+        Gson reader = DENOPTIMgson.getReader();
+
         BufferedReader br = null;
-        String line = null;
-        try {
+        try
+        {
             br = new BufferedReader(new FileReader(fileName));
-            while ((line = br.readLine()) != null) {
-                if (line.trim().length() == 0) {
-                    continue;
+            graphEditTasks = reader.fromJson(br, 
+                    new TypeToken<ArrayList<DENOPTIMGraphEdit>>(){}.getType());
+        }
+        catch (FileNotFoundException fnfe)
+        {
+            throw new DENOPTIMException("File '" + fileName + "' not found.");
+        }
+        catch (JsonSyntaxException jse)
+        {
+            String msg = "Expected BEGIN_ARRAY but was BEGIN_OBJECT";
+            if (jse.getMessage().contains(msg))
+            {
+                // The file contains a single object, not a list. We try to read
+                // that single object as a DENOPTIMGraph
+                try 
+                {
+                    br.close();
+                    br = new BufferedReader(new FileReader(fileName));
                 }
-
-                if (line.startsWith(DENOPTIMConstants.APCMAPIGNORE)) {
-                    continue;
+                catch (FileNotFoundException fnfe)
+                {
+                    //cannot happen
+                } catch (IOException ioe) 
+                {
+                    throw new DENOPTIMException(ioe);
                 }
-
-                DENOPTIMGraphEdit graphEdit;
-                try {
-                    graphEdit = new DENOPTIMGraphEdit(line.trim());
-                } catch (Throwable t) {
-                    String msg = "Cannot convert string to DENOPTIMGraphEdit. "
-                            + "Check line '" + line.trim() + "'";
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-                    throw new DENOPTIMException(msg, t);
-                }
-                lst.add(graphEdit);
+                DENOPTIMGraphEdit graphEditTask = reader.fromJson(br,
+                        DENOPTIMGraphEdit.class);
+                graphEditTasks.add(graphEditTask);
             }
-        } catch (IOException ioe) {
-            String msg = "Cannot read file " + fileName;
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
-            throw new DENOPTIMException(msg, ioe);
-        } finally {
+        }
+        finally 
+        {
             try {
-                if (br != null) {
+                if (br != null)
+                {
                     br.close();
                 }
             } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
             }
         }
-        return lst;
+        
+        return graphEditTasks;
     }
     
 //------------------------------------------------------------------------------
@@ -2003,8 +2021,7 @@ public class DenoptimIO
      * @throws Exception 
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-            File inFile, boolean useFS)
-            throws Exception 
+            File inFile, boolean useFS) throws Exception 
     {
         FileFormat ff = detectFileFormat(inFile);
         switch (ff) 
@@ -2039,8 +2056,8 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-            String file, String format, boolean useFS)
-            throws DENOPTIMException {
+            String file, String format, boolean useFS) throws DENOPTIMException 
+    {
         switch (format) {
             case "JSON":
                 return DenoptimIO.readDENOPTIMGraphsFromJSONFile(file,useFS);
@@ -2069,7 +2086,8 @@ public class DenoptimIO
      */
 
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSerFile(
-            String fileName) throws DENOPTIMException {
+            String fileName) throws DENOPTIMException 
+    {
         ArrayList<DENOPTIMGraph> list = new ArrayList<DENOPTIMGraph>();
         list.add(deserializeDENOPTIMGraph(new File(fileName)));
         return list;
@@ -2090,8 +2108,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
-            String fileName, boolean useFS)
-            throws DENOPTIMException 
+            String fileName, boolean useFS) throws DENOPTIMException 
     {
         if (!useFS)
         {
@@ -2191,7 +2208,8 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromTxtFile(
-            String fileName, boolean useFS) throws DENOPTIMException {
+            String fileName, boolean useFS) throws DENOPTIMException 
+    {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
         String line = null;
@@ -2308,8 +2326,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeGraphsToFile(File file, FileFormat format,
-            ArrayList<DENOPTIMGraph> graphs)
-            throws DENOPTIMException 
+            ArrayList<DENOPTIMGraph> graphs) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {

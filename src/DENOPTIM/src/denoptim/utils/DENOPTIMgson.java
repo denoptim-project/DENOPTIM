@@ -55,7 +55,6 @@ public class DENOPTIMgson
       .setPrettyPrinting()
       .create();
 
-
     reader = new GsonBuilder()
       .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
       // Custom deserializer to dispatch to the correct subclass of Vertex

@@ -135,6 +135,10 @@
 			<li><a href="#Toc13097_799972446">FragmentSpaceExplorer</a></li>
 			<li><a href="#Toc13097_123456789">Fitness provider</a></li>
 		</ul></li>
+		<li><a href="#Toc9999_1">Utilities</a>
+		<ul>
+			<li><a href="#Toc9999_2">GraphEditor</a></li>
+		</ul></li>
 		<li><a href="#Toc40920_1191730726">File Formats</a>
 		<ul>
 			<li><a href="#Toc16847_799972446">Molecular Fragments</a></li>
@@ -143,6 +147,7 @@
 			<li><a href="#Toc16851_799972446">Initial Population File</a></li>
 			<li><a href="#Toc10339_2456711212">Candidate Chemical Entity Files</a></li>
 			<li><a href="#Toc16853_799972446">Fitness Files</a></li>
+			<li><a href="#Toc9999_3">Graph Editing Task Files</a></li>
 		</ul></li>
 	</ul>
 </div>
@@ -1767,10 +1772,28 @@ without providing that specific keyword in the input file.</p>
 		</td>
 </table>
 
+
+<hr>
+<h1 class="western"><a name="Toc9999_1"></a>Utilities</h1>
+
+<h3 class="western"><a name="Toc9999_2"></a>GraphEditor</h3>
+<p>GraphEditor is a standalone tool to modigy DENOPTIMGraph programmatically outside DENOPTIM main programs. To use GraphEditor run the following command:
+<pre class="bash"><code> java -jar $DENOPTIM_HOME/build/GraphEditor.jar parameters_file</code></pre>
+where <code>$DENOPTIM_HOME</code> is the path to the DENOPTIM installation folder, and a <code>parameters_file</code> is a text parameters file with the keywords needed to perform the task. In addition to any definition of the building block space (see <a href="#Toc40912_1191730726">Fragment space definition</a>), GraphEditor is controleld by the following key-value pairs: 
+<ul>
+  <li><code>GRAPHEDIT-INPUTGRAPHS</code> (<b>REQUIRED</b>): the pathname to a file containing one or more graphs to be edited.</li>
+  <li><code>GRAPHEDIT-GRAPHSEDITSFILE</code> (<b>REQUIRED</b>): the pathname to a file containing one or more graph edit tasks (see <a href="#Toc9999_3">Graph Editing Task Files</a>).</li>
+  <li><code>GRAPHEDIT-OUTPUTGRAPHS</code> (<b>REQUIRED</b>): the pathname of a file whee to put the resulting graphs.</li>
+  <li><code>GRAPHEDIT-OUTPUTGRAPHSFORMAT</code>: the format of the output.</li>
+  <li><code>GRAPHEDIT-VERBOSITY</code>: the amount of log.</li>
+</ul></p>
+
+
 <hr>
 <h1 class="western"><a name="Toc40920_1191730726"></a>File Formats</h1>
 
 <h3 class="western"><a name="Toc16847_799972446"></a>Molecular Fragments</h3>
+//TODO-V3 update!
 
 <p>SDF file format is used for
 any type of fragment (i.e., scaffolds, fragments, capping groups).
@@ -1989,6 +2012,58 @@ Mol_000027&nbsp;
 $$$$
 </pre>
 
+
+<h3 class="western"><a name="Toc9999_3"></a>Graph Editing Task Files</h3>
+<p>Example of JSON syntax for defining the most detailed vertex query. Any of the fields can be left removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brakets immedialty following "incomingEdgeQuery") will make the vertex query match any vertex irrespectively of the properties of the edge that connects such verted to its parent vertex (if any).</p>
+<pre>
+  "vertexQuery": {
+    "vertexId": 1,
+    "buildingBlockId": 4,
+    "buildingBlockType": "FRAGMENT",
+    "vertexType": "MolecularFragment",
+    "level": 2,
+    "incomingEdgeQuery": {
+      "srcVertexId": 1,
+      "trgVertexId": 2,
+      "srcAPID": 3,
+      "trgAPID": 4,
+      "bondType": "DOUBLE",
+      "srcAPC": {
+        "rule": "s",
+        "subClass": 0
+      },
+      "trgAPC": {
+        "rule": "t",
+        "subClass": 0
+      }
+    },
+    "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
+  }
+</pre>
+
+<p>The above is a complete list of fields that can be used to define a vertex query, but a valid query can include any of those fields from none (i.e., a query that matches everithing) to all of them (i.e., the most detailed query possible). For example, the following is a vertex query meant to match only vertexes in level 2:</p>
+<pre>
+  "vertexQuery": {
+      "level": 2
+  }
+</pre>
+
+<p>A sequence of graph editing tasks is defining using JSON syntax as following:</p>
+<pre>
+[
+  {
+    "task": "REPLACECHILD",
+    "vertexQuery": {...}
+  }
+  {
+    "task": ...,
+    "vertexQuery": {...}
+  }
+]
+</pre>
+
 <hr>
+
+
 </body>
 </html>

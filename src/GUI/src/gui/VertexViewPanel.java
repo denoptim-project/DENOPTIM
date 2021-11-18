@@ -394,7 +394,7 @@ public class VertexViewPanel extends JPanel
     
     /**
      * Loads the given template to this viewer.
-     * @param tmpl the template to visualize
+     * @param tmpl the template to visualise
      */
     private void loadTemplateToViewer(DENOPTIMTemplate tmpl)
     {       

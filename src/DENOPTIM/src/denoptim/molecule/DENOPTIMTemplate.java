@@ -441,8 +441,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    //TODO-V3: test this. it fails for read-in templates!
-    
     @Override
     public boolean containsAtoms()
     {

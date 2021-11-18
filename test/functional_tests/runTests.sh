@@ -290,8 +290,7 @@ runTest "t15"
 #
 # t16: GraphEditor
 #
-#runTest "t16"
-echo "Skipping t16 until GraphEdit wildcard problem is solved."
+runTest "t16"
 
 #
 # t17: Evolution based on random seletion of known graphs

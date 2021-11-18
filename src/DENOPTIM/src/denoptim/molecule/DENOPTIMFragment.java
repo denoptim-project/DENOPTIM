@@ -998,8 +998,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             for (int iap = 0; iap<fragNoMol.getNumberOfAPs(); iap++)
             {
                 DENOPTIMAttachmentPoint oriAP = fragNoMol.getAP(iap);
-                DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(
-                        iap);
+                DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
                 newAP.setID(oriAP.getID());
             }
             returnedFrag = fragWithMol;

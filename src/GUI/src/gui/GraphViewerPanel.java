@@ -281,7 +281,10 @@ public class GraphViewerPanel extends JPanel
         public JEdge(DENOPTIMAttachmentPoint srcAP) 
         {
             this.id = srcAP.getOwner().getVertexId()+"_"+srcAP.getIndexInOwner();
-            this.srcAPC = srcAP.getAPClass().toString();
+            if (srcAP.getAPClass() != null)
+                this.srcAPC = srcAP.getAPClass().toString();
+            else
+                this.srcAPC = "null";
             this.trgAPC = "none";
             this.bt = "none";
         }
@@ -302,8 +305,14 @@ public class GraphViewerPanel extends JPanel
             this.id = srcAP.getOwner().getVertexId() 
                     + "-" 
                     + trgAP.getOwner().getVertexId();
-            this.srcAPC = srcAP.getAPClass().toString();
-            this.trgAPC = trgAP.getAPClass().toString();
+            if (srcAP.getAPClass() != null)
+                this.srcAPC = srcAP.getAPClass().toString();
+            else
+                this.srcAPC = "null";
+            if (trgAP.getAPClass() != null)
+                this.trgAPC = trgAP.getAPClass().toString();
+            else
+                this.trgAPC = "null";
             //NB: in GUI as well as in SDF files APs have 1-based index!
             this.srcAPID = "AP" + (srcAP.getIndexInOwner()+1);
             this.trgAPID = "AP" + (trgAP.getIndexInOwner()+1);

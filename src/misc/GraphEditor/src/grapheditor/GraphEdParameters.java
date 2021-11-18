@@ -371,17 +371,17 @@ public class GraphEdParameters
         {
             msg = "Input file with graphs to edit not define. Check you input.";
             throw new DENOPTIMException(msg);
-	}
+	    }
         else if (inGraphsFile != null && !DenoptimIO.checkExists(inGraphsFile))
         {
             msg = "File with input graphs not found. Check " + inGraphsFile;
             throw new DENOPTIMException(msg);
         }
-	else
-	{
-	    inGraphsFormat = FilenameUtils.getExtension(
-						    inGraphsFile).toUpperCase();
-	}
+	    else
+	    {
+	        inGraphsFormat = FilenameUtils.getExtension(
+			    			    inGraphsFile).toUpperCase();
+	    }
 
         if (graphEditsFile != null && !DenoptimIO.checkExists(graphEditsFile))
         {
@@ -392,7 +392,7 @@ public class GraphEdParameters
 
         if (outGraphsFile != null && DenoptimIO.checkExists(outGraphsFile))
         {
-            msg = "Ouput file '" + outGraphsFile + "' exists aleary!";
+            msg = "Ouput file '" + outGraphsFile + "' exists already!";
             throw new DENOPTIMException(msg);
         }
 
@@ -472,8 +472,7 @@ public class GraphEdParameters
             outGraphsFile = inGraphsFile + ".mod" ;
             if (DenoptimIO.checkExists(outGraphsFile))
             {
-                String msg = "Ouput file '" + outGraphsFile + 
-                                                             "' exists aleary!";
+                String msg = "Ouput file '" + outGraphsFile + "' exists already!";
                 throw new DENOPTIMException(msg);
             }
         }

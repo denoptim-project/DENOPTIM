@@ -23,7 +23,7 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-nBr=$(grep Br "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
+nBr=$(grep " Br " "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
 if [[ $nBr != 8 ]]
 then
     echo " "
@@ -37,7 +37,7 @@ then
     echo "Test 't16' NOT PASSED (symptom: wrong number of F-fragments, $nF)"
     exit -1
 fi
-nCl=$(grep Cl "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
+nCl=$(grep " Cl " "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
 if [[ $nCl != 0 ]]
 then
     echo " "

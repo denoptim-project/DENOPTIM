@@ -30,6 +30,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.molecule.DENOPTIMVertex.VertexType;
 
 
 /**
@@ -1553,6 +1554,124 @@ public class DENOPTIMGraphTest {
 	}
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Build a graph meant to be used in unit tests. 
+     * The structure of the graph is the following:
+     * <pre>
+     *          [ap1-EV1-ap0]-[ap0-EV2]
+     *         /
+     *        ap2
+     *       /
+     * [C1-C0-ap0]-[ap0-O-ap1]-[ap0-H]
+     *  |    \
+     *  ap3   ap1
+     *  |       \
+     *  |        [ap0-H]
+     *  [ap0-EV3] </pre>
+     *  
+     * Contrary to test graph A, this graph contains:
+     * <ul>
+     * <li>mixture of vertex types</li>
+     * <li>APClasses</li>
+     * </ul>
+     * @return a new instance of the test graph.
+     */
+    public static DENOPTIMGraph makeTestGraphA2() 
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+
+        // If we cannot make the test graph, something is deeeeeply wrong and
+        // a bugfix is needed.
+        try {
+            IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+            IAtomContainer iac1 = builder.newAtomContainer();
+            IAtom ia1 = new Atom("C");
+            IAtom ia2 = new Atom("C");
+            iac1.addAtom(ia1);
+            iac1.addAtom(ia2);
+            iac1.addBond(new Bond(ia1, ia2, IBond.Order.SINGLE));
+            
+            DENOPTIMFragment v1 = new DENOPTIMFragment(1, iac1, 
+                    BBType.SCAFFOLD);
+            v1.addAP(0, APClass.make(a,0));
+            v1.addAP(0, APClass.make(b,1));
+            v1.addAP(0, APClass.make(b,1));
+            v1.addAP(1, APClass.make(a,0));
+            v1.setBuildingBlockId(0);
+        
+            IAtomContainer iac2 = builder.newAtomContainer();
+            iac2.addAtom(new Atom("O"));
+            DENOPTIMFragment v2 = new DENOPTIMFragment(2, iac2, 
+                    BBType.FRAGMENT);
+            v2.addAP(0, APClass.make(b,1));
+            v2.addAP(0, APClass.make(b,1));
+            v2.setBuildingBlockId(1);
+        
+            IAtomContainer iac3 = builder.newAtomContainer();
+            iac3.addAtom(new Atom("H"));
+            DENOPTIMFragment v3 = new DENOPTIMFragment(3, iac3, 
+                    BBType.CAP);
+            v3.addAP(0, APClass.make(c,1));
+            v3.setBuildingBlockId(2);
+        
+            IAtomContainer iac4 = builder.newAtomContainer();
+            iac4.addAtom(new Atom("H"));
+            DENOPTIMFragment v4 = new DENOPTIMFragment(4, iac4, 
+                    BBType.CAP);
+            v4.addAP(0, APClass.make(c,1));
+            v4.setBuildingBlockId(3);
+            
+            EmptyVertex ev1 = new EmptyVertex();
+            ev1.addAP(0, APClass.make(d,0));
+            ev1.addAP(0, APClass.make(d,0));
+            
+            EmptyVertex ev2 = new EmptyVertex();
+            ev2.addAP(0, APClass.make(d,0));
+            ev2.addAP(0, APClass.make(d,0));
+            
+            EmptyVertex ev3 = new EmptyVertex();
+            ev3.addAP(0, APClass.make(a,1));
+            ev3.addAP(0, APClass.make(a,1));
+        
+            graph.addVertex(v1);
+            graph.addVertex(v2);
+            graph.addVertex(v3);
+            graph.addVertex(v4);
+            graph.addVertex(ev3); //These are disordered on purpose
+            graph.addVertex(ev2);
+            graph.addVertex(ev1);
+            graph.addEdge(new DENOPTIMEdge(v1.getAP(0), v2.getAP(0), 
+                    BondType.TRIPLE));
+            graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v3.getAP(0), 
+                    BondType.SINGLE));
+            graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v4.getAP(0)));
+            graph.addEdge(new DENOPTIMEdge(v1.getAP(2), ev1.getAP(1), 
+                    BondType.SINGLE));
+            graph.addEdge(new DENOPTIMEdge(v1.getAP(3), ev3.getAP(0), 
+                    BondType.NONE));
+            graph.addEdge(new DENOPTIMEdge(ev1.getAP(0), ev2.getAP(0), 
+                    BondType.TRIPLE));
+            
+            // Use this just to verify identify of the graph
+            /*
+            System.out.println("WRITING TEST GRAPH A2 in /tmp/test_graph_A2.json");
+            DenoptimIO.writeGraphToJSON(new File("/tmp/test_graph_A2.json"),
+                    graph);
+            */
+        } catch (Throwable t)
+        {
+            t.printStackTrace();
+            System.err.println("FATAL ERROR! Could not make test graph (A). "
+                    + "Please, report this to the development team.");
+            System.exit(-1);
+        }
+        
+        return graph;
+    }
+
+
+//------------------------------------------------------------------------------
 
 	@Test
 	public void testRemoveCapping() throws Exception {
@@ -1803,6 +1922,264 @@ public class DENOPTIMGraphTest {
         assertEquals(0,subGraph2.getRingCount(),"Rings in subGraph2");
         assertTrue(graph.isIsomorphicTo(graphOriginal), 
                 "Original stays the same");
+	}
+
+//-----------------------------------------------------------------------------
+	
+	@Test
+	public void testFindVertex() throws Exception
+	{
+	    DENOPTIMGraph g = makeTestGraphA2();
+	    
+	    List<VertexQuery> allQueries = new ArrayList<VertexQuery>();
+	    List<List<DENOPTIMVertex>> allExpected = 
+	            new ArrayList<List<DENOPTIMVertex>>();
+	    
+	    VertexQuery q0 = new VertexQuery(null, null, null, null, null, null, null);
+	    List<DENOPTIMVertex> e0 = new ArrayList<DENOPTIMVertex>();
+	    e0.addAll(g.getVertexList());
+	    allQueries.add(q0);
+	    allExpected.add(e0);
+	    
+        VertexQuery q1 = new VertexQuery(
+                g.getVertexAtPosition(5).getVertexId(), 
+                null, null, null, null, null, null);
+        List<DENOPTIMVertex> e1 = new ArrayList<DENOPTIMVertex>();
+        e1.add(g.getVertexAtPosition(5));
+        allQueries.add(q1);
+        allExpected.add(e1);
+        
+        VertexQuery q2 = new VertexQuery(
+                g.getVertexAtPosition(2).getVertexId(), 
+                null, null, null, null, null, null);
+        List<DENOPTIMVertex> e2 = new ArrayList<DENOPTIMVertex>();
+        e2.add(g.getVertexAtPosition(2));
+        allQueries.add(q2);
+        allExpected.add(e2);
+        
+        VertexQuery q3 = new VertexQuery(null, VertexType.EmptyVertex, 
+                null, null, null, null, null);
+        List<DENOPTIMVertex> e3 = new ArrayList<DENOPTIMVertex>();
+        e3.add(g.getVertexAtPosition(4));
+        e3.add(g.getVertexAtPosition(5));
+        e3.add(g.getVertexAtPosition(6));
+        allQueries.add(q3);
+        allExpected.add(e3);
+        
+        VertexQuery q4 = new VertexQuery(null, null, BBType.CAP,
+                null, null, null, null);
+        List<DENOPTIMVertex> e4 = new ArrayList<DENOPTIMVertex>();
+        e4.add(g.getVertexAtPosition(2));
+        e4.add(g.getVertexAtPosition(3));
+        allQueries.add(q4);
+        allExpected.add(e4);
+        
+        VertexQuery q5 = new VertexQuery(null, null, null, 2,
+                null, null, null);
+        List<DENOPTIMVertex> e5 = new ArrayList<DENOPTIMVertex>();
+        e5.add(g.getVertexAtPosition(2));
+        allQueries.add(q5);
+        allExpected.add(e5);
+        
+        VertexQuery q6 = new VertexQuery(null, null, null, null, 1,
+                null, null);
+        List<DENOPTIMVertex> e6 = new ArrayList<DENOPTIMVertex>();
+        e6.add(g.getVertexAtPosition(3));
+        e6.add(g.getVertexAtPosition(5));
+        allQueries.add(q6);
+        allExpected.add(e6);
+        
+        //
+        // From here: test filters acting on incoming edge
+        //
+        
+        EdgeQuery eq7 = new EdgeQuery(null, null, null, null, null, null, null);
+        VertexQuery q7 = new VertexQuery(null, null, null, null, null, 
+                eq7, eq7);
+        List<DENOPTIMVertex> e7 = new ArrayList<DENOPTIMVertex>();
+        e7.addAll(g.getVertexList());
+        allQueries.add(q7);
+        allExpected.add(e7);
+        
+        EdgeQuery eq8 = new EdgeQuery(g.getVertexAtPosition(1).getVertexId(), 
+                null, null, null, null, null, null);
+        VertexQuery q8 = new VertexQuery(null, null, null, null, null, 
+                eq8, null);
+        List<DENOPTIMVertex> e8 = new ArrayList<DENOPTIMVertex>();
+        e8.add(g.getVertexAtPosition(3));
+        allQueries.add(q8);
+        allExpected.add(e8);
+        
+        //NB: the trg vertex ID on the incoming vertex is NOT considered
+        // because it is a redundant condition that should be expressed as
+        // the VertexQuery vID argument.
+        EdgeQuery eq9 = new EdgeQuery(null, 
+                g.getVertexAtPosition(5).getVertexId(), 
+                null, null, null, null, null);
+        VertexQuery q9 = new VertexQuery(null, null, null, null, null, 
+                eq9, null);
+        List<DENOPTIMVertex> e9 = new ArrayList<DENOPTIMVertex>();
+        e9.addAll(g.getVertexList());
+        allQueries.add(q9);
+        allExpected.add(e9);
+        
+        EdgeQuery eq10 = new EdgeQuery(null, null, 1, null, null, null, null);
+        VertexQuery q10 = new VertexQuery(null, null, null, null, null, 
+                eq10, null);
+        List<DENOPTIMVertex> e10 = new ArrayList<DENOPTIMVertex>();
+        e10.add(g.getVertexAtPosition(2));
+        e10.add(g.getVertexAtPosition(3));
+        allQueries.add(q10);
+        allExpected.add(e10);
+        
+        EdgeQuery eq11 = new EdgeQuery(null, null, null, 0, null, null, null);
+        VertexQuery q11 = new VertexQuery(null, null, null, null, null, 
+                eq11, null);
+        List<DENOPTIMVertex> e11 = new ArrayList<DENOPTIMVertex>();
+        e11.add(g.getVertexAtPosition(1));
+        e11.add(g.getVertexAtPosition(2));
+        e11.add(g.getVertexAtPosition(3));
+        e11.add(g.getVertexAtPosition(4));
+        e11.add(g.getVertexAtPosition(5));       
+        allQueries.add(q11);
+        allExpected.add(e11);
+        
+        EdgeQuery eq12 = new EdgeQuery(null, null, null, null,
+                BondType.TRIPLE, null, null);
+        VertexQuery q12 = new VertexQuery(null, null, null, null, null, 
+                eq12, null);
+        List<DENOPTIMVertex> e12 = new ArrayList<DENOPTIMVertex>();
+        e12.add(g.getVertexAtPosition(1));
+        e12.add(g.getVertexAtPosition(5));
+        allQueries.add(q12);
+        allExpected.add(e12);
+        
+        EdgeQuery eq13 = new EdgeQuery(null, null, null, null, null, 
+                APClass.make(b,1), null);
+        VertexQuery q13 = new VertexQuery(null, null, null, null, null, 
+                eq13, null);
+        List<DENOPTIMVertex> e13 = new ArrayList<DENOPTIMVertex>();
+        e13.add(g.getVertexAtPosition(2));
+        e13.add(g.getVertexAtPosition(3));
+        e13.add(g.getVertexAtPosition(6));
+        allQueries.add(q13);
+        allExpected.add(e13);
+        
+        EdgeQuery eq14 = new EdgeQuery(null, null, null, null, null, null,
+                APClass.make(c,1));
+        VertexQuery q14 = new VertexQuery(null, null, null, null, null, 
+                eq14, null);
+        List<DENOPTIMVertex> e14 = new ArrayList<DENOPTIMVertex>();
+        e14.add(g.getVertexAtPosition(2));
+        e14.add(g.getVertexAtPosition(3));
+        allQueries.add(q14);
+        allExpected.add(e14);
+        
+        //
+        // From here: test filters acting on outgoing edge
+        //
+        
+        //NB: the src vertex ID on the outging vertex is NOT considered
+        // because it is a redundant condition that should be expressed as
+        // the VertexQuery vID argument.
+        EdgeQuery eq15 = new EdgeQuery(g.getVertexAtPosition(3).getVertexId(), 
+                null, null, null, null, null, null);
+        VertexQuery q15 = new VertexQuery(null, null, null, null, null, null,
+                eq15);
+        List<DENOPTIMVertex> e15 = new ArrayList<DENOPTIMVertex>();
+        e15.addAll(g.getVertexList());
+        allQueries.add(q15);
+        allExpected.add(e15);
+        
+        EdgeQuery eq16 = new EdgeQuery(null,
+                g.getVertexAtPosition(3).getVertexId(),
+                null, null, null, null, null);
+        VertexQuery q16 = new VertexQuery(null, null, null, null, null, null,
+                eq16);
+        List<DENOPTIMVertex> e16 = new ArrayList<DENOPTIMVertex>();
+        e16.add(g.getVertexAtPosition(1));
+        allQueries.add(q16);
+        allExpected.add(e16);
+
+        EdgeQuery eq17 = new EdgeQuery(null, null, 1, null, null, null, null);
+        VertexQuery q17 = new VertexQuery(null, null, null, null, null, null,
+                eq17);
+        List<DENOPTIMVertex> e17 = new ArrayList<DENOPTIMVertex>();
+        e17.add(g.getVertexAtPosition(0));
+        e17.add(g.getVertexAtPosition(1));
+        allQueries.add(q17);
+        allExpected.add(e17);
+  
+        EdgeQuery eq18 = new EdgeQuery(null, null, null, 0, null, null, null);
+        VertexQuery q18 = new VertexQuery(null, null, null, null, null, null,
+                eq18);
+        List<DENOPTIMVertex> e18 = new ArrayList<DENOPTIMVertex>();
+        e18.add(g.getVertexAtPosition(0));
+        e18.add(g.getVertexAtPosition(1));
+        e18.add(g.getVertexAtPosition(6));
+        allQueries.add(q18);
+        allExpected.add(e18);
+
+        EdgeQuery eq19 = new EdgeQuery(null, null, null, null,
+                BondType.TRIPLE, null, null);
+        VertexQuery q19 = new VertexQuery(null, null, null, null, null, null,
+                eq19);
+        List<DENOPTIMVertex> e19 = new ArrayList<DENOPTIMVertex>();
+        e19.add(g.getVertexAtPosition(0));
+        e19.add(g.getVertexAtPosition(6));
+        allQueries.add(q19);
+        allExpected.add(e19);
+        
+        EdgeQuery eq20 = new EdgeQuery(null, null, null, null, null,
+                APClass.make(b,1), null);
+        VertexQuery q20 = new VertexQuery(null, null, null, null, null, null,
+                eq20);
+        List<DENOPTIMVertex> e20 = new ArrayList<DENOPTIMVertex>();
+        e20.add(g.getVertexAtPosition(0));
+        e20.add(g.getVertexAtPosition(1));
+        allQueries.add(q20);
+        allExpected.add(e20);
+
+        EdgeQuery eq21 = new EdgeQuery(null, null, null, null, null, null,
+                APClass.make(d,0));
+        VertexQuery q21 = new VertexQuery(null, null, null, null, null, null,
+                eq21);
+        List<DENOPTIMVertex> e21 = new ArrayList<DENOPTIMVertex>();
+        e21.add(g.getVertexAtPosition(0));
+        e21.add(g.getVertexAtPosition(6));
+        allQueries.add(q21);
+        allExpected.add(e21);
+        
+        //
+        // From here: test combinations
+        //
+       
+        EdgeQuery eq22in = new EdgeQuery(null, null, null, 0, null, null, null);
+        EdgeQuery eq22out = new EdgeQuery(null, null, 1,null, null, null, null);
+        VertexQuery q22 = new VertexQuery(null, null, null, null, null, 
+                eq22in, eq22out);
+        List<DENOPTIMVertex> e22 = new ArrayList<DENOPTIMVertex>();
+        e22.add(g.getVertexAtPosition(1));      
+        allQueries.add(q22);
+        allExpected.add(e22);
+        
+        EdgeQuery eq23 = new EdgeQuery(null, null, null, null, BondType.TRIPLE, 
+                null, null);
+        VertexQuery q23 = new VertexQuery(null, VertexType.MolecularFragment, 
+                null, null, null, eq23, null);
+        List<DENOPTIMVertex> e23 = new ArrayList<DENOPTIMVertex>();
+        e23.add(g.getVertexAtPosition(1));
+        allQueries.add(q23);
+        allExpected.add(e23);
+	    
+	    for (int i=0; i<allQueries.size(); i++)
+	    {
+	        List<DENOPTIMVertex> matches = g.findVertices(allQueries.get(i),0);
+	        assertEquals(allExpected.get(i).size(),matches.size(),
+	                "Different number of matched vertexes ("+i+")");
+    	    assertTrue(allExpected.get(i).containsAll(matches),
+    	            "Inconsistent matches ("+i+")");
+	    }
 	}
 	
 //-----------------------------------------------------------------------------

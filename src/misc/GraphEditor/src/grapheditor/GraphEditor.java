@@ -31,7 +31,7 @@ import denoptim.utils.GraphConversionTool;
 
 
 /**
- * Tool for editing DENOPTIMGraphs.
+ * Tool for editing {@link DENOPTIMGraph}s.
  *
  * @author Marco Foscato
  */
@@ -42,7 +42,7 @@ public class GraphEditor
 //------------------------------------------------------------------------------
 
     /**
-     * Prints the syntax to execute
+     * Prints the syntax to execute the main program.
      */
 
     public static void printUsage()

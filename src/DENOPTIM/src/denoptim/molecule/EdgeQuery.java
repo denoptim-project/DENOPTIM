@@ -30,29 +30,29 @@ public class EdgeQuery
     /**
      * The vertex id of the source fragment
      */
-    private int srcVertex = -1; 
+    private Integer srcVertexId = null; 
     
     /**
      * the vertex id of the destination fragment
      */
-    private int trgVertex = -1; 
+    private Integer trgVertexId = null; 
     
     /**
-     * the index of the attachment point in the list of DAPs associated
+     * The index of the attachment point in the list of DAPs associated
      * with the source fragment
      */
-    private int srcDAP = -1;
+    private Integer srcAPID = null;
     
     /**
-     * the index of the attachment point in the list of DAPs associated
+     * The index of the attachment point in the list of DAPs associated
      * with the target fragment
      */
-    private int trgDAP = -1;
+    private Integer trgAPID = null;
 
     /**
      * The bond type associated with the connection between the fragments
      */
-    private BondType bondType = BondType.UNDEFINED;
+    private BondType bondType = null;
     
     /**
      * The class associated with the source AP
@@ -63,96 +63,62 @@ public class EdgeQuery
      * The class associated with the target AP
      */
     private APClass trgAPC = null;
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Constructor for a query that contains only wildcards.
-     */
-    public EdgeQuery()
-    {}
     
 //------------------------------------------------------------------------------
     
     /**
      * Constructor for an edge from all parameters
-     * @param m_src verted ID of the source vertex
-     * @param m_trg vertex ID of the target vertex
-     * @param m_srcDAP index of the AP on the source vertex
-     * @param m_trgDAP index of the AP on the target vertex
-     * @param m_btype the bond type
+     * @param srcVertexId vertex ID of the source vertex
+     * @param trgVertexId vertex ID of the target vertex
+     * @param srcAPID index of the {@link DENOPTIMAttachmentPoint} on the source
+     *  vertex
+     * @param trgAPID index of the {@link DENOPTIMAttachmentPoint} on the target
+     *  vertex
+     * @param btype the bond type
+     * @param srcAPC the {@link APClass} on the source 
+     * {@link DENOPTIMAttachmentPoint} .
+     * @param trgAPC the {@link APClass} on the target 
+     * {@link DENOPTIMAttachmentPoint} .
      */
-    public EdgeQuery(int m_src, int m_trg, int m_srcDAP, int m_trgDAP, 
-            BondType bt)
+    public EdgeQuery(Integer srcVertexId, Integer trgVertexId, 
+            Integer srcAPID, Integer trgAPID, 
+            BondType bt, APClass srcAPC, APClass trgAPC)
     {
-        srcVertex = m_src;
-        trgVertex = m_trg;
-        srcDAP = m_srcDAP;
-        trgDAP = m_trgDAP;
-        bondType = bt;
+        this.srcVertexId = srcVertexId;
+        this.trgVertexId = trgVertexId;
+        this.srcAPID = srcAPID;
+        this.trgAPID = trgAPID;
+        this.bondType = bt;
+        this.srcAPC = srcAPC;
+        this.trgAPC = trgAPC;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setSourceVertex(int m_src)
+    public Integer getSourceVertexId()
     {
-        srcVertex = m_src;
+        return srcVertexId;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setSourceAPIdx(int m_srcDAP)
+    public Integer getSourceAPIdx()
     {
-        srcDAP = m_srcDAP;
+        return srcAPID;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setTargetAPIdx(int m_trgDAP)
+    public Integer getTargetAPIdx()
     {
-        trgDAP = m_trgDAP;
+        return trgAPID;
     }        
 
 //------------------------------------------------------------------------------
 
-    public void setTargetVertex(int m_trg)
+    public Integer getTargetVertexId()
     {
-        trgVertex = m_trg;
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setBondType(BondType bt)
-    {
-        bondType = bt; 
-    }
-    
-//------------------------------------------------------------------------------
-
-    public int getSourceVertex()
-    {
-        return srcVertex;
-    }
-    
-//------------------------------------------------------------------------------
-
-    public int getSourceAPIdx()
-    {
-        return srcDAP;
-    }
-    
-//------------------------------------------------------------------------------
-
-    public int getTargetAPIdx()
-    {
-        return trgDAP;
-    }        
-
-//------------------------------------------------------------------------------
-
-    public int getTargetVertex()
-    {
-        return trgVertex;
+        return trgVertexId;
     }
     
 //------------------------------------------------------------------------------
@@ -167,89 +133,13 @@ public class EdgeQuery
     public APClass getTargetAPClass()
     {
         return trgAPC;
-    }    
-    
-//------------------------------------------------------------------------------
-    
-    public void setSourceAPClass(APClass apc)
-    {
-        srcAPC = apc;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    public void setTargetAPClass(APClass apc)
-    {
-        trgAPC = apc;
-    }    
+    }       
     
 //------------------------------------------------------------------------------
 
     public BondType getBondType()
     {
         return bondType;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Compares this and another edge ignoring edge and vertex IDs
-     * @param other
-     * @param reason string builder used to build the message clarifying the 
-     * reason for returning <code>false</code>.
-     * @return <code>true</code> if the two edges represent the same connection
-     * even if the vertex IDs are different.
-     */
-    public boolean sameAs(EdgeQuery other, StringBuilder reason)
-    {
-    	if (this.getSourceAPIdx() != other.getSourceAPIdx())
-    	{
-    		reason.append("Different source atom ("+this.getSourceAPIdx()+":"
-    						+other.getSourceAPIdx()+"); ");
-    		return false;
-    	}
-    	if (this.getTargetAPIdx() != other.getTargetAPIdx())
-    	{
-    		reason.append("Different target atom ("+this.getTargetAPIdx()+":"
-					+other.getTargetAPIdx()+"); ");
-    		return false;
-    	}
-    	if (!this.getSourceAPClass().equals(other.getSourceAPClass()))
-    	{
-    		reason.append("Different source APClass ("
-    				+this.getSourceAPClass()+":"
-					+other.getSourceAPClass()+"); ");
-    		return false;
-    	}
-    	if (!this.getTargetAPClass().equals(other.getTargetAPClass()))
-    	{
-    		reason.append("Different target APClass ("
-    				+this.getTargetAPClass()+":"
-					+other.getTargetAPClass()+"); ");
-    		return false;
-    	}
-    	if (this.getBondType() != (other.getBondType()))
-    	{
-    		reason.append("Different bond type ("+this.getBondType()+":"
-					+other.getBondType()+"); ");
-    		return false;
-    	}
-    	return true;
-    }
-
-//------------------------------------------------------------------------------
-
-    @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append(srcVertex).append("_").append(srcDAP).append("_").
-                append(trgVertex).append("_").append(trgDAP).append("_").
-                append(bondType);
-        if (srcAPC != null && trgAPC != null)
-            sb.append("_").append(srcAPC).append("_").append(trgAPC);
-
-        return sb.toString();
     }
 
 //------------------------------------------------------------------------------    
