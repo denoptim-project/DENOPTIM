@@ -42,7 +42,11 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 import java.io.StringWriter;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -3208,6 +3212,67 @@ public class DenoptimIO
             s = s + DENOPTIMConstants.SEPARATORAPPROPATMS;
         }
         return s;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Search in a file for a match to the given unique identifier (UID). If the
+     * UID is not found in the file, then it is added to it. Note that the UID 
+     * is compared with the content of each line in the file.
+     * @param uid the unique identifier to search for and possibly add to the 
+     * file.
+     * @param file the text file collecting UIDs (one per line).
+     * @return <code>true</code> is the UID was found in the file. Note that 
+     * we return <code>false</code> when the match is not found in the file, but
+     * the moment we return the file has been already updated by this method as
+     * to add the UID. So, independently on the return value, the file will 
+     * contain the UID string when this method returns. 
+     * @throws IOException
+     */
+    
+    public static boolean isUIDInFile(String uid, File file) throws IOException
+    {
+        boolean found = false;
+        
+        RandomAccessFile rafile = null; // The file we'll lock
+        FileChannel channel = null; // The channel to the file
+        FileLock lock = null; // The lock object we hold
+        
+        try
+        {
+            rafile = new RandomAccessFile(file, "rw");
+            channel = rafile.getChannel();
+            lock = channel.lock();
+            
+            for (String line; (line = rafile.readLine()) != null; )
+            {
+                if (line.trim().length() == 0)
+                    continue;
+                if (line.trim().equalsIgnoreCase(uid.trim()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found)
+            {
+                rafile.seek(channel.position());
+                rafile.writeBytes(uid.trim() + NL);
+                channel.force(true);
+            }
+        }
+        finally
+        {
+            if (channel != null)
+                channel.close();
+            if (rafile!= null)
+                rafile.close();
+            if (lock != null && lock.isValid())
+                lock.release();
+        }
+        return found;
     }
     
 //------------------------------------------------------------------------------

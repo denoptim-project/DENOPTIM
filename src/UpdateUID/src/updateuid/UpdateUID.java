@@ -81,6 +81,8 @@ public class UpdateUID
         FileLock lock = null; // The lock object we hold
         File lockfile = null;
         
+        //TODO: replace most of this with DenoptimIO.isUIDInFile
+        
         try
         {
             

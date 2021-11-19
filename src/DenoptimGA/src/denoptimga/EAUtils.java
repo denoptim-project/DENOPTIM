@@ -607,7 +607,11 @@ public class EAUtils
                 res = null;
                 mnt.increase(CounterID.FAILEDBUILDATTEMPTS_FORBIDENDS);
             }
-            
+            if (rcv.getEdgeToParent() == null)
+            {
+                // RCV as scaffold! Ignore special case
+                continue;
+            }
             APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
             if (FragmentSpace.getCappingMap().get(apc)==null 
                     && FragmentSpace.getForbiddenEndList().contains(apc))

@@ -104,6 +104,10 @@ public class FitnessParametersForm extends ParametersForm
     JPanel line3dTrees;
     JRadioButton rdb3dTrees;
     
+    String keyPreFitnessUIDCheck = "FP-CheckUidBeforeFitness";
+    JPanel linePreFitnessUIDCheck;
+    JRadioButton rdbPreFitnessUIDCheck;
+    
     JPanel lineFPSource;
     JLabel lblFPSource;
     JTextField txtFPSource;
@@ -299,6 +303,19 @@ public class FitnessParametersForm extends ParametersForm
         mapKeyFieldToValueField.put(key3dTrees.toUpperCase(), rdb3dTrees);
         line3dTrees.add(rdb3dTrees);
         localBlock2.add(line3dTrees);
+        
+        String toolTipPreFitnessUIDCheck = "<html>Tick here to enable/disable evaluation "
+                + "of candidate uniqueness prior to submission of the fitness "
+                + "evaluation.</html>";
+        linePreFitnessUIDCheck = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbPreFitnessUIDCheck = new JRadioButton("Check candidate uniqueness "
+                + "before sending to fitness evaluation.");
+        rdbPreFitnessUIDCheck.setToolTipText(toolTipPreFitnessUIDCheck);
+        rdbPreFitnessUIDCheck.setSelected(true);
+        mapKeyFieldToValueField.put(keyPreFitnessUIDCheck.toUpperCase(), rdbPreFitnessUIDCheck);
+        linePreFitnessUIDCheck.add(rdbPreFitnessUIDCheck);
+        localBlock2.add(linePreFitnessUIDCheck);
+        
 
         String toolTipIntOrExt = "<html>A fitness provider is an existing "
         		+ "tool or script.<br> The fitness provider must produce an "
@@ -966,6 +983,13 @@ public class FitnessParametersForm extends ParametersForm
  				} else {
  					((JRadioButton) valueField).setSelected(true);
  				}
+ 				
+ 				if (key.toUpperCase().equals(keyPreFitnessUIDCheck.toUpperCase()))
+ 				{
+                    ((JRadioButton) valueField).setSelected(false);
+                } else {
+                    ((JRadioButton) valueField).setSelected(true);
+                }
  				break;
  				
  			case "class javax.swing.JComboBox":
@@ -1021,6 +1045,10 @@ public class FitnessParametersForm extends ParametersForm
         if (!rdb3dTrees.isSelected())
         {
             sb.append(key3dTrees).append(NL);
+        }
+        if (rdbPreFitnessUIDCheck.isSelected())
+        {
+            sb.append(keyPreFitnessUIDCheck).append(NL);
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }

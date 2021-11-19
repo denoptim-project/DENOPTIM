@@ -35,6 +35,8 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.time.StopWatch;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
@@ -400,6 +402,23 @@ public class EvolutionaryAlgorithm
                   
                 if (candidate == null)
                     continue;
+                
+                
+                if (FitnessParameters.checkPreFitnessUID())
+                {
+                    try {
+                        if (DenoptimIO.isUIDInFile(candidate.getUID(),
+                                new File(GAParameters.getUIDFileOut())))
+                        {
+                            mnt.increase(CounterID.DUPLICATEPREFITNESS);
+                            continue;
+                        }
+                    } catch (Exception e) {
+                        mnt.increase(
+                                CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
+                        continue;
+                    }
+                }
                
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         candidate, EAUtils.getPathNameToGenerationFolder(0), 
@@ -423,6 +442,8 @@ public class EvolutionaryAlgorithm
                         TasksBatchManager.executeTasks(tasks,
                                 GAParameters.getNumberOfCPU());
                         tasks.clear();
+                    } else {
+                        i = 0;
                     }
                 }
             }
@@ -442,6 +463,7 @@ public class EvolutionaryAlgorithm
                 cleanupAsync(tpe, futures, submitted);
                 tpe.shutdown();
             }
+            ex.printStackTrace();
             throw new DENOPTIMException(ex);
         }
         
@@ -458,8 +480,9 @@ public class EvolutionaryAlgorithm
             DENOPTIMLogger.appLogger.log(Level.SEVERE,
                     "Unable to initialize molecules in {0} attempts."+NL, i);
 
-            throw new DENOPTIMException("Unable to initialize molecules in " +
-                            i + " attempts.");
+            throw new DENOPTIMException("Unable to initialize population in " 
+                    + i + " attempts (Population size: " + population.size() 
+                    + ", tasks batch size: " + tasks.size() + ").");
         }
 
         synchronized (population)
@@ -602,6 +625,22 @@ public class EvolutionaryAlgorithm
                 
                 if (candidate == null)
                     continue;
+                
+                if (FitnessParameters.checkPreFitnessUID())
+                {
+                    try {
+                        if (DenoptimIO.isUIDInFile(candidate.getUID(),
+                                new File(GAParameters.getUIDFileOut())))
+                        {
+                            mnt.increase(CounterID.DUPLICATEPREFITNESS);
+                            continue;
+                        }
+                    } catch (Exception e) {
+                        mnt.increase(
+                                CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
+                        continue;
+                    }
+                }
                 
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         candidate, EAUtils.getPathNameToGenerationFolder(genId), 

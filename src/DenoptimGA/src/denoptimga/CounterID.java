@@ -52,7 +52,10 @@ public enum CounterID
     FAILEDMANUALADDATTEMPTS, 
     FAILEDMANUALADDATTEMPTS_EVAL, 
     
-    FITNESSEVALS, FAILEDFITNESSEVALS;
+    FITNESSEVALS, FAILEDFITNESSEVALS,
+    
+    DUPLICATEPREFITNESS,
+    FAILEDDUPLICATEPREFITNESSDETECTION;
     
     private String description = "";
     
@@ -139,6 +142,12 @@ public enum CounterID
         
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";
+        
+        DUPLICATEPREFITNESS.description = "Number of candidates with duplicate "
+                + "UID detected prior to considering their fitness evaluation.";
+        FAILEDDUPLICATEPREFITNESSDETECTION.description = "Number of failed "
+                + "attempts to compare UID with known UIDs prior to considering "
+                + "the fitness evaluation of a candidate.";
     }
     
     /**
