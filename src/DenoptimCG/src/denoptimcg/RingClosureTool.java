@@ -26,9 +26,11 @@ import java.util.Set;
 
 import javax.vecmath.Point3d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -688,7 +690,7 @@ public class RingClosureTool
                 maxDistH2T1 = distTolerance;
                 maxDistH2T2 = lenH + lenT;
             }
-	    else if (RingClosureParameters.getRCStrategy().equals(
+            else if (RingClosureParameters.getRCStrategy().equals(
                                                          "BONDCOMPLEMENTARITY"))
             {
                 distTolerance = distTolerance / 2.0;
@@ -752,51 +754,64 @@ public class RingClosureTool
     public static void saturateRingClosingAttractor(Molecule3DBuilder mol)
                                                        throws DENOPTIMException
     {
-	IAtomContainer fmol = mol.getIAtomContainer();
-	TinkerMolecule tmol = mol.getTinkerMolecule();
-	String duSymbol = DENOPTIMConstants.DUMMYATMSYMBOL;
+    	IAtomContainer fmol = mol.getIAtomContainer();
+    	TinkerMolecule tmol = mol.getTinkerMolecule();
+    	String duSymbol = DENOPTIMConstants.DUMMYATMSYMBOL;
         for (RingClosingAttractor rca : mol.getAttractorsList())
         {
             if (rca.isUsed())
-	    {
-		// Used RCA are changed to inert dummy atoms (to keep ZMatrix)
-                IAtom fatm = rca.getIAtom();
-                TinkerAtom tatm = tmol.getAtom(fmol.getAtomNumber(fatm) + 1);
-                tatm.setAtomString(duSymbol);
-                ((PseudoAtom) fatm).setLabel(duSymbol);
-                fatm.setSymbol(duSymbol);
-	    }
-	    else
             {
-		// Unused RCA are replaced by capping group
-
-//TODO: select capping group (if any) and use that to saturate the free AP
-// Note that to do that the capping og the RingClosure-related APclasses must be
-// reported in the CompatibilityMatrix. Thus, it is also necessary to make DenoptimGA
-// prefer RingClosure-related APclasses over other capping groups
-/*
-                //Choose capping group
-                String freeAPClass = rca.getApClass();
-                ArrayList<String> capAPClasses = 
-                            CGParameters.getCompatibilityMap().get(freeAPClass);
-*/
-		// We force the conversion to H with a fixed bon length
-		// This code is temporary as will be removed by the introduction
-		// proper capping group selection and use (TODO)
-		IAtom fatm = rca.getIAtom();
-		TinkerAtom tatm = tmol.getAtom(fmol.getAtomNumber(fatm) + 1);
-		tatm.setAtomString("H");
-		double[] ic = tatm.getDistAngle();
-		ic[0] = 1.10; //hard coded bond  
-		tatm.setDistAngle(ic);
-		// NOTE: this remains a PseudoAtom
+		        // Used RCA are changed to inert dummy atoms (to keep ZMatrix)
+                IAtom fatm = rca.getIAtom();
+                TinkerAtom tatm = tmol.getAtom(fmol.indexOf(fatm) + 1);
+                tatm.setAtomString(duSymbol);
+                
+                IAtom newAtm = new PseudoAtom(duSymbol,new Point3d(fatm.getPoint3d()));
+                newAtm.setProperties(fatm.getProperties());
+                AtomContainerManipulator.replaceAtomByAtom(
+                        mol.getIAtomContainer(),fatm,newAtm);
+                rca.setIAtom(newAtm);
+    	    }
+    	    else
+            {
+        		// Unused RCA are replaced by capping group
+        
+        //TODO: select capping group (if any) and use that to saturate the free AP
+        // Note that to do that the capping og the RingClosure-related APclasses must be
+        // reported in the CompatibilityMatrix. Thus, it is also necessary to make DenoptimGA
+        // prefer RingClosure-related APclasses over other capping groups
+        /*
+                        //Choose capping group
+                        String freeAPClass = rca.getApClass();
+                        ArrayList<String> capAPClasses = 
+                                    CGParameters.getCompatibilityMap().get(freeAPClass);
+        */
+        		// We force the conversion to H with a fixed bond length
+        		// This code is temporary as will be removed by the introduction
+        		// proper capping group selection and use (TODO)
+        		IAtom fatm = rca.getIAtom();
+        		TinkerAtom tatm = tmol.getAtom(fmol.getAtomNumber(fatm) + 1);
+        		tatm.setAtomString("H");
+        		double[] ic = tatm.getDistAngle();
+        		ic[0] = 1.10; //hard coded bond  
+        		tatm.setDistAngle(ic);
+        		
+        		//UPGRADE: this cannot be done since CDK 2.*. So, we must
+        		// create a new IAtom object to replace the old one.
+        		/*
                 ((PseudoAtom) fatm).setLabel("H"); 
-		fatm.setSymbol("H");
-	    }
-	}
-
-	// Update XYZ
-	mol.updateXYZFromINT();
+        		fatm.setSymbol("H");
+        		*/
+        		IAtom newAtm = new PseudoAtom("H",new Point3d(fatm.getPoint3d()));
+                newAtm.setProperties(fatm.getProperties());
+                AtomContainerManipulator.replaceAtomByAtom(
+                        mol.getIAtomContainer(),fatm,newAtm);
+                rca.setIAtom(newAtm);
+    	    }
+    	}
+    
+    	// Update XYZ
+    	mol.updateXYZFromINT();
 
         // Update Tinker atom types
         setTinkerTypes(tmol);

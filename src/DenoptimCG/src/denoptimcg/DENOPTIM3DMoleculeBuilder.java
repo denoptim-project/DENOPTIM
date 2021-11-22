@@ -168,8 +168,6 @@ public class DENOPTIM3DMoleculeBuilder
 
 //------------------------------------------------------------------------------
 
-    //------------------------------------------------------------------------------
-
     /**
      * Given the graph representation of the molecular constitution,
      * along with the 3D

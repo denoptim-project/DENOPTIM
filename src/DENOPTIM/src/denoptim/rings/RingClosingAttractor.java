@@ -111,7 +111,7 @@ public class RingClosingAttractor
     private String attType = "none";
 
     /**
-     * Pseuso atom representing RingClosingAttractor in molecule
+     * Pseudo atom representing RingClosingAttractor in molecule
      */
     private IAtom atm;
 
@@ -157,7 +157,7 @@ public class RingClosingAttractor
      * {@link #isAttractor() isAttractor}.
      *
      * @param atm the selected atom 
-     * @param mol the molecule containg the atom
+     * @param mol the molecule containing the atom
      */
 
     public RingClosingAttractor(IAtom atm, IAtomContainer mol)
@@ -228,6 +228,18 @@ public class RingClosingAttractor
     public IAtom getIAtom()
     {
         return this.atm;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Change the reference to the atom in the molecular representation.
+     * @param atm the new reference
+     */
+
+    public void setIAtom(IAtom atm)
+    {
+        this.atm = atm;
     }
 
 //-----------------------------------------------------------------------------

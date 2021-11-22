@@ -1,53 +1,46 @@
 # Genetic Algorithm - parameters
-GA-RandomSeed=1234567
 GA-PrintLevel=1
-GA-PopulationSize=100
-GA-NumChildren=100
+GA-PopulationSize=20
+GA-NumChildren=20
 GA-NumGenerations=100
-GA-NumConvGen=100
-
-GA-MOLGROWTHPROBSCHEME=SIGMA
-GA-MOLGROWTHSIGMASTEEPNESS=0.2
-GA-MOLGROWTHSIGMAMIDDLE=20
-
-#GA-LevelGrowthProbScheme=SIGMA
-#GA-LevelGrowthSigmaSteepness=0.4
-#GA-LevelGrowthSigmaMiddle=6.0
-
+GA-NumConvGen=10
+GA-MaxTriesPerPopulation=100
+GA-MolGrowthProbScheme=SIGMA
+GA-MolGrowthMultiplier=1.0
+GA-MolGrowthSigmaSteepness=0.19999999999999998
+GA-MolGrowthSigmaMiddle=20.0
 GA-CrowdProbScheme=SIGMA
-#GA-CrowdMultiplier=20
-GA-CrowdSigmaSteepness=10.0
-GA-CrowdSigmaMiddle=1.5
-
-GA-KEEPNEWRINGSYSTEMVERTEXES
-GA-KEEPNEWRINGSYSTEMFITNESSTRSH=0.10
-#GA-KEEPNEWRINGSYSTEMSCAFFOLDS
-
+GA-CrowdMultiplier=1.0
+GA-CrowdSigmaSteepness=1.3
+GA-CrowdSigmaMiddle=2.0
 GA-XOverSelectionMode=TS
-GA-CrossoverWeight=0.70
+GA-CrossoverWeight=0.50
 GA-MutationWeight=0.90
-GA-ConstructionWeight=0.2
+GA-ConstructionWeight=0.5
 GA-SymmetryProbability=0.0
 GA-ReplacementStrategy=ELITIST
 GA-NumParallelTasks=1
 GA-Parallelization=Synchronous
 # Fragment Space - parameters
-FS-ScaffoldLibFile=data/lib_frags.sdf
-FS-FragmentLibFile=data/lib_frags.sdf
-FS-CappingFragmentLibFile=data/lib_cap.sdf
-FS-CompMatrixFile=data/CPMap.par
+FS-ScaffoldLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
+FS-FragmentLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
+FS-CappingFragmentLibFile=/tmp/denoptim_Diamond/data/lib_cap.sdf
+FS-CompMatrixFile=/tmp/denoptim_Diamond/data/CPMap.par
 FS-MaxHeavyAtom=20
 FS-MaxMW=200
 FS-MaxRotatableBond=50
-RC-CloseRings=SELECTED_by_GUI
-FS-RCCompMatrixFile=data/RC-CPMap
+RC-CloseRings
+FS-RCCompMatrixFile=/tmp/denoptim_Diamond/data/RC-CPMap
+RC-RingSizeBias=4 1
 RC-RingSizeBias=5 2
 RC-RingSizeBias=6 4
 RC-RingSizeBias=7 1
-RC-RingSizeBias=4 1
 RC-MaxSizeNewRings=10
-RC-EvaluationClosabilityMode=Ring_size
+RC-EvaluationClosabilityMode=3D-Conformation
+RC-RCCINDEX=/tmp/denoptim_Diamond/data/rccIndex
+RC-RCCFOLDER=/tmp/denoptim_Diamond/data/rccArchive
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/tmp/denoptim_Diamond/data/goal.sdf')}
+FP-CheckUidBeforeFitness

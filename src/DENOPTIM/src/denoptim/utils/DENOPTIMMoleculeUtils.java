@@ -177,7 +177,8 @@ public class DENOPTIMMoleculeUtils
 
     /**
      * Replace any <code>PseudoAtom</code>s representing ring closing attractors
-     * with H. No change in coordinates.
+     * with H. No change in coordinates, but any reference to the original
+     * atom, beyond those managed internally to the CDK library, will be broken.
      * @param mol Molecule to replace <code>PseudoAtom</code>s of.
      */
     public static void removeRCA(IAtomContainer mol) {
@@ -207,7 +208,7 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Replace used RCAs (i.e., those involved in <code>DENOPTIMRing</code>s)
+     * Replace used RCAs (i.e., those involved in {@link DENOPTIMRing}s)
      * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 

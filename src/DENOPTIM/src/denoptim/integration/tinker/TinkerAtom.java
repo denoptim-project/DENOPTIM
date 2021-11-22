@@ -67,7 +67,6 @@ public class TinkerAtom implements Serializable, Cloneable
 
     public TinkerAtom()
     {
-
     }
 
 //------------------------------------------------------------------------------

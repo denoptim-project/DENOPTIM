@@ -189,6 +189,15 @@ public class Molecule3DBuilder
         this.newRingClosures = ringClosures;
         this.overalRCScore = Double.NaN;
         this.atmOveralScore = Double.NaN;
+        this.mapDRingsRCACombs = new HashMap<ObjectPair,DENOPTIMRing>();
+        if (this.attractors.size() != 0)
+        {
+            if (molGraph.hasRings())
+            {
+                // ring closures defined in the input
+                convertDENOPTIMRingIntoRcaCombinationns();
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -197,7 +206,7 @@ public class Molecule3DBuilder
      * Constructs a <code>Molecule3DBuilder</code> specifying all its features
      * @param molGraph the graph representation
      * @param fmol the CDK molecular representation
-     * @param tmol the intermal coordinates representation
+     * @param tmol the internal coordinates representation
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
      * indeces)
@@ -245,7 +254,7 @@ public class Molecule3DBuilder
             if (rca.isAttractor())
             {
                 attractors.add(rca);
-                attToAtmID.put(rca, fmol.getAtomNumber(atm));
+                attToAtmID.put(rca, fmol.indexOf(atm));
             }
         }
         
