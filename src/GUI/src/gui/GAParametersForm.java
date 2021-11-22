@@ -1361,7 +1361,7 @@ public class GAParametersForm extends ParametersForm
                 + "(high fitness w.r.t. population range)<br> "
                 + "candidates need to be for generating "
                 + "new ring system templates.<br>"
-                + "For example, 0.10"
+                + "For example, 0.10 "
                 + "allows only the best 10% of the candidates <br>to generate "
                 + "a new building block from theyr graph.</html>";
         lineRingSysTmpl = new JPanel(new FlowLayout(FlowLayout.LEFT));

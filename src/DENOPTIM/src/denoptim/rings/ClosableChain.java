@@ -65,27 +65,23 @@ public class ClosableChain implements Cloneable, Serializable
     public ClosableChain(String str)
     {
     	links = new ArrayList<ChainLink>();
+    	
+    	String words[] = str.trim().split("%");
     
-    	String[] parts = str.trim().split("_");
-    	int lastFType = Integer.MAX_VALUE;
+    	String[] parts = words[0].split("_");
     	for (int i=0; i<parts.length; i++)
     	{
     	    String clStr = parts[i];
             String[] clParts = clStr.trim().split("/");
             int molID = Integer.parseInt(clParts[0]);
-            int ftype = Integer.parseInt(clParts[1]);
-            DENOPTIMVertex.BBType bbt = DENOPTIMVertex.BBType.parseInt(ftype);
+            BBType bbt = BBType.valueOf(clParts[1]);
             String[] partsAps = clParts[2].split("ap");
             int apLeft = Integer.parseInt(partsAps[1]);
     	    int apRight = Integer.parseInt(partsAps[2]);
-    	    if (ftype < lastFType)
-    	    {
-        		tuningPoint = i;
-        		lastFType = ftype;
-    	    }
     	    ChainLink cl = new ChainLink(molID, bbt, apLeft, apRight);
     	    links.add(cl);
     	}
+        tuningPoint = Integer.parseInt(words[1]);
     }
     
 //----------------------------------------------------------------------------
@@ -144,21 +140,6 @@ public class ClosableChain implements Cloneable, Serializable
     public int getSize()
     {
         return links.size();
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Get index of the turning point. Note that since the chain is a 
-     * path in a graph the relative direction of the
-     * edges spanned can display an inversion point (i.e., the turning point).
-     * @return the index of the <code>ChainLink</code> at which the direction
-     * of the edges gets inverted.
-     */
-
-    public int getTurningPoint()
-    {
-        return tuningPoint;
     }
 
 //-----------------------------------------------------------------------------

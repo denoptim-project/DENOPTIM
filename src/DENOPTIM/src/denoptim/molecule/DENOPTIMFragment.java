@@ -290,6 +290,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     public void addAP() {
         addAP(0);
+        //TODO-V3 unify
     }
 
 //------------------------------------------------------------------------------
@@ -302,6 +303,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
                 atomPositionNumber);
         getAttachmentPoints().add(ap);
+
+        //TODO-V3 unify
     }
 
 //------------------------------------------------------------------------------
@@ -313,6 +316,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     public void addAP(int atomPositionNumber, APClass apClass) {
         addAP(atomPositionNumber, null, apClass);
+
+        //TODO-V3 unify
     }
 
 //------------------------------------------------------------------------------
@@ -328,6 +333,17 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, dirVec, apClass);
         getAttachmentPoints().add(ap);
+        
+        IAtom srcAtm = mol.getAtom(atomPositionNumber);
+        
+        ArrayList<DENOPTIMAttachmentPoint> apList = new ArrayList<>();
+        if (getAPCountOnAtom(srcAtm) > 0) {
+            apList = getAPListFromAtom(srcAtm);
+        }
+        apList.add(ap);
+        srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
+        
+        updateSymmetryRelations();
     }
     
 //-----------------------------------------------------------------------------
@@ -348,6 +364,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public void addAP(int srcAtmId, APClass apc, Point3d vector) 
             throws DENOPTIMException
     {
+        //TODO-V3 unify
         IAtom srcAtm = mol.getAtom(srcAtmId);
         addAPOnAtom(srcAtm, apc, vector);
     }
@@ -371,17 +388,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         int atmId = mol.indexOf(srcAtm);
         this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);
-        ArrayList<DENOPTIMAttachmentPoint> aps = this.getAttachmentPoints();
-        DENOPTIMAttachmentPoint ap = aps.get(aps.size() - 1);
-
-        ArrayList<DENOPTIMAttachmentPoint> apList = new ArrayList<>();
-        if (getAPCountOnAtom(srcAtm) > 0) {
-            apList = getAPListFromAtom(srcAtm);
-        }
-        apList.add(ap);
-        srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
-        
-        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------

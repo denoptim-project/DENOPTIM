@@ -101,7 +101,7 @@ public class PathSubGraph
     private List<IAtom> atomsPathVAVB;
 
     /**
-     * The list of bonds in the shortest path
+     * The list of bonds in the shortest path.
      * Note that the <code>IBond</code>s are those of the entire molecule
      * not of the <code>IAtomContainer</code> representing only this path.
      */
@@ -186,6 +186,8 @@ public class PathSubGraph
         // Build the DENOPTIMGraph and ID of this sub graph
         chainID = "";
         revChainID = "";
+        int tpId = -1;
+        int tpIdRev = -1;
         DENOPTIMVertex vertBack;
         DENOPTIMVertex vertHere;
         DENOPTIMVertex vertFrnt;
@@ -216,6 +218,8 @@ public class PathSubGraph
                 apIdHere2Back = edgeToBack.getSrcAPID();
                 apIdHere2Frnt = edgeToFrnt.getSrcAPID();
                 apIdFrnt2Here = edgeToFrnt.getTrgAPID();
+                tpId = i-1;
+                tpIdRev = vertPathVAVB.size()-i;
             }
             else
             {
@@ -273,28 +277,28 @@ public class PathSubGraph
     	// prepare alternative chain IDs
     	String[] pA = chainID.split("_");
     	String[] pB = revChainID.split("_");
-    	allPossibleChainIDs.add(chainID);
-    	allPossibleChainIDs.add(revChainID);
+    	allPossibleChainIDs.add(chainID + "%" + tpId);
+    	allPossibleChainIDs.add(revChainID + "%" + tpIdRev);
     	for (int i=1; i<pA.length; i++)
     	{
     	    String altrnA = "";
     	    String altrnB = "";
     	    for (int j=0; j<pA.length; j++)
     	    {
-    		if ((i+j) < pA.length)
-    		{
-                       altrnA = altrnA + pA[i+j] + "_";
-                       altrnB = altrnB + pB[i+j] + "_";
-    		}
-    		else
-    		{
-    		   altrnA = altrnA + pA[i+j-pA.length] + "_";
-                       altrnB = altrnB + pB[i+j-pA.length] + "_";
-    		}
+        		if ((i+j) < pA.length)
+        		{
+                    altrnA = altrnA + pA[i+j] + "_";
+                    altrnB = altrnB + pB[i+j] + "_";
+        		} else {
+        		    altrnA = altrnA + pA[i+j-pA.length] + "_";
+                    altrnB = altrnB + pB[i+j-pA.length] + "_";
+        		}
     	    }
-    	    allPossibleChainIDs.add(altrnA);
-    	    allPossibleChainIDs.add(altrnB);
+    	    allPossibleChainIDs.add(altrnA + "%" + tpId);
+    	    allPossibleChainIDs.add(altrnB + "%" + tpIdRev);
     	}
+        chainID = chainID + "%" + tpId;
+        revChainID = revChainID + "%" + tpIdRev;
     }
 
 //------------------------------------------------------------------------------
@@ -423,11 +427,12 @@ public class PathSubGraph
         Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
                 iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxBOND);
 
-    	if (debug)
-    	{
-    	    String f = "pathSubGraph.sdf";
+        if (debug)
+        {
+    	    String f = "/tmp/pathSubGraph.sdf";
     	    System.out.println("Find SDF representation of path in: " + f);
     	    DenoptimIO.writeMolecule(f,iacPathVAVB,false);
+    	    DenoptimIO.writeMolecule(f,mol,true);
     	}
 
         // Get shortest atom path between the two ends of the chain
@@ -442,18 +447,26 @@ public class PathSubGraph
 
         // Identify which atoms in mol represent the RCA in the current chain.
         // Since we are looking for the verteces of the RCA atoms
-        // there is only one atom per each of the of the two vertexID required
-        List<IAtom> ends = new ArrayList<IAtom>();
+        // there is only one atom per each of the two vertexID required
+        
+        IAtom e0 = null;
+        IAtom e1 = null;
         for (IAtom atm : mol.atoms())
         {
             int vrtId = (Integer) atm.getProperty(
                                             DENOPTIMConstants.ATMPROPVERTEXID);
-            if (vrtId == vertPathVAVB.get(0).getVertexId() ||
-                vrtId == vertPathVAVB.get(vertPathVAVB.size()-1).getVertexId())
-            {
-                ends.add(atm);
-            }
+            if (vrtId == vertPathVAVB.get(0).getVertexId())
+                e0 = atm;
+                      
+            if (vrtId == vertPathVAVB.get(vertPathVAVB.size()-1).getVertexId())
+                e1 = atm;
+            
+            if (e0 != null && e1 != null)
+                break;
         }
+        List<IAtom> ends = new ArrayList<IAtom>();
+        ends.add(e0);
+        ends.add(e1);
 
         // Get path in mol that corresponds to the shortest path in iacPathVAVB
         // This is done to get the bond properties from mol that is a 
@@ -465,9 +478,96 @@ public class PathSubGraph
         // this particular context.
         List<IAtom> pathInFullMol = new ArrayList<IAtom>();
         try {
-            pathInFullMol = PathTools.getShortestPath(mol, 
-                                                      ends.get(0), 
-                                                      ends.get(1));
+            IAtom currentAtm = null;
+            int prevAtmInPathVID = -1;
+            int currAtmInPathVID = -1;
+            int nextAtmInPathVID = -1;
+            boolean openInVertexPath = false;
+            List<IAtom> candidates = new ArrayList<IAtom>();
+            for (int i=1; i<(atomsPathVAVB.size()); i++)
+            {
+                //We have already found the atoms corresponding to the extremes
+                if (i==1)
+                {
+                    currentAtm = ends.get(0);
+                    pathInFullMol.add(currentAtm);
+                    candidates.addAll(mol.getConnectedAtomsList(currentAtm));
+                } else if (i==(atomsPathVAVB.size()-1))
+                {
+                    pathInFullMol.add(ends.get(1));
+                    break;
+                }
+                
+                // Now, standard behaviour for all other non-extreme cases
+                prevAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i-1));
+                currAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i));
+                nextAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i+1));
+                
+                if (prevAtmInPathVID != currAtmInPathVID)
+                {
+                    for (IAtom c : candidates)
+                    {
+                        if (getVertexIdInPath(c) == currAtmInPathVID)
+                        {
+                            currentAtm = c;
+                            pathInFullMol.add(currentAtm);
+                            candidates.clear();
+                            
+                            for (IAtom c2 : mol.getConnectedAtomsList(c))
+                            {
+                                if (!pathInFullMol.contains(c2))
+                                    candidates.add(c2);
+                            }
+                            break;
+                        }
+                    }
+                    continue;
+                } else {
+                    //NB:  currentAtm remains the same
+                    openInVertexPath = true;
+                    List<IAtom> newCandidates = new ArrayList<IAtom>(); 
+                    for (IAtom nbr : candidates)
+                    {
+                        boolean foundNextLevel = false;
+                        for (IAtom nbrNbr : mol.getConnectedAtomsList(nbr))
+                        {
+                            if (pathInFullMol.contains(nbrNbr)
+                                    || candidates.contains(nbrNbr))
+                                continue;
+                            
+                            int vid = getVertexIdInPath(nbrNbr);
+                            if (vid == nextAtmInPathVID 
+                                    && currAtmInPathVID!=nextAtmInPathVID)
+                            {
+                                List<IAtom> itnraVertPath = 
+                                        PathTools.getShortestPath(mol, 
+                                                currentAtm, nbr);
+
+                                // currentAtm was already added: skip it
+                                for (int j=1; j<itnraVertPath.size(); j++)
+                                    pathInFullMol.add(itnraVertPath.get(j));
+                                
+                                currentAtm = nbr;
+                                newCandidates.clear();
+                                newCandidates.add(nbrNbr);
+                                foundNextLevel = true;
+                                break;
+                            } else {
+                                if (vid == currAtmInPathVID)
+                                {
+                                    newCandidates.add(nbrNbr);
+                                }
+                            }
+                        }
+                        if (foundNextLevel)
+                            break;
+                    }
+                    candidates.clear();
+                    candidates.addAll(newCandidates);
+                    continue;
+                } 
+
+            }
         } catch (Throwable t) {
             throw new DENOPTIMException("PathTools Exception: " + t);
         }
@@ -477,27 +577,11 @@ public class PathSubGraph
                         + "proceed in the evaluation of ring closability. "
                         + "Please report this to the author.");
         }
-        atmNumStr = " Atm in path: ";
-        for (int ia=0; ia<pathInFullMol.size(); ia++)
-        {
-            IAtom a = pathInFullMol.get(ia);
-            if (ia == 0 || ia == pathInFullMol.size()-1)
-            {
-                atmNumStr = atmNumStr + "RCA-" + (mol.indexOf(a)+1)+"_";
-            }
-            else
-            {
-                atmNumStr = atmNumStr + a.getSymbol() + "-"
-                                            + (mol.indexOf(a) + 1) + "_";
-            }
-        }
-        if (debug)
-        {
-            System.out.println("Path goes via " + atmNumStr + "(if unique)");
-        }
 
         // Identify the path of bonds between head and tail
         // This is taken from the fully defined mol to inherit rotatability
+        // and allow identification of bonds used in multiple rings-closing
+        // chains.
         bondsPathVAVB = new ArrayList<IBond>();
         for (int i=0; i < pathInFullMol.size()-1; i++)
         {
@@ -636,6 +720,14 @@ public class PathSubGraph
 
         // set flag
         hasMolRepr = true;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private int getVertexIdInPath(IAtom a)
+    {
+        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID,
+                Integer.class).intValue();
     }
 
 //-----------------------------------------------------------------------------

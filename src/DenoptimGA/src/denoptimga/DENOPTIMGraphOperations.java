@@ -1263,19 +1263,32 @@ public class DENOPTIMGraphOperations
                 BBType nfty = BBType.UNDEFINED;
                 int nfap = -1;
 
-                int posScaffInCc = cc.getTurningPoint();
-                if (posInCc > posScaffInCc)
+                List<Integer> altertnativeDirections = new ArrayList<>();
+                altertnativeDirections.add(-1);
+                altertnativeDirections.add(+1);
+                for (int altDir : altertnativeDirections)
                 {
-                    ChainLink parentLink = cc.getLink(posInCc - 1);
+                    ChainLink parentLink = cc.getLink(posInCc + altDir);
                     int pLnkId = parentLink.getMolID();
                     BBType pLnkTyp = parentLink.getFragType();
-                    int pLnkAp = parentLink.getApIdToRight();
-                    if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
-                        cLink.getApIdToLeft() == chidAp)
+                    
+                    int pLnkAp = -1;
+                    int cApId = -1;
+                    if (altDir>0)
                     {
-                        if (cc.getSize() > (posInCc+1))
+                        pLnkAp = parentLink.getApIdToRight();
+                        cApId = cLink.getApIdToLeft();
+                    } else {
+                        pLnkAp = parentLink.getApIdToLeft();
+                        cApId = cLink.getApIdToRight();
+                    }
+                    if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
+                            cApId == chidAp)
+                    {
+                        if (cc.getSize() > (posInCc+altDir)
+                                && (posInCc+altDir) >= 0)
                         {
-                            ChainLink nextChainLink = cc.getLink(posInCc + 1);
+                            ChainLink nextChainLink = cc.getLink(posInCc + altDir);
                             nfid = nextChainLink.getMolID();
                             nfty = nextChainLink.getFragType();
                             nfap = nextChainLink.getApIdToLeft();
@@ -1292,37 +1305,6 @@ public class DENOPTIMGraphOperations
                         continue;
                     }
                 }
-                else if (posInCc < posScaffInCc)
-                {
-                    ChainLink parentLink = cc.getLink(posInCc + 1);
-                    int pLnkId = parentLink.getMolID();
-                    BBType pLnkTyp = parentLink.getFragType();
-                    int pLnkAp = parentLink.getApIdToLeft();
-                    if (pLnkId==prntId && pLnkTyp==prntTyp && pLnkAp == prntAp  &&
-                        cLink.getApIdToRight() == chidAp)
-                    {
-                        if ((posInCc-1) >= 0)
-                        {
-                            ChainLink nextChainLink = cc.getLink(posInCc - 1);
-                            nfid = nextChainLink.getMolID();
-                            nfty = nextChainLink.getFragType();
-                            nfap = nextChainLink.getApIdToRight();
-                        }
-                        else
-                        {
-                            // cLink is the leftmost chain link
-                            // closability bias suggest NO fragment
-                        }
-                    }
-                    else
-                    {
-                        // different parent link
-                        continue;
-
-                    }
-                }
-                // There is no case posInCc==posScaffInCc because is treated 
-                // in the first IF block of this method
 
                 ArrayList<Integer> eligibleFrgId = new ArrayList<Integer>();
                 eligibleFrgId.add(nfid);

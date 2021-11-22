@@ -1644,6 +1644,7 @@ public class CyclicGraphHandler
 
         RingClosingConformations rcc;
         boolean closable = false;
+        
         String foundID = RingClosuresArchive.containsChain(subGraph);
         if (foundID != "")
         {

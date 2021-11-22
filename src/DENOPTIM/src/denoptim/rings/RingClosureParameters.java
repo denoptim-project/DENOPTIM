@@ -379,7 +379,7 @@ public class RingClosureParameters
 
     public static boolean selectFragmentsFromClosableChains()
     {
-	return selectFragsFromCC;
+        return selectFragsFromCC;
     }
 
 //----------------------------------------------------------------------------

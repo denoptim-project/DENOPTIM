@@ -245,7 +245,7 @@ public class RingClosuresArchive
                     {
                        System.out.println("Attempt " + nTry
                              + " to get lock " + "for '"
-			     + RingClosureParameters.getRCCLibraryIndexFile()
+                             + RingClosureParameters.getRCCLibraryIndexFile()
                              + "' failed. ");
                     }
                 }
@@ -307,7 +307,8 @@ public class RingClosuresArchive
         }
         catch (Throwable t)
         {
-             throw new DENOPTIMException(t);
+             throw new DENOPTIMException("Exception while trying to store " 
+                     + chainId,t);
         }
         finally
         {
@@ -361,7 +362,7 @@ public class RingClosuresArchive
     {
     	String result = "";
     	for (String altChId : chain.getAllAlternativeChainIDs())
-            {
+        {
     	    if (rccsPerChainId.containsKey(altChId))
     	    {
     	        result = altChId;
