@@ -807,16 +807,22 @@ public class EvolutionaryAlgorithm
         {
             for (FitnessTask tsk : submitted)
             {
-                if (tsk.foundException())
+                boolean interrupt = false;
+                synchronized (tsk.lock)
                 {
-                    foundExceptions = true;
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
-                      + tsk.toString() + ". ErrorMessage: '" 
-                      + tsk.getErrorMessage() + "'. ExceptionInTask: "
-                      + tsk.getException());
-                    ex = tsk.getException().getCause();
-                    break;
+                    if (tsk.foundException())
+                    {
+                        foundExceptions = true;
+                        DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
+                          + tsk.toString() + ". ErrorMessage: '" 
+                          + tsk.getErrorMessage() + "'. ExceptionInTask: "
+                          + tsk.getException());
+                        ex = tsk.getException().getCause();
+                        interrupt = true;
+                    }
                 }
+                if (interrupt)
+                    break;
             }
         } else {
             // We don't really check of exceptions for synchronous scheme

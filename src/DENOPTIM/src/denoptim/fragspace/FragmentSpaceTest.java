@@ -44,6 +44,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -479,8 +481,8 @@ public class FragmentSpaceTest
             List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
             fragLib.clear(); // Workaround. See @BeforeEach in this class.
             
-            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
-            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+            FragmentSpaceParameters.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
@@ -704,6 +706,198 @@ public class FragmentSpaceTest
             this.graph = g;
             this.expected = expected;
         }
+    }
+    
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Wotks with this graph:
+     * <pre>
+     *            c1 
+     *            | 
+     *   v1--v2--v3
+     *        |   |
+     *        |   v11
+     *        |   (chord)
+     *        |   v10          c3
+     *        |   |            |
+     *       v4--v6--v9--v5---v7
+     *        |           \    |  
+     *       c2            \   v12
+     *                      |  (chord)
+     *                      \  v13
+     *                       \ |
+     *                        v8-v13
+     *                        |
+     *                        c4  
+     * </pre>
+     */
+    @Test
+    public void testUseWholeMolGeometryForExtractedTemplates() throws Exception
+    {   
+        DENOPTIMFragment scaf = new DENOPTIMFragment();
+        IAtom s1 = new Atom("C", new Point3d(0,0,0));
+        scaf.addAtom(s1);
+        scaf.addAPOnAtom(s1, APC2, new Point3d(1,1,0));
+        scaf.addAPOnAtom(s1, APC3, new Point3d(1,-1,0));
+        scaf.addAPOnAtom(s1, APC4, new Point3d(-1,-1,0));
+        scaf.projectAPsToProperties();
+        
+        FragmentSpace.appendVertexToLibrary(scaf, BBType.SCAFFOLD, 
+                FragmentSpace.getScaffoldLibrary());
+        int sId = FragmentSpace.getScaffoldLibrary().size() - 1;
+        
+        DENOPTIMFragment frg = new DENOPTIMFragment();
+        IAtom a1 = new Atom("C", new Point3d(0,0,0));
+        IAtom a2 = new Atom("C", new Point3d(0,0,1));
+        IAtom a3 = new Atom("C", new Point3d(0,0,2));
+        frg.addAtom(a1);
+        frg.addAtom(a2);
+        frg.addAtom(a3);
+        frg.addBond(new Bond(a1, a2));
+        frg.addBond(new Bond(a2, a3));
+        frg.addAPOnAtom(a1, APC2, new Point3d(1,1,2));
+        frg.addAPOnAtom(a2, APC3, new Point3d(1,-1,0));
+        frg.addAPOnAtom(a3, APC4, new Point3d(-1,-1,0));
+        frg.projectAPsToProperties();
+        
+        FragmentSpace.appendVertexToLibrary(frg, BBTFRAG, 
+                FragmentSpace.getFragmentLibrary());
+        int bbId = FragmentSpace.getFragmentLibrary().size() - 1;
+        
+        DENOPTIMFragment rcv = new DENOPTIMFragment();
+        IAtom a4 = new PseudoAtom("ATN", new Point3d(0,0,0));
+        rcv.addAtom(a4);
+        rcv.addAPOnAtom(a4, APClass.make("ATneutral",0), new Point3d(1,0,0));
+        rcv.projectAPsToProperties();
+        rcv.setAsRCV(true);
+        
+        FragmentSpace.appendVertexToLibrary(rcv, BBTFRAG, 
+                FragmentSpace.getFragmentLibrary());
+        int rcvId = FragmentSpace.getFragmentLibrary().size() - 1;
+        
+        DENOPTIMGraph wholeGraph = new DENOPTIMGraph();
+        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v2 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v3 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v4 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v5 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v6 = FragmentSpace.getVertexFromLibrary(BBType.SCAFFOLD, 
+                sId);
+        DENOPTIMVertex v7 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v8 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v9 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v10 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex v11 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex v12 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex v13 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex c1 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex c2 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex c3 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex c4 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
+        
+        // Disordered... just for the fun of it. Still, do not change it further
+        // as we need to wholeMol to be created consistently
+        wholeGraph.addVertex(v7);
+        wholeGraph.addVertex(v8);
+        wholeGraph.addVertex(v9);
+        wholeGraph.addVertex(v6);
+        wholeGraph.addVertex(v1);
+        wholeGraph.addVertex(v2);
+        wholeGraph.addVertex(v3);
+        wholeGraph.addVertex(v4);
+        wholeGraph.addVertex(v5);
+        wholeGraph.addVertex(v10);
+        wholeGraph.addVertex(v11);
+        wholeGraph.addVertex(v12);
+        wholeGraph.addVertex(v13);
+        wholeGraph.addVertex(c1);
+        wholeGraph.addVertex(c2);
+        wholeGraph.addVertex(c3);
+        wholeGraph.addVertex(c4);
+        wholeGraph.addEdge(new DENOPTIMEdge(v6.getAP(0),v4.getAP(1),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v6.getAP(1),v10.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v4.getAP(0),v2.getAP(1),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v2.getAP(0),v3.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v3.getAP(1),v11.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v2.getAP(2),v1.getAP(2),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v6.getAP(2),v9.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v9.getAP(1),v5.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v5.getAP(1),v7.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v5.getAP(2),v8.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v7.getAP(1),v12.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v8.getAP(2),v13.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v3.getAP(2),c1.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v4.getAP(2),c2.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v7.getAP(2),c3.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new DENOPTIMEdge(v8.getAP(1),c4.getAP(0),BondType.SINGLE));
+        
+        wholeGraph.addRing(v10, v11, BondType.DOUBLE);
+        wholeGraph.addRing(v12, v13, BondType.DOUBLE);
+        
+        ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
+        IAtomContainer wholeMol = tb3d.convertGraphTo3DAtomContainer(
+                wholeGraph.clone(),true);
+        
+        double r = 10;
+        for (int i=0; i<wholeMol.getAtomCount(); i++)
+        {
+            IAtom atm = wholeMol.getAtom(i);
+            if (atm instanceof PseudoAtom)
+                ((PseudoAtom) atm).setLabel("Du");
+            else
+                atm.setSymbol("P");
+            atm.setPoint3d(new Point3d(r*Math.cos(Math.toRadians(360/34 * i)),
+                    r*Math.sin(Math.toRadians(360/34 * i)),0));
+        }
+        
+        int szScafLibPre = FragmentSpace.getScaffoldLibrary().size();
+        int szFragLibPre = FragmentSpace.getFragmentLibrary().size();
+        
+        String scafFile = tempDir.getAbsolutePath() + SEP + "newScaf.sdf";
+        String fragFile = tempDir.getAbsolutePath() + SEP + "newFrag.sdf";
+        FragmentSpaceParameters.scaffoldLibFile = scafFile;
+        FragmentSpaceParameters.fragmentLibFile = fragFile;
+
+        FragmentSpace.addFusedRingsToFragmentLibrary(wholeGraph, true, true,
+                wholeMol);
+        
+        // NB: in here there is cloning of template with mol representation
+        assertEquals(szScafLibPre+1,FragmentSpace.getScaffoldLibrary().size(),
+                "Size scaffolds library");
+        assertEquals(szFragLibPre+1,FragmentSpace.getFragmentLibrary().size(),
+                "Size fragments library");
+        
+        DENOPTIMVertex newScaff = FragmentSpace.getVertexFromLibrary(
+                BBType.SCAFFOLD,szScafLibPre); // szScafLibPre+1-1
+        assertEquals(4,newScaff.getAttachmentPoints().size(), 
+                "#APs on new scaffold");
+        int nP = 0;
+        for (IAtom a : newScaff.getIAtomContainer().atoms())
+        {
+            if ("P".equals(DENOPTIMMoleculeUtils.getSymbolOrLabel(a)))
+                nP++;
+        }
+        assertEquals(10,nP,"#P in new scaffold");
+        
+        DENOPTIMVertex newFrag = FragmentSpace.getVertexFromLibrary(
+                BBType.FRAGMENT,szFragLibPre); // szFragLibPre+1-1
+        assertEquals(3,newFrag.getAttachmentPoints().size(), 
+                "#APs on new fragment");
+        nP = 0;
+        for (IAtom a : newFrag.getIAtomContainer().atoms())
+        {
+            if ("P".equals(DENOPTIMMoleculeUtils.getSymbolOrLabel(a)))
+                nP++;
+        }
+        assertEquals(9,nP,"#P in new fragment");
+        
+        //Cleanup tmp files
+        DenoptimIO.deleteFile(
+                FragmentSpaceParameters.getPathnameToAppendedFragments());
+        DenoptimIO.deleteFile(
+                FragmentSpaceParameters.getPathnameToAppendedScaffolds());
     }
 
 //------------------------------------------------------------------------------

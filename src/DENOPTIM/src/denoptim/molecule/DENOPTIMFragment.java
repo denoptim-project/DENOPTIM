@@ -328,8 +328,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param dirVec the AP direction vector end (the beginning at the 
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
+     * @return the reference to the created AP.
      */
-    public void addAP(int atomPositionNumber, Point3d dirVec, APClass apClass) {
+    public DENOPTIMAttachmentPoint addAP(int atomPositionNumber, Point3d dirVec, APClass apClass) {
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, dirVec, apClass);
         getAttachmentPoints().add(ap);
@@ -344,6 +345,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
         
         updateSymmetryRelations();
+        
+        return ap;
     }
     
 //-----------------------------------------------------------------------------
@@ -380,14 +383,15 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param vector the coordinates of the 3D point representing the end of 
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
+     * @return the reference to the created AP.
      * @throws DENOPTIMException 
      */
 
-    public void addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector)
+    public DENOPTIMAttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector)
             throws DENOPTIMException
     {
         int atmId = mol.indexOf(srcAtm);
-        this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);
+        return this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);
     }
 
 //-----------------------------------------------------------------------------

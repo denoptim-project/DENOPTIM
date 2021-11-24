@@ -122,6 +122,23 @@ function abandonDueToChild {
 }
 
 #
+# Concatenates SDF files making sure that in ay incompleted write operation
+# (possibly ongoing) does not result in incompleted molecular definition.
+#
+function mergeSDFFiles {
+    firstFile=$1
+    secondFile=$2
+    endFile=$3
+    cat "$firstFile" "$secondFile" > "$endFile"
+    lastCorrectEnd=$(grep -n '\$\$\$\$' "$endFile" | tail -n 1 | awk -F':' '{print $1}')
+    fileEnd=$(wc -l "$endFile" | awk '{print $1}')
+    if [ "$fileEnd" -ne "$lastCorrectEnd" ]; then 
+        head -n "$lastCorrectEnd" "$endFile" > tmpFrag_$molNum 
+        mv tmpFrag_$molNum "$endFile"
+    fi
+}
+
+#
 # Cleanup all tmp files according to the cleanup flag
 #
 function cleanUpTmpFiles {
@@ -185,6 +202,28 @@ exec > $log
 exec 2>&1
 echo "Starting fitness calculation (ID:$taskId) at $beginTime" 
 
+
+#
+# Since we have the possibility to introduce new fragments on the fly, we
+# need to update the initial libraries of building blocks.
+#
+currentScaffLib="$wrkDir/currentScaff_$molNum.sdf"
+if [ -f "$wrkDir/../../data/lib_scaff.sdf_addedScaffolds.sdf" ]; then
+    echo "Merging original library of scaffolds with extension."
+    mergeSDFFiles "$wrkDir/../../data/lib_scaff.sdf" "$wrkDir/../../data/lib_scaff.sdf_addedScaffolds.sdf" "$currentScaffLib"
+else
+   cp "$wrkDir/../../data/lib_scaff.sdf" "$currentScaffLib"
+fi
+
+currentFragLib="$wrkDir/currentFrag_$molNum.sdf"
+if [ -f "$wrkDir/../../data/lib_frags.sdf_addedFragments.sdf" ]; then
+    echo "Merging original library of fragments with extension."
+    mergeSDFFiles "$wrkDir/../../data/lib_frags.sdf" "$wrkDir/../../data/lib_frags.sdf_addedFragments.sdf" "$currentFragLib"
+else 
+    cp "$wrkDir/../../data/lib_frags.sdf" "$currentFragLib"
+fi
+
+
 #
 # Build 3D via ring-closing potential
 #
@@ -195,8 +234,8 @@ DnCGParFile="$wrkDir/${molNum}_DnCG.par"
 echo "CG-VERBOSITY=1" > "$DnCGParFile"
 echo "CG-inpSDF=$DnCG3Dinp" >> "$DnCGParFile"
 echo "CG-outSDF=$DnCG3Dout" >> "$DnCGParFile"
-echo "FS-scaffoldLibFile=$wrkDir/../../data/lib_frags.sdf" >> "$DnCGParFile"
-echo "FS-fragmentLibFile=$wrkDir/../../data/lib_frags.sdf" >> "$DnCGParFile"
+echo "FS-scaffoldLibFile=$currentScaffLib" >> "$DnCGParFile"
+echo "FS-fragmentLibFile=$currentFragLib" >> "$DnCGParFile"
 echo "FS-cappingFragmentLibFile=$wrkDir/../../data/lib_cap.sdf" >> "$DnCGParFile"
 echo "FS-compMatrixFile=$wrkDir/../../data/CPMap.par" >> "$DnCGParFile"
 echo "FS-RotBondsDefFile=$wrkDir/../../data/rotatableBonds-1.0" >> "$DnCGParFile"
@@ -220,6 +259,7 @@ echo "CG-RCPSSROTPARAMS=$wrkDir/../../data/submit_RC-PSSROT" >> "$DnCGParFile"
 # Cleanup files tmp files
 #echo "Removing $wrkDir/${molNum}_cs0.*"
 #rm -f "$wrkDir/${molNum}_cs0."*
+rm "$currentScaffLib" "$currentFragLib"
 
 # Check outcome
 if [ -f "$DnCG3Dout" ]; then
@@ -241,7 +281,7 @@ echo "Calculation of fitness"
 FPinp="$DnCG3Dout"
 FPout="$wrkDir/${molNum}_FP.sdf"
 FPParFile="$wrkDir/${molNum}_FP.par"
-echo 'FP-Equation=${taniToGoal}' > "$FPParFile"
+echo 'FP-Equation=${taniToGoal*taniToGoal}' > "$FPParFile"
 echo "FP-DescriptorSpecs=\${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/Users/marco/tools/DENOPTIM_graphTemplate/test/diamonds/data/goal.sdf')}" >> "$FPParFile"
 echo 'FP-No3dTreeModel' >> "$FPParFile"
 echo "FR-Input=$FPinp" >> "$FPParFile"

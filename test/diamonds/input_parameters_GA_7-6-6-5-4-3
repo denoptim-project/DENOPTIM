@@ -1,0 +1,49 @@
+# Genetic Algorithm - parameters
+GA-RandomSeed=1234567
+GA-PrintLevel=1
+GA-PopulationSize=100
+GA-NumChildren=100
+GA-NumGenerations=100
+GA-NumConvGen=20
+GA-MaxTriesPerPopulation=10000
+GA-MolGrowthProbScheme=SIGMA
+GA-MolGrowthMultiplier=1.0
+GA-MolGrowthSigmaSteepness=0.5
+GA-MolGrowthSigmaMiddle=20.0
+GA-CrowdProbScheme=SIGMA
+GA-CrowdMultiplier=1.0
+GA-CrowdSigmaSteepness=0.9
+GA-CrowdSigmaMiddle=2.0
+GA-XOverSelectionMode=TS
+GA-CrossoverWeight=0.50
+GA-MutationWeight=0.90
+GA-ConstructionWeight=0.5
+GA-SymmetryProbability=0.0
+GA-ReplacementStrategy=ELITIST
+GA-NumParallelTasks=2
+GA-Parallelization=Asynchronous
+GA-KeepNewRingSystemVertexes
+GA-KeepNewRingSystemScaffolds
+GA-KeepNewRingSystemFitnessTrsh=0.02
+# Fragment Space - parameters
+FS-ScaffoldLibFile=/tmp/denoptim_Diamond/data/lib_scaff.sdf
+FS-FragmentLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
+FS-CappingFragmentLibFile=/tmp/denoptim_Diamond/data/lib_cap.sdf
+FS-CompMatrixFile=/tmp/denoptim_Diamond/data/CPMap.par
+FS-MaxHeavyAtom=30
+FS-MaxMW=300
+FS-MaxRotatableBond=50
+RC-CloseRings
+FS-RCCompMatrixFile=/tmp/denoptim_Diamond/data/RC-CPMap
+RC-RingSizeBias=5 1
+RC-RingSizeBias=6 1
+RC-RingSizeBias=7 1
+RC-RingSizeBias=4 1
+RC-RingSizeBias=3 1
+RC-MaxSizeNewRings=10
+RC-EvaluationClosabilityMode=Ring_size
+
+# Fitness Provider - parameters
+FP-Equation=${taniToGoal*taniToGoal}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/tmp/denoptim_Diamond/data/goal.sdf')}
+FP-CheckUidBeforeFitness

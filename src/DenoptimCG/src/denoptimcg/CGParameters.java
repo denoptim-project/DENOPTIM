@@ -132,9 +132,9 @@ public class CGParameters
     protected static ArrayList<String> rsKeyFileParams;
 
     /**
-     * Flag controlling the critetion used to reorder atom lists.
+     * Flag controlling the criterion used to reorder atom lists.
      * 1: branch-oriented (completes a branch before moving to the next one).
-     * 2: layer-oriented )completes a layer bevore moving to the next one).
+     * 2: layer-oriented) completes a layer before moving to the next one).
      */
     protected static int atomOrderingScheme = 1;
 

@@ -93,28 +93,26 @@ public class ConformationalSearchPSSROT
         ArrayList<Molecule3DBuilder> nMols = new ArrayList<Molecule3DBuilder>();
         for (int i=0; i<mols.size(); i++)
         {
-	    Object molErroProp = mols.get(i).getIAtomContainer().getProperty(
-								   DENOPTIMConstants.MOLERRORTAG);
-	    if (molErroProp == null)
-	    {
-		if (verbosity > 1)
-		{
-		    System.out.println("Field MOL_ERROR is null: proceeding "
-				   + "with conformational search.");
-		}
+    	    Object molErroProp = mols.get(i).getIAtomContainer().getProperty(
+    								   DENOPTIMConstants.MOLERRORTAG);
+    	    if (molErroProp == null)
+    	    {
+        		if (verbosity > 1)
+        		{
+        		    System.out.println("Field MOL_ERROR is null: proceeding "
+        				   + "with conformational search.");
+        		}
                 Molecule3DBuilder csMol = performPSSROT(mols.get(i), i);
                 nMols.add(csMol);
-	    }
-	    else
-	    {
-		if (verbosity > 1)
-		{
-		    System.out.println("Field MOL_ERROR is NOT null: skiping "
-				   + "conformational search. Reason: "
-				   + molErroProp);
-		}
+    	    } else {
+        		if (verbosity > 1)
+        		{
+        		    System.out.println("Field MOL_ERROR is NOT null: skiping "
+        				   + "conformational search. Reason: "
+        				   + molErroProp);
+        		}
                 nMols.add(mols.get(i).deepcopy());
-	    }
+    	    }
         }
 
         return nMols;
@@ -140,17 +138,17 @@ public class ConformationalSearchPSSROT
 
         Molecule3DBuilder csMol3d = mol.deepcopy();
 
-	// Is there any rotatable bond?
+        // Is there any rotatable bond?
         int sz = csMol3d.getNumberRotatableBonds();
-	if (sz == 0)
-	{
-	    if (verbosity > 1)
-	    {
-	        System.out.println("No rotatable bond: skip PSSROT "
-				+ "conformational search.");
-	    }
-	    return csMol3d;
-	}
+    	if (sz == 0)
+    	{
+    	    if (verbosity > 1)
+    	    {
+    	        System.out.println("No rotatable bond: skip PSSROT "
+    				+ "conformational search.");
+    	    }
+    	    return csMol3d;
+    	}
 
         TinkerMolecule tmol = csMol3d.getTinkerMolecule();
         String workDir = CGParameters.getWorkingDirectory();
@@ -164,16 +162,16 @@ public class ConformationalSearchPSSROT
         String csKeyFile = workDir + fsep + molName + "_cs" + idm + ".key";
         StringBuilder csSbKey = new StringBuilder(512);
         // Molecule-independent keywords
-	csSbKey.append("parameters    ").append(
+        csSbKey.append("parameters    ").append(
 				    CGParameters.getParamFile()).append("\n");
-	boolean isFirstLine = true;
+        boolean isFirstLine = true;
         for (String line : CGParameters.getKeyFileParams())
         {
-	    if (isFirstLine)
-	    {
+    	    if (isFirstLine)
+    	    {
                 isFirstLine = false;
-		continue;
-	    }
+                continue;
+    	    }
             csSbKey.append(line).append("\n");
         }
         DenoptimIO.writeData(csKeyFile, csSbKey.toString(), false);
@@ -198,31 +196,27 @@ public class ConformationalSearchPSSROT
         // Linear search section of SUB file
         if (sz > 1)
         {
-	    ArrayList<String> txt = CGParameters.getRestPSSROTParams();
+            ArrayList<String> txt = CGParameters.getRestPSSROTParams();
             for (int ir=0; ir<txt.size(); ir++)
             {
-		// Control number of linear search directions
-		if (ir == 2)
-		{
-		    int maxDirs = Integer.parseInt(txt.get(ir));
-		    if (sz < maxDirs)
-		    {
-			csSbSub.append(sz).append("\n");
-		    }
-		    else
-		    {
+        		// Control number of linear search directions
+        		if (ir == 2)
+        		{
+        		    int maxDirs = Integer.parseInt(txt.get(ir));
+        		    if (sz < maxDirs)
+        		    {
+        		        csSbSub.append(sz).append("\n");
+        		    }
+        		    else
+        		    {
                         csSbSub.append(maxDirs).append("\n");
-		    }
-		}
-		else
-		{
-		    String row = txt.get(ir);
+        		    }
+        		} else {
+        		    String row = txt.get(ir);
                     csSbSub.append(row).append("\n");
-		}
+        		}
             }
-        }
-        else 
-        {
+        } else {
             if (sz == 1)
             {
                 // No linear search if there is only 1 rotation bond
@@ -256,7 +250,7 @@ public class ConformationalSearchPSSROT
             if (csPh.getExitCode() != 0)
             {
                 String msg = "PSSROT Conformational Search failed for ";
-		msg = msg + molName;
+                msg = msg + molName;
                 throw new DENOPTIMException(msg + "\n"
                                             + csPh.getErrorOutput());
             }
@@ -273,8 +267,8 @@ public class ConformationalSearchPSSROT
         String ocsIntfile = getNameLastCycleFile(molName + "_cs" 
 							+ idm, csOutFile);
 
-	// But beforethan, need to handle case where Tinker splits line in two
-	fixLongeLinesInXYZ(ocsIntfile);
+    	// But beforethan, need to handle case where Tinker splits line in two
+    	fixLongeLinesInXYZ(ocsIntfile);
 
         String ocsID = "" + CGParameters.getTaskID();
         String ocsCmd = CGParameters.getXYZINTTool() + " "
@@ -330,6 +324,7 @@ GenUtils.pause();
     }
 
 //------------------------------------------------------------------------------    
+    
     /**
      * The XYZ file generated by tinker for molecules having atoms with many 
      * neighbours is corrupted: the line ofthe atom with long list of connected

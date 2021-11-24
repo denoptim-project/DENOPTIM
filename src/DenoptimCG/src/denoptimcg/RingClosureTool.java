@@ -237,33 +237,19 @@ public class RingClosureTool
                                         + "Combination (" + i + "): " + s);
             }
 
-	    // Try to create new molecule
+            // Try to create new molecule
             Molecule3DBuilder rcMol = attemptRingClosure(mol,rcaComb);
 
-	    // If some ring remaines open, report in the MOL_ERROR field
-	    int newRingClosed = rcMol.getNewRingClosures().size();
-	    if (newRingClosed < rcaComb.size())
+    	    // If some ring remains open, report in the MOL_ERROR field
+    	    int newRingClosed = rcMol.getNewRingClosures().size();
+    	    if (newRingClosed < rcaComb.size())
             {
-		String err = "#RingClosureTool: uncomplete closure ("
-				+ newRingClosed + "/" + rcaComb.size() + ")";
-		rcMol.getIAtomContainer().setProperty(DENOPTIMConstants.MOLERRORTAG,err);
-	    }
+        	    String err = "#RingClosureTool: uncomplete closure ("
+    				+ newRingClosed + "/" + rcaComb.size() + ")";
+        	    rcMol.getIAtomContainer().setProperty(
+        	            DENOPTIMConstants.MOLERRORTAG,err);
+            }
             rcMols.add(rcMol);
-/*
-	    // Decide whether to keep this new system or not
-	    boolean keepIt = true;
-	    // First condition: must have closed all rings suggested in rcaComb
-	    if (rcMol.getNewRingClosures().size() < rcaComb.size())
-	    {
-		keepIt = false;
-	    }
-
-	    // Store new molecule
-	    if (keepIt)
-	    {
-                rcMols.add(rcMol);
-	    }
-*/
         }
 
         // Sort
@@ -276,8 +262,8 @@ public class RingClosureTool
 
     /**
      * Compares the Molecule3DBuilder afters ring closing-biased conformational
-     * adaptation. Creteria for the evaluation are (i) the number of closed 
-     * rings, (ii) the summ of the overall quality of all new RingClosures,
+     * adaptation. Criteria for the evaluation are (i) the number of closed 
+     * rings, (ii) the sum of the overall quality of all new RingClosures,
      * and (iii) the evaluation of atom proximity (dummy atoms excluded).
      * Note that this comparator sorts in DESCENDING order.
      */
@@ -621,7 +607,7 @@ public class RingClosureTool
         // Update list rotatabe bonds
         rcMol3d.purgeListRotatableBonds();
 
-        // Finalize the molecule: saturate fre RCA
+        // Finalize the molecule: saturate free RCA
         saturateRingClosingAttractor(rcMol3d);
         
         // Cleanup

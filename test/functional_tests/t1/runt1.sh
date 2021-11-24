@@ -106,10 +106,10 @@ echo " "
 
 # Check outcome (only size of SDF files: #atoms+#bonds+props+headers)
 n=$(wc -l *3Dbuilt.sdf | tail -n 1 | awk '{print $1}')
-if [[ "$n" != 579 ]]
+if [[ "$n" != 594 ]]
 then
     echo " "
-    echo "Test 't1' NOT PASSED (symptom: )"
+    echo "Test 't1' NOT PASSED (symptom: size is $n)"
     exit 1
 else
     echo "Test 't1' PASSED"

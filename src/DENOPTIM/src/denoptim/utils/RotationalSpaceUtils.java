@@ -252,8 +252,8 @@ public class RotationalSpaceUtils
             {
                 IAtom atmA = bnd.getAtom(0);
                 IAtom atmB = bnd.getAtom(1);
-		String fragIdA = atmA.getProperty(p).toString();
-		String fragIdB = atmB.getProperty(p).toString();
+        		String fragIdA = atmA.getProperty(p).toString();
+        		String fragIdB = atmB.getProperty(p).toString();
 
                 if (!fragIdA.equals(fragIdB) &&
                     (mol.getConnectedBondsCount(atmA) != 1) &&

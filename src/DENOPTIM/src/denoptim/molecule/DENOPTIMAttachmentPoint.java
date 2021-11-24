@@ -92,6 +92,11 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * The edge that is using this AP, if any
      */
     private DENOPTIMEdge user;
+    
+    /**
+     * Map of customisable properties
+     */
+    private Map<Object, Object> properties;
 
 
 //------------------------------------------------------------------------------
@@ -956,6 +961,30 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         return owner.getIndexOfAP(this);
     }
 
+    
+//------------------------------------------------------------------------------
+    
+    public Object getProperty(Object description)
+    {
+        if (properties == null)
+        {
+            return null;
+        } else {
+            return properties.get(description);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperty(Object key, Object property)
+    {
+        if (properties == null)
+        {
+            properties = new HashMap<Object, Object>();
+        }
+        properties.put(key, property);
+    }
+    
 //-----------------------------------------------------------------------------
 
 }

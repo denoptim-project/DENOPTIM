@@ -1007,7 +1007,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 
     /**
      * Processes an atom container and builds a vertex out of it.
-     * @param iac the  atom containers.
+     * @param iac the atom containers.
      * @param bbt the type of building block
      * @return the vertex.
      * @throws DENOPTIMException if the atom container could not be converted 
@@ -1029,6 +1029,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         } else if (jsonVertex != null)
         {
             v = fromJson(jsonVertex.toString());
+            if (v instanceof DENOPTIMTemplate && iac.getAtomCount()>0)
+            {
+                ((DENOPTIMTemplate) v).setIAtomContainer(iac,false);
+            }
         } else {
             v = new DENOPTIMFragment(iac,bbt);
         }

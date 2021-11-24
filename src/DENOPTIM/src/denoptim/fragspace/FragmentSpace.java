@@ -44,6 +44,7 @@ import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
 
 import static denoptimga.DENOPTIMGraphOperations.extractPattern;
@@ -1331,7 +1332,7 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Takes a vertices and add it to a given library. Each vertex
+     * Takes a vertex and add it to a given library. Each vertex
      * is assigned the building block type and ID. 
      * 
      * @param v  vertex to import.
@@ -1390,6 +1391,30 @@ public class FragmentSpace
      * ring systems that do NOT contain any scaffold vertexes as new fragments.
      */
     
+    public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph,
+            boolean addIfScaffold, boolean addIfFragment) 
+    {
+        addFusedRingsToFragmentLibrary(graph, addIfScaffold, addIfFragment, null);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Extracts a system of one or more fused rings and adds them to the
+     * fragment space if not already present. <b>WARNING</b> 
+     * Expanding the libraries of 
+     * building blocks on-the-fly has the potential to overload the memory.
+     * @param graph the graph to analyze and possibly chop.
+     * @param addIfScaffold use <code>true</code> to enable saving of new
+     * ring systems that contain any scaffold vertexes as new scaffolds.
+     * @param addIfFragment use <code>true</code> to enable saving of new
+     * ring systems that do NOT contain any scaffold vertexes as new fragments.
+     * @param wholeMol the complete molecular representation of 
+     * <code>graph</code>. If this parameter is not null, then we'll try to use
+     * the geometry found in this parameter to define the geometry of the 
+     * fused-rings templates.
+     */
+    
     //TODO: need something to prevent memory overload: 
     // -> keep only some templates?
     // -> remove those who did not lead to good population members?
@@ -1399,14 +1424,14 @@ public class FragmentSpace
     
     //TODO: deal with molecular representation. For each subgraph we want the
     // corresponding molecular representation with APs and atoms with 
-    // geometrical
+    // geometric
     // features that might be obtained from the results of the fitness provider.
-    // In particular, we should take optimized 3D geometries when the 
+    // In particular, we should take optimised 3D geometries when the 
     // geom.optimization
     // is run within the fitness provider.
     
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph,
-            boolean addIfScaffold, boolean addIfFragment) 
+            boolean addIfScaffold, boolean addIfFragment, IAtomContainer wholeMol) 
     {
         List<DENOPTIMGraph> subgraphs = null;
         try
@@ -1450,8 +1475,22 @@ public class FragmentSpace
                     DENOPTIMTemplate t = new DENOPTIMTemplate(type);
                     t.setInnerGraph(g);
                     
-                    //TODO: try to use the 3D structure from fitness evaluation which called this method.
                     boolean has3Dgeometry = false;
+                    IAtomContainer subIAC = null;
+                    if (wholeMol!=null)
+                    {
+                        try
+                        {
+                            subIAC = DENOPTIMMoleculeUtils
+                                    .extractIACForSubgraph(wholeMol, g, graph);
+                            t.setIAtomContainer(subIAC,true);
+                            has3Dgeometry = true;
+                        } catch (DENOPTIMException e1)
+                        {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    }
     
                     FragmentSpace.appendVertexToLibrary(t, type, library);
                     
@@ -1462,11 +1501,10 @@ public class FragmentSpace
                                          .getPathnameToAppendedScaffolds();
                     try
                     {
-                        //TODO: compare with method reading-in fragments
+                        //TODO: we should have a writeVertex method do do all things
                         if (has3Dgeometry)
                         {
-                            //TODO: write a fragment-like molecular representation that can be read in.
-                            throw new DENOPTIMException("Not implemented yet!!!");
+                            DenoptimIO.writeMolecule(destFileName,subIAC,true);
                         } else {
                             DenoptimIO.writeGraphToSDF(new File(destFileName), 
                                     g, true, false);

@@ -734,27 +734,28 @@ public class EAUtils
             sb.append(NL);
         }
 
-        int sz = FragmentSpace.getScaffoldLibrary().size();
         HashMap<Integer, Integer> scf_cntr = new HashMap<>();
-        for (int i=1; i<=sz; i++)
-        {
-            scf_cntr.put(i, 0);
-        }
-
         for (int i=0; i<popln.size(); i++)
         {
             Candidate mol = popln.get(i);
             DENOPTIMGraph g = mol.getGraph();
-            int scafIdx = g.getVertexAtPosition(0).getBuildingBlockId() + 1;
-            scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
+            int scafIdx = g.getSourceVertex().getBuildingBlockId() + 1;
+            if (scf_cntr.containsKey(scafIdx)) {
+                scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
+            } else {
+                scf_cntr.put(scafIdx, 1);
+            }
         }
 
-        sb.append(NL+NL+"#####SCAFFOLD ANALYSIS#####"+NL);
+        sb.append(NL+NL+"#####SCAFFOLD ANALYSIS##### (Scaffolds list current "
+                + "size: " + FragmentSpace.getScaffoldLibrary().size() + ")" 
+                + NL);
         for (Map.Entry pairs : scf_cntr.entrySet())
         {
             sb.append(pairs.getKey()).append(" ").append(pairs.getValue());
             sb.append(NL);
         }
+        
         res = sb.toString();
         sb.setLength(0);
         

@@ -46,6 +46,11 @@ public abstract class Task implements Callable<Object>
     protected boolean hasException = false;
     
     /**
+     * Lock for addressing synchronisation issues.
+     */
+    public Object lock = new Object();
+    
+    /**
      * Error message produced by any subtask
      */
     protected String errMsg = "";

@@ -89,13 +89,16 @@ public class DenoptimCG
 */
 //MF: writes more than one structure if needed
                 ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
-                for (int inmol = 0; inmol<nmols.size(); inmol++)
+                for (int i = 0; i<nmols.size(); i++)
                 {
-                    nmols.get(inmol).setProperties(mol.getProperties());
+                    String propVIDs = nmols.get(i).getProperty(
+                            DENOPTIMConstants.ATMPROPVERTEXID).toString();
+                    nmols.get(i).setProperties(mol.getProperties());
+                    nmols.get(i).setProperty(
+                            DENOPTIMConstants.ATMPROPVERTEXID, propVIDs);
                 }
                 // write file
                 DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);
-
             }
         }
         catch (DENOPTIMException de)

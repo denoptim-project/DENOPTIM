@@ -32,16 +32,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.AtomRef;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.aromaticity.Kekulization;
@@ -84,11 +88,14 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.molecule.APClass;
 import denoptim.molecule.DENOPTIMAttachmentPoint;
 import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.molecule.DENOPTIMFragment;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.molecule.DENOPTIMRing;
 import denoptim.molecule.DENOPTIMVertex;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import net.sf.jniinchi.INCHI_RET;
 
 
@@ -750,7 +757,7 @@ public class DENOPTIMMoleculeUtils
      * Constructs a copy of an atom container, i.e., a molecule that reflects 
      * the one given in the input argument
      * in terms of atom count, type, and geometric properties, and bond count 
-     * and type. Other properties
+     * and type. Other properties are not copyied.
      * @param mol the container to copy.
      * @return the chemical-copy of the input argument.
      * @throws DENOPTIMException if there are bonds involving more than two atoms.
@@ -921,6 +928,155 @@ public class DENOPTIMMoleculeUtils
         }
         c.scale(1.0 / ((double) mol.getAtomCount()));
         return c;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Selects only the atoms that originate from a subgraph of a whole graph 
+     * that originated the whole molecule given as parameter.
+     * @param wholeIAC the molecular representation of the whole graph. The 
+     * atoms contained here are expected to be labelled by the property
+     * {@link DENOPTIMConstants#ATMPROPVERTEXID}, 
+     * which is used to identify which 
+     * atoms originated from which vertex of the whole graph.
+     * @param subGraph the portion of the whole graph for which we want the 
+     * corresponding atoms. The vertexes are expected to have the 
+     * {@link DENOPTIMConstants#STOREDVID} property that defined their original 
+     * vertex ID in the whole graph. Note that the current vertexID of each 
+     * vertex can be different from the ID of the original vertex had in the
+     * while graph.
+     * @return a new container with the requested substructure
+     * @throws DENOPTIMException 
+     */
+    public static IAtomContainer extractIACForSubgraph(IAtomContainer wholeIAC, 
+            DENOPTIMGraph subGraph, DENOPTIMGraph wholeGraph) throws DENOPTIMException
+    {
+        IAtomContainer iac = makeSameAs(wholeIAC);
+        
+        Set<Integer> wantedVIDs = new HashSet<Integer>();
+        Map<Integer,DENOPTIMVertex> wantedVertexesMap = new HashMap<>();
+        for (DENOPTIMVertex v : subGraph.getVertexList())
+        {
+            Object o = v.getProperty(DENOPTIMConstants.STOREDVID);
+            if (o == null)
+            {
+                throw new DENOPTIMException("Property '" 
+                        + DENOPTIMConstants.STOREDVID + "' not defined in "
+                        + "vertex " + v + ", but is needed to extract "
+                                + "substructure.");
+            }
+            wantedVIDs.add(((Integer) o).intValue());
+            wantedVertexesMap.put(((Integer) o).intValue(), v);
+        }
+        
+        // Identify the destiny of each atom: keep, remove, or make AP from it.
+        IAtomContainer toRemove = new AtomContainer();
+        Map<IAtom,IAtom> toAP = new HashMap<IAtom,IAtom>();
+        Map<IAtom,DENOPTIMAttachmentPoint> mapAtmToAPInG = 
+                new HashMap<IAtom,DENOPTIMAttachmentPoint>();
+        Map<IAtom,APClass> apcMap = new HashMap<IAtom,APClass>();
+        for (int i=0; i<wholeIAC.getAtomCount(); i++)
+        {
+            IAtom cpAtm = iac.getAtom(i);
+            IAtom oriAtm = wholeIAC.getAtom(i);
+            Object o = oriAtm.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+            if (o == null)
+            {
+                throw new DENOPTIMException("Property '" 
+                        + DENOPTIMConstants.ATMPROPVERTEXID 
+                        + "' not defined in atom "
+                        + oriAtm.getSymbol() + wholeIAC.indexOf(oriAtm) 
+                        + ", but is needed to extract substructure.");
+            }
+            int vid = ((Integer) o).intValue();
+            if (wantedVIDs.contains(vid))
+            {
+                continue; //keep this atom cpAtm
+            }
+            // Now, decide if the current atom should become an AP
+            boolean willBecomeAP = false;
+            for (IAtom nbr : wholeIAC.getConnectedAtomsList(oriAtm))
+            {
+                Object oNbr = nbr.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                if (oNbr == null)
+                {
+                    throw new DENOPTIMException("Property '" 
+                            + DENOPTIMConstants.ATMPROPVERTEXID 
+                            + "' not defined in atom "
+                            + nbr.getSymbol() + wholeIAC.indexOf(nbr) 
+                            + ", but is needed to extract substructure.");
+                }
+                int nbrVid = ((Integer) oNbr).intValue();
+                if (wantedVIDs.contains(nbrVid))
+                {
+                    // cpAtm is connected to an atom to keep and will therefore
+                    // become an AP.
+                    toAP.put(cpAtm,iac.getAtom(wholeIAC.indexOf(nbr)));
+                    DENOPTIMAttachmentPoint apInWholeGraph = 
+                            wholeGraph.getAPOnLeftVertexID(nbrVid,vid);
+                    DENOPTIMAttachmentPoint apInSubGraph = 
+                            wantedVertexesMap.get(nbrVid).getAP(apInWholeGraph.getIndexInOwner());
+                    mapAtmToAPInG.put(cpAtm, apInSubGraph);
+                    APClass apc = apInWholeGraph.getAPClass();
+                    apcMap.put(cpAtm, apc);
+                    willBecomeAP = true;
+                    break;
+                }
+            }
+            if (!willBecomeAP)
+                toRemove.addAtom(cpAtm);
+        }
+        
+        iac.remove(toRemove);
+        
+        // NB: the molecular representation in frag is NOT iac! It's a clone of it
+        DENOPTIMFragment frag = new DENOPTIMFragment(iac,BBType.FRAGMENT);
+        
+        List<IAtom> atmosToRemove = new ArrayList<>();
+        List<IBond> bondsToRemove = new ArrayList<>();
+        for (IAtom trgAtmInIAC : toAP.keySet())
+        {
+            IAtom trgAtm = frag.getAtom(iac.indexOf(trgAtmInIAC));
+            IAtom srcAtmInISC = toAP.get(trgAtmInIAC);
+            IAtom srcAtm = frag.getAtom(iac.indexOf(srcAtmInISC));
+            
+            // Make Attachment point
+            Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
+            Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
+            Point3d vector = new Point3d();
+            vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
+            vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
+            vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
+            
+            DENOPTIMAttachmentPoint createdAP = frag.addAPOnAtom(srcAtm, 
+                    apcMap.get(trgAtmInIAC), vector);
+            createdAP.setProperty(DENOPTIMConstants.LINKAPS, 
+                    mapAtmToAPInG.get(trgAtmInIAC));
+            
+            for (IBond bnd : frag.bonds())
+            {
+                if (bnd.contains(trgAtm))
+                {
+                    bondsToRemove.add(bnd);
+                }
+            }
+            atmosToRemove.add(trgAtm);
+        }
+        
+        // Remove atom that has become an AP and associated bonds
+        for (IBond bnd : bondsToRemove)
+        {
+            frag.removeBond(bnd);
+        }
+        for (IAtom a : atmosToRemove)
+        {
+            frag.removeAtomAndConnectedElectronContainers(a);
+        }
+        
+        frag.updateAPs();
+        
+        return frag.getIAtomContainer();
     }
 
 //------------------------------------------------------------------------------

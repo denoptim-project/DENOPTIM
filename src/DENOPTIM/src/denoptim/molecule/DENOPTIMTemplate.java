@@ -38,6 +38,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.PathSubGraph;
 import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -223,7 +224,32 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             c.addRequiredAP(ap.getDirectionVector(), ap.getAPClass());
         }
         c.setInnerGraph(this.getInnerGraph().clone());
-        
+        if (this.mol!=null)
+        {
+            //NB: We cannot use setIAtomContainer because it implies using 
+            // referenced to graph's AP which have been cloned, so the references
+            // are broken.
+            try
+            {
+                c.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
+                for (int i=0; i<this.getAttachmentPoints().size(); i++)
+                {
+                    DENOPTIMAttachmentPoint thisOutAP = 
+                            this.getAttachmentPoints().get(i);
+                    DENOPTIMAttachmentPoint cloneOutAP = 
+                            c.getAttachmentPoints().get(i);
+                    cloneOutAP.setDirectionVector(new Point3d(
+                            thisOutAP.getDirectionVector()));
+                    cloneOutAP.setAtomPositionNumber(
+                            thisOutAP.getAtomPositionNumber());
+                }
+                
+            } catch (DENOPTIMException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
         return c;
     }
     
@@ -444,7 +470,107 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public boolean containsAtoms()
     {
-        return innerGraph.containsAtoms();
+        //NB: the mol!=null allows templates readin from file to be displayed
+        // even if their graph's vertexes are empty because they were 
+        // deserialized from json. Another good reason for having atoms defined
+        // the json format...
+        return mol!=null || innerGraph.containsAtoms();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Attaches a molecular representation to this template. Note that changes 
+     * to this Template have the power to trigger the request to update the
+     * molecular representation that we set here, thus removing the 
+     * representation we define in this method.
+     * @param updateAPsAccordingToIAC flag that prevents actions when the IAC 
+     * does not have the details needed to update the APs on the template. 
+     * For instance, when cloning a template or reading in a template with IAC
+     * from file. In these cases we only want to add a molecular representation
+     * and we set this flag to <code>false</code>.
+     * @throws DENOPTIMException 
+     */
+    public void setIAtomContainer(IAtomContainer mol, 
+            boolean updateAPsAccordingToIAC) throws DENOPTIMException
+    { 
+        //Collects all the links to APs
+        Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+            apInnerGraphToApOnMol = new HashMap<>();
+        if (updateAPsAccordingToIAC)
+        {
+            for (IAtom a : mol.atoms())
+            {
+                Object p = a.getProperty(DENOPTIMConstants.ATMPROPAPS);
+                if (p == null)
+                {
+                    continue;
+                }
+                ArrayList<DENOPTIMAttachmentPoint> apLst = 
+                        (ArrayList<DENOPTIMAttachmentPoint>) p;
+                for (DENOPTIMAttachmentPoint apOnMol : apLst)
+                {
+                    Object o = apOnMol.getProperty(DENOPTIMConstants.LINKAPS);
+                    if (o==null)
+                    {
+                        throw new DENOPTIMException("Unexpected null link to AP.");
+                    }
+                    DENOPTIMAttachmentPoint linkedAPOnGraph = 
+                            (DENOPTIMAttachmentPoint) o;
+                    apInnerGraphToApOnMol.put(linkedAPOnGraph, apOnMol);
+                }
+            }
+        }
+            
+        // We have to ensure outer APs point to the correct source atom in
+        // the atom list of the entire molecular representation of the 
+        // templates.
+        // And we collects the outer APs per atom at the same time
+        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
+                new LinkedHashMap<>();
+        for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) 
+        {
+            DENOPTIMAttachmentPoint inAPOnGraph = getInnerAPFromOuterAP(outAP);
+            int atmIndexInMol = outAP.getAtomPositionNumber();
+            if (updateAPsAccordingToIAC 
+                    && apInnerGraphToApOnMol.containsKey(inAPOnGraph))
+            {
+                DENOPTIMAttachmentPoint apOnMol = apInnerGraphToApOnMol.get(inAPOnGraph);
+                outAP.setDirectionVector(apOnMol.getDirectionVector());
+                atmIndexInMol = apOnMol.getAtomPositionNumber(); //yes, not InMol!
+            }
+            outAP.setAtomPositionNumber(atmIndexInMol);
+            if (apsPerAtom.containsKey(atmIndexInMol))
+            {
+                apsPerAtom.get(atmIndexInMol).add(outAP);
+            } else {
+                List<DENOPTIMAttachmentPoint> list = 
+                        new ArrayList<DENOPTIMAttachmentPoint>();
+                list.add(outAP);
+                apsPerAtom.put(atmIndexInMol, list);
+            }
+        }
+
+        for (int i = 0; i < mol.getAtomCount(); i++) {
+            IAtom a = mol.getAtom(i);
+            a.setProperty(DENOPTIMConstants.ATMPROPORIGINALATMID, i);
+            a.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,
+                    getVertexId());
+        }
+        
+        // Prepare SDF-like string for atom container. 0-based to 1-based
+        // index conversion done in here
+        mol.setProperty(DENOPTIMConstants.APSTAG, 
+                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+        
+        mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        
+        mol.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
+        mol.removeProperty(DENOPTIMConstants.GRAPHTAG);
+        mol.removeProperty(DENOPTIMConstants.GMSGTAG);
+        mol.removeProperty(DENOPTIMConstants.GCODETAG);
+        
+        this.mol = mol;
     }
 
 //-----------------------------------------------------------------------------

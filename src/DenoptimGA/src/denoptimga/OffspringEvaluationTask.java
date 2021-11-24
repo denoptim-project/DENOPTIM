@@ -133,7 +133,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
         }
         
-        // Run the fitness provider, whatever that is
+        // Run the fitness provider, whatever that is (internal or external)
         try
         {
             runFitnessProvider();
@@ -177,7 +177,8 @@ public class OffspringEvaluationTask extends FitnessTask
                 // enable extraction of refined molecular fragments
                 FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                         GAParameters.saveRingSystemsAsTemplatesScaffolds,
-                        GAParameters.saveRingSystemsAsTemplatesNonScaff);
+                        GAParameters.saveRingSystemsAsTemplatesNonScaff,
+                        fitProvMol);
         	}
         }
         completed = true;

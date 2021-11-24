@@ -42,6 +42,8 @@ public class DENOPTIMMoleculeUtilsTest
 {
     private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
     
+//------------------------------------------------------------------------------
+    
     @Test
     public void testGetPoint3d() throws Exception
     {

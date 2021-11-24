@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -130,6 +131,9 @@ public class Molecule3DBuilder
      */
     private double atmOveralScore = Double.NaN;
 
+    
+    private ArrayList<Integer> oldToNewOrder;
+    private ArrayList<Integer> newToOldOrder;
 
 //------------------------------------------------------------------------------
 
@@ -150,6 +154,8 @@ public class Molecule3DBuilder
         this.rotatableBnds = new ArrayList<ObjectPair>();
         this.newRingClosures = new ArrayList<RingClosure>();
         this.molName = "none";
+        this.oldToNewOrder = new ArrayList<Integer>();
+        this.newToOldOrder =  new ArrayList<Integer>();
     }
 
 //------------------------------------------------------------------------------
@@ -176,7 +182,9 @@ public class Molecule3DBuilder
          ArrayList<RingClosingAttractor> attractors,
        Map<RingClosingAttractor,Integer> attToAtmID,
              ArrayList<Set<ObjectPair>> allRCACombs,
-             ArrayList<RingClosure> ringClosures)
+             ArrayList<RingClosure> ringClosures,
+             ArrayList<Integer> oldToNewOrder,
+             ArrayList<Integer> newToOldOrder)
     {
         this.molGraph = molGraph;
         this.fmol = fmol;
@@ -198,6 +206,8 @@ public class Molecule3DBuilder
                 convertDENOPTIMRingIntoRcaCombinationns();
             }
         }
+        this.oldToNewOrder = oldToNewOrder;
+        this.newToOldOrder = newToOldOrder;
     }
 
 //------------------------------------------------------------------------------
@@ -212,11 +222,13 @@ public class Molecule3DBuilder
      * indeces)
      */
 
-    public Molecule3DBuilder(DENOPTIMGraph molGraph, 
+    public Molecule3DBuilder(DENOPTIMGraph molGraph,
                                 IAtomContainer fmol, 
                                 TinkerMolecule tmol, 
                                      String molName, 
-                ArrayList<ObjectPair> rotatableBnds) throws DENOPTIMException
+                ArrayList<ObjectPair> rotatableBnds,
+               ArrayList<Integer> oldToNewOrder,
+               ArrayList<Integer> newToOldOrder) throws DENOPTIMException
     {
         this.molGraph = molGraph;
         this.fmol = fmol;
@@ -241,8 +253,24 @@ public class Molecule3DBuilder
         this.newRingClosures = new ArrayList<RingClosure>();
         this.overalRCScore = Double.NaN;
         this.atmOveralScore = Double.NaN;
+        this.oldToNewOrder = oldToNewOrder;
+        this.newToOldOrder = newToOldOrder;
     }
-
+    
+//------------------------------------------------------------------------------
+    
+    public List<Integer> getOldToNewOrder()
+    {
+        return oldToNewOrder;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public List<Integer> getNewToOldOrder()
+    {
+        return newToOldOrder;
+    }
+    
 //------------------------------------------------------------------------------    
 
     private void findAttractors()
@@ -855,6 +883,15 @@ public class Molecule3DBuilder
         {
             nNewRingClosures.add(rc.deepCopy());
         }
+        
+        ArrayList<Integer> newOldToNewOrder = new ArrayList<Integer>();
+        for (Integer i : oldToNewOrder)
+            newOldToNewOrder.add(i.intValue());
+        
+        ArrayList<Integer> newNewToOldOrder = new ArrayList<Integer>();
+        for (Integer i : newToOldOrder)
+            newNewToOldOrder.add(i.intValue());
+        
 
         Molecule3DBuilder molClone = new Molecule3DBuilder(nMolGraph,
                                                     nFMol,
@@ -864,7 +901,9 @@ public class Molecule3DBuilder
                                                     nAttractors,
                                                     nAttToAtmID,
                                                     nAllRCACombs,
-                                                    nNewRingClosures);
+                                                    nNewRingClosures,
+                                                    newOldToNewOrder,
+                                                    newNewToOldOrder);
 
         return molClone;
     }

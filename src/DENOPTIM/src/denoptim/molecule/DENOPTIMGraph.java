@@ -4346,4 +4346,45 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------    
     
+    /**
+     * Copies the current vertexID of each vertex into a property of the vertex 
+     * itself. Use this to keep a memory of the vertex IDs in any given moment.
+     */
+    public void storeCurrentVertexIDs()
+    {
+        for (DENOPTIMVertex v : gVertices)
+        {
+            v.setProperty(DENOPTIMConstants.STOREDVID, v.getVertexId());
+        }
+    }
+
+//------------------------------------------------------------------------------        
+    
+    /**
+     * 
+     * @param vid1 vertex ID of one vertex.
+     * @param vid2 vertex ID of another vertex.
+     * @return the{@link DENOPTIMAttachmentPoint} or null is the two vertex IDs
+     * are not connected in this graph.
+     */
+    public DENOPTIMAttachmentPoint getAPOnLeftVertexID(int vid1, int vid2)
+    {
+        DENOPTIMVertex v1 = getVertexWithId(vid1);
+        DENOPTIMVertex v2 = getVertexWithId(vid2);
+        if ( v1== null || v2 == null)
+            return null;
+        
+        if (getChildVertices(v1).contains(v2))
+        {
+            return v2.getEdgeToParent().getSrcAP();
+        } else if (getChildVertices(v2).contains(v1))
+        {
+            return v1.getEdgeToParent().getTrgAP();
+        }
+        
+        return null;
+    }
+
+//------------------------------------------------------------------------------    
+    
 }

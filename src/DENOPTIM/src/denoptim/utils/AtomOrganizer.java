@@ -32,11 +32,12 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 
 
 /**
- * Toolbox for reorganizing the list of atoms of an <code>IAtomContainer</code>
+ * Tool for reorganising the list of atoms of an <code>IAtomContainer</code>
  *
  * @author Marco Foscato
  */
@@ -74,15 +75,54 @@ public class AtomOrganizer
     }
 
 //------------------------------------------------------------------------------
+    
     public void setScheme(int scheme)
     {
         this.scheme = scheme;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the list of indexes that
+     * allow to map the new atom position with the old one. Namely,
+     * <pre>
+     * int oldAtmIdx = getNewToOldOrder().get(newAtmIdx);
+     * </pre>
+     * 
+     * @return the atom ordering list. 
+     */
+    
+    public ArrayList<Integer> getNewToOldOrder(int seed)
+    {
+        ArrayList<Integer> lst = new ArrayList<Integer>();
+        for (Integer i : atomOrders.get(seed))
+        {
+            lst.add(i.intValue());
+        }
+        return lst;
+    }
 
 //------------------------------------------------------------------------------
-    public Map<Integer, ArrayList<Integer>> getOldToNewOrder()
+    
+    /**
+     * Returns the list of indexes that
+     * allow to map the old atom position with the new one. Namely,
+     * <pre>
+     * int newAtmIdx = getOldToNewOrder().get(seed).get(oldAtmIdx);
+     * </pre>
+     * 
+     * @return the atom ordering list. 
+     */
+    
+    public ArrayList<Integer> getOldToNewOrder(int seed)
     {
-        return oldToNewOrder;
+        ArrayList<Integer> lst = new ArrayList<Integer>();
+        for (Integer i : oldToNewOrder.get(seed))
+        {
+            lst.add(i.intValue());
+        }
+        return lst;
     }
 
 //------------------------------------------------------------------------------
@@ -131,47 +171,91 @@ public class AtomOrganizer
             deleteAtomsFlag(flag);
         }
 
-        //Now build the reordered system: regenerate atoms and bonds
-        //Regenerate Atoms
-        for (int i = 0; i < mol.getAtomCount(); i++) {
-            try {
-                IAtom atm = (IAtom) mol.getAtom(atomOrders.get(seed).get(i)).clone();
-                newMol.addAtom(atm);
-            } catch (CloneNotSupportedException cnse) {
-                throw new DENOPTIMException(cnse);
+        //The reordered system is the output of this method
+        return makeReorderedCopy(mol, 
+                atomOrders.get(seed), 
+                oldToNewOrder.get(seed));
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Produces a new container that looks very similar to the original one, but
+     * has a different atom order.
+     * @param original the container to reorganise.
+     * @param newToOldOrder list of atom indexes in the original atom container.
+     * The list is supposed to work so that 
+     * <pre>
+     * oldIndex = newToOldOrder.get(newIndex);
+     * </pre>
+     * Indexes are 0-based.
+     * @param oldToNewOrder list of atom indexes in the new atom container.
+     * The list is supposed to work so that 
+     * <pre>
+     * newIndex = oldToNewOrder.get(oldIndex);
+     * </pre>
+     * Indexes are 0-based.
+     * @return a new container that collects new atoms and new bonds that
+     * reflect the original molecule but with a different order of atoms.
+     * @throws DENOPTIMException 
+     */
+    public static IAtomContainer makeReorderedCopy(IAtomContainer original,
+            List<Integer> newToOldOrder, List<Integer> oldToNewOrder) 
+                    throws DENOPTIMException
+    {
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer iac = builder.newAtomContainer();
+        
+        StringBuilder sbMolProp = new StringBuilder();
+        for (int i = 0; i < original.getAtomCount(); i++) 
+        {
+            IAtom originalAtom = original.getAtom(newToOldOrder.get(i));
+            IAtom atm = DENOPTIMMoleculeUtils.makeSameAtomAs(originalAtom,true,true);
+            String atmPropVID = " none";
+            Object p = originalAtom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+            if (p != null)
+            {
+                atmPropVID = " " + ((Integer) p).intValue();
+                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
+                        ((Integer) p).intValue());
             }
+            sbMolProp.append(atmPropVID);
+            iac.addAtom(atm);
         }
+        iac.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
+                sbMolProp.toString().trim());
 
         //Regenerate Bonds
-        for (int i = 0; i < mol.getBondCount(); i++) {
+        for (int i = 0; i < original.getBondCount(); i++) {
             try {
-                IBond oldBnd = mol.getBond(i);
+                IBond oldBnd = original.getBond(i);
                 if (oldBnd.getAtomCount() != 2) {
-                    System.err.println("\nMulticenter bond!!!");
+                    System.err.println("Multicenter bond!!!");
                     String msg = "Multicenter bond not supported yet.";
                     throw new DENOPTIMException(msg);
                     //TODO in case of multicenter
                     //        IAtoms[] = ... ...
                 }
-                int atm1 = mol.getAtomNumber(oldBnd.getAtom(0));
-                int atm2 = mol.getAtomNumber(oldBnd.getAtom(1));
-                int newatm1 = oldToNewOrder.get(seed).get(atm1) - 1;
-                int newatm2 = oldToNewOrder.get(seed).get(atm2) - 1;
+                int atm1 = original.indexOf(oldBnd.getAtom(0));
+                int atm2 = original.indexOf(oldBnd.getAtom(1));
+                int newatm1 = oldToNewOrder.get(atm1);
+                int newatm2 = oldToNewOrder.get(atm2);
                 IBond.Order order = oldBnd.getOrder();
                 IBond.Stereo stereo = oldBnd.getStereo();
-                IBond bnd = new Bond(newMol.getAtom(newatm1), newMol.getAtom(newatm2), order, stereo);
-                newMol.addBond(bnd);
+                IBond bnd = new Bond(iac.getAtom(newatm1), 
+                        iac.getAtom(newatm2), order, stereo);
+                iac.addBond(bnd);
             } catch (Throwable t) {
                 String msg = "ERROR in making new BOND";
                 throw new DENOPTIMException(msg);
             }
         }
-
-        //The reordered system is the output of this method
-        return newMol;
+        
+        return iac;
     }
-
+    
 //------------------------------------------------------------------------------
+    
     /**
      * Reorders atoms according to the branch-oriented scheme. Atoms connected
      * to the seed (starting point) are listed according to the priority rules
@@ -179,7 +263,7 @@ public class AtomOrganizer
      * <code>ConnectedLigandComparator<code/>.
      *
      * @param seed index of the first atom. The starting point.
-     * @param flag index of the flag uset to specify that an atom was processed.
+     * @param flag index of the flag used to specify that an atom was processed.
      * @param mol molecular object.
      */
     private void branchOrienterReordering(int seed, int flag, IAtomContainer mol)
@@ -206,7 +290,7 @@ public class AtomOrganizer
         List<IAtom> purgedList = new ArrayList<>();
         for (IAtom connectedAtom : neighbourAtoms)
         {
-            int atmidx = mol.getAtomNumber(connectedAtom);
+            int atmidx = mol.indexOf(connectedAtom);
             if (!flags.get(flag).get(atmidx))
             {
                 purgedList.add(connectedAtom);
@@ -228,7 +312,7 @@ public class AtomOrganizer
         // Add all the atoms connected
         for (IAtom connectedAtom : purgedList) {
             // Identify atom
-            int atmidx = mol.getAtomNumber(connectedAtom);
+            int atmidx = mol.indexOf(connectedAtom);
 
             // Use flag to avoid giving a bite on your own tail!
             if (flags.get(flag).get(atmidx)) {
@@ -243,7 +327,7 @@ public class AtomOrganizer
         for (IAtom connectedAtom : purgedList) {
             //get atom
             //identify atom
-            int atmidx = mol.getAtomNumber(connectedAtom);
+            int atmidx = mol.indexOf(connectedAtom);
 
             // move to the next shell of atoms
             if (mol.getConnectedAtomsCount(connectedAtom) > 1) {
@@ -393,7 +477,7 @@ public class AtomOrganizer
         int newIdx = atomOrders.get(ap).size();
 
         //Add NEW atom index to the OLD ORDER pointer
-        oldToNewOrder.get(ap).set(atmidx, newIdx);
+        oldToNewOrder.get(ap).set(atmidx, newIdx-1);
     }
 
 //------------------------------------------------------------------------------

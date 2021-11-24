@@ -938,8 +938,9 @@ public class DENOPTIMGraphOperations
         for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
             subgraphs.add(extractSubgraph(graph, fusedRing));
         }
-
+        
         for (DENOPTIMGraph g : subgraphs) {
+            g.storeCurrentVertexIDs();
             g.renumberGraphVertices();
             reorderVertexList(g);
         }

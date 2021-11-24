@@ -20,8 +20,10 @@
 package denoptimcg;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -179,7 +181,7 @@ public class DENOPTIM3DMoleculeBuilder
      */
 
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
-                                                        throws DENOPTIMException
+            throws DENOPTIMException
     {
         String msg = "Building Multiple 3D representations for "
                  + "graph = " + molGraph.toString();
@@ -240,22 +242,44 @@ public class DENOPTIM3DMoleculeBuilder
                   + " #atoms: " + mol.getIAtomContainer().getAtomCount()
                   + " #rotBnds: " + mol.getRotatableBonds().size();
             System.out.println(msg);
-	}
+        }
 
         // Convert and return results
         ArrayList<IAtomContainer> results = new ArrayList<IAtomContainer>();
         DummyAtomHandler dah = new DummyAtomHandler(
-                                              DENOPTIMConstants.DUMMYATMSYMBOL);
+                DENOPTIMConstants.DUMMYATMSYMBOL);
         for (Molecule3DBuilder mol3db : csMols)
         {
             IAtomContainer iac = mol3db.getIAtomContainer();
+            
+            //TODO-V3 make reordering optional
+            
+            IAtomContainer originalOrderMol = AtomOrganizer.makeReorderedCopy(
+                    iac, mol3db.getOldToNewOrder(), mol3db.getNewToOldOrder());
+            iac = originalOrderMol;
+            
+            
             if (!CGParameters.getKeepDummyFlag())
             {
+                // To keep track of which vertexID should be removed from mol 
+                // properties, we remove that property from the mol. It remains
+                // defined in each atom.
+                iac.removeProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                
                 iac = dah.removeDummyInHapto(iac);
-                results.add(dah.removeDummy(iac));
-            }
-            else
-            {
+                iac = dah.removeDummy(iac);
+                
+                // Now we put the property back among the molecular ones
+                StringBuilder sbMolProp = new StringBuilder();
+                for (IAtom atm : iac.atoms())
+                {
+                    sbMolProp.append(" ").append(atm.getProperty(
+                            DENOPTIMConstants.ATMPROPVERTEXID).toString());
+                }
+                iac.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
+                        sbMolProp.toString().trim());
+                results.add(iac);
+            } else {
                 results.add(iac);
             }
         }
@@ -275,65 +299,22 @@ public class DENOPTIM3DMoleculeBuilder
 
     public Molecule3DBuilder build3DTree() throws DENOPTIMException
     {
-        // Create 3D tree-like structure from DENOPTIMGraph
+        // Create 3D tree-like structure
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
         IAtomContainer initMol = tb.convertGraphTo3DAtomContainer(molGraph);
-
-        // NOTE: the two following data structures might turn out useful in the
-        // future, although now they are not needed
-/*
-        // Create map of rototranslated APs per each vertex ID
-        Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
-                                                         tb.getApsPerVertexId();
-        
-        // Create map of rototranslated APs per each edge (edge has no ID)
-        Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
-                                                             tb.getApsPerEdge();
-
-        if (debug)
-        {
-            System.out.println("apsPerVertexId: "+apsPerVertexId);
-            System.out.println("apsPerEdge: "+apsPerEdge);
-        }
-*/
-        // Reorder atoms
+       
+        // Reorder atoms and clone molecule.
         AtomOrganizer oa = new AtomOrganizer();
         oa.setScheme(CGParameters.getAtomOrderingScheme());
         int seedAtm = 0;
         IAtomContainer reorderedMol = oa.reorderStartingFrom(seedAtm, initMol);
-        Map<Integer, ArrayList<Integer>> oldToNewMap = oa.getOldToNewOrder();
+        ArrayList<Integer> newToOldMap = oa.getNewToOldOrder(seedAtm);
+        ArrayList<Integer> oldToNewMap = oa.getOldToNewOrder(seedAtm);
         if (debug)
         {
-            System.out.println("oldToNewMap: "+oldToNewMap.get(seedAtm));
+            System.out.println("oldToNewMap: "+oldToNewMap);
         }
-
-        /*
-        COMMENTED out because apsPerVertexId is not used
-        // Update list of AP on reordered atom container
-        for (int vid : apsPerVertexId.keySet())
-        {
-            if (debug)
-            {
-                System.out.println("VERTEX: "+vid);
-            }
-            ArrayList<DENOPTIMAttachmentPoint> aps = apsPerVertexId.get(vid);
-            for (DENOPTIMAttachmentPoint ap : aps)
-            {
-                if (debug)
-                {
-                    System.out.println("  AP old: "+ap);
-                }
-                int oldAtmId = ap.getAtomPositionNumber();
-                int newAtmId = oldToNewMap.get(seedAtm).get(oldAtmId) - 1;
-                ap.setAtomPositionNumber(newAtmId);
-                if (debug)
-                {
-                    System.out.println("     new: "+ap);
-                }
-            }
-        }
-        */
-
+        
         // Collect rotatable bonds defined by fragment-fragment connections
         ArrayList<ObjectPair> rotBonds = 
                          RotationalSpaceUtils.defineRotatableBonds(reorderedMol,
@@ -360,7 +341,9 @@ public class DENOPTIM3DMoleculeBuilder
                 reorderedMol,
                 tmol,
                 molName,
-                rotBonds
+                rotBonds,
+                oldToNewMap,
+                newToOldMap
         );
     }
 

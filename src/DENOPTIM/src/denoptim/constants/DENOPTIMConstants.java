@@ -403,4 +403,19 @@ public final class DENOPTIMConstants
      * {@link DENOPTIMAttachmentPoint}s per atom. 
      */
     public static final Object MOLPROPAPxBOND = "APsPerBond";
+
+    /**
+     * Key of the property remembering vertex IDs. Note this property is not 
+     * many, is typically is rarely in sync with the actual vertex ID of that
+     * vertex.
+     */
+    public static final Object STOREDVID = "OLDVERTEXID";
+
+    /**
+     * Key of property used to records references of APs. This is used, for
+     * instance, when dealing with templates
+     * that inherit a molecular representation.
+     */
+    public static final Object LINKAPS = "LINKTOGRAPHSAP";
+    
 }
