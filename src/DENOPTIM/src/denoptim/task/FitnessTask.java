@@ -232,6 +232,24 @@ public abstract class FitnessTask extends Task
             {
                 unreadable=true;
             }
+            Object o = processedMol.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+            if (o != null)
+            {
+                String[] parts = o.toString().trim().split("\\s+");
+                if (processedMol.getAtomCount() != parts.length)
+                {
+                    throw new DENOPTIMException("Inconsistent number of vertex "
+                            + "IDs (" + parts.length + ") and atoms (" 
+                            + processedMol.getAtomCount() + ") in candidate "
+                            + "processed by external fitness provider.");
+                }
+                for (int i=0; i<processedMol.getAtomCount(); i++)
+                {
+                    processedMol.getAtom(i).setProperty(
+                            DENOPTIMConstants.ATMPROPVERTEXID, 
+                            Integer.parseInt(parts[i]));
+                }
+            }
         }
         catch (Throwable t)
         {

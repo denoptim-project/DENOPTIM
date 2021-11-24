@@ -1412,7 +1412,9 @@ public class FragmentSpace
      * @param wholeMol the complete molecular representation of 
      * <code>graph</code>. If this parameter is not null, then we'll try to use
      * the geometry found in this parameter to define the geometry of the 
-     * fused-rings templates.
+     * fused-rings templates. The atoms in this container are expected to have 
+     * property {@link DENOPTIMConstants#ATMPROPVERTEXID} that defines the 
+     * ID of the vertex from which each atom comes from.
      */
     
     //TODO: need something to prevent memory overload: 

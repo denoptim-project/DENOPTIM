@@ -91,11 +91,20 @@ public class DenoptimCG
                 ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
                 for (int i = 0; i<nmols.size(); i++)
                 {
+                    //NB: here we reset the IAC properties, so, any property that
+                    // should be passed on to the future should be copied.
                     String propVIDs = nmols.get(i).getProperty(
                             DENOPTIMConstants.ATMPROPVERTEXID).toString();
+                    Object propMolErr = nmols.get(i).getProperty(
+                            DENOPTIMConstants.MOLERRORTAG);
                     nmols.get(i).setProperties(mol.getProperties());
                     nmols.get(i).setProperty(
                             DENOPTIMConstants.ATMPROPVERTEXID, propVIDs);
+                    if (propMolErr != null)
+                    {
+                        nmols.get(i).setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                                propMolErr.toString());
+                    }
                 }
                 // write file
                 DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);

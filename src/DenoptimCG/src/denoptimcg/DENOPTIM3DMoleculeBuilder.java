@@ -204,6 +204,7 @@ public class DENOPTIM3DMoleculeBuilder
         // 1: Attempt Ring Closures 
         RingClosureTool rct = new RingClosureTool();
         ArrayList<Molecule3DBuilder> rcMols =new ArrayList<Molecule3DBuilder>();
+        boolean skipConfSearch = false;
         if (RingClosureParameters.allowRingClosures() && 
             mol.getGraph().getRings().size() != 0)
         {
@@ -211,13 +212,31 @@ public class DENOPTIM3DMoleculeBuilder
             rcMols = rct.attemptAllRingClosures(mol);
             endTime = System.nanoTime();
             time = (endTime - startTime);
+            int numAllClosedCombs = 0;
+            for (Molecule3DBuilder rcMol : rcMols)
+            {
+                Object o = rcMol.getIAtomContainer().getProperty(
+                        DENOPTIMConstants.MOLERRORTAG);
+                if (o == null)
+                    numAllClosedCombs++;
+            }
             if (verbosity > 0)
             {
                 msg = "TIME (close ring): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
-                      + " #rings: " + mol.getGraph().getRings().size();
+                      + " #rings: " + mol.getGraph().getRings().size()
+                      + " #rcaCombs: " + mol.getRCACombinations().size()
+                      + " #allClosedRCSCombs: " + numAllClosedCombs;
                 System.out.println(msg);
+            }
+            if (RingClosureParameters.requireCompleteRingclosure 
+                    && numAllClosedCombs<1)
+            {
+                msg = "No fully closed RCS combinaton. Nothing to send to "
+                        + "conformational search.";
+                System.out.println(msg);
+                skipConfSearch = true;
             }
         }
         else
@@ -229,19 +248,25 @@ public class DENOPTIM3DMoleculeBuilder
         }
 
 
-        // 2: Conformational search
-        ConformationalSearchPSSROT csPssRot = new ConformationalSearchPSSROT();
-        startTime = System.nanoTime();
-        ArrayList<Molecule3DBuilder> csMols = csPssRot.performPSSROT(rcMols);
-        endTime = System.nanoTime();
-        time = (endTime - startTime);
-        if (verbosity > 0)
+        // 2: Conformational search (if possible)
+        ArrayList<Molecule3DBuilder> csMols = new ArrayList<Molecule3DBuilder>();
+        if (skipConfSearch)
         {
-            msg = "TIME (conf. search): "+time/1000000+" ms"
-                  + " #frags: " + mol.getGraph().getVertexList().size()
-                  + " #atoms: " + mol.getIAtomContainer().getAtomCount()
-                  + " #rotBnds: " + mol.getRotatableBonds().size();
-            System.out.println(msg);
+            csMols.addAll(rcMols);
+        } else {
+            ConformationalSearchPSSROT csPssRot = new ConformationalSearchPSSROT();
+            startTime = System.nanoTime();
+            csMols = csPssRot.performPSSROT(rcMols);
+            endTime = System.nanoTime();
+            time = (endTime - startTime);
+            if (verbosity > 0)
+            {
+                msg = "TIME (conf. search): "+time/1000000+" ms"
+                      + " #frags: " + mol.getGraph().getVertexList().size()
+                      + " #atoms: " + mol.getIAtomContainer().getAtomCount()
+                      + " #rotBnds: " + mol.getRotatableBonds().size();
+                System.out.println(msg);
+            }
         }
 
         // Convert and return results

@@ -57,6 +57,13 @@ public class RingClosureParameters
     protected static boolean closeRings = false;
 
     /**
+     * Flag requesting complete ring closure of all pairs of RCAs in at least
+     * one combination of RCAs to consider the calculation successful.
+     */
+    //TODO-V3 make controllable from parameters side.
+    public static boolean requireCompleteRingclosure = true;
+    
+    /**
      * Flag activating procedures favouring formation of chelates
      */
     protected static boolean buildChelatesMode = false;
@@ -230,6 +237,7 @@ public class RingClosureParameters
      * keyword providing the pathname of the root folder of the RCCs archive
      */
     protected static boolean serializeRCCs = false;
+
 
 //------------------------------------------------------------------------------
     
@@ -760,13 +768,13 @@ public class RingClosureParameters
             return;
         }
 
-	if (!closeRings && rcParamsInUse)
-	{
+    	if (!closeRings && rcParamsInUse)
+    	{
             msg = "The use of ring-closure related keywords "
-		  + "is dependent on the activation of the ring-closing "
-		  + "machinery (use RC-CLOSERINGS keyword).";
+        		  + "is dependent on the activation of the ring-closing "
+        		  + "machinery (use RC-CLOSERINGS keyword).";
             throw new DENOPTIMException(msg);
-	}
+	    }
 
         if (!DenoptimIO.checkExists(rccIndex))
         {
@@ -792,17 +800,17 @@ public class RingClosureParameters
 		  + " not found. Creating new archive at " + rccFolder;
             DENOPTIMLogger.appLogger.info(msg);
 
-	    File folder = new File(rccFolder);
-	    try
+    	    File folder = new File(rccFolder);
+    	    try
             {
                 folder.mkdir();
             }
             catch (Throwable t2)
             {
-		msg = "CyclicGraphHandler can't make folder " + rccFolder
-		      + ". " + t2;
+                msg = "CyclicGraphHandler can't make folder " + rccFolder
+                        + ". " + t2;
                 throw new DENOPTIMException(msg);
-	    }
+            }
         }
 
         if (buildChelatesMode && !closeRings)

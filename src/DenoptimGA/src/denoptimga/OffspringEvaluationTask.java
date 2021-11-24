@@ -136,6 +136,8 @@ public class OffspringEvaluationTask extends FitnessTask
         // Run the fitness provider, whatever that is (internal or external)
         try
         {
+            // Note that in here the molecular representation of the offspring 
+            // is altered and the original references to fitProvMol will be lost.
             runFitnessProvider();
         }
         catch (Throwable ex)
@@ -172,9 +174,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	if ((GAParameters.saveRingSystemsAsTemplatesNonScaff
         	        || GAParameters.saveRingSystemsAsTemplatesScaffolds)
         	    && isWithinBestPrcentile)
-        	{
-                //TODO: here we might need to send also molecular representation to 
-                // enable extraction of refined molecular fragments
+        	{   
                 FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                         GAParameters.saveRingSystemsAsTemplatesScaffolds,
                         GAParameters.saveRingSystemsAsTemplatesNonScaff,

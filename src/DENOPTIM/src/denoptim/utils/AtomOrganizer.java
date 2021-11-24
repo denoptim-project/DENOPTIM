@@ -181,7 +181,12 @@ public class AtomOrganizer
 
     /**
      * Produces a new container that looks very similar to the original one, but
-     * has a different atom order.
+     * has a different atom order. Only selected properties of the original
+     * container are projected into the new one, namely
+     * <ul>
+     * <li>{@link DENOPTIMConstants#ATMPROPVERTEXID}</li>
+     * <li>{@link DENOPTIMConstants#MOLERRORTAG}</li>
+     * </ul>
      * @param original the container to reorganise.
      * @param newToOldOrder list of atom indexes in the original atom container.
      * The list is supposed to work so that 
@@ -222,9 +227,18 @@ public class AtomOrganizer
             sbMolProp.append(atmPropVID);
             iac.addAtom(atm);
         }
+        //NB: ATMPROPVERTEXID is integer when its atom property, but it's string
+        // when collected in a molecular property.
         iac.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
                 sbMolProp.toString().trim());
-
+        
+        Object e = original.getProperty(DENOPTIMConstants.MOLERRORTAG);
+        if (e != null)
+        {
+            iac.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                    e.toString().trim());
+        }
+        
         //Regenerate Bonds
         for (int i = 0; i < original.getBondCount(); i++) {
             try {

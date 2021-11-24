@@ -639,8 +639,8 @@ public class RingClosureTool
         List<RingClosure> candidatesClosures = new ArrayList<RingClosure>();
         for (ObjectPair op : rcaCombination)
         {
-	    if (verbosity > 2)
-		System.out.println("closeRings: evaluating closure of "+op);
+    	    if (verbosity > 2)
+    	        System.out.println("closeRings: evaluating closure of "+op);
 
             int iRcaA = ((Integer) op.getFirst()).intValue();
             int iRcaB = ((Integer) op.getSecond()).intValue();
