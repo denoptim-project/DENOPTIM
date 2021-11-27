@@ -46,6 +46,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.molecule.DENOPTIMVertex.VertexType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 
 
 /**
@@ -57,7 +58,6 @@ import denoptim.utils.GraphUtils;
  */
 public class EmptyVertex extends DENOPTIMVertex
 {
-
     /**
      * Version UID
      */
@@ -86,6 +86,23 @@ public class EmptyVertex extends DENOPTIMVertex
         lstSymAPs = new ArrayList<SymmetricSet>();
     }
 
+//------------------------------------------------------------------------------
+
+      /**
+       * Constructor for an identified vertex without attachment points.
+       * @param id the VertedID of the vertex to construct. Note that this ID 
+       * should be unique within a graph. To generate unique IDs either use 
+       * {@link GraphUtils#getUniqueVertexIndex()} or use constructor
+       * {@link EmptyVertex()}.
+       */
+      public EmptyVertex(BBType type)
+      {
+          super(VertexType.EmptyVertex);
+          lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+          lstSymAPs = new ArrayList<SymmetricSet>();
+          buildingBlockType = type;
+      }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -526,8 +543,16 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
+    /**
+     * A list of mutation sites from within this vertex.
+     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * that allow only ignored types of mutation will
+     * not be considered mutation sites.
+     * @return the list of vertexes that allow any non-ignored mutation type.
+     */
+    
     @Override
-    public List<DENOPTIMVertex> getMutationSites()
+    public List<DENOPTIMVertex> getMutationSites(List<MutationType> ignoredTypes)
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
         switch (getBuildingBlockType())
@@ -539,7 +564,10 @@ public class EmptyVertex extends DENOPTIMVertex
                 break;
                 
             default:
-                if (getMutationTypes().size()>0)
+                List<MutationType> mutationTypes = new ArrayList<>(
+                        getMutationTypes());
+                mutationTypes.removeAll(ignoredTypes);
+                if (mutationTypes.size()>0)
                     lst.add(this);
                 break;
         }

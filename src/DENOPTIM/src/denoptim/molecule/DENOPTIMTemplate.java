@@ -87,16 +87,19 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     /**
      * Enum specifying to what extent the template's inner graph can be changed.
-     * <ul>
-     * <li>{@link ContractLevel#FIXED} inner graphs are effectively equivalent 
-     * to the DENOPTIMFragment class, as no change in the inner structure is
-     * allowed.</li>
-     * <li>{@link ContractLevel#FREE} inner graphs are free to change within 
-     * the confines of the required APs.</li>
-     * </ul>
      */
     public enum ContractLevel {
+        /**
+         * Inner graphs are free to change within 
+         * the confines of the required APs
+         */
         FREE,
+        
+        /**
+         * Inner graphs are effectively equivalent 
+         * to the DENOPTIMFragment class, as no change in the inner structure is
+         * allowed.
+         */
         FIXED
         //FIXED_STRUCT, //TO-BE-DEVELOPED
         /*
@@ -708,29 +711,38 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
+    /**
+     * A list of mutation sites from within this vertex.
+     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * that allow only ignored types of mutation will
+     * not be considered mutation sites.
+     * @return the list of vertexes that allow any non-ignored mutation type.
+     */
+    
     @Override
-    public List<DENOPTIMVertex> getMutationSites()
+    public List<DENOPTIMVertex> getMutationSites(List<MutationType> ignoredTypes)
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        // capping groups not considered as mutable sites
+        // capping groups are not considered mutable sites
         if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
         {
             return lst;
         }
-
-        BBType bbt = getBuildingBlockType();
         
         switch (contractLevel) 
         {
             case FIXED:
-                if (getMutationTypes().size() > 0)
+                List<MutationType> mutationTypes = new ArrayList<>(
+                        getMutationTypes());
+                mutationTypes.removeAll(ignoredTypes);
+                if (mutationTypes.size()>0)
                     lst.add(this);
                 break;
                 
             case FREE:
                 for (DENOPTIMVertex v : innerGraph.gVertices) 
                 {
-                    lst.addAll(v.getMutationSites());
+                    lst.addAll(v.getMutationSites(ignoredTypes));
                 }
                 break;
         }

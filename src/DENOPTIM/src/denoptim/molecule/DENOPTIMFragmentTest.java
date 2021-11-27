@@ -223,29 +223,4 @@ public class DENOPTIMFragmentTest
     
 //------------------------------------------------------------------------------
 
-
-    @Test
-    public void testGetMutationSites() throws Exception
-    {
-        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-        IAtomContainer iac = builder.newAtomContainer();
-        DENOPTIMFragment v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.FRAGMENT);
-        assertEquals(1,v.getMutationSites().size(),
-                "Fragments return themselves as mutable sites.");
-        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.SCAFFOLD);
-        assertEquals(0,v.getMutationSites().size(),
-                "Scaffolds so not return any mutable site.");
-        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.CAP);
-        assertEquals(0,v.getMutationSites().size(),
-                "Capping groups so not return any mutable site.");
-        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.UNDEFINED);
-        assertEquals(1,v.getMutationSites().size(),
-                "Undefined building block return themselves as mutable sites.");
-        v = new DENOPTIMFragment(iac,DENOPTIMVertex.BBType.NONE);
-        assertEquals(1,v.getMutationSites().size(),
-                "'None' building block return themselves as mutable sites.");
-    }
-    
-//------------------------------------------------------------------------------
-
 }

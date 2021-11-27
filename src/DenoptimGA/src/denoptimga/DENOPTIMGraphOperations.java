@@ -1590,7 +1590,8 @@ public class DENOPTIMGraphOperations
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
         // embedded in templates
-        List<DENOPTIMVertex> mutable = graph.getMutableSites();
+        List<DENOPTIMVertex> mutable = graph.getMutableSites(
+                GAParameters.getExcludedMutationTypes());
         if (mutable.size() == 0)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);

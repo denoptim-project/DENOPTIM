@@ -26,7 +26,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
@@ -39,6 +43,7 @@ import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Version;
 import denoptim.rings.RingClosureParameters;
+import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
 
 
@@ -262,6 +267,11 @@ public class GAParameters
     protected static String strXoverSelectionMode =
             "STOCHASTIC UNIVERSAL SAMPLING";
 
+    /**
+     * Mutation types that are excluded everywhere.
+     */
+    static List<MutationType> excludedMutationTypes = new ArrayList<MutationType>();
+    
     /**
      * The seed value for random number generation
      */
@@ -612,6 +622,13 @@ public class GAParameters
     protected static String getSelectionStrategy()
     {
         return strXoverSelectionMode;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected static List<MutationType> getExcludedMutationTypes()
+    {
+        return excludedMutationTypes;
     }
 
 //------------------------------------------------------------------------------
@@ -1011,7 +1028,7 @@ public class GAParameters
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        GAParameters.numOfChildren = Integer.parseInt(option);
+                        numOfChildren = Integer.parseInt(option);
                     }
                 }
 
@@ -1020,7 +1037,7 @@ public class GAParameters
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        GAParameters.crossoverWeight = Double.parseDouble(option);
+                        crossoverWeight = Double.parseDouble(option);
                     }
                 }
 
@@ -1029,7 +1046,16 @@ public class GAParameters
                     option = line.substring(line.indexOf("=") + 1).trim();
                     if (option.length() > 0)
                     {
-                        GAParameters.mutationWeight = Double.parseDouble(option);
+                        mutationWeight = Double.parseDouble(option);
+                    }
+                }
+                
+                if (line.toUpperCase().startsWith("GA-EXCLUDEMUTATIONTYPE="))
+                {
+                    option = line.substring(line.indexOf("=") + 1).trim();
+                    if (option.length() > 0)
+                    {
+                        excludedMutationTypes.add(MutationType.valueOf(option));
                     }
                 }
                 

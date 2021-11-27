@@ -45,6 +45,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
+import denoptim.utils.MutationType;
 
 import static denoptim.molecule.DENOPTIMVertex.*;
 
@@ -913,8 +914,16 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
 //------------------------------------------------------------------------------
 
+    /**
+     * A list of mutation sites from within this vertex.
+     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * that allow only ignored types of mutation will
+     * not be considered mutation sites.
+     * @return the list of vertexes that allow any non-ignored mutation type.
+     */
+    
     @Override
-    public List<DENOPTIMVertex> getMutationSites()
+    public List<DENOPTIMVertex> getMutationSites(List<MutationType> ignoredTypes)
     {
         List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
         switch (getBuildingBlockType())
@@ -926,7 +935,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
                 
             default:
-                if (getMutationTypes().size()>0)
+                List<MutationType> mutationTypes = new ArrayList<>(
+                        getMutationTypes());
+                mutationTypes.removeAll(ignoredTypes);
+                if (mutationTypes.size()>0)
                     lst.add(this);
                 break;
         }

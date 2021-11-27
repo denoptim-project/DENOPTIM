@@ -1015,6 +1015,11 @@ public class DENOPTIMMoleculeUtils
                     toAP.put(cpAtm,iac.getAtom(wholeIAC.indexOf(nbr)));
                     DENOPTIMAttachmentPoint apInWholeGraph = 
                             wholeGraph.getAPOnLeftVertexID(nbrVid,vid);
+                    if (apInWholeGraph == null)
+                    {
+                        throw new DENOPTIMException("Unmexpected null AP from "
+                                + nbrVid + " " + vid +" on " + wholeGraph);
+                    }
                     DENOPTIMAttachmentPoint apInSubGraph = 
                             wantedVertexesMap.get(nbrVid).getAP(apInWholeGraph.getIndexInOwner());
                     mapAtmToAPInG.put(cpAtm, apInSubGraph);
@@ -1041,13 +1046,25 @@ public class DENOPTIMMoleculeUtils
             IAtom srcAtmInISC = toAP.get(trgAtmInIAC);
             IAtom srcAtm = frag.getAtom(iac.indexOf(srcAtmInISC));
             
+            DENOPTIMAttachmentPoint apInG = mapAtmToAPInG.get(trgAtmInIAC);
+            
             // Make Attachment point
             Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
             Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
+            double currentLength = srcP3d.distance(trgP3d);
+            //TODO-V3
+            double idealLength = 1.53;
+            /*
+            double idealLength = apInG.getProperty(
+                    DENOPTIMConstants.APORIGINALLENGTH);
+                    */
             Point3d vector = new Point3d();
-            vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
-            vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
-            vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
+            vector.x = srcP3d.x + (trgP3d.x - srcP3d.x)*(idealLength/currentLength);
+            vector.y = srcP3d.y + (trgP3d.y - srcP3d.y)*(idealLength/currentLength);
+            vector.z = srcP3d.z + (trgP3d.z - srcP3d.z)*(idealLength/currentLength);
+            
+            //TODO-V3 elongate vector to fit original length. Otherwise, is get's
+            // shorter when the target vertex is a capping or RCA group.
             
             DENOPTIMAttachmentPoint createdAP = frag.addAPOnAtom(srcAtm, 
                     apcMap.get(trgAtmInIAC), vector);

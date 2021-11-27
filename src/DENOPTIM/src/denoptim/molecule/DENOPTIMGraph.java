@@ -4080,12 +4080,36 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * A list of mutation sites from within this graph.
+     * @return the list of vertexes that allow any mutation type.
+     */
     public List<DENOPTIMVertex> getMutableSites()
     {
         List<DENOPTIMVertex> mutableSites = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : gVertices)
         {
-            mutableSites.addAll(v.getMutationSites());
+            mutableSites.addAll(v.getMutationSites(
+                    new ArrayList<MutationType>()));
+        }
+        return mutableSites;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * A list of mutation sites from within this graph.
+     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * that allow only ignored types of mutation will
+     * not be considered mutation sites.
+     * @return the list of vertexes that allow any non-ignored mutation type.
+     */
+    public List<DENOPTIMVertex> getMutableSites(List<MutationType> ignoredTypes)
+    {
+        List<DENOPTIMVertex> mutableSites = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : gVertices)
+        {
+            mutableSites.addAll(v.getMutationSites(ignoredTypes));
         }
         return mutableSites;
     }

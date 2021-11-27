@@ -31,6 +31,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.DENOPTIMVertex.VertexType;
+import denoptim.utils.MutationType;
 
 
 /**
@@ -1429,6 +1430,10 @@ public class DENOPTIMGraphTest {
 
 		assertEquals(2, graph.getMutableSites().size(),
 				"Size of mutation size list in case of free template");
+		
+        assertEquals(0, graph.getMutableSites(new ArrayList<>(
+                Arrays.asList(MutationType.values()))).size(),
+                "No sites if all is ignored");
 	}
 	
 //------------------------------------------------------------------------------

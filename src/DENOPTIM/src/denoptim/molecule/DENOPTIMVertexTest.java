@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import javax.vecmath.Point3d;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.Bond;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import com.google.gson.Gson;
 
@@ -24,6 +27,7 @@ import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.molecule.DENOPTIMVertex.VertexType;
 import denoptim.utils.DENOPTIMgson;
+import denoptim.utils.MutationType;
 
 /**
  * Unit test for DENOPTIMVertex
@@ -162,6 +166,35 @@ public class DENOPTIMVertexTest
         assertEquals(v2.getAllAPClasses(),c2.getAllAPClasses(),"APClass list");
         assertEquals(v2.getAllAPClasses().get(0).hashCode(),
                 c2.getAllAPClasses().get(0).hashCode(),"APClass hash code");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testGetMutationSites() throws Exception
+    {
+        DENOPTIMVertex v = new EmptyVertex(DENOPTIMVertex.BBType.FRAGMENT);
+        assertEquals(1,v.getMutationSites().size(),
+                "Fragments return themselves as mutable sites.");
+        v = new EmptyVertex(DENOPTIMVertex.BBType.SCAFFOLD);
+        assertEquals(0,v.getMutationSites().size(),
+                "Scaffolds so not return any mutable site.");
+        v = new EmptyVertex(DENOPTIMVertex.BBType.CAP);
+        assertEquals(0,v.getMutationSites().size(),
+                "Capping groups so not return any mutable site.");
+        v = new EmptyVertex(DENOPTIMVertex.BBType.UNDEFINED);
+        assertEquals(1,v.getMutationSites().size(),
+                "Undefined building block return themselves as mutable sites.");
+        v = new EmptyVertex(DENOPTIMVertex.BBType.NONE);
+        assertEquals(1,v.getMutationSites().size(),
+                "'None' building block return themselves as mutable sites.");
+        
+        v.setMutationTypes(new ArrayList<>(Arrays.asList(MutationType.EXTEND)));
+        assertEquals(1,v.getMutationSites().size(),
+                "Consistency with restricted list of mutation types.");
+        assertEquals(0,v.getMutationSites(new ArrayList<>(Arrays.asList(
+                MutationType.EXTEND))).size(), "Vertex that allows only "
+                        + "ignored mutation types is not a mutable site");
     }
     
 //------------------------------------------------------------------------------

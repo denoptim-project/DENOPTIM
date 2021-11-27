@@ -672,10 +672,29 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     {
         return owner;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * A list of mutation sites from within this vertex.
+     * @return the list of vertexes that allow any mutation type.
+     */
+    public List<DENOPTIMVertex> getMutationSites()
+    {
+        return getMutationSites(new ArrayList<MutationType>());
+    }
 
 //------------------------------------------------------------------------------
 
-    public abstract List<DENOPTIMVertex> getMutationSites();
+    /**
+     * A list of mutation sites from within this vertex.
+     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * that allow only ignored types of mutation will
+     * not be considered mutation sites.
+     * @return the list of vertexes that allow any non-ignored mutation type.
+     */
+    public abstract List<DENOPTIMVertex> getMutationSites(
+            List<MutationType> ignoredTypes);
 
 //------------------------------------------------------------------------------
 
@@ -691,7 +710,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * vertex irrespectively on the graph or the context in which this vertex
      * is included.
      * @return the list of allowed mutation types as configured upon vertex 
-     * contitution.
+     * constitution.
      */
     protected List<MutationType> getUnfilteredMutationTypes()
     {
