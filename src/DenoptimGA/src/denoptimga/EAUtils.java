@@ -1227,7 +1227,8 @@ public class EAUtils
         {
             Monitor mnt = new Monitor();
             mnt.name = "IntraTemplateBuild";
-            List<DENOPTIMVertex> initialMutableSites = graph.getMutableSites();
+            List<DENOPTIMVertex> initialMutableSites = graph.getMutableSites(
+                    GAParameters.getExcludedMutationTypes());
             for (DENOPTIMVertex mutableSite : initialMutableSites)
             {
                 // This account for the possibility that a mutation changes a 

@@ -1621,7 +1621,8 @@ public class DENOPTIMGraphOperations
     public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
             throws DENOPTIMException
     {
-        List<MutationType> mTypes = vertex.getMutationTypes();
+        List<MutationType> mTypes = vertex.getMutationTypes(
+                GAParameters.getExcludedMutationTypes());
         if (mTypes.size() == 0)
         {
             return false;
@@ -1690,7 +1691,8 @@ public class DENOPTIMGraphOperations
                     + "Mutation aborted");
             return false;
         }
-        if (!vertex.getMutationTypes().contains(mType))
+        if (!vertex.getMutationTypes(GAParameters.getExcludedMutationTypes())
+                .contains(mType))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE);
             DENOPTIMLogger.appLogger.info("Vertex does not allow mutation type "

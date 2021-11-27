@@ -684,7 +684,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    public List<MutationType> getMutationTypes()
+    public List<MutationType> getMutationTypes(List<MutationType> ignoredTypes)
     {   
         if (getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
         {
@@ -704,9 +704,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // sufficient to remove RCVs from the list of mutation sites, and 
             // do only CHANGELINK. See 'cyclicpeptide' test case.
             
+            scaffCompatTypes.removeAll(ignoredTypes);
             return scaffCompatTypes;
         }
-        return super.getMutationTypes();
+        return super.getMutationTypes(ignoredTypes);
     }
 
 //------------------------------------------------------------------------------
@@ -732,10 +733,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         switch (contractLevel) 
         {
             case FIXED:
-                List<MutationType> mutationTypes = new ArrayList<>(
-                        getMutationTypes());
-                mutationTypes.removeAll(ignoredTypes);
-                if (mutationTypes.size()>0)
+                if (getMutationTypes(ignoredTypes).size()>0)
                     lst.add(this);
                 break;
                 

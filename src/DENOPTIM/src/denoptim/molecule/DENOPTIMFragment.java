@@ -935,10 +935,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 break;
                 
             default:
-                List<MutationType> mutationTypes = new ArrayList<>(
-                        getMutationTypes());
-                mutationTypes.removeAll(ignoredTypes);
-                if (mutationTypes.size()>0)
+                if (getMutationTypes(ignoredTypes).size()>0)
                     lst.add(this);
                 break;
         }

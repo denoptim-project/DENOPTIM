@@ -350,7 +350,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * then projected on the template's surface and used to make an edge that 
      * uses the template as a single vertex. To ignore this possibility and 
      * consider only edges that belong to the graph owning this vertex, use
-     * {@Link DENOPTIMVertex#getFreeAPCount()}.
+     * {@link DENOPTIMVertex#getFreeAPCount()}.
      * @return the APs of this vertex that are not used by any edge, 
      * whether within
      * the graph owning this vertex (if any) or within a graph owning the
@@ -379,7 +379,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * then projected on the template's surface and used to make an edge that 
      * uses the template as a single vertex. To ignore this possibility and 
      * consider only edges that belong to the graph owning this vertex, use
-     * {@Link DENOPTIMVertex#getFreeAPCount()}.
+     * {@link DENOPTIMVertex#getFreeAPCount()}.
      * @return the number of APs that are not used by any edge, whether within
      * the graph owning this vertex (if any) or within a graph owning the
      * template embedding the graph that owns this vertex.
@@ -388,7 +388,90 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     {
         return getFreeAPThroughout().size();
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Gets attachment points that are used by capping groups. 
+     * This method does NOT account for embedding of the vertex in a 
+     * template, i.e., APs can be available in the graph owning this vertex,
+     * but if the graph is itself the inner graph of a template, the AP is 
+     * then projected on the template's surface and can be used. 
+     * To account for this possibility use
+     * {@link DENOPTIMVertex#getCappedAPsThroughout()}.
+     * @return the APs of this vertex that are used to bind a {@link BBType#CAP} 
+     * vertex.
+     */
+    public ArrayList<DENOPTIMAttachmentPoint> getCappedAPs()
+    {
+        ArrayList<DENOPTIMAttachmentPoint> lst = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        {
+            if (!ap.isAvailable())
+            {
+                DENOPTIMAttachmentPoint linkedAP = ap.getLinkedAP();
+                if (linkedAP.getOwner().getBuildingBlockType() == BBType.CAP)
+                    lst.add(ap);
+            }
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets attachment points that are used by capping groups throughout 
+     * the graph levels, i.e., checks also across the inner graph template 
+     * boundary. This method does account for embedding of the vertex in a 
+     * template, i.e., APs can be available in the graph owning this vertex,
+     * but if the graph is itself the inner graph of a template, the AP is 
+     * then projected on the template's surface and used to make an edge that 
+     * uses the template as a single vertex. To ignore this possibility and 
+     * consider only edges that belong to the graph owning this vertex, use
+     * {@link DENOPTIMVertex#getCappedAPs()}.
+     * @return the APs of this vertex that are used to bind a {@link BBType#CAP} 
+     * vertex, 
+     * whether within the graph owning this vertex (if any) 
+     * or within a graph owning the
+     * template embedding the graph that owns this vertex.
+     */
+    public ArrayList<DENOPTIMAttachmentPoint> getCappedAPsThroughout()
+    {
+        ArrayList<DENOPTIMAttachmentPoint> lst = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        {
+            if (!ap.isAvailableThroughout())
+            {
+                DENOPTIMAttachmentPoint linkedAP = ap.getLinkedAPThroughout();
+                if (linkedAP.getOwner().getBuildingBlockType() == BBType.CAP)
+                    lst.add(ap);
+            }
+        }
+        return lst;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Counts the number of attachment points that are used by {@link BBType#CAP} 
+     * vertex.  This method does account for embedding of the vertex in a 
+     * template, i.e., APs can be available in the graph owning this vertex,
+     * but if the graph is itself the inner graph of a template, the AP is 
+     * then projected on the template's surface and used to make an edge that 
+     * uses the template as a single vertex.
+     * @return the number of APs of this vertex that are used to bind a 
+     * {@link BBType#CAP} vertex, 
+     * whether within the graph owning this vertex (if any) 
+     * or within a graph owning the
+     * template embedding the graph that owns this vertex.
+     */
+    public int getCappedAPCountThroughout()
+    {
+        return getCappedAPsThroughout().size();
+    }
+    
 //------------------------------------------------------------------------------
 
     public boolean hasFreeAP()
@@ -719,7 +802,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
-    public List<MutationType> getMutationTypes()
+    public List<MutationType> getMutationTypes(List<MutationType> excludedTypes)
     {
         List<MutationType> filteredTypes = new ArrayList<MutationType>(
                 allowedMutationTypes);
@@ -734,8 +817,9 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 filteredTypes.remove(MutationType.CHANGELINK);
             }
             
-            // Cannot extend vertex that has no truly free AP
-            if (getFreeAPCountThroughout()==0)
+            // Cannot extend vertex that has no truly free AP, but can do it
+            // on APs that are used by capping groups.
+            if ((getFreeAPCountThroughout() + getCappedAPs().size()) == 0)
                 filteredTypes.remove(MutationType.EXTEND);
             
             // Cannot remove the only vertex of a graph
@@ -747,6 +831,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         {
             filteredTypes.remove(MutationType.DELETELINK);
         }
+        
+        filteredTypes.removeAll(excludedTypes);
         
         return filteredTypes;
     }
