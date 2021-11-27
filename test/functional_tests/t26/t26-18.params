@@ -1,0 +1,18 @@
+#
+# This must unsuccesful because it is an attempt to delete two (symmetric) 
+# vertexes that would lead to formation of a loop.
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-18.sdf
+TESTGENOPS-outFile=graph_mut-18.sdf
+TESTGENOPS-MutationTarget=6
+TESTGENOPS-MutationType=DELETELINK
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap.par
+FS-rcCompMatrixFile=RC-CPMap.par
+FS-RotBondsDefFile=rotatableBonds
+

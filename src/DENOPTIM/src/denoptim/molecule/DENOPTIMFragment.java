@@ -299,6 +299,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Adds an attachment point with a dummy APClass.
      * @param atomPositionNumber the index of the source atom (0-based)
      */
+    
+    //TODO: since APs can be on any vertex, and vertexes are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    
     public void addAP(int atomPositionNumber) {
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
                 atomPositionNumber);
@@ -339,7 +346,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         
         ArrayList<DENOPTIMAttachmentPoint> apList = new ArrayList<>();
         if (getAPCountOnAtom(srcAtm) > 0) {
-            apList = getAPListFromAtom(srcAtm);
+            apList = getAPsFromAtom(srcAtm);
         }
         apList.add(ap);
         srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
@@ -396,7 +403,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    private ArrayList<DENOPTIMAttachmentPoint> getAPListFromAtom(IAtom srcAtm)
+    ArrayList<DENOPTIMAttachmentPoint> getAPsFromAtom(IAtom srcAtm)
     {
         @SuppressWarnings("unchecked")
 		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
@@ -435,7 +442,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
     	{
 			ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
-					getAPListFromAtom(srcAtm);
+					getAPsFromAtom(srcAtm);
         	num = apsOnAtm.size();
     	}
     	return num;
@@ -458,7 +465,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
             	ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
-            			getAPListFromAtom(srcAtm);
+            			getAPsFromAtom(srcAtm);
 	            for (int i = 0; i < apsOnAtm.size(); i++)
 	            {
 	                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
@@ -492,7 +499,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
         		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
-        				getAPListFromAtom(srcAtm);
+        				getAPsFromAtom(srcAtm);
         		lstAPs.addAll(apsOnAtm);
             }
         }
@@ -605,7 +612,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
 				ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
-						getAPListFromAtom(atm);
+						getAPsFromAtom(atm);
                 oldAPs.add(ap);
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,oldAPs);
             } 
@@ -643,7 +650,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             }
             int atmID = mol.indexOf(atm);
             ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
-                    getAPListFromAtom(atm);
+                    getAPsFromAtom(atm);
             for (DENOPTIMAttachmentPoint ap : apsOnAtm)
             {
                 if (apsPerAtom.containsKey(atmID))
@@ -1033,6 +1040,26 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         // vertex, if any
 
         return returnedFrag;
+    }
+
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the atom where the given attachment point is rooted, i.e., the
+     * atom that is involved in the bond resulting from using the attachment 
+     * point to form an edge with a {@link BondType} that leads to bond 
+     * creation.
+     * @param ap the attachment point to find the source of.
+     * @return the source atom of the attachment point, or null is the 
+     * attachment point does not belong to this vertex.
+     */
+    public IAtom getAtomHoldingAP(DENOPTIMAttachmentPoint ap)
+    {
+        if (ap.getOwner() != this)
+            return null;
+       
+        return mol.getAtom(ap.getAtomPositionNumber());
     }
     
 //------------------------------------------------------------------------------

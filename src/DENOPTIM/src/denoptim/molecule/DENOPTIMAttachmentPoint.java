@@ -22,6 +22,7 @@ package denoptim.molecule;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -105,6 +106,13 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * Constructor for undefined DENOPTIMAttachmentPoint
      * @param owner the vertex that holds the attachment point under creation.
      */
+    
+    //TODO: since APs can be on any vertex, and vertexes are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
         this.owner = owner;
@@ -891,7 +899,10 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * Gets the attachment point (AP) that is connected to this AP via the edge 
      * user or in any edge user that might be
      * external to the template embedding the graph where this AP is directly
-     * reachable.
+     * reachable. Note that the AP that is used in the edge might not be the 
+     * deepest image of that AP, i.e., the AP returned by this method might be
+     * a projection of a more deeply embedded AP, which you can get by using the
+     * {@link DENOPTIMAttachmentPoint#getEmbeddedAP()} method.
      * @return the AP linked with this AP, or null;
      */
     public DENOPTIMAttachmentPoint getLinkedAPThroughout() 
@@ -960,7 +971,97 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         }
         return owner.getIndexOfAP(this);
     }
-
+    
+//------------------------------------------------------------------------------
+    
+    public boolean hasSameSrcAtom(DENOPTIMAttachmentPoint other)
+    {
+        DENOPTIMAttachmentPoint deepThis = getEmbeddedAP();
+        DENOPTIMAttachmentPoint deepOther = other.getEmbeddedAP();
+        DENOPTIMVertex deepOwnerT = deepThis.getOwner();
+        DENOPTIMVertex deepOwnerO = deepOther.getOwner();
+        
+        if (deepOwnerT instanceof DENOPTIMFragment
+                && deepOwnerO instanceof DENOPTIMFragment)
+        {
+            IAtom srcThis = ((DENOPTIMFragment) deepOwnerT).getAtomHoldingAP(
+                    deepThis);
+            IAtom srcOther = ((DENOPTIMFragment) deepOwnerO).getAtomHoldingAP(
+                    deepOther);
+            
+            if (srcThis == srcOther)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if this and another APs are rooted on atoms that are bonded in
+     * any way other than a possible connection resulting by an edge made in
+     * between this and the other AP.
+     * 
+     * @param other the other aP to consider.
+     * @return <code>true</code> is the two APs are rooted on atoms that 
+     * participate in a bond either within a molecular fragment or across
+     * a graph edge.
+     */
+    public boolean hasConnectedSrcAtom(DENOPTIMAttachmentPoint other)
+    {
+        DENOPTIMAttachmentPoint deepThis = getEmbeddedAP();
+        DENOPTIMAttachmentPoint deepOther = other.getEmbeddedAP();
+        DENOPTIMVertex deepOwnerT = deepThis.getOwner();
+        DENOPTIMVertex deepOwnerO = deepOther.getOwner();
+        
+        if (deepOwnerT instanceof DENOPTIMFragment
+                && deepOwnerO instanceof DENOPTIMFragment)
+        {
+            IAtom srcThis = ((DENOPTIMFragment) deepOwnerT).getAtomHoldingAP(
+                    deepThis);
+            IAtom srcOther = ((DENOPTIMFragment) deepOwnerO).getAtomHoldingAP(
+                    deepOther);
+            
+            if (srcThis.getContainer() == srcOther.getContainer())
+            {
+                if (srcThis.getContainer().getConnectedAtomsList(srcThis)
+                        .contains(srcOther))
+                {
+                    return true;
+                }
+            } else {
+                // If the two atoms are not directly connected, they
+                // might be connected via an edge in the graph.
+                List<DENOPTIMAttachmentPoint> apsOnSrcThis = 
+                        ((DENOPTIMFragment)deepOwnerT).getAPsFromAtom(srcThis);
+                List<DENOPTIMAttachmentPoint> apsOnSrcOther = 
+                        ((DENOPTIMFragment)deepOwnerT).getAPsFromAtom(srcOther);
+                for (DENOPTIMAttachmentPoint apOnSrcThis : apsOnSrcThis)
+                {
+                    // We ignore the connection deepThis-to-deepOther
+                    if (apOnSrcThis.isAvailableThroughout() 
+                            || apOnSrcThis==deepThis)
+                        continue;
+                    
+                    DENOPTIMAttachmentPoint linkedAP = 
+                            apOnSrcThis.getLinkedAPThroughout().getEmbeddedAP();
+                    for (DENOPTIMAttachmentPoint apOnSrcOther : apsOnSrcOther)
+                    {
+                        if (apOnSrcOther.isAvailableThroughout() 
+                                || apOnSrcOther==deepOther)
+                            continue;
+                        if (linkedAP==apOnSrcOther)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
     
 //------------------------------------------------------------------------------
     

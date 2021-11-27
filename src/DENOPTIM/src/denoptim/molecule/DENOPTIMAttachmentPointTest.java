@@ -32,6 +32,8 @@ import java.util.List;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
@@ -596,6 +598,196 @@ public class DENOPTIMAttachmentPointTest
         two objects with the same hash code need not be equal.*/
         assertEquals(clone.getAPClass().hashCode(),
                 orig.getAPClass().hashCode(),"Hashcode of cloned APClass");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testHasSameSrcAtom() throws Exception
+    {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMFragment v1 = new DENOPTIMFragment();
+        Atom a1 = new Atom("C");
+        Atom a2 = new Atom("C");
+        Atom a3 = new Atom("C");
+        v1.addAtom(a1);
+        v1.addAtom(a2);
+        v1.addAtom(a3);
+        v1.addBond(new Bond(a1, a2));
+        v1.addBond(new Bond(a2, a3));
+        v1.addAPOnAtom(a1, APClass.make(APCLASS), new Point3d());
+        v1.addAPOnAtom(a1, APClass.make(APCLASS), new Point3d());
+        v1.addAPOnAtom(a2, APClass.make(APCLASS), new Point3d());
+        v1.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d());
+        
+        DENOPTIMAttachmentPoint ap0 = v1.getAP(0);
+        DENOPTIMAttachmentPoint ap1 = v1.getAP(1);
+        DENOPTIMAttachmentPoint ap2 = v1.getAP(2);
+        DENOPTIMAttachmentPoint ap3 = v1.getAP(3);
+        
+        /*
+         *  ap0 
+         *   \
+         *   a1----a2---a3
+         *   /      \    \
+         *  ap1     ap2   ap3
+         */
+        
+        assertTrue(ap0.hasSameSrcAtom(ap1),"Intra-fragment (A)");
+        assertTrue(ap1.hasSameSrcAtom(ap0),"Intra-fragment (B)");
+        assertFalse(ap0.hasSameSrcAtom(ap2),"Intra-fragment (C)");
+        assertFalse(ap2.hasSameSrcAtom(ap0),"Intra-fragment (D)");
+        
+        DENOPTIMFragment v2 = v1.clone();
+        DENOPTIMGraph g2 = new DENOPTIMGraph();  
+        g2.addVertex(v2);
+        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t2.setInnerGraph(g2);
+        
+        ap0 = t2.getAP(0);
+        ap1 = t2.getAP(1);
+        ap2 = t2.getAP(2);
+        ap3 = t2.getAP(3);
+        
+        assertTrue(ap0.hasSameSrcAtom(ap1),"Intra-Template (A)");
+        assertTrue(ap1.hasSameSrcAtom(ap0),"Intra-Template (B)");
+        assertFalse(ap0.hasSameSrcAtom(ap2),"Intra-Template (C)");
+        assertFalse(ap2.hasSameSrcAtom(ap0),"Intra-Template (D)");
+    }   
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testHasConnectedSrcAtom() throws Exception
+    {
+        // This is just to avoid the warnings about trying to get a bond type
+        // when the fragment space in not defined
+        HashMap<String, BondType> map = new HashMap<>();
+        map.put(APRULE,BondType.SINGLE);
+        FragmentSpace.setBondOrderMap(map);
+        
+        DENOPTIMFragment v1 = new DENOPTIMFragment();
+        Atom a1 = new Atom("C");
+        Atom a2 = new Atom("C");
+        Atom a3 = new Atom("C");
+        v1.addAtom(a1);
+        v1.addAtom(a2);
+        v1.addAtom(a3);
+        v1.addBond(new Bond(a1, a2));
+        v1.addBond(new Bond(a2, a3));
+        v1.addAPOnAtom(a1, APClass.make(APCLASS), new Point3d());
+        v1.addAPOnAtom(a1, APClass.make(APCLASS), new Point3d());
+        v1.addAPOnAtom(a2, APClass.make(APCLASS), new Point3d());
+        v1.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d());
+        
+        DENOPTIMAttachmentPoint ap0 = v1.getAP(0);
+        DENOPTIMAttachmentPoint ap1 = v1.getAP(1);
+        DENOPTIMAttachmentPoint ap2 = v1.getAP(2);
+        DENOPTIMAttachmentPoint ap3 = v1.getAP(3);
+        
+        /*
+         *  ap0 
+         *   \
+         *   a1----a2---a3
+         *   /      \    \
+         *  ap1     ap2   ap3
+         */
+
+        assertTrue(ap0.hasConnectedSrcAtom(ap2),"Intra-fragment (E)");
+        assertTrue(ap2.hasConnectedSrcAtom(ap0),"Intra-fragment (F)");
+        assertFalse(ap1.hasConnectedSrcAtom(ap3),"Intra-fragment (G)");
+        assertFalse(ap3.hasConnectedSrcAtom(ap1),"Intra-fragment (H)");
+        
+        DENOPTIMFragment v2 = v1.clone();
+        DENOPTIMGraph g2 = new DENOPTIMGraph();  
+        g2.addVertex(v2);
+        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t2.setInnerGraph(g2);
+        
+        ap0 = t2.getAP(0);
+        ap1 = t2.getAP(1);
+        ap2 = t2.getAP(2);
+        ap3 = t2.getAP(3);
+        
+        assertTrue(ap0.hasConnectedSrcAtom(ap2),"Intra-Template (E)");
+        assertTrue(ap2.hasConnectedSrcAtom(ap0),"Intra-Template (F)");
+        assertFalse(ap1.hasConnectedSrcAtom(ap3),"Intra-Template (G)");
+        assertFalse(ap3.hasConnectedSrcAtom(ap1),"Intra-Template (H)");
+        
+        DENOPTIMFragment v3a = v1.clone();
+        DENOPTIMFragment v3b = v1.clone();
+        v3b.setVertexId(v3a.getVertexId()+1);
+        DENOPTIMGraph g3 = new DENOPTIMGraph();  
+        g3.addVertex(v3a);
+        g3.addVertex(v3b);
+        g3.addEdge(new DENOPTIMEdge(v3a.getAP(1), v3b.getAP(0)));
+        
+        /*
+         *  ap0 
+         *   \
+         *   a1---a2---a3          v3a
+         *   /     \    \
+         *  ap1    ap2   ap3
+         *   |
+         *  ap0 
+         *   \
+         *   a1---a2---a3          v3b
+         *   /     \    \
+         *  ap1    ap2   ap3
+         *
+         */
+        
+        assertTrue(v3a.getAP(0).hasConnectedSrcAtom(v3b.getAP(1)), 
+                "Through edge (A)"); // The two APs are not in the edge
+        assertFalse(v3a.getAP(1).hasConnectedSrcAtom(v3b.getAP(0)), 
+                "Through edge (B)"); //The two APs are those making the edge
+        
+        DENOPTIMTemplate t3 = new DENOPTIMTemplate(BBType.FRAGMENT);
+        t3.setInnerGraph(g3);
+        
+        assertTrue(t3.getAP(0).hasConnectedSrcAtom(t3.getAP(3)), 
+                "Through edge intra-template (A)");
+        assertTrue(t3.getAP(0).hasConnectedSrcAtom(t3.getAP(1)), 
+                "Through edge intra-template (B)");
+        assertFalse(t3.getAP(0).hasConnectedSrcAtom(t3.getAP(2)), 
+                "Through edge intra-template (C)");
+        assertFalse(t3.getAP(0).hasConnectedSrcAtom(t3.getAP(4)), 
+                "Through edge intra-template (D)");
+        
+        DENOPTIMTemplate t4 = t2.clone();
+        t4.setVertexId(t2.getVertexId()+1);
+        DENOPTIMGraph g5 = new DENOPTIMGraph();
+        g5.addVertex(t2);
+        g5.addVertex(t4);
+        g5.addEdge(new DENOPTIMEdge(t2.getAP(1), t4.getAP(0)));
+        
+        /*
+         * {
+         *  ap0 
+         *   \
+         *   a1---a2---a3          t2
+         *   /     \    \
+         *  ap1    ap2   ap3
+         *  }
+         *   |
+         *  {
+         *  ap0 
+         *   \
+         *   a1---a2---a3          t4
+         *   /     \    \
+         *  ap1    ap2   ap3
+         *  }
+         */
+        
+        assertTrue(t2.getAP(0).hasConnectedSrcAtom(t4.getAP(1)), 
+                "Through deep edge (A)"); // The two APs are not in the edge
+        assertFalse(t2.getAP(1).hasConnectedSrcAtom(t4.getAP(0)), 
+                "Through deep edge (B)"); //The two APs are those making the edge
     }
     
 //------------------------------------------------------------------------------

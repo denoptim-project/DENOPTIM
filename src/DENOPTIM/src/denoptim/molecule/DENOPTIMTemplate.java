@@ -90,9 +90,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * <ul>
      * <li>{@link ContractLevel#FIXED} inner graphs are effectively equivalent 
      * to the DENOPTIMFragment class, as no change in the inner structure is
-     * allowed.</il>
+     * allowed.</li>
      * <li>{@link ContractLevel#FREE} inner graphs are free to change within 
-     * the confines of the required APs.</il>
+     * the confines of the required APs.</li>
      * </ul>
      */
     public enum ContractLevel {

@@ -60,7 +60,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * Version UID
      */
-    private static final long serialVersionUID = -6093013990421027436L;
+    private static final long serialVersionUID = 3L;
     
     /**
      * Graph that includes this vertex

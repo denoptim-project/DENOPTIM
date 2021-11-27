@@ -313,6 +313,14 @@ public class EmptyVertex extends DENOPTIMVertex
      * Adds an attachment point with a dummy APClass.
      * @param atomPositionNumber the index of the source atom (0-based)
      */
+    
+    //TODO: since APs can be on any vertex, and vertexes are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    // TODO-V3 remove this method.
+    
     public void addAP(int atomPositionNumber) {
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
                 atomPositionNumber);

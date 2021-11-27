@@ -824,6 +824,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (symSites.size() == 0)
         {
             symSites.add(vertex);
+        } else {
+            //TODO-V3 flip coin to decide if this should be a symmetric operation or not
         }
         for (DENOPTIMVertex oldLink : symSites)
         {
@@ -832,6 +834,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 return false;
             }
+        }
+        // Reject deletions that cause the collapse of a 3-atom ring into a
+        // loop (i.e., 1-atom ring) or multiple connection (i.e., a 3-atom ring)
+        for (DENOPTIMRing r : gRings)
+        {
+            // 3 = 1 actual vertex + 2 RCVs
+            if (r.getSize()!=3)
+                continue;
+            
+            DENOPTIMAttachmentPoint apH = r.getHeadVertex().getEdgeToParent()
+                    .getSrcAPThroughout();
+            DENOPTIMAttachmentPoint apT = r.getTailVertex().getEdgeToParent()
+                    .getSrcAPThroughout();
+            
+            if (apH.hasSameSrcAtom(apT) || apH.hasConnectedSrcAtom(apT))
+                return false;
         }
         return true;
     }
