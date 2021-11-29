@@ -4,7 +4,9 @@
 # Fitness provider script
 # =======================
 #
-# This scripts recovers the fitness/mol_error from a list.
+# This scripts build a molecular model using the Ring-Closing potential, then
+# performs conformational search, and calculated a fitness based on the
+# Tanimoto similarity with a givnel moleculs (i.e., the "goal").
 #
 # @param $1 pathname of input SDF file: it must contain the graph 
 #        representation of the candidate system of which we are calculating 
@@ -264,7 +266,8 @@ rm "$currentScaffLib" "$currentFragLib"
 # Check outcome
 if [ -f "$DnCG3Dout" ]; then
     if grep -q "MOL_ERROR" "$DnCG3Dout" ; then
-        echo "Exiting! Found ERROR in output of DenoptimCG"
+        errMsg=$(grep "MOL_ERROR" "$DnCG3Dout")
+        echo "Exiting! Found ERROR in output of DenoptimCG ($errMsg)"
         cat "$DnCG3Dout" > "$outSDF"
         exit "$E_OPTERROR"
     fi

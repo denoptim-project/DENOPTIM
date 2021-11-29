@@ -37,7 +37,7 @@ if [ "$n31" -lt 7 ] || [ "$n31" -gt 10 ]; then
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including M00000031: $n31)"
     exit 1
 fi
-if [ "$nMAX28" -lt 7 ] || [ "$nMAX28" -gt 9 ]; then
+if [ "$nMAX28" -lt 6 ] || [ "$nMAX28" -gt 9 ]; then
     echo " "
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of generation with max fitness from manually added molecule: $nMAX28)"
     exit 1
