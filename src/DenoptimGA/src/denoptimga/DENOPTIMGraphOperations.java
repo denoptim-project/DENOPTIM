@@ -1599,7 +1599,18 @@ public class DENOPTIMGraphOperations
             DENOPTIMLogger.appLogger.info(msg);
             return false;
         }
-        return performMutation(RandomUtils.randomlyChooseOne(mutable),mnt);
+        boolean doneMutation = true;
+        int numberOfMutations = EAUtils.chooseNumberOfSitesToMutate(
+                GAParameters.getMultiSiteMutationWeights(), 
+                RandomUtils.nextDouble());
+        for (int i=0; i<numberOfMutations; i++)
+        {
+            doneMutation = performMutation(
+                    RandomUtils.randomlyChooseOne(mutable),mnt);
+            if(!doneMutation)
+                break;
+        }
+        return doneMutation;
     }
     
 //------------------------------------------------------------------------------

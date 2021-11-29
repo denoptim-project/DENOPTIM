@@ -496,15 +496,20 @@ public class GraphLinkFinder
             List<DENOPTIMAttachmentPoint> needeAPs = new ArrayList<DENOPTIMAttachmentPoint>();
             needeAPs.add(originalEdge.getSrcAP());
             needeAPs.add(originalEdge.getTrgAP());
-            for (DENOPTIMAttachmentPoint oAP : needeAPs)
+            for (int j=0; j<2;j++)
             {
+                DENOPTIMAttachmentPoint oAP = needeAPs.get(j);
                 APClass oriAPC = oAP.getAPClass();
                 for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
                 {  
                     boolean compatible = false;
                     if (FragmentSpace.useAPclassBasedApproach())
                     {
-                        if (oriAPC.isCPMapCompatibleWith(cAP.getAPClass()))
+                        if (j==0 
+                                && oriAPC.isCPMapCompatibleWith(cAP.getAPClass()))
+                            compatible = true;
+                        else if (j==1 
+                                && cAP.getAPClass().isCPMapCompatibleWith(oriAPC))
                             compatible = true;
                     } else {
                         compatible = true;

@@ -1358,7 +1358,16 @@ without providing that specific keyword in the input file.</p>
 		<td width="60%"><p>Specifies the relative weight of mutation when generating new candidate population members.</p>
 		</td>
 	</tr>
-		<tr valign="middle">
+        <tr valign="middle">
+                <td width="40%"><p><code>GA-MultiSiteMutationWeights</code>
+                </td>
+<td width="60%"><p>Specifies the relative wight of multisite mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutates again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the sddition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.</p>
+<p>Provide values in a comma- or space-separated list. The first value is the wight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,
+<pre>GA-MultiSiteMutationWeights=10, 1</pre>
+enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.</p>
+                </td>
+        </tr>
+	<tr valign="middle">
 		<td width="40%"><p><code>GA-ConstructionWeight</code></p>
 		</td>
 		<td width="60%"><p>Specifies the relative weight of construction from scratch when generating new candidate population members.</p>

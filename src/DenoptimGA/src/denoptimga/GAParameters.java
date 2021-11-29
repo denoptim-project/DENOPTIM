@@ -338,6 +338,11 @@ public class GAParameters
      * Print level
      */
     protected static int print_level = 0;
+
+    /**
+     * The weights of multisite mutations
+     */
+    private static double[] mutliSiteMutationWeights = new double[]{0,10,1};
     
     private static final String FS = System.getProperty("file.separator");
     
@@ -391,6 +396,7 @@ public class GAParameters
     	dumpMonitor = false;
     	useLevelBasedProb = false;
     	useMolSizeBasedProb = false;
+    	mutliSiteMutationWeights = new double[]{0,10,1};
     	
         FragmentSpaceParameters.resetParameters();
         RingClosureParameters.resetParameters();
@@ -686,6 +692,14 @@ public class GAParameters
         return initPoplnFile;
     }
     
+
+//------------------------------------------------------------------------------
+      
+    public static double[] getMultiSiteMutationWeights()
+    {
+        return mutliSiteMutationWeights;
+    }
+    
 //------------------------------------------------------------------------------
 
     protected static void printParameters()
@@ -731,7 +745,7 @@ public class GAParameters
      */
     protected static void readParameterFile(String infile) throws DENOPTIMException
     {
-        String option, line;
+        String line;
         BufferedReader br = null;
         try
         {
@@ -765,391 +779,11 @@ public class GAParameters
                     FitnessParameters.interpretKeyword(line);
                     continue;
                 }
-
-                if (line.toUpperCase().startsWith("GA-NUMPARALLELTASKS="))
+                
+                if (line.toUpperCase().startsWith("GA-"))
                 {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        numParallelTasks = Integer.parseInt(option);
-                    }
+                    interpretKeyword(line);
                     continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-PARALLELIZATION="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    switch (option.toUpperCase())
-                    {
-                        case "SYNCHRONOUS":
-                            parallelizationScheme = 1;
-                            break;
-                        case "ASYNCHRONOUS":
-                            parallelizationScheme = 2;
-                            break;
-                        default:
-                            throw new DENOPTIMException("Unknown parallelization scheme.");
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GA-PRECISIONLEVEL="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        precisionLevel = Integer.parseInt(option);
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GA-UIDFILEIN="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        uidFileIn = option;
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GA-UIDFILEOUT="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        uidFileOut = option;
-                    }
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-MONITORFILE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        monitorFile = option;
-                    }
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-MONITORDUMPSTEP="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        monitorDumpStep = Integer.parseInt(option);
-                        dumpMonitor = true;
-                    }
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-RANDOMSEED="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        seed = Long.parseLong(option);
-                    }
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-MAXTRIESPERPOPULATION="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                        maxTriesPerPop  = Integer.parseInt(option);
-                }
-                
-                if (line.toUpperCase().startsWith("GA-MAXGENETICOPSATTEMPTS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                        maxGeneticOpAttempts  = Integer.parseInt(option);
-                }
-
-                if (line.toUpperCase().startsWith("GA-INITPOPLNFILE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        initPoplnFile = option;
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GA-PRINTLEVEL="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        print_level = Integer.parseInt(option);
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GA-SORTBYINCREASINGFITNESS"))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        sortOrderDecreasing = false;
-                    }
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GA-GROWTHMULTIPLIER="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        lvlGrowthMultiplier = Double.parseDouble(option);
-                        useLevelBasedProb = true;
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-LEVELGROWTHSIGMASTEEPNESS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        lvlGrowthSigmaSteepness = Double.parseDouble(option);
-                        useLevelBasedProb = true;
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-LEVELGROWTHSIGMAMIDDLE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        lvlGrowthSigmaMiddle = Double.parseDouble(option);
-                        useLevelBasedProb = true;
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-LEVELGROWTHPROBSCHEME="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    lvlGrowthProbabilityScheme = convertProbabilityScheme(option);
-                    useLevelBasedProb = true;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-MOLGROWTHMULTIPLIER="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        molGrowthMultiplier = Double.parseDouble(option);
-                        useMolSizeBasedProb = true;
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-MOLGROWTHSIGMASTEEPNESS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        molGrowthSigmaSteepness = Double.parseDouble(option);
-                        useMolSizeBasedProb = true;
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-MOLGROWTHSIGMAMIDDLE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        molGrowthSigmaMiddle = Double.parseDouble(option);
-                        useMolSizeBasedProb = true;
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-MOLGROWTHPROBSCHEME="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    molGrowthProbabilityScheme = convertProbabilityScheme(option);
-                    useMolSizeBasedProb = true;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-CROWDMULTIPLIER="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        crowdingMultiplier = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-CROWDSIGMASTEEPNESS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        crowdingSigmaSteepness = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-CROWDSIGMAMIDDLE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        crowdingSigmaMiddle = Double.parseDouble(option);
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("GA-SYMMETRYPROBABILITY="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        symmetricSubProbability = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-CROWDPROBSCHEME="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    crowdingProbabilityScheme = convertProbabilityScheme(option);
-                }
-
-                if (line.toUpperCase().startsWith("GA-NUMGENERATIONS="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        numGenerations = Integer.parseInt(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-NUMCHILDREN="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        numOfChildren = Integer.parseInt(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-CROSSOVERWEIGHT="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        crossoverWeight = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-MUTATIONWEIGHT="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        mutationWeight = Double.parseDouble(option);
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("GA-EXCLUDEMUTATIONTYPE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        excludedMutationTypes.add(MutationType.valueOf(option));
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("GA-CONSTRUCTIONWEIGHT="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.builtAnewWeight = Double.parseDouble(option);
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("GA-REPLACEMENTSTRATEGY="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    switch (option.toUpperCase())
-                    {
-                        case "NONE":
-                        	replacementStrategy = 2;
-                            break;
-                        case "ELITIST":
-                            replacementStrategy = 1;
-                            break;
-                        default:
-                            throw new DENOPTIMException("Unknown replacement strategy.");
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-POPULATIONSIZE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.populationSize = Integer.parseInt(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-NUMCONVGEN="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.numConvGen = Integer.parseInt(option);
-                    }
-                }
-                
-                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMVERTEXES"))
-                {
-                    saveRingSystemsAsTemplatesNonScaff = true;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMSCAFFOLDS"))
-                {
-                    saveRingSystemsAsTemplatesScaffolds = true;
-                }
-                
-                
-                if (line.toUpperCase().startsWith("GA-KEEPNEWRINGSYSTEMFITNESSTRSH="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        saveRingSystemsFitnessThreshold = Double.parseDouble(option);
-                    }
-                }
-
-                if (line.toUpperCase().startsWith("GA-XOVERSELECTIONMODE="))
-                {
-                    option = line.substring(line.indexOf("=") + 1).trim();
-                    if (option.length() > 0)
-                    {
-                        GAParameters.xoverSelectionMode = -1;
-                        if (option.compareToIgnoreCase("TS") == 0)
-                        {
-                            GAParameters.xoverSelectionMode = 1;
-                            GAParameters.strXoverSelectionMode = "TOURNAMENT";
-                        }
-                        if (option.compareToIgnoreCase("RWS") == 0)
-                        {
-                            GAParameters.xoverSelectionMode = 2;
-                            GAParameters.strXoverSelectionMode = "ROULETTE WHEEL";
-                        }
-                        if (option.compareToIgnoreCase("SUS") == 0)
-                        {
-                            GAParameters.xoverSelectionMode = 3;
-                            GAParameters.strXoverSelectionMode =
-                                "STOCHASTIC UNIVERSAL SAMPLING";
-                        }
-                        if (option.compareToIgnoreCase("RANDOM") == 0)
-                        {
-                            GAParameters.xoverSelectionMode = 4;
-                            GAParameters.strXoverSelectionMode = "RANDOM";
-                        }
-                    }
                 }
             }
         }
@@ -1173,9 +807,449 @@ public class GAParameters
                 throw new DENOPTIMException(ioe);
             }
         }
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Processes a string looking for keyword and a possibly associated value.
+     * @param line the string to parse
+     * @throws DENOPTIMException
+     */
+
+    public static void interpretKeyword(String line) throws DENOPTIMException
+    {
+        String key = line.trim();
+        String value = "";
+        if (line.contains("="))
+        {
+            key = line.substring(0,line.indexOf("=") + 1).trim();
+            value = line.substring(line.indexOf("=") + 1).trim();
+        }
+        try
+        {
+            interpretKeyword(key,value);
+        }
+        catch (DENOPTIMException e)
+        {
+            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
+        }
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Processes a keyword/value pair and assign the related parameters.
+     * @param key the keyword as string
+     * @param value the value as a string
+     * @throws DENOPTIMException
+     */
+
+    public static void interpretKeyword(String key, String value)
+                                                      throws DENOPTIMException
+    {
+        String msg = "";
+        switch (key.toUpperCase())
+        {
+            case "GA-NUMPARALLELTASKS=":
+            {
+                if (value.length() > 0)
+                {
+                    numParallelTasks = Integer.parseInt(value);
+                }
+                break;
+            }
+            
+            case "GA-PARALLELIZATION=":
+            {
+                switch (value.toUpperCase())
+                {
+                    case "SYNCHRONOUS":
+                        parallelizationScheme = 1;
+                        break;
+                    case "ASYNCHRONOUS":
+                        parallelizationScheme = 2;
+                        break;
+                    default:
+                        throw new DENOPTIMException("Unknown parallelization scheme.");
+                }
+                break;
+            }
         
-        option = null;
-        line = null;
+            case "GA-PRECISIONLEVEL=":
+            {
+                if (value.length() > 0)
+                {
+                    precisionLevel = Integer.parseInt(value);
+                }
+                break;
+            }
+        
+            case "GA-UIDFILEIN=":
+            {
+                if (value.length() > 0)
+                {
+                    uidFileIn = value;
+                }
+                break;
+            }
+        
+            case "GA-UIDFILEOUT=":
+            {
+                if (value.length() > 0)
+                {
+                    uidFileOut = value;
+                }
+                break;
+            }
+            
+            case "GA-MONITORFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    monitorFile = value;
+                }
+                break;
+            }
+            
+            case "GA-MONITORDUMPSTEP=":
+            {
+                if (value.length() > 0)
+                {
+                    monitorDumpStep = Integer.parseInt(value);
+                    dumpMonitor = true;
+                }
+                break;
+            }
+            
+            case "GA-RANDOMSEED=":
+            {
+                if (value.length() > 0)
+                {
+                    seed = Long.parseLong(value);
+                }
+                break;
+            }
+            
+            case "GA-MAXTRIESPERPOPULATION=":
+            {
+                if (value.length() > 0)
+                    maxTriesPerPop  = Integer.parseInt(value);
+                break;
+            }
+            
+            case "GA-MAXGENETICOPSATTEMPTS=":
+            {
+                if (value.length() > 0)
+                    maxGeneticOpAttempts  = Integer.parseInt(value);
+                break;
+            }
+        
+            case "GA-INITPOPLNFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    initPoplnFile = value;
+                }
+                break;
+            }
+        
+            case "GA-PRINTLEVEL=":
+            {
+                if (value.length() > 0)
+                {
+                    print_level = Integer.parseInt(value);
+                }
+                break;
+            }
+        
+            case "GA-SORTBYINCREASINGFITNESS":
+            {
+                if (value.length() > 0)
+                {
+                    sortOrderDecreasing = false;
+                }
+                break;
+            }
+        
+            case "GA-GROWTHMULTIPLIER=":
+            {
+                if (value.length() > 0)
+                {
+                    lvlGrowthMultiplier = Double.parseDouble(value);
+                    useLevelBasedProb = true;
+                }
+                break;
+            }
+        
+            case "GA-LEVELGROWTHSIGMASTEEPNESS=":
+            {
+                if (value.length() > 0)
+                {
+                    lvlGrowthSigmaSteepness = Double.parseDouble(value);
+                    useLevelBasedProb = true;
+                }
+                break;
+            }
+        
+            case "GA-LEVELGROWTHSIGMAMIDDLE=":
+            {
+                if (value.length() > 0)
+                {
+                    lvlGrowthSigmaMiddle = Double.parseDouble(value);
+                    useLevelBasedProb = true;
+                }
+                break;
+            }
+        
+            case "GA-LEVELGROWTHPROBSCHEME=":
+            {
+                lvlGrowthProbabilityScheme = convertProbabilityScheme(value);
+                useLevelBasedProb = true;
+                break;
+            }
+            
+            case "GA-MOLGROWTHMULTIPLIER=":
+            {
+                if (value.length() > 0)
+                {
+                    molGrowthMultiplier = Double.parseDouble(value);
+                    useMolSizeBasedProb = true;
+                }
+                break;
+            }
+        
+            case "GA-MOLGROWTHSIGMASTEEPNESS=":
+            {
+                if (value.length() > 0)
+                {
+                    molGrowthSigmaSteepness = Double.parseDouble(value);
+                    useMolSizeBasedProb = true;
+                }
+                break;
+            }
+        
+            case "GA-MOLGROWTHSIGMAMIDDLE=":
+            {
+                if (value.length() > 0)
+                {
+                    molGrowthSigmaMiddle = Double.parseDouble(value);
+                    useMolSizeBasedProb = true;
+                }
+                break;
+            }
+        
+            case "GA-MOLGROWTHPROBSCHEME=":
+            {
+                molGrowthProbabilityScheme = convertProbabilityScheme(value);
+                useMolSizeBasedProb = true;
+                break;
+            }
+            
+            case "GA-CROWDMULTIPLIER=":
+            {
+                if (value.length() > 0)
+                {
+                    crowdingMultiplier = Double.parseDouble(value);
+                }
+                break;
+            }
+        
+            case "GA-CROWDSIGMASTEEPNESS=":
+            {
+                if (value.length() > 0)
+                {
+                    crowdingSigmaSteepness = Double.parseDouble(value);
+                }
+                break;
+            }
+        
+            case "GA-CROWDSIGMAMIDDLE=":
+            {
+                if (value.length() > 0)
+                {
+                    crowdingSigmaMiddle = Double.parseDouble(value);
+                }
+                break;
+            }
+            
+            case "GA-SYMMETRYPROBABILITY=":
+            {
+                if (value.length() > 0)
+                {
+                    symmetricSubProbability = Double.parseDouble(value);
+                }
+                break;
+            }
+        
+            case "GA-CROWDPROBSCHEME=":
+            {
+                crowdingProbabilityScheme = convertProbabilityScheme(value);
+                break;
+            }
+        
+            case "GA-NUMGENERATIONS=":
+            {
+                if (value.length() > 0)
+                {
+                    numGenerations = Integer.parseInt(value);
+                }
+                break;
+            }
+        
+            case "GA-NUMCHILDREN=":
+            {
+                if (value.length() > 0)
+                {
+                    numOfChildren = Integer.parseInt(value);
+                }
+                break;
+            }
+        
+            case "GA-CROSSOVERWEIGHT=":
+            {
+                if (value.length() > 0)
+                {
+                    crossoverWeight = Double.parseDouble(value);
+                }
+                break;
+            }
+        
+            case "GA-MUTATIONWEIGHT=":
+            {
+                if (value.length() > 0)
+                {
+                    mutationWeight = Double.parseDouble(value);
+                }
+                break;
+            }
+            
+            case "GA-EXCLUDEMUTATIONTYPE=":
+            {
+                if (value.length() > 0)
+                {
+                    excludedMutationTypes.add(MutationType.valueOf(value));
+                }
+                break;
+            }
+            
+            case "GA-CONSTRUCTIONWEIGHT=":
+            {
+                if (value.length() > 0)
+                {
+                    GAParameters.builtAnewWeight = Double.parseDouble(value);
+                }
+                break;
+            }
+            
+            case "GA-REPLACEMENTSTRATEGY=":
+            {
+                switch (value.toUpperCase())
+                {
+                    case "NONE":
+                    	replacementStrategy = 2;
+                        break;
+                    case "ELITIST":
+                        replacementStrategy = 1;
+                        break;
+                    default:
+                        throw new DENOPTIMException("Unknown replacement strategy.");
+                }
+                break;
+            }
+        
+            case "GA-POPULATIONSIZE=":
+            {
+                if (value.length() > 0)
+                {
+                    GAParameters.populationSize = Integer.parseInt(value);
+                }
+                break;
+            }
+        
+            case "GA-NUMCONVGEN=":
+            {
+                if (value.length() > 0)
+                {
+                    GAParameters.numConvGen = Integer.parseInt(value);
+                }
+                break;
+            }
+            
+            case "GA-KEEPNEWRINGSYSTEMVERTEXES":
+            {
+                saveRingSystemsAsTemplatesNonScaff = true;
+                break;
+            }
+            
+            case "GA-KEEPNEWRINGSYSTEMSCAFFOLDS":
+            {
+                saveRingSystemsAsTemplatesScaffolds = true;
+                break;
+            }
+            
+            
+            case "GA-KEEPNEWRINGSYSTEMFITNESSTRSH=":
+            {
+                if (value.length() > 0)
+                {
+                    saveRingSystemsFitnessThreshold = Double.parseDouble(value);
+                }
+                break;
+            }
+            
+            case "GA-MULTISITEMUTATIONWEIGHTS=":
+            {
+                String[] ws = value.split(",|\\s+");
+                List<Double> lst = new ArrayList<Double>();
+                for (String w : ws)
+                {
+                    if (!w.trim().equals(""))
+                        lst.add(Double.parseDouble(w));
+                }
+                mutliSiteMutationWeights = new double[lst.size()];
+                for (int i=0; i<lst.size(); i++)
+                {
+                    mutliSiteMutationWeights[i] = lst.get(i);
+                }
+                break;
+            }
+        
+            case "GA-XOVERSELECTIONMODE=":
+            {
+                if (value.length() > 0)
+                {
+                    GAParameters.xoverSelectionMode = -1;
+                    if (value.compareToIgnoreCase("TS") == 0)
+                    {
+                        GAParameters.xoverSelectionMode = 1;
+                        GAParameters.strXoverSelectionMode = "TOURNAMENT";
+                    }
+                    if (value.compareToIgnoreCase("RWS") == 0)
+                    {
+                        GAParameters.xoverSelectionMode = 2;
+                        GAParameters.strXoverSelectionMode = "ROULETTE WHEEL";
+                    }
+                    if (value.compareToIgnoreCase("SUS") == 0)
+                    {
+                        GAParameters.xoverSelectionMode = 3;
+                        GAParameters.strXoverSelectionMode =
+                            "STOCHASTIC UNIVERSAL SAMPLING";
+                    }
+                    if (value.compareToIgnoreCase("RANDOM") == 0)
+                    {
+                        GAParameters.xoverSelectionMode = 4;
+                        GAParameters.strXoverSelectionMode = "RANDOM";
+                    }
+                }
+                break;
+            }
+            
+            default:
+                msg = "Keyword " + key + " is not a known GeneticAlgorithm-" 
+                        + "related keyword. Check input files.";
+               throw new DENOPTIMException(msg);
+        }
     }
     
 //------------------------------------------------------------------------------

@@ -307,7 +307,7 @@ public class EAUtilsTest
         
         DENOPTIMAttachmentPoint ap2 = g.getVertexAtPosition(0).getAP(2);
         p = EAUtils.getCrowdingProbability(ap2,2,1.0,10,1.0);
-        assertTrue(Math.abs(0.0 - p)<t, "Scheme 2 on ap2");
+        assertTrue(Math.abs(0.5 - p)<t, "Scheme 2 on ap2");
     }
   
 //------------------------------------------------------------------------------
@@ -358,6 +358,32 @@ public class EAUtilsTest
             assertEquals(expected, chosen, "Index of the only choosable " +
                     "vertex");
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testChooseNumberOfSitesToMutate() throws Exception
+    {
+        double[] weights = new double[] {0,0,0,0,1};
+        assertEquals(4,EAUtils.chooseNumberOfSitesToMutate(weights,1.0));
+        assertEquals(4,EAUtils.chooseNumberOfSitesToMutate(weights,0.00000001));
+        
+        weights = new double[] {1,0,0,0,1};
+        assertEquals(4,EAUtils.chooseNumberOfSitesToMutate(weights,1.0));
+        assertEquals(0,EAUtils.chooseNumberOfSitesToMutate(weights,0.00000001));
+        
+        weights = new double[] {1,1,1,1,1};
+        assertEquals(4,EAUtils.chooseNumberOfSitesToMutate(weights,1.0));
+        assertEquals(4,EAUtils.chooseNumberOfSitesToMutate(weights,0.800001));
+        assertEquals(3,EAUtils.chooseNumberOfSitesToMutate(weights,0.799999));
+        assertEquals(3,EAUtils.chooseNumberOfSitesToMutate(weights,0.600001));
+        assertEquals(2,EAUtils.chooseNumberOfSitesToMutate(weights,0.599999));
+        assertEquals(2,EAUtils.chooseNumberOfSitesToMutate(weights,0.400001));
+        assertEquals(1,EAUtils.chooseNumberOfSitesToMutate(weights,0.399999));
+        assertEquals(1,EAUtils.chooseNumberOfSitesToMutate(weights,0.200001));
+        assertEquals(0,EAUtils.chooseNumberOfSitesToMutate(weights,0.199999));
+        assertEquals(0,EAUtils.chooseNumberOfSitesToMutate(weights,0.000001));
     }
     
 //------------------------------------------------------------------------------

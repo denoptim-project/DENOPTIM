@@ -655,11 +655,15 @@ public class EvolutionaryAlgorithm
                     syncronisedTasks.add(task);
                     
                     if (syncronisedTasks.size() 
-                            >= Math.abs(population.size() - newPopSize))
+                            >= Math.abs(population.size() - newPopSize)
+                            ||
+                            //This to avoid the fixed batch size to block the
+                            //generation of new candidates for too long
+                            i >= (0.1 * GAParameters.getPopulationSize() *
+                                    GAParameters.getMaxTriesFactor()))
                     {
                         // Now we have as many tasks as are needed to fill up 
-                        // the population. Therefore, we can run the execution 
-                        // service.
+                        // the population, or we got sick to wait.
                         // TasksBatchManager takes the collection of tasks and
                         // runs them in batches of N, where N is given by the
                         // second argument.

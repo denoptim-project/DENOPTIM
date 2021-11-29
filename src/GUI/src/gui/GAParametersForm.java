@@ -264,6 +264,11 @@ public class GAParametersForm extends ParametersForm
     JLabel lblPar17;
     JTextField txtPar17;
     
+    String keyParMSM = "GA-MultiSiteMutationWeights";
+    JPanel lineParMSM;
+    JLabel lblParMSM;
+    JTextField txtParMSM;
+    
     String keyParWC = "GA-ConstructionWeight";
     JPanel lineParWC;
     JLabel lblParWC;
@@ -1197,6 +1202,22 @@ public class GAParametersForm extends ParametersForm
         localBlock2.add(linePar25);
 
         // From here it's all about advanced options
+        
+        String toolTipParMSM = "<html>Specifies the relative weight of "
+                + "multi-site mutation operations "
+                + "(comma- or space-separated list).</html>";
+        lineParMSM = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblParMSM = new JLabel("Multi-site mutation weight:", SwingConstants.LEFT);
+        lblParMSM.setPreferredSize(fileLabelSize);
+        lblParMSM.setToolTipText(toolTipParMSM);
+        txtParMSM = new JTextField();
+        txtParMSM.setToolTipText(toolTipParMSM);
+        txtParMSM.setPreferredSize(strFieldSize);
+        txtParMSM.getDocument().addDocumentListener(fieldListener);
+        mapKeyFieldToValueField.put(keyParMSM.toUpperCase(),txtParMSM);
+        lineParMSM.add(lblParMSM);
+        lineParMSM.add(txtParMSM);
+        advOptsBlock.add(lineParMSM);
 
         String toolTipPar3 = "Specifies the seed number used by the random number generator";
         linePar3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -1896,6 +1917,7 @@ public class GAParametersForm extends ParametersForm
         sb.append(keyPar15).append("=").append(cmbPar15.getSelectedItem()).append(NL);
         sb.append(getStringIfNotEmpty(keyPar16,txtPar16));
         sb.append(getStringIfNotEmpty(keyPar17,txtPar17));
+        sb.append(getStringIfNotEmpty(keyParMSM,txtParMSM));
         sb.append(getStringIfNotEmpty(keyParWC,txtParWC));
         sb.append(getStringIfNotEmpty(keyPar18,txtPar18));
         sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem()).append(NL);

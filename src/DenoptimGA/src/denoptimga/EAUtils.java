@@ -183,6 +183,39 @@ public class EAUtils
 //------------------------------------------------------------------------------
     
     /**
+     * Takes a decision on how many sites to mutate on a candidate.
+     * @param multiSiteMutationProb the probability (0-1) of multi-site mutation.
+     * @param hit a random real number between 0 and 1.
+     * @return an integer indicating how many mutation to perform.
+     */
+    public static int chooseNumberOfSitesToMutate(double[] multiSiteMutationProb,
+            double hit)
+    {
+        double tot = 0;
+        for (int i=0; i<multiSiteMutationProb.length; i++)
+            tot = tot + multiSiteMutationProb[i];
+        
+        double scaledHit = hit * tot;
+        
+        double min = 0;
+        double max = 0;
+        int choice = 0;
+        for (int i=0; i<multiSiteMutationProb.length; i++)
+        {
+            max = max + multiSiteMutationProb[i];
+            if (min < scaledHit && scaledHit <= max)
+            {
+                choice = i;
+                break;
+            }
+            min = Math.max(min,min+multiSiteMutationProb[i]);
+        }
+        return choice;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Takes a decision on which {@link CandidateSource} method to use for 
      * generating a new {@link Candidate}. The choice is made according to the
      * weights given as arguments, and shooting a random number over a weighted
@@ -430,7 +463,7 @@ public class EAUtils
         String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
         int parentGraphId = parent.getGraph().getGraphId();
         graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
-
+        
         if (!DENOPTIMGraphOperations.performMutation(graph,mnt))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
@@ -2002,7 +2035,9 @@ public class EAUtils
         for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())
         {
             if (oap.getAtomPositionNumber() == ap.getAtomPositionNumber()
-                    && !oap.isAvailable())
+                    && !oap.isAvailableThroughout() 
+                    && oap.getLinkedAP().getOwner().getBuildingBlockType() != 
+                        BBType.CAP)
             {
                 crowdness = crowdness + 1;
             }
