@@ -417,5 +417,10 @@ public final class DENOPTIMConstants
      * that inherit a molecular representation.
      */
     public static final Object LINKAPS = "LINKTOGRAPHSAP";
+
+    /**
+     * Property of AP where we save the original length of the AP vector.
+     */
+    public static final Object APORIGINALLENGTH = "ORIGINALLENGTH";
     
 }

@@ -813,6 +813,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
  
 //-----------------------------------------------------------------------------
 
+    // The Vertex class has properties and getter/setter for properties.
+    // This looks like an overkill and a creates confusion as to where exactly 
+    // are the properties stored. 
+    // TODO: distinguish between the properties of the vertex and those of the 
+    // atom container.
+    
     @Override
     public Object getProperty(Object description)
     {
@@ -820,6 +826,11 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     }
     
 //-----------------------------------------------------------------------------
+    // The Vertex class has properties and getter/setter for properties.
+    // This looks like an overkill and a creates confusion as to where exactly 
+    // are the properties stored. 
+    // TODO: distinguish between the properties of the vertex and those of the 
+    // atom container.
     
     @Override
     public void setProperty(Object description, Object property)
@@ -828,6 +839,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     }
     
 //-----------------------------------------------------------------------------
+    
+    // The Vertex class has properties and getter/setter for properties.
+    // This looks like an overkill and a creates confusion as to where exactly 
+    // are the properties stored. 
+    // TODO: distinguish between the properties of the vertex and those of the 
+    // atom container.
     
     public void setProperties(Map<Object, Object> properties)
     {

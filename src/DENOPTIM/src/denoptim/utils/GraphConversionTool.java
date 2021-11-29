@@ -96,6 +96,7 @@ public class GraphConversionTool
                             cappAPClass).get(0);
                     DENOPTIMVertex capVrt = DENOPTIMVertex.newVertexFromLibrary(
                             capId,BBType.CAP);
+                    capVrt.setVertexId(v.getVertexId());
                     g.appendVertexOnAP(apOnG, capVrt.getAP(0));
                 }
             }

@@ -311,7 +311,6 @@ public class ThreeDimTreeBuilder
                         DENOPTIMMoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
                         apSrc.getAtomPositionNumber())));
                 
-            
                 // Append next building block on AP-vector - start recursion
                 append3DFragmentsViaEdges(mol, graph,
                         apSrc.getAtomPositionNumber(),

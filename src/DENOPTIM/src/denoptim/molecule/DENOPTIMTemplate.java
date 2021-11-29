@@ -473,11 +473,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public boolean containsAtoms()
     {
-        //NB: the mol!=null allows templates readin from file to be displayed
+        //NB: the mol!=null allows templates read-in from file to be displayed
         // even if their graph's vertexes are empty because they were 
         // deserialized from json. Another good reason for having atoms defined
         // the json format...
-        return mol!=null || innerGraph.containsAtoms();
+        return mol!=null 
+                || innerGraph != null ? innerGraph.containsAtoms() : false;
     }
     
 //-----------------------------------------------------------------------------

@@ -1352,7 +1352,11 @@ public class FragmentSpace
 
     /**
      * Extracts a system of one or more fused rings and adds them to the
-     * fragment space if not already present. <b>WARNING</b> 
+     * fragment space if not already present. This method does not
+     * create any molecular geometry in the building block that is stores
+     * in the library. See {@link FragmentSpace#addFusedRingsToFragmentLibrary(DENOPTIMGraph, boolean, boolean, IAtomContainer)}
+     * to include a molecular representation on the stored building block.
+     * <b>WARNING</b> 
      * Expanding the libraries of 
      * building blocks on-the-fly has the potential to overload the memory.
      */
@@ -1363,14 +1367,6 @@ public class FragmentSpace
     // -> remove redundant? The highest-simmetry principle (i.e., rather than 
     //    keeping a template as it is, we'd like to keep its highest symmetry 
     //    isomorphic) would be the first thing to do.
-    
-    //TODO: deal with molecular representation. For each subgraph we want the
-    // corresponding molecular representation with APs and atoms with 
-    // geometrical
-    // features that might be obtained from the results of the fitness provider.
-    // In particular, we should take optimized 3D geometries when the 
-    // geom.optimization
-    // is run within the fitness provider.
     
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph) 
     {
@@ -1420,17 +1416,9 @@ public class FragmentSpace
     //TODO: need something to prevent memory overload: 
     // -> keep only some templates?
     // -> remove those who did not lead to good population members?
-    // -> remove redundant? The highest-simmetry principle (i.e., rather than 
+    // -> remove redundant? The highest-symmetry principle (i.e., rather than 
     //    keeping a template as it is, we'd like to keep its highest symmetry 
     //    isomorphic) would be the first thing to do.
-    
-    //TODO: deal with molecular representation. For each subgraph we want the
-    // corresponding molecular representation with APs and atoms with 
-    // geometric
-    // features that might be obtained from the results of the fitness provider.
-    // In particular, we should take optimised 3D geometries when the 
-    // geom.optimization
-    // is run within the fitness provider.
     
     public static void addFusedRingsToFragmentLibrary(DENOPTIMGraph graph,
             boolean addIfScaffold, boolean addIfFragment, IAtomContainer wholeMol) 

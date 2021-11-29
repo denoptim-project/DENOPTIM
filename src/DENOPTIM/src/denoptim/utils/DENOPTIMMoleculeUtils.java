@@ -936,14 +936,18 @@ public class DENOPTIMMoleculeUtils
      * Selects only the atoms that originate from a subgraph of a whole graph 
      * that originated the whole molecule given as parameter.
      * @param wholeIAC the molecular representation of the whole graph. The 
-     * atoms contained here are expected to be labelled by the property
+     * atoms contained here are expected to be have the property
      * {@link DENOPTIMConstants#ATMPROPVERTEXID}, 
      * which is used to identify which 
      * atoms originated from which vertex of the whole graph.
      * @param subGraph the portion of the whole graph for which we want the 
      * corresponding atoms. The vertexes are expected to have the 
-     * {@link DENOPTIMConstants#STOREDVID} property that defined their original 
-     * vertex ID in the whole graph. Note that the current vertexID of each 
+     * {@link DENOPTIMConstants#STOREDVID} property that defines their original 
+     * vertex ID in the whole graph. These labels are expected to be consistent
+     *  with those in the property
+     * {@link DENOPTIMConstants#ATMPROPVERTEXID} of the <code>wholeIAC</code>
+     * parameter.
+     * Note that the current vertexID of each 
      * vertex can be different from the ID of the original vertex had in the
      * while graph.
      * @return a new container with the requested substructure
@@ -1052,7 +1056,9 @@ public class DENOPTIMMoleculeUtils
             Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
             Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
             double currentLength = srcP3d.distance(trgP3d);
-            //TODO-V3
+            //TODO-V3+? change hard-coded value with property of AP, when such
+            // property will be available, i. e., one refactoring of AP and 
+            // atom coordinates is done.
             double idealLength = 1.53;
             /*
             double idealLength = apInG.getProperty(
@@ -1063,13 +1069,9 @@ public class DENOPTIMMoleculeUtils
             vector.y = srcP3d.y + (trgP3d.y - srcP3d.y)*(idealLength/currentLength);
             vector.z = srcP3d.z + (trgP3d.z - srcP3d.z)*(idealLength/currentLength);
             
-            //TODO-V3 elongate vector to fit original length. Otherwise, is get's
-            // shorter when the target vertex is a capping or RCA group.
-            
             DENOPTIMAttachmentPoint createdAP = frag.addAPOnAtom(srcAtm, 
                     apcMap.get(trgAtmInIAC), vector);
-            createdAP.setProperty(DENOPTIMConstants.LINKAPS, 
-                    mapAtmToAPInG.get(trgAtmInIAC));
+            createdAP.setProperty(DENOPTIMConstants.LINKAPS, apInG);
             
             for (IBond bnd : frag.bonds())
             {

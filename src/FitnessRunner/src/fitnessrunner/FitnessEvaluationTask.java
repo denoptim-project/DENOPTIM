@@ -23,11 +23,13 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.molecule.Candidate;
 import denoptim.molecule.DENOPTIMGraph;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
+import denoptimga.GAParameters;
 
 /**
  * Task that calls the fitness provider
@@ -106,6 +108,12 @@ public class FitnessEvaluationTask extends FitnessTask
             thrownExc = ex;
             ex.printStackTrace();
             throw new DENOPTIMException(ex);
+        }
+        
+        if (FRParameters.addTemplatesToLibraries)
+        {   
+            FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
+                    true, true, fitProvMol);
         }
 
         completed = true;

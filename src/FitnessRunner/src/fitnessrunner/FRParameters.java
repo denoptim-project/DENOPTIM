@@ -64,6 +64,11 @@ public class FRParameters
     private static File outFile = new File("output.sdf");
     
     /**
+     * Flag controlling attempt to add templates to building block libraries
+     */
+    protected static boolean addTemplatesToLibraries = false;
+    
+    /**
      * Verbosity level
      */
     private static int verbosity = 0;
@@ -260,6 +265,9 @@ public class FRParameters
 		    break;
         case "FR-OUTPUT=":
             outFile = new File(value);
+            break;
+        case "FR-EXTRACTTEMPLATES":
+            addTemplatesToLibraries = true;
             break;
         case "FR-VERBOSITY=":
             try
