@@ -608,9 +608,9 @@ public class GUIInspectGARun extends GUICardPanel
 			
 			@Override
 			public void chartMouseClicked(ChartMouseEvent e) 
-			{
+			{   
 				if (e.getEntity() instanceof XYItemEntity)
-				{
+				{   
 					XYDataset ds = ((XYItemEntity)e.getEntity()).getDataset();
 					if (!ds.equals(datasetAllFit))
 					{
@@ -646,10 +646,9 @@ public class GUIInspectGARun extends GUICardPanel
 		// Update series of selected (chart is updated automatically)
         double[][] selectedCandsData = new double[2][1]; //NB: for now allow only one
         int j = -1;
-        for (int i=0; i<1; i++) //NB: for now allow only one
+        for (int i=0; i<1; i++) //NB: for now allow only one selected item
         {	
         	j++;
-        	candsWithFitnessMap.put(j, item);
         	selectedCandsData[0][j] = item.getGeneration();
         	selectedCandsData[1][j] = item.getFitness();
         }
