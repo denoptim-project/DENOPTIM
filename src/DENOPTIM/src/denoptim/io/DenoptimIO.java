@@ -28,6 +28,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,9 +40,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
@@ -453,7 +456,9 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeMoleculeSet(String fileName,
-            ArrayList<IAtomContainer> mols, boolean append) throws DENOPTIMException {
+            ArrayList<IAtomContainer> mols, boolean append) 
+                    throws DENOPTIMException 
+    {
         SDFWriter sdfWriter = null;
         try {
             IAtomContainerSet molSet = new AtomContainerSet();

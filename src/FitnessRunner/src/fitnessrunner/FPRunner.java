@@ -18,6 +18,8 @@
 
 package fitnessrunner;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -30,6 +32,7 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -156,30 +159,6 @@ public class FPRunner
 //------------------------------------------------------------------------------
 
     /**
-     * Looks for exceptions in the subtasks and, if any, store its reference
-     * locally to allow reporting it back from the main thread.
-     * @return <code>true</code> if any of the subtasks has thrown an exception
-     */
-
-    private boolean subtaskHasException()
-    {
-        boolean hasException = false;
-        for (FitnessTask tsk : submitted)
-        {
-            if (tsk.foundException())
-            {
-                hasException = true;
-                thrownByTask = tsk.getException();
-                break;
-            }
-        }
-
-        return hasException;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Create and run the fitness task.
      * @throws Exception 
      */
@@ -190,28 +169,56 @@ public class FPRunner
         StopWatch watch = new StopWatch();
         watch.start();
         
-        //WARNING: assumption of SDF format and single entry!
+        List<DENOPTIMGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+                FRParameters.getInputFile(), FragmentSpace.isDefined());
+        List<IAtomContainer> iacs = DenoptimIO.readSDFFile(
+                FRParameters.getInputFile().getAbsolutePath());
+        if (graphs.size() != iacs.size())
+        {
+            throw new DENOPTIMException("Found " + graphs.size() + " and " 
+                    + iacs.size() + " in " + FRParameters.getInputFile());
+        }
         
-        DENOPTIMGraph graph = DenoptimIO.readDENOPTIMGraphsFromFile(
-                FRParameters.getInputFile(), FragmentSpace.isDefined()).get(0);
-        IAtomContainer iac = DenoptimIO.readSDFFile(
-                FRParameters.getInputFile().getAbsolutePath()).get(0);
-
         tpe.prestartAllCoreThreads();
+        
+        int evaluationCount = 0;
+        for (int i=0; i<graphs.size(); i++)
+        {
+            DENOPTIMGraph graph = graphs.get(i);
+            IAtomContainer iac = iacs.get(i);
+
   
-        FitnessEvaluationTask task = new FitnessEvaluationTask(graph, iac, 
+            FitnessEvaluationTask task = new FitnessEvaluationTask(graph, iac, 
                 FRParameters.getWorkDirectory(), 
-                FRParameters.getOutputFile().getAbsolutePath());
+                FRParameters.getOutputFile().getAbsolutePath()+"_"+i);
 
-        submitted.add(task);
-        futures.add(tpe.submit(task));
-            
+            submitted.add(task);
+            futures.add(tpe.submit(task));
+            evaluationCount++;
+        }
+        
+        // wait a bit for pending tasks to finish
+        tpe.awaitTermination(5, TimeUnit.SECONDS);
         tpe.shutdown();
-
+        
+        for (int i=0; i<graphs.size(); i++)
+        {
+            String s = DenoptimIO.readText(
+                    FRParameters.getOutputFile().getAbsolutePath()+"_"+i);
+            DenoptimIO.writeData(FRParameters.getOutputFile().getAbsolutePath(), 
+                    s, true);
+            FileUtils.deleteQuietly(new File(
+                    FRParameters.getOutputFile().getAbsolutePath()+"_"+i));
+        }
+        
         watch.stop();
-        msg = "Overall time: " + watch.toString() + ". " 
-            + DENOPTIMConstants.EOL
-            + "FitnessRunner run completed." + DENOPTIMConstants.EOL;
+        String plural = "";
+        if (evaluationCount>1)
+            plural = "s";
+        msg = "Overall time: " + watch.toString() + ". " + DENOPTIMConstants.EOL
+                + "Run " + evaluationCount + " evaluation" + plural 
+                + " of fitness." + DENOPTIMConstants.EOL
+                + "FitnessRunner run completed." + DENOPTIMConstants.EOL;
         DENOPTIMLogger.appLogger.log(Level.INFO, msg);
     }
 
