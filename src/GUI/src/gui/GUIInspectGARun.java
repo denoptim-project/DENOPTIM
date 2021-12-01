@@ -525,8 +525,8 @@ public class GUIInspectGARun extends GUICardPanel
         plot.setDataset(1, datasetAllFit);
         plot.setRenderer(1, renderer1);
         renderer1.setSeriesShape(0, shape1);
-        renderer1.setSeriesPaint(0, Color.LIGHT_GRAY);
-        renderer1.setSeriesFillPaint(0, Color.LIGHT_GRAY);
+        renderer1.setSeriesPaint(0, new Color(192, 192, 192, 60));
+        renderer1.setSeriesFillPaint(0, new Color(192, 192, 192, 60));
         renderer1.setSeriesOutlinePaint(0, Color.GRAY);
         renderer1.setUseOutlinePaint(true);
         renderer1.setUseFillPaint(true);
