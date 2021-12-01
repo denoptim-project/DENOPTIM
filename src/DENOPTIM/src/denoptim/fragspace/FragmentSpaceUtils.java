@@ -61,7 +61,7 @@ public class FragmentSpaceUtils
 		for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
 		{
 			DENOPTIMVertex frag = FragmentSpace.getFragmentLibrary().get(j);
-		    classifyFragment(frag,1,j);
+		    classifyFragment(frag,j);
 		}
 	}
 
@@ -70,14 +70,12 @@ public class FragmentSpaceUtils
     /**
      * Classify a fragment in terms of the number of APs and possibly their 
      * type (AP-Class).
-     * @param mol the molecular representation of the fragment
-     * @param type the type of fragment
+     * @param frg the building block to classify
      * @param id the index of the fragment in the library
      * @throws DENOPTIMException
      */
 
-    private static void classifyFragment(DENOPTIMVertex frg, int type, 
-					    int fragId) throws DENOPTIMException
+    static void classifyFragment(DENOPTIMVertex frg,int fragId)
     {   
 		// Classify according to number of APs
         int nAps = frg.getFreeAPCount();
@@ -131,6 +129,9 @@ public class FragmentSpaceUtils
 				    FragmentSpace.getMapFragsAPsPerAPClass().put(cls,outLst);
 				}
 		    }
+		    
+		    if (frg.isRCV())
+		        FragmentSpace.registerRCV(frg);
 		}
     }
     

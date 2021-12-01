@@ -832,6 +832,14 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             filteredTypes.remove(MutationType.DELETELINK);
         }
         
+        if (BBType.SCAFFOLD == getBuildingBlockType())
+        {
+            filteredTypes.remove(MutationType.DELETELINK);
+            filteredTypes.remove(MutationType.CHANGELINK);
+            filteredTypes.remove(MutationType.CHANGEBRANCH);
+            filteredTypes.remove(MutationType.DELETE);
+        }
+        
         filteredTypes.removeAll(excludedTypes);
         
         return filteredTypes;

@@ -198,8 +198,8 @@ public class FPRunner
         }
         
         // wait a bit for pending tasks to finish
-        tpe.awaitTermination(5, TimeUnit.SECONDS);
         tpe.shutdown();
+        tpe.awaitTermination(5, TimeUnit.SECONDS);
         
         for (int i=0; i<graphs.size(); i++)
         {

@@ -87,10 +87,10 @@ public class TestOperator
     
     private static void runMutation() throws DENOPTIMException
     {
-        DENOPTIMGraph g = null;
+        DENOPTIMGraph graph = null;
         try
         {
-            g = DenoptimIO.readDENOPTIMGraphsFromFile(
+            graph = DenoptimIO.readDENOPTIMGraphsFromFile(
                     new File(TestOperatorParameters.inpFileM), true).get(0);
         } catch (Exception e)
         {
@@ -98,74 +98,81 @@ public class TestOperator
         }
     
         System.out.println("Initial graphs: ");
-        System.out.println(g);
+        System.out.println(graph);
         System.out.println(" ");
         MutationType mt = TestOperatorParameters.mutationType;
         
-        DENOPTIMVertex v = null;
-        int[] vidv = TestOperatorParameters.mutationTarget;
-        String str = "";
-        if (vidv.length>1)
+        if (mt != null)
         {
-            for (int i=(vidv.length-1); i>-1; i--)
+            DENOPTIMVertex v = null;
+            int[] vidv = TestOperatorParameters.mutationTarget;
+            String str = "";
+            if (vidv != null && vidv.length>1)
             {
-                if (i==vidv.length-1)
+                for (int i=(vidv.length-1); i>-1; i--)
                 {
-                    str = "[" + vidv[i] + "]";
-                } else {
-                    str = "[" + str + " " + vidv[i] + "] ";
+                    if (i==vidv.length-1)
+                    {
+                        str = "[" + vidv[i] + "]";
+                    } else {
+                        str = "[" + str + " " + vidv[i] + "] ";
+                    }
                 }
-            }
-            System.out.println("Attempting mutation '" + mt + "' on deep "
-                    + "vertex " + str);
-            DENOPTIMVertex outerVertex = null;
-            DENOPTIMGraph innerGraph = g;
-            for (int i=0; i<vidv.length; i++)
-            {
-                if (outerVertex != null && outerVertex instanceof DENOPTIMTemplate)
+                System.out.println("Attempting mutation '" + mt + "' on deep "
+                        + "vertex " + str);
+                DENOPTIMVertex outerVertex = null;
+                DENOPTIMGraph innerGraph = graph;
+                for (int i=0; i<vidv.length; i++)
                 {
-                    innerGraph = ((DENOPTIMTemplate) outerVertex).getInnerGraph();
+                    if (outerVertex != null && outerVertex instanceof DENOPTIMTemplate)
+                    {
+                        innerGraph = ((DENOPTIMTemplate) outerVertex).getInnerGraph();
+                    }
+                    outerVertex = innerGraph.getVertexWithId(vidv[i]);
+                    if (outerVertex == null)
+                    {
+                        System.out.println("VertexID '" + vidv[i] +  "' not found "
+                                + "in graph "+innerGraph);
+                        System.exit(-1);
+                    }
                 }
-                outerVertex = innerGraph.getVertexWithId(vidv[i]);
-                if (outerVertex == null)
+                v = outerVertex;
+            } else {
+                int vid = vidv[0];
+                System.out.println("Attempting mutation '" + mt + "' on vertex " 
+                        + vidv[0]);
+                v = graph.getVertexWithId(vid);
+                if (v == null)
                 {
-                    System.out.println("VertexID '" + vidv[i] +  "' not found "
-                            + "in graph "+innerGraph);
+                    System.out.println("VertexID '" +vid +  "' not found in graph " 
+                            + graph);
                     System.exit(-1);
                 }
             }
-            v = outerVertex;
-        } else {
-            int vid = vidv[0];
-            System.out.println("Attempting mutation '" + mt + "' on vertex " 
-                    + vidv[0]);
-            v = g.getVertexWithId(vid);
-            if (v == null)
+             
+            int apID = TestOperatorParameters.idNewAP;
+            if (mt==MutationType.ADDLINK)
             {
-                System.out.println("VertexID '" +vid +  "' not found in graph " 
-                        + g);
-                System.exit(-1);
+                apID = TestOperatorParameters.idTargetAP;
+                if (apID<0)
+                    throw new DENOPTIMException("ID of target AP is negative.");
             }
-        }
-         
-        int apID = TestOperatorParameters.idNewAP;
-        if (mt==MutationType.ADDLINK)
-        {
-            apID = TestOperatorParameters.idTargetAP;
-            if (apID<0)
-                throw new DENOPTIMException("ID of target AP is negative.");
-        }
-        
-        // NB: last boolean asks to ignore the growth probability
-        DENOPTIMGraphOperations.performMutation(v,mt,true,
-                TestOperatorParameters.idNewVrt, apID, new Monitor());
+            
+            // NB: last boolean asks to ignore the growth probability
+            DENOPTIMGraphOperations.performMutation(v,mt,true,
+                    TestOperatorParameters.idNewVrt, apID, new Monitor());
 
+        } else {
+            System.out.println("Attempting mutation a random mutation on a "
+                    + "random vertex");
+            DENOPTIMGraphOperations.performMutation(graph, new Monitor());
+        }
         System.out.println("Result of mutation:");
-        System.out.println(g);
+        System.out.println(graph);
         System.out.println(" ");
     
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-        IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(g, true);
+        IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
         DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, iac, false);
     }
     

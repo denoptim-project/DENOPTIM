@@ -528,9 +528,10 @@ public class DENOPTIMMoleculeUtils
     public static int getHeavyAtomCount(IAtomContainer mol)
     {
         int n = 0;
-        for (int f = 0; f < mol.getAtomCount(); f++)
+        for (IAtom atm : mol.atoms())
         {
-            if (!mol.getAtom(f).getSymbol().equals("H"))
+            if (DENOPTIMMoleculeUtils.isElement(atm)
+                    && !DENOPTIMMoleculeUtils.getSymbolOrLabel(atm).equals("H"))
                 n++;
         }
         return n;

@@ -1,12 +1,13 @@
 package denoptim.fitness.descriptors;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.fingerprint.BitSetFingerprint;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
-import org.openscience.cdk.fingerprint.ShortestPathFingerprinter;
+import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
 import org.openscience.cdk.fingerprint.Fingerprinter;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
 import org.openscience.cdk.fingerprint.ICountFingerprint;
@@ -21,56 +22,46 @@ import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.DoubleResultType;
 import org.openscience.cdk.qsar.result.IDescriptorResult;
-import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.similarity.Tanimoto;
-import org.openscience.cdk.tools.ILoggingTool;
-import org.openscience.cdk.tools.LoggingToolFactory;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.IDenoptimDescriptor;
-import denoptim.io.DenoptimIO;
 
 
 /**
  * Calculates the molecular similarity against a target compound the
- * fingerprint of which is given as parameter.
+ * fingerprint of which is given as parameter, and using a given list of 
+ * substructures.
  */
 
-public class TanimotoMolSimilarity extends AbstractMolecularDescriptor 
+public class TanimotoMolSimilarityBySubstructure extends AbstractMolecularDescriptor 
 implements IMolecularDescriptor, IDenoptimDescriptor
 {
     //private static ILoggingTool logger = LoggingToolFactory.createLoggingTool(
     //        TanimotoMolSimilarity.class);
     private IBitFingerprint referenceFingerprint;
     private IFingerprinter fingerprinter;
-    private String fingerprinterName = "none";
+    private String[] substructuressmarts;
     private static final String[] PARAMNAMES = new String[] {
-            "fingerprinterImplementation","referenceFingerprint"};
+            "substructuressmarts","referenceFingerprint"};
 
-    private static final String[] NAMES  = {"TanimotoSimilarity"};
+    private static final String[] NAMES  = {"TanimotoSimilarityBySubstructure"};
     
-    /**
-     * Utility for constructing CDK objects
-     */
-    private static IChemObjectBuilder cdkBuilder = 
-            DefaultChemObjectBuilder.getInstance();
-
 //------------------------------------------------------------------------------
     
     /**
      * Constructor for a TanimotoMolSimilarity object
      */
-    public TanimotoMolSimilarity() {}
+    public TanimotoMolSimilarityBySubstructure() {}
 
 //------------------------------------------------------------------------------
       
     /**
      * Get the specification attribute of Tanimoto molecular similarity. Given 
-     * the dependency on the fingerpringer and reference fingerprint, the
+     * the dependency on the substructures list and reference fingerprint, the
      * implementation identifier is made dependent on those two parameters. 
      * Consequently resetting the parameter with two new instances of the 
-     * fingerpringer and reference fingerprint (even is effectively equal) will
+     * substructures and reference fingerprint 
+     * (even is effectively equal) will
      * result in two different DescriptorSpecification objects.
      * @return the specification of this descriptor.
      */
@@ -80,7 +71,8 @@ implements IMolecularDescriptor, IDenoptimDescriptor
         String paramID = ""; 
         if (fingerprinter!=null && referenceFingerprint!=null)
         {
-            paramID = "" + fingerprinterName + referenceFingerprint.hashCode();
+            paramID = "" + substructuressmarts.hashCode() 
+            + referenceFingerprint.hashCode();
         }
         return new DescriptorSpecification("Denoptim source code", 
                 this.getClass().getName(), paramID, "DENOPTIM project");
@@ -89,7 +81,8 @@ implements IMolecularDescriptor, IDenoptimDescriptor
 //------------------------------------------------------------------------------
     
     /**
-     * Gets the parameterNames attribute of the TanimotoMolSimilarity object.
+     * Gets the parameterNames attribute of the 
+     * TanimotoMolSimilarityBySubstructure object.
      * @return the parameterNames value
      */
     @Override
@@ -107,7 +100,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
         {
             return IBitFingerprint.class;
         } else if (name.equals(PARAMNAMES[0])) {
-            return "";
+            return String[].class;
         } else {
             throw new IllegalArgumentException("No parameter for name: "+name);
         }
@@ -116,9 +109,10 @@ implements IMolecularDescriptor, IDenoptimDescriptor
 //------------------------------------------------------------------------------
 
     /**
-     * Set the parameters attribute of TanimotoMolSimilarity object.
-     * The descriptor takes two parameters: the class name of the fingerprinter 
-     * used to generate the fingerprints (e.g., <code>org.openscience.cdk.fingerprint.PubchemFingerprinter</code>), 
+     * Set the parameters attribute of TanimotoMolSimilarityBySubstructure 
+     * object.
+     * The descriptor takes two parameters: the array of substructures defining
+     * the fingerprint bits,
      * and the fingerprint against which we want to calculate similarity.
      * @param params the array of parameters
      */
@@ -127,62 +121,24 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     {
         if (params.length != 2)
         {
-            throw new IllegalArgumentException("TanimotoMolSimilarity only "
-                    + "expects two parameter");
+            throw new IllegalArgumentException(""
+                    + "TanimotoMolSimilarityBySubstructure requires two "
+                    + "parameters");
         }
         if (!(params[1] instanceof IBitFingerprint))
         {
             throw new IllegalArgumentException("Parameter does not implemet "
                     + "IBitFingerprint.");
         }
-        if (!(params[0] instanceof String))
+        if (!(params[0] instanceof String[]))
         {
-            throw new IllegalArgumentException("Parameter is not String (" 
+            throw new IllegalArgumentException("Parameter is not String[] (" 
                     + params[0].getClass().getName() + ").");
         }
 
-        fingerprinterName = params[0].toString();
-        fingerprinter = makeIFingerprinter(fingerprinterName);
+        substructuressmarts = ((String[])params[0]);
+        fingerprinter = new SubstructureFingerprinter(substructuressmarts);
         referenceFingerprint = (IBitFingerprint) params[1];
-    }
-
-//------------------------------------------------------------------------------
- 
-    /*
-     * ASSUMPTION: implementation from package org.openscience.cdk.fingerprint
-     */
-    public static IFingerprinter makeIFingerprinter(String classShortName) 
-            throws CDKException 
-    {
-        IFingerprinter fp = null;
-        try
-        {
-            Class<?> cl = Class.forName("org.openscience.cdk.fingerprint." 
-                    + classShortName);
-            for (Constructor<?> constructor : cl.getConstructors()) 
-            {
-                Class<?>[] params = constructor.getParameterTypes();
-                if (params.length == 0) 
-                {
-                    fp = (IFingerprinter) constructor.newInstance();
-                } else if (params[0].equals(IChemObjectBuilder.class))
-                {
-                    //NB potential source of ambiguity on the builder class
-                    fp = (IFingerprinter) constructor.newInstance(cdkBuilder);
-                }
-            }
-        } catch (Throwable t)
-        {
-            
-            throw new CDKException("Could not make new instance of '" 
-                    + classShortName + "'.", t);
-        }
-        if (fp == null)
-        {
-            throw new CDKException("Could not make new instance of '" 
-                    + classShortName + "'. No suitable constructor found.");
-        }
-        return fp;
     }
     
 //------------------------------------------------------------------------------
@@ -193,7 +149,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     {
         Object[] params = new Object[2];
         params[1] = referenceFingerprint;
-        params[0] = fingerprinterName;
+        params[0] = substructuressmarts;
         return params;
     }
 
@@ -212,19 +168,6 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     @Override
     public DescriptorValue calculate(IAtomContainer mol)
     {
-        if (fingerprinter instanceof ShortestPathFingerprinter)
-        {
-            try
-            {
-                AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
-            } catch (CDKException e1)
-            {
-                throw new IllegalStateException("Could not assign atom types "
-                        + "to calculate fingerprint of input molecule.",
-                        e1);
-            }
-        }
-        
         DoubleResult result;
         if (referenceFingerprint==null)
         {
@@ -273,7 +216,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     @Override
     public String getDictionaryTitle()
     {
-        return "Tanimoto Molecular Similarity";
+        return "Tanimoto Molecular Similarity By Substructures";
     }
     
 //------------------------------------------------------------------------------
@@ -282,15 +225,17 @@ implements IMolecularDescriptor, IDenoptimDescriptor
     @Override
     public String getDictionaryDefinition()
     {
-        return "The Tanimoto Molecular Similarity is calculated between the "
+        return "The Tanimoto Molecular Similarity By Susbtructure "
+                + "considers a given set of substructures to calculate "
+                + "the Tanimoto similarity between the "
                 + "reference fingerprint given upon definition of the "
-                + "descriptor (see parameters), and a molecule given as "
+                + "descriptor (see parameters), and the fingerprint of a "
+                + "molecule given as "
                 + "argument when calculating the value of the descriptor. "
                 + "Fingerprints are obtained from a new instance of"
-                + "<code>IFingerprinter</code>, which is created according to "
-                + "the parameter <code>" + PARAMNAMES[0] + "</code>, "
-                + "and take the form of "
-                + "<code>IFingerprinter.getBitFingerprint(mol)</code>";
+                + "<code>SubstructureFingerprinter</code> defined by the "
+                + "list of SMARTS strings given "
+                + "as parameter <code>" + PARAMNAMES[0] + "</code>.";
     }
 
 //------------------------------------------------------------------------------

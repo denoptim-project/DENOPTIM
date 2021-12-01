@@ -42,14 +42,18 @@ import org.openscience.cdk.fingerprint.Fingerprinter;
 import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
+import org.openscience.cdk.fingerprint.ShortestPathFingerprinter;
+import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.descriptors.TanimotoMolSimilarity;
+import denoptim.fitness.descriptors.TanimotoMolSimilarityBySubstructure;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 
@@ -536,15 +540,34 @@ public class FitnessParameters
                     } else if (parType instanceof String) {
                         p = v.params[j];
                     } else if (parType instanceof Class) {
+                        //TODO Change: this part lacks generality!
                         String type = ((Class<?>) parType).getSimpleName();
                         switch (type)
                         {       
                             case "IBitFingerprint":
-                                // WARNING! we expect this to be found always
-                                // after the corresponding IFingerprinter
-                                // parameter.
-                                p = makeIBitFingerprint(v.params[j], 
-                                        makeIFingerprinter(params[j-1].toString()));
+                                if (impl instanceof TanimotoMolSimilarityBySubstructure)
+                                {
+                                    // WARNING! We esxpect this to be found always
+                                    // after the parameter providing a pathname
+                                    // to a file with substructure smarts.
+                                    p = makeIBitFingerprintBySubstructure(
+                                            v.params[j],((String[])params[j-1]));
+                                } else if (impl instanceof TanimotoMolSimilarity) {
+                                    // WARNING! we expect this to be found always
+                                    // after the corresponding IFingerprinter
+                                    // parameter.
+                                    p = makeIBitFingerprint(v.params[j], 
+                                            makeIFingerprinter(params[j-1].toString()));
+                                } else {
+                                    throw new DENOPTIMException("Descriptor '" 
+                                            + rawDff.getShortName() + "' is "
+                                            + "not expected to need an "
+                                            + "IBitFingerprint parameter.");
+                                }
+                                break;
+                                
+                            case "String[]":
+                                p = makeStringArray(v.params[j]);
                                 break;
                                 
                             default:
@@ -585,6 +608,41 @@ public class FitnessParameters
 	}
 	
 //------------------------------------------------------------------------------
+    
+    private static String[] makeStringArray(String line) throws DENOPTIMException
+    {
+        String key = "FILE:";
+        line = line.trim();
+        if (!line.toUpperCase().startsWith(key))
+        {
+            throw new DENOPTIMException("Presently, parameters of type "
+                    + "'String[]' can only be generated upon "
+                    + "reading a text lines from file. To this end, the "
+                    + "definition of the parameter *MUST* start with '"
+                    + key + "'. Input line '" + line + "' does not.");
+        }
+        
+        String fileName = line.substring(key.length()).trim();
+        ArrayList<String> lst = DenoptimIO.readList(fileName);
+        String[] arr = new String[lst.size()];
+        arr = lst.toArray(arr);
+        return arr;
+    }
+	
+//------------------------------------------------------------------------------
+    
+    /**
+     * For now we only accept a filename from which we read in a molecule
+     * @throws DENOPTIMException 
+     */
+    private static IBitFingerprint makeIBitFingerprintBySubstructure(String line, 
+            String[] smarts) throws DENOPTIMException
+    {
+        IFingerprinter fingerprinter = new SubstructureFingerprinter(smarts);
+        return makeIBitFingerprint(line, fingerprinter);
+    }
+    
+//------------------------------------------------------------------------------
 	
 	/**
 	 * For now we only accept a filename from which we read in a molecule
@@ -613,6 +671,20 @@ public class FitnessParameters
         try
         {
             IAtomContainer ref = DenoptimIO.readSingleSDFFile(fileName);
+            
+            if (fingerprinter instanceof ShortestPathFingerprinter)
+            {
+                try
+                {
+                    AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(ref);
+                } catch (CDKException e1)
+                {
+                    throw new DENOPTIMException("Could not assign atom types "
+                            + "to calculate fingerprint of reference molecule.",
+                            e1);
+                }
+            }
+            
             fp = fingerprinter.getBitFingerprint(ref);
         } catch (CDKException e)
         {

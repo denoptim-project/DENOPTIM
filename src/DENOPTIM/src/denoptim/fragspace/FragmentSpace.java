@@ -97,6 +97,13 @@ public class FragmentSpace
     private static HashMap<APClass, ArrayList<APClass>> compatMap;
 
     /**
+     * Store references to the Ring-Closing Vertexes found in the library of 
+     * fragments.
+     */
+    private static ArrayList<DENOPTIMVertex> rcvs = 
+            new ArrayList<DENOPTIMVertex>();
+    
+    /**
      * Data structure that stores compatible APclasses for joining APs in
      * ring-closing bonds. Symmetric, purpose specific compatibility matrix.
      */
@@ -113,7 +120,7 @@ public class FragmentSpace
      * the growing molecule.
      */
     private static HashMap<APClass, APClass> cappingMap;
-
+    
     /**
      * Data structure that stores AP classes that cannot be held unused
      */
@@ -133,7 +140,7 @@ public class FragmentSpace
      * Clusters of fragments'AP based on AP classes
      */
     private static HashMap<APClass, ArrayList<ArrayList<Integer>>> fragsApsPerApClass;
-
+    
     /**
      * APclass-specific constraints to constitutional symmetry
      */
@@ -1483,6 +1490,10 @@ public class FragmentSpace
                     }
     
                     FragmentSpace.appendVertexToLibrary(t, type, library);
+                    if (type == BBType.FRAGMENT)
+                    {
+                        FragmentSpaceUtils.classifyFragment(t,library.size()-1);
+                    }
                     
                     String destFileName = type == BBType.FRAGMENT ?
                             FragmentSpaceParameters
@@ -1531,6 +1542,29 @@ public class FragmentSpace
                 .map(t -> (DENOPTIMTemplate) t)
                 .map(DENOPTIMTemplate::getInnerGraph)
                 .anyMatch(graph::isIsomorphicTo);
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Adds the reference to a ring-closing vertex (RCV) to the quick-access 
+     * list of RCVs known in this building block space.
+     * @param v the RCV to add to the list.
+     */
+    public static void registerRCV(DENOPTIMVertex v)
+    {
+        rcvs.add(v);
+    }
+  
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the list of registered ring-closing vertexes (RCVs).
+     * @returnthe list of registered ring-closing vertexes (RCVs).
+     */
+    public static ArrayList<DENOPTIMVertex> getRCVs()
+    {
+        return rcvs;
     }
 
 //------------------------------------------------------------------------------

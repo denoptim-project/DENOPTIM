@@ -28,6 +28,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
+import denoptimga.GAParameters;
 
 
 /**
@@ -176,6 +177,12 @@ public class TestOperatorParameters
                 if (line.toUpperCase().startsWith("RC-"))
                 {
                     RingClosureParameters.interpretKeyword(line);
+                    continue;
+                }
+                
+                if (line.toUpperCase().startsWith("GA-"))
+                {
+                    GAParameters.interpretKeyword(line);
                     continue;
                 }
             }

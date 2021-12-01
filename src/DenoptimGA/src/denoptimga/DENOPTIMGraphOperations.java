@@ -563,6 +563,10 @@ public class DENOPTIMGraphOperations
                 continue;
             }
 
+            // Ring closure does not change the size of the molecule, so we
+            // give it an extra chance to occur irrespectively on molecular size
+            // limit, while still subject of crowdedness probability.
+            boolean allowOnlyRingClosure = false;
             if (!force)
             {
                 // Decide whether we want to extend the graph at this AP?
@@ -585,12 +589,22 @@ public class DENOPTIMGraphOperations
                     {
                         System.err.println("Decided not to grow on this AP!");
                     }
-                    continue;
+                    if (RingClosureParameters.allowRingClosures() 
+                            && RandomUtils.nextBoolean(byLevelProb * crowdingProb))
+                    {
+                        if (debug)
+                        {
+                            System.err.println("Decided to close ring, if possible.");
+                        }
+                        allowOnlyRingClosure = true;
+                    } else {
+                        continue;
+                    }
                 }
             }
 
             // Apply closability bias in selection of next fragment
-            if (RingClosureParameters.allowRingClosures() && 
+            if (!allowOnlyRingClosure && RingClosureParameters.allowRingClosures() && 
                       RingClosureParameters.selectFragmentsFromClosableChains())
             {
                 boolean successful = attachFragmentInClosableChain(curVrtx,
@@ -602,8 +616,14 @@ public class DENOPTIMGraphOperations
             }
             
             // find a compatible combination of fragment and AP
-            IdFragmentAndAP chosenFrgAndAp = getFrgApForSrcAp(curVrtx, 
+            IdFragmentAndAP chosenFrgAndAp = null;
+            if (allowOnlyRingClosure)
+            {
+                chosenFrgAndAp = getRCVForSrcAp(curVrtx,apId);
+            } else {
+                chosenFrgAndAp = getFrgApForSrcAp(curVrtx, 
                     apId, chosenVrtxIdx, chosenApId);
+            }
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
             {
@@ -633,7 +653,9 @@ public class DENOPTIMGraphOperations
             // Decide on symmetric substitution within this vertex...
             boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
             SymmetricSet symAPs = new SymmetricSet();
-            if (curVrtx.hasSymmetricAP() && (cpOnSymAPs || symmetryOnAps))
+            if (curVrtx.hasSymmetricAP() 
+                    && (cpOnSymAPs || symmetryOnAps)
+                    && !allowOnlyRingClosure)
             {
                 symAPs = curVrtx.getSymmetricAPs(apId);
 				if (symAPs != null)
@@ -649,9 +671,7 @@ public class DENOPTIMGraphOperations
 				    symAPs = new SymmetricSet();
 				    symAPs.add(apId);
 				}
-            }
-            else
-            {
+            } else {
                 symAPs.add(apId);
             }
 
@@ -797,7 +817,7 @@ public class DENOPTIMGraphOperations
      * sets the choice of the AP (of the incoming vertex) to the 
      * given index.
      * @return the vector of indeces identifying the molId (fragment index) 
-     * os a fragment with a compatible attachment point, and the index of such 
+     * of a fragment with a compatible attachment point, and the index of such 
      * attachment point.
      * @throws DENOPTIMException
      */
@@ -837,7 +857,56 @@ public class DENOPTIMGraphOperations
         }
         return res;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Select a compatible ring-closing vertex for the given attachment point.
+     * @param curVertex the source graph vertex
+     * @param dapidx the attachment point index on the src vertex
+     * @return the vector of indeces identifying the molId (fragment index) 
+     * of a fragment with a compatible attachment point, and the index of such 
+     * attachment point.
+     * @throws DENOPTIMException
+     */
 
+    protected static IdFragmentAndAP getRCVForSrcAp(DENOPTIMVertex curVertex, 
+            int dapidx) throws DENOPTIMException
+    {
+        DENOPTIMAttachmentPoint curDap = curVertex.getAP(dapidx);
+
+        // Initialize with an empty pointer
+        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
+                -1, -1);
+        
+        ArrayList<DENOPTIMVertex> rcvs = FragmentSpace.getRCVs();
+        DENOPTIMVertex chosen = null;
+        if (!FragmentSpace.useAPclassBasedApproach())
+        {
+            chosen = RandomUtils.randomlyChooseOne(rcvs);
+            res = new IdFragmentAndAP(-1,chosen.getBuildingBlockId(),
+                    chosen.getBuildingBlockType(),0,-1,-1);
+        }
+        else
+        {
+            ArrayList<IdFragmentAndAP> candidates = new ArrayList<IdFragmentAndAP>();
+            for (DENOPTIMVertex v : rcvs)
+            {
+                if (curDap.getAPClass().isCPMapCompatibleWith(
+                        v.getAP(0).getAPClass()))
+                {
+                    candidates.add(new IdFragmentAndAP(-1,v.getBuildingBlockId(),
+                            v.getBuildingBlockType(),0,-1,-1));
+                }
+            }
+            if (candidates.size() > 0)
+            {
+                res = RandomUtils.randomlyChooseOne(candidates);
+            }
+        }
+        return res;
+    }
+    
 //------------------------------------------------------------------------------
 
     protected static boolean attachFragmentInClosableChain(

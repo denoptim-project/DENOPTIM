@@ -948,9 +948,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             case CAP:
                 break;
                 
-            case SCAFFOLD:
-                break;
-                
             default:
                 if (getMutationTypes(ignoredTypes).size()>0)
                     lst.add(this);
