@@ -432,7 +432,12 @@ public class EvolutionaryAlgorithm
                 } else {
                     tasks.add(task);
                     if (tasks.size() >= Math.abs(
-                            population.size() - GAParameters.getPopulationSize()))
+                            population.size() - GAParameters.getPopulationSize())
+                            ||
+                            //This to avoid the fixed batch size to block the
+                            //generation of new candidates for too long
+                            i >= (0.1 * GAParameters.getPopulationSize() *
+                                    GAParameters.getMaxTriesFactor()))
                     {
                         // Now we have as many tasks as are needed to fill up the 
                         // population. Therefore we can run the execution service.
