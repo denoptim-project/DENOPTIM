@@ -205,6 +205,8 @@ public class FPRunner
         {
             String s = DenoptimIO.readText(
                     FRParameters.getOutputFile().getAbsolutePath()+"_"+i);
+            // Get rid of trailing newline character
+            s = s.substring(0, s.length()-1);
             DenoptimIO.writeData(FRParameters.getOutputFile().getAbsolutePath(), 
                     s, true);
             FileUtils.deleteQuietly(new File(
