@@ -39,6 +39,13 @@ public enum MutationType {
      * Removes a vertex from a tree and merges remaining branches into the
      * remaining trunk.
      */
-    DELETELINK
+    DELETELINK, 
+    
+    /**
+     * Removes a vertex and all its neighbours recursively until a branching 
+     * point, i.e., until a vertex that is connected to more than two 
+     * non-capping vertexes.
+     */
+    DELETECHAIN
 
 }

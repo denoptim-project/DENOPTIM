@@ -446,6 +446,49 @@ public class DENOPTIMGraphOperations
             return true;
         return false;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Deletes the given vertex and all other vertexes that are not connected to
+     * more than 2 non-capping group vertexes. Effectively, it removes an entire
+     * branch (in acyclic graphs) or the part of a cyclic graph between two 
+     * branching points (in a ring, thus opening the ring wide). The same is 
+     * done on symmetric partners on its parent.
+     * @param vertex the vertex at which the deletion begins.
+     * @param mnt monitoring tool to keep count of events.
+     * @return <code>true</code> if deletion is successful
+     * @throws DENOPTIMException
+     */
+    
+    protected static boolean deleteChain(DENOPTIMVertex vertex, Monitor mnt)
+                                                    throws DENOPTIMException
+    {
+        int vid = vertex.getVertexId();
+        DENOPTIMGraph molGraph = vertex.getGraphOwner();
+
+        if (molGraph.hasSymmetryInvolvingVertex(vertex))
+        {
+            ArrayList<Integer> toRemove = new ArrayList<Integer>();
+            for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
+            {
+                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i); 
+                toRemove.add(svid);
+            }
+            for (Integer svid : toRemove)
+            {
+                molGraph.removeChainUpToBranching(molGraph.getVertexWithId(svid));
+            }
+        }
+        else
+        {
+            molGraph.removeChainUpToBranching(vertex);
+        }
+
+        if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
+            return true;
+        return false;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1806,6 +1849,13 @@ public class DENOPTIMGraphOperations
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+                break;
+                
+            case DELETECHAIN:
+                done = deleteChain(vertex, mnt);
+                if (!done)
+                    mnt.increase(
+                            CounterID.FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN);
                 break;
                 
             case ADDLINK:

@@ -30,6 +30,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSerializationContext;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 
 /**
@@ -289,6 +290,31 @@ public class DENOPTIMRing implements Serializable
             vertices.add(idA,newLink);
         }
         return true;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Measures how many edges there are between two edges along the sequence of
+     * vertexes that defined this fundamental ring.
+     * @param v1
+     * @param v2
+     * @return the distance between the vertexes (i.e., number of edges).
+     * @throws DENOPTIMException if either vertex is not part of this ring.
+     */
+    public int getDistance(DENOPTIMVertex v1, DENOPTIMVertex v2) throws DENOPTIMException
+    {
+        if (!contains(v1))
+            throw new DENOPTIMException("Cannot measure distance along ring "
+                    + "because " + v1 + " does not belong ring " + this);
+        if (!contains(v2))
+            throw new DENOPTIMException("Cannot measure distance along ring "
+                    + "because " + v2 + " does not belong ring " + this);
+        
+        int pV1 = vertices.indexOf(v1);
+        int pV2 = vertices.indexOf(v2);
+        
+        return Math.max(pV1,pV2) - Math.min(pV1, pV2);
     }
 
 //------------------------------------------------------------------------------

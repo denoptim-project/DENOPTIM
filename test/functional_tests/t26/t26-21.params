@@ -1,0 +1,19 @@
+#
+# This must unsuccesful because it is an attempt to delete one
+# atom in a 3-membered ring, thus it woul result in the change of order of
+# the bond between the two remaining atoms.
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-21.sdf
+TESTGENOPS-outFile=graph_mut-21.sdf
+TESTGENOPS-MutationTarget=37
+TESTGENOPS-MutationType=DELETECHAIN
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap.par
+FS-rcCompMatrixFile=RC-CPMap.par
+FS-RotBondsDefFile=rotatableBonds
+

@@ -2192,7 +2192,7 @@ public class DenoptimIO
                 g = DENOPTIMGraph.fromJson(js);
             } catch (Exception e)
             {
-                throw new DENOPTIMException(e.getMessage()+"Check file '" 
+                throw new DENOPTIMException(e.getMessage()+" Check file '" 
                         + fileName + "'", e);
             }
         } else {
