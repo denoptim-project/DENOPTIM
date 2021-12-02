@@ -258,7 +258,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		btnAddGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String[] options = new String[]{"Build", "File", "Cancel"};
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(btnAddGraph,
 		                "<html>Please choose wherther to start creations "
 		                + "of a new graph (Build), "
 		                + "or import graph from file.</html>",
