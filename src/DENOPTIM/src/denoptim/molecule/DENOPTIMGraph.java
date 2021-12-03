@@ -2867,18 +2867,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         getParentTree(replacedByEdge[1], parents1);
         DENOPTIMVertex srcOfNewEdge = null;
         ArrayList<DENOPTIMVertex> chainToRevert = new ArrayList<DENOPTIMVertex>();
-        if (parents0.contains(v))
+        if (replacedByEdge[0]==v || parents0.contains(v))
         {
             srcOfNewEdge = parents1.get(0);
             chainToRevert = parents0;
-        } else if (parents1.contains(v)) {
+        } else if (replacedByEdge[1]==v || parents1.contains(v)) {
             srcOfNewEdge = parents0.get(0);
             chainToRevert = parents1;
         } else {
+            DenoptimIO.writeGraphToJSON(new File("toReproduceBUG.json"), this);
             throw new DENOPTIMException("BUG in removal of vertex with "
                     + "restructoring of edges: either chain must contain the "
                     + "vertex being removed. Please, report this to the "
-                    + "development team.");
+                    + "development team and attach the file "
+                    + "'toReproduceBUG.json' that was just saved to your file "
+                    + "system.");
         }
         
         // Identify the vertexes to be removed from the graph
