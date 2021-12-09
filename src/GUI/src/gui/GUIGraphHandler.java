@@ -35,6 +35,7 @@ import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -273,7 +274,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 					case 0:
 						if (!hasFragSpace)
 						{
-							JOptionPane.showMessageDialog(null,
+							JOptionPane.showMessageDialog(btnAddGraph,
 					                "<html>No fragment space is currently loaded!<br>"
 					                + "You must load a fragment space to build graphs that<br>"
 					                + "contain molecular frgments. <br>"
@@ -290,7 +291,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                         } catch (DENOPTIMException e1)
                         {
                             e1.printStackTrace();
-                            JOptionPane.showMessageDialog(null,
+                            JOptionPane.showMessageDialog(btnAddGraph,
                                     "<html>Could not create graph!<br>"
                                     + "Exception thrown when starting the "
                                     + "construction<br>"
@@ -418,7 +419,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 			public void actionPerformed(ActionEvent e) {	
 				if (!hasFragSpace)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnAddLibVrtx,
 			                "<html>No fragment space is currently "
 			                + "loaded!<br>"
 			                + "You must first load a fragment space before "
@@ -432,7 +433,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				        visualPanel.getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnAddLibVrtx,
 			                "<html>No attachment point selected!<br>"
 			                + "Drag the mouse to select APs.<br> "
 			                + "Click again to unselect.</html>",
@@ -475,7 +476,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                     if (selAps.size() == 0)
                     {
                         //This would overwrite the current graph, so no-go!
-                        JOptionPane.showMessageDialog(null,
+                        JOptionPane.showMessageDialog(btnAddEmptyVrtx,
                                 "<html>No attachment point selected!<br>"
                                 + "Drag the mouse to select APs.<br> "
                                 + "Click again to unselect.</html>",
@@ -501,7 +502,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				        visualPanel.getSelectedNodesInViewer();
 				if (selVrtx.size() == 0)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnDelSel,
 							"<html>No vertex selected! Drag the "
 			                + "mouse to select vertices."
 					        + "<br>Click on background to unselect.</html>",
@@ -518,7 +519,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				{
 					if (v == src)
 					{
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnDelSel,
 								"<html>The scaffold cannot be removed."
 						        + "</html>",
 				                "Error",
@@ -558,7 +559,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                         visualPanel.getSelectedNodesInViewer();               
                 if (selVrtxs.size() != 2)
                 {
-                    JOptionPane.showMessageDialog(null,
+                    JOptionPane.showMessageDialog(btnAddChord,
                             "<html>Number of selected vertices: "
                             + selVrtxs.size() + " <br>"
                             + "Please, drag the mouse and "
@@ -611,17 +612,20 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		JLabel lblShowHideLabels = new JLabel("Show/Hide labels:");
 		
 		btnLabAPC = new JButton("APClass");
-		btnLabAPC.addActionListener(new showHideLabelsListener(LabelType.APC));
+		btnLabAPC.addActionListener(new showHideLabelsListener(btnLabAPC,
+		        LabelType.APC));
 		btnLabAPC.setEnabled(false);
         btnLabAPC.setToolTipText("Show/Hide attachment point class labels.");
         
         btnLabBT = new JButton("Bnd Typ");
-        btnLabBT.addActionListener(new showHideLabelsListener(LabelType.BT));
+        btnLabBT.addActionListener(new showHideLabelsListener(btnLabBT,
+                LabelType.BT));
         btnLabBT.setEnabled(false);
         btnLabBT.setToolTipText("Show/Hide bond type ID labels.");
         
         btnLabBB = new JButton("BB ID");
-        btnLabBB.addActionListener(new showHideLabelsListener(LabelType.BBID));
+        btnLabBB.addActionListener(new showHideLabelsListener(btnLabBB,
+                LabelType.BBID));
         btnLabBB.setEnabled(false);
         btnLabBB.setToolTipText("Show/Hide building block ID labels.");
 		
@@ -774,7 +778,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 						+ "<p>Right-click on the Jmol viewer will open the "
 						+ "Jmol menu. However, any change on the molecular "
 						+ "object will not be saved.</p></html>";
-				JOptionPane.showMessageDialog(null, 
+				JOptionPane.showMessageDialog(btnHelp, 
 						String.format(txt, 500),
 	                    "Tips",
 	                    JOptionPane.PLAIN_MESSAGE);
@@ -787,12 +791,14 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	
 	private class showHideLabelsListener implements ActionListener
 	{
+	    private JComponent parent;
 	    private LabelType labTyp;
 	    private Map<LabelType,Boolean> lastIteration = new HashMap<>();
 	    
-	    public showHideLabelsListener(LabelType labTyp) 
+	    public showHideLabelsListener(JComponent parent, LabelType labTyp) 
 	    {   
 	        this.labTyp = labTyp;
+	        this.parent = parent;
 	        for (LabelType lt : LabelType.values())
 	            lastIteration.put(lt, false);
 	    }
@@ -807,7 +813,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
             }
             else
             {
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(parent,
                         "<html>No elements selected! Drag the "
                         + "mouse to select elements."
                         + "<br>Click on background to unselect.</html>",
@@ -879,7 +885,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
             } catch (DENOPTIMException e1)
             {
                 e1.printStackTrace();
-                JOptionPane.showMessageDialog(null,"Could not make the "
+                JOptionPane.showMessageDialog(this,"Could not make the "
                         + "new graph. " + e1.getMessage(),
                         "Error",
                         JOptionPane.PLAIN_MESSAGE,
@@ -929,7 +935,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	        options = new String[]{"EmptyVertex", "Cancel"};
 	        defaultOpt = options[1];
 	    }
-        int res = JOptionPane.showOptionDialog(null,String.format(msg,350),
+        int res = JOptionPane.showOptionDialog(this,String.format(msg,350),
                 "Specify type of initial building block",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
@@ -976,7 +982,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         }
         if (vrtxLib.size() == 0)
 		{
-			JOptionPane.showMessageDialog(null,"No building blocks of the "
+			JOptionPane.showMessageDialog(this,"No building blocks of the "
 			        + "choosen type.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -1012,7 +1018,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                     firstBBId, scaffFragId, rootType);
         } catch (DENOPTIMException e)
         {
-            JOptionPane.showMessageDialog(null,"Could not retrieve the "
+            JOptionPane.showMessageDialog(this,"Could not retrieve the "
                     + "requested building blocks. " + e.getMessage(),
                     "Error",
                     JOptionPane.PLAIN_MESSAGE,
@@ -1056,7 +1062,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	{
         if (rcvs.size() != 2)
         {
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(this,
                     "<html>Number of selected vertices: "
                     + rcvs.size() + " <br>"
                     + "Please, drag the mouse and "
@@ -1092,7 +1098,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		// For extensions of existing graphs we need to know where to extend
 		if (selAps.size() == 0)
 		{
-			JOptionPane.showMessageDialog(null,"No AP selected in the "
+			JOptionPane.showMessageDialog(this,"No AP selected in the "
 					+ "graph.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -1108,7 +1114,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		String[] options = new String[]{"Any Vertex",
 				"Compatible Vertices ("+compatVrtxs.size()+")",
 				"Capping group"};
-		int res = JOptionPane.showOptionDialog(null,
+		int res = JOptionPane.showOptionDialog(this,
                 "<html>Choose a subset of possible vertices:</html>",
                 "Choose Vertex Subset",
                 JOptionPane.DEFAULT_OPTION,
@@ -1148,7 +1154,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 
 		if (vertxLib.size() == 0)
 		{
-			JOptionPane.showMessageDialog(null,"No fragments in the library",
+			JOptionPane.showMessageDialog(this,"No fragments in the library",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -1193,7 +1199,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
             {
                 dnGraph.appendVertexOnAP(srcAp, trgAp);
             } catch (DENOPTIMException e) {
-                JOptionPane.showMessageDialog(null,"Unable to make new edge. "
+                JOptionPane.showMessageDialog(this,"Unable to make new edge. "
                         + e.getMessage(),
                         "Error",
                         JOptionPane.PLAIN_MESSAGE,
@@ -1390,7 +1396,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 FileFormat[] ffs = {null,
                         FileFormat.GRAPHSDF,
                         FileFormat.GRAPHJSON};
-                int res = JOptionPane.showOptionDialog(null,
+                int res = JOptionPane.showOptionDialog(this,
                     "<html>Failed to detect file type from file's "
                     + "extension.<br>"
                     + "Please, tell me how to interpret file <br>"
@@ -1447,7 +1453,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 						+ "Aborting import of graphs.";
 			}
 			msg = msg + "</html>";
-			JOptionPane.showMessageDialog(null,String.format(msg,400),
+			JOptionPane.showMessageDialog(this,String.format(msg,400),
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
@@ -1464,7 +1470,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	{
 		if (dnGraphLibrary == null)
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "No list of graphs loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,

@@ -306,7 +306,7 @@ public class MoleculeViewPanel extends JSplitPane
 			if (!toleratePartialData)
 			{
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(this,
 		                "<html>Could not load data from file <br>'" + file +"'.",
 		                "Error",
 		                JOptionPane.PLAIN_MESSAGE,

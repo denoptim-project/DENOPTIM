@@ -344,7 +344,7 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				if (!inFile.getName().endsWith(".sdf"))
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnOpenMol,
 			                "<html>Expecting and MDL SDF file, but file<br>'"
 							+ inFile.getAbsolutePath() + "' does not have .sdf"
 							+ " extension.</html>",
@@ -509,7 +509,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				if (selectedAtms.size() == 0)
 				{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnDelSel,
 							"<html>No atom selected! Click on atoms to select"
 					        + " them.<br>Click again to unselect.</html>",
 			                "Error",
@@ -616,7 +616,7 @@ public class GUIVertexInspector extends GUICardPanel
 				catch (Exception ex)
 				{
 					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnSaveVrtxs,
 			                "Could not write to '" + outFile + "'! "
 			                + "Hint: "+ex.getMessage(),
 			                "Error",
@@ -672,7 +672,7 @@ public class GUIVertexInspector extends GUICardPanel
 						+ "of the molecular structure that do not change the "
 						+ "list of atoms au to the last atom decorated with an "
 						+ "attachment point.</p></html>";
-				JOptionPane.showMessageDialog(null, 
+				JOptionPane.showMessageDialog(btnHelp, 
 						String.format(txt, 400),
 	                    "Tips",
 	                    JOptionPane.PLAIN_MESSAGE);
@@ -717,7 +717,7 @@ public class GUIVertexInspector extends GUICardPanel
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "<html>Could not read file '" + file.getAbsolutePath() 
 	                + "'!<br>Hint about reason: " + e.getCause() + "</html>",
 	                "Error",
@@ -854,7 +854,7 @@ public class GUIVertexInspector extends GUICardPanel
             updateVrtxListSpinner();
         } else {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(this,
                     "<html>No vertices to import from the given list.</html>",
                     "Error",
                     JOptionPane.PLAIN_MESSAGE,
@@ -877,7 +877,7 @@ public class GUIVertexInspector extends GUICardPanel
 	{
 		if (verticesLibrary == null)
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "No list of building blocks loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -943,7 +943,7 @@ public class GUIVertexInspector extends GUICardPanel
     		}
     		System.out.println("Connected atoms: "+str);
     		
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "<html>Atom "+ trgAtm.getSymbol() 
 	                + (frag.getAtomNumber(trgAtm)) 
 	                + " has zero or more than one neighbour.<br>I can only "
@@ -967,7 +967,7 @@ public class GUIVertexInspector extends GUICardPanel
     	    frag.addAPOnAtom(srcAtm, APClass.make(apClass), vector);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "<html>Could not make AP.<br>Possible cause: " 
 	                + e.getMessage() +"</html>",
 	                "Error",
@@ -1112,7 +1112,7 @@ public class GUIVertexInspector extends GUICardPanel
     	if (vertexViewer.hasUnsavedAPEdits())
     	{
 			String[] options = new String[]{"Yes","No"};
-			int res = JOptionPane.showOptionDialog(null,
+			int res = JOptionPane.showOptionDialog(this,
 	                "<html>Removing unsaved vertex?",
 	                "Warning",
 	                JOptionPane.DEFAULT_OPTION,

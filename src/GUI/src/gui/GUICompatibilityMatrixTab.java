@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import denoptim.io.DenoptimIO;
@@ -109,7 +110,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				{
 					return;
 				}
-				cpMapHandler.importCPMapFromFile(inFile);
+				cpMapHandler.importCPMapFromFile(btnLoadCPMap,inFile);
 			}
 		});
 		commandsPane.add(btnLoadCPMap);
@@ -130,7 +131,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				String[] options = new String[]{"Cancel", 
 						"Capping Groups",
 						"Scaffolds and Fragments"};
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(btnImportAPClasses,
 		                "What type of building block are the imported "
 		                + "APClasses meant for?",
 		                "Select Role for Imported APClasses",
@@ -167,7 +168,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				{
 					return;
 				}
-				cpMapHandler.writeCopatibilityMatrixFile(outFile);
+				cpMapHandler.writeCopatibilityMatrixFile(btnSaveFrags,outFile);
 				unsavedChanges = false;
 				DenoptimIO.addToRecentFiles(outFile, FileFormat.COMP_MAP);
 			}
@@ -195,7 +196,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 						+ "<li>the list of APClasses that cannot be left "
 						+ "unused (i.e., the forbidden ends)</li>"
 						+ "</ul></p></html>";
-				JOptionPane.showMessageDialog(null, 
+				JOptionPane.showMessageDialog(btnHelp, 
 						String.format(txt, 400),
 	                    "Tips",
 	                    JOptionPane.PLAIN_MESSAGE);
@@ -206,9 +207,9 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	public void importCPMapFromFile(File inFile)
+	public void importCPMapFromFile(JComponent parent, File inFile)
 	{
-		cpMapHandler.importCPMapFromFile(inFile);
+		cpMapHandler.importCPMapFromFile(parent, inFile);
 	}
 
 //-----------------------------------------------------------------------------

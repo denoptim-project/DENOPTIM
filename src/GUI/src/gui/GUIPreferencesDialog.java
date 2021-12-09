@@ -317,7 +317,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 			Integer.parseInt(field.getText());
 		} catch (Exception e) {
 			inputIsOK = false;
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 					"<html>Unacceptable value for '" + name + "'<br>"
 					+ "<br>The value should be an integer.</html>",
 	                "Error",
@@ -336,7 +336,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 		if (!DenoptimIO.canWriteAndReadTo(testFileName))
 		{
 			inputIsOK = false;
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 					"<html>Unacceptable value for '" + name + "'<br>"
 					+ "<br>The pathname should be readable and writable.</html>",
 	                "Error",

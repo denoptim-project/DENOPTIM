@@ -203,7 +203,7 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
             }
             else
             {
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(this,
                         "<html>Parameter '" + key + "' is not recognized<br> and "
                                 + "will be ignored.</html>",
                         "WARNING",

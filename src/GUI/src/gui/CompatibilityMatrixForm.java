@@ -450,7 +450,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 }
                 else
                 {
-        			JOptionPane.showMessageDialog(null,
+        			JOptionPane.showMessageDialog(btnCopyCompRul,
         					"<html>Please, select one and only one source "
         					+ "APCLasss.</html>",
         	                "Error",
@@ -501,7 +501,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 }
                 else
                 {
-                	JOptionPane.showMessageDialog(null,
+                	JOptionPane.showMessageDialog(btnDelCompRul,
         					"<html>Please, click to select at least one source "
         					+ "AP CLasss.</html>",
         	                "Error",
@@ -572,7 +572,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 		+ "with any of the compatible APClasses can be chosen "
                 		+ "to form a bond with any AP annotated with the "
                 		+ "<i>Source APClass</i>.</li></ul></p></html>";
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(btnHelpCPMap,
                         String.format(txt, 400),
                         "Tips",
                         JOptionPane.PLAIN_MESSAGE);
@@ -859,7 +859,7 @@ public class CompatibilityMatrixForm extends JPanel {
                 		+ "<code>Refresh</code> allows also to recover the "
                 		+ "last available and valid bond type value provided "
                 		+ "for any APClass.</p></html>";
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(btnHelpAPClsBO,
                         String.format(txt, 400),
                         "Tips",
                         JOptionPane.PLAIN_MESSAGE);
@@ -1152,7 +1152,7 @@ public class CompatibilityMatrixForm extends JPanel {
                         + "<code>ctrl</code>, "
                         + "<code>cmd</code> depending on your keyboard "
                         + "settings).</p></html>";
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(btnHelpCapping,
                         String.format(txt, 400),
                         "Tips",
                         JOptionPane.PLAIN_MESSAGE);
@@ -1329,7 +1329,7 @@ public class CompatibilityMatrixForm extends JPanel {
 						+ "<code>ctrl</code>, "
 						+ "<code>cmd</code> depending on your keyboard "
 						+ "settings).</p></html>";
-				JOptionPane.showMessageDialog(null, 
+				JOptionPane.showMessageDialog(btnHelpFrbEnd, 
 						String.format(txt, 400),
 	                    "Tips",
 	                    JOptionPane.PLAIN_MESSAGE);
@@ -1597,7 +1597,7 @@ public class CompatibilityMatrixForm extends JPanel {
     
 //-----------------------------------------------------------------------------
 
-	protected void importCPMapFromFile(File inFile)
+	protected void importCPMapFromFile(JComponent parent, File inFile)
 	{	
 		//Read data from file
         compatMap = new HashMap<APClass,ArrayList<APClass>>();
@@ -1612,7 +1612,7 @@ public class CompatibilityMatrixForm extends JPanel {
 						forbiddenEndList);
 			allAPClsInCPMap.addAll(compatMap.keySet());
 		} catch (DENOPTIMException e) {
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(parent,
 					"<html>Could not read compatibility matrix data from "
 					+ "file<br>'" + inFile + "': " + e.getMessage() + "</html>",
 	                "Error",
@@ -1641,16 +1641,17 @@ public class CompatibilityMatrixForm extends JPanel {
 	 * Writes all the compatibility matrix data to the given file. 
 	 * this methods writes all data, that is, compatibility rules, APClass-to-
 	 * bond type, capping rules, and definition of forbidden ends.
+	 * @param parent the component to which the dialog should be bound.
 	 * @param outFile where to write
 	 */
-	public void writeCopatibilityMatrixFile(File outFile)
+	public void writeCopatibilityMatrixFile(JComponent parent, File outFile)
 	{
 		try {
 			DenoptimIO.writeCompatibilityMatrix(outFile.getAbsolutePath(), 
 					compatMap, bondTypeMap, 
 					cappingMap, forbiddenEndList);
 		} catch (DENOPTIMException e) {
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(parent,
 					"<html>Could not write compatibility matrix data to "
 					+ "file<br>'" + outFile + "'</html>",
 	                "Error",

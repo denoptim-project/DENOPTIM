@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -218,7 +219,7 @@ public class FSEParametersForm extends ParametersForm
 	        		if (e1.getMessage().equals("") || e1.getMessage() == null)
 	        		{
 	        			e1.printStackTrace();
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnLoadFSESource,
 								"<html>Exception occurred while importing parameters.<br>Please, report this to the DENOPTIM team.</html>",
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
@@ -226,7 +227,7 @@ public class FSEParametersForm extends ParametersForm
 	        		}
 	        		else
 	        		{
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnLoadFSESource,
 								e1.getMessage(),
 				                "Error",
 				                JOptionPane.ERROR_MESSAGE,
@@ -517,7 +518,7 @@ public class FSEParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 					"<html>Parameter '" + key + "' is not recognized<br> and will be ignored.</html>",
 	                "WARNING",
 	                JOptionPane.WARNING_MESSAGE,

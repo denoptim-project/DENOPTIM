@@ -296,7 +296,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	{
 		if (vertexLibrary == null)
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "No list of vertices loaded.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,

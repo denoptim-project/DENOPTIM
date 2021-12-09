@@ -18,6 +18,8 @@
 
 package gui;
 
+import javax.swing.JComponent;
+
 /**
  * Interface for parameter forms. 
  * This interface requires the existence of a methods that allow recovery of the parameters from the forms.

@@ -462,7 +462,7 @@ public class GraphViewerPanel extends JPanel
                     vMap.get(e.getTrgAP().getOwner()), EdgeType.DIRECTED);
         }
         for (DENOPTIMRing r : dnpGraph.getRings())
-        {
+        {   
             g.addEdge(new JEdge(
                         r.getHeadVertex().getEdgeToParent().getSrcAP(),
                         r.getTailVertex().getEdgeToParent().getSrcAP(), 

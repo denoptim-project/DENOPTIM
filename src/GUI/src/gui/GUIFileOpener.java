@@ -162,7 +162,7 @@ public class GUIFileOpener
 		else
 		{
 			/*
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(parent,
 					"Could not save. Try again.",
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,

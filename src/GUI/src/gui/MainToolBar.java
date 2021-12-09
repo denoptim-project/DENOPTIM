@@ -176,7 +176,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		JMenuItem about = new JMenuItem("About");
 		about.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(about,
                         getAboutPanel(),
                         "About DENOPTIM",
                         JOptionPane.PLAIN_MESSAGE);
@@ -324,7 +324,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 							+ "'%1s'>Failed to detect file type automatically."
 							+ "<br>Please, specify how to interpret file "
 							+ "'" + file.getAbsolutePath() + "'.",270));
-					int res = JOptionPane.showConfirmDialog(null, 
+					int res = JOptionPane.showConfirmDialog(open, 
 							new Object[] {msgText,cmbFiletype}, 
 							"Select file type",
 							JOptionPane.OK_CANCEL_OPTION,
@@ -395,7 +395,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		    				+ "master/doc/user_manual.html";
                     Desktop.getDesktop().browse(new URI(url));
                 } catch (IOException | URISyntaxException e1) {
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(usrManual,
 							"Could not launch the browser to open online "
 							+ "version of the manual.",
 			                "Error",
@@ -563,7 +563,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                     + "Do you want to change the building blocks "
                     + "space? </html>";
             String[] options = new String[]{"Yes", "No"};
-            int res = JOptionPane.showOptionDialog(null,
+            int res = JOptionPane.showOptionDialog(this,
                     String.format(msg,350),                     
                     "Change Space?",
                     JOptionPane.DEFAULT_OPTION,
@@ -635,7 +635,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 			case COMP_MAP:
 				GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
 				mainPanel.add(cpmap);
-				cpmap.importCPMapFromFile(file);
+				cpmap.importCPMapFromFile(mainPanel,file);
 				break;
 				
 				/*
@@ -650,7 +650,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				GUIInspectGARun eiPanel = 
 					new GUIInspectGARun(mainPanel);
 				mainPanel.add(eiPanel);
-				eiPanel.importGARunData(file);
+				eiPanel.importGARunData(file,mainPanel);
 				break;
 				
 			case FSE_RUN:
@@ -666,7 +666,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                 break;
 			
 			default:
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(this,
 						"File format '" + fileFormat + "' not recognized.",
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,

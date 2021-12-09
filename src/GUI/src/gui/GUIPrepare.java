@@ -170,7 +170,7 @@ public class GUIPrepare extends GUICardPanel
 				msg = msg + "<p>Continue?</p></body></html>";
 				//TODO: add capability of running in the background
 				String[] options = new String[]{"Yes", "Cancel"};
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(btnRun,
 						String.format(msg, 450),
 						"WARNING",
 						JOptionPane.DEFAULT_OPTION,
@@ -197,7 +197,7 @@ public class GUIPrepare extends GUICardPanel
 							}
 							location = wrkSpace.getAbsolutePath();
 						} catch (DENOPTIMException e1) {
-							JOptionPane.showMessageDialog(null,
+							JOptionPane.showMessageDialog(btnRun,
 									"Could not start task. " + e1.getMessage()
 									+ ". " + e1.getCause().getMessage(),
 				                    "ERROR",
@@ -205,7 +205,7 @@ public class GUIPrepare extends GUICardPanel
 							return;
 						}
 						
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnRun,
 								"<html>Experiment submitted!<br>"
     								+ "See under " + location+"<br>"
     								+ "or 'File -&gt; Open Recent'</html>",
@@ -241,7 +241,7 @@ public class GUIPrepare extends GUICardPanel
 						}
 						location = wrkSpace.getAbsolutePath();
 					} catch (DENOPTIMException e1) {
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(btnSubmit,
 								"Could not prepare work space. " 
 								+ e1.getMessage()
 								+ ". " + e1.getCause().getMessage(),
@@ -254,7 +254,7 @@ public class GUIPrepare extends GUICardPanel
 					// Should get copies of all input files and place them under 
 					// the same location.
 
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(btnSubmit,
 							"<html>The experiment is all set up under<br>"
 							+ location+"</html>",
 		                    "Prepared. Now, submit!",
@@ -286,7 +286,7 @@ public class GUIPrepare extends GUICardPanel
 	                    + "<br>"
 	                    + "<p>Hover over buttons and parameter fields to get "
 	                    + "informations on a specific parameter.</p></html>";
-				JOptionPane.showMessageDialog(null, 
+				JOptionPane.showMessageDialog(btnHelp, 
 						String.format(txt, 350),
 	                    "Tips",
 	                    JOptionPane.PLAIN_MESSAGE);
@@ -395,7 +395,7 @@ public class GUIPrepare extends GUICardPanel
 			} 
 		    catch (Exception e1) 
 		    {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(this,
 		                e1.getMessage(),
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,
@@ -424,7 +424,7 @@ public class GUIPrepare extends GUICardPanel
 		}
 		catch (IOException io)
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "Could not write to '" + outFile + "'!.",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -483,7 +483,7 @@ public class GUIPrepare extends GUICardPanel
         				|| e1.getMessage() == null)
         		{
         			e1.printStackTrace();
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(this,
 							"<html>Exception occurred while importing"
 							+ "parameters.<br>Please, report this to "
 							+ "the DENOPTIM team.</html>",
@@ -493,7 +493,7 @@ public class GUIPrepare extends GUICardPanel
         		}
         		else
         		{
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(this,
 							e1.getMessage(),
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,

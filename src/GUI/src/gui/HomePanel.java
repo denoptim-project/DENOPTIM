@@ -143,7 +143,7 @@ public class HomePanel extends GUICardPanel
 				mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		        GUIInspectGARun inspector = new GUIInspectGARun(mainPanel);
 		        mainPanel.add(inspector);
-		        inspector.importGARunData(file);
+		        inspector.importGARunData(file,btnReadGAOutput);
 			}
 		});
         JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");

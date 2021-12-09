@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -481,7 +482,7 @@ public class ParametersForm extends JPanel implements IParametersForm
 	public void importSingleParameter(String key, String value) 
 			throws Exception 
   	{
-  	  System.err.println("WARNING: runnin empty method "
+  	  System.err.println("WARNING: running empty method "
               + "'importSingleParameter'. "
               + "A subclass is not overwriting it. "
               + "Report this bug to the development team.");

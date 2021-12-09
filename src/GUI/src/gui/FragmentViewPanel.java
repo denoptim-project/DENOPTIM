@@ -259,7 +259,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 							Cursor.DEFAULT_CURSOR));
 				}
 				String[] options = new String[]{"Yes","No"};
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(this,
 		                "<html>" + cause + ".<br>Keep waiting? (5 sec)</html>",
 		                "Should we wait for another 5 seconds?",
 		                JOptionPane.DEFAULT_OPTION,
@@ -406,7 +406,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			if (data == null || data.equals(""))
 			{
 				String[] options = new String[] {"Build 3D guess","Abandon"}; 
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(this,
 		                "<html>Could not find a valid structure.<br>"
 		                + "Possible reasons are:"
 		                + "<ul>"
@@ -432,7 +432,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 					} catch (CDKException | CloneNotSupportedException 
 							| IOException e1) {
 						e1.printStackTrace();
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(this,
 				                "<html>Could not make 3D structure from SMILES."
 				                + " Cause: '"+e1.getMessage()+"'</html>",
 				                "Error",
@@ -468,7 +468,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			} catch (CDKException | CloneNotSupportedException 
 					| IOException e1) {
 				e1.printStackTrace();
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(this,
 		                "<html>Could not make 3D structure from SMILES. "
 		                + "Cause: '"+e1.getMessage()+"'</html>",
 		                "Error",
@@ -500,7 +500,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		            DENOPTIMVertex.BBType.FRAGMENT);
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "<html>Could not understand Jmol system.</html>",
 	                "Error",
 	                JOptionPane.ERROR_MESSAGE,
@@ -709,7 +709,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		
 		if (fragment == null)
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "<html>No structure loaded.<br>This is most likely a bug "
 			        + "in FragmentViewPanel. "
 	                + "Please report it to the development team.</html>",

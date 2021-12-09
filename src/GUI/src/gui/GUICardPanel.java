@@ -80,21 +80,6 @@ public class GUICardPanel extends JPanel
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Shows a dialog saying that the functionality is not ready yet. 
-	 * Use only during devel phase.
-	 */
-	protected void getNonImplementedError()
-	{
-		JOptionPane.showMessageDialog(null,
-                "Sorry! Function not implemented yet.",
-                "Error",
-                JOptionPane.PLAIN_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"));
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
 	 * Remove the card from the deck of cards and takes care of removing
 	 * also the entry in the list of active tabs.
 	 */
@@ -113,7 +98,7 @@ public class GUICardPanel extends JPanel
 			if (hasUnsavedChanges())
 			{
 				Object[] options = {"Yes","No"};
-				int res = JOptionPane.showOptionDialog(null,
+				int res = JOptionPane.showOptionDialog(parentPanel,
 	                "<html>Found unsaved edits.<br>"
 	                + "Abandon without saving?</html>",
 	                "Abandon?",

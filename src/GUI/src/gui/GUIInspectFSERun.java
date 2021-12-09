@@ -254,7 +254,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	                    + "options</li>"
 	                    + "</ul></p>"
 	                    + "</body></html>";
-				JOptionPane.showMessageDialog(null, String.format(txt, 300),
+				JOptionPane.showMessageDialog(btnHelp, String.format(txt, 300),
                     "Tips",
                     JOptionPane.PLAIN_MESSAGE);
 			}
@@ -305,7 +305,7 @@ public class GUIInspectFSERun extends GUICardPanel
 
 		if (!folder.isDirectory() || !folder.exists())
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 	                "Could not read data from folder '" + folder+ "'!",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -356,7 +356,7 @@ public class GUIInspectFSERun extends GUICardPanel
 					msgPanel.add(text);
 					msgPanel.add(cb);
 					String[] options = new String[]{"Yes", "Abandon"};
-					int res = JOptionPane.showOptionDialog(null,
+					int res = JOptionPane.showOptionDialog(this,
 							msgPanel,
 							"ERROR",
 							JOptionPane.DEFAULT_OPTION,

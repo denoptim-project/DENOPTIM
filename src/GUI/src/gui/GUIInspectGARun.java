@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -298,7 +299,7 @@ public class GUIInspectGARun extends GUICardPanel
 	                    + "options</li>"
 	                    + "</ul></p>"
 	                    + "</body></html>";
-				JOptionPane.showMessageDialog(null, String.format(txt, 300),
+				JOptionPane.showMessageDialog(btnHelp, String.format(txt, 300),
                     "Tips",
                     JOptionPane.PLAIN_MESSAGE);
 			}
@@ -309,11 +310,11 @@ public class GUIInspectGARun extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 
-	public void importGARunData(File file) 
+	public void importGARunData(File file, JComponent parent) 
 	{
 		if (!file.isDirectory() || !file.exists())
 		{
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(parent,
 	                "Could not read data from folder '" + file + "'!",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
@@ -357,7 +358,7 @@ public class GUIInspectGARun extends GUICardPanel
 			
 			if (!DenoptimIO.checkExists(genSummary.getAbsolutePath()))
 			{
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(parent,
 		                "<html>File '" + genSummary + "' not found!<br>"
 		                + "There will be holes in the min/max/mean profile."
 		                + "</html>",
@@ -369,7 +370,7 @@ public class GUIInspectGARun extends GUICardPanel
 				popProperties.put(genId, DenoptimIO.readPopulationProps(
 						genSummary));
 			} catch (DENOPTIMException e2) {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(parent,
 		                "<html>File '" + genSummary + "' not found!<br>"
 		                + "There will be holes in the min/max/mean profile."
 		                + "</html>",
@@ -400,7 +401,7 @@ public class GUIInspectGARun extends GUICardPanel
 					one = DenoptimIO.readLightWeightCandidate(fitFile).get(0);
 				} catch (DENOPTIMException e1) {
 					e1.printStackTrace();
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(parent,
 			                "Could not read data from to '" + fitFile + "'!.",
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
