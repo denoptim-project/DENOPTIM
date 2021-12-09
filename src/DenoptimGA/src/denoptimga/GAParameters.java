@@ -55,6 +55,11 @@ import denoptim.utils.RandomUtils;
 public class GAParameters
 {
     /**
+     * Time stamp identifying this run
+     */
+    public static String timeStamp = "NOTIMESTAMP";
+    
+    /**
      * Pathname to the working directory for the current run
      */
     private static String dataDir = System.getProperty("user.dir");
@@ -1293,7 +1298,8 @@ public class GAParameters
         while (!success)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
-            String str = "RUN" + sdf.format(new Date());
+            timeStamp = sdf.format(new Date());
+            String str = "RUN" + timeStamp;
             dataDir = cdataDir + FS + str;
             success = DenoptimIO.createDirectory(dataDir);
         }

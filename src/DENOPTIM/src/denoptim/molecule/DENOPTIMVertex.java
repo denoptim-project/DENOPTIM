@@ -44,6 +44,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
@@ -825,6 +826,18 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             // Cannot remove the only vertex of a graph
             if (owner.getVertexCount()==0)
                 filteredTypes.remove(MutationType.DELETE);
+            
+            // Cannot start removal of chain from a branching vertex.
+            // NB: "1" is the parent! SInce we count over the list of children,
+            // he parent is not included in the counting.
+            // This "1" should be "0" if this vertex was the scaffold,
+            // but that case is covered by checking the BBType.
+            long nonCap = 1 + owner.getChildVertices(this)
+                .stream()
+                .filter(c -> c.getBuildingBlockType()!=BBType.CAP)
+                .count();
+            if (nonCap != 2)
+                filteredTypes.remove(MutationType.DELETECHAIN);
         }
         
         if (getAttachmentPoints().size()-getFreeAPCountThroughout() < 2)
@@ -834,6 +847,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         
         if (BBType.SCAFFOLD == getBuildingBlockType())
         {
+            filteredTypes.remove(MutationType.DELETECHAIN);
             filteredTypes.remove(MutationType.DELETELINK);
             filteredTypes.remove(MutationType.CHANGELINK);
             filteredTypes.remove(MutationType.CHANGEBRANCH);

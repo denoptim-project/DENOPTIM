@@ -402,7 +402,7 @@ public class DENOPTIMGraphOperations
         
         // delete the vertex and its children and all its symmetric partners
         deleteFragment(vertex);
-        
+
         // extend the graph at this vertex but without recursion
         return extendGraph(parentVrt,false,symmetry,force,chosenVrtxIdx,
                 chosenApId);
@@ -434,16 +434,20 @@ public class DENOPTIMGraphOperations
             }
             for (Integer svid : toRemove)
             {
-                molGraph.removeBranchStartingAt(molGraph.getVertexWithId(svid));
+                DENOPTIMVertex v = molGraph.getVertexWithId(svid);
+                if (v == null)
+                    continue;
+                molGraph.removeBranchStartingAt(v);
             }
         }
         else
         {
-            molGraph.removeBranchStartingAt(molGraph.getVertexWithId(vid));
+            molGraph.removeBranchStartingAt(vertex);
         }
 
         if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
             return true;
+        
         return false;
     }
     
@@ -472,12 +476,16 @@ public class DENOPTIMGraphOperations
             ArrayList<Integer> toRemove = new ArrayList<Integer>();
             for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
             {
-                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i); 
+                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i);
                 toRemove.add(svid);
             }
             for (Integer svid : toRemove)
             {
-                molGraph.removeChainUpToBranching(molGraph.getVertexWithId(svid));
+                DENOPTIMVertex v = molGraph.getVertexWithId(svid);
+                if (v == null || !v.getMutationTypes(new ArrayList<MutationType>())
+                        .contains(MutationType.DELETECHAIN))
+                    continue;
+                molGraph.removeChainUpToBranching(v);
             }
         }
         else
@@ -1717,8 +1725,14 @@ public class DENOPTIMGraphOperations
                 RandomUtils.nextDouble());
         for (int i=0; i<numberOfMutations; i++)
         {
-            doneMutation = performMutation(
-                    RandomUtils.randomlyChooseOne(mutable),mnt);
+            if (i>0)
+            {
+                mutable = graph.getMutableSites(
+                        GAParameters.getExcludedMutationTypes());
+                break;
+            }
+            DENOPTIMVertex v = RandomUtils.randomlyChooseOne(mutable);
+            doneMutation = performMutation(v,mnt);
             if(!doneMutation)
                 break;
         }
@@ -1770,7 +1784,23 @@ public class DENOPTIMGraphOperations
     
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, Monitor mnt) throws DENOPTIMException
-    {  
+    {
+        /*
+        DENOPTIMGraph c = vertex.getGraphOwner().clone();
+        try
+        {
+            return performMutation(vertex, mType, false, -1 ,-1, mnt);
+        } catch (NullPointerException e)
+        {
+            DenoptimIO.writeGraphToJSON(new File("/tmp/failing_"+mType+"_"+vertex.getVertexId()+"_"
+                    + GAParameters.timeStamp + ".json"), c);
+            throw e;
+        } catch (IllegalArgumentException e) {
+            DenoptimIO.writeGraphToJSON(new File("/tmp/failing_"+mType+"_"+vertex.getVertexId()+"_"
+                    + GAParameters.timeStamp +".json"), c);
+            throw e;
+        }
+        */
         return performMutation(vertex, mType, false, -1 ,-1, mnt);
     }
     
@@ -1824,8 +1854,9 @@ public class DENOPTIMGraphOperations
         }
         
         int graphId = graph.getGraphId();
+        int positionOfVertex = graph.indexOf(vertex);
         graph.setLocalMsg(graph.getLocalMsg() + " " + mType + " " 
-                + vertex.getVertexId());
+                + vertex.getVertexId()+"("+positionOfVertex+")");
         
         boolean done = false;
         switch (mType) 
@@ -1896,8 +1927,9 @@ public class DENOPTIMGraphOperations
                 break;
         }
         
-        String msg = "Mutation '" + mType.toString() + "' on vertex " +
-        vertex.toString() + " (graph " + graphId+"): ";
+        String msg = "Mutation '" + mType.toString() + "' on vertex " 
+                + vertex.toString() + " (position " + positionOfVertex
+                + " in graph " + graphId+"): ";
         if (done)
             msg = msg + "done";
         else

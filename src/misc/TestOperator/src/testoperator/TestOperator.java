@@ -170,7 +170,7 @@ public class TestOperator
         System.out.println("Result of mutation:");
         System.out.println(graph);
         System.out.println(" ");
-    
+        
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
         DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, iac, false);

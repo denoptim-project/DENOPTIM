@@ -470,12 +470,12 @@ public class EAUtils
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
             return null;
         }
+        
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
     
         EAUtils.addCappingGroup(graph);
-        
         Object[] res = EAUtils.evaluateGraph(graph);
-
+        
         if (res != null)
         {
             if (!EAUtils.setupRings(res,graph))
@@ -1685,7 +1685,8 @@ public class EAUtils
         // calculate the molecule representation
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         t3d.setAlidnBBsIn3D(false);
-        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
+        IAtomContainer mol = null;
+        mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
 
         if (mol == null)
         { 
