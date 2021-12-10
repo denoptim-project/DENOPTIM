@@ -1,8 +1,8 @@
 #
 TESTGENOPS-OP=MUTATION
-TESTGENOPS-inpFile=graph-22.sdf
-TESTGENOPS-outFile=graph_mut-22.sdf
-TESTGENOPS-MutationTarget=6
+TESTGENOPS-inpFile=graph-28.sdf
+TESTGENOPS-outFile=graph_mut-29.sdf
+TESTGENOPS-MutationTarget=2,21
 TESTGENOPS-MutationType=DELETECHAIN
 
 # Definition of the Fragment Space

@@ -268,7 +268,7 @@ public class TestOperatorParameters
                 mutationTarget = new int[parts.length];
                 for (int i=0; i<parts.length; i++)
                 {
-                    mutationTarget[i] = Integer.parseInt(parts[i]);
+                    mutationTarget[i] = Integer.parseInt(parts[i].trim());
                 }
                 break;
             case "TESTGENOPS-APIDONTARGETVERTEX=":

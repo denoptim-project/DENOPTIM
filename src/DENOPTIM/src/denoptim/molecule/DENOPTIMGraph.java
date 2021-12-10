@@ -2836,7 +2836,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Mutates the graph by removing the chain where a given vertex if located
+     * Mutates the graph by removing the chain where a given vertex is located
      * up to the first branching (i.e., to non-capping group) on either side.
      * The graph is updated accordingly. In particular, the direction of 
      * edges in the surviving graph and the definition of fundamental cycles 
@@ -2852,29 +2852,13 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (rings.isEmpty())
         {
             return false;
-        } else if (rings.size()==1 ) {
-            // Need to make sure this ring is not all there is in this graph.
-            boolean thereIsMore = false;
-            for (DENOPTIMVertex vinr : rings.get(0).getVertices())
-            {
-                int base = 1; // "1" is the parent!
-                if (vinr.getBuildingBlockType()==BBType.SCAFFOLD)
-                    base = 0;
-                long oNonCap = base + getChildVertices(vinr)
-                    .stream()
-                    .filter(or -> or.getBuildingBlockType()!=BBType.CAP)
-                    .count();
-                if (oNonCap > 2)
-                {
-                    thereIsMore = true;
-                    break;
-                }
-            }
-            if (!thereIsMore)
-                return false;
         }
         
         // Identify the RCVs defining the chord that might become an edge
+        // The corresponding ring is the "frame" we'll use throughout this 
+        // operation, and is the smallest ring that is closest to the appointed
+        // vertex.
+        DENOPTIMRing frame = null;
         DENOPTIMVertex[] replacedByEdge = new DENOPTIMVertex[2];
         int minDist = Integer.MAX_VALUE;
         BondType bt = null;
@@ -2885,212 +2869,114 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             if (dist < minDist)
             {
                 minDist = dist;
+                frame = r;
                 replacedByEdge[0] = r.getHeadVertex();
                 replacedByEdge[1] = r.getTailVertex();
                 bt = r.getBondType();
             }
         }
         
-        // Find out which side will remain directly connected to scaffold (edge direction-wise)
-        ArrayList<DENOPTIMVertex> parents0 = new ArrayList<DENOPTIMVertex>();
-        getParentTree(replacedByEdge[0], parents0);
-        ArrayList<DENOPTIMVertex> parents1 = new ArrayList<DENOPTIMVertex>();
-        getParentTree(replacedByEdge[1], parents1);
-        DENOPTIMVertex srcOfNewEdge = null; //that is, in case we do make a new edge...
-        ArrayList<DENOPTIMVertex> pathToRCVAndViaV = 
-                new ArrayList<DENOPTIMVertex>();
-        if (replacedByEdge[0]==v || parents0.contains(v))
+        // Find out where branching vertexes are along the frame ring
+        boolean frameHasBranching = false;
+        List<Integer> branchingPositions = new ArrayList<Integer>();
+        int posOfFocusVrtInRing = frame.getPositionOf(v);
+        for (int i=0; i<frame.getSize(); i++)
         {
-            srcOfNewEdge = parents1.get(0);
-            pathToRCVAndViaV = parents0;
-        } else if (replacedByEdge[1]==v || parents1.contains(v)) {
-            srcOfNewEdge = parents0.get(0);
-            pathToRCVAndViaV = parents1;
-        } else {
-            String bugFile = "toReproduceBUG.json";
-            DenoptimIO.writeGraphToJSON(new File(bugFile), this);
-            throw new DENOPTIMException("BUG in removal of vertex with "
-                    + "restructoring of edges: either chain must contain the "
-                    + "vertex being removed. Please, report this to the "
-                    + "development team and attach the file "
-                    + "'" + bugFile + "' that was just saved to your file "
-                    + "system.");
+            DENOPTIMVertex vi = frame.getVertexAtPosition(i);
+            long oNonCap = vi.getAttachmentPoints().size() 
+                    - vi.getCappedAPCountThroughout()
+                    - vi.getFreeAPCountThroughout();
+            if (oNonCap > 2)
+            {
+                branchingPositions.add(i);
+                frameHasBranching = true;
+            }
+            // We consider the scaffold as a branching point, i.e., it will never be removed
+            if (vi.getBuildingBlockType() == BBType.SCAFFOLD)
+            {
+                branchingPositions.add(i);
+            }
         }
         
-        // Identify the vertexes to be removed from the graph, and
-        // identify portion of path to RCV to revert
-        Set<DENOPTIMVertex> toRemove = new HashSet<DENOPTIMVertex>();
-        // ...first we consider v and any cap on it
-        toRemove.add(v);
-        pathToRCVAndViaV.remove(v);
-        for (DENOPTIMVertex n : getChildVertices(v))
+        // Make sure this ring is not all there is in this graph.
+        if (rings.size()==1 && !frameHasBranching) 
         {
-            if (n.getBuildingBlockType() == BBType.CAP)
-                toRemove.add(n);
+            return false;
         }
-        if (v.isRCV())
+        
+        // Identify the end points of chain that gets removed, i.e., the chain
+        // containing V and is between branchingDownstreamId and 
+        // branchingUpstreamId gets removed.
+        int branchingDownstreamId = -1;
+        for (int i=0; i<frame.getSize(); i++)
         {
-            ArrayList<DENOPTIMRing> rs = getRingsInvolvingVertex(v);
-            if (rs.size()>0)
+            int iTranslated = i + posOfFocusVrtInRing;
+            if (iTranslated >= frame.getSize())
+                iTranslated = iTranslated - frame.getSize();
+            if (branchingPositions.contains(iTranslated))
             {
-                // Assumption (safe) that one RCS belongs only to one ring
-                DENOPTIMRing r = rs.get(0);
-                DENOPTIMVertex h = r.getHeadVertex();
-                DENOPTIMVertex t = r.getTailVertex();
-                DENOPTIMVertex otherEndOfChord = null;
-                if (v==h)
-                    otherEndOfChord = t;
-                else
-                    otherEndOfChord = h;
-                
-                toRemove.add(otherEndOfChord);
-                
-                ArrayList<DENOPTIMVertex> chainOtherSideOfCHord = 
-                        new ArrayList<DENOPTIMVertex>();
-                getParentTree(otherEndOfChord, chainOtherSideOfCHord);
-                for (DENOPTIMVertex oc : chainOtherSideOfCHord)
-                {
-                    if (oc.getBuildingBlockType()==BBType.SCAFFOLD)
-                    {
-                        pathToRCVAndViaV.remove(oc);
-                        break;
-                    }
-                    
-                    // "1" is the parent!
-                    long oNonCap = 1 + getChildVertices(oc)
-                        .stream()
-                        .filter(or -> or.getBuildingBlockType()!=BBType.CAP)
-                        .count();
-                    if (oNonCap > 2)
-                    {
-                        break;
-                    }
-                    
-                    toRemove.add(oc);
-                    pathToRCVAndViaV.remove(oc);
-                    for (DENOPTIMVertex on : getChildVertices(oc))
-                    {
-                        if (on.getBuildingBlockType() == BBType.CAP)
-                            toRemove.add(on);
-                    }
-                }
+                branchingDownstreamId = iTranslated;
+                break;
             }
         }
-        // ...then, we consider the chain that is downstream of v
-        ArrayList<DENOPTIMVertex> childrenOfV = new ArrayList<DENOPTIMVertex>();
-        getChildrenTree(v, childrenOfV);
-        for (DENOPTIMVertex c : childrenOfV)
+        int branchingUpstreamId = -1;
+        for (int i=(frame.getSize()-1); i>-1; i--)
         {
-            if (c.getBuildingBlockType()==BBType.SCAFFOLD)
+            int iTranslated = i + posOfFocusVrtInRing;
+            if (iTranslated >= frame.getSize())
+                iTranslated = iTranslated - frame.getSize();
+            if (branchingPositions.contains(iTranslated))
+            {
+                branchingUpstreamId = iTranslated;
                 break;
-            // "1" is the parent!
-            long nonCap = 1 + getChildVertices(c)
-                    .stream()
-                    .filter(r -> r.getBuildingBlockType() != BBType.CAP)
-                    .count();
-            if (nonCap > 2)
+            }
+        }
+        
+        // Now, collect the vertexes along the ring based on whether they
+        // will be removed or remain (possible with a change of edge direction
+        // and replacement of an RCV pair by edge)
+        List<DENOPTIMVertex> remainingChain = new ArrayList<DENOPTIMVertex>();
+        for (int i=0; i<frame.getSize(); i++)
+        {
+            int iTranslated = i + branchingDownstreamId;
+            if (iTranslated >= frame.getSize())
+                iTranslated = iTranslated - frame.getSize();
+            remainingChain.add(frame.getVertexAtPosition(iTranslated));
+            if (iTranslated == branchingUpstreamId)
             {
                 break;
             }
-            
-            toRemove.add(c);
-            pathToRCVAndViaV.remove(c);
-            for (DENOPTIMVertex n : getChildVertices(c))
-            {
-                if (n.getBuildingBlockType() == BBType.CAP)
-                    toRemove.add(n);
-            }
-            
-            if (c.isRCV())
-            {
-                ArrayList<DENOPTIMRing> rs = getRingsInvolvingVertex(c);
-                if (rs.size()>0)
-                {
-                    // Assumption (safe) that one RCV belongs only to one ring
-                    DENOPTIMRing r = rs.get(0);
-                    DENOPTIMVertex h = r.getHeadVertex();
-                    DENOPTIMVertex t = r.getTailVertex();
-                    DENOPTIMVertex otherEndOfChord = null;
-                    if (c==h)
-                        otherEndOfChord = t;
-                    else
-                        otherEndOfChord = h;
-                    
-                    toRemove.add(otherEndOfChord);
-                    
-                    ArrayList<DENOPTIMVertex> chainOtherSideOfCHord = 
-                            new ArrayList<DENOPTIMVertex>();
-                    getParentTree(otherEndOfChord, chainOtherSideOfCHord);
-                    for (DENOPTIMVertex oc : chainOtherSideOfCHord)
-                    {
-                        if (oc.getBuildingBlockType()==BBType.SCAFFOLD)
-                        {
-                            pathToRCVAndViaV.remove(oc);
-                            break;
-                        }
-                        // "1" is the parent!
-                        long oNonCap = 1 + getChildVertices(oc)
-                            .stream()
-                            .filter(or -> or.getBuildingBlockType()!=BBType.CAP)
-                            .count();
-                        if (oNonCap > 2)
-                        {
-                            break;
-                        }
-                        
-                        toRemove.add(oc);
-                        pathToRCVAndViaV.remove(oc);
-                        for (DENOPTIMVertex on : getChildVertices(oc))
-                        {
-                            if (on.getBuildingBlockType() == BBType.CAP)
-                                toRemove.add(on);
-                        }
-                    }
-                }
-            }
         }
-        // ...finally, we consider the chain that is upstream of v
-        ArrayList<DENOPTIMVertex> parentsOfV = new ArrayList<DENOPTIMVertex>();
-        getParentTree(v, parentsOfV);
-        boolean noMoreRemoval = false;
-        for (DENOPTIMVertex p : parentsOfV)
+        List<DENOPTIMVertex> toRemoveChain = new ArrayList<DENOPTIMVertex>();
+        for (int i=0; i<frame.getSize(); i++)
         {
-            if (p.getBuildingBlockType() == BBType.SCAFFOLD)
+            int iTranslated = i + branchingUpstreamId + 1; //exclude branch point
+            if (iTranslated >= frame.getSize())
+                iTranslated = iTranslated - frame.getSize();
+            toRemoveChain.add(frame.getVertexAtPosition(iTranslated));
+            if (iTranslated == (branchingDownstreamId - 1)) //exclude branch point
             {
-                pathToRCVAndViaV.remove(p);
                 break;
             }
-            
-            // "1" is the parent!
-            long nonCap = 1 + getChildVertices(p)
-                    .stream()
-                    .filter(r -> r.getBuildingBlockType() != BBType.CAP)
-                    .count();
-            if (noMoreRemoval || nonCap > 2)
-            {
-                noMoreRemoval = true;
-                // we need to remove from chainToRevert the vertexes upstream 
-                // of the branching
-                pathToRCVAndViaV.remove(p);
-            } else {
-                toRemove.add(p);
-                for (DENOPTIMVertex n : getChildVertices(p))
-                {
-                    if (n.getBuildingBlockType() == BBType.CAP)
-                        toRemove.add(n);
-                }
-            }
+        }
+        
+        // Also we choose direction as to try to reverse as few edges as possible.
+        if (getLevel(remainingChain.get(0)) > getLevel(
+                remainingChain.get(remainingChain.size()-1)))
+        {
+            Collections.reverse(remainingChain);
         }
         
         // Need to exclude the case where the chain to remove consists only of
         // the RCVs because it would lead to loss of the chord and creation of
-        // cyclic graph.
-        if (toRemove.size() == 2)
+        // cyclic graph. Also, proceeding without making the edge would simply
+        // correspond to removing the chord.
+        if (toRemoveChain.size() == 2)
         {
             int countOrRCVs = 0;
-            for (DENOPTIMVertex vtr : toRemove)
+            for (DENOPTIMVertex vtr : toRemoveChain)
             {
-                if (replacedByEdge[0] == vtr || replacedByEdge[1] == vtr)
+                if (vtr.isRCV())
                     countOrRCVs++;
             }
             if (countOrRCVs == 2)
@@ -3099,74 +2985,135 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         
-        // Identify APs used by the edge that replaces the to-be-removed RCVs
+        // Check if we need to transform a pair of RCVs into an edge, and 
+        // identify APs used by the edge that replaces the to-be-removed RCVs
         DENOPTIMAttachmentPoint apSrcOfNewEdge = null;
         DENOPTIMAttachmentPoint apTrgOfNewEdge = null;
-        for (int i=0;i<2; i++)
+        int nRcvsInRemaining = 0;
+        for (DENOPTIMVertex vir : remainingChain)
         {
-            DENOPTIMVertex vToBeRemoved = replacedByEdge[i];
-            if (vToBeRemoved.getParent() == srcOfNewEdge)
-                apSrcOfNewEdge = vToBeRemoved.getEdgeToParent().getSrcAP();
-            else
-                apTrgOfNewEdge = vToBeRemoved.getEdgeToParent().getSrcAP();
+            if (vir == frame.getHeadVertex() || vir == frame.getTailVertex())
+            {
+                if (nRcvsInRemaining < 1)
+                {
+                    apSrcOfNewEdge = vir.getEdgeToParent().getSrcAP();
+                    nRcvsInRemaining++;
+                } else {
+                    apTrgOfNewEdge = vir.getEdgeToParent().getSrcAP();
+                    nRcvsInRemaining++;
+                }
+            }
         }
-        
-        // Replace the RCVs with an edge
-        removeVertex(replacedByEdge[0]);
-        removeVertex(replacedByEdge[1]);
+        if (nRcvsInRemaining==2) // can be 0, but I do not see how this could ever be 1
+        {
+            // Replace the RCVs that will be replaced by an edge
+            removeVertex(replacedByEdge[0]);
+            remainingChain.remove(replacedByEdge[0]);
+            removeVertex(replacedByEdge[1]);
+            remainingChain.remove(replacedByEdge[1]);
+            //NB: the compatibility between the APs should be granted by the 
+            // previous existence of the chord. so no need to check 
+            // apSrcOfNewEdge.getAPClass().isCPMapCompatibleWith(
+            //        apTrgOfNewEdge.getAPClass()))
+            addEdge(new DENOPTIMEdge(apSrcOfNewEdge, apTrgOfNewEdge, bt));
+        } else {
+            // We remove the frame already, otherwise we will try to recreate 
+            // such ring from RCVs and waste time with it.
+            removeRing(frame);
+        }
         
         // Remember all chord that will have to be recreated
         Map<DENOPTIMVertex,DENOPTIMVertex> chordsToRecreate = 
                 new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
-
         Map<DENOPTIMVertex,BondType> chordsToRecreateBB = 
                 new HashMap<DENOPTIMVertex,BondType>();
-       
-        // Change direction of edges that have to be reversed
-
-        ArrayList<DENOPTIMVertex> chainToRevert = pathToRCVAndViaV;
-        for (int i=(chainToRevert.size()-1); i>0; i--)
+        
+        // Change direction of those edges that have to be reversed as a 
+        // consequence of the change in the spanning tree
+        if (remainingChain.size()>1)
         {
-            DENOPTIMVertex vOnTheWay = chainToRevert.get(i);
-            List<DENOPTIMRing> ringsToRemove = new ArrayList<DENOPTIMRing>();
-            for (DENOPTIMRing r : getRingsInvolvingVertex(vOnTheWay))
+            for (int i=1; i<remainingChain.size(); i++)
             {
-                ringsToRemove.add(r);
-                chordsToRecreate.put(r.getHeadVertex(), r.getTailVertex());
-                chordsToRecreateBB.put(r.getHeadVertex(), r.getBondType());
-            }
-            for (DENOPTIMRing r : ringsToRemove)
-            {
-                removeRing(r);
-            }
-            DENOPTIMEdge oldEdge = chainToRevert.get(i-1).getEdgeToParent();
-            BondType oldBt = oldEdge.getBondType();
-            DENOPTIMAttachmentPoint newSrcAP = oldEdge.getTrgAP();
-            DENOPTIMAttachmentPoint newTrgAP = oldEdge.getSrcAP();
-            if (newSrcAP.getAPClass().isCPMapCompatibleWith(
-                    newTrgAP.getAPClass()))
-            {
-                removeEdge(oldEdge);
-                addEdge(new DENOPTIMEdge(newSrcAP, newTrgAP, oldBt));
-            } else {
-                // There is a non-reversible connection along the way, therefore
-                // we cannot do this mutation
-                return false;
+                DENOPTIMVertex vOnTheWay = remainingChain.get(i);
+                DENOPTIMVertex vPrevious = remainingChain.get(i-1);
+                List<DENOPTIMRing> ringsToRemove = new ArrayList<DENOPTIMRing>();
+                for (DENOPTIMRing r : getRingsInvolvingVertex(vOnTheWay))
+                {
+                    ringsToRemove.add(r);
+                    chordsToRecreate.put(r.getHeadVertex(), r.getTailVertex());
+                    chordsToRecreateBB.put(r.getHeadVertex(), r.getBondType());
+                }
+                for (DENOPTIMRing r : ringsToRemove)
+                {
+                    removeRing(r);
+                }
+                
+                DENOPTIMEdge edgeToPrevious = vOnTheWay.getEdgeWith(vPrevious);
+                if (edgeToPrevious == null) 
+                {
+                    // Since we have already made the new edge this should never happen
+                    String debugFile = "debug_"+v.getVertexId()+".json";
+                    DenoptimIO.writeGraphToJSON(new File(debugFile), this);
+                    throw new DENOPTIMException("Unconnected vertexes "  
+                            + vOnTheWay.getVertexId() + " and "
+                            + vPrevious.getVertexId() + ". Unable to deal with "
+                            + "removal of " + v + " from ring " + frame 
+                            + " in graph " + this.getGraphId() 
+                            + ". See graph in " + debugFile);
+                } else {
+                    if (edgeToPrevious.getSrcAP().getOwner() == vOnTheWay) // edge goes backwards
+                    {
+                        // This is an edge that has to be reversed.
+                        DENOPTIMAttachmentPoint newSrcAP = 
+                                edgeToPrevious.getTrgAP();
+                        DENOPTIMAttachmentPoint newTrgAP = 
+                                edgeToPrevious.getSrcAP();
+                        if (newSrcAP.getAPClass().isCPMapCompatibleWith(
+                                newTrgAP.getAPClass()))
+                        {
+                            BondType oldBt = edgeToPrevious.getBondType();
+                            removeEdge(edgeToPrevious);
+                            addEdge(new DENOPTIMEdge(newSrcAP, newTrgAP, oldBt));
+                        } else {
+                            // There is a non-reversible connection along the way, therefore
+                            // we cannot do this mutation
+                            return false;
+                        }
+                    }
+                }
             }
         }
-       
-        // Make the new edge
-        //NB: the compatibility between the APs should be granted by the 
-        // previous existence of the chord. so no need to check 
-        // apSrcOfNewEdge.getAPClass().isCPMapCompatibleWith(
-        //        apTrgOfNewEdge.getAPClass()))
-        addEdge(new DENOPTIMEdge(apSrcOfNewEdge, apTrgOfNewEdge, bt));
-    
-        
-        // delete the children vertices and associated edges
-        for (DENOPTIMVertex tr : toRemove) 
+           
+        // Delete the chain to be removed
+        for (DENOPTIMVertex vtr : toRemoveChain) 
         {
-            removeVertex(tr);
+            // This works across template boundaries!
+            for (DENOPTIMVertex child : vtr.getChildrenThroughout())
+            {
+                if (remainingChain.contains(child)
+                        || toRemoveChain.contains(child))
+                    continue;
+                DENOPTIMGraph ownerOfChild = child.getGraphOwner();
+                ownerOfChild.removeVertex(child);
+            }
+            if (templateJacket!= null)
+            {
+                List<DENOPTIMAttachmentPoint> apProjectionsToRemove = 
+                        new ArrayList<DENOPTIMAttachmentPoint>();
+                for (DENOPTIMAttachmentPoint outerAP : 
+                    templateJacket.getAttachmentPoints())
+                {
+                    DENOPTIMAttachmentPoint innerAP = 
+                            templateJacket.getInnerAPFromOuterAP(outerAP);
+                    if (innerAP.getOwner() == vtr)
+                    {
+                        apProjectionsToRemove.add(innerAP);
+                    }
+                }
+                for (DENOPTIMAttachmentPoint apToRemove : apProjectionsToRemove)
+                    templateJacket.removeProjectionOfInnerAP(apToRemove);
+            }
+            removeVertex(vtr);
         }
         
         // Regenerate the rings that have been affected
@@ -3175,35 +3122,45 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             addRing(h, chordsToRecreate.get(h), chordsToRecreateBB.get(h));
         }
         
-        // Symmetry relation need to reflect the change of topology.
-        ArrayList<DENOPTIMVertex> affectedByTopologyChange = 
-                new ArrayList<DENOPTIMVertex>();
-        getChildrenTree(apTrgOfNewEdge.getOwner(), affectedByTopologyChange);
-        affectedByTopologyChange.add(apTrgOfNewEdge.getOwner());
-        for (DENOPTIMVertex av : affectedByTopologyChange)
+        // Symmetry relation need to be compared with the change of topology.
+        // The worst that can happen is that two vertexes that are
+        // listed as symmetric are, instead, one the (grand)parent of 
+        // the other. This is inconsistent with the expectations when
+        // dealing with any operation with symmetric vertexes.
+        // A different level does NOT imply a parent-child relation,
+        // but is a sign that the topology has changed substantially,
+        // and that the symmetric relation is, most likely, not sensible
+        // anymore.
+        List<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
+        Iterator<SymmetricSet> ssIter = getSymSetsIterator();
+        while (ssIter.hasNext())
         {
-            boolean foundInconsistency = false;
-            int levelAV = getLevel(av);
-            for (DENOPTIMVertex sv : getSymVertexesForVertex(av))
+            SymmetricSet ss = ssIter.next();
+            int level = -2;
+            for (Integer vid : ss.getList())
             {
-                if (av==sv)
-                    continue;
-                // NB: the worst that can happen is that two vertexes that are
-                // listed as symmetric are, instead, one the (grand)parent of 
-                // the other. This is inconsistent with the expectations when
-                // dealing with any operation with symmetric vertexes.
-                // A different level does NOT imply a parent-child relation,
-                // but is a sign that the topology has changed substantially,
-                // and that the symmetric relation is, most likely, not sensible
-                // anymore. 
-                if (levelAV != getLevel(sv))
+                if (level==-2)
                 {
-                    foundInconsistency = true;
-                    break;
+                    level = getLevel(getVertexWithId(vid));
+                } else {
+                    if (level != getLevel(getVertexWithId(vid)))
+                    {
+                        ssToRemove.add(ss);
+                        break;
+                    }
                 }
             }
-            if (foundInconsistency)
-                removeSymmetrySet(getSymSetForVertex(av));
+        }
+        for (SymmetricSet ss : ssToRemove)
+            removeSymmetrySet(ss);
+        
+        // The free-ed up APs need to be projected to template's surface
+        if (templateJacket!= null)
+        {
+            for (DENOPTIMAttachmentPoint innerAP : getAvailableAPs())
+            {
+                templateJacket.addInnerToOuterAPMapping(innerAP);
+            }
         }
         
         return true;

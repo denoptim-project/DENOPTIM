@@ -828,15 +828,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 filteredTypes.remove(MutationType.DELETE);
             
             // Cannot start removal of chain from a branching vertex.
-            // NB: "1" is the parent! SInce we count over the list of children,
-            // he parent is not included in the counting.
-            // This "1" should be "0" if this vertex was the scaffold,
-            // but that case is covered by checking the BBType.
-            long nonCap = 1 + owner.getChildVertices(this)
-                .stream()
-                .filter(c -> c.getBuildingBlockType()!=BBType.CAP)
-                .count();
-            if (nonCap != 2)
+            long nonCap = getAttachmentPoints().size() 
+                    - getCappedAPCountThroughout()
+                    - getFreeAPCountThroughout();
+            if (nonCap > 2)
                 filteredTypes.remove(MutationType.DELETECHAIN);
         }
         
@@ -955,7 +950,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * (can be empty list, but not null)
      */
 
-    public ArrayList<DENOPTIMAttachmentPoint> getAPsFromChilddren() 
+    public ArrayList<DENOPTIMAttachmentPoint> getAPsFromChildren() 
     {
         ArrayList<DENOPTIMAttachmentPoint> apsOnChildren = 
                 new ArrayList<DENOPTIMAttachmentPoint>();
@@ -979,6 +974,36 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * Looks into the edges that use any of the APs that belong to 
      * this vertex and returns the list of vertices which are target of any 
      * edge departing from this vertex. Only the directly connected children
+     * are considered (no recursion). This method does cross template 
+     * boundaries, thus it includes also children belonging to uprooted graph, 
+     * but does not get into embedded graph at the child side, i.e., each child 
+     * is the outermost recursion levels.
+     * @return the list of child vertices (can be empty list, but not null)
+     */
+
+    public ArrayList<DENOPTIMVertex> getChildrenThroughout() 
+    {
+        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        {
+            DENOPTIMEdge user = ap.getEdgeUserThroughout();
+            if (user == null)
+                continue;
+            
+            if (ap.isSrcInUserThroughout())
+            {
+                children.add(user.getTrgAP().getOwner());
+            }
+        }
+        return children;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into the edges that use any of the APs that belong to 
+     * this vertex and returns the list of vertices which are target of any 
+     * edge departing from this vertex. Only the directly connected children
      * are considered (no recursion). This method does not cross template 
      * boundaries, thus all children belong to the same graph.
      * @return the list of child vertices (can be empty list, but not null)
@@ -990,7 +1015,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
         {
             // NB: this is meant to NOT cross template boundaries, so that all
-            // childres do belong to the same graph.
+            // children do belong to the same graph.
             DENOPTIMEdge user = ap.getEdgeUser();
             if (user == null)
                 continue;
@@ -1181,6 +1206,30 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     public boolean connectedTo(DENOPTIMVertex other)
     {
         return this.getParent() == other || this == other.getParent();
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Finds the edge between this and the other vertex, if it exists.
+     * @param other the vertex we expect to be linked to this vertex.
+     * @return the edge or null if no connection exists between the two.
+     */
+    public DENOPTIMEdge getEdgeWith(DENOPTIMVertex other)
+    {
+        if (this.owner != null && other.owner !=null
+                && this.owner == other.owner)
+        {
+            for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+            {
+                DENOPTIMAttachmentPoint linkedAp = ap.getLinkedAP();
+                if (linkedAp == null)
+                    continue;
+                if (linkedAp.getOwner()==other)
+                    return ap.getEdgeUser();
+            }
+        }
+        return null;
     }
     
 //------------------------------------------------------------------------------

@@ -318,6 +318,17 @@ public class DENOPTIMRing implements Serializable
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * @param v the vertex to search for
+     * @return the index of that vertex (first instance), or -1 if that vertex 
+     * is not part of the ring.
+     */
+    public int getPositionOf(DENOPTIMVertex v)
+    {
+        return vertices.indexOf(v);
+    }
 
+//------------------------------------------------------------------------------
 
 }

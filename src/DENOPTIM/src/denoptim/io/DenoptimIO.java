@@ -2450,7 +2450,7 @@ public class DenoptimIO
             if (make3D)
             {
                 try {
-                    iac = tb.convertGraphTo3DAtomContainer(g);
+                    iac = tb.convertGraphTo3DAtomContainer(g,true);
                 } catch (Throwable t) {
                     t.printStackTrace();
                     System.out.println("Couldn't make 3D-tree representation: "
