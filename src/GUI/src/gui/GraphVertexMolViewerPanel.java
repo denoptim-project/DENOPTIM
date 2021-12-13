@@ -150,7 +150,12 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		setRightComponent(graphViewer);
 		graphViewer.addPropertyChangeListener(
 				new PropertyChangeListenerProxy(
-						"NODECLICKED", new NodeClickedListener()));
+						GraphViewerPanel.PROPERTYNODECLICKED, 
+						new NodeClickedListener()));
+        graphViewer.addPropertyChangeListener(
+                new PropertyChangeListenerProxy(
+                        GraphViewerPanel.PROPERTYMOUSEMODE, 
+                        new MouseModeChoiceListener()));
 		
 		fragViewerPanel = new JPanel(new BorderLayout());
 		fragViewerHeader = new JPanel();
@@ -426,7 +431,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 */
 	private class NodeClickedListener implements PropertyChangeListener
 	{
-		
 		@Override
 		public void propertyChange(PropertyChangeEvent evt) 
 		{   
@@ -488,6 +492,34 @@ public class GraphVertexMolViewerPanel extends JSplitPane
             }
 		}
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Listener for identifying the node on which the user has clicked and 
+     * load the corresponding fragment into the fragment viewer pane.
+     */
+    private class MouseModeChoiceListener implements PropertyChangeListener
+    {
+        
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) 
+        { 
+            switch ((Integer)evt.getNewValue())
+            {
+                case 0:
+                    setMouseMode(ModalGraphMouse.Mode.PICKING);
+                    break;
+                    
+                case 1:
+                    setMouseMode(ModalGraphMouse.Mode.TRANSFORMING);
+                    break;
+                
+                default:
+                    System.out.println("WARNING: invalid mouse mode request!");
+            }
+        }
+    }
 	
 //-----------------------------------------------------------------------------
 	

@@ -104,6 +104,10 @@ public class GraphViewerPanel extends JPanel
 	
     public enum JVertexType {SCAF, FRAG, CAP, RCV, AP, NONE};
     
+    // Properties fired y this class and intercepted in parent containers
+    public static final String PROPERTYNODECLICKED = "NODECLICKED";
+    public static final String PROPERTYMOUSEMODE = "SETMOUSEMODE";
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -610,9 +614,9 @@ public class GraphViewerPanel extends JPanel
             {
                 if (v.expandable)
                 {
-                    firePropertyChange("NODECLICKED", null, v);
+                    firePropertyChange(PROPERTYNODECLICKED, null, v);
                 } else {
-                    firePropertyChange("NODECLICKED", null, null);
+                    firePropertyChange(PROPERTYNODECLICKED, null, null);
                 }
             }
         });
@@ -664,6 +668,17 @@ public class GraphViewerPanel extends JPanel
         
         centerGraphLayout();
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Files a property change relative to the mode of mouse transformation.
+	 * @param i use 0 for picking mode, 1 for move mode.
+	 */
+	public void fireMouseModePropertyChange(int i)
+    {
+        firePropertyChange(PROPERTYMOUSEMODE, null, i);
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -728,7 +743,7 @@ public class GraphViewerPanel extends JPanel
 	@SuppressWarnings("serial")
     private class GraphOptsPopup extends JPopupMenu
 	{
-	    public GraphOptsPopup() {
+        public GraphOptsPopup() {
 	        super();
 	        
             JMenuItem mnuRelax = new JMenuItem("Refine node locations");
@@ -786,6 +801,28 @@ public class GraphViewerPanel extends JPanel
                 }
             });
             this.add(mnuCenterView);
+            
+            JMenuItem mnuMoveMode = new JMenuItem("Mouse mode: move");
+            mnuMoveMode.setToolTipText(String.format(
+                    "<html><body width='%1s'>"
+                    + "Makes mouse move the graph view.</html>", 300));
+            mnuMoveMode.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    fireMouseModePropertyChange(1);
+                }
+            });
+            this.add(mnuMoveMode);
+            
+            JMenuItem mnuPickMode = new JMenuItem("Mouse mode: pick");
+            mnuPickMode.setToolTipText(String.format(
+                    "<html><body width='%1s'>"
+                    + "Makes the mouse select vertex on click.</html>", 300));
+            mnuPickMode.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    fireMouseModePropertyChange(0);
+                }
+            });
+            this.add(mnuPickMode);
             
             this.add(new JSeparator());
             

@@ -367,7 +367,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		
 		JLabel mouseModeLab = new JLabel("Mouse mode:");
 		btnPickMode = new JButton("Pick");
-		btnPickMode.setToolTipText("Make the mouse select vertex on click.");
+		btnPickMode.setToolTipText("Makes the mouse select vertex on click.");
 		btnPickMode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
@@ -376,7 +376,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
             }
         });
         btnMoveMode = new JButton("Move");
-        btnMoveMode.setToolTipText("Makes mouse move transform the graph view.");
+        btnMoveMode.setToolTipText("Makes mouse move the graph view.");
         btnMoveMode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
