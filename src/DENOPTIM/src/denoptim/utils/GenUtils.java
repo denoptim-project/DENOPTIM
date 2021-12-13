@@ -20,6 +20,10 @@ package denoptim.utils;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -157,6 +161,43 @@ public class GenUtils
         }
         
         return result;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Takes the union of any two sets in this list that intersect. Performs
+     * operations in-place.
+     * @param list List to merge sets of
+     */
+    public static <T> void unionOfIntersectingSets(List<Set<T>> list) 
+    {
+        Iterator<Set<T>> iterator = list.iterator();
+        
+        int prevSize = 1;
+        int currentSize = 0;
+        while (prevSize > currentSize)
+        {
+            prevSize = list.size();
+            while (iterator.hasNext())
+            {
+                Set<T> setA = iterator.next();
+                Iterator<Set<T>> innerIterator = list.iterator();
+                while (innerIterator.hasNext())
+                {
+                    Set<T> setB = innerIterator.next();
+                    if (setA == setB)
+                        continue;
+                    if (!Collections.disjoint(setA,setB))
+                    {
+                        setB.addAll(setA);
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+            currentSize = list.size();
+        }
     }
     
 //------------------------------------------------------------------------------

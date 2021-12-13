@@ -4798,10 +4798,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------        
     
     /**
-     * 
+     * Finds the AP that is on the first given parameter and that is used to 
+     * make a connection to the second vertex, no matter the direction of the 
+     * edge. If the two vertexes are connected by a chord, i.e., there is a pair 
+     * of RCVs in between the two vertexes, we still work out the AP on 
+     * the vertex on the left, even if in the graph it is actually used to bind 
+     * the RCV that defines the chord and that eventually connects the 
+     * vertex on the left with that on the right.
      * @param vid1 vertex ID of one vertex.
      * @param vid2 vertex ID of another vertex.
-     * @return the{@link DENOPTIMAttachmentPoint} or null is the two vertex IDs
+     * @return the {@link DENOPTIMAttachmentPoint} or null is the two vertex IDs
      * are not connected in this graph.
      */
     public DENOPTIMAttachmentPoint getAPOnLeftVertexID(int vid1, int vid2)
@@ -4819,6 +4825,26 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return v1.getEdgeToParent().getTrgAP();
         }
         
+        // At this point the two vertexes are not directly connected, but there 
+        // could still be a chord between them. Here, we check for chords:
+        /*
+        for (DENOPTIMRing r : getRingsInvolvingVertex(v1))
+        {
+            if (r.contains(v2))
+            {
+                int lstId = r.getSize()-1;
+                // Position 0 and lstId are where the RCVs sit
+                if (r.getPositionOf(v1)==1 && r.getPositionOf(v2)==lstId)
+                {
+                    return r.getHeadVertex().getEdgeToParent().getSrcAP();
+                }
+                if (r.getPositionOf(v1)==lstId && r.getPositionOf(v2)==1)
+                {
+                    return r.getTailVertex().getEdgeToParent().getSrcAP();
+                }
+            }
+        }
+        */
         return null;
     }
 

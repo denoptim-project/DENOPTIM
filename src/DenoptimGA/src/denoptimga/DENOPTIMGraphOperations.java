@@ -42,6 +42,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -1052,7 +1053,7 @@ public class DENOPTIMGraphOperations
                 .map(HashSet::new)
                 .collect(Collectors.toList());
 
-        unionOfIntersectingSets(disjointMultiCycleVertices);
+        GenUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
 
         List<DENOPTIMGraph> subgraphs = new ArrayList<>();
         for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
@@ -1113,28 +1114,6 @@ public class DENOPTIMGraphOperations
         }
         DENOPTIMGraph.setScaffold(newScaffold);
         fixEdgeDirections(g);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Takes the union of any two sets in this list that intersect. Performs
-     * operations in-place.
-     * @param l List to merge sets of
-     */
-    private static <T> void unionOfIntersectingSets(List<Set<T>> l) {
-        for (int i = 0; i < l.size() - 1; i++) {
-            Set<T> setA = l.get(i);
-            for (int j = i + 1; j < l.size(); ) {
-                Set<T> setB = l.get(j);
-                if (Collections.disjoint(setA, setB)) {
-                    j++;
-                } else {
-                    setA.addAll(setB);
-                    l.remove(j);
-                }
-            }
-        }
     }
 
 //------------------------------------------------------------------------------
@@ -1785,22 +1764,22 @@ public class DENOPTIMGraphOperations
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, Monitor mnt) throws DENOPTIMException
     {
-        //TODO-GG remove or make optional
         DENOPTIMGraph c = vertex.getGraphOwner().clone();
+        int pos = vertex.getGraphOwner().indexOf(vertex);
         try
         {
             return performMutation(vertex, mType, false, -1 ,-1, mnt);
-        } catch (NullPointerException e)
+        } catch (IllegalArgumentException|NullPointerException e)
         {
-            DenoptimIO.writeGraphToJSON(new File("/tmp/failing_"+mType+"_"+vertex.getVertexId()+"_"
-                    + GAParameters.timeStamp + ".json"), c);
-            throw e;
-        } catch (IllegalArgumentException e) {
-            DenoptimIO.writeGraphToJSON(new File("/tmp/failing_"+mType+"_"+vertex.getVertexId()+"_"
-                    + GAParameters.timeStamp +".json"), c);
+            String debugFile = "failedMutation_" + mType 
+                    + "_" + vertex.getVertexId() + "(" + pos + ")_"
+                    + GAParameters.timeStamp + ".sdf";
+            DenoptimIO.writeGraphToSDF(new File(debugFile), c, false);
+            DENOPTIMLogger.appLogger.warning("Fatal exception while performing "
+                    + "mutation. See file '" + debugFile + "' to reproduce the "
+                    + "problem.");
             throw e;
         }
-        //return performMutation(vertex, mType, false, -1 ,-1, mnt);
     }
     
 //------------------------------------------------------------------------------
