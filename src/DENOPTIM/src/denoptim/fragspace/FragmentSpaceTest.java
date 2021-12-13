@@ -522,8 +522,8 @@ public class FragmentSpaceTest
             List<DENOPTIMVertex> scaffLib = FragmentSpace.getScaffoldLibrary();
             scaffLib.clear();
             
-            FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
-            FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+            FragmentSpaceParameters.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+            FragmentSpaceParameters.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
@@ -558,7 +558,6 @@ public class FragmentSpaceTest
                         t.renumberGraphVertices();
                     } catch (DENOPTIMException e)
                     {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 })
@@ -567,8 +566,8 @@ public class FragmentSpaceTest
         List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
         fragLib.clear();
 
-        FragmentSpaceParameters.fragmentLibFile = "./dummyFilename_DenoptimTest_Frag";
-        FragmentSpaceParameters.scaffoldLibFile = "./dummyFilename_DenoptimTest_Scaff";
+        FragmentSpaceParameters.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+        FragmentSpaceParameters.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         
         for (DENOPTIMGraph g : sameGraphs) {
             FragmentSpace.addFusedRingsToFragmentLibrary(g);

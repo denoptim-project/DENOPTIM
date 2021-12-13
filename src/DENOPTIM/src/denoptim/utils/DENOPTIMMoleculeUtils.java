@@ -357,9 +357,7 @@ public class DENOPTIMMoleculeUtils
         catch (Throwable t)
         {
             t.printStackTrace();
-        	String fileName = System.getProperty("user.dir") 
-        		+ System.getProperty("file.separator") 
-        		+ "failed_generation_of_SMILES.sdf";
+        	String fileName = "failed_generation_of_SMILES.sdf";
         	System.out.println("WARNING: Skipping calculation of SMILES. See "
         			+ "file '" + fileName + "'");
         	DenoptimIO.writeMolecule(fileName,fmol,false);
@@ -1016,14 +1014,19 @@ public class DENOPTIMMoleculeUtils
                 if (wantedVIDs.contains(nbrVid))
                 {
                     // cpAtm is connected to an atom to keep and will therefore
-                    // become an AP.
+                    // become an AP. Note that the connection may go through
+                    // a chord in the graph, i.e., a pairs of RCVs!
                     toAP.put(cpAtm,iac.getAtom(wholeIAC.indexOf(nbr)));
                     DENOPTIMAttachmentPoint apInWholeGraph = 
                             wholeGraph.getAPOnLeftVertexID(nbrVid,vid);
                     if (apInWholeGraph == null)
                     {
+                        String debugFile = "failedAPIdentificationIACSubGraph" 
+                                + wholeGraph.getGraphId() + ".sdf";
+                        DenoptimIO.writeGraphToSDF(new File(debugFile), wholeGraph, willBecomeAP);
                         throw new DENOPTIMException("Unmexpected null AP from "
-                                + nbrVid + " " + vid +" on " + wholeGraph);
+                                + nbrVid + " " + vid +" on " + wholeGraph 
+                                + " See " + debugFile);
                     }
                     DENOPTIMAttachmentPoint apInSubGraph = 
                             wantedVertexesMap.get(nbrVid).getAP(apInWholeGraph.getIndexInOwner());

@@ -131,8 +131,7 @@ public class SymmetricSet implements Serializable,Cloneable
     public void remove(Integer i)
     {
         symIds.remove((Integer) i);
-        //TODO: why should this remove only two? either remove all or only one.
-        if (symIds.contains(i))
+        while (symIds.contains(i))
         {
             symIds.remove((Integer) i);
         }

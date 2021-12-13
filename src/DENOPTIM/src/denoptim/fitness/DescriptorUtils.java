@@ -178,7 +178,10 @@ public class DescriptorUtils
 	
 //------------------------------------------------------------------------------
 
-	//TODO only CDK? or all?
+	/**
+	 * Makes an engine using CDK descriptors.
+	 * @return an engine using CDK descriptors.
+	 */
 	public static DescriptorEngine getCDKDescriptorEngine()
 	{
 		return new DescriptorEngine(getClassNamesToCDKDescriptors(), null);

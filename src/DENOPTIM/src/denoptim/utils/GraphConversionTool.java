@@ -427,93 +427,12 @@ public class GraphConversionTool
             DENOPTIMVertex pA = vA.getParent();
             DENOPTIMVertex pB = vB.getParent();
 
-            //TODO del try/catch
-            //try
-            //{
-                g.addEdge(pA, pB, new UndirectedEdgeRelation(
-                        vA.getEdgeToParent().getSrcAP(), 
-                        vB.getEdgeToParent().getSrcAP(), r.getBondType()));
-            /*
-            } catch (Throwable t) {
-                t.printStackTrace();
-                System.out.println("HERE: graph "+dg.getGraphId()+" FAILES seemengly due to LOOP.");
-                System.out.println("pA: "+pA);
-                System.out.println("pB: "+pB);
-                System.out.println("vA: "+vA);
-                System.out.println("vB: "+vB);
-                String filename = "/tmp/"+dg.getGraphId()+"failed.sdf";
-                
-                try
-                {
-                    ArrayList<DENOPTIMGraph> lst = new ArrayList<>();
-                    lst.add(dg);
-                    DenoptimIO.writeGraphsToSDF(new File(filename), lst, false);
-                } catch (DENOPTIMException e1)
-                {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-            */
+            g.addEdge(pA, pB, new UndirectedEdgeRelation(
+                    vA.getEdgeToParent().getSrcAP(), 
+                    vB.getEdgeToParent().getSrcAP(), r.getBondType()));
         }
         return g;
     }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Just a utility class that is used to convert the atom index in the
-     * molecular representation of a specific vertex (i.e., vertexId) in the
-     * atom index in the whole molecular representation of the graph.
-     */
-    
-    private static class DENOPTIMVertexAtom
-    {
-        private int vertexId;
-        private final HashMap<Integer, Integer> atmNumMap;
-
-        public DENOPTIMVertexAtom(int vertexId,
-                                  HashMap<Integer, Integer> atmNumMap)
-        {
-            this.vertexId = vertexId;
-            this.atmNumMap = atmNumMap;
-        }
-        
-        public int lookupMatchingAtomNumber(int anum)
-        {
-            return atmNumMap.getOrDefault(anum, -1);
-        }
-        
-        public int getVertexId()
-        {
-            return vertexId;
-        }
-    }
-    
-//------------------------------------------------------------------------------
-
-      /**
-       * Return the atom number corresponding to the attachment point index
-       * @param lstDVA
-       * @param vertexId
-       * @param dap_anum
-       * @return the atom number corresponding to the attachment point index
-       */
-
-      public static int getCorrespondingAtomNumber(
-             ArrayList<DENOPTIMVertexAtom> lstDVA, int vertexId, int dap_anum)
-      {
-          int mnum = -1;
-          for (DENOPTIMVertexAtom dva : lstDVA)
-          {
-              if (dva.getVertexId() == vertexId)
-              {
-                  mnum = dva.lookupMatchingAtomNumber(dap_anum);
-                  break;
-              }
-          }
-          return mnum;
-      }
 
 //------------------------------------------------------------------------------
 

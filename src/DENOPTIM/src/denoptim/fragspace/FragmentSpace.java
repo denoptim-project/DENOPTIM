@@ -1432,7 +1432,7 @@ public class FragmentSpace
     {
         List<DENOPTIMGraph> subgraphs = null;
         try
-        {
+        {   
             subgraphs = extractPattern(graph,GraphPattern.RING);
         } catch (DENOPTIMException e1)
         {
@@ -1484,8 +1484,26 @@ public class FragmentSpace
                             has3Dgeometry = true;
                         } catch (DENOPTIMException e1)
                         {
-                            // TODO Auto-generated catch block
                             e1.printStackTrace();
+                            ArrayList<DENOPTIMGraph> lst = new ArrayList<>();
+                            lst.add(graph);
+                            lst.add(g);
+                            String forDebugFile = "failedExtractIAC_" 
+                            + graph.getGraphId() + ".json";
+                            try
+                            {
+                                DenoptimIO.writeGraphsToJSON(new File(forDebugFile),
+                                        lst);
+                                System.out.println("WARNING: failed to extract "
+                                        + "molecular representation of graph. See "
+                                        + "file '" + forDebugFile + "'.");
+                            } catch (DENOPTIMException e)
+                            {
+                                System.out.println("WARNING: failed to extract "
+                                        + "molecular representation of graph, "
+                                        + "and failed to write graph to file.");
+                            }
+                            
                         }
                     }
     
@@ -1502,7 +1520,6 @@ public class FragmentSpace
                                          .getPathnameToAppendedScaffolds();
                     try
                     {
-                        //TODO: we should have a writeVertex method do do all things
                         if (has3Dgeometry)
                         {
                             DenoptimIO.writeMolecule(destFileName,subIAC,true);
