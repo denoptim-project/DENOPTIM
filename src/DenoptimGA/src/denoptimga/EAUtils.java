@@ -474,7 +474,17 @@ public class EAUtils
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
     
         EAUtils.addCappingGroup(graph);
-        Object[] res = EAUtils.evaluateGraph(graph);
+        Object[] res = null;
+        try
+        {
+            res = EAUtils.evaluateGraph(graph);
+        } catch (NullPointerException|IllegalArgumentException e)
+        {
+            System.out.println("WRITING DEBUG FILE for "+graph.getLocalMsg());
+            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_parent.sdf"), parent.getGraph(),false);
+            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_curr.sdf"), graph,false);
+            throw e;
+        }
         
         if (res != null)
         {

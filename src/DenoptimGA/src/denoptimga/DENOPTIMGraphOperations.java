@@ -1785,7 +1785,7 @@ public class DENOPTIMGraphOperations
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, Monitor mnt) throws DENOPTIMException
     {
-        /*
+        //TODO-GG remove or make optional
         DENOPTIMGraph c = vertex.getGraphOwner().clone();
         try
         {
@@ -1800,8 +1800,7 @@ public class DENOPTIMGraphOperations
                     + GAParameters.timeStamp +".json"), c);
             throw e;
         }
-        */
-        return performMutation(vertex, mType, false, -1 ,-1, mnt);
+        //return performMutation(vertex, mType, false, -1 ,-1, mnt);
     }
     
 //------------------------------------------------------------------------------

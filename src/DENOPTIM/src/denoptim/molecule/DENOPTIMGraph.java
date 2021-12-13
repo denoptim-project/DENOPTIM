@@ -2883,6 +2883,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (int i=0; i<frame.getSize(); i++)
         {
             DENOPTIMVertex vi = frame.getVertexAtPosition(i);
+            // We consider the scaffold as a branching point, i.e., it will never be removed
+            if (vi.getBuildingBlockType() == BBType.SCAFFOLD)
+            {
+                branchingPositions.add(i);
+                continue;
+            }
             long oNonCap = vi.getAttachmentPoints().size() 
                     - vi.getCappedAPCountThroughout()
                     - vi.getFreeAPCountThroughout();
@@ -2890,11 +2896,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 branchingPositions.add(i);
                 frameHasBranching = true;
-            }
-            // We consider the scaffold as a branching point, i.e., it will never be removed
-            if (vi.getBuildingBlockType() == BBType.SCAFFOLD)
-            {
-                branchingPositions.add(i);
             }
         }
         
@@ -2960,13 +2961,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         
-        // Also we choose direction as to try to reverse as few edges as possible.
-        if (getLevel(remainingChain.get(0)) > getLevel(
-                remainingChain.get(remainingChain.size()-1)))
-        {
-            Collections.reverse(remainingChain);
-        }
-        
         // Need to exclude the case where the chain to remove consists only of
         // the RCVs because it would lead to loss of the chord and creation of
         // cyclic graph. Also, proceeding without making the edge would simply
@@ -2985,32 +2979,39 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         
-        // Check if we need to transform a pair of RCVs into an edge, and 
-        // identify APs used by the edge that replaces the to-be-removed RCVs
-        DENOPTIMAttachmentPoint apSrcOfNewEdge = null;
-        DENOPTIMAttachmentPoint apTrgOfNewEdge = null;
-        int nRcvsInRemaining = 0;
-        for (DENOPTIMVertex vir : remainingChain)
+        // To understand if we need to reverse some edges, we identify the
+        // deepest vertex level-wise. It may or may not be a scaffold!!!
+        int deepestLevel = Integer.MAX_VALUE;
+        DENOPTIMVertex deepestVrtRemainingChain = null;
+        for (DENOPTIMVertex vint : remainingChain)
         {
-            if (vir == frame.getHeadVertex() || vir == frame.getTailVertex())
+            int lvl = getLevel(vint);
+            if (lvl < deepestLevel)
             {
-                if (nRcvsInRemaining < 1)
-                {
-                    apSrcOfNewEdge = vir.getEdgeToParent().getSrcAP();
-                    nRcvsInRemaining++;
-                } else {
-                    apTrgOfNewEdge = vir.getEdgeToParent().getSrcAP();
-                    nRcvsInRemaining++;
-                }
+                deepestLevel = lvl;
+                deepestVrtRemainingChain = vint;
             }
         }
-        if (nRcvsInRemaining==2) // can be 0, but I do not see how this could ever be 1
+        
+        // Check if we need to transform a pair of RCVs into an edge, and 
+        // identify APs used by the edge that replaces the to-be-removed RCVs.
+        // I do not see how the chain can possibly contain only one of the 
+        // RCVs, so I assume that if one RCV is there, then the other is too.
+        if (remainingChain.contains(replacedByEdge[0]))
         {
-            // Replace the RCVs that will be replaced by an edge
+            DENOPTIMAttachmentPoint apSrcOfNewEdge = replacedByEdge[0]
+                    .getEdgeToParent().getSrcAP();
+            DENOPTIMAttachmentPoint apTrgOfNewEdge = replacedByEdge[1]
+                    .getEdgeToParent().getSrcAP();
+            
+            // Remove the RCVs that will be replaced by an edge
             removeVertex(replacedByEdge[0]);
             remainingChain.remove(replacedByEdge[0]);
             removeVertex(replacedByEdge[1]);
             remainingChain.remove(replacedByEdge[1]);
+            
+            // And make the new edge. The direction can be anything. Later, we
+            // decide if we need to reverse it.
             //NB: the compatibility between the APs should be granted by the 
             // previous existence of the chord. so no need to check 
             // apSrcOfNewEdge.getAPClass().isCPMapCompatibleWith(
@@ -3022,62 +3023,106 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             removeRing(frame);
         }
         
-        // Remember all chord that will have to be recreated
+        // Now, inspect the paths from the deepest vertex and outwards, to
+        // find out where to start reversing edges.
+        List<DENOPTIMVertex> chainToReverseA = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> chainToReverseB = new ArrayList<DENOPTIMVertex>();
+        for (int i=(remainingChain.indexOf(deepestVrtRemainingChain)+1); 
+                i<remainingChain.size(); i++)
+        {
+            DENOPTIMVertex vPrev = remainingChain.get(i-1);
+            DENOPTIMVertex vHere = remainingChain.get(i);
+            if (!vPrev.getChilddren().contains(vHere))
+            {
+                // in an healthy spanning tree, once we find the first reversed
+                // edge, all the following edges will also have to be reversed.
+                if (chainToReverseA.size()==0)
+                    chainToReverseA.add(vPrev);
+                chainToReverseA.add(vHere);
+            }
+        }
+        for (int i=(remainingChain.indexOf(deepestVrtRemainingChain)-1);i>-1;i--)
+        {
+            DENOPTIMVertex vPrev = remainingChain.get(i+1);
+            DENOPTIMVertex vHere = remainingChain.get(i);
+            if (!vPrev.getChilddren().contains(vHere))
+            {
+                if (chainToReverseB.size()==0)
+                    chainToReverseB.add(vPrev);
+                chainToReverseB.add(vHere);
+            }
+        }
+        
+        // These are to remember all chords that will have to be recreated
         Map<DENOPTIMVertex,DENOPTIMVertex> chordsToRecreate = 
                 new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
         Map<DENOPTIMVertex,BondType> chordsToRecreateBB = 
                 new HashMap<DENOPTIMVertex,BondType>();
         
         // Change direction of those edges that have to be reversed as a 
-        // consequence of the change in the spanning tree
-        if (remainingChain.size()>1)
+        // consequence of the change in the spanning tree.
+        if (chainToReverseA.size()+chainToReverseB.size() > 1)
         {
-            for (int i=1; i<remainingChain.size(); i++)
+            List<DENOPTIMVertex> chainToWorkOn = null;
+            for (int ic=0; ic<2; ic++)
             {
-                DENOPTIMVertex vOnTheWay = remainingChain.get(i);
-                DENOPTIMVertex vPrevious = remainingChain.get(i-1);
-                List<DENOPTIMRing> ringsToRemove = new ArrayList<DENOPTIMRing>();
-                for (DENOPTIMRing r : getRingsInvolvingVertex(vOnTheWay))
+                if (ic == 1)
+                    chainToWorkOn = chainToReverseA;
+                else
+                    chainToWorkOn = chainToReverseB;
+            
+                for (int i=1; i<chainToWorkOn.size(); i++)
                 {
-                    ringsToRemove.add(r);
-                    chordsToRecreate.put(r.getHeadVertex(), r.getTailVertex());
-                    chordsToRecreateBB.put(r.getHeadVertex(), r.getBondType());
-                }
-                for (DENOPTIMRing r : ringsToRemove)
-                {
-                    removeRing(r);
-                }
-                
-                DENOPTIMEdge edgeToPrevious = vOnTheWay.getEdgeWith(vPrevious);
-                if (edgeToPrevious == null) 
-                {
-                    // Since we have already made the new edge this should never happen
-                    String debugFile = "debug_"+v.getVertexId()+".json";
-                    DenoptimIO.writeGraphToJSON(new File(debugFile), this);
-                    throw new DENOPTIMException("Unconnected vertexes "  
-                            + vOnTheWay.getVertexId() + " and "
-                            + vPrevious.getVertexId() + ". Unable to deal with "
-                            + "removal of " + v + " from ring " + frame 
-                            + " in graph " + this.getGraphId() 
-                            + ". See graph in " + debugFile);
-                } else {
-                    if (edgeToPrevious.getSrcAP().getOwner() == vOnTheWay) // edge goes backwards
+                    DENOPTIMVertex vHere = chainToWorkOn.get(i);
+                    DENOPTIMVertex vPrev = chainToWorkOn.get(i-1);
+                    List<DENOPTIMRing> ringsToRecreate = new ArrayList<>();
+                    for (DENOPTIMRing r : getRingsInvolvingVertex(vHere))
                     {
-                        // This is an edge that has to be reversed.
-                        DENOPTIMAttachmentPoint newSrcAP = 
-                                edgeToPrevious.getTrgAP();
-                        DENOPTIMAttachmentPoint newTrgAP = 
-                                edgeToPrevious.getSrcAP();
-                        if (newSrcAP.getAPClass().isCPMapCompatibleWith(
-                                newTrgAP.getAPClass()))
+                        ringsToRecreate.add(r);
+                        chordsToRecreate.put(r.getHeadVertex(), 
+                                r.getTailVertex());
+                        chordsToRecreateBB.put(r.getHeadVertex(), 
+                                r.getBondType());
+                    }
+                    for (DENOPTIMRing r : ringsToRecreate)
+                    {
+                        removeRing(r);
+                    }
+                    
+                    DENOPTIMEdge edgeToPrevious = vHere.getEdgeWith(vPrev);
+                    if (edgeToPrevious == null) 
+                    {
+                        // Since we have already made the new edge this should 
+                        // never happen.
+                        String debugFile = "debug_"+v.getVertexId()+".json";
+                        DenoptimIO.writeGraphToJSON(new File(debugFile), this);
+                        throw new DENOPTIMException("Unconnected vertexes "  
+                                + vHere.getVertexId() + " and "
+                                + vPrev.getVertexId() + ". Unable to deal with "
+                                + "removal of " + v + " from ring " + frame 
+                                + " in graph " + this.getGraphId() 
+                                + ". See graph in " + debugFile);
+                    } else {
+                        if (edgeToPrevious.getSrcAP().getOwner() == vHere) 
                         {
-                            BondType oldBt = edgeToPrevious.getBondType();
-                            removeEdge(edgeToPrevious);
-                            addEdge(new DENOPTIMEdge(newSrcAP, newTrgAP, oldBt));
-                        } else {
-                            // There is a non-reversible connection along the way, therefore
-                            // we cannot do this mutation
-                            return false;
+                            // This is an edge that has to be reversed.
+                            DENOPTIMAttachmentPoint newSrcAP = 
+                                    edgeToPrevious.getTrgAP();
+                            DENOPTIMAttachmentPoint newTrgAP = 
+                                    edgeToPrevious.getSrcAP();
+                            if (newSrcAP.getAPClass().isCPMapCompatibleWith(
+                                    newTrgAP.getAPClass()))
+                            {
+                                BondType oldBt = edgeToPrevious.getBondType();
+                                removeEdge(edgeToPrevious);
+                                addEdge(new DENOPTIMEdge(newSrcAP, newTrgAP, 
+                                        oldBt));
+                            } else {
+                                // There is a non-reversible connection along 
+                                // the way, therefore we cannot do this 
+                                // specific mutation.
+                                return false;
+                            }
                         }
                     }
                 }
