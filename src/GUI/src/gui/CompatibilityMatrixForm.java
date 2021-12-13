@@ -68,10 +68,10 @@ import javax.swing.table.DefaultTableModel;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge.BondType;
 
 public class CompatibilityMatrixForm extends JPanel {
 

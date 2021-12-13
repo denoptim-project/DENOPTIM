@@ -1,4 +1,6 @@
-package denoptim.molecule;
+package denoptim.graph;
+
+import static denoptim.graph.DENOPTIMVertex.*;
 
 /*
  *   DENOPTIM
@@ -46,8 +48,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.MutationType;
-
-import static denoptim.molecule.DENOPTIMVertex.*;
 
 /**
  * Class representing a continuously connected portion of chemical object

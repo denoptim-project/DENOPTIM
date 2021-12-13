@@ -9,9 +9,9 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
 
 

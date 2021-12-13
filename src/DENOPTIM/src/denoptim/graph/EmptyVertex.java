@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 import java.lang.reflect.Type;
 
@@ -42,8 +42,8 @@ import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMVertex.VertexType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMVertex.VertexType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;

@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.SymmetricSet;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.SymmetricSet;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.utils.GraphUtils;
 
 

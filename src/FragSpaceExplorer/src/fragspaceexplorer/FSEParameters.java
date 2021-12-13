@@ -32,10 +32,10 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.rings.RingClosureParameters;
 
 

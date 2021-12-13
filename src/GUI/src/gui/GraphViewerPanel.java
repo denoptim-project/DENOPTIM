@@ -55,13 +55,13 @@ import java.awt.event.MouseListener;
 
 import com.google.common.base.Function;
 
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
 import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;

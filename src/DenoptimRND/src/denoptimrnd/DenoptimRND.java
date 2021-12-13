@@ -26,9 +26,9 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.math3.random.MersenneTwister;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.Candidate;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.Candidate;
 import denoptim.utils.GenUtils;
 import denoptim.utils.RandomUtils;
 

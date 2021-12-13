@@ -57,10 +57,10 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 

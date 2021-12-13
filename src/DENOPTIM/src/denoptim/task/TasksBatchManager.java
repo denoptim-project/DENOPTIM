@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.Candidate;
+import denoptim.graph.Candidate;
 
 
 /**

@@ -32,18 +32,18 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import denoptim.molecule.*;
 import denoptimga.GAParameters;
 import denoptimga.GraphPattern;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.*;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
 

@@ -6,12 +6,12 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMGraph.StringFormat;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMGraph.StringFormat;
 import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 

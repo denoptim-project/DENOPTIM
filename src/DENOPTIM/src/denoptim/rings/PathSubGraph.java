@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 
 import javax.vecmath.Point3d;
 
-import denoptim.molecule.*;
 import org.openscience.cdk.graph.PathTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -32,11 +31,8 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.*;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.threedim.ThreeDimTreeBuilder;
 
 

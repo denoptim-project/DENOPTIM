@@ -23,9 +23,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
 
 
 /**

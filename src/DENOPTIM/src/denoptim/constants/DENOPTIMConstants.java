@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
 
 
 /**

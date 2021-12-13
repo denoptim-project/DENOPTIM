@@ -36,9 +36,9 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.graph.Candidate;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.Candidate;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;

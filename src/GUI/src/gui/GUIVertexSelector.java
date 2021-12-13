@@ -33,7 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import denoptim.molecule.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex;
 
 
 /**

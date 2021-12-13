@@ -23,14 +23,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EdgeQuery;
-import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.VertexQuery;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EdgeQuery;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.VertexQuery;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 
 /**

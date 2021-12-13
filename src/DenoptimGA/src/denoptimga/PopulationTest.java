@@ -5,15 +5,15 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.APClass;
+import denoptim.graph.Candidate;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.APClass;
-import denoptim.molecule.Candidate;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.DENOPTIMEdge.BondType;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;

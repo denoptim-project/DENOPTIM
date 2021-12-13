@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.utils.GenUtils;
 
 

@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.task.FitnessTask;
 import denoptim.utils.GenUtils;
 import denoptimga.DenoptimGA;

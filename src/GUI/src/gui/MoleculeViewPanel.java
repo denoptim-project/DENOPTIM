@@ -49,8 +49,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.Candidate;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.Candidate;
 
 
 /**

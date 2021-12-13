@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
 
 
 /**

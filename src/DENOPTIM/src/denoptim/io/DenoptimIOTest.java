@@ -45,16 +45,16 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.APClass;
-import denoptim.molecule.CandidateLW;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.SymmetricSet;
+import denoptim.graph.APClass;
+import denoptim.graph.CandidateLW;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.SymmetricSet;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for input/output

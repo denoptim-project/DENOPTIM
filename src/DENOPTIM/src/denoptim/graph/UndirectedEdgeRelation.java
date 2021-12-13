@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
 
 import java.io.Serializable;
 
@@ -35,9 +35,9 @@ import org.openscience.cdk.interfaces.IBond.Order;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.GenUtils;
 
 /**

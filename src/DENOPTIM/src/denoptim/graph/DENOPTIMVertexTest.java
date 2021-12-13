@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,9 +23,9 @@ import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.DENOPTIMVertex.VertexType;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMVertex.VertexType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.MutationType;
 

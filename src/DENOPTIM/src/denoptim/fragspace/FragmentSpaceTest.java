@@ -26,7 +26,6 @@ import java.util.stream.IntStream;
 
 import javax.vecmath.Point3d;
 
-import denoptim.molecule.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -41,9 +40,10 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.*;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;

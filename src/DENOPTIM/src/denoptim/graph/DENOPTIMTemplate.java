@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -34,8 +34,8 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMEdge.BondType;
 import denoptim.rings.PathSubGraph;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;

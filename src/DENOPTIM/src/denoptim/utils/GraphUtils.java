@@ -25,7 +25,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMGraph;
 
 
 /**

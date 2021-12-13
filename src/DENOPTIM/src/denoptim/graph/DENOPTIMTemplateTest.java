@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +28,7 @@ import java.util.*;
  */
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
@@ -40,7 +41,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;

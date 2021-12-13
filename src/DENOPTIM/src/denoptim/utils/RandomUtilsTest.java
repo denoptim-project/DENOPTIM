@@ -1,11 +1,10 @@
 package denoptim.utils;
 
-import denoptim.molecule.*;
-
 import org.apache.commons.math3.random.MersenneTwister;
 import org.junit.jupiter.api.Test;
 
-import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.graph.*;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptimga.EAUtils.CandidateSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

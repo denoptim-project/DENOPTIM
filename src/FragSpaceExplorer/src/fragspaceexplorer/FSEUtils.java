@@ -30,9 +30,9 @@ import org.apache.commons.io.FileUtils;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.io.SingletonFileAccess;
-import denoptim.molecule.DENOPTIMGraph;
 
 
 /**

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 
-import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 
 /**
  * Interface for all vertex viewers that intend to allow selection of attachment

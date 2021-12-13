@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSerializationContext;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * This class represents the closure of a ring in a spanning tree

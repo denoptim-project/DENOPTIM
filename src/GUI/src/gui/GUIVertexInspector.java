@@ -18,6 +18,8 @@
 
 package gui;
 
+import static denoptim.graph.DENOPTIMVertex.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -60,16 +62,14 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-
-import static denoptim.molecule.DENOPTIMVertex.*;
 
 
 /**

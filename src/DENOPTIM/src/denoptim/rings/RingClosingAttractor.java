@@ -25,7 +25,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.molecule.APClass;
+import denoptim.graph.APClass;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 

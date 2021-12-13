@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 /*
  *   DENOPTIM
@@ -38,7 +38,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for DENOPTIMFragment

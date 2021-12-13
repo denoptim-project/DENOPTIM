@@ -21,9 +21,9 @@ package denoptim.rings;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 
 /**
  * ClosableChain represents a chain of fragments (chain links) that

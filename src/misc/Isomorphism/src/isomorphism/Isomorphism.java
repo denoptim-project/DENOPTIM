@@ -22,8 +22,8 @@ import java.io.File;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.MutationType;

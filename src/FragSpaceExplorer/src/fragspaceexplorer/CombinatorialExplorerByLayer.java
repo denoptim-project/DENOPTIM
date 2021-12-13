@@ -40,10 +40,10 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
 import denoptim.utils.GraphUtils;
 
 

@@ -72,9 +72,9 @@ import org.jfree.data.xy.XYDataset;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.Candidate;
+import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.Candidate;
-import denoptim.molecule.CandidateLW;
 import denoptim.utils.GenUtils;
 
 

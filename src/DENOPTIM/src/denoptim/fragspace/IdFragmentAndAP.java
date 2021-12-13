@@ -20,7 +20,7 @@ package denoptim.fragspace;
 
 import java.io.Serializable;
 
-import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 
 
 /**

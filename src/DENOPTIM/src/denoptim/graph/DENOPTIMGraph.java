@@ -17,7 +17,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
+
+import static denoptim.graph.DENOPTIMVertex.*;
 
 import java.io.File;
 import java.io.Reader;
@@ -54,13 +56,13 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragmentSpaceUtils;
 import denoptim.fragspace.GraphLinkFinder;
+import denoptim.graph.APClass.APClassDeserializer;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMVertex.DENOPTIMVertexDeserializer;
+import denoptim.graph.DENOPTIMVertex.VertexType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexDeserializer;
-import denoptim.molecule.DENOPTIMVertex.VertexType;
-import denoptim.molecule.APClass.APClassDeserializer;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.PathSubGraph;
@@ -76,8 +78,6 @@ import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptimga.CounterID;
-
-import static denoptim.molecule.DENOPTIMVertex.*;
 
 
 /**

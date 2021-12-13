@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
 
 import java.lang.reflect.Type;
 import java.io.Serializable;
@@ -44,7 +44,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;

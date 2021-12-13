@@ -38,11 +38,11 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
 
 
 /**

@@ -50,9 +50,9 @@ import javax.swing.table.JTableHeader;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.APClass;
+import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.APClass;
-import denoptim.molecule.EmptyVertex;
 import gui.GUIPreferences.SMITo3DEngine;
 
 public class GUIEmptyVertexMaker extends GUIModalDialog

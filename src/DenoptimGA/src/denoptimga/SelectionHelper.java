@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.random.MersenneTwister;
 
-import denoptim.molecule.Candidate;
+import denoptim.graph.Candidate;
 import denoptim.utils.RandomUtils;
 
 

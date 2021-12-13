@@ -34,9 +34,9 @@ import java.util.TreeMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.Candidate;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMVertex;
+import denoptim.graph.Candidate;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of

@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;

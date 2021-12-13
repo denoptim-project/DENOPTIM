@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.graph.DENOPTIMGraph.StringFormat;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMGraph.StringFormat;
 import denoptim.rings.RingClosureParameters;
 
 /**

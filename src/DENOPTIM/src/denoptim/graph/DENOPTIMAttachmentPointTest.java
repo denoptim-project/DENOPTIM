@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,8 +37,8 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint

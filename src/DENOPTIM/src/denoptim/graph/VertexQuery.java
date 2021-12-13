@@ -16,10 +16,10 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
 
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.DENOPTIMVertex.VertexType;
+import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMVertex.VertexType;
 
 /**
  * Query for searching vertexes.

@@ -86,16 +86,16 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import net.sf.jniinchi.INCHI_RET;
 
 

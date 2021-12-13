@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.APClass;
-import denoptim.molecule.APMapping;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMVertex;
+import denoptim.graph.APClass;
+import denoptim.graph.APMapping;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.utils.RandomUtils;
 
 

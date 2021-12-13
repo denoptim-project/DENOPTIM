@@ -22,9 +22,9 @@ import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;

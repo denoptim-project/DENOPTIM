@@ -3,7 +3,7 @@ package denoptimga;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.*;
+import denoptim.graph.*;
 import denoptim.utils.GraphUtils;
 
 import org.jgrapht.alg.util.Pair;
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static denoptim.molecule.DENOPTIMEdge.*;
-import static denoptim.molecule.DENOPTIMVertex.*;
+import static denoptim.graph.DENOPTIMEdge.*;
+import static denoptim.graph.DENOPTIMVertex.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

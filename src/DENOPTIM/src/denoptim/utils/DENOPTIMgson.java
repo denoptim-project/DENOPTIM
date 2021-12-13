@@ -5,26 +5,22 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMGraphSerializer;
-import denoptim.molecule.DENOPTIMGraph.DENOPTIMGraphDeserializer;
-
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.DENOPTIMVertexDeserializer;
-
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMRing.DENOPTIMRingSerializer;
-
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMEdge.DENOPTIMEdgeSerializer;
-import denoptim.molecule.APClass;
-import denoptim.molecule.APClass.APClassDeserializer;
-import denoptim.molecule.APTreeMap;
-import denoptim.molecule.APTreeMap.APMapSerializer;
-
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
+import denoptim.graph.APClass;
+import denoptim.graph.APTreeMap;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.APClass.APClassDeserializer;
+import denoptim.graph.APTreeMap.APMapSerializer;
+import denoptim.graph.DENOPTIMEdge.DENOPTIMEdgeSerializer;
+import denoptim.graph.DENOPTIMGraph.DENOPTIMGraphDeserializer;
+import denoptim.graph.DENOPTIMGraph.DENOPTIMGraphSerializer;
+import denoptim.graph.DENOPTIMRing.DENOPTIMRingSerializer;
+import denoptim.graph.DENOPTIMVertex.DENOPTIMVertexDeserializer;
 
 
 public class DENOPTIMgson

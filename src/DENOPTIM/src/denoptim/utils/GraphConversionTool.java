@@ -38,21 +38,21 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.SymmetricSet;
+import denoptim.graph.UndirectedEdgeRelation;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.EmptyVertex;
-import denoptim.molecule.SymmetricSet;
-import denoptim.molecule.UndirectedEdgeRelation;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptimga.EAUtils;
 
@@ -113,7 +113,7 @@ public class GraphConversionTool
      * @param strGraph the string representation in DENOPTIM format. NOTE: this
      * is not the serialized representation of a <code>DENOPTIMGraph</code>, but
      * the string obtained by the
-     * {@link denoptim.molecule.DENOPTIMGraph#toString() toString} method the
+     * {@link denoptim.graph.DENOPTIMGraph#toString() toString} method the
      * <code>DENOPTIMGraph</code>.
      * @return the Graph representation that can be used by DENOPTIM
      * @throws denoptim.exception.DENOPTIMException
@@ -133,7 +133,7 @@ public class GraphConversionTool
      * @param strGraph the string representation in DENOPTIM format. NOTE: this
      * is not the serialized representation of a <code>DENOPTIMGraph</code>, but
      * the string obtained by the 
-     * {@link denoptim.molecule.DENOPTIMGraph#toString() toString} method the
+     * {@link denoptim.graph.DENOPTIMGraph#toString() toString} method the
      * <code>DENOPTIMGraph</code>.
      * @param useMolInfo set to <code>true</code> when molecular information 
      * is available for all fragments. That is, the libraries of fragments 

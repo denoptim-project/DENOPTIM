@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,11 +26,11 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
+import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.DENOPTIMVertex.VertexType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.DENOPTIMVertex.VertexType;
 import denoptim.utils.MutationType;
 
 

@@ -1,4 +1,4 @@
-package denoptim.molecule;
+package denoptim.graph;
 
 /*
  *   DENOPTIM

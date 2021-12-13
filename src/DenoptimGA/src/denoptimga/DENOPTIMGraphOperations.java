@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import denoptim.molecule.*;
 import denoptim.rings.*;
 
 import org.apache.commons.io.FilenameUtils;
@@ -38,10 +37,11 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragmentSpaceUtils;
 import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
+import denoptim.graph.*;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;

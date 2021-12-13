@@ -1,12 +1,11 @@
 package denoptim.fragspace;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.*;
-import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.graph.*;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 
 import org.junit.jupiter.api.Test;
-
-import denoptim.molecule.DENOPTIMVertex.BBType;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

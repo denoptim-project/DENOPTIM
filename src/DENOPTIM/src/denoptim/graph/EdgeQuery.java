@@ -16,9 +16,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.molecule;
+package denoptim.graph;
 
-import denoptim.molecule.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * A query for edges: a list of properties that target edges should possess in 

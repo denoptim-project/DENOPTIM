@@ -2,14 +2,14 @@ package denoptimga;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.*;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecule.*;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMTemplate.ContractLevel;
 
 import org.junit.jupiter.api.Test;
 
-import denoptim.molecule.DENOPTIMVertex.BBType;
 import denoptim.utils.RandomUtils;
 import denoptimga.EAUtils.CandidateSource;
 

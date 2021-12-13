@@ -36,14 +36,14 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
-import denoptim.molecule.APClass;
-import denoptim.molecule.DENOPTIMEdge;
-import denoptim.molecule.DENOPTIMEdge.BondType;
-import denoptim.molecule.DENOPTIMVertex.BBType;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMRing;
-import denoptim.molecule.DENOPTIMVertex;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.utils.GraphConversionTool;
 
 /**

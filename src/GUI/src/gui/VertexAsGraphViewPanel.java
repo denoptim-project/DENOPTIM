@@ -35,12 +35,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.molecule.DENOPTIMAttachmentPoint;
-import denoptim.molecule.DENOPTIMFragment;
-import denoptim.molecule.DENOPTIMGraph;
-import denoptim.molecule.DENOPTIMTemplate;
-import denoptim.molecule.DENOPTIMVertex;
-import denoptim.molecule.EmptyVertex;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
 
 
 /**
