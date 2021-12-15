@@ -37,17 +37,13 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.EmptyVertex;
-import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.io.DenoptimIO;
-import denoptim.utils.GraphConversionTool;
+import denoptim.graph.EmptyVertex;
 
 /**
  * Unit test for TreeBuilder3D

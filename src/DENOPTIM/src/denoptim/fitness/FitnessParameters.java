@@ -18,9 +18,7 @@
 
 package denoptim.fitness;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,18 +35,13 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.apache.commons.el.ExpressionEvaluatorImpl;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.exception.InvalidSmilesException;
-import org.openscience.cdk.fingerprint.Fingerprinter;
-import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
-import org.openscience.cdk.fingerprint.PubchemFingerprinter;
+import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.ShortestPathFingerprinter;
 import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.exception.DENOPTIMException;

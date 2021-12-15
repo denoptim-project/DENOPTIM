@@ -1,30 +1,22 @@
 package denoptim.graph;
 
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import javax.vecmath.Point3d;
 
-import denoptim.utils.MutationType;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.reflect.TypeToken;
@@ -32,16 +24,12 @@ import com.google.gson.stream.JsonReader;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.io.DenoptimIO;
-import denoptim.rings.PathSubGraph;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;
-import denoptim.utils.GraphConversionTool;
-import denoptim.utils.GraphUtils;
+import denoptim.utils.MutationType;
 
 /**
  * A template is a contract that defines subgraph features that can go from

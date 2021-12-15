@@ -1,12 +1,6 @@
 package denoptim.fragspace;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.graph.*;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMVertex.BBType;
-
-import org.junit.jupiter.api.Test;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -18,7 +12,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
+import denoptim.graph.APMapping;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.EmptyVertex;
 
 /**
  * Unit test

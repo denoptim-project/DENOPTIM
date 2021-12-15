@@ -1,7 +1,5 @@
 package denoptim.fitness;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
@@ -35,17 +33,10 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.InvalidSmilesException;
-import org.openscience.cdk.fingerprint.IBitFingerprint;
-import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.qsar.DescriptorEngine;
-import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
-import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 import denoptim.io.DenoptimIO;
 
 /**

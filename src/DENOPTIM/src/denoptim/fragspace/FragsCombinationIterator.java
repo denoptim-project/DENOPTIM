@@ -30,7 +30,6 @@ import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.SymmetricSet;
-import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.utils.GraphUtils;
 
 

@@ -26,8 +26,6 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
 
 
 /**

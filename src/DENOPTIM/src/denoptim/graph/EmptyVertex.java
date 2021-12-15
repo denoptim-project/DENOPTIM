@@ -1,7 +1,5 @@
 package denoptim.graph;
 
-import java.lang.reflect.Type;
-
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Marco Foscato <marco.foscato@uib.no>
@@ -21,13 +19,8 @@ import java.lang.reflect.Type;
  */
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.vecmath.Point3d;
 
@@ -35,14 +28,8 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.DENOPTIMVertex.VertexType;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;

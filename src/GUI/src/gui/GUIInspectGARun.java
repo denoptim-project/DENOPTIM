@@ -51,7 +51,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
@@ -63,7 +62,6 @@ import org.jfree.chart.entity.PlotEntity;
 import org.jfree.chart.entity.XYItemEntity;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.SeriesRenderingOrder;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -72,7 +70,6 @@ import org.jfree.data.xy.XYDataset;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.Candidate;
 import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.GenUtils;

@@ -7,12 +7,11 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMGraph.StringFormat;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMGraph.StringFormat;
 import denoptim.io.DenoptimIO;
 import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 
 public class StringConverter

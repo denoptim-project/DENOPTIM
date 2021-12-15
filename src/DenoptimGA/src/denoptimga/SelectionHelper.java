@@ -21,8 +21,6 @@ package denoptimga;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.math3.random.MersenneTwister;
-
 import denoptim.graph.Candidate;
 import denoptim.utils.RandomUtils;
 

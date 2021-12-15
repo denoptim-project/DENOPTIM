@@ -39,8 +39,6 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
@@ -85,14 +83,13 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;

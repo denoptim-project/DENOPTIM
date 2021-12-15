@@ -6,20 +6,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import denoptim.graph.APClass;
+import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.APTreeMap;
+import denoptim.graph.APTreeMap.APMapSerializer;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.DENOPTIMEdgeSerializer;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.APClass.APClassDeserializer;
-import denoptim.graph.APTreeMap.APMapSerializer;
-import denoptim.graph.DENOPTIMEdge.DENOPTIMEdgeSerializer;
 import denoptim.graph.DENOPTIMGraph.DENOPTIMGraphDeserializer;
 import denoptim.graph.DENOPTIMGraph.DENOPTIMGraphSerializer;
+import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMRing.DENOPTIMRingSerializer;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.DENOPTIMVertexDeserializer;
 
 

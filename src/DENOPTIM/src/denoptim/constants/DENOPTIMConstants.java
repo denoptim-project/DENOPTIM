@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.io.DenoptimIO;

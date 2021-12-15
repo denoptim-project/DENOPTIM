@@ -48,13 +48,13 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
 import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
-import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for input/output

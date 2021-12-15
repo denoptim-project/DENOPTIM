@@ -20,8 +20,6 @@
 package denoptimcg;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -29,8 +27,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;

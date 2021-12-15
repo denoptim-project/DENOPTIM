@@ -19,22 +19,27 @@
 
 package denoptim.graph;
 
-import static denoptim.graph.DENOPTIMVertex.*;
-
 import java.io.File;
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.DefaultUndirectedGraph;
-import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -46,16 +51,15 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragmentSpaceUtils;
-import denoptim.fragspace.GraphLinkFinder;
 import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
@@ -70,14 +74,13 @@ import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.DENOPTIMgson;
+import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
-import denoptim.utils.DENOPTIMgson;
-import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
-import denoptimga.CounterID;
 
 
 /**

@@ -20,9 +20,7 @@ package denoptim.utils;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.math3.random.MersenneTwister;
 

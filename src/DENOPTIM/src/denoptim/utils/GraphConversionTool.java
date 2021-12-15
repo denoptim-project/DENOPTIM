@@ -19,42 +19,28 @@
 
 package denoptim.utils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Level;
 
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
 import denoptim.graph.UndirectedEdgeRelation;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptimga.EAUtils;
 
 
 /**

@@ -19,32 +19,26 @@
 
 package denoptim.graph;
 
-import java.lang.reflect.Type;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.Set;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;

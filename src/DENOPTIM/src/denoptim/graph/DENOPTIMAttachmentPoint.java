@@ -33,7 +33,6 @@ import org.openscience.cdk.interfaces.IAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.utils.DENOPTIMMoleculeUtils;
 
 /**
  * An attachment point (AP) is a possibility to attach a {@link DENOPTIMVertex} 

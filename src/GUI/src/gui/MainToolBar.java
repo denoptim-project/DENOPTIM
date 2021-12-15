@@ -32,13 +32,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.logging.Level;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
@@ -53,12 +49,9 @@ import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.StaticTaskManager;
 
 

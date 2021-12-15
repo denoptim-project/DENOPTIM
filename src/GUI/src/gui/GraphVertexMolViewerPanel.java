@@ -34,17 +34,14 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
-import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.EmptyVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import gui.GraphViewerPanel.JVertex;
 import gui.GraphViewerPanel.JVertexType;

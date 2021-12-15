@@ -18,7 +18,6 @@
 
 package denoptim.rings;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import java.util.logging.Level;
 
 import javax.vecmath.Point3d;
 
-import org.apache.commons.math3.random.MersenneTwister;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.graph.PathTools;
 import org.openscience.cdk.graph.matrix.TopologicalMatrix;
@@ -46,13 +44,11 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;

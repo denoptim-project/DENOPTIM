@@ -28,7 +28,6 @@ import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.utils.RandomUtils;
 
 
 /**

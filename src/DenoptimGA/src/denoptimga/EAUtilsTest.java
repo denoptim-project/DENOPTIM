@@ -1,27 +1,30 @@
 package denoptimga;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.*;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.io.DenoptimIO;
-
-import org.junit.jupiter.api.Test;
-
-import denoptim.utils.RandomUtils;
-import denoptimga.EAUtils.CandidateSource;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.APClass;
+import denoptim.graph.Candidate;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMGraphTest;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
+import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.EmptyVertex;
+import denoptim.utils.RandomUtils;
+import denoptimga.EAUtils.CandidateSource;
 
 /**
  * Unit test

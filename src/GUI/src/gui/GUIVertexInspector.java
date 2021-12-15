@@ -18,8 +18,6 @@
 
 package gui;
 
-import static denoptim.graph.DENOPTIMVertex.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -46,8 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.ListSelectionModel;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -66,6 +64,7 @@ import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;

@@ -36,7 +36,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.io.FileFormat;
 import denoptim.task.DenoptimGATask;
 import denoptim.task.FitnessRunnerTask;
-import denoptim.task.FitnessTask;
 import denoptim.task.FragSpaceExplorerTask;
 import denoptim.task.GUIInvokedMainTask;
 import denoptim.task.StaticTaskManager;

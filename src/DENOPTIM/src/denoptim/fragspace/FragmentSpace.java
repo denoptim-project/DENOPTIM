@@ -19,35 +19,35 @@
 
 package denoptim.fragspace;
 
+import static denoptimga.DENOPTIMGraphOperations.extractPattern;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import denoptimga.GAParameters;
-import denoptimga.GraphPattern;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.*;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
-
-import static denoptimga.DENOPTIMGraphOperations.extractPattern;
+import denoptimga.GraphPattern;
 
 /**
  * Class defining the fragment space

@@ -32,19 +32,16 @@ import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMEdge;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.utils.GraphConversionTool;
 
 /**
  * Unit test for GraphConversionTool

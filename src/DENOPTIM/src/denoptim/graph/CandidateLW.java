@@ -18,18 +18,6 @@
 
 package denoptim.graph;
 
-import java.io.File;
-import java.io.Serializable;
-
-import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.GraphConversionTool;
-
-
 /**
  * A light-weight candidate is a very low-demanding collection of data upon
  * a specific candidate item. This dies NOT include the {@link DENOPTIMGraph}

@@ -18,19 +18,10 @@
 
 package denoptim.utils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import denoptim.exception.DENOPTIMException;
-import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.EdgeQuery;
-import denoptim.graph.EmptyVertex;
 import denoptim.graph.VertexQuery;
-import denoptim.graph.DENOPTIMEdge.BondType;
 
 
 /**

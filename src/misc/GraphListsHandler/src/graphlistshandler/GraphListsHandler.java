@@ -6,7 +6,6 @@ import java.util.logging.Level;
 
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.GenUtils;
 
 
 /**

@@ -2,20 +2,15 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
-import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
-import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
 import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
 import edu.uci.ics.jung.graph.Graph;
-import gui.GraphViewerPanel.JEdge;
 import gui.GraphViewerPanel.JVertex;
 
 /**

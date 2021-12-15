@@ -21,7 +21,6 @@ package denoptim.rings;
 import java.io.Serializable;
 
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
 
 /**
  * ChainLink represents a vertex in a closable chain.

@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;

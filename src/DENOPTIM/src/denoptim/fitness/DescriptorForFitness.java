@@ -2,9 +2,7 @@ package denoptim.fitness;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.IImplementationSpecification;

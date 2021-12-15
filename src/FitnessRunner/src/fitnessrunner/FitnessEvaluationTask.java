@@ -29,7 +29,6 @@ import denoptim.graph.DENOPTIMGraph;
 import denoptim.task.FitnessTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.GraphConversionTool;
-import denoptimga.GAParameters;
 
 /**
  * Task that calls the fitness provider

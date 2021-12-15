@@ -19,21 +19,16 @@
 package denoptim.graph;
 
 import java.io.Serializable;
-
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
-import com.google.gson.JsonSerializationContext;
 
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Order;
 
-import denoptim.fragspace.FragmentSpace;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 import denoptim.utils.GenUtils;
 
 /**

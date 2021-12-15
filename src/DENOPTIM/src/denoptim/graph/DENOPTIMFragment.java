@@ -1,7 +1,5 @@
 package denoptim.graph;
 
-import static denoptim.graph.DENOPTIMVertex.*;
-
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Marco Foscato <marco.foscato@uib.no>
@@ -21,14 +19,9 @@ import static denoptim.graph.DENOPTIMVertex.*;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.vecmath.Point3d;
 
@@ -44,6 +37,7 @@ import com.google.gson.JsonParseException;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMgson;

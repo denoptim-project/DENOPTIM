@@ -19,16 +19,15 @@
 package denoptim.graph;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMEdge.BondType;

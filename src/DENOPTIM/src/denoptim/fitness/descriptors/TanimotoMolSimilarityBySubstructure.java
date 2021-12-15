@@ -1,23 +1,13 @@
 package denoptim.fitness.descriptors;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-
-import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.fingerprint.BitSetFingerprint;
-import org.openscience.cdk.fingerprint.PubchemFingerprinter;
-import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
-import org.openscience.cdk.fingerprint.Fingerprinter;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
-import org.openscience.cdk.fingerprint.ICountFingerprint;
 import org.openscience.cdk.fingerprint.IFingerprinter;
+import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.AbstractMolecularDescriptor;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.DescriptorValue;
-import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.DoubleResultType;

@@ -23,14 +23,11 @@ import java.io.File;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
 import denoptim.utils.MutationType;
 import denoptimga.DENOPTIMGraphOperations;
 import denoptimga.Monitor;

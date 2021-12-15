@@ -20,28 +20,35 @@
 package denoptimga;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import denoptim.rings.*;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.math3.random.MersenneTwister;
-import org.openscience.cdk.isomorphism.mcss.RMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.fragspace.FragmentSpaceUtils;
 import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.graph.*;
+import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.SymmetricSet;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.rings.ChainLink;
+import denoptim.rings.ClosableChain;
+import denoptim.rings.RingClosureParameters;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
