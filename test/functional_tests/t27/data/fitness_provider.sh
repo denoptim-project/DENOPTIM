@@ -105,13 +105,26 @@ ncl=$(grep -c " Cl " $inpSDF)
 nf=$(grep -c " F " $inpSDF)
 fitness=$((ncl + nf))
 
-candIdTo50="M00000028"
-candIdTo40="M00000031"
+# These are the candidates that will have an artificially high fitness:
+candIdTo50="M00000027"
+candIdTo40="M00000026"
+# And this is the moment (i.e., the generation) where we'll ask to remove the 
+#two high-fitness candidates, and  we'll add a brand new candidate that is 
+# defined further below (i.e., see $newCandSrc)
 triggerRemovalAndAddition="Gen10"
+# This is the generation where we'll ask denoptim to stop.
 triggerStop="Gen15" 
-# NB: if you change these numbers be aware that dome candidates never reach this point
-# of the fitness evaluation script. This because they are rejected due to duplicate UID.
-# For example, M00000056 is abandoned before reaching this point.
+
+# NB: you might need to change these numbers as a consequence of a change in 
+# the algorithms that makes the exact sequence of candidates not reproducible
+# anymore. For example, this will indeed happen when adding a new
+# type of genetic operator. In such case, be aware that some candidates never 
+# reach this point of the fitness evaluation script. This because they are 
+# rejected due to duplicate UID.
+
+# NB: also note that candIdTo50 and candIdTo40 are hard-coded variables in 
+# the ../run_t27.sh script. So, any change made here will have to be reproduced
+# there.
 
 removalAndAdditionTaskFile="$wrkDir/../interface/removal_task"
 stopTaskFile="$wrkDir/../interface/stop_run_task"

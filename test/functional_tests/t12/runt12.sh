@@ -47,10 +47,13 @@ then
     exit 1
 fi
 
-# NB: use this in case you have to update the expected results
+# NB: set this to true in case you have to update the expected results. This
+# is needed in case of changes to the GA algorithms that make the sequence of
+# generated gandidates differe from version to version. For example, when
+# introducingor new or modifying existing genetic operators.
 prepare_expected=false
 # The lines beginning with M00... should then be processed to remove duplicates 
-# and wrtitten into the data/expected_Results file
+# and written into the data/expected_results file
 
 for genFolder in Gen0 Gen1 Gen2 Gen3 Final
 do
@@ -77,12 +80,12 @@ do
         if $prepare_expected ; then
             echo "$molName $invariant"
         else
-            if ! grep -q "$molName" "$wrkDir/expected_Results"; then
+            if ! grep -q "$molName" "$wrkDir/expected_results"; then
                 echo " "
                 echo "Test 't12' NOT PASSED (Lack of reproducibility - symptom: could not find mol name '$molName' in expected results)"
                 exit 1
             fi
-            expected=$(grep "$molName" "$wrkDir/expected_Results" | awk '{print $2}')
+            expected=$(grep "$molName" "$wrkDir/expected_results" | awk '{print $2}')
             if [[ "$expected" != "$invariant" ]]; then
                 echo " "
                 echo "Test 't12' NOT PASSED (Lack of reproducibility - symptom: inconsistent invariant for $molName)"

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +38,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.io.DenoptimIO;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of
@@ -97,24 +99,25 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     /**
      * A data structure collecting crossover-compatible sites. This class wants
      * to collect information like 
-     * "these two candidates are cannot do crossover" (i.e., non compatible) or 
+     * "these two candidates cannot do crossover" (i.e., non compatible) or 
      * "they can do crossover (i.e., compatible) 
      * and here is the list of crossover sites".
-     * This data structure user a map of sorted maps. This to ensure
-     * reproducibility in the generation of list of keys for the inner map.
+     * This data structure user a {@link LinkedHashMap} to ensure
+     * reproducibility in the generation of list of keys for the inner map. The
+     * order of the keys is given by insertion order.
      */
     private class XoverCompatibilitySites
     {
-        private SortedMap<Candidate,
-            SortedMap<Candidate,List<DENOPTIMVertex[]>>> data;
+        private LinkedHashMap<Candidate,
+        LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>> data;
         
         /**
          * Initialises an empty data structure.
          */
         public XoverCompatibilitySites()
         {
-            data = new TreeMap<Candidate,SortedMap<Candidate, 
-                    List<DENOPTIMVertex[]>>>(new CandidatesComparator());
+            data = new LinkedHashMap<Candidate,LinkedHashMap<Candidate, 
+                    List<DENOPTIMVertex[]>>>();
         }
         
         /**
@@ -128,14 +131,13 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          */
         public void put(Candidate c1, Candidate c2, 
                 List<DENOPTIMVertex[]> pairs)
-        {       
+        {     
             if (data.containsKey(c1))
             {
                 data.get(c1).put(c2, pairs);
             } else {
-                SortedMap<Candidate,List<DENOPTIMVertex[]>> toC1 = 
-                        new TreeMap<Candidate,List<DENOPTIMVertex[]>>(
-                                new CandidatesComparator());
+                LinkedHashMap<Candidate,List<DENOPTIMVertex[]>> toC1 = 
+                        new LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>();
                 toC1.put(c2, pairs);
                 data.put(c1, toC1);
             }
@@ -153,9 +155,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             {
                 data.get(c2).put(c1, revPairs);
             } else {
-                SortedMap<Candidate,List<DENOPTIMVertex[]>> toC2 = 
-                        new TreeMap<Candidate,List<DENOPTIMVertex[]>>(
-                                new CandidatesComparator());
+                LinkedHashMap<Candidate,List<DENOPTIMVertex[]>> toC2 = 
+                        new LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>();
                 toC2.put(c1, revPairs);
                 data.put(c2, toC2);
             }
@@ -222,26 +223,12 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         public void remove(Candidate c)
         {
             data.remove(c);
-            for (SortedMap<Candidate, List<DENOPTIMVertex[]>> m : data.values())
+            for (LinkedHashMap<Candidate, List<DENOPTIMVertex[]>> m : 
+                data.values())
             {
                 m.remove(c);
             }
         }
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Comparator meant to compare candidates when these are used as maps' keys
-     */
-    private class CandidatesComparator implements Comparator<Candidate>
-    {
-        @Override
-        public int compare(Candidate o1, Candidate o2)
-        {
-            return o1.hashCode() - o2.hashCode();
-        }
-        
     }
 
 //------------------------------------------------------------------------------

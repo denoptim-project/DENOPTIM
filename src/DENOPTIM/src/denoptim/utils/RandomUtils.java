@@ -83,7 +83,7 @@ public class RandomUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Utility to debug
+     * Utility to debug: writes some log in file '/tmp/rng_debug_log'
      */
     private static void print(Object val, String type)
     {
@@ -106,10 +106,8 @@ public class RandomUtils
         try
         {
             DenoptimIO.writeData("/tmp/rng_debug_log",sss,true);
-            
         } catch (DENOPTIMException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

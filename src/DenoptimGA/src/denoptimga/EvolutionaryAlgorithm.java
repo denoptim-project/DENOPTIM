@@ -591,6 +591,7 @@ public class EvolutionaryAlgorithm
                         src = EAUtils.chooseGenerationMethod();
                     }
                 }
+                
                 switch (src)
                 {
                     case MANUAL:
