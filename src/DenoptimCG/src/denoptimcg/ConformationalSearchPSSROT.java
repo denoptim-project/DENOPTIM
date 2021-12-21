@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.integration.tinker.TinkerAtom;
+import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
@@ -85,10 +86,11 @@ public class ConformationalSearchPSSROT
      * @param fitProvMol the list of input molecules 
      * @return the list of generated conformations.
      * @throws DENOPTIMException
+     * @throws TinkerException if tinker fails.
      */
 
     public ArrayList<Molecule3DBuilder> performPSSROT(
-		     ArrayList<Molecule3DBuilder> mols) throws DENOPTIMException
+		     ArrayList<Molecule3DBuilder> mols) throws DENOPTIMException, TinkerException
     {
         ArrayList<Molecule3DBuilder> nMols = new ArrayList<Molecule3DBuilder>();
         for (int i=0; i<mols.size(); i++)
@@ -126,10 +128,11 @@ public class ConformationalSearchPSSROT
      * @param idm index to distinguish molecules with same name
      * @return the new conformation of the molecular system 
      * @throws DENOPTIMException
+     * @throws TinkerException 
      */
 
     public Molecule3DBuilder performPSSROT(Molecule3DBuilder mol, int idm)
-						throws DENOPTIMException
+						throws DENOPTIMException, TinkerException
     {
         if (verbosity > 1)
         {
@@ -234,9 +237,9 @@ public class ConformationalSearchPSSROT
             System.err.println("Submitting PSSTOR Conformational Search");
 
         // Perform Ring Search with Tinker's PSSROT
-        String csOutFile = workDir + fsep + molName + "_cs" + idm + ".log";
+        String csLogFile = workDir + fsep + molName + "_cs" + idm + ".log";
         String csCmdStr = CGParameters.getPSSROTTool() +
-                          " < " + csSubFile + " > " + csOutFile;
+                          " < " + csSubFile + " > " + csLogFile;
         String csID = "" + CGParameters.getTaskID();
         if (verbosity > 1)
         {
@@ -259,21 +262,27 @@ public class ConformationalSearchPSSROT
         {
             throw new DENOPTIMException(ex);
         }
+        
+        //We check for the first output file, i.e., .000 but there could be many
+        TinkerUtils.ensureOutputExistsOrRelayError(workDir + fsep + molName 
+                + "_cs" + idm + ".000", csLogFile, "PSSROT job");
 
         // Convert XYZ output of Tinker to INT with same z.matrix
         // Here we assume the file *.int with same basename exists
         // (was used it as input the PSSTOR step) and that file works as
         // template of the z-matrix
         String ocsIntfile = getNameLastCycleFile(molName + "_cs" 
-							+ idm, csOutFile);
+							+ idm, csLogFile);
 
-    	// But beforethan, need to handle case where Tinker splits line in two
+    	// But before that, need to handle case where Tinker splits line in two
     	fixLongeLinesInXYZ(ocsIntfile);
 
+    	String newTnkICLog = workDir + fsep + molName + "_cs" + idm + ".log2";
         String ocsID = "" + CGParameters.getTaskID();
         String ocsCmd = CGParameters.getXYZINTTool() + " "
                         + ocsIntfile + " "
-                        + " T"; //set use of template 
+                        + " T " //set use of template 
+                        + " > " + newTnkICLog;
         if (verbosity > 1)
         {
             System.err.println("CMD: " + ocsCmd + " TskID: " + ocsID);
@@ -293,9 +302,15 @@ public class ConformationalSearchPSSROT
         {
             throw new DENOPTIMException(ex);
         }
-
-        // Update local molecular representation with output from PSSROT
+        
+        // Conversion can fail if system is beyond the capabilities of Tinker.
+        // Such capabilities can be expanded by altering Tinker's parameters 
+        // such as maxval and maxtors (and others?)
         String newTnkIC = workDir + fsep + molName + "_cs" + idm + ".int_2";
+        TinkerUtils.ensureOutputExistsOrRelayError(newTnkIC, newTnkICLog, 
+                "convert xyz to int");
+        
+        // Update local molecular representation with output from PSSROT
         TinkerMolecule tmpTmol = TinkerUtils.readTinkerIC(newTnkIC);
         ArrayList<TinkerAtom> lstAtoms = tmpTmol.getAtoms();
         for (int i=0; i<lstAtoms.size(); i++)

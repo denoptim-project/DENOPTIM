@@ -1026,6 +1026,8 @@ public class EAUtils
             Population population, HashSet<String> lstInchi,
             String genDir) throws DENOPTIMException
     {
+        //TODO-GG use DenoptimIO.readGraph...
+        
         ArrayList<IAtomContainer> mols;
         if (GenUtils.getFileExtension(filename).compareToIgnoreCase(".sdf") == 0)
         {

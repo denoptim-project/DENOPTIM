@@ -479,53 +479,53 @@ public class GraphEdParameters
 
         try
         {
-	    switch (inGraphsFormat)
-	    {
-		case (STRINGFORMATLABEL):
-		{
-                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                                                             inGraphsFile,true);
-		    break;
-                }
-		case (SERFORMATLABEL):
+    	    switch (inGraphsFormat)
+    	    {
+        		case (STRINGFORMATLABEL):
+        		{
+                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(inGraphsFile, 
+                            true);
+        		    break;
+        		}
+        		case (SERFORMATLABEL):
                 {
                     //TODO get arraylist of graphs or accept multiple files
                     DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
                                                         new File(inGraphsFile));
                     inGraphs.add(g);
-		    break;
+        		    break;
                 }
-		case ("SDF"):
-		{
-		    inMols = DenoptimIO.readSDFFile(inGraphsFile);
-		    int i = 0;
-		    for (IAtomContainer m : inMols)
-		    {
-			i++;
-			if (m.getProperty(DENOPTIMConstants.GRAPHTAG) != null)
-            		{
-			    String sGrp = m.getProperty(
-			            DENOPTIMConstants.GRAPHTAG).toString();
-			    GraphConversionTool gct = new GraphConversionTool();
-			    DENOPTIMGraph g = gct.getGraphFromString(sGrp);
-			    inGraphs.add(g);
-			}
-			else
-			{
-			    String msg = "Molecule " + i + " in file '" 
-					 + inGraphsFile + "' has no GraphENC. "
-                                         + " Unable to read DENOPTIMGraph!";
-                            throw new DENOPTIMException(msg);
-			}
-		    }
-		    break;
-		}
-		default:
+        		case ("SDF"):
+        		{
+        		    //TODO-GG use DenoptimIO.readGraph...
+        		    inMols = DenoptimIO.readSDFFile(inGraphsFile);
+        		    int i = 0;
+        		    for (IAtomContainer m : inMols)
+        		    {
+            			i++;
+            			if (m.getProperty(DENOPTIMConstants.GRAPHTAG) != null)
+            			{
+            			    String sGrp = m.getProperty(
+            			            DENOPTIMConstants.GRAPHTAG).toString();
+            			    DENOPTIMGraph g = GraphConversionTool.getGraphFromString(sGrp);
+            			    inGraphs.add(g);
+            			}
+            			else
+            			{
+            			    String msg = "Molecule " + i + " in file '" 
+            					 + inGraphsFile + "' has no GraphENC. "
+                                                     + " Unable to read DENOPTIMGraph!";
+                                        throw new DENOPTIMException(msg);
+            			}
+        		    }
+        		    break;
+        		}
+        		default:
                 {
                     String msg = "'" + inGraphsFormat + "'"
                                          + " is not a valid format for graphs.";
                     throw new DENOPTIMException(msg);
-		}
+        		}
             }
         }
         catch (Throwable t)

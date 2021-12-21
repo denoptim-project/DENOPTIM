@@ -19,6 +19,7 @@
 
 package denoptimcg;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -26,6 +27,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.GraphConversionTool;
 
@@ -42,7 +44,6 @@ public class DenoptimCG
      */
     public static void main(String[] args) 
     {
-        // TODO code application logic here
         if (args.length < 1)
         {
             System.err.println("Usage: java DenoptimCG paramFile");
@@ -59,62 +60,67 @@ public class DenoptimCG
             CGParameters.printParameters();
             
             // read the input molecule
+            DENOPTIMGraph grph = DenoptimIO.readDENOPTIMGraphsFromFile(
+                    new File(CGParameters.getInputSDFFile()), true).get(0);
+            
             IAtomContainer mol = DenoptimIO.readSingleSDFFile(
                     CGParameters.getInputSDFFile());
-            if (mol.getProperty(DENOPTIMConstants.GRAPHTAG) != null)
-            {
             
-                String graphStr = mol.getProperty(
-                        DENOPTIMConstants.GRAPHTAG).toString();
-                System.err.println("Imported graph: " + graphStr);
-        		GraphConversionTool gct = new GraphConversionTool();
-        		DENOPTIMGraph grph = gct.getGraphFromString(graphStr);
-
-                String mname = mol.getProperty("cdk:Title").toString();
-                
-                
-                DENOPTIM3DMoleculeBuilder mbuild = 
-                        new DENOPTIM3DMoleculeBuilder(mname, grph, 
-                                        CGParameters.getWorkingDirectory());
-// MF: commented out for multi-conf procedure which is going to be
-// implemented at some time in the future. 
-// Note that the method buildMulti3DStructure can be used also for 
-// generating a single conformation.
-/*                
-                IAtomContainer nmol = mbuild.build3DStructure();
-                nmol.setProperties(mol.getProperties());
-                // write file
-                DenoptimIO.writeMolecule(CGParameters.getOutputSDFFile(), nmol, false);
-*/
-//MF: writes more than one structure if needed
-                ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
-                for (int i = 0; i<nmols.size(); i++)
+            String mname = "noname";
+            Object propName = mol.getProperty("cdk:Title");
+            if (propName != null)
+            {
+                mname = propName.toString();
+            } else {
+                Object propTitle = mol.getTitle();
+                if (propTitle != null)
                 {
-                    //NB: here we reset the IAC properties, so, any property that
-                    // should be passed on to the future should be copied.
-                    String propVIDs = nmols.get(i).getProperty(
-                            DENOPTIMConstants.ATMPROPVERTEXID).toString();
-                    Object propMolErr = nmols.get(i).getProperty(
-                            DENOPTIMConstants.MOLERRORTAG);
-                    nmols.get(i).setProperties(mol.getProperties());
-                    nmols.get(i).setProperty(
-                            DENOPTIMConstants.ATMPROPVERTEXID, propVIDs);
-                    if (propMolErr != null)
-                    {
-                        nmols.get(i).setProperty(DENOPTIMConstants.MOLERRORTAG, 
-                                propMolErr.toString());
-                    }
+                    mname = propTitle.toString();
                 }
-                // write file
-                DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);
             }
-        }
-        catch (DENOPTIMException de)
+            
+            DENOPTIM3DMoleculeBuilder mbuild = 
+                    new DENOPTIM3DMoleculeBuilder(mname, grph);
+
+            ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
+            for (int i = 0; i<nmols.size(); i++)
+            {
+                //NB: here we reset the IAC properties, so, any property that
+                // should be passed on to the future should be copied.
+                String propVIDs = nmols.get(i).getProperty(
+                        DENOPTIMConstants.ATMPROPVERTEXID).toString();
+                Object propMolErr = nmols.get(i).getProperty(
+                        DENOPTIMConstants.MOLERRORTAG);
+                nmols.get(i).setProperties(mol.getProperties());
+                nmols.get(i).setProperty(
+                        DENOPTIMConstants.ATMPROPVERTEXID, propVIDs);
+                if (propMolErr != null)
+                {
+                    nmols.get(i).setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                            propMolErr.toString());
+                }
+            }
+            // write file
+            DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);
+            
+        } catch (TinkerException te)
+        {
+            String msg = "ERROR! Tinker failed on task '" + te.taskName 
+                    + "'!";
+            if (te.solution != "")
+            {
+                msg = msg + System.getProperty("line.separator") + te.solution;
+            }
+            System.out.println(msg);
+            System.exit(-1);
+        } 
+        catch (Exception de)
         {
             de.printStackTrace(System.err);
             System.exit(-1);
-        }
+        } 
         
+        System.out.println("DenoptimCG terminated normally!");
         System.exit(0);
     }
 }

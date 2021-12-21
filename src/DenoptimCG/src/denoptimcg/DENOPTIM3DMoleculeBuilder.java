@@ -28,6 +28,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
@@ -47,121 +48,17 @@ import denoptim.utils.RotationalSpaceUtils;
 public class DENOPTIM3DMoleculeBuilder
 {
     private String molName;
-    private String workDir;
     private DENOPTIMGraph molGraph;
-    private final static double EPSILON = 0.0001;
     
     private boolean debug = CGParameters.debug();
     private static int verbosity = CGParameters.getVerbosity();
-	
-
-    private double[] zerovec =
-    {
-        0.0, 0.0, 0.0
-    };
-    private String fsep = System.getProperty("file.separator");
-    private static int spin = 1;
-    private static String propNameVId = DENOPTIMConstants.ATMPROPVERTEXID;
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIM3DMoleculeBuilder(String molName, DENOPTIMGraph molGraph,
-            String dir)
+    public DENOPTIM3DMoleculeBuilder(String molName, DENOPTIMGraph molGraph)
     {
         this.molName = molName;
-        workDir = dir;
         this.molGraph = molGraph;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Command line string for converting sdf to tinker XYZ format
-     *
-     * @param swPath
-     * @param sdfinfile
-     * @param xyzOutfile
-     * @return the command string
-     */
-    private String sdfToTXYZ(String swPath, String sdfinfile,
-            String xyzOutfile)
-    {
-        String cmdStr = swPath + " -isdf " + sdfinfile
-                + " -otxyz -O " + xyzOutfile;
-        return cmdStr;
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Command line string for converting tinker XYZ format to internal
-     * coordinates
-     *
-     * @param swPath
-     * @param xyzinfile
-     * @return the command statement
-     */
-    private String tXYZToInt(String swPath, String xyzinfile)
-    {
-        String cmdStr = swPath + " " + xyzinfile + " A";
-        return cmdStr;
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Internal coordinates to XYZ command line
-     *
-     * @param swPath
-     * @param intfile
-     * @return the command statement
-     */
-    private String intToXYZ(String swPath, String intfile)
-    {
-        String cmdStr = swPath + " " + intfile;
-        return cmdStr;
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Command line string for converting tinker XYZ format to internal
-     * coordinates
-     *
-     * @param swPath
-     * @param xyzinfile
-     * @return the command statement
-     */
-    private String tXYZToSDF(String swPath, String xyzinfile, String sdfOutfile)
-    {
-        String cmdStr = swPath + " -itxyz " + xyzinfile + " -osdf -O " + sdfOutfile;
-        return cmdStr;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Get the direction vector associated with the atom and AP index
-     *
-     * @param dirData
-     * @param natm
-     * @param apidx
-     * @return direction vector
-     */
-    private double[] getDirectionVector(ArrayList<APAtomHolder> dirData,
-            int natm, int apidx)
-    {
-        for (APAtomHolder aph : dirData)
-        {
-            if (aph.getAtomNumber() == natm)
-            {
-                if (aph.getAPIndex() == apidx)
-                {
-                    return aph.getDirVec();
-                }
-            }
-        }
-        return null;
     }
 
 //------------------------------------------------------------------------------
@@ -174,10 +71,11 @@ public class DENOPTIM3DMoleculeBuilder
      * structure can be obtained if the provided graph allows for isomerism
      * for example by multiple possibility of ring formation or conformational
      * isomerism (not implemented yet).
+     * @throws TinkerException if thinker fails
      */
 
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
-            throws DENOPTIMException
+            throws DENOPTIMException, TinkerException
     {
         String msg = "Building Multiple 3D representations for "
                  + "graph = " + molGraph.toString();

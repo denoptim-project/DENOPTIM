@@ -826,8 +826,7 @@ public class Molecule3DBuilder
     public Molecule3DBuilder deepcopy() throws DENOPTIMException
     {
         String nMolName = this.molName;
-        DENOPTIMGraph nMolGraph = 
-               GraphConversionTool.getGraphFromString(this.molGraph.toString());
+        DENOPTIMGraph nMolGraph = this.molGraph.clone();
         IAtomContainer nFMol;
         TinkerMolecule nTMol;
         ArrayList<ObjectPair> nRotBnds;

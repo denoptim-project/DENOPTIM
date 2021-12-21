@@ -26,6 +26,11 @@ import java.io.Serializable;
  */
 public class TinkerAtom implements Serializable, Cloneable
 {
+    /**
+     * Version ID
+     */
+    private static final long serialVersionUID = 3L;
+
     /*
      * tinker assigned atom type
      */

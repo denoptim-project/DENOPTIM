@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -49,7 +50,7 @@ import denoptim.utils.ObjectPair;
  */
 public class TinkerUtils 
 {
-    private static String lsep = System.getProperty("line.separator");
+    private static final String NL = System.getProperty("line.separator");
     private static boolean debug = false;
     
     
@@ -440,7 +441,7 @@ public class TinkerUtils
 
             if (zadd.size() > 0 || zdel.size() > 0)
             {
-                fw.write(lsep);
+                fw.write(NL);
                 fw.flush();
 
                 for (int i = 0; i < zadd.size(); i++)
@@ -453,7 +454,7 @@ public class TinkerUtils
 
                 if (zdel.size() > 0)
                 {
-                    fw.write(lsep);
+                    fw.write(NL);
                     fw.flush();
 
                     for (int i = 0; i < zdel.size(); i++)
@@ -515,7 +516,7 @@ public class TinkerUtils
                     String str = line.substring(38);
                     // read the number of atoms and store
                     String[] arr = str.split("\\s+");
-                    energies.add(new Double(arr[1]));
+                    energies.add(Double.parseDouble(arr[1]));
                 }
             }
         }
@@ -658,16 +659,18 @@ public class TinkerUtils
                     String[] dq = line.split("\"");
                     String fp = dq[0];
                     String[] str1 = fp.split("\\s+");
-                    String sp = dq[2];
-                    String[] str2 = sp.split("\\s+");
 
                     //Check the format by reading all parts of atom type def.
                     int atomType = Integer.parseInt(str1[1]);
                     String symbol = str1[2];
+                    /* Not needed so far...
+                    String sp = dq[2];
+                    String[] str2 = sp.split("\\s+");
                     String label = dq[1];
                     int z = Integer.parseInt(str2[1]);
                     double atmWeight = Double.parseDouble(str2[2]);
                     int cn = Integer.parseInt(str2[3]);
+                    */
 
                     //Store
                     atomTypesMap.put(symbol,atomType);                    
@@ -839,8 +842,8 @@ public class TinkerUtils
         {
             if (b.getProperty(doneBnd) == null)
             {
-                tm.addBond(mol.getAtomNumber(b.getAtom(0))+1,
-                           mol.getAtomNumber(b.getAtom(1))+1);
+                tm.addBond(mol.indexOf(b.getAtom(0))+1,
+                           mol.indexOf(b.getAtom(1))+1);
             }
         }
 
@@ -860,14 +863,14 @@ public class TinkerUtils
         List<ConnectedLigand> candidates = new ArrayList<ConnectedLigand>();
         for (IAtom nbr : mol.getConnectedAtomsList(mol.getAtom(i1)))
         {
-            if (mol.getAtomNumber(nbr) < i1)
+            if (mol.indexOf(nbr) < i1)
             {
                 ConnectedLigand cl = new ConnectedLigand(nbr,1);
                 candidates.add(cl);
             }
         }
         Collections.sort(candidates, new ConnectedLigandComparator());
-        int i2 = mol.getAtomNumber(candidates.get(0).getAtom());
+        int i2 = mol.indexOf(candidates.get(0).getAtom());
         return i2;
     }
 
@@ -878,14 +881,14 @@ public class TinkerUtils
         List<ConnectedLigand> candidates = new ArrayList<ConnectedLigand>();
         for (IAtom nbr : mol.getConnectedAtomsList(mol.getAtom(i2)))
         {
-            if ((mol.getAtomNumber(nbr) < i1) && (nbr != mol.getAtom(i1)))
+            if ((mol.indexOf(nbr) < i1) && (nbr != mol.getAtom(i1)))
             {
                 ConnectedLigand cl = new ConnectedLigand(nbr,1);
                 candidates.add(cl);
             }
         }
         Collections.sort(candidates, new ConnectedLigandComparator());
-        int i3 = mol.getAtomNumber(candidates.get(0).getAtom());
+        int i3 = mol.indexOf(candidates.get(0).getAtom());
         return i3;
     }
 
@@ -908,12 +911,12 @@ public class TinkerUtils
                 if (debug)
                 {
                    System.err.println("  Eval. 3rd (ANG): " + nbr.getSymbol()
-                   + mol.getAtomNumber(nbr) + " " 
-                   + (mol.getAtomNumber(nbr) < i1) + " "
+                   + mol.indexOf(nbr) + " " 
+                   + (mol.indexOf(nbr) < i1) + " "
                    + (nbr != atmI1) + " " 
                    + (nbr != atmI3));
                 }
-                if ((mol.getAtomNumber(nbr) < i1) && (nbr != atmI1) && 
+                if ((mol.indexOf(nbr) < i1) && (nbr != atmI1) && 
                                                         (nbr != atmI3))
                 {
                     double dbcAng = DENOPTIMMathUtils.angle(nbr.getPoint3d(),
@@ -945,12 +948,12 @@ public class TinkerUtils
                 if (debug)
                 {
                    System.err.println("  Eval. 3rd (TOR): " + nbr.getSymbol()
-                   + mol.getAtomNumber(nbr) + " "
-                   + (mol.getAtomNumber(nbr) < i1) + " "
+                   + mol.indexOf(nbr) + " "
+                   + (mol.indexOf(nbr) < i1) + " "
                    + (nbr != atmI1) + " "
                    + (nbr != atmI2));
                 }
-                if ((mol.getAtomNumber(nbr) < i1) && (nbr != atmI1) &&
+                if ((mol.indexOf(nbr) < i1) && (nbr != atmI1) &&
                                                         (nbr != atmI2))
                 {
                     ConnectedLigand cl = new ConnectedLigand(nbr,1);
@@ -966,7 +969,7 @@ public class TinkerUtils
                          + "of atom " + tm.getAtom(i1+1);
             throw new DENOPTIMException(msg);
         }
-        int i4 = mol.getAtomNumber(candidates.get(0).getAtom());
+        int i4 = mol.indexOf(candidates.get(0).getAtom());
 
         ObjectPair op = new ObjectPair(i4,i5);
         
@@ -980,7 +983,7 @@ public class TinkerUtils
         int tot = 0;
         for (IAtom nbr : mol.getConnectedAtomsList(a))
         {
-            if (mol.getAtomNumber(nbr) < i)
+            if (mol.indexOf(nbr) < i)
                 tot++;
         }
         return tot;
@@ -1030,6 +1033,62 @@ public class TinkerUtils
                 throw new DENOPTIMException(msg);
             }
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check for the existence of an output file for a Tinker job and, if the 
+     * output file is not found, this method throws an exception that contains 
+     * the error message from Tinker job log.
+     * @param outputPathName pathname of the Tinker output file that we expect
+     * to exist.
+     * @param logPathName pathname to the log of the Tinker job that was
+     * supposed to generate the output.
+     * @param taskName a string identifying the task that Tinker was supposed to
+     * perform.
+     * @throws TinkerException if the output file is not found. This exception
+     * will contain the error from Tinker's log.
+     */
+    
+    public static void ensureOutputExistsOrRelayError(String outputPathName, 
+            String logPathName, String taskName) throws TinkerException
+    {
+        File output = new File(outputPathName);
+        if (output.exists() && output.canRead())
+        {
+            return;
+        }
+        
+        String errMsg = "TINKER ERROR: ";
+        ReversedLinesFileReader fr = null;
+        try
+        {
+            fr = new ReversedLinesFileReader(new File(
+                    logPathName));
+
+            int numEmpty = 0;
+            for (int i=0; i<100; i++) //at most 100 lines are read
+            {
+                String line = fr.readLine();
+                if (line==null)
+                    break;
+                
+                if (line.trim().isEmpty())
+                    numEmpty++;
+                
+                if (numEmpty==2)
+                    break;
+                errMsg = errMsg + NL + line;
+            }
+            fr.close();
+        } catch (IOException e)
+        {
+            throw new TinkerException("Missing Tinker log '" + logPathName + "'",
+                    taskName);
+        }
+        
+        throw new TinkerException(errMsg, taskName);
     }
 
 //------------------------------------------------------------------------------

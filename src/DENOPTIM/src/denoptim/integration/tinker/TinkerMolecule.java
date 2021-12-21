@@ -30,6 +30,11 @@ import java.util.ArrayList;
  */
 public class TinkerMolecule implements Serializable, Cloneable
 {
+    /**
+     * Version ID
+     */
+    private static final long serialVersionUID = 3L;
+    
     private ArrayList<TinkerAtom> lstAtoms;
     ArrayList<int[]> zdel;
     ArrayList<int[]> zadd;
