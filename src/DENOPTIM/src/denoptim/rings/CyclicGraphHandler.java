@@ -21,7 +21,6 @@ package denoptim.rings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,7 +103,7 @@ public class CyclicGraphHandler
      * @return the selected combination of closable paths 
      */
 
-    public Set<DENOPTIMRing> getRandomCombinationOfRings(IAtomContainer inMol,
+    public List<DENOPTIMRing> getRandomCombinationOfRings(IAtomContainer inMol,
                                                        DENOPTIMGraph molGraph)
                                                       throws DENOPTIMException
     {
@@ -132,7 +131,7 @@ public class CyclicGraphHandler
         
         // Randomly choose the compatible combinations of RCAs and store them
         // as DENOPTIMRings. 
-        Set<DENOPTIMRing> combOfRings = new HashSet<DENOPTIMRing>();
+        List<DENOPTIMRing> combOfRings = new ArrayList<DENOPTIMRing>();
         while (wLstVrtI.size() > 0)
         {
             int vIdI = RandomUtils.nextInt(wLstVrtI.size());
@@ -218,7 +217,7 @@ public class CyclicGraphHandler
      * @return the candidate closable paths in the given graph
      */
 
-    public ArrayList<Set<DENOPTIMRing>> getPossibleCombinationOfRings(
+    public ArrayList<List<DENOPTIMRing>> getPossibleCombinationOfRings(
                                                             IAtomContainer mol,
                                                         DENOPTIMGraph molGraph)
                                                        throws DENOPTIMException
@@ -322,8 +321,8 @@ public class CyclicGraphHandler
         }
 
         // Identify paths that share bonds (interdependent paths)
-        Map<IBond,Set<PathSubGraph>> interdepPaths =
-                                new HashMap<IBond,Set<PathSubGraph>>();
+        Map<IBond,List<PathSubGraph>> interdepPaths =
+                                new HashMap<IBond,List<PathSubGraph>>();
         if (RingClosureParameters.checkInterdependentChains())
         {
             for (PathSubGraph rpA : allGoodPaths.values())
@@ -366,8 +365,8 @@ public class CyclicGraphHandler
                             }
                             else
                             {
-                                Set<PathSubGraph> paths = 
-                                                   new HashSet<PathSubGraph>();
+                                List<PathSubGraph> paths = 
+                                                   new ArrayList<PathSubGraph>();
                                 paths.add(rpA);
                                 paths.add(rpB);
                                 interdepPaths.put(bnd,paths);
@@ -381,7 +380,7 @@ public class CyclicGraphHandler
                 for (IBond bnd : interdepPaths.keySet())
                 {
                     System.out.println("Interdependent paths for bond " + bnd);
-                    Set<PathSubGraph> sop = interdepPaths.get(bnd);
+                    List<PathSubGraph> sop = interdepPaths.get(bnd);
                     for (PathSubGraph p : sop)
                     {
                         System.out.println(" vA: "+p.getHeadVertex()
@@ -401,8 +400,8 @@ public class CyclicGraphHandler
         }
 
         // All possible ring closing paths will be stored here
-        ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
-                                     new ArrayList<Set<DENOPTIMRing>>();
+        ArrayList<List<DENOPTIMRing>> allCombsOfRings =
+                                     new ArrayList<List<DENOPTIMRing>>();
         
         combineCompatPathSubGraphs(0,
                 sortedKeys,
@@ -434,8 +433,8 @@ public class CyclicGraphHandler
                        ArrayList<ObjectPair> lstPairs,
                        ArrayList<Integer> usedId,
                        Map<ObjectPair,PathSubGraph> allGoodPaths,
-                       Map<IBond,Set<PathSubGraph>> interdepPaths,
-                       ArrayList<Set<DENOPTIMRing>> allCombsOfRings)
+                       Map<IBond,List<PathSubGraph>> interdepPaths,
+                       ArrayList<List<DENOPTIMRing>> allCombsOfRings)
                                                       throws DENOPTIMException
     {
         int objId = this.hashCode();
@@ -452,7 +451,7 @@ public class CyclicGraphHandler
             System.out.println(objId+"-"+recLab+"> lstPairs= "+lstPairs);
             System.out.println(objId+"-"+recLab+"> compatMap= "+compatMap);
             System.out.println(objId+"-"+recLab+"> allCombsOfRings");
-            for (Set<DENOPTIMRing> ringSet : allCombsOfRings)
+            for (List<DENOPTIMRing> ringSet : allCombsOfRings)
             {
                 System.out.println("        "+ringSet);
             }
@@ -535,8 +534,7 @@ public class CyclicGraphHandler
                         if (debug)
                             System.out.println(objId+"-"+recLab+"> in B");
 
-                        Set<DENOPTIMRing> ringsComb = 
-                                                   new HashSet<DENOPTIMRing>();
+                        List<DENOPTIMRing> ringsComb = new ArrayList<DENOPTIMRing>();
                         for (ObjectPair opFinal : lstPairs)
                         {
                             PathSubGraph path = allGoodPaths.get(opFinal);
@@ -568,7 +566,7 @@ public class CyclicGraphHandler
                         }
 
                         boolean notNewCmb = false;
-                        for(Set<DENOPTIMRing> oldCmb : allCombsOfRings)
+                        for(List<DENOPTIMRing> oldCmb : allCombsOfRings)
                         {
                             if (debug)
                             {
@@ -657,13 +655,13 @@ public class CyclicGraphHandler
      */
 
     private boolean hasInterdependentPaths(ArrayList<ObjectPair> lstPairs,
-                                    Map<IBond,Set<PathSubGraph>> interdepPaths)
+                                    Map<IBond,List<PathSubGraph>> interdepPaths)
     {
         boolean result = false;
         
         for (IBond bnd : interdepPaths.keySet())
         {
-            Set<PathSubGraph> psgSet = interdepPaths.get(bnd);
+            List<PathSubGraph> psgSet = interdepPaths.get(bnd);
             for (PathSubGraph psg : psgSet)
             {
                 DENOPTIMVertex va1 = psg.getHeadVertex();
@@ -700,16 +698,16 @@ public class CyclicGraphHandler
 
     private boolean checkClosabilityOfInterdependentPaths(
                                 ArrayList<ObjectPair> lstPairs,
-                                Map<IBond,Set<PathSubGraph>> interdepPaths,
+                                Map<IBond,List<PathSubGraph>> interdepPaths,
                                 Map<ObjectPair,PathSubGraph> allGoodPaths)
     {
         // Identify the interdependent sets of paths
-        Set<ArrayList<ObjectPair>> listOfIntrDepPaths = 
-                                          new HashSet<ArrayList<ObjectPair>>();
+        List<ArrayList<ObjectPair>> listOfIntrDepPaths = 
+                new ArrayList<ArrayList<ObjectPair>>();
         for (IBond bnd : interdepPaths.keySet())
         {
             ArrayList<ObjectPair> locSop = new ArrayList<ObjectPair>();
-            Set<PathSubGraph> psgSet = interdepPaths.get(bnd);
+            List<PathSubGraph> psgSet = interdepPaths.get(bnd);
             for (PathSubGraph psg : psgSet)
             {
                 DENOPTIMVertex va1 = psg.getHeadVertex();
@@ -739,13 +737,13 @@ public class CyclicGraphHandler
         {
             // Per each closable conf. of the first path stores the paths 
             // that have a simultaneously closable conf.
-            Map<ClosableConf,Set<ObjectPair>> mapOcPathsWithCC = 
-                                 new HashMap<ClosableConf,Set<ObjectPair>>();
+            Map<ClosableConf,List<ObjectPair>> mapOcPathsWithCC = 
+                                 new HashMap<ClosableConf,List<ObjectPair>>();
 
             // Per each closable conf. of a path lists the simultaneously 
             // closable confs of the other interdependent paths
-            Map<ClosableConf,Set<ClosableConf>> mapOfClosableConfs =
-                                 new HashMap<ClosableConf,Set<ClosableConf>>();
+            Map<ClosableConf,List<ClosableConf>> mapOfClosableConfs =
+                                 new HashMap<ClosableConf,List<ClosableConf>>();
 
             // For the first path just put all closable conf in the list
             ObjectPair firstOp = grpIntrdepPaths.get(0);
@@ -757,10 +755,10 @@ public class CyclicGraphHandler
                 ClosableConf cc = new ClosableConf(firstPsg.getBondPath(), 
                                                    ccAngls);
                 // Container for cc of other paths
-                Set<ClosableConf> scc = new HashSet<ClosableConf>();
+                List<ClosableConf> scc = new ArrayList<ClosableConf>();
                 mapOfClosableConfs.put(cc,scc);
                 // Container for other paths
-                Set<ObjectPair> sop = new HashSet<ObjectPair>();
+                List<ObjectPair> sop = new ArrayList<ObjectPair>();
                 sop.add(firstOp);
                 mapOcPathsWithCC.put(cc,sop);                
             }
@@ -1463,7 +1461,7 @@ public class CyclicGraphHandler
                 DENOPTIMMoleculeUtils.getVertexToAtomIdMap(
                         (ArrayList<DENOPTIMVertex>) subGraph.getVertecesPath(),
                         mol);
-        Set<Integer> atmIdsInVrtxPath = new HashSet<Integer>();
+        List<Integer> atmIdsInVrtxPath = new ArrayList<Integer>();
         for (DENOPTIMVertex v : subGraph.getVertecesPath())
         {
             atmIdsInVrtxPath.addAll(vIdToAtmId.get(v));
@@ -1730,7 +1728,7 @@ public class CyclicGraphHandler
      */
 
     public boolean checkChelatesGraph(DENOPTIMGraph molGraph,
-                                      Set<DENOPTIMRing> ringsSet)
+                                      List<DENOPTIMRing> ringsSet)
     {
 
         if (verbosity > 0)

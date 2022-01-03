@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -660,7 +661,8 @@ public class DENOPTIMGraphTest {
         
         DENOPTIMVertex v1 = g.getVertexAtPosition(1);
         
-        Map<Integer,Integer> apMap = new HashMap<Integer,Integer>();
+        LinkedHashMap<Integer, Integer> apMap = 
+                new LinkedHashMap<Integer,Integer>();
         apMap.put(0, 4); 
         apMap.put(1, 1);
         apMap.put(3, 2);
@@ -716,7 +718,8 @@ public class DENOPTIMGraphTest {
         
         DENOPTIMVertex v2 = g2.getVertexAtPosition(2);
         
-        Map<Integer,Integer> apMap2 = new HashMap<Integer,Integer>();
+        LinkedHashMap<Integer,Integer> apMap2 = 
+                new LinkedHashMap<Integer,Integer>();
         apMap2.put(0, 1);
         
         int chosenBBId2 = 5;

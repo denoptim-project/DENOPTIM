@@ -152,7 +152,10 @@ public class TestOperator
             {
                 apID = TestOperatorParameters.idTargetAP;
                 if (apID<0)
-                    throw new DENOPTIMException("ID of target AP is negative.");
+                    throw new DENOPTIMException("ID of target AP is negative. "
+                            + "For mutation " + mt + " you should specify also "
+                            + "the index of the AP on the mutation target as "
+                            + "TESTGENOPS-APIDONTARGETVERTEX.");
             }
             
             // NB: last boolean asks to ignore the growth probability

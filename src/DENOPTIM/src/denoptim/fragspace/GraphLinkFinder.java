@@ -1,9 +1,8 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
@@ -46,7 +45,7 @@ public class GraphLinkFinder
      * edge rather than a vertex.
      */
     //TODO: consider getting rid of this and use only chosenAPMap
-    private Map<Integer,Integer> chosenAPMapInt;
+    private LinkedHashMap<Integer,Integer> chosenAPMapInt;
     
     /**
      * The collection of all alternative vertex that can replace the 
@@ -55,8 +54,8 @@ public class GraphLinkFinder
      * field is null in case the constructor was asked to work on an
      * edge rather than a vertex.
      */
-    private Map<DENOPTIMVertex,List<Map<Integer,Integer>>> allCompatLinksInt = 
-            new HashMap<DENOPTIMVertex,List<Map<Integer,Integer>>>();
+    private LinkedHashMap<DENOPTIMVertex,List<LinkedHashMap<Integer,Integer>>> allCompatLinksInt = 
+            new LinkedHashMap<DENOPTIMVertex,List<LinkedHashMap<Integer,Integer>>>();
     
     /**
      * The mapping of attachment points between the original vertex/es and the
@@ -73,8 +72,8 @@ public class GraphLinkFinder
      * field is null in case the constructor was asked to work on an
      * edge rather than a vertex.
      */
-    private Map<DENOPTIMVertex,List<APMapping>> allCompatLinks = 
-            new HashMap<DENOPTIMVertex,List<APMapping>>();
+    private LinkedHashMap<DENOPTIMVertex,List<APMapping>> allCompatLinks = 
+            new LinkedHashMap<DENOPTIMVertex,List<APMapping>>();
     
     /**
      * Maximum number of combinations. This prevents combinatorial explosion, 
@@ -177,8 +176,8 @@ public class GraphLinkFinder
             }
             
             // We map all the compatibilities before choosing a specific mapping
-            Map<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
-                    new HashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+            LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
+                    new LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
             
             for (DENOPTIMAttachmentPoint oAP : originalLink.getAttachmentPoints())
             {
@@ -356,7 +355,8 @@ public class GraphLinkFinder
             }
             if (screenAll)
             {
-                List<Map<Integer,Integer>> lst = new ArrayList<Map<Integer,Integer>>();
+                List<LinkedHashMap<Integer,Integer>> lst = 
+                        new ArrayList<LinkedHashMap<Integer,Integer>>();
                 for (APMapping apm : apMappings)
                 {
                     try
@@ -490,8 +490,8 @@ public class GraphLinkFinder
             }
             
             // We map all the compatibilities before choosing a specific mapping
-            Map<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
-                    new HashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+            LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
+                    new LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
             
             List<DENOPTIMAttachmentPoint> needeAPs = new ArrayList<DENOPTIMAttachmentPoint>();
             needeAPs.add(originalEdge.getSrcAP());
@@ -588,7 +588,7 @@ public class GraphLinkFinder
      * {@link GraphLinkFinder#getChosenAlternativeLink()} is guaranteed.
      * @return the chosen alternative or null is none was found.
      */
-    public Map<Integer, Integer> getChosenAPMappingInt()
+    public LinkedHashMap<Integer, Integer> getChosenAPMappingInt()
     {
         return chosenAPMapInt;
     }
@@ -601,7 +601,7 @@ public class GraphLinkFinder
      * be installed in the slot originally occupied by the original vertex.
      * @return map of all AP mappings for each alternative vertex. 
      */
-    public Map<DENOPTIMVertex, List<Map<Integer, Integer>>> getAllAlternativesFoundInt()
+    public LinkedHashMap<DENOPTIMVertex, List<LinkedHashMap<Integer, Integer>>> getAllAlternativesFoundInt()
     {
         return allCompatLinksInt;
     }
@@ -651,7 +651,7 @@ public class GraphLinkFinder
      * constructed. 
      * @return map of all AP mappings for each alternative vertex. 
      */
-    public Map<DENOPTIMVertex, List<APMapping>> getAllAlternativesFound()
+    public LinkedHashMap<DENOPTIMVertex, List<APMapping>> getAllAlternativesFound()
     {
         return allCompatLinks;
     }

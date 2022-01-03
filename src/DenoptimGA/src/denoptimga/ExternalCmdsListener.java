@@ -109,11 +109,14 @@ public class ExternalCmdsListener implements Runnable
 	{
 		ArrayList<String> lines = null;
 		try {
-			lines = DenoptimIO.readList(file.getAbsolutePath());
+			lines = DenoptimIO.readList(file.getAbsolutePath(), true);
 		} catch (DENOPTIMException e) {
 			DENOPTIMLogger.appLogger.log(Level.WARNING, "Unable to read file '"  
 	        		+ file.getAbsolutePath() + "'. Any instruction contained "
-	        		        + "in that file is ignored."+NL);
+	        		        + "in that file is ignored. "
+	        		        + "Hint: " + e.getMessage() + NL);
+			e.printStackTrace();
+			return;
 		}
 
 		if (lines.size() == 0)
@@ -144,7 +147,8 @@ public class ExternalCmdsListener implements Runnable
                         + candIDs + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);
                 String[] parts = candIDs.split("\\s+");
-                Set<String> candNames = new HashSet<String>(Arrays.asList(parts));
+                Set<String> candNames = new HashSet<String>(
+                        Arrays.asList(parts));
                 if (ea != null)
                 {   
                     ea.removeCandidates(candNames);

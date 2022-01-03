@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -324,7 +326,7 @@ public class DENOPTIMGraphOperations
     public static boolean extendLink(DENOPTIMEdge edge, int chosenBBIdx,
             Monitor mnt) throws DENOPTIMException
     {
-       //TODO: for reproducibility, the AP mapping should become an optional
+        //TODO: for reproducibility, the AP mapping should become an optional
         // parameter: if given we try to use it, if not given we GraphLinkFinder
         // will try to find a suitable mapping.
         
@@ -343,8 +345,8 @@ public class DENOPTIMGraphOperations
         
         // Need to convert the mapping to make it independent from the instance
         // or the new link.
-        Map<DENOPTIMAttachmentPoint,Integer> apMap = 
-                new HashMap<DENOPTIMAttachmentPoint,Integer>();
+        LinkedHashMap<DENOPTIMAttachmentPoint,Integer> apMap = 
+                new LinkedHashMap<DENOPTIMAttachmentPoint,Integer>();
         for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
             glf.getChosenAPMapping().entrySet())
         {
@@ -1840,8 +1842,11 @@ public class DENOPTIMGraphOperations
         
         int graphId = graph.getGraphId();
         int positionOfVertex = graph.indexOf(vertex);
+        //NB: since we have renumbered the vertexes, we use the old vertex ID
+        // when reporting what vertex is being mutated.
         graph.setLocalMsg(graph.getLocalMsg() + " " + mType + " " 
-                + vertex.getVertexId()+"("+positionOfVertex+")");
+                + vertex.getProperty(DENOPTIMConstants.STOREDVID) 
+                + "(" + positionOfVertex+")");
         
         boolean done = false;
         switch (mType) 

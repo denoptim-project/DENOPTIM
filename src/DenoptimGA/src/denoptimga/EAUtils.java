@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -698,26 +699,30 @@ public class EAUtils
 
         // NB: we consider the configured size of the population, not the actual 
         // size of list representing the population.
-        for (int i=0; i<GAParameters.getPopulationSize(); i++)
+        String stats = "";
+        synchronized (population)
         {
-            Candidate mol = population.get(i);
-            if (mol != null)
+            for (int i=0; i<GAParameters.getPopulationSize(); i++)
             {
-                String mname = new File(mol.getSDFFile()).getName();
-                if (mname != null)
-                    sb.append(String.format("%-20s", mname));
-
-                sb.append(String.format("%-20s", 
-                        mol.getGraph().getGraphId()));
-                sb.append(String.format("%-30s", mol.getUID()));
-                sb.append(df.format(mol.getFitness()));
-                sb.append("    ").append(mol.getSDFFile());
-                sb.append(System.getProperty("line.separator"));
+                Candidate mol = population.get(i);
+                if (mol != null)
+                {
+                    String mname = new File(mol.getSDFFile()).getName();
+                    if (mname != null)
+                        sb.append(String.format("%-20s", mname));
+    
+                    sb.append(String.format("%-20s", 
+                            mol.getGraph().getGraphId()));
+                    sb.append(String.format("%-30s", mol.getUID()));
+                    sb.append(df.format(mol.getFitness()));
+                    sb.append("    ").append(mol.getSDFFile());
+                    sb.append(System.getProperty("line.separator"));
+                }
             }
+    
+            // calculate descriptive statistics for the population
+            stats = getSummaryStatistics(population);
         }
-
-        // calculate descriptive statistics for the population
-        String stats = getSummaryStatistics(population);
         if (stats.trim().length() > 0)
             sb.append(stats);
         DenoptimIO.writeData(filename, sb.toString(), false);
@@ -782,9 +787,12 @@ public class EAUtils
         sb.append(NL+NL+"#####SCAFFOLD ANALYSIS##### (Scaffolds list current "
                 + "size: " + FragmentSpace.getScaffoldLibrary().size() + ")" 
                 + NL);
-        for (Map.Entry pairs : scf_cntr.entrySet())
+        List<Integer> sortedKeys = new ArrayList<Integer>(scf_cntr.keySet());
+        Collections.sort(sortedKeys);
+        for (Integer k : sortedKeys)
         {
-            sb.append(pairs.getKey()).append(" ").append(pairs.getValue());
+            
+            sb.append(k).append(" ").append(scf_cntr.get(k));
             sb.append(NL);
         }
         
@@ -1388,7 +1396,7 @@ public class EAUtils
         boolean onlyRandomCombOfRings = true;
         if (onlyRandomCombOfRings)
         {
-            Set<DENOPTIMRing> combsOfRings = cgh.getRandomCombinationOfRings(
+            List<DENOPTIMRing> combsOfRings = cgh.getRandomCombinationOfRings(
                                                                           mol,
                                                                     molGraph);
             if (combsOfRings.size() > 0)
@@ -1401,7 +1409,7 @@ public class EAUtils
         }
         else
         {
-            ArrayList<Set<DENOPTIMRing>> allCombsOfRings = 
+            ArrayList<List<DENOPTIMRing>> allCombsOfRings = 
                             cgh.getPossibleCombinationOfRings(mol, molGraph);
         
             if (DEBUG)
@@ -1413,8 +1421,8 @@ public class EAUtils
             // Keep closable chains that are relevant for chelate formation
             if (RingClosureParameters.buildChelatesMode())
             {
-                ArrayList<Set<DENOPTIMRing>> toRemove = new ArrayList<>();
-                for (Set<DENOPTIMRing> setRings : allCombsOfRings)
+                ArrayList<List<DENOPTIMRing>> toRemove = new ArrayList<>();
+                for (List<DENOPTIMRing> setRings : allCombsOfRings)
                 {
                     if (!cgh.checkChelatesGraph(molGraph,setRings))
                     {
@@ -1435,7 +1443,7 @@ public class EAUtils
             int sz = allCombsOfRings.size();
             if (sz > 0)
             {
-                Set<DENOPTIMRing> selected = new HashSet<>();
+                List<DENOPTIMRing> selected = new ArrayList<>();
                 if (sz == 1)
                 {
                     selected = allCombsOfRings.get(0);
@@ -1469,7 +1477,6 @@ public class EAUtils
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             molsmiles = "FAIL: NO SMILES GENERATED";
         }
-
         res[1] = molsmiles;
 
         // Update the INCHI key representation
@@ -1665,7 +1672,7 @@ public class EAUtils
      * that prevent graphs from violating constrains on 
      * fully connected molecules (<code>true</code> enables disconnected systems),
      * molecular weight,
-     * maximun number of rotatable bonds, 
+     * max number of rotatable bonds, 
      * and number of ring closures.
      * @return an object array containing the inchi code, the molecular
      * representation of the candidate, and additional attributes. Or 
@@ -1709,6 +1716,7 @@ public class EAUtils
         }
 
         // hopefully the null shouldn't happen if all goes well
+        boolean smilesIsAvailable = true;
         String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
         if (molsmiles == null)
         {
@@ -1716,6 +1724,7 @@ public class EAUtils
                                                         + molGraph.toString();
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
             molsmiles = "FAIL: NO SMILES GENERATED";
+            smilesIsAvailable = false;
         }
 
         // if by chance the molecule is disconnected
@@ -1856,7 +1865,10 @@ public class EAUtils
         {
             String msg = "Evaluation of graph: INCHI is null!";
             DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-            pr.setFirst("UNDEFINED");
+            if (smilesIsAvailable)
+                pr.setFirst("UNDEFINED-INCHI_"+molsmiles);
+            else
+                pr.setFirst("UNDEFINED-INCHI_"+RandomUtils.nextInt(100000));
         }
 
         Object[] res = new Object[3];

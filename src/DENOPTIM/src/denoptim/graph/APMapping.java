@@ -1,9 +1,7 @@
 package denoptim.graph;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import denoptim.exception.DENOPTIMException;
 
@@ -52,9 +50,9 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
      * @throws DENOPTIMException if APs belong to different owners so the
      * int-based mapping cannot be produced.
      */
-    public Map<Integer, Integer> toIntMappig() throws DENOPTIMException
+    public LinkedHashMap<Integer, Integer> toIntMappig() throws DENOPTIMException
     {
-        Map<Integer, Integer> apMap = new HashMap<Integer, Integer>();
+        LinkedHashMap<Integer, Integer> apMap = new LinkedHashMap<Integer, Integer>();
      
         if (this.isEmpty())
             return apMap;

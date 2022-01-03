@@ -407,8 +407,8 @@ public final class DENOPTIMConstants
     public static final Object MOLPROPAPxBOND = "APsPerBond";
 
     /**
-     * Key of the property remembering vertex IDs. Note this property is not 
-     * many, is typically is rarely in sync with the actual vertex ID of that
+     * Key of the property remembering vertex IDs. Note this property 
+     * is rarely in sync with the actual vertex ID of that
      * vertex.
      */
     public static final Object STOREDVID = "OLDVERTEXID";

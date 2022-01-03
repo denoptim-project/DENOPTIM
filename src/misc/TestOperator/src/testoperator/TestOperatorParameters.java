@@ -71,7 +71,7 @@ public class TestOperatorParameters
     
     /**
      * Target attachment point ID for mutation (AP belonging already to the 
-     * graph).
+     * graph). Zero-based index.
      */
     protected static int idTargetAP = -1;
     
@@ -81,16 +81,16 @@ public class TestOperatorParameters
     protected static MutationType mutationType;
     
     /**
-     * The given vertex index. 
+     * The given vertex index.  Zero-based index.
      * Used whenever a vertex id has to be given. For
-     * example, when specifying how to mutate a graph.
+     * example, when specifying how to mutate a graph. 
      */
     protected static int idNewVrt = -1;
     
     /**
      * The given attachment point index. 
      * Used whenever an AP id has to be given. 
-     * For example, when specifying how to mutate a graph.
+     * For example, when specifying how to mutate a graph. Zero-based index.
      */
     protected static int idNewAP = -1;
     

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -313,7 +314,7 @@ public class GraphLinkFinderTest
         expected.put(11, 84);
         expected.put(13, 2);
         
-        Map<DENOPTIMVertex, List<Map<Integer, Integer>>> allAltLinks = 
+        LinkedHashMap<DENOPTIMVertex, List<LinkedHashMap<Integer, Integer>>> allAltLinks = 
                 glf.getAllAlternativesFoundInt();
         Set<DENOPTIMVertex> keys = allAltLinks.keySet();
         for (DENOPTIMVertex k : keys)

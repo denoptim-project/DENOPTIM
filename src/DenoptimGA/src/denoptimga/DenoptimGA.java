@@ -28,6 +28,7 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.utils.SizeControlledSet;
 
 /**
  *

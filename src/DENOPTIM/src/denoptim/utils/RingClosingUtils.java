@@ -20,6 +20,7 @@ package denoptim.utils;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtom;
@@ -76,22 +77,22 @@ public class RingClosingUtils
      * Compares two combinations of <code>DENOPTIMRings</code>s and evaluates
      * whether these correspond to the same combination
      */
-    public static boolean areSameRingsSet(Set<DENOPTIMRing> sA,
-							   Set<DENOPTIMRing> sB)
+    public static boolean areSameRingsSet(List<DENOPTIMRing> oldCmb,
+							   List<DENOPTIMRing> ringsComb)
     {
 	// Compare size
-	if (sA.size() != sB.size())
+	if (oldCmb.size() != ringsComb.size())
 	{
 	    return false;
 	}
 
 	// Compare individual rings
 	int checkedRings = 0;
-	for (DENOPTIMRing rA : sA)
+	for (DENOPTIMRing rA : oldCmb)
 	{
 	    DENOPTIMVertex headA = rA.getHeadVertex();
 	    DENOPTIMVertex tailA = rA.getTailVertex();
-	    for (DENOPTIMRing rB : sB)
+	    for (DENOPTIMRing rB : ringsComb)
 	    {
 		if (rA.getSize() != rB.getSize())
 		{
@@ -114,7 +115,7 @@ public class RingClosingUtils
 		}
 	    }
 	}
-	if (sA.size() != checkedRings)
+	if (oldCmb.size() != checkedRings)
 	{
 	    return false;
 	}

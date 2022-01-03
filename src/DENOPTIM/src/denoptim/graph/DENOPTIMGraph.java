@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1025,8 +1026,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         // Remove edges to/from old vertex, while keeping track of edits to do
         // in a hypothetical jacket template (if such template exists)
-        Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> inToOutAPForTemplate = //rename to newInReplaceOldInInTmpl
-                new HashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> newInReplaceOldInInTmpl = 
+                new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = 
                 new ArrayList<DENOPTIMAttachmentPoint>();
         for (DENOPTIMAttachmentPoint oldAP : vertex.getAttachmentPoints())
@@ -1045,11 +1046,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                 oldAP.getLinkedAPThroughout();
                         if (bestScoringMapping.keySet().contains(lAP))
                         {
-                            inToOutAPForTemplate.put(
+                            newInReplaceOldInInTmpl.put(
                                     bestScoringMapping.get(lAP), oldAP);
                         } else if (bestScoringMapping.values().contains(lAP))
                         {
-                            inToOutAPForTemplate.put(
+                            newInReplaceOldInInTmpl.put(
                                     bestScoringMappingReverse.get(lAP), oldAP);
                         } else {
                             oldAPToRemoveFromTmpl.add(oldAP);
@@ -1108,14 +1109,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     if (containsVertex(apOnParent.getOwner()))
                     {
                         templateJacket.updateInnerApID(
-                                inToOutAPForTemplate.get(apOnParent), //AP on old vertex
+                                newInReplaceOldInInTmpl.get(apOnParent), //AP on old vertex
                                 apOnParent);
                         reconnettedApsOnChilds.add(apOnChild);
                     }
                     if (containsVertex(apOnChild.getOwner()))
                     {
                         templateJacket.updateInnerApID(
-                                inToOutAPForTemplate.get(apOnChild), //AP on old vertex
+                                newInReplaceOldInInTmpl.get(apOnChild), //AP on old vertex
                                 apOnChild);
                         reconnettedApsOnChilds.add(apOnChild);
                     }
@@ -1174,7 +1175,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
     public boolean replaceVertex(DENOPTIMVertex vertex, int bbId, BBType bbt,
-            Map<Integer, Integer> apMap)throws DENOPTIMException
+            LinkedHashMap<Integer, Integer> apMap) throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
         {
@@ -1219,7 +1220,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
     public boolean replaceSingleVertex(DENOPTIMVertex oldLink, DENOPTIMVertex newLink,
-            Map<Integer, Integer> apMap) throws DENOPTIMException
+            LinkedHashMap<Integer, Integer> apMap) throws DENOPTIMException
     {
         if (!gVertices.contains(oldLink) || gVertices.contains(newLink))
         {
@@ -1229,12 +1230,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         // Keep track of the links that will be broken and re-created,
         // and also of the relation free APs may have with a possible template
         // that embeds this graph.
-        Map<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
-                new HashMap<Integer,DENOPTIMAttachmentPoint>();
-        Map<Integer,BondType> linkTypesToRecreate = 
-                new HashMap<Integer,BondType>();
-        Map<Integer,DENOPTIMAttachmentPoint> inToOutAPForTemplate = 
-                new HashMap<Integer,DENOPTIMAttachmentPoint>();
+        LinkedHashMap<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
+                new LinkedHashMap<Integer,DENOPTIMAttachmentPoint>();
+        LinkedHashMap<Integer,BondType> linkTypesToRecreate = 
+                new LinkedHashMap<Integer,BondType>();
+        LinkedHashMap<Integer,DENOPTIMAttachmentPoint> inToOutAPForTemplate = 
+                new LinkedHashMap<Integer,DENOPTIMAttachmentPoint>();
         List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = 
                 new ArrayList<DENOPTIMAttachmentPoint>();
         int trgApIdOnNewLink = -1;
@@ -1401,8 +1402,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
+    
+    //NB: LinkedHashMap is used to retain reproducibility between runs.
+    
     public boolean insertVertex(DENOPTIMEdge edge, int bbId, BBType bbt,
-            Map<DENOPTIMAttachmentPoint,Integer> apMap) 
+            LinkedHashMap<DENOPTIMAttachmentPoint,Integer> apMap) 
                     throws DENOPTIMException
     {
         if (!gEdges.contains(edge))
@@ -1411,9 +1415,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         ArrayList<DENOPTIMEdge> symSites = new ArrayList<DENOPTIMEdge> ();
-        ArrayList<Map<DENOPTIMAttachmentPoint,Integer>> symApMaps = 
-                
-                new ArrayList<Map<DENOPTIMAttachmentPoint,Integer>>();
+        ArrayList<LinkedHashMap<DENOPTIMAttachmentPoint,Integer>> symApMaps = 
+                new ArrayList<LinkedHashMap<DENOPTIMAttachmentPoint,Integer>>();
         ArrayList<DENOPTIMVertex> symTrgVertexes = getSymVertexesForVertex(
                 edge.getTrgAP().getOwner());
         if (symTrgVertexes.size() == 0)
@@ -1426,8 +1429,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 DENOPTIMEdge symEdge = trgVrtx.getEdgeToParent();
                 symSites.add(symEdge);
                 
-                Map<DENOPTIMAttachmentPoint,Integer> locApMap = new
-                        HashMap<DENOPTIMAttachmentPoint,Integer>();
+                LinkedHashMap<DENOPTIMAttachmentPoint,Integer> locApMap = new
+                        LinkedHashMap<DENOPTIMAttachmentPoint,Integer>();
                 locApMap.put(symEdge.getSrcAP(), apMap.get(edge.getSrcAP()));
                 locApMap.put(symEdge.getTrgAP(), apMap.get(edge.getTrgAP()));
                 symApMaps.add(locApMap);
@@ -1438,14 +1441,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (int i=0; i<symSites.size(); i++)
         {
             DENOPTIMEdge symEdge = symSites.get(i);
-            Map<DENOPTIMAttachmentPoint,Integer> locApMap = symApMaps.get(i);
+            LinkedHashMap<DENOPTIMAttachmentPoint,Integer> locApMap = symApMaps.get(i);
             
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
                     GraphUtils.getUniqueVertexIndex(), bbId, bbt);
             newSS.add(newLink.getVertexId());
-            Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apToApMap =
-                    new HashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apToApMap =
+                    new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
             for (DENOPTIMAttachmentPoint apOnGraph : locApMap.keySet())
             {
                 apToApMap.put(apOnGraph, newLink.getAP(locApMap.get(apOnGraph)));
@@ -1482,7 +1485,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
     public boolean insertSingleVertex(DENOPTIMEdge edge, DENOPTIMVertex newLink,
-            Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
                     throws DENOPTIMException
     {
         //TODO: for reproducibility the AP mapping should become an optional
@@ -1548,6 +1551,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the vertex that is in the given position of the list of vertexes 
+     * belonging to this graph.
+     * @param pos the position in the list.
+     * @return the vertex in the given position.
+     */
     public DENOPTIMVertex getVertexAtPosition(int pos)
     {
         return ((pos >= gVertices.size()) || pos < 0) ? null :
@@ -3057,10 +3066,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         // These are to remember all chords that will have to be recreated
-        Map<DENOPTIMVertex,DENOPTIMVertex> chordsToRecreate = 
-                new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
-        Map<DENOPTIMVertex,BondType> chordsToRecreateBB = 
-                new HashMap<DENOPTIMVertex,BondType>();
+        LinkedHashMap<DENOPTIMVertex,DENOPTIMVertex> chordsToRecreate = 
+                new LinkedHashMap<DENOPTIMVertex,DENOPTIMVertex>();
+        LinkedHashMap<DENOPTIMVertex,BondType> chordsToRecreateBB = 
+                new LinkedHashMap<DENOPTIMVertex,BondType>();
         
         // Change direction of those edges that have to be reversed as a 
         // consequence of the change in the spanning tree.
@@ -3258,10 +3267,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Reassign vertex IDs to a graph.
-     * Before any operation is performed on the graph, its vertices should be
-     * renumbered to differentiate them from their clones.
-     * @throws DENOPTIMException 
+     * Reassign vertex IDs to all vertexes of this graph. The old IDs are stored 
+     * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
+     * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
+     * used to refer to this graph's vertexes.
      */
 
     public void renumberGraphVertices() throws DENOPTIMException
@@ -3272,11 +3281,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Reassign vertex IDs to a graph.
-     * Before any operation is performed on the graph, its vertices should be
-     * renumbered so as to differentiate them from their clones
-     * @return map with old IDs as key and new IDs as values
-     * @throws DENOPTIMException 
+     * Reassign vertex IDs to a graph. The old IDs are stored 
+     * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
+     * @return map with old IDs as key and new IDs as values.
+     * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
+     * used to refer to this graph's vertexes.
      */
 
     public Map<Integer,Integer> renumberVerticesGetMap() throws DENOPTIMException 
@@ -3286,12 +3295,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         // for the vertices in the graph, get new vertex ids
         for (int i=0; i<getVertexCount(); i++)
         {
-            int vid = getVertexList().get(i).getVertexId();
+            DENOPTIMVertex v = getVertexList().get(i);
+            int vid = v.getVertexId();
             int nvid = GraphUtils.getUniqueVertexIndex();
 
             nmap.put(vid, nvid);
 
-            getVertexList().get(i).setVertexId(nvid);
+            v.setVertexId(nvid);
+            v.setProperty(DENOPTIMConstants.STOREDVID, vid);
         }
 
         // Update the sets of symmetric vertex IDs
@@ -3305,8 +3316,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 {
                     DENOPTIMException e = new DENOPTIMException("Assumption "
                             + "violated: vertex IDs in "
-                            + "symmetric seta are out of sync w.r.t. actual "
-                            + "vertex IDs. Reposrt bug!");
+                            + "symmetric set are out of sync w.r.t. actual "
+                            + "vertex IDs. Report bug!");
                     throw e;
                 }
                 ss.getList().set(i,nmap.get(ss.getList().get(i)));
@@ -3320,7 +3331,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     
     /**
      * Calculates the level of a vertex in this graph.
-     * @param v the gertex for which we want the level.
+     * @param v the vertex for which we want the level.
      * @return the level, i.e., an integer that is -1 for the seed vertex of
      * this graph and increases by one unit per each edge that has to be 
      * traversed to reach the vertex given as argument via a direct path.
@@ -3559,14 +3570,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();
-        ArrayList<Set<DENOPTIMRing>> allCombsOfRings =
+        ArrayList<List<DENOPTIMRing>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
 
         // Keep closable chains that are relevant for chelate formation
         if (RingClosureParameters.buildChelatesMode())
         {
-            ArrayList<Set<DENOPTIMRing>> toRemove = new ArrayList<>();
-            for (Set<DENOPTIMRing> setRings : allCombsOfRings)
+            ArrayList<List<DENOPTIMRing>> toRemove = new ArrayList<>();
+            for (List<DENOPTIMRing> setRings : allCombsOfRings)
             {
                 if (!cgh.checkChelatesGraph(this,setRings))
                 {
@@ -3577,7 +3588,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         // prepare output graphs
-        for (Set<DENOPTIMRing> ringSet : allCombsOfRings)
+        for (List<DENOPTIMRing> ringSet : allCombsOfRings)
         {
             // clone root graph
             DENOPTIMGraph newGraph = this.clone();
