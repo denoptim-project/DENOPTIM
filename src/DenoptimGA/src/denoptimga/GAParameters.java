@@ -108,11 +108,6 @@ public class GAParameters
     protected static String visitedGraphsFile = "GRAPHS.txt";
 
     /**
-     * Pathname to the file collecting the failed sdf molecules
-     */
-    static String failedSDF = "";
-
-    /**
      * Pathname of log file (STDOUT)
      */
     protected static String logFile = "";
@@ -346,6 +341,19 @@ public class GAParameters
      * The weights of multisite mutations
      */
     private static double[] mutliSiteMutationWeights = new double[]{0,10,1};
+
+    /**
+     * Maximum number of unique identifiers kept in memory. Beyond this value
+     * the identifiers are dealt with using a file on disk.
+     */
+    public static int maxUIDMemory = 1000000;
+
+    /**
+     * Text file used to store unique identifiers beyond the limits of the
+     * memory (see {@link GAParameters#maxUIDMemory}).
+     */
+    public static String uidMemoryOnDisk = "memory_UIDs.txt";
+    
     
     private static final String FS = System.getProperty("file.separator");
     
@@ -366,7 +374,6 @@ public class GAParameters
     	uidFileOut = "";
     	//final: DEFUIDFILEOUTNAME = "MOLUID.txt";
     	visitedGraphsFile = "GRAPHS.txt";
-    	failedSDF = "";
     	logFile = "";
     	populationSize = 50;
     	numOfChildren = 5;
@@ -512,8 +519,6 @@ public class GAParameters
         {
             monitorFile = dataDir + ".eaMonitor";
         }
-
-        failedSDF = dataDir + "_FAILED.sdf";
 
         if (uidFileOut.equals(""))
         {

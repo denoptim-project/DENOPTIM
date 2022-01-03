@@ -41,6 +41,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
+import denoptim.utils.SizeControlledSet;
 import denoptimga.EAUtils.CandidateSource;
 
 /**
@@ -86,6 +87,11 @@ public class EvolutionaryAlgorithm
 	final ExternalCmdsListener cmdListener;
 	
 	/**
+	 * Storage of unique identifiers encountered by this instance.
+	 */
+	private SizeControlledSet scs;
+	
+	/**
 	 * Flag signalling this EA was stopped
 	 */
     private boolean stopped = false;
@@ -110,13 +116,13 @@ public class EvolutionaryAlgorithm
     private boolean isAsync = true;
     
     /*
-     * Temp. storage of future results produced by fitness evaluation tasks
+     * Temporary storage of future results produced by fitness evaluation tasks
      * submitted to asynchronous parallelisation scheme.
      */
     private List<Future<Object>> futures;
     
     /*
-     * Temp. storage of fitness evaluation tasks just submitted to asynchronous 
+     * Temporary storage of fitness evaluation tasks just submitted to asynchronous 
      * parallelisation scheme.
      */
     private ArrayList<FitnessTask> submitted;
@@ -201,6 +207,10 @@ public class EvolutionaryAlgorithm
                 }
             });
         }
+        
+        scs = new SizeControlledSet(
+                GAParameters.maxUIDMemory, GAParameters.uidMemoryOnDisk, 
+                GAParameters.getUIDFileOut());
     }
 
 //------------------------------------------------------------------------------
@@ -405,9 +415,9 @@ public class EvolutionaryAlgorithm
                 
                 if (FitnessParameters.checkPreFitnessUID())
                 {
-                    try {
-                        if (DenoptimIO.isUIDInFile(candidate.getUID(),
-                                new File(GAParameters.getUIDFileOut())))
+                    try
+                    {
+                        if (!scs.addNewUniqueEntry(candidate.getUID()))
                         {
                             mnt.increase(CounterID.DUPLICATEPREFITNESS);
                             continue;
@@ -633,9 +643,9 @@ public class EvolutionaryAlgorithm
                 
                 if (FitnessParameters.checkPreFitnessUID())
                 {
-                    try {
-                        if (DenoptimIO.isUIDInFile(candidate.getUID(),
-                                new File(GAParameters.getUIDFileOut())))
+                    try
+                    {
+                        if (!scs.addNewUniqueEntry(candidate.getUID()))
                         {
                             mnt.increase(CounterID.DUPLICATEPREFITNESS);
                             continue;
@@ -658,7 +668,7 @@ public class EvolutionaryAlgorithm
                 } else {
                     
                     syncronisedTasks.add(task);
-                    
+
                     if (syncronisedTasks.size() 
                             >= Math.abs(population.size() - newPopSize)
                             ||

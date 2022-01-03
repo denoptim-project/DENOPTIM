@@ -3209,21 +3209,26 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
     
     /**
-     * Search in a file for a match to the given unique identifier (UID). If the
-     * UID is not found in the file, then it is added to it. Note that the UID 
-     * is compared with the content of each line in the file.
-     * @param uid the unique identifier to search for and possibly add to the 
-     * file.
-     * @param file the text file collecting UIDs (one per line).
-     * @return <code>true</code> is the UID was found in the file. Note that 
+     * Search in a file for a line matching the given string query. If the query
+     * is not found in the file, then it is added to it. Note that the query 
+     * is compared in a case insensitive manner, and ignoring heading/trailing
+     * spaces, and with the content of each 
+     * line in the file, so this is rather slow.
+     * @param query the string to search for and possibly add to the file.
+     * @param file the text file to analyse.
+     * @param add if <code>true</code> then we add the query if it was not found.
+     * @return <code>true</code> is the query was found in the file. Note that 
+     * when <code>add</code> is <code>true</code>
      * we return <code>false</code> when the match is not found in the file, but
      * the moment we return the file has been already updated by this method as
-     * to add the UID. So, independently on the return value, the file will 
-     * contain the UID string when this method returns. 
-     * @throws IOException
+     * to add the query. So, independently on the return value, the file will 
+     * contain the query string when this method returns. 
+     * @throws IOException when handling of the memory written on disk returns
+     * exception.
      */
     
-    public static boolean isUIDInFile(String uid, File file) throws IOException
+    public static boolean isLineInTxtFile(String query, File file, boolean add) 
+            throws IOException
     {
         boolean found = false;
         
@@ -3241,17 +3246,17 @@ public class DenoptimIO
             {
                 if (line.trim().length() == 0)
                     continue;
-                if (line.trim().equalsIgnoreCase(uid.trim()))
+                if (line.trim().equalsIgnoreCase(query.trim()))
                 {
                     found = true;
                     break;
                 }
             }
             
-            if (!found)
+            if (!found && add)
             {
                 rafile.seek(channel.position());
-                rafile.writeBytes(uid.trim() + NL);
+                rafile.writeBytes(query.trim() + NL);
                 channel.force(true);
             }
         }
