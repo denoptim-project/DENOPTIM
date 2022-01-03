@@ -118,22 +118,14 @@ public class TasksBatchManager
         };
         Runtime.getRuntime().addShutdownHook(shutDownHook);
 
+        // Waits for completion of tasks
         ArrayList<Candidate> results = new ArrayList<>();
         try
         {
             for (int i=0; i<tasks.size(); i++)
             {
-                Candidate taskResult =
-                                    (Candidate) cservice.take().get();
-                if (!taskResult.getUID().equals("UNDEFINED"))
-                {
-                    results.add(taskResult);
-                }
-                else 
-                {
-                    taskResult.cleanup();
-                    taskResult = null;
-                }
+                Candidate taskResult = (Candidate) cservice.take().get();
+                results.add(taskResult);
             }
         }
         catch (InterruptedException ie)
