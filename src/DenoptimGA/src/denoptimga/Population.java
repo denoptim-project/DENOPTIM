@@ -20,10 +20,12 @@ package denoptimga;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
@@ -49,6 +51,11 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     private static final long serialVersionUID = 1L;
     
     /**
+     * An integer that changes every time we change the population.
+     */
+    private AtomicInteger populationUpdate = new AtomicInteger();
+    
+    /**
      * Crossover compatibility between members
      */
     private XoverCompatibilitySites xoverCompatibilities;
@@ -62,6 +69,91 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         {
             xoverCompatibilities = new XoverCompatibilitySites();
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public boolean add(Candidate c)
+    {
+        boolean result = super.add(c);
+        if (result)
+            populationUpdate.getAndIncrement();
+        return result;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public void add(int index, Candidate c)
+    {
+        super.add(index, c);
+        populationUpdate.getAndIncrement();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public Candidate set(int index, Candidate c)
+    {
+        populationUpdate.getAndIncrement();
+        return super.set(index, c);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public Candidate remove(int index)
+    {
+        populationUpdate.getAndIncrement();
+        return super.remove(index);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public boolean remove(Object c)
+    {
+        boolean result = super.remove(c);
+        if (result)
+            populationUpdate.getAndIncrement();
+        return result;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public boolean removeAll(Collection<?> c)
+    {
+        boolean result = super.removeAll(c);
+        if (result)
+            populationUpdate.getAndIncrement();
+        return result;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public boolean retainAll(Collection<?> c)
+    {
+        boolean result = super.retainAll(c);
+        if (result)
+            populationUpdate.getAndIncrement();
+        return result;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns an integer that represent the current status of the population.
+     * Additions, removal or change of a population member triggers change of 
+     * the returned value. The integer is a good way to check for population
+     * changes without looking at the actual population content.
+     * @return an integer representing the version of the population.
+     */
+    public int getVersionID()
+    {
+        return populationUpdate.get();
     }
     
 //------------------------------------------------------------------------------
@@ -383,7 +475,6 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @param name the name of the candidate to retrieve
      * @return the candidate with the given name, if present, or null.
      */
-    
     public Candidate getCandidateNamed(String name)
     {
         return this.stream()

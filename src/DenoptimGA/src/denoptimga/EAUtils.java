@@ -1626,26 +1626,6 @@ public class EAUtils
         return DENOPTIMStatUtils.stddev(fitvals, true);
     }
     
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Extracts the list of unique identifiers from a list of candidates.
-     * @param candidateParents
-     * @return list of INCHI codes for the molecules in the population
-     */
-
-    protected static ArrayList<String> getUniqueIdentifiers(
-            ArrayList<Candidate> candidateParents)
-    {
-        ArrayList<String> arr = new ArrayList<>();
-        for (Candidate c : candidateParents)
-        {
-            arr.add(c.getUID());
-        }
-        return arr;
-    }
-    
 //------------------------------------------------------------------------------
 
     /**

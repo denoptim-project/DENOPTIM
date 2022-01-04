@@ -36,7 +36,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.graph.Candidate;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
@@ -525,15 +524,15 @@ public class EvolutionaryAlgorithm
         // Take a snapshot of the initial population members. This to exclude
         // that offsprings of this generation become parents in this generation.
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        int populationVersion = -1;
         synchronized (population)
         {
             for (Candidate c : population)
             {
                 eligibleParents.add(c);
             }
+            populationVersion = population.getVersionID();
         }
-        ArrayList<String> initUIDs = EAUtils.getUniqueIdentifiers(
-                eligibleParents);
         
         int newPopSize = GAParameters.getNumberOfChildren() 
                 + eligibleParents.size();
@@ -740,24 +739,13 @@ public class EvolutionaryAlgorithm
         syncronisedTasks.clear();
 
         // Check if the population has changed
-        boolean hasChanged = false;
+        int newPopulationVersion = -1;
         synchronized (population)
         {
-            //TODO: this should be done more efficiently by making the population class 
-            // have an atomic integer with the update value and compare that value
-            // with the value originally there when initUIDs was created.
-            for (Candidate mol : population)
-            {
-                if (!initUIDs.contains(mol.getUID()))
-                {
-                    hasChanged = true;
-                    break;
-                }
-            }
+            newPopulationVersion = population.getVersionID();
         }
-        initUIDs.clear();
         
-        return hasChanged;
+        return populationVersion != newPopulationVersion;
     }
     
 //------------------------------------------------------------------------------

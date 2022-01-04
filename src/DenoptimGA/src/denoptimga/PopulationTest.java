@@ -438,5 +438,49 @@ public class PopulationTest
     }
     
 //------------------------------------------------------------------------------
+    
+    @Test
+    public void testPopulationVersion() throws Exception
+    {
+        Population pop = new Population();
+        int v0 = pop.getVersionID();
+        
+        DENOPTIMGraph g1 = makeGraphA();
+        Candidate c1 = new Candidate("C1",g1);
+        pop.add(c1);
+        int v1 = pop.getVersionID();
+        assertTrue(v1>v0,"Version change 1");
+        
+        DENOPTIMGraph g2 = makeGraphB();
+        Candidate c2 = new Candidate("C2",g2);
+        pop.add(c2);
+        int v2 = pop.getVersionID();
+        assertTrue(v2>v1,"Version change 2");
+        
+        DENOPTIMGraph g3 = makeGraphB();
+        Candidate c3 = new Candidate("C3",g3);
+        pop.add(c3);
+        int v3 = pop.getVersionID();
+        assertTrue(v3>v2,"Version change 3");
+        
+        pop.remove(c1);
+        int v4 = pop.getVersionID();
+        assertTrue(v4>v3,"Version change 4");
+        
+        DENOPTIMGraph g4 = makeGraphB();
+        Candidate c4 = new Candidate("C4",g4);
+        pop.add(0,c4);
+        int v5 = pop.getVersionID();
+        assertTrue(v5>v4,"Version change 5");
+        
+        DENOPTIMGraph g5 = makeGraphC();
+        Candidate c5 = new Candidate("C5",g5);
+        pop.set(1,c5);
+        int v6 = pop.getVersionID();
+        assertTrue(v6>v5,"Version change 6");
+        
+    }
+    
+//------------------------------------------------------------------------------
       
 }
