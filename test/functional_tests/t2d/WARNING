@@ -1,0 +1,3 @@
+Running this test on MacOS triggers a change of the focus of the user (i.e., the window on which the mouse/keyboard are active) to the FragSpaceExplorer process. This is done by the depiction class of CDK (i.e., org.openscience.cdk.depict.DepictionGenerator) when it configures the font for the graphics. 
+
+Although it is a bit annoying to see the focus move to a process that in not really under control of the user, this change of focus does not seem to lead to any particular problem. Therefore, we ignore this slightly annoying, but innocent behaviour.
