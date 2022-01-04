@@ -68,6 +68,7 @@ import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
 import denoptim.utils.RotationalSpaceUtils;
+import denoptim.utils.SizeControlledSet;
 
 
 /**
@@ -131,8 +132,10 @@ public class EAUtils
     /**
      * Reads unique identifiers and initial population files according to the
      * {@link GAParameters}.
+     * @throws IOException 
      */
-    protected static Population importInitialPopulation() throws DENOPTIMException
+    protected static Population importInitialPopulation(
+            SizeControlledSet uniqueIDsSet) throws DENOPTIMException, IOException
     {
         Population population = new Population();
 
@@ -140,14 +143,17 @@ public class EAUtils
         if (!GAParameters.getUIDFileIn().equals(""))
         {
             EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
-            EAUtils.writeUID(GAParameters.getUIDFileOut(),lstUID,false); //overwrite
+            for (String uid : lstUID)
+            {
+                uniqueIDsSet.addNewUniqueEntry(uid);
+            }
             DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + lstUID.size() 
                 + " known UIDs from " + GAParameters.getUIDFileIn());
         }
         String inifile = GAParameters.getInitialPopulationFile();
         if (inifile.length() > 0)
         {
-            EAUtils.getPopulationFromFile(inifile, population, lstUID, 
+            EAUtils.getPopulationFromFile(inifile, population, uniqueIDsSet, 
                     EAUtils.getPathNameToGenerationFolder(0));
             DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + population.size() 
                 + " molecules from " + inifile);
@@ -1025,132 +1031,60 @@ public class EAUtils
 
     /**
      * Reconstruct the molecular population from the file.
-     * @param filename
-     * @param population
-     * @param lstInchi
+     * @param filename the pathname to read in.
+     * @param population the collection of population members.
+     * @param uniqueIDsSet collection of unique identifiers.
      * @throws DENOPTIMException
+     * @throws IOException 
      */
     protected static void getPopulationFromFile(String filename,
-            Population population, HashSet<String> lstInchi,
-            String genDir) throws DENOPTIMException
+            Population population, SizeControlledSet uniqueIDsSet,
+            String genDir) throws DENOPTIMException, IOException
     {
-        //TODO-GG use DenoptimIO.readGraph...
-        
-        ArrayList<IAtomContainer> mols;
-        if (GenUtils.getFileExtension(filename).compareToIgnoreCase(".sdf") == 0)
-        {
-            mols = DenoptimIO.readSDFFile(filename);
-        }
-        // process everything else as a text file with links to individual molecules
-        else
-        {
-            mols = DenoptimIO.readLinksToMols(filename);
-        }
-        if (mols.size() == 0)
+        ArrayList<Candidate> candidates = DenoptimIO.readCandidates(
+                new File(filename), true);
+        if (candidates.size() == 0)
         {
         	String msg = "Found 0 candidates in file " + filename;
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
-        String fsep = System.getProperty("file.separator");
-
-        HashSet<String> uidsFromInitPop = new HashSet<String>();
-        for (int i=0; i<mols.size(); i++)
+        for (Candidate candidate : candidates)
         {
-            DENOPTIMGraph graph = null;
-            double fitness = 0, ad = 0;
-            String molsmiles = null, molinchi = null, molfile = null;
-
-            IAtomContainer mol = mols.get(i);
-            Object apProperty = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
-            if (apProperty != null)
-            {
-                graph = GraphConversionTool.getGraphFromString(apProperty.toString().trim());
-            }
-            else
-            {
-                DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                        "Molecule does not have the DENOPTIMGraph encoding.");
-                throw new DENOPTIMException(
-                        "Molecule does not have the DENOPTIMGraph encoding.");
-            }
-
-            apProperty = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
-            if (apProperty != null)
-            {
-                fitness = Double.parseDouble(apProperty.toString());
-            }
-            else
-            {
-                DENOPTIMLogger.appLogger.log(Level.SEVERE,
-                            "Molecule does not have the associated fitness.");
-                throw new DENOPTIMException(
-                            "Molecule does not have the associated fitness.");
-            }
-
-            apProperty = mol.getProperty(DENOPTIMConstants.SMILESTAG);
-            if (apProperty != null)
-            {
-                molsmiles = apProperty.toString().trim();
-            }
-            else
-            {
-                molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
-            }
-
-            apProperty = mol.getProperty(DENOPTIMConstants.INCHIKEYTAG);
-            if (apProperty != null)
-            {
-                molinchi = apProperty.toString();
-            }
-            if (mol.getProperty(DENOPTIMConstants.UNIQUEIDTAG) != null)
-            {
-                molinchi = mol.getProperty(DENOPTIMConstants.UNIQUEIDTAG).toString();
-            }
-            else
-            {
-                ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
-                if (pr.getFirst() != null)
-                {
-                    molinchi = pr.getFirst().toString();
-                }
-            }
-
-            // Add molecule to population, unless it has previously known UID
-            if (lstInchi.add(molinchi))
+            if (!uniqueIDsSet.contains(candidate.getUID()))
             {
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
-                String molName = "M" + GenUtils.getPaddedString(8, ctr);
-                molfile = genDir + fsep + molName + 
-                        DENOPTIMConstants.FITFILENAMEEXTOUT;
-
                 int gctr = GraphUtils.getUniqueGraphIndex();
-                graph.setGraphId(gctr);
-                graph.setLocalMsg("NEW");
-                mol.setProperty(DENOPTIMConstants.GCODETAG, gctr);
-                mol.setProperty(CDKConstants.TITLE, molName);
-                mol.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
-                mol.setProperty(DENOPTIMConstants.GMSGTAG, 
-                        "From Initial Population File");
-
-                Candidate pmol = new Candidate(molName, graph, fitness, 
-                        molinchi, molsmiles);
                 
-                DenoptimIO.writeMolecule(molfile, mol, false);
-                pmol.setSDFFile(molfile);
-                pmol.setImageFile(null);
-                pmol.setName(molName);
-                population.add(pmol);
-                uidsFromInitPop.add(molinchi);
+                IAtomContainer iac = candidate.getChemicalRepresentation();
+                
+                String molName = "M" + GenUtils.getPaddedString(8, ctr);
+                candidate.setName(molName);
+                iac.setProperty(CDKConstants.TITLE, molName);
+                
+                String sdfPathName = genDir + System.getProperty("file.separator") 
+                            + molName + DENOPTIMConstants.FITFILENAMEEXTOUT;
+                candidate.getGraph().setGraphId(gctr);
+                iac.setProperty(DENOPTIMConstants.GCODETAG, gctr);
+                
+                candidate.getGraph().setLocalMsg("INITIAL_POPULATION");
+                iac.setProperty(DENOPTIMConstants.GMSGTAG, 
+                        "INITIAL_POPULATION");
+                
+                DenoptimIO.writeMolecule(sdfPathName, iac, false);
+                candidate.setSDFFile(sdfPathName);
+                
+                candidate.setImageFile(null);
+                
+                population.add(candidate);
             }
         }
-        writeUID(GAParameters.getUIDFileOut(),uidsFromInitPop,true);
 
         if (population.isEmpty())
         {
         	String msg = "Population is still empty after having processes "
-        			+ mols.size() + " candidates from file " + filename;
+        			+ candidates.size() + " candidates from file " + filename;
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
@@ -1187,8 +1121,9 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Set the Vertex counter value
-     * @param population
+     * Set the Vertex counter value according to the largest value found in
+     * the given population.
+     * @param population the collection of candidates to analyse.
      * @throws DENOPTIMException 
      */
 

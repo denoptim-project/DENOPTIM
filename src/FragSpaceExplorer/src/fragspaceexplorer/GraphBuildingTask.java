@@ -492,6 +492,8 @@ public class GraphBuildingTask extends FitnessTask
         		+ DENOPTIMConstants.FITFILENAMEEXTIN;
         fitProvOutFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
+        fitProvPNGFile = workDir + SEP + molName 
+                + DENOPTIMConstants.CANDIDATE2DEXTENSION;
         fitProvUIDFile = FSEParameters.getUIDFileName();
         
         runFitnessProvider();

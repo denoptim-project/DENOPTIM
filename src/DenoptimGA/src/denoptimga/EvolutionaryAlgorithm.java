@@ -19,6 +19,7 @@
 package denoptimga;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -229,7 +230,14 @@ public class EvolutionaryAlgorithm
         
         // Create initial population of candidates
         EAUtils.createFolderForGeneration(0);
-        Population population = EAUtils.importInitialPopulation();
+        Population population;
+        try
+        {
+            population = EAUtils.importInitialPopulation(scs);
+        } catch (Exception e)
+        {
+            throw new DENOPTIMException("Unable to import initial population.",e);
+        }
         initializePopulation(population);
         EAUtils.outputPopulationDetails(population, 
                 EAUtils.getPathNameToGenerationDetailsFile(0));

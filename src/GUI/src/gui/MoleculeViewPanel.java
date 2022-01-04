@@ -301,7 +301,7 @@ public class MoleculeViewPanel extends JSplitPane
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		try {
-			item = DenoptimIO.readDENOPTIMMolecules(file, false).get(0);
+			item = DenoptimIO.readCandidates(file, false).get(0);
 		} catch (DENOPTIMException e) {
 			if (!toleratePartialData)
 			{

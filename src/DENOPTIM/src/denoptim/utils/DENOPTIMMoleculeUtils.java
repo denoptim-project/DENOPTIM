@@ -49,6 +49,8 @@ import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.aromaticity.Kekulization;
 import org.openscience.cdk.config.IsotopeFactory;
 import org.openscience.cdk.config.Isotopes;
+import org.openscience.cdk.depict.Depiction;
+import org.openscience.cdk.depict.DepictionGenerator;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.GeometryUtil;
 import org.openscience.cdk.graph.ConnectivityChecker;
@@ -622,62 +624,14 @@ public class DENOPTIMMoleculeUtils
         {
             throw new DENOPTIMException("Failed to generate 2D coordinates.");
         }
-    
+        
         try
         {
-            int WIDTH = 400;
-            int HEIGHT = 400;
-            
-            GeometryUtil.scaleMolecule(iac, 0.9);
-            GeometryUtil.translateAllPositive(iac);
-            // the draw area and the image should be the same size
-            Rectangle drawArea = new Rectangle(WIDTH, HEIGHT);
-            Image image = new BufferedImage(WIDTH, HEIGHT, 
-                    BufferedImage.TYPE_4BYTE_ABGR);
-
-            // generators make the image elements
-            ArrayList<IGenerator<IAtomContainer>> generators = 
-                    new ArrayList<>(); 
-            generators.add(new BasicSceneGenerator());
-            generators.add(new BasicBondGenerator());
-            generators.add(new BasicAtomGenerator());
-            
-
-            // the renderer needs to have a toolkit-specific font manager
-            AtomContainerRenderer renderer =
-                    new AtomContainerRenderer(generators, new AWTFontManager());
-                    
-            RendererModel model = renderer.getRenderer2DModel();
-            model.set(BasicSceneGenerator.UseAntiAliasing.class, true);
-            model.set(BasicBondGenerator.BondWidth.class, 2.0);            
-            model.set(BasicAtomGenerator.ShowExplicitHydrogens.class, false);
-            model.set(BasicAtomGenerator.AtomRadius.class, 0.5);
-            model.set(BasicAtomGenerator.CompactShape.class, 
-                    BasicAtomGenerator.Shape.OVAL);
-
-            // the call to 'setup' only needs to be done on the first paint
-            renderer.setup(iac, drawArea);
-
-            // paint the background
-            Graphics2D g = (Graphics2D)image.getGraphics();
-            g.setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON
-            );
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, WIDTH, HEIGHT);
-            
-
-            // the paint method also needs a toolkit-specific renderer
-            renderer.paint(iac, new AWTDrawVisitor(g), 
-                    new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
-            g.dispose();
-
-            ImageIO.write((RenderedImage)image, "PNG", new File(filename));
-        }
-        catch (IOException e)
+            Depiction depiction = new DepictionGenerator().depict(iac);
+            depiction.writeTo(filename);
+        } catch (Exception e)
         {
-            throw new DENOPTIMException(e);
+            throw new DENOPTIMException("Failed to write image to "+filename);
         }
     }
     

@@ -1636,9 +1636,9 @@ public class DenoptimIO
      * @throws DENOPTIMException is something goes wrong while reading the file
      *                           or interpreting its content
      */
-    public static ArrayList<Candidate> readDENOPTIMMolecules(File file, 
+    public static ArrayList<Candidate> readCandidates(File file, 
             boolean useFragSpace) throws DENOPTIMException {
-        return readDENOPTIMMolecules(file, useFragSpace, false);
+        return readCandidates(file, useFragSpace, false);
     }
 
 //------------------------------------------------------------------------------
@@ -1658,17 +1658,17 @@ public class DenoptimIO
      *                           or interpreting its content
      */
     
-    public static ArrayList<Candidate> readDENOPTIMMolecules(File file, 
+    public static ArrayList<Candidate> readCandidates(File file, 
             boolean useFragSpace, boolean allowNoUID) throws DENOPTIMException {
         String filename = file.getAbsolutePath();
-        ArrayList<Candidate> mols = new ArrayList<>();
+        ArrayList<Candidate> candidates = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readMoleculeData(filename);
         for (IAtomContainer iac : iacs) {
             Candidate mol = new Candidate(iac, useFragSpace, allowNoUID);
             mol.setSDFFile(filename);
-            mols.add(mol);
+            candidates.add(mol);
         }
-        return mols;
+        return candidates;
     }
 
 //------------------------------------------------------------------------------
