@@ -39,17 +39,17 @@ runFolder=$(basename $(ls -lrtd "$wrkDir"/RUN*/ | tail -n 1 | awk '{print $NF}')
 n50=$(grep -l "$candIdTo50" "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
 n40=$(grep -l "$candIdTo40" "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
 nMAX28=$(grep -l "MAX: *28.000" "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
-if [ "$n50" -lt 9 ] || [ "$n50" -gt 11 ]; then
+if [ "$n50" -lt 5 ] || [ "$n50" -gt 12 ]; then
     echo " "
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including $candIdTo50: $n50)"
     exit 1
 fi
-if [ "$n40" -lt 9 ] || [ "$n40" -gt 11 ]; then
+if [ "$n40" -lt 5 ] || [ "$n40" -gt 12 ]; then
     echo " "
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including "$candIdTo40": $n40)"
     exit 1
 fi
-if [ "$nMAX28" -lt 6 ] || [ "$nMAX28" -gt 9 ]; then
+if [ "$nMAX28" -lt 5 ] || [ "$nMAX28" -gt 10 ]; then
     echo " "
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of generation with max fitness from manually added molecule: $nMAX28)"
     exit 1
