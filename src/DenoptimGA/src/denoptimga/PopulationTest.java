@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 
@@ -156,6 +158,61 @@ public class PopulationTest
         compareSizeOfSites(c3,expectedForC3,partnersForC3,pop);
         compareSizeOfSites(c4,expectedForC4,partnersForC4,pop);
         assertEquals(partnersForC5.size(), 0, "Wrong umber of partners for C5");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testClone() throws Exception
+    {
+        Population pop = new Population();
+        
+        DENOPTIMGraph g1 = makeGraphA();
+        Candidate c1 = new Candidate("C1",g1);
+        pop.add(c1);
+        
+        DENOPTIMGraph g2 = makeGraphB();
+        Candidate c2 = new Candidate("C2",g2);
+        pop.add(c2);
+        
+        ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
+                new ArrayList<Candidate>(Arrays.asList(c1,c2)));
+        ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
+                new ArrayList<Candidate>(Arrays.asList(c1,c2)));
+        
+        Map<Candidate,Map<Candidate,Integer>> expected = 
+                new HashMap<Candidate,Map<Candidate,Integer>>();
+        Map<Candidate,Integer> expectedForC1 = new HashMap<Candidate,Integer>();
+        expectedForC1.put(c2, 6);
+        expected.put(c1, expectedForC1);
+        Map<Candidate,Integer> expectedForC2 = new HashMap<Candidate,Integer>();
+        expectedForC2.put(c1, 6);
+        expected.put(c2, expectedForC2);
+        
+        Population clonedPop = pop.clone();
+        
+        compareSizeOfSites(c1,expectedForC1,partnersForC1,clonedPop);
+        compareSizeOfSites(c2,expectedForC2,partnersForC2,clonedPop);
+        
+        compareSitesLists(pop.getXoverSites(c1, c2),
+                clonedPop.getXoverSites(c1, c2));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Assumes the two lists have equal size
+     */
+    private void compareSitesLists(List<DENOPTIMVertex[]> listA,
+            List<DENOPTIMVertex[]> listB)
+    {
+        for (int i=0; i<listA.size(); i++)
+        {
+            DENOPTIMVertex[] pairA = listA.get(i);
+            DENOPTIMVertex[] pairB = listB.get(i);
+            assertEquals(pairA[0],pairB[0],"Identity of xover site");
+            assertEquals(pairA[1],pairB[1],"Identity of xover site");
+        }
     }
     
 //------------------------------------------------------------------------------

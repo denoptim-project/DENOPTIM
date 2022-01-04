@@ -79,7 +79,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             clone.add(c);
         }
         
-        //TODO: clone relations "xoverCompatibilities"
+        clone.xoverCompatibilities = xoverCompatibilities.clone();
         
         return clone;
     }
@@ -218,6 +218,32 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             {
                 m.remove(c);
             }
+        }
+        
+        /**
+         * Return a somewhat-shallow clone of this object: the map and list are 
+         * new objects, but the references to candidates and vertexes will point
+         * to the original instances.
+         */
+        public XoverCompatibilitySites clone()
+        {
+            XoverCompatibilitySites cloned = new XoverCompatibilitySites();
+            for (Candidate c1 : data.keySet())
+            {
+                LinkedHashMap<Candidate, List<DENOPTIMVertex[]>> inner =
+                        new LinkedHashMap<Candidate, List<DENOPTIMVertex[]>>();
+                for (Candidate c2 : data.get(c1).keySet())
+                {
+                    List<DENOPTIMVertex[]> lst = new ArrayList<DENOPTIMVertex[]>();
+                    for (DENOPTIMVertex[] arr : data.get(c1).get(c2))
+                    {
+                        lst.add(Arrays.copyOf(arr,arr.length));
+                    }
+                    inner.put(c2,lst);
+                }
+                cloned.data.put(c1, inner);
+            }
+            return cloned;
         }
     }
 
