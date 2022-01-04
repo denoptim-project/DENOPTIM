@@ -109,7 +109,7 @@ public class GraphEditor
                         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
                         IAtomContainer newMol = t3d
                                 .convertGraphTo3DAtomContainer(modGraph,true);
-                         if (GraphEdParameters.getInFormat().equals("SDF"))
+                        if (GraphEdParameters.getInFormat().equals("SDF"))
                         {
                             IAtomContainer oldMol = 
                                                  GraphEdParameters.getInpMol(i);

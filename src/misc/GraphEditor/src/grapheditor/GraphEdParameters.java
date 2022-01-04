@@ -497,26 +497,14 @@ public class GraphEdParameters
                 }
         		case ("SDF"):
         		{
-        		    //TODO-GG use DenoptimIO.readGraph...
         		    inMols = DenoptimIO.readSDFFile(inGraphsFile);
         		    int i = 0;
         		    for (IAtomContainer m : inMols)
         		    {
             			i++;
-            			if (m.getProperty(DENOPTIMConstants.GRAPHTAG) != null)
-            			{
-            			    String sGrp = m.getProperty(
-            			            DENOPTIMConstants.GRAPHTAG).toString();
-            			    DENOPTIMGraph g = GraphConversionTool.getGraphFromString(sGrp);
-            			    inGraphs.add(g);
-            			}
-            			else
-            			{
-            			    String msg = "Molecule " + i + " in file '" 
-            					 + inGraphsFile + "' has no GraphENC. "
-                                                     + " Unable to read DENOPTIMGraph!";
-                                        throw new DENOPTIMException(msg);
-            			}
+            			DENOPTIMGraph g = DenoptimIO.readGraphFromSDFileIAC(m, 
+            			        i, true, inGraphsFile);
+            			inGraphs.add(g);
         		    }
         		    break;
         		}

@@ -2150,12 +2150,14 @@ public class DenoptimIO
      * Converts an atom container read in from an SDF file into a graph, if 
      * possible. Otherwise, throws an exception.
      * @param mol the atom container coming from SDF representation
-     * @param molId identified used only for logging purposed
+     * @param molId identified used only for logging purposes.
      * @param useFS set to <code>true</code> when there is a defined
      * fragment space that contains the fragments used to build the graphs.
      * Otherwise, use <code>false</code>. This will create only as many APs as
      * needed to satisfy the graph representation, thus creating a potential
      * mismatch between fragment space and graph representation.
+     * @param fileName a pathname used only for logging errors. This is usually
+     * the pathname to the file from which we took the atom container.
      * @return the corresponding graph or null.
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
