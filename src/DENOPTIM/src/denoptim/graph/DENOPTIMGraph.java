@@ -1562,13 +1562,43 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return ((pos >= gVertices.size()) || pos < 0) ? null :
                 gVertices.get(pos);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check if the specified vertex is contained in this graph as a node or
+     * in any inner graphs that may be embedded in {@link DENOPTIMTemplate}-kind
+     * vertex belonging to this graph. 
+     * @param v the vertex.
+     * @return <code>true</code> if the vertex belongs to this graph or is 
+     * anyhow embedded in it.
+     */
+    public boolean containsOrEmbedsVertex(DENOPTIMVertex v)
+    {
+        if (gVertices.contains(v))
+            return true;
+           
+        for (DENOPTIMVertex vrt : gVertices)
+        {
+            if (vrt instanceof DENOPTIMTemplate)
+            {
+                DENOPTIMTemplate t = (DENOPTIMTemplate) vrt;
+                if (t.getInnerGraph().containsOrEmbedsVertex(v))
+                    return true;
+            }
+        }
+        return false;
+    }
+    
 
 //------------------------------------------------------------------------------
 
     /**
-     * Check if the graph contains the specified vertex.
+     * Check if this graph contains the specified vertex. Does not consider 
+     * inner graphs that may be embedded in {@link DENOPTIMTemplate}-kind
+     * vertex belonging to this graph. 
      * @param v the vertex.
-     * @return <code>true</code> if the vertex belong to this graph.
+     * @return <code>true</code> if the vertex belongs to this graph.
      */
     public boolean containsVertex(DENOPTIMVertex v)
     {
@@ -4793,6 +4823,16 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public void setTemplateJacket(DENOPTIMTemplate template)
     {
         this.templateJacket = template;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the template that contains this graph or null.
+     */
+    public DENOPTIMTemplate getTemplateJacket()
+    {
+        return templateJacket;
     }
 
 //------------------------------------------------------------------------------    

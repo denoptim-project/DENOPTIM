@@ -1201,9 +1201,9 @@ public class EAUtils
                     GAParameters.getExcludedMutationTypes());
             for (DENOPTIMVertex mutableSite : initialMutableSites)
             {
-                // This account for the possibility that a mutation changes a 
-                // branch of the initial graph or deleted vertexes.
-                if (!graph.containsVertex(mutableSite))
+                // This accounts for the possibility that a mutation changes a 
+                // branch of the initial graph or deletes vertexes.
+                if (!graph.containsOrEmbedsVertex(mutableSite))
                     continue;
                 
                 if (!DENOPTIMGraphOperations.performMutation(mutableSite,mnt))

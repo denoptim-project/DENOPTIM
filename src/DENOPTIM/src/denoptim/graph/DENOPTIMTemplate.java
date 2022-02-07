@@ -261,7 +261,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         // reflected in any place where the inner graph is modified (e.g.,
         // DENOPTIMGraph.insertSingleVertex()
         
-        mol = null;
+        clearIAtomContainer();
         if (!isValidInnerGraph(innerGraph)) {
             throw new IllegalArgumentException("inner graph does not have all" +
                     " required APs");
@@ -282,7 +282,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
     private void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
     {
-        mol = null;
+        clearIAtomContainer();
         this.innerToOuterAPs = new APTreeMap();
         for (Entry<Integer, DENOPTIMAttachmentPoint> e : map.entrySet())
         {
@@ -472,10 +472,22 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
     
     /**
+     * Removes the molecular representation
+     */
+    public void clearIAtomContainer()
+    {
+        this.mol = null;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
      * Attaches a molecular representation to this template. Note that changes 
      * to this Template have the power to trigger the request to update the
      * molecular representation that we set here, thus removing the 
      * representation we define in this method.
+     * @param mol the atom container to be used as molecular representation of 
+     * this template.
      * @param updateAPsAccordingToIAC flag that prevents actions when the IAC 
      * does not have the details needed to update the APs on the template. 
      * For instance, when cloning a template or reading in a template with IAC
@@ -744,7 +756,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     public void addRequiredAP(Point3d pt, APClass apClass) {
-        mol = null;
+        clearIAtomContainer();
         if (getInnerGraph() != null) {
             throw new IllegalArgumentException("cannot add more required APs " +
                     "after setting the inner graph");

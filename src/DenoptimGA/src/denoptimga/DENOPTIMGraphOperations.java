@@ -1921,9 +1921,18 @@ public class DENOPTIMGraphOperations
                 + vertex.toString() + " (position " + positionOfVertex
                 + " in graph " + graphId+"): ";
         if (done)
+        {
             msg = msg + "done";
-        else
+            
+            // Triggers reconstruction of the molecular representation of
+            // templates upon changes of the embedded graph
+            if (graph.getTemplateJacket() != null)
+            {
+                graph.getTemplateJacket().clearIAtomContainer();
+            }
+        } else {
             msg = msg + "unsuccessful";
+        }
         DENOPTIMLogger.appLogger.info(msg);
 
         return done;
