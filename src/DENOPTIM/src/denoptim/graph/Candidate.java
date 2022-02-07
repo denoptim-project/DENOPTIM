@@ -406,10 +406,49 @@ Serializable, Cloneable
     }
     
 //------------------------------------------------------------------------------
-    
+
+    /**
+     * Returns the atom container representing this candidate
+     * @return the atom container.
+     */
     public IAtomContainer getChemicalRepresentation()
     {
         return iac;
+    } 
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns an atom container representing this item in a way that is 
+     * compatible for writing this item to an SDF file.
+     * @return a decorated atom container.
+     * @throws DENOPTIMException when conversion of graph to json fails.
+     */
+    public IAtomContainer getFitnessProviderOutputRepresentation() throws DENOPTIMException
+    {
+        IAtomContainer iacForFitFile = iac;
+
+        iacForFitFile.setProperty(CDKConstants.TITLE, name);
+        iacForFitFile.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
+        iacForFitFile.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
+        
+        // This is slow, and should not be needed because the json format is in
+        // in the input file given to the fitness provider.
+        // iacForFitFile.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
+        
+        if (graph.getLocalMsg() != null && !graph.getLocalMsg().equals(""))
+        {
+            iacForFitFile.setProperty(DENOPTIMConstants.GMSGTAG, graph.getLocalMsg());
+        }
+        iacForFitFile.setProperty(DENOPTIMConstants.SMILESTAG, smiles);
+        iacForFitFile.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid);
+        if (hasFitness)
+        {
+            iacForFitFile.setProperty(DENOPTIMConstants.FITNESSTAG, fitness);
+        } else {
+            iacForFitFile.setProperty(DENOPTIMConstants.MOLERRORTAG, error);
+        }
+        return iacForFitFile;
     } 
     
 //------------------------------------------------------------------------------

@@ -1020,7 +1020,7 @@ public class DenoptimIO
             Object uidObj = props.get(DENOPTIMConstants.UNIQUEIDTAG);
             if (uidObj==null )
             {
-                throw new DENOPTIMException("Cannot create item is SDF tag "
+                throw new DENOPTIMException("Cannot create item if SDF tag "
                         + DENOPTIMConstants.UNIQUEIDTAG + " is null!");
             }
             Object nameObj = props.get(CDKConstants.TITLE);

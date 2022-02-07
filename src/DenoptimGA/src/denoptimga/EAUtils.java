@@ -1057,25 +1057,18 @@ public class EAUtils
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 
-                IAtomContainer iac = candidate.getChemicalRepresentation();
-                
                 String molName = "M" + GenUtils.getPaddedString(8, ctr);
                 candidate.setName(molName);
-                iac.setProperty(CDKConstants.TITLE, molName);
-                
+                candidate.getGraph().setGraphId(gctr);
+                candidate.getGraph().setLocalMsg("INITIAL_POPULATION");
                 String sdfPathName = genDir + System.getProperty("file.separator") 
                             + molName + DENOPTIMConstants.FITFILENAMEEXTOUT;
-                candidate.getGraph().setGraphId(gctr);
-                iac.setProperty(DENOPTIMConstants.GCODETAG, gctr);
-                
-                candidate.getGraph().setLocalMsg("INITIAL_POPULATION");
-                iac.setProperty(DENOPTIMConstants.GMSGTAG, 
-                        "INITIAL_POPULATION");
-                
-                DenoptimIO.writeMolecule(sdfPathName, iac, false);
                 candidate.setSDFFile(sdfPathName);
-                
                 candidate.setImageFile(null);
+                
+                // Write the candidate to file as if it had been processed by fitness provider
+                DenoptimIO.writeMolecule(sdfPathName, 
+                        candidate.getFitnessProviderOutputRepresentation(), false);
                 
                 population.add(candidate);
             }

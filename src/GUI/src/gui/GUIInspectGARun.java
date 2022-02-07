@@ -125,6 +125,8 @@ public class GUIInspectGARun extends GUICardPanel
 	private ChartPanel chartPanel;
 	
 	
+	private final String NL = System.getProperty("line.separator");
+	
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -399,7 +401,8 @@ public class GUIInspectGARun extends GUICardPanel
 				} catch (DENOPTIMException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(parent,
-			                "Could not read data from to '" + fitFile + "'!.",
+			                "Could not read data from to '" + fitFile + "'! "
+			                + NL + e1.getMessage(),
 			                "Error",
 			                JOptionPane.PLAIN_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
