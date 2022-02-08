@@ -134,6 +134,13 @@ public class CyclicGraphHandler
         List<DENOPTIMRing> combOfRings = new ArrayList<DENOPTIMRing>();
         while (wLstVrtI.size() > 0)
         {
+            // TODO make optional
+            // Termination criterion based on maximum number of rings per graph
+            /*
+            if (combOfRings.size() > 4)
+                break;
+            */
+            
             int vIdI = RandomUtils.nextInt(wLstVrtI.size());
             DENOPTIMVertex vI = wLstVrtI.get(vIdI);
 

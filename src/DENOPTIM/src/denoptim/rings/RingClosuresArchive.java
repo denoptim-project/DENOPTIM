@@ -323,7 +323,7 @@ public class RingClosuresArchive
             }
             catch (Throwable t)
             {
-                throw new DENOPTIMException("CyclicGraphHandler is unable "
+                throw new DENOPTIMException("RingClosuresArchive is unable "
                         + "to unlock file '" 
 			+ RingClosureParameters.getRCCLibraryIndexFile() 
 			+ "'. " + t);

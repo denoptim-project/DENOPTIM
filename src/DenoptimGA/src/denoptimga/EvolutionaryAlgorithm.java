@@ -418,8 +418,7 @@ public class EvolutionaryAlgorithm
                   
                 if (candidate == null)
                     continue;
-                
-                
+               
                 if (FitnessParameters.checkPreFitnessUID())
                 {
                     try

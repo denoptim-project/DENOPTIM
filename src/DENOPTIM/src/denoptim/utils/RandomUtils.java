@@ -112,6 +112,11 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the next pseudorandom, uniformly distributed double value between
+     * 0.0 and 1.0 from this random number generator's sequence.
+     * @return the next double between 0.0 and 1.0;
+     */
     public static double nextDouble()
     {
         double d = getRNG().nextDouble();
@@ -122,6 +127,13 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns a pseudorandom, uniformly distributed int value between 0 
+     * (inclusive) and the specified value (exclusive), drawn from this random 
+     * number generator's sequence.
+     * @param i the bound on the random number to be returned. Must be positive.
+     * @return the next integer between 0 and the specified value.
+     */
     public static int nextInt(int i)
     {
         int r = getRNG().nextInt(i);
@@ -132,6 +144,11 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the next pseudorandom, uniformly distributed boolean value from 
+     * this random number generator's sequence.
+     * @return the next boolean.
+     */
     public static boolean nextBoolean()
     {
         boolean r = getRNG().nextBoolean();
@@ -142,10 +159,17 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
 
-      public static boolean nextBoolean(double prob)
-      {
-          return nextDouble() < prob;
-      }
+    /**
+     * Returns whether the next pseudorandom, uniformly distributed double 
+     * is lower than the specified value.
+     * @param prob the bound on the random double.
+     * @return <code>true</code> is the next double is lower than the specified 
+     * value.
+     */
+    public static boolean nextBoolean(double prob)
+    {
+        return nextDouble() < prob;
+    }
       
 //------------------------------------------------------------------------------
     
