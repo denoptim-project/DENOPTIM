@@ -619,11 +619,6 @@ public class EAUtils
         
         Object[] res = EAUtils.evaluateGraph(graph);
         
-        //TODO-GG del
-        ArrayList<DENOPTIMGraph> lll = new  ArrayList<DENOPTIMGraph>();
-        lll.add(graph);
-        DenoptimIO.writeGraphsToSDF(new File("/tmp/graph.sdf"), lll, false);
-        
         if (res != null)
         {
             if (!EAUtils.setupRings(res,graph))
