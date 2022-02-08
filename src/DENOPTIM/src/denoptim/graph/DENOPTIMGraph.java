@@ -238,7 +238,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * Returns the reference of the candidate item that is defined by this 
      * graph.
-     * @return the reference to the owner.
+     * @return the reference to the owner or null.
      */
     public Candidate getCandidateOwner()
     {

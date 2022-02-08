@@ -36,6 +36,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
+import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMGraph;
@@ -1507,6 +1508,17 @@ public class FragmentSpace
                         }
                     }
     
+                    String msg = "Adding new template (Inner Graph id: " 
+                            + t.getInnerGraph().getGraphId() + ") to the "
+                            + "library of " + type + "s. The template is "
+                            + "generated from graph " + graph.getGraphId();
+                    Candidate source = graph.getCandidateOwner();
+                    if (source != null)
+                        msg = msg + " candidate " + source.getName();
+                    else
+                        msg = msg + ".";
+                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    
                     FragmentSpace.appendVertexToLibrary(t, type, library);
                     if (type == BBType.FRAGMENT)
                     {
