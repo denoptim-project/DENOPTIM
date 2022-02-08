@@ -637,7 +637,7 @@ public class DENOPTIMGraphOperations
                 double byLevelProb = EAUtils.getGrowthByLevelProbability(lvl);
                 double crowdingProb = EAUtils.getCrowdingProbability(ap);
                 double extendGraphProb = molSizeProb * byLevelProb * crowdingProb;
-                boolean fgrow =  RandomUtils.nextBoolean(extendGraphProb);
+                boolean fgrow = RandomUtils.nextBoolean(extendGraphProb);
                 if (debug)
                 {
                     System.err.println("Growth probability on this AP:" 
@@ -725,6 +725,56 @@ public class DENOPTIMGraphOperations
                     {
                         System.err.println("Applying intra-fragment symmetric "
                                           + "substitution over APs: " + symAPs);
+                    }
+                    
+                    // Are symmetric APs rooted on same atom?
+                    boolean allOnSameSrc = true;
+                    for (Integer symApId : symAPs.getList())
+                    {
+                        if (!curVrtx.getAttachmentPoints().get(symApId).hasSameSrcAtom(ap))
+                        {
+                            allOnSameSrc = false;
+                            break;
+                        }
+                    }
+                    
+                    if (allOnSameSrc)
+                    {
+                        // If the APs are rooted on the same src atom, we want to
+                        // apply the crowdedness probability to avoid over crowded
+                        // atoms
+                        
+                        int crowdedness = EAUtils.getCrowdedness(ap);
+                        
+                        SymmetricSet toKeep = new SymmetricSet();
+                        
+                        
+                        // Start by keeping "ap"
+                        toKeep.add(apId);
+                        crowdedness = crowdedness + 1;
+                        
+                        // Pick the accepted value once (used to decide how much
+                        // crowdedness we accept)
+                        double shot = RandomUtils.nextDouble();
+                        
+                        // Keep as many as allowed by the crowdedness decision
+                        for (Integer symApId : symAPs.getList())
+                        {
+                            if (symApId.compareTo(apId) == 0)
+                                continue;
+                            
+                            double crowdProb = EAUtils.getCrowdingProbability(
+                                    crowdedness);
+                            
+                            if (shot > crowdProb)
+                                break;
+                            
+                            toKeep.add(symApId);
+                            crowdedness = crowdedness + 1;
+                        }
+                        
+                        // Adjust the list of symmetric APs to work with
+                        symAPs = toKeep;
                     }
                 }
 				else

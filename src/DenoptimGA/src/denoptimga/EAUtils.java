@@ -619,6 +619,11 @@ public class EAUtils
         
         Object[] res = EAUtils.evaluateGraph(graph);
         
+        //TODO-GG del
+        ArrayList<DENOPTIMGraph> lll = new  ArrayList<DENOPTIMGraph>();
+        lll.add(graph);
+        DenoptimIO.writeGraphsToSDF(new File("/tmp/graph.sdf"), lll, false);
+        
         if (res != null)
         {
             if (!EAUtils.setupRings(res,graph))
@@ -1933,6 +1938,56 @@ public class EAUtils
 
     /**
      * Calculated the probability of using and attachment point rooted on
+     * an atom that is holding other attachment points which have already been
+     * used. This method does not use the actual information on attachment point
+     * usage, but relies on a externally calculated values of the crowdedness.
+     * Use {@link EAUtils#getCrowdingProbability(DENOPTIMAttachmentPoint)} to
+     * get the crowding probability for an actual attachment point.
+     * Use {@link EAUtils#getCrowdedness(DENOPTIMAttachmentPoint)} to calculate
+     * the crowdedness for an attachment point.
+     * @param crowdedness the level of crowdedness
+     * @return probability of adding a new building block on an attachment point
+     * with the given crowdedness.
+     */
+    public static double getCrowdingProbability(int crowdedness)
+    {
+        int scheme = GAParameters.getCrowdingProbabilityScheme();
+        double lambda =GAParameters.getCrowdingMultiplier();
+        double sigmaOne = GAParameters.getCrowdingFactorSteepSigma();
+        double sigmaTwo = GAParameters.getCrowdingFactorMiddleSigma();
+        return getCrowdingProbabilityForCrowdedness(crowdedness, scheme, lambda,
+                sigmaOne, sigmaTwo);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Calculate the current crowdedness of the given attachment point.
+     * @param ap the attachment point to consider
+     * @return the integer representing how many AP rooted on the same atom that 
+     * holds the given attachment point are used by non-capping group building 
+     * blocks.
+     */
+    public static int getCrowdedness(DENOPTIMAttachmentPoint ap)
+    {
+        int crowdness = 0;
+        for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())
+        {
+            if (oap.getAtomPositionNumber() == ap.getAtomPositionNumber()
+                    && !oap.isAvailableThroughout() 
+                    && oap.getLinkedAP().getOwner().getBuildingBlockType() != 
+                        BBType.CAP)
+            {
+                crowdness = crowdness + 1;
+            }
+        }
+        return crowdness;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculated the probability of using and attachment point rooted on
      * an atom that is holding other attachment points that have already been
      * used.
      * @param ap the attachment point candidate to be used.
@@ -1953,17 +2008,8 @@ public class EAUtils
             return 1.0;
         }
         
-        int crowdness = 0;
-        for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())
-        {
-            if (oap.getAtomPositionNumber() == ap.getAtomPositionNumber()
-                    && !oap.isAvailableThroughout() 
-                    && oap.getLinkedAP().getOwner().getBuildingBlockType() != 
-                        BBType.CAP)
-            {
-                crowdness = crowdness + 1;
-            }
-        }
+        int crowdness = getCrowdedness(ap);
+        
         return getCrowdingProbabilityForCrowdedness(crowdness, scheme, lambda,
                 sigmaOne, sigmaTwo);
     }
