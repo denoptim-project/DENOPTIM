@@ -610,7 +610,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) 
             {
                 DENOPTIMAttachmentPoint inAP = getInnerAPFromOuterAP(outAP);
-                outAP.setDirectionVector(inAP.getDirectionVector());
+                if (inAP.getDirectionVector()==null)
+                {
+                    outAP.setDirectionVector(null);
+                } else {
+                    outAP.setDirectionVector(inAP.getDirectionVector());
+                }
                 int atmIndexInMol = inAP.getAtomPositionNumberInMol();
                 outAP.setAtomPositionNumber(atmIndexInMol);
                 if (apsPerAtom.containsKey(atmIndexInMol))
