@@ -328,11 +328,14 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * entries of <code>dirVec</code> are referred to the same origin as
      * the coordinates of the source atom.
      * @param dirVec the coordinates of the 3D point defining the end of the
-     * direction vector
+     * direction vector.
      */
     public void setDirectionVector(Point3d dirVec)
     {
-        this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
+        if (dirVec == null)
+            this.dirVec = null;
+        else
+            this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
     }
 
 //------------------------------------------------------------------------------
