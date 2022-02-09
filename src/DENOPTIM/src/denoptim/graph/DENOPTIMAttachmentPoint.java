@@ -603,6 +603,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             }
         }
         
+        //TODO-gg this should not be done because the coordinates can change
+        // upon rototranslation of the building block.
         if (this.getDirectionVector()!=null && other.getDirectionVector()!=null)
         {
             boolean different = false;
@@ -614,6 +616,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                 return false;
             }
         }
+        
         
         return true;
     }

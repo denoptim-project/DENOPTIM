@@ -39,7 +39,7 @@ import com.google.gson.JsonParseException;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.utils.DENOPTIMgson;
+import denoptim.json.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 

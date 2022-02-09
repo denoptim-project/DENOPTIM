@@ -31,7 +31,7 @@ import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMgson;
+import denoptim.json.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 

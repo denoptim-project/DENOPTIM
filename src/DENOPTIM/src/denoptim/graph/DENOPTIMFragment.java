@@ -39,8 +39,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.io.DenoptimIO;
+import denoptim.json.DENOPTIMgson;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.MutationType;
 
 /**
@@ -591,7 +591,23 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			}
 	    }
 
-		// Write attachment points in the atoms
+	    projectListAPToAPProperties();
+
+        updateSymmetryRelations();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Takes the list of APs from the field of this class and projects the APs
+     * into properties of the {@link IAtom}s. This method does not update
+     * the symmetry relation between APs because it might have been read
+     * from file, which takes priority over recalculating it.
+     * @throws DENOPTIMException
+     */
+    public void projectListAPToAPProperties() throws DENOPTIMException
+    {
+        // Write attachment points in the atoms
         for (int i = 0; i < lstAPs.size(); i++)
         {
             DENOPTIMAttachmentPoint ap = lstAPs.get(i);
@@ -599,29 +615,27 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             
             if (atmID > mol.getAtomCount())
             {
-            	throw new DENOPTIMException("Fragment property defines AP "
-            			+ "with out-of-borders atom index (" + atmID + ").");
+                throw new DENOPTIMException("Fragment property defines AP "
+                        + "with out-of-borders atom index (" + atmID + ").");
             }
             
             IAtom atm = mol.getAtom(atmID);
             if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-				ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
-						getAPsFromAtom(atm);
+                ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
+                        getAPsFromAtom(atm);
                 oldAPs.add(ap);
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,oldAPs);
             } 
             else
             {
                 ArrayList<DENOPTIMAttachmentPoint> aps = 
-                		new ArrayList<DENOPTIMAttachmentPoint>();
+                        new ArrayList<DENOPTIMAttachmentPoint>();
                 aps.add(ap);
                 
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,aps);
             }
         }
-        
-        updateSymmetryRelations();
     }
 
 //-----------------------------------------------------------------------------
@@ -969,82 +983,84 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
     /**
      * Reads a JSON string and returns an instance of this class.
+     * Fields that depend on the context of this vertex, such as the graph 
+     * 'owner' of this vertex and the 'user' of each attachment point, 
+     * are recovered, if needed, upon deserialization of the graph that 
+     * contains this vertex.
      * @param json the string to parse.
      * @return a new instance of this class.
      */
     
     public static DENOPTIMFragment fromJson(String json)
-    {   
-        DENOPTIMFragment returnedFrag = null;
-        
-        //TODO-V3?: serialize AtomContainer2 somehow (as an SDF string?)
-        // Perhaps, an idea is to place a json version of the atom
-        // container only if the json string is meant to go in a .json file
-        // but not if it goes in an SDF file
-
-        // The serialized fragment does NOT include its molecular
-        // representation, which cannot be serialized (so far...)
+    {
         Gson gson = DENOPTIMgson.getReader();
-        DENOPTIMFragment fragNoMol = gson.fromJson(json, DENOPTIMFragment.class);
-        // fragNoMol has these issues:
-        // - mol in null
-        // - AP user/owner is null
-
-        if (FragmentSpace.isDefined())
+        DENOPTIMFragment returnedFrag = gson.fromJson(json, 
+                DENOPTIMFragment.class);
+        
+        //TODO-gg this whole IF block will disappear once finished
+        boolean oldApproach = false;
+        if (returnedFrag.mol == null || returnedFrag.mol.getAtomCount()==0)
         {
-            // If a fragment space exists, we rebuild the fragment from the
-            // library, and attach to it the serialized data
-            DENOPTIMFragment fragWithMol;
-            try
+            // In this case we have read a fragment from before we started
+            // writing the mol to json.
+            DENOPTIMFragment fragNoMol = gson.fromJson(json, DENOPTIMFragment.class);
+            if (FragmentSpace.isDefined())
             {
-                DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(
-                            fragNoMol.getBuildingBlockType(), 
-                            fragNoMol.getBuildingBlockId());
-                if (v instanceof DENOPTIMFragment)
+                // If a fragment space exists, we rebuild the fragment from the
+                // library, and attach to it the serialized data
+                DENOPTIMFragment fragWithMol;
+                try
                 {
-                    fragWithMol = (DENOPTIMFragment) v;
-                } else {
-                    throw new JsonParseException("Building block "
-                            + fragNoMol.getBuildingBlockType() + " " 
+                    DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(
+                                fragNoMol.getBuildingBlockType(),
+                                fragNoMol.getBuildingBlockId());
+                    if (v instanceof DENOPTIMFragment)
+                    {
+                        fragWithMol = (DENOPTIMFragment) v;
+                    } else {
+                        throw new JsonParseException("Building block "
+                                + fragNoMol.getBuildingBlockType() + " "
+                                + fragNoMol.getBuildingBlockId()
+                                + " is not a " + DENOPTIMFragment.class.getName()
+                                + "as claimed by JSON representation.");
+                    }
+                } catch (DENOPTIMException e)
+                {
+                    throw new JsonParseException("Could not get "
+                            + fragNoMol.getBuildingBlockType() + " "
                             + fragNoMol.getBuildingBlockId()
-                            + " is not a " + DENOPTIMFragment.class.getName() 
-                            + "as claimed by JSON representation.");
+                            + " from "
+                            + "library. ",e);
                 }
-            } catch (DENOPTIMException e)
-            {
-                throw new JsonParseException("Could not get "
-                        + fragNoMol.getBuildingBlockType() + " " 
-                        + fragNoMol.getBuildingBlockId()
-                        + " from "
-                        + "library. ",e);
-            }
-            ArrayList<SymmetricSet> cLstSymAPs = 
-                    new ArrayList<SymmetricSet>();
-            for (SymmetricSet ss : fragNoMol.getSymmetricAPSets())
-            {
-                cLstSymAPs.add(ss.clone());
-            }
+                ArrayList<SymmetricSet> cLstSymAPs =
+                        new ArrayList<SymmetricSet>();
+                for (SymmetricSet ss : fragNoMol.getSymmetricAPSets())
+                {
+                    cLstSymAPs.add(ss.clone());
+                }
 
-            fragWithMol.setMutationTypes(fragNoMol.getUnfilteredMutationTypes());
-            fragWithMol.setSymmetricAPSets(cLstSymAPs);
-            fragWithMol.setAsRCV(fragNoMol.isRCV());
-            fragWithMol.setVertexId(fragNoMol.getVertexId());
-            for (int iap = 0; iap<fragNoMol.getNumberOfAPs(); iap++)
-            {
-                DENOPTIMAttachmentPoint oriAP = fragNoMol.getAP(iap);
-                DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
-                newAP.setID(oriAP.getID());
+                fragWithMol.setMutationTypes(fragNoMol.getUnfilteredMutationTypes());
+                fragWithMol.setSymmetricAPSets(cLstSymAPs);
+                fragWithMol.setAsRCV(fragNoMol.isRCV());
+                fragWithMol.setVertexId(fragNoMol.getVertexId());
+                for (int iap = 0; iap<fragNoMol.getNumberOfAPs(); iap++)
+                {
+                    DENOPTIMAttachmentPoint oriAP = fragNoMol.getAP(iap);
+                    DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
+                    newAP.setID(oriAP.getID());
+                }
+                returnedFrag = fragWithMol;
+            } else {
+                System.err.println("WARNING: undefined fragment space. "
+                        + "Templates will contain fragments with no "
+                        + "molecular representation. To avoid this, "
+                        + "first "
+                        + "define the fragment space, and "
+                        + "then work with "
+                        + "templates.");
+                returnedFrag = fragNoMol;
             }
-            returnedFrag = fragWithMol;
-        } else {
-            System.err.println("WARNING: undefined fragment space. "
-                    + "Templates will contain fragments with no "
-                    + "molecular representation. To avoid this, "
-                    + "first "
-                    + "define the fragment space, and "
-                    + "then work with "
-                    + "templates.");
-            returnedFrag = fragNoMol;
+            oldApproach = true;
         }
         
         for (DENOPTIMAttachmentPoint ap : returnedFrag.getAttachmentPoints())
@@ -1052,13 +1068,21 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             ap.setOwner(returnedFrag);
         }
         
-        // WARNING: other fields, such as 'owner' and AP 'user' are
-        // recovered upon deserializing the graph containing this 
-        // vertex, if any
+        if (!oldApproach)
+        {
+            //TODO: one day this will disappear because of better handling of APs
+            try
+            {
+                returnedFrag.projectListAPToAPProperties();
+            } catch (DENOPTIMException e)
+            {
+                // This should never happen.
+                e.printStackTrace();
+            }
+        }
 
         return returnedFrag;
     }
-
 
 //------------------------------------------------------------------------------
     

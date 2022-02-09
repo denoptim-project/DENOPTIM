@@ -55,6 +55,9 @@ RC-RingSizeBias=8 1
 RC-MaxSizeNewRings=8
 RC-EvaluationClosabilityMode=Ring_size
 
+#Per graph (or embedded graph)
+RC-MAXNUMBERRINGCLOSURES=3
+
 # Fitness Provider - parameters
 #FP-Equation=${taniPubChem*taniPubChem + taniSP}
 #FP-DescriptorSpecs=${parametrized('taniSP','TanimotoSimilarity','ShortestPathFingerprinter, FILE:RUNDIRTOSET/data/goal.sdf')}
