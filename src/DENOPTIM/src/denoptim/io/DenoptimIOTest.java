@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -49,6 +51,7 @@ import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
@@ -70,7 +73,7 @@ public class DenoptimIOTest {
 
     @TempDir
     File tempDir;
-
+    
 //------------------------------------------------------------------------------
 
     @Test
@@ -85,10 +88,10 @@ public class DenoptimIOTest {
         v.addAP(1, xyz, APClass.make("myClass:2"));
         v.addAP(2, xyz, APClass.make("myClass:3"));
         
-        DenoptimIO.writeVertex(pathName, v);
+        DenoptimIO.writeVertexToSDF(pathName, v);
         
         ArrayList<DENOPTIMVertex> readInVrtxs = 
-                DenoptimIO.readVerices(new File(pathName));
+                DenoptimIO.readVertexes(new File(pathName));
         
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -293,7 +296,6 @@ public class DenoptimIOTest {
 	private void buildVertexAndConnectToGraph(EmptyVertex v, int apCount,
 											  DENOPTIMGraph graph) 
 											          throws DENOPTIMException {
-
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
 			v.addAP(atomPos);
 		}

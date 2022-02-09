@@ -121,7 +121,7 @@ public enum FileFormat {
                         ff = GRAPHSDF;
                         break;
                     case VERTEX:
-                        ff = GRAPHSDF;
+                        ff = VRTXSDF;
                         break;
                 }
                 break;
@@ -132,7 +132,7 @@ public enum FileFormat {
                         ff = GRAPHJSON;
                         break;
                     case VERTEX:
-                        ff = GRAPHJSON;
+                        ff = VRTXJSON;
                         break;
                 }
                 break;

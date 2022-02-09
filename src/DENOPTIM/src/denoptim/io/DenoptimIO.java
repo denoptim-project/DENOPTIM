@@ -309,80 +309,83 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Writes a vertex to file.
+     * Writes vertexes to file. Always overwrites.
      *
-     * @param pathName The pathname where to write
-     * @param vertices The list of vertices to write
+     * @param file the file where to print
+     * @param format how to print vertexes on file
+     * @param vertexes the list of vertexes to print
      * @throws DENOPTIMException
      */
-    
-    public static void writeVertex(String pathName, DENOPTIMVertex vertex) 
-            throws DENOPTIMException 
+    public static File writeVertexesToFile(File file, FileFormat format,
+            ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        lst.add(vertex);
-        writeVertices(pathName, lst);
+        if (FilenameUtils.getExtension(file.getName()).equals(""))
+        {
+            file = new File(file.getAbsoluteFile()+"."+format.getExtension());
+        }
+        switch (format)
+        {
+            case VRTXJSON:
+                writeVertexesToJSON(file, vertexes);
+                break;
+                
+            case VRTXSDF:
+                writeVertexesToSDF(file, vertexes, false);
+                break;
+                
+            default:
+                throw new DENOPTIMException("Cannot write vertexes with format '" 
+                        + format + "'.");
+        }
+        return file;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes vertexes to JSON file. Always overwrites.
+     *
+     * @param file the file where to print.
+     * @param vertexes the list of vertexes to print.
+     * @throws DENOPTIMException
+     */
+    public static void writeVertexesToJSON(File file,
+            ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException
+    {
+        Gson writer = DENOPTIMgson.getWriter();
+        writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Writes vertices to SDF file.
+     * Writes a vertex to an SDF file.
      *
-     * @param pathName The pathname where to write
-     * @param vertices The list of vertices to write
+     * @param pathName pathname where to write.
+     * @param vertices list of vertices to write.
      * @throws DENOPTIMException
      */
     
-    public static void writeVertices(String pathName,
-            ArrayList<DENOPTIMVertex> vertices) throws DENOPTIMException 
+    public static void writeVertexToSDF(String pathName, DENOPTIMVertex vertex) 
+            throws DENOPTIMException 
     {
-        
-        //TODO: add option to append
-        //TODO: add option to choose file format
-        
-        SDFWriter sdfWriter = null;
-        try 
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        lst.add(vertex);
+        writeVertexesToSDF(new File(pathName), lst, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static void writeVertexesToSDF(File file, 
+            ArrayList<DENOPTIMVertex> vertexes, boolean append) 
+                    throws DENOPTIMException 
+    {
+        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        for (DENOPTIMVertex v : vertexes) 
         {
-            IAtomContainerSet molSet = new AtomContainerSet();
-            for (int idx = 0; idx < vertices.size(); idx++) 
-            {
-                DENOPTIMVertex v = vertices.get(idx);
-                if (v.containsAtoms())
-                {
-                    molSet.addAtomContainer(v.getIAtomContainer());
-                } else {
-                    IAtomContainer iac = builder.newAtomContainer();
-                    try {
-                        iac = v.getIAtomContainer();
-                    } catch (Throwable t)
-                    {
-                        t.printStackTrace();
-                        System.out.println("ERROR: something went wrong while "
-                                + "writing of non-molecular "
-                                + "building blocks in SDF files. " 
-                                + t.getMessage());
-                    }
-                    if (iac == null)
-                    {
-                        iac = builder.newAtomContainer();
-                    }
-                    molSet.addAtomContainer(iac);
-                }
-            }
-            sdfWriter = new SDFWriter(new FileWriter(new File(pathName)));
-            sdfWriter.write(molSet);
-        } catch (CDKException | IOException cdke) {
-            throw new DENOPTIMException(cdke);
-        } finally {
-            try {
-                if (sdfWriter != null) {
-                    sdfWriter.close();
-                }
-            } catch (IOException ioe) {
-                throw new DENOPTIMException(ioe);
-            }
+            lst.add(v.getIAtomContainer());
         }
+        writeMoleculeSet(file.getAbsolutePath(), lst, append);
     }
     
 //------------------------------------------------------------------------------
@@ -394,6 +397,7 @@ public class DenoptimIO
      * @param mols     The molecules to be written
      * @throws DENOPTIMException
      */
+    @Deprecated
     public static void writeFragmentSet(String fileName,
                                         ArrayList<DENOPTIMFragment> mols)
             throws DENOPTIMException {
@@ -2030,6 +2034,24 @@ public class DenoptimIO
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(
                         inFile.getAbsolutePath(), useFS);
                 
+            case VRTXSDF:
+                ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+                ArrayList<DENOPTIMVertex> vertexes = readVertexes(inFile);
+                for (DENOPTIMVertex v : vertexes)
+                {
+                    if (v instanceof DENOPTIMTemplate)
+                    {
+                        graphs.add(((DENOPTIMTemplate)v).getInnerGraph());
+                    }
+                }
+                System.out.println("WARNING: Reading graphs from " 
+                        + FileFormat.VRTXSDF + " file can only read the "
+                        + "templates' inner graphs. Importing " 
+                        + graphs.size() + " graphs "
+                        + "from " + vertexes.size() + " vertexes.");
+                return graphs;
+                
+                
             default:
                 throw new Exception("Format '" + ff + "' could not be used to "
                         + "read graphs from file '" + inFile + "'.");
@@ -2248,6 +2270,72 @@ public class DenoptimIO
             }
         }
         return lstGraphs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    //TODO-v3+ this method should is almost a copy of the one working on graphs.
+    // It should be possible to have one method do both tasks.
+    
+    /**
+     * Reads a list of {@link DENOPTIMVertex}es from a JSON file.
+     * @param fileName the pathname of the file to read.
+     * @return the list of vertexes.
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<DENOPTIMVertex>  readDENOPTIMVertexesFromJSONFile(
+            String fileName) throws DENOPTIMException 
+    {
+        ArrayList<DENOPTIMVertex> result = new ArrayList<DENOPTIMVertex>();
+        Gson reader = DENOPTIMgson.getReader();
+
+        BufferedReader br = null;
+        try
+        {
+            br = new BufferedReader(new FileReader(fileName));
+            result = reader.fromJson(br, 
+                    new TypeToken<ArrayList<DENOPTIMVertex>>(){}.getType());
+        }
+        catch (FileNotFoundException fnfe)
+        {
+            throw new DENOPTIMException("File '" + fileName + "' not found.");
+        }
+        catch (JsonSyntaxException jse)
+        {
+            String msg = "Expected BEGIN_ARRAY but was BEGIN_OBJECT";
+            if (jse.getMessage().contains(msg))
+            {
+                // The file contains a single object, not a list. We try to read
+                // that single object as a DENOPTIMVertex
+                try 
+                {
+                    br.close();
+                    br = new BufferedReader(new FileReader(fileName));
+                }
+                catch (FileNotFoundException fnfe)
+                {
+                    //cannot happen
+                } catch (IOException ioe) 
+                {
+                    throw new DENOPTIMException(ioe);
+                }
+                DENOPTIMVertex v = reader.fromJson(br,DENOPTIMVertex.class);
+                result.add(v);
+            }
+        }
+        finally 
+        {
+            try {
+                if (br != null)
+                {
+                    br.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+
+        return result;
     }
     
 //------------------------------------------------------------------------------
@@ -2584,7 +2672,7 @@ public class DenoptimIO
      * @throws IllegalArgumentException 
      * @throws Exception
      */
-    public static ArrayList<DENOPTIMVertex> readVerices(File file) 
+    public static ArrayList<DENOPTIMVertex> readVertexes(File file) 
             throws IllegalArgumentException, UndetectedFileFormatException, 
             IOException, DENOPTIMException
     {
@@ -2627,6 +2715,9 @@ public class DenoptimIO
         // Therefore, here we read and add vertices to the appropriate library 
         // right away.
         
+        //TODO-V3+ this will change one the dependency on the pre-defined 
+        // fragment space will be removed
+        
         FileFormat ff = DenoptimIO.detectFileFormat(file);
         switch (ff)
         {
@@ -2667,10 +2758,17 @@ public class DenoptimIO
                 break;
                 
             case VRTXJSON:
-                System.out.println("TODO: implement import of " + ff);
-                throw new DENOPTIMException("Format '" + ff 
-                        + "' could not be used to "
-                        + "read in vertices from file '" + file + "'.");
+                for (DENOPTIMVertex v : readDENOPTIMVertexesFromJSONFile(
+                        file.getAbsolutePath())) 
+                {
+                    if (setBBId)
+                    {
+                        FragmentSpace.appendVertexToLibrary(v, bbt, library);
+                    } else {
+                        library.add(v);
+                    }
+                }
+                break;
                     
             case GRAPHSDF:
                 //TODO: change this. Not compatible to reading a list of graphs

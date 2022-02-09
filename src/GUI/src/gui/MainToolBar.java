@@ -179,7 +179,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		        JPanel abtPanel = new JPanel();
 		        abtPanel.setLayout(new GridLayout(3, 1, 3, 0));
 		        JPanel row1 = new JPanel();
-		        JLabel t1 = new JLabel("DENPTIM is open source software "
+		        JLabel t1 = new JLabel("DENOPTIM is open source software "
 		        		+" (Affero GPL-3.0).");
 		        row1.add(t1);
 		        abtPanel.add(row1);
@@ -291,6 +291,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 					openFile(file, DenoptimIO.detectFileFormat(
 							file));
 				} catch (Exception e1) {
+				    e1.printStackTrace();
 					if (file == null)
 					{
 						return;
@@ -611,6 +612,13 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				mainPanel.add(fragPanel);
 				fragPanel.importVerticesFromFile(file,"SDF");
 				break;	
+			
+	        case VRTXJSON:
+                GUIVertexInspector fragPanel2 = 
+                    new GUIVertexInspector(mainPanel);
+                mainPanel.add(fragPanel2);
+                fragPanel2.importVerticesFromFile(file,"SDF");
+                break;  
 				
 			case GRAPHSDF:
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);

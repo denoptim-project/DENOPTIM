@@ -67,6 +67,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
+import denoptim.io.FileAndFormat;
 import denoptim.io.FileFormat;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
@@ -598,20 +599,18 @@ public class GUIVertexInspector extends GUICardPanel
 		btnSaveVrtxs.setToolTipText("Write all building blocks to a file.");
 		btnSaveVrtxs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File outFile = GUIFileOpener.pickFileForSaving(
-				        btnSaveVrtxs);
-				if (outFile == null)
-				{
-					return;
-				}
-				//The format is given by the DenoptimIO.writeVertices method
-				//TODO: consider using other formats, e.g., VRTXJSON.
-				FileFormat ff = FileFormat.VRTXSDF;
-				try
-				{
-				    DenoptimIO.writeVertices(outFile.getAbsolutePath(),
-							verticesLibrary);
-				}
+				FileAndFormat fileAndFormat = 
+                        GUIFileSaver.pickFileForSavingVertexes(btnSaveVrtxs);
+                if (fileAndFormat == null)
+                {
+                    return;
+                }
+                File outFile = fileAndFormat.file;
+                try
+                {
+                    DenoptimIO.writeVertexesToFile(outFile,fileAndFormat.format,
+                            verticesLibrary);
+                }
 				catch (Exception ex)
 				{
 					ex.printStackTrace();
@@ -627,7 +626,7 @@ public class GUIVertexInspector extends GUICardPanel
 						verticesLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
-				DenoptimIO.addToRecentFiles(outFile, ff);
+				DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
 			}
 		});
 		commandsPane.add(btnSaveVrtxs);

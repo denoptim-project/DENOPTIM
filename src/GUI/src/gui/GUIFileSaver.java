@@ -66,4 +66,30 @@ public class GUIFileSaver
 	
 //-----------------------------------------------------------------------------
 
+    public static FileAndFormat pickFileForSavingVertexes(Component parent) 
+    {
+        fileChooser.resetChoosableFileFilters();
+        FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
+                "JSON", "json");
+        fileChooser.addChoosableFileFilter(jsonFilter);
+        FileNameExtensionFilter sdfFilter = new FileNameExtensionFilter(
+                "SDF", "sdf");
+        fileChooser.addChoosableFileFilter(sdfFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        File file;
+        if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
+        {
+            file = fileChooser.getSelectedFile();
+        }
+        else
+        {
+            return null;
+        }
+        FileAndFormat ff = new FileAndFormat(file,FileFormat.fromString(
+                fileChooser.getFileFilter().getDescription(), DataKind.VERTEX));
+        return ff;
+    }
+	
+//-----------------------------------------------------------------------------
+
 }

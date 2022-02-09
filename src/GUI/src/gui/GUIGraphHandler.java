@@ -20,6 +20,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -27,16 +28,19 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
@@ -55,7 +59,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
@@ -180,6 +186,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	
 	private static final  IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
+	
+    private final String CONTRACTKEY = "CONTRACT";
+    private final String BBTYPEKEY = "BBTYPE";
 	
 	private boolean painted;
 
@@ -672,38 +681,98 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 			}
 		});
 		commandsPane.add(btnOpenGraphs);
+		  
+        JButton btnSaveGraphs = new JButton("Save Library of Graphs");
+        btnSaveGraphs.setToolTipText("Write all graphs to a file.");
+        btnSaveGraphs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FileAndFormat fileAndFormat = 
+                        GUIFileSaver.pickFileForSavingGraphs(btnSaveGraphs);
+                if (fileAndFormat == null)
+                {
+                    return;
+                }
+                File outFile = fileAndFormat.file;
+                try
+                {
+                    outFile = DenoptimIO.writeGraphsToFile(outFile,
+                            fileAndFormat.format, dnGraphLibrary);
+                }
+                catch (Exception ex)
+                {
+                    JOptionPane.showMessageDialog(btnSaveGraphs,
+                            "Could not write to '" + outFile + "'!.",
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                deprotectEditedSystem();
+                unsavedChanges = false;
+                DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
+            }
+        });
+        commandsPane.add(btnSaveGraphs);
 		
-		JButton btnSaveFrags = new JButton("Save Library of Graphs");
-		btnSaveFrags.setToolTipText("Write all graphs to a file.");
-		btnSaveFrags.addActionListener(new ActionListener() {
+		JButton btnSaveTmpl = new JButton("Save Library of Templates");
+		btnSaveTmpl.setToolTipText("Make templates from the graphs and same "
+		        + "them to file");
+		btnSaveTmpl.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileAndFormat fileAndFormat = 
-				        GUIFileSaver.pickFileForSavingGraphs(btnSaveFrags);
-				if (fileAndFormat == null)
-				{
-					return;
-				}
-				File outFile = fileAndFormat.file;
-				try
-				{
-					outFile = DenoptimIO.writeGraphsToFile(outFile,
-					        fileAndFormat.format, dnGraphLibrary);
-				}
-				catch (Exception ex)
-				{
-					JOptionPane.showMessageDialog(btnSaveFrags,
-			                "Could not write to '" + outFile + "'!.",
-			                "Error",
-			                JOptionPane.PLAIN_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-					return;
-				}
-				deprotectEditedSystem();
-				unsavedChanges = false;
-				DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
+			    
+			    ConfigTemplateDialog tmplPropDialog = new ConfigTemplateDialog(
+			            btnSaveTmpl, dnGraphLibrary.size());
+		        tmplPropDialog.pack();
+		        Object o = tmplPropDialog.showDialog();
+		        if (o == null)
+		        {
+		            return;
+		        }
+		        
+		        @SuppressWarnings("unchecked")
+                Map<String,List<Object>> configs = (Map<String,List<Object>>) o;
+		        
+		        ArrayList<DENOPTIMVertex> templates = 
+		                new ArrayList<DENOPTIMVertex>();
+		        for (int i=0; i<dnGraphLibrary.size(); i++)
+		        {
+		            DENOPTIMTemplate t = new DENOPTIMTemplate(
+		                    (BBType) configs.get(BBTYPEKEY).get(i));
+		            t.setInnerGraph(dnGraphLibrary.get(i));
+		            t.setContractLevel((ContractLevel) 
+		                    configs.get(CONTRACTKEY).get(i));
+		            templates.add(t);
+		        }
+				
+		        FileAndFormat fileAndFormat = 
+				        GUIFileSaver.pickFileForSavingVertexes(btnSaveTmpl);
+		        if (fileAndFormat == null)
+                {
+                    return;
+                }
+                File outFile = fileAndFormat.file;
+                try
+                {
+                    DenoptimIO.writeVertexesToFile(outFile,fileAndFormat.format,
+                            templates);
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(btnSaveTmpl,
+                            "Could not write to '" + outFile + "'! "
+                            + "Hint: "+ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                deprotectEditedSystem();
+                unsavedChanges = false;
+                DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
 			}
 		});
-		commandsPane.add(btnSaveFrags);
+		commandsPane.add(btnSaveTmpl);		
 
 		JButton btnCanc = new JButton("Close Tab");
 		btnCanc.setToolTipText("Closes this graph handler.");
@@ -1702,6 +1771,133 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	public void dispose() 
 	{
 		visualPanel.dispose();
+	}
+
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Dialog to configure one or more templates.
+	 */
+	private class ConfigTemplateDialog extends GUIModalDialog
+	{   
+	    private JPanel centralPanel;
+	    private JScrollPane scrollPanel;
+	    private JPanel listPanel;
+	    
+	//------------------------------------------------------------------------------
+
+	    /**
+	     * Creates a modal dialog with a specified number of limes allowing to 
+	     * configure the properties of the templates to be created from graphs.
+	     * @param parent the parent component calling this modal dialog.
+	     * @param num the number of templates to configure.
+	     */
+	    public ConfigTemplateDialog(Component parent, int num)
+	    {
+	        setLocationRelativeTo(parent);
+	        setTitle("Define Properties of Templates");
+	        centralPanel = new JPanel();
+	        centralPanel.setLayout(new BoxLayout(
+	                centralPanel, SwingConstants.VERTICAL)); 
+
+	        listPanel = new JPanel();
+	        listPanel.setLayout(new BoxLayout(listPanel, SwingConstants.VERTICAL));
+	        scrollPanel = new JScrollPane(listPanel);
+	        for (int i=0; i<num; i++)
+	            listPanel.add(new TemplateConfiguration(i));
+	        centralPanel.add(scrollPanel);
+	        
+	        this.btnDone.setText("OK");
+	        this.btnDone.setToolTipText("Confirm properties.");
+	        this.btnDone.addActionListener(new ActionListener() {
+
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                // Collect data from form
+	                Map<String,List<Object>> selection = 
+	                        new HashMap<String,List<Object>>();
+	                selection.put(CONTRACTKEY, new ArrayList<>());
+	                selection.put(BBTYPEKEY, new ArrayList<>());
+	                for (Component c : listPanel.getComponents())
+	                {
+	                    if (c instanceof TemplateConfiguration)
+	                    {
+	                        TemplateConfiguration tc = 
+	                                ((TemplateConfiguration) c);
+	                        selection.get(CONTRACTKEY).add(
+	                                tc.contractCmb.getSelectedItem());
+	                        selection.get(BBTYPEKEY).add(
+	                                tc.bbTypeCmb.getSelectedItem());
+	                    }    
+	                }
+	                result = selection;
+	                close();
+	            }
+	        });
+	        
+	        this.btnCanc.setEnabled(true);
+	        this.btnCanc.setVisible(true);
+	        this.btnCanc.setToolTipText("Abandon");
+	        
+	        super.addToCentralPane(centralPanel);
+	    }
+	    
+//------------------------------------------------------------------------------
+	    
+	    /**
+	     * Utility class for a form to configure a template via the GUI.
+	     *
+	     */
+	    private class TemplateConfiguration extends JPanel
+	    {
+	        JComboBox<ContractLevel> contractCmb = new JComboBox<ContractLevel>(
+	                ContractLevel.values());
+
+	        private String contractTolTip = "<html><body width='%1s'>"
+	                + "Speicfy the type of contract of the template, i.e., "
+	                + "to what "
+	                + "extent the graph embedded in the template can change in "
+	                + "structure and/or identity of the vertexes.</html>";
+	        
+	        JComboBox<BBType> bbTypeCmb = new JComboBox<BBType>(BBType.values());
+
+	        private String bbtTolTip = "<html><body width='%1s'>"
+	                + "Speicfy the type of contract of the template, i.e., "
+	                + "to what "
+	                + "extent the graph embedded in the template can change in "
+	                + "structure and/or identity of the vertexes.</html>";
+	        
+	        private int szTolTip = 250;
+	        
+	        /**
+	         * Constructor
+	         * @param id 0-based ID to be converted to 1-based
+	         * @return
+	         */
+	        public TemplateConfiguration(int id)
+	        {
+	            super();
+	            this.add(new JLabel("#" + (id+1)));
+	            
+	            JLabel contractLbl = new JLabel("  Contract:");
+	            contractLbl.setToolTipText(String.format(contractTolTip,
+	                    szTolTip));
+	            this.add(contractLbl);
+	            contractCmb.setToolTipText(String.format(contractTolTip,
+	                    szTolTip));
+	            this.add(contractCmb);
+	            
+	            JLabel bbtLbl = new JLabel("  Building Block Type:");
+	            bbtLbl.setToolTipText(String.format(bbtTolTip,szTolTip));
+	            this.add(bbtLbl);
+	            bbTypeCmb.setToolTipText(String.format(bbtTolTip,szTolTip));
+	            bbTypeCmb.setSelectedItem(BBType.FRAGMENT);
+	            this.add(bbTypeCmb);
+	            
+	            //Other properties should be added here
+	            
+	        }
+	    }
 	}
 		
 //-----------------------------------------------------------------------------
