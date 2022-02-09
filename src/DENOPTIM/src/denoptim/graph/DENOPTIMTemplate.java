@@ -88,16 +88,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
          * to the DENOPTIMFragment class, as no change in the inner structure is
          * allowed.
          */
-        FIXED
-        //FIXED_STRUCT, //TO-BE-DEVELOPED
-        /*
-        <li>{@link ContractLevel#FIXED_STRUCT} will keep a constant 
-        * inter-connectivity between vertices, but the content at each vertex may 
-        * vary. this contract does not guarantee that the AP classes connecting 
-        * inner
-        * graph vertices will remain the same as the content at vertices change.
-        * </il>
-        */
+        FIXED,
+        
+        /**
+         * Inner graph keep the same structure, but the identify of vertexes
+         * can change. 
+         * Effectively this contract allows only CHANGELINK mutation.
+         */
+        FIXED_STRUCT
     }
 
     private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
@@ -177,6 +175,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     public void setContractLevel(ContractLevel contract)
     {
+        if (contract == ContractLevel.FIXED_STRUCT)
+            updateMutTypeToFixedSTructure();
+        
         this.contractLevel = contract;
     }
 
@@ -683,7 +684,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     }
     
 //------------------------------------------------------------------------------
-
+    
     @Override
     public List<MutationType> getMutationTypes(List<MutationType> ignoredTypes)
     {   
@@ -700,11 +701,6 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 }
             }
             
-            // NB: to freeze graph structure while allowing mutation of
-            // single vertexes, i.e., retain the graph topology, it is 
-            // sufficient to remove RCVs from the list of mutation sites, and 
-            // do only CHANGELINK. See 'cyclicpeptide' test case.
-            
             scaffCompatTypes.removeAll(ignoredTypes);
             return scaffCompatTypes;
         }
@@ -714,7 +710,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * A list of mutation sites from within this vertex.
+     * A list of mutation sites from within this vertex. This method sets the 
+     * mutation sites of the embedded vertexes according to the 
+     * {@link DENOPTIMTemplate#contractLevel} of
+     * this template.
      * @param ignoredTypes a collection of mutation types to ignore. Vertexes
      * that allow only ignored types of mutation will
      * not be considered mutation sites.
@@ -738,6 +737,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                     lst.add(this);
                 break;
                 
+            case FIXED_STRUCT:
+                updateMutTypeToFixedSTructure();
+                for (DENOPTIMVertex v : innerGraph.gVertices) 
+                {
+                    lst.addAll(v.getMutationSites(ignoredTypes));
+                }
+                break;
+                
             case FREE:
                 for (DENOPTIMVertex v : innerGraph.gVertices) 
                 {
@@ -746,6 +753,28 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 break;
         }
         return lst;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void updateMutTypeToFixedSTructure()
+    {
+        List<MutationType> toBeRemoved = new ArrayList<MutationType>();
+        toBeRemoved.add(MutationType.DELETE);
+        toBeRemoved.add(MutationType.DELETECHAIN);
+        toBeRemoved.add(MutationType.CHANGEBRANCH);
+        toBeRemoved.add(MutationType.ADDLINK);
+        toBeRemoved.add(MutationType.DELETELINK);
+        toBeRemoved.add(MutationType.EXTEND);
+        for (DENOPTIMVertex v : innerGraph.gVertices) 
+        {
+            for (MutationType mt : toBeRemoved)
+                v.removeMutationType(mt);
+            
+            if (v instanceof DENOPTIMTemplate)
+                ((DENOPTIMTemplate) v).setContractLevel(
+                        ContractLevel.FIXED_STRUCT);
+        }
     }
 
 //------------------------------------------------------------------------------

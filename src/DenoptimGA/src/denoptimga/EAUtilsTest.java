@@ -23,6 +23,7 @@ import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
+import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
 import denoptimga.EAUtils.CandidateSource;
 
@@ -113,6 +114,8 @@ public class EAUtilsTest
         DENOPTIMGraph graphForTemplate = new DENOPTIMGraph();
         DENOPTIMVertex vg1 = DENOPTIMVertex.newVertexFromLibrary(0,
                         BBType.FRAGMENT);
+        //vg1.removeMutationType(MutationType.DELETECHAIN);
+        //vg1.removeMutationType(MutationType.DELETE);
         graphForTemplate.addVertex(vg1);
         for (int i=1; i<6; i++)
         {
@@ -133,7 +136,7 @@ public class EAUtilsTest
         
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.SCAFFOLD);
         template.setInnerGraph(graphForTemplate);
-        template.setContractLevel(ContractLevel.FREE);
+        template.setContractLevel(ContractLevel.FIXED_STRUCT);
         FragmentSpace.appendVertexToLibrary(template, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
     }

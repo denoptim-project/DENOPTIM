@@ -796,7 +796,36 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * Removes the specified mutation type.
+     * @param mt the element to remove.
+     * @return <code>true</code> if this list contained the specified element.
+     */
+    public boolean removeMutationType(MutationType mt)
+    {
+        return allowedMutationTypes.remove(mt);
+    }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of mutation types.
+     * @return  the list of mutation types.
+     */
+    public List<MutationType> getMutationTypes()
+    {
+        return getMutationTypes(new ArrayList<MutationType>());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of mutation types.
+     * @param excludedTypes list of mutation types to purge from before 
+     * returning the list.
+     * @return the purged list of mutation types.
+     */
     public List<MutationType> getMutationTypes(List<MutationType> excludedTypes)
     {
         List<MutationType> filteredTypes = new ArrayList<MutationType>(
