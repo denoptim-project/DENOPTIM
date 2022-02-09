@@ -114,8 +114,6 @@ public class EAUtilsTest
         DENOPTIMGraph graphForTemplate = new DENOPTIMGraph();
         DENOPTIMVertex vg1 = DENOPTIMVertex.newVertexFromLibrary(0,
                         BBType.FRAGMENT);
-        //vg1.removeMutationType(MutationType.DELETECHAIN);
-        //vg1.removeMutationType(MutationType.DELETE);
         graphForTemplate.addVertex(vg1);
         for (int i=1; i<6; i++)
         {
