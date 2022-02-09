@@ -1,0 +1,12 @@
+FR-INPUT=acyclic_molecules.sdf
+FR-OUTPUT=initial_population.sdf
+
+FP-NO3DTREEMODEL
+
+# Fitness Provider - parameters
+#FP-Equation=${taniPubChem*taniPubChem + taniSP}
+#FP-DescriptorSpecs=${parametrized('taniSP','TanimotoSimilarity','ShortestPathFingerprinter, FILE:../data/goal.sdf')}
+#FP-DescriptorSpecs=${parametrized('taniPubChem','TanimotoSimilarity','PubchemFingerprinter, FILE:../data/goal.sdf')}
+
+FP-Equation=${taniToSubStructs*taniToSubStructs}
+FP-DescriptorSpecs=${parametrized('taniToSubStructs','TanimotoSimilarityBySubstructure','FILE:substructures.smarts, FILE:goal.sdf')}

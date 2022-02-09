@@ -1,0 +1,10 @@
+# Compatibility matrix data
+# Written by DENOPTIM-GUI on 22/06/21 09:59:09
+# APCLass Compatibility rules
+RCN c:0 c:0,ATneutral:0
+# APClass-to-BondOrder
+RBO c 1
+RBO h 1
+RBO ATneutral 1
+# Capping rules
+CAP c:0 h:0
