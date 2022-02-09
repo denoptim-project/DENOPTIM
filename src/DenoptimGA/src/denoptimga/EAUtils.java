@@ -63,7 +63,6 @@ import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
@@ -1320,18 +1319,35 @@ public class EAUtils
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();
 
-        //TODO: remove hard-coded variable that exclude considering combination of rings
+        //TODO: remove hard-coded variable that exclude considering all 
+        // combination of rings
         boolean onlyRandomCombOfRings = true;
+        
         if (onlyRandomCombOfRings)
         {
             List<DENOPTIMRing> combsOfRings = cgh.getRandomCombinationOfRings(
-                                                                          mol,
-                                                                    molGraph);
+                    mol, molGraph, RingClosureParameters.getMaxRingClosures());
             if (combsOfRings.size() > 0)
             {
+                int nnn = 0;
                 for (DENOPTIMRing ring : combsOfRings)
                 {
-                    molGraph.addRing(ring);
+                    // Consider the crowding probability
+                    double shot = RandomUtils.nextDouble();
+                    int crowdOnH = EAUtils.getCrowdedness(
+                            ring.getHeadVertex().getEdgeToParent().getSrcAP(),
+                            true);
+                    int crowdOnT = EAUtils.getCrowdedness(
+                            ring.getTailVertex().getEdgeToParent().getSrcAP(),
+                            true);
+                    double crowdProbH = EAUtils.getCrowdingProbability(crowdOnH);
+                    double crowdProbT = EAUtils.getCrowdingProbability(crowdOnT);
+                    
+                    if (shot < crowdProbH && shot < crowdProbT)
+                    {
+                        molGraph.addRing(ring);
+                        nnn++;
+                    }
                 }
             }
         }
@@ -1965,15 +1981,39 @@ public class EAUtils
      */
     public static int getCrowdedness(DENOPTIMAttachmentPoint ap)
     {
+        return getCrowdedness(ap,false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Calculate the current crowdedness of the given attachment point.
+     * @param ap the attachment point to consider
+     * @param ignoreFreeRCVs use <code>true</code> to avoid counting unused 
+     * ring-closing vertexes and actual connections.
+     * @return the integer representing how many AP rooted on the same atom that 
+     * holds the given attachment point are used by non-capping group building 
+     * blocks.
+     */
+    public static int getCrowdedness(DENOPTIMAttachmentPoint ap, 
+            boolean ignoreFreeRCVs)
+    {
         int crowdness = 0;
+        DENOPTIMGraph g = ap.getOwner().getGraphOwner();
         for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())
         {
             if (oap.getAtomPositionNumber() == ap.getAtomPositionNumber()
                     && !oap.isAvailableThroughout() 
-                    && oap.getLinkedAP().getOwner().getBuildingBlockType() != 
-                        BBType.CAP)
+                    && oap.getLinkedAP().getOwner()
+                    .getBuildingBlockType() != BBType.CAP)
             {
-                crowdness = crowdness + 1;
+                if (ignoreFreeRCVs && oap.getLinkedAP().getOwner().isRCV())
+                {
+                    if (g.getUsedRCVertices().contains(oap.getLinkedAP().getOwner()))
+                        crowdness = crowdness + 1;
+                } else {
+                    crowdness = crowdness + 1;
+                }
             }
         }
         return crowdness;
@@ -2002,9 +2042,7 @@ public class EAUtils
         {
             return 1.0;
         }
-        
         int crowdness = getCrowdedness(ap);
-        
         return getCrowdingProbabilityForCrowdedness(crowdness, scheme, lambda,
                 sigmaOne, sigmaTwo);
     }

@@ -100,12 +100,12 @@ public class CyclicGraphHandler
      * list of DENOPTIMRings ready to be appended to a DENOPTIMGraph.
      * @param inMol the molecule
      * @param molGraph the molecular graph
+     * @param maxRingClosures maximum number of ring closures to perform.
      * @return the selected combination of closable paths 
      */
 
     public List<DENOPTIMRing> getRandomCombinationOfRings(IAtomContainer inMol,
-                                                       DENOPTIMGraph molGraph)
-                                                      throws DENOPTIMException
+            DENOPTIMGraph molGraph, int maxRingClosures) throws DENOPTIMException
     {
         // Prepare molecular representation with no dummy atoms
         // NOTE: the connectivity of this molecule is going to be edited 
@@ -134,12 +134,9 @@ public class CyclicGraphHandler
         List<DENOPTIMRing> combOfRings = new ArrayList<DENOPTIMRing>();
         while (wLstVrtI.size() > 0)
         {
-            // TODO make optional
             // Termination criterion based on maximum number of rings per graph
-            /*
-            if (combOfRings.size() > 4)
+            if (combOfRings.size() >= maxRingClosures)
                 break;
-            */
             
             int vIdI = RandomUtils.nextInt(wLstVrtI.size());
             DENOPTIMVertex vI = wLstVrtI.get(vIdI);
@@ -887,22 +884,32 @@ public class CyclicGraphHandler
         private IAtomContainer mol;
 
         // Topological matrix: contains the number of bonds (shortest path) 
-        // separating the two atoms having idex i and j in the current system
+        // separating the two atoms having index i and j in the current system
         private int[][] topoMat;
         
         // List of Ring Closing Vertices (RCV as DENOPTIMVerex) each containing
         // an available Ring Closing Attractor (RCA)
         private ArrayList<DENOPTIMVertex> lstVert;
+        
+        /**
+         * Size of the list of available RCAs
+         */
         private int sz;
 
         // Compatibility matrix between pairs of RCAs in the current system.
         private boolean[][] compatibilityOfPairs;
 
-        // Weight factors used to control the likeliness of choosing rings of a
-        // given size for the current system
+        /**
+         * List of weight factors used to control the likeliness of choosing 
+         * rings of a given size for the current system
+         */
         private ArrayList<Double> w;
 
-        // Visited flag for RCAs
+        /**
+         * List of flags defining if an RCA has been "used", i.e., not used to
+         * make an actual chord, but used to make a plan to make a chord and
+         * update the molecular representation accordingly.
+         */
         private ArrayList<Boolean> done;
 
         // Map linking the list of vertices and atoms
@@ -1085,7 +1092,7 @@ public class CyclicGraphHandler
                 {
                     wLst.add(v);
                 }
-            }  
+            }
 
             if (verbosity > 1)
             {
@@ -1113,11 +1120,23 @@ public class CyclicGraphHandler
 
                 int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
                                       [vIdToAtmId.get(vJ).get(0)] - 1;
-                int szFct = 0;
+                
+                // The likeliness of picking this RCS is given by the ring-size
+                // factor, which accounts for the requested bias towards specific
+                // ring sizes. The larger the bias, the higher the number of
+                // slots occupied by vJ in the list of possible partners, thus
+                // the larger the likeliness of picking it when randomly
+                // choosing the partner for vI.
+                int szFct = 0; //This is the ring-size factor
                 if (ringSize < RingClosureParameters.getMaxRingSize())
                 {
                     szFct = ringSizeBias.get(ringSize);
                 }
+                
+                // TODO: here we could consider biasing against crowding, but
+                // the parameters defining what crowding is are defined in 
+                // GAParameters, so we would loose generality of this class.
+                
                 for (int z=0; z<szFct; z++)
                 {
                     wLst.add(vJ);

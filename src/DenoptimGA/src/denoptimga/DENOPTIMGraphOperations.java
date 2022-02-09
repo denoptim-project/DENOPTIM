@@ -731,7 +731,8 @@ public class DENOPTIMGraphOperations
                     boolean allOnSameSrc = true;
                     for (Integer symApId : symAPs.getList())
                     {
-                        if (!curVrtx.getAttachmentPoints().get(symApId).hasSameSrcAtom(ap))
+                        if (!curVrtx.getAttachmentPoints().get(symApId)
+                                .hasSameSrcAtom(ap))
                         {
                             allOnSameSrc = false;
                             break;
