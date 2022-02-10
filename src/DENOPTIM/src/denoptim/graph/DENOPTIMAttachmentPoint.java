@@ -592,6 +592,14 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             return false;
         }
         
+        if (this.getIndexInOwner() != other.getIndexInOwner())
+        {
+            reason.append("Different index on list of APs ("
+                    + this.getIndexInOwner() + ","
+                    + other.getIndexInOwner() + ");");
+            return false;
+        }
+        
         if (this.getAPClass()!=null && other.getAPClass()!=null)
         {
             if (!this.getAPClass().equals(other.getAPClass()))
@@ -602,21 +610,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                 return false;
             }
         }
-        
-        //TODO-gg this should not be done because the coordinates can change
-        // upon rototranslation of the building block.
-        if (this.getDirectionVector()!=null && other.getDirectionVector()!=null)
-        {
-            boolean different = false;
-            double trslh = 0.001;
-            if (this.getDirectionVector().distance(
-                    other.getDirectionVector()) > trslh)
-            {
-                reason.append("Different direction vector");
-                return false;
-            }
-        }
-        
         
         return true;
     }

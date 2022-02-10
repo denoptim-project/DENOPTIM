@@ -116,7 +116,15 @@ public class DENOPTIMgsonTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testDENOPTIMFragmentSerialization() throws Exception
+    public void testTemplateSerialization() throws Exception
+    {
+        
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMolecularFragmentSerialization() throws Exception
     {
         DENOPTIMFragment frag = DENOPTIMFragmentTest.makeFragment();
         frag.setBuildingBlockId(-206); //just any number
@@ -127,7 +135,7 @@ public class DENOPTIMgsonTest
         Gson jsonWriter = DENOPTIMgson.getWriter();
         String jsonString = jsonWriter.toJson(frag);
         
-        System.out.println("JSON of DENOPTIMFragment: "+jsonString);
+        //System.out.println("JSON of DENOPTIMFragment: "+jsonString);
         
         Gson jsonReader = DENOPTIMgson.getReader();
         DENOPTIMVertex fragFromJSON = jsonReader.fromJson(jsonString,

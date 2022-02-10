@@ -2,6 +2,7 @@ package denoptim.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -536,9 +537,14 @@ public class DENOPTIMAttachmentPointTest
 		dummyVertex.addAP(1);
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
+		
+		DENOPTIMVertex clone = dummyVertex.clone();
+        DENOPTIMAttachmentPoint apAc = clone.getAP(0);
+        DENOPTIMAttachmentPoint apBc = clone.getAP(1);
 
     	assertEquals(-1,apA.compareTo(apB),"Comparison driven by ID.");
-    	assertTrue(apA.sameAs(apB),"SameAs ignores ID.");
+    	assertTrue(apA.sameAs(apAc),"SameAs ignores ID.");
+        assertTrue(apB.sameAs(apBc),"SameAs ignores ID (2).");
     }
     
 //-----------------------------------------------------------------------------
@@ -553,20 +559,6 @@ public class DENOPTIMAttachmentPointTest
 
     	assertFalse(apA.sameAs(apB));
     }
-
-//-----------------------------------------------------------------------------
-    
-    @Test
-    public void testSameAs_SameAPClass() throws Exception
-    {
-		APClass apClass = APClass.make("classA:0");
-		dummyVertex.addAP(1,apClass);
-    	dummyVertex.addAP(1,apClass);
-    	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
-    	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
-
-    	assertTrue(apA.sameAs(apB));
-    }
     
 //-----------------------------------------------------------------------------
     
@@ -574,11 +566,13 @@ public class DENOPTIMAttachmentPointTest
     public void testSameAs_DiffAPClass() throws Exception
     {
     	dummyVertex.addAP(1,APClass.make("classA:0"));
-    	dummyVertex.addAP(1,APClass.make("classB:0"));
+        DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);    	
 
-		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
-		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
-		assertFalse(apA.sameAs(apB));
+        DENOPTIMVertex clone = dummyVertex.clone();
+        DENOPTIMAttachmentPoint apAc = clone.getAP(0);
+        apAc.setAPClass(APClass.make("classB:0"));
+
+		assertFalse(apA.sameAs(apAc));
     }
     
 //-----------------------------------------------------------------------------
@@ -586,17 +580,33 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testClone() throws Exception
     {
-        dummyVertex.addAP(1,APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint orig = dummyVertex.getAP(
-                dummyVertex.getNumberOfAPs()-1);
+        EmptyVertex ev = new EmptyVertex();
+        ev.addAP(1,APClass.make(APCLASS));
+        
+        
+        EmptyVertex ev2 = new EmptyVertex();
+        ev2.addAP(1,APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint ev2Ap = ev2.getAP(0);
+        
+        DENOPTIMAttachmentPoint orig = ev.getAP(0);
+        Point3d p3d = new Point3d(0.1, 0.2, -0.3);
+        orig.setDirectionVector(p3d);
+        
+        DENOPTIMEdge e = new DENOPTIMEdge(ev2Ap, orig);
         
         DENOPTIMAttachmentPoint clone = orig.clone();
 
-        /* This may not always work as hashing only guarantees that if
-        objectA == objectB then objectA.hashCode() == objectB.hashCode(). I.e
-        two objects with the same hash code need not be equal.*/
-        assertEquals(clone.getAPClass().hashCode(),
-                orig.getAPClass().hashCode(),"Hashcode of cloned APClass");
+        assertEquals(orig.getAPClass(),clone.getAPClass(),"APClass");
+        assertEquals(orig.getAtomPositionNumber(),
+                clone.getAtomPositionNumber(),"AtomPositionNumber");
+        assertEquals(orig.getDirectionVector(),
+                clone.getDirectionVector(),"DirectionVector");
+        assertNotEquals(orig.getID(),clone.getID(),"ID");
+        assertEquals(orig.getOwner(),
+                clone.getOwner(),"Owner");
+        assertEquals(e,orig.getEdgeUser(),"Edge user in original");
+        assertEquals(null,clone.getEdgeUser(),"Edge user in clone");
+        
     }
     
 //------------------------------------------------------------------------------
