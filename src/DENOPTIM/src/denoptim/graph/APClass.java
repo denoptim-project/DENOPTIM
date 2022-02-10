@@ -80,7 +80,7 @@ public class APClass implements Cloneable,Comparable<APClass>
     /**
      * Bond type to use when converting edge users into formal bonds
      */
-    private BondType bondType = BondType.UNDEFINED;
+    private BondType bondType = BondType.UNDEFINED; //default for all but RCAs
 
 //------------------------------------------------------------------------------
 
@@ -189,12 +189,14 @@ public class APClass implements Cloneable,Comparable<APClass>
                 newApc.setSubClass(subClass);
                 newApc.setBondType(bt);
             } else {
-                if (bt != newApc.bondType)
+                // NB: the default bond type for RCAs is different, so we do
+                // not overwrite it.
+                if (bt != newApc.bondType && !RCAAPCLASSSET.contains(newApc))
                 {
-                    //TODO-gg del
-                    //System.out.println("WARNING! Not overwriting bond order of "
-                    //        + "APClass " + newApc + "(" + newApc.bondType 
-                    //        + ") with " + bt);
+                    System.out.println("WARNING! Changing bond order of "
+                            + "APClass " + newApc + "(" + newApc.bondType 
+                            + ") with " + bt);
+                    newApc.setBondType(bt);
                 }
             }
             uniqueAPClasses.add(newApc);

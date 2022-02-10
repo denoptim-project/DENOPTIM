@@ -62,6 +62,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
@@ -919,11 +920,14 @@ public class GUIVertexInspector extends GUICardPanel
     
     /**
      * Removes an atom and replaces it with an attachment point.
-     * @param apClass the attachment point class of the new AP
+     * @param ruleAndSubClass the attachment point class of the new AP. 
+     * This must be a
+     * valid string as we do not check for validity. We assume the check has 
+     * been done already.
      * @param trgAtm
      * @return <code>true</code> if the conversion was successful
      */
-    private boolean convertAtomToAP(IAtom trgAtm, String apClass)
+    private boolean convertAtomToAP(IAtom trgAtm, String ruleAndSubClass)
     {
         if (!(vertex instanceof DENOPTIMFragment))
         {
@@ -954,6 +958,8 @@ public class GUIVertexInspector extends GUICardPanel
     	}
     	
     	IAtom srcAtm = frag.getConnectedAtomsList(trgAtm).get(0);
+    	BondType bt = BondType.valueOf(
+    	        srcAtm.getBond(trgAtm).getOrder().toString());
     	
     	Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
     	Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
@@ -961,8 +967,15 @@ public class GUIVertexInspector extends GUICardPanel
     	vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
     	vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
+    	
+    	//NB: assumption of validity!
+    	String[] parts = ruleAndSubClass.split(
+                DENOPTIMConstants.SEPARATORAPPROPSCL);
     	try {
-    	    frag.addAPOnAtom(srcAtm, APClass.make(apClass), vector);
+    	    // NB: here we change the bond type to make it fit with the one we
+    	    // have in the molecular model.
+    	    frag.addAPOnAtom(srcAtm, APClass.make(parts[0],
+    	            Integer.parseInt(parts[1]), bt), vector);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,
