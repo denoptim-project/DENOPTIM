@@ -773,9 +773,8 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * Imports fragments from a file.
 	 * @param file the file to open
-	 * @param format the format
 	 */
-	public void importVerticesFromFile(File file, String format)
+	public void importVerticesFromFile(File file)
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		

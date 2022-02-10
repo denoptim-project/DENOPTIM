@@ -610,14 +610,14 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				GUIVertexInspector fragPanel = 
 					new GUIVertexInspector(mainPanel);
 				mainPanel.add(fragPanel);
-				fragPanel.importVerticesFromFile(file,"SDF");
+				fragPanel.importVerticesFromFile(file);
 				break;	
 			
 	        case VRTXJSON:
                 GUIVertexInspector fragPanel2 = 
                     new GUIVertexInspector(mainPanel);
                 mainPanel.add(fragPanel2);
-                fragPanel2.importVerticesFromFile(file,"SDF");
+                fragPanel2.importVerticesFromFile(file);
                 break;  
 				
 			case GRAPHSDF:

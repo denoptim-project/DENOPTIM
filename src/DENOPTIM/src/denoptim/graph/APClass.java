@@ -80,7 +80,7 @@ public class APClass implements Cloneable,Comparable<APClass>
     /**
      * Bond type to use when converting edge users into formal bonds
      */
-    private BondType bondType = BondType.UNDEFINED; //default for all but RCAs
+    private BondType bndTyp = BondType.UNDEFINED; //default for all but RCAs
 
 //------------------------------------------------------------------------------
 
@@ -128,7 +128,18 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static APClass make(String rule, int subClass) 
             throws DENOPTIMException 
     {
-        return make(rule, subClass, BondType.UNDEFINED);
+        //TODO-gg this is only for converting files to V3
+        if (FragmentSpace.isDefined())
+        {
+            if (FragmentSpace.getBondOrderMap().containsKey(rule))
+            {
+                return make(rule, subClass, FragmentSpace.getBondOrderMap().get(rule));
+            } else {
+                return make(rule, subClass, BondType.UNDEFINED);
+            }
+        } else {
+            return make(rule, subClass, BondType.UNDEFINED);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -191,10 +202,10 @@ public class APClass implements Cloneable,Comparable<APClass>
             } else {
                 // NB: the default bond type for RCAs is different, so we do
                 // not overwrite it.
-                if (bt != newApc.bondType && !RCAAPCLASSSET.contains(newApc))
+                if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
                 {
                     System.out.println("WARNING! Changing bond order of "
-                            + "APClass " + newApc + "(" + newApc.bondType 
+                            + "APClass " + newApc + " (" + newApc.bndTyp 
                             + ") with " + bt);
                     newApc.setBondType(bt);
                 }
@@ -207,7 +218,7 @@ public class APClass implements Cloneable,Comparable<APClass>
 //------------------------------------------------------------------------------
     
     private void setBondType(BondType bt) {
-        this.bondType = bt;
+        this.bndTyp = bt;
     }
 
 //------------------------------------------------------------------------------
@@ -267,7 +278,7 @@ public class APClass implements Cloneable,Comparable<APClass>
      * @return the bond type associated with this APClass
      */
     public BondType getBondType() {
-        return bondType;
+        return bndTyp;
     }
     
 //------------------------------------------------------------------------------
@@ -295,7 +306,7 @@ public class APClass implements Cloneable,Comparable<APClass>
         return rule + DENOPTIMConstants.SEPARATORAPPROPSCL 
                 + Integer.toString(subClass)
                 + DENOPTIMConstants.SEPARATORAPPROPSCL
-                + bondType;
+                + bndTyp;
     }
 
 //------------------------------------------------------------------------------
@@ -433,16 +444,33 @@ public class APClass implements Cloneable,Comparable<APClass>
         {
             JsonObject jo = json.getAsJsonObject();
             APClass apc = null;
-            if (jo.has("bondType"))
+            if (jo.has("bndTyp"))
             {
                 apc = getUnique(jo.get("rule").getAsString(),
                     jo.get("subClass").getAsInt(),
-                    context.deserialize(jo.get("bondType"),BondType.class));
+                    context.deserialize(jo.get("bndTyp"),BondType.class));
             } else {
-
-                apc = getUnique(jo.get("rule").getAsString(),
-                    jo.get("subClass").getAsInt(),
-                    BondType.UNDEFINED);
+                //TODO-gg possibly only for conversion to V3
+                String rule = jo.get("rule").getAsString();
+                int subClass = jo.get("subClass").getAsInt();
+                boolean found = false;
+                for (APClass existingApc : uniqueAPClasses)
+                {
+                    if (existingApc.getRule().equals(rule)
+                            && existingApc.getSubClass()==subClass)
+                    {
+                        apc = existingApc;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    System.out.println("WARNING! Setting UNDEFINED for "+rule+":"+subClass);
+                    apc = getUnique(jo.get("rule").getAsString(),
+                        jo.get("subClass").getAsInt(),
+                        BondType.UNDEFINED);
+                }
             }
             return apc;
         }

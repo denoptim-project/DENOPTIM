@@ -1189,6 +1189,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * into a {@link DENOPTIMFragment}.
      */
     
+    @Deprecated
     public static DENOPTIMVertex convertIACToVertex(IAtomContainer iac, 
             DENOPTIMVertex.BBType bbt) throws DENOPTIMException
     {
