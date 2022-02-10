@@ -3768,7 +3768,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         BondType bndTyp = btSrc;
         if (btSrc != btTrg)
         {
-            bndTyp = BondType.UNDEFINED;
+            if (btSrc == BondType.ANY && btTrg != BondType.ANY)
+            {
+                bndTyp = btTrg;
+            } else {
+                if (btSrc != BondType.ANY && btTrg == BondType.ANY)
+                {
+                    bndTyp = btSrc;
+                } else {
+                    bndTyp = BondType.UNDEFINED;
+                }
+            }
         }
 
         this.addVertex(trgAP.getOwner());

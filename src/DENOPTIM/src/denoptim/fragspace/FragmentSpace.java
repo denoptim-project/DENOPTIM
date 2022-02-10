@@ -684,6 +684,9 @@ public class FragmentSpace
      */
     public static BondType getBondOrderForAPClass(APClass apc)
     {
+        if (apc!= null && BondType.UNDEFINED != apc.getBondType())
+            return apc.getBondType();
+        
         if (bondOrderMap == null || apc == null)
         {
             String msg = "Attempting to get bond order, but no "

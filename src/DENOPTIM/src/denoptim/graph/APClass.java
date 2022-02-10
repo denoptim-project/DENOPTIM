@@ -12,10 +12,13 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 public class APClass implements Cloneable,Comparable<APClass>
 {   
@@ -52,28 +55,32 @@ public class APClass implements Cloneable,Comparable<APClass>
      */
     public static final Set<APClass> RCAAPCLASSSET = 
     	    new HashSet<APClass>(){{
-    	        APClass a = getUnique("ATplus",0);
+    	        APClass a = getUnique("ATplus", 0, BondType.ANY);
     	        add(a);
     	        synchronized (uniqueAPClassesLock)
                 {
     	            uniqueAPClasses.add(a);
                 }
     	        
-    	        APClass b = getUnique("ATminus",0);
+    	        APClass b = getUnique("ATminus", 0, BondType.ANY);
                 add(b);
                 synchronized (uniqueAPClassesLock)
                 {
                     uniqueAPClasses.add(b);
                 }
                 
-                APClass c = getUnique("ATneutral",0);
+                APClass c = getUnique("ATneutral", 0, BondType.ANY);
                 add(c);
                 synchronized (uniqueAPClassesLock)
                 {
                     uniqueAPClasses.add(c);
                 }
                 }};
-               
+    
+    /**
+     * Bond type to use when converting edge users into formal bonds
+     */
+    private BondType bondType = BondType.UNDEFINED;
 
 //------------------------------------------------------------------------------
 
@@ -100,7 +107,28 @@ public class APClass implements Cloneable,Comparable<APClass>
         }
         String[] parts = ruleAndSubclass.split(
                 DENOPTIMConstants.SEPARATORAPPROPSCL);
-        return getUnique(parts[0], Integer.parseInt(parts[1]));
+        return make(parts[0], Integer.parseInt(parts[1]));
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor for an APClass with default bond type (i.e., 
+     * {@link BondType#UNDEFINED}).
+     * Checks if there is already a instance with the given rule name and 
+     * subclass, if not it 
+     * created one. In either case, returns the reference to that instance of 
+     * APClass.
+     * @param rule the APClass rule, i.e., a string identifier that typically
+     * corresponds to the name of the cutting rule used to break a bond.
+     * @param subClass the integer identifier of the "side" of the bond broken
+     * to make an attachment point.
+     * @throws DENOPTIMException 
+     */
+    public static APClass make(String rule, int subClass) 
+            throws DENOPTIMException 
+    {
+        return make(rule, subClass, BondType.UNDEFINED);
     }
     
 //------------------------------------------------------------------------------
@@ -110,12 +138,19 @@ public class APClass implements Cloneable,Comparable<APClass>
      * Checks if there is already a instance with the given members, if not it 
      * created one. In either case, returns the reference to that instance of 
      * APClass.
+     * @param rule the APClass rule, i.e., a string identifier that typically
+     * corresponds to the name of the cutting rule used to break a bond.
+     * @param subClass the integer identifier of the "side" of the bond broken
+     * to make an attachment point.
+     * @param bt the bond type to be used when converting edges using APs of
+     * this APClass into bonds, if any.
      * @throws DENOPTIMException 
      */
-    public static APClass make(String rule, int subClass) 
-            throws DENOPTIMException {
+    public static APClass make(String rule, int subClass, BondType bt) 
+            throws DENOPTIMException 
+    {
         if (isValidAPRuleString(rule)) {        
-            return getUnique(rule, subClass);
+            return getUnique(rule, subClass, bt);
         } else {
             throw new DENOPTIMException("Invalid sttempt to make APClass out "
                     + "of '" + rule + "' and '" + subClass + "'.");
@@ -132,27 +167,47 @@ public class APClass implements Cloneable,Comparable<APClass>
      * @param subClass
      * @return reference to the APClass instance with the given members.
      */
-    private static APClass getUnique(String rule, int subClass)
+    private static APClass getUnique(String rule, int subClass, BondType bt)
     {
         APClass newApc = new APClass();
         synchronized (uniqueAPClassesLock)
         {
+            boolean found = false;
             for (APClass existingApc : uniqueAPClasses)
             {
                 if (existingApc.getRule().equals(rule)
                         && existingApc.getSubClass()==subClass)
                 {
                     newApc = existingApc;
+                    found = true;
                     break;
                 }
             }
-            newApc.setRule(rule);
-            newApc.setSubClass(subClass);
+            if (!found)
+            {
+                newApc.setRule(rule);
+                newApc.setSubClass(subClass);
+                newApc.setBondType(bt);
+            } else {
+                if (bt != newApc.bondType)
+                {
+                    //TODO-gg del
+                    //System.out.println("WARNING! Not overwriting bond order of "
+                    //        + "APClass " + newApc + "(" + newApc.bondType 
+                    //        + ") with " + bt);
+                }
+            }
             uniqueAPClasses.add(newApc);
         }
         return newApc;
     }
     
+//------------------------------------------------------------------------------
+    
+    private void setBondType(BondType bt) {
+        this.bondType = bt;
+    }
+
 //------------------------------------------------------------------------------
     
     private void setRule(String rule) {
@@ -168,7 +223,7 @@ public class APClass implements Cloneable,Comparable<APClass>
 //------------------------------------------------------------------------------
     
     /**
-     * Returns the list of the names of all APClasses. This method 
+     * Returns the list of the names of all APClasses.
      * @return
      */
     public static List<String> getAllAPClassesAsString()
@@ -202,6 +257,15 @@ public class APClass implements Cloneable,Comparable<APClass>
      */
     public int getSubClass() {
         return subClass;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the bond type associated with this APClass
+     */
+    public BondType getBondType() {
+        return bondType;
     }
     
 //------------------------------------------------------------------------------
@@ -342,11 +406,6 @@ public class APClass implements Cloneable,Comparable<APClass>
     
 //------------------------------------------------------------------------------
 
-    //NB: JSON serializer is currently not needed because the static and final
-    // fields are ignored by GSON serializer
-    
-//------------------------------------------------------------------------------
-
     public static class APClassDeserializer 
     implements JsonDeserializer<APClass>
     {
@@ -355,8 +414,18 @@ public class APClass implements Cloneable,Comparable<APClass>
                 JsonDeserializationContext context) throws JsonParseException
         {
             JsonObject jo = json.getAsJsonObject();
-            APClass apc = getUnique(jo.get("rule").getAsString(),
-                    jo.get("subClass").getAsInt());
+            APClass apc = null;
+            if (jo.has("bondType"))
+            {
+                apc = getUnique(jo.get("rule").getAsString(),
+                    jo.get("subClass").getAsInt(),
+                    context.deserialize(jo.get("bondType"),BondType.class));
+            } else {
+
+                apc = getUnique(jo.get("rule").getAsString(),
+                    jo.get("subClass").getAsInt(),
+                    BondType.UNDEFINED);
+            }
             return apc;
         }
     }
