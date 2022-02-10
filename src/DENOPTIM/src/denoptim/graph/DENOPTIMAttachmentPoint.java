@@ -33,6 +33,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * An attachment point (AP) is a possibility to attach a {@link DENOPTIMVertex} 
@@ -215,31 +216,61 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             switch (details.length)
             {
                 case 2:
+                {
                     //OK, APClass:subclass but no direction vector
+                    this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
+                    
+                    String[] coord = details[2].split(
+                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                    
+                    if (coord.length == 3)
+                    {
+                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                                Double.parseDouble(coord[1]),
+                                Double.parseDouble(coord[2]));
+                    }
                     break;
+                }
                     
                 case 3:
+                {
                     //OK, APClass:subclass:direction_vector
+                    this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
+                    
+                    String[] coord = details[2].split(
+                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                    
+                    if (coord.length == 3)
+                    {
+                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                                Double.parseDouble(coord[1]),
+                                Double.parseDouble(coord[2]));
+                    }
                     break;
+                }
+                    
+                case 4:
+                {
+                    //OK, new format that includes bond type
+                    this.apClass = APClass.make(details[0],
+                            Integer.parseInt(details[1]),
+                            BondType.valueOf(details[2]));
+                    
+                    String[] coord = details[3].split(
+                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                    
+                    if (coord.length == 3)
+                    {
+                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                                Double.parseDouble(coord[1]),
+                                Double.parseDouble(coord[2]));
+                    }
+                    break;
+                }
                     
                 default:
                     throw new DENOPTIMException("Unable to split APClass, "
                             + "subclass, and coordinates");
-            }
-            
-            this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
-            
-            if (details.length == 3)
-            {
-                String[] coord = details[2].split(
-                        Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
-                
-                if (coord.length == 3)
-                {
-                    this.dirVec = new Point3d(Double.parseDouble(coord[0]),
-                            Double.parseDouble(coord[1]),
-                            Double.parseDouble(coord[2]));
-                }
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -685,7 +716,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             sb.append(atmIdx);
             sb.append(DENOPTIMConstants.SEPARATORAPPROPAAP);
         }
-        sb.append(apClass);
+        sb.append(apClass.toSDFString());
         if (dirVec != null)
         {
             DecimalFormat digits = new DecimalFormat("###.####");

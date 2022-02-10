@@ -275,9 +275,25 @@ public class APClass implements Cloneable,Comparable<APClass>
      * text files (e.g., compatibility matrix files) and SDF files (e.g., 
      * SDF with fragments).
      */
+    //TODO-gg avoid to use it to make SDF strings
+    @Deprecated 
     public String toString() {
         return rule + DENOPTIMConstants.SEPARATORAPPROPSCL 
         + Integer.toString(subClass);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return a string with a format compatible with reporting APClasses in
+     * text files (e.g., compatibility matrix files) and SDF files (e.g., 
+     * SDF with fragments).
+     */
+    public String toSDFString() {
+        return rule + DENOPTIMConstants.SEPARATORAPPROPSCL 
+                + Integer.toString(subClass)
+                + DENOPTIMConstants.SEPARATORAPPROPSCL
+                + bondType;
     }
 
 //------------------------------------------------------------------------------
