@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
@@ -39,11 +42,16 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import com.google.gson.Gson;
 
+import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMFragmentTest;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplateTest;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.EmptyVertex;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.MutationType;
 
@@ -115,10 +123,80 @@ public class DENOPTIMgsonTest
     
 //------------------------------------------------------------------------------
     
+    public void setUp() {
+        HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
+        FragmentSpace.setBondOrderMap(map);
+        FragmentSpace.setFragmentLibrary(new ArrayList<>());
+        FragmentSpace.setCompatibilityMatrix(new HashMap<>());
+    }
+    
+//------------------------------------------------------------------------------
+    
     @Test
     public void testTemplateSerialization() throws Exception
     {
+        setUp();
+        DENOPTIMTemplate tmpl = DENOPTIMTemplateTest.getTestAmideTemplate();
+        tmpl.setBuildingBlockId(-206); //just any number
+        tmpl.setBuildingBlockType(BBType.CAP); //just a type easy to spot
+        tmpl.removeMutationType(MutationType.CHANGEBRANCH);
+        tmpl.removeMutationType(MutationType.CHANGELINK);
         
+        Gson jsonWriter = DENOPTIMgson.getWriter();
+        String jsonString = jsonWriter.toJson(tmpl);
+        
+        //System.out.println("JSON of template: "+jsonString);
+        
+        Gson jsonReader = DENOPTIMgson.getReader();
+        DENOPTIMVertex tmplFromJSON = jsonReader.fromJson(jsonString,
+                DENOPTIMVertex.class);
+
+        assertEquals(tmpl.getNumberOfAPs(), tmplFromJSON.getNumberOfAPs(),
+                "Number of APs");
+        assertEquals(tmpl.getAttachmentPoints().size(),
+                tmplFromJSON.getAttachmentPoints().size(),
+                "Number of APs (B)");
+        assertEquals(tmpl.getSymmetricAPSets().size(),
+                tmplFromJSON.getSymmetricAPSets().size(),
+                "Number of symmetric sets");
+        assertEquals(tmpl.getVertexId(), tmplFromJSON.getVertexId(), 
+                "Vertex ID");
+        assertEquals(tmpl.isRCV(), tmplFromJSON.isRCV(), 
+                "RCV flag");
+        assertNotEquals(tmpl.hashCode(), tmplFromJSON.hashCode(), 
+                "Hash code");
+        assertEquals(tmpl.getBuildingBlockId(),
+                tmplFromJSON.getBuildingBlockId(), 
+                "Building block ID");
+        assertEquals(tmpl.getBuildingBlockType(),
+                tmplFromJSON.getBuildingBlockType(), 
+                "Building block type");
+        IAtomContainer iac = tmpl.getIAtomContainer();
+        IAtomContainer iacFromJSON = tmplFromJSON.getIAtomContainer();
+        for (int i=0; i<tmpl.getIAtomContainer().getAtomCount(); i++)
+        {
+            IAtom atmOri = iac.getAtom(i);
+            IAtom atmJsn = iacFromJSON.getAtom(i);
+            assertEquals(DENOPTIMMoleculeUtils.getSymbolOrLabel(atmOri),
+                    DENOPTIMMoleculeUtils.getSymbolOrLabel(atmJsn), 
+                    "Symbol atom "+i);
+            double distance = DENOPTIMMoleculeUtils.getPoint3d(atmOri).distance(
+                    DENOPTIMMoleculeUtils.getPoint3d(atmJsn));
+            assertTrue(areCloseEnough(0.0,distance), "Coordinates atom "+i);
+        }
+        for (int i=0; i<iac.getBondCount(); i++)
+        {
+            IBond bndOri = iac.getBond(i);
+            IBond bndJsn = iacFromJSON.getBond(i);
+            assertEquals(iac.indexOf(bndOri.getAtom(0)), 
+                    iacFromJSON.indexOf(bndJsn.getAtom(0)), 
+                    "1st atom in bond "+i);
+            assertEquals(iac.indexOf(bndOri.getAtom(1)), 
+                    iacFromJSON.indexOf(bndJsn.getAtom(1)), 
+                    "2nd atom in bond "+i);
+            assertEquals(bndOri.getOrder(),bndJsn.getOrder(), 
+                    "Order in bond "+i);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -160,20 +238,15 @@ public class DENOPTIMgsonTest
                 "Number of symmetric APs in set");
         assertEquals(frag.getVertexId(), fragFromJSON.getVertexId(), 
                 "Vertex ID");
-        assertEquals(frag.getNumberOfAPs(), fragFromJSON.getNumberOfAPs(), 
-                "Number of APS");
-        assertEquals(frag.getSymmetricAPSets().size(), 
-                fragFromJSON.getSymmetricAPSets().size(), 
-                "Number of SymAPs sets");
         assertEquals(frag.isRCV(), fragFromJSON.isRCV(), 
                 "RCV flag");
         assertNotEquals(frag.hashCode(), fragFromJSON.hashCode(), 
                 "Hash code");
         assertEquals(frag.getBuildingBlockId(),
-                ((DENOPTIMFragment)fragFromJSON).getBuildingBlockId(), 
+                fragFromJSON.getBuildingBlockId(), 
                 "Building block ID");
         assertEquals(frag.getBuildingBlockType(),
-                ((DENOPTIMFragment)fragFromJSON).getBuildingBlockType(), 
+                fragFromJSON.getBuildingBlockType(), 
                 "Building block type");
         IAtomContainer iac = frag.getIAtomContainer();
         IAtomContainer iacFromJSON = fragFromJSON.getIAtomContainer();

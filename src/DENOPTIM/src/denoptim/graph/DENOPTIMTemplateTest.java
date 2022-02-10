@@ -61,7 +61,7 @@ public class DENOPTIMTemplateTest
 {
     final long SEED = 13;
     Random rng = new Random(SEED);
-    IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
+    static IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
 
     @TempDir
     File tempDir;
@@ -204,7 +204,7 @@ public class DENOPTIMTemplateTest
      * @return 3D building block CH2 with two APs both on C.
      * @throws DENOPTIMException
      */
-    private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException 
+    private static DENOPTIMVertex getCH2Fragment() throws DENOPTIMException 
     {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -251,7 +251,7 @@ public class DENOPTIMTemplateTest
      * @return 3D building block C(=O)N with three APs: one on C and two on N.
      * @throws DENOPTIMException
      */
-    private DENOPTIMVertex getAmideFragment() throws DENOPTIMException 
+    private static DENOPTIMVertex getAmideFragment() throws DENOPTIMException 
     {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "O", "N"};
@@ -465,7 +465,22 @@ public class DENOPTIMTemplateTest
     
 //------------------------------------------------------------------------------
     
-    private DENOPTIMTemplate getTestAmideTemplate() throws DENOPTIMException
+    /**
+     * Builds a template object meant for tests. The inner graph has the 
+     * following structure;
+     * <pre>
+     *                             -->AP
+     *                            /
+     * AP<--v7<--v5<--v3<--v1-->v9-->AP
+     * 
+     * </pre>
+     * Before calling this method from outside its class, you should call
+     * {@link DENOPTIMTemplateTest#setUp()} to prepare the fragment space.
+     * 
+     * @return
+     * @throws DENOPTIMException
+     */
+    public static DENOPTIMTemplate getTestAmideTemplate() throws DENOPTIMException
     {
         DENOPTIMVertex v1 = getCH2Fragment();
         DENOPTIMVertex v2 = getCH2Fragment();
