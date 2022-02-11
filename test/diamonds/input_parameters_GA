@@ -1,7 +1,6 @@
 # Genetic Algorithm - parameters
 GA-RandomSeed=1234567
 GA-PrintLevel=1
-GA-InitPoplnFile=/tmp/denoptim_Diamond/data/initial_pop.sdf
 GA-PopulationSize=20
 GA-NumChildren=20
 GA-NumGenerations=100
@@ -29,15 +28,15 @@ GA-ReplacementStrategy=ELITIST
 GA-NumParallelTasks=2
 GA-Parallelization=asynchronous
 # Fragment Space - parameters
-FS-ScaffoldLibFile=/tmp/denoptim_Diamond/data/lib_scaff.sdf
-FS-FragmentLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
-FS-CappingFragmentLibFile=/tmp/denoptim_Diamond/data/lib_cap.sdf
-FS-CompMatrixFile=/tmp/denoptim_Diamond/data/CPMap.par
+FS-ScaffoldLibFile=data/lib_scaff.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CappingFragmentLibFile=data/lib_cap.sdf
+FS-CompMatrixFile=data/CPMap.par
 FS-MaxHeavyAtom=20
 FS-MaxMW=200
 FS-MaxRotatableBond=50
 RC-CloseRings
-FS-RCCompMatrixFile=/tmp/denoptim_Diamond/data/RC-CPMap
+FS-RCCompMatrixFile=data/RC-CPMap
 RC-RingSizeBias=3 1
 RC-RingSizeBias=4 1
 RC-RingSizeBias=5 1
@@ -52,6 +51,6 @@ RC-RCCFOLDER=data/rccArchive
 # Fitness Provider - parameters
 #FP-Equation=${taniToGoal*taniToGoal}
 #FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
-FP-Source=/tmp/denoptim_Diamond/data/fitness_provider_w3D.sh
+FP-Source=data/fitness_provider_w3D.sh
 FP-Interpreter=bash
 FP-CHECKUIDBEFOREFITNESS

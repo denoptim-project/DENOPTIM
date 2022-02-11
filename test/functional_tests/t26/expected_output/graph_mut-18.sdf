@@ -1,5 +1,5 @@
 
-  CDK     11272114583D
+  CDK     02112209123D
 
   8  8  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0550 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -40,7 +40,8 @@ M  END
           "atomPositionNumberInMol": 0,
           "apClass": {
             "rule": "n",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": -0.0128,
@@ -54,7 +55,8 @@ M  END
           "atomPositionNumberInMol": 0,
           "apClass": {
             "rule": "n",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": 0.8379,
@@ -68,7 +70,8 @@ M  END
           "atomPositionNumberInMol": 0,
           "apClass": {
             "rule": "n",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": -0.8251,
@@ -86,6 +89,19 @@ M  END
           ]
         }
       ],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "N",
+            "p3d": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.055
+            }
+          }
+        ],
+        "bonds": []
+      },
       "vertexId": 1,
       "buildingBlockId": 0,
       "buildingBlockType": "FRAGMENT",
@@ -108,7 +124,8 @@ M  END
           "atomPositionNumberInMol": 1,
           "apClass": {
             "rule": "c",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": -0.0336023950429974,
@@ -122,7 +139,8 @@ M  END
           "atomPositionNumberInMol": 1,
           "apClass": {
             "rule": "c",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": 1.5580530021781458,
@@ -139,6 +157,50 @@ M  END
           ]
         }
       ],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": 0.8715023950429974,
+              "y": 0.48791236843856056,
+              "z": -0.2674319637944017
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": 1.3480306381651193,
+              "y": -0.1000944657960697,
+              "z": -1.0518344665952992
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": 0.613528334871722,
+              "y": 1.472569177893413,
+              "z": -0.6573279010301437
+            }
+          }
+        ],
+        "bonds": [
+          {
+            "atomIds": [
+              0,
+              1
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              0,
+              2
+            ],
+            "bo": "SINGLE"
+          }
+        ]
+      },
       "vertexId": 2,
       "buildingBlockId": 2,
       "buildingBlockType": "FRAGMENT",
@@ -161,7 +223,8 @@ M  END
           "atomPositionNumberInMol": 4,
           "apClass": {
             "rule": "ATplus",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "ANY"
           },
           "dirVec": {
             "x": 1.5580530021781458,
@@ -171,6 +234,19 @@ M  END
         }
       ],
       "lstSymAPs": [],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "ATP",
+            "p3d": {
+              "x": 1.5712750712328019,
+              "y": 0.600107026407074,
+              "z": 0.5881689622798981
+            }
+          }
+        ],
+        "bonds": []
+      },
       "vertexId": 3,
       "buildingBlockId": 5,
       "buildingBlockType": "FRAGMENT",
@@ -193,7 +269,8 @@ M  END
           "atomPositionNumberInMol": 4,
           "apClass": {
             "rule": "hyd",
-            "subClass": 1
+            "subClass": 1,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": 0.047759477790554235,
@@ -203,6 +280,19 @@ M  END
         }
       ],
       "lstSymAPs": [],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": -0.8728594777905542,
+              "y": 0.5196322572908982,
+              "z": -0.2729438105866826
+            }
+          }
+        ],
+        "bonds": []
+      },
       "vertexId": 5,
       "buildingBlockId": 0,
       "buildingBlockType": "CAP",
@@ -225,7 +315,8 @@ M  END
           "atomPositionNumberInMol": 5,
           "apClass": {
             "rule": "c",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": 5.139152129541918E-4,
@@ -239,7 +330,8 @@ M  END
           "atomPositionNumberInMol": 5,
           "apClass": {
             "rule": "c",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": 0.7581303349698286,
@@ -256,6 +348,50 @@ M  END
           ]
         }
       ],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": -0.013313915212954133,
+              "y": -0.9986476559341632,
+              "z": -0.2674463840637335
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": -0.9892626394656393,
+              "y": -1.4356778566405302,
+              "z": -0.0561475878056667
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": 0.17736272843104048,
+              "y": -1.0367059288712306,
+              "z": -1.339972596064964
+            }
+          }
+        ],
+        "bonds": [
+          {
+            "atomIds": [
+              0,
+              1
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              0,
+              2
+            ],
+            "bo": "SINGLE"
+          }
+        ]
+      },
       "vertexId": 6,
       "buildingBlockId": 2,
       "buildingBlockType": "FRAGMENT",
@@ -278,7 +414,8 @@ M  END
           "atomPositionNumberInMol": 8,
           "apClass": {
             "rule": "ATminus",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "ANY"
           },
           "dirVec": {
             "x": 0.7581303349698286,
@@ -288,6 +425,19 @@ M  END
         }
       ],
       "lstSymAPs": [],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "ATM",
+            "p3d": {
+              "x": 0.7750051842926822,
+              "y": -1.5730502215510769,
+              "z": 0.2704014971651606
+            }
+          }
+        ],
+        "bonds": []
+      },
       "vertexId": 7,
       "buildingBlockId": 6,
       "buildingBlockType": "FRAGMENT",
@@ -351,8 +501,5 @@ M  END
     }
   ]
 }
-
-> <GraphMsg>
- DELETELINK 6
 
 $$$$

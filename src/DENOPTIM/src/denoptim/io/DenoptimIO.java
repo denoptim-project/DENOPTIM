@@ -1678,6 +1678,54 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
+     * Writes candidate items to file. Always overwrites.
+     * @param file the file where to print.
+     * @param candidates the list of candidates to print to file.
+     * @param append use <code>true</code> to append if the file exist
+     * @throws DENOPTIMException
+     */
+    public static void writeCandidatesToFile(File file, 
+            ArrayList<Candidate> candidates, boolean append) 
+                    throws DENOPTIMException 
+    {
+        if (FilenameUtils.getExtension(file.getName()).equals(""))
+        {
+            file = new File(file.getAbsoluteFile() + "." 
+                    + FileFormat.CANDIDATESDF.getExtension());
+        }
+        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        for (Candidate g : candidates) 
+        {
+            lst.add(g.getFitnessProviderOutputRepresentation());
+        }
+        writeMoleculeSet(file.getAbsolutePath(), lst, append);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes one candidate item to file. Always overwrites.
+     * @param file the file where to print.
+     * @param candidate the candidate to print to file.
+     * @param append use <code>true</code> to append if the file exist
+     * @throws DENOPTIMException
+     */
+    public static void writeCandidateToFile(File file, Candidate candidate,
+            boolean append) 
+            throws DENOPTIMException 
+    {
+        if (FilenameUtils.getExtension(file.getName()).equals(""))
+        {
+            file = new File(file.getAbsoluteFile() + "." 
+                    + FileFormat.CANDIDATESDF.getExtension());
+        }
+        writeMolecule(file.getAbsolutePath(), 
+                candidate.getFitnessProviderOutputRepresentation(), append);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Reads the molecules in a file. Accepts filenames with commonly accepted
      * extensions (i.e., .smi and .sdf). Unrecognised extensions will be
      * interpreted as links (i.e., pathnames) to SDF files.
@@ -2033,6 +2081,10 @@ public class DenoptimIO
             case GRAPHSDF:
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(
                         inFile.getAbsolutePath(), useFS);
+                
+            case CANDIDATESDF:
+                return DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                    inFile.getAbsolutePath(), useFS);
                 
             case VRTXSDF:
                 ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
@@ -3001,7 +3053,8 @@ public class DenoptimIO
     public static FileFormat detectKindOfSDFFile(String fileName) 
             throws IOException 
     {
-        FileFormat[] ffs = {FileFormat.VRTXSDF,FileFormat.GRAPHSDF};
+        FileFormat[] ffs = {FileFormat.VRTXSDF, FileFormat.GRAPHSDF,
+                FileFormat.CANDIDATESDF};
         return detectKindFile(fileName, ffs);
     }
 

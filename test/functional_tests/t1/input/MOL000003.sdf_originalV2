@@ -1,0 +1,191 @@
+
+  CDK     12212117153D
+
+ 20 25  0  0  0  0  0  0  0  0999 V2000
+    1.1116    4.8010   -0.4148 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2582    3.9143    0.7471 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.1304    3.0767    1.1570 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.9375    5.4212   -0.7336 H   0  0  0  0  0  0  0  0  0  0  0  0
+    2.1814    3.8987    1.2885 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.2114    2.4394    2.0222 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1008    3.1130    0.4101 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2590    3.9903   -0.7401 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.1271    4.8228   -1.1469 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.9476    2.4817    0.7199 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.1864    4.0071   -1.2937 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.2137    5.4683   -2.0388 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0022    3.9530    0.0021 Du  0  0  0  0  0  0  0  0  0  0  0  0
+    0.8672    5.4643    0.2967 Du  0  0  0  0  0  0  0  0  0  0  0  0
+    0.8778    4.5562    1.4033 Du  0  0  0  0  0  0  0  0  0  0  0  0
+   -0.0912    3.8414    1.7649 Du  0  0  0  0  0  0  0  0  0  0  0  0
+   -0.7818    2.3952   -0.1832 Du  0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9311    3.2516   -1.3240 Du  0  0  0  0  0  0  0  0  0  0  0  0
+   -0.5301    5.5440   -0.5645 Du  0  0  0  0  0  0  0  0  0  0  0  0
+    0.1960    4.1742    0.9532 Du  0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0  0  0  0 
+  4  1  1  0  0  0  0 
+  5  2  1  0  0  0  0 
+  6  3  1  0  0  0  0 
+ 10  7  1  0  0  0  0 
+ 11  8  1  0  0  0  0 
+ 12  9  1  0  0  0  0 
+  1  9  1  0  0  0  0 
+  2  3  1  0  0  0  0 
+  3  7  1  0  0  0  0 
+  7  8  1  0  0  0  0 
+  8  9  1  0  0  0  0 
+ 13  7  1  0  0  0  0 
+ 13  1  1  0  0  0  0 
+ 13  9  1  0  0  0  0 
+ 13  2  1  0  0  0  0 
+ 13  3  1  0  0  0  0 
+ 13  8  1  0  0  0  0 
+ 14  1  1  0  0  0  0 
+ 15  2  1  0  0  0  0 
+ 16  3  1  0  0  0  0 
+ 17  7  1  0  0  0  0 
+ 18  8  1  0  0  0  0 
+ 19  9  1  0  0  0  0 
+ 20 13  1  0  0  0  0 
+M  END
+> <ATTACHMENT_POINTS>
+
+
+> <GCODE>
+1
+
+> <GraphENC>
+1 1_57_1,2_EmptyVertex,3_EmptyVertex, 1_1_2_0_SINGLE_MAreneM:1_MAreneM:0,1_0_3_0_SINGLE_MAreneM:1_MAreneM:0, 
+
+> <GraphJson>
+{
+  "graphId": 1,
+  "gVertices": [
+    {
+      "lstAPs": [
+        {
+          "id": 628,
+          "atomPositionNumber": 12,
+          "atomPositionNumberInMol": 12,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 1
+          },
+          "dirVec": {
+            "x": -0.5621,
+            "y": 5.1953,
+            "z": 1.0082
+          }
+        },
+        {
+          "id": 629,
+          "atomPositionNumber": 12,
+          "atomPositionNumberInMol": 12,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 1
+          },
+          "dirVec": {
+            "x": 0.5809,
+            "y": 2.7129,
+            "z": -1.019
+          }
+        }
+      ],
+      "lstSymAPs": [
+        {
+          "symIds": [
+            0,
+            1
+          ]
+        }
+      ],
+      "vertexId": 1,
+      "buildingBlockId": 56,
+      "buildingBlockType": "FRAGMENT",
+      "isRCV": false,
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "MolecularFragment"
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 632,
+          "atomPositionNumber": -1,
+          "atomPositionNumberInMol": 19,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 0
+          }
+        }
+      ],
+      "lstSymAPs": [],
+      "vertexId": 2,
+      "buildingBlockId": -99,
+      "buildingBlockType": "UNDEFINED",
+      "isRCV": false,
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "EmptyVertex"
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 633,
+          "atomPositionNumber": -1,
+          "atomPositionNumberInMol": 19,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 0
+          }
+        }
+      ],
+      "lstSymAPs": [],
+      "vertexId": 3,
+      "buildingBlockId": -99,
+      "buildingBlockType": "UNDEFINED",
+      "isRCV": false,
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "EmptyVertex"
+    }
+  ],
+  "gEdges": [
+    {
+      "srcAPID": 629,
+      "trgAPID": 632,
+      "bondType": "SINGLE"
+    },
+    {
+      "srcAPID": 628,
+      "trgAPID": 633,
+      "bondType": "SINGLE"
+    }
+  ],
+  "gRings": [],
+  "symVertices": []
+}
+
+$$$$

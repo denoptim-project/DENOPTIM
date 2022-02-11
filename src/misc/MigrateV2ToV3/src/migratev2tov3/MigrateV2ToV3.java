@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
@@ -48,15 +49,21 @@ public class MigrateV2ToV3
             } catch (UndetectedFileFormatException | IOException e)
             {
                 e.printStackTrace();
-                System.out.println("EROR! Unable to read input file '" + 
+                System.out.println("ERROR! Unable to read input file '" + 
                         inFile + "'");
                 System.exit(1);
             }
             
+            ArrayList<Candidate> candidates;
             ArrayList<DENOPTIMGraph> graphs;
             ArrayList<DENOPTIMVertex> vertexes;
             switch (ff)
             {
+                case CANDIDATESDF:
+                    candidates = DenoptimIO.readCandidates(inFile, true, true);
+                    DenoptimIO.writeCandidatesToFile(outFile, candidates, false);
+                    break;
+                    
                 case GRAPHSDF:
                     graphs = DenoptimIO.readDENOPTIMGraphsFromSDFile(
                                 inFile.getAbsolutePath(), true);

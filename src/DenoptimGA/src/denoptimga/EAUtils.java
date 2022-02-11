@@ -1066,8 +1066,8 @@ public class EAUtils
                 candidate.setImageFile(null);
                 
                 // Write the candidate to file as if it had been processed by fitness provider
-                DenoptimIO.writeMolecule(sdfPathName, 
-                        candidate.getFitnessProviderOutputRepresentation(), false);
+                DenoptimIO.writeCandidateToFile(new File(sdfPathName), 
+                        candidate, false);
                 
                 population.add(candidate);
             }

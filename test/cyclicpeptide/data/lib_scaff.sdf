@@ -1,5 +1,5 @@
 
-  CDK     10062115053D
+  CDK     02102219103D
 
   2  0  0  0  0  0  0  0  0  0999 V2000
     4.4091   14.4169   14.2085 ATN 0  0  0  0  0  0  0  0  0  0  0  0
@@ -19,33 +19,31 @@ M  END
             "id": 123,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           },
           {
             "id": 124,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 1
+              "subClass": 1,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           }
         ],
         "lstSymAPs": [],
@@ -64,33 +62,31 @@ M  END
             "id": 131,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           },
           {
             "id": 132,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 1
+              "subClass": 1,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           }
         ],
         "lstSymAPs": [],
@@ -109,33 +105,31 @@ M  END
             "id": 139,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           },
           {
             "id": 140,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 1
+              "subClass": 1,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           }
         ],
         "lstSymAPs": [],
@@ -154,33 +148,31 @@ M  END
             "id": 145,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           },
           {
             "id": 146,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 1
+              "subClass": 1,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           }
         ],
         "lstSymAPs": [],
@@ -199,33 +191,31 @@ M  END
             "id": 151,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           },
           {
             "id": 152,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 1
+              "subClass": 1,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           }
         ],
         "lstSymAPs": [],
@@ -244,33 +234,31 @@ M  END
             "id": 157,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           },
           {
             "id": 158,
             "atomPositionNumber": -1,
             "atomPositionNumberInMol": -1,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "peptide",
-              "subClass": 1
+              "subClass": 1,
+              "bndTyp": "SINGLE"
             },
             "dirVec": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
-              }
+            }
           }
         ],
         "lstSymAPs": [],
@@ -288,27 +276,38 @@ M  END
           {
             "id": 161,
             "atomPositionNumber": 0,
-            "atomPositionNumberInMol": 1,
-            "totalConnections": 1,
-            "freeConnections": 0,
+            "atomPositionNumberInMol": 0,
             "apClass": {
               "rule": "ATneutral",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "ANY"
             },
             "dirVec": {
-              "x": 15.4091,
-              "y": 28.4169,
-              "z": 15.808499999999999
-              }
+              "x": -0.0087,
+              "y": -0.007,
+              "z": -0.0079
+            }
           }
         ],
         "lstSymAPs": [],
+        "mol": {
+          "atoms": [
+            {
+              "elSymbol": "ATN",
+              "p3d": {
+                "x": 4.0E-4,
+                "y": 0.0099,
+                "z": 6.0E-4
+              }
+            }
+          ],
+          "bonds": []
+        },
         "vertexId": 70,
         "buildingBlockId": 20,
         "buildingBlockType": "FRAGMENT",
         "isRCV": true,
-        "allowedMutationTypes": [
-        ],
+        "allowedMutationTypes": [],
         "vertexType": "MolecularFragment"
       },
       {
@@ -317,26 +316,37 @@ M  END
             "id": 162,
             "atomPositionNumber": 0,
             "atomPositionNumberInMol": 0,
-            "totalConnections": 1,
-            "freeConnections": 0,
             "apClass": {
               "rule": "ATneutral",
-              "subClass": 0
+              "subClass": 0,
+              "bndTyp": "ANY"
             },
             "dirVec": {
-              "x": 4.4,
-              "y": 14.399999999999999,
-              "z": 14.2
-              }
+              "x": -0.0087,
+              "y": -0.007,
+              "z": -0.0079
+            }
           }
         ],
         "lstSymAPs": [],
+        "mol": {
+          "atoms": [
+            {
+              "elSymbol": "ATN",
+              "p3d": {
+                "x": 4.0E-4,
+                "y": 0.0099,
+                "z": 6.0E-4
+              }
+            }
+          ],
+          "bonds": []
+        },
         "vertexId": 71,
         "buildingBlockId": 20,
         "buildingBlockType": "FRAGMENT",
         "isRCV": true,
-        "allowedMutationTypes": [
-        ],
+        "allowedMutationTypes": [],
         "vertexType": "MolecularFragment"
       }
     ],
@@ -401,8 +411,7 @@ M  END
   "buildingBlockId": 0,
   "buildingBlockType": "FRAGMENT",
   "isRCV": false,
-  "allowedMutationTypes": [
-  ],
+  "allowedMutationTypes": [],
   "vertexType": "Template"
 }
 

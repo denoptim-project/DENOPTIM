@@ -8,6 +8,7 @@ import denoptim.constants.DENOPTIMConstants;
 
 public enum FileFormat {
     
+    CANDIDATESDF,
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP,
@@ -17,7 +18,9 @@ public enum FileFormat {
     
     /**
      * Collection of regex that, if matched, suggests assigning the format to a
-     * specific FileFormat.
+     * specific FileFormat. Consider a logical <b>OR</b> operator, i.e., any 
+     * match will suggest among the set of regex will lead to format 
+     * interpretation.
      */
     private Set<String> definingRegex = new HashSet<String>();
     
@@ -41,14 +44,31 @@ public enum FileFormat {
                 "^> *<" + DENOPTIMConstants.GRAPHTAG + ">.*",
                 "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
                 ));
+        GRAPHSDF.negatingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*"
+                ));
         GRAPHSDF.endOfSampleRegex = "\\$\\$\\$\\$";
         
         //------------------------------------
         
+        CANDIDATESDF.extension = "sdf";
+        CANDIDATESDF.definingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*"
+                ));
+        CANDIDATESDF.endOfSampleRegex = "\\$\\$\\$\\$";
+        
+        //------------------------------------
+        
+        //TODO
         GRAPHJSON.extension = "json";
         
         //------------------------------------
         
+        //TODO
         VRTXJSON.extension = "json";
 
         //------------------------------------

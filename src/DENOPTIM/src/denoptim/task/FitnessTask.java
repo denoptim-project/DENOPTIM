@@ -152,8 +152,7 @@ public abstract class FitnessTask extends Task
         
         // Write the FIT file
         result.setChemicalRepresentation(fitProvMol);
-        DenoptimIO.writeMolecule(fitProvOutFile, 
-                result.getFitnessProviderOutputRepresentation(), false);
+        DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, false);
         
         // Optional image creation
         if (status && FitnessParameters.makePictures())
