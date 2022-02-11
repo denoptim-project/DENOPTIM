@@ -24,6 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import com.google.gson.Gson;
 
@@ -653,6 +654,35 @@ public class FileUtils
             }
         }
     	return ff;
+    }
+
+    public static File getAvailableFileName(File parent, String baseName)
+    		throws DENOPTIMException
+    {
+    	File newFolder = null;
+    	if (!parent.exists())
+    	{
+    		if (!createDirectory(parent.getAbsolutePath()))
+    		{
+    			throw new DENOPTIMException("Cannot make folder '"+parent+"'");
+    		}
+    	}
+    	FileFilter fileFilter = new WildcardFileFilter(baseName+"*");
+    	File[] cands = parent.listFiles(fileFilter);
+    	int i=0;
+    	boolean goon = true;
+    	while (goon)
+    	{
+    		i++;
+    		int iFolder = i + cands.length;
+    		newFolder = new File(parent + DenoptimIO.FS + baseName + "_" + iFolder);
+    		if (!newFolder.exists())
+    		{
+    			goon = false;
+    			break;
+    		}
+    	}
+    	return newFolder;
     }
 
 }

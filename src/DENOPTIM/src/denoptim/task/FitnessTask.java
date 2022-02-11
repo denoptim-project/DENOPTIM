@@ -226,7 +226,7 @@ public abstract class FitnessTask extends Task
         boolean unreadable = false;
         try
         {
-            processedMol = DenoptimIO.readSingleSDFFile(fitProvOutFile);
+            processedMol = DenoptimIO.getFirstMolInSDFFile(fitProvOutFile);
             if (processedMol.isEmpty())
             {
                 unreadable=true;

@@ -30,7 +30,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
@@ -451,7 +450,7 @@ public class EmptyVertex extends DENOPTIMVertex
             }
         }
         iac.setProperty(DENOPTIMConstants.APSTAG, 
-                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
         iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
         return iac;

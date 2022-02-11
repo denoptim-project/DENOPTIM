@@ -25,7 +25,6 @@ import com.google.gson.stream.JsonReader;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
@@ -566,7 +565,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         // Prepare SDF-like string for atom container. 0-based to 1-based
         // index conversion done in here
         mol.setProperty(DENOPTIMConstants.APSTAG, 
-                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
         
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
@@ -639,7 +638,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // Prepare SDF-like string for atom container. 0-based to 1-based
             // index conversion done in here
             iac.setProperty(DENOPTIMConstants.APSTAG, 
-                    DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+                    DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
             
             iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
             

@@ -38,7 +38,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.MutationType;
@@ -675,7 +674,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         }
         //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
         mol.setProperty(DENOPTIMConstants.APSTAG, 
-                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
     }
 
 //-----------------------------------------------------------------------------

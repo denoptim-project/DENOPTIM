@@ -664,7 +664,7 @@ public class FitnessParameters
         IBitFingerprint fp = null;
         try
         {
-            IAtomContainer ref = DenoptimIO.readSingleSDFFile(fileName);
+            IAtomContainer ref = DenoptimIO.getFirstMolInSDFFile(fileName);
             
             if (fingerprinter instanceof ShortestPathFingerprinter)
             {

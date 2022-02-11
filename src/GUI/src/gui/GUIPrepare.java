@@ -34,7 +34,6 @@ import javax.swing.UIManager;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.io.DenoptimIO;
 import denoptim.task.DenoptimGATask;
 import denoptim.task.FitnessRunnerTask;
 import denoptim.task.FragSpaceExplorerTask;
@@ -462,7 +461,7 @@ public class GUIPrepare extends GUICardPanel
 	{
 		String baseName = getAchronimFromClass() + "_run";
 		File parent = new File(GUIPreferences.tmpSpace);
-		File wrkSpace = DenoptimIO.getAvailableFileName(parent, baseName);
+		File wrkSpace = FileUtils.getAvailableFileName(parent, baseName);
 		FileUtils.createDirectory(wrkSpace.getAbsolutePath());
 		return wrkSpace;
 	}

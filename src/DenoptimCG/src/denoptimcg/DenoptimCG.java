@@ -63,7 +63,7 @@ public class DenoptimCG
             DENOPTIMGraph grph = DenoptimIO.readDENOPTIMGraphsFromFile(
                     new File(CGParameters.getInputSDFFile()), true).get(0);
             
-            IAtomContainer mol = DenoptimIO.readSingleSDFFile(
+            IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
                     CGParameters.getInputSDFFile());
             
             String mname = "noname";

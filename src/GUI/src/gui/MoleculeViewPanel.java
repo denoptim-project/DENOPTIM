@@ -192,7 +192,7 @@ public class MoleculeViewPanel extends JSplitPane
 		IAtomContainer mol;
 		TreeMap<String,String> availableProps = new TreeMap<String,String>();
 		try {
-			mol = DenoptimIO.readSingleSDFFile(item.getSDFFile());
+			mol = DenoptimIO.getFirstMolInSDFFile(item.getSDFFile());
 		} catch (DENOPTIMException e1) {
 			return;
 		}
@@ -373,7 +373,7 @@ public class MoleculeViewPanel extends JSplitPane
 		if (molFile != null)
 		{
 			try {
-				mol = DenoptimIO.readSingleSDFFile(molFile.getAbsolutePath());
+				mol = DenoptimIO.getFirstMolInSDFFile(molFile.getAbsolutePath());
 			} catch (DENOPTIMException e) {
 				System.out.println("Could not read descriptors from '" 
 						+ molFile + "': "+e.getLocalizedMessage());

@@ -22,6 +22,7 @@ package denoptim.graph;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -1117,6 +1118,61 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             properties = new HashMap<Object, Object>();
         }
         properties.put(key, property);
+    }
+
+    /**
+     * Prepares the two strings that can be used to define 
+     * {@link DENOPTIMAttachmentPoint}s in SDF files.
+     * @param apsPerIndex a map of {@link DENOPTIMAttachmentPoint}s grouped by 
+     * index. The index may or may not be an index of an existing atom (i.e.,
+     * we do not use it as such, but we just place if in the text-representation
+     * of the AP. This index is supposed to be 0-based (i.e., in this method it 
+     * is transformed in 1-based).
+     * @return the string meant the be the value of the
+     * {@link DENOPTIMConstants#APSTAG} tag in SDF file.
+     */
+    
+    // WARNING: here is a place where we still assume a fixed order of APs
+    // In fact, the order in which we process the keys is given by the comparable
+    // class Integer, i.e., the APs are reported in SDF following the ordering
+    // of the respective source atoms.
+    // To solve the issue of ordering we could drop the format in which we 
+    // collect APs by source atom (i.e., 1#firstAP,second-AP) and allow for
+    // a one-to-one (sorted) list of APs where "1#firstAP,second-AP" becomes
+    // "1#firstAP 1#second-AP"
+    
+    public static String getAPDefinitionsForSDF(
+            LinkedHashMap<Integer, List<DENOPTIMAttachmentPoint>> apsPerIndex)
+    {   
+        String s = "";
+        for (Integer ii : apsPerIndex.keySet())
+        {
+            //WARNING: here is the 1-based criterion implemented also for
+            // fake atom IDs!
+            int atmID = ii+1;
+    
+            List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerIndex.get(ii);
+            
+            boolean firstCL = true;
+            for (int i = 0; i<apsOnAtm.size(); i++)
+            {
+                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+                
+                //Build SDF property DENOPTIMConstants.APCVTAG
+                String stingAPP = ""; //String Attachment Point Property
+                if (firstCL)
+                {
+                    firstCL = false;
+                    stingAPP = ap.getSingleAPStringSDF(true,atmID);
+                } else {
+                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
+                            + ap.getSingleAPStringSDF(false,atmID);
+                }
+                s = s + stingAPP;
+            }
+            s = s + DENOPTIMConstants.SEPARATORAPPROPATMS;
+        }
+        return s;
     }
     
 //-----------------------------------------------------------------------------
