@@ -292,6 +292,7 @@ M  END
             }
         }
       },
+      "vertexType": "Template",
       "vertexId": 1,
       "buildingBlockId": 1,
       "buildingBlockType": "SCAFFOLD",
@@ -495,6 +496,7 @@ M  END
             }
         }
       },
+      "vertexType": "Template",
       "vertexId": 2,
       "buildingBlockId": 4,
       "buildingBlockType": "FRAGMENT",
@@ -868,6 +870,7 @@ M  END
             }
         }
       },
+      "vertexType": "Template",
       "vertexId": 11,
       "buildingBlockId": 4,
       "buildingBlockType": "FRAGMENT",
