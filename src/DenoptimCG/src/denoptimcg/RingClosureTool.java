@@ -33,6 +33,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
@@ -612,7 +613,7 @@ public class RingClosureTool
         // Cleanup
         if (verbosity < 2)
         {
-            DenoptimIO.deleteFilesContaining(workDir,molName + "_rs" + itn);
+            FileUtils.deleteFilesContaining(workDir,molName + "_rs" + itn);
         }
 
         return rcMol3d;

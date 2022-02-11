@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
+import denoptim.files.FileUtils;
 import denoptim.logging.DENOPTIMLogger;
 
 
@@ -90,7 +90,7 @@ public class RingClosuresArchive
 
     public RingClosuresArchive(String rccIndex) throws DENOPTIMException
     {
-        if (DenoptimIO.checkExists(rccIndex))
+        if (FileUtils.checkExists(rccIndex))
         {
             readLibraryOfRCCs(rccIndex);
         }

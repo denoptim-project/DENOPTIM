@@ -23,8 +23,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 
 
@@ -375,7 +375,7 @@ public class FragmentSpaceParameters
             msg = "No scaffold library file specified.";
             throw new DENOPTIMException(msg);
         }
-        if (!DenoptimIO.checkExists(scaffoldLibFile))
+        if (!FileUtils.checkExists(scaffoldLibFile))
         {
             msg = "Cannot find the scaffold library: " + scaffoldLibFile;
             throw new DENOPTIMException(msg);
@@ -386,7 +386,7 @@ public class FragmentSpaceParameters
             msg = "No fragment library file specified.";
             throw new DENOPTIMException(msg);
         }
-        if (!DenoptimIO.checkExists(fragmentLibFile))
+        if (!FileUtils.checkExists(fragmentLibFile))
         {
             msg = "Cannot find the fragment library: " +  fragmentLibFile;
             throw new DENOPTIMException(msg);
@@ -394,7 +394,7 @@ public class FragmentSpaceParameters
 
         if (cappingLibFile.length() > 0)
         {
-            if (!DenoptimIO.checkExists(cappingLibFile))
+            if (!FileUtils.checkExists(cappingLibFile))
             {
                 msg = "Cannot find the library of capping groups: "
                       + cappingLibFile;
@@ -404,7 +404,7 @@ public class FragmentSpaceParameters
 
         if (compMatrixFile.length() > 0)
         {
-            if (!DenoptimIO.checkExists(compMatrixFile))
+            if (!FileUtils.checkExists(compMatrixFile))
             {
                 msg = "Cannot find the compatibility matrix file: " 
                       + compMatrixFile;
@@ -414,7 +414,7 @@ public class FragmentSpaceParameters
 
         if (rcCompMatrixFile.length() > 0)
         {
-            if (!DenoptimIO.checkExists(rcCompMatrixFile))
+            if (!FileUtils.checkExists(rcCompMatrixFile))
             {
                 msg = "Cannot find the ring-closures compatibility matrix "
                       + "file: " + rcCompMatrixFile;
@@ -422,7 +422,7 @@ public class FragmentSpaceParameters
             }
         }
 
-        if (rotBndsFile.length()>0 && !DenoptimIO.checkExists(rotBndsFile))
+        if (rotBndsFile.length()>0 && !FileUtils.checkExists(rotBndsFile))
         {
             msg = "Cannot find file with definitions of rotatable bonds: " 
                   + rotBndsFile;

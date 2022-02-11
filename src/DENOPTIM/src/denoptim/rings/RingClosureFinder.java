@@ -430,7 +430,7 @@ public class RingClosureFinder
         }
         try
         {
-            DenoptimIO.writeMolecule(filename, mol, true);
+            DenoptimIO.writeSDFFile(filename, mol, true);
         } catch (Throwable thr)
         {
             System.out.println("Unable to write SDF: "+thr);

@@ -558,7 +558,7 @@ public class DENOPTIMTemplateTest
         String fileName = tempDir.getAbsolutePath() + SEP + "refMol.sdf";
         DenoptimIO.writeData(fileName, refGeometry, false);
         
-        IAtomContainer refMol = DenoptimIO.readMoleculeData(fileName).get(0);
+        IAtomContainer refMol = DenoptimIO.readSDFFile(fileName).get(0);
         
         KabschAlignment sa = null;
         try {
@@ -738,7 +738,7 @@ public class DENOPTIMTemplateTest
         String fileName = tempDir.getAbsolutePath() + SEP + "refMol.sdf";
         DenoptimIO.writeData(fileName, refGeometry, false);
         
-        IAtomContainer refMol = DenoptimIO.readMoleculeData(fileName).get(0);
+        IAtomContainer refMol = DenoptimIO.readSDFFile(fileName).get(0);
         
         KabschAlignment sa = null;
         try {

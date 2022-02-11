@@ -123,7 +123,7 @@ public class EAUtils
      */
     protected static void createFolderForGeneration(int genId)
     {
-        DenoptimIO.createDirectory(EAUtils.getPathNameToGenerationFolder(genId));
+        denoptim.files.FileUtils.createDirectory(EAUtils.getPathNameToGenerationFolder(genId));
     }
 
 //------------------------------------------------------------------------------
@@ -992,7 +992,7 @@ public class EAUtils
     protected static void outputFinalResults(Population popln) throws DENOPTIMException
     {
         String dirName = EAUtils.getPathNameToFinalPopulationFolder();
-        DenoptimIO.createDirectory(dirName);
+        denoptim.files.FileUtils.createDirectory(dirName);
         File fileDir = new File(dirName);
 
         for (int i=0; i<popln.size(); i++)

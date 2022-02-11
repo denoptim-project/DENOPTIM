@@ -435,8 +435,8 @@ public class PathSubGraph
         {
     	    String f = "/tmp/pathSubGraph.sdf";
     	    System.out.println("Find SDF representation of path in: " + f);
-    	    DenoptimIO.writeMolecule(f,iacPathVAVB,false);
-    	    DenoptimIO.writeMolecule(f,mol,true);
+    	    DenoptimIO.writeSDFFile(f,iacPathVAVB,false);
+    	    DenoptimIO.writeSDFFile(f,mol,true);
     	}
 
         // Get shortest atom path between the two ends of the chain

@@ -267,7 +267,7 @@ public class MoleculeViewPanel extends JSplitPane
 	public void loadChemicalStructure(IAtomContainer mol)
 	{
 		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, mol, false);
+			DenoptimIO.writeSDFFile(tmpSDFFile, mol, false);
 		} catch (DENOPTIMException e) {
 			System.out.println("Could not write molecular representation to "
 					+ "tmp file. Thus, could not load it into Jmol viewer.");
@@ -322,12 +322,12 @@ public class MoleculeViewPanel extends JSplitPane
                     // so far, there is no case where the fully defined graph 
                     // is needed. We only need its string representation.
 					
-					item = new Candidate(DenoptimIO.readMoleculeData(
+					item = new Candidate(DenoptimIO.readSDFFile(
 							file.getAbsolutePath()).get(0),false,true);
 				} catch (DENOPTIMException e1) {
 				    try {
 				        item = Candidate.fromAtomContainerNoGraph(
-				                DenoptimIO.readMoleculeData(
+				                DenoptimIO.readSDFFile(
 				                        file.getAbsolutePath()).get(0), true);
 				    } catch (DENOPTIMException e2) {
     					e1.printStackTrace();

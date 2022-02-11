@@ -71,7 +71,7 @@ public class PrepareMOPAC
             pmf.readParameters(paramFile);
             pmf.readMOPACKeywords(pmf.kwdsFile);
             IAtomContainer mol = DenoptimIO.readSingleSDFFile(pmf.inpSDF);
-            DenoptimIO.writeMolecule(pmf.inpSDF, mol, false);
+            DenoptimIO.writeSDFFile(pmf.inpSDF, mol, false);
             
             // calculate charge
             double charge = AtomContainerManipulator.getTotalFormalCharge(mol);

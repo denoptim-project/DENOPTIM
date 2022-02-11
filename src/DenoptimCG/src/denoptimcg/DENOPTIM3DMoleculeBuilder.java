@@ -244,7 +244,7 @@ public class DENOPTIM3DMoleculeBuilder
             if (debug)
             {
                 System.out.println("Reordered IAtomContainer: 'iacToIC.sdf'");
-                DenoptimIO.writeMolecule("iacToIC.sdf",reorderedMol,false);
+                DenoptimIO.writeSDFFile("iacToIC.sdf",reorderedMol,false);
                 GenUtils.pause();
             }
         }

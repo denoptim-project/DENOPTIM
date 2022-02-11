@@ -40,7 +40,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import denoptim.io.DenoptimIO;
+import denoptim.files.FileUtils;
 
 
 /**
@@ -378,7 +378,7 @@ public class ParametersForm extends JPanel implements IParametersForm
     				+ "'importParametersFromDenoptimParamsFile'!</html>");
     	}
     	String parType = keyRoot.replaceAll("-", "");
-    	if (fileName.equals("") || !DenoptimIO.checkExists(fileName))
+    	if (fileName.equals("") || !FileUtils.checkExists(fileName))
     	{
     		throw new Exception("<html>Source file for the " + parType 
     				+ " parameters is not found!<br>Please, specify another"

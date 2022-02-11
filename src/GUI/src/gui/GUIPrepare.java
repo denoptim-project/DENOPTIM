@@ -32,8 +32,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.task.DenoptimGATask;
 import denoptim.task.FitnessRunnerTask;
 import denoptim.task.FragSpaceExplorerTask;
@@ -130,7 +131,7 @@ public class GUIPrepare extends GUICardPanel
 				File outFile = GUIFileOpener.pickFileForSaving(btnSaveParams);
 				printAllParamsToFile(outFile);
 				if (outFile!=null)
-				    DenoptimIO.addToRecentFiles(outFile, getFileFormat("PARAMS"));
+				    FileUtils.addToRecentFiles(outFile, getFileFormat("PARAMS"));
 			}
 		});
 		commandsPane.add(btnSaveParams);
@@ -462,7 +463,7 @@ public class GUIPrepare extends GUICardPanel
 		String baseName = getAchronimFromClass() + "_run";
 		File parent = new File(GUIPreferences.tmpSpace);
 		File wrkSpace = DenoptimIO.getAvailableFileName(parent, baseName);
-		DenoptimIO.createDirectory(wrkSpace.getAbsolutePath());
+		FileUtils.createDirectory(wrkSpace.getAbsolutePath());
 		return wrkSpace;
 	}
 //------------------------------------------------------------------------------

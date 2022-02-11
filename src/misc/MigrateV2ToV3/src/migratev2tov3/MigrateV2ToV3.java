@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
-import denoptim.io.UndetectedFileFormatException;
 
 public class MigrateV2ToV3
 {
@@ -45,7 +46,7 @@ public class MigrateV2ToV3
             FileFormat ff = null;
             try
             {
-                ff = DenoptimIO.detectFileFormat(inFile);
+                ff = FileUtils.detectFileFormat(inFile);
             } catch (UndetectedFileFormatException | IOException e)
             {
                 e.printStackTrace();
@@ -79,7 +80,7 @@ public class MigrateV2ToV3
                 case VRTXSDF:
                     try
                     {
-                        vertexes = DenoptimIO.readVertexes(inFile);
+                        vertexes = FileUtils.readVertexes(inFile);
                     } catch (IllegalArgumentException
                             | UndetectedFileFormatException | IOException e)
                     {
@@ -91,7 +92,7 @@ public class MigrateV2ToV3
                 case VRTXJSON:
                     try
                     {
-                        vertexes = DenoptimIO.readVertexes(inFile);
+                        vertexes = FileUtils.readVertexes(inFile);
                     } catch (IllegalArgumentException
                             | UndetectedFileFormatException | IOException e)
                     {

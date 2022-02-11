@@ -25,8 +25,9 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.TaskUtils;
 
@@ -93,7 +94,7 @@ public abstract class GUIInvokedMainTask extends Task
 	        			+ "Inspect the log before this line.");
 			}
             
-            DenoptimIO.addToRecentFiles(errFile, FileFormat.TXT);
+            FileUtils.addToRecentFiles(errFile, FileFormat.TXT);
             
             // NB: the static logger should have been set by the main we called
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");

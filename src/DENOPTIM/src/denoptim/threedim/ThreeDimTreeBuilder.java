@@ -369,8 +369,8 @@ public class ThreeDimTreeBuilder
                     cmol.addBond(bnd);
                 }
             }
-            DenoptimIO.writeMolecule(file, mol, false);
-            DenoptimIO.writeMolecule(file, cmol, true);
+            DenoptimIO.writeSDFFile(file, mol, false);
+            DenoptimIO.writeSDFFile(file, cmol, true);
             System.out.println("AP-per-Edge");
             for (DENOPTIMEdge e : apsPerEdge.keySet())
             {

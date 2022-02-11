@@ -35,6 +35,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMAttachmentPoint;
@@ -44,7 +45,6 @@ import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.io.UndetectedFileFormatException;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
@@ -1537,7 +1537,7 @@ public class FragmentSpace
                     {
                         if (has3Dgeometry)
                         {
-                            DenoptimIO.writeMolecule(destFileName,subIAC,true);
+                            DenoptimIO.writeSDFFile(destFileName,subIAC,true);
                         } else {
                             DenoptimIO.writeGraphToSDF(new File(destFileName), 
                                     g, true, false);

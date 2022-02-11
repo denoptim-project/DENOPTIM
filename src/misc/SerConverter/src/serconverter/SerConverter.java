@@ -67,7 +67,7 @@ public class SerConverter
 
 	        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
 	        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph,true);
-		    DenoptimIO.writeMolecule(SerConvParameters.outFile, mol, false);
+		    DenoptimIO.writeSDFFile(SerConvParameters.outFile, mol, false);
 		    break;
 	    }
 

@@ -139,7 +139,7 @@ public abstract class FitnessTask extends Task
         boolean status = false;
         if (FitnessParameters.useExternalFitness()) {
             // Write file with input data to fitness provider
-            DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
+            DenoptimIO.writeSDFFile(fitProvInputFile, fitProvMol, false);
 
             // NB: inside this call we change fitProvMol for a reordered copy: 
             //     reference will not work!

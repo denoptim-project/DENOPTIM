@@ -49,9 +49,10 @@ import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.task.StaticTaskManager;
 
 
@@ -288,7 +289,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 			public void actionPerformed(ActionEvent e) {
 				File file = GUIFileOpener.pickFileOrFolder(open);
 				try {
-					openFile(file, DenoptimIO.detectFileFormat(
+					openFile(file, FileUtils.detectFileFormat(
 							file));
 				} catch (Exception e1) {
 				    e1.printStackTrace();

@@ -32,7 +32,6 @@ import org.apache.commons.io.FileUtils;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Version;
 import denoptim.rings.RingClosureParameters;
@@ -452,7 +451,7 @@ public class RNDParameters
             SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
             String str = "RUN" + sdf.format(new Date());
             dataDir = curDir + fileSep + str;
-            success = DenoptimIO.createDirectory(dataDir);
+            success = denoptim.files.FileUtils.createDirectory(dataDir);
         }
     }
 
@@ -543,7 +542,7 @@ public class RNDParameters
 
         if (allGraphsFile.length() > 0)
         {
-            if (!DenoptimIO.checkExists(allGraphsFile))
+            if (!denoptim.files.FileUtils.checkExists(allGraphsFile))
             {
                 error = "Cannot find colleciton of graphs: " + allGraphsFile;
                 throw new DENOPTIMException(error);

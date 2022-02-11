@@ -30,11 +30,12 @@ import java.util.logging.Level;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.RingClosureParameters;
 
@@ -543,14 +544,14 @@ public class FSEParameters
             return;
         }
 
-	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
 	{
 	   msg = "Directory '" + workDir + "' not found. Please specify an "
 		 + "existing directory.";
 	   throw new DENOPTIMException(msg);
 	}
 
-	if (!dbRootDir.equals(workDir) && !DenoptimIO.checkExists(dbRootDir))
+	if (!dbRootDir.equals(workDir) && !FileUtils.checkExists(dbRootDir))
 	{
 	    msg = "Directory '" + dbRootDir + "' not found. "
 		  + "Please specify an existing directory where to put "
@@ -558,7 +559,7 @@ public class FSEParameters
 	   throw new DENOPTIMException(msg);
 	}
 
-	if (rootGraphsFile != null && !DenoptimIO.checkExists(rootGraphsFile))
+	if (rootGraphsFile != null && !FileUtils.checkExists(rootGraphsFile))
 	{
 	    msg = "File with root graphs not found. Check " + rootGraphsFile;
             throw new DENOPTIMException(msg);
@@ -606,7 +607,7 @@ public class FSEParameters
             throw new DENOPTIMException(msg);
         }
 
-	if (chkptFile != null && !DenoptimIO.checkExists(chkptFile))
+	if (chkptFile != null && !FileUtils.checkExists(chkptFile))
         {
             msg = "Checkpoint file " + chkptFile + " not found. ";
             throw new DENOPTIMException(msg);
@@ -648,9 +649,9 @@ public class FSEParameters
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             String str = "FSE" + sdf.format(new Date());
             workDir = curDir + fileSep + str;
-            success = DenoptimIO.createDirectory(workDir);
+            success = FileUtils.createDirectory(workDir);
         }
-        DenoptimIO.addToRecentFiles(workDir, FileFormat.FSE_RUN);
+        FileUtils.addToRecentFiles(workDir, FileFormat.FSE_RUN);
 		if (dbRootDir.equals(".") || dbRootDir.equals(""))
 		{
 		    dbRootDir = workDir;

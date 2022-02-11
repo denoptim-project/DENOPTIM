@@ -30,9 +30,8 @@ import org.apache.commons.io.FileUtils;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.SingletonFileAccess;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.io.DenoptimIO;
-import denoptim.io.SingletonFileAccess;
 
 
 /**
@@ -187,7 +186,7 @@ public class FSEUtils
                                                         throws DENOPTIMException
     {
         String outDir = getNameOfStorageDir(level);
-        if (!DenoptimIO.checkExists(outDir))
+        if (!denoptim.files.FileUtils.checkExists(outDir))
         {
             try
             {

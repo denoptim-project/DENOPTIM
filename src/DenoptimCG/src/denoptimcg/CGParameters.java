@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.integration.tinker.TinkerUtils;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.RingClosureParameters;
 
@@ -494,7 +494,7 @@ public class CGParameters
 
     private static void checkFileExists(String pathname)
     {
-	if (!DenoptimIO.checkExists(pathname))
+	if (!FileUtils.checkExists(pathname))
 	{
 	    System.out.println("ERROR! File '" + pathname + "' not found!");
 	    System.exit(-1);

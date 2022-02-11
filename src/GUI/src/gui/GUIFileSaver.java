@@ -25,9 +25,9 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-import denoptim.io.FileAndFormat;
-import denoptim.io.FileFormat;
-import denoptim.io.FileFormat.DataKind;
+import denoptim.files.FileAndFormat;
+import denoptim.files.FileFormat;
+import denoptim.files.FileFormat.DataKind;
 
 /**
  * GUI component to provide pathname where to save stuff.

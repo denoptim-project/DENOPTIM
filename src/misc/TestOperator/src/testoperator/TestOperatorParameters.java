@@ -23,8 +23,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -332,21 +332,21 @@ public class TestOperatorParameters
             return;
         }
 
-    	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+    	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
     	{
     	   msg = "Directory " + workDir + " not found. Please specify an "
     		 + "existing directory.";
     	   throw new DENOPTIMException(msg);
     	}
 
-        if (!DenoptimIO.checkExists(inpFileM))
+        if (!FileUtils.checkExists(inpFileM))
         {
             msg = "Input file '" + inpFileM + "' not found.";
             throw new DENOPTIMException(msg);
         }
 
         if (operatorToTest == Operator.XOVER
-                && !DenoptimIO.checkExists(inpFileF))
+                && !FileUtils.checkExists(inpFileF))
         {
             msg = "Input file '" + inpFileF + "' not found.";
             throw new DENOPTIMException(msg);

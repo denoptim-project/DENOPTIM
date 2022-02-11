@@ -25,8 +25,8 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.time.StopWatch;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.Candidate;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GenUtils;
 import denoptim.utils.RandomUtils;
@@ -141,7 +141,7 @@ public class DenoptimRND
         String genDir = sb.toString();
         sb.setLength(0);
         // create the directory for the current generation
-        DenoptimIO.createDirectory(genDir);
+        FileUtils.createDirectory(genDir);
 
         // create the population
 
@@ -173,7 +173,7 @@ public class DenoptimRND
             // create a directory for the current generation
             genDir = sb.toString();
             sb.setLength(0);
-            DenoptimIO.createDirectory(genDir);
+            FileUtils.createDirectory(genDir);
 
             // create a new generation
             // update the population, by replacing weakest members
@@ -222,7 +222,7 @@ public class DenoptimRND
         }
 
         genDir = RNDParameters.getDataDirectory() + fsep + "Final";
-        DenoptimIO.createDirectory(genDir);
+        FileUtils.createDirectory(genDir);
 
         RNDEAUtils.outputFinalResults(molPopulation, genDir);
         

@@ -45,6 +45,7 @@ import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 import denoptim.fitness.descriptors.TanimotoMolSimilarityBySubstructure;
 import denoptim.io.DenoptimIO;
@@ -770,7 +771,7 @@ public class FitnessParameters
         }
 
         if ((externalExe.length() != 0) 
-        	&& (!DenoptimIO.checkExists(externalExe)))
+        	&& (!FileUtils.checkExists(externalExe)))
         {
             msg = "Cannot find the fitness provider: " + externalExe;
             throw new DENOPTIMException(msg);

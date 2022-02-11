@@ -60,6 +60,9 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileAndFormat;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge.BondType;
@@ -68,8 +71,6 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileAndFormat;
-import denoptim.io.FileFormat;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
@@ -627,7 +628,7 @@ public class GUIVertexInspector extends GUICardPanel
 						verticesLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
-				DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
+				FileUtils.addToRecentFiles(outFile, fileAndFormat.format);
 			}
 		});
 		commandsPane.add(btnSaveVrtxs);

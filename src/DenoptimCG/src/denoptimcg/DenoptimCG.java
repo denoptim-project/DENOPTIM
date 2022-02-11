@@ -101,7 +101,7 @@ public class DenoptimCG
                 }
             }
             // write file
-            DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);
+            DenoptimIO.writeSDFFile(CGParameters.getOutputSDFFile(), nmols);
             
         } catch (TinkerException te)
         {

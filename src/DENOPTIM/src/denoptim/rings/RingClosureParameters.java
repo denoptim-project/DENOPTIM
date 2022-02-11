@@ -28,8 +28,8 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 
 
@@ -776,7 +776,7 @@ public class RingClosureParameters
             throw new DENOPTIMException(msg);
 	    }
 
-        if (!DenoptimIO.checkExists(rccIndex))
+        if (!FileUtils.checkExists(rccIndex))
         {
             msg = "Index of the RCC archive: " + rccIndex
                   + " not found: making a new index file.";
@@ -794,7 +794,7 @@ public class RingClosureParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (rccFolder!="" && !DenoptimIO.checkExists(rccFolder))
+        if (rccFolder!="" && !FileUtils.checkExists(rccFolder))
         {
             msg = "Root folder for serialized RingClosingConformation"
 		  + " not found. Creating new archive at " + rccFolder;

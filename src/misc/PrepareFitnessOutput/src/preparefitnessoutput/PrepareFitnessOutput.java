@@ -89,7 +89,7 @@ public class PrepareFitnessOutput
                 }
             }
             
-            DenoptimIO.writeMolecule(pfd.inpSDFFile, mol, false);
+            DenoptimIO.writeSDFFile(pfd.inpSDFFile, mol, false);
         }
         catch (DENOPTIMException ioe)
         {

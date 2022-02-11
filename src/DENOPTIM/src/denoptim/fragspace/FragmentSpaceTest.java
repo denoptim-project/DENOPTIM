@@ -49,6 +49,7 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
@@ -156,7 +157,7 @@ public class FragmentSpaceTest
 
         String rootName = tempDir.getAbsolutePath() + SEP;
 
-    	ArrayList<DENOPTIMFragment> fragLib = new ArrayList<DENOPTIMFragment>();
+    	ArrayList<DENOPTIMVertex> fragLib = new ArrayList<DENOPTIMVertex>();
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -213,9 +214,9 @@ public class FragmentSpaceTest
         fragLib.add(frg8);
         
         String fragLibFile = rootName + "frags.sdf";
-        DenoptimIO.writeFragmentSet(fragLibFile, fragLib);
+        DenoptimIO.writeVertexesToSDF(new File(fragLibFile), fragLib, false);
         
-    	ArrayList<DENOPTIMFragment> scaffLib = new ArrayList<DENOPTIMFragment>();
+    	ArrayList<DENOPTIMVertex> scaffLib = new ArrayList<DENOPTIMVertex>();
         DENOPTIMFragment scaf0 = new DENOPTIMFragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -242,9 +243,9 @@ public class FragmentSpaceTest
         scaffLib.add(scaf1);
         
         String scaffLibFile = rootName + "scaff.sdf";
-        DenoptimIO.writeFragmentSet(scaffLibFile, scaffLib);
+        DenoptimIO.writeVertexesToSDF(new File(scaffLibFile), scaffLib, false);
         
-        ArrayList<DENOPTIMFragment> cappLib = new ArrayList<DENOPTIMFragment>();
+        ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
         DENOPTIMFragment cap1 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         cap1.addAtom(a61);
@@ -260,7 +261,7 @@ public class FragmentSpaceTest
         cappLib.add(cap2);
 
         String capLibFile = rootName + "caps.sdf";
-        DenoptimIO.writeFragmentSet(capLibFile, cappLib);
+        DenoptimIO.writeVertexesToSDF(new File(capLibFile), cappLib, false);
         
     	HashMap<APClass,ArrayList<APClass>> cpMap = 
     	        new HashMap<APClass,ArrayList<APClass>>();
@@ -500,9 +501,9 @@ public class FragmentSpaceTest
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             //Cleanup tmp files
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedFragments());
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedScaffolds());
             
             assertEquals(1, fragLib.size());
@@ -541,9 +542,9 @@ public class FragmentSpaceTest
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             //Cleanup tmp files
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedFragments());
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedScaffolds());
 
             assertEquals(1, scaffLib.size());
@@ -587,9 +588,9 @@ public class FragmentSpaceTest
         }
 
         //Cleanup tmp files
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedFragments());
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedScaffolds());
         
         assertEquals(1, fragLib.size());
@@ -906,9 +907,9 @@ public class FragmentSpaceTest
         assertEquals(9,nP,"#P in new fragment");
         
         //Cleanup tmp files
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedFragments());
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedScaffolds());
     }
 

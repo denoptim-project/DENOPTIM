@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
@@ -323,7 +324,7 @@ public class ConformationalSearchPSSROT
         // Cleanup
         if (verbosity < 2)
         {
-            DenoptimIO.deleteFilesContaining(workDir,molName + "_cs" + idm);
+            FileUtils.deleteFilesContaining(workDir,molName + "_cs" + idm);
         }
 
 //Useful code only for debug

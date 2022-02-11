@@ -1,4 +1,4 @@
-package denoptim.io;
+package denoptim.files;
 
 import java.util.Arrays;
 import java.util.HashSet;

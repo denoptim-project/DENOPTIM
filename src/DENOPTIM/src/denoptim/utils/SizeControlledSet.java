@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
 
 /**
@@ -101,7 +102,7 @@ public class SizeControlledSet
                 {
                     return false;
                 }
-                wasNew = !DenoptimIO.isLineInTxtFile(entry, dataOnDisk, true);
+                wasNew = !FileUtils.isLineInTxtFile(entry, dataOnDisk, true);
                 if (wasNew)
                 {
                     entriesInFile++;
@@ -144,7 +145,7 @@ public class SizeControlledSet
             boolean foundInDisk = false;
             if (usingDisk && !foundInMemory)
             {
-                foundInDisk = DenoptimIO.isLineInTxtFile(entry, dataOnDisk, 
+                foundInDisk = FileUtils.isLineInTxtFile(entry, dataOnDisk, 
                         false);
             }
             return foundInMemory || foundInDisk;
