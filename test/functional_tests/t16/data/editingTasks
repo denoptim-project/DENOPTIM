@@ -16,32 +16,47 @@
         {
           "lstAPs": [
             {
-              "id": 132,
+              "id": 22,
               "atomPositionNumber": 0,
               "atomPositionNumberInMol": 0,
               "apClass": {
-                "rule": "ATplus",
-                "subClass": 0
+                "rule": "F",
+                "subClass": 0,
+                "bndTyp": "SINGLE"
               },
               "dirVec": {
-                "x": -0.0087,
-                "y": -0.007,
-                "z": -0.0079
+                "x": 0.0065,
+                "y": -0.0029,
+                "z": 0.0045
               }
             }
           ],
           "lstSymAPs": [],
+          "mol": {
+            "atoms": [
+              {
+                "elSymbol": "Br",
+                "p3d": {
+                  "x": 0.0042,
+                  "y": -0.003,
+                  "z": -0.0094
+                }
+              }
+            ],
+            "bonds": []
+          },
           "vertexId": 1,
           "buildingBlockId": 4,
           "buildingBlockType": "FRAGMENT",
-          "isRCV": true,
+          "isRCV": false,
           "allowedMutationTypes": [
             "DELETE",
             "EXTEND",
             "CHANGEBRANCH",
             "CHANGELINK",
             "ADDLINK",
-            "DELETELINK"
+            "DELETELINK",
+            "DELETECHAIN"
           ],
           "vertexType": "MolecularFragment"
         }
