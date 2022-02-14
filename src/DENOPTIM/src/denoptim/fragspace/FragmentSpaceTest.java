@@ -51,6 +51,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
@@ -329,32 +330,16 @@ public class FragmentSpaceTest
         assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	ArrayList<IdFragmentAndAP> l = FragmentSpace.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
-    	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	
-    	boolean found1 = false;
-    	boolean found2 = false;
-    	boolean found3 = false;
-    	boolean found4 = false;
+
+    	int i = -1;
     	for (IdFragmentAndAP id : l)
     	{
-    		if (id.sameFragAndAp(ref1))
-    			found1 = true;
-    		if (id.sameFragAndAp(ref2))
-    			found2 = true;
-    		if (id.sameFragAndAp(ref3))
-    			found3 = true;
-    		if (id.sameFragAndAp(ref4))
-    			found4 = true;
+    	    i++;
+    	    DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+    	            id.getVertexMolId(), id.getVertexMolType());
+    	    assertEquals(APC2, v.getAP(id.getApId()).getAPClass(),
+    	            "APClass of "+i);
     	}
-    	
-    	assertTrue(found1, "Missing first AP ID.");
-    	assertTrue(found2, "Missing second AP ID.");
-    	assertTrue(found3, "Missing third AP ID.");
-    	assertTrue(found4, "Missing fourth AP ID.");
     	
     	FragmentSpace.clearAll();
     }
@@ -370,32 +355,17 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
 
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-
-    	boolean found1 = false;
-    	boolean found2 = false;
-    	boolean found3 = false;
-    	boolean found4 = false;
-    	for (IdFragmentAndAP id : lst)
-    	{
-    		if (id.sameFragAndAp(ref1))
-    			found1 = true;
-    		if (id.sameFragAndAp(ref2))
-    			found2 = true;
-    		if (id.sameFragAndAp(ref3))
-    			found3 = true;
-    		if (id.sameFragAndAp(ref4))
-    			found4 = true;
-    	}
-    	
-    	assertTrue(found1, "Missing first AP ID.");
-    	assertTrue(found2, "Missing second AP ID.");
-    	assertTrue(found3, "Missing third AP ID.");
-    	assertTrue(found4, "Missing fourth AP ID.");
-    	
+    	int i = -1;
+        for (IdFragmentAndAP id : lst)
+        {
+            i++;
+            DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+                    id.getVertexMolId(), id.getVertexMolType());
+            DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
+            assertTrue(APC1.isCPMapCompatibleWith(ap.getAPClass()), 
+                    "Incompatible choice at "+i);
+        }
+        
     	FragmentSpace.clearAll();
     }
     
@@ -410,6 +380,13 @@ public class FragmentSpaceTest
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
+    	DENOPTIMVertex src1V = DENOPTIMVertex.newVertexFromLibrary(-1,
+    	        src1.getVertexMolId(), src1.getVertexMolType());
+    	APClass src1APC = src1V.getAP(src1.getApId()).getAPClass();
+        DENOPTIMVertex src2V = DENOPTIMVertex.newVertexFromLibrary(-1,
+                src2.getVertexMolId(), src2.getVertexMolType());
+        APClass src2APC = src2V.getAP(src2.getApId()).getAPClass();
+    	
     	
     	/*
     	System.out.println("SRC1 "+FragmentSpace.getAPClassForFragment(src1)+" => "
@@ -427,31 +404,17 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	
-    	boolean found1 = false;
-    	boolean found2 = false;
-    	boolean found3 = false;
-    	boolean found4 = false;
-    	for (IdFragmentAndAP id : lst)
-    	{            
-    		if (id.sameFragAndAp(ref1))
-    			found1 = true;
-    		if (id.sameFragAndAp(ref2))
-    			found2 = true;
-    		if (id.sameFragAndAp(ref3))
-    			found3 = true;
-    		if (id.sameFragAndAp(ref4))
-    			found4 = true;
-    	}
-    	
-    	assertTrue(found1, "Missing first AP ID.");
-    	assertTrue(found2, "Missing second AP ID.");
-    	assertTrue(found3, "Missing third AP ID.");
-    	assertTrue(found4, "Missing fourth AP ID.");
+        int i = -1;
+        for (IdFragmentAndAP id : lst)
+        {
+            i++;
+            DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+                    id.getVertexMolId(), id.getVertexMolType());
+            DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
+            assertTrue(src1APC.isCPMapCompatibleWith(ap.getAPClass())
+                    || src2APC.isCPMapCompatibleWith(ap.getAPClass()), 
+                    "Incompatible choice at "+i);
+        }
     	
     	FragmentSpace.clearAll();
     }

@@ -6,6 +6,10 @@ import java.util.Set;
 
 import denoptim.constants.DENOPTIMConstants;
 
+/**
+ * File formats identified by DENOOTIM.
+ *
+ */
 public enum FileFormat {
     
     CANDIDATESDF,

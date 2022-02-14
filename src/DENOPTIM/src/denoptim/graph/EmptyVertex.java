@@ -422,35 +422,15 @@ public class EmptyVertex extends DENOPTIMVertex
     /**
      * Although empty vertex do not contain atoms, by definitions, we allow
      * the generation of an SDF representation that uses an empty atom list.
-     * @return an empty atom container with attachment points rooted on 
-     * non-existing atoms, i.e., atom source index is negative.
+     * @return an empty atom container that contains the definition of the
+     * vertex in the JSON-formatted property.
      */
     
     @Override
     public IAtomContainer getIAtomContainer()
     {
         IAtomContainer iac = new AtomContainer();
-        
-        // We need to get the APs sorted by pseudo-atom source ID. This
-        // to write the CLASS and ATTACHMENT_PPOINT fields of the SDF.
-        
-        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
-                new LinkedHashMap<>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
-        {
-            int atmSrcId = ap.getAtomPositionNumber();
-            if (apsPerAtom.containsKey(atmSrcId))
-            {
-                apsPerAtom.get(atmSrcId).add(ap);
-            } else {
-                List<DENOPTIMAttachmentPoint> list = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
-                list.add(ap);
-                apsPerAtom.put(atmSrcId, list);
-            }
-        }
-        iac.setProperty(DENOPTIMConstants.APSTAG, 
-                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
+        iac.setProperty(DENOPTIMConstants.APSTAG, "");
         iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
         return iac;

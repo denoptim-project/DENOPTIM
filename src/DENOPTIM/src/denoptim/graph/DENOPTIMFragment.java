@@ -590,7 +590,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			}
 	    }
 
-	    projectListAPToAPProperties();
+	    projectListAPToAtomProperties();
 
         updateSymmetryRelations();
     }
@@ -604,19 +604,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * from file, which takes priority over recalculating it.
      * @throws DENOPTIMException
      */
-    public void projectListAPToAPProperties() throws DENOPTIMException
+    public void projectListAPToAtomProperties()
     {
         // Write attachment points in the atoms
         for (int i = 0; i < lstAPs.size(); i++)
         {
             DENOPTIMAttachmentPoint ap = lstAPs.get(i);
             int atmID = ap.getAtomPositionNumber();
-            
-            if (atmID > mol.getAtomCount())
-            {
-                throw new DENOPTIMException("Fragment property defines AP "
-                        + "with out-of-borders atom index (" + atmID + ").");
-            }
             
             IAtom atm = mol.getAtom(atmID);
             if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
@@ -688,15 +682,26 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public DENOPTIMFragment clone()
     {   
     	DENOPTIMFragment clone = new DENOPTIMFragment();
-		try {
-		    this.projectAPsToProperties();
-		    //deep copy of mol is created in the DENOPTIMFragment constructor
-			clone = new DENOPTIMFragment(getVertexId(),mol,getBuildingBlockType());
-		} catch (Exception e) {
-		    e.printStackTrace();
-			String msg = "Failed to clone DENOPTIMFragment! " +clone;
-			System.err.println(msg);
-		}
+    	clone.setVertexId(this.getVertexId());
+    	try
+        {
+            clone.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
+        } catch (DENOPTIMException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    	
+        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        {
+            DENOPTIMAttachmentPoint cAp = new DENOPTIMAttachmentPoint(clone,
+                    ap.getAtomPositionNumber(),
+                    ap.getDirectionVector(),
+                    ap.getAPClass());
+            clone.lstAPs.add(cAp);
+        }
+        clone.projectListAPToAtomProperties();
+        
 		clone.setBuildingBlockId(this.getBuildingBlockId());
 		clone.setBuildingBlockType(this.getBuildingBlockType());
 
@@ -724,6 +729,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, getVertexId());
             atm.setProperty(DENOPTIMConstants.ATMPROPORIGINALATMID, atmPos);
         }
+        mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         return mol;
     }
     
@@ -996,89 +1002,12 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         DENOPTIMFragment returnedFrag = gson.fromJson(json, 
                 DENOPTIMFragment.class);
         
-        //TODO-gg this whole IF block will disappear once finished
-        boolean oldApproach = false;
-        if (returnedFrag.mol == null || returnedFrag.mol.getAtomCount()==0)
-        {
-            // In this case we have read a fragment from before we started
-            // writing the mol to json.
-            DENOPTIMFragment fragNoMol = gson.fromJson(json, DENOPTIMFragment.class);
-            if (FragmentSpace.isDefined())
-            {
-                // If a fragment space exists, we rebuild the fragment from the
-                // library, and attach to it the serialized data
-                DENOPTIMFragment fragWithMol;
-                try
-                {
-                    DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(
-                                fragNoMol.getBuildingBlockType(),
-                                fragNoMol.getBuildingBlockId());
-                    if (v instanceof DENOPTIMFragment)
-                    {
-                        fragWithMol = (DENOPTIMFragment) v;
-                    } else {
-                        throw new JsonParseException("Building block "
-                                + fragNoMol.getBuildingBlockType() + " "
-                                + fragNoMol.getBuildingBlockId()
-                                + " is not a " + DENOPTIMFragment.class.getName()
-                                + "as claimed by JSON representation.");
-                    }
-                } catch (DENOPTIMException e)
-                {
-                    throw new JsonParseException("Could not get "
-                            + fragNoMol.getBuildingBlockType() + " "
-                            + fragNoMol.getBuildingBlockId()
-                            + " from "
-                            + "library. ",e);
-                }
-                ArrayList<SymmetricSet> cLstSymAPs =
-                        new ArrayList<SymmetricSet>();
-                for (SymmetricSet ss : fragNoMol.getSymmetricAPSets())
-                {
-                    cLstSymAPs.add(ss.clone());
-                }
-
-                fragWithMol.setMutationTypes(fragNoMol.getUnfilteredMutationTypes());
-                fragWithMol.setSymmetricAPSets(cLstSymAPs);
-                fragWithMol.setAsRCV(fragNoMol.isRCV());
-                fragWithMol.setVertexId(fragNoMol.getVertexId());
-                for (int iap = 0; iap<fragNoMol.getNumberOfAPs(); iap++)
-                {
-                    DENOPTIMAttachmentPoint oriAP = fragNoMol.getAP(iap);
-                    DENOPTIMAttachmentPoint newAP = fragWithMol.getAP(iap);
-                    newAP.setID(oriAP.getID());
-                }
-                returnedFrag = fragWithMol;
-            } else {
-                System.err.println("WARNING: undefined fragment space. "
-                        + "Templates will contain fragments with no "
-                        + "molecular representation. To avoid this, "
-                        + "first "
-                        + "define the fragment space, and "
-                        + "then work with "
-                        + "templates.");
-                returnedFrag = fragNoMol;
-            }
-            oldApproach = true;
-        }
-        
         for (DENOPTIMAttachmentPoint ap : returnedFrag.getAttachmentPoints())
         {
             ap.setOwner(returnedFrag);
         }
         
-        if (!oldApproach)
-        {
-            //TODO: one day this will disappear because of better handling of APs
-            try
-            {
-                returnedFrag.projectListAPToAPProperties();
-            } catch (DENOPTIMException e)
-            {
-                // This should never happen.
-                e.printStackTrace();
-            }
-        }
+        returnedFrag.projectListAPToAtomProperties();
 
         return returnedFrag;
     }

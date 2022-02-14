@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -56,19 +54,23 @@ import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMFragmentTest;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplateTest;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
 
 /**
- * Unit test for input/output
+ * Unit test for input/output.
  * 
  * @author Marco Foscato
  */
 
-public class DenoptimIOTest {
+public class DenoptimIOTest 
+{
 
     private static final BondType BT = BondType.SINGLE;
 
@@ -82,7 +84,6 @@ public class DenoptimIOTest {
     @Test
     public void testIOEmptyVertex() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
-        String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
         
         EmptyVertex v = new EmptyVertex();
         Point3d xyz = new Point3d(1.1,-2.2,3.3);
@@ -91,13 +92,84 @@ public class DenoptimIOTest {
         v.addAP(1, xyz, APClass.make("myClass:2"));
         v.addAP(2, xyz, APClass.make("myClass:3"));
         
-        DenoptimIO.writeVertexToSDF(pathName, v);
-        
+        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        initVrtxs.add(v);
+
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
         ArrayList<DENOPTIMVertex> readInVrtxs = 
-                FileUtils.readVertexes(new File(pathName));
-        
+                DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+        tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.json");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXJSON, 
+                initVrtxs);
+        readInVrtxs = DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIOMolFragment() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        
+        DENOPTIMFragment v = DENOPTIMFragmentTest.makeFragment();
+        
+        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        initVrtxs.add(v);
+
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
+        ArrayList<DENOPTIMVertex> readInVrtxs = 
+                DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+        tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.json");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXJSON, 
+                initVrtxs);
+        readInVrtxs = DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIOTemplate() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        
+        DENOPTIMTemplate v = DENOPTIMTemplateTest.getTestAmideTemplate();
+        
+        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        initVrtxs.add(v);
+
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
+        ArrayList<DENOPTIMVertex> readInVrtxs = 
+                DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+        tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.json");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXJSON, 
+                initVrtxs);
+        readInVrtxs = DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        sb = new StringBuilder();
         assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
                 + sb.toString());
     }

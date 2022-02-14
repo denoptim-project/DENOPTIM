@@ -30,16 +30,14 @@ import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.DENOPTIMLogger;
 
 public class FileUtils
 {
+
+//------------------------------------------------------------------------------
 
     /**
      * Appends an entry to the list of recent files.
@@ -50,6 +48,8 @@ public class FileUtils
     {
         FileUtils.addToRecentFiles(new File(fileName), ff);
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Appends an entry to the list of recent files. If the  current list is 
@@ -87,6 +87,8 @@ public class FileUtils
                     + "write list of recent files.", e);
         }
     }
+    
+//------------------------------------------------------------------------------
 
     /**
      * Search in a file for a line matching the given string query. If the query
@@ -151,7 +153,9 @@ public class FileUtils
         }
         return found;
     }
-
+     
+//------------------------------------------------------------------------------
+    
     /**
      * Check whether we can write and read to a given pathname
      *
@@ -168,31 +172,8 @@ public class FileUtils
         }
         return res;
     }
-
-    /**
-     * Reads vertices from a file. This method does not import vertices into 
-     * the fragment space. Therefore, the imported vertices cannot be 
-     * interdependent (i.e., a template that is vertex N in the list of vertices
-     * we are importing here, cannot incorporate any vertex that is not already
-     * defined in the fragment space. Nevertheless, this method will
-     * interpret {@link DENOPTIMGraph}s with available attachment points
-     * as {@link DENOPTIMTemplate}s.
-     *  
-     * @param file the file we want to read.
-     * @throws IOException 
-     * @throws UndetectedFileFormatException 
-     * @throws DENOPTIMException 
-     * @throws IllegalArgumentException 
-     * @throws Exception
-     */
-    public static ArrayList<DENOPTIMVertex> readVertexes(File file) 
-            throws IllegalArgumentException, UndetectedFileFormatException, 
-            IOException, DENOPTIMException
-    {
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        DenoptimIO.appendVerticesFromFileToLibrary(file, BBType.UNDEFINED, lst, false);
-        return lst;
-    }
+  
+//------------------------------------------------------------------------------
 
     /**
      * Looks for a writable location where to put temporary files and returns
@@ -220,13 +201,18 @@ public class FileUtils
         return tmpFolder;
     }
 
+//------------------------------------------------------------------------------
+
     /**
+     * Creates a directory.
      * @param fileName
      * @return <code>true</code> if directory is successfully created
      */
     public static boolean createDirectory(String fileName) {
         return (new File(fileName)).mkdir();
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * @param fileName
@@ -238,6 +224,8 @@ public class FileUtils
         }
         return false;
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Delete the file
@@ -272,6 +260,8 @@ public class FileUtils
         }
     }
 
+//------------------------------------------------------------------------------
+
     /**
      * Delete all files with pathname containing a given string
      *
@@ -292,6 +282,8 @@ public class FileUtils
             }
         }
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Count the number of lines in the file
@@ -327,6 +319,8 @@ public class FileUtils
             }
         }
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Creates a zip file
@@ -372,6 +366,8 @@ public class FileUtils
         }
         zos.close();
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Inspects a file/folder and tries to detect if the it is one of
@@ -459,6 +455,14 @@ public class FileUtils
     	return ff;
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Detect the content of a json file.
+     * @param fileName file to analyse.
+     * @return the format of that file or null.
+     * @throws IOException
+     */
     public static FileFormat detectKindOfJSONFile(String fileName) 
             throws IOException
     {
@@ -514,6 +518,8 @@ public class FileUtils
         return ff;
     }
 
+//------------------------------------------------------------------------------
+
     /**
      * Looks into a text file and tries to understand if the file is a 
      * collection of parameters for any specific DENOPTIM module.
@@ -530,6 +536,8 @@ public class FileUtils
                 FileFormat.CANDIDATESDF};
         return FileUtils.detectKindFile(fileName, ffs);
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Looks into a text file and tries to understand is the file is a 
@@ -549,6 +557,8 @@ public class FileUtils
     	        FileFormat.COMP_MAP};
     	return FileUtils.detectKindFile(fileName, ffs);
     }
+
+//------------------------------------------------------------------------------
 
     /**
      * Looks into a text file and tries to understand what format it is among 
@@ -656,10 +666,24 @@ public class FileUtils
     	return ff;
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Define a filename that can be used, i.e., is still available, because no
+     * other file with the same pathname exists. This method returns a string
+     * like <code>File_3</code> when files <code>File</code>, 
+     * <code>File_1</code>, and
+     *  <code>File_2</code> exist already.
+     * @param parent the folder where the file is meant to be.
+     * @param baseName the prefix of the filename. This string will be postponed
+     * by an integer number to identify an available filename.
+     * @return the available filename.
+     * @throws DENOPTIMException
+     */
     public static File getAvailableFileName(File parent, String baseName)
     		throws DENOPTIMException
     {
-    	File newFolder = null;
+    	File newName = null;
     	if (!parent.exists())
     	{
     		if (!createDirectory(parent.getAbsolutePath()))
@@ -674,15 +698,17 @@ public class FileUtils
     	while (goon)
     	{
     		i++;
-    		int iFolder = i + cands.length;
-    		newFolder = new File(parent + DenoptimIO.FS + baseName + "_" + iFolder);
-    		if (!newFolder.exists())
+    		int idx = i + cands.length;
+    		newName = new File(parent + DenoptimIO.FS + baseName + "_" + idx);
+    		if (!newName.exists())
     		{
     			goon = false;
     			break;
     		}
     	}
-    	return newFolder;
+    	return newName;
     }
+
+//------------------------------------------------------------------------------
 
 }

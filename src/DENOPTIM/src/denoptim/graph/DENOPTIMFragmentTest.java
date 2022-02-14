@@ -201,6 +201,7 @@ public class DENOPTIMFragmentTest
         v.setSymmetricAPSets(ssaps);
         v.setVertexId(18);
         v.setAsRCV(true);
+        //NB thy bond type is check by other methods: do not change it.
         v.setBuildingBlockType(DENOPTIMVertex.BBType.SCAFFOLD);
         
         return v;

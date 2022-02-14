@@ -289,18 +289,18 @@ public class FragmentSpace
             DenoptimIO.readRCCompatibilityMatrix(rcpmFile, rcCpMap);
             setRCCompatibilityMatrix(rcCpMap);
         }
-
-        isValid = true;
-
-        // We load first the capping groups because there should not be any
-        // template in there.
+        
         if (capFile.length() > 0)
         {
             cappingLib = new ArrayList<DENOPTIMVertex>();
             try
             {
-                DenoptimIO.appendVerticesFromFileToLibrary(new File(capFile),
-                        BBType.CAP, cappingLib, true);
+                cappingLib = DenoptimIO.readVertexes(new File(capFile),
+                        BBType.CAP);
+                for (int i=0; i<cappingLib.size(); i++)
+                {
+                    cappingLib.get(i).setBuildingBlockId(i);
+                }
             } catch (IllegalArgumentException | UndetectedFileFormatException
                     | IOException | DENOPTIMException e)
             {
@@ -312,8 +312,12 @@ public class FragmentSpace
         fragmentLib = new ArrayList<DENOPTIMVertex>();
         try
         {
-            DenoptimIO.appendVerticesFromFileToLibrary(new File(fragFile),
-                    BBType.FRAGMENT, fragmentLib, true);
+            fragmentLib = DenoptimIO.readVertexes(new File(fragFile),
+                    BBType.FRAGMENT);
+            for (int i=0; i<fragmentLib.size(); i++)
+            {
+                fragmentLib.get(i).setBuildingBlockId(i);
+            }
         } catch (IllegalArgumentException | UndetectedFileFormatException
                 | IOException | DENOPTIMException e)
         {
@@ -324,8 +328,12 @@ public class FragmentSpace
         scaffoldLib = new ArrayList<DENOPTIMVertex>();
         try
         {
-            DenoptimIO.appendVerticesFromFileToLibrary(new File(scaffFile),
-                    BBType.SCAFFOLD, scaffoldLib, true);
+            scaffoldLib = DenoptimIO.readVertexes(new File(scaffFile),
+                    BBType.SCAFFOLD);
+            for (int i=0; i<scaffoldLib.size(); i++)
+            {
+                scaffoldLib.get(i).setBuildingBlockId(i);
+            }
         } catch (IllegalArgumentException | UndetectedFileFormatException
                 | IOException | DENOPTIMException e)
         {
@@ -333,6 +341,8 @@ public class FragmentSpace
                     + "from file '" + fragFile + "'.", e);
         }
 
+        isValid = true;
+        
         FragmentSpaceUtils.groupAndClassifyFragments(useAPclassBasedApproach());
     }
 
@@ -1278,42 +1288,6 @@ public class FragmentSpace
         symmConstraints = null;
         isValid = false;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Takes a list of atom containers and converts it into a list of vertices
-     * that are added to a given library. 
-     * @param list of atom containers to import.
-     * @param bbt the type of building block the vertices should be set to.
-     * @param library where to import the vertices to.
-     */
-    
-    public static void appendIACsAsVerticesToLibrary(
-            ArrayList<IAtomContainer>list, DENOPTIMVertex.BBType bbt,
-            ArrayList<DENOPTIMVertex> library)
-    {
-        for(IAtomContainer iac : list)
-        {
-            DENOPTIMVertex v = null;
-            try
-            {
-                v = DENOPTIMVertex.convertIACToVertex(iac,bbt);
-            } catch (Throwable e)
-            {
-                e.printStackTrace();
-                System.err.println("ERROR! Could not import "+bbt+". Failed "
-                        + "conversion of IAtomContainer to "+bbt+".");
-                System.exit(-1);;
-            }
-            appendVertexToLibrary(v,bbt,library);
-        }
-        // NB: do not try to add all vertices in one. If there are templates
-        // that are built using vertices that are imported in the same run of
-        // this method, then the building blocks must be added to the library
-        // before the template is added. The latter will, in fact, require
-        // to find the building blocks in the library.
-    }
     
 //------------------------------------------------------------------------------
 
@@ -1330,6 +1304,8 @@ public class FragmentSpace
      * @param bbt the type of building block the vertices should be set to.
      * @param library where to import the vertices to.
      */
+    
+    //TODO-GG check these methods wrt V3
     
     public static void appendVerticesToLibrary(ArrayList<DENOPTIMVertex> list, 
             DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)

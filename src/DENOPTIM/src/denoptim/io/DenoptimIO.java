@@ -112,6 +112,7 @@ import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.threedim.ThreeDimTreeBuilder;
@@ -1553,7 +1554,8 @@ public class DenoptimIO
                 
             case VRTXSDF:
                 ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
-                ArrayList<DENOPTIMVertex> vertexes = FileUtils.readVertexes(inFile);
+                ArrayList<DENOPTIMVertex> vertexes = 
+                        readVertexes(inFile, BBType.UNDEFINED);
                 for (DENOPTIMVertex v : vertexes)
                 {
                     if (v instanceof DENOPTIMTemplate)
@@ -2091,12 +2093,15 @@ public class DenoptimIO
      * @throws IllegalArgumentException 
      * @throws Exception
      */
+    
+    //TODO-gg remove and keep only the part about adding builging block id
+    
     public static void appendVerticesFromFileToLibrary(File file,
             DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
             boolean setBBId) throws UndetectedFileFormatException, IOException,
     IllegalArgumentException, DENOPTIMException
     {
-        // NB: we do NOT read in all vertexes, first, and then add them to the
+        // NB: we do NOT read in all vertexes first, and then add them to the
         // library because that is inconsistent with having vertexes that depend
         // on previously defined vertexes.
         // For instance, if vertex N is a template that contains vertex N-1, the
@@ -2246,6 +2251,130 @@ public class DenoptimIO
             map = new HashMap<File, FileFormat>();
         }
         return map;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads vertices from a file. This method does not import vertices into 
+     * the fragment space. Therefore, the imported vertices cannot be 
+     * interdependent (i.e., a template that is vertex N in the list of vertices
+     * we are importing here, cannot incorporate any vertex that is not already
+     * defined in the fragment space. Nevertheless, this method will
+     * interpret {@link DENOPTIMGraph}s with available attachment points
+     * as {@link DENOPTIMTemplate}s.
+     *  
+     * @param file the file we want to read.
+     * @throws IOException 
+     * @throws UndetectedFileFormatException 
+     * @throws DENOPTIMException 
+     * @throws IllegalArgumentException 
+     * @throws Exception
+     */
+    
+    //TODO-GG remove this method and, where suitable, use the newReadVertexes
+    public static ArrayList<DENOPTIMVertex> oldreadVertexes(File file) 
+            throws IllegalArgumentException, UndetectedFileFormatException, 
+            IOException, DENOPTIMException
+    {
+        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        appendVerticesFromFileToLibrary(file, BBType.UNDEFINED, lst, false);
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads {@link DENOPTIMVertex}es from any file that can contain such items.
+     *  
+     * @param file the file we want to read.
+     * @param bbt the type of building blocks assigned to each new vertex, if
+     * not already specified by the content of the file, i.e., this method does
+     * not overwrite the {@link DENOPTIMVertex.BBType} defined in the file.
+     * @throws IOException 
+     * @throws UndetectedFileFormatException 
+     * @throws DENOPTIMException 
+     * @throws IllegalArgumentException 
+     * @throws Exception
+     */
+    public static ArrayList<DENOPTIMVertex> readVertexes(File file,
+            DENOPTIMVertex.BBType bbt) throws UndetectedFileFormatException, 
+    IOException, IllegalArgumentException, DENOPTIMException
+    {
+        ArrayList<DENOPTIMVertex> vertexes = new ArrayList<DENOPTIMVertex>();
+        FileFormat ff = FileUtils.detectFileFormat(file);
+        switch (ff)
+        {
+            case VRTXSDF:
+                vertexes = readDENOPTIMVertexesFromSDFile(
+                        file.getAbsolutePath(),bbt);
+                break;
+                
+            case VRTXJSON:
+                vertexes = readDENOPTIMVertexesFromJSONFile(
+                        file.getAbsolutePath());
+                break;
+                    
+            case GRAPHSDF:
+                ArrayList<DENOPTIMGraph> lstGraphs = 
+                    readDENOPTIMGraphsFromSDFile(file.getAbsolutePath(),true);
+                for (DENOPTIMGraph g : lstGraphs)
+                {
+                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                    t.setInnerGraph(g);
+                    vertexes.add(t);
+                }
+                break;
+                    
+            case GRAPHJSON:
+                ArrayList<DENOPTIMGraph> lstGraphs2 = 
+                readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath(), true);
+                for (DENOPTIMGraph g : lstGraphs2)
+                {
+                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                    t.setInnerGraph(g);
+                    vertexes.add(t);
+                }
+                break;
+                
+            default:
+                throw new DENOPTIMException("Format '" + ff 
+                        + "' could not be used to "
+                        + "read in vertices from file '" + file + "'.");
+        }
+        return vertexes;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of  {@link DENOPTIMVertex}es from a SDF file.
+     *
+     * @param fileName the pathname of the file to read.
+     * @return the list of vertexes.
+     * @throws DENOPTIMException
+     */
+    public static ArrayList<DENOPTIMVertex> readDENOPTIMVertexesFromSDFile(
+            String fileName, DENOPTIMVertex.BBType bbt) throws DENOPTIMException 
+    {
+        ArrayList<DENOPTIMVertex> vertexes = new ArrayList<DENOPTIMVertex>();
+        int i=0;
+        Gson reader = DENOPTIMgson.getReader();
+        for (IAtomContainer mol : readSDFFile(fileName)) 
+        {
+            i++;
+            DENOPTIMVertex v = null;
+            try
+            {
+                v = DENOPTIMVertex.parseVertexFromSDFFormat(mol, reader, bbt);
+            } catch (DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Unable to read vertex " + i 
+                        + " in file " + fileName,e);
+            }
+            vertexes.add(v);
+        }
+        return vertexes;
     }
 
 //------------------------------------------------------------------------------
