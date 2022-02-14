@@ -440,6 +440,11 @@ public class FileUtils
                 ff = FileUtils.detectKindOfParameterFile(inFile.getAbsolutePath());
                 break;
     		
+    		case "TXT":
+    		    //TODO-gg make specific
+                ff = FileFormat.GRAPHTXT;
+                break;
+                
     		case "":
                 //Parameters for any DENOPTIM module
                 ff = FileUtils.detectKindOfParameterFile(inFile.getAbsolutePath());

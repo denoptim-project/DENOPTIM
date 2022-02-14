@@ -80,8 +80,7 @@ public class UndirectedEdgeRelation
     
     public UndirectedEdgeRelation(DENOPTIMAttachmentPoint apA, 
             DENOPTIMAttachmentPoint apB) {
-        this(apA, apB, FragmentSpace.getBondOrderForAPClass(
-                  apA.getAPClass()));
+        this(apA, apB, apA.getAPClass().getBondType());
     }
     
 //------------------------------------------------------------------------------

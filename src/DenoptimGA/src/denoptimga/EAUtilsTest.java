@@ -43,14 +43,9 @@ public class EAUtilsTest
     
     private void prepareFragmentSpace() throws DENOPTIMException
     {
-        APCA = APClass.make(a, 0);
-        APCB = APClass.make(b, 1);
-        APCC = APClass.make(c, 2);
-        
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(a,BondType.SINGLE);
-        boMap.put(b,BondType.SINGLE);
-        boMap.put(c,BondType.SINGLE);
+        APCA = APClass.make(a, 0,BondType.SINGLE);
+        APCB = APClass.make(b, 1,BondType.SINGLE);
+        APCC = APClass.make(c, 2,BondType.SINGLE);
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
@@ -81,7 +76,6 @@ public class EAUtilsTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);

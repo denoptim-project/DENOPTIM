@@ -71,8 +71,6 @@ public class DENOPTIMTemplateTest
     
     @BeforeEach
     public void setUp() {
-        HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
-        FragmentSpace.setBondOrderMap(map);
         FragmentSpace.setFragmentLibrary(new ArrayList<>());
         FragmentSpace.setCompatibilityMatrix(new HashMap<>());
     }
@@ -234,10 +232,6 @@ public class DENOPTIMTemplateTest
         for (int i = 0; i < 2; i++) {
 
             APClass apClass = APClass.make("c", 0);
-
-            FragmentSpace.getBondOrderMap().put(apClass.getRule(),
-                    DENOPTIMEdge.BondType.SINGLE);
-
             v.addAP(0, apClass,apCoords[i]);
         }
         return v;
@@ -285,10 +279,6 @@ public class DENOPTIMTemplateTest
                 APClass.make("NAmide", 0),
                 APClass.make("NAmide", 0)};
         for (int i = 0; i < 3; i++) {
-
-            FragmentSpace.getBondOrderMap().put(apClass[i].getRule(),
-                    DENOPTIMEdge.BondType.SINGLE);
-
             v.addAP(srcAtm[i], apClass[i],apCoords[i]);
         }
         return v;
@@ -317,8 +307,6 @@ public class DENOPTIMTemplateTest
                 BBType.FRAGMENT);
         double precision = 10*10*10*10;
         APClass apClass = APClass.make("o", 0);
-        FragmentSpace.getBondOrderMap().put(apClass.getRule(),
-                DENOPTIMEdge.BondType.SINGLE);
         v.addAP(
                 0,
                 apClass,
@@ -360,7 +348,6 @@ public class DENOPTIMTemplateTest
         DENOPTIMTemplate template = 
                 new DENOPTIMTemplate(BBType.NONE);
         int requiredAPCount = 2;
-        int atmPos = 0;
         EmptyVertex v1 = new EmptyVertex();
         EmptyVertex v2 = new EmptyVertex();
         int v1APCount = 3;
@@ -369,10 +356,10 @@ public class DENOPTIMTemplateTest
             template.addRequiredAP(null, null);
         }
         for (int i = 0; i < v1APCount; i++) {
-            v1.addAP(atmPos);
+            v1.addAP();
         }
         for (int i = 0; i < v2APCount; i++) {
-            v2.addAP(atmPos);
+            v2.addAP();
         }
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v1);

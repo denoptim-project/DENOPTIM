@@ -59,27 +59,20 @@ public class ThreeDimTreeBuilderTest
     @Test
     public void testConversionTo3dTree() throws Exception
     {
-        APClass a0 = APClass.make("a:0");
-        APClass b0 = APClass.make("b:0");
-        APClass h0 = APClass.make("h:0");
+        APClass a0 = APClass.make("a",0,BondType.SINGLE);
+        APClass b0 = APClass.make("b",0,BondType.SINGLE);
+        APClass h0 = APClass.make("h",0,BondType.SINGLE);
         APClass ap0 = APClass.make("ATplus:0");
         APClass am0 = APClass.make("ATminus:0");
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
         cpMap.put(a0, new ArrayList<APClass>(Arrays.asList(a0, b0)));
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put("a", BondType.SINGLE);
-        boMap.put("b", BondType.SINGLE);
-        boMap.put("h", BondType.SINGLE);
-        boMap.put("ATplus", BondType.SINGLE);
-        boMap.put("ATminus", BondType.SINGLE);
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         capMap.put(a0, h0);
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         forbEnds.add(b0);
         
-        FragmentSpace.setBondOrderMap(boMap);
         
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	IAtom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
@@ -139,7 +132,7 @@ public class ThreeDimTreeBuilderTest
     	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
     	caps.add(cap);
     	
-    	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,boMap,capMap,
+    	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,capMap,
     			forbEnds,null);
     	
     	DENOPTIMGraph g1 = new DENOPTIMGraph();

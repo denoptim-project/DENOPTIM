@@ -43,22 +43,9 @@ public class DENOPTIMGraphTest {
     
     private final String APRULE = "MyRule";
     private final String APSUBRULE = "1";
-    private final String APCLASS = APRULE
-            + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
     
     private static APClass APCA, APCB, APCC, APCD;
     private static String a="A", b="B", c="C", d="D";
-    
-//------------------------------------------------------------------------------
-    
-    @BeforeEach
-    public void setBoMap()
-    {
-        //This is just to aboid printing the warning about unset bond order map
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(boMap);
-    }
     
 //------------------------------------------------------------------------------
     
@@ -109,7 +96,6 @@ public class DENOPTIMGraphTest {
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);

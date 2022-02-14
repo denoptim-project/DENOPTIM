@@ -81,7 +81,7 @@ public class FragmentSpaceTest
 
     private final Random rng = new Random();
     
-	private static final String APSUBRULE = "0";
+	private static final int APSUBRULE = 0;
 
     private static final String RULAPCS = "apc-S";
     private static final String RULAPC1 = "apc-1";
@@ -120,41 +120,19 @@ public class FragmentSpaceTest
 	    
         try
         {
-            APCS = APClass.make(RULAPCS
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC1 = APClass.make(RULAPC1
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC2 = APClass.make(RULAPC2
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC3 = APClass.make(RULAPC3
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC4 = APClass.make(RULAPC4
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC5 = APClass.make(RULAPC5
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC6 = APClass.make(RULAPC6
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APCC1 = APClass.make(RULAPCC1
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APCC2 = APClass.make(RULAPCC2
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APCS = APClass.make(RULAPCS, APSUBRULE, BondType.SINGLE);
+            APC1 = APClass.make(RULAPC1, APSUBRULE, BondType.SINGLE);
+            APC2 = APClass.make(RULAPC2, APSUBRULE, BondType.SINGLE);
+            APC3 = APClass.make(RULAPC3, APSUBRULE, BondType.SINGLE);
+            APC4 = APClass.make(RULAPC4, APSUBRULE, BondType.SINGLE);
+            APC5 = APClass.make(RULAPC5, APSUBRULE, BondType.SINGLE);
+            APC6 = APClass.make(RULAPC6, APSUBRULE, BondType.DOUBLE);
+            APCC1 = APClass.make(RULAPCC1, APSUBRULE, BondType.SINGLE);
+            APCC2 = APClass.make(RULAPCC2, APSUBRULE, BondType.SINGLE);
         } catch (DENOPTIMException e)
         {
             //This will not happen
         }
-	       
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(RULAPCS,BondType.SINGLE);
-        boMap.put(RULAPC1,BondType.SINGLE);
-        boMap.put(RULAPC2,BondType.SINGLE);
-        boMap.put(RULAPC3,BondType.SINGLE);
-        boMap.put(RULAPC4,BondType.SINGLE);
-        boMap.put(RULAPC5,BondType.SINGLE);
-        boMap.put(RULAPC6,BondType.DOUBLE);
-        boMap.put(RULAPCC1,BondType.SINGLE);
-        boMap.put(RULAPCC2,BondType.SINGLE);
-        
-        FragmentSpace.setBondOrderMap(boMap);
 
         String rootName = tempDir.getAbsolutePath() + SEP;
 
@@ -287,7 +265,7 @@ public class FragmentSpaceTest
     	ends.add(APC3);
     	
     	String cpmFile = rootName + "cpm.dat";
-    	DenoptimIO.writeCompatibilityMatrix(cpmFile, cpMap, boMap, capMap,ends);
+    	DenoptimIO.writeCompatibilityMatrix(cpmFile, cpMap, capMap,ends);
 
     	/*
     	//Just in case one day we want to have also an RC-CPMap
@@ -636,8 +614,6 @@ public class FragmentSpaceTest
         for (int i = 0; i < 4; i++) {
             v.addAP(0, APC1, getRandomVector());
         }
-        FragmentSpace.getBondOrderMap().put(APC1.getRule(),
-                DENOPTIMEdge.BondType.SINGLE);
         return v;
     }
 

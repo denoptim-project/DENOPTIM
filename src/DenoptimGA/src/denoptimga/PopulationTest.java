@@ -41,16 +41,10 @@ public class PopulationTest
     @BeforeEach
     private void prepare() throws DENOPTIMException
     {
-        APCA = APClass.make("A", 0);
-        APCB = APClass.make("B", 0);
-        APCC = APClass.make("C", 0);
-        APCD = APClass.make("D", 99);
-        
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put("A",BondType.SINGLE);
-        boMap.put("B",BondType.SINGLE);
-        boMap.put("C",BondType.SINGLE);
-        boMap.put("D",BondType.DOUBLE);
+        APCA = APClass.make("A", 0, BondType.SINGLE);
+        APCB = APClass.make("B", 0, BondType.SINGLE);
+        APCC = APClass.make("C", 0, BondType.SINGLE);
+        APCD = APClass.make("D", 99, BondType.DOUBLE);
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
@@ -85,7 +79,6 @@ public class PopulationTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);

@@ -74,7 +74,6 @@ public class DENOPTIMgson
       .setPrettyPrinting()
       .create();
     
-    //TODO-gg
     /*
      * WARNING:
      * If you have to add a Type adapter in the reader, you should consider
@@ -114,14 +113,6 @@ public class DENOPTIMgson
           //     class org.openscience.cdk.Atom declares multiple JSON
           //     fields named identifier
           
-
-          //TODO-gg remove once mol becomes jsonable
-          /*
-          if (field.getDeclaringClass() == DENOPTIMFragment.class
-                  && field.getName().equals("mol")) {
-              return true;
-          }
-          */
           if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
                   && field.getName().equals("owner")) {
               return true;
@@ -134,8 +125,6 @@ public class DENOPTIMgson
                   && field.getName().equals("owner")) {
               return true;
           }
-          
-          //TODO-gg remove once mol becomes jsonable
           if (field.getDeclaringClass() == DENOPTIMTemplate.class
                   && field.getName().equals("mol")) {
               return true;
@@ -160,13 +149,6 @@ public class DENOPTIMgson
               // cannot serialize chemical representations:
               //     class org.openscience.cdk.Atom declares multiple JSON
               //     fields named identifier
-            //TODO-gg remove once mol becomes jsonable
-              /*
-              if (field.getDeclaringClass() == DENOPTIMFragment.class
-                      && field.getName().equals("mol")) {
-                  return true;
-              }
-              */
               if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
                       && field.getName().equals("owner")) {
                   return true;
@@ -187,7 +169,6 @@ public class DENOPTIMgson
                       && field.getName().equals("innerGraph")) {
                   return true;
               }
-            //TODO-gg remove once mol becomes jsonable
               if (field.getDeclaringClass() == DENOPTIMTemplate.class
                       && field.getName().equals("mol")) {
                   return true;

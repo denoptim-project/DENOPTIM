@@ -111,12 +111,6 @@ public class FragmentSpace
     private static HashMap<APClass, ArrayList<APClass>> rcCompatMap;
 
     /**
-     * Data structure that stores the correspondence between bond order and
-     * attachment point class.
-     */
-    private static HashMap<String, BondType> bondOrderMap;
-
-    /**
      * Data structure that stores the AP-classes to be used to cap unused APS on
      * the growing molecule.
      */
@@ -206,9 +200,6 @@ public class FragmentSpace
      * @param cpMap    the APClass compatibility map. This data structure is a
      *                 map of the APClass-on-growing-graph (key) to list of
      *                 permitted APClasses on incoming fragment (values).
-     * @param boMap    the map of APClass into bond order. This data structure
-     *                 is a map of APClass (keys) to bond order as integer
-     *                 (values).
      * @param capMap   the capping rules. This data structure is a map of
      *                 APClass-to-cap (keys) to APClass-of-capping-group
      *                 (values).
@@ -221,7 +212,7 @@ public class FragmentSpace
             ArrayList<DENOPTIMVertex> fragLib,
             ArrayList<DENOPTIMVertex> cappLib,
             HashMap<APClass, ArrayList<APClass>> cpMap,
-            HashMap<String, BondType> boMap, HashMap<APClass, APClass> capMap,
+            HashMap<APClass, APClass> capMap,
             HashSet<APClass> forbEnds,
             HashMap<APClass, ArrayList<APClass>> rcCpMap)
             throws DENOPTIMException
@@ -231,7 +222,6 @@ public class FragmentSpace
         setCappingLibrary(cappLib);
         setCompatibilityMatrix(cpMap);
         apClassBasedApproch = true;
-        setBondOrderMap(boMap);
         setCappingMap(capMap);
         setForbiddenEndList(forbEnds);
         setRCCompatibilityMatrix(rcCpMap);
@@ -254,8 +244,8 @@ public class FragmentSpace
      *                   purpose.
      * @param capFile    pathname to the library of single-AP fragments used to
      *                   cap free attachment points (i.e., the capping groups).
-     * @param cpmFile    pathname to the compatibility matrix, bond type
-     *                   mapping, capping, and forbidden ends rules.
+     * @param cpmFile    pathname to the compatibility matrix, capping, and 
+     * forbidden ends rules.
      * @param rcpmFile   the APClass compatibility matrix for ring closures.
      * @param symCntrMap the map of symmetry constraints
      * @throws DENOPTIMException
@@ -266,17 +256,15 @@ public class FragmentSpace
     {
         HashMap<APClass, ArrayList<APClass>> cpMap = 
                 new HashMap<APClass, ArrayList<APClass>>();
-        HashMap<String, BondType> boMap = new HashMap<String, BondType>();
         HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         if (cpmFile.length() > 0)
         {
-            DenoptimIO.readCompatibilityMatrix(cpmFile, cpMap, boMap, capMap,
+            DenoptimIO.readCompatibilityMatrix(cpmFile, cpMap, capMap,
                     forbEnds);
             apClassBasedApproch = true;
         }
         setCompatibilityMatrix(cpMap);
-        setBondOrderMap(boMap);
         setCappingMap(capMap);
         setForbiddenEndList(forbEnds);
 
@@ -613,10 +601,9 @@ public class FragmentSpace
             throws DENOPTIMException
     {
         setCompatibilityMatrix(new HashMap<APClass, ArrayList<APClass>>());
-        setBondOrderMap(new HashMap<String, BondType>());
         setCappingMap(new HashMap<APClass, APClass>());
         setForbiddenEndList(new HashSet<APClass>());
-        DenoptimIO.readCompatibilityMatrix(inFile, compatMap, bondOrderMap,
+        DenoptimIO.readCompatibilityMatrix(inFile, compatMap,
                 cappingMap, forbiddenEndList);
     }
 
@@ -676,45 +663,6 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static HashMap<String, BondType> getBondOrderMap()
-    {
-        return bondOrderMap;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the bond order for the given APClass, if defined.
-     * 
-     * @param apclass the APclass to be converted into bond order.
-     * @return the bond order as an integer, or 1 if either the Fragment space
-     *         is not defined, that is, the bond order map is <code>null</code>,
-     *         or a fully defined map does not include any mapping for the given
-     *         APClass.
-     */
-    public static BondType getBondOrderForAPClass(APClass apc)
-    {
-        if (apc!= null && BondType.UNDEFINED != apc.getBondType())
-            return apc.getBondType();
-        
-        if (bondOrderMap == null || apc == null)
-        {
-            String msg = "Attempting to get bond order, but no "
-                    + "FragmentSpace defined (i.e., null BondOrderMap). "
-                    + "Assuming edge/APClass represents an " 
-                    + BondType.UNDEFINED
-                    + " bond.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-
-            return BondType.UNDEFINED;
-        } else
-        {
-            return bondOrderMap.getOrDefault(apc.getRule(), BondType.UNDEFINED);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
     public static HashMap<APClass, APClass> getCappingMap()
     {
         return cappingMap;
@@ -754,22 +702,6 @@ public class FragmentSpace
     public static Set<APClass> getAllAPClassesFromCPMap()
     {
         return FragmentSpace.getCompatibilityMatrix().keySet();
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the set of APClasses that are defined in the bond order map. Note
-     * the APClasses in the bond order map fo not include the subclass. For
-     * example, for AP with class <code>MyAPClass:0</code> the map stores only
-     * <code>MyAPClass</code>.
-     * 
-     * @return the lst of APClasses
-     */
-
-    public static Set<String> getAllAPClassesFromBOMap()
-    {
-        return FragmentSpace.getBondOrderMap().keySet();
     }
 
 //------------------------------------------------------------------------------
@@ -1216,13 +1148,6 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public static void setBondOrderMap(HashMap<String, BondType> map)
-    {
-        bondOrderMap = map;
-    }
-
-//------------------------------------------------------------------------------
-
     public static void setCappingMap(HashMap<APClass, APClass> map)
     {
         cappingMap = map;
@@ -1279,7 +1204,6 @@ public class FragmentSpace
         cappingLib = null;
         compatMap = null;
         rcCompatMap = null;
-        bondOrderMap = null;
         cappingMap = null;
         forbiddenEndList = null;
         fragPoolPerNumAP = null;
@@ -1294,18 +1218,11 @@ public class FragmentSpace
     /**
      * Takes a list of vertices and add them to a given library. Each vertex
      * is assigned the building block type and ID. 
-     * do not try to add all vertices in one. If there are templates
-     * that are built using vertices that are imported in the same run of
-     * this method, then the building blocks must be added to the library
-     * before the template is added. The latter will, in fact, require
-     * to find the building blocks in the library.
      * 
      * @param list of vertices to import.
      * @param bbt the type of building block the vertices should be set to.
      * @param library where to import the vertices to.
      */
-    
-    //TODO-GG check these methods wrt V3
     
     public static void appendVerticesToLibrary(ArrayList<DENOPTIMVertex> list, 
             DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library)
@@ -1322,7 +1239,7 @@ public class FragmentSpace
      * Takes a vertex and add it to a given library. Each vertex
      * is assigned the building block type and ID. 
      * 
-     * @param v  vertex to import.
+     * @param v vertex to import.
      * @param bbt the type of building block the vertex should be set to.
      * @param library where to import the vertex to.
      */

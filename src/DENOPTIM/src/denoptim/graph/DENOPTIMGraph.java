@@ -1099,8 +1099,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     && containsVertex(apOnParent.getOwner()))
             {
                 DENOPTIMEdge edge = new DENOPTIMEdge(apOnParent,apOnChild,
-                        FragmentSpace.getBondOrderForAPClass(
-                                apOnParent.getAPClass()));
+                        apOnParent.getAPClass().getBondType());
                 addEdge(edge);
                 reconnettedApsOnChilds.add(apOnChild);
             } else {
@@ -3761,10 +3760,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     + trgAP.getOwner().getVertexId());
         }
         
-        BondType btSrc = FragmentSpace.getBondOrderForAPClass(
-                srcAP.getAPClass());
-        BondType btTrg = FragmentSpace.getBondOrderForAPClass(
-                trgAP.getAPClass());
+        BondType btSrc = srcAP.getBondType();
+        BondType btTrg = trgAP.getBondType();
         BondType bndTyp = btSrc;
         if (btSrc != btTrg)
         {

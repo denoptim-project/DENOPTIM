@@ -47,12 +47,6 @@ public class GraphLinkFinderTest
         APCE = APClass.make("E", 13);
         APCF = APClass.make("F", 17);
         
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put("A",BondType.SINGLE);
-        boMap.put("B",BondType.SINGLE);
-        boMap.put("C",BondType.SINGLE);
-        boMap.put("D",BondType.DOUBLE);
-        
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
         ArrayList<APClass> lstA = new ArrayList<APClass>();
@@ -96,7 +90,6 @@ public class GraphLinkFinderTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);

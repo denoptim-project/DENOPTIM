@@ -61,13 +61,7 @@ public class DENOPTIMAttachmentPointTest
     
     @Test
     public void testGetEmbeddedAP() throws Exception
-    {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
+    {   
         EmptyVertex vA1 = new EmptyVertex(0);
         vA1.addAP(0);
         vA1.addAP(1);
@@ -243,13 +237,7 @@ public class DENOPTIMAttachmentPointTest
 	
 	@Test
 	public void testAvailableThrougout() throws Exception
-	{
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
+	{   
         EmptyVertex vA = new EmptyVertex(0);
         vA.addAP(0);
         vA.addAP(1);
@@ -311,12 +299,6 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testGetEdbeUserThrougout() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         EmptyVertex vA = new EmptyVertex(0);
         vA.addAP(0);
         vA.addAP(1);
@@ -384,12 +366,6 @@ public class DENOPTIMAttachmentPointTest
 	@Test
 	public void testIsSrcInUser() throws Exception
 	{
-	    // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMGraph g = new DENOPTIMGraph();
         EmptyVertex v1 = new EmptyVertex();
         v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
@@ -415,12 +391,6 @@ public class DENOPTIMAttachmentPointTest
 	@Test
 	public void testGetLinkedAP() throws Exception
 	{
-	    // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
 	    DENOPTIMGraph g = new DENOPTIMGraph();
 	    EmptyVertex v1 = new EmptyVertex();
         v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
@@ -446,12 +416,6 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFString() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-
 		dummyVertex.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
     	
@@ -614,12 +578,6 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testHasSameSrcAtom() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMFragment v1 = new DENOPTIMFragment();
         Atom a1 = new Atom("C");
         Atom a2 = new Atom("C");
@@ -674,12 +632,6 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testHasConnectedSrcAtom() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMFragment v1 = new DENOPTIMFragment();
         Atom a1 = new Atom("C");
         Atom a2 = new Atom("C");

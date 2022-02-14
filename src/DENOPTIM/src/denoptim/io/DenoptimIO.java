@@ -517,6 +517,8 @@ public class DenoptimIO
      * @param append
      * @throws DENOPTIMException
      */
+    
+    @Deprecated
     public static void serializeToFile(String fileName, Object obj, 
             boolean append) throws DENOPTIMException {
         FileOutputStream fos = null;
@@ -557,6 +559,7 @@ public class DenoptimIO
      * @throws DENOPTIMException if anything goes wrong
      */
 
+    @Deprecated
     public static DENOPTIMGraph deserializeDENOPTIMGraph(File file)
             throws DENOPTIMException {
         DENOPTIMGraph graph = null;
@@ -881,16 +884,15 @@ public class DenoptimIO
     public static Set<APClass> readAllAPClasses(File fragLib) {
         Set<APClass> allCLasses = new HashSet<APClass>();
         try {
-            //TODO-gg can be replaced with readVertex?
-            for (IAtomContainer mol : DenoptimIO.readSDFFile(
-                    fragLib.getAbsolutePath())) {
-                DENOPTIMFragment frag = new DENOPTIMFragment(mol,
-                        DENOPTIMVertex.BBType.UNDEFINED);
-                for (DENOPTIMAttachmentPoint ap : frag.getAttachmentPoints()) {
+            for (DENOPTIMVertex v : DenoptimIO.readVertexes(fragLib, 
+                    BBType.UNDEFINED)) 
+            {
+                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
                     allCLasses.add(ap.getAPClass());
                 }
             }
-        } catch (DENOPTIMException e) {
+        } catch (DENOPTIMException | IllegalArgumentException 
+                | UndetectedFileFormatException | IOException e) {
             System.out.println("Could not read data from '" + fragLib + "'. "
                     + "Cause: " + e.getMessage());
         }
@@ -905,13 +907,12 @@ public class DenoptimIO
      *
      * @param fileName    the file to be read
      * @param cpMap container for the APClass compatibility rules
-     * @param boMap       container for the APClass-to-bond order
      * @param capMap     container for the capping rules
      * @param ends     container for the definition of forbidden ends
      */
     public static void writeCompatibilityMatrix(String fileName, 
             HashMap<APClass, ArrayList<APClass>> cpMap,
-            HashMap<String, BondType> boMap, HashMap<APClass, APClass> capMap,
+            HashMap<APClass, APClass> capMap,
             HashSet<APClass> ends) throws DENOPTIMException {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
         Date date = new Date();
@@ -938,16 +939,6 @@ public class DenoptimIO
                     sb.append(NL);
                 }
             }
-        }
-
-        sb.append(DENOPTIMConstants.APCMAPIGNORE);
-        sb.append(" APClass-to-BondOrder").append(NL);
-        SortedSet<String> keysBO = new TreeSet<String>();
-        keysBO.addAll(boMap.keySet());
-        for (String apc : keysBO) {
-            sb.append(DENOPTIMConstants.APCMAPAP2BO).append(" ");
-            sb.append(apc).append(" ").append(
-                    boMap.get(apc).toString()).append(NL);
         }
 
         sb.append(DENOPTIMConstants.APCMAPIGNORE);
@@ -978,13 +969,12 @@ public class DenoptimIO
      *
      * @param fileName    the file to be read
      * @param compatMap container for the APClass compatibility rules
-     * @param boMap       container for the APClass-to-bond type rules
      * @param cappingMap     container for the capping rules
      * @param forbiddenEndList     container for the definition of forbidden ends
      * @throws DENOPTIMException
      */
     public static void readCompatibilityMatrix(String fileName,HashMap<APClass, 
-            ArrayList<APClass>> compatMap, HashMap<String, BondType> boMap, 
+            ArrayList<APClass>> compatMap, 
             HashMap<APClass, APClass> cappingMap, Set<APClass> forbiddenEndList)
             throws DENOPTIMException {
 
@@ -1017,37 +1007,27 @@ public class DenoptimIO
                     }
                     compatMap.put(srcAPC, trgAPCs);
                 } else {
-                    if (line.startsWith(DENOPTIMConstants.APCMAPAP2BO)) {
+                    if (line.startsWith(DENOPTIMConstants.APCMAPCAPPING)) {
                         String str[] = line.split("\\s+");
                         if (str.length != 3) {
-                            String err = "Incomplete reaction bondorder line '"
-                                    + line + "'.";
-                            throw new DENOPTIMException(err + " " + fileName);
+                            String err = "Incomplete capping line '"
+                                    + line +"'.";
+                            throw new DENOPTIMException(err + " "+fileName);
                         }
-                        boMap.put(str[1], BondType.parseStr(str[2]));
+                        APClass srcAPC = APClass.make(str[1]);
+                        APClass trgAPC = APClass.make(str[2]);
+                        cappingMap.put(srcAPC, trgAPC);
                     } else {
-                        if (line.startsWith(DENOPTIMConstants.APCMAPCAPPING)) {
+                        if (line.startsWith(
+                                DENOPTIMConstants.APCMAPFORBIDDENEND)) {
                             String str[] = line.split("\\s+");
-                            if (str.length != 3) {
-                                String err = "Incomplete capping line '"
-                                        + line +"'.";
-                                throw new DENOPTIMException(err + " "+fileName);
-                            }
-                            APClass srcAPC = APClass.make(str[1]);
-                            APClass trgAPC = APClass.make(str[2]);
-                            cappingMap.put(srcAPC, trgAPC);
-                        } else {
-                            if (line.startsWith(
-                                    DENOPTIMConstants.APCMAPFORBIDDENEND)) {
-                                String str[] = line.split("\\s+");
-                                if (str.length != 2) {
-                                    for (int is = 1; is < str.length; is++) {
-                                        forbiddenEndList.add(
-                                                APClass.make(str[is]));
-                                    }
-                                } else {
-                                    forbiddenEndList.add(APClass.make(str[1]));
+                            if (str.length != 2) {
+                                for (int is = 1; is < str.length; is++) {
+                                    forbiddenEndList.add(
+                                            APClass.make(str[is]));
                                 }
+                            } else {
+                                forbiddenEndList.add(APClass.make(str[1]));
                             }
                         }
                     }
@@ -1067,11 +1047,6 @@ public class DenoptimIO
 
         if (compatMap.isEmpty()) {
             String err = "No reaction compatibility data found in file: ";
-            throw new DENOPTIMException(err + " " + fileName);
-        }
-
-        if (boMap.isEmpty()) {
-            String err = "No bond data found in file: ";
             throw new DENOPTIMException(err + " " + fileName);
         }
     }
@@ -1534,6 +1509,9 @@ public class DenoptimIO
      * @return the list of graphs
      * @throws Exception 
      */
+    
+    //TODO-gg get rid of useFS
+    
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
             File inFile, boolean useFS) throws Exception 
     {
@@ -1546,6 +1524,10 @@ public class DenoptimIO
 
             case GRAPHSDF:
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(
+                        inFile.getAbsolutePath(), useFS);
+                
+            case GRAPHTXT:
+                return DenoptimIO.readDENOPTIMGraphsFromTxtFile(
                         inFile.getAbsolutePath(), useFS);
                 
             case CANDIDATESDF:
@@ -2073,139 +2055,6 @@ public class DenoptimIO
     }  
     
 //------------------------------------------------------------------------------
-    
-    /**
-     * Appends vertices taken from a file onto a given library. This method will
-     * interpret {@link DENOPTIMGraph}s with available attachment points
-     * as {@link DENOPTIMTemplate}s. Moreover, the vertices can
-     * be interdependent, meaning that vertex #n can contain references to 
-     * vertex #m with m lower then n. Such interdependency is acceptable only 
-     * for SDF-based files (not yet JSON).
-     *  
-     * @param file the file we want to read.
-     * @param bbt the type of building blocks assigned to each new vertex.
-     * @param library the library on which new vertices are appended.
-     * @param setBBId if <code>true</code> re-sets the building block it to be 
-     * consistent with the destination library.
-     * @throws IOException 
-     * @throws UndetectedFileFormatException 
-     * @throws DENOPTIMException 
-     * @throws IllegalArgumentException 
-     * @throws Exception
-     */
-    
-    //TODO-gg remove and keep only the part about adding builging block id
-    
-    public static void appendVerticesFromFileToLibrary(File file,
-            DENOPTIMVertex.BBType bbt, ArrayList<DENOPTIMVertex> library,
-            boolean setBBId) throws UndetectedFileFormatException, IOException,
-    IllegalArgumentException, DENOPTIMException
-    {
-        // NB: we do NOT read in all vertexes first, and then add them to the
-        // library because that is inconsistent with having vertexes that depend
-        // on previously defined vertexes.
-        // For instance, if vertex N is a template that contains vertex N-1, the
-        // latter must be already in the fragment space when we read vertex N.
-        // Therefore, here we read and add vertices to the appropriate library 
-        // right away.
-        
-        //TODO-V3+ this will change one the dependency on the pre-defined 
-        // fragment space will be removed
-        
-        FileFormat ff = FileUtils.detectFileFormat(file);
-        switch (ff)
-        {
-            case VRTXSDF:
-                int i=0;
-                for (IAtomContainer mol : readSDFFile(file.getAbsolutePath())) 
-                {
-                    i++;
-                    DENOPTIMVertex v = null;
-                    Object ap = mol.getProperty(DENOPTIMConstants.APSTAG);
-                    if (ap == null) {
-                        //NB: templates with no APs land here
-                        if (FragmentSpace.isDefined())
-                        {
-                            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-                            t.setInnerGraph(readGraphFromSDFileIAC(mol,i,true));
-                            v = t;
-                        } else {
-                            DENOPTIMLogger.appLogger.log(Level.WARNING,
-                                "No attachment point information for " + bbt 
-                                + " " + i + " in file '" + file 
-                                + "'. No fragment space defined that could be "
-                                + "used to interprete the SDF file content. "
-                                + "I'm ignoring " + bbt + " " + i);
-                            continue;
-                        }
-                    } else {
-                        //NB: templates that do have APs land here
-                        v = DENOPTIMVertex.convertIACToVertex(mol, bbt);
-                    }
-                    if (setBBId)
-                    {
-                        FragmentSpace.appendVertexToLibrary(v, bbt, library);
-                    } else {
-                        library.add(v);
-                    }
-                }
-                break;
-                
-            case VRTXJSON:
-                for (DENOPTIMVertex v : readDENOPTIMVertexesFromJSONFile(
-                        file.getAbsolutePath())) 
-                {
-                    if (setBBId)
-                    {
-                        FragmentSpace.appendVertexToLibrary(v, bbt, library);
-                    } else {
-                        library.add(v);
-                    }
-                }
-                break;
-                    
-            case GRAPHSDF:
-                //TODO: change this. Not compatible to reading a list of graphs
-                // where graph #n contains graph #(n-1) as a template
-                ArrayList<DENOPTIMGraph> lstGraphs = 
-                    readDENOPTIMGraphsFromSDFile(file.getAbsolutePath(),true);
-                for (DENOPTIMGraph g : lstGraphs)
-                {
-                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-                    t.setInnerGraph(g);
-                    if (setBBId)
-                    {
-                        FragmentSpace.appendVertexToLibrary(t,bbt,library);
-                    } else {
-                        library.add(t);
-                    }
-                }
-                break;
-                    
-            case GRAPHJSON:
-                ArrayList<DENOPTIMGraph> lstGraphs2 = 
-                readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath(), true);
-                for (DENOPTIMGraph g : lstGraphs2)
-                {
-                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-                    t.setInnerGraph(g);
-                    if (setBBId)
-                    {
-                        FragmentSpace.appendVertexToLibrary(t,bbt,library);
-                    } else {
-                        library.add(t);
-                    }
-                }
-                break;
-                
-            default:
-                throw new DENOPTIMException("Format '" + ff 
-                        + "' could not be used to "
-                        + "read in vertices from file '" + file + "'.");
-        }
-    }
-    
-//------------------------------------------------------------------------------
 
     /**
      * Reads the file defined in {@link DENOPTIMConstants#RECENTFILESLIST} and
@@ -2251,35 +2100,6 @@ public class DenoptimIO
             map = new HashMap<File, FileFormat>();
         }
         return map;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Reads vertices from a file. This method does not import vertices into 
-     * the fragment space. Therefore, the imported vertices cannot be 
-     * interdependent (i.e., a template that is vertex N in the list of vertices
-     * we are importing here, cannot incorporate any vertex that is not already
-     * defined in the fragment space. Nevertheless, this method will
-     * interpret {@link DENOPTIMGraph}s with available attachment points
-     * as {@link DENOPTIMTemplate}s.
-     *  
-     * @param file the file we want to read.
-     * @throws IOException 
-     * @throws UndetectedFileFormatException 
-     * @throws DENOPTIMException 
-     * @throws IllegalArgumentException 
-     * @throws Exception
-     */
-    
-    //TODO-GG remove this method and, where suitable, use the newReadVertexes
-    public static ArrayList<DENOPTIMVertex> oldreadVertexes(File file) 
-            throws IllegalArgumentException, UndetectedFileFormatException, 
-            IOException, DENOPTIMException
-    {
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
-        appendVerticesFromFileToLibrary(file, BBType.UNDEFINED, lst, false);
-        return lst;
     }
     
 //------------------------------------------------------------------------------

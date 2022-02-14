@@ -107,13 +107,6 @@ public class DENOPTIMVertexTest
     @Test
     public void testClone() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        String APRULE = "apc";
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.DOUBLE);
-        FragmentSpace.setBondOrderMap(map);
-
         EmptyVertex v = new EmptyVertex(0);
         v.addAP(1);
         v.addAP(2);
@@ -138,7 +131,7 @@ public class DENOPTIMVertexTest
         v2.addAtom(a3);
         v2.addBond(new Bond(a1, a2));
         v2.addBond(new Bond(a2, a3));
-        String APCLASS = APRULE + DENOPTIMConstants.SEPARATORAPPROPSCL +"0";
+        String APCLASS = "apc" + DENOPTIMConstants.SEPARATORAPPROPSCL +"0";
         v2.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(
                 new double[]{0.0, 2.2, 3.3}));
         v2.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(

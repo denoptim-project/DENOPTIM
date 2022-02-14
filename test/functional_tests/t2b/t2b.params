@@ -8,7 +8,7 @@ FSE-UidFile=OTF_WDIR/MOLUID.txt
 FSE-NumOfProcessors=1
 FSE-MAXLEVEL=0
 FSE-VERBOSITY=1
-FSE-ROOTGRAPHS=OTF_WDIR/roots.txt
+FSE-ROOTGRAPHS=OTF_WDIR/roots.json
 FP-EQUATION=${nHBAcc + 0.2*nAtom + 3*Zagreb}
 
 # Definition of the Fragment Space 

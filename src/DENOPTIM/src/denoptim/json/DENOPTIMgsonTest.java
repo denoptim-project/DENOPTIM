@@ -124,8 +124,6 @@ public class DENOPTIMgsonTest
 //------------------------------------------------------------------------------
     
     public void setUp() {
-        HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
-        FragmentSpace.setBondOrderMap(map);
         FragmentSpace.setFragmentLibrary(new ArrayList<>());
         FragmentSpace.setCompatibilityMatrix(new HashMap<>());
     }

@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * Unit test for APClass
@@ -49,7 +50,8 @@ public class APClassTest
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(DENOPTIMException.class, () -> {APClass.make("r7: :f9");}, 
+        assertThrows(DENOPTIMException.class, () -> {APClass.make("r7: :f9", 0,
+                BondType.UNDEFINED);}, 
                 "Wrong syntax for whole APClass string");
         assertThrows(DENOPTIMException.class, () -> {APClass.make("r ",0);}, 
                 "Wrong syntax for 'rule' string");
@@ -88,19 +90,19 @@ public class APClassTest
     @Test
     public void testEquals() throws Exception
     {
-        APClass a = APClass.make("a:1");
-        APClass b = APClass.make("a:1");
+        APClass a = APClass.make("a",1, BondType.UNDEFINED);
+        APClass b = APClass.make("a",1, BondType.UNDEFINED);
         assertTrue(a.equals(b));
         assertTrue(a==b,"a==b operator");
         
-        APClass c = APClass.make("a",1);
+        APClass c = APClass.make("a",1, BondType.UNDEFINED);
         assertTrue(a.equals(c));
         assertTrue(c.equals(b));
         assertTrue(a==c,"a==c operator");
         assertTrue(c==b,"c==b operator");
         
-        APClass d = APClass.make("a:0");
-        APClass e = APClass.make("b:1");
+        APClass d = APClass.make("a",0, BondType.UNDEFINED);
+        APClass e = APClass.make("b",1, BondType.UNDEFINED);
         assertFalse(a.equals(d));
         assertFalse(a.equals(e));
     }
@@ -110,7 +112,7 @@ public class APClassTest
     @Test
     public void testListContains() throws Exception
     {
-        APClass a = APClass.make("a:1");
+        APClass a = APClass.make("a",1, BondType.UNDEFINED);
         APClass b = APClass.make("a:1");
         APClass c = APClass.make("a",1);
         APClass d = a;
@@ -136,10 +138,10 @@ public class APClassTest
     @Test
     public void testCompareTo() throws Exception
     {
-        APClass a = APClass.make("ab:2");
-        APClass b = APClass.make("ab:1");
-        APClass c = APClass.make("dc:1");
-        APClass d = APClass.make("ef:0");
+        APClass a = APClass.make("ab",2, BondType.UNDEFINED);
+        APClass b = APClass.make("ab",1, BondType.UNDEFINED);
+        APClass c = APClass.make("dc",1, BondType.UNDEFINED);
+        APClass d = APClass.make("ef",0, BondType.UNDEFINED);
         List<APClass> l = new ArrayList<APClass>(Arrays.asList(d,a,b,c));
         Collections.sort(l);
         List<APClass> ref = new ArrayList<APClass>(Arrays.asList(b,a,c,d));

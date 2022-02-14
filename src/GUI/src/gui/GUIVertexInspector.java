@@ -227,8 +227,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-				    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
-				            BBType.FRAGMENT, vrtxLib, true);
+				    vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -567,8 +566,7 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
-                    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
-                            BBType.FRAGMENT, vrtxLib, true);
+                    vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog(btnAddVrtx,
@@ -781,8 +779,7 @@ public class GUIVertexInspector extends GUICardPanel
 		
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
-            DenoptimIO.appendVerticesFromFileToLibrary(file, BBType.FRAGMENT,
-                    vrtxLib, true);
+            vrtxLib = DenoptimIO.readVertexes(file, BBType.FRAGMENT);
         } catch (Exception e1) {
             e1.printStackTrace();
             JOptionPane.showMessageDialog(btnAddVrtx,
@@ -1189,10 +1186,14 @@ public class GUIVertexInspector extends GUICardPanel
 	        	String currApClass = tabModel.getValueAt(i, 1).toString();
 	        	
 	        	// Make sure the new class has a proper syntax
-	        	try {
-					currApClass = ensureGoodAPClassString(currApClass,true,
-					        btnSaveEdits);
-				} catch (DENOPTIMException e1) {
+	        	GUIAPClassDefinitionDialog apcDefiner = 
+                        new GUIAPClassDefinitionDialog(btnSaveEdits, false);
+                Object chosen = apcDefiner.showDialog();
+                if (chosen != null)
+                {
+                    Object[] pair = (Object[]) chosen;
+                    currApClass = pair[0].toString();
+                } else {
 					currApClass = "dafaultAPClass:0";
 				}
 	        	
@@ -1334,11 +1335,15 @@ public class GUIVertexInspector extends GUICardPanel
                     if (idAPC.intValue() == (apClassLstModel.size()-1))
                     {
                         // We chose to create a new class
-                        apc = APClass.make(GUIVertexInspector
-                              .ensureGoodAPClassString("", 
-                                  "Define APClass", 
-                                  false,
-                                  parent));
+                        GUIAPClassDefinitionDialog apcDefiner = 
+                                new GUIAPClassDefinitionDialog(parent, false);
+                        Object chosen = apcDefiner.showDialog();
+                        if (chosen != null)
+                        {
+                            Object[] pair = (Object[]) chosen;
+                            apc = APClass.make(pair[0].toString(),
+                                    (BondType) pair[1]);
+                        }
                     } else {
                         apc = APClass.make(apClassLstModel.getElementAt(idAPC));
                     }
@@ -1351,79 +1356,6 @@ public class GUIVertexInspector extends GUICardPanel
         }
   	    return selectedSPCs;
   	}
-  	
-//------------------------------------------------------------------------------
-  	
-  	/**
-  	 * Forces the user to specify a properly formatted APClass.
-  	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the question
-  	 * @return 
-  	 * @throws DENOPTIMException 
-  	 */
-	public static String ensureGoodAPClassString(String currApClass, 
-			boolean mustReply, JComponent parent) 
-			throws DENOPTIMException 
-	{		
-		return ensureGoodAPClassString(currApClass,"Define APClass",mustReply, 
-		        parent);
-	}
-	
-//-----------------------------------------------------------------------------
-  	
-  	/**
-  	 * Forces the user to specify a properly formatted APClass.
-  	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the 
-  	 * question
-  	 * @param parent the component to bind the dialog to. Can be null, in which
-  	 * case the dialog will appear in default location and perhaps behind 
-  	 * other windows.
-  	 * @return the APClass
-  	 * @throws DENOPTIMException 
-  	 */
-	public static String ensureGoodAPClassString(String currApClass, 
-			String title, boolean mustReply, JComponent parent) 
-			        throws DENOPTIMException 
-	{		
-		String preStr = "";
-		while (!APClass.isValidAPClassString(currApClass))
-    	{
-			if (currApClass != "")
-			{
-	    		preStr = "APClass '" + currApClass + "' is not valid!<br>"
-	    				+ "The valid syntax for APClass is:<br><br><code>rule" 
-	        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
-	    				+ "subClass</code><br><br> where "
-	    				+ "<ul><li><code>rule</code>"
-	    				+ " is a string (no spaces)</li>"
-	    				+ "<li><code>subClass</code> is an integer</li>";
-			}
-			
-    		currApClass = JOptionPane.showInputDialog(parent, 
-    				"<html>" + preStr + "</ul>Please, provide a valid "
-    				+ "APClass string: ", title, JOptionPane.PLAIN_MESSAGE);
-        	
-    		if (currApClass == null)
-        	{
-        		currApClass = "";
-        		if (!mustReply)
-        		{
-        			throw new DENOPTIMException();
-        		}
-        	}
-        	
-    		preStr = "APClass '" + currApClass + "' is not valid!<br>"
-    				+ "The valid syntax for APClass is:<br><br><code>rule" 
-        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
-    				+ "subClass</code><br><br> where "
-    				+ "<ul><li><code>rule</code>"
-    				+ " is a string (no spaces)</li>"
-    				+ "<li><code>subClass</code> is an integer</li>";
-    	}
-    	
-    	return currApClass;
-	}
 	
 //-----------------------------------------------------------------------------
   	

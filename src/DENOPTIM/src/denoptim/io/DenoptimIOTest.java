@@ -300,21 +300,6 @@ public class DenoptimIOTest
 
 	@Test
 	public void testReadAllAPClasses() throws Exception {
-		// This is just to avoid the warnings about trying to get a bond type
-		// when the fragment space in not defined
-		HashMap<String, BondType> map = new HashMap<String, BondType>();
-		map.put("classAtmC", BondType.SINGLE);
-		map.put("otherClass", BondType.SINGLE);
-		map.put("classAtmH", BondType.SINGLE);
-		map.put("apClassO", BondType.SINGLE);
-		map.put("apClassObis", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		FragmentSpace.setBondOrderMap(map);
-
 		DENOPTIMFragment frag = new DENOPTIMFragment();
 		IAtom atmC = new Atom("C");
 		atmC.setPoint3d(new Point3d(0.0, 0.0, 1.0));

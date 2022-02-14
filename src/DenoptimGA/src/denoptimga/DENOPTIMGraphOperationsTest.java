@@ -207,10 +207,6 @@ public class DENOPTIMGraphOperationsTest {
     private DENOPTIMGraph buildGraph(List<DENOPTIMVertex> vertices,
                                      List<List<Integer>> edges) 
                                              throws DENOPTIMException {
-        HashMap<String, BondType> bondMap = new HashMap<>();
-        bondMap.put(String.valueOf(DEFAULT_APCLASS), BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(bondMap);
-
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vertices.get(0));
         for (int i = 0; i < edges.size(); i++) {

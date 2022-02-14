@@ -218,7 +218,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             {
                 case 2:
                 {
-                    //OK, APClass:subclass but no direction vector
+                    //OK, APClass:subclass but no direction vector and no bnd type
                     this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
                     
                     String[] coord = details[2].split(
@@ -352,6 +352,22 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         this.atomPositionNumberInMol = atomPositionNumberInMol;
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the bond type preferred by this attachment point as defined by 
+     * the {@link APClass}, or null if {@link APClass} is null.
+     * @return the bond type preferred by this attachment point as defined by 
+     * the {@link APClass}, or null if {@link APClass} is null.
+     */
+    public BondType getBondType()
+    {
+        if (apClass == null)
+            return APClass.DEFAULTBT;
+        else
+            return apClass.getBondType();
+    }
+    
 //------------------------------------------------------------------------------
     
     /**

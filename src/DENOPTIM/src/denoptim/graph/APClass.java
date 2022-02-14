@@ -80,7 +80,12 @@ public class APClass implements Cloneable,Comparable<APClass>
     /**
      * Bond type to use when converting edge users into formal bonds
      */
-    private BondType bndTyp = BondType.UNDEFINED; //default for all but RCAs
+    private BondType bndTyp = DEFAULTBT; 
+    
+    /**
+     * Default bond type for all but APClasses of RCVs.
+     */
+    public static final BondType DEFAULTBT = BondType.SINGLE;
 
 //------------------------------------------------------------------------------
 
@@ -94,8 +99,18 @@ public class APClass implements Cloneable,Comparable<APClass>
 
     /**
      * Creates an APClass if it does not exist already, or returns the 
-     * reference to the existing instance.
+     * reference to the existing instance. This method does not define the bond
+     * type that should be used to make bonds when using the attachment point
+     * belonging to the specified class. Therefore, it creates an incomplete
+     * class definition. 
+     * To create a complete one, use {@link #make(String, int, BondType)}.
+     * @param ruleAndSubclass the string representing the APClass name in terms
+     * of 'rule' and 'subclass', where the first is typically the name of the
+     * cutting rule that generated the attachment point, and the second is the
+     * integer desymmetrizing the two attachment points created by braking 
+     * asymmetric bonds.
      */
+    
     public static APClass make(String ruleAndSubclass) throws DENOPTIMException 
     { 
         if (!isValidAPClassString(ruleAndSubclass))
@@ -114,11 +129,15 @@ public class APClass implements Cloneable,Comparable<APClass>
 
     /**
      * Constructor for an APClass with default bond type (i.e., 
-     * {@link BondType#UNDEFINED}).
+     * {@link BondType#DEFAULTBT}).
      * Checks if there is already a instance with the given rule name and 
      * subclass, if not it 
      * created one. In either case, returns the reference to that instance of 
-     * APClass.
+     * APClass. This method does not define the bond
+     * type that should be used to make bonds when using the attachment point
+     * belonging to the specified class. Therefore, it creates an incomplete
+     * class definition. 
+     * To create a complete one, use {@link #make(String, int, BondType)}.
      * @param rule the APClass rule, i.e., a string identifier that typically
      * corresponds to the name of the cutting rule used to break a bond.
      * @param subClass the integer identifier of the "side" of the bond broken
@@ -128,18 +147,38 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static APClass make(String rule, int subClass) 
             throws DENOPTIMException 
     {
-        //TODO-gg this is only for converting files to V3
-        if (FragmentSpace.isDefined())
+        return make(rule, subClass, DEFAULTBT);
+    }
+    
+ //------------------------------------------------------------------------------
+
+    /**
+     * Constructor for a fully defined APClass. 
+     * Checks if there is already a instance with the given members, if not it 
+     * created one. In either case, returns the reference to that instance of 
+     * APClass.
+     * @param ruleAndSubclass the string representing the APClass name in terms
+     * of 'rule' and 'subclass', where the first is typically the name of the
+     * cutting rule that generated the attachment point, and the second is the
+     * integer desymmetrizing the two attachment points created by braking 
+     * asymmetric bonds.
+     * @param bt the bond type to be used when converting edges using APs of
+     * this APClass into bonds, if any.
+     * @throws DENOPTIMException 
+     */
+    public static APClass make(String ruleAndSubclass, BondType bt) 
+            throws DENOPTIMException 
+    {
+        if (!isValidAPClassString(ruleAndSubclass))
         {
-            if (FragmentSpace.getBondOrderMap().containsKey(rule))
-            {
-                return make(rule, subClass, FragmentSpace.getBondOrderMap().get(rule));
-            } else {
-                return make(rule, subClass, BondType.UNDEFINED);
-            }
-        } else {
-            return make(rule, subClass, BondType.UNDEFINED);
+            throw new DENOPTIMException("Attempt to use APClass '" 
+                        + ruleAndSubclass
+                        + "' that does not respect syntax <rule>"
+                        + DENOPTIMConstants.SEPARATORAPPROPSCL + "<subClass>.");
         }
+        String[] parts = ruleAndSubclass.split(
+                DENOPTIMConstants.SEPARATORAPPROPSCL);
+        return make(parts[0], Integer.parseInt(parts[1]), bt);
     }
     
 //------------------------------------------------------------------------------
@@ -205,8 +244,8 @@ public class APClass implements Cloneable,Comparable<APClass>
                 if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
                 {
                     System.out.println("WARNING! Changing bond order of "
-                            + "APClass " + newApc + " (" + newApc.bndTyp 
-                            + ") with " + bt);
+                            + "APClass " + newApc + ": " + newApc.bndTyp 
+                            + " -> " + bt);
                     newApc.setBondType(bt);
                 }
             }
@@ -284,12 +323,10 @@ public class APClass implements Cloneable,Comparable<APClass>
 //------------------------------------------------------------------------------
     
     /**
-     * @return a string with a format compatible with reporting APClasses in
-     * text files (e.g., compatibility matrix files) and SDF files (e.g., 
-     * SDF with fragments).
+     * Do not use this to make SDF representations. Use {@link #toSDFString()}
+     * instead.
+     * @return a string meant for human reading.
      */
-    //TODO-gg avoid to use it to make SDF strings
-    @Deprecated 
     public String toString() {
         return rule + DENOPTIMConstants.SEPARATORAPPROPSCL 
         + Integer.toString(subClass);
@@ -450,7 +487,7 @@ public class APClass implements Cloneable,Comparable<APClass>
                     jo.get("subClass").getAsInt(),
                     context.deserialize(jo.get("bndTyp"),BondType.class));
             } else {
-                //TODO-gg possibly only for conversion to V3
+                //Only for conversion to V3
                 String rule = jo.get("rule").getAsString();
                 int subClass = jo.get("subClass").getAsInt();
                 boolean found = false;
@@ -466,10 +503,10 @@ public class APClass implements Cloneable,Comparable<APClass>
                 }
                 if (!found)
                 {
-                    System.out.println("WARNING! Setting UNDEFINED for "+rule+":"+subClass);
+                    System.out.println("WARNING! Setting " + DEFAULTBT 
+                            + " for "+rule+":"+subClass);
                     apc = getUnique(jo.get("rule").getAsString(),
-                        jo.get("subClass").getAsInt(),
-                        BondType.UNDEFINED);
+                        jo.get("subClass").getAsInt(), DEFAULTBT);
                 }
             }
             return apc;

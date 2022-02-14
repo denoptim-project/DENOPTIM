@@ -16,7 +16,7 @@ public enum FileFormat {
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP,
-    TXT;
+    TXT, GRAPHTXT;
         
     private String extension = "";
     
@@ -119,6 +119,10 @@ public enum FileFormat {
         //------------------------------------
         
         TXT.extension = "";
+        
+        //------------------------------------
+        
+        GRAPHTXT.extension = "txt";
     }
     
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
@@ -157,6 +161,15 @@ public enum FileFormat {
                         break;
                     case VERTEX:
                         ff = VRTXJSON;
+                        break;
+                }
+                break;
+                
+            case "TXT":
+                switch (kind)
+                {
+                    case GRAPH:
+                        ff = GRAPHTXT;
                         break;
                 }
                 break;
