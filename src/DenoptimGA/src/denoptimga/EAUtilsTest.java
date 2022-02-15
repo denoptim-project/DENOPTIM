@@ -86,21 +86,21 @@ public class EAUtilsTest
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0,APCB);
-        v1.addAP(0,APCB);
+        v1.addAP(APCB);
+        v1.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0,APCC);
-        v2.addAP(0,APCC);
+        v2.addAP(APCC);
+        v2.addAP(APCC);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex rcv = new EmptyVertex();
         rcv.setBuildingBlockType(BBType.FRAGMENT);
-        rcv.addAP(0,APCC);
+        rcv.addAP(APCC);
         rcv.setAsRCV(true);
         FragmentSpace.appendVertexToLibrary(rcv, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());

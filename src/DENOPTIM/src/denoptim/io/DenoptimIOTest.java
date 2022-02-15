@@ -87,10 +87,10 @@ public class DenoptimIOTest
         
         EmptyVertex v = new EmptyVertex();
         Point3d xyz = new Point3d(1.1,-2.2,3.3);
-        v.addAP(0, xyz, APClass.make("myClass:0"));
-        v.addAP(1, xyz, APClass.make("myClass:1"));
-        v.addAP(1, xyz, APClass.make("myClass:2"));
-        v.addAP(2, xyz, APClass.make("myClass:3"));
+        v.addAP(APClass.make("myClass:0"));
+        v.addAP(APClass.make("myClass:1"));
+        v.addAP(APClass.make("myClass:2"));
+        v.addAP(APClass.make("myClass:3"));
         
         ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
         initVrtxs.add(v);
@@ -357,7 +357,7 @@ public class DenoptimIOTest
 											  DENOPTIMGraph graph) 
 											          throws DENOPTIMException {
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos);
+			v.addAP();
 		}
 		graph.addVertex(v);
 	}

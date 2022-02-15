@@ -117,7 +117,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
         this.owner = owner;
-        atomPositionNumber = 0;
+        atomPositionNumber = -1;
         id = FragmentSpace.apID.getAndIncrement();
     }
 
@@ -311,6 +311,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      */
     public int getAtomPositionNumber()
     {
+        if (owner!=null && owner instanceof EmptyVertex)
+            return -1;
         return atomPositionNumber;
     }
 
@@ -336,6 +338,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      */
     public int getAtomPositionNumberInMol()
     {
+        if (owner!=null && owner instanceof EmptyVertex)
+            return -1;
         return atomPositionNumberInMol;
     }
 
@@ -628,7 +632,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * @param other AP to compare with this AP.
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> is the two APs have the same features.
+     * @return <code>true</code> if the two APs have the same features.
      */
     public boolean sameAs(DENOPTIMAttachmentPoint other, StringBuilder reason)
     {

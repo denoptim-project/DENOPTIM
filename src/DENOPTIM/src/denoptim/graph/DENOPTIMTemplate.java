@@ -150,11 +150,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         EmptyVertex vrtx = new EmptyVertex(0);
         EmptyVertex vrtx2 = new EmptyVertex(1);
     
-        vrtx.addAP(0);
-        vrtx.addAP(1);
+        vrtx.addAP();
+        vrtx.addAP();
 
-        vrtx2.addAP(0);
-        vrtx2.addAP(1);
+        vrtx2.addAP();
+        vrtx2.addAP();
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vrtx);
         g.addVertex(vrtx2);

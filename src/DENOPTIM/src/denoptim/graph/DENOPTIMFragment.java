@@ -210,7 +210,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                                     d2.getAtomPositionNumber()))
                 {
                     // check if reactions are compatible w.r.t. symmetry
-                    if (d1.getAPClass().compareTo(d2.getAPClass()) == 0)
+                    if (d1.getAPClass()!=null && d2.getAPClass()!=null 
+                            && d1.getAPClass().compareTo(d2.getAPClass()) == 0)
                     {
                         Integer i2 = j;
                         lst.add(i2);

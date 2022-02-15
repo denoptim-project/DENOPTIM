@@ -108,21 +108,6 @@ public class EmptyVertex extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Constructor for an identified vertex with attachment points.
-     * @param id the VertedID of the vertex to construct. Note that this ID 
-     * should be unique within a graph. To generate unique IDs either use 
-     * @param lstAPs the list of attachment point on this vertex.
-     */
-    public EmptyVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs)
-    {
-        super(VertexType.EmptyVertex, id);
-        this.lstAPs = lstAPs;
-        this.lstSymAPs = new ArrayList<SymmetricSet>();
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Constructor for an identified vertex.
      * @param id the VertedID of the vertex to construct. Note that this ID 
      * should be unique within a graph. To generate unique IDs either use 
@@ -285,9 +270,7 @@ public class EmptyVertex extends DENOPTIMVertex
         
         for (DENOPTIMAttachmentPoint ap : lstAPs)
         {
-            c.addAP(ap.getAtomPositionNumber(),
-                    ap.getDirectionVector(),
-                    ap.getAPClass());
+            c.addAP(ap.getAPClass());
         }
 
         ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
@@ -303,59 +286,26 @@ public class EmptyVertex extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Adds an attachment point with a dummy APClass and dummy properties.
+     * Adds an attachment point with a no {@link APClass} or other attribute.
      * This is used only for testing purposes.
      */
     public void addAP() {
-        addAP(0);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Adds an attachment point with a dummy APClass.
-     * @param atomPositionNumber the index of the source atom (0-based)
-     */
-    
-    //TODO: since APs can be on any vertex, and vertexes are not required to
-    // contain atoms, the information of which atom is an AP rooted should be
-    // stored and managed by the implementation of vertex that do contain atoms.
-    // The DENOPTIMFragment should thus be charged with keeping the reference to
-    // the atom that holds the AP.
-    // TODO-V3 remove this method.
-    
-    public void addAP(int atomPositionNumber) {
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
-                atomPositionNumber);
+        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this);
         getAttachmentPoints().add(ap);
     }
-
+      
 //------------------------------------------------------------------------------
 
-    /**
-     * Adds an attachment point.
-     * @param atomPositionNumber the index of the source atom (0-based)
-     * @param apClass the APClass
-     */
-    public void addAP(int atomPositionNumber, APClass apClass) {
-        addAP(atomPositionNumber, null, apClass);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Adds an attachment point.
-     * @param atomPositionNumber the index of the source atom (0-based)
-     * @param dirVec the AP direction vector end (the beginning at the 
-     * coordinates of the source atom). This must array have 3 entries.
-     * @param apClass the APClass
-     */
-    public void addAP(int atomPositionNumber, Point3d dirVec, APClass apClass) {
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
-                atomPositionNumber, dirVec, apClass);
-        getAttachmentPoints().add(ap);
-    }
-
+      /**
+       * Adds an attachment point with the specified {@link APClass}.
+       * @param apClass the APClass
+       */
+      public void addAP(APClass apClass) {
+          DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
+                  -1, null, apClass);
+          getAttachmentPoints().add(ap);
+      }
+      
 //------------------------------------------------------------------------------
 
     /**
@@ -371,37 +321,7 @@ public class EmptyVertex extends DENOPTIMVertex
     {
         return sameVertexFeatures(other, reason);
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @param cmpReac list of reactions of the source vertex attachment point
-     * @return list of indices of the attachment points in vertex that has
-     * the corresponding reaction
-     */
-
-    public ArrayList<Integer> getCompatibleClassAPIndex(
-            String cmpReac) 
-    {
-        ArrayList<DENOPTIMAttachmentPoint> apLst = getAttachmentPoints();
-        ArrayList<Integer> apIdx = new ArrayList<>();
-        for (int i = 0; i < apLst.size(); i++)
-        {
-            DENOPTIMAttachmentPoint dap = apLst.get(i);
-            if (dap.isAvailable())
-            {
-                // check if this AP has the compatible reactions
-                String dapReac = dap.getAPClass().toString();
-                if (dapReac.compareToIgnoreCase(cmpReac) == 0)
-                {
-                    apIdx.add(i);
-                }
-            }
-        }
-        return apIdx;
-    }
-
+    
 //------------------------------------------------------------------------------
 
     public int getHeavyAtomsCount()
@@ -415,7 +335,6 @@ public class EmptyVertex extends DENOPTIMVertex
     {
         return false;
     }
-    
 
 //-----------------------------------------------------------------------------
 

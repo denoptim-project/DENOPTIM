@@ -348,10 +348,10 @@ public class DENOPTIMGraphOperationsTest {
         List<EmptyVertex> vertices = Arrays.asList(v1, rcv1, rcv2);
         for (EmptyVertex v : vertices) {
             v.setBuildingBlockType(BBType.FRAGMENT);
-            v.addAP(-1);
+            v.addAP();
         }
         // Need an additional AP on v1
-        v1.addAP(-1);
+        v1.addAP();
 
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(v1);

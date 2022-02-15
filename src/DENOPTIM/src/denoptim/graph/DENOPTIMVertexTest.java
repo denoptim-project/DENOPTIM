@@ -68,15 +68,15 @@ public class DENOPTIMVertexTest
     {
         EmptyVertex vA = new EmptyVertex(0);
         EmptyVertex vB = new EmptyVertex(90);
-        vA.addAP(0);
-        vA.addAP(1);
-        vA.addAP(2);
-        vA.addAP(3);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
 
-        vB.addAP(0);
-        vB.addAP(1);
-        vB.addAP(2);
-        vB.addAP(3);
+        vB.addAP();
+        vB.addAP();
+        vB.addAP();
+        vB.addAP();
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertTrue(vA.sameAs(vB, reason));	
@@ -88,15 +88,15 @@ public class DENOPTIMVertexTest
     public void testSameAs_DiffAPNum()
     {
         EmptyVertex vA = new EmptyVertex(0);
-        vA.addAP(0);
-        vA.addAP(1);
-        vA.addAP(2);
-        vA.addAP(3);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
 
         EmptyVertex vB = new EmptyVertex(90);
-        vB.addAP(0);
-        vB.addAP(1);
-        vB.addAP(2);
+        vB.addAP();
+        vB.addAP();
+        vB.addAP();
         //NB: vertex ID must be ignores by the sameAs method
 
         assertFalse(vA.sameAs(vB, reason));
@@ -108,9 +108,9 @@ public class DENOPTIMVertexTest
     public void testClone() throws Exception
     {
         EmptyVertex v = new EmptyVertex(0);
-        v.addAP(1);
-        v.addAP(2);
-        v.addAP(3);
+        v.addAP();
+        v.addAP();
+        v.addAP();
         
         DENOPTIMVertex c = v.clone();
         

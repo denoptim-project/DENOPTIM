@@ -236,7 +236,7 @@ public class GraphConversionTool
                                  k++)
                             {
                                 if (vertex instanceof EmptyVertex)
-                                    ((EmptyVertex)vertex).addAP(0);
+                                    ((EmptyVertex)vertex).addAP();
                                 if (vertex instanceof DENOPTIMFragment)
                                     ((DENOPTIMFragment)vertex).addAP(0);
                             }
@@ -258,7 +258,7 @@ public class GraphConversionTool
                                  k++)
                             {
                                 if (vertex instanceof EmptyVertex)
-                                    ((EmptyVertex)vertex).addAP(0);
+                                    ((EmptyVertex)vertex).addAP();
                                 if (vertex instanceof DENOPTIMFragment)
                                     ((DENOPTIMFragment)vertex).addAP(0);
                             }

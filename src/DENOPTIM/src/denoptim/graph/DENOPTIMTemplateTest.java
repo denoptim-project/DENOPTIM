@@ -81,21 +81,21 @@ public class DENOPTIMTemplateTest
     public void testClone() throws Exception
     {
         EmptyVertex vA = new EmptyVertex(0);
-        vA.addAP(0);
-        vA.addAP(0);
-        vA.addAP(0);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
         EmptyVertex vB = new EmptyVertex(1);
-        vB.addAP(0);
-        vB.addAP(0);
+        vB.addAP();
+        vB.addAP();
         EmptyVertex vC = new EmptyVertex(2);
-        vC.addAP(0);
-        vC.addAP(0);
-        vA.addAP(0);
+        vC.addAP();
+        vC.addAP();
+        vA.addAP();
         EmptyVertex vRcvA = new EmptyVertex(3);
-        vRcvA.addAP(0);
+        vRcvA.addAP();
         vRcvA.setAsRCV(true);
         EmptyVertex vRcvC = new EmptyVertex(4);
-        vRcvC.addAP(0);
+        vRcvC.addAP();
         vRcvC.setAsRCV(true);
         
         DENOPTIMGraph g = new DENOPTIMGraph();
@@ -326,7 +326,7 @@ public class DENOPTIMTemplateTest
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
-        v.addAP(0);
+        v.addAP();
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v);
         template.setInnerGraph(innerGraph);
@@ -395,16 +395,12 @@ public class DENOPTIMTemplateTest
         for (int i = 0; i < numberOfAPs; i++) {
             template.addRequiredAP(dirVecs.get(i),
                     APClasses.get(i));
-            v.addAP(-1, dirVecs.get(i),
-                    APClasses.get(i));
+            v.addAP(APClasses.get(i));
         }
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v);
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
-        // Unsure if inner APs should be required to have the same direction
-        // vectors as required APs.
-//        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
 

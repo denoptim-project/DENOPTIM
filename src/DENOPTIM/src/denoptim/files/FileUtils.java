@@ -441,7 +441,6 @@ public class FileUtils
                 break;
     		
     		case "TXT":
-    		    //TODO-gg make specific
                 ff = FileFormat.GRAPHTXT;
                 break;
                 
