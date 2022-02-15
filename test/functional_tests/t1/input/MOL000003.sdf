@@ -1,5 +1,5 @@
 
-  CDK     12212117153D
+  CDK     02112211293D
 
  20 25  0  0  0  0  0  0  0  0999 V2000
     1.1116    4.8010   -0.4148 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -69,7 +69,8 @@ M  END
           "atomPositionNumberInMol": 12,
           "apClass": {
             "rule": "MAreneM",
-            "subClass": 1
+            "subClass": 1,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": -0.5621,
@@ -83,7 +84,8 @@ M  END
           "atomPositionNumberInMol": 12,
           "apClass": {
             "rule": "MAreneM",
-            "subClass": 1
+            "subClass": 1,
+            "bndTyp": "SINGLE"
           },
           "dirVec": {
             "x": 0.5809,
@@ -100,6 +102,347 @@ M  END
           ]
         }
       ],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": 1.1116,
+              "y": 4.801,
+              "z": -0.4148
+            }
+          },
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": 1.2582,
+              "y": 3.9143,
+              "z": 0.7471
+            }
+          },
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": 0.1304,
+              "y": 3.0767,
+              "z": 1.157
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": 1.9375,
+              "y": 5.4212,
+              "z": -0.7336
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": 2.1814,
+              "y": 3.8987,
+              "z": 1.2885
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": 0.2114,
+              "y": 2.4394,
+              "z": 2.0222
+            }
+          },
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": -1.1008,
+              "y": 3.113,
+              "z": 0.4101
+            }
+          },
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": -1.259,
+              "y": 3.9903,
+              "z": -0.7401
+            }
+          },
+          {
+            "elSymbol": "C",
+            "p3d": {
+              "x": -0.1271,
+              "y": 4.8228,
+              "z": -1.1469
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": -1.9476,
+              "y": 2.4817,
+              "z": 0.7199
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": -2.1864,
+              "y": 4.0071,
+              "z": -1.2937
+            }
+          },
+          {
+            "elSymbol": "H",
+            "p3d": {
+              "x": -0.2137,
+              "y": 5.4683,
+              "z": -2.0388
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": 0.0022,
+              "y": 3.953,
+              "z": 0.0021
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": 0.8672,
+              "y": 5.4643,
+              "z": 0.2967
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": 0.8778,
+              "y": 4.5562,
+              "z": 1.4033
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": -0.0912,
+              "y": 3.8414,
+              "z": 1.7649
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": -0.7818,
+              "y": 2.3952,
+              "z": -0.1832
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": -0.9311,
+              "y": 3.2516,
+              "z": -1.324
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": -0.5301,
+              "y": 5.544,
+              "z": -0.5645
+            }
+          },
+          {
+            "elSymbol": "Du",
+            "p3d": {
+              "x": 0.196,
+              "y": 4.1742,
+              "z": 0.9532
+            }
+          }
+        ],
+        "bonds": [
+          {
+            "atomIds": [
+              0,
+              1
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              3,
+              0
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              4,
+              1
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              5,
+              2
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              9,
+              6
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              10,
+              7
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              11,
+              8
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              0,
+              8
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              1,
+              2
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              2,
+              6
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              6,
+              7
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              7,
+              8
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              12,
+              6
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              12,
+              0
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              12,
+              8
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              12,
+              1
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              12,
+              2
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              12,
+              7
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              13,
+              0
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              14,
+              1
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              15,
+              2
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              16,
+              6
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              17,
+              7
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              18,
+              8
+            ],
+            "bo": "SINGLE"
+          },
+          {
+            "atomIds": [
+              19,
+              12
+            ],
+            "bo": "SINGLE"
+          }
+        ]
+      },
       "vertexId": 1,
       "buildingBlockId": 56,
       "buildingBlockType": "FRAGMENT",
@@ -123,7 +466,8 @@ M  END
           "atomPositionNumberInMol": 19,
           "apClass": {
             "rule": "MAreneM",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           }
         }
       ],
@@ -151,7 +495,8 @@ M  END
           "atomPositionNumberInMol": 19,
           "apClass": {
             "rule": "MAreneM",
-            "subClass": 0
+            "subClass": 0,
+            "bndTyp": "SINGLE"
           }
         }
       ],

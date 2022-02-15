@@ -570,7 +570,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		sb.append("M  END").append(NL).append("$$$$");
 		
 		DenoptimIO.writeData(tmpSDFFile, sb.toString(), false);
-		mol = DenoptimIO.readSingleSDFFile(tmpSDFFile);
+		mol = DenoptimIO.getFirstMolInSDFFile(tmpSDFFile);
 		return mol;
 	}
 	
@@ -723,7 +723,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		// fragile/discontinued CDK-to-Jmol support.
 		
 		try {
-			DenoptimIO.writeMolecule(tmpSDFFile, fragment.getIAtomContainer(), 
+			DenoptimIO.writeSDFFile(tmpSDFFile, fragment.getIAtomContainer(), 
 			        false);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();

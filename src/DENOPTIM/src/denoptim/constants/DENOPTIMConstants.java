@@ -30,8 +30,8 @@ import java.util.Set;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.io.DenoptimIO;
 
 
 /**
@@ -62,7 +62,7 @@ public final class DENOPTIMConstants
         {
             if (!configFolder.exists())
             {
-                boolean wasMade = DenoptimIO.createDirectory(
+                boolean wasMade = FileUtils.createDirectory(
                         configFolder.getAbsolutePath());
                 if (!wasMade)
                 {

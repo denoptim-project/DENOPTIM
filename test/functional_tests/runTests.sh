@@ -349,15 +349,5 @@ runTest "t26"
 runTest "t27"
 
 
-#
-# t97: under development - mutation involving templates
-#
-#runTest "t97"
-
-#
-# t99: under development - Meant for testing of the graph template stuff in GA run
-#
-#runTest "t99"
-
 echo "All done!"
 exit 0

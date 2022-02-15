@@ -63,7 +63,7 @@ public class DenoptimCG
             DENOPTIMGraph grph = DenoptimIO.readDENOPTIMGraphsFromFile(
                     new File(CGParameters.getInputSDFFile()), true).get(0);
             
-            IAtomContainer mol = DenoptimIO.readSingleSDFFile(
+            IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
                     CGParameters.getInputSDFFile());
             
             String mname = "noname";
@@ -101,7 +101,7 @@ public class DenoptimCG
                 }
             }
             // write file
-            DenoptimIO.writeMoleculeSet(CGParameters.getOutputSDFFile(), nmols);
+            DenoptimIO.writeSDFFile(CGParameters.getOutputSDFFile(), nmols);
             
         } catch (TinkerException te)
         {

@@ -59,27 +59,20 @@ public class ThreeDimTreeBuilderTest
     @Test
     public void testConversionTo3dTree() throws Exception
     {
-        APClass a0 = APClass.make("a:0");
-        APClass b0 = APClass.make("b:0");
-        APClass h0 = APClass.make("h:0");
+        APClass a0 = APClass.make("a",0,BondType.SINGLE);
+        APClass b0 = APClass.make("b",0,BondType.SINGLE);
+        APClass h0 = APClass.make("h",0,BondType.SINGLE);
         APClass ap0 = APClass.make("ATplus:0");
         APClass am0 = APClass.make("ATminus:0");
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
         cpMap.put(a0, new ArrayList<APClass>(Arrays.asList(a0, b0)));
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put("a", BondType.SINGLE);
-        boMap.put("b", BondType.SINGLE);
-        boMap.put("h", BondType.SINGLE);
-        boMap.put("ATplus", BondType.SINGLE);
-        boMap.put("ATminus", BondType.SINGLE);
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         capMap.put(a0, h0);
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         forbEnds.add(b0);
         
-        FragmentSpace.setBondOrderMap(boMap);
         
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	IAtom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
@@ -139,7 +132,7 @@ public class ThreeDimTreeBuilderTest
     	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
     	caps.add(cap);
     	
-    	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,boMap,capMap,
+    	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,capMap,
     			forbEnds,null);
     	
     	DENOPTIMGraph g1 = new DENOPTIMGraph();
@@ -221,8 +214,8 @@ public class ThreeDimTreeBuilderTest
     	
         DENOPTIMGraph g3 = new DENOPTIMGraph();
         EmptyVertex v1c = new EmptyVertex(1);
-        v1c.addAP(-1,a0);
-        v1c.addAP(-1, a0);
+        v1c.addAP(a0);
+        v1c.addAP(a0);
         DENOPTIMVertex v2c = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT);
         DENOPTIMVertex v3c = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
@@ -254,18 +247,18 @@ public class ThreeDimTreeBuilderTest
         
         DENOPTIMGraph g4 = new DENOPTIMGraph();
         EmptyVertex v1d = new EmptyVertex(1);
-        v1d.addAP(-1,a0);
-        v1d.addAP(-1,a0);
+        v1d.addAP(a0);
+        v1d.addAP(a0);
         EmptyVertex v2d = new EmptyVertex(2);
-        v2d.addAP(-1,a0);
-        v2d.addAP(-1,b0);
+        v2d.addAP(a0);
+        v2d.addAP(b0);
         DENOPTIMVertex v3d = DENOPTIMVertex.newVertexFromLibrary(3, 3, 
                 BBType.FRAGMENT);
         DENOPTIMVertex v4d = DENOPTIMVertex.newVertexFromLibrary(4, 0, 
                 BBType.FRAGMENT);
         EmptyVertex v5d = new EmptyVertex(5);
-        v5d.addAP(-1,b0);
-        v5d.addAP(-1,b0);
+        v5d.addAP(b0);
+        v5d.addAP(b0);
         DENOPTIMVertex v6d = DENOPTIMVertex.newVertexFromLibrary(6, 0, 
                 BBType.FRAGMENT);
         DENOPTIMVertex v7d = DENOPTIMVertex.newVertexFromLibrary(7, 0, 

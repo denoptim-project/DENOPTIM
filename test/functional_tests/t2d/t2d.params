@@ -8,7 +8,7 @@ FSE-UidFile=OTF_WDIR/MOLUID.txt
 FSE-NumOfProcessors=1
 FSE-MAXLEVEL=0
 FSE-VERBOSITY=1
-FSE-ROOTGRAPHS=OTF_WDIR/roots.txt
+FSE-ROOTGRAPHS=OTF_WDIR/roots.json
 
 # Setting fitness evaluation
 FP-Source=OTF_WDIR/fitness_provider.py

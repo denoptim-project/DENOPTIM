@@ -67,6 +67,8 @@ import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMVertex.DENOPTIMVertexDeserializer;
 import denoptim.graph.DENOPTIMVertex.VertexType;
 import denoptim.io.DenoptimIO;
+import denoptim.json.DENOPTIMgson;
+import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.CyclicGraphHandler;
@@ -75,8 +77,6 @@ import denoptim.rings.RingClosureParameters;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.DENOPTIMgson;
-import denoptim.utils.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
@@ -1099,8 +1099,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     && containsVertex(apOnParent.getOwner()))
             {
                 DENOPTIMEdge edge = new DENOPTIMEdge(apOnParent,apOnChild,
-                        FragmentSpace.getBondOrderForAPClass(
-                                apOnParent.getAPClass()));
+                        apOnParent.getAPClass().getBondType());
                 addEdge(edge);
                 reconnettedApsOnChilds.add(apOnChild);
             } else {
@@ -3761,14 +3760,22 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     + trgAP.getOwner().getVertexId());
         }
         
-        BondType btSrc = FragmentSpace.getBondOrderForAPClass(
-                srcAP.getAPClass());
-        BondType btTrg = FragmentSpace.getBondOrderForAPClass(
-                trgAP.getAPClass());
+        BondType btSrc = srcAP.getBondType();
+        BondType btTrg = trgAP.getBondType();
         BondType bndTyp = btSrc;
         if (btSrc != btTrg)
         {
-            bndTyp = BondType.UNDEFINED;
+            if (btSrc == BondType.ANY && btTrg != BondType.ANY)
+            {
+                bndTyp = btTrg;
+            } else {
+                if (btSrc != BondType.ANY && btTrg == BondType.ANY)
+                {
+                    bndTyp = btSrc;
+                } else {
+                    bndTyp = BondType.UNDEFINED;
+                }
+            }
         }
 
         this.addVertex(trgAP.getOwner());

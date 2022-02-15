@@ -47,12 +47,6 @@ public class GraphLinkFinderTest
         APCE = APClass.make("E", 13);
         APCF = APClass.make("F", 17);
         
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put("A",BondType.SINGLE);
-        boMap.put("B",BondType.SINGLE);
-        boMap.put("C",BondType.SINGLE);
-        boMap.put("D",BondType.DOUBLE);
-        
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
         ArrayList<APClass> lstA = new ArrayList<APClass>();
@@ -96,7 +90,6 @@ public class GraphLinkFinderTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);
@@ -107,117 +100,117 @@ public class GraphLinkFinderTest
         
         EmptyVertex s = new EmptyVertex();
         s.setBuildingBlockType(BBType.SCAFFOLD);
-        s.addAP(0,APCA);
+        s.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(s, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
         EmptyVertex v0 = new EmptyVertex();
         v0.setBuildingBlockType(BBType.FRAGMENT);
-        v0.addAP(0,APCA);
-        v0.addAP(0,APCB);
-        v0.addAP(0,APCB);
+        v0.addAP(APCA);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0,APCB);
+        v1.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0,APCA);
-        v2.addAP(0,APCA);
+        v2.addAP(APCA);
+        v2.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v3 = new EmptyVertex();
         v3.setBuildingBlockType(BBType.FRAGMENT);
-        v3.addAP(0,APCB);
-        v3.addAP(0,APCB);
+        v3.addAP(APCB);
+        v3.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v4 = new EmptyVertex();
         v4.setBuildingBlockType(BBType.FRAGMENT);
-        v4.addAP(0,APCA);
-        v4.addAP(0,APCB);
-        v4.addAP(0,APCB);
+        v4.addAP(APCA);
+        v4.addAP(APCB);
+        v4.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v5 = new EmptyVertex();
         v5.setBuildingBlockType(BBType.FRAGMENT);
-        v5.addAP(0,APCA);
-        v5.addAP(0,APCC);
-        v5.addAP(0,APCB);
+        v5.addAP(APCA);
+        v5.addAP(APCC);
+        v5.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v6 = new EmptyVertex();
         v6.setBuildingBlockType(BBType.FRAGMENT);
-        v6.addAP(0,APCD);
-        v6.addAP(0,APCD);
+        v6.addAP(APCD);
+        v6.addAP(APCD);
         FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
-        v7.addAP(0,APCA);
+        v7.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v8 = new EmptyVertex();
         v8.setBuildingBlockType(BBType.FRAGMENT);
-        v8.addAP(0,APCB);
+        v8.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v8, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v9 = new EmptyVertex();
         v9.setBuildingBlockType(BBType.FRAGMENT);
-        v9.addAP(0,APCA);
-        v9.addAP(0,APCA);
-        v9.addAP(0,APCB);
-        v9.addAP(0,APCB);
+        v9.addAP(APCA);
+        v9.addAP(APCA);
+        v9.addAP(APCB);
+        v9.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v9, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v10 = new EmptyVertex();
         v10.setBuildingBlockType(BBType.FRAGMENT);
-        v10.addAP(0,APCA);
-        v10.addAP(0,APCC);
-        v10.addAP(0,APCD);
-        v10.addAP(0,APCB);
+        v10.addAP(APCA);
+        v10.addAP(APCC);
+        v10.addAP(APCD);
+        v10.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v10, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v11 = new EmptyVertex();
         v11.setBuildingBlockType(BBType.FRAGMENT);
-        v11.addAP(0,APCA);
-        v11.addAP(0,APCD);
-        v11.addAP(0,APCA);
-        v11.addAP(0,APCA);
-        v11.addAP(0,APCC);
-        v11.addAP(0,APCB);
-        v11.addAP(0,APCB);
-        v11.addAP(0,APCB);
+        v11.addAP(APCA);
+        v11.addAP(APCD);
+        v11.addAP(APCA);
+        v11.addAP(APCA);
+        v11.addAP(APCC);
+        v11.addAP(APCB);
+        v11.addAP(APCB);
+        v11.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v11, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v12 = new EmptyVertex();
         v12.setBuildingBlockType(BBType.FRAGMENT);
-        v12.addAP(0,APCE);
-        v12.addAP(0,APCE);
-        v12.addAP(0,APCE);
+        v12.addAP(APCE);
+        v12.addAP(APCE);
+        v12.addAP(APCE);
         FragmentSpace.appendVertexToLibrary(v12, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v13 = new EmptyVertex();
         v13.setBuildingBlockType(BBType.FRAGMENT);
-        v13.addAP(0,APCF);
-        v13.addAP(0,APCB);
-        v13.addAP(0,APCA);
+        v13.addAP(APCF);
+        v13.addAP(APCB);
+        v13.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(v13, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         

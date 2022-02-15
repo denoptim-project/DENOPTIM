@@ -68,15 +68,15 @@ public class DENOPTIMVertexTest
     {
         EmptyVertex vA = new EmptyVertex(0);
         EmptyVertex vB = new EmptyVertex(90);
-        vA.addAP(0);
-        vA.addAP(1);
-        vA.addAP(2);
-        vA.addAP(3);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
 
-        vB.addAP(0);
-        vB.addAP(1);
-        vB.addAP(2);
-        vB.addAP(3);
+        vB.addAP();
+        vB.addAP();
+        vB.addAP();
+        vB.addAP();
         //NB: vertex ID must be ignores by the sameAs method
 
     	assertTrue(vA.sameAs(vB, reason));	
@@ -88,15 +88,15 @@ public class DENOPTIMVertexTest
     public void testSameAs_DiffAPNum()
     {
         EmptyVertex vA = new EmptyVertex(0);
-        vA.addAP(0);
-        vA.addAP(1);
-        vA.addAP(2);
-        vA.addAP(3);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
 
         EmptyVertex vB = new EmptyVertex(90);
-        vB.addAP(0);
-        vB.addAP(1);
-        vB.addAP(2);
+        vB.addAP();
+        vB.addAP();
+        vB.addAP();
         //NB: vertex ID must be ignores by the sameAs method
 
         assertFalse(vA.sameAs(vB, reason));
@@ -107,17 +107,10 @@ public class DENOPTIMVertexTest
     @Test
     public void testClone() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        String APRULE = "apc";
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.DOUBLE);
-        FragmentSpace.setBondOrderMap(map);
-
         EmptyVertex v = new EmptyVertex(0);
-        v.addAP(1);
-        v.addAP(2);
-        v.addAP(3);
+        v.addAP();
+        v.addAP();
+        v.addAP();
         
         DENOPTIMVertex c = v.clone();
         
@@ -138,7 +131,7 @@ public class DENOPTIMVertexTest
         v2.addAtom(a3);
         v2.addBond(new Bond(a1, a2));
         v2.addBond(new Bond(a2, a3));
-        String APCLASS = APRULE + DENOPTIMConstants.SEPARATORAPPROPSCL +"0";
+        String APCLASS = "apc" + DENOPTIMConstants.SEPARATORAPPROPSCL +"0";
         v2.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(
                 new double[]{0.0, 2.2, 3.3}));
         v2.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d(

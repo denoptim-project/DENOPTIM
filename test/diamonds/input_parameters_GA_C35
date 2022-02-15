@@ -24,15 +24,15 @@ GA-NumParallelTasks=1
 GA-Parallelization=Synchronous
 GA-KeepNewRingSystemVertexes
 # Fragment Space - parameters
-FS-ScaffoldLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
-FS-FragmentLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
-FS-CappingFragmentLibFile=/tmp/denoptim_Diamond/data/lib_cap.sdf
-FS-CompMatrixFile=/tmp/denoptim_Diamond/data/CPMap.par
+FS-ScaffoldLibFile=data/lib_frags.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CappingFragmentLibFile=data/lib_cap.sdf
+FS-CompMatrixFile=data/CPMap.par
 FS-MaxHeavyAtom=50
 FS-MaxMW=500
 FS-MaxRotatableBond=100
 RC-CloseRings
-FS-RCCompMatrixFile=/tmp/denoptim_Diamond/data/RC-CPMap
+FS-RCCompMatrixFile=data/RC-CPMap
 RC-RingSizeBias=5 2
 RC-RingSizeBias=6 4
 RC-RingSizeBias=7 1
@@ -42,4 +42,4 @@ RC-EvaluationClosabilityMode=Ring_size
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal*taniToGoal*taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/tmp/denoptim_Diamond/data/goal.sdf')}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}

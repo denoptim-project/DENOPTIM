@@ -82,37 +82,37 @@ do
     inpSDF="$wrkDir/$f"
     fname=`basename "$inpSDF" .sdf`
     outSDF="$wrkDir/$fname""_3Dbuilt.sdf"
-    tinkerparFile="$wrkDir/$fname""_tinker.par"
+    dnpParams="$wrkDir/$fname""_DnpCG.params"
     logFile="$wrkDir/$fname.log"
 
     #report
     echo -ne ' progress: '$fname' / '$nFiles' \r'
 
     #Prepare parameters
-    echo "CG-inpSDF=$inpSDF" > "$tinkerparFile"
-    echo "CG-outSDF=$outSDF" >> "$tinkerparFile"
-    echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> "$tinkerparFile"
-    echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$tinkerparFile"
-    echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$tinkerparFile"
-    echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$tinkerparFile"
-    echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/DenoptimCG/data/rotatableBonds-1.0" >> "$tinkerparFile"
+    echo "CG-inpSDF=$inpSDF" > "$dnpParams"
+    echo "CG-outSDF=$outSDF" >> "$dnpParams"
+    echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> "$dnpParams"
+    echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$dnpParams"
+    echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$dnpParams"
+    echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$dnpParams"
+    echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/DenoptimCG/data/rotatableBonds-1.0" >> "$dnpParams"
 
-    echo "CG-workDir=$wrkDir" >> "$tinkerparFile"
+    echo "CG-workDir=$wrkDir" >> "$dnpParams"
     # location of the TINKER tools
-    echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$tinkerparFile"
-    echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$tinkerparFile"
-    echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$tinkerparFile"
+    echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$dnpParams"
+    echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$dnpParams"
+    echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$dnpParams"
     # param file used by Tinker
-    echo "CG-ForceFieldFile=$DENOPTIM_HOME/src/DenoptimCG/data/uff_vdw.prm" >> "$tinkerparFile"
+    echo "CG-ForceFieldFile=$DENOPTIM_HOME/src/DenoptimCG/data/uff_vdw.prm" >> "$dnpParams"
     # key file to be used by tinker with PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-KEYFILE=$DENOPTIM_HOME/src/DenoptimCG/data/build_uff.key" >> "$tinkerparFile"
+    echo "CG-KEYFILE=$DENOPTIM_HOME/src/DenoptimCG/data/build_uff.key" >> "$dnpParams"
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-PSSROTPARAMS=$DENOPTIM_HOME/src/DenoptimCG/data/submit_pssrot" >> "$tinkerparFile"
+    echo "CG-PSSROTPARAMS=$DENOPTIM_HOME/src/DenoptimCG/data/submit_pssrot" >> "$dnpParams"
 
     #run builder
-    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimCG.jar" "$tinkerparFile" &> "$logFile"
+    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimCG.jar" "$dnpParams" &> "$logFile"
 
     #Check output
     if [ -f "$logFile" ]; then

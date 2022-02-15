@@ -61,7 +61,7 @@ public class DENOPTIMTemplateTest
 {
     final long SEED = 13;
     Random rng = new Random(SEED);
-    IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
+    static IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
 
     @TempDir
     File tempDir;
@@ -71,8 +71,6 @@ public class DENOPTIMTemplateTest
     
     @BeforeEach
     public void setUp() {
-        HashMap<String, DENOPTIMEdge.BondType> map = new HashMap<>();
-        FragmentSpace.setBondOrderMap(map);
         FragmentSpace.setFragmentLibrary(new ArrayList<>());
         FragmentSpace.setCompatibilityMatrix(new HashMap<>());
     }
@@ -83,21 +81,21 @@ public class DENOPTIMTemplateTest
     public void testClone() throws Exception
     {
         EmptyVertex vA = new EmptyVertex(0);
-        vA.addAP(0);
-        vA.addAP(0);
-        vA.addAP(0);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
         EmptyVertex vB = new EmptyVertex(1);
-        vB.addAP(0);
-        vB.addAP(0);
+        vB.addAP();
+        vB.addAP();
         EmptyVertex vC = new EmptyVertex(2);
-        vC.addAP(0);
-        vC.addAP(0);
-        vA.addAP(0);
+        vC.addAP();
+        vC.addAP();
+        vA.addAP();
         EmptyVertex vRcvA = new EmptyVertex(3);
-        vRcvA.addAP(0);
+        vRcvA.addAP();
         vRcvA.setAsRCV(true);
         EmptyVertex vRcvC = new EmptyVertex(4);
-        vRcvC.addAP(0);
+        vRcvC.addAP();
         vRcvC.setAsRCV(true);
         
         DENOPTIMGraph g = new DENOPTIMGraph();
@@ -204,7 +202,7 @@ public class DENOPTIMTemplateTest
      * @return 3D building block CH2 with two APs both on C.
      * @throws DENOPTIMException
      */
-    private DENOPTIMVertex getCH2Fragment() throws DENOPTIMException 
+    private static DENOPTIMVertex getCH2Fragment() throws DENOPTIMException 
     {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "H", "H"};
@@ -234,10 +232,6 @@ public class DENOPTIMTemplateTest
         for (int i = 0; i < 2; i++) {
 
             APClass apClass = APClass.make("c", 0);
-
-            FragmentSpace.getBondOrderMap().put(apClass.getRule(),
-                    DENOPTIMEdge.BondType.SINGLE);
-
             v.addAP(0, apClass,apCoords[i]);
         }
         return v;
@@ -251,7 +245,7 @@ public class DENOPTIMTemplateTest
      * @return 3D building block C(=O)N with three APs: one on C and two on N.
      * @throws DENOPTIMException
      */
-    private DENOPTIMVertex getAmideFragment() throws DENOPTIMException 
+    private static DENOPTIMVertex getAmideFragment() throws DENOPTIMException 
     {
         IAtomContainer atomContainer = chemBuilder.newAtomContainer();
         String[] elements = new String[]{"C", "O", "N"};
@@ -285,10 +279,6 @@ public class DENOPTIMTemplateTest
                 APClass.make("NAmide", 0),
                 APClass.make("NAmide", 0)};
         for (int i = 0; i < 3; i++) {
-
-            FragmentSpace.getBondOrderMap().put(apClass[i].getRule(),
-                    DENOPTIMEdge.BondType.SINGLE);
-
             v.addAP(srcAtm[i], apClass[i],apCoords[i]);
         }
         return v;
@@ -317,8 +307,6 @@ public class DENOPTIMTemplateTest
                 BBType.FRAGMENT);
         double precision = 10*10*10*10;
         APClass apClass = APClass.make("o", 0);
-        FragmentSpace.getBondOrderMap().put(apClass.getRule(),
-                DENOPTIMEdge.BondType.SINGLE);
         v.addAP(
                 0,
                 apClass,
@@ -338,7 +326,7 @@ public class DENOPTIMTemplateTest
     {
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
         EmptyVertex v = new EmptyVertex();
-        v.addAP(0);
+        v.addAP();
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v);
         template.setInnerGraph(innerGraph);
@@ -360,7 +348,6 @@ public class DENOPTIMTemplateTest
         DENOPTIMTemplate template = 
                 new DENOPTIMTemplate(BBType.NONE);
         int requiredAPCount = 2;
-        int atmPos = 0;
         EmptyVertex v1 = new EmptyVertex();
         EmptyVertex v2 = new EmptyVertex();
         int v1APCount = 3;
@@ -369,10 +356,10 @@ public class DENOPTIMTemplateTest
             template.addRequiredAP(null, null);
         }
         for (int i = 0; i < v1APCount; i++) {
-            v1.addAP(atmPos);
+            v1.addAP();
         }
         for (int i = 0; i < v2APCount; i++) {
-            v2.addAP(atmPos);
+            v2.addAP();
         }
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v1);
@@ -408,16 +395,12 @@ public class DENOPTIMTemplateTest
         for (int i = 0; i < numberOfAPs; i++) {
             template.addRequiredAP(dirVecs.get(i),
                     APClasses.get(i));
-            v.addAP(-1, dirVecs.get(i),
-                    APClasses.get(i));
+            v.addAP(APClasses.get(i));
         }
         DENOPTIMGraph innerGraph = new DENOPTIMGraph();
         innerGraph.addVertex(v);
 
         testAtLeastSameNumberOfAPs(template, numberOfAPs);
-        // Unsure if inner APs should be required to have the same direction
-        // vectors as required APs.
-//        testSameDirVec(template, innerGraph);
         testSameAPClass(template, innerGraph);
     }
 
@@ -465,7 +448,22 @@ public class DENOPTIMTemplateTest
     
 //------------------------------------------------------------------------------
     
-    private DENOPTIMTemplate getTestAmideTemplate() throws DENOPTIMException
+    /**
+     * Builds a template object meant for tests. The inner graph has the 
+     * following structure;
+     * <pre>
+     *                             -->AP
+     *                            /
+     * AP<--v7<--v5<--v3<--v1-->v9-->AP
+     * 
+     * </pre>
+     * Before calling this method from outside its class, you should call
+     * {@link DENOPTIMTemplateTest#setUp()} to prepare the fragment space.
+     * 
+     * @return
+     * @throws DENOPTIMException
+     */
+    public static DENOPTIMTemplate getTestAmideTemplate() throws DENOPTIMException
     {
         DENOPTIMVertex v1 = getCH2Fragment();
         DENOPTIMVertex v2 = getCH2Fragment();
@@ -543,7 +541,7 @@ public class DENOPTIMTemplateTest
         String fileName = tempDir.getAbsolutePath() + SEP + "refMol.sdf";
         DenoptimIO.writeData(fileName, refGeometry, false);
         
-        IAtomContainer refMol = DenoptimIO.readMoleculeData(fileName).get(0);
+        IAtomContainer refMol = DenoptimIO.readSDFFile(fileName).get(0);
         
         KabschAlignment sa = null;
         try {
@@ -723,7 +721,7 @@ public class DENOPTIMTemplateTest
         String fileName = tempDir.getAbsolutePath() + SEP + "refMol.sdf";
         DenoptimIO.writeData(fileName, refGeometry, false);
         
-        IAtomContainer refMol = DenoptimIO.readMoleculeData(fileName).get(0);
+        IAtomContainer refMol = DenoptimIO.readSDFFile(fileName).get(0);
         
         KabschAlignment sa = null;
         try {

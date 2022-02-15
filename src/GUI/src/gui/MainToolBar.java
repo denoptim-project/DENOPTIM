@@ -49,9 +49,10 @@ import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.task.StaticTaskManager;
 
 
@@ -288,7 +289,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 			public void actionPerformed(ActionEvent e) {
 				File file = GUIFileOpener.pickFileOrFolder(open);
 				try {
-					openFile(file, DenoptimIO.detectFileFormat(
+					openFile(file, FileUtils.detectFileFormat(
 							file));
 				} catch (Exception e1) {
 				    e1.printStackTrace();
@@ -610,14 +611,14 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 				GUIVertexInspector fragPanel = 
 					new GUIVertexInspector(mainPanel);
 				mainPanel.add(fragPanel);
-				fragPanel.importVerticesFromFile(file,"SDF");
+				fragPanel.importVerticesFromFile(file);
 				break;	
 			
 	        case VRTXJSON:
                 GUIVertexInspector fragPanel2 = 
                     new GUIVertexInspector(mainPanel);
                 mainPanel.add(fragPanel2);
-                fragPanel2.importVerticesFromFile(file,"SDF");
+                fragPanel2.importVerticesFromFile(file);
                 break;  
 				
 			case GRAPHSDF:

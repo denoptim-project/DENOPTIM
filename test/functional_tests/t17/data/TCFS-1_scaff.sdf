@@ -1,6 +1,6 @@
-PtCO
-  CDK     0627192254
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   5  4  0  0  0  0  0  0  0  0999 V2000
    -0.0073   -0.0093    0.6367 Pt  0  0  0  0  0  0  0  0  0  0  0  0
    -0.0117    0.0015    2.5711 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -12,13 +12,7 @@ From GM3DFragmenter
   4  1  1  0  0  0  0 
   5  2  1  0  0  0  0 
 M  END
-> <cdk:Title>
-PtCO
-
-> <cdk:Remark>
-From GM3DFragmenter
-
 > <ATTACHMENT_POINTS>
-1#Xlig:0:-2.3253%0.0094%0.8053,Xlig:0:2.3273%-0.0052%0.8136,scaff:0:0.0020%0.0016%-1.7111
+1#Xlig:0:SINGLE:-2.3253%0.0094%0.8053,Xlig:0:SINGLE:2.3273%-0.0052%0.8136,scaff:0:SINGLE:0.0020%0.0016%-1.7111 
 
 $$$$

@@ -310,10 +310,6 @@ public class DENOPTIMEdge implements Serializable
 
         NONE, UNDEFINED, ANY, SINGLE, DOUBLE, TRIPLE, QUADRUPLE;
 
-        // This is to be consistent with old "int-based" internal
-        // convention.
-        private String oldString = "1";
-
         private int valenceUsed = 0;
 
         private IBond.Order bo = null;
@@ -329,11 +325,6 @@ public class DENOPTIMEdge implements Serializable
             DOUBLE.valenceUsed = 2;
             TRIPLE.valenceUsed = 3;
             QUADRUPLE.valenceUsed = 4;
-
-            SINGLE.oldString = "1";
-            DOUBLE.oldString = "2";
-            TRIPLE.oldString = "3";
-            QUADRUPLE.oldString = "4";
         }
 
         /**
@@ -349,16 +340,6 @@ public class DENOPTIMEdge implements Serializable
          */
         public Order getCDKOrder() {
             return bo;
-        }
-
-        /**
-         * This method exists only to retain compatibility with old int-based
-         * notation.
-         * @return a string representation of the bond type
-         */
-        @Deprecated
-        public String toOldString() {
-            return oldString;
         }
 
         /**

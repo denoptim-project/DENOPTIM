@@ -40,7 +40,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
+import denoptim.files.FileUtils;
 import gui.GUIPreferences.SMITo3DEngine;
 
 public class GUIPreferencesDialog extends GUIModalDialog
@@ -333,7 +333,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 		String testFileName = field.getText()
 				+ System.getProperty("file.separator") 
 				+ "test";
-		if (!DenoptimIO.canWriteAndReadTo(testFileName))
+		if (!FileUtils.canWriteAndReadTo(testFileName))
 		{
 			inputIsOK = false;
 			JOptionPane.showMessageDialog(this,
@@ -344,7 +344,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	                UIManager.getIcon("OptionPane.errorIcon"));
 		}
 		try {
-			DenoptimIO.deleteFile(testFileName);
+			FileUtils.deleteFile(testFileName);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 		}

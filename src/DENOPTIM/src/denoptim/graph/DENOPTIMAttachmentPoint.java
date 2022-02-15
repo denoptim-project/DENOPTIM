@@ -22,6 +22,7 @@ package denoptim.graph;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -33,6 +34,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.DENOPTIMEdge.BondType;
 
 /**
  * An attachment point (AP) is a possibility to attach a {@link DENOPTIMVertex} 
@@ -65,13 +67,13 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
 	/**
 	 * The index of the source atom in the atom list of the fragment (0-based)
 	 */
-    private int atomPositionNumber;
+    private int atomPositionNumber = -1;
     
     /**
      * The index of the source atom in the atom list of the entire molecule 
      * (0-based)
      */
-    private int atomPositionNumberInMol;
+    private int atomPositionNumberInMol = -1;
     
     /**
      * The attachment point class
@@ -115,7 +117,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
         this.owner = owner;
-        atomPositionNumber = 0;
         id = FragmentSpace.apID.getAndIncrement();
     }
 
@@ -215,31 +216,61 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             switch (details.length)
             {
                 case 2:
-                    //OK, APClass:subclass but no direction vector
+                {
+                    //OK, APClass:subclass but no direction vector and no bnd type
+                    this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
+                    
+                    String[] coord = details[2].split(
+                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                    
+                    if (coord.length == 3)
+                    {
+                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                                Double.parseDouble(coord[1]),
+                                Double.parseDouble(coord[2]));
+                    }
                     break;
+                }
                     
                 case 3:
+                {
                     //OK, APClass:subclass:direction_vector
+                    this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
+                    
+                    String[] coord = details[2].split(
+                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                    
+                    if (coord.length == 3)
+                    {
+                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                                Double.parseDouble(coord[1]),
+                                Double.parseDouble(coord[2]));
+                    }
                     break;
+                }
+                    
+                case 4:
+                {
+                    //OK, new format that includes bond type
+                    this.apClass = APClass.make(details[0],
+                            Integer.parseInt(details[1]),
+                            BondType.valueOf(details[2]));
+                    
+                    String[] coord = details[3].split(
+                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
+                    
+                    if (coord.length == 3)
+                    {
+                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                                Double.parseDouble(coord[1]),
+                                Double.parseDouble(coord[2]));
+                    }
+                    break;
+                }
                     
                 default:
                     throw new DENOPTIMException("Unable to split APClass, "
                             + "subclass, and coordinates");
-            }
-            
-            this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
-            
-            if (details.length == 3)
-            {
-                String[] coord = details[2].split(
-                        Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
-                
-                if (coord.length == 3)
-                {
-                    this.dirVec = new Point3d(Double.parseDouble(coord[0]),
-                            Double.parseDouble(coord[1]),
-                            Double.parseDouble(coord[2]));
-                }
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -279,6 +310,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      */
     public int getAtomPositionNumber()
     {
+        if (owner!=null && owner instanceof EmptyVertex)
+            return -1;
         return atomPositionNumber;
     }
 
@@ -304,6 +337,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      */
     public int getAtomPositionNumberInMol()
     {
+        if (owner!=null && owner instanceof EmptyVertex)
+            return -1;
         return atomPositionNumberInMol;
     }
 
@@ -320,6 +355,22 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         this.atomPositionNumberInMol = atomPositionNumberInMol;
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the bond type preferred by this attachment point as defined by 
+     * the {@link APClass}, or null if {@link APClass} is null.
+     * @return the bond type preferred by this attachment point as defined by 
+     * the {@link APClass}, or null if {@link APClass} is null.
+     */
+    public BondType getBondType()
+    {
+        if (apClass == null)
+            return APClass.DEFAULTBT;
+        else
+            return apClass.getBondType();
+    }
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -580,7 +631,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * @param other AP to compare with this AP.
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
-     * @return <code>true</code> is the two APs have the same features.
+     * @return <code>true</code> if the two APs have the same features.
      */
     public boolean sameAs(DENOPTIMAttachmentPoint other, StringBuilder reason)
     {
@@ -592,6 +643,14 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             return false;
         }
         
+        if (this.getIndexInOwner() != other.getIndexInOwner())
+        {
+            reason.append("Different index on list of APs ("
+                    + this.getIndexInOwner() + ","
+                    + other.getIndexInOwner() + ");");
+            return false;
+        }
+        
         if (this.getAPClass()!=null && other.getAPClass()!=null)
         {
             if (!this.getAPClass().equals(other.getAPClass()))
@@ -599,18 +658,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
                 reason.append("Different APClass ("
                         + this.getAPClass() + ","
                         + other.getAPClass() + ");");
-                return false;
-            }
-        }
-        
-        if (this.getDirectionVector()!=null && other.getDirectionVector()!=null)
-        {
-            boolean different = false;
-            double trslh = 0.001;
-            if (this.getDirectionVector().distance(
-                    other.getDirectionVector()) > trslh)
-            {
-                reason.append("Different direction vector");
                 return false;
             }
         }
@@ -689,7 +736,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             sb.append(atmIdx);
             sb.append(DENOPTIMConstants.SEPARATORAPPROPAAP);
         }
-        sb.append(apClass);
+        sb.append(apClass.toSDFString());
         if (dirVec != null)
         {
             DecimalFormat digits = new DecimalFormat("###.####");
@@ -1090,6 +1137,61 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
             properties = new HashMap<Object, Object>();
         }
         properties.put(key, property);
+    }
+
+    /**
+     * Prepares the two strings that can be used to define 
+     * {@link DENOPTIMAttachmentPoint}s in SDF files.
+     * @param apsPerIndex a map of {@link DENOPTIMAttachmentPoint}s grouped by 
+     * index. The index may or may not be an index of an existing atom (i.e.,
+     * we do not use it as such, but we just place if in the text-representation
+     * of the AP. This index is supposed to be 0-based (i.e., in this method it 
+     * is transformed in 1-based).
+     * @return the string meant the be the value of the
+     * {@link DENOPTIMConstants#APSTAG} tag in SDF file.
+     */
+    
+    // WARNING: here is a place where we still assume a fixed order of APs
+    // In fact, the order in which we process the keys is given by the comparable
+    // class Integer, i.e., the APs are reported in SDF following the ordering
+    // of the respective source atoms.
+    // To solve the issue of ordering we could drop the format in which we 
+    // collect APs by source atom (i.e., 1#firstAP,second-AP) and allow for
+    // a one-to-one (sorted) list of APs where "1#firstAP,second-AP" becomes
+    // "1#firstAP 1#second-AP"
+    
+    public static String getAPDefinitionsForSDF(
+            LinkedHashMap<Integer, List<DENOPTIMAttachmentPoint>> apsPerIndex)
+    {   
+        String s = "";
+        for (Integer ii : apsPerIndex.keySet())
+        {
+            //WARNING: here is the 1-based criterion implemented also for
+            // fake atom IDs!
+            int atmID = ii+1;
+    
+            List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerIndex.get(ii);
+            
+            boolean firstCL = true;
+            for (int i = 0; i<apsOnAtm.size(); i++)
+            {
+                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+                
+                //Build SDF property DENOPTIMConstants.APCVTAG
+                String stingAPP = ""; //String Attachment Point Property
+                if (firstCL)
+                {
+                    firstCL = false;
+                    stingAPP = ap.getSingleAPStringSDF(true,atmID);
+                } else {
+                    stingAPP = DENOPTIMConstants.SEPARATORAPPROPAPS 
+                            + ap.getSingleAPStringSDF(false,atmID);
+                }
+                s = s + stingAPP;
+            }
+            s = s + DENOPTIMConstants.SEPARATORAPPROPATMS;
+        }
+        return s;
     }
     
 //-----------------------------------------------------------------------------

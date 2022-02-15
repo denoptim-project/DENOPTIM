@@ -295,7 +295,7 @@ public class DummyAtomHandler
                                  + "Du: " + du
                                  + "Candidates: " + allCandidates
                                  + "See current molecule in 'error.sdf'";
-                    DenoptimIO.writeMolecule("error.sdf",mol,false);
+                    DenoptimIO.writeSDFFile("error.sdf",mol,false);
                     throw new DENOPTIMException(msg);
                 }
                 

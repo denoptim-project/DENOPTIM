@@ -31,6 +31,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
@@ -360,7 +361,7 @@ public class GraphEdParameters
             return;
         }
 
-        if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+        if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
         {
            msg = "Directory " + workDir + " not found. Please specify an "
                  + "existing directory.";
@@ -372,7 +373,7 @@ public class GraphEdParameters
             msg = "Input file with graphs to edit not define. Check you input.";
             throw new DENOPTIMException(msg);
 	    }
-        else if (inGraphsFile != null && !DenoptimIO.checkExists(inGraphsFile))
+        else if (inGraphsFile != null && !FileUtils.checkExists(inGraphsFile))
         {
             msg = "File with input graphs not found. Check " + inGraphsFile;
             throw new DENOPTIMException(msg);
@@ -383,14 +384,14 @@ public class GraphEdParameters
 			    			    inGraphsFile).toUpperCase();
 	    }
 
-        if (graphEditsFile != null && !DenoptimIO.checkExists(graphEditsFile))
+        if (graphEditsFile != null && !FileUtils.checkExists(graphEditsFile))
         {
             msg = "File with graph editing tasks not found. Check " + 
                                                                  graphEditsFile;
             throw new DENOPTIMException(msg);
         }
 
-        if (outGraphsFile != null && DenoptimIO.checkExists(outGraphsFile))
+        if (outGraphsFile != null && FileUtils.checkExists(outGraphsFile))
         {
             msg = "Ouput file '" + outGraphsFile + "' exists already!";
             throw new DENOPTIMException(msg);
@@ -470,7 +471,7 @@ public class GraphEdParameters
         if (outGraphsFile == null)
         {
             outGraphsFile = inGraphsFile + ".mod" ;
-            if (DenoptimIO.checkExists(outGraphsFile))
+            if (FileUtils.checkExists(outGraphsFile))
             {
                 String msg = "Ouput file '" + outGraphsFile + "' exists already!";
                 throw new DENOPTIMException(msg);

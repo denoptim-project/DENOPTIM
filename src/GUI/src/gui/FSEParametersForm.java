@@ -95,11 +95,6 @@ public class FSEParametersForm extends ParametersForm
     JTextField txtPar9;
     JButton btnPar9;
 
-    String keyPar10 = "FSE-RootGraphsFormat";
-    JPanel linePar10;
-    JLabel lblPar10;
-    JComboBox<String> cmbPar10;
-
     String keyPar8 = "FSE-Verbosity";
     JPanel linePar8;
     JLabel lblPar8;
@@ -311,19 +306,6 @@ public class FSEParametersForm extends ParametersForm
         linePar9.add(txtPar9);
         linePar9.add(btnPar9);
         localBlock2.add(linePar9);
-
-        String toolTipPar10 = "<html>Specifies the format of the root graphs.<br><ul><li><code><b>STRING</b></code> for human readable graphs</li><li><code><b>'BYTE'</b></code> for serialized graphs (binary)</li></ul></html>";
-        linePar10 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar10 = new JLabel("Format of root graphs: ", SwingConstants.LEFT);
-        lblPar10.setPreferredSize(fileLabelSize);
-        lblPar10.setToolTipText(toolTipPar10);
-        cmbPar10 = new JComboBox<String>(new String[] {"STRING", "BYTE"});
-        cmbPar10.setToolTipText(toolTipPar10);
-        cmbPar10.addActionListener(cmbFieldChange);
-        mapKeyFieldToValueField.put(keyPar10.toUpperCase(),cmbPar10);
-        linePar10.add(lblPar10);
-        linePar10.add(cmbPar10);
-        localBlock2.add(linePar10);
 
         //HEREGOESIMPLEMENTATION this is only to facilitate automated insertion of code
 
@@ -575,7 +557,6 @@ public class FSEParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar7,txtPar7));
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));
         sb.append(getStringIfNotEmpty(keyPar9,txtPar9));
-        sb.append(keyPar10).append("=").append(cmbPar10.getSelectedItem()).append(NL);
         sb.append(getStringIfNotEmpty(keyPar8,txtPar8));
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(getStringIfNotEmpty(keyPar4,txtPar4));

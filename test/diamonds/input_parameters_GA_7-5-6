@@ -22,25 +22,25 @@ GA-ReplacementStrategy=ELITIST
 GA-NumParallelTasks=1
 GA-Parallelization=Synchronous
 # Fragment Space - parameters
-FS-ScaffoldLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
-FS-FragmentLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
-FS-CappingFragmentLibFile=/tmp/denoptim_Diamond/data/lib_cap.sdf
-FS-CompMatrixFile=/tmp/denoptim_Diamond/data/CPMap.par
+FS-ScaffoldLibFile=data/lib_frags.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CappingFragmentLibFile=data/lib_cap.sdf
+FS-CompMatrixFile=data/CPMap.par
 FS-MaxHeavyAtom=20
 FS-MaxMW=200
 FS-MaxRotatableBond=50
 RC-CloseRings
-FS-RCCompMatrixFile=/tmp/denoptim_Diamond/data/RC-CPMap
+FS-RCCompMatrixFile=data/RC-CPMap
 RC-RingSizeBias=4 1
 RC-RingSizeBias=5 2
 RC-RingSizeBias=6 4
 RC-RingSizeBias=7 1
 RC-MaxSizeNewRings=10
 RC-EvaluationClosabilityMode=3D-Conformation
-RC-RCCINDEX=/tmp/denoptim_Diamond/data/rccIndex
-RC-RCCFOLDER=/tmp/denoptim_Diamond/data/rccArchive
+RC-RCCINDEX=data/rccIndex
+RC-RCCFOLDER=data/rccArchive
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/tmp/denoptim_Diamond/data/goal.sdf')}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
 FP-CheckUidBeforeFitness

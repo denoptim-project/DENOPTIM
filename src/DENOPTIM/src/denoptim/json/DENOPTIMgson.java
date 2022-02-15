@@ -1,4 +1,6 @@
-package denoptim.utils;
+package denoptim.json;
+
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -48,6 +50,11 @@ public class DENOPTIMgson
       // Custom serialized that keeps only the IDs to vertices defined in
       // the list of vertices belonging to the graph
       .registerTypeAdapter(DENOPTIMRing.class, new DENOPTIMRingSerializer())
+      // Custom serializer to make serialisation of IAtomContainers feasible.
+      // The registerTypeHierarchyAdapter is needed because of IAtomContainer is
+      // an interface.
+      .registerTypeHierarchyAdapter(IAtomContainer.class, 
+              new IAtomContainerSerializer())
       .setPrettyPrinting()
       .create();
 
@@ -60,6 +67,10 @@ public class DENOPTIMgson
       // to references to vertices and APs
       .registerTypeAdapter(DENOPTIMGraph.class, new DENOPTIMGraphDeserializer())
       .registerTypeAdapter(APClass.class, new APClassDeserializer())
+      // Custom deserialiser build an IAtomContainer from the light-weight 
+      // representations of atoms and bonds.
+      .registerTypeHierarchyAdapter(IAtomContainer.class, 
+              new IAtomContainerDeserializer())
       .setPrettyPrinting()
       .create();
     
@@ -102,10 +113,6 @@ public class DENOPTIMgson
           //     class org.openscience.cdk.Atom declares multiple JSON
           //     fields named identifier
           
-          if (field.getDeclaringClass() == DENOPTIMFragment.class
-                  && field.getName().equals("mol")) {
-              return true;
-          }
           if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
                   && field.getName().equals("owner")) {
               return true;
@@ -142,10 +149,6 @@ public class DENOPTIMgson
               // cannot serialize chemical representations:
               //     class org.openscience.cdk.Atom declares multiple JSON
               //     fields named identifier
-              if (field.getDeclaringClass() == DENOPTIMFragment.class
-                      && field.getName().equals("mol")) {
-                  return true;
-              }
               if (field.getDeclaringClass() == DENOPTIMAttachmentPoint.class
                       && field.getName().equals("owner")) {
                   return true;

@@ -20,7 +20,7 @@ package gui;
 
 import javax.swing.JOptionPane;
 
-import denoptim.io.DenoptimIO;
+import denoptim.files.FileUtils;
 
 public class Utils 
 {
@@ -39,16 +39,16 @@ public class Utils
 				+ System.getProperty("file.separator")
 				+ tmpFileName;
 		
-		if (!DenoptimIO.canWriteAndReadTo(tmpSDFFile))
+		if (!FileUtils.canWriteAndReadTo(tmpSDFFile))
 		{
-			String tmpFolder = DenoptimIO.getTempFolder();
+			String tmpFolder = FileUtils.getTempFolder();
 			tmpSDFFile = tmpFolder + System.getProperty("file.separator")
 					+ tmpFileName;
-			if (!DenoptimIO.canWriteAndReadTo(tmpSDFFile))
+			if (!FileUtils.canWriteAndReadTo(tmpSDFFile))
 			{		
 				String preStr = "Could not find a location for temprorary"
 						+ " files automatically ";
-				while (!DenoptimIO.canWriteAndReadTo(tmpSDFFile))
+				while (!FileUtils.canWriteAndReadTo(tmpSDFFile))
 				{
 					tmpFolder = JOptionPane.showInputDialog("<html>" + preStr
 						+ "<br>Please, "

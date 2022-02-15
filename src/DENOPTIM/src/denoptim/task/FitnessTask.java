@@ -139,7 +139,7 @@ public abstract class FitnessTask extends Task
         boolean status = false;
         if (FitnessParameters.useExternalFitness()) {
             // Write file with input data to fitness provider
-            DenoptimIO.writeMolecule(fitProvInputFile, fitProvMol, false);
+            DenoptimIO.writeSDFFile(fitProvInputFile, fitProvMol, false);
 
             // NB: inside this call we change fitProvMol for a reordered copy: 
             //     reference will not work!
@@ -152,8 +152,7 @@ public abstract class FitnessTask extends Task
         
         // Write the FIT file
         result.setChemicalRepresentation(fitProvMol);
-        DenoptimIO.writeMolecule(fitProvOutFile, 
-                result.getFitnessProviderOutputRepresentation(), false);
+        DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, false);
         
         // Optional image creation
         if (status && FitnessParameters.makePictures())
@@ -227,7 +226,7 @@ public abstract class FitnessTask extends Task
         boolean unreadable = false;
         try
         {
-            processedMol = DenoptimIO.readSingleSDFFile(fitProvOutFile);
+            processedMol = DenoptimIO.getFirstMolInSDFFile(fitProvOutFile);
             if (processedMol.isEmpty())
             {
                 unreadable=true;

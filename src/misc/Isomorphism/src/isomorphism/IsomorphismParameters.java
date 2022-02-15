@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
@@ -183,13 +184,13 @@ public class IsomorphismParameters
     {
         String msg = "";
 
-        if (!DenoptimIO.checkExists(inpFileGraphA))
+        if (!FileUtils.checkExists(inpFileGraphA))
         {
             msg = "Input file '" + inpFileGraphA + "' not found.";
             throw new DENOPTIMException(msg);
         }
         
-        if (!DenoptimIO.checkExists(inpFileGraphB))
+        if (!FileUtils.checkExists(inpFileGraphB))
         {
             msg = "Input file '" + inpFileGraphB + "' not found.";
             throw new DENOPTIMException(msg);

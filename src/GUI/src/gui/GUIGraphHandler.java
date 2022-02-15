@@ -56,6 +56,10 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileAndFormat;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge.BondType;
@@ -66,9 +70,6 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileAndFormat;
-import denoptim.io.FileFormat;
-import denoptim.io.UndetectedFileFormatException;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import gui.GraphViewerPanel.LabelType;
 
@@ -709,7 +710,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 }
                 deprotectEditedSystem();
                 unsavedChanges = false;
-                DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
+                FileUtils.addToRecentFiles(outFile, fileAndFormat.format);
             }
         });
         commandsPane.add(btnSaveGraphs);
@@ -769,7 +770,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 }
                 deprotectEditedSystem();
                 unsavedChanges = false;
-                DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
+                FileUtils.addToRecentFiles(outFile, fileAndFormat.format);
 			}
 		});
 		commandsPane.add(btnSaveTmpl);		
@@ -1365,8 +1366,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		dnGraphLibrary = readGraphsFromFile(file);
 		
 		try {
-			molLibrary = DenoptimIO.readMoleculeData(
-					file.getAbsolutePath());
+			molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
 		} catch (DENOPTIMException e) {
 			System.out.println("Could not read molecules from " + file);
 			for (int i=0; i<dnGraphLibrary.size(); i++)
@@ -1394,7 +1394,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         FileFormat ff = null;
         try
         {
-            ff = DenoptimIO.detectFileFormat(file);
+            ff = FileUtils.detectFileFormat(file);
         } catch (Exception e1)
         {
             // we'll ignore the format specific tasks
@@ -1403,7 +1403,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         {
             case GRAPHSDF:
                 try {
-                    molLibrary.addAll(DenoptimIO.readMoleculeData(
+                    molLibrary.addAll(DenoptimIO.readSDFFile(
                             file.getAbsolutePath()));
                 } catch (DENOPTIMException e) {
                     System.err.println("WARNING: Could not read molecular "

@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.RingClosureParameters;
 
@@ -300,7 +300,7 @@ public class FRParameters
             return;
         }
     
-    	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+    	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
     	{
     	   msg = "Directory '" + workDir + "' not found. Please specify an "
     		 + "existing directory.";
@@ -341,7 +341,7 @@ public class FRParameters
 
     public static void processParameters() throws DENOPTIMException
     {
-        DenoptimIO.addToRecentFiles(outFile, FileFormat.GRAPHSDF);
+        FileUtils.addToRecentFiles(outFile, FileFormat.GRAPHSDF);
 
         if (FragmentSpaceParameters.fsParamsInUse())
         {

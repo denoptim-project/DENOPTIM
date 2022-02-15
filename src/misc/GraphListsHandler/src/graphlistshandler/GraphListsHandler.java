@@ -65,15 +65,14 @@ public class GraphListsHandler
                     
                     System.out.println(" ");
                     System.out.println("-> Comparing "+i+" and "+j);
-                    StringBuilder reason = new StringBuilder();
-                    if (gA.sameAs(gB, reason))
+                    if (gA.isIsomorphicTo(gB))
                     {
                         System.out.println(" SAME!");
                         matchedA.add(gA);
                         matchedB.add(gB);
                         break;
                     } else {
-                        System.out.println(" Different: "+reason.toString());
+                        System.out.println(" Different");
                     }
                 }
             }

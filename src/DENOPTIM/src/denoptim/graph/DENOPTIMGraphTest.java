@@ -43,22 +43,9 @@ public class DENOPTIMGraphTest {
     
     private final String APRULE = "MyRule";
     private final String APSUBRULE = "1";
-    private final String APCLASS = APRULE
-            + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
     
     private static APClass APCA, APCB, APCC, APCD;
     private static String a="A", b="B", c="C", d="D";
-    
-//------------------------------------------------------------------------------
-    
-    @BeforeEach
-    public void setBoMap()
-    {
-        //This is just to aboid printing the warning about unset bond order map
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(boMap);
-    }
     
 //------------------------------------------------------------------------------
     
@@ -109,7 +96,6 @@ public class DENOPTIMGraphTest {
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);
@@ -120,78 +106,78 @@ public class DENOPTIMGraphTest {
         
         EmptyVertex s0 = new EmptyVertex();
         s0.setBuildingBlockType(BBType.SCAFFOLD);
-        s0.addAP(0,APCA);
-        s0.addAP(0,APCA);
+        s0.addAP(APCA);
+        s0.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(s0, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
         EmptyVertex s1 = new EmptyVertex();
         s1.setBuildingBlockType(BBType.SCAFFOLD);
-        s1.addAP(0,APCA);
-        s1.addAP(0,APCA);
-        s1.addAP(0,APCD);
+        s1.addAP(APCA);
+        s1.addAP(APCA);
+        s1.addAP(APCD);
         FragmentSpace.appendVertexToLibrary(s1, BBType.SCAFFOLD,
                 FragmentSpace.getScaffoldLibrary());
         
         EmptyVertex v0 = new EmptyVertex();
         v0.setBuildingBlockType(BBType.FRAGMENT);
-        v0.addAP(0,APCA);
-        v0.addAP(0,APCB);
-        v0.addAP(0,APCA);
+        v0.addAP(APCA);
+        v0.addAP(APCB);
+        v0.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0,APCA);
-        v1.addAP(0,APCB);
-        v1.addAP(0,APCA);
-        v1.addAP(0,APCB);
-        v1.addAP(0,APCC);
+        v1.addAP(APCA);
+        v1.addAP(APCB);
+        v1.addAP(APCA);
+        v1.addAP(APCB);
+        v1.addAP(APCC);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0,APCB);
+        v2.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v3 = new EmptyVertex();
         v3.setBuildingBlockType(BBType.FRAGMENT);
-        v3.addAP(0,APCD);
-        v3.addAP(0,APCD);
+        v3.addAP(APCD);
+        v3.addAP(APCD);
         FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
        
         EmptyVertex v4 = new EmptyVertex();
         v4.setBuildingBlockType(BBType.FRAGMENT);
-        v4.addAP(0,APCC);
-        v4.addAP(0,APCB);
-        v4.addAP(0,APCB);
-        v4.addAP(0,APCA);
-        v4.addAP(0,APCA);
+        v4.addAP(APCC);
+        v4.addAP(APCB);
+        v4.addAP(APCB);
+        v4.addAP(APCA);
+        v4.addAP(APCA);
         FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v5 = new EmptyVertex();
         v5.setBuildingBlockType(BBType.FRAGMENT);
-        v5.addAP(0,APCB);
-        v5.addAP(0,APCD);
+        v5.addAP(APCB);
+        v5.addAP(APCD);
         FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v6 = new EmptyVertex();
         v6.setBuildingBlockType(BBType.FRAGMENT);
-        v6.addAP(0,APCC);
-        v6.addAP(0,APCD);
+        v6.addAP(APCC);
+        v6.addAP(APCD);
         FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
         v7.setAsRCV(true);
-        v7.addAP(0,APCB);
+        v7.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
@@ -1307,9 +1293,9 @@ public class DENOPTIMGraphTest {
 	    EmptyVertex vertex0 = new EmptyVertex(0);
 	    EmptyVertex vertex1 = new EmptyVertex(1);
 
-		vertex0.addAP(0);
-		vertex0.addAP(0);
-		vertex1.addAP(0);
+		vertex0.addAP();
+		vertex0.addAP();
+		vertex1.addAP();
 
 		DENOPTIMEdge edge0 = new DENOPTIMEdge(vertex0.getAP(0),
 		        vertex1.getAP(0));
@@ -1629,16 +1615,16 @@ public class DENOPTIMGraphTest {
             v4.setBuildingBlockId(3);
             
             EmptyVertex ev1 = new EmptyVertex();
-            ev1.addAP(0, APClass.make(d,0));
-            ev1.addAP(0, APClass.make(d,0));
+            ev1.addAP(APClass.make(d,0));
+            ev1.addAP(APClass.make(d,0));
             
             EmptyVertex ev2 = new EmptyVertex();
-            ev2.addAP(0, APClass.make(d,0));
-            ev2.addAP(0, APClass.make(d,0));
+            ev2.addAP(APClass.make(d,0));
+            ev2.addAP(APClass.make(d,0));
             
             EmptyVertex ev3 = new EmptyVertex();
-            ev3.addAP(0, APClass.make(a,1));
-            ev3.addAP(0, APClass.make(a,1));
+            ev3.addAP(APClass.make(a,1));
+            ev3.addAP(APClass.make(a,1));
         
             graph.addVertex(v1);
             graph.addVertex(v2);
@@ -1688,24 +1674,24 @@ public class DENOPTIMGraphTest {
 		IAtomContainer iac1 = builder.newAtomContainer();
 		iac1.addAtom(new Atom("C"));
 		DENOPTIMFragment v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
-		v1.addAP(1);
-		v1.addAP(1);
+		v1.addAP(0);
+		v1.addAP(0);
 
 		IAtomContainer iac2 = builder.newAtomContainer();
 		iac2.addAtom(new Atom("O"));
 		DENOPTIMFragment v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
-		v2.addAP(1);
-		v2.addAP(1);
+		v2.addAP(0);
+		v2.addAP(0);
 
 		IAtomContainer iac3 = builder.newAtomContainer();
 		iac3.addAtom(new Atom("H"));
 		DENOPTIMFragment v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
-		v3.addAP(1);
+		v3.addAP(0);
 
 		IAtomContainer iac4 = builder.newAtomContainer();
 		iac4.addAtom(new Atom("H"));
 		DENOPTIMFragment v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
-		v4.addAP(1);
+		v4.addAP(0);
 
 		graph.addVertex(v1);
 		graph.addVertex(v2);
@@ -1785,7 +1771,7 @@ public class DENOPTIMGraphTest {
 	        DENOPTIMGraph graph) throws DENOPTIMException 
 	{
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos);
+			v.addAP();
 		}
 		graph.addVertex(v);
 	}

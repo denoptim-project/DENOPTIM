@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
@@ -289,7 +290,7 @@ public class GraphListsHandlerParameters
             return;
         }
 
-        if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+        if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
         {
            msg = "Directory " + workDir + " not found. Please specify an "
                  + "existing directory.";
@@ -302,19 +303,19 @@ public class GraphListsHandlerParameters
             throw new DENOPTIMException(msg);
         }
         else if (inGraphsFileA != null 
-                && !DenoptimIO.checkExists(inGraphsFileA))
+                && !FileUtils.checkExists(inGraphsFileA))
         {
             msg = "File with input graphs not found. Check " + inGraphsFileA;
             throw new DENOPTIMException(msg);
         }
         else if (inGraphsFileB != null 
-                && !DenoptimIO.checkExists(inGraphsFileB))
+                && !FileUtils.checkExists(inGraphsFileB))
         {
             msg = "File with input graphs not found. Check " + inGraphsFileB;
             throw new DENOPTIMException(msg);
         }
 
-        if (outGraphsFile != null && DenoptimIO.checkExists(outGraphsFile))
+        if (outGraphsFile != null && FileUtils.checkExists(outGraphsFile))
         {
             msg = "Ouput file '" + outGraphsFile + "' exists aleary!";
             throw new DENOPTIMException(msg);
@@ -393,7 +394,7 @@ public class GraphListsHandlerParameters
         if (outGraphsFile == null)
         {
             outGraphsFile = "graphListHandler.output" ;
-            if (DenoptimIO.checkExists(outGraphsFile))
+            if (FileUtils.checkExists(outGraphsFile))
             {
                 String msg = "Ouput file '" + outGraphsFile +
                                                              "' exists aleary!";

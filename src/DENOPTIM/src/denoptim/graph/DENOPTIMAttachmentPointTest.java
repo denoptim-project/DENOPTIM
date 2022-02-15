@@ -2,6 +2,7 @@ package denoptim.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,6 +33,7 @@ import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -54,30 +56,23 @@ public class DENOPTIMAttachmentPointTest
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	private final Point3d DIRVEC = new Point3d(1.1, 2.2, 3.3);
-	private final EmptyVertex dummyVertex = new EmptyVertex();
 	
 //-----------------------------------------------------------------------------
     
     @Test
     public void testGetEmbeddedAP() throws Exception
-    {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
+    {   
         EmptyVertex vA1 = new EmptyVertex(0);
-        vA1.addAP(0);
-        vA1.addAP(1);
-        vA1.addAP(2);
-        vA1.addAP(3);
-        vA1.addAP(4);
-        vA1.addAP(5);
-        vA1.addAP(6);
+        vA1.addAP();
+        vA1.addAP();
+        vA1.addAP();
+        vA1.addAP();
+        vA1.addAP();
+        vA1.addAP();
+        vA1.addAP();
         ArrayList<DENOPTIMAttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
         EmptyVertex vB1 = new EmptyVertex(1);
-        vB1.addAP(0);
+        vB1.addAP();
         
         DENOPTIMGraph gL01 = new DENOPTIMGraph();
         gL01.addVertex(vA1);
@@ -102,7 +97,7 @@ public class DENOPTIMAttachmentPointTest
         for (int i=1; i<6; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
-            vNew.addAP(0);
+            vNew.addAP();
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             gNew.addVertex(old1);
             gNew.appendVertexOnAP(old1.getAP(0), vNew.getAP(0));
@@ -142,16 +137,16 @@ public class DENOPTIMAttachmentPointTest
         //
         
         EmptyVertex vA2 = new EmptyVertex();
-        vA2.addAP(0);
-        vA2.addAP(1);
-        vA2.addAP(2);
-        vA2.addAP(3);
-        vA2.addAP(4);
-        vA2.addAP(5);
-        vA2.addAP(6);
+        vA2.addAP();
+        vA2.addAP();
+        vA2.addAP();
+        vA2.addAP();
+        vA2.addAP();
+        vA2.addAP();
+        vA2.addAP();
         ArrayList<DENOPTIMAttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
         EmptyVertex vB2 = new EmptyVertex(1);
-        vB2.addAP(0);
+        vB2.addAP();
         
         DENOPTIMGraph gL02 = new DENOPTIMGraph();
         
@@ -180,7 +175,7 @@ public class DENOPTIMAttachmentPointTest
         for (int i=1; i<6; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
-            vNew.addAP(0);
+            vNew.addAP();
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             
             //NB: here we pick the other vertex as source
@@ -242,24 +237,18 @@ public class DENOPTIMAttachmentPointTest
 	
 	@Test
 	public void testAvailableThrougout() throws Exception
-	{
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
+	{   
         EmptyVertex vA = new EmptyVertex(0);
-        vA.addAP(0);
-        vA.addAP(1);
-        vA.addAP(2);
-        vA.addAP(3);
-        vA.addAP(4);
-        vA.addAP(5);
-        vA.addAP(6);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
         EmptyVertex vB = new EmptyVertex(1);
-        vB.addAP(0);
-        vB.addAP(0);
+        vB.addAP();
+        vB.addAP();
         
         DENOPTIMGraph gL0 = new DENOPTIMGraph();
         gL0.addVertex(vA);
@@ -277,7 +266,7 @@ public class DENOPTIMAttachmentPointTest
         for (int i=1; i<4; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
-            vNew.addAP(0);
+            vNew.addAP();
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             gNew.addVertex(old);
             gNew.appendVertexOnAP(old.getAP(0), vNew.getAP(0));
@@ -310,18 +299,12 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testGetEdbeUserThrougout() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         EmptyVertex vA = new EmptyVertex(0);
-        vA.addAP(0);
-        vA.addAP(1);
-        vA.addAP(2);
-        vA.addAP(3);
-        vA.addAP(4);
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
+        vA.addAP();
         
         DENOPTIMGraph gL0 = new DENOPTIMGraph();
         gL0.addVertex(vA);
@@ -334,7 +317,7 @@ public class DENOPTIMAttachmentPointTest
         for (int i=0; i<5; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
-            vNew.addAP(i);
+            vNew.addAP();
             newVrtxs.add(vNew);
             DENOPTIMGraph gNew = new DENOPTIMGraph();
             gNew.addVertex(old);
@@ -383,21 +366,15 @@ public class DENOPTIMAttachmentPointTest
 	@Test
 	public void testIsSrcInUser() throws Exception
 	{
-	    // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMGraph g = new DENOPTIMGraph();
         EmptyVertex v1 = new EmptyVertex();
-        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
-        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(APClass.make(APCLASS));
+        v1.addAP(APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
         DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
         EmptyVertex v2 = new EmptyVertex();
-        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
-        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(APClass.make(APCLASS));
+        v2.addAP(APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
         DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
         g.addVertex(v1);
@@ -414,21 +391,15 @@ public class DENOPTIMAttachmentPointTest
 	@Test
 	public void testGetLinkedAP() throws Exception
 	{
-	    // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
 	    DENOPTIMGraph g = new DENOPTIMGraph();
 	    EmptyVertex v1 = new EmptyVertex();
-        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
-        v1.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v1.addAP(APClass.make(APCLASS));
+        v1.addAP(APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
         DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
         EmptyVertex v2 = new EmptyVertex();
-        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
-        v2.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        v2.addAP(APClass.make(APCLASS));
+        v2.addAP(APClass.make(APCLASS));
         DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
         DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
         g.addVertex(v1);
@@ -445,27 +416,17 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFString() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-
-		dummyVertex.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        DENOPTIMFragment dummyVertex = new DENOPTIMFragment();
+        dummyVertex.addAtom(new Atom("C"));
+		dummyVertex.addAP(0, DIRVEC, APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
     	
     	String str2 = ap.getSingleAPStringSDF(true);
     	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
 				, str2);
     	
-    	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
-    			+ ap.getSingleAPStringSDF(false);
-    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
-				, str3);
-    	
     	assertEquals(ap.getSingleAPStringSDF(true),
     			ap2.getSingleAPStringSDF(true));
-    	assertEquals(ap2.toStringNoId(),ap3.toStringNoId());
     }
     
 //-----------------------------------------------------------------------------
@@ -473,14 +434,16 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFStringNoDirVec() throws Exception
     {
-		dummyVertex.addAP(ATMID, DIRVEC, APClass.make(APCLASS));
+        DENOPTIMFragment dummyVertex = new DENOPTIMFragment();
+        dummyVertex.addAtom(new Atom("C"));
+		dummyVertex.addAP(0, DIRVEC, APClass.make(APCLASS));
 		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
 
     	String str2 = ap.getSingleAPStringSDF(true);
     	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
 				, str2);
     	
-    	String str3 = (ATMID+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
+    	String str3 = (0+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
     			+ ap.getSingleAPStringSDF(false);
     	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
 				, str3);
@@ -495,6 +458,14 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSortAPs() throws Exception
     {
+        DENOPTIMFragment dummyVertex = new DENOPTIMFragment();
+        dummyVertex.addAtom(new Atom("C"));
+        dummyVertex.addAtom(new Atom("C"));
+        dummyVertex.addAtom(new Atom("C"));
+        dummyVertex.addAtom(new Atom("C"));
+        dummyVertex.addAtom(new Atom("C"));
+        dummyVertex.addAtom(new Atom("C"));
+        dummyVertex.addAtom(new Atom("C"));
     	dummyVertex.addAP(0);
     	dummyVertex.addAP(0);
 		DENOPTIMAttachmentPoint ap1 = dummyVertex.getAP(0);
@@ -532,13 +503,19 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSameAs()
     {
-		dummyVertex.addAP(1);
-		dummyVertex.addAP(1);
+        EmptyVertex dummyVertex = new EmptyVertex();
+		dummyVertex.addAP();
+		dummyVertex.addAP();
 		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
+		
+		DENOPTIMVertex clone = dummyVertex.clone();
+        DENOPTIMAttachmentPoint apAc = clone.getAP(0);
+        DENOPTIMAttachmentPoint apBc = clone.getAP(1);
 
     	assertEquals(-1,apA.compareTo(apB),"Comparison driven by ID.");
-    	assertTrue(apA.sameAs(apB),"SameAs ignores ID.");
+    	assertTrue(apA.sameAs(apAc),"SameAs ignores ID.");
+        assertTrue(apB.sameAs(apBc),"SameAs ignores ID (2).");
     }
     
 //-----------------------------------------------------------------------------
@@ -546,26 +523,13 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSameAs_DiffSrcAtm()
     {
-		dummyVertex.addAP(1);
-		dummyVertex.addAP(2);
+        EmptyVertex dummyVertex = new EmptyVertex();
+		dummyVertex.addAP();
+		dummyVertex.addAP();
     	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
     	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
 
     	assertFalse(apA.sameAs(apB));
-    }
-
-//-----------------------------------------------------------------------------
-    
-    @Test
-    public void testSameAs_SameAPClass() throws Exception
-    {
-		APClass apClass = APClass.make("classA:0");
-		dummyVertex.addAP(1,apClass);
-    	dummyVertex.addAP(1,apClass);
-    	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
-    	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
-
-    	assertTrue(apA.sameAs(apB));
     }
     
 //-----------------------------------------------------------------------------
@@ -573,12 +537,15 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSameAs_DiffAPClass() throws Exception
     {
-    	dummyVertex.addAP(1,APClass.make("classA:0"));
-    	dummyVertex.addAP(1,APClass.make("classB:0"));
+        EmptyVertex dummyVertex = new EmptyVertex();
+    	dummyVertex.addAP(APClass.make("classA:0"));
+        DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);    	
 
-		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
-		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
-		assertFalse(apA.sameAs(apB));
+        DENOPTIMVertex clone = dummyVertex.clone();
+        DENOPTIMAttachmentPoint apAc = clone.getAP(0);
+        apAc.setAPClass(APClass.make("classB:0"));
+
+		assertFalse(apA.sameAs(apAc));
     }
     
 //-----------------------------------------------------------------------------
@@ -586,17 +553,33 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testClone() throws Exception
     {
-        dummyVertex.addAP(1,APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint orig = dummyVertex.getAP(
-                dummyVertex.getNumberOfAPs()-1);
+        EmptyVertex ev = new EmptyVertex();
+        ev.addAP(APClass.make(APCLASS));
+        
+        
+        EmptyVertex ev2 = new EmptyVertex();
+        ev2.addAP(APClass.make(APCLASS));
+        DENOPTIMAttachmentPoint ev2Ap = ev2.getAP(0);
+        
+        DENOPTIMAttachmentPoint orig = ev.getAP(0);
+        Point3d p3d = new Point3d(0.1, 0.2, -0.3);
+        orig.setDirectionVector(p3d);
+        
+        DENOPTIMEdge e = new DENOPTIMEdge(ev2Ap, orig);
         
         DENOPTIMAttachmentPoint clone = orig.clone();
 
-        /* This may not always work as hashing only guarantees that if
-        objectA == objectB then objectA.hashCode() == objectB.hashCode(). I.e
-        two objects with the same hash code need not be equal.*/
-        assertEquals(clone.getAPClass().hashCode(),
-                orig.getAPClass().hashCode(),"Hashcode of cloned APClass");
+        assertEquals(orig.getAPClass(),clone.getAPClass(),"APClass");
+        assertEquals(orig.getAtomPositionNumber(),
+                clone.getAtomPositionNumber(),"AtomPositionNumber");
+        assertEquals(orig.getDirectionVector(),
+                clone.getDirectionVector(),"DirectionVector");
+        assertNotEquals(orig.getID(),clone.getID(),"ID");
+        assertEquals(orig.getOwner(),
+                clone.getOwner(),"Owner");
+        assertEquals(e,orig.getEdgeUser(),"Edge user in original");
+        assertEquals(null,clone.getEdgeUser(),"Edge user in clone");
+        
     }
     
 //------------------------------------------------------------------------------
@@ -604,12 +587,6 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testHasSameSrcAtom() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMFragment v1 = new DENOPTIMFragment();
         Atom a1 = new Atom("C");
         Atom a2 = new Atom("C");
@@ -664,12 +641,6 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testHasConnectedSrcAtom() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMFragment v1 = new DENOPTIMFragment();
         Atom a1 = new Atom("C");
         Atom a2 = new Atom("C");

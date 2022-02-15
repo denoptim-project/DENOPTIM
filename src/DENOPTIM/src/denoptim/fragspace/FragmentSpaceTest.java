@@ -49,7 +49,9 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
@@ -79,7 +81,7 @@ public class FragmentSpaceTest
 
     private final Random rng = new Random();
     
-	private static final String APSUBRULE = "0";
+	private static final int APSUBRULE = 0;
 
     private static final String RULAPCS = "apc-S";
     private static final String RULAPC1 = "apc-1";
@@ -118,45 +120,23 @@ public class FragmentSpaceTest
 	    
         try
         {
-            APCS = APClass.make(RULAPCS
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC1 = APClass.make(RULAPC1
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC2 = APClass.make(RULAPC2
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC3 = APClass.make(RULAPC3
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC4 = APClass.make(RULAPC4
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC5 = APClass.make(RULAPC5
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APC6 = APClass.make(RULAPC6
-                    + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APCC1 = APClass.make(RULAPCC1
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
-            APCC2 = APClass.make(RULAPCC2
-                + DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE);
+            APCS = APClass.make(RULAPCS, APSUBRULE, BondType.SINGLE);
+            APC1 = APClass.make(RULAPC1, APSUBRULE, BondType.SINGLE);
+            APC2 = APClass.make(RULAPC2, APSUBRULE, BondType.SINGLE);
+            APC3 = APClass.make(RULAPC3, APSUBRULE, BondType.SINGLE);
+            APC4 = APClass.make(RULAPC4, APSUBRULE, BondType.SINGLE);
+            APC5 = APClass.make(RULAPC5, APSUBRULE, BondType.SINGLE);
+            APC6 = APClass.make(RULAPC6, APSUBRULE, BondType.DOUBLE);
+            APCC1 = APClass.make(RULAPCC1, APSUBRULE, BondType.SINGLE);
+            APCC2 = APClass.make(RULAPCC2, APSUBRULE, BondType.SINGLE);
         } catch (DENOPTIMException e)
         {
             //This will not happen
         }
-	       
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(RULAPCS,BondType.SINGLE);
-        boMap.put(RULAPC1,BondType.SINGLE);
-        boMap.put(RULAPC2,BondType.SINGLE);
-        boMap.put(RULAPC3,BondType.SINGLE);
-        boMap.put(RULAPC4,BondType.SINGLE);
-        boMap.put(RULAPC5,BondType.SINGLE);
-        boMap.put(RULAPC6,BondType.DOUBLE);
-        boMap.put(RULAPCC1,BondType.SINGLE);
-        boMap.put(RULAPCC2,BondType.SINGLE);
-        
-        FragmentSpace.setBondOrderMap(boMap);
 
         String rootName = tempDir.getAbsolutePath() + SEP;
 
-    	ArrayList<DENOPTIMFragment> fragLib = new ArrayList<DENOPTIMFragment>();
+    	ArrayList<DENOPTIMVertex> fragLib = new ArrayList<DENOPTIMVertex>();
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -213,9 +193,9 @@ public class FragmentSpaceTest
         fragLib.add(frg8);
         
         String fragLibFile = rootName + "frags.sdf";
-        DenoptimIO.writeFragmentSet(fragLibFile, fragLib);
+        DenoptimIO.writeVertexesToSDF(new File(fragLibFile), fragLib, false);
         
-    	ArrayList<DENOPTIMFragment> scaffLib = new ArrayList<DENOPTIMFragment>();
+    	ArrayList<DENOPTIMVertex> scaffLib = new ArrayList<DENOPTIMVertex>();
         DENOPTIMFragment scaf0 = new DENOPTIMFragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -242,9 +222,9 @@ public class FragmentSpaceTest
         scaffLib.add(scaf1);
         
         String scaffLibFile = rootName + "scaff.sdf";
-        DenoptimIO.writeFragmentSet(scaffLibFile, scaffLib);
+        DenoptimIO.writeVertexesToSDF(new File(scaffLibFile), scaffLib, false);
         
-        ArrayList<DENOPTIMFragment> cappLib = new ArrayList<DENOPTIMFragment>();
+        ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
         DENOPTIMFragment cap1 = new DENOPTIMFragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         cap1.addAtom(a61);
@@ -260,7 +240,7 @@ public class FragmentSpaceTest
         cappLib.add(cap2);
 
         String capLibFile = rootName + "caps.sdf";
-        DenoptimIO.writeFragmentSet(capLibFile, cappLib);
+        DenoptimIO.writeVertexesToSDF(new File(capLibFile), cappLib, false);
         
     	HashMap<APClass,ArrayList<APClass>> cpMap = 
     	        new HashMap<APClass,ArrayList<APClass>>();
@@ -285,7 +265,7 @@ public class FragmentSpaceTest
     	ends.add(APC3);
     	
     	String cpmFile = rootName + "cpm.dat";
-    	DenoptimIO.writeCompatibilityMatrix(cpmFile, cpMap, boMap, capMap,ends);
+    	DenoptimIO.writeCompatibilityMatrix(cpmFile, cpMap, capMap,ends);
 
     	/*
     	//Just in case one day we want to have also an RC-CPMap
@@ -328,32 +308,16 @@ public class FragmentSpaceTest
         assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
     	ArrayList<IdFragmentAndAP> l = FragmentSpace.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
-    	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	
-    	boolean found1 = false;
-    	boolean found2 = false;
-    	boolean found3 = false;
-    	boolean found4 = false;
+
+    	int i = -1;
     	for (IdFragmentAndAP id : l)
     	{
-    		if (id.sameFragAndAp(ref1))
-    			found1 = true;
-    		if (id.sameFragAndAp(ref2))
-    			found2 = true;
-    		if (id.sameFragAndAp(ref3))
-    			found3 = true;
-    		if (id.sameFragAndAp(ref4))
-    			found4 = true;
+    	    i++;
+    	    DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+    	            id.getVertexMolId(), id.getVertexMolType());
+    	    assertEquals(APC2, v.getAP(id.getApId()).getAPClass(),
+    	            "APClass of "+i);
     	}
-    	
-    	assertTrue(found1, "Missing first AP ID.");
-    	assertTrue(found2, "Missing second AP ID.");
-    	assertTrue(found3, "Missing third AP ID.");
-    	assertTrue(found4, "Missing fourth AP ID.");
     	
     	FragmentSpace.clearAll();
     }
@@ -369,32 +333,17 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
 
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-
-    	boolean found1 = false;
-    	boolean found2 = false;
-    	boolean found3 = false;
-    	boolean found4 = false;
-    	for (IdFragmentAndAP id : lst)
-    	{
-    		if (id.sameFragAndAp(ref1))
-    			found1 = true;
-    		if (id.sameFragAndAp(ref2))
-    			found2 = true;
-    		if (id.sameFragAndAp(ref3))
-    			found3 = true;
-    		if (id.sameFragAndAp(ref4))
-    			found4 = true;
-    	}
-    	
-    	assertTrue(found1, "Missing first AP ID.");
-    	assertTrue(found2, "Missing second AP ID.");
-    	assertTrue(found3, "Missing third AP ID.");
-    	assertTrue(found4, "Missing fourth AP ID.");
-    	
+    	int i = -1;
+        for (IdFragmentAndAP id : lst)
+        {
+            i++;
+            DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+                    id.getVertexMolId(), id.getVertexMolType());
+            DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
+            assertTrue(APC1.isCPMapCompatibleWith(ap.getAPClass()), 
+                    "Incompatible choice at "+i);
+        }
+        
     	FragmentSpace.clearAll();
     }
     
@@ -409,6 +358,13 @@ public class FragmentSpaceTest
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
+    	DENOPTIMVertex src1V = DENOPTIMVertex.newVertexFromLibrary(-1,
+    	        src1.getVertexMolId(), src1.getVertexMolType());
+    	APClass src1APC = src1V.getAP(src1.getApId()).getAPClass();
+        DENOPTIMVertex src2V = DENOPTIMVertex.newVertexFromLibrary(-1,
+                src2.getVertexMolId(), src2.getVertexMolType());
+        APClass src2APC = src2V.getAP(src2.getApId()).getAPClass();
+    	
     	
     	/*
     	System.out.println("SRC1 "+FragmentSpace.getAPClassForFragment(src1)+" => "
@@ -426,31 +382,17 @@ public class FragmentSpaceTest
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
-    	IdFragmentAndAP ref1 = new IdFragmentAndAP(-1,0,BBTFRAG,3,-1,-1);
-    	IdFragmentAndAP ref2 = new IdFragmentAndAP(-1,1,BBTFRAG,0,-1,-1);
-    	IdFragmentAndAP ref3 = new IdFragmentAndAP(-1,1,BBTFRAG,1,-1,-1);
-    	IdFragmentAndAP ref4 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	
-    	boolean found1 = false;
-    	boolean found2 = false;
-    	boolean found3 = false;
-    	boolean found4 = false;
-    	for (IdFragmentAndAP id : lst)
-    	{            
-    		if (id.sameFragAndAp(ref1))
-    			found1 = true;
-    		if (id.sameFragAndAp(ref2))
-    			found2 = true;
-    		if (id.sameFragAndAp(ref3))
-    			found3 = true;
-    		if (id.sameFragAndAp(ref4))
-    			found4 = true;
-    	}
-    	
-    	assertTrue(found1, "Missing first AP ID.");
-    	assertTrue(found2, "Missing second AP ID.");
-    	assertTrue(found3, "Missing third AP ID.");
-    	assertTrue(found4, "Missing fourth AP ID.");
+        int i = -1;
+        for (IdFragmentAndAP id : lst)
+        {
+            i++;
+            DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+                    id.getVertexMolId(), id.getVertexMolType());
+            DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
+            assertTrue(src1APC.isCPMapCompatibleWith(ap.getAPClass())
+                    || src2APC.isCPMapCompatibleWith(ap.getAPClass()), 
+                    "Incompatible choice at "+i);
+        }
     	
     	FragmentSpace.clearAll();
     }
@@ -500,9 +442,9 @@ public class FragmentSpaceTest
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             //Cleanup tmp files
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedFragments());
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedScaffolds());
             
             assertEquals(1, fragLib.size());
@@ -541,9 +483,9 @@ public class FragmentSpaceTest
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             //Cleanup tmp files
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedFragments());
-            DenoptimIO.deleteFile(
+            FileUtils.deleteFile(
                     FragmentSpaceParameters.getPathnameToAppendedScaffolds());
 
             assertEquals(1, scaffLib.size());
@@ -587,9 +529,9 @@ public class FragmentSpaceTest
         }
 
         //Cleanup tmp files
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedFragments());
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedScaffolds());
         
         assertEquals(1, fragLib.size());
@@ -672,8 +614,6 @@ public class FragmentSpaceTest
         for (int i = 0; i < 4; i++) {
             v.addAP(0, APC1, getRandomVector());
         }
-        FragmentSpace.getBondOrderMap().put(APC1.getRule(),
-                DENOPTIMEdge.BondType.SINGLE);
         return v;
     }
 
@@ -906,9 +846,9 @@ public class FragmentSpaceTest
         assertEquals(9,nP,"#P in new fragment");
         
         //Cleanup tmp files
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedFragments());
-        DenoptimIO.deleteFile(
+        FileUtils.deleteFile(
                 FragmentSpaceParameters.getPathnameToAppendedScaffolds());
     }
 

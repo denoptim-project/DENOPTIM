@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -46,6 +44,9 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
@@ -53,19 +54,23 @@ import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.DENOPTIMFragmentTest;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplateTest;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
 
 /**
- * Unit test for input/output
+ * Unit test for input/output.
  * 
  * @author Marco Foscato
  */
 
-public class DenoptimIOTest {
+public class DenoptimIOTest 
+{
 
     private static final BondType BT = BondType.SINGLE;
 
@@ -79,22 +84,92 @@ public class DenoptimIOTest {
     @Test
     public void testIOEmptyVertex() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
-        String pathName = tempDir.getAbsolutePath() + SEP + "test.sdf";
         
         EmptyVertex v = new EmptyVertex();
         Point3d xyz = new Point3d(1.1,-2.2,3.3);
-        v.addAP(0, xyz, APClass.make("myClass:0"));
-        v.addAP(1, xyz, APClass.make("myClass:1"));
-        v.addAP(1, xyz, APClass.make("myClass:2"));
-        v.addAP(2, xyz, APClass.make("myClass:3"));
+        v.addAP(APClass.make("myClass:0"));
+        v.addAP(APClass.make("myClass:1"));
+        v.addAP(APClass.make("myClass:2"));
+        v.addAP(APClass.make("myClass:3"));
         
-        DenoptimIO.writeVertexToSDF(pathName, v);
-        
+        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        initVrtxs.add(v);
+
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
         ArrayList<DENOPTIMVertex> readInVrtxs = 
-                DenoptimIO.readVertexes(new File(pathName));
-        
+                DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+        tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.json");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXJSON, 
+                initVrtxs);
+        readInVrtxs = DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIOMolFragment() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        
+        DENOPTIMFragment v = DENOPTIMFragmentTest.makeFragment();
+        
+        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        initVrtxs.add(v);
+
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
+        ArrayList<DENOPTIMVertex> readInVrtxs = 
+                DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+        tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.json");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXJSON, 
+                initVrtxs);
+        readInVrtxs = DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIOTemplate() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        
+        DENOPTIMTemplate v = DENOPTIMTemplateTest.getTestAmideTemplate();
+        
+        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        initVrtxs.add(v);
+
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
+        ArrayList<DENOPTIMVertex> readInVrtxs = 
+                DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        StringBuilder sb = new StringBuilder();
+        assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
+                + sb.toString());
+        
+        tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.json");
+        DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXJSON, 
+                initVrtxs);
+        readInVrtxs = DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+        assertEquals(1,readInVrtxs.size(),"Number of vertexes");
+        sb = new StringBuilder();
         assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
                 + sb.toString());
     }
@@ -123,7 +198,7 @@ public class DenoptimIOTest {
         iac.setProperty(DENOPTIMConstants.GMSGTAG, msg);
         iac.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         
-        DenoptimIO.writeMolecule(pathName, iac, false);
+        DenoptimIO.writeSDFFile(pathName, iac, false);
         
         IAtomContainer iac2 = builder.newAtomContainer();
         iac.addAtom(new Atom("C"));
@@ -140,7 +215,7 @@ public class DenoptimIOTest {
         iac2.setProperty(DENOPTIMConstants.GMSGTAG, msg2);
         iac2.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level2);
         
-        DenoptimIO.writeMolecule(pathName, iac2, true);
+        DenoptimIO.writeSDFFile(pathName, iac2, true);
         
         List<CandidateLW> cands = DenoptimIO.readLightWeightCandidate(
                 new File(pathName));
@@ -225,21 +300,6 @@ public class DenoptimIOTest {
 
 	@Test
 	public void testReadAllAPClasses() throws Exception {
-		// This is just to avoid the warnings about trying to get a bond type
-		// when the fragment space in not defined
-		HashMap<String, BondType> map = new HashMap<String, BondType>();
-		map.put("classAtmC", BondType.SINGLE);
-		map.put("otherClass", BondType.SINGLE);
-		map.put("classAtmH", BondType.SINGLE);
-		map.put("apClassO", BondType.SINGLE);
-		map.put("apClassObis", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		map.put("", BondType.SINGLE);
-		FragmentSpace.setBondOrderMap(map);
-
 		DENOPTIMFragment frag = new DENOPTIMFragment();
 		IAtom atmC = new Atom("C");
 		atmC.setPoint3d(new Point3d(0.0, 0.0, 1.0));
@@ -274,13 +334,13 @@ public class DenoptimIOTest {
 		        new Point3d(1.0, 2.0, 2.0));
 		frag2.projectAPsToProperties();
 
-		ArrayList<DENOPTIMFragment> frags = new ArrayList<DENOPTIMFragment>();
+		ArrayList<DENOPTIMVertex> frags = new ArrayList<DENOPTIMVertex>();
 		frags.add(frag);
 		frags.add(frag2);
 
-		String tmpFile = DenoptimIO.getTempFolder()
+		String tmpFile = FileUtils.getTempFolder()
 				+ System.getProperty("file.separator") + "frag.sdf";
-		DenoptimIO.writeFragmentSet(tmpFile, frags);
+		DenoptimIO.writeVertexesToSDF(new File(tmpFile), frags, false);
 
 		Set<APClass> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
 
@@ -297,7 +357,7 @@ public class DenoptimIOTest {
 											  DENOPTIMGraph graph) 
 											          throws DENOPTIMException {
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP(atomPos);
+			v.addAP();
 		}
 		graph.addVertex(v);
 	}
@@ -313,59 +373,59 @@ public class DenoptimIOTest {
         
         DenoptimIO.writeData(pathName, "dummy text", false);
         assertThrows(UndetectedFileFormatException.class, 
-                () -> DenoptimIO.detectFileFormat(ffile));
+                () -> FileUtils.detectFileFormat(ffile));
         
         DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.APSTAG
                 + ">", false);
-        assertTrue(FileFormat.VRTXSDF == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.VRTXSDF == FileUtils.detectFileFormat(file),
                 "Vertex SDF");
         
         DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.GRAPHTAG 
                 + ">", false);
-        assertTrue(FileFormat.GRAPHSDF == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.GRAPHSDF == FileUtils.detectFileFormat(file),
                 "Graph SDF");
         
         DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.GRAPHJSONTAG 
                 + ">", false);
-        assertTrue(FileFormat.GRAPHSDF == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.GRAPHSDF == FileUtils.detectFileFormat(file),
                 "Graph SDF");
         
         pathName = tempDir.getAbsolutePath() + SEP + "filename";
         file = new File(pathName);
         
         DenoptimIO.writeData(pathName, "FSE-SOMETING", false);
-        assertTrue(FileFormat.FSE_PARAM == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.FSE_PARAM == FileUtils.detectFileFormat(file),
                 "FSE params");
         
         DenoptimIO.writeData(pathName, "GA-SOMETING", false);
-        assertTrue(FileFormat.GA_PARAM == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.GA_PARAM == FileUtils.detectFileFormat(file),
                 "GA params");
         
         DenoptimIO.writeData(pathName, "RCN SOMETING", false);
-        assertTrue(FileFormat.COMP_MAP == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.COMP_MAP == FileUtils.detectFileFormat(file),
                 "Compatibility Matrix (1)");
         
         DenoptimIO.writeData(pathName, "RBO SOMETING", false);
-        assertTrue(FileFormat.COMP_MAP == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.COMP_MAP == FileUtils.detectFileFormat(file),
                 "Compatibility Matrix (2)");
         
         DenoptimIO.writeData(pathName, "CAP SOMETING", false);
-        assertTrue(FileFormat.COMP_MAP == DenoptimIO.detectFileFormat(file),
+        assertTrue(FileFormat.COMP_MAP == FileUtils.detectFileFormat(file),
                 "Compatibility Matrix (3)");
         
         String dirName = tempDir.getAbsolutePath() + SEP + "blabla1234";
         String subDirName = dirName + SEP+DENOPTIMConstants.FSEIDXNAMEROOT+"0";
         
-        DenoptimIO.createDirectory(dirName);
-        DenoptimIO.createDirectory(subDirName);
-        assertTrue(FileFormat.FSE_RUN == DenoptimIO.detectFileFormat(
+        FileUtils.createDirectory(dirName);
+        FileUtils.createDirectory(subDirName);
+        assertTrue(FileFormat.FSE_RUN == FileUtils.detectFileFormat(
                 new File(dirName)), "FSE output folder");
         
         dirName = tempDir.getAbsolutePath() + SEP + "blabla5678";
         subDirName = dirName + SEP+DENOPTIMConstants.GAGENDIRNAMEROOT+"0";
-        DenoptimIO.createDirectory(dirName);
-        DenoptimIO.createDirectory(subDirName);
-        assertTrue(FileFormat.GA_RUN == DenoptimIO.detectFileFormat(
+        FileUtils.createDirectory(dirName);
+        FileUtils.createDirectory(subDirName);
+        assertTrue(FileFormat.GA_RUN == FileUtils.detectFileFormat(
                 new File(dirName)), "GA output folder");
     }
 }

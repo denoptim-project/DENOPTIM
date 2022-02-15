@@ -34,10 +34,9 @@ import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Version;
 import denoptim.rings.RingClosureParameters;
@@ -1304,15 +1303,15 @@ public class GAParameters
             timeStamp = sdf.format(new Date());
             String str = "RUN" + timeStamp;
             dataDir = cdataDir + FS + str;
-            success = DenoptimIO.createDirectory(dataDir);
+            success = denoptim.files.FileUtils.createDirectory(dataDir);
         }
         setWorkingDirectory(dataDir);
-        if (!DenoptimIO.createDirectory(interfaceDir))
+        if (!denoptim.files.FileUtils.createDirectory(interfaceDir))
         {
         	throw new DENOPTIMException("ERROR! Unable to make interface "
         			+ "folder '" + interfaceDir + "'");
         }
-        DenoptimIO.addToRecentFiles(dataDir, FileFormat.GA_RUN);
+        denoptim.files.FileUtils.addToRecentFiles(dataDir, FileFormat.GA_RUN);
     }
 
 //------------------------------------------------------------------------------
@@ -1430,7 +1429,7 @@ public class GAParameters
 
         if (initPoplnFile.length() > 0)
         {
-            if (!DenoptimIO.checkExists(initPoplnFile))
+            if (!denoptim.files.FileUtils.checkExists(initPoplnFile))
             {
                 error = "Cannot find initial population data: " + initPoplnFile;
                 throw new DENOPTIMException(error);

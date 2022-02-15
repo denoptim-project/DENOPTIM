@@ -359,7 +359,7 @@ public class DENOPTIMMoleculeUtils
         	String fileName = "failed_generation_of_SMILES.sdf";
         	System.out.println("WARNING: Skipping calculation of SMILES. See "
         			+ "file '" + fileName + "'");
-        	DenoptimIO.writeMolecule(fileName,fmol,false);
+        	DenoptimIO.writeSDFFile(fileName,fmol,false);
         	smiles = "calculation_or_SMILES_crashed";
         }
         return smiles;

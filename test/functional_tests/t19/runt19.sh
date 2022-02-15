@@ -72,15 +72,26 @@ fi
 nref=$(grep -n "^M *END" reference.sdf | awk -F':' '{print $1}')
 n=$(grep -n "^M *END" final.sdf | awk -F':' '{print $1}')
 
-head -n "$nref" reference.sdf | tail -n +4 > cnRef
-head -n "$n" final.sdf | tail -n +4 > cn
+head -n "$nref" reference.sdf | tail -n +5 > cnRef
+head -n "$n" final.sdf | tail -n +5 > cn
 
-differences=$(diff cn cnref)
+head -n "$na" cn | cut -c 1-7,11-17,21-27,31-35 > atmLst
+head -n "$naref" cnRef | cut -c 1-7,11-17,21-27,31-35 > atmLstRef
+tail -n "$((nb+1))" cn > bndLst
+tail -n "$((nbref+1))" cn > bndLstRef
+
+differences=$(diff atmLst atmLstref)
 if [ "$differences" != "" ]; then
-    echo "Test 't19' NOT PASSED (symptom: different atom list or connection table)."
+    echo "Test 't19' NOT PASSED (symptom: different atom list)."
     echo "$differences"
     exit -1
-else 
+fi
+differences=$(diff bndLst bndLstref)
+if [ "$differences" != "" ]; then
+    echo "Test 't19' NOT PASSED (symptom: different bond list)."
+    echo "$differences"
+    exit -1
+else
     echo "Test 't19' PASSED"
 fi
 

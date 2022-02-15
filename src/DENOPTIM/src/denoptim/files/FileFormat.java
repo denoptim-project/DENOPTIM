@@ -1,4 +1,4 @@
-package denoptim.io;
+package denoptim.files;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -6,18 +6,25 @@ import java.util.Set;
 
 import denoptim.constants.DENOPTIMConstants;
 
+/**
+ * File formats identified by DENOOTIM.
+ *
+ */
 public enum FileFormat {
     
+    CANDIDATESDF,
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP,
-    TXT;
+    TXT, GRAPHTXT;
         
     private String extension = "";
     
     /**
      * Collection of regex that, if matched, suggests assigning the format to a
-     * specific FileFormat.
+     * specific FileFormat. Consider a logical <b>OR</b> operator, i.e., any 
+     * match will suggest among the set of regex will lead to format 
+     * interpretation.
      */
     private Set<String> definingRegex = new HashSet<String>();
     
@@ -41,14 +48,31 @@ public enum FileFormat {
                 "^> *<" + DENOPTIMConstants.GRAPHTAG + ">.*",
                 "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
                 ));
+        GRAPHSDF.negatingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*"
+                ));
         GRAPHSDF.endOfSampleRegex = "\\$\\$\\$\\$";
         
         //------------------------------------
         
+        CANDIDATESDF.extension = "sdf";
+        CANDIDATESDF.definingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*"
+                ));
+        CANDIDATESDF.endOfSampleRegex = "\\$\\$\\$\\$";
+        
+        //------------------------------------
+        
+        //TODO
         GRAPHJSON.extension = "json";
         
         //------------------------------------
         
+        //TODO
         VRTXJSON.extension = "json";
 
         //------------------------------------
@@ -95,6 +119,10 @@ public enum FileFormat {
         //------------------------------------
         
         TXT.extension = "";
+        
+        //------------------------------------
+        
+        GRAPHTXT.extension = "txt";
     }
     
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
@@ -133,6 +161,15 @@ public enum FileFormat {
                         break;
                     case VERTEX:
                         ff = VRTXJSON;
+                        break;
+                }
+                break;
+                
+            case "TXT":
+                switch (kind)
+                {
+                    case GRAPH:
+                        ff = GRAPHTXT;
                         break;
                 }
                 break;

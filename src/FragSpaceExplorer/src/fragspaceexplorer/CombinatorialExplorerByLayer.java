@@ -339,7 +339,7 @@ public class CombinatorialExplorerByLayer
                   + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
             
-            if (!DenoptimIO.checkExists(FSEUtils.getNameOfStorageDir(level)))
+            if (!denoptim.files.FileUtils.checkExists(FSEUtils.getNameOfStorageDir(level)))
             {
             	msg = "ERROR! Folder '" + FSEUtils.getNameOfStorageDir(level) 
             			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
@@ -366,7 +366,7 @@ public class CombinatorialExplorerByLayer
                     msg = "Removing non-safely completed graph '" + fName + "'";
                     DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
                     serFromChkRestart--;
-                    DenoptimIO.deleteFile(FSEUtils.getNameOfStorageDir(level)
+                    denoptim.files.FileUtils.deleteFile(FSEUtils.getNameOfStorageDir(level)
                     		+ File.separator + fName);
                 }
             }
@@ -586,7 +586,7 @@ public class CombinatorialExplorerByLayer
         int itersFromChkPt = 0;
         String prevLevDirName = FSEUtils.getNameOfStorageDir(level-1);
         File prevLevDir = new File(prevLevDirName);
-        if (!DenoptimIO.checkExists(prevLevDirName))
+        if (!denoptim.files.FileUtils.checkExists(prevLevDirName))
         {
              msg = "Previous level folder '" + prevLevDirName + "' not found!";
             throw new DENOPTIMException(msg);

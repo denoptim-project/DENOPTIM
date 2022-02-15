@@ -26,15 +26,15 @@ GA-KeepNewRingSystemVertexes
 GA-KeepNewRingSystemScaffolds
 GA-KeepNewRingSystemFitnessTrsh=0.02
 # Fragment Space - parameters
-FS-ScaffoldLibFile=/tmp/denoptim_Diamond/data/lib_scaff.sdf
-FS-FragmentLibFile=/tmp/denoptim_Diamond/data/lib_frags.sdf
-FS-CappingFragmentLibFile=/tmp/denoptim_Diamond/data/lib_cap.sdf
-FS-CompMatrixFile=/tmp/denoptim_Diamond/data/CPMap.par
+FS-ScaffoldLibFile=data/lib_scaff.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CappingFragmentLibFile=data/lib_cap.sdf
+FS-CompMatrixFile=data/CPMap.par
 FS-MaxHeavyAtom=30
 FS-MaxMW=300
 FS-MaxRotatableBond=50
 RC-CloseRings
-FS-RCCompMatrixFile=/tmp/denoptim_Diamond/data/RC-CPMap
+FS-RCCompMatrixFile=data/RC-CPMap
 RC-RingSizeBias=5 1
 RC-RingSizeBias=6 1
 RC-RingSizeBias=7 1
@@ -45,5 +45,5 @@ RC-EvaluationClosabilityMode=Ring_size
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal*taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:/tmp/denoptim_Diamond/data/goal.sdf')}
+FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
 FP-CheckUidBeforeFitness

@@ -173,7 +173,7 @@ public class TestOperator
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
-        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, iac, false);
+        DenoptimIO.writeSDFFile(TestOperatorParameters.outFileM, iac, false);
     }
     
 //------------------------------------------------------------------------------
@@ -242,8 +242,8 @@ public class TestOperator
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male,true);
         IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female,true);
-        DenoptimIO.writeMolecule(TestOperatorParameters.outFileM, iacM, false);
-        DenoptimIO.writeMolecule(TestOperatorParameters.outFileF, iacF, false);
+        DenoptimIO.writeSDFFile(TestOperatorParameters.outFileM, iacM, false);
+        DenoptimIO.writeSDFFile(TestOperatorParameters.outFileF, iacF, false);
     }
 
 //------------------------------------------------------------------------------

@@ -220,7 +220,7 @@ public class FitnessProviderTest
     {
         String fileName = tempDir.getAbsolutePath() + SEP + "ref.sdf";
         IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
-        DenoptimIO.writeMolecule(fileName, ref, false);
+        DenoptimIO.writeSDFFile(fileName, ref, false);
         
         FitnessParameters.resetParameters();
         String[] lines = new String[] {

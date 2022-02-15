@@ -180,7 +180,7 @@ public class StringConverter
                 {
                     iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG, output);
                 }
-                DenoptimIO.writeMolecule(outFileName, iac, false);
+                DenoptimIO.writeSDFFile(outFileName, iac, false);
             } else if (inpFileName.endsWith(".txt")) {
                 DenoptimIO.writeData(outFileName, output, false);
             } else {

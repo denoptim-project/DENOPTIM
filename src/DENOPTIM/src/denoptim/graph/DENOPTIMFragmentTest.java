@@ -35,6 +35,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
 
@@ -46,23 +47,17 @@ import denoptim.graph.DENOPTIMEdge.BondType;
 
 public class DENOPTIMFragmentTest
 {
-	private final String APRULE = "MyRule";
-	private final String APSUBRULE = "1";
-	private final String APCLASS = APRULE
+	private static final String APRULE = "MyRule";
+	private static final String APSUBRULE = "1";
+	private static final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
-    private final String APCSEP = DENOPTIMConstants.SEPARATORAPPROPSCL;
+    private static final String APCSEP = DENOPTIMConstants.SEPARATORAPPROPSCL;
     
 //------------------------------------------------------------------------------
 	
     @Test
     public void testHandlingAPsAsObjOrProperty() throws Exception
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<String, BondType>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
     	DENOPTIMFragment frg1 = new DENOPTIMFragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -110,13 +105,7 @@ public class DENOPTIMFragmentTest
     	// WARNING: the conversion does not project the atom properties into
     	// molecular properties. So the APs do not appear in the mol properties
         // unless we project the APs to properties (see projectAPsToProperties)
-        
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<String, BondType>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-    	
+
         DENOPTIMFragment frg1 = new DENOPTIMFragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("O", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -160,18 +149,11 @@ public class DENOPTIMFragmentTest
         assertTrue(frg1.getSymmetricAPs(1).contains(5),"SymmSet [1,5] in frg1");
         assertTrue(frg2.getSymmetricAPs(1).contains(5),"SymmSet [1,5] in frg2");
     }
-
+    
 //------------------------------------------------------------------------------
-
-    @Test
-    public void testClone() throws Exception
+    
+    public static DENOPTIMFragment makeFragment() throws DENOPTIMException
     {
-        // This is just to avoid the warnings about trying to get a bond type
-        // when the fragment space in not defined
-        HashMap<String, BondType> map = new HashMap<String, BondType>();
-        map.put(APRULE,BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
-        
         DENOPTIMFragment v = new DENOPTIMFragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -192,31 +174,56 @@ public class DENOPTIMFragmentTest
         
         ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
         ssaps.add(new SymmetricSet(new ArrayList<Integer>(
-                Arrays.asList(0,1,2))));
+                Arrays.asList(0,1,2)))); 
+        //NB: customised symmetry set that does not correspond to the
+        // definition of symmetry as perceived automatically by
+        // DENOPTIMFragment.identifySymmetryRelatedAPSets
+        // This because we want to test if the symmetric set is properly
+        // serialized/deserialized.
         v.setSymmetricAPSets(ssaps);
         v.setVertexId(18);
         v.setAsRCV(true);
+        //NB thy bond type is check by other methods: do not change it.
         v.setBuildingBlockType(DENOPTIMVertex.BBType.SCAFFOLD);
+        
+        return v;
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testClone() throws Exception
+    {   
+        DENOPTIMFragment v = makeFragment();
         
         DENOPTIMVertex c = v.clone();
         
-        assertEquals(4,((DENOPTIMFragment) c).getNumberOfAPs(),"Number of APs");
+        assertEquals(4,((DENOPTIMFragment) c).getNumberOfAPs(),
+                "Number of APs");
         assertEquals(1,((DENOPTIMFragment) c).getAPCountOnAtom(0),
                 "Size APs on atm0");
         assertEquals(3,((DENOPTIMFragment) c).getAPCountOnAtom(2),
                 "Size APs on atm2");
-        assertEquals(4,c.getAttachmentPoints().size(),"Number of APs (B)");
-        assertEquals(1,c.getSymmetricAPSets().size(), "Number of symmetric sets");
+        assertEquals(4,c.getAttachmentPoints().size(),
+                "Number of APs (B)");
+        assertEquals(1,c.getSymmetricAPSets().size(), 
+                "Number of symmetric sets");
         assertEquals(3,c.getSymmetricAPSets().get(0).size(), 
                 "Number of symmetric APs in set");
-        assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
-        assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
+        assertEquals(v.getVertexId(), c.getVertexId(), 
+                "Vertex ID");
+        assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), 
+                "Number of APS");
         assertEquals(v.getSymmetricAPSets().size(), 
-                c.getSymmetricAPSets().size(), "Number of SymAPs sets");
-        assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
-        assertNotEquals(v.hashCode(), c.hashCode(), "Hash code");  
+                c.getSymmetricAPSets().size(), 
+                "Number of SymAPs sets");
+        assertEquals(v.isRCV(), c.isRCV(), 
+                "RCV flag");
+        assertNotEquals(v.hashCode(), c.hashCode(), 
+                "Hash code");  
         assertEquals(v.getBuildingBlockType(),
-                ((DENOPTIMFragment)c).getBuildingBlockType(), "Building bloc ktype");
+                ((DENOPTIMFragment)c).getBuildingBlockType(), 
+                "Building bloc ktype");
     }
     
 //------------------------------------------------------------------------------

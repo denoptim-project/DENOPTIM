@@ -40,7 +40,7 @@ import denoptim.logging.DENOPTIMLogger;
  * The exploration of a fragment space generated all combination of building
  * blocks according to the definition of the fragment space. Symmetry may be
  * enforced in the fragment space 
- * (see {@link fragspace.FragmentSpaceParameters}). 
+ * (see {@link FragmentSpaceParametersV2.FragmentSpaceParameters}). 
  * In such case, if symmetric attachment points are found on a 
  * scaffold/fragment/graph, then the exploration is restricted
  * to such combinations respecting the constitutional symmetry of the APs.

@@ -1,32 +1,20 @@
-asymm_scaff
-  CDK     0627192254
-From GM3DFragmenter
+
+  CDK     02112211153D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0087   -0.0046    0.0040 C   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-asymm_scaff
-
-> <cdk:Remark>
-From GM3DFragmenter
-
 > <ATTACHMENT_POINTS>
-1#co1:0:-0.4787%-1.2956%0.3384,ccb:0:-0.4681%0.3574%-1.2917,ch:0:-0.4800%0.9576%0.9519,co2:0:1.4361%-0.0087%-0.0065
+1#co1:0:SINGLE:-0.4787%-1.2956%0.3384,ccb:0:SINGLE:-0.4681%0.3574%-1.2917,ch:0:SINGLE:-0.4800%0.9576%0.9519,co2:0:SINGLE:1.4361%-0.0087%-0.0065 
 
 $$$$
-symm_scaff
-  CDK     0627192254
-From GM3DFragmenter
+
+  CDK     02112211153D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0025   -0.0052    0.0086 C   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-symm_scaff
-
-> <cdk:Remark>
-From GM3DFragmenter
-
 > <ATTACHMENT_POINTS>
-1#co:0:-0.4812%-1.2974%0.3470,ccb:0:-0.4847%0.3556%-1.2907,ccb:0:-0.4717%0.9449%0.9477,co:0:1.4218%-0.0079%0.0045
+1#co:0:SINGLE:-0.4812%-1.2974%0.3470,ccb:0:SINGLE:-0.4847%0.3556%-1.2907,ccb:0:SINGLE:-0.4717%0.9449%0.9477,co:0:SINGLE:1.4218%-0.0079%0.0045 
 
 $$$$

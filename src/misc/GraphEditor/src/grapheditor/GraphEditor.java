@@ -120,7 +120,7 @@ public class GraphEditor
                             	newMol.setProperty("cdk:Title",name);
                             }
                         }
-                        DenoptimIO.writeMolecule(GraphEdParameters.getOutFile(),
+                        DenoptimIO.writeSDFFile(GraphEdParameters.getOutFile(),
                                                                    newMol,true);
                         break;
                     }

@@ -427,15 +427,10 @@ Serializable, Cloneable
     public IAtomContainer getFitnessProviderOutputRepresentation() throws DENOPTIMException
     {
         IAtomContainer iacForFitFile = iac;
-
         iacForFitFile.setProperty(CDKConstants.TITLE, name);
         iacForFitFile.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
         iacForFitFile.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
-        
-        // This is slow, and should not be needed because the json format is in
-        // in the input file given to the fitness provider.
-        // iacForFitFile.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
-        
+        iacForFitFile.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
         if (graph.getLocalMsg() != null && !graph.getLocalMsg().equals(""))
         {
             iacForFitFile.setProperty(DENOPTIMConstants.GMSGTAG, graph.getLocalMsg());

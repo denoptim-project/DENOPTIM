@@ -29,8 +29,8 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-import denoptim.io.DenoptimIO;
-import denoptim.io.FileFormat;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 
 
 /**
@@ -170,7 +170,7 @@ public class GUICompatibilityMatrixTab extends GUICardPanel
 				}
 				cpMapHandler.writeCopatibilityMatrixFile(btnSaveFrags,outFile);
 				unsavedChanges = false;
-				DenoptimIO.addToRecentFiles(outFile, FileFormat.COMP_MAP);
+				FileUtils.addToRecentFiles(outFile, FileFormat.COMP_MAP);
 			}
 		});
 		commandsPane.add(btnSaveFrags);

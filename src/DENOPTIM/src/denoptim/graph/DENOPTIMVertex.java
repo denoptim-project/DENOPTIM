@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -35,18 +36,22 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.utils.DENOPTIMgson;
+import denoptim.json.DENOPTIMgson;
+import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
  * list of attachment points. The attachment points can be related by
- * an here-undefined relation.
+ * an here-undefined relation. Also, the attributes that each 
+ * attachment point needs upon construction depend on the instance of vertex. 
+ * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
@@ -1181,41 +1186,71 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
 
     /**
-     * Processes an atom container and builds a vertex out of it.
+     * Processes an {@link IAtomContainer} and builds a {@link DENOPTIMVertex} 
+     * that is an instance of {@link DENOPTIMFragment}. 
+     * This method does not consider any JSON definition that might be 
+     * embedded in the container properties. 
+     * This because this method is meant to convert an {@link IAtomContainer} 
+     * with {@link DENOPTIMAttachmentPoint}s defined in the 
+     * {@link IAtomContainer}'s properties.
      * @param iac the atom containers.
-     * @param bbt the type of building block
+     * @param bbt the type of building block.
      * @return the vertex.
      * @throws DENOPTIMException if the atom container could not be converted 
      * into a {@link DENOPTIMFragment}.
      */
-    
+
     public static DENOPTIMVertex convertIACToVertex(IAtomContainer iac, 
             DENOPTIMVertex.BBType bbt) throws DENOPTIMException
     {
-        DENOPTIMVertex v;
-        Object jsonGraph = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
-        Object jsonVertex = iac.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
-        if (jsonGraph != null)
-        {
-            DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
-            DENOPTIMGraph g = DENOPTIMGraph.fromJson(jsonGraph.toString());
-            t.setInnerGraph(g);
-            v = t;
-        } else if (jsonVertex != null)
-        {
-            v = fromJson(jsonVertex.toString());
-            if (v instanceof DENOPTIMTemplate && iac.getAtomCount()>0)
-            {
-                ((DENOPTIMTemplate) v).setIAtomContainer(iac,false);
-            }
-        } else {
-            v = new DENOPTIMFragment(iac,bbt);
-        }
+        DENOPTIMVertex v = new DENOPTIMFragment(iac, bbt);
         v.setAsRCV(v.getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
         return v;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Created a {@link DENOPTIMVertex} from the SDF representation, i.e., from
+     * an {@link IAtomContainer}. 
+     * @param mol the container to parse.
+     * @param reader a converted able to deserialize a vertex from a JSON string.
+     * @param bbt the type of building block we want to generate.
+     * @return a vertex 
+     */
+    
+    public static DENOPTIMVertex parseVertexFromSDFFormat(IAtomContainer mol,
+            Gson reader, BBType bbt) throws DENOPTIMException
+    {
+        DENOPTIMVertex v = null;
+        try
+        {
+            Object json = mol.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
+            if (json != null) {
+                v = reader.fromJson(json.toString(),DENOPTIMVertex.class);
+            } else {
+                json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
+                if (json != null)
+                {
+                    DENOPTIMLogger.appLogger.log(Level.WARNING, "Attempt to "
+                        + "read a vertex from "
+                        + "a SDF file that contains a JSON definition of a "
+                        + "graph. This should not be intentional, so we'll "
+                        + "read the atom container ignoring the JSON "
+                        + "definition of a graph.");
+                }
+                v = DENOPTIMVertex.convertIACToVertex(mol, bbt);
+            }
+        } catch (JsonSyntaxException | DENOPTIMException e)
+        {
+            throw new DENOPTIMException("Unable to parse IAtomContainer to "
+                    + "create vertex .",e);
+        }
+        return v;
+    }
+    
 
 //------------------------------------------------------------------------------
     

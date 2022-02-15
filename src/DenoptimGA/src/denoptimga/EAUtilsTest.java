@@ -43,14 +43,9 @@ public class EAUtilsTest
     
     private void prepareFragmentSpace() throws DENOPTIMException
     {
-        APCA = APClass.make(a, 0);
-        APCB = APClass.make(b, 1);
-        APCC = APClass.make(c, 2);
-        
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(a,BondType.SINGLE);
-        boMap.put(b,BondType.SINGLE);
-        boMap.put(c,BondType.SINGLE);
+        APCA = APClass.make(a, 0,BondType.SINGLE);
+        APCB = APClass.make(b, 1,BondType.SINGLE);
+        APCC = APClass.make(c, 2,BondType.SINGLE);
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
@@ -81,7 +76,6 @@ public class EAUtilsTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setBondOrderMap(boMap);
         FragmentSpace.setCompatibilityMatrix(cpMap);
         FragmentSpace.setCappingMap(capMap);
         FragmentSpace.setForbiddenEndList(forbEnds);
@@ -92,21 +86,21 @@ public class EAUtilsTest
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
-        v1.addAP(0,APCB);
-        v1.addAP(0,APCB);
+        v1.addAP(APCB);
+        v1.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
-        v2.addAP(0,APCC);
-        v2.addAP(0,APCC);
+        v2.addAP(APCC);
+        v2.addAP(APCC);
         FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
         EmptyVertex rcv = new EmptyVertex();
         rcv.setBuildingBlockType(BBType.FRAGMENT);
-        rcv.addAP(0,APCC);
+        rcv.addAP(APCC);
         rcv.setAsRCV(true);
         FragmentSpace.appendVertexToLibrary(rcv, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());

@@ -51,9 +51,6 @@ public class PathSubGraphTest {
     public static DENOPTIMGraph makeTestGraphA() throws DENOPTIMException 
     {
         APClass apc = APClass.make("A",0);
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(apc.getRule(),BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
         
         DENOPTIMGraph graph = new DENOPTIMGraph();
 
@@ -165,10 +162,7 @@ public class PathSubGraphTest {
      */
     public static DENOPTIMGraph makeTestGraphB() throws DENOPTIMException 
     {
-        APClass apc = APClass.make("A",0);
-        HashMap<String, BondType> map = new HashMap<>();
-        map.put(apc.getRule(),BondType.SINGLE);
-        FragmentSpace.setBondOrderMap(map);
+        APClass apc = APClass.make("A",0,BondType.SINGLE);
         
         DENOPTIMGraph graph = new DENOPTIMGraph();
 

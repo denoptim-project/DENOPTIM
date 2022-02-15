@@ -69,7 +69,7 @@ public class PrepareFitnessOutput
             pfd.parseCommandLine(args);
             pfd.checkOptions();
 
-            IAtomContainer mol = DenoptimIO.readSingleSDFFile(pfd.inpSDFFile);
+            IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(pfd.inpSDFFile);
             
             if (pfd.property.length() > 0)
             {
@@ -89,7 +89,7 @@ public class PrepareFitnessOutput
                 }
             }
             
-            DenoptimIO.writeMolecule(pfd.inpSDFFile, mol, false);
+            DenoptimIO.writeSDFFile(pfd.inpSDFFile, mol, false);
         }
         catch (DENOPTIMException ioe)
         {

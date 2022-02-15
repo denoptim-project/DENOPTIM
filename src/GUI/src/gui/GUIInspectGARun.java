@@ -70,6 +70,7 @@ import org.jfree.data.xy.XYDataset;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileUtils;
 import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.GenUtils;
@@ -384,7 +385,7 @@ public class GUIInspectGARun extends GUICardPanel
 			
 			System.out.println("Reading "+genSummary);
 			
-			if (!DenoptimIO.checkExists(genSummary.getAbsolutePath()))
+			if (!FileUtils.checkExists(genSummary.getAbsolutePath()))
 			{
 				JOptionPane.showMessageDialog(parent,
 		                "<html>File '" + genSummary + "' not found!<br>"

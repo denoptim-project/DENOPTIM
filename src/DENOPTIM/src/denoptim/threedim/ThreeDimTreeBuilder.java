@@ -369,8 +369,8 @@ public class ThreeDimTreeBuilder
                     cmol.addBond(bnd);
                 }
             }
-            DenoptimIO.writeMolecule(file, mol, false);
-            DenoptimIO.writeMolecule(file, cmol, true);
+            DenoptimIO.writeSDFFile(file, mol, false);
+            DenoptimIO.writeSDFFile(file, cmol, true);
             System.out.println("AP-per-Edge");
             for (DENOPTIMEdge e : apsPerEdge.keySet())
             {
@@ -425,7 +425,7 @@ public class ThreeDimTreeBuilder
             }
         }
         mol.setProperty(DENOPTIMConstants.APSTAG, 
-                DenoptimIO.getAPDefinitionsForSDF(freeAPPerAtm));
+                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(freeAPPerAtm));
         
         // Add usual graph-related string-based data to SDF properties
         GraphUtils.writeSDFFields(mol, graph);

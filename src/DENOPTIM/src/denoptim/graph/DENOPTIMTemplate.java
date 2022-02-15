@@ -25,10 +25,9 @@ import com.google.gson.stream.JsonReader;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.io.DenoptimIO;
+import denoptim.json.DENOPTIMgson;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.DENOPTIMgson;
 import denoptim.utils.MutationType;
 
 /**
@@ -151,11 +150,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         EmptyVertex vrtx = new EmptyVertex(0);
         EmptyVertex vrtx2 = new EmptyVertex(1);
     
-        vrtx.addAP(0);
-        vrtx.addAP(1);
+        vrtx.addAP();
+        vrtx.addAP();
 
-        vrtx2.addAP(0);
-        vrtx2.addAP(1);
+        vrtx2.addAP();
+        vrtx2.addAP();
         DENOPTIMGraph g = new DENOPTIMGraph();
         g.addVertex(vrtx);
         g.addVertex(vrtx2);
@@ -566,7 +565,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         // Prepare SDF-like string for atom container. 0-based to 1-based
         // index conversion done in here
         mol.setProperty(DENOPTIMConstants.APSTAG, 
-                DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
         
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
@@ -639,7 +638,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // Prepare SDF-like string for atom container. 0-based to 1-based
             // index conversion done in here
             iac.setProperty(DENOPTIMConstants.APSTAG, 
-                    DenoptimIO.getAPDefinitionsForSDF(apsPerAtom));
+                    DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
             
             iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
             

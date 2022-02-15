@@ -16,9 +16,10 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.io;
+package denoptim.files;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 /**
  * Singleton for synchronizing multi-thread safe file access

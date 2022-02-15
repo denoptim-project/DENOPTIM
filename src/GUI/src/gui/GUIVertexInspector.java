@@ -60,15 +60,17 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileAndFormat;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.io.FileAndFormat;
-import denoptim.io.FileFormat;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 
 
@@ -225,8 +227,7 @@ public class GUIVertexInspector extends GUICardPanel
 				
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
 				try {
-				    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
-				            BBType.FRAGMENT, vrtxLib, true);
+				    vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(btnAddVrtx,
@@ -565,8 +566,7 @@ public class GUIVertexInspector extends GUICardPanel
 				}
 				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
                 try {
-                    DenoptimIO.appendVerticesFromFileToLibrary(inFile,
-                            BBType.FRAGMENT, vrtxLib, true);
+                    vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog(btnAddVrtx,
@@ -626,7 +626,7 @@ public class GUIVertexInspector extends GUICardPanel
 						verticesLibrary.size(), 1));
 				deprotectEditedSystem();
 				unsavedChanges = false;
-				DenoptimIO.addToRecentFiles(outFile, fileAndFormat.format);
+				FileUtils.addToRecentFiles(outFile, fileAndFormat.format);
 			}
 		});
 		commandsPane.add(btnSaveVrtxs);
@@ -689,7 +689,7 @@ public class GUIVertexInspector extends GUICardPanel
 		clearCurrentSystem();
 		
 		try {			
-			IAtomContainer mol = DenoptimIO.readSingleSDFFile(
+			IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
 					file.getAbsolutePath());
 			
 			// We mean to import only the structure: get rid of AP
@@ -772,16 +772,14 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * Imports fragments from a file.
 	 * @param file the file to open
-	 * @param format the format
 	 */
-	public void importVerticesFromFile(File file, String format)
+	public void importVerticesFromFile(File file)
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
         try {
-            DenoptimIO.appendVerticesFromFileToLibrary(file, BBType.FRAGMENT,
-                    vrtxLib, true);
+            vrtxLib = DenoptimIO.readVertexes(file, BBType.FRAGMENT);
         } catch (Exception e1) {
             e1.printStackTrace();
             JOptionPane.showMessageDialog(btnAddVrtx,
@@ -919,11 +917,14 @@ public class GUIVertexInspector extends GUICardPanel
     
     /**
      * Removes an atom and replaces it with an attachment point.
-     * @param apClass the attachment point class of the new AP
+     * @param ruleAndSubClass the attachment point class of the new AP. 
+     * This must be a
+     * valid string as we do not check for validity. We assume the check has 
+     * been done already.
      * @param trgAtm
      * @return <code>true</code> if the conversion was successful
      */
-    private boolean convertAtomToAP(IAtom trgAtm, String apClass)
+    private boolean convertAtomToAP(IAtom trgAtm, String ruleAndSubClass)
     {
         if (!(vertex instanceof DENOPTIMFragment))
         {
@@ -954,6 +955,8 @@ public class GUIVertexInspector extends GUICardPanel
     	}
     	
     	IAtom srcAtm = frag.getConnectedAtomsList(trgAtm).get(0);
+    	BondType bt = BondType.valueOf(
+    	        srcAtm.getBond(trgAtm).getOrder().toString());
     	
     	Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
     	Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
@@ -961,8 +964,15 @@ public class GUIVertexInspector extends GUICardPanel
     	vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
     	vector.z = srcP3d.z + (trgP3d.z - srcP3d.z);
+    	
+    	//NB: assumption of validity!
+    	String[] parts = ruleAndSubClass.split(
+                DENOPTIMConstants.SEPARATORAPPROPSCL);
     	try {
-    	    frag.addAPOnAtom(srcAtm, APClass.make(apClass), vector);
+    	    // NB: here we change the bond type to make it fit with the one we
+    	    // have in the molecular model.
+    	    frag.addAPOnAtom(srcAtm, APClass.make(parts[0],
+    	            Integer.parseInt(parts[1]), bt), vector);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,
@@ -1176,10 +1186,14 @@ public class GUIVertexInspector extends GUICardPanel
 	        	String currApClass = tabModel.getValueAt(i, 1).toString();
 	        	
 	        	// Make sure the new class has a proper syntax
-	        	try {
-					currApClass = ensureGoodAPClassString(currApClass,true,
-					        btnSaveEdits);
-				} catch (DENOPTIMException e1) {
+	        	GUIAPClassDefinitionDialog apcDefiner = 
+                        new GUIAPClassDefinitionDialog(btnSaveEdits, false);
+                Object chosen = apcDefiner.showDialog();
+                if (chosen != null)
+                {
+                    Object[] pair = (Object[]) chosen;
+                    currApClass = pair[0].toString();
+                } else {
 					currApClass = "dafaultAPClass:0";
 				}
 	        	
@@ -1321,11 +1335,15 @@ public class GUIVertexInspector extends GUICardPanel
                     if (idAPC.intValue() == (apClassLstModel.size()-1))
                     {
                         // We chose to create a new class
-                        apc = APClass.make(GUIVertexInspector
-                              .ensureGoodAPClassString("", 
-                                  "Define APClass", 
-                                  false,
-                                  parent));
+                        GUIAPClassDefinitionDialog apcDefiner = 
+                                new GUIAPClassDefinitionDialog(parent, false);
+                        Object chosen = apcDefiner.showDialog();
+                        if (chosen != null)
+                        {
+                            Object[] pair = (Object[]) chosen;
+                            apc = APClass.make(pair[0].toString(),
+                                    (BondType) pair[1]);
+                        }
                     } else {
                         apc = APClass.make(apClassLstModel.getElementAt(idAPC));
                     }
@@ -1338,79 +1356,6 @@ public class GUIVertexInspector extends GUICardPanel
         }
   	    return selectedSPCs;
   	}
-  	
-//------------------------------------------------------------------------------
-  	
-  	/**
-  	 * Forces the user to specify a properly formatted APClass.
-  	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the question
-  	 * @return 
-  	 * @throws DENOPTIMException 
-  	 */
-	public static String ensureGoodAPClassString(String currApClass, 
-			boolean mustReply, JComponent parent) 
-			throws DENOPTIMException 
-	{		
-		return ensureGoodAPClassString(currApClass,"Define APClass",mustReply, 
-		        parent);
-	}
-	
-//-----------------------------------------------------------------------------
-  	
-  	/**
-  	 * Forces the user to specify a properly formatted APClass.
-  	 * @param currApClass the current value of the APClass, or empty string
-  	 * @param mustReply set to <code>true</code> to prevent escaping the 
-  	 * question
-  	 * @param parent the component to bind the dialog to. Can be null, in which
-  	 * case the dialog will appear in default location and perhaps behind 
-  	 * other windows.
-  	 * @return the APClass
-  	 * @throws DENOPTIMException 
-  	 */
-	public static String ensureGoodAPClassString(String currApClass, 
-			String title, boolean mustReply, JComponent parent) 
-			        throws DENOPTIMException 
-	{		
-		String preStr = "";
-		while (!APClass.isValidAPClassString(currApClass))
-    	{
-			if (currApClass != "")
-			{
-	    		preStr = "APClass '" + currApClass + "' is not valid!<br>"
-	    				+ "The valid syntax for APClass is:<br><br><code>rule" 
-	        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
-	    				+ "subClass</code><br><br> where "
-	    				+ "<ul><li><code>rule</code>"
-	    				+ " is a string (no spaces)</li>"
-	    				+ "<li><code>subClass</code> is an integer</li>";
-			}
-			
-    		currApClass = JOptionPane.showInputDialog(parent, 
-    				"<html>" + preStr + "</ul>Please, provide a valid "
-    				+ "APClass string: ", title, JOptionPane.PLAIN_MESSAGE);
-        	
-    		if (currApClass == null)
-        	{
-        		currApClass = "";
-        		if (!mustReply)
-        		{
-        			throw new DENOPTIMException();
-        		}
-        	}
-        	
-    		preStr = "APClass '" + currApClass + "' is not valid!<br>"
-    				+ "The valid syntax for APClass is:<br><br><code>rule" 
-        			+ DENOPTIMConstants.SEPARATORAPPROPSCL 
-    				+ "subClass</code><br><br> where "
-    				+ "<ul><li><code>rule</code>"
-    				+ " is a string (no spaces)</li>"
-    				+ "<li><code>subClass</code> is an integer</li>";
-    	}
-    	
-    	return currApClass;
-	}
 	
 //-----------------------------------------------------------------------------
   	
