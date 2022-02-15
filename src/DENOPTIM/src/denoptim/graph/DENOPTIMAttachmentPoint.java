@@ -67,13 +67,13 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
 	/**
 	 * The index of the source atom in the atom list of the fragment (0-based)
 	 */
-    private int atomPositionNumber;
+    private int atomPositionNumber = -1;
     
     /**
      * The index of the source atom in the atom list of the entire molecule 
      * (0-based)
      */
-    private int atomPositionNumberInMol;
+    private int atomPositionNumberInMol = -1;
     
     /**
      * The attachment point class
@@ -117,7 +117,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
         this.owner = owner;
-        atomPositionNumber = -1;
         id = FragmentSpace.apID.getAndIncrement();
     }
 

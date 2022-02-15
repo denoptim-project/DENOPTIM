@@ -276,17 +276,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
         return k == la1.size();
     }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Adds an attachment point with a dummy APClass and dummy properties.
-     * This is used only for testing purposes.
-     */
-    public void addAP() {
-        addAP(0);
-        //TODO-V3 unify
-    }
 
 //------------------------------------------------------------------------------
 
@@ -295,18 +284,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param atomPositionNumber the index of the source atom (0-based)
      */
     
-    //TODO: since APs can be on any vertex, and vertexes are not required to
-    // contain atoms, the information of which atom is an AP rooted should be
-    // stored and managed by the implementation of vertex that do contain atoms.
-    // The DENOPTIMFragment should thus be charged with keeping the reference to
-    // the atom that holds the AP.
-    
     public void addAP(int atomPositionNumber) {
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, 
-                atomPositionNumber);
-        getAttachmentPoints().add(ap);
-
-        //TODO-V3 unify
+        APClass apc = null;
+        addAP(atomPositionNumber, null, apc);
     }
 
 //------------------------------------------------------------------------------
@@ -318,8 +298,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     public void addAP(int atomPositionNumber, APClass apClass) {
         addAP(atomPositionNumber, null, apClass);
-
-        //TODO-V3 unify
     }
 
 //------------------------------------------------------------------------------
@@ -328,11 +306,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Adds an attachment point.
      * @param atomPositionNumber the index of the source atom (0-based)
      * @param dirVec the AP direction vector end (the beginning at the 
-     * coordinates of the source atom). This must array have 3 entries.
+     * coordinates of the source atom).
      * @param apClass the APClass
      * @return the reference to the created AP.
      */
-    public DENOPTIMAttachmentPoint addAP(int atomPositionNumber, Point3d dirVec, APClass apClass) {
+    public DENOPTIMAttachmentPoint addAP(int atomPositionNumber, Point3d dirVec, 
+            APClass apClass) 
+    {
         DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
                 atomPositionNumber, dirVec, apClass);
         getAttachmentPoints().add(ap);
@@ -369,7 +349,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public void addAP(int srcAtmId, APClass apc, Point3d vector) 
             throws DENOPTIMException
     {
-        //TODO-V3 unify
         IAtom srcAtm = mol.getAtom(srcAtmId);
         addAPOnAtom(srcAtm, apc, vector);
     }
@@ -389,8 +368,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
 
-    public DENOPTIMAttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, Point3d vector)
-            throws DENOPTIMException
+    public DENOPTIMAttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, 
+            Point3d vector) throws DENOPTIMException
     {
         int atmId = mol.indexOf(srcAtm);
         return this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);

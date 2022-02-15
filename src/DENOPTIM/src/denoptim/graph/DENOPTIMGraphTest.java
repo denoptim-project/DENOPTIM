@@ -1674,24 +1674,24 @@ public class DENOPTIMGraphTest {
 		IAtomContainer iac1 = builder.newAtomContainer();
 		iac1.addAtom(new Atom("C"));
 		DENOPTIMFragment v1 = new DENOPTIMFragment(1, iac1, BBType.SCAFFOLD);
-		v1.addAP(1);
-		v1.addAP(1);
+		v1.addAP(0);
+		v1.addAP(0);
 
 		IAtomContainer iac2 = builder.newAtomContainer();
 		iac2.addAtom(new Atom("O"));
 		DENOPTIMFragment v2 = new DENOPTIMFragment(2, iac2, BBType.FRAGMENT);
-		v2.addAP(1);
-		v2.addAP(1);
+		v2.addAP(0);
+		v2.addAP(0);
 
 		IAtomContainer iac3 = builder.newAtomContainer();
 		iac3.addAtom(new Atom("H"));
 		DENOPTIMFragment v3 = new DENOPTIMFragment(3, iac3, BBType.CAP);
-		v3.addAP(1);
+		v3.addAP(0);
 
 		IAtomContainer iac4 = builder.newAtomContainer();
 		iac4.addAtom(new Atom("H"));
 		DENOPTIMFragment v4 = new DENOPTIMFragment(4, iac4, BBType.CAP);
-		v4.addAP(1);
+		v4.addAP(0);
 
 		graph.addVertex(v1);
 		graph.addVertex(v2);

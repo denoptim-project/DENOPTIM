@@ -49,7 +49,9 @@ import denoptim.utils.MutationType;
 /**
  * A vertex is a data structure that has an identity and holds a 
  * list of attachment points. The attachment points can be related by
- * an here-undefined relation.
+ * an here-undefined relation. Also, the attributes that each 
+ * attachment point needs upon construction depend on the instance of vertex. 
+ * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */

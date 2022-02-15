@@ -466,8 +466,8 @@ public class DENOPTIMAttachmentPointTest
         dummyVertex.addAtom(new Atom("C"));
         dummyVertex.addAtom(new Atom("C"));
         dummyVertex.addAtom(new Atom("C"));
-    	dummyVertex.addAP();
-    	dummyVertex.addAP();
+    	dummyVertex.addAP(0);
+    	dummyVertex.addAP(0);
 		DENOPTIMAttachmentPoint ap1 = dummyVertex.getAP(0);
 		DENOPTIMAttachmentPoint ap2 = dummyVertex.getAP(1);
 
