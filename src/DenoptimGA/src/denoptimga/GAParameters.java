@@ -1316,15 +1316,13 @@ public class GAParameters
 
 //------------------------------------------------------------------------------
 
-    // reads files as listed in the parameters
-    // other initialization code such as the random number generator
+    /** 
+     * Processes currently loaded fields.  
+     * @throws DENOPTIMException typically due to I/O exception.
+     */
+
     protected static void processParameters() throws DENOPTIMException
     {
-        // regardless of the random number seed, the following
-        // will always create a new directory
-        // inside this directory all further directories
-        // will be created
-        
         createWorkingDirectory();
 
         try
