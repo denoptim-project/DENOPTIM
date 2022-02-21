@@ -78,9 +78,9 @@ public class Isomorphism
         try
         {
             graphA = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(IsomorphismParameters.inpFileGraphA),true).get(0);
+                    new File(IsomorphismParameters.inpFileGraphA)).get(0);
             graphB = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(IsomorphismParameters.inpFileGraphB),true).get(0);
+                    new File(IsomorphismParameters.inpFileGraphB)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();

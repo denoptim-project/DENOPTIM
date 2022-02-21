@@ -605,7 +605,7 @@ public class CombinatorialExplorerByLayer
             }
 
             DENOPTIMGraph rootGraph = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
-                    file.getAbsolutePath(),true).get(0);
+                    file.getAbsolutePath()).get(0);
                     
             // Get combination factory
             FragsCombinationIterator fcf = new FragsCombinationIterator(

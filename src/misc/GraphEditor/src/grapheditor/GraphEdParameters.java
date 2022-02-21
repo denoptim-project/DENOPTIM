@@ -484,8 +484,8 @@ public class GraphEdParameters
     	    {
         		case (STRINGFORMATLABEL):
         		{
-                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(inGraphsFile, 
-                            true);
+                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
+                            inGraphsFile);
         		    break;
         		}
         		case (SERFORMATLABEL):
@@ -504,7 +504,7 @@ public class GraphEdParameters
         		    {
             			i++;
             			DENOPTIMGraph g = DenoptimIO.readGraphFromSDFileIAC(m, 
-            			        i, true, inGraphsFile);
+            			        i, inGraphsFile);
             			inGraphs.add(g);
         		    }
         		    break;

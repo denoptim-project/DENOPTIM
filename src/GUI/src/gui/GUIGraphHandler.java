@@ -127,11 +127,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	 */
 	private boolean unsavedChanges = false;
 	
-	/**
-	 * Flag signaling that there is a fully defined fragment space
-	 */
-	private boolean hasFragSpace = FragmentSpace.isDefined();
-	
 	// The panel that hosts graph, vertex, and molecular viewers
 	private GraphVertexMolViewerPanel visualPanel;
 	
@@ -273,7 +268,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				switch (res)
 				{
 					case 0:
-						if (!hasFragSpace)
+						if (!FragmentSpace.isDefined())
 						{
 							JOptionPane.showMessageDialog(btnAddGraph,
 					                "<html>No fragment space is currently loaded!<br>"
@@ -418,7 +413,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		btnAddLibVrtx.setEnabled(false);
 		btnAddLibVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {	
-				if (!hasFragSpace)
+				if (!FragmentSpace.isDefined())
 				{
 					JOptionPane.showMessageDialog(btnAddLibVrtx,
 			                "<html>No fragment space is currently "
@@ -446,7 +441,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				extendGraphFromFragSpace(selAps);
 				
 				// Update viewer
-				visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+				visualPanel.loadDnGraphToViewer(dnGraph,true);
 				
 				// Protect edited system
 		        unsavedChanges = true;
@@ -537,7 +532,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				}
 				
 				// Update viewer
-                visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+                visualPanel.loadDnGraphToViewer(dnGraph,true);
 				
 		        // Protect the temporary "dnGraph" obj
 		        unsavedChanges = true;
@@ -574,7 +569,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 addChordOnGraph(selVrtxs);
                 
                 // Update viewer
-                visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+                visualPanel.loadDnGraphToViewer(dnGraph,true);
                 
                 // Protect edited system
                 unsavedChanges = true;
@@ -958,7 +953,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         }
         
         // Update viewer
-        visualPanel.loadDnGraphToViewer(dnGraph,true,hasFragSpace);
+        visualPanel.loadDnGraphToViewer(dnGraph,true);
         enableGraphDependentButtons(true);
         
         // Protect edited system
@@ -985,7 +980,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 + "vertex of the graph.";
 	    String[] options = null;
 	    String defaultOpt = null;
-	    if (hasFragSpace)
+	    if (FragmentSpace.isDefined())
 	    {
 	        options = new String[]{"Scaffold", "Fragment", "EmptyVertex", 
 	            "Cancel"};
@@ -1003,7 +998,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 UIManager.getIcon("OptionPane.warningIcon"),
                 options,
                 defaultOpt);
-        if (!hasFragSpace)
+        if (!FragmentSpace.isDefined())
         {
             res = res + 10;
         }
@@ -1090,7 +1085,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		dnGraph.addVertex(firstVertex);
 		
 		// Put the graph to the viewer
-        visualPanel.loadDnGraphToViewer(dnGraph,false,hasFragSpace);
+        visualPanel.loadDnGraphToViewer(dnGraph,false);
 		enableGraphDependentButtons(true);
 		unsavedChanges = true;
 		updateMolViewer = true;
@@ -1333,28 +1328,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 	{
 	    mainPanel.toolBar.renderForPresenceOfFragSpace();
 	}
-	
-//-----------------------------------------------------------------------------
 
-    /**
-     * Changes the GUI appearance compatibly to no loaded fragment space
-     */
-    void renderThisForLackOfFragSpace() 
-    {
-        hasFragSpace = false;
-        visualPanel.bringCardToTopOfVertexViewer(visualPanel.NOFSCARDNAME);
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Changes the GUI appearance and activated buttons that depend on the
-     * fragment space being loaded
-     */
-    void renderThisForPresenceOfFragSpace() 
-    {
-        hasFragSpace = true;
-    }
 //-----------------------------------------------------------------------------
 
 	/**
@@ -1447,8 +1421,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		{
     		try 
     		{
-    			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(file, 
-    			        hasFragSpace);	
+    			graphs = DenoptimIO.readDENOPTIMGraphsFromFile(file);	
     		} 
     		catch (UndetectedFileFormatException uff) 
     		{
@@ -1477,12 +1450,12 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                         
                     case 1:
                         graphs = DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                                file.getAbsolutePath(), hasFragSpace);
+                                file.getAbsolutePath());
                         break;
                         
                     case 2:
                         graphs = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
-                                file.getAbsolutePath(), hasFragSpace);
+                                file.getAbsolutePath());
                         break;
                 }
     		} 
@@ -1504,14 +1477,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				msg = msg + " " + e.getMessage();
 			}
 			msg = msg + ")";
-			if (hasFragSpace)
-			{
-				msg = msg + "<br>This could be due to a mistmatch between "
-						+ "the fragment IDs in the "
-						+ "graph you are trying to load, "
-						+ "and the currently loaded fragment space.<br>"
-						+ "Aborting import of graphs.";
-			}
 			msg = msg + "</html>";
 			JOptionPane.showMessageDialog(this,String.format(msg,400),
 	                "Error",
@@ -1547,12 +1512,12 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		if (molLibrary.get(currGrphIdx).getAtomCount() > 0)
 		{
 		    visualPanel.loadDnGraphToViewer(dnGraphLibrary.get(currGrphIdx), 
-		            molLibrary.get(currGrphIdx), keepSprites, hasFragSpace);
+		            molLibrary.get(currGrphIdx), keepSprites);
 		}
 		else
 		{
 		    visualPanel.loadDnGraphToViewer(dnGraphLibrary.get(currGrphIdx),
-		            keepSprites, hasFragSpace);
+		            keepSprites);
 		}
 		
 		enableGraphDependentButtons(true);
@@ -1730,19 +1695,16 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
   		
   		if (updateMolViewer)
   		{
-  			if (hasFragSpace)
-  			{
-  			    IAtomContainer mol = visualPanel.updateMolevularViewer();
-  			    if (mol != null)
-  			    {
-                    molLibrary.set(currGrphIdx, mol);
-                    mol.setProperty(DENOPTIMConstants.GMSGTAG,
-                            "ManuallyBuilt");
-	        	} else {
-	        	    // Logging done within visualPanel
-	        		molLibrary.set(currGrphIdx, builder.newAtomContainer());
-	        	}
-  			}
+		    IAtomContainer mol = visualPanel.updateMolevularViewer();
+		    if (mol != null)
+		    {
+                molLibrary.set(currGrphIdx, mol);
+                mol.setProperty(DENOPTIMConstants.GMSGTAG,
+                        "ManuallyBuilt");
+        	} else {
+        	    // Logging done within visualPanel
+        		molLibrary.set(currGrphIdx, builder.newAtomContainer());
+        	}
   			updateMolViewer = false;
   		}
   		

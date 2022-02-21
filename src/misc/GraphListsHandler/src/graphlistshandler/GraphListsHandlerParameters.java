@@ -409,18 +409,18 @@ public class GraphListsHandlerParameters
                 case (STRINGFORMATLABEL):
                 {
                     inGraphsA = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                            inGraphsFileA,true);
+                            inGraphsFileA);
                     inGraphsB = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                            inGraphsFileB,true);
+                            inGraphsFileB);
                     break;
                 }
 
                 case (SDFFORMATLABEL):
                 {
                     inGraphsA = DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                            inGraphsFileA,true);
+                            inGraphsFileA);
                     inGraphsB = DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                            inGraphsFileB,true);
+                            inGraphsFileB);
                     break;
                 }
 

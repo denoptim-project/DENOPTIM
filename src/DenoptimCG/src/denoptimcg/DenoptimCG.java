@@ -61,7 +61,7 @@ public class DenoptimCG
             
             // read the input molecule
             DENOPTIMGraph grph = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(CGParameters.getInputSDFFile()), true).get(0);
+                    new File(CGParameters.getInputSDFFile())).get(0);
             
             IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
                     CGParameters.getInputSDFFile());

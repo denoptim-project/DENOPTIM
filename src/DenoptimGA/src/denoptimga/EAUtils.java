@@ -536,8 +536,7 @@ public class EAUtils
         ArrayList<DENOPTIMGraph> graphs;
         try
         {
-            graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    srcFile, FragmentSpace.isDefined());
+            graphs = DenoptimIO.readDENOPTIMGraphsFromFile(srcFile);
         } catch (Exception e)
         {
             e.printStackTrace();

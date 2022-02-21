@@ -77,11 +77,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 */
 	private JUNGGraphSnapshot oldGSStatus;
 	
-	/**
-	 * Flag signalling that there is a fully defined fragment space
-	 */
-	private boolean hasFragSpace = false;
-	
 	private JSplitPane leftPane;
 	protected FragmentViewPanel fragViewer;
 	private JPanel fragViewerPanel;
@@ -244,13 +239,11 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * converting the graph into a molecular representation every time you load
      * the same graph.
      * @param keepSprites if <code>true</code> we'll keep track of old labels.
-     * @param useFragSpace give <code>true</code> when a fragment space is 
-     * loaded.
      */
     public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, IAtomContainer mol, 
-            boolean keepSprites, boolean useFragSpace)
+            boolean keepSprites)
     {
-        loadDnGraphToViewer(dnGraph,keepSprites,useFragSpace);
+        loadDnGraphToViewer(dnGraph,keepSprites);
         try {
             molViewer.loadChemicalStructure(mol);
             bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
@@ -268,13 +261,10 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 * Loads the given graph into the graph viewer.
 	 * @param dnGraph the graph to load.
 	 * @param keepLabels if <code>true</code> we'll keep track of old labels.
-	 * @param useFragSpace give <code>true</code> when a fragment space is 
 	 * loaded.
 	 */
-	public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, boolean keepLabels, 
-	        boolean useFragSpace)
+	public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, boolean keepLabels)
 	{
-	    hasFragSpace = useFragSpace;
 	    this.dnGraph = dnGraph;
 	    resetFragViewerCardDeck();
 		
@@ -308,7 +298,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	/**
 	 * Updates the molecular representation of the loaded graph. We rebuild 
 	 * the molecular representation, if we can do so because we have the space
-	 * of building blocks. Thismethod is needed in case of changes to the loaded
+	 * of building blocks. This method is needed in case of changes to the loaded
 	 * graph, to project those changes in the graph into the molecular
 	 * representation.
 	 */
@@ -317,34 +307,37 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	    molViewer.clearAll();
 
         IAtomContainer mol = builder.newAtomContainer();
-        if (hasFragSpace)
-        {
-            ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
-            try {
-                mol = tb.convertGraphTo3DAtomContainer(
-                        dnGraph);
-                DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                System.out.println("Couldn't make 3D-tree representation: "
-                        + t.getMessage());
-                //molLibrary.set(currGrphIdx, builder.newAtomContainer());
-            }
+	    if (!dnGraph.containsAtoms())
+	    {
+            bringCardToTopOfMolViewer(EMPTYCARDNAME);
+	        return mol;
+	    }
+	    
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
+        try {
+            mol = tb.convertGraphTo3DAtomContainer(
+                    dnGraph);
+            DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.out.println("Couldn't make 3D-tree representation: "
+                    + t.getMessage());
+            //molLibrary.set(currGrphIdx, builder.newAtomContainer());
+        }
 
-            if (mol.getAtomCount() > 0)
-            {
-                try {
-                    molViewer.loadChemicalStructure(mol);
-                    bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("Could not read molecular data: "+
-                            e.getCause() + " " + e.getMessage());
-                    bringCardToTopOfMolViewer(EMPTYCARDNAME);
-                }
-            } else {
+        if (mol.getAtomCount() > 0)
+        {
+            try {
+                molViewer.loadChemicalStructure(mol);
+                bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Could not read molecular data: "+
+                        e.getCause() + " " + e.getMessage());
                 bringCardToTopOfMolViewer(EMPTYCARDNAME);
             }
+        } else {
+            bringCardToTopOfMolViewer(EMPTYCARDNAME);
         }
         return mol;
 	}
@@ -361,12 +354,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	    if (fragViewer != null)
         {
             fragViewer.clearAll();
-            if (hasFragSpace)
-            {
-                bringCardToTopOfVertexViewer(EMPTYCARDNAME);
-            } else {
-                bringCardToTopOfVertexViewer(NOFSCARDNAME);
-            }
+            bringCardToTopOfVertexViewer(EMPTYCARDNAME);
             removeNestedGraphViewer();
         }
 	}
@@ -439,13 +427,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			}
 			
 			JVertex jv = (JVertex) evt.getNewValue();
-			
-            if (!hasFragSpace)
-            {
-                removeNestedGraphViewer(); //Just is case we still have it
-                bringCardToTopOfVertexViewer(NOFSCARDNAME);
-                return;
-            }
 
 		    DENOPTIMVertex bb = jv.dnpVertex.clone();
 			if (bb instanceof DENOPTIMFragment)
@@ -473,7 +454,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                         fragViewerCardHolder.getSize());
 
                 fragViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), 
-                        t.getIAtomContainer(), false, hasFragSpace);
+                        t.getIAtomContainer(), false);
 			    
                 bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
 			    fragViewerTmplViewerCard.setDividerLocation(defDivLoc);

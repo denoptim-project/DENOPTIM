@@ -1142,16 +1142,13 @@ public class DenoptimIO
      * not be evaluated.
      *
      * @param file         the SDF file to read.
-     * @param useFragSpace use <code>true</code> if a fragment space is defined
-     * and we can use it to interpret the graph finding a full meaning for the
-     * nodes in the graph.
      * @return the list of candidates.
      * @throws DENOPTIMException is something goes wrong while reading the file
      *                           or interpreting its content
      */
-    public static ArrayList<Candidate> readCandidates(File file, 
-            boolean useFragSpace) throws DENOPTIMException {
-        return readCandidates(file, useFragSpace, false);
+    public static ArrayList<Candidate> readCandidates(File file) 
+            throws DENOPTIMException {
+        return readCandidates(file,false);
     }
 
 //------------------------------------------------------------------------------
@@ -1161,9 +1158,6 @@ public class DenoptimIO
      * candidates. 
      *
      * @param file the SDF file to read.
-     * @param useFragSpace use <code>true</code> if a fragment space is defined
-     * and we can use it to interpret the graph finding a full meaning for the
-     * nodes in the graph.
      * @param allowNoUID use <code>true</code> if candidates should be allowed 
      * to have no unique identifier.
      * @return the list of candidates.
@@ -1172,12 +1166,12 @@ public class DenoptimIO
      */
     
     public static ArrayList<Candidate> readCandidates(File file, 
-            boolean useFragSpace, boolean allowNoUID) throws DENOPTIMException {
+            boolean allowNoUID) throws DENOPTIMException {
         String filename = file.getAbsolutePath();
         ArrayList<Candidate> candidates = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readSDFFile(file.getAbsolutePath());
         for (IAtomContainer iac : iacs) {
-            Candidate mol = new Candidate(iac, useFragSpace, allowNoUID);
+            Candidate mol = new Candidate(iac, allowNoUID);
             mol.setSDFFile(filename);
             candidates.add(mol);
         }
@@ -1498,41 +1492,34 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from file
+     * Reads a list of <code>DENOPTIMGraph</code>s from file.
      *
      * @param fileName the pathname of the file to read
-     * @param useFS    set to <code>true</code> when there is a defined
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential
-     * mismatch between fragment space and graph representation.
      * @return the list of graphs
      * @throws Exception 
      */
     
-    //TODO-gg get rid of useFS
-    
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
-            File inFile, boolean useFS) throws Exception 
+            File inFile) throws Exception 
     {
         FileFormat ff = FileUtils.detectFileFormat(inFile);
         switch (ff) 
         {
             case GRAPHJSON:
                 return DenoptimIO.readDENOPTIMGraphsFromJSONFile(
-                        inFile.getAbsolutePath(), useFS);
+                        inFile.getAbsolutePath());
 
             case GRAPHSDF:
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                        inFile.getAbsolutePath(), useFS);
+                        inFile.getAbsolutePath());
                 
             case GRAPHTXT:
                 return DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                        inFile.getAbsolutePath(), useFS);
+                        inFile.getAbsolutePath());
                 
             case CANDIDATESDF:
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                    inFile.getAbsolutePath(), useFS);
+                    inFile.getAbsolutePath());
                 
             case VRTXSDF:
                 ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
@@ -1563,30 +1550,20 @@ public class DenoptimIO
     /**
      * Reads a list of <code>DENOPTIMGraph</code>s from a SDF file.
      *
-     * @param fileName the pathname of the file to read
-     * @param useFS    set to <code>true</code> when there is a defined
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential
-     * mismatch between fragment space and graph representation.
+     * @param fileName the pathname of the file to read.
      * @return the list of graphs
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
-            String fileName, boolean useFS) throws DENOPTIMException 
+            String fileName) throws DENOPTIMException 
     {
-        if (!useFS)
-        {
-            System.err.println("WARNING! Reading graphs without a "
-                    + "defined fragment space!");
-        }
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
         int i = 0;
         for (IAtomContainer mol : mols) 
         {
             i++;
-            DENOPTIMGraph g = readGraphFromSDFileIAC(mol,i,useFS,fileName);
+            DENOPTIMGraph g = readGraphFromSDFileIAC(mol,i,fileName);
             lstGraphs.add(g);
         }
         return lstGraphs;
@@ -1599,19 +1576,14 @@ public class DenoptimIO
      * possible. Otherwise, throws an exception.
      * @param mol the atom container coming from SDF representation
      * @param molId identified used only for logging purposed
-     * @param useFS set to <code>true</code> when there is a defined
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential
-     * mismatch between fragment space and graph representation.
      * @return the corresponding graph or null.
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
      */
     public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
-            int molId, boolean useFS) throws DENOPTIMException
+            int molId) throws DENOPTIMException
     {
-        return readGraphFromSDFileIAC(mol, molId, useFS, "unKnown");
+        return readGraphFromSDFileIAC(mol, molId, "unKnown");
     }
     
 //------------------------------------------------------------------------------
@@ -1621,11 +1593,6 @@ public class DenoptimIO
      * possible. Otherwise, throws an exception.
      * @param mol the atom container coming from SDF representation
      * @param molId identified used only for logging purposes.
-     * @param useFS set to <code>true</code> when there is a defined
-     * fragment space that contains the fragments used to build the graphs.
-     * Otherwise, use <code>false</code>. This will create only as many APs as
-     * needed to satisfy the graph representation, thus creating a potential
-     * mismatch between fragment space and graph representation.
      * @param fileName a pathname used only for logging errors. This is usually
      * the pathname to the file from which we took the atom container.
      * @return the corresponding graph or null.
@@ -1633,7 +1600,7 @@ public class DenoptimIO
      * to lack of the proper SDF tags, or failure in the conversion.
      */
     public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
-            int molId, boolean useFS, String fileName) throws DENOPTIMException
+            int molId, String fileName) throws DENOPTIMException
     {
         // Something very similar is done also in Candidate
         DENOPTIMGraph g = null;
@@ -1656,7 +1623,7 @@ public class DenoptimIO
             }
         } else {
             g = GraphConversionTool.getGraphFromString(
-                    graphEnc.toString().trim(), useFS);
+                    graphEnc.toString().trim());
         }
         return g;
     }
@@ -1664,19 +1631,14 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a text file
+     * Reads a list of <code>DENOPTIMGraph</code>s from a text file.
      *
-     * @param fileName the pathname of the file to read
-     * @param useFS    set to <code>true</code> when there is a defined
-     *                 fragment space that contains the fragments used to build the graphs.
-     *                 Otherwise, use <code>false</code>. This will create only as many APs as
-     *                 needed to satisfy the graph representation, thus creating a potential
-     *                 mismatch between fragment space and graph representation.
-     * @return the list of graphs
+     * @param fileName the pathname of the file to read.
+     * @return the list of graphs.
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromTxtFile(
-            String fileName, boolean useFS) throws DENOPTIMException 
+            String fileName) throws DENOPTIMException 
     {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
@@ -1694,8 +1656,7 @@ public class DenoptimIO
 
                 DENOPTIMGraph g;
                 try {
-                    g = GraphConversionTool.getGraphFromString(
-                            line.trim(), useFS);
+                    g = GraphConversionTool.getGraphFromString(line.trim());
                 } catch (Throwable t) {
                     String msg = "Cannot convert string to DENOPTIMGraph. "
                             + "Check line '" + line.trim() + "'";
@@ -1795,7 +1756,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph>  readDENOPTIMGraphsFromJSONFile(
-            String fileName, boolean useFS) throws DENOPTIMException 
+            String fileName) throws DENOPTIMException 
     {
         ArrayList<DENOPTIMGraph> list_of_graphs = new ArrayList<DENOPTIMGraph>();
         Gson reader = DENOPTIMgson.getReader();
@@ -2137,7 +2098,7 @@ public class DenoptimIO
                     
             case GRAPHSDF:
                 ArrayList<DENOPTIMGraph> lstGraphs = 
-                    readDENOPTIMGraphsFromSDFile(file.getAbsolutePath(),true);
+                    readDENOPTIMGraphsFromSDFile(file.getAbsolutePath());
                 for (DENOPTIMGraph g : lstGraphs)
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
@@ -2148,7 +2109,7 @@ public class DenoptimIO
                     
             case GRAPHJSON:
                 ArrayList<DENOPTIMGraph> lstGraphs2 = 
-                readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath(), true);
+                readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath());
                 for (DENOPTIMGraph g : lstGraphs2)
                 {
                     DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);

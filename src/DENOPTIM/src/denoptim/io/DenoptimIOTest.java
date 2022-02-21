@@ -291,7 +291,7 @@ public class DenoptimIOTest
         
 		DenoptimIO.writeData(jsonFile, graph.toJson(), false);
 		DENOPTIMGraph graphJ = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
-		        jsonFile,false).get(0);
+		        jsonFile).get(0);
 		assertNotNull(graphJ,"Graph read from JSON file is null");
 		assertTrue(graph.sameAs(graphJ, reason));
 	}

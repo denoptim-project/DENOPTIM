@@ -162,7 +162,7 @@ public class GAParametersForm extends ParametersForm
     String keyParMolSz1 = "GA-MolGrowthProbScheme";
     JPanel lineParMolSz1;
     JLabel lblParMolSz1;
-    JComboBox<String> cmbParMolSz1;
+    JComboBox<ProbabilityFuncitonShape> cmbParMolSz1;
 
     String keyParMolSz2 = "GA-MolGrowthMultiplier";
     JPanel lineParMolSz2;
@@ -195,7 +195,7 @@ public class GAParametersForm extends ParametersForm
     String keyPar11 = "GA-LevelGrowthProbScheme";
     JPanel linePar11;
     JLabel lblPar11;
-    JComboBox<String> cmbPar11;
+    JComboBox<ProbabilityFuncitonShape> cmbPar11;
 
     String keyPar12 = "GA-LevelGrowthMultiplier";
     JPanel linePar12;
@@ -232,7 +232,7 @@ public class GAParametersForm extends ParametersForm
     String keyParCrowd1 = "GA-CrowdProbScheme";
     JPanel lineParCrowd1;
     JLabel lblParCrowd1;
-    JComboBox<String> cmbParCrowd1;
+    JComboBox<ProbabilityFuncitonShape> cmbParCrowd1;
 
     String keyParCrowd2 = "GA-CrowdMultiplier";
     JPanel lineParCrowd2;
@@ -324,6 +324,12 @@ public class GAParametersForm extends ParametersForm
     JPanel lineRingSysTmpl;
     JLabel lblRingSysTmpl;
     JSpinner spnRingSysTmpl;
+    
+    /**
+     * The identifiers of probability function shapes that are available.
+     */
+    public enum ProbabilityFuncitonShape {EXP_DIFF, TANH, 
+            SIGMA, UNRESTRICTED};
 
     //HEREGOFIELDS  this is only to facilitate automated insertion of code
 
@@ -571,8 +577,10 @@ public class GAParametersForm extends ParametersForm
         localBlock2.add(lineGrowthPropMode);
         
         String toolTipPar12 = "<html>Specifies the value of the factor used in"
-        		+ " growth probability schemes <code>EXP_DIFF</code> and "
-        		+ "<code>TANH</code></html>";
+        		+ " growth probability schemes <code>"
+                + ProbabilityFuncitonShape.EXP_DIFF + "</code> and "
+        		+ "<code>"
+                + ProbabilityFuncitonShape.TANH + "</code></html>";
         linePar12 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar12 = new JLabel("<html>Graph growth by level - parameter "
         		+ "<code>&lambda;</code><html>", SwingConstants.LEFT);
@@ -588,11 +596,14 @@ public class GAParametersForm extends ParametersForm
         
         String toolTipPar13 = "<html>Specifies the value of parameter "
         		+ "&sigma;<sub>1</sub> used for growth probability scheme"
-        		+ " <code>SIGMA</code>.<br>It corresponds to the steepness of"
+        		+ " <code>"
+        		+ ProbabilityFuncitonShape.SIGMA
+        		+ "</code>.<br>It corresponds to the steepness of"
         		+ " the function where <i>P(level) = 50%</i></html>";
         linePar13 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar13 = new JLabel("<html>Graph growth by level - parameter "
-        		+ "<code>&sigma;</code><sub>1</sub>:</html>", SwingConstants.LEFT);
+        		+ "<code>&sigma;</code><sub>1</sub>:</html>", 
+        		SwingConstants.LEFT);
         lblPar13.setPreferredSize(fileLabelSize);
         lblPar13.setToolTipText(toolTipPar13);
         spnPar13 = new JSpinner(new SpinnerNumberModel(1.0, null, null, 0.1));
@@ -605,10 +616,14 @@ public class GAParametersForm extends ParametersForm
         
         String toolTipPar14 = "<html>Specifies the value of parameter "
         		+ "&sigma;<sub>2</sub> used in growth probability scheme "
-        		+ "<code>SIGMA</code>.<br>It corresponds to the level "
+        		+ "<code>"
+        		+ ProbabilityFuncitonShape.SIGMA
+        		+ "</code>.<br>It corresponds to the level "
         		+ "where <i>P(level) = 50%</i></html>";
         linePar14 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar14 = new JLabel("<html>Graph growth by level - parameter <code>&sigma;</code><sub>2</sub>:<html>", SwingConstants.LEFT);
+        lblPar14 = new JLabel("<html>Graph growth by level - parameter "
+                + "<code>&sigma;</code><sub>2</sub>:<html>", 
+                SwingConstants.LEFT);
         lblPar14.setPreferredSize(fileLabelSize);
         lblPar14.setToolTipText(toolTipPar14);
         spnPar14 = new JSpinner(new SpinnerNumberModel(3.5, null, null, 0.1));
@@ -621,11 +636,13 @@ public class GAParametersForm extends ParametersForm
         
         String toolTipPar11 = "Specifies the growth probability scheme";
         linePar11 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar11 = new JLabel("Graph extension probability function:", SwingConstants.LEFT);
+        lblPar11 = new JLabel("Graph extension probability function:", 
+                SwingConstants.LEFT);
         lblPar11.setPreferredSize(fileLabelSize);
         lblPar11.setToolTipText(toolTipPar11);
-        cmbPar11 = new JComboBox<String>(new String[] {"EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
-        cmbPar11.setSelectedIndex(0);
+        cmbPar11 = new JComboBox<ProbabilityFuncitonShape>(
+                ProbabilityFuncitonShape.values());
+        cmbPar11.setSelectedItem(ProbabilityFuncitonShape.EXP_DIFF);
         cmbPar11.setToolTipText(toolTipPar11);
         cmbPar11.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyPar11.toUpperCase(),cmbPar11);
@@ -693,23 +710,24 @@ public class GAParametersForm extends ParametersForm
 		
         cmbPar11.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		switch (cmbPar11.getSelectedItem().toString())
+        		switch (ProbabilityFuncitonShape.valueOf(
+        		        cmbPar11.getSelectedItem().toString()))
         		{
-        			case "EXP_DIFF":
+        			case EXP_DIFF:
         				updateSubsProbDataset();
         				localBlockLvlProb3.setVisible(true);
         				localBlockLvlProb4.setVisible(false);
         				localBlockLvlProbGraph.setVisible(true);
             			break;
             			
-        			case "TANH":
+        			case TANH:
         				updateSubsProbDataset();
         				localBlockLvlProb3.setVisible(true);
             			localBlockLvlProb4.setVisible(false);  
             			localBlockLvlProbGraph.setVisible(true);
             			break;
             			
-        			case "SIGMA":
+        			case SIGMA:
         				updateSubsProbDataset();
         				localBlockLvlProb3.setVisible(false);
             			localBlockLvlProb4.setVisible(true);
@@ -733,8 +751,10 @@ public class GAParametersForm extends ParametersForm
         localBlock2.add(localBlockLvlProbAll);
         
         String toolTipParMolSz2 = "<html>Specifies the value of the factor used in"
-                + " molecular growth probability schemes <code>EXP_DIFF</code> and "
-                + "<code>TANH</code></html>";
+                + " molecular growth probability schemes <code>"
+                + ProbabilityFuncitonShape.EXP_DIFF + "</code> and "
+                + "<code>" 
+                + ProbabilityFuncitonShape.TANH + "</code></html>";
         lineParMolSz2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblParMolSz2 = new JLabel("<html>Mol growth probability - parameter "
                 + "<code>&lambda;</code><html>", SwingConstants.LEFT);
@@ -751,7 +771,9 @@ public class GAParametersForm extends ParametersForm
         String toolTipParMolSz3 = "<html>Specifies the value of parameter "
                 + "&sigma;<sub>1</sub> used for molecular growth probability "
                 + "scheme"
-                + " <code>SIGMA</code>.<br>It corresponds to the steepness of"
+                + " <code>"
+                + ProbabilityFuncitonShape.SIGMA
+                + "</code>.<br>It corresponds to the steepness of"
                 + " the function where <i>P(level) = 50%</i></html>";
         lineParMolSz3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblParMolSz3 = new JLabel("<html>Mol growth probability - parameter "
@@ -769,7 +791,9 @@ public class GAParametersForm extends ParametersForm
         String toolTipParMolSz4 = "<html>Specifies the value of parameter "
                 + "&sigma;<sub>2</sub> used in molecular growth probability "
                 + "scheme "
-                + "<code>SIGMA</code>.<br>It corresponds to the level "
+                + "<code>"
+                + ProbabilityFuncitonShape.SIGMA 
+                + "</code>.<br>It corresponds to the level "
                 + "where <i>P(level) = 50%</i></html>";
         lineParMolSz4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblParMolSz4 = new JLabel("<html>Mol growth probability - parameter "
@@ -790,9 +814,9 @@ public class GAParametersForm extends ParametersForm
                 SwingConstants.LEFT);
         lblParMolSz1.setPreferredSize(fileLabelSize);
         lblParMolSz1.setToolTipText(toolTipParMolSz1);
-        cmbParMolSz1 = new JComboBox<String>(new String[] {
-                "EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
-        cmbParMolSz1.setSelectedIndex(2);
+        cmbParMolSz1 = new JComboBox<ProbabilityFuncitonShape>(
+                ProbabilityFuncitonShape.values());
+        cmbParMolSz1.setSelectedItem(ProbabilityFuncitonShape.SIGMA);
         cmbParMolSz1.setToolTipText(toolTipParMolSz1);
         cmbParMolSz1.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyParMolSz1.toUpperCase(),cmbParMolSz1);
@@ -860,31 +884,31 @@ public class GAParametersForm extends ParametersForm
 
         cmbParMolSz1.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                String scheme = cmbParMolSz1.getSelectedItem().toString();
-                switch (scheme)
+                switch (ProbabilityFuncitonShape.valueOf(
+                        cmbParMolSz1.getSelectedItem().toString()))
                 {
-                    case "EXP_DIFF":
+                    case EXP_DIFF:
                         updatemolSizeProbDataset();
                         localBlockMolSz3.setVisible(true);
                         localBlockMolSz4.setVisible(false);
                         localBlockMolSzGraph.setVisible(true);
                         break;
 
-                    case "TANH":
+                    case TANH:
                         updatemolSizeProbDataset();
                         localBlockMolSz3.setVisible(true);
                         localBlockMolSz4.setVisible(false);
                         localBlockMolSzGraph.setVisible(true);
                         break;
 
-                    case "SIGMA":
+                    case SIGMA:
                         updatemolSizeProbDataset();
                         localBlockMolSz3.setVisible(false);
                         localBlockMolSz4.setVisible(true);
                         localBlockMolSzGraph.setVisible(true);
                         break;
 
-                    case "UNRESTRICTED":
+                    case UNRESTRICTED:
                         updatemolSizeProbDataset();
                         localBlockMolSz3.setVisible(false);
                         localBlockMolSz4.setVisible(false);
@@ -911,8 +935,12 @@ public class GAParametersForm extends ParametersForm
         localBlock2.add(new JSeparator());
         
         String toolTipParCrowd2 = "<html>Specifies the value of the factor used in"
-                + " crowding probability schemes <code>EXP_DIFF</code> and "
-                + "<code>TANH</code></html>";
+                + " crowding probability schemes <code>"
+                + ProbabilityFuncitonShape.EXP_DIFF
+                + "</code> and "
+                + "<code>"
+                + ProbabilityFuncitonShape.TANH
+                + "</code></html>";
         lineParCrowd2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblParCrowd2 = new JLabel("<html>Crowding probability - parameter "
                 + "<code>&lambda;</code><html>", SwingConstants.LEFT);
@@ -928,7 +956,9 @@ public class GAParametersForm extends ParametersForm
         
         String toolTipParCrowd3 = "<html>Specifies the value of parameter "
                 + "&sigma;<sub>1</sub> used for crowding probability scheme"
-                + " <code>SIGMA</code>.<br>It corresponds to the steepness of"
+                + " <code>"
+                + ProbabilityFuncitonShape.SIGMA
+                + "</code>.<br>It corresponds to the steepness of"
                 + " the function where <i>P(level) = 50%</i></html>";
         lineParCrowd3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblParCrowd3 = new JLabel("<html>Crowding probability - parameter "
@@ -945,7 +975,9 @@ public class GAParametersForm extends ParametersForm
         
         String toolTipParCrowd4 = "<html>Specifies the value of parameter "
                 + "&sigma;<sub>2</sub> used in crowding probability scheme "
-                + "<code>SIGMA</code>.<br>It corresponds to the level "
+                + "<code>"
+                + ProbabilityFuncitonShape.SIGMA
+                + "</code>.<br>It corresponds to the level "
                 + "where <i>P(level) = 50%</i></html>";
         lineParCrowd4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblParCrowd4 = new JLabel("<html>Crowding probability - parameter "
@@ -966,9 +998,9 @@ public class GAParametersForm extends ParametersForm
                 SwingConstants.LEFT);
         lblParCrowd1.setPreferredSize(fileLabelSize);
         lblParCrowd1.setToolTipText(toolTipParCrowd1);
-        cmbParCrowd1 = new JComboBox<String>(new String[] {
-                "EXP_DIFF", "TANH", "SIGMA", "UNRESTRICTED"});
-        cmbParCrowd1.setSelectedIndex(3);
+        cmbParCrowd1 = new JComboBox<ProbabilityFuncitonShape>(
+                ProbabilityFuncitonShape.values());
+        cmbParCrowd1.setSelectedItem(ProbabilityFuncitonShape.UNRESTRICTED);
         cmbParCrowd1.setToolTipText(toolTipParCrowd1);
         cmbParCrowd1.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyParCrowd1.toUpperCase(),cmbParCrowd1);
@@ -1037,30 +1069,30 @@ public class GAParametersForm extends ParametersForm
         cmbParCrowd1.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 String scheme = cmbParCrowd1.getSelectedItem().toString();
-                switch (scheme)
+                switch (ProbabilityFuncitonShape.valueOf(scheme))
                 {
-                    case "EXP_DIFF":
+                    case EXP_DIFF:
                         updateCrowdProbDataset();
                         localBlockCrowd3.setVisible(true);
                         localBlockCrowd4.setVisible(false);
                         localBlockCrowdGraph.setVisible(true);
                         break;
                         
-                    case "TANH":
+                    case TANH:
                         updateCrowdProbDataset();
                         localBlockCrowd3.setVisible(true);
                         localBlockCrowd4.setVisible(false);  
                         localBlockCrowdGraph.setVisible(true);
                         break;
                         
-                    case "SIGMA":
+                    case SIGMA:
                         updateCrowdProbDataset();
                         localBlockCrowd3.setVisible(false);
                         localBlockCrowd4.setVisible(true);
                         localBlockCrowdGraph.setVisible(true);
                         break;
                         
-                    case "UNRESTRICTED":
+                    case UNRESTRICTED:
                         updateCrowdProbDataset();
                         localBlockCrowd3.setVisible(false);
                         localBlockCrowd4.setVisible(false);
@@ -1755,19 +1787,20 @@ public class GAParametersForm extends ParametersForm
     	rdbSrcOrNew.setSelected(false);
     	localBlock1.setVisible(false);
 		localBlock2.setVisible(true);
-		switch (cmbPar11.getSelectedItem().toString())
+		switch (ProbabilityFuncitonShape.valueOf(
+		        cmbPar11.getSelectedItem().toString()))
 		{
-			case "EXP_DIFF":
+			case EXP_DIFF:
 				localBlockLvlProb3.setVisible(true);
     			localBlockLvlProb4.setVisible(false);   
     			break;
     			
-			case "TANH":
+			case TANH:
 				localBlockLvlProb3.setVisible(true);
     			localBlockLvlProb4.setVisible(false);   
     			break;
     			
-			case "SIGMA":
+			case SIGMA:
 				localBlockLvlProb3.setVisible(false);
     			localBlockLvlProb4.setVisible(true);   
     			break;
@@ -1777,19 +1810,20 @@ public class GAParametersForm extends ParametersForm
     			localBlockLvlProb4.setVisible(false);   
     			break;
 		}
-        switch (cmbParMolSz1.getSelectedItem().toString())
+        switch (ProbabilityFuncitonShape.valueOf(
+                cmbParMolSz1.getSelectedItem().toString()))
         {
-            case "EXP_DIFF":
+            case EXP_DIFF:
                 localBlockMolSz3.setVisible(true);
                 localBlockMolSz4.setVisible(false);
                 break;
 
-            case "TANH":
+            case TANH:
                 localBlockMolSz3.setVisible(true);
                 localBlockMolSz4.setVisible(false);
                 break;
 
-            case "SIGMA":
+            case SIGMA:
                 localBlockMolSz3.setVisible(false);
                 localBlockMolSz4.setVisible(true);
                 break;
@@ -1883,14 +1917,16 @@ public class GAParametersForm extends ParametersForm
         {
         	if (txtGASource.getText().equals("") || txtGASource.getText() == null)
         	{
-        		throw new Exception("<html>No source specified for GA parameters.<br>Please, specify the file name.</html>");
+        		throw new Exception("<html>No source specified for GA "
+        		        + "parameters.<br>Please, specify the file name.</html>");
         	}
         	importParametersFromDenoptimParamsFile(txtGASource.getText());
         }
         
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
-        sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem()).append(NL);
+        sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem())
+        .append(NL);
         sb.append(getStringIfSelected(keyPar5,rdbPar5));
         sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
         sb.append(getStringIfNotEmpty(keyPar7,txtPar7));
@@ -1899,33 +1935,66 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar10,txtPar10));
         if (rbtLevelGrowth.isSelected())
         {
-            sb.append(keyPar11).append("=").append(cmbPar11.getSelectedItem()).append(NL);
-            sb.append(getStringForKVLine(keyPar12,spnPar12));
-            sb.append(getStringForKVLine(keyPar13,spnPar13));
-            sb.append(getStringForKVLine(keyPar14,spnPar14));
+            sb.append(keyPar11).append("=").append(cmbPar11.getSelectedItem())
+            .append(NL);
+            if (cmbPar11.getSelectedItem()!=ProbabilityFuncitonShape.UNRESTRICTED)
+            {
+                if (cmbPar11.getSelectedItem()==ProbabilityFuncitonShape.EXP_DIFF 
+                        || cmbPar11.getSelectedItem()==ProbabilityFuncitonShape.TANH)
+                {
+                    sb.append(getStringForKVLine(keyPar12,spnPar12));
+                } else if (cmbPar11.getSelectedItem()==ProbabilityFuncitonShape.SIGMA)
+                {
+                    sb.append(getStringForKVLine(keyPar13,spnPar13));
+                    sb.append(getStringForKVLine(keyPar14,spnPar14));
+                }
+            }
         } else if (rbtMolSzGrowth.isSelected()) 
         {
-            sb.append(keyParMolSz1).append("=").append(cmbParMolSz1.getSelectedItem()).append(NL);
-            sb.append(getStringForKVLine(keyParMolSz2,spnParMolSz2));
-            sb.append(getStringForKVLine(keyParMolSz3,spnParMolSz3));
-            sb.append(getStringForKVLine(keyParMolSz4,spnParMolSz4));
+            sb.append(keyParMolSz1).append("=")
+            .append(cmbParMolSz1.getSelectedItem()).append(NL);
+            if (cmbParMolSz1.getSelectedItem()!=ProbabilityFuncitonShape.UNRESTRICTED)
+            {
+                if (cmbParMolSz1.getSelectedItem()==ProbabilityFuncitonShape.EXP_DIFF 
+                        || cmbParMolSz1.getSelectedItem()==ProbabilityFuncitonShape.TANH)
+                {
+                    sb.append(getStringForKVLine(keyParMolSz2,spnParMolSz2));
+                } else if (cmbParMolSz1.getSelectedItem()==ProbabilityFuncitonShape.SIGMA)
+                {
+                    sb.append(getStringForKVLine(keyParMolSz3,spnParMolSz3));
+                    sb.append(getStringForKVLine(keyParMolSz4,spnParMolSz4));
+                }
+            }
         }
-        sb.append(keyParCrowd1).append("=").append(cmbParCrowd1.getSelectedItem()).append(NL);
-        sb.append(getStringForKVLine(keyParCrowd2,spnParCrowd2));
-        sb.append(getStringForKVLine(keyParCrowd3,spnParCrowd3));
-        sb.append(getStringForKVLine(keyParCrowd4,spnParCrowd4));
-        sb.append(keyPar15).append("=").append(cmbPar15.getSelectedItem()).append(NL);
+        sb.append(keyParCrowd1).append("=")
+        .append(cmbParCrowd1.getSelectedItem()).append(NL);
+        if (cmbParCrowd1.getSelectedItem()!=ProbabilityFuncitonShape.UNRESTRICTED)
+        {
+            if (cmbParCrowd1.getSelectedItem()==ProbabilityFuncitonShape.EXP_DIFF 
+                    || cmbParCrowd1.getSelectedItem()==ProbabilityFuncitonShape.TANH)
+            {
+                sb.append(getStringForKVLine(keyParCrowd2,spnParCrowd2));
+            } else if (cmbParCrowd1.getSelectedItem()==ProbabilityFuncitonShape.SIGMA)
+            {
+                sb.append(getStringForKVLine(keyParCrowd3,spnParCrowd3));
+                sb.append(getStringForKVLine(keyParCrowd4,spnParCrowd4));
+            }
+        }
+        sb.append(keyPar15).append("=").append(cmbPar15.getSelectedItem())
+        .append(NL);
         sb.append(getStringIfNotEmpty(keyPar16,txtPar16));
         sb.append(getStringIfNotEmpty(keyPar17,txtPar17));
         sb.append(getStringIfNotEmpty(keyParMSM,txtParMSM));
         sb.append(getStringIfNotEmpty(keyParWC,txtParWC));
         sb.append(getStringIfNotEmpty(keyPar18,txtPar18));
-        sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem()).append(NL);
+        sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem())
+        .append(NL);
         sb.append(getStringIfNotEmpty(keyPar20,txtPar20));
         sb.append(getStringIfNotEmpty(keyPar21,txtPar21));
         sb.append(getStringIfNotEmpty(keyPar22,txtPar22));
         sb.append(getStringIfNotEmpty(keyPar24,txtPar24));
-        sb.append(keyPar25).append("=").append(cmbPar25.getSelectedItem()).append(NL);
+        sb.append(keyPar25).append("=").append(cmbPar25.getSelectedItem())
+        .append(NL);
         sb.append(getStringIfSelected(keyRingTmplsFrags,rdbRingTmplsFrags));
         sb.append(getStringIfSelected(keyRingTmplsScaff,rdbRingTmplsScaff));
         if (rdbRingTmplsScaff.isSelected() || rdbRingTmplsScaff.isSelected())

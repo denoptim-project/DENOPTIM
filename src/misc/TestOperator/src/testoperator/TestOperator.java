@@ -88,7 +88,7 @@ public class TestOperator
         try
         {
             graph = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(TestOperatorParameters.inpFileM), true).get(0);
+                    new File(TestOperatorParameters.inpFileM)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -185,9 +185,9 @@ public class TestOperator
         try
         {
             male = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(TestOperatorParameters.inpFileM), true).get(0);
+                    new File(TestOperatorParameters.inpFileM)).get(0);
             female = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(TestOperatorParameters.inpFileF), true).get(0);
+                    new File(TestOperatorParameters.inpFileF)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();

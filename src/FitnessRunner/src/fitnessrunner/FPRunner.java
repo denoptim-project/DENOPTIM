@@ -164,7 +164,7 @@ public class FPRunner
         watch.start();
         
         List<DENOPTIMGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-                FRParameters.getInputFile(), FragmentSpace.isDefined());
+                FRParameters.getInputFile());
         List<IAtomContainer> iacs = DenoptimIO.readSDFFile(
                 FRParameters.getInputFile().getAbsolutePath());
         if (graphs.size() != iacs.size())

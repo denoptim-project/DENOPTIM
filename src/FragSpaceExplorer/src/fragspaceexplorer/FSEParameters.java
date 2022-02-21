@@ -653,7 +653,7 @@ public class FSEParameters
             try
             {
                 rootGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-                        new File(rootGraphsFile), true);
+                        new File(rootGraphsFile));
             }
             catch (Throwable t)
             {

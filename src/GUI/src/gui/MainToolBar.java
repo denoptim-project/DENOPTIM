@@ -368,7 +368,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		        350));
 		loadSpace.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (cancelDueToConflictWithPreviouslyLoadedData())
+                if (checkForLoadedFragmentSpace())
                 {
                     return;
                 }
@@ -478,14 +478,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
      */
     public void renderForLackOfFragSpace() 
     {
-        for (GUICardPanel panel : activeTabsAndRefs.keySet())
-        {
-            if (panel instanceof GUIGraphHandler)
-            {
-                ((GUIGraphHandler)panel).renderThisForLackOfFragSpace();
-            }
-        }
-
         fragSpaceIndicator.setBackground(Color.ORANGE);
     }
     
@@ -497,13 +489,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
      */
     public void renderForPresenceOfFragSpace()
     {
-        for (GUICardPanel panel : activeTabsAndRefs.keySet())
-        {
-            if (panel instanceof GUIGraphHandler)
-            {
-                ((GUIGraphHandler)panel).renderThisForPresenceOfFragSpace();
-            }
-        }
         fragSpaceIndicator.setBackground(Color.decode("#4cc253"));
     }
 	
@@ -517,45 +502,19 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 	 * @return <code>true</code> if we have decided not to load a fragment space
 	 * after all.
 	 */
-    private boolean cancelDueToConflictWithPreviouslyLoadedData()
+    private boolean checkForLoadedFragmentSpace()
     {
-        String msg = "<html><body width='%1s'>"
-                + "<b>WARNING</b>: you are introducing a "
-                + "potential source of mistmatch between "
-                + "the IDs of the building block used in graphs "
-                + "and the currently loaded"
-                + "space of building block.<br>In particular:<br>"
-                + "<ul>";
+        String msg = "<html><body width='%1s'><b>WARNING</b>: ";
         boolean showWarning = false;
 
-        boolean foundGraphs = false;
-        for (GUICardPanel panel : activeTabsAndRefs.keySet())
-        {
-            if (panel instanceof GUIGraphHandler)
-            {
-                if (((GUIGraphHandler)panel).dnGraphLibrary.size() != 0)
-                {
-                    foundGraphs = true;
-                }
-            }
-        }
-        if (foundGraphs)
-        {
-            msg = msg 
-                    + "<li>One or more graphs are already loaded.</li>";
-            showWarning = true;
-        }
         if (FragmentSpace.isDefined())
         {
-            msg = msg + "<li>A space of building block is alredy loaded.</li>";
+            msg = msg + "A space of building block is alredy loaded.";
             showWarning = true;
         }
         if (showWarning)
         {
-            msg = msg + "</ul>"
-                    + "<p>Changing the space might affect any of these "
-                    + "currently loaded data.</p> <p> </p>"
-                    + "Do you want to change the building blocks "
+            msg = "Do you want to change the building blocks "
                     + "space? </html>";
             String[] options = new String[]{"Yes", "No"};
             int res = JOptionPane.showOptionDialog(this,
@@ -633,20 +592,11 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                 graphPanel2.importGraphsFromFile(file);
                 break;
                 
-				
 			case COMP_MAP:
 				GUICompatibilityMatrixTab cpmap = new GUICompatibilityMatrixTab(mainPanel);
 				mainPanel.add(cpmap);
 				cpmap.importCPMapFromFile(mainPanel,file);
 				break;
-				
-				/*
-			case ("SERGRAPH"):
-				GUIGraphHandler graphPanelSer = new GUIGraphHandler(mainPanel);
-				mainPanel.add(graphPanelSer);
-				graphPanelSer.importGraphsFromFile(file); //NB: deals with SER/SDF/TXT
-				break;
-				*/
 				
 			case GA_RUN:
 				GUIInspectGARun eiPanel = 
