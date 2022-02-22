@@ -14,11 +14,6 @@
 	<classpathentry kind="src" path="src/misc/PrepareFitnessOutput/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareMOPAC/src"/>
 	<classpathentry kind="src" path="src/misc/TestOperator/src"/>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/GUI">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="src" path="src/DenoptimCG/src"/>
 	<classpathentry kind="src" path="src/DenoptimGA/src"/>
 	<classpathentry kind="src" path="src/DenoptimRND/src"/>
@@ -31,7 +26,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
-			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>

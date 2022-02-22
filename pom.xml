@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.denoptim</groupId>
-  <artifactId>denoptim</artifactId>
+  <artifactId>denoptim3</artifactId>
   <version>3.0.0</version>
-  <name>DENOPTIM</name>
+  <name>DENOPTIM3</name>
   
   <dependencies>
     <!-- https://mvnrepository.com/artifact/net.sourceforge.jmol/jmol -->
@@ -151,15 +151,6 @@
 </dependencies>
   
   <build>
-    <sourceDirectory>src/DENOPTIM/src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src/GUI</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
